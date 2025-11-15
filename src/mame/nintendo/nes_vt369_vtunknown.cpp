@@ -98,6 +98,7 @@ public:
 	void init_lxcmcypp();
 	void init_dgun2572();
 	void init_s10fake();
+	void init_f5_620();
 
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
@@ -1196,6 +1197,16 @@ ROM_START( h12p1000 )
 	ROM_LOAD( "h12pro1000.u12", 0x00000, 0x2000000, CRC(b471cb79) SHA1(2324d82a6ae00537090fb534cdf4e4ac6a74ebaf) )
 ROM_END
 
+ROM_START( s10_520 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s10_white_520.bin", 0x00000, 0x1000000, CRC(552ffddb) SHA1(6a1be8bead43eceb51e674499159e850d4c115be) )
+	ROM_FILL( 0x07f3d9, 1, 0x64 ) // bug in init code? how does this work on hardware
+ROM_END
+
+ROM_START( f5_620 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "f5_620in1.u4", 0x00000, 0x1000000, CRC(e3ec27c8) SHA1(d377ccf9bdbe60f6d484360b4b13c3b132628676) )
+ROM_END
 
 void vt369_state::init_lxcmcypp()
 {
@@ -1226,10 +1237,22 @@ void vt369_state::init_dgun2572()
 void vt369_state::init_s10fake()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
-	for (offs_t i = 0; i < 0x800000; i += 2)
+	int size = memregion("mainrom")->bytes();
+	for (offs_t i = 0; i < size; i += 2)
 	{
 		uint16_t w = get_u16le(&romdata[i]);
 		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0600) >> 8 | (w & 0x0006) << 8);
+	}
+}
+
+void vt369_state::init_f5_620()
+{
+	uint8_t *romdata = memregion("mainrom")->base();
+	int size = memregion("mainrom")->bytes();
+	for (offs_t i = 0; i < size; i += 2)
+	{
+		uint16_t w = get_u16le(&romdata[i]);
+		put_u16le(&romdata[i], (w & 0xfbfb) | (w & 0x0400) >> 8 | (w & 0x0004) << 8);
 	}
 }
 
@@ -1382,6 +1405,11 @@ CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,  
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
 // there are other S10 units available
 CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
+// different version, same packaging.  Larger ROM, fewer duplicates etc.
+CONS( 202?, s10_520,   0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1)",  MACHINE_NOT_WORKING )
+
+// there were also 'F1' units, shaped like a car, ROM may or may not be the same
+CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
 
 // banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
 CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

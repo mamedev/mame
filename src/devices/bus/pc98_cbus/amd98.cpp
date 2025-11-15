@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(AMD98, amd98_device, "amd98", "System Sacom AMD-98")
 
 amd98_device::amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMD98, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_ay1(*this, "ay1")
 	, m_ay2(*this, "ay2")
 	, m_ay3(*this, "ay3")
@@ -81,7 +81,7 @@ void amd98_device::device_add_mconfig(machine_config &config)
 	m_pit->set_clk<2>(1'996'800);
 	m_pit->out_handler<2>().set([this] (int state) {
 		// requires inverted polarity
-		m_bus->int_w<6>(!state);
+		m_bus->int_w(6, !state);
 	});
 }
 
@@ -136,10 +136,18 @@ void amd98_device::device_start()
 
 void amd98_device::device_reset()
 {
-	m_bus->install_device(0x0000, 0x00ff, *this, &amd98_device::io_map);
-	// thexder access with following
-	m_bus->install_device(0x3800, 0x38ff, *this, &amd98_device::io_map);
 }
+
+void amd98_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x00ff, *this, &amd98_device::io_map);
+		// thexder access with following
+		m_bus->install_device(0x3800, 0x38ff, *this, &amd98_device::io_map);
+	}
+}
+
 
 
 //**************************************************************************

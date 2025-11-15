@@ -268,6 +268,7 @@ const double XTAL::known_xtals[] = {
 	 15'300'720, // 15.30072_MHz_XTAL      Microterm 420
 	 15'360'000, // 15.36_MHz_XTAL         Visual 1050
 	 15'400'000, // 15.4_MHz_XTAL          DVK KSM
+	 15'468'000, // 15.468_MHz_XTAL        Koi Koi
 	 15'468'480, // 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80
 	 15'582'000, // 15.582_MHz_XTAL        Zentec Zephyr
 	 15'625'000, // 15.625_MHz_XTAL        Zaccaria The Invaders

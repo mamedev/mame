@@ -453,7 +453,7 @@ void diamond_state::diamond(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
-	screen.set_size(1920/3, 606/3);
+	screen.set_size(1920/5, 606/5);
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
@@ -490,7 +490,7 @@ void diamond_state::diamond2(machine_config &config)
 	m_lcd_pwm->set_width(16);
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_size(1920/3, 671/3);
+	screen.set_size(1920/5, 671/5);
 	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_diamond2);

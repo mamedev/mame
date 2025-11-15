@@ -36,8 +36,6 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	m_space_read_cb(*this, 0),
 	m_rowscroll(*this, "^rowscroll"),
 	m_rowzoom(*this, "^rowzoom"),
-	m_alt_extrasprite_hack(0),
-	m_alt_tile_addressing(0),
 	m_use_legacy_mode(false),
 	m_disallow_resolution_control(false),
 	m_renderer(*this, "renderer")
@@ -254,7 +252,6 @@ void gcm394_base_video_device::device_start()
 	save_item(NAME(m_spriteram));
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_maxgfxelement));
-	save_item(NAME(m_alt_tile_addressing));
 }
 
 void gcm394_base_video_device::device_reset()
@@ -318,7 +315,8 @@ void gcm394_base_video_device::device_reset()
 	m_page3_addr_lsb = 0;
 	m_page3_addr_msb = 0;
 
-	m_renderer->set_video_spaces(m_cpuspace, m_cs_space, m_csbase);
+	m_renderer->set_video_spaces(m_cpuspace);
+	m_renderer->set_cs_video_spaces(m_cs_space, m_csbase);
 }
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -330,19 +328,6 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	// The 'bitmap test mode' in jak_car2 requires this to be black instead.
 
 	// jak_s500 briely sets pen 0 of the layer to magenta, but then ends up erasing it
-
-	uint32_t page0_addr = (m_page0_addr_msb << 16) | m_page0_addr_lsb;
-	uint32_t page1_addr = (m_page1_addr_msb << 16) | m_page1_addr_lsb;
-	uint32_t page2_addr = (m_page2_addr_msb << 16) | m_page2_addr_lsb;
-	uint32_t page3_addr = (m_page3_addr_msb << 16) | m_page3_addr_lsb;
-
-	if (m_use_legacy_mode)
-	{
-		page0_addr = page0_addr * 0x40;
-		page1_addr = page1_addr * 0x40;
-		page2_addr = page2_addr * 0x40;
-		page3_addr = page3_addr * 0x40;
-	}
 
 
 	if (0)
@@ -366,10 +351,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 			"p2attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
 			"p3attr dw:%01x dh:%01x Z:%d P:%d V:%d H:%d FY:%d FX:%d D:%d xs: %04x ys %04x\n"
 			"palbank %04x 707e: %04x 707f: %04x tvc703c: %04x spr7042: %04x\n",
-			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0), page0_addr, m_tmap0_regs[2], m_tmap0_regs[3],
-			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0), page1_addr, m_tmap1_regs[2], m_tmap1_regs[3],
-			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0), page2_addr, m_tmap2_regs[2], m_tmap2_regs[3],
-			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0), page3_addr, m_tmap3_regs[2], m_tmap3_regs[3],
+			(ctrl0 & 0xfe00) >> 9, BIT(ctrl0, 8), BIT(ctrl0, 7), BIT(ctrl0, 6), BIT(ctrl0, 5), BIT(ctrl0, 4), BIT(ctrl0, 3), BIT(ctrl0, 2), BIT(ctrl0, 1), BIT(ctrl0, 0), m_page0_addr_lsb, m_tmap0_regs[2], m_tmap0_regs[3],
+			(ctrl1 & 0xfe00) >> 9, BIT(ctrl1, 8), BIT(ctrl1, 7), BIT(ctrl1, 6), BIT(ctrl1, 5), BIT(ctrl1, 4), BIT(ctrl1, 3), BIT(ctrl1, 2), BIT(ctrl1, 1), BIT(ctrl1, 0), m_page1_addr_lsb, m_tmap1_regs[2], m_tmap1_regs[3],
+			(ctrl2 & 0xfe00) >> 9, BIT(ctrl2, 8), BIT(ctrl2, 7), BIT(ctrl2, 6), BIT(ctrl2, 5), BIT(ctrl2, 4), BIT(ctrl2, 3), BIT(ctrl2, 2), BIT(ctrl2, 1), BIT(ctrl2, 0), m_page2_addr_lsb, m_tmap2_regs[2], m_tmap2_regs[3],
+			(ctrl3 & 0xfe00) >> 9, BIT(ctrl3, 8), BIT(ctrl3, 7), BIT(ctrl3, 6), BIT(ctrl3, 5), BIT(ctrl3, 4), BIT(ctrl3, 3), BIT(ctrl3, 2), BIT(ctrl3, 1), BIT(ctrl3, 0), m_page3_addr_lsb, m_tmap3_regs[2], m_tmap3_regs[3],
 			BIT(attr0, 15), BIT(attr0, 14), (attr0 >> 12) & 3, (attr0 >> 8) & 15, 8 << ((attr0 >> 6) & 3), 8 << ((attr0 >> 4) & 3), BIT(attr0, 3), BIT(attr0, 2), 2 * ((attr0 & 3) + 1), m_tmap0_scroll[0], m_tmap0_scroll[1],
 			BIT(attr1, 15), BIT(attr1, 14), (attr1 >> 12) & 3, (attr1 >> 8) & 15, 8 << ((attr1 >> 6) & 3), 8 << ((attr1 >> 4) & 3), BIT(attr1, 3), BIT(attr1, 2), 2 * ((attr1 & 3) + 1), m_tmap1_scroll[0], m_tmap1_scroll[1],
 			BIT(attr2, 15), BIT(attr2, 14), (attr2 >> 12) & 3, (attr2 >> 8) & 15, 8 << ((attr2 >> 6) & 3), 8 << ((attr2 >> 4) & 3), BIT(attr2, 3), BIT(attr2, 2), 2 * ((attr2 & 3) + 1), m_tmap2_scroll[0], m_tmap2_scroll[1],
@@ -397,11 +382,16 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 	address_space &mem = m_cpu->space(AS_PROGRAM);
 
+	uint32_t sprites_addr;
 
-	uint32_t sprites_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb;
-
-	if (m_use_legacy_mode)
-		sprites_addr *= 0x40;
+	if (m_707f & 0x0040) // FREE == 1
+	{
+		sprites_addr = ((m_sprite_702d_gfxbase_msb & 0x07ff) << 16) | m_sprite_7022_gfxbase_lsb;
+	}
+	else
+	{
+		sprites_addr = m_sprite_7022_gfxbase_lsb * 0x40;
+	}
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
@@ -409,12 +399,12 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page0_addr, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page1_addr, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page2_addr, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
-			m_renderer->draw_page(true, true, m_alt_tile_addressing ? false : true, m_703a_palettebank, cliprect, scanline, i, page3_addr, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_alt_extrasprite_hack ? true : false, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
@@ -748,6 +738,19 @@ void gcm394_base_video_device::sprite_7042_extra_w(uint16_t data)
 	m_7042_sprite = data;
 	m_renderer->set_video_reg_42(data);
 
+	// format is
+	// NNNN NNNN ZRMD rBCE
+	//
+	// N = number of sprites to draw
+	// Z = global sprite zoom enable
+	// R = global sprite rotate enable
+	// M = global sprite mosaic enable
+	// D = direct addressing enable
+	// r = sprite round robin mode
+	// B = blend mode (0 = use 702a for blending, 1 = use individual sprite blending)
+	// C = co-ordinate mode
+	// E = sprite enable
+
 	//popmessage("extra modes %04x\n", data);
 }
 
@@ -779,15 +782,19 @@ void gcm394_base_video_device::video_dma_size_trigger_w(address_space &space, ui
 
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_spritebank, m_707f );
 
-	// jak_spmm sets dest to 0 when it wants to write to spriteram, looks intentional?
-	// does something else force writes to go to spriteram or does 0 always just mean there?
-	if (m_videodma_dest == 0)
-		m_videodma_dest = 0x7400;
+	// sprite DMA can only write to spriteram (just like on spg2xx)
+	int dest = m_videodma_dest & 0x03ff;
+	int size = m_videodma_size & 0x03ff;
 
-	for (int i = 0; i <= m_videodma_size; i++)
+	// on spg2xx size 0 means full transfer, with a < condition in the loop rather than <=
+	// jak_spmm seems to indicate that it differs here
+
+	for (int i = 0; i <= size; i++)
 	{
-		uint16_t dat = space.read_word(m_videodma_source+i);
-		space.write_word(m_videodma_dest + i, dat);
+		uint16_t dat = space.read_word(m_videodma_source + i);
+
+		if ((dest + i) < 0x400)
+			space.write_word(0x7400 + dest + i, dat);
 	}
 
 	m_videodma_size = 0x0000;
@@ -814,22 +821,6 @@ uint16_t gcm394_base_video_device::video_707c_r()
 	return 0x8000;
 }
 
-/* 707f is VERY important, lots of rendering codepaths in the code depend on the value it returns.
-
-   all operations in the code based on 707f are bit based, usually read register, set / clear a bit
-   and then write register, or read register and test an individual bit.
-
-   our current codeflow means that bits are only ever set, not cleared.
-
-   are the bits triggers? acks? enables? status flags?
-
-   in wrlshunt this ends up being set to  02f9   ---- --x- xxxx x--x
-   and in smartfp it ends up being set to 0065   ---- ---- -xx- -x-x
-
-   is this because wrlshunt uses more layers?
-*/
-
-
 uint16_t gcm394_base_video_device::video_707f_r()
 {
 	uint16_t retdata = m_renderer->get_video_reg_7f();
@@ -840,22 +831,26 @@ void gcm394_base_video_device::video_707f_w(uint16_t data)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data);
 
-	for (int i = 0; i < 16; i++)
-	{
-		uint16_t mask = 1 << i;
-
-		if ((m_707f & mask) != (data & mask))
-		{
-			if (data & mask)
-			{
-				LOGMASKED(LOG_GCM394_VIDEO, "\tbit %04x Low -> High\n", mask);
-			}
-			else
-			{
-				LOGMASKED(LOG_GCM394_VIDEO, "\tbit %04x High -> Low\n", mask);
-			}
-		}
-	}
+	// Format for GPL1625x / GPAC800
+	//
+	// S000 MMDF EfIV BDCP
+	//
+	// S# = SAVE_ROM (0 = normal mode, 1 = ROM saving mode, uses even line data for odd lines)
+	// MM = FB_MONO (0 = RGB, 1 = Mono, 2 = 2bpp, 3 = 4bpp)
+	// D* = SPR25D (0 = disable virtual 3D sprites, 1 = enable)
+	// F = FB_FORMAT (0 = RGB565, 1 = RGBG)
+	// E = FB_EN (0 = Half-line base mode, 1 = Frame base mode)
+	// f = FREE (0 = 22 bit addressing, 1 = 27 bit addressing)
+	// I* = VGA_NOINTL (0 = VGA interlace mode 640x480, 1 = VGA-non interlace mode, 640x240)
+	// V* = VGA_EN  (0 = QVGA / 320x240, 1 = VGA / 640x480)
+	// B = TX_BOTUP (0 = top to bottom layers, 1 = bottom to top layers)
+	// D = TX_DIRECT (0 = relative addressing, 1 = direct addressing)
+	// C = TCHAR (0 = disable transparent tile, 1 = enable transparent tile - only works in relative address mode)
+	// P = PPU_EN
+	//
+	// # not on GPL16250 (GPAC500 only?)
+	// * not on GPL1622x / GPL1623x / GPAC500
+	//
 
 	m_707f = data;
 	m_renderer->set_video_reg_7f(data);
@@ -1162,7 +1157,7 @@ void gcm394_base_video_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256*0x10);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 
-	SPG_RENDERER(config, m_renderer, 0);
+	GPL_RENDERER(config, m_renderer, 0);
 }
 
 

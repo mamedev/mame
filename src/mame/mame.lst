@@ -16458,8 +16458,9 @@ cncchess2
 @source:chess/conic_cchess3.cpp
 cncchess3
 
-@source:chess/krypton_regency.cpp
-regency
+@source:chess/krypton_challenge.cpp
+kchal
+kchala
 
 @source:chess/regence.cpp
 regence
@@ -16936,6 +16937,7 @@ backfirea
 battlera
 bldwolf
 bldwolfj
+miade
 
 @source:dataeast/boogwing.cpp
 boogwing
@@ -17745,7 +17747,7 @@ mjchuuka
 mjdchuka
 mjflove
 mjgnight
-mjkokuryu
+mjkokryu
 mjmyorn2
 mjmyornt
 mjmyorntr
@@ -17897,8 +17899,10 @@ mjifb3
 mjsenka
 mjsiyoub
 mjtensin
+mjtensina
 mjvegas
 mjvegasa
+mjvegasb
 mjyarou
 mjyarou2
 openmj
@@ -20659,6 +20663,7 @@ cmfun
 cmpacman
 cmpacmana
 cmpacmanb
+cmpap
 cmtetris
 cmtetrisa
 cmtetrisb
@@ -20709,6 +20714,7 @@ hamhouse9
 jkrmast
 jkrmasta
 jkrmastb
+jkrmastc
 jpknight
 kkotnoli
 ladylinr
@@ -20834,6 +20840,7 @@ skdelux99
 skill98
 skillch
 skillcha
+skillchb
 skillmst
 skillmsta
 srmagic
@@ -20961,6 +20968,7 @@ cjddzps
 cjddzs
 cjddzsa
 cjdh6th
+cjdh6tha
 cjsxp
 cjtljp
 extradrw
@@ -21060,6 +21068,7 @@ qhzb
 slqzsp
 super70s
 sydh
+xcjnh
 xyddz
 xydn
 zjddz
@@ -24556,6 +24565,7 @@ jongkyo
 
 @source:kiwako/koikoi.cpp
 koikoi
+koikoip2
 
 @source:kiwako/mrjong.cpp
 blkbustr
@@ -30043,6 +30053,7 @@ castfpt
 castrev
 
 @source:misc/cb2001.cpp
+bsbonanza
 cb2001
 cb4
 cb4a
@@ -30060,6 +30071,7 @@ scherrym12
 scherrymp
 scherrymp10u
 tripjack
+tripjack07
 tripjack11
 
 @source:misc/chameleonrx1.cpp
@@ -33468,6 +33480,9 @@ wmsboom
 wmstopb
 yukongld
 
+@source:misc/wren.cpp
+wren
+
 @source:misc/xtom3d.cpp
 pumpipx2
 pumpipx2p
@@ -34748,6 +34763,7 @@ pc9801bx2
 pc9801dx
 pc9801f
 pc9801fs
+pc9801m2
 pc9801rs
 pc9801rx
 pc9801us
@@ -35773,6 +35789,7 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+fingerd
 k10_2l
 k10_5l
 lxpcli
@@ -35804,6 +35821,7 @@ dgun2577
 dgun2593
 dvnimbus
 egame150
+f5_620
 gb50_150
 gbox2020
 gcs2mgp
@@ -35866,6 +35884,7 @@ rtvgc300
 rtvgc300cr
 rtvgc300fz
 rtvgc300pj
+s10_520
 s10fake
 sealvt
 supr200
@@ -35885,7 +35904,10 @@ zonefusn
 bittboy
 bl339
 fapocket
+g3_800
 g5_500
+g6_666
+g7_666
 g9_666
 gbox2019
 gprnrs1
@@ -39755,6 +39777,7 @@ wbeachvla
 @source:playmark/powerbal.cpp
 atombjt
 hotminda
+hotmindb
 magicstk
 powerbal
 
@@ -47047,6 +47070,7 @@ tvbg6b
 
 @source:tvgames/elan_eu3a05.cpp
 airblsjs
+bratzra
 buzztime
 carlecfg
 pvmil8
@@ -47151,6 +47175,7 @@ anpaneng
 anpanm15
 bk139in1
 bkrankp
+lxcymls
 lxcympp
 lxcymsm
 lxcyrace
@@ -47171,6 +47196,7 @@ bubltea
 dsgnpal
 pokebala
 pokeissh
+pokemech
 pokgoget
 punifrnd
 punij1m

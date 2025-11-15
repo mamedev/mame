@@ -95,8 +95,8 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	}
 
 
-	const uint32_t page1_addr = 0x40 * m_video_regs[0x20];
-	const uint32_t page2_addr = 0x40 * m_video_regs[0x21];
+	const uint32_t page1_addr = m_video_regs[0x20];
+	const uint32_t page2_addr = m_video_regs[0x21];
 	const uint32_t sprite_addr = 0x40 * m_video_regs[0x22];
 
 	uint16_t *page1_scroll = m_video_regs + 0x10;
@@ -110,11 +110,11 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(false, false, false, 0, cliprect, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
-			m_renderer->draw_page(false, false, false, 0, cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
-			m_renderer->draw_sprites(false, 0, false, 0, false, cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
+			m_renderer->draw_page(cliprect, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
+			m_renderer->draw_page(cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
+			m_renderer->draw_sprites(cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
-
+		
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
 	}
 

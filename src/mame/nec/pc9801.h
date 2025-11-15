@@ -27,7 +27,6 @@
 #include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd4991a.h"
@@ -143,10 +142,9 @@ public:
 		, m_ppi_mouse(*this, "ppi_mouse")
 		, m_fdc_2hd(*this, "fdc_2hd")
 		, m_fdc_2dd(*this, "fdc_2dd")
-		, m_ram(*this, RAM_TAG)
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
-		, m_cbus(*this, "cbus%d", 0)
+		, m_cbus_root(*this, "cbus_root")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
@@ -158,6 +156,8 @@ public:
 	}
 
 	void pc9801(machine_config &config);
+	void pc9801f(machine_config &config);
+	void pc9801m(machine_config &config);
 
 	void init_pc9801_kanji();
 
@@ -174,10 +174,9 @@ protected:
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
-	optional_device<ram_device> m_ram;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
-	required_device_array<pc98_cbus_slot_device, 2> m_cbus;
+	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 private:
@@ -395,15 +394,13 @@ public:
 protected:
 	TIMER_CALLBACK_MEMBER(fdc_trigger);
 
-	u8 ram_ext_r(offs_t offset) { return m_ram->read_no_mirror(offset + 0x100000); }
-	void ram_ext_w(offs_t offset, u8 data) { return m_ram->write_no_mirror(offset + 0x100000, data); }
+	void pc9801vm_map(address_map &map) ATTR_COLD;
+	void pc9801vm_io(address_map &map) ATTR_COLD;
 
 	void pc9801rs_io(address_map &map) ATTR_COLD;
 	void pc9801rs_map(address_map &map) ATTR_COLD;
-	void pc9801ux_io(address_map &map) ATTR_COLD;
 	void pc9801ux_map(address_map &map) ATTR_COLD;
 	void pc9801vx_map(address_map &map) ATTR_COLD;
-	void pc9801vm_map(address_map &map) ATTR_COLD;
 	void pc9801dx_map(address_map &map) ATTR_COLD;
 
 	uint16_t grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -466,8 +463,6 @@ private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
-
-	uint8_t midi_r();
 
 	// 286-based machines except for PC98XA
 	u8 dma_access_ctrl_r(offs_t offset);
@@ -582,11 +577,6 @@ protected:
 
 	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_RESET(pc9801bx2);
-
-	u8 ram_ext_15m_r(offs_t offset) { return m_ram->read_no_mirror(offset + 0xf00000); }
-	void ram_ext_15m_w(offs_t offset, u8 data) { return m_ram->write_no_mirror(offset + 0xf00000, data); }
-	u8 ram_ext_16m_r(offs_t offset) { return m_ram->read_no_mirror(offset + 0x1000000); }
-	void ram_ext_16m_w(offs_t offset, u8 data) { return m_ram->write_no_mirror(offset + 0x1000000, data); }
 
 	virtual void hole_15m_control_w(offs_t offset, u8 data);
 	u8 hole_15m_control_r(offs_t offset);

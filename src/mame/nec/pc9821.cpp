@@ -67,6 +67,9 @@ TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
 #include "emu.h"
 #include "pc9821.h"
 
+#include "bus/pc98_61simm/options.h"
+#include "bus/pc98_61simm/slot.h"
+#include "bus/pc98_cbus/options.h"
 #include "machine/pci.h"
 
 // TODO: remove me, cfr. pc9801.cpp; verify that 9801 clocks are correct for 9821 series as well
@@ -375,17 +378,17 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 			logerror("$e0100 packed mode %02x\n", data);
 		})
 	);
-    map(0x102, 0x102).lw8(
-        NAME([this] (u8 data) {
-            logerror("$e0102 upper VRAM %s (%02x)\n", BIT(data, 0) ? "enable" : "disable", data);
-            if (BIT(data, 0))
-            {
-                m_pegc_vram_view.select(0);
-            }
-            else
-                m_pegc_vram_view.disable();
-        })
-    );
+	map(0x102, 0x102).lw8(
+		NAME([this] (u8 data) {
+			logerror("$e0102 upper VRAM %s (%02x)\n", BIT(data, 0) ? "enable" : "disable", data);
+			if (BIT(data, 0))
+			{
+				m_pegc_vram_view.select(0);
+			}
+			else
+				m_pegc_vram_view.disable();
+		})
+	);
 	// $4a0 alias
 	map(0x104, 0x104).lw8(
 		NAME([this] (u8 data) {
@@ -455,14 +458,18 @@ TIMER_CALLBACK_MEMBER(pc9821_state::pit_delay)
 
 void pc9821_state::pc9821_map(address_map &map)
 {
-	pc9801rs_map(map);
+	pc9801vm_map(map);
+	map(0x00000000, 0x0009ffff).rw("simm", FUNC(pc9801_61_simm_device::read), FUNC(pc9801_61_simm_device::write));
+
+	map(0x000da000, 0x000dbfff).ram(); // ide ram
+
 	map(0x000a8000, 0x000bffff).rw(FUNC(pc9821_state::pc9821_grcg_gvram_r), FUNC(pc9821_state::pc9821_grcg_gvram_w));
 	map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::grcg_gvram0_r), FUNC(pc9821_state::grcg_gvram0_w));
 	map(0x000e0000, 0x000e7fff).view(m_pegc_mmio_view);
 	m_pegc_mmio_view[0](0x000e0000, 0x000e7fff).m(*this, FUNC(pc9821_state::pegc_mmio_map));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 
-	map(0x00100000, 0x00efffff).rw(FUNC(pc9821_state::ram_ext_r), FUNC(pc9821_state::ram_ext_w));
+	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
 	map(0x00f00000, 0xffffffff).view(m_pegc_vram_view);
 	m_pegc_vram_view[0](0x00f00000, 0x00f7ffff).ram().share("ext_gvram");
 	m_pegc_vram_view[0](0xfff00000, 0xfff7ffff).ram().share("ext_gvram");
@@ -470,13 +477,13 @@ void pc9821_state::pc9821_map(address_map &map)
 	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0x00f00000, 0x00ffffff).view(m_hole_15M_view);
-	m_hole_15M_view[0](0x00f00000, 0x00ffffff).rw(FUNC(pc9821_state::ram_ext_15m_r), FUNC(pc9821_state::ram_ext_15m_w));
+	m_hole_15M_view[0](0x00f00000, 0x00ffffff).rw("simm", FUNC(pc9801_61_simm_device::read_15m_ext), FUNC(pc9801_61_simm_device::write_15m_ext));
 }
 
 void pc9821_state::pc9821_io(address_map &map)
 {
 	// later SW expects unmapped C-Bus accesses to return high for proper card detection
-	// cfr. entax, amarankh, freebsd21
+	// cfr. entax, amarankh, freebsd21, gods
 	map.unmap_value_high();
 	pc9801bx2_io(map);
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
@@ -648,7 +655,7 @@ void pc9821_mate_a_state::pc9821as_io(address_map &map)
 void pc9821_mate_a_state::pc9821ap2_map(address_map &map)
 {
 	pc9821as_map(map);
-	map(0x01000000, 0x04ffffff).rw(FUNC(pc9821_mate_a_state::ram_ext_16m_r), FUNC(pc9821_mate_a_state::ram_ext_16m_w));
+	map(0x01000000, 0x04ffffff).rw("simm", FUNC(pc9801_61_simm_device::read_16m_ext), FUNC(pc9801_61_simm_device::write_16m_ext));
 }
 
 
@@ -706,9 +713,8 @@ void pc9821_canbe_state::pc9821ce_map(address_map &map)
 	map(0x000f8000, 0x000fffff).view(m_bios_view);
 	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
 
-	m_hole_15M_view[1](0x00f00000, 0x00ffffff).rw(FUNC(pc9821_canbe_state::ram_ext_15m_r), FUNC(pc9821_canbe_state::ram_ext_15m_w));
+	m_hole_15M_view[1](0x00f00000, 0x00ffffff).rw("simm", FUNC(pc9801_61_simm_device::read_15m_ext), FUNC(pc9801_61_simm_device::write_15m_ext));
 	m_hole_15M_view[1](0x00f00000, 0x00f7ffff).ram().share("ext_gvram");
-
 }
 
 void pc9821_canbe_state::pc9821ce_io(address_map &map)
@@ -821,7 +827,7 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
-	PORT_START("ROM_LOAD")
+	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
@@ -903,7 +909,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
-	m_cbus[0]->set_default_option("pc9801_86");
+	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_state, pc9821)
@@ -926,8 +932,10 @@ void pc9821_state::pc9821(machine_config &config)
 	PC98_SDIP(config, "sdip", 0);
 
 	// RAM 1.6MB (S1) / 3.6 (S2) ~ 15M (with dedicated 10MB module)
-	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("4M,8M,14M,15M");
+	config.device_remove("simm");
+	PC9801_61_SIMM(config, "simm", pc9821_simm_options, "2mb");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("4M,8M,14M,15M");
 }
 
 void pc9821_mate_a_state::pc9821as(machine_config &config)
@@ -945,8 +953,10 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("8M,14M,15M");
+	// RAM 3.6 MB ~ 14.6 MB
+	PC9801_61_SIMM(config.replace(), "simm", pc9821_simm_options, "4mb");
+//  m_ram->set_default_size("4M");
+//  m_ram->set_extra_options("8M,14M,15M");
 }
 
 void pc9821_mate_a_state::pc9821ap2(machine_config &config)
@@ -967,8 +977,9 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	// DOS 5.0, Windows 3.1
 	// minimum RAM 3.6MB (U2) / 7.6MB (C9T)
 	// maximum RAM 71.6MB / 73.6MB (U8W / C9W)
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("8M,14M,32M,64M,72M,74M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "4mb");
+//  m_ram->set_default_size("4M");
+//  m_ram->set_extra_options("8M,14M,32M,64M,72M,74M");
 
 	// 340MB HD
 	// Expansion slot C-BUS4 (4)
@@ -986,12 +997,12 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 
 	// 1.6MB ~ 14.6MB model S1
 	// 5.6MB ~ 14.6MB model S2
-	m_ram->set_default_size("2M");
-	m_ram->set_extra_options("6M,8M,14M,15M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821_simm_options, "2mb");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("6M,8M,14M,15M");
 
 	// pc9801-86 (built-in)
-	m_cbus[0]->set_default_option("sound_pc9821ce");
-	m_cbus[0]->set_fixed(true);
+	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, "sound_pc9821ce", true);
 
 	// 3.5 x2
 	config_floppy_35hd(config);
@@ -1018,14 +1029,15 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	m_cbus[0]->set_default_option("sound_pc9821cx3");
-	m_cbus[0]->set_fixed(true);
+	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, "sound_pc9821cx3", true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 
 	// RAM 16MB ~ 128MB
-	RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+	// TODO: really regular SIMM over PCI
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
 
 	// VLSI Supercore594 (Wildcat) PCI 2.0
 	// GD5440
@@ -1060,7 +1072,8 @@ void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 
 	// Xa16/R specs
 	// 16MB ~ 128MB F.P.DRAM
-	RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
 
 	// VLSI Supercore594 (PCI rev 2.0)
 	// S3 manufactured Trident TGUI9680XGi with 2MB VRAM (on board PCI)
@@ -1090,9 +1103,9 @@ void pc9821_mate_x_state::pc9821xv13(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_x_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	// minimum RAM 16MB
-	// maximum RAM 128MB
-	RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+	// RAM 16MB ~ 128MB
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
 
 	// Xv13/R identical to Xa16/R specs with an extra C-Bus slot
 
@@ -1111,7 +1124,8 @@ void pc9821_mate_r_state::pc9821ra20(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// 16MB ~ 128MB F.P.DRAM for /N12 or 32MB ~ 256MB ECC compatible EDO DRAM for /N30
-	RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
 
 	// Intel 440FX
 	PCI_ROOT(config, "pci", 0);
@@ -1134,7 +1148,8 @@ void pc9821_mate_r_state::pc9821ra266(machine_config &config)
 	// 512KB CPU cache RAM
 
 	// 32MB, max 256 MB (ECC EDO RAM)
-	RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M,192M,256M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "32mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M,192M,256M");
 
 	// Intel 440FX
 	PCI_ROOT(config, "pci", 0);
@@ -1163,7 +1178,8 @@ void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 	// 128KB CPU cache RAM
 
 	// ECC EDO RAM 32MB ~ 256 MB
-	RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M,192M,256M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "64mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M,192M,256M");
 
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
@@ -1189,7 +1205,8 @@ void pc9821_note_lavie_state::pc9821nr15(machine_config &config)
 	// 256KB CPU cache RAM
 
 	// EDO RAM 16MB ~ 256MB
-	RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "16mb");
+//  RAM(config.replace(), m_ram).set_default_size("16M").set_extra_options("32M,64M,128M");
 
 	// TFT 12.1 screen with 800x600 max resolution
 	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
@@ -1212,7 +1229,8 @@ void pc9821_note_lavie_state::pc9821nr166(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	// EDO RAM 32MB ~ 256MB
-	RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "32mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M,128M");
 
 	// TFT 13.3 screen with 1024x768 resolution
 	// Trident Cyber9385 Flat Panel Controller (SVGA, PCI?)
@@ -1233,7 +1251,8 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 	// 256KB CPU cache RAM
 
 	// EDO RAM 32MB ~ 64M
-	RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M");
+	PC9801_61_SIMM(config.replace(), "simm", pc9821ap2_simm_options, "32mb");
+//  RAM(config.replace(), m_ram).set_default_size("32M").set_extra_options("64M");
 
 	// TFT 12.1 screen with 800x600 resolution & true color
 	// Trident Cyber9385-1 Flat Panel Controller (SVGA, PCI?)
@@ -1403,7 +1422,7 @@ ROM_START( pc9821ce )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	ROM_REGION( 0x4000, "cbus0:sound_pc9821ce:sound_bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "cbus0:sound_pc9821ce:bios", ROMREGION_ERASE00 )
 	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
 
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
@@ -1488,7 +1507,7 @@ ROM_START( pc9821cx3 )
 	// cfr. $afe00 and $ad400 range
 	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 
-	ROM_REGION( 0x4000, "cbus0:sound_pc9821cx3:sound_bios", 0)
+	ROM_REGION( 0x4000, "cbus0:sound_pc9821cx3:bios", 0)
 	ROM_COPY( "biosrom", 0x54000, 0x00000, 0x04000 )
 
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )

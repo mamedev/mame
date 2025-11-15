@@ -801,7 +801,7 @@ void model2_state::push_geo_data(u32 data)
 
 u32 model2_state::geo_prg_r(offs_t offset)
 {
-	popmessage("Read from Geometry FIFO at %08x, contact MAMEdev",offset*4);
+	popmessage("Read from Geometry FIFO at %08x", offset * 4);
 	return 0xffffffff;
 }
 
@@ -891,7 +891,7 @@ void model2_state::geo_w(offs_t offset, u32 data)
 					if(function == 1)
 					{
 						r |= ((address>>10)&3)<<29; // Eye Mode, used by Sega Rally on car select
-						//popmessage("Eye mode %02x? Contact MAMEdev",function);
+						//popmessage("Eye mode %02x?",function);
 					}
 				}
 				push_geo_data(r);

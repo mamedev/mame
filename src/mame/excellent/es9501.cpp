@@ -591,7 +591,7 @@ ROM_START( multspin )
 	ROM_LOAD16_BYTE( "3.u31", 0x00001, 0x40000, CRC(b06626a9) SHA1(80a2394209a45bc49083889d2be1427c8d3e841a) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "gfx", 0 )
-	ROM_LOAD( "t58.u50", 0x000000, 0x200000, CRC(7a572d9e) SHA1(9a1d842ac78fea6047242c405aaf81c827dc2358) ) // not dumped yet, should match specd9 and starball though
+	ROM_LOAD( "t58.u50", 0x000000, 0x200000, CRC(7a572d9e) SHA1(9a1d842ac78fea6047242c405aaf81c827dc2358) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "t59.u23", 0x000000, 0x200000, CRC(b11857b4) SHA1(c0a6478fd8a8ef1ed35cfbfa9fd2af44eb258725) )
