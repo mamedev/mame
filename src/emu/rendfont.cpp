@@ -491,7 +491,7 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 //  render_font - constructor
 //-------------------------------------------------
 
-render_font::render_font(render_manager &manager, const char *filename)
+render_font::render_font(render_manager &manager, const char *filenames)
 	: m_manager(manager)
 	, m_format(format::UNKNOWN)
 	, m_height(0)
@@ -507,27 +507,39 @@ render_font::render_font(render_manager &manager, const char *filename)
 	memset(m_glyphs_cmd, 0, sizeof(m_glyphs_cmd));
 
 	// if this is an OSD font, we're done
-	if (filename)
+	if (filenames)
 	{
+		std::string_view remaining(filenames);
 		m_osdfont = manager.machine().osd().font_alloc();
-		if (m_osdfont && m_osdfont->open(manager.machine().options().font_path(), filename, m_height))
-		{
-			m_scale = 1.0f / float(m_height);
-			m_format = format::OSD;
 
-			//mamep: allocate command glyph font
-			render_font_command_glyph();
-			return;
+		while (!remaining.empty())
+		{
+			std::string::size_type const separator = remaining.find(',');
+			std::string filename(remaining.substr(0, separator));
+			LOG("Trying OSD font '%s'\n", filename);
+			remaining = separator != std::string::npos ? remaining.substr(separator + 1) : "";
+
+			if (m_osdfont && m_osdfont->open(manager.machine().options().font_path(), filename, m_height))
+			{
+				LOG("- Using OSD font '%s'\n", filename);
+				m_scale = 1.0f / float(m_height);
+				m_format = format::OSD;
+
+				//mamep: allocate command glyph font
+				render_font_command_glyph();
+				return;
+			}
 		}
+
 		m_osdfont.reset();
 	}
 
 	// if the filename is 'default' default to 'ui.bdf' for backwards compatibility
-	if (filename && !core_stricmp(filename, "default"))
-		filename = "ui.bdf";
+	if (filenames && !core_stricmp(filenames, "default"))
+		filenames = "ui.bdf";
 
 	// attempt to load an external BDF font first
-	if (filename && load_cached_bdf(filename))
+	if (filenames && load_cached_bdf(filenames))
 	{
 		//mamep: allocate command glyph font
 		render_font_command_glyph();
