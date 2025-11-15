@@ -9,14 +9,14 @@ license:CC0-1.0
 	<element name="button" defstate="0">
 		<!-- black border for the button -->
 		<rect>
-			<color red="0" green="0" blue="0"/>
+			<color red="0" green="0" blue="0" alpha="0.25"/>
 			<bounds x="0" y="0" width="45" height="45"/>
 		</rect>
 
 		<!-- body -->
 		<rect>
-			<color state="0" red="0.16" green="0.18" blue="0.16"/>
-			<color state="1" red="0.12" green="0.12" blue="0.12"/>
+			<color state="0" red="0.40" green="0.38" blue="0.37"/>
+			<color state="1" red="0.30" green="0.28" blue="0.26"/>
 			<bounds x="3" y="3" width="39" height="39"/>
 		</rect>
 		<rect>
@@ -77,13 +77,10 @@ license:CC0-1.0
 
 	<element name="rotating_knob">
 		<disk>
-			<color red="0" green="0" blue="0"/>
+			<color red="0.9" green="0.9" blue="1.0" alpha="0.05"/>
 			<bounds x="0" y="0" width="47" height="47"/>
 		</disk>
-		<disk>
-			<color red="0.13" green="0.13" blue="0.13"/>
-			<bounds x="2" y="2" width="43" height="43"/>
-		</disk>
+
 		<!-- For now ommit the tick. I'd like to animate it later using
 		     currently unsupported element rotations with arbitrary angles:
 
@@ -92,9 +89,10 @@ license:CC0-1.0
 			<bounds x="22" y="2" width="3" height="12"/>
 		</rect>
 		-->
+
 		<disk>
-			<color red="1" green="1" blue="1" alpha="0.05"/>
-			<bounds x="5" y="5" width="37" height="37"/>
+			<color red="0.42" green="0.38" blue="0.37"/>
+			<bounds x="3" y="3" width="41" height="41"/>
 		</disk>
 	</element>
 
@@ -209,7 +207,7 @@ license:CC0-1.0
 	</group>
 
 	<element name="panel_sheet">
-		<rect><color red="0.13" green="0.13" blue="0.14"/></rect>
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
 	</element>
 
 	<element name="wood">
@@ -217,7 +215,7 @@ license:CC0-1.0
 	</element>
 
 	<element name="screen_metalic_border"><!-- metalic frame around display -->
-		<rect><color red="0.64" green="0.51" blue="0.49"/></rect>
+		<rect><color red="0.27" green="0.23" blue="0.23"/></rect>
 	</element>
 
 	<element name="screen_red_border"><!-- a portion of the display itself -->
@@ -351,7 +349,7 @@ license:CC0-1.0
 
 	<element name="background_color">
 		<rect>
-			<color red="0.07" green="0" blue="0.12"/>
+			<color red="0" green="0.3" blue="0.3"/>
 		</rect>
 	</element>
 
