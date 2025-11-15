@@ -108,7 +108,7 @@ void ticket_dispenser_device::motor_w(int state)
 		m_power = true;
 		m_status = false;
 	}
-	else (!state && m_power)
+	else if (!state && m_power)
 	{
 		if (!m_hopper_type || !m_status)
 		{
