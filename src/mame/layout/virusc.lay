@@ -140,6 +140,16 @@ license:CC0-1.0
 	<element name="fall_text"><text string="FALL"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="rise_text"><text string="RISE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
+	<element name="minus_text"><text string="-"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="plus_text"><text string="+"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<group name="knob_minus_plus">
+		<group ref="knob_base"><bounds x="0" y="7" width="77" height="59"/></group>
+
+		<element ref="minus_text"><bounds x="9" y="62" width="6" height="12"/></element>
+		<element ref="scale_dot"><color red="0.8" green="0.8" blue="0.8"/><bounds x="37" y="4" width="4" height="4"/></element>
+		<element ref="plus_text"><bounds x="58" y="62" width="13" height="12"/></element>
+	</group>
+
 	<group name="knob_0_6_12">
 		<group ref="knob_base"><bounds x="0" y="7" width="77" height="59"/></group>
 
@@ -307,10 +317,30 @@ license:CC0-1.0
 		]]></data></image>
 	</element>
 
+	<element name="left_right_arrows">
+		<image><data><![CDATA[
+			<svg width="88" height="8">
+				<path fill="#666666" stroke="none" d="
+					m 88,4 -6.1,3.9 -0.1,-7.4 z
+					m -88.2,0 6.1,3.9 0.1,-7.4 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
 	<element name="multisingle_rect">
 		<image><data><![CDATA[
 			<svg width="81" height="13">
 				<rect stroke="#666666" stroke-width="1px" fill="none" x="0.5" y="0.5" width="80" height="12"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="lines_for_button_pair">
+		<image><data><![CDATA[
+			<svg width="84" height="4">
+				<path stroke="#666666" fill="none" stroke-width="1px" d="
+					m 83.5,0 v 3.5 h -20.5
+					m -62.5,-3.5 v 3.5 h 20.5"/>
 			</svg>
 		]]></data></image>
 	</element>
@@ -549,17 +579,13 @@ license:CC0-1.0
 	<element name="soft_knob_2_text"><text string="SOFT KNOB 2"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="value_white_text"><text string="VALUE"><color red="1.0" green="1.0" blue="1.0"/></text></element>
 
-	<element name="less_than_text"><text string="&lt;"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="part_text"><text string="PART"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-	<element name="greater_than_text"><text string="&gt;"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="demo_text"><text string="DEMO"><color red="0.4" green="0.4" blue="0.4"/></text></element>
 
 	<element name="parameter_text"><text string="PARAMETER"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="bank_text"><text string="BANK"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="minus_text"><text string="-"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="value_text"><text string="VALUE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
-	<element name="plus_text"><text string="+"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="program_text"><text string="PROGRAM"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
 	<element name="mix_text"><text string="MIX"><color red="0.8" green="0.8" blue="0.8"/></text></element>
@@ -879,7 +905,8 @@ license:CC0-1.0
 
 		<element ref="edit_text"><bounds x="661" y="300" width="29" height="12"/></element>
 		<element ref="sync_text"><bounds x="706" y="300" width="29" height="12"/></element>
-		<element ref="audition_text"><bounds x="679" y="314" width="38" height="9"/></element>
+		<element ref="audition_text"><bounds x="679" y="312" width="38" height="9"/></element>
+		<element ref="lines_for_button_pair"><bounds x="656" y="313" width="84" height="4"/></element>
 
 		<group ref="knob_0_6_12"><!-- FM AMOUNT --><bounds x="762" y="222" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_14"/>
@@ -958,8 +985,7 @@ license:CC0-1.0
 		<element ref="button" inputtag="ROW2" inputmask="0x08"><!-- TRANSPOSE [+] --><bounds x="523" y="495" width="45" height="45"/></element>
 		<element ref="transpose_text"><bounds x="489" y="547" width="66" height="12"/></element>
 		<element ref="panic_text"><bounds x="511" y="560" width="24" height="10"/></element>
-		<element ref="gray_line"><bounds x="482" y="564" width="15" height="1"/></element>
-		<element ref="gray_line"><bounds x="538" y="564" width="15" height="1"/></element>
+		<element ref="lines_for_button_pair"><bounds x="482" y="564" width="84" height="4"/></element>
 
 
 		<element ref="button" inputtag="ROW2" inputmask="0x10"><!-- STORE --><bounds x="582" y="495" width="45" height="45"/></element>
@@ -979,13 +1005,13 @@ license:CC0-1.0
 
 
 		<!-- FIXME: knob type -->
-		<group ref="knob_0_6_12"><!-- SOFT KNOB 1 --><bounds x="751" y="467" width="77" height="77"/></group>
+		<group ref="knob_minus_plus"><!-- SOFT KNOB 1 --><bounds x="751" y="467" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_9"/>
 		<group ref="knob"><bounds x="751" y="467" width="77" height="77"/></group>
 		<element ref="soft_knob_1_text"><bounds x="750" y="547" width="80" height="12"/></element>
 
 		<!-- FIXME: knob type -->
-		<group ref="knob_0_6_12"><!-- SOFT KNOB 2 --><bounds x="859" y="467" width="77" height="77"/></group>
+		<group ref="knob_minus_plus"><!-- SOFT KNOB 2 --><bounds x="859" y="467" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_10"/>
 		<group ref="knob"><bounds x="859" y="467" width="77" height="77"/></group>
 		<element ref="soft_knob_2_text"><bounds x="858" y="547" width="81" height="12"/></element>
@@ -993,22 +1019,20 @@ license:CC0-1.0
 		<element ref="value_white_text"><bounds x="881" y="563" width="36" height="12"/></element>
 
 
-		<element ref="button" inputtag="ROW3" inputmask="0x02"><!-- PART [-] --><bounds x="959" y="343" width="45" height="45"/></element>
-		<element ref="button" inputtag="ROW3" inputmask="0x10"><!-- PART [+] --><bounds x="1004" y="343" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x02"><!-- PART [<] --><bounds x="959" y="343" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW3" inputmask="0x10"><!-- PART [>] --><bounds x="1004" y="343" width="45" height="45"/></element>
 
-		<element ref="less_than_text"><bounds x="964" y="394" width="5" height="12"/></element>
 		<element ref="part_text"><bounds x="989" y="393" width="30" height="12"/></element>
-		<element ref="greater_than_text"><bounds x="1045" y="394" width="6" height="12"/></element>
-		<element ref="demo_text"><bounds x="995" y="408" width="20" height="9"/></element>
-		<element ref="gray_line"><bounds x="962" y="409" width="30" height="1"/></element>
-		<element ref="gray_line"><bounds x="1019" y="409" width="30" height="1"/></element>
+		<element ref="left_right_arrows"><bounds x="959" y="395" width="88" height="8"/></element>
+		<element ref="demo_text"><bounds x="995" y="405" width="20" height="9"/></element>
+		<element ref="lines_for_button_pair"><bounds x="961" y="406" width="84" height="4"/></element>
+
 
 		<element ref="button" inputtag="ROW3" inputmask="0x04"><!-- PARAM [<] --><bounds x="959" y="418" width="45" height="45"/></element>
 		<element ref="button" inputtag="ROW3" inputmask="0x20"><!-- PARAM [>] --><bounds x="1004" y="418" width="45" height="45"/></element>
 
-		<element ref="less_than_text"><bounds x="962" y="470" width="6" height="12"/></element>
 		<element ref="parameter_text"><bounds x="971" y="470" width="66" height="12"/></element>
-		<element ref="greater_than_text"><bounds x="1047" y="470" width="6" height="12"/></element>
+		<element ref="left_right_arrows"><bounds x="959" y="470" width="88" height="8"/></element>
 		<element ref="bank_text"><bounds x="994" y="481" width="20" height="9"/></element>
 
 		<element ref="button" inputtag="ROW3" inputmask="0x08"><!-- VALUE [-] --><bounds x="959" y="494" width="45" height="45"/></element>
@@ -1016,7 +1040,7 @@ license:CC0-1.0
 		<element ref="minus_text"><bounds x="961" y="548" width="10" height="12"/></element>
 		<element ref="value_text"><bounds x="986" y="546" width="36" height="12"/></element>
 		<element ref="plus_text"><bounds x="1044" y="548" width="6" height="12"/></element>
-		<element ref="program_text"><bounds x="987" y="558" width="36" height="9"/></element>
+		<element ref="program_text"><bounds x="986" y="558" width="38" height="9"/></element>
 
 <!-- MIX -->
 		<element ref="mix_text"><bounds x="1078" y="90" width="29" height="16"/></element>
