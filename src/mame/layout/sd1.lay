@@ -3,7 +3,7 @@
 	<param name="f_bold" value="Nonexistent Sans|Bold,Liberation Sans|Bold,Helvetica|Bold,Arial|Bold,default" />
 	<param name="f_italic" value="Nonexistent Sans|Italic,Liberation Sans|Italic,Helvetica|Italic,Arial|Italic,default" />
 	<param name="f_bold_italic" value="Nonexistent Sans|BoldItalic,Liberation Sans|BoldItalic,Helvetica|BoldItalic,Arial|BoldItalic,default" />
-	<param name="f_normal" value="Nonexistent Sans,Liberation Sans,Helvetica,Arial,default" />
+	<param name="f_regular" value="Nonexistent Sans|Regular,Liberation Sans|Regular,Helvetica|Regular,Arial|Regular,default" />
 
 	<!-- Decoration definitions -->
 	<element name="drawing_triangle_down">
@@ -436,7 +436,7 @@
 		<text string="Env3" font="~f_italic~" align="1" />
 	</element>
 	<element name="text_tracks">
-		<text string="Tracks" font="~f_normal~" />
+		<text string="Tracks" font="~f_regular~" />
 	</element>
 	<element name="text_I_1_6">
 		<text string="1-6" font="~f_italic~" />
@@ -478,7 +478,7 @@
 		<text string="Storage" font="~f_italic~" align="1" />
 	</element>
 	<element name="text_edit">
-		<text string="Edit" font="~f_normal~" />
+		<text string="Edit" font="~f_regular~" />
 	</element>
 	<element name="text_L_B_system">
 		<text string="System" font="~f_bold~" align="1" />
@@ -541,13 +541,13 @@
 		<text string="Phones" font="~f_italic~" align="1" />
 	</element>
 	<element name="text_S_music_production_synthesizer">
-		<text string="MUSIC PRODUCTION SYNTHESIZER" font="~f_normal~" align="3" />
+		<text string="MUSIC PRODUCTION SYNTHESIZER" font="~f_regular~" align="3" />
 	</element>
 	<element name="text_B_S_ensoniq">
 		<text string="ensoniq" font="~f_bold~" align="3" />
 	</element>
 	<element name="text_S_sd_1">
-		<text string="SD-1" font="~f_normal~" align="3" />
+		<text string="SD-1" font="~f_regular~" align="3" />
 	</element>
 	<element name="text_L_B_pitch">
 		<text string="Pitch" font="~f_bold~" align="1" />

@@ -3,7 +3,7 @@
 	<param name="f_bold" value="Nonexistent Sans|Bold,Liberation Sans|Bold,Helvetica|Bold,Arial|Bold,default" />
 	<param name="f_italic" value="Nonexistent Sans|Italic,Liberation Sans|Italic,Helvetica|Italic,Arial|Italic,default" />
 	<param name="f_bold_italic" value="Nonexistent Sans|BoldItalic,Liberation Sans|BoldItalic,Helvetica|BoldItalic,Arial|BoldItalic,default" />
-	<param name="f_normal" value="Nonexistent Sans,Liberation Sans,Helvetica,Arial,default" />
+	<param name="f_regular" value="Nonexistent Sans|Regular,Liberation Sans|Regular,Helvetica|Regular,Arial|Regular,default" />
 
 	<!-- Decoration definitions -->
 	<element name="drawing_triangle_down">
@@ -381,7 +381,7 @@
 		<text string="Env3" font="~f_italic~" align="1" />
 	</element>
 	<element name="text_multi">
-		<text string="Multi" font="~f_normal~" />
+		<text string="Multi" font="~f_regular~" />
 	</element>
 	<element name="text_I_a">
 		<text string="A" font="~f_italic~" />
@@ -450,13 +450,13 @@
 		<text string="Phones" font="~f_italic~" align="1" />
 	</element>
 	<element name="text_S_dynamic_component_synthesizer">
-		<text string="DYNAMIC COMPONENT SYNTHESIZER" font="~f_normal~" align="3" />
+		<text string="DYNAMIC COMPONENT SYNTHESIZER" font="~f_regular~" align="3" />
 	</element>
 	<element name="text_B_S_ensoniq">
 		<text string="ensoniq" font="~f_bold~" align="3" />
 	</element>
 	<element name="text_S_vfx">
-		<text string="VFX" font="~f_normal~" align="3" />
+		<text string="VFX" font="~f_regular~" align="3" />
 	</element>
 	<element name="text_L_B_pitch">
 		<text string="Pitch" font="~f_bold~" align="1" />
