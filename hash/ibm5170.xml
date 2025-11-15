@@ -10361,6 +10361,53 @@ The disks have had their OEM IDs modified by Windows
 		</part>
 	</software>
 
+	<software name="alfonspl">
+		<description>Alfons påhittelåda (Swedish)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="version" value="1.0" />
+		<info name="copy_protection" value="Serial number required: 8F-046-016088, 8F-046-022378" />
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "10425680">
+				<rom name="Alfons paahittelaada (Swedish) (Disk 1).mfi" size="10425680" crc="f59149ee" sha1="cc1436942e50419d58088a86c4fe74a50e09b46c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "9906489">
+				<rom name="Alfons paahittelaada (Swedish) (Disk 2).mfi" size="9906489" crc="b97f6654" sha1="1beabe7fdf4c619b336d1682398d510cb581d352"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alfonstra" supported="no">
+	    <description>Alfons på äventyr i trafiken (Swedish)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="copy_protection" value="Serial number required: 8H-046-015934" />
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1511424">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 1).img" size="1511424" crc="6c282ca4" sha1="6e074d5953abd623c0fd4a0f1d1b7b3f12a0750e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1511424">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 2).img" size="1511424" crc="257185bf" sha1="870b9d0837051e0cfbdd7e1a049c69600b6c2bdb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1511424">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 3).img" size="1511424" crc="30eb5699" sha1="9a3289e89151c450922950002e82868400aaeadb"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1511424">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 4).img" size="1511424" crc="1d8c7e93" sha1="351f45eec5bc9ac2c490e4a8ed3b6eca493cbec3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alienbrd">
 		<description>Alien Breed</description>
 		<year>1993</year>
@@ -11754,6 +11801,31 @@ Differences between clone/parent:
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Cannon Fodder 2 [Virgin Interactive Entertainment] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="d4e2aa4b" sha1="119e74068858e5a409fa79ef3302a2012d843ac2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cheops">
+	    <description>Cheops pyramid (Swedish)</description>
+		<year>1991</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="version" value="3.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 1 (3)" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Cheops pyramid (Swedish) (Disk 1).img" size="737280" crc="c8501f88" sha1="e80cb2ac60f08383d7267079eb79a868226a3ac6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 2 (3)" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Cheops pyramid (Swedish) (Disk 2).img" size="737280" crc="10996970" sha1="4a19a550d07e9bc3c3c537429297784bee8ce4a1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Diskett 3 (3)" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Cheops pyramid (Swedish) (Disk 3).img" size="737280" crc="f913df2d" sha1="a7dad5258ead5064eaff58bd16e4c2220a03fc33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15231,6 +15303,24 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		</part>
 	</software>
 
+	<software name="hmalfons">
+	    <description>Handla med Alfons (Swedish)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="copy_protection" value="Serial number required: 8E-046-018192, 8E-046-015848, 8E-046-019252" />
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "10744031">
+				<rom name="Handla med Alfons (Swedish) (Disk 1).mfi" size="10744031" crc="1881dfa6" sha1="472b3b47bfc6206b2badfd4d49fab223e7ea173a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "9818577">
+				<rom name="Handla med Alfons (Swedish) (Disk 2).mfi" size="9818577" crc="ff859852" sha1="74c1e19fdb6bda035d7ee48bf45bba99b6f91bdc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hardbal3">
 		<description>HardBall 3 (3.5" DD)</description>
 		<year>1992</year>
@@ -17157,6 +17247,29 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		</part>
 	</software>
 
+	<software name="alfonshk" supported="no">
+	    <description>Kom till Alfons hemliga kalas (Swedish)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="copy_protection" value="Serial number required: 8G-046-016181" />
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1511424">
+				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 1).img" size="1511424" crc="7d5e6b2d" sha1="d1ec271304dc2113660a56adc2cf5d687dd72ddd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1511424">
+				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 2).img" size="1511424" crc="0932c0cd" sha1="0f34b3caacce55dab03a7acb24859993463bbbe6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1511424">
+				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 3).img" size="1511424" crc="dc26a1d5" sha1="1a8db7c67f2114682f1dbf00f350f5373ec14e38"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="krustyfh">
 		<description>Krusty's Fun House</description>
 		<year>1993</year>
@@ -18037,6 +18150,19 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		</part>
 	</software>
 
+	<software name="mmalfons">
+	    <description>Måla med Alfons (Swedish)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="copy_protection" value="Serial number required: 8B-046-018116" />
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Maala med Alfons (Swedish).img" size="737280" crc="7a6664e9" sha1="b24eeb8da1fef79021fa2e925da2d946a6423d4c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stryker">
 		<description>Major Stryker</description>
 		<year>1993</year>
@@ -18759,6 +18885,17 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 			<dataarea name="flop" size = "1474560">
 				<!-- <rom name="0605_6.DDI" size="479232" crc="39b6135f" sha1="92c3571fac5e8e48a4318b20d7e03be8a3eaa489"/> -->
 				<rom name="0605_6.img" size="1474560" crc="cd220cce" sha1="d7f37b5b7e46e94f3e96ee1f043c1deb7e952916"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frstprog">
+	    <description>Mitt första datorprogram (Swedish)</description>
+		<year>1991</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Mitt foersta datorprogram (Swedish).img" size="737280" crc="4062c799" sha1="63dcaabfc3220fd696ce35768d3097a37b6e8b63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19889,6 +20026,24 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Push-Over [Hit Squad] [1994] [3.5DD] [Disk 3 of 3].img" size="737280" crc="084b4833" sha1="30c27a7d606aba9aa9d6478f4ad56ad1155726ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmalfons">
+	    <description>Pussla med Alfons (Swedish)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="copy_protection" value="Serial number required: 8C-046-020096" />
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pussla med Alfons (Swedish) (Disk 1).img" size="1474560" crc="3d6c0d52" sha1="7f6d8c88cae42516f5bc02614b33740c9b2ef220"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Pussla med Alfons (Swedish) (Disk 2).img" size="1474560" crc="e9ee1718" sha1="049401ec6d89c767fc580e6051819f681a439c66"/>
 			</dataarea>
 		</part>
 	</software>
