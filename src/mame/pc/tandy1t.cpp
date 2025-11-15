@@ -180,12 +180,12 @@ public:
 	}
 
 	void t1000(machine_config &config) ATTR_COLD;
-	void t1000tl(machine_config &config) ATTR_COLD;
-	void t1000tl2(machine_config &config) ATTR_COLD;
+	void t1000hx(machine_config &config) ATTR_COLD;
 	void t1000sx(machine_config &config) ATTR_COLD;
 	void t1000rl(machine_config &config) ATTR_COLD;
 	void t1000sl2(machine_config &config) ATTR_COLD;
-	void t1000hx(machine_config &config) ATTR_COLD;
+	void t1000tl2(machine_config &config) ATTR_COLD;
+	void t1000tl(machine_config &config) ATTR_COLD;
 	void t1000tx(machine_config &config) ATTR_COLD;
 
 protected:
@@ -833,7 +833,7 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 	PC_JOY(config, "pc_joy");
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("640K");
+	RAM(config, m_ram);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("t1000");
 	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
@@ -877,7 +877,11 @@ void tandy1000_state::t1000(machine_config &config)
 
 	subdevice<isa8_slot_device>("isa_fdc")->set_option_machine_config("fdc_xt", cfg_fdc_525);
 
-	m_ram->set_extra_options("256K, 384K");
+	// 128K onboard, supports one or two expansion modules in ISA slots
+	// Onboard RAM is organised as sixteen 64K*1 DRAMs
+	// Tandy sold 128K and 256K expansions, third-party 512K expansions also exist
+	m_ram->set_default_size("640K");
+	m_ram->set_extra_options("128K, 256K, 384K, 512K");
 
 	for (unsigned i = 0; 3 > i; ++i)
 		ISA8_SLOT(config, m_isa_slots[i], XTAL(14'318'181) / 3, "mb:isa", pc_isa8_cards, nullptr, false);
@@ -889,6 +893,9 @@ void tandy1000_state::t1000hx(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000hx_io);
 
+	// 256K onboard, supports a 128K or 384K expansion in the Plus slot
+	// all onboard RAM controlled by BIGBLUE (eight 64K*4 DRAMs)
+	m_ram->set_default_size("640K");
 	m_ram->set_extra_options("256K, 384K");
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
@@ -904,6 +911,9 @@ void tandy1000_state::t1000sx(machine_config &config)
 	for (unsigned i = 0; 5 > i; ++i)
 		ISA8_SLOT(config, m_isa_slots[i], XTAL(28'636'363) / 4, "mb:isa", pc_isa8_cards, nullptr, false);
 
+	// 384K standard, has sockets for an additional eight 256K*1 DRAMs to expand to 640K
+	// 128K controlled by BIGBLUE (four 64K*4 DRAMs)
+	m_ram->set_default_size("640K");
 	m_ram->set_extra_options("384K");
 }
 
@@ -918,6 +928,7 @@ void tandy1000_state::t1000rl(machine_config &config)
 
 	tandy1000_101key(config);
 
+	m_ram->set_default_size("640K");
 	m_ram->set_extra_options("384K");
 
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
@@ -949,6 +960,8 @@ void tandy1000_state::t1000tl2(machine_config &config)
 	tandy1000_common(config);
 
 	tandy1000_101key(config);
+
+	m_ram->set_default_size("640K");
 
 	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
 
@@ -1062,21 +1075,21 @@ ROM_START( t1000 )
 	ROM_SYSTEM_BIOS( 1, "v010100", "v010100" )
 	ROMX_LOAD("v010100.f0", 0x10000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(1))
 
-	// Part of video array at u76?
+	// Part of VIDEO-ARRAY at U76
 	ROM_REGION(0x08000,"gfx1", 0)
 	ROM_LOAD("8079027.u76", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
 
 ROM_START( t1000hx )
 	ROM_REGION(0x20000,"bios", 0)
-	ROM_LOAD("v020000.u12", 0x00000, 0x20000, CRC(6f3acd80) SHA1(976af8c04c3f6fde14d7047f6521d302bdc2d017)) // TODO: Rom label
+	ROM_LOAD("v020000.u12", 0x00000, 0x20000, CRC(6f3acd80) SHA1(976af8c04c3f6fde14d7047f6521d302bdc2d017)) // TODO: ROM label
 
 	// TODO: Add dump of the 8048 at u9 if it ever gets dumped
 	ROM_REGION(0x400, "kbdc", 0)
 	ROM_LOAD("8048.u9", 0x000, 0x400, NO_DUMP)
 
 	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u31", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location, probably internal to "big blue" at u31
+	ROM_LOAD("8079027.u31", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // internal to BIGBLUE at U31
 
 	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASE00)
 ROM_END
@@ -1085,11 +1098,9 @@ ROM_START( t1000sx )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD("8040328.u41", 0x18000, 0x8000, CRC(4e2b9f0b) SHA1(e79a9ed9e885736e30d9b135557f0e596ce5a70b))
 
-	// No character rom is listed in the schematics?
-	// But disabling it results in no text being printed
-	// Part of bigblue at u30??
+	// Part of BIGBLUE at U30
 	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u30", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
+	ROM_LOAD("8079027.u30", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
 ROM_END
 
 
