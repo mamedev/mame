@@ -745,7 +745,7 @@ license:CC0-1.0
 
 
 
-		<element ref="button" inputtag="ROW1" inputmask="0x01"><!-- SELECT --><bounds x="222" y="250" width="45" height="45"/></element>
+		<element ref="button" inputtag="ROW0" inputmask="0x40"><!-- SELECT --><bounds x="222" y="250" width="45" height="45"/></element>
 		<element ref="select_text"><bounds x="222" y="300" width="45" height="12"/></element>
 
 		<element ref="dark_grey_rect"><bounds x="264" y="214" width="12" height="12"/></element>
