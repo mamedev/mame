@@ -596,12 +596,12 @@ void sega_scu_device::t1_mode_w(uint16_t data)
 }
 
 
-void sega_scu_device::check_scanline_timers(int scanline,int y_step)
+void sega_scu_device::check_scanline_timers(int scanline, int y_step)
 {
 	if(m_tenb == false)
 		return;
 
-	int timer0_compare = (m_t0c & 0x3ff)*y_step;
+	int timer0_compare = (m_t0c & 0x3ff) * y_step;
 
 	// Timer 0
 	if(scanline == timer0_compare)
