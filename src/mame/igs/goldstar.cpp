@@ -665,6 +665,7 @@ public:
 
 	void init_cb2() ATTR_COLD;
 	void init_cbaai() ATTR_COLD;
+	void init_fl7_3121() ATTR_COLD;
 	void init_flam7_tw() ATTR_COLD;
 	void init_flaming7() ATTR_COLD;
 	void init_lucky8a() ATTR_COLD;
@@ -15011,7 +15012,7 @@ static const gfx_layout flam7_tw_tilelayout =  // FIXME
 	256,   // 256 tiles
 	4,     // 4 bits per pixel
 	{ 0, 2, 4, 6 },
-	{ 3*8+0, 3*8+1, 2*8+0, 1*8+0, 1*8+1, 2*8+1, 0, 1 },
+	{ 3*8+0, 3*8+1, 2*8+0, 2*8+1, 1*8+0, 1*8+1, 0, 1 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
 		32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
 		64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
@@ -15238,14 +15239,14 @@ static GFXDECODE_START( gfx_super9 )
 	GFXDECODE_ENTRY( "gfx2", 0, super9_tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_flaming7 )  // gfx 2 still wrong...
+static GFXDECODE_START( gfx_flaming7 )
 	GFXDECODE_ENTRY( "gfx1", 0, flaming7_charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 104,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, flaming7_tilelayout, 128,  8 )
 GFXDECODE_END
 
-static GFXDECODE_START( gfx_flam7_tw )  // gfx 2 still wrong...
+static GFXDECODE_START( gfx_flam7_tw )
 	GFXDECODE_ENTRY( "gfx1", 0, flam7_tw_charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, flam7_tw_tilelayout, 104,  8 )
+	GFXDECODE_ENTRY( "gfx2", 0, flam7_tw_tilelayout, 128,  8 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_nfm )
@@ -16046,6 +16047,7 @@ void wingco_state::flaming7(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
 
 	m_gfxdecode->set_info(gfx_flaming7);
+	PALETTE(config.replace(), m_palette, FUNC(wingco_state::cm_palette), 256);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
@@ -16061,6 +16063,7 @@ void wingco_state::flam7_tw(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
 
 	m_gfxdecode->set_info(gfx_flam7_tw);
+	PALETTE(config.replace(), m_palette, FUNC(wingco_state::cm_palette), 256);
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
@@ -28345,15 +28348,16 @@ ROM_END
   Needs proper graphics ROM decryption and gfxdecode...
 
 */
-ROM_START( fl7_tw )  // Serial 00000050E9B7.
+// Flaming 7's TW - Cherry Bonus - Nevada Numbers - Diamonds 7's
+ROM_START( fl7_tw )  // Serial 00000050E9B7. 
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_tw.u20",  0x0000, 0x10000, CRC(50927a1b) SHA1(2557069f497b23f13978294f3ac108229d9db544) )  // identical halves.
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "m27c1001_tw.u1", 0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
+	ROM_LOAD( "m27c1001_tw.u1",  0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "27c256_tw.u3",   0x0000, 0x8000, CRC(7f163639) SHA1(607aa1e7d15423409bb2cd49895502dc2e4b3e46) )
+	ROM_LOAD( "27c256.u3",  0x0000, 0x8000, CRC(23ae8d1a) SHA1(d9b7c442b6c7c58380a84b63cab7748f1c902fba) )
 
 	// Bipolar PROM dump borrowed from main sets
 	ROM_REGION( 0x200, "proms", 0 )
@@ -30826,7 +30830,20 @@ void wingco_state::init_flam7_tw()
 */
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x60b3] = 0x05;
+}
 
+void wingco_state::init_fl7_3121()
+{
+	uint8_t *rom = memregion("proms2")->base();
+
+//	uint8_t col4 = rom[0x04];
+	uint8_t col8 = rom[0x08];
+	rom[0x04] = col8;
+	rom[0x14] = col8;
+//	rom[0x08] = col4;
+//	rom[0x18] = col4;
+
+	m_palette->update();
 }
 
 void cmaster_state::init_tcl()
@@ -31444,12 +31461,12 @@ GAME(  2002, mbs2euro,   0,        mbstar,   mbstar,   wingco_state,   init_mbs2
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   empty_init,     ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
+GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   init_fl7_3121,  ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
 GAME(  199?, fl7_50,     0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 GAME(  199?, fl7_500,    fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 GAME(  199?, fl7_2000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs proper reels gfx ROMs decryption.
+GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs the bg and window, and scroll ram fix
+GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs the bg and window
 
 
 // --- Wing W-6 hardware ---
