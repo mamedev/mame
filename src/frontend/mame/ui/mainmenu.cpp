@@ -190,7 +190,8 @@ void menu_main::populate()
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-
+	if (!machine().options().skip_gameinfo())
+	{
 	if (!mame_machine_manager::instance()->favorite().is_favorite(machine()))
 		item_append(_("menu-main", "Add To Favorites"), 0, (void *)FAVORITE);
 	else
@@ -215,7 +216,7 @@ void menu_main::populate()
 	}
 }
 
-
+}
 /*-------------------------------------------------
     handle - handle main menu events
 -------------------------------------------------*/

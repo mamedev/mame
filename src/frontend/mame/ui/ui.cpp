@@ -303,6 +303,7 @@ void mame_ui_manager::init()
 			handler_callback_func(
 				[this] (render_container &container) -> uint32_t
 				{
+					if (!machine().options().skip_gameinfo())
 					draw_text_box(container, messagebox_text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
 					return 0;
 				}));
@@ -635,6 +636,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging, or if there's no mame window to send inputs to
+	first_time = show_gameinfo;
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) || video_none)
 		show_gameinfo = show_warnings = false;
 
