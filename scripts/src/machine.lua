@@ -3423,17 +3423,6 @@ if (MACHINES["SMC91C9X"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/smpc.h,MACHINES["SMPC"] = true
----------------------------------------------------
-
-if (MACHINES["SMPC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/smpc.cpp",
-		MAME_DIR .. "src/devices/machine/smpc.h",
-	}
-end
 
 ---------------------------------------------------
 --

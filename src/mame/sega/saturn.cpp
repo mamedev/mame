@@ -431,7 +431,6 @@ test1f diagnostic hacks:
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "machine/nvram.h"
-#include "machine/smpc.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"
@@ -547,7 +546,7 @@ uint32_t sat_console_state::abus_dummy_r(offs_t offset)
 void sat_console_state::saturn_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0).nopw(); // bios
-	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
+	map(0x00100000, 0x0010007f).mirror(0x2007ff80).m(m_smpc_hle, FUNC(smpc_hle_device::io_map));
 	map(0x00180000, 0x0018ffff).rw(FUNC(sat_console_state::backupram_r), FUNC(sat_console_state::backupram_w)).share("share1");
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
 	map(0x01000000, 0x017fffff).w(FUNC(sat_console_state::saturn_minit_w));

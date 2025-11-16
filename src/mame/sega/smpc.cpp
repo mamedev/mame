@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, R. Belmont
 /************************************************************************************
 
@@ -6,8 +6,6 @@ Sega Saturn SMPC - System Manager and Peripheral Control MCU simulation
 
 The SMPC is actually a 4-bit Hitachi HD404920FS MCU, labeled with a Sega custom
 315-5744 (that needs decapping)
-
-MCU simulation by Angelo Salese & R. Belmont
 
 TODO:
 - timings;
@@ -165,8 +163,9 @@ SMPC NVRAM contents:
 #include "screen.h"
 #include "coreutil.h"
 
+#define LOG_COMMAND (1U << 1)
+#define LOG_PAD_CMD (1U << 2)
 
-#define LOG_PAD_CMD (1U << 1)
 #define VERBOSE (0)
 #include "logmacro.h"
 
@@ -178,11 +177,12 @@ SMPC NVRAM contents:
 // device type definition
 DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE (HD404920FS)")
 
-// TODO: use DEVICE_ADDRESS_MAP once this fatalerror is fixed:
-// "uplift_submaps unhandled case: range straddling slots."
-void smpc_hle_device::smpc_regs(address_map &map)
+void smpc_hle_device::io_map(address_map &map)
 {
-//  map.unmap_value_high();
+	map(0x00, 0x7f).lr8(NAME([this] (offs_t offset) {
+		logerror("%s: Read to [%02x] open bus address\n", machine().describe_context(), offset & 0x7f);
+		return offset & 1 ? 0x00 : 0xff;
+	}));
 	map(0x00, 0x0d).w(FUNC(smpc_hle_device::ireg_w));
 	map(0x1f, 0x1f).w(FUNC(smpc_hle_device::command_register_w));
 	map(0x20, 0x5f).r(FUNC(smpc_hle_device::oreg_r));
@@ -206,9 +206,7 @@ void smpc_hle_device::smpc_regs(address_map &map)
 
 smpc_hle_device::smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SMPC_HLE, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
 	, device_rtc_interface(mconfig, *this)
-	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 7, 0, address_map_constructor(FUNC(smpc_hle_device::smpc_regs), this))
 	, m_mini_nvram(*this, "smem")
 	, m_mshres(*this)
 	, m_mshnmi(*this)
@@ -292,8 +290,8 @@ void smpc_hle_device::device_reset()
 	m_pdr1_readback = 0;
 	m_pdr2_readback = 0;
 
-	memset(m_ireg,0,7);
-	memset(m_oreg,0,32);
+	memset(m_ireg, 0, 7);
+	memset(m_oreg, 0, 32);
 
 	m_cmd_timer->reset();
 	m_intback_timer->reset();
@@ -320,13 +318,6 @@ void smpc_hle_device::rtc_clock_updated(int year, int month, int day, int day_of
 	m_rtc_data[4] = DectoBCD(hour);
 	m_rtc_data[5] = DectoBCD(minute);
 	m_rtc_data[6] = DectoBCD(second);
-}
-
-device_memory_interface::space_config_vector smpc_hle_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
 }
 
 
@@ -367,8 +358,8 @@ void smpc_hle_device::ireg_w(offs_t offset, uint8_t data)
 
 uint8_t smpc_hle_device::oreg_r(offs_t offset)
 {
-	if (!(offset & 1)) // avoid reading to even bytes (TODO: is it 0s or 1s?)
-		return 0x00;
+	if (!(offset & 1))
+		return 0xff;
 
 	return m_oreg[offset >> 1];
 }
@@ -381,7 +372,7 @@ uint8_t smpc_hle_device::status_register_r()
 uint8_t smpc_hle_device::status_flag_r()
 {
 	// bit 3: CD enable related?
-	return (m_sf<<0) | (m_cd_sf<<3);
+	return (m_sf << 0) | (m_cd_sf << 3);
 }
 
 void smpc_hle_device::status_flag_w(uint8_t data)
@@ -491,18 +482,6 @@ inline void smpc_hle_device::irq_request()
 	m_irq_line(0);
 }
 
-// TODO: trampolines that needs to go away
-
-uint8_t smpc_hle_device::read(offs_t offset)
-{
-	return this->space().read_byte(offset);
-}
-
-void smpc_hle_device::write(offs_t offset, uint8_t data)
-{
-	this->space().write_byte(offset,data);
-}
-
 //**************************************************************************
 //  Command simulation
 //**************************************************************************
@@ -563,18 +542,21 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 	switch(m_comreg)
 	{
 		case 0x00: // MSHON
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x MSHON\n", m_comreg);
 			// enable Master SH2
 			m_mshres(m_comreg & 1);
 			break;
 
 		case 0x02: // SSHON
 		case 0x03: // SSHOFF
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x SSH%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			// enable or disable Slave SH2
 			m_sshres(m_comreg & 1);
 			break;
 
 		case 0x06: // SNDON
 		case 0x07: // SNDOFF
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x SND%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			// enable or disable 68k
 			m_sndres(m_comreg & 1);
 			break;
@@ -582,6 +564,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		case 0x08: // CDON
 		case 0x09: // CDOFF
 			// ...
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x CD%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			m_command_in_progress = false;
 			m_oreg[31] = m_comreg;
 			// TODO: diagnostic also wants this to have bit 3 high
@@ -594,9 +577,11 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			popmessage("%s: NetLink enabled", this->tag());
 			 [[fallthrough]];
 		case 0x0b: // NETLINKOFF
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x NETLINK%s\n", m_comreg, m_comreg & 1 ? "OFF" : "ON");
 			break;
 
 		case 0x0d: // SYSRES
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x SYSRES\n", m_comreg);
 			// send a 1 -> 0 to device reset lines
 			m_sysres(1);
 			m_sysres(0);
@@ -608,6 +593,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 
 		case 0x0e: // CKCHG352
 		case 0x0f: // CKCHG320
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x CKCHG%s\n", m_comreg, m_comreg & 1 ? "320" : "352");
 			m_dotsel(m_comreg & 1);
 
 			// assert Slave SH2 line
@@ -626,19 +612,24 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			break;
 
 		case 0x10: // INTBACK
+			// ignore logging, very verbose
 			resolve_intback();
 			return;
 
 		case 0x16: // SETTIME
 		{
-			for(int i=0;i<7;i++)
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x SETTIME\n", m_comreg);
+
+			for(int i = 0; i < 7; i++)
 				m_rtc_data[i] = m_ireg[i];
 			break;
 		}
 
 		case 0x17: // SETSMEM
 		{
-			for(int i=0;i<4;i++)
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x SETSMEM\n", m_comreg);
+
+			for(int i = 0; i < 4; i++)
 				m_smem[i] = m_ireg[i];
 
 			// clear the SETIME variable, simulate a cr2032 battery alive in the system
@@ -647,17 +638,19 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 		}
 
 		case 0x18: // NMIREQ
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x NMIREQ\n", m_comreg);
 			// NMI is unconditionally requested
 			master_sh2_nmi();
 			break;
 
 		case 0x19: // RESENAB
 		case 0x1a: // RESDISA
+			LOGMASKED(LOG_COMMAND, "SMPC: %02x RES%s\n", m_comreg, m_comreg & 1 ? "DISA" : "ENAB");
 			m_NMI_reset = m_comreg & 1;
 			break;
 
 		default:
-			logerror("%s: unemulated %02x command\n",this->tag(),m_comreg);
+			popmessage("%s: unemulated %02x command", this->tag(), m_comreg);
 			return;
 	}
 

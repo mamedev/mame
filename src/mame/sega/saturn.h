@@ -13,8 +13,8 @@
 
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
+#include "smpc.h"
 #include "machine/sega_scu.h"
-#include "machine/smpc.h"
 #include "machine/timer.h"
 
 #include "sound/scsp.h"
