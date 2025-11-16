@@ -28240,9 +28240,6 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
-	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
-
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
@@ -28270,9 +28267,6 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
-
-	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
 	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
@@ -28302,9 +28296,6 @@ ROM_START( fl7_2000 )  // Serial 00000063A47F.
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
-	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
-
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
@@ -28332,9 +28323,6 @@ ROM_START( fl7_2k16 )  // Serial 000000743111.
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
-
-	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
@@ -28364,8 +28352,24 @@ ROM_START( fl7_tw )  // Serial 00000050E9B7.
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
-	ROM_REGION( 0x20, "proms2", 0 )
-	ROM_LOAD( "dummy", 0x0000, 0x0020, NO_DUMP )
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
+	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+ROM_END
+
+// Special 7's
+ROM_START( special7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u20.bin",  0x0000, 0x10000, CRC(c20e04a0) SHA1(37045ba628cc6df313014e0e9f91fffbb4b19a06) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "u1.bin",  0x00000, 0x20000, CRC(7e603969) SHA1(5627de945bc8edf9fc73a939a763665a7e2884ae) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "u3.bin",  0x0000, 0x8000, CRC(63498f59) SHA1(d0607a4f85b37a525e6f03604e678836dee5e277) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "ws57c291_prom.bin", 0x0000, 0x0200, CRC(7437acfb) SHA1(3a96dc6585cf39696c4157790920091f6fff813d) )
+	ROM_IGNORE(                            0x0600 )
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
@@ -31465,8 +31469,9 @@ GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   init_fl7_
 GAME(  199?, fl7_50,     0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 GAME(  199?, fl7_500,    fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
 GAME(  199?, fl7_2000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs the bg and window, and scroll ram fix
-GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs the bg and window
+GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs bg layer and window, and scroll ram fix
+GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs bg layer and window
+GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // needs prg decryption, bg layer and window
 
 
 // --- Wing W-6 hardware ---
