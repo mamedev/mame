@@ -17,11 +17,8 @@ class pc_t1t_device :
 		public device_memory_interface
 {
 public:
-	// configuration
-	template <typename T> pc_t1t_device &set_chr_gen_tag(T &&tag) { m_chr_gen.set_tag(std::forward<T>(tag)); return *this; }
-
 	void t1000_de_changed(int state);
-	uint8_t read(offs_t offset);
+	uint8_t read(address_space &space, offs_t offset);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( t1000_text_inten_update_row );
@@ -54,7 +51,15 @@ protected:
 	};
 
 	// construction/destruction
-	pc_t1t_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrbits);
+	pc_t1t_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			uint8_t addrbits,
+			unsigned chr_size,
+			unsigned ra_offset);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual uint32_t palette_entries() const noexcept override { return 32; }
@@ -76,6 +81,8 @@ protected:
 	required_region_ptr<uint8_t> m_chr_gen;
 	required_device<mc6845_device> m_mc6845;
 
+	unsigned const m_chr_size, m_ra_offset;
+
 	uint32_t m_display_base, m_window_base;
 
 	uint8_t m_mode_control, m_color_select;
@@ -87,9 +94,6 @@ protected:
 
 	int m_pc_framecnt;
 
-	uint8_t m_chr_size;
-	uint16_t m_ra_offset;
-
 	uint8_t m_address_data_ff;
 
 	int m_update_row_type;
@@ -99,7 +103,7 @@ protected:
 };
 
 
-class pcvideo_t1000_device :  public pc_t1t_device
+class pcvideo_t1000_device : public pc_t1t_device, public device_gfx_interface
 {
 public:
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -116,6 +120,7 @@ public:
 protected:
 	pcvideo_t1000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrbits);
 
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
@@ -133,6 +138,22 @@ private:
 DECLARE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device)
 
 
+class pcvideo_t1000x_device :  public pcvideo_t1000_device
+{
+public:
+	static auto parent_rom_device_type() { return &PCVIDEO_T1000; }
+
+	pcvideo_t1000x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	pcvideo_t1000x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrbits);
+
+	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
+};
+
+DECLARE_DEVICE_TYPE(PCVIDEO_T1000X, pcvideo_t1000x_device)
+
+
 class pcvideo_pcjr_device :  public pc_t1t_device
 {
 public:
@@ -141,6 +162,7 @@ public:
 
 	// configuration
 	auto vsync_callback() { return m_vsync_cb.bind(); }
+	template <typename T> pcvideo_pcjr_device &set_chr_gen_tag(T &&tag) { m_chr_gen.set_tag(std::forward<T>(tag)); return *this; }
 	template <typename T> pcvideo_pcjr_device &set_kanji_tag(T &&tag) { m_jxkanji.set_tag(std::forward<T>(tag)); return *this; }
 
 	void write(offs_t offset, uint8_t data);

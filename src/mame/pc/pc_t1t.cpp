@@ -8,6 +8,13 @@
     Note that in the IBM PC Junior world, the term 'vga' is not the 'vga' that
     most people think of
 
+    The Tandy 1000 used an actual 6845 CRT controller, while later models
+    integrated equivalent functionality into custom chips.
+    * The Tandy 1000A integrates the functionality into the 8079010 Custom
+      Address Array.
+    * The Tandy 1000 SX and Tandy 1000 HX integrate the functionality into
+      the BIGBLUE video array.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -15,6 +22,8 @@
 
 #include "screen.h"
 
+
+namespace {
 
 enum
 {
@@ -29,8 +38,48 @@ enum
 };
 
 
-DEFINE_DEVICE_TYPE(PCVIDEO_T1000, pcvideo_t1000_device, "tandy_1000_graphics", "Tandy 1000 Graphics Adapter")
-DEFINE_DEVICE_TYPE(PCVIDEO_PCJR,  pcvideo_pcjr_device,  "pcjr_graphics",       "PC Jr Graphics Adapter")
+ROM_START(pcvideo_t1000)
+	// ROM dump from a 16-bit model with external character ROM marked:
+	// 8079027
+	// NCR
+	// 609-2495004
+	// F841030 A9025
+	ROM_REGION(0x8000, "chrgen", 0)
+	ROM_LOAD("video-array.chr", 0x0000, 0x4000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
+ROM_END
+
+ROM_START(pcvideo_t1000x)
+	// ROM dump from a 16-bit model with external character ROM marked:
+	// 8079027
+	// NCR
+	// 609-2495004
+	// F841030 A9025
+	ROM_REGION(0x8000, "chrgen", 0)
+	ROM_LOAD("bigblue.chr", 0x0000, 0x4000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
+ROM_END
+
+
+static gfx_layout const t1000_charlayout =
+{
+	8, 16,
+	256,
+	1,
+	{ 0 },
+	{ STEP8(0, 1) },
+	{ STEP16(0, 2048) },
+	8
+};
+
+static GFXDECODE_START(gfx_t1000)
+	GFXDECODE_DEVICE("chrgen", 0x0000, t1000_charlayout, 3, 1)
+GFXDECODE_END
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE(PCVIDEO_T1000,  pcvideo_t1000_device,  "tandy_1000_graphics",  "Tandy 1000 built-in video (VIDEO-ARRAY)")
+DEFINE_DEVICE_TYPE(PCVIDEO_T1000X, pcvideo_t1000x_device, "tandy_1000x_graphics", "Tandy 1000 X built-in videeo (BIGBLUE)")
+DEFINE_DEVICE_TYPE(PCVIDEO_PCJR,   pcvideo_pcjr_device,   "pcjr_graphics",        "IBM PCjr built-in video")
 
 
 pc_t1t_device::pc_t1t_device(
@@ -39,7 +88,9 @@ pc_t1t_device::pc_t1t_device(
 		const char *tag,
 		device_t *owner,
 		uint32_t clock,
-		uint8_t addrbits) :
+		uint8_t addrbits,
+		unsigned chr_size,
+		unsigned ra_offset) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_palette_interface(mconfig, *this),
@@ -47,6 +98,8 @@ pc_t1t_device::pc_t1t_device(
 	m_vram_config("vram", ENDIANNESS_LITTLE, 8, addrbits, 0, address_map_constructor(FUNC(pc_t1t_device::default_map), this)),
 	m_chr_gen(*this, finder_base::DUMMY_TAG),
 	m_mc6845(*this, "mc6845_t1000"),
+	m_chr_size(chr_size),
+	m_ra_offset(ra_offset),
 	m_display_base(0),
 	m_window_base(0),
 	m_mode_control(0),
@@ -54,8 +107,6 @@ pc_t1t_device::pc_t1t_device(
 	m_status(0),
 	m_bank(0),
 	m_pc_framecnt(0),
-	m_chr_size(0),
-	m_ra_offset(0),
 	m_address_data_ff(0),
 	m_update_row_type(-1),
 	m_display_enable(0),
@@ -80,8 +131,29 @@ pcvideo_t1000_device::pcvideo_t1000_device(
 		device_t *owner,
 		uint32_t clock,
 		uint8_t addrbits) :
-	pc_t1t_device(mconfig, type, tag, owner, clock, addrbits),
+	pc_t1t_device(mconfig, type, tag, owner, clock, addrbits, 1, 256),
+	device_gfx_interface(mconfig, *this, gfx_t1000, DEVICE_SELF),
 	m_disable(false)
+{
+}
+
+pcvideo_t1000x_device::pcvideo_t1000x_device(
+		const machine_config &mconfig,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock) :
+	pcvideo_t1000x_device(mconfig, PCVIDEO_T1000X, tag, owner, clock, 18)
+{
+}
+
+pcvideo_t1000x_device::pcvideo_t1000x_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		uint8_t addrbits) :
+	pcvideo_t1000_device(mconfig, type, tag, owner, clock, addrbits)
 {
 }
 
@@ -90,7 +162,7 @@ pcvideo_pcjr_device::pcvideo_pcjr_device(
 		const char *tag,
 		device_t *owner,
 		uint32_t clock) :
-	pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock, 17),
+	pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock, 17, 8, 1),
 	m_jxkanji(*this, finder_base::DUMMY_TAG),
 	m_vsync_cb(*this)
 {
@@ -122,8 +194,6 @@ void pcvideo_t1000_device::device_start()
 	pc_t1t_device::device_start();
 
 	m_bank = 0;
-	m_chr_size = 1;
-	m_ra_offset = 256;
 }
 
 void pcvideo_pcjr_device::device_start()
@@ -134,8 +204,6 @@ void pcvideo_pcjr_device::device_start()
 
 	m_bank = 0;
 	m_mode_control = 0x08;
-	m_chr_size = 8;
-	m_ra_offset = 1;
 
 	if ((m_jxkanji.finder_tag() != finder_base::DUMMY_TAG) && !m_jxkanji)
 		throw emu_fatalerror("%s: kanji ROM region %s configured but not found", tag(), m_jxkanji.finder_tag());
@@ -160,8 +228,22 @@ void pc_t1t_device::default_map(address_map &map)
 
 ***************************************************************************/
 
+tiny_rom_entry const *pcvideo_t1000_device::device_rom_region() const
+{
+	return ROM_NAME(pcvideo_t1000);
+}
+
+
+tiny_rom_entry const *pcvideo_t1000x_device::device_rom_region() const
+{
+	return ROM_NAME(pcvideo_t1000x);
+}
+
+
 void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
 {
+	m_chr_gen.set_tag("chrgen");
+
 	screen_device &screen(SCREEN(config, T1000_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(14'318'181),912,0,640,262,0,200);
 	screen.set_screen_update(m_mc6845, FUNC(mc6845_device::screen_update));
@@ -849,7 +931,7 @@ int pc_t1t_device::bank_r()
 
 void pcvideo_t1000_device::write(offs_t offset, uint8_t data)
 {
-	switch( offset )
+	switch (offset & 0x0f)
 	{
 		case 0: case 2: case 4: case 6:
 			m_mc6845->address_w(data);
@@ -921,9 +1003,9 @@ void pcvideo_pcjr_device::write(offs_t offset, uint8_t data)
 }
 
 
-uint8_t pc_t1t_device::read(offs_t offset)
+uint8_t pc_t1t_device::read(address_space &space, offs_t offset)
 {
-	int data = 0xff;
+	int data = space.unmap();
 
 	switch (offset)
 	{
@@ -935,16 +1017,17 @@ uint8_t pc_t1t_device::read(offs_t offset)
 			data = m_mc6845->register_r();
 			break;
 
-		case 8:
+		case 8: // FIXME: this is a write-only register
 			data = mode_control_r();
 			break;
 
-		case 9:
+		case 9: // FIXME: this is a write-only register
 			data = color_select_r();
 			break;
 
 		case 10:
-			m_address_data_ff = 0;
+			if (!machine().side_effects_disabled())
+				m_address_data_ff = 0;
 			data = status_r();
 			break;
 
@@ -960,7 +1043,7 @@ uint8_t pc_t1t_device::read(offs_t offset)
 			data = vga_data_r();
 			break;
 
-		case 15:
+		case 15: // FIXME: this is a write-only register
 			data = bank_r();
 			break;
 	}
