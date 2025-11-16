@@ -59,23 +59,25 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &_name, 
 
 	std::string name(_name);
 
+	CTFontSymbolicTraits traits = 0;
+	CTFontSymbolicTraits trait_mask = kCTFontTraitBold | kCTFontTraitItalic;
+
 	if (name.find('|') != std::string::npos)
 	{
-		// Handle the "Font Family|Style" type of font name, by
-		// modifying the name to be more likely a PostScript name:
-		// - Style is separated from family name by '-', not '|'.
-		strreplace(name, "|", "-");
-		// - Spaces within the name are removed.
-		strreplace(name, " ", "");
-		std::string regular("-Regular");
-
-		// - The "Regular" style is not spelled out.
-		if (name.rfind(regular) == name.length() - regular.length())
+		// Handle the "Font Family|Style" type of font name:
+		// Separate it into family and style, and extract bold and italic style information
+		// into CTFontSymbolicTraits.
+		std::string::size_type const separator = name.rfind('|');
+		std::string const style((std::string::npos != separator) ? name.substr(separator + 1) : std::string());
+		if ((style.find("Bold") != std::string::npos) || (style.find("Black") != std::string::npos))
 		{
-			name = name.substr(0, name.length() - regular.length());
+			traits |= kCTFontTraitBold;
 		}
-
-		osd_printf_verbose("osd_font_osx::open: candidate PostScript name=\"%s\"\n", name);
+		if ((style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos))
+		{
+			traits |= kCTFontTraitItalic;
+		}
+		name = name.substr(0, separator);
 	}
 
 	CFStringRef font_name;
@@ -103,12 +105,24 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &_name, 
 		return false;
 	}
 
-	CTFontDescriptorRef const font_descriptor(CTFontDescriptorCreateWithNameAndSize(font_name, 0.0));
+	CTFontDescriptorRef font_descriptor(CTFontDescriptorCreateWithNameAndSize(font_name, 0.0));
 	CFRelease(font_name);
 	if (!font_descriptor)
 	{
 		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font descriptor for \"%s\"\n", name);
 		return false;
+	}
+
+	if (traits != 0)
+	{
+		CTFontDescriptorRef styled_descriptor(CTFontDescriptorCreateCopyWithSymbolicTraits(font_descriptor, traits, trait_mask));
+		CFRelease(font_descriptor);
+		if (!styled_descriptor)
+		{
+			osd_printf_verbose("osd_font_osx::open: failed to create styled CoreText font descriptor for \"%s\" with traits=%08x\n", name, traits);
+			return false;
+		}
+		font_descriptor = styled_decscriptor;
 	}
 
 	CTFontRef const ct_font(CTFontCreateWithFontDescriptor(font_descriptor, POINT_SIZE, &CGAffineTransformIdentity));
