@@ -2476,13 +2476,14 @@ public:
 	{
 		m_string = env.get_attribute_string(compnode, "string");
 		m_textalign = env.get_attribute_int(compnode, "align", 0);
+		m_font = env.get_attribute_string(compnode, "font", "default");
 	}
 
 protected:
 	// overrides
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		auto font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc(m_font.c_str());
 		draw_text(*font, dest, bounds, m_string, m_textalign, color(state));
 	}
 
@@ -2490,6 +2491,7 @@ private:
 	// internal state
 	std::string         m_string;                   // string for text components
 	int                 m_textalign;                // text alignment to box
+	std::string         m_font;                     // the font to use
 };
 
 

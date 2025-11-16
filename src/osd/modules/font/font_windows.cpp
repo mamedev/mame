@@ -67,6 +67,17 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 	bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 	bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
+	if (name.find('|') != std::string::npos)
+	{
+		// Handle the "Font Family|Style" type of font name:
+		// Separate it into family and style, and extract bold and italic style information.
+		std::string::size_type const separator = name.rfind('|');
+		std::string const style((std::string::npos != separator) ? name.substr(separator + 1) : std::string());
+		bold |= (style.find("Bold") != std::string::npos) || (style.find("Black") != std::string::npos);
+		italic |= (style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos);
+		name = name.substr(0, separator);
+	}
+
 	// build a basic LOGFONT description of what we want
 	LOGFONT logfont;
 	logfont.lfHeight = DEFAULT_HEIGHT;
