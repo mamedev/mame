@@ -122,7 +122,7 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &_name, 
 			osd_printf_verbose("osd_font_osx::open: failed to create styled CoreText font descriptor for \"%s\" with traits=%08x\n", name, traits);
 			return false;
 		}
-		font_descriptor = styled_decscriptor;
+		font_descriptor = styled_descriptor;
 	}
 
 	CTFontRef const ct_font(CTFontCreateWithFontDescriptor(font_descriptor, POINT_SIZE, &CGAffineTransformIdentity));
