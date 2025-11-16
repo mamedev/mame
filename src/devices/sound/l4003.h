@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_SOUND_L4003_DSP_A_H
-#define MAME_SOUND_L4003_DSP_A_H
-
+#ifndef MAME_SOUND_L4003_H
+#define MAME_SOUND_L4003_H
 #pragma once
 class l4003_sound_device : public device_t,
 							 public device_sound_interface,
@@ -59,4 +58,4 @@ private:
 
 DECLARE_DEVICE_TYPE(L4003, l4003_sound_device)
 
-#endif // MAME_SOUND_L4003_DSP_A_H
+#endif // MAME_SOUND_L4003_H
