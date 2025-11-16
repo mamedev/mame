@@ -25,6 +25,11 @@
     C800-CBFF: ROM page 1
     CC00-CFEF: VRAM window or ROM page 2
 
+    TODO:
+        - Videx logo splash on Ultraterm demo disk has stride problems
+        - DIP switches
+        - Ability to /INH $C300 away on the IIe (known not to work on IIgs)
+
 *********************************************************************/
 
 #include "emu.h"
@@ -34,6 +39,14 @@
 
 #include "screen.h"
 
+#define LOG_REGISTERS   (1U << 1)
+#define LOG_VRAM        (1U << 2)
+#define LOG_HIFREQ      (1U << 3)
+
+#define VERBOSE (0)
+
+// #define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
 
 namespace {
 
@@ -83,6 +96,8 @@ ROM_START( a2ultraterm )
 	ROM_LOAD( "ult_2a313.jed", 0x000000, 0x000305, CRC(dcd51dea) SHA1(0ad0c5e802e48495da27f7bd26ee3ab1c92d74dd) )
 ROM_END
 
+// MouseText replaces the "lo res graphics" characters in both fonts here so the original demo disk
+// does not look correct with this set.
 ROM_START( a2ultratermenh )
 	ROM_REGION(0x1000, ULTRATERM_ROM_REGION, 0)
 	ROM_LOAD( "frm_b5c9.bin", 0x000000, 0x001000, CRC(b71e05e0) SHA1(092e3eda4644d4f465809864a7f023ac7d1d1542) )
@@ -242,7 +257,7 @@ void a2bus_videx160_device::reset_from_bus()
 
 uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 {
-//    printf("%s Read c0n%x\n", machine().describe_context().c_str(), offset);
+	LOGMASKED(LOG_HIFREQ, "%s Read c0n%x\n", machine().describe_context().c_str(), offset);
 
 	if (!(m_ctrl1 & CT1_VTEMU))
 	{
@@ -271,7 +286,7 @@ uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 
 void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//    printf("%s Write %02x to c0n%x\n", machine().describe_context().c_str(), data, offset);
+	LOGMASKED(LOG_HIFREQ, "%s Write %02x to c0n%x\n", machine().describe_context().c_str(), data, offset);
 
 	switch (offset)
 	{
@@ -289,7 +304,7 @@ void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 
 		case 3:
 			m_ctrl2 = data;
-//          printf("%02x to ctrl2\n", data);
+			LOGMASKED(LOG_REGISTERS, "%02x to ctrl2\n", data);
 			break;
 	}
 
@@ -302,7 +317,7 @@ void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 void a2bus_videx160_device::write_ctrl1(uint8_t data)
 {
 	m_ctrl1 = data;
-//  printf("%02x to ctrl1\n", data);
+	LOGMASKED(LOG_REGISTERS, "%02x to ctrl1\n", data);
 
 	m_crtc->set_clock((data & CT1_CLKSEL ? CLOCK_HIGH : CLOCK_LOW) / 9);
 
@@ -337,19 +352,19 @@ void a2bus_videx160_device::write_cnxx(uint8_t offset, uint8_t data)
 uint8_t a2bus_videx160_device::read_c800(uint16_t offset)
 {
 	// ROM at c800-cbff
-	// bankswitched RAM at cc00-cdff
+	// bankswitched RAM or ROM at cc00-cdff
 	if (offset < 0x400)
 	{
-//        printf("Read VRAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
 		return m_rom[offset + 0x800];
 	}
 	else
 	{
-		if (m_ctrl1 & CT1_MEMSEL)   // read ROM?
+		if (m_ctrl1 & CT1_MEMSEL)   // read ROM
 		{
 			return m_rom[offset + 0x800];
 		}
 
+		LOGMASKED(LOG_VRAM, "Read VRAM at %x = %02x\n", offset + m_rambank, m_ram[offset + m_rambank]);
 		return m_ram[(offset & (m_ctrl1 & CT1_VTEMU ? 0x0ff : 0x1ff)) + m_rambank];
 	}
 }
@@ -361,7 +376,7 @@ void a2bus_videx160_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (offset >= 0x400)
 	{
-//        printf("%02x to VRAM at %x\n", data, offset-0x400+m_rambank);
+		LOGMASKED(LOG_VRAM, "%02x to VRAM at %x\n", data, offset - 0x400 + m_rambank);
 		m_ram[(offset & (m_ctrl1 & CT1_VTEMU ? 0x0ff : 0x1ff)) + m_rambank] = data;
 	}
 }
@@ -374,9 +389,15 @@ MC6845_UPDATE_ROW( a2bus_videx160_device::crtc_update_row )
 
 	for ( int i = 0; i < x_count; i++ )
 	{
-		uint16_t offset = ( ma + i );
+		const uint16_t offset = ( ma + i );
 		uint8_t chr = m_ram[ offset & addr_mask ];
-		uint8_t data = m_chrrom[ chr_base + (chr * 16) ];
+		uint16_t chr_address = ((chr & 0x7f) << 4) | 0x800;
+		if (m_ctrl2 & CT2_HIDENSITY)
+		{
+			chr_address &= ~0x800;
+		}
+
+		uint8_t data = m_chrrom[ chr_base + chr_address ];
 		uint8_t fg = 2;
 		uint8_t bg = 0;
 		uint8_t tmp;
@@ -435,15 +456,15 @@ MC6845_UPDATE_ROW( a2bus_videx160_device::crtc_update_row )
 			data = 0xFF;
 		}
 
-		*p = ultraterm_palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x01 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x01 ) ? fg : bg]; p++;
+		*p++ = ultraterm_palette[(data & 0x80) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x40) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x20) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x10) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x08) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x04) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x02) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x01) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x01) ? fg : bg];
 	}
 }
 
