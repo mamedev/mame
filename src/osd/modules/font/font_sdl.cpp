@@ -96,6 +96,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 		if (!file.open(family))
 		{
 			std::string full_name = file.fullpath();
+			osd_printf_verbose("Searching font %s in '%s'/s\n", family, full_name);
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE, 0);
 			if (font)
 				osd_printf_verbose("Found font %s\n", full_name);
@@ -118,6 +119,8 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 		}
 		return false;
 	}
+
+	osd_printf_verbose("Found font '%s' style '%s'\n", TTF_FontFaceFamilyName(font.get()), TTF_FontFaceStyleName(font.get()));
 
 	// apply styles
 	int styleflags = 0;
