@@ -181,42 +181,42 @@
 	</element>
 	<element name="rect_black">
 		<rect>
-			<color red="0" green="0" blue="0" />
+			<color hex="000000" />
 		</rect>
 	</element>
 	<element name="rect_panel">
 		<rect>
-			<color red="0.2" green="0.2" blue="0.2" />
+			<color hex="333333" />
 		</rect>
 	</element>
 	<element name="rect_vfx">
 		<rect>
-			<color red="0.16078" green="0.61176" blue="0.63922" />
+			<color hex="299ca3" />
 		</rect>
 	</element>
 	<element name="rect_glass">
 		<rect>
-			<color red="0" green="0" blue="0" />
+			<color hex="000000" />
 		</rect>
 	</element>
 	<element name="rect_white">
 		<rect>
-			<color red="1" green="1" blue="1" />
+			<color hex="ffffff" />
 		</rect>
 	</element>
 	<element name="rect_body_down">
 		<rect>
-			<color red="0.06275" green="0.06275" blue="0.06275" />
+			<color hex="101010" />
 		</rect>
 	</element>
 	<element name="rect_body">
 		<rect>
-			<color red="0.12549" green="0.12549" blue="0.12549" />
+			<color hex="202020" />
 		</rect>
 	</element>
 	<element name="ellipse_screwhead">
 		<disk>
-			<color red="0.21961" green="0.21961" blue="0.21961" />
+			<color hex="383838" />
 		</disk>
 	</element>
 	<element name="full_keyboard_background">
@@ -239,23 +239,23 @@
 	<!-- VFD definitions -->
 	<element name="segments" defstate="0">
 		<led14seg>
-			<color red="0.45098" green="1" blue="0.94902" />
+			<color hex="73fff2" />
 		</led14seg>
 	</element>
 	<element name="dot" defstate="0">
 		<disk statemask="0x4000" state="0">
-			<color red="0.05882" green="0.12157" blue="0.10196" />
+			<color hex="0f1f1a" />
 		</disk>
 		<disk statemask="0x4000" state="0x4000">
-			<color red="0.45098" green="1" blue="0.94902" />
+			<color hex="73fff2" />
 		</disk>
 	</element>
 	<element name="underline" defstate="0">
 		<rect state="0" statemask="0x8000">
-			<color red="0.05882" green="0.12157" blue="0.10196" />
+			<color hex="0f1f1a" />
 		</rect>
 		<rect state="0x8000" statemask="0x8000">
-			<color red="0.45098" green="1" blue="0.94902" />
+			<color hex="73fff2" />
 		</rect>
 	</element>
 	<group name="vfd_cell">
@@ -272,7 +272,7 @@
 	</group>
 	<element name="vfd_background">
 		<rect>
-			<color red="0" green="0" blue="0" />
+			<color hex="000000" />
 		</rect>
 	</element>
 	<group name="vfd">
@@ -548,23 +548,23 @@
 
 	<element name="plugin_warning" defstate="1">
 		<rect state="1">
-			<color red="0.69804" green="0.69804" blue="0.69804" />
+			<color hex="b2b2b2" />
 		</rect>
 		<text string="This view requires the layout plugin." align="0" state="1">
-			<color red="0.73333" green="0.17255" blue="0.17255" />
+			<color hex="bb2c2c" />
 		</text>
 	</element>
 	<!-- Button shapes -->
 	<element name="button_15_8x5_dark">
 		<image state="0">
-			<color red="0.06667" green="0.06667" blue="0.06667" />
+			<color hex="111111" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
 		</image>
 		<image state="1">
-			<color red="1" green="1" blue="1" />
+			<color hex="ffffff" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
@@ -573,14 +573,14 @@
 	</element>
 	<element name="button_15_8x5_screen">
 		<image state="0">
-			<color red="0.16471" green="0.16471" blue="0.16471" />
+			<color hex="2a2a2a" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
 		</image>
 		<image state="1">
-			<color red="1" green="1" blue="1" />
+			<color hex="ffffff" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
@@ -589,14 +589,14 @@
 	</element>
 	<element name="button_15_8x10_light">
 		<image state="0">
-			<color red="0.73333" green="0.73333" blue="0.73333" />
+			<color hex="bbbbbb" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
 		</image>
 		<image state="1">
-			<color red="1" green="1" blue="1" />
+			<color hex="ffffff" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
@@ -605,14 +605,14 @@
 	</element>
 	<element name="button_15_8x10_medium">
 		<image state="0">
-			<color red="0.46667" green="0.46667" blue="0.46667" />
+			<color hex="777777" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
 		</image>
 		<image state="1">
-			<color red="1" green="1" blue="1" />
+			<color hex="ffffff" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="10" viewBox="0 0 15.8 10"><rect x="0.25" y="0.25" width="15.3" height="9.5" rx="1.25" fill="white" stroke="none" /></svg>
@@ -621,14 +621,14 @@
 	</element>
 	<element name="button_15_8x5_light">
 		<image state="0">
-			<color red="0.73333" green="0.73333" blue="0.73333" />
+			<color hex="bbbbbb" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
 				]]></data>
 		</image>
 		<image state="1">
-			<color red="1" green="1" blue="1" />
+			<color hex="ffffff" />
 			<data>
 				<![CDATA[
 					<svg width="15.8" height="5" viewBox="0 0 15.8 5"><rect x="0.25" y="0.25" width="15.3" height="4.5" rx="1.25" fill="white" stroke="none" /></svg>
@@ -637,14 +637,14 @@
 	</element>
 	<element name="psel_9x12">
 		<image state="0">
-			<color red="0.73333" green="0.73333" blue="0.73333" />
+			<color hex="bbbbbb" />
 			<data>
 				<![CDATA[
 					<svg width="9" height="12" viewBox="0 0 9 12"><rect x="0" y="0" width="9" height="12" rx="0" fill="white" stroke="none" /></svg>
 				]]></data>
 		</image>
 		<image state="1">
-			<color red="1" green="1" blue="1" />
+			<color hex="ffffff" />
 			<data>
 				<![CDATA[
 					<svg width="9" height="12" viewBox="0 0 9 12"><rect x="0" y="0" width="9" height="12" rx="0" fill="white" stroke="none" /></svg>
@@ -655,176 +655,176 @@
 	<!-- Light items -->
 	<element name="light_15">
 		<rect state="0" statemask="0x8000">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x8000" statemask="0x8000">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_13">
 		<rect state="0" statemask="0x2000">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x2000" statemask="0x2000">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_7">
 		<rect state="0" statemask="0x0080">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0080" statemask="0x0080">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_14">
 		<rect state="0" statemask="0x4000">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x4000" statemask="0x4000">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_6">
 		<rect state="0" statemask="0x0040">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0040" statemask="0x0040">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_4">
 		<rect state="0" statemask="0x0010">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0010" statemask="0x0010">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_12">
 		<rect state="0" statemask="0x1000">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x1000" statemask="0x1000">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_3">
 		<rect state="0" statemask="0x0008">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0008" statemask="0x0008">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_11">
 		<rect state="0" statemask="0x0800">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0800" statemask="0x0800">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_2">
 		<rect state="0" statemask="0x0004">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0004" statemask="0x0004">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_10">
 		<rect state="0" statemask="0x0400">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0400" statemask="0x0400">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_1">
 		<rect state="0" statemask="0x0002">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0002" statemask="0x0002">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_9">
 		<rect state="0" statemask="0x0200">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0200" statemask="0x0200">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_5">
 		<rect state="0" statemask="0x0020">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0020" statemask="0x0020">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_0">
 		<rect state="0" statemask="0x0001">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0001" statemask="0x0001">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_8">
 		<rect state="0" statemask="0x0100">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x0100" statemask="0x0100">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 	<element name="light_16">
 		<rect state="0" statemask="0x10000">
-			<color red="0.06667" green="0.13333" blue="0.06667" />
+			<color hex="112211" />
 		</rect>
 		<rect state="0x10000" statemask="0x10000">
-			<color red="0.13333" green="1" blue="0.13333" />
+			<color hex="22ff22" />
 		</rect>
 	</element>
 
 	<!-- Slider definitions -->
 	<element name="invisible_rect">
 		<rect>
-			<color red="0" green="0" blue="0" alpha="0" />
+			<color hex="00000000" />
 		</rect>
 	</element>
 	<element name="slider_frame">
 		<rect>
-			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<color hex="444444" />
 			<bounds x="0" y="0" width="8" height="24" />
 		</rect>
 		<rect>
-			<color red="0" green="0" blue="0" />
+			<color hex="000000" />
 			<bounds x="0.5" y="0.5" width="7" height="23" />
 		</rect>
 	</element>
 	<element name="slider_knob">
 		<rect>
-			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<color hex="444444" />
 			<bounds x="0.75" y="0.75" width="6.5" height="4" />
 		</rect>
 		<rect>
-			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<color hex="555555" />
 			<bounds x="0.75" y="0.75" width="6.5" height="0.75" />
 		</rect>
 		<rect>
-			<color red="0.2" green="0.2" blue="0.2" />
+			<color hex="333333" />
 			<bounds x="0.75" y="2.5" width="6.5" height="0.25" />
 		</rect>
 		<rect>
-			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<color hex="555555" />
 			<bounds x="0.75" y="2.75" width="6.5" height="0.25" />
 		</rect>
 		<rect>
-			<color red="0.2" green="0.2" blue="0.2" />
+			<color hex="333333" />
 			<bounds x="0.75" y="4" width="6.5" height="0.75" />
 		</rect>
 	</element>
@@ -843,31 +843,31 @@
 	</group>
 	<element name="wheel_frame">
 		<rect>
-			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<color hex="444444" />
 			<bounds x="0" y="0" width="13" height="66" />
 		</rect>
 		<rect>
-			<color red="0" green="0" blue="0" />
+			<color hex="000000" />
 			<bounds x="1.5" y="1.5" width="10" height="63" />
 		</rect>
 	</element>
 	<element name="wheel_body">
 		<rect>
-			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<color hex="444444" />
 			<bounds x="3" y="5" width="7" height="56" />
 		</rect>
 	</element>
 	<element name="wheel_knob">
 		<rect>
-			<color red="0.2" green="0.2" blue="0.2" />
+			<color hex="333333" />
 			<bounds x="3" y="5" width="7" height="3" />
 		</rect>
 		<rect>
-			<color red="0.26667" green="0.26667" blue="0.26667" />
+			<color hex="444444" />
 			<bounds x="3" y="8" width="7" height="4" />
 		</rect>
 		<rect>
-			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<color hex="555555" />
 			<bounds x="3" y="12" width="7" height="3" />
 		</rect>
 	</element>
@@ -1679,495 +1679,495 @@
 		<bounds x="0" y="0" width="845" height="138" />
 		<element ref="full_keyboard_background" id="full_keyboard_background">
 			<bounds x="0" y="0" width="845" height="138" />
-			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<color hex="555555" />
 		</element>
 		<element ref="keyshape_0" id="full_keyboard_key_0" clickthrough="no">
 			<bounds x="0" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="full_keyboard_key_2" clickthrough="no">
 			<bounds x="23.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="full_keyboard_key_4" clickthrough="no">
 			<bounds x="47" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="full_keyboard_key_5" clickthrough="no">
 			<bounds x="70.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="full_keyboard_key_7" clickthrough="no">
 			<bounds x="94" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="full_keyboard_key_9" clickthrough="no">
 			<bounds x="117.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="full_keyboard_key_11" clickthrough="no">
 			<bounds x="141" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_0" id="full_keyboard_key_12" clickthrough="no">
 			<bounds x="164.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="full_keyboard_key_14" clickthrough="no">
 			<bounds x="188" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="full_keyboard_key_16" clickthrough="no">
 			<bounds x="211.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="full_keyboard_key_17" clickthrough="no">
 			<bounds x="235" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="full_keyboard_key_19" clickthrough="no">
 			<bounds x="258.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="full_keyboard_key_21" clickthrough="no">
 			<bounds x="282" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="full_keyboard_key_23" clickthrough="no">
 			<bounds x="305.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_0" id="full_keyboard_key_24" clickthrough="no">
 			<bounds x="329" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="full_keyboard_key_26" clickthrough="no">
 			<bounds x="352.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="full_keyboard_key_28" clickthrough="no">
 			<bounds x="376" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="full_keyboard_key_29" clickthrough="no">
 			<bounds x="399.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="full_keyboard_key_31" clickthrough="no">
 			<bounds x="423" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="full_keyboard_key_33" clickthrough="no">
 			<bounds x="446.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="full_keyboard_key_35" clickthrough="no">
 			<bounds x="470" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_0" id="full_keyboard_key_36" clickthrough="no">
 			<bounds x="493.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="full_keyboard_key_38" clickthrough="no">
 			<bounds x="517" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="full_keyboard_key_40" clickthrough="no">
 			<bounds x="540.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="full_keyboard_key_41" clickthrough="no">
 			<bounds x="564" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="full_keyboard_key_43" clickthrough="no">
 			<bounds x="587.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="full_keyboard_key_45" clickthrough="no">
 			<bounds x="611" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="full_keyboard_key_47" clickthrough="no">
 			<bounds x="634.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_0" id="full_keyboard_key_48" clickthrough="no">
 			<bounds x="658" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="full_keyboard_key_50" clickthrough="no">
 			<bounds x="681.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="full_keyboard_key_52" clickthrough="no">
 			<bounds x="705" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="full_keyboard_key_53" clickthrough="no">
 			<bounds x="728.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="full_keyboard_key_55" clickthrough="no">
 			<bounds x="752" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="full_keyboard_key_57" clickthrough="no">
 			<bounds x="775.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="full_keyboard_key_59" clickthrough="no">
 			<bounds x="799" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_12" id="full_keyboard_key_60" clickthrough="no">
 			<bounds x="822.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="full_keyboard_key_1" clickthrough="no">
 			<bounds x="14.55" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="full_keyboard_key_3" clickthrough="no">
 			<bounds x="42.65" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="full_keyboard_key_6" clickthrough="no">
 			<bounds x="83.75" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="full_keyboard_key_8" clickthrough="no">
 			<bounds x="110.85" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="full_keyboard_key_10" clickthrough="no">
 			<bounds x="137.95" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="full_keyboard_key_13" clickthrough="no">
 			<bounds x="179.05" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="full_keyboard_key_15" clickthrough="no">
 			<bounds x="207.15" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="full_keyboard_key_18" clickthrough="no">
 			<bounds x="248.25" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="full_keyboard_key_20" clickthrough="no">
 			<bounds x="275.35" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="full_keyboard_key_22" clickthrough="no">
 			<bounds x="302.45" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="full_keyboard_key_25" clickthrough="no">
 			<bounds x="343.55" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="full_keyboard_key_27" clickthrough="no">
 			<bounds x="371.65" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="full_keyboard_key_30" clickthrough="no">
 			<bounds x="412.75" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="full_keyboard_key_32" clickthrough="no">
 			<bounds x="439.85" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="full_keyboard_key_34" clickthrough="no">
 			<bounds x="466.95" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="full_keyboard_key_37" clickthrough="no">
 			<bounds x="508.05" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="full_keyboard_key_39" clickthrough="no">
 			<bounds x="536.15" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="full_keyboard_key_42" clickthrough="no">
 			<bounds x="577.25" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="full_keyboard_key_44" clickthrough="no">
 			<bounds x="604.35" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="full_keyboard_key_46" clickthrough="no">
 			<bounds x="631.45" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="full_keyboard_key_49" clickthrough="no">
 			<bounds x="672.55" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="full_keyboard_key_51" clickthrough="no">
 			<bounds x="700.65" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="full_keyboard_key_54" clickthrough="no">
 			<bounds x="741.75" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="full_keyboard_key_56" clickthrough="no">
 			<bounds x="768.85" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="full_keyboard_key_58" clickthrough="no">
 			<bounds x="795.95" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 	</group>
 	<group name="NarrowWheelArea">
@@ -2223,303 +2223,303 @@
 		<bounds x="0" y="0" width="516" height="138" />
 		<element ref="compact_keyboard_background" id="compact_keyboard_background">
 			<bounds x="0" y="0" width="516" height="138" />
-			<color red="0.33333" green="0.33333" blue="0.33333" />
+			<color hex="555555" />
 		</element>
 		<element ref="keyshape_0" id="compact_keyboard_key_0" clickthrough="no">
 			<bounds x="0" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="compact_keyboard_key_2" clickthrough="no">
 			<bounds x="23.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="compact_keyboard_key_4" clickthrough="no">
 			<bounds x="47" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="compact_keyboard_key_5" clickthrough="no">
 			<bounds x="70.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="compact_keyboard_key_7" clickthrough="no">
 			<bounds x="94" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="compact_keyboard_key_9" clickthrough="no">
 			<bounds x="117.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="compact_keyboard_key_11" clickthrough="no">
 			<bounds x="141" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_0" id="compact_keyboard_key_12" clickthrough="no">
 			<bounds x="164.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="compact_keyboard_key_14" clickthrough="no">
 			<bounds x="188" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="compact_keyboard_key_16" clickthrough="no">
 			<bounds x="211.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="compact_keyboard_key_17" clickthrough="no">
 			<bounds x="235" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="compact_keyboard_key_19" clickthrough="no">
 			<bounds x="258.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="compact_keyboard_key_21" clickthrough="no">
 			<bounds x="282" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="compact_keyboard_key_23" clickthrough="no">
 			<bounds x="305.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_0" id="compact_keyboard_key_24" clickthrough="no">
 			<bounds x="329" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_2" id="compact_keyboard_key_26" clickthrough="no">
 			<bounds x="352.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_4" id="compact_keyboard_key_28" clickthrough="no">
 			<bounds x="376" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_5" id="compact_keyboard_key_29" clickthrough="no">
 			<bounds x="399.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_7" id="compact_keyboard_key_31" clickthrough="no">
 			<bounds x="423" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_9" id="compact_keyboard_key_33" clickthrough="no">
 			<bounds x="446.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_11" id="compact_keyboard_key_35" clickthrough="no">
 			<bounds x="470" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_12" id="compact_keyboard_key_36" clickthrough="no">
 			<bounds x="493.5" y="0" width="22.5" height="138" />
-			<color state="0" red="0.94902" green="0.94902" blue="0.90196" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="f2f2e6" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="compact_keyboard_key_1" clickthrough="no">
 			<bounds x="14.55" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="compact_keyboard_key_3" clickthrough="no">
 			<bounds x="42.65" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="compact_keyboard_key_6" clickthrough="no">
 			<bounds x="83.75" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="compact_keyboard_key_8" clickthrough="no">
 			<bounds x="110.85" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="compact_keyboard_key_10" clickthrough="no">
 			<bounds x="137.95" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="compact_keyboard_key_13" clickthrough="no">
 			<bounds x="179.05" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="compact_keyboard_key_15" clickthrough="no">
 			<bounds x="207.15" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="compact_keyboard_key_18" clickthrough="no">
 			<bounds x="248.25" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="compact_keyboard_key_20" clickthrough="no">
 			<bounds x="275.35" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="compact_keyboard_key_22" clickthrough="no">
 			<bounds x="302.45" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_1" id="compact_keyboard_key_25" clickthrough="no">
 			<bounds x="343.55" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_3" id="compact_keyboard_key_27" clickthrough="no">
 			<bounds x="371.65" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_6" id="compact_keyboard_key_30" clickthrough="no">
 			<bounds x="412.75" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_8" id="compact_keyboard_key_32" clickthrough="no">
 			<bounds x="439.85" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 		<element ref="keyshape_10" id="compact_keyboard_key_34" clickthrough="no">
 			<bounds x="466.95" y="0" width="12" height="88" />
-			<color state="0" red="0.07843" green="0.07843" blue="0.07843" />
-			<color state="1" red="0.17255" green="0.26667" blue="0.67843" />
-			<color state="127" red="0.09804" green="0.63137" blue="0.30196" />
-			<color state="128" red="0.90196" green="0.80784" blue="0.28235" />
-			<color state="254" red="0.80784" green="0.24706" blue="0.02353" />
+			<color state="0" hex="141414" />
+			<color state="1" hex="2c44ad" />
+			<color state="127" hex="19a14d" />
+			<color state="128" hex="e6ce48" />
+			<color state="254" hex="ce3f06" />
 		</element>
 	</group>
 	<group name="CompactVolumeSlider">

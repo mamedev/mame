@@ -887,6 +887,39 @@ public:
 		if (!node)
 			return render_color{ 1.0F, 1.0F, 1.0F, 1.0F };
 
+		if (node->has_attribute("hex"))
+		{
+			// Use the single hex attribute
+			if (node->has_attribute("red") || node->has_attribute("green") || node->has_attribute("blue") || node->has_attribute("alpha"))
+				throw layout_syntax_error(util::string_format("specify either hex or (red,green,blue) colors"));
+
+			const std::string hex{node->get_attribute_string("hex", "")};
+			auto l = hex.length();
+			if (l == 6 || l == 8)
+			{
+				std::size_t pos;
+				unsigned long val = std::stoul(hex, &pos, 16);
+				if (pos != l)
+					throw layout_syntax_error(util::string_format("illegal hex color %s", hex));
+
+				float alpha = 1.0;
+				size_t offset = 0;
+				if (l == 8)
+				{
+					alpha = BIT(val, 0, 8) / 255.0;
+					offset = 8;
+				}
+				float blue  = BIT(val, offset +  0, 8) / 255.0;
+				float green = BIT(val, offset +  8, 8) / 255.0;
+				float red   = BIT(val, offset + 16, 8) / 255.0;
+				return render_color { alpha, red, green, blue };
+			}
+			else
+			{
+				throw layout_syntax_error(util::string_format("illegal hex color %s", hex));
+			}
+		}
+
 		// parse attributes
 		render_color const result{
 				get_attribute_float(*node, "alpha", 1.0F),
