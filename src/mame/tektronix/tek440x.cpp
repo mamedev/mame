@@ -76,6 +76,7 @@
 #define LOG_MMU (1U << 1)
 #define LOG_FPU (1U << 2)
 #define LOG_SCSI (1U << 3)
+#define LOG_IRQ (1U << 4)
 
 #define VERBOSE LOG_GENERAL
 #include "logmacro.h"
@@ -1380,7 +1381,7 @@ void tek440x_state::kb_tdata_w(int state)
 
 void tek440x_state::timer_irq(int state)
 {
-	LOGMASKED(LOG_GENERAL,"%10s: irq1_raise %04x\n", machine().time().as_string(8), state);
+	LOGMASKED(LOG_IRQ,"%10s: irq1_raise %04x\n", machine().time().as_string(8), state);
 	
 	if (state == 0)
 	{
@@ -1398,11 +1399,11 @@ void tek440x_state::timer_irq(int state)
 // to handle offset 0x1xx reads resetting TPInt...
 u16 tek440x_state::timer_r(offs_t offset)
 {
-	LOGMASKED(LOG_GENERAL,"%10s: timer_r %08x pc(%08x)\n", machine().time().as_string(8), offset, m_maincpu->pc());
+	LOGMASKED(LOG_IRQ,"%10s: timer_r %08x pc(%08x)\n", machine().time().as_string(8), offset, m_maincpu->pc());
 
 	if (m_u244latch)
 	{
-		LOGMASKED(LOG_GENERAL,"timer_r: M68K_IRQ_1 clear\n");
+		LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_u244latch = 0;
 	}
@@ -1418,7 +1419,7 @@ void tek440x_state::timer_w(offs_t offset, u16 data)
 
 	if (m_u244latch)
 	{
-		LOGMASKED(LOG_GENERAL,"timer_w: M68K_IRQ_1 clear\n");
+		LOGMASKED(LOG_IRQ,"timer_w: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_u244latch = 0;
 	}
@@ -1645,7 +1646,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set([this](int state)
     {
-		LOGMASKED(LOG_GENERAL,"%10s: vblank(%d) vint(%d)\n", machine().time().as_string(8), state,m_vint_enable);
+		LOGMASKED(LOG_IRQ,"%10s: vblank(%d) vint(%d)\n", machine().time().as_string(8), state,m_vint_enable);
 		if (state && m_vint_enable)
 		{
 			m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
