@@ -80,6 +80,7 @@
 #include "virusa.lh"
 #include "virusb.lh"
 #include "virusc.lh"
+#include "virusrck.lh"
 #include "virusrckxl.lh"
 
 
@@ -110,6 +111,7 @@ public:
 	void virusa(machine_config &config) ATTR_COLD;
 	void virusb(machine_config &config) ATTR_COLD;
 	void virusc(machine_config &config) ATTR_COLD;
+	void virusrck(machine_config &config) ATTR_COLD;
 	void virusrckxl(machine_config &config) ATTR_COLD;
 
 	void init_virus() ATTR_COLD;
@@ -361,6 +363,12 @@ void acvirus_state::virusc(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(acvirus_state::red_palette_init), 2);
 	config.set_default_layout(layout_virusc);
+}
+
+void acvirus_state::virusrck(machine_config &config)
+{
+	virusb(config);
+	config.set_default_layout(layout_virusrck);
 }
 
 void acvirus_state::virusrckxl(machine_config &config)
@@ -830,6 +838,6 @@ ROM_END
 SYST( 1997, virusa,     0, 0, virusa, virusa, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 1999, virusb,     0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 2002, virusc,     0, 0, virusc, virusc, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2001, virusrck,   0, 0, virusb, virusrck, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2001, virusrck,   0, 0, virusrck, virusrck, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 2002, virusrckxl, 0, 0, virusrckxl, virusrck, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 2004, viruscl,    0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
