@@ -613,7 +613,7 @@ private:
 	void palette(palette_device &palette) const;
 
 	// need to handle bit 8 reset
-	void irq1_raise(int state);
+	void timer_irq(int state);
 	u16 timer_r(offs_t offset);
 	void timer_w(offs_t offset, u16 data);
 
@@ -1452,9 +1452,9 @@ void tek440x_state::kb_tdata_w(int state)
 	}
 }
 
-void tek440x_state::irq1_raise(int state)
+void tek440x_state::timer_irq(int state)
 {
-	//LOG("irq1_raise %04x\n", state);
+	LOGMASKED(LOG_GENERAL,"%10s: irq1_raise %04x\n", machine().time().as_string(8), state);
 	
 	if (state == 0)
 	{
@@ -1462,6 +1462,10 @@ void tek440x_state::irq1_raise(int state)
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 
 		m_u244latch = 1;
+	}
+	else
+	{
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);	
 	}
 }
 
@@ -1766,7 +1770,7 @@ m_printer->in_pb_callback().set_constant(0xb0);		// HACK:  vblank always checks 
 	AM9513(config, m_timer, 40_MHz_XTAL / 4 / 10 ); // from CPU E output
 
 	// see diagram page 2.2-6
-	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set(FUNC(tek440x_state::irq1_raise));
+	INPUT_MERGER_ALL_HIGH(config, "irq1").output_handler().set(FUNC(tek440x_state::timer_irq));
 	m_timer->out1_cb().set("irq1", FUNC(input_merger_device::in_w<0>));
 	m_timer->out2_cb().set("irq1", FUNC(input_merger_device::in_w<1>));
 
