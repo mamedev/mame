@@ -63,7 +63,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// ncsci_device implementation
-	virtual attotime scsi_data_byte_period();
 	virtual void scsi_ctrl_changed() override;
 
 	// read handlers
