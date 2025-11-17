@@ -10099,6 +10099,18 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="wondrkid" supported="no"> <!-- also found in the Australian 4 Pak All Action compilation, game requires custom mapper -->
+		<description>Wonder Kid (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Innovation Tech</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="wonder kid [proto] [sms-gg].sms" size="131072" crc="5e7b18c8" sha1="90a556bd3e1c2b0a5b66f7a778193d2edf09942f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="woodypop">
 		<description>Woody Pop (Europe, USA, v1.1)</description>
 		<year>1991</year>

@@ -91,11 +91,6 @@ const char *ipf_format::extensions() const noexcept
 	return "ipf";
 }
 
-bool ipf_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int ipf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	static const uint8_t refh[12] = { 0x43, 0x41, 0x50, 0x53, 0x00, 0x00, 0x00, 0x0c, 0x1c, 0xd5, 0x73, 0xba };

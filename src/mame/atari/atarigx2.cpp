@@ -1514,14 +1514,13 @@ void atarigx2_state::atarigx2(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ATARI_JSA_IIIS(config, m_jsa, 0);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
-	m_jsa->add_route(0, "lspeaker", 0.7);
-	m_jsa->add_route(1, "rspeaker", 0.7);
+	m_jsa->add_route(0, "speaker", 0.7, 0);
+	m_jsa->add_route(1, "speaker", 0.7, 1);
 }
 
 void atarigx2_state::atarigx2_0x200(machine_config &config)

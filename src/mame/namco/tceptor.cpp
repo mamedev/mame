@@ -333,22 +333,21 @@ void tceptor_state::tceptor(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ym(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
-	ym.add_route(0, "lspeaker", 1.0);
-	ym.add_route(1, "rspeaker", 1.0);
+	ym.add_route(0, "speaker", 1.0, 0);
+	ym.add_route(1, "speaker", 1.0, 1);
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
 	m_cus30->set_voices(8);
 	m_cus30->set_stereo(true);
-	m_cus30->add_route(0, "lspeaker", 0.40);
-	m_cus30->add_route(1, "rspeaker", 0.40);
+	m_cus30->add_route(0, "speaker", 0.40, 0);
+	m_cus30->add_route(1, "speaker", 0.40, 1);
 
 	dac_8bit_r2r_device &dac(DAC_8BIT_R2R(config, "dac", 0)); // unknown DAC
-	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.4);
-	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.4);
+	dac.add_route(ALL_OUTPUTS, "speaker", 0.4, 0);
+	dac.add_route(ALL_OUTPUTS, "speaker", 0.4, 1);
 }
 
 

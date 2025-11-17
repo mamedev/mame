@@ -132,9 +132,9 @@ std::string umc6619_sound_device::print_audio_state()
 	return outbuffer.str();
 }
 
-void umc6619_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void umc6619_sound_device::sound_stream_update(sound_stream &stream)
 {
-	std::fill_n(&m_mix[0], outputs[0].samples() * 2, 0);
+	std::fill_n(&m_mix[0], stream.samples() * 2, 0);
 
 	if (LIVE_AUDIO_VIEW)
 		popmessage(print_audio_state());
@@ -146,7 +146,7 @@ void umc6619_sound_device::sound_stream_update(sound_stream &stream, std::vector
 			acan_channel &channel = m_channels[i];
 			int32_t *mixp = &m_mix[0];
 
-			for (int s = 0; s < outputs[0].samples(); s++)
+			for (int s = 0; s < stream.samples(); s++)
 			{
 				uint8_t data = m_ram_read(channel.curr_addr) + 0x80;
 				int16_t sample = (int16_t)(data << 8);
@@ -179,10 +179,10 @@ void umc6619_sound_device::sound_stream_update(sound_stream &stream, std::vector
 	}
 
 	int32_t *mixp = &m_mix[0];
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		outputs[0].put_int(i, *mixp++, 32768 << 4);
-		outputs[1].put_int(i, *mixp++, 32768 << 4);
+		stream.put_int(0, i, *mixp++, 32768 << 4);
+		stream.put_int(1, i, *mixp++, 32768 << 4);
 	}
 }
 

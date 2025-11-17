@@ -15,13 +15,17 @@
 
 std::string psxcpu_disassembler::make_signed_hex_str_16( uint32_t value )
 {
-	if( value & 0x8000 )
+	if( int16_t( value & 0xffff ) >= -9 && int16_t( value & 0xffff ) <= 9 )
 	{
-		return util::string_format("-$%x", -value & 0xffff );
+		return util::string_format("%d", int16_t( value & 0xffff ) );
+	}
+	else if( value & 0x8000 )
+	{
+		return util::string_format("-0x%x", -value & 0xffff );
 	}
 	else
 	{
-		return util::string_format("$%x", value & 0xffff );
+		return util::string_format("0x%x", value & 0xffff );
 	}
 }
 
@@ -159,15 +163,15 @@ std::string psxcpu_disassembler::upper_address( uint32_t op, offs_t pos, const d
 
 	if( INS_OP( nextop ) == OP_ORI && INS_RT( op ) == INS_RS( nextop ) )
 	{
-		return util::string_format("$%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) | INS_IMMEDIATE( nextop ) );
+		return util::string_format("0x%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) | INS_IMMEDIATE( nextop ) );
 	}
 	else if( INS_OP( nextop ) == OP_ADDIU && INS_RT( op ) == INS_RS( nextop ) )
 	{
-		return util::string_format("$%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) + (int16_t) INS_IMMEDIATE( nextop ) );
+		return util::string_format("0x%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) + (int16_t) INS_IMMEDIATE( nextop ) );
 	}
 	else
 	{
-		return util::string_format("$%04x", INS_IMMEDIATE( op ) );
+		return util::string_format("0x%04x", INS_IMMEDIATE( op ) );
 	}
 }
 
@@ -198,19 +202,19 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case FUNCT_SLL:
 			if( op == 0 )
 			{
-				/* the standard nop is "sll     zero,zero,$0000" */
+				/* the standard nop is "sll     zero,zero,0x0000" */
 				util::stream_format( stream, "nop" );
 			}
 			else
 			{
-				util::stream_format( stream, "sll     %s,%s,$%02x", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], INS_SHAMT( op ) );
+				util::stream_format( stream, "sll     %s,%s,0x%02x", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], INS_SHAMT( op ) );
 			}
 			break;
 		case FUNCT_SRL:
-			util::stream_format( stream, "srl     %s,%s,$%02x", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], INS_SHAMT( op ) );
+			util::stream_format( stream, "srl     %s,%s,0x%02x", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], INS_SHAMT( op ) );
 			break;
 		case FUNCT_SRA:
-			util::stream_format( stream, "sra     %s,%s,$%02x", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], INS_SHAMT( op ) );
+			util::stream_format( stream, "sra     %s,%s,0x%02x", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], INS_SHAMT( op ) );
 			break;
 		case FUNCT_SLLV:
 			util::stream_format( stream, "sllv    %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ] );
@@ -225,7 +229,7 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			util::stream_format( stream, "jr      %s", s_cpugenreg[ INS_RS( op ) ] );
 			if( INS_RS( op ) == 31 )
 			{
-				flags = STEP_OUT;
+				flags = STEP_OUT | step_over_extra( 1 );
 			}
 			break;
 		case FUNCT_JALR:
@@ -233,11 +237,11 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			flags = STEP_OVER | step_over_extra( 1 );
 			break;
 		case FUNCT_SYSCALL:
-			util::stream_format( stream, "syscall $%05x", INS_CODE( op ) );
+			util::stream_format( stream, "syscall 0x%05x", INS_CODE( op ) );
 			flags = STEP_OVER;
 			break;
 		case FUNCT_BREAK:
-			util::stream_format( stream, "break   $%05x", INS_CODE( op ) );
+			util::stream_format( stream, "break   0x%05x", INS_CODE( op ) );
 			flags = STEP_OVER;
 			break;
 		case FUNCT_MFHI:
@@ -268,13 +272,22 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			util::stream_format( stream, "add     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_ADDU:
-			util::stream_format( stream, "addu    %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
+			if( INS_RT( op ) == 0 )
+				util::stream_format( stream, "move    %s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ] );
+			else
+				util::stream_format( stream, "addu    %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_SUB:
-			util::stream_format( stream, "sub     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
+			if( INS_RS( op ) == 0 )
+				util::stream_format( stream, "neg     %s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ] );
+			else
+				util::stream_format( stream, "sub     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_SUBU:
-			util::stream_format( stream, "subu    %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
+			if( INS_RS( op ) == 0 )
+				util::stream_format( stream, "negu    %s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ] );
+			else
+				util::stream_format( stream, "subu    %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_AND:
 			util::stream_format( stream, "and     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
@@ -286,7 +299,10 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			util::stream_format( stream, "xor     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_NOR:
-			util::stream_format( stream, "nor     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
+			if( INS_RS( op ) == 0 || INS_RT( op ) == 0 )
+				util::stream_format( stream, "not     %s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) != 0 ? INS_RS( op ) : INS_RT( op ) ] );
+			else
+				util::stream_format( stream, "nor     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_SLT:
 			util::stream_format( stream, "slt     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
@@ -302,13 +318,13 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case RT_BLTZ:
 			if( INS_RT( op ) == RT_BLTZAL )
 			{
-				util::stream_format( stream, "bltzal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				util::stream_format( stream, "bltzal  %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
 				if( INS_RS( op ) != 0 )
 					flags = STEP_OVER | STEP_COND | step_over_extra( 1 );
 			}
 			else
 			{
-				util::stream_format( stream, "bltz    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				util::stream_format( stream, "bltz    %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
 				if( INS_RS( op ) != 0 )
 					flags = STEP_COND | step_over_extra( 1 );
 			}
@@ -316,14 +332,14 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		case RT_BGEZ:
 			if( INS_RT( op ) == RT_BGEZAL )
 			{
-				util::stream_format( stream, "bgezal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				util::stream_format( stream, "bgezal  %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
 				flags = STEP_OVER | step_over_extra( 1 );
 				if( INS_RS( op ) != 0 )
 					flags |= STEP_COND;
 			}
 			else
 			{
-				util::stream_format( stream, "bgez    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				util::stream_format( stream, "bgez    %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
 				if( INS_RS( op ) != 0 )
 					flags = STEP_COND | step_over_extra( 1 );
 			}
@@ -331,33 +347,49 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		}
 		break;
 	case OP_J:
-		util::stream_format( stream, "j       $%08x", jump_address( pc, op ) );
+		util::stream_format( stream, "j       0x%08x", jump_address( pc, op ) );
 		break;
 	case OP_JAL:
-		util::stream_format( stream, "jal     $%08x", jump_address( pc, op ) );
+		util::stream_format( stream, "jal     0x%08x", jump_address( pc, op ) );
 		flags = STEP_OVER | step_over_extra( 1 );
 		break;
 	case OP_BEQ:
-		util::stream_format( stream, "beq     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
-		flags = STEP_COND | step_over_extra( 1 );
+		if( INS_RS( op ) == 0 && INS_RT( op ) == 0 )
+		{
+			util::stream_format( stream, "b       0x%08x", relative_address( pc, op ) );
+		}
+		else
+		{
+			if( INS_RT( op ) == 0 )
+				util::stream_format( stream, "beqz    %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+			else
+				util::stream_format( stream, "beq     %s,%s,0x%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+			flags = STEP_COND | step_over_extra( 1 );
+		}
 		break;
 	case OP_BNE:
-		util::stream_format( stream, "bne     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+		if( INS_RT( op ) == 0 )
+			util::stream_format( stream, "bnez    %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+		else
+			util::stream_format( stream, "bne     %s,%s,0x%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
 		flags = STEP_COND | step_over_extra( 1 );
 		break;
 	case OP_BLEZ:
-		util::stream_format( stream, "blez    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+		util::stream_format( stream, "blez    %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
 		flags = STEP_COND | step_over_extra( 1 );
 		break;
 	case OP_BGTZ:
-		util::stream_format( stream, "bgtz    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+		util::stream_format( stream, "bgtz    %s,0x%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
 		flags = STEP_COND | step_over_extra( 1 );
 		break;
 	case OP_ADDI:
 		util::stream_format( stream, "addi    %s,%s,%s", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
 		break;
 	case OP_ADDIU:
-		util::stream_format( stream, "addiu   %s,%s,%s", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
+		if( INS_RS( op ) == 0 )
+			util::stream_format( stream, "li      %s,%s", s_cpugenreg[ INS_RT( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
+		else
+			util::stream_format( stream, "addiu   %s,%s,%s", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
 		break;
 	case OP_SLTI:
 		util::stream_format( stream, "slti    %s,%s,%s", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
@@ -366,13 +398,16 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		util::stream_format( stream, "sltiu   %s,%s,%s", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
 		break;
 	case OP_ANDI:
-		util::stream_format( stream, "andi    %s,%s,$%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
+		util::stream_format( stream, "andi    %s,%s,0x%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
 		break;
 	case OP_ORI:
-		util::stream_format( stream, "ori     %s,%s,$%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
+		if( INS_RS( op ) == 0 )
+			util::stream_format( stream, "li      %s,0x%04x", s_cpugenreg[ INS_RT( op ) ], INS_IMMEDIATE( op ) );
+		else
+			util::stream_format( stream, "ori     %s,%s,0x%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
 		break;
 	case OP_XORI:
-		util::stream_format( stream, "xori    %s,%s,$%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
+		util::stream_format( stream, "xori    %s,%s,0x%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
 		break;
 	case OP_LUI:
 		util::stream_format( stream, "lui     %s,%s", s_cpugenreg[ INS_RT( op ) ], upper_address( op, pos, opcodes ) );
@@ -397,10 +432,10 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				util::stream_format( stream, "bc0f    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc0f    0x%08x", relative_address( pc, op ) );
 				break;
 			case BC_BCT:
-				util::stream_format( stream, "bc0t    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc0t    0x%08x", relative_address( pc, op ) );
 				break;
 			}
 			flags = STEP_COND | step_over_extra( 1 );
@@ -427,7 +462,7 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 					util::stream_format( stream, "rfe" );
 					break;
 				default:
-					util::stream_format(stream, "cop0    $%07x", INS_COFUN(op));
+					util::stream_format(stream, "cop0    0x%07x", INS_COFUN(op));
 					break;
 				}
 				break;
@@ -455,10 +490,10 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				util::stream_format( stream, "bc1f    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc1f    0x%08x", relative_address( pc, op ) );
 				break;
 			case BC_BCT:
-				util::stream_format( stream, "bc1t    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc1t    0x%08x", relative_address( pc, op ) );
 				break;
 			}
 			flags = STEP_COND | step_over_extra( 1 );
@@ -467,7 +502,7 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			switch( INS_CO( op ) )
 			{
 			case 1:
-				util::stream_format( stream, "cop1    $%07x", INS_COFUN( op ) );
+				util::stream_format( stream, "cop1    0x%07x", INS_COFUN( op ) );
 				break;
 			}
 			break;
@@ -493,10 +528,10 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				util::stream_format( stream, "bc2f    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc2f    0x%08x", relative_address( pc, op ) );
 				break;
 			case BC_BCT:
-				util::stream_format( stream, "bc2t    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc2t    0x%08x", relative_address( pc, op ) );
 				break;
 			}
 			flags = STEP_COND | step_over_extra( 1 );
@@ -577,7 +612,7 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 					util::stream_format( stream, "ncct%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				default:
-					util::stream_format(stream, "cop2    $%07x", INS_COFUN(op));
+					util::stream_format(stream, "cop2    0x%07x", INS_COFUN(op));
 					break;
 				}
 			}
@@ -604,10 +639,10 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				util::stream_format( stream, "bc3f    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc3f    0x%08x", relative_address( pc, op ) );
 				break;
 			case BC_BCT:
-				util::stream_format( stream, "bc3t    $%08x", relative_address( pc, op ) );
+				util::stream_format( stream, "bc3t    0x%08x", relative_address( pc, op ) );
 				break;
 			}
 			flags = STEP_COND | step_over_extra( 1 );
@@ -616,7 +651,7 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			switch( INS_CO( op ) )
 			{
 			case 1:
-				util::stream_format( stream, "cop3    $%07x", INS_COFUN( op ) );
+				util::stream_format( stream, "cop3    0x%07x", INS_COFUN( op ) );
 				break;
 			}
 			break;
@@ -687,7 +722,7 @@ offs_t psxcpu_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	// fall back if we have not emitted anything
 	if (current_pos == stream.tellp())
 	{
-		util::stream_format(stream, "dw      $%08x", op);
+		util::stream_format(stream, "dw      0x%08x", op);
 	}
 
 	return ( pos - pc ) | flags | SUPPORTED;

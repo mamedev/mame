@@ -1,0 +1,1270 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+BASIC-M25 caveats (needed for Dust Box and unk* disks):
+- files is the equivalent of DIR in DOS env
+- chdir swaps current directory (not cd), going back one level is chdir "..
+- BTX files are executables
+
+Hold HELP key during basicv1 / basicv2 bootstrap to select S25 BASIC mode.
+
+Dust Box: double click with space key to startup any item, later versions allows starting up with
+mouse by holding right button then press left.
+
+TODO:
+- [Missing] Orrbit 3 / オービット3: floppy issue makes it to throw a game over as soon as you start a game;
+- "Riglas (19xx)(Randam House).d88" (sic): "loading error", probably just bad (cfr. weird geometry on HxC);
+- "Wizardly (19xx)(Ascii).d88" (sic): Invalid image, throws error -2 in HxC;
+
+-->
+
+<softwarelist name="mz2500_flop" description="Sharp MZ-2500 disk images">
+
+<!-- !Games -->
+
+	<software name="simulwar">
+		<description>Aoki Ookami to Shiroki Mejika - Simulation War Game</description>
+		<year>1985</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="蒼き狼と白き牝鹿"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="disk a.d88" size="697008" crc="9cf82887" sha1="ba201051640682588124335d5c08a9a38c408061"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="disk b.d88" size="697008" crc="897257a1" sha1="916332d226a7e2fe60613b46d003c5de196bb8e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arion">
+		<description>Neo Heroic Fantasia Arion</description>
+		<year>198?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<info name="alt_title" value="ネオ・ヒロイック・ファンタジア・アリオン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692656">
+				<rom name="arion.d88" size="692656" crc="b417a12b" sha1="64c3362eb42f75fc65f58c1409ac3767f8df9535"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="backtof">
+		<description>Back to the Future</description>
+		<year>1986</year>
+		<publisher>Pony Canyon / Data West</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="696736">
+				<rom name="back to the future.d88" size="696736" crc="f8f31c2c" sha1="544ca759503bbcea62b1574780ea40e90b234a11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balonfgt" supported="yes">
+		<description>Balloon Fight</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="71792">
+				<rom name="balloon fight.d88" size="71792" crc="89ef19e2" sha1="12954ef1388fd078ef67e457650633a3162cdd67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckonyx">
+		<description>The Black Onyx</description>
+		<year>1985</year>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692656">
+				<rom name="black onyx.d88" size="692656" crc="be1d79ca" sha1="cf5316806dfa74179c8cb830ee0b4a4f858e11fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eiyuden">
+		<description>Eiyuu Densetsu Saga</description>
+		<year>198?</year>
+		<publisher>Arrow Soft</publisher>
+		<info name="alt_title" value="英雄伝説サーガ"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="disk a.d88" size="697008" crc="350a4aff" sha1="592f32fe92585b4115449006d498b578a99c7106"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="696736">
+				<rom name="disk b.d88" size="696736" crc="7466e6a0" sha1="d10ea5a6f5916fa5c7a64371fc2f3245179b284c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excitbik">
+		<description>Excite Bike</description>
+		<year>1985</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="98624">
+				<rom name="excite bike.d88" size="98624" crc="657367ed" sha1="1c15ffa591c0de997694da691a5f3acb301463c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f2gp" supported="yes">
+		<description>F2 Grand Prix</description>
+		<year>1985</year>
+		<publisher>キャリーラボ (Carry Lab)</publisher>
+		<info name="alt_title" value="F2グランプリ"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1706757">
+				<!-- baddump: converted from .d88 thru HxC (which causes a strong crash in d88_format::load) -->
+				<!-- contains 373+87 bad sectors (protection?), seems to have non-factory times too ... -->
+				<rom name="f2 grand prix (19xx)(carry lab).mfi" size="1706757" crc="c522a8b7" sha1="a4afe9cfd1df86f46846ffa219acb2e249749a03" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firecrys">
+		<description>The Fire Crystal</description>
+		<year>198?</year>
+		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692656">
+				<rom name="fire crystal.d88" size="692656" crc="81b3c897" sha1="984158e6157d44ff31748921b47f71be72c8f731"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaga" supported="yes">
+		<description>Galaga</description>
+		<!-- shows original 1981 release on title screen -->
+		<year>1985?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="ギャラガ" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="205504">
+				<rom name="galaga (19xx)(dempa).d88" size="205504" crc="10db6fc6" sha1="e160071c47368d77cceab60e5fc580cd34bb44c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gomokuna">
+		<description>Gomoku Narabe</description>
+		<year>198?</year>
+		<publisher>ウスヰパソコンセンター (Usui Pasocom Center)</publisher>
+		<info name="alt_title" value="五目並べ"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="disk.d88" size="697008" crc="8047e60c" sha1="37b70478bf8d87ee7660cf4c85b781fb7c67065a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hashires" supported="no">
+		<description>Hashire! Skyline (V1.2A)</description>
+		<year>198?</year>
+		<!-- Compaq? -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Missing blink effect on title screen
+Requires [GVRAM] layer split emulation (currently repeating horizon)
+Cannot steer, does it require an analog joystick?
+]]></notes>
+		<info name="alt_title" value="走れ!スカイライン"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="hashire_skyline.d88" size="697008" crc="897257a1" sha1="916332d226a7e2fe60613b46d003c5de196bb8e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hoveratk">
+		<description>Hover Attack</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="657568">
+				<rom name="hover attack.d88" size="657568" crc="eee949d0" sha1="886fbd18c3d54c5f0f1ba229026fb846641b8c1c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hfox">
+		<description>Hurry Fox</description>
+		<year>198?</year>
+		<publisher>Arrow Soft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="disk1.d88" size="697008" crc="777158c0" sha1="35b991cd69a11e0ec22470f1bd9807c65c53a4e3"/>
+			</dataarea>
+		</part>
+
+		<!-- original disk 2 filename: ﾃｩ-ﾃｼ`ﾃｩﾃ榲ｩﾃｭﾃｩﾃ凝ｩﾂｺﾃｩ-ﾃｩﾂ｡ﾃｩﾃ.D88 -->
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="disk2.d88" size="697008" crc="23378860" sha1="885ec9eaf69fcae97e47587b4beb68ad46bbf719"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingflap" supported="yes">
+		<description>King Flappy</description>
+		<year>1985</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="alt_title" value="キングフラッピー"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="701360">
+				<rom name="king flappy (19xx)(db-soft).d88" size="701360" crc="73e299d7" sha1="33f9247dd762080f9d7f57ebfd14362217b46c6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kitahei">
+		<description>Kitahei</description>
+		<year>198?</year>
+		<publisher>SPS</publisher>
+		<info name="alt_title" value="棋太平" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="kitahei.d88" size="697008" crc="c03f378d" sha1="5f757025ffdb344bc300325b40909bfe4c7a1708"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laydock" supported="no">
+		<description>Laydock</description>
+		<year>198?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 4 head 0, expected_size=100000, current_size=135872
+Old note: hangs at title screen due of a PIT bug (timer irq dies)
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="731856">
+				<rom name="laydock.d88" size="731856" crc="b0304955" sha1="408550668abb3a0fa0a46f2375c10c7411dbeca1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lizard">
+		<description>Lizard</description>
+		<year>1985</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="alt_title" value="リザード"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="lizard (1985)(xtal soft).d88" size="697008" crc="209c6e17" sha1="c3c1bf7b53f17a6e3ae4c93f2e478acc2db45332"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macadam" supported="no">
+		<description>Macadam</description>
+		<year>198?</year>
+		<publisher>マカダミアソフト (Macadamia Soft)</publisher>
+		<notes><![CDATA[
+Fails to autoboot, needs to explicitly be loaded by IPL selection (verify)
+Hangs on "Please wait" screen (regression?)
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="macadam.d88" size="697008" crc="f11b4b6b" sha1="0dde2885b5d3ed730da3595b99514761d6655f46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mappy">
+		<description>Mappy</description>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692928">
+				<rom name="mappy.d88" size="692928" crc="1ddcf0ed" sha1="263acc72a8a0b6d1bb690737c7d4bd0615cc9aef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marchen" supported="no">
+		<description>Märchen Veil I</description>
+		<year>198?</year>
+		<publisher>システムサコム (System Sacom)</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872
+Old note: doesn't load if you try to run it directly, it does if you load another game first then perform a soft reset
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="805728">
+				<rom name="marchen veil.d88" size="805728" crc="4919dd5e" sha1="8e499527610c9bfe00bf12b33c683d5b01275da6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marvels" supported="no">
+		<description>Marvelous</description>
+		<year>1986?</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<notes><![CDATA[
+Inconsistent [keyboard] inputs
+]]></notes>
+		<info name="alt_title" value="マーベラス"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="705712">
+				<rom name="marvelous (19xx)(datawest).d88" size="705712" crc="cec0076f" sha1="ac5d71c0ea0ff0ca93f420be1fb4f97846b051e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mclown" supported="partial">
+		<description>Meurtre d'un Clown - Dokeshi Satsujin Jiken</description>
+		<year>1985?</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<notes><![CDATA[
+Title screen looks incorrect (verify), also has inconsistent blood animation, randomly doesn't appear
+]]></notes>
+
+		<info name="alt_title" value="道化師殺人事件" />
+		<!-- TODO: pc98:mclown shows these with Disk A/B, verify label for both -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692656">
+				<rom name="doukeshi satsujin jiken (19xx)(thinking rabbit)(disk 1).d88" size="692656" crc="dc190b39" sha1="819aeae25ec311233e65d3aa03896c2e798a7c84" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="doukeshi satsujin jiken (19xx)(thinking rabbit)(disk 2).d88" size="697008" crc="30dd1b0c" sha1="c5d2c39952a0d1479a6a94c59796b7d8a98ef517" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonchld" supported="no">
+		<description>Moonchild</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Uses mixed 3+3bpp [TVRAM] support, kludged for now (not a real test case)
+Suspicious window masking on main menu
+[FDC] disk error when trying to create an user disk
+Has optional [Modem] and [Data Link] features
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="moon child.d88" size="697008" crc="e8d6c3e1" sha1="14694923ee771676bb45186c607192ffd61947c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murdclub" supported="no">
+		<description>J.B. Harold no Jikenbo #1: Murder Club</description>
+		<year>1986</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 0 head 0, expected_size=100000, current_size=135872
+Old note: has lots of CG artifacts, FDC issue?
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="767968">
+				<rom name="disk 1.d88" size="767968" crc="a0223eb9" sha1="8ad2ca5ceee4f1adcb118a1342785d3ccc9de1f0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="808192">
+				<rom name="disk 2.d88" size="808192" crc="9a8e05b3" sha1="bb9d029ae7a83bf846a4f78c19b5bc58d0728741"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mugen">
+		<description>Mugen no Shinzou</description>
+		<year>198?</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<info name="alt_title" value="夢幻の心臓"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="696736">
+				<rom name="disk a.d88" size="696736" crc="c8bbe8aa" sha1="3a88d9eb9090a0c5882dd3a3def141b449ec6c7a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mugen2" supported="no">
+		<description>Mugen no Shinzou II</description>
+		<year>198?</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<notes><![CDATA[
+Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872
+]]></notes>
+		<info name="alt_title" value="夢幻の心臓Ⅱ"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="370528">
+				<rom name="disk a.d88" size="370528" crc="10134438" sha1="e208d618110f26d2c896a378fc9246e32ffdc45c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="720208">
+				<rom name="disk b.d88" size="720208" crc="c5c213e7" sha1="f15dbb7e5d13244165e44efe7965d4978cacd5c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobo">
+		<description>Nobo</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="70592">
+				<rom name="nobo.d88" size="70592" crc="5131d728" sha1="e0591015cb86d7a3dea20d9c0a34e9b12ed48d39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nobunaga">
+		<description>Nobunaga no Yabou</description>
+		<year>198?</year>
+		<publisher>光栄 (Koei)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="nobunaga no yabou.d88" size="697008" crc="0e7c183e" sha1="1b78d5ea8603e629680f756684c1616086c63a9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penguinw" supported="partial">
+		<description>Penguin-kun Wars</description>
+		<year>198?</year>
+		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+"Push space or trigger" window cutoff at bottom
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697424">
+				<rom name="penguin kun wars.d88" size="697424" crc="04c5365b" sha1="a82d149adc464f9d5a8412c4e88d686f7e6dbbfc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profmj">
+		<description>Professional Mahjong (v2.1)</description>
+		<year>198?</year>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="65968">
+				<rom name="mahjong (set 1).d88" size="65968" crc="d7acb2ae" sha1="59f45bb973e5314d65aa8055e3f208ef339db1a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profmja" cloneof="profmj">
+		<description>Professional Mahjong (v2.1, Alt)</description>
+		<year>198?</year>
+		<publisher>シャノアール (Chat Noir)</publisher>
+		<info name="alt_title" value="プロフェッショナル麻雀"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="65968">
+				<rom name="mahjong (set 2).d88" size="65968" crc="ff89ac18" sha1="ea11061e4b164758f42dc805c7e7ab30e8db1711"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rebirth">
+		<description>Re-Birth</description>
+		<year>1986?</year>
+		<publisher>SPS</publisher>
+
+		<info name="alt_title" value="リバース"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="831136">
+				<rom name="re-birth (19xx)(sps)(disk 1).d88" size="831136" crc="4ae8e09e" sha1="24066c13c9e66befb9f0dd05c29c44a13b00eec4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="830992">
+				<rom name="re-birth (19xx)(sps)(disk 2).d88" size="830992" crc="1993ce8d" sha1="4ddd93767a75af2ad3850dfd39f8e22862b25585"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="relics" supported="partial">
+		<description>Relics</description>
+		<year>198?</year>
+		<publisher>ボーステック (Bothtec)</publisher>
+		<notes><![CDATA[
+Cuts off top of player jumps with first capture (verify)
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692928">
+				<rom name="relics.d88" size="692928" crc="620e4bf2" sha1="ae6d5bca35724b9f7d918449850d9f2c7cc61d5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sangoku">
+		<description>Sangokushi (Ver 3.2 05-Mar-1987)</description>
+		<year>1987</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="alt_title" value="三国志" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="697008">
+				<rom name="sangokushi (1985)(koei)(disk a).d88" size="697008" crc="d1680ced" sha1="43e709c341dfb6ddf51482e071abcbf3f967f2a9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="761008">
+				<rom name="sangokushi (1985)(koei)(disk b).d88" size="761008" crc="bc3dd8ad" sha1="317ed8f7278f34607f17dddd2cdd2a8daaee1753" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="761008">
+				<rom name="sangokushi (1985)(koei)(disk c).d88" size="761008" crc="381f7b8a" sha1="f1875f92fd17d673fb633f39343269b6b7794bc9" />
+			</dataarea>
+		</part>
+
+	</software>
+
+	<software name="druaga">
+		<description>The Tower of Druaga</description>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="695648">
+				<rom name="druaga.d88" size="695648" crc="42632ffc" sha1="8201b4e52cc324fd0d501c2b37523fb388c1d1cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triton">
+		<description>Triton</description>
+		<year>198?</year>
+		<publisher>ザインソフト (Sein Soft)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="545840">
+				<rom name="tritorn.d88" size="545840" crc="6848600a" sha1="2f288e0c1b8f405aa41c0b17264a9be3aac5a19b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xevious">
+		<description>Xevious</description>
+		<year>198?</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="xevious.d88" size="697008" crc="276d0126" sha1="c6bf4550bb34deac4ab1e9ceec852ada2e338bba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys3">
+		<description>Ys 3 - Wanderers from Ys</description>
+		<year>1989</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="830144">
+				<rom name="ys3.d88" size="830144" crc="9df096d2" sha1="309ad4417984ec31e4a0ecc3f8c73d14ce4f33b4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="830144">
+				<rom name="ys3 data.d88" size="830144" crc="56e42bcd" sha1="03e655948f1d05af548a06934888dcdd73ae39b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Demo disks &amp; Diskmag disks -->
+
+	<software name="kaleidos">
+		<description>Kaleidoscope Demo</description>
+		<year>198?</year>
+		<publisher>Hot-B</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="270512">
+				<rom name="system.d88" size="270512" crc="92886753" sha1="f995ea805e0f243169f9c761f6a4ba11748b37ed"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="270512">
+				<rom name="disk1.d88" size="270512" crc="868dc6e1" sha1="d61bec783662e604cad50738806ca6be502a1532"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="688304">
+				<rom name="disk2.d88" size="688304" crc="3ea8f87f" sha1="155d927aca38ae6c828092e5d5ecce0e8b2b9dea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mzdemo1">
+		<description>Super MZ Demo 1</description>
+		<year>198?</year>
+		<publisher>SPS?</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="super mz demo 1.d88" size="697008" crc="b49cfe1b" sha1="9dd7e37712799b93c8d93f9185cc05272e0e868b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- NOTE: using left to right for listing in notes -->
+	<!-- TODO: romaji-ize entries denoted with triple question mark -->
+
+	<software name="dustbx01" supported="partial">
+		<description>Dust Box Vol. 1 - '90/4</description>
+		<year>1990</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Columns: missing pointer on main menu, uses reverse on [PCG]
+Vector: doesn't upload [PCG] if run first (works by loading Columns first), missing stars [GVRAM] layer, seems too fast
+Free Basket Ball:
+Chack N Kun no Koubou:
+]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 1.d88" size="697008" crc="170fc283" sha1="d67798df7b07ff69afa6d58872d315d1ab7eaab8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx02" supported="partial">
+		<description>Dust Box Vol. 2</description>
+		<year>1990</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Ball Race: requires an analog joystick, [XE-1AP] doesn't detect any input even if should be supported
+Knight of Legend:
+Atatepon!:
+]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 2.d88" size="697008" crc="e437f6f5" sha1="1d7dd4e1450f20351df10f679f9a8682484c0943"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx03" supported="partial">
+		<description>Dust Box Vol. 3 - '90/9</description>
+		<year>1990</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Versus ??? Tetris: doesn't load [PCG] when run from dashboard
+Reader ??? Tetris:
+Return of Columns: uses Basic default for [PCG]
+???:
+Pit Gal Plus: crashes if attempted to load or save
+Abstract World:
+]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 3.d88" size="697008" crc="84e61343" sha1="721d2369a268ddef97a363f35ed7bbb4974ae79b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx04" supported="partial">
+		<description>Dust Box Vol. 4 - '90/11</description>
+		<year>19??</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Buggy window clip transition on title screen
+Solitaire:
+Rock'N Bomb!:
+Dot Race:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 4.d88" size="697008" crc="3d3c4d43" sha1="810d94fc0074bc1660de66ecab515f1d9aeadef6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Start using kanji for months -->
+	<!-- TODO: confirm them all -->
+
+	<software name="dustbx05" supported="partial">
+		<description>Dust Box Vol. 5 - July '91</description>
+		<year>1991</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+First SW that tests [MZ-1E35] ADPCM ports
+???:
+???:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 5.d88" size="697008" crc="851e0842" sha1="f7da222c2b2838ea1184e41b79170a7c30c8ca42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx91" supported="partial">
+		<description>Dust Box '91 Special - August '91</description>
+		<year>1991</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Demo section
+???: uses unimplemented [CG] mode 0x93
+Basic 3 ???:
+DNA Modoki:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust_box_91_special.d88" size="697008" crc="aaec667d" sha1="0adaf4e0b306ac8389bd202ce0a1b11c29ffa52c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx06" supported="partial">
+		<description>Dust Box Vol. 6 - December '91</description>
+		<year>1991</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+???:
+Bean Ball:
+???:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 6.d88" size="697008" crc="97e418bf" sha1="01b44f55eada23aa823be0ab5ab024823ca10753"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx07" supported="partial">
+		<description>Dust Box Vol. 7 - April '92</description>
+		<year>1992</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Zeldis:
+??? Smow:
+Bara-Noia II:
+Blue Ribbon:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 7.d88" size="697008" crc="bd403c61" sha1="084c83408896fd289ed4415eb0d638b9c25667d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx08" supported="partial">
+		<description>Dust Box Vol. 8 - August '92</description>
+		<year>1992</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Bound Ball:
+Funny Ball:
+Kuruper:
+???:
+???:
+Diamond is Forever:
+C??? K and R:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 8.d88" size="697008" crc="5018ff23" sha1="4004ad24f7d0def5a18ad2225ba6c9bf8c817901"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx09" supported="partial">
+		<description>Dust Box Vol. 9 - June '93</description>
+		<year>1993</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+???:
+Super Angel:
+Block:
+Sigma's:
+6x6:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 9.d88" size="697008" crc="98594460" sha1="c0e4898731532c8ead62dfc65c1229345b5e91fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx10" supported="partial">
+		<description>Dust Box Vol. 10 - August '93</description>
+		<year>1993</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Parabolic Ball:
+Nantekotai ??? 99:
+3-D ???:
+Fighters II:
+???:
+Loopasser:
+Toshi Jong:
+Nekkoro:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="784048">
+				<rom name="dust box vol 10.d88" size="784048" crc="26132963" sha1="94be072225623b1ec83c845241d173df5aca3e5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx11" supported="partial">
+		<description>Dust Box Vol. 11 - December '93</description>
+		<year>1993</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Space Bluster FX:
+???:
+Invader (MZ80):
+??? (MZ80):
+Zalion (MZ80):
+Batting (MZ80):
+The Chanbara (MZ80):
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="784048">
+				<rom name="dust box vol 11.d88" size="784048" crc="e0adaa77" sha1="6c15d5370c7e041283f2b063880ee614b80eccb8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx12" supported="partial">
+		<description>Dust Box Vol. 12 - May '94</description>
+		<year>1994</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+??? ver.3.0:
+Border:
+Bakea:
+Titlis:
+Kurukuru:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 12.d88" size="697008" crc="f38b28a9" sha1="b2cb2856e69fec026c7eafc03afe3217da2b058d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx13" supported="partial">
+		<description>Dust Box Vol. 13 - August '94</description>
+		<year>1994</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Gernion:
+Othello:
+??? ver3.1:
+Tama:
+???:
+Cosmic Cruiser II:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 13.d88" size="697008" crc="48e61701" sha1="6007b4800b925435d49c703960c696ec8221d183"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx14" supported="partial">
+		<description>Dust Box Vol. 14 - December '94</description>
+		<year>1994</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Illegal Mission:
+???:
+Car:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 14.d88" size="697008" crc="6b897344" sha1="6f8b0ed388cce5a4d8ad24c16f37441a1c70b308"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx15" supported="partial">
+		<description>Dust Box Vol. 15 - August '95</description>
+		<year>1995</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+??? Quarth:
+???:
+??? Heptas:
+???:
+3-D ???:
+Monster Road:
+Card Game Uno:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 15.d88" size="697008" crc="4719c224" sha1="b93215672858018d4cc8b9e5af6a3fe92f0cb705"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Back to numerical format ... -->
+
+	<software name="dustbx16" supported="partial">
+		<description>Dust Box Vol. 16 - 1996/10 (Pre-Release ver.)</description>
+		<year>1996</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+vs ???:
+Super Mahjong:
+Zones ???:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust box vol 16.d88" size="697008" crc="43cc53a6" sha1="bce8a75be3731814a3ab4ab7d956c05839ad4337"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !Program disks -->
+
+	<software name="basicv1" supported="partial">
+		<description>BASIC-M25 (6Z002) V1.0A</description>
+		<year>1985</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+Various utilities, not extensively tested
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="basic-m25 v1(6z002).d88" size="697008" crc="f0f84164" sha1="6f4f57195299b4ba329fd4bb9eb733c8f791adf0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicv2" supported="partial">
+		<description>BASIC-M25 (6Z002) V2.0B</description>
+		<year>1987?</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+Various utilities, not extensively tested
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="basic-m25 v2(6z002).d88" size="697008" crc="2e585759" sha1="c8ea6bb291be68d7b0186cd2117c7fe01dd21f55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fenix">
+		<description>Fenix Shell (v0.2)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="fenix shell.d88" size="697008" crc="d643ed6b" sha1="edecfdac27218b27a06de2b679f159be72414466"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multplan" supported="no">
+		<description>Multiplan v1.07</description>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+Hangs randomly after you set date and time, sometimes it loads properly
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="759808">
+				<rom name="multiplan.d88" size="759808" crc="c335c3a2" sha1="190b759613c5793f13acfa9ab1cb64a5988340f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcpm">
+		<description>Personal CP/M (MZ-6Z001 V1.0A)</description>
+		<year>1985</year>
+		<publisher>Digital Research / Sharp</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="personal cpm.d88" size="697008" crc="e33d828d" sha1="ca3b4a9950da0b79755389ced851a57b618e9f65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soundgal" supported="no">
+		<description>Sound Gal Music Editor (v1.0A)</description>
+		<year>1986</year>
+		<publisher>EA-Z Communication</publisher>
+		<notes><![CDATA[
+Moans about missing Master Disk after title screen
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="544560">
+				<rom name="sound gal.d88" size="544560" crc="b97b4d57" sha1="d1463b3cf1a5bd769a7cd68d1b3f748c4014984a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telephona" cloneof="telephon" supported="no">
+		<description>Telephone Soft (6Z006) V1.1A</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires [MZ-1E26] modem
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="telephone soft 1.d88" size="697008" crc="24c0ff6f" sha1="1adb1028c59ec3961dfafeb4ed8cf472c7add918"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telephon" supported="no">
+		<description>Telephone Soft (6Z006) V2.0B</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires [MZ-1E26] modem
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="telephone soft 2.d88" size="697008" crc="27b5a0ff" sha1="c5959050e319627882744f2de2aa9acfb6626aed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yukark2" supported="no">
+		<!-- Original filanames: テ「テ・テシ[テ「Jテ「ティK2 xxxx, with xxx our current names -->
+		<description>Yukar K2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen (regression)
+Old note: "please put the system disk back to normal", disk write-protected?
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="system.d88" size="697008" crc="4c8d6b85" sha1="425bd75e6c327fd026bfacb82b75f909b0e7b8a3"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dictionary.d88" size="697008" crc="bceda534" sha1="2804c127288cba23cdf4a73e55a48246b66c23bd"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="support.d88" size="697008" crc="3f71c6b1" sha1="af2e036be4ab3e823934eacb0e1e3781c1a30f41"/>
+			</dataarea>
+		</part>
+
+		<!-- TODO: standalone data disk? -->
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="turbokit.d88" size="697008" crc="b28ac39b" sha1="78291ad03e107c92e9a64bd8e8a57cb02264a49d"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- This fails to be recognized by floppy loading code? it shall be 2DD plain disk -->
+	<software name="scobol" supported="no">
+		<description>Sharp COBOL</description>
+		<year>198?</year>
+		<publisher>Sharp</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="sharpcobol.hdm" size="655360" crc="898021bb" sha1="c30c5cb99acf6aadba2b7b431935d8446916c673"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This fails to be recognized by floppy loading code? it shall be 2DD plain disk -->
+	<software name="scpmwm" supported="no">
+		<description>Personal CP/M + Wordmaster</description>
+		<year>198?</year>
+		<publisher>Sharp</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="sharpcpm.hdm" size="655360" crc="9b3f1d46" sha1="7b901031873437a8824e15ac2577f175b8bffdd4"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- !Misc. dumps (non master disks) -->
+
+	<software name="unk1" supported="partial">
+		<description>Small-C Compiler</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="usage" value="CP/M formatted disk" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="unk1.d88" size="697008" crc="84c9309d" sha1="c06d7bc6691bbdac574433665b15596888bddc03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk2" supported="no">
+		<description>Unknown Disk 2 (MZ-1E30)</description>
+		<year>1987</year>
+		<publisher>Sharp?</publisher>
+		<notes><![CDATA[
+Contains HDD formatting utilities
+]]></notes>
+		<info name="usage" value="BASIC formatted disk" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="unk2.d88" size="697008" crc="0cc720f5" sha1="fc1c27fabb53046dd273ebdd8db832e4700cdb30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk3" supported="partial">
+		<description>Unknown Disk 3 (SB02)</description>
+		<year>1991?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Contains misc coverdisc games and utilities
+Not extensively tested
+]]></notes>
+		<info name="usage" value="BASIC formatted disk" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="784048">
+				<rom name="unk3.d88" size="784048" crc="bafe3fd2" sha1="02b2ae5e964cb0a130f70962e913b2de3603dbec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk4" supported="no">
+		<description>Unknown Disk 4 (SB03)</description>
+		<year>1991?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Contains misc coverdisc BGMs, loading any of them will throw BASIC errors (missing MML engine?)
+]]></notes>
+		<info name="usage" value="BASIC formatted disk" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="unk4.d88" size="697008" crc="d6d1de04" sha1="b72f0b17fdf52bd8d08a09a719dab668e11a2bee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk5" supported="partial">
+		<description>Turbo Pascal (V3.0)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="usage" value="CP/M formatted disk" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="unk5.d88" size="697008" crc="32e63f6d" sha1="c491a548db9bc7aee66c56069c99453b598f1300"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk6" supported="no">
+		<description>Unknown Disk 6 (Brown)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"Unable to identify image file format"
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697009">
+				<rom name="unk6.d88" size="697009" crc="2457a9c9" sha1="ffb094354f44c691d2dc41cd93f7007ab33484c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

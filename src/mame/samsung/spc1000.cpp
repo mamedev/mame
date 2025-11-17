@@ -484,12 +484,12 @@ void spc1000_state::spc1000(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MC6847_NTSC(config, m_vdg, XTAL(3'579'545));
+	MC6847(config, m_vdg, XTAL(3'579'545));
 	m_vdg->set_screen("screen");
 	m_vdg->fsync_wr_callback().set(FUNC(spc1000_state::irq_w));
 	m_vdg->input_callback().set(FUNC(spc1000_state::mc6847_videoram_r));
 	m_vdg->set_get_char_rom(FUNC(spc1000_state::get_char_rom));
-	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2);
+	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2);
 	// other lines not connected
 
 	/* sound hardware */

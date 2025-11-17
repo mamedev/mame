@@ -167,7 +167,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 			std::unordered_set<std::string> soundtags;
 			for (device_sound_interface &sound : snditer)
 			{
-				if (!sound.issound() || !soundtags.insert(sound.device().tag()).second)
+				if (!soundtags.insert(sound.device().tag()).second)
 					continue;
 
 				// count how many identical sound chips we have

@@ -192,31 +192,15 @@ void tnx1_state::update_palette()
 
 void tnx1_state::background_w(offs_t offset, uint8_t data)
 {
-	// TODO: confirm the memory layout
-	bool lsn = (data & 0x80) == 0;
-	if (lsn)
-	{
-		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
-	}
-	else
-	{
-		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
-	}
+	int shift = BIT(data, 7) ? 4 : 0;
+	m_background_ram[offset] = (m_background_ram[offset] & ~(0x0f << shift)) | ((data & 0xf) << shift);
 }
 
 void tpp2_state::background_w(offs_t offset, uint8_t data)
 {
-	// TODO: confirm the memory layout
-	bool lsn = (offset & 0x40) == 0;
-	offset = (offset & 0x3f) | ((offset & ~0x7f) >> 1);
-	if (lsn)
-	{
-		m_background_ram[offset] = (m_background_ram[offset] & 0xf0) | (data & 0xf);
-	}
-	else
-	{
-		m_background_ram[offset] = (m_background_ram[offset] & 0x0f) | (data << 4);
-	}
+	int shift = BIT(offset, 12) ? 4 : 0;
+	offset = BIT(offset, 0, 12);
+	m_background_ram[offset] = (m_background_ram[offset] & ~(0x0f << shift)) | ((data & 0xf) << shift);
 }
 
 void tnx1_state::popeye_videoram_w(offs_t offset, uint8_t data)
@@ -367,80 +351,47 @@ void tnx1_state::draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			bitmap.pix(y, x) = 0;
 }
 
-void tnx1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tnx1_state::draw_background(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int sy = y;
-		if (flip_screen())
-			sy ^= 0x1ff;
-
-		sy -= 0x200 - (2 * m_background_scroll[1]);
+		uint16_t rovi = (flip_screen() ? (y / 2) ^ 0xff : (y / 2)) + m_background_scroll[1];
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (sy < 0)
-				bitmap.pix(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
-			else
-			{
-				// TODO: confirm the memory layout
-				int sx = x + (2 * (m_background_scroll[0] | ((m_background_scroll[2] & 1) << 8))) + 0x70;
-				int shift = (sx & 0x200) / 0x80;
-
-				bitmap.pix(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
-			}
+			uint16_t roh = 0x38 + (x / 2) + m_background_scroll[0] + (BIT(m_background_scroll[2], 0) << 8);
+			int shift = BIT(roh, 8) ? 4 : 0;
+			bitmap.pix(y, x) = (m_background_ram[BIT(rovi, 8) ? (BIT(rovi, 2, 6) << 6) | BIT(roh, 2, 6) : 0] >> shift) & 0xf;
 		}
 	}
 }
 
-void tpp1_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tpp1_state::draw_background(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int sy = y;
-		if (flip_screen())
-			sy ^= 0x1ff;
-
-		sy -= 0x200 - (2 * m_background_scroll[1]);
+		uint16_t rovi = (flip_screen() ? (y / 2) ^ 0xff : (y / 2)) + m_background_scroll[1];
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (sy < 0)
-				bitmap.pix(y, x) = m_background_ram[0] & 0xf; // TODO: find out exactly where the data is fetched from
-			else
-			{
-				// TODO: confirm the memory layout
-				int sx = x + (2 * m_background_scroll[0]) + 0x70;
-				int shift = (sy & 4);
-
-				bitmap.pix(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
-			}
+			uint16_t roh = 0x38 + (x / 2) + m_background_scroll[0] + (BIT(m_background_scroll[2], 0) << 8);
+			int shift = BIT(rovi, 1) ? 4 : 0;
+			bitmap.pix(y, x) = (m_background_ram[BIT(rovi, 8) ? (BIT(rovi, 2, 6) << 6) | BIT(roh, 2, 6) : 0] >> shift) & 0xf;
 		}
 	}
 }
 
-void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tpp2_state::draw_background(bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int sy = y;
-		if (flip_screen())
-			sy ^= 0x1ff;
-
-		sy -= 0x200 - (2 * m_background_scroll[1]);
+		uint16_t rovi = (flip_screen() ? (y / 2) ^ 0xff : (y / 2)) + m_background_scroll[1];
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (sy < 0)
-				bitmap.pix(y, x) = m_background_ram[((sy & 0x100) / 8) * 0x40] & 0xf;
-			else
-			{
-				// TODO: confirm the memory layout
-				int sx = x + (2 * m_background_scroll[0]) + 0x70;
-				int shift = (sy & 4);
-
-				bitmap.pix(y, x) = (m_background_ram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
-			}
+			uint8_t roh = 0x38 + (x / 2) + m_background_scroll[0];
+			int shift = BIT(rovi, 7) ? 4 : 0;
+			bitmap.pix(y, x) = (m_background_ram[BIT(rovi, 8) ? (BIT(rovi, 1, 6) << 6) | BIT(roh, 2, 6) : 0] >> shift) & 0xf;
 		}
 	}
 }

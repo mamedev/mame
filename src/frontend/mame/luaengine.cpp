@@ -26,6 +26,7 @@
 #include "natkeyboard.h"
 #include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "uiinput.h"
 
 #include "corestr.h"
@@ -605,13 +606,13 @@ size_t lua_engine::enumerate_functions(const char *id, T &&callback)
 	return count;
 }
 
-bool lua_engine::execute_function(const char *id)
+template <typename... Params> bool lua_engine::execute_function(const char *id, Params&&... args)
 {
 	size_t count = enumerate_functions(
 			id,
-			[this] (const sol::protected_function &func)
+			[this, args...] (const sol::protected_function &func)
 			{
-				auto ret = invoke(func);
+				auto ret = invoke(func, args...);
 				if (!ret.valid())
 				{
 					sol::error err = ret;
@@ -706,9 +707,23 @@ void lua_engine::on_machine_postload()
 	m_notifiers->on_postload();
 }
 
-void lua_engine::on_sound_update()
+void lua_engine::on_sound_update(const std::map<std::string, std::vector<std::pair<const float *, int>>> &sound)
 {
-	execute_function("LUA_ON_SOUND_UPDATE");
+	auto stable = sol().create_table();
+	for(const auto &e : sound) {
+		auto dtable = sol().create_table();
+		u32 channels = e.second.size();
+		for(u32 channel = 0; channel != channels; channel ++) {
+			const auto &info = e.second[channel];
+			auto ctable = sol().create_table(sol::new_table(info.second));
+			for(u32 i=0; i != info.second; i++)
+				ctable[i+1] = info.first[i];
+			dtable[channel+1] = ctable;
+		}
+		stable[e.first] = dtable;
+	}
+
+	execute_function("LUA_ON_SOUND_UPDATE", stable);
 }
 
 void lua_engine::on_periodic()
@@ -1462,6 +1477,7 @@ void lua_engine::initialize()
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
+	machine_type["sounds"] = sol::property([](running_machine &m) { return devenum<sound_interface_enumerator>(m.root_device()); });
 	machine_type["phase"] = sol::property(
 			[] (running_machine const &m) -> char const *
 			{
@@ -1511,8 +1527,8 @@ void lua_engine::initialize()
 				}
 				return rot;
 			});
-	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) != 0; });
-	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) != 0; });
+	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.type.emulation_flags() & device_t::flags::NOT_WORKING) != 0; });
+	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.type.emulation_flags() & device_t::flags::SAVE_UNSUPPORTED) == 0; });
 	game_driver_type["no_cocktail"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) != 0; });
 	game_driver_type["is_bios_root"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) != 0; });
 	game_driver_type["requires_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) != 0; });
@@ -1602,7 +1618,6 @@ void lua_engine::initialize()
 				return table;
 			});
 
-
 	auto dipalette_type = sol().registry().new_usertype<device_palette_interface>("dipalette", sol::no_constructor);
 	dipalette_type.set_function("pen", &device_palette_interface::pen);
 	dipalette_type.set_function(
@@ -1654,8 +1669,54 @@ void lua_engine::initialize()
 	dipalette_type["black_pen"] = sol::property(&device_palette_interface::black_pen);
 	dipalette_type["white_pen"] = sol::property(&device_palette_interface::white_pen);
 	dipalette_type["shadows_enabled"] = sol::property(&device_palette_interface::shadows_enabled);
-	dipalette_type["highlights_enabled"] = sol::property(&device_palette_interface::hilights_enabled);
+	dipalette_type["highlights_enabled"] = sol::property(&device_palette_interface::highlights_enabled);
 	dipalette_type["device"] = sol::property(static_cast<device_t & (device_palette_interface::*)()>(&device_palette_interface::device));
+
+
+	auto disound_type = sol().registry().new_usertype<device_sound_interface>("disound", sol::no_constructor);
+	disound_type["inputs"] = sol::property(&device_sound_interface::inputs);
+	disound_type["outputs"] = sol::property(&device_sound_interface::outputs);
+	disound_type["microphone"] = sol::property(
+			[] (device_sound_interface &dev)
+			{
+				return dev.device().type() == MICROPHONE;
+			});
+	disound_type["speaker"] = sol::property(
+			[] (device_sound_interface &dev)
+			{
+				return dev.device().type() == SPEAKER;
+			});
+	disound_type["io_positions"] = sol::property(
+			[this] (device_sound_interface &dev)
+			{
+				auto pos_table = sol().create_table();
+				auto *iodev = dynamic_cast<sound_io_device *>(&dev.device());
+				if (iodev)
+					for(int channel=0; channel != iodev->channels(); channel++)
+					{
+						auto pos = iodev->get_position(channel);
+						auto table = sol().create_table();
+						table[1] = pos.m_x;
+						table[2] = pos.m_y;
+						table[3] = pos.m_z;
+						pos_table[channel+1] = table;
+					}
+				return pos_table;
+			});
+	disound_type["io_names"] = sol::property(
+			[this] (device_sound_interface &dev)
+			{
+				auto pos_table = sol().create_table();
+				auto *iodev = dynamic_cast<sound_io_device *>(&dev.device());
+				if (iodev)
+					for(int channel=0; channel != iodev->channels(); channel++)
+						pos_table[channel+1] = iodev->get_position(channel).name();
+				return pos_table;
+			});
+
+	disound_type["hook"] = sol::property(&device_sound_interface::get_sound_hook, &device_sound_interface::set_sound_hook);
+	disound_type["device"] = sol::property(static_cast<device_t & (device_sound_interface::*)()>(&device_sound_interface::device));
+
 
 
 	auto screen_dev_type = sol().registry().new_usertype<screen_device>(
@@ -2049,7 +2110,7 @@ void lua_engine::initialize()
 			luaL_pushresultsize(&buff, size);
 			return sol::make_reference(s, sol::stack_reference(s, -1));
 		};
-	video_type["speed_factor"] = sol::property(&video_manager::speed_factor);
+	video_type["speed_factor"] = sol::property(&video_manager::speed_factor, &video_manager::set_speed_factor);
 	video_type["throttled"] = sol::property(&video_manager::throttled, &video_manager::set_throttled);
 	video_type["throttle_rate"] = sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate);
 	video_type["frameskip"] = sol::property(&video_manager::frameskip, &video_manager::set_frameskip);
@@ -2068,16 +2129,6 @@ void lua_engine::initialize()
 			return filename ? sm.start_recording(filename) : sm.start_recording();
 		};
 	sound_type["stop_recording"] = &sound_manager::stop_recording;
-	sound_type["get_samples"] =
-		[] (sound_manager &sm, sol::this_state s)
-		{
-			luaL_Buffer buff;
-			s32 const count = sm.sample_count() * 2 * 2; // 2 channels, 2 bytes per sample
-			s16 *const ptr = (s16 *)luaL_buffinitsize(s, &buff, count);
-			sm.samples(ptr);
-			luaL_pushresultsize(&buff, count);
-			return sol::make_reference(s, sol::stack_reference(s, -1));
-		};
 	sound_type["muted"] = sol::property(&sound_manager::muted);
 	sound_type["ui_mute"] = sol::property(
 			static_cast<bool (sound_manager::*)() const>(&sound_manager::ui_mute),
@@ -2088,9 +2139,6 @@ void lua_engine::initialize()
 	sound_type["system_mute"] = sol::property(
 			static_cast<bool (sound_manager::*)() const>(&sound_manager::system_mute),
 			static_cast<void (sound_manager::*)(bool)>(&sound_manager::system_mute));
-	sound_type["attenuation"] = sol::property(
-			&sound_manager::attenuation,
-			&sound_manager::set_attenuation);
 	sound_type["recording"] = sol::property(&sound_manager::is_recording);
 
 
@@ -2106,12 +2154,14 @@ void lua_engine::initialize()
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
 	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(); });
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);
-	ui_type["show_menu"] = &mame_ui_manager::show_menu;
 	ui_type["ui_active"] = sol::property(&mame_ui_manager::ui_active, &mame_ui_manager::set_ui_active);
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
 	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
+
+	// undocumented/unsupported
+	ui_type["show_menu"] = &mame_ui_manager::show_menu; // FIXME: this is dangerous - it doesn't give a proper chance for the current UI handler to clean up
 
 
 /* rom_entry library

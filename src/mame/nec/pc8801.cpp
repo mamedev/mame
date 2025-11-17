@@ -3,40 +3,41 @@
 // thanks-to: Alex Marshall
 /**************************************************************************************************
 
-    PC-8801 (c) 1981 NEC
+PC-8801 (c) 1981 NEC
 
-    driver by Angelo Salese, original MESS PC-88SR driver by ???
+References:
+- http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
+- http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
+- http://www.maroon.dti.ne.jp/youkan/pc88/index.html
+- https://web.archive.org/web/20190404052331/https://retrocomputerpeople.web.fc2.com/machines/nec/8801/index.html
 
-    TODO:
-    - cassette support;
-    - waitstates;
-    - support for partial palette updates (pretty off in p8suite analog RGB test if enabled);
-    - understand why i8214 needs a dis hack setter (depends on attached i8212?);
-    - clean-ups:
-      - slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
-      - better state machine isolation of features between various models.
-        Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
-        (uses external minidisk), only model with working border color, other misc banking bits.
-      - refactor memory banking to use address maps & views;
-      - double check dipswitches;
-      - Slotify PC80S31K, also needed by PC-6601SR, PC-88VA, (vanilla & optional) PC-9801. **partially done**
-        Also notice that there are common points with SPC-1000 and TF-20 FDDs;
-      - backport/merge what is portable to PC-8001;
-      - Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
-        Needs identification effort about what's internal to machine models and what instead
-        can be optionally installed;
-    - implement proper joypad / mouse (PC-8872) DB9 port connector, consider deriving from vcs_ctrl;
-    - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
-      guessing from the back panels seems that each model can install between 1 to 3 cards.
-      Also note: most cards aren't compatible between each other;
+TODO:
+- cassette support;
+- refactor memory banking to use address maps & views;
+- waitstates (relevant for V1 mode);
+- hook Z80_INPUT_LINE_BUSRQ to DMA interactions in place of HALT (common with pc8001);
+- complete support for partial palette updates (pretty off in p8suite analog RGB test);
+- understand why i8214 needs a dis hack setter (depends on attached i8212?);
+- slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
+- better state machine isolation of features between various models.
+  Vanilla PC-8801 doesn't have analog palette, PC80S31 device as default
+  (uses external minidisk instead), only model with working border color, other misc banking bits.
+- double check dipswitches;
+- backport/merge what is portable to PC-8001;
+- Kanji LV1/LV2 ROM hookups needs to be moved at slot level.
+  Needs identification effort about what's internal to machine models and what instead
+  can be optionally installed;
+- Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
+  guessing from the back panels seems that each model can install between 1 to 3 cards.
+  Also note: most cards aren't compatible between each other;
 
-    Notes:
-    - Later models have washed out palette with some SWs, with no red component.
-      This is because you have to set up the V1 / V2 DIP-SW to V1 mode for those games
-      (BIOS sets up analog palette and never changes back otherwise).
-      cfr. SW list usage SW notes that specifically needs V1.
+Notes:
+- Later models have washed out palette with some SWs, with no red component.
+  This is because you have to set up the V1 / V2 DIP-SW to V1 mode for those games
+  (BIOS sets up analog palette and never changes back otherwise).
+  cfr. SW list usage SW notes that specifically needs V1.
 
-======================================================================================================================================
+===================================================================================================
 
     PC-88xx Models (and similar machines like PC-80xx and PC-98DO)
 
@@ -95,13 +96,7 @@
      * CD-ROM BIOS: 0x0000 - 0x7fff
      * Dictionary: 0xc000 - 0xffff (32 Banks)
 
-    References:
-    - https://retrocomputerpeople.web.fc2.com/machines/nec/8801/
-    - http://mydocuments.g2.xrea.com/html/p8/vraminfo.html
-    - http://www7b.biglobe.ne.jp/~crazyunit/pc88.html
-    - http://www.maroon.dti.ne.jp/youkan/pc88/index.html
-
-*************************************************************************************************************************************/
+**************************************************************************************************/
 
 
 #include "emu.h"
@@ -283,7 +278,22 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 uint8_t pc8801_state::dma_mem_r(offs_t offset)
 {
 	// TODO: TVRAM readback
+	//if ((offset & 0xf000) == 0xf000)
+	//	return m_hi_work_ram[offset & 0xfff];
 	return m_work_ram[offset & 0xffff];
+}
+
+void pc8801_state::dma_mem_w(offs_t offset, u8 data)
+{
+//	printf("%04x %02x\n", offset, data);
+	m_work_ram[offset & 0xffff] = data;
+}
+
+// the pc8801 appears to just to dma memr and iow cycles if verify mode is set
+uint8_t pc8801_state::dackv(offs_t offset)
+{
+	m_crtc->dack_w(dma_mem_r(offset));
+	return 0;
 }
 
 uint8_t pc8801_state::alu_r(offs_t offset)
@@ -1641,7 +1651,8 @@ void pc8801_state::pc8801(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
-	config.set_perfect_quantum(m_maincpu);
+//	config.set_perfect_quantum(m_maincpu);
+	// TODO: get rid of this
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 //  config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
@@ -1664,15 +1675,11 @@ void pc8801_state::pc8801(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("pc8801_cass");
 
-	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 
 	// TODO: clock, receiver handler, DCD?
 	I8251(config, m_usart, 0);
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
-
-	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
-	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
@@ -1697,27 +1704,27 @@ void pc8801_state::pc8801(machine_config &config)
 	I8257(config, m_dma, MASTER_CLOCK);
 	m_dma->out_hrq_cb().set(FUNC(pc8801_state::hrq_w));
 	m_dma->in_memr_cb().set(FUNC(pc8801_state::dma_mem_r));
+	m_dma->out_memw_cb().set(FUNC(pc8801_state::dma_mem_w));
 	// CH0: 5-inch floppy DMA
 	// CH1: 8-inch floppy DMA, SCSI CD-ROM interface (on MA/MC)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
+	m_dma->verify_cb<2>().set(FUNC(pc8801_state::dackv));
 	// CH3: <autoload only?>
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
 
 	// Note: original models up to OPNA variants really have an internal mono speaker,
 	// but user eventually can have a stereo mixing audio card mounted so for simplicity we MCM here.
-	SPEAKER(config, m_lspeaker).front_left();
-	SPEAKER(config, m_rspeaker).front_right();
+	SPEAKER(config, m_speaker, 2).front();
 
 	// TODO: DAC_1BIT
 	// 2400 Hz according to schematics, unaffected by clock speed setting (confirmed on real HW)
 	BEEP(config, m_beeper, MASTER_CLOCK / 16 / 13 / 8);
 
-	for (auto &speaker : { m_lspeaker, m_rspeaker })
-	{
-		m_cassette->add_route(ALL_OUTPUTS, speaker, 0.025);
-		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
-	}
+	m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.025, 0);
+	m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.025, 1);
+	m_beeper->add_route(ALL_OUTPUTS, m_speaker, 0.10, 0);
+	m_beeper->add_route(ALL_OUTPUTS, m_speaker, 0.10, 1);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
 
@@ -1726,6 +1733,11 @@ void pc8801_state::pc8801(machine_config &config)
 	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
 	m_exp->int4_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
 	m_exp->int5_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
+
+	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
+	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
+	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc8801");
 }
 
 void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
@@ -1738,14 +1750,15 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
 	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
 
-	for (auto &speaker : { m_lspeaker, m_rspeaker })
-	{
-		// TODO: per-channel mixing is unconfirmed
-		m_opn->add_route(0, speaker, 0.125);
-		m_opn->add_route(1, speaker, 0.125);
-		m_opn->add_route(2, speaker, 0.125);
-		m_opn->add_route(3, speaker, 0.125);
-	}
+	// TODO: per-channel mixing is unconfirmed
+	m_opn->add_route(0, m_speaker, 0.125, 0);
+	m_opn->add_route(1, m_speaker, 0.125, 0);
+	m_opn->add_route(2, m_speaker, 0.125, 0);
+	m_opn->add_route(3, m_speaker, 0.125, 0);
+	m_opn->add_route(0, m_speaker, 0.125, 1);
+	m_opn->add_route(1, m_speaker, 0.125, 1);
+	m_opn->add_route(2, m_speaker, 0.125, 1);
+	m_opn->add_route(3, m_speaker, 0.125, 1);
 }
 
 void pc8801mk2sr_state::pc8801mk2mr(machine_config &config)
@@ -1768,10 +1781,10 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_lspeaker, 0.25);
-	m_opna->add_route(0, m_rspeaker, 0.25);
-	m_opna->add_route(1, m_lspeaker, 0.75);
-	m_opna->add_route(2, m_rspeaker, 0.75);
+	m_opna->add_route(0, m_speaker, 0.25, 0);
+	m_opna->add_route(0, m_speaker, 0.25, 1);
+	m_opna->add_route(1, m_speaker, 0.50, 0);
+	m_opna->add_route(2, m_speaker, 0.50, 1);
 
 	// TODO: add possible configuration override for baudrate here
 	// ...
@@ -1790,6 +1803,9 @@ void pc8801mc_state::pc8801mc(machine_config &config)
 
 	PC8801_31(config, m_cdrom_if, 0);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
+	m_cdrom_if->drq_cb().set(m_dma, FUNC(i8257_device::dreq1_w));
+	m_dma->in_ior_cb<1>().set(m_cdrom_if, FUNC(pc8801_31_device::dma_r));
+//	m_dma->out_iow_cb<1>().set([] (u8 data) { printf("SASI iow\n"); });
 }
 
 ROM_START( pc8801 )

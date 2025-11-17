@@ -56,7 +56,7 @@
 #include "neogeo_spr.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
@@ -671,12 +671,11 @@ void midas_state::livequiz(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
-	ymz.add_route(0, "lspeaker", 0.80);
-	ymz.add_route(1, "rspeaker", 0.80);
+	ymz.add_route(0, "speaker", 0.80, 0);
+	ymz.add_route(1, "speaker", 0.80, 1);
 }
 
 void hammer_state::hammer(machine_config &config)

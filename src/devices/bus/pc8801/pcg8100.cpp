@@ -46,8 +46,8 @@ void pcg8100_device::device_add_mconfig(machine_config &config)
 	for (auto &dac1bit : m_dac1bit)
 	{
 		SPEAKER_SOUND(config, dac1bit);
-		dac1bit->add_route(ALL_OUTPUTS, "^^lspeaker", 0.25);
-		dac1bit->add_route(ALL_OUTPUTS, "^^rspeaker", 0.25);
+		dac1bit->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 0);
+		dac1bit->add_route(ALL_OUTPUTS, "^^speaker", 0.25, 1);
 	}
 }
 

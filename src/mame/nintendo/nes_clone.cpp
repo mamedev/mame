@@ -28,10 +28,10 @@ public:
 		m_ppu(*this, "ppu")
 	{ }
 
-	void nes_clone(machine_config &config);
-	void nes_clone_pal(machine_config &config);
+	void nes_clone(machine_config &config) ATTR_COLD;
+	void nes_clone_pal(machine_config &config) ATTR_COLD;
 
-	void init_nes_clone();
+	void init_nes_clone() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -73,7 +73,7 @@ public:
 		m_gfxrom(*this, "gfxrom"),
 		m_mainrom(*this, "maincpu")
 	{ }
-	void nes_clone_dancexpt(machine_config &config);
+	void nes_clone_dancexpt(machine_config &config) ATTR_COLD;
 
 private:
 	void nes_clone_dancexpt_map(address_map &map) ATTR_COLD;
@@ -109,7 +109,7 @@ public:
 	nes_clone_dnce2000_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_clone_state(mconfig, type, tag)
 	{ }
-	void nes_clone_dnce2000(machine_config& config);
+	void nes_clone_dnce2000(machine_config& config) ATTR_COLD;
 
 private:
 	void nes_clone_dnce2000_map(address_map &map) ATTR_COLD;
@@ -120,20 +120,6 @@ private:
 	uint8_t m_rombase = 0;
 };
 
-class nes_clone_vtvppong_state : public nes_clone_state
-{
-public:
-	nes_clone_vtvppong_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_clone_state(mconfig, type, tag)
-	{ }
-	void nes_clone_vtvppong(machine_config& config);
-
-	void init_vtvppong();
-
-private:
-	void nes_clone_vtvppong_map(address_map &map) ATTR_COLD;
-};
-
 class nes_clone_sudoku_state : public nes_clone_state
 {
 public:
@@ -141,9 +127,9 @@ public:
 		nes_clone_state(mconfig, type, tag)
 	{ }
 
-	void init_sudoku();
+	void init_sudoku() ATTR_COLD;
 
-	void nes_clone_sudoku(machine_config& config);
+	void nes_clone_sudoku(machine_config& config) ATTR_COLD;
 
 private:
 	void nes_clone_sudoku_map(address_map &map) ATTR_COLD;
@@ -162,6 +148,7 @@ public:
 	{ }
 
 	void nes_clone_vtvsocr(machine_config& config);
+	void nes_clone_danzkara_pal(machine_config& config);
 
 private:
 	void nes_clone_vtvsocr_map(address_map &map) ATTR_COLD;
@@ -185,7 +172,7 @@ public:
 		m_charbank(*this, "charbank"),
 		m_rom_solderpad_bank(*this, "rom_sldpad_bank")
 	{ }
-	void nes_clone_afbm7800(machine_config& config);
+	void nes_clone_afbm7800(machine_config& config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -267,6 +254,21 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 };
 
+class nes_clone_vtvppong_state : public nes_clone_taikee_new_state
+{
+public:
+	nes_clone_vtvppong_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_clone_taikee_new_state(mconfig, type, tag)
+	{ }
+
+	void init_vtvppong() ATTR_COLD;
+
+protected:
+	virtual uint8_t in0_r() override;
+	virtual uint8_t in1_r() override;
+	virtual void handle_mmc3chr_banks(uint16_t* selected_chrbanks) override;
+};
+
 // Standard NES style inputs (not using bus device as there are no real NES controller ports etc. these are all-in-one units and can be custom
 uint8_t nes_clone_state::in0_r()
 {
@@ -284,6 +286,18 @@ uint8_t nes_clone_state::in1_r()
 	ret |= m_latch1 & 1;
 	m_latch1 >>= 1;
 	return ret;
+}
+
+uint8_t nes_clone_vtvppong_state::in0_r()
+{
+	// read directly, not shifted
+	return m_io0->read();
+}
+
+uint8_t nes_clone_vtvppong_state::in1_r()
+{
+	// read directly, not shifted
+	return m_io1->read();
 }
 
 void nes_clone_state::in0_w(uint8_t data)
@@ -393,6 +407,55 @@ static INPUT_PORTS_START( dancexpt )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( digezlg )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( danzkara )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY // NOT A JOYSTICK!!
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+// TODO: verify directional inputs and input polarity
+static INPUT_PORTS_START( vtvppong )
+	PORT_START("IO0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0xfd, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 void nes_clone_state::video_start()
 {
@@ -619,22 +682,6 @@ void nes_clone_dnce2000_state::bank_w(uint8_t data)
 }
 
 /**************************************************
- Virtual Ping Pong Specifics
-**************************************************/
-
-void nes_clone_vtvppong_state::nes_clone_vtvppong(machine_config& config)
-{
-	nes_clone_pal(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvppong_state::nes_clone_vtvppong_map);
-}
-
-void nes_clone_vtvppong_state::nes_clone_vtvppong_map(address_map& map)
-{
-	nes_clone_basemap(map);
-	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
-}
-
-/**************************************************
  Atari Flashback Specifics
 **************************************************/
 
@@ -712,6 +759,7 @@ void nes_clone_afbm7800_state::update_prg_banks()
 		selected_banks[3] = outerbank | (basebank + 1);
 	}
 
+	//logerror("%s: PRG bank select: 0=$%X 1=$%X 2=$%X 3=$%X\n", machine().describe_context(), selected_banks[0] * 0x2000, selected_banks[1] * 0x2000, selected_banks[2] * 0x2000, selected_banks[3] * 0x2000);
 	m_prgbank[0]->set_entry(selected_banks[0]);
 	m_prgbank[1]->set_entry(selected_banks[1]);
 	m_prgbank[2]->set_entry(selected_banks[2]);
@@ -828,6 +876,27 @@ void nes_clone_taikee_new_state::handle_mmc3chr_banks(uint16_t* selected_chrbank
 	selected_chrbanks[5] = (outerchrbank | (m_bankregs[5] & bankmask));
 }
 
+void nes_clone_vtvppong_state::handle_mmc3chr_banks(uint16_t* selected_chrbanks)
+{
+	int bankmask;
+	int outerchrbank;
+
+	bankmask = 0x7f;
+	outerchrbank = 0x00;
+
+	if (m_banksel & 0x80)
+		m_charbank->set_bank(1);
+	else
+		m_charbank->set_bank(0);
+
+	selected_chrbanks[0] = (outerchrbank | (m_bankregs[0] & bankmask));
+	selected_chrbanks[1] = (outerchrbank | (m_bankregs[1] & bankmask));
+	selected_chrbanks[2] = (outerchrbank | (m_bankregs[2] & bankmask));
+	selected_chrbanks[3] = (outerchrbank | (m_bankregs[3] & bankmask));
+	selected_chrbanks[4] = (outerchrbank | (m_bankregs[4] & bankmask));
+	selected_chrbanks[5] = (outerchrbank | (m_bankregs[5] & bankmask));
+}
+
 void nes_clone_afbm7800_state::update_nt_mirroring()
 {
 	if (m_ntmirror & 1)
@@ -854,6 +923,7 @@ void nes_clone_afbm7800_state::mapper_8000_w(uint8_t data)
 
 void nes_clone_afbm7800_state::mapper_8001_w(uint8_t data)
 {
+	//logerror("bankreg[%d] = %02X\n", m_banksel & 0x7, data);
 	m_bankregs[m_banksel & 0x7] = data;
 	update_banks();
 }
@@ -921,6 +991,7 @@ void nes_clone_afbm7800_state::mapper_6000_w(uint8_t data)
 	{
 		if (!(m_extraregs[3] & 0x80))
 		{
+			//logerror("extraregs[0] = %02X\n", data);
 			m_extraregs[0] = data;
 			update_banks();
 		}
@@ -931,6 +1002,7 @@ void nes_clone_afbm7800_state::mapper_6001_w(uint8_t data)
 {
 	if (m_ramprot & 0x80)
 	{
+		//logerror("extraregs[1] = %02X\n", data);
 		m_extraregs[1] = data;
 		update_banks();
 	}
@@ -940,6 +1012,7 @@ void nes_clone_afbm7800_state::mapper_6002_w(uint8_t data)
 {
 	if (m_ramprot & 0x80)
 	{
+		//logerror("extraregs[2] = %02X\n", data);
 		m_extraregs[2] = data;
 		update_banks();
 	}
@@ -951,6 +1024,7 @@ void nes_clone_afbm7800_state::mapper_6003_w(uint8_t data)
 	{
 		if (!(m_extraregs[3] & 0x80))
 		{
+			//logerror("extraregs[3] = %02X\n", data);
 			m_extraregs[3] = data;
 			update_banks();
 		}
@@ -1128,13 +1202,15 @@ void nes_clone_taikee_new_state::machine_start()
 
 	common_start();
 
-	m_maxchrbank = (0x80000/0x400)-1;
+	u8 *src = memregion("gfx1")->base();
+	u32 len = memregion("gfx1")->bytes();
+	m_maxchrbank = (len/0x400)-1;
 
 	for (int i = 0; i < 2; i++)
-		m_cbank[i]->configure_entries(0, 0x80000 / 0x800, memregion("gfx1")->base(), 0x800);
+		m_cbank[i]->configure_entries(0, len / 0x800, src, 0x800);
 
 	for (int i = 2; i < 6; i++)
-		m_cbank[i]->configure_entries(0, 0x80000 / 0x400, memregion("gfx1")->base(), 0x400);
+		m_cbank[i]->configure_entries(0, len / 0x400, src, 0x400);
 }
 
 /**************************************************
@@ -1225,6 +1301,12 @@ void nes_clone_vtvsocr_state::nes_clone_vtvsocr(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvsocr_state::nes_clone_vtvsocr_map);
 }
 
+void nes_clone_vtvsocr_state::nes_clone_danzkara_pal(machine_config& config)
+{
+	nes_clone_pal(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvsocr_state::nes_clone_vtvsocr_map);
+}
+
 void nes_clone_vtvsocr_state::nes_clone_vtvsocr_map(address_map& map)
 {
 	nes_clone_basemap(map);
@@ -1248,19 +1330,17 @@ void nes_clone_vtvsocr_state::bank_w(offs_t offset, uint8_t data)
  Ping Pong Specifics
 **************************************************/
 
-
 void nes_clone_vtvppong_state::init_vtvppong()
 {
-	u8 *src = memregion("maincpu")->base();
-	int len = memregion("maincpu")->bytes();
-
-	std::vector<u8> buffer(len);
 	{
+		u8 *src = memregion("maincpu")->base();
+		int len = memregion("maincpu")->bytes();
+		std::vector<u8> buffer(len);
 		for (int i = 0; i < len; i++)
 		{
-			int newaddr = bitswap<18>(i, 17, 16, 15, 13, 14, 12,
-				11, 10, 9, 8,
-				7, 6, 5, 4,
+			int newaddr = bitswap<18>(i, 17, 15, 16, 13, 14, 10,
+				8, 4, 12, 11,
+				9, 7, 6, 5,
 				3, 2, 1, 0);
 
 			buffer[i] = src[newaddr];
@@ -1268,17 +1348,21 @@ void nes_clone_vtvppong_state::init_vtvppong()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
-#if 0
-	FILE *fp;
-	char filename[256];
-	sprintf(filename,"decrypted_%s", machine().system().name);
-	fp=fopen(filename, "w+b");
-	if (fp)
 	{
-		fwrite(&src[0], len, 1, fp);
-		fclose(fp);
+		u8 *src = memregion("gfx1")->base();
+		int len = memregion("gfx1")->bytes();
+		std::vector<u8> buffer(len);
+		for (int i = 0; i < len; i++)
+		{
+			int newaddr = bitswap<17>(i, 16, 12, 14, 13, 15,
+				4, 10, 8, 11,
+				6, 7, 5, 9,
+				3, 2, 1, 0);
+
+			buffer[i] = src[newaddr] << 1 | src[newaddr] >> 7;
+		}
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
-#endif
 }
 
 
@@ -1317,10 +1401,10 @@ ROM_START( croaky )
 ROM_END
 
 ROM_START( vtvppong )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // high bit is never set in the first 0x28000 bytes of this ROM, probably 7-bit sound data? code might need opcode bits swapping
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // address lines are swapped
 	ROM_LOAD( "vtvpongcpu.bin", 0x00000, 0x40000, CRC(52df95fa) SHA1(3015bcc90eee862b3568f122b402c9defa566aab) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 ) // address lines are swapped
 	ROM_LOAD( "vtvpongppu.bin", 0x00000, 0x20000, CRC(474dfc0c) SHA1(4d0afab111e40172ae0b31e94f1b74b73a18385f) )
 ROM_END
 
@@ -1330,14 +1414,11 @@ ROM_START( vtvsocr )
 	ROM_LOAD16_WORD_SWAP( "virtualtvsoccer.bin", 0x00000, 0x40000, CRC(2cfe42aa) SHA1(c2cafdbd5cc6491c94efd3f1be4b70c9de737b46) )
 ROM_END
 
-ROM_START( hs36red )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx29lv160cb.u3", 0x00000, 0x200000, CRC(318a81bb) SHA1(8b207e6a5fca53cbf383b79ff570fcdb89639fa3) )
-ROM_END
-
-ROM_START( hs36blk )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx29lv160cbtc.u3", 0x00000, 0x200000, CRC(b5cf91a0) SHA1(399f015fb0580c90928e7f3d73810cc4b6cc70d9) )
+// Unit obtained in the UK; PCB has 26.601712 MHz XTAL (6x PAL subcarrier)
+ROM_START( danzkara )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	// 8-bit ROM, but byteswapped for encryption?
+	ROM_LOAD16_WORD_SWAP( "bs-danz-r2.bin", 0x00000, 0x100000, CRC(806be92b) SHA1(07bad2f383dc578fa8fc83b0c1886001bf1d72b9) )
 ROM_END
 
 ROM_START( dancexpt )
@@ -1383,9 +1464,9 @@ CONS( 200?, papsudok,     0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_s
 
 CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_state, init_sudoku, "Excalibur Electronics / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
 
-CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
+CONS( 200?, vtvppong, 0,  0, nes_clone_afbm7800, vtvppong, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
-CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
+CONS( 200?, pjoypj001, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
 //
 
@@ -1407,13 +1488,11 @@ CONS( 200?, dancexpt, 0, 0, nes_clone_dancexpt, dancexpt, nes_clone_dancexpt_sta
 
 CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )
 
-// might be VT02 hardware, needs decrypting, possibly designed by wellminds (M350 etc.)
-CONS( 2010, hs36red, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
-CONS( 2010, hs36blk, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
-
+// manufacturer not named on box
+CONS( 200?, danzkara,  0,  0,  nes_clone_danzkara_pal, danzkara, nes_clone_vtvsocr_state, init_nes_clone, "Game Star", "DanZ Kara (BS-888)", MACHINE_NOT_WORKING )
 
 // in early 2000s LG TVs
-CONS( 200?, digezlg, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )
+CONS( 200?, digezlg, 0, 0, nes_clone_dnce2000, digezlg, nes_clone_dnce2000_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )
 
 // 2005-04-03 date on PCB
 CONS( 2005, racechl8, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision / Taikee", "Racing Challenge - 8 Games In 1", 0 )

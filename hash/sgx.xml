@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="sgx" description="NEC Supergrafx cartridges">
+<softwarelist name="sgx" description="NEC Supergrafx HuCards">
 	<software name="1941">
 		<description>1941 - Counter Attack</description>
 		<year>1991</year>

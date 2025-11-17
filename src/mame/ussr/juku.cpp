@@ -21,22 +21,24 @@
       and T to boot from tape/disk/network
 
     TODO:
+    - E5103 (Juss) and IBM AT keyboard layouts?
     - Work out how the floppy interface really works?
     - Tape? (split up to E5101 batch as tape only?)
+    - Separate FDC 1791, 1792 and 1793 versions
     - И41 (=Multibus-1) compatibility?
     - Network?
     - Ramdisk?
     - Memory extensions?
-    - Mouse!
 
 ***************************************************************************/
 
 #include "emu.h"
 
+#include "jukumouse.h"
+
 #include "cpu/i8085/i8085.h"
 #include "imagedev/floppy.h"
 #include "machine/74148.h"
-#include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
@@ -80,7 +82,11 @@ public:
 	juku_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_bank(*this, "bank"),
+		m_rom(*this, "maincpu"),
+		m_exp(*this, "expcart"),
+		m_ram(*this, "ram"),
+		m_ext(*this, "ext%u", 0U, 0x8000U, ENDIANNESS_LITTLE),
+		m_mode(*this, "mode"),
 		m_pic(*this, "pic"),
 		m_pit(*this, "pit%u", 0U),
 		m_pio(*this, "pio%u", 0U),
@@ -91,7 +97,8 @@ public:
 		m_keys(*this, "COL.%u", 0U),
 		m_key_special(*this, "SPECIAL"),
 		m_screen(*this, "screen"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_mouse(*this, "mouse")
 	{ }
 
 	void juku(machine_config &config);
@@ -102,7 +109,11 @@ protected:
 
 private:
 	required_device<i8080a_cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_bank;
+	required_region_ptr<uint8_t> m_rom;
+	optional_region_ptr<uint8_t> m_exp;
+	required_shared_ptr<uint8_t> m_ram;
+	memory_share_array_creator<uint8_t, 1> m_ext;
+	memory_view m_mode;
 	required_device<pic8259_device> m_pic;
 	required_device_array<pit8253_device, 3> m_pit;
 	required_device_array<i8255_device, 2> m_pio;
@@ -114,6 +125,7 @@ private:
 	required_ioport m_key_special;
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
+	optional_device<juku_mouse_device> m_mouse;
 
 	int32_t m_width, m_height, m_hbporch, m_vbporch;
 
@@ -126,10 +138,7 @@ private:
 
 	uint8_t m_fdc_cur_cmd;
 
-	std::unique_ptr<uint8_t[]> m_ram;
-
 	void mem_map(address_map &map) ATTR_COLD;
-	void bank_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
 	void pio0_porta_w(uint8_t data);
@@ -163,25 +172,16 @@ private:
 
 void juku_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).m(m_bank, FUNC(address_map_bank_device::amap8));
-}
-
-void juku_state::bank_map(address_map &map)
-{
-	// memory mode 0
-	map(0x00000, 0x03fff).rom().region("maincpu", 0);
-	map(0x00000, 0x03fff).bankw("ram_0000");
-	map(0x04000, 0x0ffff).bankrw("ram_4000");
-	// memory mode 1
-	map(0x10000, 0x1ffff).bankrw("ram_0000");
-	map(0x1d800, 0x1ffff).bankr("rom_d800");
-	// memory mode 2
-	map(0x20000, 0x23fff).bankrw("ram_0000");
-	map(0x24000, 0x2bfff).rom().region("extension", 0);
-	map(0x2c000, 0x2ffff).bankrw("ram_c000");
-	map(0x2d800, 0x2ffff).bankr("rom_d800");
-	// memory mode 3
-	map(0x30000, 0x3ffff).bankrw("ram_0000");
+	map(0x0000, 0xffff).ram().share(m_ram);
+	map(0x0000, 0xffff).view(m_mode);
+	m_mode[0](0x0000, 0x3fff).rom().region("maincpu", 0x0000);
+	m_mode[1](0xd800, 0xffff).rom().region("maincpu", 0x1800);
+	// optional BASIC expansion cartridge
+	m_mode[2](0x4000, 0xbfff).rom().region("expcart", 0x0000);
+	// no info on programs actually using extra 32kb "memory window"
+	//m_mode[2](0x4000, 0xbfff).ram().share(m_ext[0]);
+	m_mode[2](0xd800, 0xffff).rom().region("maincpu", 0x1800);
+	m_mode[3]; // let everything fall through to RAM
 }
 
 void juku_state::io_map(address_map &map)
@@ -206,6 +206,7 @@ void juku_state::io_map(address_map &map)
 	map(0x1f, 0x1f).rw(FUNC(juku_state::fdc_data_r), FUNC(juku_state::fdc_data_w));
 	// mapping for cassette version (E5101?)
 	// map(0x1c, 0x1d).rw(m_sio[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x80, 0x80).r(m_mouse, FUNC(juku_mouse_device::mouse_port_r)); // TODO: turn this into a Multibus expansion
 }
 
 
@@ -645,19 +646,11 @@ void juku_state::pio0_portc_w(uint8_t data)
 		floppy->ss_w(BIT(data, 6));
 	}
 
-	m_bank->set_bank(data & 0x03);
+	m_mode.select(data & 0b11);
 }
 
 void juku_state::machine_start()
 {
-	m_ram = std::make_unique<uint8_t []>(0x10000);
-
-	membank("rom_d800")->set_base(memregion("maincpu")->base() + 0x1800);
-
-	membank("ram_0000")->set_base(&m_ram[0x0000]);
-	membank("ram_4000")->set_base(&m_ram[0x4000]);
-	membank("ram_c000")->set_base(&m_ram[0xc000]);
-
 	// register for save states
 	save_item(NAME(m_width));
 	save_item(NAME(m_height));
@@ -671,12 +664,11 @@ void juku_state::machine_start()
 	save_item(NAME(m_beep_state));
 	save_item(NAME(m_beep_level));
 	save_item(NAME(m_fdc_cur_cmd));
-	save_pointer(NAME(m_ram), 0x10000);
 }
 
 void juku_state::machine_reset()
 {
-	m_bank->set_bank(0);
+	m_mode.select(0);
 	m_key_encoder->enable_input_w(0);
 	m_beep_state = 0;
 	m_beep_level = 0;
@@ -701,13 +693,7 @@ void juku_state::juku(machine_config &config)
 	I8080A(config, m_maincpu, 20_MHz_XTAL/10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &juku_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &juku_state::io_map);
-	m_maincpu->in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
-
-	ADDRESS_MAP_BANK(config, m_bank);
-	m_bank->set_map(&juku_state::bank_map);
-	m_bank->set_data_width(8);
-	m_bank->set_addr_width(18);
-	m_bank->set_stride(0x10000);
+	m_maincpu->in_inta_func().set(m_pic, FUNC(pic8259_device::acknowledge));
 
 	// КР580ВН59
 	PIC8259(config, m_pic, 0);
@@ -721,30 +707,26 @@ void juku_state::juku(machine_config &config)
 	m_pit[0]->out_handler<0>().set(m_pit[1], FUNC(pit8253_device::write_clk0));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate1));
 	m_pit[0]->out_handler<0>().append(m_pit[0], FUNC(pit8253_device::write_gate2));
-	//m_pit[0]->out_handler<1>().set(, ); // HOR RTR
-	//m_pit[0]->out_handler<1>().append(, ); // HOR RTR
+	//m_pit[0]->out_handler<1>().set(?, ?); // HOR RTR
 
 	// КР580ВИ53 #2
 	PIT8253(config, m_pit[1], 0);
-	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // H SYNC DSL
+	m_pit[0]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // HOR SYNC DSL
 	m_pit[0]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate1));
 	m_pit[1]->out_handler<0>().append(m_pit[1], FUNC(pit8253_device::write_gate2));
 	m_pit[1]->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w)); // VER RTR / FRAME INT
-
-	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC DSL
+	//m_pit[1]->out_handler<2>().set(m_pit[1], FUNC(pit8253_device::write_clk1)); // VERT SYNC DSL
 	//m_pit[1]->out_handler<2>().append(m_pit[1], FUNC(pit8253_device::write_clk2));
 
 	// КР580ВИ53 #3
 	PIT8253(config, m_pit[2], 0);
-
 	m_pit[2]->set_clk<0>(16_MHz_XTAL/13); // 1.23 MHz
 	m_pit[2]->set_clk<1>(16_MHz_XTAL/8); // 2 MHz
-	m_pit[2]->set_clk<2>(16_MHz_XTAL/13); // 1.23 MHz
-
-	//m_pit[1]->out_handler<0>().append(...); // BAUD RATE
+	m_pit[1]->out_handler<1>().append(m_pit[2], FUNC(pit8253_device::write_clk2)); // ~49.92 Hz
+	//m_pit[2]->out_handler<0>().set(?, ?); // BAUD RATE
 	m_pit[2]->out_handler<1>().append(FUNC(juku_state::speaker_w)); // SOUND
-	//m_pit[1]->out_handler<2>().append(...); // SYNC BAUD RATE
+	//m_pit[2]->out_handler<2>().set(?, ?); // SYNC BAUD RATE
 
 	// КР580ВВ55A #1 (=КР580ИК55)
 	I8255A(config, m_pio[0]);
@@ -757,13 +739,13 @@ void juku_state::juku(machine_config &config)
 
 	// КР580ВВ51A
 	I8251(config, m_sio[0], 0);
-	m_sio[0]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir2_w));
-	m_sio[0]->txrdy_handler().set("pic", FUNC(pic8259_device::ir3_w));
+	m_sio[0]->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
+	m_sio[0]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
 
 	// КР580ВВ51A (instead of FDC?)
 	I8251(config, m_sio[1], 0);
-	m_sio[1]->rxrdy_handler().set("pic", FUNC(pic8259_device::ir0_w));
-	m_sio[1]->txrdy_handler().set("pic", FUNC(pic8259_device::ir1_w));
+	m_sio[1]->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_sio[1]->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	// Электроника МС 6105.1 "Колокольчик" (DEC VR201 analog)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -777,6 +759,10 @@ void juku_state::juku(machine_config &config)
 
 	// К155ИВ1
 	TTL74148(config, m_key_encoder, 0);
+
+	// E4701 (joystick like mouse device)
+	JUKU_MOUSE(config, m_mouse);
+	m_mouse->int_handler().set(m_pic, FUNC(pic8259_device::ir6_w));
 
 	// КР1818ВГ93 (for E6502 disk drive)
 	KR1818VG93(config, m_fdc, 16_MHz_XTAL/16);
@@ -796,8 +782,8 @@ ROM_START( juku )
 	ROM_DEFAULT_BIOS("3.43m_37")
 	ROM_REGION(0x4000, "maincpu", 0)
 
-	// Monitor 3.3 with Bootstrap 3.3, FDC 1791 from early 1985 prototype
-	// Does not seem to be compatible with JBASIC extension cartridge
+	// Monitor 3.3 with Bootstrap 3.3, FDC 1791 from early prototypes
+	// Does not seem to be compatible with JBASIC expansion cartridge
 	ROM_SYSTEM_BIOS(0, "jmon3.3", "Monitor/Bootstrap 3.3 \\w JBASIC")
 	ROMX_LOAD("jmon33.bin", 0x0000, 0x4000, CRC(ed22c287) SHA1(76407d99bf83035ef526d980c9468cb04972608c), ROM_BIOS(0))
 
@@ -826,7 +812,7 @@ ROM_START( juku )
 	ROM_SYSTEM_BIOS(5, "2.43m_43", "Tape/Disk \\w AT keyb (2.43m #0043)")
 	ROMX_LOAD("ekta43.bin", 0x0000, 0x4000, CRC(05678f9f) SHA1(a7419bfd8249871cc7dbf5c6ea85022d6963fc9a), ROM_BIOS(5))
 
-	ROM_REGION(0x8000, "extension", 0)
+	ROM_REGION(0x8000, "expcart", 0)
 
 	// EKTA JBASIC cartridge (buggy) seems similar to v1.1 from 14.09.1987.
 	// There is also a version with additional HEX$ directive for EKDOS.

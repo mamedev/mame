@@ -69,23 +69,24 @@ public:
 	int get_output_pin( output_pin_t pin );
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
+
 	virtual uint8_t key_codes(int mode, int x, int y) { return 0x00; }
 
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
 private:
 	// internal state
-	int m_pins[41];
+	uint8_t m_pins[41];
 
-	int m_ring11;                     /* sense input scan counter */
-	int m_ring8;                      /* drive output scan counter */
+	uint8_t m_ring11;                     /* sense input scan counter */
+	uint8_t m_ring8;                      /* drive output scan counter */
 
-	int m_strobe;                     /* strobe output */
-	int m_strobe_old;
-	int m_parity;
-	int m_data;
+	uint8_t m_strobe;                     /* strobe output */
+	uint8_t m_strobe_old;
+	uint8_t m_parity;
+	uint8_t m_data;
 
 	/* timers */
 	emu_timer *m_scan_timer;          /* keyboard scan timer */
@@ -98,21 +99,26 @@ private:
 	void detect_keypress();
 };
 
+
 class kr2376_st_device : public kr2376_device
 {
 public:
 	kr2376_st_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
 	virtual uint8_t key_codes(int mode, int x, int y) override;
 };
 
+
 class kr2376_12_device : public kr2376_device
 {
 public:
-  kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	kr2376_12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-  virtual uint8_t key_codes(int mode, int x, int y) override;
+	virtual uint8_t key_codes(int mode, int x, int y) override;
 };
+
 
 DECLARE_DEVICE_TYPE(KR2376_ST, kr2376_st_device)
 DECLARE_DEVICE_TYPE(KR2376_12, kr2376_12_device)

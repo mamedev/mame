@@ -379,9 +379,6 @@ authors:hap
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="446" y="574" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x04">
 				<bounds x="446" y="574" width="32" height="64" />
 				<color alpha="0.6" />
@@ -391,6 +388,9 @@ authors:hap
 					<bounds x="446" y="574" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="446" y="574" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 
@@ -406,9 +406,6 @@ authors:hap
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="488" y="574" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x04">
 				<bounds x="488" y="574" width="32" height="64" />
 				<color alpha="0.6" />
@@ -418,6 +415,9 @@ authors:hap
 					<bounds x="488" y="574" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="488" y="574" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 
@@ -433,9 +433,6 @@ authors:hap
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="2" y="574" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x04">
 				<bounds x="2" y="574" width="32" height="64" />
 				<color alpha="0.6" />
@@ -445,6 +442,9 @@ authors:hap
 					<bounds x="2" y="574" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="2" y="574" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 
@@ -460,9 +460,6 @@ authors:hap
 			<bounds x="0" y="0" width="480" height="640" />
 		</screen>
 		<collection name="Shifter">
-			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-				<bounds x="-40" y="574" width="32" height="64" />
-			</element>
 			<element ref="shifter" inputtag="IN0" inputmask="0x04">
 				<bounds x="-40" y="574" width="32" height="64" />
 				<color alpha="0.6" />
@@ -472,6 +469,9 @@ authors:hap
 					<bounds x="-40" y="574" width="32" height="64" />
 				</element>
 			</collection>
+			<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+				<bounds x="-40" y="574" width="32" height="64" />
+			</element>
 		</collection>
 	</view>
 

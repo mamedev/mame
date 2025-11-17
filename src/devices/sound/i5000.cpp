@@ -114,9 +114,9 @@ bool i5000snd_device::read_sample(int ch)
 }
 
 
-void i5000snd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void i5000snd_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		int32_t mix_l = 0;
 		int32_t mix_r = 0;
@@ -157,8 +157,8 @@ void i5000snd_device::sound_stream_update(sound_stream &stream, std::vector<read
 			mix_l += m_channels[ch].output_l;
 		}
 
-		outputs[0].put_int(i, mix_r, 32768 * 16);
-		outputs[1].put_int(i, mix_l, 32768 * 16);
+		stream.put_int(0, i, mix_r, 32768 * 16);
+		stream.put_int(1, i, mix_l, 32768 * 16);
 	}
 }
 

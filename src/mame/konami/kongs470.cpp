@@ -76,12 +76,11 @@ void kongs470_state::kongs470(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kongs470_state::main_map);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539(K054539(config, "k054539", 18'432'000)); // clock unverified
-	k054539.add_route(0, "rspeaker", 0.75);
-	k054539.add_route(1, "lspeaker", 0.75);
+	k054539.add_route(0, "speaker", 0.75, 1);
+	k054539.add_route(1, "speaker", 0.75, 0);
 }
 
 

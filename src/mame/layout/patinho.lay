@@ -31,19 +31,19 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	</element>
 
 	<element name="str_ula">
-		<text string="UNIDADE ARITMETICA E LOGICA" ><color red="0" green="0" blue="0" /></text>
+		<text string="UNIDADE ARITMÉTICA E LÓGICA" ><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_rc">
-		<text string="DADOS   DO   PAINEL"><color red="0" green="0" blue="0" /></text>
+		<text string="DADOS DO PAINEL"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_pc">
-		<text string="ENDERECO DE INSTRUCAO"><color red="0" green="0" blue="0" /></text>
+		<text string="ENDEREÇO DE INSTRUÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_mem_addr">
-		<text string="ENDERECO DA MEMORIA"><color red="0" green="0" blue="0" /></text>
+		<text string="ENDEREÇO DA MEMÓRIA"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_acc">
@@ -51,15 +51,15 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	</element>
 
 	<element name="str_opcode">
-		<text string="CODIGO DE INSTRUCAO"><color red="0" green="0" blue="0" /></text>
+		<text string="CÓDIGO DE INSTRUÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_mem_data">
-		<text string="DADOS DA MEMORIA"><color red="0" green="0" blue="0" /></text>
+		<text string="DADOS DA MEMÓRIA"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_mem">
-		<text string="MEMORIA"><color red="0" green="0" blue="0" /></text>
+		<text string="MEMÓRIA"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 
@@ -69,19 +69,17 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 
 	<element name="str_CICLOUNICO">
-			<text string="CICLO
-UNICO">
+			<text string="CICLO ÚNICO">
 			<color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_INSTRUCAOUNICA">
-			<text string="INSTRUCAO
-UNICA">
+			<text string="INSTRUÇÃO ÚNICA">
 			<color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_ENDERECAMENTO">
-		<text string="ENDERECAMENTO"><color red="0" green="0" blue="0" /></text>
+		<text string="ENDEREÇAMENTO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_ARMAZENAMENTO">
@@ -89,7 +87,7 @@ UNICA">
 	</element>
 
 	<element name="str_EXPOSICAO">
-		<text string="EXPOSICAO"><color red="0" green="0" blue="0" /></text>
+		<text string="EXPOSIÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 
@@ -99,7 +97,7 @@ UNICA">
 	</element>
 
 	<element name="str_INTERRUPCAO">
-		<text string="INTERRUP????O"><color red="0" green="0" blue="0" /></text>
+		<text string="INTERRUPÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="str_PARTIDA">
@@ -107,12 +105,12 @@ UNICA">
 	</element>
 
 	<element name="str_PREPARACAO">
-		<text string="PREPARACAO"><color red="0" green="0" blue="0" /></text>
+		<text string="PREPARAÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 <!-- define background -->
 
-	<view name="Button Lamps">
+	<view name="Front panel">
 		<screen index="0">
 			<bounds left="0" top="0" right="1000" bottom="1000" />
 		</screen>

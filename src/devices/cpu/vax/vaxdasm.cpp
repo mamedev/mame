@@ -928,7 +928,6 @@ offs_t vax_disassembler::disassemble_inst(std::ostream &stream, const vax_disass
 					else switch (inst.operand[n])
 					{
 					case mode::rb:
-					case mode::ab: // Immediate bytes may be used as MOVCn sources, at least with a length of 0
 						format_immediate(stream, opcodes.r8(pc++));
 						break;
 
@@ -938,6 +937,7 @@ offs_t vax_disassembler::disassemble_inst(std::ostream &stream, const vax_disass
 						break;
 
 					case mode::urb:
+					case mode::ab: // Immediate bytes may be used as MOVCn sources, at least with a length of 0
 						util::stream_format(stream, "#^X%02X", opcodes.r8(pc++));
 						break;
 
@@ -999,7 +999,7 @@ offs_t vax_disassembler::disassemble_inst(std::ostream &stream, const vax_disass
 						break;
 
 					case mode::ro: case mode::uro:
-						util::stream_format(stream, "#^X%016X%016X", opcodes.r64(pc), opcodes.r64(pc + 4));
+						util::stream_format(stream, "#^X%016X%016X", opcodes.r64(pc + 8), opcodes.r64(pc));
 						pc += 16;
 						break;
 
@@ -1109,7 +1109,7 @@ bool vax_disassembler::is_read_mode(vax_disassembler::mode m)
 	}
 }
 
-const vax_disassembler::mode* vax_disassembler::get_operands(u8 op)
+const vax_disassembler::mode *vax_disassembler::get_operands(u8 op)
 {
 	return s_nonprefix_ops[op].operand;
 }

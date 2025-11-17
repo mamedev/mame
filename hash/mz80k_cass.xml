@@ -1,0 +1,508 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+As with other Sharp MZ series machines, there is no built in BASIC so this needs to be loaded from cassette before any
+BASIC programs can be run.
+
+Machine code programs (including BASIC interpreters) can be loaded directly from the monitor, using LOAD 
+(or L on the MZ-80A) then RETURN.
+
+For BASIC programs, once BASIC loads, insert the programme cassette and type LOAD then RETURN.
+Once the program has loaded, type RUN then RETURN to start the program.
+-->
+
+<softwarelist name="mz80k_cass" description="Sharp MZ-80K / MZ-80A cassettes">
+
+<!-- Operating Systems -->
+
+	<software name="hudsnbas" supported="yes">
+		<description>HU-BASIC V1.3</description>
+		<year>1980</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="24448">
+				<rom name="hu-basic 1.3.mzf" size="24448" crc="ec200014" sha1="767a35604d1ead0bd719489a18975d8df40d54ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="om500" supported="yes">
+		<description>BASIC OM-500</description>
+		<year>19??</year>
+		<publisher>Omegasoft</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4036362">
+				<rom name="om-500.wav" size="4036362" crc="3e100753" sha1="6bf1851a9461aac8b7b811f673a1d469916acf08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp5025" supported="yes">
+		<description>BASIC SP-5025</description>
+		<year>19??</year>
+		<publisher>Sharp</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4034862">
+				<rom name="sp-5025.wav" size="4034862" crc="d433c5a0" sha1="a0150ae8905375167c1923eed521d6d2ff909a88"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<software name="alien" supported="yes">
+		<description>Alien</description>
+		<year>1983</year>
+		<publisher>Andreas Piotrowski</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2834">
+				<rom name="alien.m12" size="2834" crc="d0d35083" sha1="097ba18b93561830199cbef17a372dc2f9173eb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienatk" supported="yes">
+		<description>Alien Attack</description>
+		<year>1981</year>
+		<publisher>John Wolstonecroft</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="14039">
+				<rom name="Alien Attack.mzf" size="14039" crc="daab052f" sha1="ac0b70b0104181bbbb842b3a2d06f90ab220910e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockkuz" supported="yes">
+		<description>Block Kuzushi</description>
+		<year>19??</year>
+		<publisher>Sharp</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3916">
+				<rom name="block kuzushi.m12" size="3916" crc="8d4730c7" sha1="174c89e649cf11d1074ec438ab5df4b1516e0f5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomber" supported="yes">
+		<description>Bomber</description>
+		<year>19??</year>
+		<publisher>R. G. Cole</publisher>
+		<info name="usage" value="Load BASIC, then LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2208">
+				<rom name="bomber.m12" size="2208" crc="9ef7cfe7" sha1="8e5df7ed70652b9254512f49883fcb50ee5e66b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout" supported="yes">
+		<description>Breakout</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4127330">
+				<rom name="breakout.wav" size="4127330" crc="310cba05" sha1="bf64bf529ffcc51d5fce1b16a76b2c48450d6ef2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugfire" supported="yes">
+		<description>Bug Fire</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2757278">
+				<rom name="bugfire.wav" size="2757278" crc="48b8a8e0" sha1="3bf2b25f1d758fb4123fe59769bb0e35b9d6268f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coscrsr2" supported="yes">
+		<description>Cosmic Cruiser 2</description>
+		<year>1983</year>
+		<publisher>WICS Soft</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3612246">
+				<rom name="cosmic cruiser 2.wav" size="3612246" crc="6ef8e383" sha1="a06feb738f4190855c81153abe8111ae1db3c61a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crzyclmb" supported="yes">
+		<description>Crazy Climber</description>
+		<year>19??</year>
+		<publisher>WICS Soft</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<feature name="part_id" value="Part 1"/>
+			<dataarea name="cass" size="6790628">
+				<rom name="crazy climber pt1.wav" size="6790628" crc="2a16d3f9" sha1="343ab1f14c1a6703cf54060352121c1716f3db12"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="mz_cass">
+			<feature name="part_id" value="Part 2"/>
+			<dataarea name="cass" size="1816122">
+				<rom name="crazy climber pt2.wav" size="1816122" crc="ac62692f" sha1="13ce8239a3a79a6ed06aadf0955f6c290e0f3ea5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crystall" supported="yes">
+		<description>Crystall</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4787">
+				<rom name="crystall.m12" size="4787" crc="eca8d449" sha1="07d63f06f442383b25cabce86c1e530cfdd419c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender" supported="yes">
+		<description>Defender</description>
+		<year>1981</year>
+		<publisher>Frank Heinzius</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10572">
+				<rom name="defender.m12" size="10572" crc="266af0a1" sha1="791c8637b014f8e033d1fb5bf08a62ba4e28f1d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f1race" supported="yes">
+		<description>F-1 Race</description>
+		<year>19??</year>
+		<publisher>Base-80</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2201">
+				<rom name="f-1 race.m12" size="2201" crc="55d7be90" sha1="279f9bddb23b231d61c54631a069d3e712dc6f93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortress" supported="yes">
+		<description>Fortress</description>
+		<year>1981</year>
+		<publisher>R. G. Schnell</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6611">
+				<rom name="fortress.m12" size="6611" crc="f1a5c3eb" sha1="98d18af4e2c5c648129bcef0daf04cefda65dc16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gremlins" supported="yes">
+		<description>Greedy Gremlins</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="17695">
+				<rom name="greedy gremlins.mzf" size="17695" crc="8bdca654" sha1="1554cba04c42bdcff6179caaeb59e63e6a34c6d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jampac" supported="yes">
+		<description>Jampac</description>
+		<year>19??</year>
+		<publisher>Starfire</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20336">
+				<rom name="jampac.m12" size="20336" crc="45fb585e" sha1="80edb732b6dde2b6118bac0ffeba2462ae91f98d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ladybug" supported="yes">
+		<description>Lady Bug</description>
+		<year>1982</year>
+		<publisher>Michael Schreiner</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="18256">
+				<rom name="ladybug.mzf" size="18256" crc="cc3c1c65" sha1="d722a0407a912f1d3250f8e1da22de68730d26b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasercmd" supported="yes">
+		<description>Laser Command</description>
+		<year>1983</year>
+		<publisher>David Hill</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="13260">
+				<rom name="laser command.m12" size="13260" crc="0477856f" sha1="3bacbae33c3d41646eaa5a7dfd72af2a7c430aaf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazeman" supported="yes">
+		<description>Maze Man</description>
+		<year>19??</year>
+		<publisher>Peter Claus Lamprecht</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10369">
+				<rom name="mazeman.m12" size="10369" crc="2e7ad188" sha1="99192cdaee59538c9eddeb11053f89f89d105e91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micropde" supported="yes">
+		<description>Micropede</description>
+		<year>1983</year>
+		<publisher>Klaus Hofrichter</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="8319">
+				<rom name="micropede.m12" size="8319" crc="90215cbb" sha1="b6a45dfbc7c6b0f0727f03f2ffd1d914a0f2f0ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mntrcave" supported="yes">
+		<description>Minotaur's Cave</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="16865">
+				<rom name="minotaurs cave.m12" size="16865" crc="67472c34" sha1="384d0fe8e6ef6c30eb7f9b4afc82019fdb11680e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="munchies" supported="yes">
+		<description>Munchies</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="7041">
+				<rom name="munchies.m12" size="7041" crc="4ab363d9" sha1="81f29b509f93c0dcca70bf4de92f1002bd9c2c65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="otoriatk" supported="yes">
+		<description>Otori Attacker</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12031">
+				<rom name="otori attack.m12" size="12031" crc="4ea6fbd4" sha1="eb7bfc116653acafbdeefc70b7d00d9a0904fcf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman" supported="yes">
+		<description>Pacman</description>
+		<year>19??</year>
+		<publisher>Klaus Hofrichter</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12656">
+				<rom name="pacman.m12" size="12656" crc="93a052d1" sha1="6c43e312c2290756829991ca36f7fa88789a50e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phoenix" supported="yes">
+		<description>Phoenix</description>
+		<year>1982</year>
+		<publisher>Piers Hendrie</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="15844">
+				<rom name="phoenix.m12" size="15844" crc="1db60eb1" sha1="2303cb216378fe5268c24da0323328ce4ada80d4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puckman" supported="yes">
+		<description>Puckman</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="17916">
+				<rom name="puckman.m12" size="17916" crc="cbdaf7a5" sha1="33d6440d55130219b5ebeff0f9004bdb4b0bc70f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scramble" supported="yes">
+		<description>Scrambler</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6017">
+				<rom name="scramble.m12" size="6017" crc="d7634efd" sha1="1ea260e073a3497ee9baa31fdff2192cea9f488c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv" supported="yes">
+		<description>Space Invader</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="10400">
+				<rom name="Space Invaders.mzf" size="10400" crc="bfaad233" sha1="8e92c0c247320d14fc310db5392a945334446bb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacepat" supported="yes">
+		<description>Space Patrol</description>
+		<year>1984</year>
+		<publisher>Omegasoft</publisher>
+		<info name="usage" value="Load BASIC, then LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6282">
+				<rom name="space patrol.m12" size="6282" crc="fb8e5db3" sha1="97a05271046bf5cc8569e80c649fc05c17ed0203"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcmouse" supported="yes">
+		<description>Space Mouse</description>
+		<year>19??</year>
+		<publisher>WICS Soft</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2424408">
+				<rom name="space mouse.wav" size="2424408" crc="179f028a" sha1="bfbc8cd22069f986586a9aef8cfc8ebd7ae73c3e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcpanic" supported="yes">
+		<description>Space Panic</description>
+		<year>1982</year>
+		<publisher>Frank Heinzius</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="20387">
+				<rom name="space panic.m12" size="20387" crc="69d41114" sha1="49681a8e2951a68f7db53d1f7e690d4886ab924a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcruinr" supported="yes">
+		<description>Space Ruiner</description>
+		<year>1982</year>
+		<publisher>WICS Soft</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4515874">
+				<rom name="space ruiner.wav" size="4515874" crc="b64fb4f1" sha1="78d93f2936b44b0b02ab5ef9c62281231d9704f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tankwar" supported="yes">
+		<description>Tank War</description>
+		<year>19??</year>
+		<publisher>Klaus Hofrichter</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="12799">
+				<rom name="tank war.m12" size="12799" crc="43074948" sha1="5645ad9f94a75e8cbfc0ccefd5a453a86099a0a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="towering" supported="yes">
+		<description>Towering Inferno</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11827">
+				<rom name="towering.m12" size="11827" crc="7c9d8230" sha1="708545826568a1721049e3a0d529b84e7bec23c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trap" supported="yes">
+		<description>Trap</description>
+		<year>19??</year>
+		<publisher>Thomas Abel</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3857">
+				<rom name="trap.m12" size="3857" crc="a1e5b8ad" sha1="08e4e3e651f6e98adddd3b47bd46a353b7f485a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufocaves" supported="yes">
+		<description>UFO Caves</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="29312">
+				<rom name="ufo caves.m12" size="29312" crc="8831dd03" sha1="f2f8759f21f5b7d9b1148e74c8849d91fd162a4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidflipr" supported="yes">
+		<description>Video Flipper</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="9505">
+				<rom name="videoflipper.mzf" size="9505" crc="20e49f61" sha1="3a5ee48d7d65b21156d73de98116a946fa62536a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zardos" supported="yes">
+		<description>Zardos</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="9152754">
+				<rom name="zardos.wav" size="9152754" crc="3794837f" sha1="200c4f40d42342bb1996c43ed517be0b64cd2069"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeroid" supported="yes">
+		<description>Zeroid</description>
+		<year>19??</year>
+		<publisher>Chiaki</publisher>
+		<info name="usage" value="LOAD then ENTER" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="13921">
+				<rom name="zeroid.m12" size="13921" crc="2046f7b1" sha1="4d72b45dd532f0a533afa970d339f406394492f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

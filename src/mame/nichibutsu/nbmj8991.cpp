@@ -1866,6 +1866,34 @@ ROM_START( galkoku )
 	ROM_LOAD( "gkok_20.bin", 0x100000, 0x10000, CRC(36107e6f) SHA1(0872d0ae2add129bdd036754fd5d751627bc142e) )
 ROM_END
 
+ROM_START( galkokua )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
+	ROM_LOAD( "gkok_01.bin", 0x00000,  0x10000, CRC(16899efa) SHA1(3078b80fb4b173320f5563b15fe79e4ae6a4dab5) )
+
+	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
+	ROM_LOAD( "gkok_02.bin", 0x00000,  0x10000, CRC(3dec7469) SHA1(e464899e7f2e1a6bf88260c6bc746df94623ef0e) )
+	ROM_LOAD( "gkok_03.bin", 0x10000,  0x10000, CRC(66f51b21) SHA1(bac5f9e20bd2eac63e5bbd72178e39b4892b0ba4) )
+
+	ROM_REGION( 0x110000, "gfx1", 0 ) /* gfx */
+	ROM_LOAD( "gkok_04.bin", 0x000000, 0x10000, CRC(741815a5) SHA1(5ddb61d88738d15e1f68df2deaa0b1612803a23e) )
+	ROM_LOAD( "gkok_05.bin", 0x010000, 0x10000, CRC(28a17cd8) SHA1(dfb4066898bd66b8306252695e9f801c8e44f25e) )
+	ROM_LOAD( "gkok_06.bin", 0x020000, 0x10000, CRC(8eac2143) SHA1(75cd75de761144b31dec387083f5a11846e6809f) )
+	ROM_LOAD( "gkok_07.bin", 0x030000, 0x10000, CRC(de5f3f20) SHA1(dd0eab9e3a7422638836859c7d7317855d7dc62e) )
+	ROM_LOAD( "gkok_08.bin", 0x040000, 0x10000, CRC(f3348126) SHA1(b2633e4ed2395f8978d88959632166d66bd29e0b) )
+	ROM_LOAD( "gkok_09.bin", 0x050000, 0x10000, CRC(691f2521) SHA1(79eb7b8dab160f30af7cb81a565d5ecdce341930) )
+	ROM_LOAD( "gkok_10.bin", 0x060000, 0x10000, CRC(f1b0b411) SHA1(b77b6026dd3daa42e00820c2a473ede3b7733c3e) )
+	ROM_LOAD( "gkok_11.bin", 0x070000, 0x10000, CRC(ef42af9e) SHA1(c1972aa92ffdcb5f462256cee2a3e38df8922d64) )
+	ROM_LOAD( "gkok_12.bin", 0x080000, 0x10000, CRC(e2b32195) SHA1(208ff04f951ba1cd5f96a484820e12005ed66e5f) )
+	ROM_LOAD( "gkok_13.bin", 0x090000, 0x10000, CRC(83d913a1) SHA1(831dc254e1300b98c236dc934bbe3c91e42dea60) )
+	ROM_LOAD( "gkok_14.bin", 0x0a0000, 0x10000, CRC(04c97de9) SHA1(03d5be851107e0e736c2ae3bb8cec0be0783174b) )
+	ROM_LOAD( "gkok_15.bin", 0x0b0000, 0x10000, CRC(3845280d) SHA1(1b86a396c9f2affb9431bc878405d87cb30b4ac0) )
+	ROM_LOAD( "gkok_16.bin", 0x0c0000, 0x10000, CRC(7472a7ce) SHA1(321ee7caeb76e6963f33ebed3db1d81bdff4de30) )
+	ROM_LOAD( "gkok_17.bin", 0x0d0000, 0x10000, CRC(92b605a2) SHA1(3f84579a855a89361ae0449c4dd4cbfe9cbae06e) )
+	ROM_LOAD( "gkok_18.bin", 0x0e0000, 0x10000, CRC(8bb7bdcc) SHA1(0d025f9b96a606fa777d11602863c118862450d5) )
+	ROM_LOAD( "gkok_19.bin", 0x0f0000, 0x10000, CRC(b1b4643a) SHA1(d4b7f1cad1b544d2800d7358ff90b7fa19ff0ca2) )
+	ROM_LOAD( "gkok_20.bin", 0x100000, 0x10000, CRC(36107e6f) SHA1(0872d0ae2add129bdd036754fd5d751627bc142e) )
+ROM_END
+
 ROM_START( hyouban ) // Medal Series No. 124N, according to dip sheet
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.3d",        0x00000,  0x10000, CRC(307b4f7e) SHA1(303e1818cb12ede15dadec165f18a6a33d564d5e) )
@@ -2103,7 +2131,8 @@ ROM_START( av2mj2rg )
 ROM_END
 
 
-GAME( 1989, galkoku,  0,        galkoku,  galkoku,  nbmj8991_state, empty_init,    ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galkoku,  0,        galkoku,  galkoku,  nbmj8991_state, empty_init,    ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galkokua, galkoku,  galkoku,  galkoku,  nbmj8991_state, empty_init,    ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kokuhaku (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hyouban,  galkoku,  hyouban,  hyouban,  nbmj8991_state, empty_init,    ROT180, "Nichibutsu / T.R.Tec", "Mahjong Hyouban Musume (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, galkaika, 0,        galkaika, galkaika, nbmj8991_state, init_galkaika, ROT180, "Nichibutsu / T.R.Tec", "Mahjong Gal no Kaika (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, tokyogal, 0,        tokyogal, tokyogal, nbmj8991_state, init_tokyogal, ROT180, "Nichibutsu", "Tokyo Gal Zukan (Japan)", MACHINE_SUPPORTS_SAVE )

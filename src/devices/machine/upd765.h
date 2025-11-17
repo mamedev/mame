@@ -55,6 +55,7 @@ public:
 
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
+	void set_ts_line_connected(bool ts);
 	void set_floppy(floppy_image_device *image);
 	virtual void soft_reset();
 
@@ -228,7 +229,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected, select_multiplexed, has_dor;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed, ts_connected, has_dor;
 
 	bool external_ready;
 

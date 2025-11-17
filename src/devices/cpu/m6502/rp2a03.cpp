@@ -45,7 +45,7 @@ rp2a03_core_device::rp2a03_core_device(const machine_config &mconfig, const char
 
 rp2a03_device::rp2a03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: rp2a03_core_device(mconfig, type, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 1)
+	, device_mixer_interface(mconfig, *this)
 	, m_apu(*this, "nesapu")
 {
 	program_config.m_internal_map = address_map_constructor(FUNC(rp2a03_device::rp2a03_map), this);
@@ -84,7 +84,7 @@ void rp2a03_device::device_add_mconfig(machine_config &config)
 	APU_2A03(config, m_apu, DERIVED_CLOCK(1,1));
 	m_apu->irq().set(FUNC(rp2a03_device::apu_irq));
 	m_apu->mem_read().set(FUNC(rp2a03_device::apu_read_mem));
-	m_apu->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_apu->add_route(ALL_OUTPUTS, *this, 1.0, 0);
 }
 
 void rp2a03g_device::device_add_mconfig(machine_config &config)
@@ -92,7 +92,7 @@ void rp2a03g_device::device_add_mconfig(machine_config &config)
 	NES_APU(config, m_apu, DERIVED_CLOCK(1,1));
 	m_apu->irq().set(FUNC(rp2a03g_device::apu_irq));
 	m_apu->mem_read().set(FUNC(rp2a03g_device::apu_read_mem));
-	m_apu->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_apu->add_route(ALL_OUTPUTS, *this, 1.0, 0);
 }
 
 

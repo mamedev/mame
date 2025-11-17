@@ -34,6 +34,7 @@
 #include "a8sio.h"
 #include "atari810.h"
 #include "atari1050.h"
+#include "atarifdc.h"
 #include "cassette.h"
 
 
@@ -131,6 +132,12 @@ void a8sio_device::motor_w(int state)
 		m_device->motor_w(state);
 }
 
+void a8sio_device::ready_w(int state)
+{
+	if (m_device)
+		m_device->ready_w(state);
+}
+
 void a8sio_device::proceed_w(int state)
 {
 	m_out_proceed_cb(state);
@@ -202,4 +209,5 @@ void a8sio_cards(device_slot_interface &device)
 	device.option_add("a810", ATARI810);
 	device.option_add("a1050", ATARI1050);
 	device.option_add("cassette", A8SIO_CASSETTE);
+	device.option_add("fdc", ATARI_FDC);
 }

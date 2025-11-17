@@ -31,12 +31,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO_PICASSO2P, bus::amiga::zorro::picasso2p_device, "zorro_picasso2p", "Picasso II+ RTG")
+DEFINE_DEVICE_TYPE(AMIGA_PICASSO2P, bus::amiga::zorro::picasso2p_device, "amiga_picasso2p", "Picasso II+ RTG")
 
 namespace bus::amiga::zorro {
 
 picasso2p_device::picasso2p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_PICASSO2P, tag, owner, clock),
+	device_t(mconfig, AMIGA_PICASSO2P, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_zorro2_card_interface(mconfig, *this),
 	m_vga(*this, "vga"),
@@ -138,9 +138,9 @@ void picasso2p_device::autoconfig_base_address(offs_t address)
 	{
 		LOG("-> installing picasso2p memory\n");
 
-		m_slot->space().install_readwrite_handler(address, address + 0x1fffff,
+		m_zorro->space().install_readwrite_handler(address, address + 0x1fffff,
 			emu::rw_delegate(m_vga, FUNC(cirrus_gd5428_vga_device::mem_r)),
-			emu::rw_delegate(m_vga, FUNC(cirrus_gd5428_vga_device::mem_w)), 0xffffffff);
+			emu::rw_delegate(m_vga, FUNC(cirrus_gd5428_vga_device::mem_w)), 0xffff);
 
 		m_autoconfig_memory_done = true;
 
@@ -152,19 +152,19 @@ void picasso2p_device::autoconfig_base_address(offs_t address)
 		LOG("-> installing picasso2p registers\n");
 
 		// install picasso registers
-		m_slot->space().install_device(address, address + 0x0ffff, *this, &picasso2p_device::mmio_map);
+		m_zorro->space().install_device(address, address + 0x0ffff, *this, &picasso2p_device::mmio_map);
 
 		// stop responding to default autoconfig
-		m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+		m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 		// we're done
-		m_slot->cfgout_w(0);
+		m_zorro->cfgout_w(0);
 	}
 }
 
 void picasso2p_device::cfgin_w(int state)
 {
-	LOG("configin_w (%d)\n", state);
+	LOG("cfgin_w (%d)\n", state);
 
 	if (state != 0)
 		return;
@@ -187,9 +187,9 @@ void picasso2p_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 	else
 	{

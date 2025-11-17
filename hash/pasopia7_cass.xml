@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="pasopia7_cass" description="Toshiba Pasopia 7 PA7007 cassettes">
+
+	<software name="3dgolf" supported="no">
+		<description>3D Golf Simulation</description>
+		<year>1983?</year>
+		<publisher>T&amp;E Soft</publisher>
+		<notes><![CDATA[
+Keeps ringing [DAC1BIT] when ball goes O.B.
+]]></notes>
+		<info name="alt_title" value="3Dゴルフシミュレーション"/>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="31821868">
+				<rom name="3d golf simulation.wav" size="31821868" crc="1005e6a0" sha1="538562b9c80f07b8671454cc5a2e270fec7440c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacebs" supported="no">
+		<description>Space Battle Ship</description>
+		<year>1988</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Hangs once an enemy is found
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="4865361">
+				<rom name="spacebattleship_(bm-1988-04).wav" size="4865361" crc="ec5299f6" sha1="55473cf086aacf90d124d775407b2315d303bfed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacesht" supported="no">
+		<description>Space Shooter</description>
+		<year>1983</year>
+		<!-- Coverdisk? -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Black screen, tight loops on PPI port B bit 6
+]]></notes>
+		<!-- Was with B&M label -->
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="1686928">
+				<rom name="space shooter (io_198301).wav" size="1686928" crc="35a071e5" sha1="706b1447fd8e40f2f5520c802c63271c4de952e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>

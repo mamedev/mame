@@ -106,6 +106,7 @@ To Do / Unknowns:
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
     - Music timing is bit different on bbakraid.
         reference : https://www.youtube.com/watch?v=zjrWs0iHQ5A
+    - kingdmgpbl moves around some registers to make up for missing VDP of the original. Implement this.
 
 *****************************************************************************/
 
@@ -113,32 +114,6 @@ void raizing_base_state::reset_audiocpu(int state)
 {
 	if (m_audiocpu != nullptr)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, state);
-}
-
-TILE_GET_INFO_MEMBER(raizing_base_state::get_text_tile_info)
-{
-	const u16 attrib = m_tx_videoram[tile_index];
-	const u32 tile_number = attrib & 0x3ff;
-	const u32 color = attrib >> 10;
-	tileinfo.set(0,
-			tile_number,
-			color,
-			0);
-}
-
-void raizing_base_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_tx_videoram[offset]);
-	if (offset < 64*32)
-		m_tx_tilemap->mark_tile_dirty(offset);
-}
-
-void raizing_base_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	/*** Line-Scroll RAM for Text Layer ***/
-	COMBINE_DATA(&m_tx_linescroll[offset]);
-
-	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
 }
 
 
@@ -163,43 +138,16 @@ void raizing_base_state::screen_vblank(int state)
 u32 raizing_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_base(screen, bitmap, cliprect);
-
-	rectangle clip = cliprect;
-
-	/* it seems likely that flipx can be set per line! */
-	/* however, none of the games does it, and emulating it in the */
-	/* MAME tilemap system without being ultra slow would be tricky */
-	m_tx_tilemap->set_flip(m_tx_lineselect[0] & 0x8000 ? 0 : TILEMAP_FLIPX);
-
-	/* line select is used for 'for use in' and '8ing' screen on bbakraid, 'Raizing' logo on batrider */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		clip.min_y = clip.max_y = y;
-		m_tx_tilemap->set_scrolly(0, m_tx_lineselect[y] - y);
-		m_tx_tilemap->draw(screen, bitmap, clip, 0);
-	}
+	m_tx_tilemap->draw_tilemap(screen, bitmap, cliprect);
 	return 0;
 }
 
 
 
-void raizing_base_state::create_tx_tilemap(int dx, int dx_flipped)
-{
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raizing_base_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
-	m_tx_tilemap->set_scroll_cols(1);
-	m_tx_tilemap->set_scrolldx(dx, dx_flipped);
-	m_tx_tilemap->set_transparent_pen(0);
-}
-
 void raizing_base_state::bgaregga_common_video_start()
 {
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-
-	/* Create the Text tilemap for this game */
-	create_tx_tilemap(0x1d4, 0x16b);
 }
 
 
@@ -222,7 +170,7 @@ void raizing_base_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
 	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
 }
 
-void raizing_base_state::common_bgaregga_reset()
+void raizing_base_state::raizing_oki_reset()
 {
 	for (int chip = 0; chip < 2; chip++)
 	{
@@ -248,9 +196,9 @@ void raizing_base_state::common_mem(address_map &map, offs_t rom_limit)
 	map(0x21c03c, 0x21c03d).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(raizing_base_state::tx_videoram_w)).share(m_tx_videoram);
-	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
-	map(0x503000, 0x5031ff).ram().w(FUNC(raizing_base_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x500000, 0x501fff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::videoram_r), FUNC(toaplan_txtilemap_device::videoram_w));
+	map(0x502000, 0x502fff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::lineselect_r), FUNC(toaplan_txtilemap_device::lineselect_w));
+	map(0x503000, 0x5031ff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::linescroll_r), FUNC(toaplan_txtilemap_device::linescroll_w));
 	map(0x503200, 0x503fff).ram();
 }
 
@@ -347,9 +295,6 @@ void bgaregga_bootleg_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-
-	/* Create the Text tilemap for this game */
-	create_tx_tilemap(4, 4);
 }
 
 
@@ -358,7 +303,7 @@ void bgaregga_bootleg_state::video_start()
 u32 bgaregga_bootleg_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_base(screen, bitmap, cliprect);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
+	m_tx_tilemap->draw_tilemap_bootleg(screen, bitmap, cliprect);
 	return 0;
 }
 
@@ -747,7 +692,7 @@ void bgaregga_state::machine_reset()
 {
 	raizing_base_state::machine_reset();
 
-	common_bgaregga_reset();
+	raizing_oki_reset();
 }
 
 void sstriker_state::mahoudai_68k_mem(address_map &map)
@@ -824,12 +769,14 @@ void sstriker_state::mahoudai(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(sstriker_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx_textrom);
+	m_tx_tilemap->set_offset(0x1d4, 0, 0x16b, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -869,12 +816,14 @@ void bgaregga_state::bgaregga(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(bgaregga_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx_textrom);
+	m_tx_tilemap->set_offset(0x1d4, 0, 0x16b, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -896,6 +845,7 @@ void bgaregga_bootleg_state::bgareggabl(machine_config &config)
 	bgaregga(config);
 
 	m_screen->set_screen_update(FUNC(bgaregga_bootleg_state::screen_update_bootleg));
+	m_tx_tilemap->set_offset(4, 0, 4, 0);
 }
 
 
@@ -1037,6 +987,45 @@ ROM_START( shippumd )
 	ROM_REGION( 0x80000, "oki1", 0 )         /* ADPCM Samples */
 	ROM_LOAD( "ma02rom6.bin", 0x00000, 0x80000, CRC(199e7cae) SHA1(0f5e13cc8ec42c80bb4bbff90aba29cdb15213d4) )
 ROM_END
+
+
+ROM_START( kingdmgpbl )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68K code, very minor differences from the original
+	ROM_LOAD16_BYTE( "d-26.bin", 0x00000, 0x80000, CRC(5838f306) SHA1(3773974aaba45a18ae34df0056275a358cf3e2f6) )
+	ROM_LOAD16_BYTE( "d-25.bin", 0x00001, 0x80000, CRC(fb1c415c) SHA1(5872c466843c2cccad03935e90df04b107a9d454) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Z80 code, same as the original
+	ROM_LOAD( "d-23.bin", 0x00000, 0x10000, CRC(dde8a57e) SHA1(f522a3f17e229c71512464349760a9e27778bf6a) )
+
+	ROM_REGION( 0x400000, "gp9001", 0 ) // same as the original, just arranged differently
+	ROM_LOAD16_BYTE( "d-27.bin", 0x000000, 0x80000, CRC(a5afe775) SHA1(c3d4dec2b24d003ee11c4c03bcc8305ac708fd27) )
+	ROM_LOAD16_BYTE( "d-29.bin", 0x000001, 0x80000, CRC(cf2331fa) SHA1(cc7fb817c1cf425d7d3b04ca562b234a30a2dec7) )
+	ROM_LOAD16_BYTE( "d-28.bin", 0x100000, 0x80000, CRC(a79e9c3e) SHA1(6c49ccc77ef220ef0b339654712e505c307def5e) )
+	ROM_LOAD16_BYTE( "d-30.bin", 0x100001, 0x80000, CRC(0f917278) SHA1(f1ba8ddd19ca3c6a364ebd1652b5195d6426e3e2) )
+	ROM_LOAD16_BYTE( "d-31.bin", 0x200000, 0x80000, CRC(da6099d8) SHA1(76ad53eec73a65ed17d4db0cd4417acdc97555d4) ) // sticker was actually d-21, but probably due to availability
+	ROM_LOAD16_BYTE( "d-33.bin", 0x200001, 0x80000, CRC(f9127208) SHA1(61fc9b68082c5d8c8982687f454ed6744431f382) ) // sticker was actually d-23, but probably due to availability
+	ROM_LOAD16_BYTE( "d-32.bin", 0x300000, 0x80000, CRC(82d54b26) SHA1(1f7517182b336bd4d635dcbf39b7c0eba40dd18b) ) // sticker was actually d-22, but probably due to availability
+	ROM_LOAD16_BYTE( "d-34.bin", 0x300001, 0x80000, CRC(8bb802d6) SHA1(786220b14e4b20ac5d482ef4363df97ac1cb5f17) ) // sticker was actually d-24, but probably due to availability
+
+	ROM_REGION( 0x8000, "text", 0 ) // same as the original
+	ROM_LOAD( "d-21.bin", 0x0000, 0x8000, CRC(8c28460b) SHA1(0aed170762f6044896a7e608df60bbd37c583a71) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) // same as the original
+	ROM_LOAD( "d-22.bin", 0x00000, 0x80000, CRC(199e7cae) SHA1(0f5e13cc8ec42c80bb4bbff90aba29cdb15213d4) )
+
+	ROM_REGION( 0x8000, "unknown", 0 )
+	ROM_LOAD( "d-24.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) ) // BADADDR         ---xxxxxxxxxxxx
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8.1",      0x000, 0x117, CRC(c1d254eb) SHA1(65ebc26f70db1bb14d1bf6a1563073d2981e5c4b) )
+	ROM_LOAD( "gal16v8.6",      0x200, 0x117, CRC(359337d4) SHA1(f3f950ce6eae36126a719bcb6f837659b85bc36a) )
+	ROM_LOAD( "palce20v10h.8",  0x400, 0x2dd, CRC(2f5b291f) SHA1(684f5ace6d43806a890e11a1946b36e0d6a3f4f1) )
+	ROM_LOAD( "palce20v10h.10", 0x700, 0x2dd, CRC(6e2a2bb3) SHA1(a716a21f18bb2344e967dd612244da609dfc67f4) )
+	ROM_LOAD( "gal16v8.13",     0xa00, 0x117, CRC(3f4a2f5e) SHA1(2fc4f7d6443f5f86366deda3524daa9ce015c0ce) )
+	ROM_LOAD( "gal16v8.14",     0xc00, 0x117, CRC(c3bbc41b) SHA1(19372e19af15c8729a7872e3eda4b7ebcc5a2b96) )
+	ROM_LOAD( "gal16v8.nn",     0xe00, 0x117, CRC(2d9efaeb) SHA1(37cb914ffda7613976c44ecfcd6d49e79feb2e9c) )
+ROM_END
+
 
 ROM_START( bgareggat )
 	/* Dumped from a location test board, with some minor changes compared to the final.
@@ -1319,6 +1308,7 @@ GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   sstriker_state, empty
 
 GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
 GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kingdmgpbl,  kingdmgp, shippumd,   kingdmgp,   sstriker_state, empty_init,      ROT270, "bootleg", "Kingdom Grandprix (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   bgaregga_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   bgaregga_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)",                         MACHINE_SUPPORTS_SAVE )

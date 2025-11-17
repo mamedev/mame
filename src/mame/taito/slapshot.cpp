@@ -179,10 +179,10 @@ u16 slapshot_state::service_input_r(offs_t offset)
 
 void slapshot_state::coin_control_w(u8 data)
 {
-	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-	machine().bookkeeping().coin_counter_w(0, data & 0x04);
-	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 0));
+	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));
 }
 
 /*****************************************************
@@ -202,8 +202,8 @@ void slapshot_state::slapshot_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x500000, 0x50ffff).ram(); /* main RAM */
-	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
-	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
+	map(0x600000, 0x60ffff).ram().share(m_spriteram);   /* sprite ram */
+	map(0x700000, 0x701fff).ram().share(m_spriteext);   /* debugging */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));    /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -219,8 +219,8 @@ void slapshot_state::opwolf3_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0x500000, 0x50ffff).ram(); /* main RAM */
-	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
-	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
+	map(0x600000, 0x60ffff).ram().share(m_spriteram);   /* sprite ram */
+	map(0x700000, 0x701fff).ram().share(m_spriteext);   /* debugging */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::ram_r), FUNC(tc0480scp_device::ram_w));    /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_r), FUNC(tc0480scp_device::ctrl_w));
 	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -240,7 +240,7 @@ void slapshot_state::opwolf3_map(address_map &map)
 void slapshot_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0x4000, 0x7fff).bankr(m_z80bank);
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
@@ -378,8 +378,8 @@ static const gfx_layout layout_6bpp_hi =
 };
 
 static GFXDECODE_START( gfx_slapshot )
-	GFXDECODE_ENTRY( "sprites",    0x0, gfx_16x16x4_packed_lsb, 0, 256 ) // low 4bpp of 6bpp sprites
-	GFXDECODE_ENTRY( "sprites_hi", 0x0, layout_6bpp_hi,         0, 256 ) // hi 2bpp of 6bpp sprites
+	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0, 256 ) // low 4bpp of 6bpp sprites
+	GFXDECODE_ENTRY( "sprites_hi", 0, layout_6bpp_hi,         0, 256 ) // hi 2bpp of 6bpp sprites
 GFXDECODE_END
 
 
@@ -437,15 +437,14 @@ void slapshot_state::slapshot(machine_config &config)
 	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08", 0);
 
@@ -503,15 +502,14 @@ void slapshot_state::opwolf3(machine_config &config)
 	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08", 0);
 

@@ -68,10 +68,9 @@ namespace
 
 	void coco_stereo_composer_device::device_add_mconfig(machine_config &config)
 	{
-		SPEAKER(config, "sc_lspeaker").front_left();
-		SPEAKER(config, "sc_rspeaker").front_right();
-		DAC_8BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, "sc_lspeaker", 0.5);
-		DAC_8BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, "sc_rspeaker", 0.5);
+		SPEAKER(config, "sc_speaker", 2).front();
+		DAC_8BIT_R2R(config, m_ldac).add_route(ALL_OUTPUTS, "sc_speaker", 0.5, 0);
+		DAC_8BIT_R2R(config, m_rdac).add_route(ALL_OUTPUTS, "sc_speaker", 0.5, 1);
 
 		pia6821_device &pia(PIA6821(config, "sc_pia"));
 		pia.writepa_handler().set("sc_ldac", FUNC(dac_byte_interface::data_w));

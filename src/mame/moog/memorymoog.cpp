@@ -187,10 +187,8 @@ private:
 	u16 m_char_led_source = 0x3fff;
 
 	required_device<pwm_display_device> m_led_matrix_device;
-	u8 m_led_sink = 0;  // Also used as the sink for the LT-1604.
-	u8 m_led_source = 0;
-
 	std::vector<std::vector<output_finder<>>> m_leds;
+
 	std::vector<float> m_cv; // Control voltages. See CV_NAMES below.
 
 	// When these strings get converted to output names, they will include
@@ -339,7 +337,7 @@ bool memorymoog_state::adc_comparator_on() const
 	if (m_selected_pot == 0)
 	{
 		LOGMASKED(LOG_ADC, "Comparator: %f %f %d %04x\n", v, dac_v, comp_on,
-		          m_dac_latch);
+				  m_dac_latch);
 	}
 	return comp_on;
 }
@@ -389,7 +387,7 @@ template<int N> u8 memorymoog_state::key_matrix_r(
 
 	if (pressed != 0xff)
 		LOGMASKED(LOG_KEYPRESS, "Pressed %s %02X: %02X\n", name, selection,
-		          pressed);
+				  pressed);
 
 	return pressed;  // Returned value is active-low.
 }
@@ -421,7 +419,7 @@ void memorymoog_state::update_sh()
 	m_cv[m_selected_sh] = cv;
 	// TODO: all autotune CVs are divided by a 115K-10K divider.
 	LOGMASKED(LOG_CV, "CV: %02d %-20s %04X - %f\n", m_selected_sh,
-	          CV_NAMES[m_selected_sh], m_dac_latch, cv);
+			  CV_NAMES[m_selected_sh], m_dac_latch, cv);
 }
 
 void memorymoog_state::keyboard_w(u8 data)
@@ -495,22 +493,18 @@ void memorymoog_state::cv_mux_control_w(offs_t offset, u8 data)
 
 void memorymoog_state::led_drive_w(u8 data)
 {
-	// Latched by 74LS273 (U1, board 7), and buffered and inverted by
-	// ULN2074 (U2, U3, board 7). Buffer output is connected to LED cathodes,
-	// and therefore is active low.
-	m_led_sink = ~data;
-	// Inverting because pwm_display_device expects inputs as active-high.
-	m_led_matrix_device->matrix(~m_led_sink, ~m_led_source);
-	m_char_device->matrix(~m_led_sink, ~m_char_led_source);
+	// Latched by 74LS273 (U1, board 7), buffered and inverted by
+	// ULN2074 (U2, U3, board 7), and connected to LED cathodes.
+	m_led_matrix_device->write_my(data);
+	m_char_device->write_my(data);
 }
 
 void memorymoog_state::led_latch_w(u8 data)
 {
 	// Latched by 2x74LS378. D0-D3 by U2, board 6. D4-D7 by U8, board 7.
 	// Active low. When 0, a PNP transistor switches 6V to the LED anodes.
-	m_led_source = data;
 	// Inverting because pwm_display_device expects inputs as active-high.
-	m_led_matrix_device->matrix(~m_led_sink, ~m_led_source);
+	m_led_matrix_device->write_mx(~data);
 }
 
 void memorymoog_state::led_update_w(offs_t offset, u8 data)
@@ -550,7 +544,7 @@ void memorymoog_state::char_latch_a_w(u8 data)
 	// to 6V.
 	m_char_led_source = (m_char_led_source & 0x3f80) | (data & 0x7f);
 	// Inverting because pwm_display_device expects inputs as active-high.
-	m_char_device->matrix(~m_led_sink, ~m_char_led_source);
+	m_char_device->write_mx(~m_char_led_source);
 }
 
 void memorymoog_state::char_latch_b_w(u8 data)
@@ -562,7 +556,7 @@ void memorymoog_state::char_latch_b_w(u8 data)
 	// to 6V.
 	m_char_led_source = (u16(data & 0x7f) << 7) | (m_char_led_source & 0x7f);
 	// Inverting because pwm_display_device expects inputs as active-high.
-	m_char_device->matrix(~m_led_sink, ~m_char_led_source);
+	m_char_device->write_mx(~m_char_led_source);
 }
 
 void memorymoog_state::char_update_w(offs_t offset, u8 data)
@@ -662,8 +656,6 @@ void memorymoog_state::machine_start()
 	save_item(NAME(m_negative_hysteresis));
 	save_item(NAME(m_octave_low));
 	save_item(NAME(m_char_led_source));
-	save_item(NAME(m_led_sink));
-	save_item(NAME(m_led_source));
 	save_item(NAME(m_cv));
 }
 
@@ -827,82 +819,82 @@ DECLARE_INPUT_CHANGED_MEMBER(memorymoog_state::octave_button_pressed)
 
 // All strings in PORT_NAME(...) match those in the schematic.
 INPUT_PORTS_START(memorymoog)
-	PORT_START("keyboard_column_0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C0") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#0")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D0")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#0")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E0")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F0")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#0")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G0")
+	PORT_START("keyboard_column_0")  // C0 - G0 in schematic.
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C2 PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS2
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D2
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS2
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E2
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F2
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS2
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G2
 
-	PORT_START("keyboard_column_1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A0")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#0")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B0") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C1")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#1")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#1")
+	PORT_START("keyboard_column_1")  // G#0 - D#1
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS2
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A2
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS2
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B2 PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C3
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS3
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D3
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS3
 
-	PORT_START("keyboard_column_2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E1")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F1")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#1")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G1")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#1")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A1")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B1")
+	PORT_START("keyboard_column_2")  // E1 - B1
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E3
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F3
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS3
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G3
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS3
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A3
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS3
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B3
 
-	PORT_START("keyboard_column_3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C2")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#2")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#2")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E2")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F2")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#2")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G2")
+	PORT_START("keyboard_column_3")  // C2 - G2
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C4
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS4
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D4
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS4
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E4
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F4
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS4
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G4
 
-	PORT_START("keyboard_column_4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#2")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A2")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#2")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B2")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C3")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#3")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D3")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#3")
+	PORT_START("keyboard_column_4")  // G#2 - D#3
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS4
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A4
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS4
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B4
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C5
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS5
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D5
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS5
 
-	PORT_START("keyboard_column_5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E3")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F3")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#3")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G3")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#3")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A3")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#3")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B3")
+	PORT_START("keyboard_column_5")  // E3 - B3
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E5
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F5
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS5
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G5
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS5
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A5
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS5
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B5
 
-	PORT_START("keyboard_column_6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C4")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C#4")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D4")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("D#4")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("E4")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F4")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("F#4")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G4") PORT_CODE(KEYCODE_C)
+	PORT_START("keyboard_column_6")  // C4 - G4
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C6
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_CS6
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_D6
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_DS6
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_E6
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_F6
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_FS6
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_G6 PORT_CODE(KEYCODE_C)
 
-	PORT_START("keyboard_column_7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("G#4")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A4")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("A#4")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("B4")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("C5") PORT_CODE(KEYCODE_V)
+	PORT_START("keyboard_column_7")  // G#4 - C5
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_GS6
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_A6
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_AS6
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_B6
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_GM_C7 PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)  // NC
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)  // NC
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)  // NC
@@ -1134,4 +1126,3 @@ ROM_END
 
 // In production from 1982 to 1985.
 SYST(1982, memorymoog, 0, 0, memorymoog, memorymoog, memorymoog_state, empty_init, "Moog Music", "Memorymoog", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)
-

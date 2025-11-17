@@ -59,7 +59,7 @@ ROM_START( a2videoterm )
 	ROM_LOAD( "videx videoterm character rom katakana.bin", 0x003000, 0x000800, CRC(b728690e) SHA1(e018fa66b0ff560313bb35757c9ce7adecae0c3a) )
 	ROM_LOAD( "videx videoterm character rom spanish.bin", 0x003800, 0x000800, CRC(439eac08) SHA1(d6f9f8eb7702440d9ae39129ea4f480b80fc4608) )
 	ROM_LOAD( "videx videoterm character rom super and subscript.bin", 0x004000, 0x000800, CRC(08b7c538) SHA1(7f4029d97be05680fe695debe07cea07666419e0) )
-	ROM_LOAD( "videx videoterm character rom symbol.bin", 0x004800, 0x000800, CRC(82bce582) SHA1(29dfa8c5257dbf25651c6bffa9cdb453482aa70e) )
+	ROM_LOAD( "videx videoterm character rom symbol.bin", 0x004800, 0x000800, CRC(82bce582) SHA1(29dfa8c5257dbf25651c6bffa9cdb453482aa70e) BAD_DUMP ) // doesn't look right
 	ROM_LOAD( "4.ic4.bin", 0x005000, 0x000800, CRC(8a497a48) SHA1(50c3df528109c65491a001ec74e50351a652c1fd) ) // dumped from clone card, contains inverse character set
 ROM_END
 
@@ -119,11 +119,14 @@ protected:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 	uint8_t m_ram[512*4];
 
 	required_device<mc6845_device> m_crtc;
 	required_region_ptr<uint8_t> m_rom, m_chrrom;
+	optional_ioport m_config;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -137,6 +140,7 @@ public:
 	a2bus_videoterm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 };
 
 class a2bus_ap16_device : public a2bus_videx80_device
@@ -271,6 +275,40 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 	return ROM_NAME( a2aevm80 );
 }
 
+
+static INPUT_PORTS_START( a2videoterm )
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x0f, 0x00, "Primary Character Set")
+	PORT_CONFSETTING(0x00, "Normal")
+	PORT_CONFSETTING(0x01, "Normal Uppercase")
+	PORT_CONFSETTING(0x02, "APL")
+	PORT_CONFSETTING(0x03, "Block Graphics")
+	PORT_CONFSETTING(0x04, "French")
+	PORT_CONFSETTING(0x05, "German")
+	PORT_CONFSETTING(0x06, "Katakana")
+	PORT_CONFSETTING(0x07, "Spanish")
+	PORT_CONFSETTING(0x08, "Super/Subscript")
+	//PORT_CONFSETTING(0x09, "Symbol")
+	PORT_CONFSETTING(0x0a, "Inverse Video")
+	PORT_CONFNAME(0xf0, 0xa0, "Alternate Character Set")
+	PORT_CONFSETTING(0x00, "Normal")
+	PORT_CONFSETTING(0x10, "Normal Uppercase")
+	PORT_CONFSETTING(0x20, "APL")
+	PORT_CONFSETTING(0x30, "Block Graphics")
+	PORT_CONFSETTING(0x40, "French")
+	PORT_CONFSETTING(0x50, "German")
+	PORT_CONFSETTING(0x60, "Katakana")
+	PORT_CONFSETTING(0x70, "Spanish")
+	PORT_CONFSETTING(0x80, "Super/Subscript")
+	//PORT_CONFSETTING(0x90, "Symbol")
+	PORT_CONFSETTING(0xa0, "Inverse Video")
+INPUT_PORTS_END
+
+ioport_constructor a2bus_videoterm_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( a2videoterm );
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -281,6 +319,7 @@ a2bus_videx80_device::a2bus_videx80_device(const machine_config &mconfig, device
 	m_crtc(*this, VIDEOTERM_MC6845_NAME),
 	m_rom(*this, VIDEOTERM_ROM_REGION),
 	m_chrrom(*this, VIDEOTERM_GFX_REGION),
+	m_config(*this, "CONFIG"),
 	m_rambank(0),
 	m_char_width(9)
 {
@@ -328,6 +367,11 @@ void a2bus_videx80_device::device_start()
 void a2bus_videx80_device::device_reset()
 {
 	m_rambank = 0;
+}
+
+void a2bus_videx80_device::reset_from_bus()
+{
+	m_crtc->reset(); // possibly not hooked up for some clones
 }
 
 
@@ -426,14 +470,19 @@ void a2bus_videx80_device::write_c800(uint16_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 {
-	uint32_t  *p = &bitmap.pix(y);
-	uint16_t  chr_base = ra; //( ra & 0x08 ) ? 0x800 | ( ra & 0x07 ) : ra;
+	ioport_value config = m_config.read_safe(0x10);
+	unsigned charset0 = std::min<unsigned>(config & 0x0f, (m_chrrom.bytes() - 1) >> 11);
+	unsigned charset1 = std::min<unsigned>(config >> 4, (m_chrrom.bytes() - 1) >> 11);
+
+	uint32_t *p = &bitmap.pix(y);
+	uint8_t *chr_base0 = &m_chrrom[(ra & 0x0f) + (uint32_t(charset0) * 0x800)];
+	uint8_t *chr_base1 = &m_chrrom[(ra & 0x0f) + (uint32_t(charset1) * 0x800)];
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = ( ma + i ) & 0x7ff;
-		uint8_t chr = m_ram[ offset ];
-		uint8_t data = m_chrrom[ chr_base + chr * 16 ];
+		uint16_t offset = (ma + i) & 0x7ff;	
+		uint8_t chr = m_ram[offset];
+		uint8_t data = (BIT(chr, 7) ? chr_base1 : chr_base0)[(chr & 0x7f) * 16];
 		rgb_t fg = rgb_t::white();
 		rgb_t bg = rgb_t::black();
 
@@ -443,7 +492,7 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 		for (int j = m_char_width; j > 0; j--)
 		{
 			*p++ = BIT(data, 7) ? fg : bg;
-			data <<= 1;
+			data = (data << 1) | (data & 1);
 		}
 	}
 }

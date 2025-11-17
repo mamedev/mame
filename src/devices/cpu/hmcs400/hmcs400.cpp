@@ -899,7 +899,7 @@ void hmcs400_cpu_device::execute_run()
 		m_op = fetch();
 		m_i = m_op & 0xf;
 
-		// 2-byte opcodes / RAM address
+		// 2-word opcodes / RAM address
 		if ((m_op >= 0x100 && m_op < 0x140) || (m_op >= 0x150 && m_op < 0x1b0))
 			m_param = fetch();
 		else

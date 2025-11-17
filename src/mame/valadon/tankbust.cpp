@@ -2,7 +2,8 @@
 // copyright-holders:Jarek Burczynski
 /***************************************************************************
 
-Tank Busters memory map
+Tank Busters
+6009-A + 6009-B PCBs
 
 driver by Jarek Burczynski
 

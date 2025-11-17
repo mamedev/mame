@@ -1613,7 +1613,7 @@ static INPUT_PORTS_START( gstrik2 )
 	PORT_DIPSETTING(      0x0011, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(      0x0008, "4 Coins/6 Credits" )
 	PORT_DIPSETTING(      0x0016, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x000d, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x000d, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_7C ) )
 	PORT_DIPSETTING(      0x0000, "4 Coins/8 Credits" )
 	PORT_DIPSETTING(      0x0009, "3 Coins/6 Credits" )
@@ -2158,43 +2158,43 @@ static INPUT_PORTS_START( mouja )
 	PORT_SERVICE_NO_TOGGLE(0x0080, IP_ACTIVE_LOW)
 
 	PORT_START("DSW0") //$478884
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play ) )            PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )          PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )          PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )       PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0800, 0x0000, "Winning Rounds (Player VS Computer)" )   PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(      0x0800, "1/1" )
-	PORT_DIPSETTING(      0x0000, "2/3" )
-	PORT_DIPNAME( 0x1000, 0x1000, "Winning Rounds (Player VS Player)" ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(      0x1000, "1/1" )
-	PORT_DIPSETTING(      0x0000, "2/3" )
-	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )
-	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Free_Play ) )                   PORT_DIPLOCATION("SW1:1")    // フリープレイ
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )                                                      // 無し
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                       // 有り
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )                 PORT_DIPLOCATION("SW1:2")    // モニター画面反転
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )                                                      // 通常
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                       // 反転
+	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )                                              // テストモード
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )                 PORT_DIPLOCATION("SW1:4")    // デモサウンド
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )                                                      // 無し
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )                                                       // 有り
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )                      PORT_DIPLOCATION("SW1:5,6")  // プレイ料金スロット1
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )                                                    // 3 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )                                                    // 2 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )                                                    // 1 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )                                                    // 1 COIN 2 PLAY
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )                      PORT_DIPLOCATION("SW1:7,8")  // プレイ料金スロット2
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )                                                    // 3 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )                                                    // 2 COIN 1 PLAY
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )                                                    // 1 COIN 1 PLAY
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )                                                    // 1 COIN 2 PLAY
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )                  PORT_DIPLOCATION("SW2:1,2")  // 難易度
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )                                                     // Easy
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )                                                   // Normal
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )                                                     // Hard
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )                                                  // Very Hard
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )              PORT_DIPLOCATION("SW2:3")    // コンティニュー
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )                                                       // 無し
+	PORT_DIPSETTING(      0x0400, DEF_STR( Yes ) )                                                      // 有り
+	PORT_DIPNAME( 0x0800, 0x0000, "Round Count (single player)" )          PORT_DIPLOCATION("SW2:4")    // 対戦回数（ひとりプレイ）
+	PORT_DIPSETTING(      0x0800, "1/1" )                                                               // 1本勝負
+	PORT_DIPSETTING(      0x0000, "2/3" )                                                               // 3本勝負
+	PORT_DIPNAME( 0x1000, 0x1000, "Round Count (two players)" )            PORT_DIPLOCATION("SW2:5")    // 対戦回数（ふたりプレイ）
+	PORT_DIPSETTING(      0x1000, "1/1" )                                                               // 1本勝負
+	PORT_DIPSETTING(      0x0000, "2/3" )                                                               // 3本勝負
+	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" )                                                    // （未使用）
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )                                                    // （未使用）
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW2:8" )                                                    // （未使用）
 
 	PORT_START("IN2") //$478886
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2381,7 +2381,7 @@ static INPUT_PORTS_START( puzzlet )
 	PORT_DIPSETTING(      0x5100, "6 Coins/8 Credits" )
 	PORT_DIPSETTING(      0x5e00, "6 Coins/9 Credits" )
 	PORT_DIPSETTING(      0xdf00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0xd700, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(      0xd700, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(      0xdb00, DEF_STR( 5C_3C ) )
 	PORT_DIPSETTING(      0xd300, "5 Coins/4 Credits" )
 	PORT_DIPSETTING(      0xdd00, "5 Coins/5 Credits" )
@@ -2402,7 +2402,7 @@ static INPUT_PORTS_START( puzzlet )
 	PORT_DIPSETTING(      0xb700, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0xbb00, DEF_STR( 3C_3C ) )
 	PORT_DIPSETTING(      0xb300, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(      0xbd00, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(      0xbd00, DEF_STR( 3C_5C ) )
 	PORT_DIPSETTING(      0xb500, "3 Coins/6 Credits" )
 	PORT_DIPSETTING(      0xb900, "3 Coins/7 Credits" )
 	PORT_DIPSETTING(      0xb100, "3 Coins/8 Credits" )
@@ -3478,18 +3478,17 @@ void blzntrnd_state::blzntrnd(machine_config &config)
 
 	// sound hardware
 	// HUM-002 PCB Configuration : Stereo output with second speaker connector
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2610_device &ymsnd(YM2610(config, m_ymsnd, 16_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void blzntrnd_state::gstrik2(machine_config &config)
@@ -3504,15 +3503,14 @@ void blzntrnd_state::gstrik2(machine_config &config)
 	m_vdp2->set_tmap_xoffsets(0,8,0);
 
 	// HUM-003 PCB Configuration : Mono output only
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 	SPEAKER(config, "mono").front_center();
 
 	ym2610_device &ymsnd(YM2610(config.replace(), m_ymsnd, 16_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.5);
-	ymsnd.add_route(1, "mono", 0.5);
-	ymsnd.add_route(2, "mono", 0.5);
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
 }
 
 
@@ -4343,8 +4341,8 @@ HSync: 15.16kHz
 
 ROM_START( lastfort ) // Japanese version on PCB VG420
 	ROM_REGION( 0x040000, "maincpu", 0 )        // 68000 Code
-	ROM_LOAD16_BYTE( "tr_jc09", 0x000000, 0x020000, CRC(8b98a49a) SHA1(15adca78d54973820d04f8b308dc58d0784eb900) )
-	ROM_LOAD16_BYTE( "tr_jc10", 0x000001, 0x020000, CRC(8d04da04) SHA1(5c7e65a39929e94d1fa99aeb5fed7030b110451f) )
+	ROM_LOAD16_BYTE( "tr_jc09", 0x000000, 0x020000, CRC(8b98a49a) SHA1(15adca78d54973820d04f8b308dc58d0784eb900) ) // also seen with same content with tr_jb09 label
+	ROM_LOAD16_BYTE( "tr_jc10", 0x000001, 0x020000, CRC(8d04da04) SHA1(5c7e65a39929e94d1fa99aeb5fed7030b110451f) ) // also seen with same content with tr_jb10 label
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
 	ROM_LOAD( "tr_jb12", 0x000000, 0x020000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) // (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
@@ -5320,6 +5318,24 @@ ROM_START( toride2j )
 	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
 ROM_END
 
+ROM_START( toride2ji )
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "tr2_ji-5.20e", 0x000000, 0x040000, CRC(15906855) SHA1(ac905ed62a0a3cd951146224acc4dab75d730237) )
+	ROM_LOAD16_BYTE( "tr2_ji-6.20c", 0x000001, 0x040000, CRC(e71e291e) SHA1(5ac5043208237d2b1ee45d34e5ad74ba2f821cd3) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )       // NEC78C10 Code
+	ROM_LOAD( "tr2_jb-8.3i", 0x000000, 0x020000, CRC(0168f46f) SHA1(01bf4cc425d72936897c3c572f6c0b1366fe4041) )
+
+	ROM_REGION( 0x200000, "vdp2", 0 )   // Gfx + Data (Addressable by CPU & Blitter)
+	ROM_LOAD64_WORD( "tr2_jb-2.14i", 0x000000, 0x080000, CRC(b31754dc) SHA1(be2423bafbf07c93c3d222e907190b44616014f0) )
+	ROM_LOAD64_WORD( "tr2_jb-4.18i", 0x000002, 0x080000, CRC(a855c3fa) SHA1(eca3e235256df7e6ae66ecbe43bc0edb974af503) )
+	ROM_LOAD64_WORD( "tr2_jb-1.12i", 0x000004, 0x080000, CRC(856f40b7) SHA1(99aca5472b991cd08e9c2128ffdd40675a3b968d) )
+	ROM_LOAD64_WORD( "tr2_jb-3.16i", 0x000006, 0x080000, CRC(78ba205f) SHA1(1069a362e60747aaa284c0d9bb7718013df347f3) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
+ROM_END
+
 /***************************************************************************
 
 Varia Metal
@@ -5488,7 +5504,8 @@ GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_upd7810_state, ini
 GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision K)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, toride2ji, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision I)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pururun,   0,        pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (set 1)", MACHINE_SUPPORTS_SAVE )

@@ -15,7 +15,7 @@
 #include "deco16.h"
 #include "deco16d.h"
 
-#define DECO16_VERBOSE 1
+#define DECO16_VERBOSE 0
 
 DEFINE_DEVICE_TYPE(DECO16, deco16_device, "deco16", "Data East DECO16")
 

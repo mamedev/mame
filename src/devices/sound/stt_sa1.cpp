@@ -160,22 +160,19 @@ void stt_sa1_device::device_reset()
 	}
 }
 
-void stt_sa1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void stt_sa1_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	for (int v = 0; v < 8; v++) {
 		voice_t &voice = m_voice[v];
 
-		for (int i = 0; i < outputs[0].samples() && voice.enabled; i++) {
+		for (int i = 0; i < stream.samples() && voice.enabled; i++) {
 			const offs_t offset = voice.addr_cur >> 12;
 			const int sample = s8(read_byte(offset)) << 8;
 
 			voice.addr_cur += voice.freq;
 
-			outputs[0].add_int(i, (sample * voice.vol_l) >> 16, 32768 * 8);
-			outputs[1].add_int(i, (sample * voice.vol_r) >> 16, 32768 * 8);
+			stream.add_int(0, i, (sample * voice.vol_l) >> 16, 32768 * 8);
+			stream.add_int(1, i, (sample * voice.vol_r) >> 16, 32768 * 8);
 
 			if (voice.addr_cur >= voice.addr_end) {
 				if (!voice.is_looped) {

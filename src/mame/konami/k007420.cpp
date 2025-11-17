@@ -21,7 +21,7 @@ TODO:
 
 static constexpr uint32_t K007420_SPRITERAM_SIZE = 0x200;
 
-DEFINE_DEVICE_TYPE(K007420, k007420_device, "k007420", "K007420 Sprite Generator")
+DEFINE_DEVICE_TYPE(K007420, k007420_device, "k007420", "Konami 007420 Sprite Generator")
 
 k007420_device::k007420_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007420, tag, owner, clock)

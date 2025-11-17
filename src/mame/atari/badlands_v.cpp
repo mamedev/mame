@@ -36,35 +36,35 @@ TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
 
 const atari_motion_objects_config badlands_state::s_mob_config =
 {
-	1,                  /* index to which gfx system */
-	1,                  /* number of motion object banks */
-	0,                  /* are the entries linked? */
-	1,                  /* are the entries split? */
-	0,                  /* render in reverse order? */
-	0,                  /* render in swapped X/Y order? */
-	0,                  /* does the neighbor bit affect the next object? */
-	0,                  /* pixels per SLIP entry (0 for no-slip) */
-	0,                  /* pixel offset for SLIPs */
-	0,                  /* maximum number of links to visit/scanline (0=all) */
+	1,                  // index to which gfx system
+	1,                  // number of motion object banks
+	0,                  // are the entries linked?
+	1,                  // are the entries split?
+	0,                  // render in reverse order?
+	0,                  // render in swapped X/Y order?
+	0,                  // does the neighbor bit affect the next object?
+	0,                  // pixels per SLIP entry (0 for no-slip)
+	0,                  // pixel offset for SLIPs
+	0,                  // maximum number of links to visit/scanline (0=all)
 
-	0x80,               /* base palette entry */
-	0,                  /* transparent pen index */
+	0x80,               // base palette entry
+	0,                  // transparent pen index
 
-	{{ 0x003f }},         /* mask for the link */
-	{{ 0x0fff,0,0,0 }}, /* mask for the code index */
-	{{ 0,0,0,0x0007 }}, /* mask for the color */
-	{{ 0,0,0,0xff80 }}, /* mask for the X position */
-	{{ 0,0xff80,0,0 }}, /* mask for the Y position */
-	{{ 0 }},            /* mask for the width, in tiles*/
-	{{ 0,0x000f,0,0 }}, /* mask for the height, in tiles */
-	{{ 0 }},            /* mask for the horizontal flip */
-	{{ 0 }},            /* mask for the vertical flip */
-	{{ 0,0,0,0x0008 }}, /* mask for the priority */
-	{{ 0 }},            /* mask for the neighbor */
-	{{ 0 }},            /* mask for absolute coordinates */
+	{{ 0x003f }},       // mask for the link
+	{{ 0x0fff,0,0,0 }}, // mask for the code index
+	{{ 0,0,0,0x0007 }}, // mask for the color
+	{{ 0,0,0,0xff80 }}, // mask for the X position
+	{{ 0,0xff80,0,0 }}, // mask for the Y position
+	{{ 0 }},            // mask for the width, in tiles
+	{{ 0,0x000f,0,0 }}, // mask for the height, in tiles
+	{{ 0 }},            // mask for the horizontal flip
+	{{ 0 }},            // mask for the vertical flip
+	{{ 0,0,0,0x0008 }}, // mask for the priority
+	{{ 0 }},            // mask for the neighbor
+	{{ 0 }},            // mask for absolute coordinates
 
-	{{ 0 }},            /* mask for the special value */
-	0,                  /* resulting value to indicate "special" */
+	{{ 0 }},            // mask for the special value
+	0,                  // resulting value to indicate "special"
 };
 
 void badlands_state::video_start()
@@ -110,18 +110,25 @@ uint32_t badlands_state::screen_update_badlands(screen_device &screen, bitmap_in
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					// not yet verified
-					if ((mo[x] & atari_motion_objects_device::PRIORITY_MASK) || !(pf[x] & 8))
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							// not yet verified
+							if ((mo[x] & atari_motion_objects_device::PRIORITY_MASK) || !(pf[x] & 8))
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }

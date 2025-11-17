@@ -22,6 +22,10 @@
 #include "emupal.h"
 #include "screen.h"
 
+#include <algorithm>
+#include <cassert>
+
+
 // define this to use digital inputs instead of the slow
 // autocentering analog mame joys
 #define ANALOG_HACK
@@ -55,13 +59,17 @@ public:
 #endif
 	{ }
 
-	void cx3000tc(machine_config &config);
-	void mpu1000(machine_config &config);
-	void vc4000(machine_config &config);
-	void database(machine_config &config);
-	void h21(machine_config &config);
-	void rwtrntcs(machine_config &config);
-	void elektor(machine_config &config);
+	void cx3000tc(machine_config &config) ATTR_COLD;
+	void mpu1000(machine_config &config) ATTR_COLD;
+	void vc4000(machine_config &config) ATTR_COLD;
+	void database(machine_config &config) ATTR_COLD;
+	void h21(machine_config &config) ATTR_COLD;
+	void rwtrntcs(machine_config &config) ATTR_COLD;
+	void elektor(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	struct SPRITE_HELPER
@@ -90,7 +98,7 @@ private:
 		uint8_t background_collision = 0;
 		union
 		{
-			uint8_t data[0x100]{};
+			uint8_t data[0x100];
 			struct
 			{
 				SPRITE_HELPER sprites[3];
@@ -111,6 +119,12 @@ private:
 				uint8_t sprite_collision;
 			} d;
 		} reg;
+
+		vc4000_video_t()
+		{
+			static_assert(sizeof(reg.d) == 204, "video registers not packed correctly");
+			std::fill(std::begin(reg.data), std::end(reg.data), 0);
+		}
 	};
 
 	void vc4000_sound_ctl(offs_t offset, uint8_t data);
@@ -120,25 +134,20 @@ private:
 	int vc4000_vsync_r();
 	uint8_t elektor_cass_r();
 	void elektor_cass_w(uint8_t data);
-	vc4000_video_t m_video;
-	uint8_t m_sprite_collision[0x20]{};
-	uint8_t m_background_collision[0x20]{};
-	uint8_t m_joy1_x = 0;
-	uint8_t m_joy1_y = 0;
-	uint8_t m_joy2_x = 0;
-	uint8_t m_joy2_y = 0;
-	uint8_t m_objects[512]{};
-	uint8_t m_irq_pause = 0;
-	std::unique_ptr<bitmap_ind16> m_bitmap;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	void vc4000_palette(palette_device &palette) const;
+
+	void vc4000_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void elektor_mem(address_map &map) ATTR_COLD;
 	void vc4000_mem(address_map &map) ATTR_COLD;
+
+	inline uint8_t vc4000_joystick_return_to_centre(uint8_t joy);
+	void vc4000_draw_digit(bitmap_ind16 &bitmap, int x, int y, int d, int line);
+	inline void vc4000_collision_plot(uint8_t *collision, uint8_t data, uint8_t color, int scale);
+	void vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision, SPRITE *This);
+	inline void vc4000_draw_grid(uint8_t *collision);
 
 	required_device<s2650_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -161,11 +170,17 @@ private:
 	required_ioport m_joys;
 	required_ioport m_config;
 #endif
-	inline uint8_t vc4000_joystick_return_to_centre(uint8_t joy);
-	void vc4000_draw_digit(bitmap_ind16 &bitmap, int x, int y, int d, int line);
-	inline void vc4000_collision_plot(uint8_t *collision, uint8_t data, uint8_t color, int scale);
-	void vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision, SPRITE *This);
-	inline void vc4000_draw_grid(uint8_t *collision);
+
+	bitmap_ind16 m_bitmap;
+	vc4000_video_t m_video;
+	uint8_t m_sprite_collision[0x20]{};
+	uint8_t m_background_collision[0x20]{};
+	uint8_t m_joy1_x = 0;
+	uint8_t m_joy1_y = 0;
+	uint8_t m_joy2_x = 0;
+	uint8_t m_joy2_y = 0;
+	uint8_t m_objects[512]{};
+	uint8_t m_irq_pause = 0;
 };
 
 #endif // MAME_INTERTON_VC4000_H

@@ -106,7 +106,7 @@ void emulator_info::periodic_check() { }
 
 bool emulator_info::frame_hook() { return false; }
 
-void emulator_info::sound_hook() { }
+void emulator_info::sound_hook(const std::map<std::string, std::vector<std::pair<const float *, int>>> &) { }
 
 void emulator_info::layout_script_cb(layout_file &file, const char *script) { }
 

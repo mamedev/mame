@@ -59,6 +59,7 @@ protected:
 		uint32_t adc_freq;
 		uint32_t dma_length, dma_transferred;
 		uint32_t adc_length, adc_transferred;
+		uint32_t play_length;
 		uint8_t dma_autoinit;
 		uint8_t data[128], d_wptr, d_rptr;
 		bool dma_timer_started;

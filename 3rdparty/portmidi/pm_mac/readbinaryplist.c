@@ -3,26 +3,28 @@
 readbinaryplist.c -- Roger B. Dannenberg, Jun 2008
 Based on ReadBinaryPList.m by Jens Ayton, 2007
 
-Note that this code is intended to read preference files and has an upper
-bound on file size (currently 100MB) and assumes in some places that 32 bit
-offsets are sufficient.
+Note that this code is intended to read preference files and has an
+upper bound on file size (currently 100MB) and assumes in some places
+that 32 bit offsets are sufficient.
 
 Here are his comments:
 
 Reader for binary property list files (version 00).
 
-This has been found to work on all 566 binary plists in my ~/Library/Preferences/
-and /Library/Preferences/ directories. This probably does not provide full
-test coverage. It has also been found to provide different data to Apple's
-implementation when presented with a key-value archive. This is because Apple's
-implementation produces undocumented CFKeyArchiverUID objects. My implementation
-produces dictionaries instead, matching the in-file representation used in XML
-and OpenStep plists. See extract_uid().
+This has been found to work on all 566 binary plists in my
+~/Library/Preferences/ and /Library/Preferences/ directories. This
+probably does not provide full test coverage. It has also been found
+to provide different data to Apple's implementation when presented
+with a key-value archive. This is because Apple's implementation
+produces undocumented CFKeyArchiverUID objects. My implementation
+produces dictionaries instead, matching the in-file representation
+used in XML and OpenStep plists. See extract_uid().
 
-Full disclosure: in implementing this software, I read one comment and one
-struct defintion in CFLite, Apple's implementation, which is under the APSL
-license. I also deduced the information about CFKeyArchiverUID from that code.
-However, none of the implementation was copied.
+Full disclosure: in implementing this software, I read one comment and
+one struct defintion in CFLite, Apple's implementation, which is under
+the APSL license. I also deduced the information about
+CFKeyArchiverUID from that code.  However, none of the implementation
+was copied.
 
 Copyright (C) 2007 Jens Ayton
 
@@ -33,16 +35,16 @@ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
@@ -72,21 +74,19 @@ memory requested or calls longjmp, so callers don't have to check.
 */
 
 #include <sys/types.h>
-#include <sys/param.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include "readbinaryplist.h"
-#include "osxsupport.h"
 #include <Carbon/Carbon.h>
 
 #define NO 0
 #define YES 1
 #define BOOL int
 
-//#define MAXPATHLEN 256
+#define MAX_PATH_LEN 256
 
 /* there are 2 levels of error logging/printing:
  *   BPLIST_LOG and BPLIST_LOG_VERBOSE
@@ -99,22 +99,21 @@ memory requested or calls longjmp, so callers don't have to check.
  * parameters like printf but might be a no-op.
  */
  
-#define BPLIST_LOG_VERBOSE 0
-#define BPLIST_LOG 0
+/* #define BPLIST_LOG_VERBOSE 1 */
 
-#if BPLIST_LOG_VERBOSE
+#if defined(BPLIST_LOG_VERBOSE) && (BPLIST_LOG_VERBOSE != 0)
     #ifndef BPLIST_LOG
         #define BPLIST_LOG 1
     #endif
 #endif
 
-#if BPLIST_LOG
+#if defined(BPLIST_LOG) && (BPLIST_LOG != 0)
     #define bplist_log printf
 #else
     #define bplist_log(...)
 #endif
 
-#if BPLIST_LOG_VERBOSE
+#if defined(BPLIST_LOG_VERBOSE) && (BPLIST_LOG_VERBOSE != 0)
     #define bplist_log_verbose bplist_log
 #else
     #define bplist_log_verbose(...)
@@ -207,10 +206,12 @@ typedef struct bplist_info
 
 
 static value_ptr bplist_read_pldata(pldata_ptr data);
-static value_ptr bplist_read_pref(char *filename, OSType folder_type);
-static uint64_t read_sized_int(bplist_info_ptr bplist, uint64_t offset, uint8_t size);
+static value_ptr bplist_read_pref(const char *filename, OSType folder_type);
+static uint64_t read_sized_int(bplist_info_ptr bplist, uint64_t offset,
+                               uint8_t size);
 static uint64_t read_offset(bplist_info_ptr bplist, uint64_t index);
-static BOOL read_self_sized_int(bplist_info_ptr bplist, uint64_t offset, uint64_t *outValue, size_t *outSize);
+static BOOL read_self_sized_int(bplist_info_ptr bplist, uint64_t offset, 
+                                uint64_t *outValue, size_t *outSize);
 
 static value_ptr extract_object(bplist_info_ptr bplist, uint64_t objectRef);
 static value_ptr extract_simple(bplist_info_ptr bplist, uint64_t offset);
@@ -219,7 +220,8 @@ static value_ptr extract_real(bplist_info_ptr bplist, uint64_t offset);
 static value_ptr extract_date(bplist_info_ptr bplist, uint64_t offset);
 static value_ptr extract_data(bplist_info_ptr bplist, uint64_t offset);
 static value_ptr extract_ascii_string(bplist_info_ptr bplist, uint64_t offset);
-static value_ptr extract_unicode_string(bplist_info_ptr bplist, uint64_t offset);
+static value_ptr extract_unicode_string(bplist_info_ptr bplist,
+                                        uint64_t offset);
 static value_ptr extract_uid(bplist_info_ptr bplist, uint64_t offset);
 static value_ptr extract_array(bplist_info_ptr bplist, uint64_t offset);
 static value_ptr extract_dictionary(bplist_info_ptr bplist, uint64_t offset);
@@ -236,14 +238,17 @@ void value_set_integer(value_ptr v, int64_t i) {
     v->tag = kTAG_INT; v->integer = i;
 }
 
+
 void value_set_real(value_ptr v, double d) {
     v->tag = kTAG_REAL; v->real = d;
 }
+
 
 // d is seconds since 1 January 2001
 void value_set_date(value_ptr v, double d) {
     v->tag = kTAG_DATE; v->real = d;
 }
+
 
 void value_set_ascii_string(value_ptr v, const uint8_t *s, size_t len) {
     v->tag = kTAG_ASCIISTRING;
@@ -251,6 +256,7 @@ void value_set_ascii_string(value_ptr v, const uint8_t *s, size_t len) {
     memcpy(v->string, s, len);
     v->string[len] = 0;
 }
+
 
 void value_set_unicode_string(value_ptr v, const uint8_t *s, size_t len) {
     v->tag = kTAG_UNICODESTRING;
@@ -276,8 +282,10 @@ void value_set_data(value_ptr v, const uint8_t *data, size_t len) {
     printf("value at %p gets data at %p\n", v, pldata);
 }
 
+
 // caller releases ownership of array to value_ptr v
-void value_set_array(value_ptr v, value_ptr *array, size_t length) {
+void value_set_array(value_ptr v, value_ptr *array, size_t length)
+{
     array_ptr a = (array_ptr) allocate(sizeof(array_node));
     a->array = array;
     a->length = length;
@@ -285,8 +293,10 @@ void value_set_array(value_ptr v, value_ptr *array, size_t length) {
     v->array = a;
 }
 
+
 // caller releases ownership of dict to value_ptr v
-void value_set_dict(value_ptr v, dict_ptr dict) {
+void value_set_dict(value_ptr v, dict_ptr dict)
+{
     v->tag = kTAG_DICTIONARY;
     v->dict = dict;
 }
@@ -334,7 +344,7 @@ BOOL is_binary_plist(pldata_ptr data)
 }
 
 
-value_ptr bplist_read_file(char *filename)
+value_ptr bplist_read_file(const char *filename)
 {
     struct stat stbuf;
     pldata_node pldata;
@@ -343,7 +353,7 @@ value_ptr bplist_read_file(char *filename)
     value_ptr value;
     int rslt = stat(filename, &stbuf);
     if (rslt) {
-        #if BPLIST_LOG
+        #if defined(BPLIST_LOG) && (BPLIST_LOG != 0)
             perror("in stat");
         #endif
         bplist_log("Could not stat %s, error %d\n", filename, rslt);
@@ -380,12 +390,11 @@ value_ptr bplist_read_file(char *filename)
     return value;
 }
 
-// use old Carbon method on PPC
-#ifdef OSX_PPC
-value_ptr bplist_read_pref(char *filename, OSType folder_type)
+
+value_ptr bplist_read_pref(const char *filename, OSType folder_type)
 {
     FSRef prefdir;
-    char cstr[MAXPATHLEN];
+    char cstr[MAX_PATH_LEN];
 
     OSErr err = FSFindFolder(kOnAppropriateDisk, folder_type,
                              FALSE, &prefdir);
@@ -393,57 +402,23 @@ value_ptr bplist_read_pref(char *filename, OSType folder_type)
         bplist_log("Error finding preferences folder: %d\n", err);
         return NULL;
     }
-    err = FSRefMakePath(&prefdir, (UInt8 *) cstr, (UInt32) (MAXPATHLEN - 1));
+    err = FSRefMakePath(&prefdir, (UInt8 *) cstr, (UInt32) (MAX_PATH_LEN - 1));
     if (err) {
         bplist_log("Error making path name for preferences folder: %d\n", err);
         return NULL;
     }
-    strlcat(cstr, "/", MAXPATHLEN);
-    strlcat(cstr, filename, MAXPATHLEN);
+    strlcat(cstr, "/", MAX_PATH_LEN);
+    strlcat(cstr, filename, MAX_PATH_LEN);
     return bplist_read_file(cstr);
 }
-#else
-value_ptr bplist_read_pref(char *filename, OSType folder_type)
-{
-	char cstr[MAXPATHLEN];
-	char *foundstr;
 
-	memset(cstr, 0, MAXPATHLEN);
 
-	// for later OS X, the user preferences folder (~/Library/Preferences) is not available directly from Cocoa,
-	// Apple documentation suggests just using POSIX APIs like so.
-	if (folder_type == kPreferencesFolderType)
-	{
-		strlcpy(cstr, getenv("HOME"), MAXPATHLEN);
-		strlcat(cstr, "/Library/Preferences", MAXPATHLEN);
-	}
-	else // the system preferences folder (~/Library/PreferencePanes) is accessible from Cocoa however
-	{
-		foundstr = FindPrefsDir();
-
-		if (!foundstr) {
-			bplist_log("Error finding preferences folder\n");
-			return NULL;
-		}
-
-		strlcat(cstr, foundstr, MAXPATHLEN);
-		free(foundstr);
-		foundstr = NULL;
-	}
-
-	strlcat(cstr, "/", MAXPATHLEN);
-	strlcat(cstr, filename, MAXPATHLEN);
-
-	return bplist_read_file(cstr);
-}
-#endif
-
-value_ptr bplist_read_system_pref(char *filename) {
+value_ptr bplist_read_system_pref(const char *filename) {
     return bplist_read_pref(filename, kSystemPreferencesFolderType);
 }
 
 
-value_ptr bplist_read_user_pref(char *filename) {
+value_ptr bplist_read_user_pref(const char *filename) {
     return bplist_read_pref(filename, kPreferencesFolderType);
 }
 
@@ -774,7 +749,7 @@ static value_ptr extract_date(bplist_info_ptr bplist, uint64_t offset)
 
 
 uint64_t bplist_get_a_size(bplist_info_ptr bplist, 
-                           uint64_t *offset_ptr, char *msg)
+                           uint64_t *offset_ptr, const char *msg)
 {
     uint64_t size = bplist->data_bytes[*offset_ptr] & 0x0F;
     (*offset_ptr)++;
@@ -814,7 +789,7 @@ static value_ptr extract_data(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((size = bplist_get_a_size(bplist, &offset, (char *)"data")) == UINT64_MAX) 
+    if ((size = bplist_get_a_size(bplist, &offset, "data")) == UINT64_MAX) 
         return NULL;
         
     value = value_create();
@@ -831,7 +806,7 @@ static value_ptr extract_ascii_string(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((size = bplist_get_a_size(bplist, &offset, (char *)"ascii string")) ==
+    if ((size = bplist_get_a_size(bplist, &offset, "ascii string")) ==
         UINT64_MAX) 
         return NULL;
 
@@ -850,7 +825,7 @@ static value_ptr extract_unicode_string(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((size = bplist_get_a_size(bplist, &offset, (char *)"unicode string")) == 
+    if ((size = bplist_get_a_size(bplist, &offset, "unicode string")) == 
         UINT64_MAX)
         return NULL;
         
@@ -911,7 +886,7 @@ static value_ptr extract_array(bplist_info_ptr bplist, uint64_t offset)
         
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
-    if ((count = bplist_get_a_size(bplist, &offset, (char *)"array")) == UINT64_MAX)
+    if ((count = bplist_get_a_size(bplist, &offset, "array")) == UINT64_MAX)
         return NULL;
         
     if (count > UINT64_MAX / bplist->object_ref_size - offset) {
@@ -973,7 +948,7 @@ static value_ptr extract_dictionary(bplist_info_ptr bplist, uint64_t offset)
     assert(bplist->data_bytes != NULL && offset < bplist->length);
         
         
-    if ((count = bplist_get_a_size(bplist, &offset, (char *)"array")) == UINT64_MAX)
+    if ((count = bplist_get_a_size(bplist, &offset, "array")) == UINT64_MAX)
         return NULL;
 
     if (count > UINT64_MAX / (bplist->object_ref_size * 2) - offset) {
@@ -1037,7 +1012,7 @@ char *value_get_asciistring(value_ptr v)
 }
 
 
-value_ptr value_dict_lookup_using_string(value_ptr v, char *key)
+value_ptr value_dict_lookup_using_string(value_ptr v, const char *key)
 {
     dict_ptr dict;
     if (v->tag != kTAG_DICTIONARY) return NULL; // not a dictionary
@@ -1053,7 +1028,7 @@ value_ptr value_dict_lookup_using_string(value_ptr v, char *key)
     return NULL; /* not found */
 }
 
-value_ptr value_dict_lookup_using_path(value_ptr v, char *path)
+value_ptr value_dict_lookup_using_path(value_ptr v, const char *path)
 {
     char key[MAX_KEY_SIZE];
     while (*path) { /* more to the path */

@@ -543,9 +543,9 @@ void gew_pcm_device::dump_sample(slot_t &slot)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void gew_pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void gew_pcm_device::sound_stream_update(sound_stream &stream)
 {
-	for (int32_t i = 0; i < outputs[0].samples(); ++i)
+	for (int32_t i = 0; i < stream.samples(); ++i)
 	{
 		int32_t smpl = 0;
 		int32_t smpr = 0;
@@ -624,8 +624,8 @@ void gew_pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			}
 		}
 
-		outputs[0].put_int_clamp(i, smpl, 32768);
-		outputs[1].put_int_clamp(i, smpr, 32768);
+		stream.put_int_clamp(0, i, smpl, 32768);
+		stream.put_int_clamp(1, i, smpr, 32768);
 	}
 }
 

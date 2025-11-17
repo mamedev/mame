@@ -129,7 +129,8 @@ enum
 {
 	DRAWMODE_NONE,
 	DRAWMODE_SOURCE,
-	DRAWMODE_SHADOW
+	DRAWMODE_SHADOW,
+	DRAWMODE_SHADOW_PRI
 };
 
 enum
@@ -149,9 +150,6 @@ class gfx_element
 {
 public:
 	// construction/destruction
-#ifdef UNUSED_FUNCTION
-	gfx_element();
-#endif
 	gfx_element(device_palette_interface *palette, const gfx_layout &gl, const u8 *srcdata, u32 xormask, u32 total_colors, u32 color_base);
 	gfx_element(device_palette_interface *palette, u8 *base, u16 width, u16 height, u32 rowbytes, u32 total_colors, u32 color_base, u32 color_granularity);
 
@@ -284,39 +282,39 @@ private:
 	void decode(u32 code);
 
 	// internal state
-	device_palette_interface *m_palette;    // palette used for drawing (optional when used as a pure decoder)
+	device_palette_interface *m_palette;     // palette used for drawing (optional when used as a pure decoder)
 
-	u16             m_width;                // current pixel width of each element (changeable with source clipping)
-	u16             m_height;               // current pixel height of each element (changeable with source clipping)
-	u16             m_startx;               // current source clip X offset
-	u16             m_starty;               // current source clip Y offset
+	u16              m_width;                // current pixel width of each element (changeable with source clipping)
+	u16              m_height;               // current pixel height of each element (changeable with source clipping)
+	u16              m_startx;               // current source clip X offset
+	u16              m_starty;               // current source clip Y offset
 
-	u16             m_origwidth;            // starting pixel width of each element
-	u16             m_origheight;           // staring pixel height of each element
-	u32             m_total_elements;       // total number of decoded elements
+	u16              m_origwidth;            // starting pixel width of each element
+	u16              m_origheight;           // staring pixel height of each element
+	u32              m_total_elements;       // total number of decoded elements
 
-	u32             m_color_base;           // base color for rendering
-	u16             m_color_depth;          // number of colors each pixel can represent
-	u16             m_color_granularity;    // number of colors for each color code
-	u32             m_total_colors;         // number of color codes
+	u32              m_color_base;           // base color for rendering
+	u16              m_color_depth;          // number of colors each pixel can represent
+	u16              m_color_granularity;    // number of colors for each color code
+	u32              m_total_colors;         // number of color codes
 
-	u32             m_line_modulo;          // bytes between each row of data
-	u32             m_char_modulo;          // bytes between each element
-	const u8 *      m_srcdata;              // pointer to the source data for decoding
-	u32             m_dirtyseq;             // sequence number; incremented each time a tile is dirtied
+	u32              m_line_modulo;          // bytes between each row of data
+	u32              m_char_modulo;          // bytes between each element
+	const u8 *       m_srcdata;              // pointer to the source data for decoding
+	u32              m_dirtyseq;             // sequence number; incremented each time a tile is dirtied
 
-	u8 *            m_gfxdata;              // pointer to decoded pixel data, 8bpp
-	std::vector<u8> m_gfxdata_allocated;    // allocated decoded pixel data, 8bpp
-	std::vector<u8> m_dirty;                // dirty array for detecting chars that need decoding
-	std::vector<u32>  m_pen_usage;      // bitmask of pens that are used (pens 0-31 only)
+	u8 *             m_gfxdata;              // pointer to decoded pixel data, 8bpp
+	std::vector<u8>  m_gfxdata_allocated;    // allocated decoded pixel data, 8bpp
+	std::vector<u8>  m_dirty;                // dirty array for detecting chars that need decoding
+	std::vector<u32> m_pen_usage;            // bitmask of pens that are used (pens 0-31 only)
 
-	bool            m_layout_is_raw;        // raw layout?
-	u8              m_layout_planes;        // bit planes in the layout
-	u32             m_layout_xormask;       // xor mask applied to each bit offset
-	u32             m_layout_charincrement; // per-character increment in source data
-	std::vector<u32>  m_layout_planeoffset;// plane offsets
-	std::vector<u32>  m_layout_xoffset; // X offsets
-	std::vector<u32>  m_layout_yoffset; // Y offsets
+	bool             m_layout_is_raw;        // raw layout?
+	u8               m_layout_planes;        // bit planes in the layout
+	u32              m_layout_xormask;       // xor mask applied to each bit offset
+	u32              m_layout_charincrement; // per-character increment in source data
+	std::vector<u32> m_layout_planeoffset;   // plane offsets
+	std::vector<u32> m_layout_xoffset;       // X offsets
+	std::vector<u32> m_layout_yoffset;       // Y offsets
 };
 
 

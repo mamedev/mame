@@ -388,7 +388,7 @@ void demon_state::sound_reset()
 	m_last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
-	m_ay1->set_volume(0, 0);
+	m_ay1->set_output_gain(0, 0.0);
 }
 
 
@@ -478,5 +478,5 @@ void qb3_state::sound_reset()
 void qb3_state::qb3_sound(machine_config &config)
 {
 	demon_sound(config);
-	m_outlatch->q_out_cb<4>().set_nop(); // not mapped through LS259
+	m_outlatch->q_out_cb<4>().remove(); // not mapped through LS259
 }

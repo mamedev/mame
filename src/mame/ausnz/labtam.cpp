@@ -61,7 +61,7 @@ class labtam_state : public driver_device
 public:
 	labtam_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
-		, m_bus(*this, "slot")
+		, m_bus(*this, "bus")
 	{
 	}
 
@@ -98,12 +98,12 @@ void labtam_state::labtam(machine_config &config)
 {
 	MULTIBUS(config, m_bus, 10_MHz_XTAL); // FIXME: clock driven by bus master
 
-	MULTIBUS_SLOT(config, "slot:0", m_bus, labtam_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:1", m_bus, labtam_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:2", m_bus, labtam_cards, nullptr, false);
-	MULTIBUS_SLOT(config, "slot:3", m_bus, labtam_cards, "labtam_8086cpu", false);
-	MULTIBUS_SLOT(config, "slot:4", m_bus, labtam_cards, "labtam_vducom", false);
-	MULTIBUS_SLOT(config, "slot:5", m_bus, labtam_cards, "labtam_z80sbc", false);
+	MULTIBUS_SLOT(config, "slot0", m_bus, labtam_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot1", m_bus, labtam_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot2", m_bus, labtam_cards, nullptr, false);
+	MULTIBUS_SLOT(config, "slot3", m_bus, labtam_cards, "labtam_8086cpu", false);
+	MULTIBUS_SLOT(config, "slot4", m_bus, labtam_cards, "labtam_vducom", false);
+	MULTIBUS_SLOT(config, "slot5", m_bus, labtam_cards, "labtam_z80sbc", false);
 }
 
 ROM_START(labtam)

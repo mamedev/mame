@@ -2605,10 +2605,9 @@ void viper_state::viper(machine_config &config)
 	PALETTE(config, "palette").set_entries(65536);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	SPEAKER(config, "speaker", 2).front();
+	DMADAC(config, "dacl").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DMADAC(config, "dacr").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	M48T58(config, "m48t58", 0);
 
@@ -2629,12 +2628,10 @@ void viper_state::viper_ppp(machine_config &config)
 void viper_state::viper_fullbody(machine_config &config)
 {
 	viper(config);
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
-	SPEAKER(config, "front").front_center();
-	SPEAKER(config, "rear").rear_center();
-	DMADAC(config.replace(), "dacl").add_route(ALL_OUTPUTS, "front", 1.0);
-	DMADAC(config.replace(), "dacr").add_route(ALL_OUTPUTS, "rear", 1.0);
+	config.device_remove("speaker");
+	SPEAKER(config, "speaker", 2).front_center(0).rear_center(1);
+	DMADAC(config.replace(), "dacl").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DMADAC(config.replace(), "dacr").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void viper_state::viper_fbdongle(machine_config &config)

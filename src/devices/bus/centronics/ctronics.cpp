@@ -117,26 +117,35 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 }
 
 
+#include "adaptator.h"
+#include "chessmec.h"
 #include "comxpl80.h"
+#include "covox.h"
+#include "digiblst.h"
 #include "epson_ex800.h"
+#include "epson_fx80.h"
 #include "epson_lx800.h"
 #include "epson_lx810l.h"
+#include "epson_rx80.h"
+#include "hasp_savquest.h"
+#include "mz1p16.h"
 #include "nec_p72.h"
-#include "printer.h"
-#include "digiblst.h"
-#include "covox.h"
-#include "samdac.h"
-#include "chessmec.h"
-#include "smartboard.h"
 #include "nlq401.h"
+#include "printer.h"
+#include "samdac.h"
+#include "smartboard.h"
 
 void centronics_devices(device_slot_interface &device)
 {
+	device.option_add("adaptator", ADAPTATOR_MULTITAP);
 	device.option_add("pl80", COMX_PL80);
 	device.option_add("ex800", EPSON_EX800);
+	device.option_add("fx80", EPSON_FX80);
+	device.option_add("jx80", EPSON_JX80);
 	device.option_add("lx800", EPSON_LX800);
 	device.option_add("lx810l", EPSON_LX810L);
 	device.option_add("ap2000", EPSON_AP2000);
+	device.option_add("rx80", EPSON_RX80);
 	device.option_add("p72", NEC_P72);
 	device.option_add("printer", CENTRONICS_PRINTER);
 	device.option_add("digiblst", CENTRONICS_DIGIBLASTER);
@@ -146,4 +155,7 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("chessmec", CENTRONICS_CHESSMEC);
 	device.option_add("smartboard", CENTRONICS_SMARTBOARD);
 	device.option_add("nlq401", NLQ401);
+	device.option_add("mz1p16", MZ1P16);
+
+	device.option_add_internal("hasp_savquest", HASP_SAVQUEST);
 }

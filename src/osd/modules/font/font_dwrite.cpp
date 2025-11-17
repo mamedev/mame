@@ -111,15 +111,13 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	// Create a DirectWrite factory.
 	HR_RETHR(OSD_DYNAMIC_CALL(DWriteCreateFactory,
 		DWRITE_FACTORY_TYPE_SHARED,
-		__uuidof(IDWriteFactory),
-		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
+		IID_PPV_ARGS(dwriteFactory.GetAddressOf())));
 
 	HR_RETHR(CoCreateInstance(
 		CLSID_WICImagingFactory,
 		nullptr,
 		CLSCTX_INPROC_SERVER,
-		__uuidof(IWICImagingFactory),
-		(void**)&wicFactory));
+		IID_PPV_ARGS(wicFactory.GetAddressOf()));
 
 	HR_RETHR(wicFactory->CreateStream(&stream));
 	HR_RETHR(stream->InitializeFromFilename(filename, GENERIC_WRITE));
@@ -166,8 +164,7 @@ HRESULT SaveBitmap2(bitmap_argb32 &bitmap, const WCHAR *filename)
 		CLSID_WICImagingFactory,
 		nullptr,
 		CLSCTX_INPROC_SERVER,
-		__uuidof(IWICImagingFactory),
-		(void**)&wicFactory));
+		IID_PPV_ARGS(wicFactory.GetAddressOf()));
 
 	// Save bitmap
 	ComPtr<IWICBitmap> bmp2 = nullptr;
@@ -376,7 +373,7 @@ public:
 			bold ? DWRITE_FONT_WEIGHT_BOLD : DWRITE_FONT_WEIGHT_NORMAL,
 			DWRITE_FONT_STRETCH_NORMAL,
 			italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL,
-			m_font.GetAddressOf()));
+			m_font));
 
 		DWRITE_FONT_METRICS metrics;
 		m_font->GetMetrics(&metrics);
@@ -619,14 +616,20 @@ private:
 	//  find_font - finds a font, given attributes
 	//-------------------------------------------------
 
-	HRESULT find_font(std::wstring familyName, DWRITE_FONT_WEIGHT weight, DWRITE_FONT_STRETCH stretch, DWRITE_FONT_STYLE style, IDWriteFont ** ppfont) const
+	HRESULT find_font(
+			std::wstring const &familyName,
+			DWRITE_FONT_WEIGHT weight,
+			DWRITE_FONT_STRETCH stretch,
+			DWRITE_FONT_STYLE style,
+			ComPtr<IDWriteFont> &ppfont) const
 	{
 		HRESULT result;
 
 		ComPtr<IDWriteFontCollection> fonts;
 		HR_RETHR(m_dwriteFactory->GetSystemFontCollection(fonts.GetAddressOf()));
 
-		UINT family_index; BOOL exists;
+		UINT family_index;
+		BOOL exists;
 		HR_RETHR(fonts->FindFamilyName(familyName.c_str(), &family_index, &exists));
 		if (!exists)
 		{
@@ -640,7 +643,7 @@ private:
 		ComPtr<IDWriteFont> font;
 		HR_RETHR(family->GetFirstMatchingFont(weight, stretch, style, font.GetAddressOf()));
 
-		*ppfont = font.Detach();
+		ppfont = std::move(font);
 		return result;
 	}
 };
@@ -701,7 +704,7 @@ public:
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory),
 			nullptr,
-			reinterpret_cast<void**>(this->m_d2dfactory.GetAddressOf())));
+			&m_d2dfactory));
 
 		// Initialize COM
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -710,14 +713,13 @@ public:
 		HR_RET1(OSD_DYNAMIC_CALL(DWriteCreateFactory,
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory),
-			reinterpret_cast<IUnknown **>(m_dwriteFactory.GetAddressOf())));
+			&m_dwriteFactory));
 
 		HR_RET1(CoCreateInstance(
 			CLSID_WICImagingFactory,
 			nullptr,
 			CLSCTX_INPROC_SERVER,
-			__uuidof(IWICImagingFactory),
-			static_cast<void**>(&m_wicFactory)));
+			IID_PPV_ARGS(m_wicFactory.GetAddressOf())));
 
 		osd_printf_verbose("FontProvider: DirectWrite initialized successfully.\n");
 		return 0;

@@ -4946,9 +4946,9 @@ static int decode_cccc_table(dsp56156_core* cpustate, uint16_t cccc)
 		case 0x9: if((N() ^  V()) == 1)                 retVal = 1;  break;  /* lt */
 		case 0xb: if( N() == 1)                         retVal = 1;  break;  /* mi */
 		case 0x2: if( Z() == 0)                         retVal = 1;  break;  /* ne */
-		case 0xc: if((Z() | ((!U()) & (!E()))) == 1)    retVal = 1;  break;  /* nr */
+		case 0xc: if((Z() || ((!U()) && (!E()))))       retVal = 1;  break;  /* nr */
 		case 0x3: if( N() == 0)                         retVal = 1;  break;  /* pl */
-		case 0x4: if((Z() | ((!U()) & (!E()))) == 0)    retVal = 1;  break;  /* nn */
+		case 0x4: if(!(Z() || ((!U()) && (!E()))))      retVal = 1;  break;  /* nn */
 	}
 
 	return retVal;

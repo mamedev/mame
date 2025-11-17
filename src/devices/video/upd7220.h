@@ -69,7 +69,6 @@ public:
 		set_screen(std::forward<T>(screen_tag));
 	}
 
-
 	template <typename... T> void set_display_pixels(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_draw_text(T &&... args) { m_draw_text_cb.set(std::forward<T>(args)...); }
 
@@ -232,6 +231,13 @@ class upd7220a_device : public upd7220_device
 public:
 	// construction/destruction
 	upd7220a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T>
+	upd7220a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&screen_tag)
+		: upd7220a_device(mconfig, tag, owner, clock)
+	{
+		set_screen(std::forward<T>(screen_tag));
+	}
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;

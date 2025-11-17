@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Vas Crabb
+copyright-holders: Roberto Fresca
 
 Cherry Master control panel
 May or may not match arrangement/colour of real control panel
@@ -21,7 +21,7 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="STOP 2">
+		<text string="STOP 3">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -38,7 +38,7 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="STOP 3">
+		<text string="STOP 2">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -231,18 +231,18 @@ May or may not match arrangement/colour of real control panel
 		</element>
 
 
-		<element name="lamp0" ref="stop_b" inputtag="IN0" inputmask="0x04">
+		<element name="lamp4" ref="stop_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp0" ref="big" inputtag="IN0" inputmask="0x04">
+		<element name="lamp4" ref="small" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
 		</element>
 
 
-		<element name="lamp4" ref="stop_b" inputtag="IN0" inputmask="0x40">
+		<element name="lamp0" ref="stop_b" inputtag="IN0" inputmask="0x04">
 			<bounds x="2.7" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp4" ref="small" inputtag="IN0" inputmask="0x40">
+		<element name="lamp0" ref="big" inputtag="IN0" inputmask="0x04">
 			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
 		</element>
 

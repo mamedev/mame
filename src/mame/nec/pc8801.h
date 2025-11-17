@@ -15,6 +15,7 @@
 
 #include "bus/centronics/ctronics.h"
 #include "bus/msx/ctrl/ctrl.h"
+#include "bus/nec_fdd/pc80s31k.h"
 #include "bus/pc8801/pc8801_31.h"
 #include "bus/pc8801/pc8801_exp.h"
 #include "cpu/z80/z80.h"
@@ -25,7 +26,6 @@
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
-#include "pc80s31k.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
 
@@ -49,8 +49,7 @@ public:
 		, m_usart(*this, "usart")
 //      , m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
-		, m_lspeaker(*this, "lspeaker")
-		, m_rspeaker(*this, "rspeaker")
+		, m_speaker(*this, "speaker")
 		, m_palette(*this, "palette")
 		, m_n80rom(*this, "n80rom")
 		, m_n88rom(*this, "n88rom")
@@ -75,6 +74,8 @@ protected:
 	virtual UPD3301_FETCH_ATTRIBUTE( attr_fetch ) override;
 
 	virtual uint8_t dma_mem_r(offs_t offset) override;
+	void dma_mem_w(offs_t offset, u8 data);
+	uint8_t dackv(offs_t offset);
 
 	virtual uint8_t dictionary_rom_r(offs_t offset);
 	virtual bool dictionary_rom_enable();
@@ -91,8 +92,7 @@ protected:
 	required_device<i8251_device> m_usart;
 //  required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
-	required_device<speaker_device> m_lspeaker;
-	required_device<speaker_device> m_rspeaker;
+	required_device<speaker_device> m_speaker;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_n80rom;
 	required_region_ptr<u8> m_n88rom;

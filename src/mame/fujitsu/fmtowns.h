@@ -102,7 +102,7 @@ public:
 		, m_scsi(*this, "fmscsi")
 		, m_flop(*this, "fdc:%u", 0U)
 		, m_pad_ports(*this, "pad%u", 1U)
-		, m_speaker(*this, "speaker")
+		, m_speaker(*this, "speaker_sound")
 		, m_pic_master(*this, "pic8259_master")
 		, m_pic_slave(*this, "pic8259_slave")
 		, m_pit(*this, "pit")

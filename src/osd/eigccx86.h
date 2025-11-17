@@ -394,35 +394,72 @@ _recip_approx(float value)
 
 
 /*-------------------------------------------------
-    mul_64x64 - perform a signed 64 bit x 64 bit
-    multiply and return the full 128 bit result
+    muldivu_64 - perform an unsigned 64 bits a*b/c,
+    rounding toward zero.  Unpredictable (including
+    crashes) when the result does not fit in 64
+    bits.
 -------------------------------------------------*/
 
 #ifdef __x86_64__
-#define mul_64x64 _mul_64x64
-inline int64_t ATTR_FORCE_INLINE
-_mul_64x64(int64_t a, int64_t b, int64_t &hi)
+#define muldivu_64 _muldivu_64
+inline uint64_t ATTR_FORCE_INLINE
+_muldivu_64(uint64_t m1, uint64_t m2, uint64_t d)
 {
-	__int128 const r(__int128(a) * b);
-	hi = int64_t(uint64_t((unsigned __int128)r >> 64));
-	return int64_t(uint64_t((unsigned __int128)r));
+	uint64_t lower, upper;
+	__asm__ (
+		" mulq %[m2]"
+		: [result]    "=a"  (lower)
+		, [upper]     "=d"  (upper)
+		: [m1]        "%0"  (m1)
+		, [m2]        "rm"  (m2)
+		: "cc"
+	);
+	uint64_t quotient, remainder;
+	__asm__ (
+		" divq %[d]"
+		: [result]    "=a"  (quotient)
+		, [remainder] "=d"  (remainder)
+		: [lower]     "0"   (lower)
+		, [upper]     "1"   (upper)
+		, [d]         "rm"  (d)
+		: "cc"
+	);
+	return quotient;
 }
 #endif
 
 
 /*-------------------------------------------------
-    mulu_64x64 - perform an unsigned 64 bit x 64
-    bit multiply and return the full 128 bit result
+    muldivupu_64 - perform an unsigned 64 bits
+    a*b/c, rounding away from zero.  Unpredictable
+    (including crashes) when the result does not
+    fit in 64 bits.
 -------------------------------------------------*/
 
 #ifdef __x86_64__
-#define mulu_64x64 _mulu_64x64
-inline uint64_t ATTR_FORCE_INLINE
-_mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
+#define muldivupu_64 _muldivupu_64
+inline uint64_t _muldivupu_64(uint64_t m1, uint64_t m2, uint64_t d)
 {
-	unsigned __int128 const r((unsigned __int128)a * b);
-	hi = uint64_t(r >> 64);
-	return uint64_t(r);
+	uint64_t lower, upper;
+	__asm__ (
+		" mulq %[m2]"
+		: [result]    "=a"  (lower)
+		, [upper]     "=d"  (upper)
+		: [m1]        "%0"  (m1)
+		, [m2]        "rm"  (m2)
+		: "cc"
+	);
+	uint64_t quotient, remainder;
+	__asm__ (
+		" divq %[d]"
+		: [result]    "=a"  (quotient)
+		, [remainder] "=d"  (remainder)
+		: [lower]     "0"   (lower)
+		, [upper]     "1"   (upper)
+		, [d]         "rm"  (d)
+		: "cc"
+	);
+	return quotient + (remainder ? 1 : 0);
 }
 #endif
 

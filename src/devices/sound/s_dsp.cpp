@@ -30,6 +30,28 @@
 #include "emu.h"
 #include "s_dsp.h"
 
+#include <algorithm>
+
+#define LOG_KEY   (1 << 1)
+#define LOG_ENV   (1 << 2)
+#define LOG_PMOD  (1 << 3)
+#define LOG_BRR   (1 << 4)
+#define LOG_ECHO  (1 << 5)
+#define LOG_INTRP (1 << 6)
+#define LOG_NOISE (1 << 7)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGKEY(...)    LOGMASKED(LOG_KEY, __VA_ARGS__)
+#define LOGENV(...)    LOGMASKED(LOG_ENV, __VA_ARGS__)
+#define LOGPMOD(...)   LOGMASKED(LOG_PMOD, __VA_ARGS__)
+#define LOGBRR(...)    LOGMASKED(LOG_BRR, __VA_ARGS__)
+#define LOGECHO(...)   LOGMASKED(LOG_ECHO, __VA_ARGS__)
+#define LOGINTRP(...)  LOGMASKED(LOG_INTRP, __VA_ARGS__)
+#define LOGNOISE(...)  LOGMASKED(LOG_NOISE, __VA_ARGS__)
+
 /***************************************************************************
  CONSTANTS AND MACROS
 ***************************************************************************/
@@ -103,14 +125,6 @@ static const int gauss[]=
 	0x519, 0x519, 0x519, 0x519, 0x519, 0x519, 0x519, 0x519
 };
 
-#undef DEBUG
-#undef DBG_KEY
-#undef DBG_ENV
-#undef DBG_PMOD
-#undef DBG_BRR
-#undef DBG_ECHO
-#undef DBG_INTRP
-
 #undef NO_PMOD
 #undef NO_ECHO
 
@@ -120,19 +134,19 @@ static const int *const G2 = &gauss[512];
 static const int *const G3 = &gauss[255];
 static const int *const G4 = &gauss[0];
 
-static const int        mask = 0xFF;
+static const u8         mask = 0xff;
 
 /* This table is for envelope timing.  It represents the number of counts
    that should be subtracted from the counter each sample period (32kHz).
    The counter starts at 30720 (0x7800). */
 static const int CNT_INIT = 0x7800;
-static const int ENVCNT[0x20]
-	= {
-	0x0000, 0x000F, 0x0014, 0x0018, 0x001E, 0x0028, 0x0030, 0x003C,
-	0x0050, 0x0060, 0x0078, 0x00A0, 0x00C0, 0x00F0, 0x0140, 0x0180,
-	0x01E0, 0x0280, 0x0300, 0x03C0, 0x0500, 0x0600, 0x0780, 0x0A00,
-	0x0C00, 0x0F00, 0x1400, 0x1800, 0x1E00, 0x2800, 0x3C00, 0x7800
-	};
+static const int ENVCNT[0x20] =
+{
+	0x0000, 0x000f, 0x0014, 0x0018, 0x001e, 0x0028, 0x0030, 0x003c,
+	0x0050, 0x0060, 0x0078, 0x00a0, 0x00c0, 0x00f0, 0x0140, 0x0180,
+	0x01e0, 0x0280, 0x0300, 0x03c0, 0x0500, 0x0600, 0x0780, 0x0a00,
+	0x0c00, 0x0f00, 0x1400, 0x1800, 0x1e00, 0x2800, 0x3c00, 0x7800
+};
 
 
 ALLOW_SAVE_TYPE(s_dsp_device::env_state_t32);
@@ -160,7 +174,7 @@ void s_dsp_device::device_start()
 	space().cache(m_cache);
 	space().specific(m_data);
 
-	m_channel = stream_alloc(0, 2, clock() / 64);
+	m_channel = stream_alloc(0, 2, clock() / 768);
 
 	state_register();
 }
@@ -181,7 +195,7 @@ void s_dsp_device::device_reset()
 
 void s_dsp_device::device_clock_changed()
 {
-	m_channel->set_sample_rate(clock() / 64);
+	m_channel->set_sample_rate(clock() / 768);
 }
 
 //-------------------------------------------------
@@ -243,16 +257,11 @@ void s_dsp_device::dsp_reset()
  to mix audio into
 -------------------------------------------------*/
 
-void s_dsp_device::dsp_update( s16 *sound_ptr )
+void s_dsp_device::dsp_update(s16 *sound_ptr)
 {
-	int V;
-
 	int envx;
-	int m;
-	int v;
-	int vl;
-	voice_state_type * vp;
-	int vr;
+	s32 vl;
+	s32 vr;
 
 	const u16 sd = m_dsp_regs[0x5d];
 
@@ -265,9 +274,6 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 	Therefore DSP only looks at these during an update, and not at the time of
 	the write.  Only need to do this once however, since the regs haven't
 	changed over the whole period we need to catch up with. */
-#ifdef DBG_KEY
-	m_dsp_regs[0x4c] &= mask;
-#endif
 
 	/* Keying on a voice resets that bit in ENDX */
 	m_dsp_regs[0x7c] &= ~m_dsp_regs[0x4c];
@@ -285,69 +291,63 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		m_noise_lev = (((m_noise_lev << 13) ^ (m_noise_lev << 14)) & 0x4000) | (m_noise_lev >> 1);
 	}
 
-	int outl  = 0;
-	int outr  = 0;
+	s32 outl  = 0;
+	s32 outr  = 0;
 
 #ifndef NO_ECHO
-	int echol = 0;
-	int echor = 0;
+	s32 echol = 0;
+	s32 echor = 0;
 #endif
 
-	for (v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
+	for (int v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1)
 	{
-		vp = &m_voice_state[v];
+		voice_state_type &vp = m_voice_state[v];
 
-		if (vp->on_cnt && (--vp->on_cnt == 0))
+		if (vp.on_cnt && (--vp.on_cnt == 0))
 		{
 			/* Voice was keyed on */
 			m_keys       |= m;
 			m_keyed_on   |= m;
-#ifdef DBG_KEY
+#if (VERBOSE & LOG_KEY)
 			vl          = m_dsp_regs[(v << 4) + 4];
 #endif
-			vp->samp_id = (vptr(sd, V) << 16) | lptr(sd, V);
-			vp->mem_ptr = vptr(sd, V);
+			vp.samp_id = (vptr(sd, V) << 16) | lptr(sd, V);
+			vp.mem_ptr = vptr(sd, V);
 
-#ifdef DBG_KEY
-			logerror("Keying on voice %d, samp=0x%04X (0x%02X)\n", v, vp->mem_ptr, vl);
-#endif
+			LOGKEY("Keying on voice %d, samp=0x%04X (0x%02X)\n", v, vp.mem_ptr, vl);
 
-			vp->header_cnt = 0;
-			vp->half       = 0;
-			vp->envx       = 0;
-			vp->end        = 0;
-			vp->sampptr    = 0;
-			vp->mixfrac    = 3 * 4096;
+			vp.header_cnt = 0;
+			vp.half       = false;
+			vp.envx       = 0;
+			vp.end        = 0;
+			vp.sampptr    = 0;
+			vp.mixfrac    = 3 * 4096;
 
 			/* NOTE: Real SNES does *not* appear to initialize the envelope
 			counter to anything in particular.  The first cycle always seems to
 			come at a random time sooner than expected; as yet, I have been
 			unable to find any pattern.  I doubt it will matter though, so
 			we'll go ahead and do the full time for now. */
-			vp->envcnt   = CNT_INIT;
-			vp->envstate = env_state_t32::ATTACK;
+			vp.envcnt   = CNT_INIT;
+			vp.envstate = env_state_t32::ATTACK;
 		}
 
 		if (m_dsp_regs[0x4c] & m & ~m_dsp_regs[0x5c])
 		{
 			/* Voice doesn't come on if key off is set */
 			m_dsp_regs[0x4c] &= ~m;
-			vp->on_cnt       = 8;
+			vp.on_cnt       = 8;
 
-#ifdef DBG_KEY
-			logerror("Key on set for voice %d\n", v);
-#endif
+			LOGKEY("Key on set for voice %d\n", v);
 		}
 
 		if (m_keys & m_dsp_regs[0x5c] & m)
 		{
 			/* Voice was keyed off */
-			vp->envstate = env_state_t32::RELEASE;
-			vp->on_cnt   = 0;
+			vp.envstate = env_state_t32::RELEASE;
+			vp.on_cnt   = 0;
 
-#ifdef DBG_KEY
-			logerror("Keying off voice %d\n", v);
-#endif
+			LOGKEY("Keying off voice %d\n", v);
 		}
 
 		if (!(m_keys & m & mask) || ((envx = advance_envelope(v)) < 0))
@@ -358,217 +358,183 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 			continue;
 		}
 
-		vp->pitch = pitch(V);
+		vp.pitch = pitch(V);
 
 #ifndef NO_PMOD
 		/* Pitch mod uses OUTX from last voice for this one.  Luckily we haven't
 		modified OUTX since it was used for last voice. */
 		if (m_dsp_regs[0x2d] & m)
 		{
-#ifdef DBG_PMOD
-			logerror("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp->pitch);
-#endif
-			vp->pitch = (vp->pitch * (outx + 32768)) >> 15;
-			}
+			LOGPMOD("Pitch Modulating voice %d, outx=%ld, old pitch=%d, ", v, outx, vp.pitch);
+			vp.pitch += (outx >> 5) * vp.pitch >> 10;
+		}
 #endif
 
-#ifdef DBG_PMOD
-			logerror("pitch=%d\n", vp->pitch);
-#endif
+		LOGPMOD("pitch=%d\n", vp.pitch);
 
-			for ( ; vp->mixfrac >= 0; vp->mixfrac -= 4096)
+		for (; vp.mixfrac >= 0; vp.mixfrac -= 4096)
+		{
+			/* This part performs the BRR decode 'on-the-fly'.  This is more
+			correct than the old way, which could be fooled if the data and/or
+			the loop point changed while the sample was playing, or if the BRR
+			decode didn't produce the same result every loop because of the
+			filters.  The event interface still has no chance of keeping up
+			with those kinds of tricks, though. */
+			if (!vp.header_cnt)
 			{
-				/* This part performs the BRR decode 'on-the-fly'.  This is more
-				correct than the old way, which could be fooled if the data and/or
-				the loop point changed while the sample was playing, or if the BRR
-				decode didn't produce the same result every loop because of the
-				filters.  The event interface still has no chance of keeping up
-				with those kinds of tricks, though. */
-				if (!vp->header_cnt)
+				if (BIT(vp.end, 0))
 				{
-					if (vp->end & 1)
+					/* Docs say ENDX bit is set when decode of block with source
+					end flag set is done.  Does this apply to looping samples?
+					Some info I've seen suggests yes. */
+					m_dsp_regs[0x7c] |= m;
+					if (BIT(vp.end, 1))
 					{
-						/* Docs say ENDX bit is set when decode of block with source
-						end flag set is done.  Does this apply to looping samples?
-						Some info I've seen suggests yes. */
-						m_dsp_regs[0x7c] |= m;
-						if (vp->end & 2)
-						{
-							vp->mem_ptr = lptr(sd, V);
+						vp.mem_ptr = lptr(sd, V);
 
-#ifdef DBG_BRR
-							logerror("BRR looping to 0x%04X\n", vp->mem_ptr);
-#endif
-						}
-						else
-						{
-#ifdef DBG_KEY
-							logerror("BRR decode end, voice %d\n", v);
-#endif
-
-							m_keys &= ~m;
-							m_dsp_regs[V + 8] = 0;
-							vp->envx         = 0;
-							while (vp->mixfrac >= 0)
-							{
-								vp->sampbuf[vp->sampptr] = 0;
-								outx         = 0;
-								vp->sampptr  = (vp->sampptr + 1) & 3;
-								vp->mixfrac -= 4096;
-							}
-							break;
-						}
+						LOGBRR("BRR looping to 0x%04X\n", vp.mem_ptr);
 					}
+					else
+					{
+						LOGBRR("BRR decode end, voice %d\n", v);
 
-					vp->header_cnt = 8;
-					vl = (u8)read_byte(vp->mem_ptr++);
-					vp->range  = vl >> 4;
-					vp->end    = vl & 3;
-					vp->filter = (vl & 12) >> 2;
-
-#ifdef DBG_BRR
-					logerror("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp->range, vp->end, vp->filter);
-#endif
+						m_keys &= ~m;
+						m_dsp_regs[V + 8] = 0;
+						vp.envx         = 0;
+						while (vp.mixfrac >= 0)
+						{
+							vp.sampbuf[vp.sampptr] = 0;
+							outx         = 0;
+							vp.sampptr  = (vp.sampptr + 1) & 3;
+							vp.mixfrac -= 4096;
+						}
+						break;
+					}
 				}
 
-				if (vp->half == 0)
-				{
-					vp->half = 1;
-					outx     = ((s8)read_byte(vp->mem_ptr)) >> 4;
-				}
-				else
-				{
-					vp->half = 0;
-					/* Funkiness to get 4-bit signed to carry through */
-					outx   = (s8)(read_byte(vp->mem_ptr++) << 4);
-					outx >>= 4;
-					vp->header_cnt--;
-				}
+				vp.header_cnt = 8;
+				vl = (u8)read_byte(vp.mem_ptr++);
+				vp.range  = vl >> 4;
+				vp.end    = vl & 3;
+				vp.filter = (vl & 12) >> 2;
 
-#ifdef DBG_BRR
-				logerror("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp->mem_ptr, vp->smp1, vp->smp2);
-#endif
-
-				/* For invalid ranges (D,E,F): if the nybble is negative, the result
-				is F000.  If positive, 0000.  Nothing else like previous range,
-				etc. seems to have any effect.  If range is valid, do the shift
-				normally.  Note these are both shifted right once to do the filters
-				properly, but the output will be shifted back again at the end. */
-				if (vp->range <= 0xc)
-				{
-					outx = (outx << vp->range) >> 1;
-				}
-				else
-				{
-					outx &= ~0x7ff;
-
-#ifdef DBG_BRR
-					logerror("V%d: invalid range! (%X)\n", v, vp->range);
-#endif
-				}
-
-#ifdef DBG_BRR
-				logerror("V%d: shifted delta=%04X\n", v, (u16)outx);
-#endif
-
-				switch (vp->filter)
-				{
-				case 0:
-					break;
-
-				case 1:
-					outx += (vp->smp1 >> 1) + ((-vp->smp1) >> 5);
-					break;
-
-				case 2:
-					outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 >> 1))) >> 5) - (vp->smp2 >> 1) + (vp->smp2 >> 5);
-					break;
-
-				case 3:
-					outx += vp->smp1 + ((-(vp->smp1 + (vp->smp1 << 2) + (vp->smp1 << 3))) >> 7)
-							- (vp->smp2 >> 1) + ((vp->smp2 + (vp->smp2 >> 1)) >> 4);
-					break;
-				}
-
-				if (outx < (s16)0x8000)
-				{
-					outx = (s16)0x8000;
-				}
-				else if (outx > (s16)0x7fff)
-				{
-					outx = (s16)0x7fff;
-				}
-
-#ifdef DBG_BRR
-				logerror("V%d: filter + delta=%04X\n", v, (u16)outx);
-#endif
-
-				vp->smp2 = (s16)vp->smp1;
-				vp->smp1 = (s16)(outx << 1);
-				vp->sampbuf[vp->sampptr] = vp->smp1;
-
-#ifdef DBG_BRR
-				logerror("V%d: final output: %04X\n", v, vp->sampbuf[vp->sampptr]);
-#endif
-
-				vp->sampptr = (vp->sampptr + 1) & 3;
+				LOGBRR("V%d: header read, range=%d, end=%d, filter=%d\n", v, vp.range, vp.end, vp.filter);
 			}
 
-			if (m_dsp_regs[0x3d] & m)
+			if (!vp.half)
 			{
-#ifdef DBG_PMOD
-				logerror("Noise enabled, voice %d\n", v);
-#endif
-				outx = (s16)(m_noise_lev << 1);
+				vp.half = true;
+				outx     = ((s8)read_byte(vp.mem_ptr)) >> 4;
 			}
 			else
 			{
+				vp.half = false;
+				/* Funkiness to get 4-bit signed to carry through */
+				outx   = (s8)(read_byte(vp.mem_ptr++) << 4);
+				outx >>= 4;
+				vp.header_cnt--;
+			}
+
+			LOGBRR("V%d: nybble=%X, ptr=%04X, smp1=%d, smp2=%d\n", v, outx & 0x0f, vp.mem_ptr, vp.smp1, vp.smp2);
+
+			/* For invalid ranges (D,E,F): if the nybble is negative, the result
+			is F000.  If positive, 0000.  Nothing else like previous range,
+			etc. seems to have any effect.  If range is valid, do the shift
+			normally.  Note these are both shifted right once to do the filters
+			properly, but the output will be shifted back again at the end. */
+			if (vp.range <= 0xc)
+			{
+				outx = (outx << vp.range) >> 1;
+			}
+			else
+			{
+				outx &= ~0x7ff;
+
+				LOGBRR("V%d: invalid range! (%X)\n", v, vp.range);
+			}
+
+			LOGBRR("V%d: shifted delta=%04X\n", v, (u16)outx);
+
+			switch (vp.filter)
+			{
+			case 0:
+				break;
+
+			case 1:
+				outx += (vp.smp1 >> 1) + ((-vp.smp1) >> 5);
+				break;
+
+			case 2:
+				outx += vp.smp1 + ((-(vp.smp1 + (vp.smp1 >> 1))) >> 5) - (vp.smp2 >> 1) + (vp.smp2 >> 5);
+				break;
+
+			case 3:
+				outx += vp.smp1 + ((-(vp.smp1 + (vp.smp1 << 2) + (vp.smp1 << 3))) >> 7)
+						- (vp.smp2 >> 1) + ((vp.smp2 + (vp.smp2 >> 1)) >> 4);
+				break;
+			}
+
+			outx = std::clamp(outx, -0x8000, 0x7fff);
+
+			LOGBRR("V%d: filter + delta=%04X\n", v, (u16)outx);
+
+			vp.smp2 = (s16)vp.smp1;
+			vp.smp1 = (s16)(outx << 1);
+			vp.sampbuf[vp.sampptr] = vp.smp1;
+
+			LOGBRR("V%d: final output: %04X\n", v, vp.sampbuf[vp.sampptr]);
+
+			vp.sampptr = (vp.sampptr + 1) & 3;
+		}
+
+		if (m_dsp_regs[0x3d] & m)
+		{
+			LOGNOISE("Noise enabled, voice %d\n", v);
+			outx = (s16)(m_noise_lev << 1);
+		}
+		else
+		{
 			/* Perform 4-Point Gaussian interpolation.  Take an approximation of a
 			Gaussian bell-curve, and move it through the sample data at a rate
 			determined by the pitch.  The sample output at any given time is
 			the sum of the products of each input sample point with the value
 			of the bell-curve corresponding to that point. */
-			vl  = vp->mixfrac >> 4;
-			vr  = ((G4[-vl-1] * vp->sampbuf[vp->sampptr]) >> 11 ) & ~1;
-			vr += ((G3[-vl] * vp->sampbuf[(vp->sampptr + 1) & 3]) >> 11) & ~1;
-			vr += ((G2[vl] * vp->sampbuf[(vp->sampptr + 2) & 3]) >> 11 ) & ~1;
+			vl  = vp.mixfrac >> 4;
+			vr  = ((G4[-vl-1] * vp.sampbuf[vp.sampptr]) >> 11) & ~1;
+			vr += ((G3[-vl] * vp.sampbuf[(vp.sampptr + 1) & 3]) >> 11) & ~1;
+			vr += ((G2[vl] * vp.sampbuf[(vp.sampptr + 2) & 3]) >> 11) & ~1;
 
 			/* This is to do the wrapping properly.  Based on my tests with the
 			SNES, it appears clipping is done only if it is the fourth addition
 			that would cause a wrap.  If it has already wrapped before the
 			fourth addition, it is not clipped. */
 			vr  = (s16)vr;
-			vr += ((G1[vl] * vp->sampbuf[(vp->sampptr + 3) & 3]) >> 11) & ~1;
+			vr += ((G1[vl] * vp.sampbuf[(vp.sampptr + 3) & 3]) >> 11) & ~1;
 
-			if (vr > 32767)
-				vr = 32767;
-			else if (vr < -32768)
-				vr = -32768;
+			vr = std::clamp(vr, -0x8000, 0x7fff);
 
 			outx = (s16)vr;
 
-#ifdef DBG_INTRP
-			logerror("V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d = %d\n", v, vl,
+			LOGINTRP("V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d = %d\n", v, vl,
 				G1[vl],
-				vp->sampbuf[(vp->sampptr + 3) & 3],
+				vp.sampbuf[(vp.sampptr + 3) & 3],
 				G2[vl],
-				vp->sampbuf[(vp->sampptr + 2) & 3],
+				vp.sampbuf[(vp.sampptr + 2) & 3],
 				G3[-vl],
-				vp->sampbuf[(vp->sampptr + 1) & 3],
+				vp.sampbuf[(vp.sampptr + 1) & 3],
 				G4[-vl-1],
-				vp->sampbuf[vp->sampptr],
+				vp.sampbuf[vp.sampptr],
 				outx);
-#endif
 		}
 
 		/* Advance the sample position for next update. */
-		vp->mixfrac += vp->pitch;
+		vp.mixfrac += vp.pitch;
 
 		outx = ((outx * envx) >> 11) & ~1;
 		m_dsp_regs[V + 9] = outx >> 8;
 
-		vl = (((int)(s8)m_dsp_regs[V    ]) * outx) >> 7;
-		vr = (((int)(s8)m_dsp_regs[V + 1]) * outx) >> 7;
+		vl = (((s32)(s8)m_dsp_regs[V    ]) * outx) >> 7;
+		vr = (((s32)(s8)m_dsp_regs[V + 1]) * outx) >> 7;
 		outl += vl;
 		outr += vr;
 
@@ -587,12 +553,10 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 #ifndef NO_ECHO
 	/* Perform echo.  First, read mem at current location, and put those samples
 	into the FIR filter queue. */
-#ifdef DBG_ECHO
-	logerror("Echo delay=%dms, feedback=%d%%\n", m_dsp_regs[0x7d] * 16,
+	LOGECHO("Echo delay=%dms, feedback=%d%%\n", m_dsp_regs[0x7d] * 16,
 		((s8)m_dsp_regs[0x0d] * 100) / 0x7f);
-#endif
 
-	int echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
+	const u16 echo_base = ((m_dsp_regs[0x6d] << 8) + m_echo_ptr) & 0xffff;
 	m_fir_lbuf[m_fir_ptr] = (s16)read_word(echo_base);
 	m_fir_rbuf[m_fir_ptr] = (s16)read_word(echo_base + sizeof(s16));
 
@@ -621,8 +585,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 	vl += m_fir_lbuf[m_fir_ptr] * (s8)m_dsp_regs[0x0f];
 	vr += m_fir_rbuf[m_fir_ptr] * (s8)m_dsp_regs[0x0f];
 
-#ifdef DBG_ECHO
-	logerror("FIR Coefficients: %02X %02X %02X %02X %02X %02X %02X %02X\n",
+	LOGECHO("FIR Coefficients: %02X %02X %02X %02X %02X %02X %02X %02X\n",
 		m_dsp_regs[0x0f],
 		m_dsp_regs[0x1f],
 		m_dsp_regs[0x2f],
@@ -631,32 +594,21 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		m_dsp_regs[0x5f],
 		m_dsp_regs[0x6f],
 		m_dsp_regs[0x7f]);
-#endif
 
 	/* FIR_ptr is left in the position of the oldest sample, the one that will be replaced next update. */
 	outl += vl * (s8)m_dsp_regs[0x2c] >> 14;
 	outr += vr * (s8)m_dsp_regs[0x3c] >> 14;
 
-	if (!(m_dsp_regs[0x6c] & 0x20))
+	if (BIT(~m_dsp_regs[0x6c], 5))
 	{
 		/* Add the echo feedback back into the original result, and save that into memory for use later. */
 		echol += vl * (s8)m_dsp_regs[0x0d] >> 14;
+		echor += vr * (s8)m_dsp_regs[0x0d] >> 14;
 
-		if (echol > 32767)
-			echol = 32767;
-		else if (echol < -32768)
-			echol = -32768;
+		echol = std::clamp(echol, -0x8000, 0x7fff);
+		echor = std::clamp(echol, -0x8000, 0x7fff);
 
-		echor += vr * (s8)m_dsp_regs[0x0D ] >> 14;
-
-		if (echor > 32767)
-			echor = 32767;
-		else if (echor < -32768)
-			echor = -32768;
-
-#ifdef DBG_ECHO
-		logerror("Echo: Writing %04X,%04X at location %04X\n", (u16)echol, (u16)echor, echo_base);
-#endif
+		LOGECHO("Echo: Writing %04X,%04X at location %04X\n", (u16)echol, (u16)echor, echo_base);
 
 		write_word(echo_base, (u16)echol);
 		write_word(echo_base + sizeof(s16), (u16)echor);
@@ -668,11 +620,11 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 	{
 		m_echo_ptr = 0;
 	}
-#endif                              /* !defined( NO_ECHO ) */
+#endif                              /* !defined(NO_ECHO) */
 
 	if (sound_ptr != nullptr)
 	{
-		if (m_dsp_regs[0x6c] & 0x40)
+		if (BIT(m_dsp_regs[0x6c], 6))
 		{
 			/* MUTE */
 #ifdef MAME_DEBUG
@@ -686,22 +638,9 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
 		}
 		else
 		{
-			if (outl > 32767)
-					*sound_ptr = 32767;
-			else if (outl < -32768)
-				*sound_ptr = -32768;
-			else
-				*sound_ptr = outl;
-
+			*sound_ptr = std::clamp(outl, -0x8000, 0x7fff);
 			sound_ptr++;
-
-			if (outr > 32767)
-					*sound_ptr = 32767;
-			else if (outr < -32768)
-				*sound_ptr = -32768;
-			else
-				*sound_ptr = outr;
-
+			*sound_ptr = std::clamp(outr, -0x8000, 0x7fff);
 			sound_ptr++;
 		}
 	}
@@ -715,7 +654,7 @@ void s_dsp_device::dsp_update( s16 *sound_ptr )
  to process envelope for.
 -------------------------------------------------*/
 
-int s_dsp_device::advance_envelope( int v )
+int s_dsp_device::advance_envelope(int v)
 {
 	int t;
 
@@ -740,17 +679,15 @@ int s_dsp_device::advance_envelope( int v )
 		m_voice_state[v].envx = envx;
 		m_dsp_regs[(v << 4) + 8] = envx >> 8;
 
-#ifdef DBG_ENV
-		logerror("ENV voice %d: envx=%03X, state=RELEASE\n", v, envx);
-#endif
+		LOGENV("ENV voice %d: envx=%03X, state=RELEASE\n", v, envx);
 
 		return envx;
 	}
 
 	int cnt = m_voice_state[v].envcnt;
-	int adsr1 = m_dsp_regs[(v << 4) + 5];
+	const int adsr1 = m_dsp_regs[(v << 4) + 5];
 
-	if (adsr1 & 0x80)
+	if (BIT(adsr1, 7))
 	{
 		switch (m_voice_state[v].envstate)
 		{
@@ -760,11 +697,9 @@ int s_dsp_device::advance_envelope( int v )
 			time ATTACK is updated, and that's what I'm going to implement. */
 			t = adsr1 & 0x0f;
 
-				if (t == 0x0f)
+			if (t == 0x0f)
 			{
-#ifdef DBG_ENV
-				logerror("ENV voice %d: instant attack\n", v);
-#endif
+				LOGENV("ENV voice %d: instant attack\n", v);
 
 				envx += 0x400;
 			}
@@ -785,9 +720,7 @@ int s_dsp_device::advance_envelope( int v )
 				m_voice_state[v].envstate = env_state_t32::DECAY;
 			}
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=ATTACK\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=ATTACK\n", v, envx);
 
 			m_voice_state[v].envx = envx;
 			break;
@@ -808,19 +741,15 @@ int s_dsp_device::advance_envelope( int v )
 			if (envx <= 0x100 * (SL(v) + 1))
 				m_voice_state[v].envstate = env_state_t32::SUSTAIN;
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
 
 			break;
 
 		case env_state_t32::SUSTAIN:
 			/* Docs: "SR [is multiplied] by the fixed value 1-1/256."
 			Multiplying ENVX by 255/256 every time SUSTAIN is updated. */
-#ifdef DBG_ENV
 			if (ENVCNT[SR(v)] == 0)
-				logerror("ENV voice %d: envx=%03X, state=SUSTAIN, zero rate\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=SUSTAIN, zero rate\n", v, envx);
 
 			cnt -= ENVCNT[SR(v)];
 			if (cnt > 0)
@@ -829,9 +758,7 @@ int s_dsp_device::advance_envelope( int v )
 			cnt   = CNT_INIT;
 			envx -= ((envx - 1) >> 8) + 1;
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=SUSTAIN\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=SUSTAIN\n", v, envx);
 
 			m_voice_state[v].envx = envx;
 
@@ -860,9 +787,7 @@ int s_dsp_device::advance_envelope( int v )
 			envx = t << 4;
 			m_voice_state[v].envx = envx;
 
-#ifdef DBG_ENV
-			logerror("ENV voice %d: envx=%03X, state=DIRECT\n", v, envx);
-#endif
+			LOGENV("ENV voice %d: envx=%03X, state=DIRECT\n", v, envx);
 		}
 		else
 		{
@@ -881,9 +806,7 @@ int s_dsp_device::advance_envelope( int v )
 				if (envx < 0)
 					envx = 0;
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=DECREASE\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=DECREASE\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -898,9 +821,7 @@ int s_dsp_device::advance_envelope( int v )
 				cnt = CNT_INIT;
 				envx -= ((envx - 1) >> 8) + 1;
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=EXP\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=EXP\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -914,12 +835,9 @@ int s_dsp_device::advance_envelope( int v )
 
 				cnt = CNT_INIT;
 				envx += 0x020;      /* 0x020 / 0x800 = 1/64th   */
-				if (envx > 0x7ff)
-					envx = 0x7ff;
+				envx = std::min(envx, 0x7ff);
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -939,12 +857,9 @@ int s_dsp_device::advance_envelope( int v )
 				else
 					envx += 0x008;  /* 0x008 / 0x800 = 1/256        */
 
-				if (envx > 0x7ff)
-					envx=0x7ff;
+				envx = std::min(envx, 0x7ff);
 
-#ifdef DBG_ENV
-				logerror("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
-#endif
+				LOGENV("ENV voice %d: envx=%03X, state=INCREASE\n", v, envx);
 
 				m_voice_state[v].envx = envx;
 				break;
@@ -985,7 +900,7 @@ u8 s_dsp_device::dsp_io_r(offs_t offset)
 #endif
 
 	/* All reads simply return the contents of the addressed register. */
-	if (offset & 1)
+	if (BIT(offset, 0))
 		return m_dsp_regs[m_dsp_addr & 0x7f];
 
 	return m_dsp_addr;
@@ -995,9 +910,9 @@ void s_dsp_device::dsp_io_w(offs_t offset, u8 data)
 {
 	m_channel->update();
 
-	if (offset & 1)
+	if (BIT(offset, 0))
 	{
-		if (!(m_dsp_addr & 0x80))
+		if (BIT(~m_dsp_addr, 7))
 		{
 			offset = m_dsp_addr & 0x7f;
 			if (offset == 0x7c)
@@ -1064,17 +979,17 @@ void s_dsp_device::state_register()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void s_dsp_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void s_dsp_device::sound_stream_update(sound_stream &stream)
 {
 	s16 mix[2];
 
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		mix[0] = mix[1] = 0;
 		dsp_update(mix);
 
 		/* Update the buffers */
-		outputs[0].put_int(i, (s32)mix[0], 32768);
-		outputs[1].put_int(i, (s32)mix[1], 32768);
+		stream.put_int(0, i, (s32)mix[0], 32768);
+		stream.put_int(1, i, (s32)mix[1], 32768);
 	}
 }

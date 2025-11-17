@@ -46,6 +46,7 @@ public:
 	void write_syn(int state);
 
 	int txrdy_r();
+	int rxrdy_r();
 
 protected:
 	enum
@@ -74,15 +75,14 @@ protected:
 
 	void receive_character(uint8_t ch);
 
-	void update_rx_ready();
-	void update_tx_ready();
+	virtual void update_rx_ready();
+	virtual void update_tx_ready();
 	void update_tx_empty();
 	void transmit_clock();
 	void receive_clock();
 	bool is_tx_enabled() const;
 	void check_for_tx_start();
 	void start_tx();
-
 
 	enum
 	{
@@ -104,7 +104,6 @@ private:
 	void sync1_rxc();
 	void sync2_rxc();
 	void update_syndet(bool voltage);
-	bool calc_parity(u8 ch);
 
 	/* flags controlling how i8251_control_w operates */
 	uint8_t m_flags;
@@ -120,11 +119,11 @@ private:
 	uint8_t m_mode_byte;
 	bool m_delayed_tx_en;
 
-	bool m_cts;
-	bool m_dsr;
-	bool m_rxd;
-	bool m_rxc;
-	bool m_txc;
+	int32_t m_cts;
+	int32_t m_dsr;
+	int32_t m_rxd;
+	int32_t m_rxc;
+	int32_t m_txc;
 	int m_rxc_count;
 	int m_txc_count;
 	int m_br_factor;
@@ -153,6 +152,8 @@ public:
 	// construction/destruction
 	v5x_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 
+	auto sint_handler() { return m_sint_handler.bind(); }
+
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
@@ -161,11 +162,29 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// TODO: currently unimplemented interrupt masking
+	virtual void update_rx_ready() override;
+	virtual void update_tx_ready() override;
+
+	template<int Bit>
+	void sint_bit_w(int state)
+	{
+		if (state)
+			m_sint |= (1 << Bit);
+		else
+			m_sint &= ~(1 << Bit);
+
+		update_sint();
+	}
+
 	u8 simk_r() { return m_simk; }
-	void simk_w(u8 data) { m_simk = data; }
+	void simk_w(u8 data) { m_simk = data; update_sint(); }
 
 private:
+	void update_sint();
+
+	devcb_write_line m_sint_handler;
+
+	u8 m_sint;
 	u8 m_simk;
 };
 

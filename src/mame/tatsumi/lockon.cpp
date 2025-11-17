@@ -489,22 +489,21 @@ void lockon_state::lockon(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	m_screen->set_screen_update(FUNC(lockon_state::screen_update_lockon));
-	m_screen->screen_vblank().set(FUNC(lockon_state::screen_vblank_lockon));
+	m_screen->set_screen_update(FUNC(lockon_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(lockon_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockon);
 	PALETTE(config, m_palette, FUNC(lockon_state::lockon_palette), 1024 + 2048);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.irq_handler().set(FUNC(lockon_state::ym2203_irq));
 	ymsnd.port_a_read_callback().set_ioport("YM2203");
 	ymsnd.port_b_write_callback().set(FUNC(lockon_state::ym2203_out_b));
-	ymsnd.add_route(0, "lspeaker", 0.40);
-	ymsnd.add_route(0, "rspeaker", 0.40);
+	ymsnd.add_route(0, "speaker", 0.40, 0);
+	ymsnd.add_route(0, "speaker", 0.40, 1);
 	ymsnd.add_route(1, "f2203.1l", 1.0);
 	ymsnd.add_route(1, "f2203.1r", 1.0);
 	ymsnd.add_route(2, "f2203.2l", 1.0);
@@ -512,12 +511,12 @@ void lockon_state::lockon(machine_config &config)
 	ymsnd.add_route(3, "f2203.3l", 1.0);
 	ymsnd.add_route(3, "f2203.3r", 1.0);
 
-	FILTER_VOLUME(config, "f2203.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "f2203.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "f2203.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "f2203.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "f2203.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "f2203.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.1l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "f2203.1r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "f2203.2l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "f2203.2r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "f2203.3l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "f2203.3r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 

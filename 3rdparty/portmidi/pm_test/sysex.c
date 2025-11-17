@@ -21,6 +21,11 @@
 #define Sleep(n) usleep(n * 1000)
 #endif
 
+// enable some extra printing
+#ifndef VERBOSE
+#define VERBOSE 0
+#endif
+
 #define MIDI_SYSEX 0xf0
 #define MIDI_EOX 0xf7
 
@@ -35,15 +40,13 @@ int latency = 0;
 
 /* read a number from console */
 /**/
-int get_number(char *prompt)
+int get_number(const char *prompt)
 {
-    char line[STRING_MAX];
     int n = 0, i;
-    printf(prompt);
+    fputs(prompt, stdout);
     while (n != 1) {
         n = scanf("%d", &i);
-        fgets(line, STRING_MAX, stdin);
-
+        while (getchar() != '\n') ;
     }
     return i;
 }
@@ -58,7 +61,6 @@ void loopback_test()
     PmStream *midi_in;
     PmStream *midi_out;
     unsigned char msg[1024];
-    char line[80];
     int32_t len;
     int i;
     int data;
@@ -90,7 +92,7 @@ void loopback_test()
     srand((unsigned int) Pt_Time()); /* seed for random numbers */
 
     begin_time = Pt_Time();
-    while (1) {
+    while (total_bytes < 100000) {
         PmError count;
         int32_t start_time;
         int error_position = -1; /* 0; -1; -1 for continuous */ 
@@ -100,9 +102,11 @@ void loopback_test()
         /* set error_position above to 0 for interactive, -1 for */
         /* continuous */
         if (error_position >= 0) {
+            int c;
             printf("Type return to send message, q to quit: ");
-            fgets(line, STRING_MAX, stdin);
-            if (line[0] == 'q') goto cleanup;
+            while ((c = getchar()) != '\n') {
+                if (c == 'q') goto cleanup;
+            }
         }
 
         /* compose the message */
@@ -125,17 +129,38 @@ void loopback_test()
             printf("Before sending anything, a MIDI message was found in\n");
             printf("the input buffer. Please try again.\n");
             break;
-		}
+        }
 
-        /* send the message */
-        printf("Sending %d byte sysex message.\n", len + 2);
-        Pm_WriteSysEx(midi_out, 0, msg);
+        /* send the message two ways: 1) Pm_WriteSysEx, 2) Pm_Write */
+        if (total_bytes & 1) {
+            printf("Sending %d byte sysex msg via Pm_WriteSysEx.\n", len + 2);
+            Pm_WriteSysEx(midi_out, 0, msg);
+        } else {
+            PmEvent event = {0, 0};
+            int bits = 0;
+            printf("Sending %d byte sysex msg via Pm_Write(s).\n", len + 2);
+            for (i = 0; i < len + 2; i++) {
+                event.message |= (msg[i] << bits);
+                bits += 8;
+                if (bits == 32) {  /* full message - send it */
+                    Pm_Write(midi_out, &event, 1);
+                    bits = 0;
+                    event.message = 0;
+                }
+            }
+            if (bits > 0) {  /* last message is partially full */
+                Pm_Write(midi_out, &event, 1);
+            }
+        }
 
         /* receive the message and compare to msg[] */
         data = 0;
         shift = 0;
         i = 0;
         start_time = Pt_Time();
+        if (VERBOSE) {
+            printf("start_time %d\n", start_time);
+        }
         error_position = -1;
         /* allow up to 2 seconds for transmission */
         while (data != MIDI_EOX && start_time + 2000 > Pt_Time()) {
@@ -144,10 +169,10 @@ void loopback_test()
                 Sleep(1); /* be nice: give some CPU time to the system */
                 continue; /* continue polling for input */
             }
-            
-            /* printf("read %lx ", event.message);
-               fflush(stdout); */
-            
+            if (VERBOSE) {
+                printf("read %08x ", event.message);
+                fflush(stdout);
+            }
             /* compare 4 bytes of data until you reach an eox */
             for (shift = 0; shift < 32 && (data != MIDI_EOX); shift += 8) {
                 data = (event.message >> shift) & 0xFF;
@@ -160,18 +185,20 @@ void loopback_test()
             }
         }
         if (error_position >= 0) {
-            printf("Error at byte %d: sent %x recd %x.\n", error_position, 
-                   expected, actual);
+            printf("Error at time %d byte %d: sent %x recd %x.\n", Pt_Time(),
+                   error_position, expected, actual);
             break;
         } else if (i != len + 2) {
-            printf("Error: byte %d not received.\n", i);
+            printf("Error at time %d: byte %d not received.\n", Pt_Time(), i);
             break;
         } else {
             int seconds = (Pt_Time() - begin_time) / 1000;
-	    if (seconds == 0) seconds = 1;
+            if (seconds == 0) seconds = 1;
             printf("Correctly received %d byte sysex message.\n", i);
-	    total_bytes += i;
-	    printf("Cummulative bytes/sec: %d\n", total_bytes / seconds);
+            total_bytes += i;
+            printf("Cummulative bytes/sec: %d, %d%% done.\n", 
+                   (int) (total_bytes / seconds),
+                   (int) (100 * total_bytes / 100000));
         }
     }
 cleanup:
@@ -378,7 +405,7 @@ void receive_sysex()
     printf("Midi Input opened, type file for sysex data: ");
 
     /* open file */
-    fgets(line, STRING_MAX, stdin);
+    if (!fgets(line, STRING_MAX, stdin)) return;  /* no more stdin? */
     /* remove the newline character */
     if (strlen(line) > 0) line[strlen(line) - 1] = 0;
     f = fopen(line, "w");
@@ -443,7 +470,7 @@ void send_sysex()
 	printf("Midi Output opened, type file with sysex data: ");
 
     /* open file */
-    fgets(line, STRING_MAX, stdin);
+    if (!fgets(line, STRING_MAX, stdin)) return;  /* no more stdin? */
     /* remove the newline character */
     if (strlen(line) > 0) line[strlen(line) - 1] = 0;
     f = fopen(line, "r");
@@ -487,7 +514,6 @@ void send_sysex()
 int main()
 {
     int i;
-    char line[80];
     
     /* list device information */
     for (i = 0; i < Pm_CountDevices(); i++) {
@@ -498,11 +524,13 @@ int main()
         printf("\n");
     }
     while (1) {
+        char cmd;
         printf("Type r to receive sysex, s to send,"
                " l for loopback test, m to send multiple,"
                " n to receive multiple, q to quit: ");
-        fgets(line, STRING_MAX, stdin);
-        switch (line[0]) {
+        cmd = getchar();
+        while (getchar() != '\n') ;
+        switch (cmd) {
           case 'r':
             receive_sysex();
             break;

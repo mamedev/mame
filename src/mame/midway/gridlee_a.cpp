@@ -53,16 +53,14 @@ void gridlee_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void gridlee_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void gridlee_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
 	/* loop over samples */
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		/* tone channel */
 		m_tone_fraction += m_tone_step;
-		buffer.put_int(sampindex, (m_tone_fraction & 0x0800000) ? m_tone_volume : 0, 32768 >> 6);
+		stream.put_int(0, sampindex, (m_tone_fraction & 0x0800000) ? m_tone_volume : 0, 32768 >> 6);
 	}
 }
 

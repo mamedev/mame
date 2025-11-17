@@ -430,7 +430,7 @@ std::error_condition cdrom_file::read_partial_sector(void *dest, uint32_t lbasec
 	if (needswap)
 	{
 		uint8_t *buffer = (uint8_t *)dest - startoffs;
-		for (int swapindex = startoffs; swapindex < 2352; swapindex += 2 )
+		for (int swapindex = startoffs; swapindex < 2352; swapindex += 2)
 		{
 			using std::swap;
 			swap(buffer[ swapindex ], buffer[ swapindex + 1 ]);
@@ -1467,9 +1467,12 @@ void cdrom_file::ecc_clear(uint8_t *sector)
 std::string cdrom_file::get_file_path(std::string &path)
 {
 	int pos = path.find_last_of('\\');
-	if (pos!=-1) {
+	if (pos!=-1)
+	{
 		path = path.substr(0,pos+1);
-	} else {
+	}
+	else
+	{
 		pos = path.find_last_of('/');
 		path = path.substr(0,pos+1);
 	}
@@ -1578,7 +1581,7 @@ int cdrom_file::msf_to_frames(const char *token)
 	int s = 0;
 	int f = 0;
 
-	if (sscanf(token, "%d:%d:%d", &m, &s, &f ) == 1)
+	if (sscanf(token, "%d:%d:%d", &m, &s, &f) == 1)
 	{
 		f = m;
 	}
@@ -2048,24 +2051,31 @@ std::error_condition cdrom_file::parse_iso(std::string_view tocfname, toc &outto
 	outinfo.track[0].offset = 0;
 	outinfo.track[0].idx[0] = outinfo.track[0].idx[1] = 0;
 
-	if ((size % 2048)==0 ) {
+	if ((size % 2048) == 0)
+	{
 		outtoc.tracks[0].trktype = CD_TRACK_MODE1;
 		outtoc.tracks[0].frames = size / 2048;
 		outtoc.tracks[0].datasize = 2048;
 		outinfo.track[0].swap = false;
-	} else if ((size % 2336)==0 ) {
+	}
+	else if ((size % 2336) == 0)
+	{
 		// 2352 byte mode 2
 		outtoc.tracks[0].trktype = CD_TRACK_MODE2;
 		outtoc.tracks[0].frames = size / 2336;
 		outtoc.tracks[0].datasize = 2336;
 		outinfo.track[0].swap = false;
-	} else if ((size % 2352)==0 ) {
+	}
+	else if ((size % 2352) == 0)
+	{
 		// 2352 byte mode 2 raw
 		outtoc.tracks[0].trktype = CD_TRACK_MODE2_RAW;
 		outtoc.tracks[0].frames = size / 2352;
 		outtoc.tracks[0].datasize = 2352;
 		outinfo.track[0].swap = false;
-	} else {
+	}
+	else
+	{
 		osd_printf_error("ERROR: Unrecognized track type\n");
 		return chd_file::error::UNSUPPORTED_FORMAT;
 	}
@@ -2288,7 +2298,7 @@ std::error_condition cdrom_file::parse_gdi(std::string_view tocfname, toc &outto
 	}
 
 	if (EXTRA_VERBOSE)
-		for(int i = 0; i < numtracks; i++)
+		for (int i = 0; i < numtracks; i++)
 		{
 			osd_printf_verbose("'%s' %d %d %d (true %d)\n", outinfo.track[i].fname, outtoc.tracks[i].frames, outtoc.tracks[i].padframes, outtoc.tracks[i].physframeofs, outtoc.tracks[i].frames - outtoc.tracks[i].padframes);
 		}
@@ -2665,20 +2675,20 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 		if (outinfo.track[trknum].offset != 0)
 			continue;
 
-		if (trknum+1 >= outtoc.numtrks && trknum > 0 && (outinfo.track[trknum].fname.compare(outinfo.track[trknum-1].fname)==0))
+		if (trknum+1 >= outtoc.numtrks && trknum > 0 && (outinfo.track[trknum].fname.compare(outinfo.track[trknum-1].fname) == 0))
 		{
 			/* if the last track's filename is the same as the previous track */
 			tlen = get_file_size(outinfo.track[trknum].fname);
 			if (tlen == 0)
 			{
-				osd_printf_error("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname);
+				osd_printf_error("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname);
 				return std::errc::no_such_file_or_directory;
 			}
 
 			outinfo.track[trknum].offset = outinfo.track[trknum-1].offset + outtoc.tracks[trknum-1].frames * (outtoc.tracks[trknum-1].datasize + outtoc.tracks[trknum-1].subsize);
 			outtoc.tracks[trknum].frames = (tlen - outinfo.track[trknum].offset) / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);
 		}
-		else if (trknum+1 < outtoc.numtrks && outinfo.track[trknum].fname.compare(outinfo.track[trknum+1].fname)==0)
+		else if (trknum+1 < outtoc.numtrks && outinfo.track[trknum].fname.compare(outinfo.track[trknum+1].fname) == 0)
 		{
 			/* if the current filename is the same as the next track */
 			outtoc.tracks[trknum].frames = outinfo.track[trknum+1].idx[0] - outinfo.track[trknum].idx[0];
@@ -2701,7 +2711,7 @@ std::error_condition cdrom_file::parse_cue(std::string_view tocfname, toc &outto
 			tlen = get_file_size(outinfo.track[trknum].fname);
 			if (tlen == 0)
 			{
-				osd_printf_error("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum-1].fname);
+				osd_printf_error("ERROR: couldn't find bin file [%s]\n", outinfo.track[trknum].fname);
 				return std::errc::no_such_file_or_directory;
 			}
 
@@ -3063,7 +3073,7 @@ std::error_condition cdrom_file::parse_toc(std::string_view tocfname, toc &outto
 					f = msf_to_frames(token);
 				}
 			}
-			else if( trknum == 0 && outinfo.track[trknum].offset != 0 )
+			else if (trknum == 0 && outinfo.track[trknum].offset != 0)
 			{
 				/* the 1st track might have a length with no offset */
 				f = outinfo.track[trknum].offset / (outtoc.tracks[trknum].datasize + outtoc.tracks[trknum].subsize);

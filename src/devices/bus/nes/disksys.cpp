@@ -9,7 +9,7 @@
  Here we emulate the RAM expansion + Disk Drive which form the
  Famicom Disk System.
 
- Based on info from NESDev wiki ( http://wiki.nesdev.com/w/index.php/Family_Computer_Disk_System )
+ Based on info from NESDev wiki ( https://www.nesdev.org/wiki/Family_Computer_Disk_System )
 
  TODO:
    - convert floppy drive + fds format to modern code!
@@ -107,7 +107,8 @@ nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char
 	, m_disk(*this, "floppy0")
 	, m_sound(*this, "rp2c33snd")
 	, irq_timer(nullptr)
-	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_repeat(0), m_irq_transfer(0), m_disk_reg_enable(0), m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
+	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(false), m_irq_repeat(false), m_irq_transfer(false), m_disk_reg_enable(false), m_sound_en(false)
+	, m_fds_motor_on(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
 	, m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)
 {
 }
@@ -136,6 +137,7 @@ void nes_disksys_device::device_start()
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
 	save_item(NAME(m_disk_reg_enable));
+	save_item(NAME(m_sound_en));
 
 	save_item(NAME(m_fds_last_side));
 	save_item(NAME(m_fds_count));
@@ -157,10 +159,11 @@ void nes_disksys_device::pcb_reset()
 	m_drive_ready = 0;
 	m_irq_count = 0;
 	m_irq_count_latch = 0;
-	m_irq_enable = 0;
-	m_irq_repeat = 0;
-	m_irq_transfer = 0;
-	m_disk_reg_enable = 0;
+	m_irq_enable = false;
+	m_irq_repeat = false;
+	m_irq_transfer = false;
+	m_disk_reg_enable = false;
+	m_sound_en = false;
 
 	m_fds_count = 0;
 	m_fds_last_side = 0;
@@ -291,7 +294,11 @@ void nes_disksys_device::write_ex(offs_t offset, uint8_t data)
 				m_fds_head_position -= 2; // ??? is this some sort of compensation??
 
 			m_read_mode = BIT(data, 2);
-			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			if (BIT(data, 3))
+				m_fds_status0 |= 0x08;
+			else
+				m_fds_status0 &= ~0x08;
+			set_nt_mirroring(BIT(m_fds_status0, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			m_drive_ready = data & 0x40;
 			m_irq_transfer = BIT(data, 7);
 			break;
@@ -334,6 +341,7 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			// bit1 - Byte transfer flag (Set to 1 every time 8 bits have been transferred between
 			//        the RAM adaptor & disk drive through $4024/$4031; Reset to 0 when $4024,
 			//        $4031, or $4030 has been serviced)
+			// bit3 = Nametable mirroring flag (0: Vertical, 1: Horizontal)
 			// bit4 - CRC control (0: CRC passed; 1: CRC error)
 			// bit6 - End of Head (1 when disk head is on the most inner track)
 			// bit7 - Disk Data Read/Write Enable (1 when disk is readable/writable)

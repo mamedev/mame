@@ -138,7 +138,7 @@ void tlcs900_device::device_start()
 	save_item( NAME(m_dmac) );
 	save_item( NAME(m_dmam) );
 	save_item( NAME(m_timer_pre) );
-	save_item( NAME(m_timer) );
+	save_item( NAME(m_timer_8) );
 	save_item( NAME(m_timer_change) );
 	save_item( NAME(m_level) );
 	save_item( NAME(m_check_irqs) );

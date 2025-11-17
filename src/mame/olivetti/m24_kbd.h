@@ -30,6 +30,8 @@ protected:
 private:
 	required_ioport_array<16> m_rows;
 	required_ioport m_mousebtn;
+	required_ioport m_mousex;
+	required_ioport m_mousey;
 	uint8_t m_p1;
 	bool m_keypress, m_kbcdata;
 	devcb_write_line m_out_data;

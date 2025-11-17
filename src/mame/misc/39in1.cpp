@@ -29,6 +29,8 @@
  *     from the CPLD (probably)
  *   - 19in1, 48in1, 48in1a, 48in1b, 48in1c, 60in1 have more conditional XORs,
  *     encryption isn't completely beaten yet
+ *   - fruitwld, fruitwlda, jumanjia show 'HW_002 ERROR', probably missing CPLD
+ *     emulation
  *
  *
  * 39in1 notes:
@@ -64,18 +66,19 @@ public:
 		, m_dsw(*this, "DSW")
 	{ }
 
-	void _39in1(machine_config &config);
-	void base(machine_config &config);
+	void _39in1(machine_config &config) ATTR_COLD;
+	void base(machine_config &config) ATTR_COLD;
+	void iam(machine_config &config) ATTR_COLD;
 
-	void init_4in1a();
-	void init_4in1b();
-	void init_19in1();
-	void init_39in1();
-	void init_48in1();
-	void init_48in1a();
-	void init_48in1c();
-	void init_60in1();
-	void init_rodent();
+	void init_4in1a() ATTR_COLD;
+	void init_4in1b() ATTR_COLD;
+	void init_19in1() ATTR_COLD;
+	void init_39in1() ATTR_COLD;
+	void init_48in1() ATTR_COLD;
+	void init_48in1a() ATTR_COLD;
+	void init_48in1c() ATTR_COLD;
+	void init_60in1() ATTR_COLD;
+	void init_rodent() ATTR_COLD;
 
 	// I.A.M. slots
 	void init_fruitwld();
@@ -110,9 +113,10 @@ private:
 
 	void _39in1_map(address_map &map) ATTR_COLD;
 	void base_map(address_map &map) ATTR_COLD;
+	void iam_map(address_map &map) ATTR_COLD;
 
-	void decrypt(u8 xor00, u8 xor02, u8 xor04, u8 xor08, u8 xor10, u8 xor20, u8 xor40, u8 xor80, u8 bit7, u8 bit6, u8 bit5, u8 bit4, u8 bit3, u8 bit2, u8 bit1, u8 bit0);
-	void further_decrypt(u8 xor400, u8 xor800, u8 xor1000, u8 xor2000, u8 xor4000, u8 xor8000);
+	void decrypt(u8 xor00, u8 xor02, u8 xor04, u8 xor08, u8 xor10, u8 xor20, u8 xor40, u8 xor80, u8 bit7, u8 bit6, u8 bit5, u8 bit4, u8 bit3, u8 bit2, u8 bit1, u8 bit0) ATTR_COLD;
+	void further_decrypt(u8 xor400, u8 xor800, u8 xor1000, u8 xor2000, u8 xor4000, u8 xor8000) ATTR_COLD;
 };
 
 void _39in1_state::machine_reset()
@@ -229,6 +233,15 @@ void _39in1_state::_39in1_map(address_map &map)
 	map(0x04000000, 0x047fffff).rw(FUNC(_39in1_state::cpld_r), FUNC(_39in1_state::cpld_w));
 	map(0xa0151648, 0xa015164b).r(FUNC(_39in1_state::prot_cheater_r));
 }
+
+void _39in1_state::iam_map(address_map &map)
+{
+	base_map(map);
+
+	map(0x04800000, 0x04ffffff).ram(); // CPLD here?
+	map(0xa0800000, 0xa3ffffff).ram(); // TODO: probably not really all RAM
+}
+
 
 static INPUT_PORTS_START( 39in1 )
 	PORT_START("MCUIPT")
@@ -378,6 +391,14 @@ void _39in1_state::_39in1(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &_39in1_state::_39in1_map);
 }
+
+void _39in1_state::iam(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &_39in1_state::iam_map);
+}
+
 
 ROM_START( 39in1 )
 	// main program, encrypted
@@ -606,9 +627,9 @@ GAME(2004, 60in1,     39in1,    base,   39in1, _39in1_state, init_60in1,    ROT9
 GAME(2005, rodent,    0,        base,   39in1, _39in1_state, init_rodent,   ROT0,  "The Game Room", "Rodent Exterminator",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // I.A.M. slots. Versions are taken from program ROM stickers or ROM strings, where available
-GAME(2008, fruitwld,  0,        base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V111)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
-GAME(2007, fruitwlda, fruitwld, base,   39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V110)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
-GAME(2007, jumanji,   0,        base,   39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",  "Jumanji (V502)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
-GAME(2007, jumanjia,  jumanji,  base,   39in1, _39in1_state, init_jumanjia, ROT0,  "I.A.M.",  "Jumanji (V113)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // JUMANJI_V113.BIN 2007-07-25 10:54:33
-GAME(200?, plutus,    0,        base,   39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",  "Plutus (V100)",                                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
-GAME(200?, pokrwild,  0,        base,   39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",  "Poker's Wild (V117)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
+GAME(2008, fruitwld,  0,        iam,    39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V111)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
+GAME(2007, fruitwlda, fruitwld, iam,    39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V110)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
+GAME(2007, jumanji,   0,        iam,    39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",  "Jumanji (V502)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
+GAME(2007, jumanjia,  jumanji,  iam,    39in1, _39in1_state, init_jumanjia, ROT0,  "I.A.M.",  "Jumanji (V113)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // JUMANJI_V113.BIN 2007-07-25 10:54:33
+GAME(200?, plutus,    0,        iam,    39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",  "Plutus (V100)",                                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
+GAME(200?, pokrwild,  0,        iam,    39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",  "Poker's Wild (V117)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string

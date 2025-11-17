@@ -70,14 +70,13 @@ DEFINE_DEVICE_TYPE(ISA8_GAME_BLASTER, isa8_gblaster_device, "isa_gblaster", "Gam
 
 void isa8_gblaster_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	SAA1099(config, m_saa1099_1, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
-	m_saa1099_1->add_route(0, "lspeaker", 0.50);
-	m_saa1099_1->add_route(1, "rspeaker", 0.50);
+	m_saa1099_1->add_route(0, "speaker", 0.50, 0);
+	m_saa1099_1->add_route(1, "speaker", 0.50, 1);
 	SAA1099(config, m_saa1099_2, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
-	m_saa1099_2->add_route(0, "lspeaker", 0.50);
-	m_saa1099_2->add_route(1, "rspeaker", 0.50);
+	m_saa1099_2->add_route(0, "speaker", 0.50, 0);
+	m_saa1099_2->add_route(1, "speaker", 0.50, 1);
 }
 
 //**************************************************************************

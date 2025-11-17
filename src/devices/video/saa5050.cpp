@@ -161,11 +161,6 @@ const tiny_rom_entry *saa5057_device::device_rom_region() const
 }
 
 
-#define ALPHANUMERIC    0x01
-#define CONTIGUOUS      0x02
-#define SEPARATED       0x03
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -247,13 +242,10 @@ void saa5050_device::device_start()
 	save_item(NAME(m_separated));
 	save_item(NAME(m_flash));
 	save_item(NAME(m_boxed));
-	save_item(NAME(m_double_height));
-	save_item(NAME(m_double_height_old));
-	save_item(NAME(m_double_height_bottom_row));
-	save_item(NAME(m_double_height_prev_row));
+	save_item(NAME(m_dbl_height));
+	save_item(NAME(m_dbl_height_bottom_row));
+	save_item(NAME(m_dbl_height_prev_row));
 	save_item(NAME(m_hold_char));
-	save_item(NAME(m_hold_clear));
-	save_item(NAME(m_hold_off));
 	save_item(NAME(m_frame_count));
 }
 
@@ -265,8 +257,8 @@ void saa5050_device::device_start()
 void saa5050_device::device_reset()
 {
 	m_ra = 0;
-	m_double_height = false;
-	m_double_height_bottom_row = false;
+	m_dbl_height = false;
+	m_dbl_height_bottom_row = false;
 }
 
 
@@ -276,9 +268,6 @@ void saa5050_device::device_reset()
 
 void saa5050_device::process_control_character(uint8_t data)
 {
-	m_hold_clear = false;
-	m_hold_off = false;
-
 	switch (data)
 	{
 		case ALPHA_RED:
@@ -289,7 +278,6 @@ void saa5050_device::process_control_character(uint8_t data)
 		case ALPHA_CYAN:
 		case ALPHA_WHITE:
 			m_graphics = false;
-			m_hold_clear = true;
 			m_fg = data & 0x07;
 			set_next_chartype();
 			break;
@@ -309,8 +297,8 @@ void saa5050_device::process_control_character(uint8_t data)
 
 		case NORMAL_HEIGHT:
 		case DOUBLE_HEIGHT:
-			m_double_height = !!(data & 1);
-			if (m_double_height) m_double_height_prev_row = true;
+			m_dbl_height = !!(data & 1);
+			if (m_dbl_height) m_dbl_height_prev_row = true;
 			break;
 
 		case GRAPHICS_RED:
@@ -352,7 +340,7 @@ void saa5050_device::process_control_character(uint8_t data)
 			break;
 
 		case RELEASE_GRAPHICS:
-			m_hold_off = true;
+			m_hold_char = false;
 			break;
 	}
 }
@@ -454,14 +442,18 @@ uint16_t saa5050_device::character_rounding(uint16_t a, uint16_t b)
 
 void saa5050_device::get_character_data(uint8_t data)
 {
-	m_double_height_old = m_double_height;
+	bool const dbl_height_prev = m_dbl_height;
+	bool const flash_prev      = m_flash;
+	bool const graphics_prev   = m_graphics;
+	bool const hold_char_prev  = m_hold_char;
+
 	m_prev_col = m_fg;
 	m_curr_chartype = m_next_chartype;
 
 	if (data < 0x20)
 	{
 		process_control_character(data);
-		if (m_hold_char && m_double_height == m_double_height_old)
+		if (graphics_prev && (hold_char_prev || m_hold_char) && m_dbl_height == dbl_height_prev)
 		{
 			data = m_held_char;
 			if (data >= 0x40 && data < 0x60) data = 0x20;
@@ -469,34 +461,34 @@ void saa5050_device::get_character_data(uint8_t data)
 		}
 		else
 		{
+			m_held_char = 0x20;
 			data = 0x20;
 		}
 	}
 	else if (m_graphics)
 	{
-		m_held_char = data;
-		m_held_chartype = m_curr_chartype;
+		if (data & 0x20)
+		{
+			m_held_char = data;
+			m_held_chartype = m_curr_chartype;
+		}
+	}
+	else
+	{
+		m_held_char = 0x20;
 	}
 
 	offs_t ra = m_ra;
-	if (m_double_height_old)
+	if (dbl_height_prev)
 	{
 		ra >>= 1;
-		if (m_double_height_bottom_row) ra += 10;
+		if (m_dbl_height_bottom_row) ra += 10;
 	}
 
-	if (m_flash && (m_frame_count > 38)) data = 0x20;
-	if (m_double_height_bottom_row && !m_double_height) data = 0x20;
-
-	if (m_hold_off)
-	{
-		m_hold_char = false;
-		m_held_char = 32;
-	}
-	if (m_hold_clear)
-	{
-		m_held_char = 32;
-	}
+	if (flash_prev && !(m_frame_count & 0x30))
+		data = 0x20;
+	if (m_dbl_height_bottom_row && !m_dbl_height)
+		data = 0x20;
 
 	if (m_curr_chartype == ALPHANUMERIC || !BIT(data,5))
 		m_char_data = character_rounding(get_rom_data(data, ra), get_rom_data(data, ra + ((ra & 1) ? 1 : -1)));
@@ -526,7 +518,7 @@ void saa5050_device::dew_w(int state)
 		m_ra = 19;
 
 		m_frame_count++;
-		if (m_frame_count > 50) m_frame_count = 0;
+		m_frame_count &= 0x3f;
 	}
 }
 
@@ -544,10 +536,10 @@ void saa5050_device::lose_w(int state)
 
 		if (!m_ra)
 		{
-			if (m_double_height_bottom_row)
-				m_double_height_bottom_row = false;
+			if (m_dbl_height_bottom_row)
+				m_dbl_height_bottom_row = false;
 			else
-				m_double_height_bottom_row = m_double_height_prev_row;
+				m_dbl_height_bottom_row = m_dbl_height_prev_row;
 		}
 
 		m_fg = 7;
@@ -560,8 +552,8 @@ void saa5050_device::lose_w(int state)
 		m_held_char = 0x20;
 		m_next_chartype = ALPHANUMERIC;
 		m_held_chartype = ALPHANUMERIC;
-		m_double_height = false;
-		m_double_height_prev_row = false;
+		m_dbl_height = false;
+		m_dbl_height_prev_row = false;
 		m_bit = 11;
 	}
 }
@@ -573,7 +565,7 @@ void saa5050_device::lose_w(int state)
 
 int saa5050_device::tlc_r()
 {
-	return !m_double_height_bottom_row;
+	return !m_dbl_height_bottom_row;
 }
 
 

@@ -158,6 +158,9 @@ public:
 
 	auto wait_cb() { return m_read_wait.bind(); }
 	auto clear_cb() { return m_read_clear.bind(); }
+	auto int_cb() { return m_read_int.bind(); }
+	auto dma_in_cb() { return m_read_dma_in.bind(); }
+	auto dma_out_cb() { return m_read_dma_out.bind(); }
 	auto ef1_cb() { return m_read_ef[0].bind(); }
 	auto ef2_cb() { return m_read_ef[1].bind(); }
 	auto ef3_cb() { return m_read_ef[2].bind(); }
@@ -224,8 +227,10 @@ protected:
 	inline void dma_input();
 	inline void dma_output();
 	inline void interrupt();
-	virtual bool check_irq() { return m_ie && m_irq; }
+	virtual bool check_irq() { return m_ie && sample_interrupt(); }
 	inline void sample_wait_clear();
+	bool sample_interrupt();
+	inline void sample_dma_io();
 	inline void sample_ef_lines();
 	virtual void output_state_code();
 	inline void set_q_flag(int state);
@@ -366,6 +371,9 @@ protected:
 	// device callbacks
 	devcb_read_line        m_read_wait;
 	devcb_read_line        m_read_clear;
+	devcb_read_line        m_read_int;
+	devcb_read_line        m_read_dma_in;
+	devcb_read_line        m_read_dma_out;
 	devcb_read_line::array<4> m_read_ef;
 	devcb_write_line       m_write_q;
 	devcb_read8            m_read_dma;
@@ -505,7 +513,7 @@ protected:
 
 	virtual cosmac_device::ophandler get_ophandler(uint16_t opcode) const override;
 	virtual bool has_extended_opcodes() override { return true; }
-	virtual bool check_irq() override { return m_ie && ((m_irq && m_xie) || (m_cil && m_cie)); }
+	virtual bool check_irq() override { return m_ie && ((sample_interrupt() && m_xie) || (m_cil && m_cie)); }
 	virtual void reset_state() override;
 
 private:

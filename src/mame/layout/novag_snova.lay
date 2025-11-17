@@ -322,21 +322,21 @@ authors:hap
 	<element name="text_c06a"><text string="Forward"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c07"><text string="Trace Back"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 
-	<element name="text_c10"><text string=" "><color red="0.15" green="0.75" blue="0.6" /></text></element>
+	<element name="text_c10"><text string=" "></text></element>
 	<element name="text_c11"><text string="Auto Clock"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c12"><text string="Verify"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c13"><text string="Video"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c14"><text string="Clear"><color red="0.15" green="0.75" blue="0.6" /></text></element>
 	<element name="text_c15"><text string="Human"><color red="0.15" green="0.75" blue="0.6" /></text></element>
-	<element name="text_c16"><text string=" "><color red="0.15" green="0.75" blue="0.6" /></text></element>
-	<element name="text_c17"><text string=" "><color red="0.15" green="0.75" blue="0.6" /></text></element>
+	<element name="text_c16"><text string=" "></text></element>
+	<element name="text_c17"><text string=" "></text></element>
 
 	<element name="text_g00"><text string="Board"><color red="0.7" green="0.7" blue="0.71" /></text></element>
 	<element name="text_g01"><text string="Game"><color red="0.7" green="0.7" blue="0.71" /></text></element>
 	<element name="text_g02"><text string="Language"><color red="0.7" green="0.7" blue="0.71" /></text></element>
 	<element name="text_g03"><text string="Moves"><color red="0.7" green="0.7" blue="0.71" /></text></element>
 	<element name="text_g04"><text string="Echo"><color red="0.7" green="0.7" blue="0.71" /></text></element>
-	<element name="text_g05"><text string=" "><color red="0.7" green="0.7" blue="0.71" /></text></element>
+	<element name="text_g05"><text string=" "></text></element>
 	<element name="text_g06"><text string="Auto Play"><color red="0.7" green="0.7" blue="0.71" /></text></element>
 	<element name="text_g07"><text string="Next Best"><color red="0.7" green="0.7" blue="0.71" /></text></element>
 

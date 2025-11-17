@@ -65,7 +65,7 @@ public:
 protected:
 	saa5050_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -106,6 +106,13 @@ private:
 		RELEASE_GRAPHICS
 	};
 
+	enum
+	{
+		ALPHANUMERIC = 0,
+		CONTIGUOUS,
+		SEPARATED
+	};
+
 	void process_control_character(uint8_t data);
 	void set_next_chartype();
 	uint16_t get_gfx_data(uint8_t data, offs_t row, bool separated);
@@ -115,7 +122,7 @@ private:
 
 	required_region_ptr<uint8_t> m_char_rom;
 
-	devcb_read8    m_read_d;
+	devcb_read8 m_read_d;
 
 	uint8_t m_code;
 	uint8_t m_held_char;
@@ -134,13 +141,10 @@ private:
 	bool m_separated;
 	bool m_flash;
 	bool m_boxed;
-	bool m_double_height;
-	bool m_double_height_old;
-	bool m_double_height_bottom_row;
-	bool m_double_height_prev_row;
+	bool m_dbl_height;
+	bool m_dbl_height_bottom_row;
+	bool m_dbl_height_prev_row;
 	bool m_hold_char;
-	bool m_hold_clear;
-	bool m_hold_off;
 	int m_frame_count;
 
 	int m_cols;

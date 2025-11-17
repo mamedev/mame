@@ -204,10 +204,9 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 	heathrow.codec_r_callback().set(screamer, FUNC(screamer_device::read_macrisc));
 	heathrow.codec_w_callback().set(screamer, FUNC(screamer_device::write_macrisc));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	screamer.add_route(0, "lspeaker", 1.0);
-	screamer.add_route(1, "rspeaker", 1.0);
+	SPEAKER(config, "speaker", 2).front();
+	screamer.add_route(0, "speaker", 1.0, 0);
+	screamer.add_route(1, "speaker", 1.0, 1);
 }
 
 /*

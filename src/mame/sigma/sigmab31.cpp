@@ -106,26 +106,36 @@ class sigmab31_state : public driver_device
 public:
 	sigmab31_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
-	void sigmab31(machine_config &config);
+	void sigmab31(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void prg_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device>     m_maincpu;
+	required_device<cpu_device>     m_audiocpu;
 };
 
 
-void sigmab31_state::prg_map(address_map &map)
+void sigmab31_state::main_map(address_map &map)
 {
 	map(0x6000, 0xf6ff).rom();
 	map(0xf800, 0xffff).rom();
+}
+
+void sigmab31_state::sound_map (address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x6060, 0x6061).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x8000, 0xffff).rom().region("audiocpu", 0);
 }
 
 
@@ -173,7 +183,10 @@ void sigmab31_state::machine_reset()
 void sigmab31_state::sigmab31(machine_config &config)
 {
 	MC6809(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab31_state::prg_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sigmab31_state::main_map);
+
+	MC6809(config, m_audiocpu, 8_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sigmab31_state::sound_map);
 
 	PTM6840(config, "6840ptm_1", 8_MHz_XTAL / 8);
 
@@ -193,7 +206,7 @@ ROM_START( cptlucky )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b325107-084_captain_lucky_l93-0091.70", 0x00000, 0x10000, CRC(84c2ab4e) SHA1(3d388ba1c8e4718ca95df45f59d0315887385a27) )
 
-	ROM_REGION( 0x8000, "opl", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "m-slot_03-00_l89-1625.57", 0x00000, 0x8000, CRC(268c8a7c) SHA1(90903428d6c0af3ebdcb462e80a7c28dc4ee7af2) )
 ROM_END
 

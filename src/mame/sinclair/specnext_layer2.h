@@ -35,11 +35,22 @@ public:
 	void draw_mix(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 mixer);
 
 protected:
+	static constexpr u16 LAYER2_INFO[2][5] =
+	{
+		//width  height  border  x-inc  y-inc
+		{   256,    192,      0,     1,   256 },
+		{   320,    256,     32,   256,     1 },
+	};
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	void draw_256(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
+	void draw_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
+	static rgb_t blend(u32 &target, const rgb_t pen, u8 mixer);
+
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_host_ram_ptr;
 	u8 m_global_transparent;

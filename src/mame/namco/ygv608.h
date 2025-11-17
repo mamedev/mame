@@ -87,7 +87,7 @@ public:
 	// TODO: is this even a real connection?
 	void set_gfxbank(uint8_t gfxbank);
 
-	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	auto vblank_callback() { return m_vblank_handler.bind(); }
 	auto raster_callback() { return m_raster_handler.bind(); }

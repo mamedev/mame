@@ -87,6 +87,11 @@ void a2bus_mcms1_device::device_reset()
 	m_mcms->set_bus_device(this);
 }
 
+void a2bus_mcms1_device::reset_from_bus()
+{
+	m_mcms->reset();
+}
+
 // read once at c0n0 to disable 125 Hz IRQs
 // read once at c0n1 to enable 125 Hz IRQs
 uint8_t a2bus_mcms1_device::read_c0nx(uint8_t offset)
@@ -249,19 +254,16 @@ TIMER_CALLBACK_MEMBER(mcms_device::clr_irq_tick)
 	m_write_irq(CLEAR_LINE);
 }
 
-void mcms_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mcms_device::sound_stream_update(sound_stream &stream)
 {
 	int i, v;
 	uint16_t wptr;
 	int8_t sample;
 	int32_t mixL, mixR;
 
-	auto &outL = outputs[1];
-	auto &outR = outputs[0];
-
 	if (m_enabled)
 	{
-		for (i = 0; i < outL.samples(); i++)
+		for (i = 0; i < stream.samples(); i++)
 		{
 			mixL = mixR = 0;
 
@@ -282,14 +284,9 @@ void mcms_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 				}
 			}
 
-			outL.put_int(i, mixL * m_mastervol, 32768 << 9);
-			outR.put_int(i, mixR * m_mastervol, 32768 << 9);
+			stream.put_int(0, i, mixL * m_mastervol, 32768 << 9);
+			stream.put_int(1, i, mixR * m_mastervol, 32768 << 9);
 		}
-	}
-	else
-	{
-		outL.fill(0);
-		outR.fill(0);
 	}
 }
 

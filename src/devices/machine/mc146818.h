@@ -39,9 +39,9 @@ public:
 	void set_epoch(int epoch) { m_epoch = epoch; }
 
 	// read/write access
-	void address_w(uint8_t data);
-	uint8_t data_r();
-	void data_w(uint8_t data);
+	virtual void address_w(uint8_t data);
+	virtual uint8_t data_r();
+	virtual void data_w(uint8_t data);
 
 	// direct-mapped read/write access
 	uint8_t read_direct(offs_t offset);

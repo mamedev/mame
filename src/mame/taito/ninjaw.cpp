@@ -395,6 +395,8 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs, int chip);
 	void parse_control();
 	u32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
+	rgb_t color_xbgr555(u16 data);
+
 	void darius2_master_map(address_map &map) ATTR_COLD;
 	void darius2_slave_map(address_map &map) ATTR_COLD;
 	void ninjaw_master_map(address_map &map) ATTR_COLD;
@@ -419,7 +421,7 @@ protected:
 	virtual void device_start();
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 };
 
 extern const device_type SUBWOOFER;
@@ -454,9 +456,8 @@ void subwoofer_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void subwoofer_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void subwoofer_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
 }
 
 #endif
@@ -546,6 +547,11 @@ void ninjaw_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 /*******************************************************************************
         SCREEN REFRESH
 *******************************************************************************/
+
+rgb_t ninjaw_state::color_xbgr555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
 
 u32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip)
 {
@@ -674,9 +680,9 @@ void ninjaw_state::ninjaw_master_map(address_map &map)
 	map(0x2e0000, 0x2e000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300000, 0x313fff).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));      /* tilemaps (3rd screen) */
 	map(0x320000, 0x32000f).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
-	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
-	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
-	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (3rd screen) */
 }
 
 // NB there could be conflicts between which cpu writes what to the
@@ -690,9 +696,9 @@ void ninjaw_state::ninjaw_slave_map(address_map &map)
 	map(0x240000, 0x24ffff).ram().share("share1");
 	map(0x260000, 0x263fff).ram().share("spriteram");
 	map(0x280000, 0x293fff).r(m_tc0100scn[0], FUNC(tc0100scn_device::ram_r)).w(FUNC(ninjaw_state::tc0100scn_triple_screen_w)); /* tilemaps (1st screen/all screens) */
-	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
-	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
-	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (3rd screen) */
 }
 
 void ninjaw_state::darius2_master_map(address_map &map)
@@ -711,9 +717,9 @@ void ninjaw_state::darius2_master_map(address_map &map)
 	map(0x2e0000, 0x2e000f).rw(m_tc0100scn[1], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x300000, 0x313fff).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));      /* tilemaps (3rd screen) */
 	map(0x320000, 0x32000f).rw(m_tc0100scn[2], FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
-	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (1st screen) */
-	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (2nd screen) */
-	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));        /* palette (3rd screen) */
+	map(0x340000, 0x340007).rw(m_tc0110pcr[0], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (1st screen) */
+	map(0x350000, 0x350007).rw(m_tc0110pcr[1], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (2nd screen) */
+	map(0x360000, 0x360007).rw(m_tc0110pcr[2], FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::word_w));        /* palette (3rd screen) */
 }
 
 void ninjaw_state::darius2_slave_map(address_map &map)
@@ -956,6 +962,8 @@ void ninjaw_state::ninjaw(machine_config &config)
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
+	m_tc0110pcr[0]->set_shift(0);
+	m_tc0110pcr[0]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_offsets(22, 0);
@@ -964,6 +972,8 @@ void ninjaw_state::ninjaw(machine_config &config)
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);
+	m_tc0110pcr[1]->set_shift(0);
+	m_tc0110pcr[1]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	TC0100SCN(config, m_tc0100scn[2], 0);
 	m_tc0100scn[2]->set_offsets(22, 0);
@@ -972,24 +982,25 @@ void ninjaw_state::ninjaw(machine_config &config)
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
 	TC0110PCR(config, m_tc0110pcr[2], 0);
+	m_tc0110pcr[2]->set_shift(0);
+	m_tc0110pcr[2]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").seat();
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "subwoofer", 0.25);
+	ymsnd.add_route(0, "subwoofer", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 1.0);
 	ymsnd.add_route(1, "2610.1.r", 1.0);
 	ymsnd.add_route(2, "2610.2.l", 1.0);
 	ymsnd.add_route(2, "2610.2.r", 1.0);
 
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 //  SUBWOOFER(config, "subwoofer", 0);
 
@@ -1062,6 +1073,8 @@ void ninjaw_state::darius2(machine_config &config)
 	m_tc0100scn[0]->set_palette(m_tc0110pcr[0]);
 
 	TC0110PCR(config, m_tc0110pcr[0], 0);
+	m_tc0110pcr[0]->set_shift(0);
+	m_tc0110pcr[0]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	TC0100SCN(config, m_tc0100scn[1], 0);
 	m_tc0100scn[1]->set_offsets(22, 0);
@@ -1070,6 +1083,8 @@ void ninjaw_state::darius2(machine_config &config)
 	m_tc0100scn[1]->set_palette(m_tc0110pcr[1]);
 
 	TC0110PCR(config, m_tc0110pcr[1], 0);
+	m_tc0110pcr[1]->set_shift(0);
+	m_tc0110pcr[1]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	TC0100SCN(config, m_tc0100scn[2], 0);
 	m_tc0100scn[2]->set_offsets(22, 0);
@@ -1078,24 +1093,25 @@ void ninjaw_state::darius2(machine_config &config)
 	m_tc0100scn[2]->set_palette(m_tc0110pcr[2]);
 
 	TC0110PCR(config, m_tc0110pcr[2], 0);
+	m_tc0110pcr[2]->set_shift(0);
+	m_tc0110pcr[2]->set_color_callback(FUNC(ninjaw_state::color_xbgr555));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").seat();
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "subwoofer", 0.25);
+	ymsnd.add_route(0, "subwoofer", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 1.0);
 	ymsnd.add_route(1, "2610.1.r", 1.0);
 	ymsnd.add_route(2, "2610.2.l", 1.0);
 	ymsnd.add_route(2, "2610.2.r", 1.0);
 
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 //  SUBWOOFER(config, "subwoofer", 0);
 

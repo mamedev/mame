@@ -36,27 +36,29 @@ public:
 	auto rbo_cb() { return m_rbo_cb.bind(); }
 
 	// construction/destruction
-	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void a_w(u8 data);
 
-	void rbi_w(int state) { m_rbi = state; }
+	void rbi_w(int state);
 	int rbo_r() { return m_rbo; }
 
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-
-	void update();
+	virtual void device_reset() override ATTR_COLD { update(); }
 
 private:
 	devcb_write8       m_update_cb;
 	devcb_write_line   m_rbo_cb;
 
+	u8 m_a;
 	int m_rbi;
 	int m_rbo;
 
 	static const u8 s_segment_data[16];
+
+	void update();
 };
 
 

@@ -1,5 +1,26 @@
 /* CHANGELOG FOR PORTMIDI
  *
+ * 21Feb22 v2.0.3 Roger Dannenberg
+ * - this version allows multiple hardware devices to have the same name.
+ * 
+ * 03Jan22 v2.0.2 Roger Dannenberg
+ * - many changes for CMake including install support
+ * - bare-bones Java and PmDefaults support. It runs, but no
+ *   installation.
+ * 
+ * 16Sep21 Roger Dannenberg
+ * - Added CreateVirtualInput and CreateVirtualOutput functions (macOS
+ *   & Linux) only.
+ * - Fix for unicode endpoints on macOS CoreMIDI.
+ * - Parsing in macOS of realtime message embedded in short messages
+ *   (can this actually happen?)
+ * - renamed pm_test/test.c to pm_test/testio.c
+ * - with this release, pm_java, pm_csharp, pm_cl, pm_python, pm_qt
+ *   are marked as "legacy code" and README.txt's refer to other
+ *   projects. I had hoped for "one-stop shopping" for language
+ *   bindings, but developers decided to move work to independent
+ *   repositories. Maybe that's better.
+ *
  * 19Oct09 Roger Dannenberg
  * - Changes dynamic library names from portmidi_d to portmidi to
  *   be backward-compatible with programs expecting a library by

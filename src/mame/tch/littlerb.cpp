@@ -310,11 +310,10 @@ void littlerb_state::littlerb(machine_config &config)
 	TIMER(config, "step_timer").configure_periodic(FUNC(littlerb_state::sound_step_cb), attotime::from_hz(7500/150));
 	TIMER(config, "sound_timer").configure_periodic(FUNC(littlerb_state::sound_cb), attotime::from_hz(7500));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 }
 
 ROM_START( littlerb )
@@ -331,7 +330,7 @@ void littlerb_state::init_littlerb()
 {
 	/* various scenes flicker to the point of graphics being invisible (eg. the map screen at the very start of a game)
 	   unless you overclock the TMS34010 to 120%, possible timing bug in the core? this is a hack */
-	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2f);
+	m_indervid->subdevice<cpu_device>("tms")->set_clock_scale(1.2);
 }
 
 } // anonymous namespace

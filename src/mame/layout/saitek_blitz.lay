@@ -362,10 +362,10 @@ authors:hap
 		<element ref="lcdm" blend="multiply"><bounds x="83.75" yc="45" width="20.5" height="4.729" /></element>
 
 		<element ref="blackb"><bounds x="105.75" yc="45" width="10.5" height="4.729" /></element>
-		<element ref="whitew" clickthrough="no"><bounds x="106" yc="45" width="10" height="4.229" /></element>
+		<element ref="whitew"><bounds x="106" yc="45" width="10" height="4.229" /></element>
 		<element ref="mode_dial1" inputtag="IN.0" inputmask="0x07" inputraw="yes"><bounds x="106.5" yc="45" width="8" height="2.5" /><color alpha="0.85" /></element>
 		<element ref="mode_dial2" inputtag="IN.0" inputmask="0x07" inputraw="yes"><bounds x="113.5" yc="45.3" width="2" height="1.5" /><color alpha="0.85" /></element>
-		<element ref="lcdm" blend="multiply"><bounds x="105.75" yc="45" width="10.5" height="4.729" /></element>
+		<element ref="lcdm" blend="multiply" clickthrough="no"><bounds x="105.75" yc="45" width="10.5" height="4.729" /></element>
 
 		<element ref="text_data"><bounds x="84" y="47.8" width="20" height="1.5" /><color alpha="0.5" /></element>
 		<element ref="text_menu"><bounds x="106" y="47.8" width="10" height="1.5" /><color alpha="0.5" /></element>

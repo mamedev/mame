@@ -197,7 +197,7 @@ void menu_control_device_image::load_software_part()
 	}
 	else
 	{
-		machine().popmessage(_("The software selected is missing one or more required ROM or CHD images.\nPlease acquire the correct files or select a different one."));
+		machine().popmessage(_("Files required for the selected software are missing or incorrect."));
 		m_state = SELECT_SOFTLIST;
 		menu_activated();
 	}

@@ -294,6 +294,14 @@ error:
 
 int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 {
+	// TODO: should this handle count == 0?
+	if (!*osdchar)
+	{
+		// mbstowcs stops on encountering NUL and doesn't include it in the output count
+		*uchar = char32_t(0);
+		return 1;
+	}
+
 	// FIXME: mbstowcs depends on global state
 	wchar_t wch;
 	count = mbstowcs(&wch, (char *)osdchar, 1);

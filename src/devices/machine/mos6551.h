@@ -172,6 +172,7 @@ private:
 	int m_rx_clock;
 	int m_rx_bits;
 	int m_rx_shift;
+	int m_rx_shifted_bits;
 	int m_rx_parity;
 	int m_rx_counter;
 	int m_rx_irq_enable;

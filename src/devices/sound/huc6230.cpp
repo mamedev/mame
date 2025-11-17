@@ -19,16 +19,16 @@
 #include "huc6230.h"
 
 
-void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void huc6230_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		// TODO: this implies to read from the PSG inputs
 		// doesn't seem right at all, eventually causes extreme DC offset on BIOS main menu,
 		// possibly because adpcm_timer runs from a different thread,
 		// needs to be rechecked once we have better examples ...
-		s32 samp0 = inputs[0].get(i) * 32768.0;
-		s32 samp1 = inputs[1].get(i) * 32768.0;
+		s32 samp0 = stream.get(0, i) * 32768.0;
+		s32 samp1 = stream.get(1, i) * 32768.0;
 
 		for (int adpcm = 0; adpcm < 2; adpcm++)
 		{
@@ -42,8 +42,8 @@ void huc6230_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			samp1 = std::clamp(samp1 + ((channel->m_output * channel->m_rvol) >> 4), -32768, 32767);
 		}
 
-		outputs[0].put_int(i, samp0, 32768);
-		outputs[1].put_int(i, samp1, 32768);
+		stream.put_int(0, i, samp0, 32768);
+		stream.put_int(1, i, samp1, 32768);
 	}
 }
 

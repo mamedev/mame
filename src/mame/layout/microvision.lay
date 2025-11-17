@@ -54,11 +54,11 @@ authors:hap
 
 		<collection name="Paddle Position">
 			<!-- show live paddle position -->
-			<element ref="nothing" clickthrough="no"><bounds x="12" y="0" width="6" height="1" /></element> <!-- block clickable input -->
 			<element ref="bar" blend="multiply" inputtag="PADDLE" inputmask="0xff" inputraw="yes"><bounds x="12.75" y="0.12" width="4.2" height="0.75" /></element>
 
 			<element ref="text_p1" blend="add"><bounds x="10.5" y="0.1" width="5" height="0.75" /></element>
 			<element ref="text_p2" blend="add" inputtag="PADDLE" inputmask="0xff" inputraw="yes"><bounds x="15.7" y="0.1" width="2" height="0.75" /></element>
+			<element ref="nothing" clickthrough="no"><bounds x="12" y="0" width="6" height="1" /></element> <!-- block clickable input -->
 		</collection>
 	</view>
 

@@ -352,12 +352,6 @@ void windows_osd_interface::init(running_machine &machine)
 	// initialize the subsystems
 	osd_common_t::init_subsystems();
 
-	// notify listeners of screen configuration
-	for (const auto &info : osd_common_t::window_list())
-	{
-		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()), dynamic_cast<win_window_info &>(*info).m_targetorient);
-	}
-
 	// hook up the debugger log
 	if (options.oslog())
 		machine.add_logerror_callback(&windows_osd_interface::output_oslog);

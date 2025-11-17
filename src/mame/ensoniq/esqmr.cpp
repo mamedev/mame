@@ -290,8 +290,7 @@ void esqmr_state::mr(machine_config &config)
 	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(duart, FUNC(mc68340_serial_module_device::rx_b_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	es5506_device &ensoniq(ES5506(config, "ensoniq", XTAL(16'000'000)));
 	ensoniq.set_region0("waverom");  /* Bank 0 */
@@ -301,8 +300,8 @@ void esqmr_state::mr(machine_config &config)
 	ensoniq.set_channels(1);
 	ensoniq.irq_cb().set(FUNC(esqmr_state::esq5506_otto_irq)); /* irq */
 	ensoniq.read_port_cb().set(FUNC(esqmr_state::esq5506_read_adc));
-	ensoniq.add_route(0, "lspeaker", 0.5);
-	ensoniq.add_route(1, "rspeaker", 0.5);
+	ensoniq.add_route(0, "speaker", 0.5, 0);
+	ensoniq.add_route(1, "speaker", 0.5, 1);
 
 	es5506_device &ensoniq2(ES5506(config, "ensoniq2", XTAL(16'000'000)));
 	ensoniq2.set_region0("waverom");  /* Bank 0 */
@@ -310,8 +309,8 @@ void esqmr_state::mr(machine_config &config)
 	ensoniq2.set_region2("waverom3"); /* Bank 0 */
 	ensoniq2.set_region3("waverom4"); /* Bank 1 */
 	ensoniq2.set_channels(1);
-	ensoniq2.add_route(0, "lspeaker", 0.5);
-	ensoniq2.add_route(1, "rspeaker", 0.5);
+	ensoniq2.add_route(0, "speaker", 0.5, 0);
+	ensoniq2.add_route(1, "speaker", 0.5, 1);
 }
 
 static INPUT_PORTS_START( mr )

@@ -343,18 +343,17 @@ void m78_state::bj92(machine_config &config)
 
 	RST_NEG_BUFFER(config, "soundirq").int_callback().set_inputline("audiocpu", 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	m72_audio_device &m72_audio(IREM_M72_AUDIO(config, "m72_audio"));
 	m72_audio.set_dac_tag("dac");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL ));   // Verified on PCB
 	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
-	ymsnd.add_route(0, "lspeaker", 0.5);
-	ymsnd.add_route(1, "rspeaker", 0.5);
+	ymsnd.add_route(0, "speaker", 0.5, 0);
+	ymsnd.add_route(1, "speaker", 0.5, 1);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 

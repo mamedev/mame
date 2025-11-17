@@ -115,8 +115,8 @@ private:
 	output_finder<2> m_leds;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
-	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da);
-	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da);
+	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, float tach_hz);
+	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t dacval, float &tach_hz);
 	void update_rdy();
 
 	void load0_cb(floppy_image_device *device);
@@ -128,13 +128,12 @@ private:
 	uint8_t m_p2;
 
 	/* floppy state */
-	uint8_t m_data;
 	uint8_t m_da[2];
 	int m_start[2];
 	int m_stop[2];
 	int m_sel[2];
 	int m_tach[2];
-	int m_rdy[2];
+	float m_tach_hz[2];
 	int m_scp_rdy0;
 	int m_scp_rdy1;
 	int m_via_rdy0;

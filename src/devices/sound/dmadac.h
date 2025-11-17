@@ -24,7 +24,7 @@ public:
 	template <typename T> void transfer(int channel, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, T* data) {
 		int j;
 
-		constexpr stream_buffer::sample_t sample_scale = 1.0 / double(std::numeric_limits<T>::max());
+		constexpr sound_stream::sample_t sample_scale = 1.0 / double(std::numeric_limits<T>::max());
 
 		if (m_enabled)
 		{
@@ -35,7 +35,7 @@ public:
 			/* copy the data */
 			for (j = 0; j < total_frames && curin != maxin; j++)
 			{
-				m_buffer[curin] = stream_buffer::sample_t(*src) * sample_scale;
+				m_buffer[curin] = sound_stream::sample_t(*src) * sample_scale;
 				curin = (curin + 1) % BUFFER_SIZE;
 				src += frame_spacing;
 			}
@@ -56,18 +56,18 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// internal state
 	/* sound stream and buffers */
 	sound_stream *  m_channel;
-	std::vector<stream_buffer::sample_t> m_buffer;
+	std::vector<sound_stream::sample_t> m_buffer;
 	uint32_t          m_bufin;
 	uint32_t          m_bufout;
 
 	/* per-channel parameters */
-	stream_buffer::sample_t m_volume;
+	sound_stream::sample_t m_volume;
 	uint8_t           m_enabled;
 
 	static constexpr int BUFFER_SIZE = 32768;

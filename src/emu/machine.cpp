@@ -212,7 +212,9 @@ void running_machine::start()
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
 	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&running_machine::stop_all_devices, this));
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
+	m_sound->before_devices_init();
 	start_all_devices();
+	m_sound->after_devices_init();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 
 	// save outputs created before start time
@@ -232,14 +234,28 @@ void running_machine::start()
 	if (filename[0] != 0 && !m_video->is_recording())
 		m_video->begin_recording(filename, movie_recording::format::AVI);
 
-	// if we're coming in with a savegame request, process it now
 	const char *savegame = options().state();
 	if (savegame[0] != 0)
+	{
+		// if we're coming in with a savegame request, process it now
 		schedule_load(savegame);
-
-	// if we're in autosave mode, schedule a load
-	else if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) != 0)
-		schedule_load("auto");
+	}
+	else if (options().autosave())
+	{
+		// if we're in autosave mode, schedule a load
+		// m_save.supported() won't be set until save state registrations are finalised
+		bool supported = true;
+		for (device_t &device : device_enumerator(root_device()))
+		{
+			if (device.type().emulation_flags() & device_t::flags::SAVE_UNSUPPORTED)
+			{
+				supported = false;
+				break;
+			}
+		}
+		if (supported)
+			schedule_load("auto");
+	}
 
 	manager().update_machine();
 }
@@ -284,14 +300,12 @@ int running_machine::run(bool quiet)
 		// then finish setting up our local machine
 		start();
 
+		// disallow save state registrations starting here
+		m_save.allow_registration(false);
+
 		// load the configuration settings
 		manager().before_load_settings(*this);
 		m_configuration->load_settings();
-
-		// disallow save state registrations starting here.
-		// Don't do it earlier, config load can create network
-		// devices with timers.
-		m_save.allow_registration(false);
 
 		// load the NVRAM
 		nvram_load();
@@ -331,9 +345,12 @@ int running_machine::run(bool quiet)
 			// execute CPUs if not paused
 			if (!m_paused)
 				m_scheduler.timeslice();
-			// otherwise, just pump video updates through
+			// otherwise, just pump video updates and sound mapping updates through
 			else
+			{
 				m_video->frame_update();
+				sound().mapping_update();
+			}
 
 			// handle save/load
 			if (m_saveload_schedule != saveload_schedule::NONE)
@@ -408,7 +425,7 @@ void running_machine::schedule_exit()
 	m_scheduler.eat_all_cycles();
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
+	if (options().autosave() && m_save.supported() && (this->time() > attotime::zero))
 		schedule_save("auto");
 }
 
@@ -905,7 +922,7 @@ void running_machine::handle_saveload()
 				case STATERR_NONE:
 				{
 					const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "Loaded" : "Saved";
-					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+					if (!m_save.supported())
 						popmessage("%s state %s %s.\nWarning: Save states are not officially supported for this system.", opnamed, preposname, m_saveload_pending_file);
 					else
 						popmessage("%s state %s %s.", opnamed, preposname, m_saveload_pending_file);

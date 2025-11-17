@@ -28,14 +28,14 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream;             // stream number
 	bool m_enable;                      // enable beep
 	uint32_t m_frequency;               // set frequency - this can be changed using the appropriate function
 	int32_t m_incr;                     // initial wave state
-	stream_buffer::sample_t m_signal;   // current signal
+	sound_stream::sample_t m_signal;   // current signal
 };
 
 DECLARE_DEVICE_TYPE(BEEP, beep_device)

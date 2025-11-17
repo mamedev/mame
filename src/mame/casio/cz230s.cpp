@@ -95,7 +95,7 @@ private:
 	void port_a_w(u8 data);
 	u8 keys_r();
 
-	void render_w(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<upd7811_device> m_maincpu;
 	required_device<mn1252_device> m_lcdc;
@@ -542,17 +542,16 @@ ioport_value cz230s_state::cassette_r()
 }
 
 /**************************************************************************/
-void cz230s_state::render_w(int state)
+u32 cz230s_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!state)
-		return;
-
 	for (int digit = 0; digit < 6; digit++)
 	{
 		const u16 data = m_lcdc->output(digit);
 		for (int seg = 0; seg < 9; seg++)
 			m_lcd_seg[digit][seg] = BIT(data, seg);
 	}
+
+	return 0;
 }
 
 
@@ -587,7 +586,7 @@ void cz230s_state::config_base(machine_config &config, u16 screen_w, u16 screen_
 	screen.set_refresh_hz(60);
 	screen.set_size(screen_w, screen_h);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(cz230s_state::render_w));
+	screen.set_screen_update(FUNC(cz230s_state::screen_update));
 
 	SPEAKER(config, "speaker").front_center();
 

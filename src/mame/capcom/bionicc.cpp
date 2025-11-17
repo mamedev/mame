@@ -82,12 +82,13 @@
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "video/bufsprite.h"
 #include "tigeroad_spr.h"
 #include "sound/ymopm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -139,7 +140,7 @@ private:
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
-	void mcu_io(address_map &map) ATTR_COLD;
+	void mcu_data(address_map &map) ATTR_COLD;
 
 	void output_w(u8 data);
 
@@ -210,7 +211,7 @@ void bionicc_state::sound_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 }
 
-void bionicc_state::mcu_io(address_map &map)
+void bionicc_state::mcu_data(address_map &map)
 {
 	map.global_mask(0x7ff);
 	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_dma_r), FUNC(bionicc_state::mcu_dma_w));
@@ -402,13 +403,6 @@ void bionicc_state::video_start()
 	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
 	m_fg_tilemap->set_transmask(1, 0xffc1, 0x803e); /* split type 1 has pens 1-5 opaque in front half */
 	m_bg_tilemap->set_transparent_pen(15);
-
-	m_tx_tilemap->set_scrolldx(128, 128);
-	m_tx_tilemap->set_scrolldy(  6,   6);
-	m_bg_tilemap->set_scrolldx(128, 128);
-	m_bg_tilemap->set_scrolldy(  6,   6);
-	m_fg_tilemap->set_scrolldx(128, 128);
-	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 
@@ -650,14 +644,14 @@ void bionicc_state::bionicc(machine_config &config)
 
 	// Protection MCU Intel C8751H-88 @ 6 MHz
 	I8751(config, m_mcu, 24_MHz_XTAL / 4);
-	m_mcu->set_addrmap(AS_IO, &bionicc_state::mcu_io);
+	m_mcu->set_addrmap(AS_DATA, &bionicc_state::mcu_data);
 	m_mcu->port_in_cb<1>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::mcu_p3_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(bionicc_state::screen_update));
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

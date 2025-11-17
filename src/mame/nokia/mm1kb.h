@@ -10,8 +10,7 @@
 
 #pragma once
 
-
-#include "sound/samples.h"
+#include "sound/beep.h"
 
 
 //**************************************************************************
@@ -20,7 +19,7 @@
 
 // ======================> mm1_keyboard_device
 
-class mm1_keyboard_device :  public device_t
+class mm1_keyboard_device : public device_t
 {
 public:
 	// construction/destruction
@@ -30,20 +29,7 @@ public:
 
 	uint8_t read() { return m_data; }
 
-	void bell_w(int state)
-	{
-		if (state == 1)
-		{
-			if (first_time)
-			{
-				m_samples->start(1, 1); // power switch
-				first_time = false;
-			}
-			if (!m_samples->playing(0)) m_samples->start(0, 0); // beep; during boot, the second beep is in real HW very short (just before floppy seeks) but that's NYI
-		}
-		else if (m_samples->playing(0)) m_samples->stop(0); // happens only once during boot, no effect on output
-	}
-	void shut_down_mm1();
+	void bell_w(int state) { m_beeper->set_state(state); }
 
 protected:
 	// device-level overrides
@@ -59,7 +45,7 @@ protected:
 private:
 	devcb_write_line m_write_kbst;
 
-	required_device<samples_device> m_samples;
+	required_device<beep_device> m_beeper;
 	required_memory_region m_rom;
 	required_ioport_array<10> m_y;
 	required_ioport m_special;
@@ -68,14 +54,12 @@ private:
 	int m_drive;
 	uint8_t m_data;
 
-	static bool first_time;                 // for power switch sound
-	emu_timer *m_scan_timer;                // scan timer
+	emu_timer *m_scan_timer; // scan timer
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(MM1_KEYBOARD, mm1_keyboard_device)
-
 
 
 #endif // MAME_NOKIA_MM1KB_H

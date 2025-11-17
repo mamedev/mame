@@ -88,7 +88,7 @@ public:
 	//! extensions the format may use.
 	virtual const char *extensions() const noexcept = 0;
 	//! @returns true if format supports saving.
-	virtual bool supports_save() const noexcept = 0;
+	virtual bool supports_save() const noexcept;
 
 	//! This checks if the file has the proper extension for this format.
 	//! @param file_name
@@ -330,7 +330,8 @@ protected:
 		int actual_size;
 		uint8_t *data;
 		bool deleted;
-		bool bad_crc;
+		bool bad_data_crc;
+		bool bad_addr_crc;
 	};
 
 	struct desc_gcr_sector

@@ -153,9 +153,4 @@ bool ccvf_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	return true;
 }
 
-bool ccvf_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const ccvf_format FLOPPY_CCVF_FORMAT;

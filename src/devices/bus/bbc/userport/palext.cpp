@@ -16,19 +16,71 @@
 #include "emu.h"
 #include "palext.h"
 
+#include "emupal.h"
+
 #include <algorithm>
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_CHAMELEON, bbc_chameleon_device, "bbc_chameleon", "Micro User Chameleon (DIY)")
-DEFINE_DEVICE_TYPE(BBC_CPALETTE, bbc_cpalette_device, "bbc_cpalette", "Clwyd Technics Colour Palette")
+class bbc_palext_device : public device_t, public device_bbc_userport_interface
+{
+protected:
+	bbc_palext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_bbc_userport_interface(mconfig, *this)
+		, m_palette(*this, ":palette")
+		, m_colour(0)
+	{
+	}
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	required_device<palette_device> m_palette;
+
+	uint8_t m_colour;
+	rgb_t m_palette_ram[16];
+};
+
+
+// ======================> bbc_chameleon_device
+
+class bbc_chameleon_device : public bbc_palext_device
+{
+public:
+	bbc_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_palext_device(mconfig, BBC_CHAMELEON, tag, owner, clock)
+	{
+	}
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry* device_rom_region() const override;
+
+	virtual void pb_w(uint8_t data) override;
+};
+
+
+// ======================> bbc_cpalette_device
+
+class bbc_cpalette_device : public bbc_palext_device
+{
+public:
+	static constexpr feature_type imperfect_features() { return feature::PALETTE; }
+
+	bbc_cpalette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: bbc_palext_device(mconfig, BBC_CPALETTE, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual void pb_w(uint8_t data) override;
+};
 
 
 //-------------------------------------------------
-//  ROM( chameleon )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START(chameleon)
@@ -36,40 +88,9 @@ ROM_START(chameleon)
 	ROM_LOAD("chameleon.rom", 0x0000, 0x2000, CRC(e0ea0252) SHA1(72cf334cdb866ba3dd2353fc7da0dfdb6abf63a7))
 ROM_END
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
 const tiny_rom_entry* bbc_chameleon_device::device_rom_region() const
 {
 	return ROM_NAME(chameleon);
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_palext_device - constructor
-//-------------------------------------------------
-
-bbc_palext_device::bbc_palext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_bbc_userport_interface(mconfig, *this)
-	, m_palette(*this, ":palette")
-	, m_colour(0)
-{
-}
-
-bbc_chameleon_device::bbc_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_palext_device(mconfig, BBC_CHAMELEON, tag, owner, clock)
-{
-}
-
-bbc_cpalette_device::bbc_cpalette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_palext_device(mconfig, BBC_CPALETTE, tag, owner, clock)
-{
 }
 
 
@@ -138,3 +159,9 @@ void bbc_cpalette_device::pb_w(uint8_t data)
 		m_palette->set_pen_colors(0, &m_palette_ram[0], 8);
 	}
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_CHAMELEON, device_bbc_userport_interface, bbc_chameleon_device, "bbc_chameleon", "Micro User Chameleon (DIY)")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_CPALETTE, device_bbc_userport_interface, bbc_cpalette_device, "bbc_cpalette", "Clwyd Technics Colour Palette")

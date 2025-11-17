@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
+'use strict';
 
 function Crc32Digester()
 {

@@ -19,8 +19,8 @@ authors:hap
 		<rect state="1"><color red="1.0" green="0.79" blue="0.38" /></rect>
 	</element>
 
-	<element name="nothing" defstate="0">
-		<text string=" "/>
+	<element name="nothing">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="hl" defstate="0">
@@ -143,6 +143,10 @@ authors:hap
 			</repeat>
 		</repeat>
 
+		<!-- backlight -->
+		<element ref="cb_light" blend="multiply" inputtag="LIGHT" inputmask="0x01" inputraw="yes"><bounds x="0" y="0" width="101" height="114" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="0" y="0" width="101" height="114" /></element>
+
 		<!-- sensors -->
 		<repeat count="8">
 			<param name="y" start="10" increment="11.78" />
@@ -153,10 +157,6 @@ authors:hap
 				<element ref="hl" inputtag="board:RANK.~i~" inputmask="~mask~"><bounds x="~x~" y="~y~" width="11.74" height="11.78" /><color alpha="0.08" /></element>
 			</repeat>
 		</repeat>
-
-		<!-- backlight -->
-		<element ref="nothing" blend="add" clickthrough="no"><bounds x="0" y="0" width="101" height="114" /></element>
-		<element ref="cb_light" blend="multiply" inputtag="LIGHT" inputmask="0x01" inputraw="yes"><bounds x="0" y="0" width="101" height="114" /></element>
 
 		<!-- mask edges -->
 		<element ref="blackb"><bounds x="0" y="0" width="101" height="2" /></element>

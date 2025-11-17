@@ -52,7 +52,7 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"),
+		m_paletteram(*this, "paletteram", 0x80, ENDIANNESS_BIG),
 		m_fgscrollram(*this, "fgscrollram"),
 		m_bgscrollram(*this, "bgscrollram"),
 		m_gfxram(*this, "gfxram", 0x6000, ENDIANNESS_BIG),
@@ -80,7 +80,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_paletteram;
+	memory_share_creator<uint16_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_fgscrollram;
 	required_shared_ptr<uint8_t> m_bgscrollram;
 	memory_share_creator<uint8_t> m_gfxram;
@@ -96,7 +96,7 @@ private:
 
 	// sound-related
 	uint8_t m_p3_nmimask = 0U;
-	uint8_t m_p3_u8f_d = 0;
+	uint8_t m_p3_u8f_d = 0U;
 
 	void p3_u8f_w(uint8_t data);
 	void p3_nmimask_w(uint8_t data);
@@ -109,6 +109,7 @@ private:
 	template <uint8_t Which> void gfxram_w(offs_t offset, uint8_t data);
 	void scrollreg_w(offs_t offset, uint8_t data);
 	void paletteram_w(offs_t offset, uint8_t data);
+	uint8_t paletteram_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_fgtileinfo);
 	TILE_GET_INFO_MEMBER(get_bgtileinfo);
@@ -182,13 +183,22 @@ void bwing_state::scrollreg_w(offs_t offset, uint8_t data)
 
 void bwing_state::paletteram_w(offs_t offset, uint8_t data)
 {
-	m_paletteram[offset] = data;
+	const uint8_t r = ~data & 7;
+	const uint8_t g = ~data >> 4 & 7;
+	const uint8_t b = ~m_palatch & 7;
 
-	int r = pal3bit(~data & 7);
-	int g = pal3bit(~(data >> 4) & 7);
-	int b = pal3bit(~m_palatch & 7);
+	// write to MB7063 (64x9) RAM and update palette
+	m_paletteram[offset] = b << 6 | g << 3 | r;
+	m_palette->set_pen_color(offset, rgb_t(pal3bit(r), pal3bit(g), pal3bit(b)));
+}
 
-	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+uint8_t bwing_state::paletteram_r(offs_t offset)
+{
+	const uint8_t r = ~m_paletteram[offset] & 7;
+	const uint8_t g = ~m_paletteram[offset] >> 3 & 7;
+	const uint8_t b = ~m_paletteram[offset] >> 6 & 7;
+
+	return (offset & 0x40) ? b : (g << 4 | r);
 }
 
 
@@ -299,7 +309,7 @@ uint32_t bwing_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		m_bgmap->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
-		bitmap.fill(m_palette->black_pen(), cliprect);
+		bitmap.fill(0x30, cliprect);
 
 	// draw low priority sprites
 	draw_sprites(bitmap, cliprect, m_spriteram, 0);
@@ -343,7 +353,7 @@ INTERRUPT_GEN_MEMBER(bwing_state::p3_interrupt)
 
 void bwing_state::p3_u8f_w(uint8_t data)
 {
-	m_p3_u8f_d = data;  // prepares custom chip for various operations
+	m_p3_u8f_d = data; // prepares custom chip for various operations
 }
 
 void bwing_state::p3_nmimask_w(uint8_t data)
@@ -422,7 +432,8 @@ void bwing_state::p1_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(bwing_state::videoram_w)).share(m_videoram);
 	map(0x1400, 0x17ff).ram();
 	map(0x1800, 0x19ff).ram().share(m_spriteram);
-	map(0x1a00, 0x1a3f).ram().w(FUNC(bwing_state::paletteram_w)).share("paletteram");
+	map(0x1a00, 0x1a3f).w(FUNC(bwing_state::paletteram_w));
+	map(0x1a00, 0x1a7f).r(FUNC(bwing_state::paletteram_r));
 	map(0x1b00, 0x1b00).portr("DSW0");
 	map(0x1b01, 0x1b01).portr("DSW1");
 	map(0x1b02, 0x1b02).portr("IN0");
@@ -686,14 +697,14 @@ void bwing_state::bwing(machine_config &config)
 ROM_START( bwings )
 	// Top Board(SCU-01)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bw_bv-02-.10a",0x04000, 0x04000, CRC(6074a86b) SHA1(0ce1bd74450144fd3c6556787d6c5c5d4531d830) )  // different
+	ROM_LOAD( "bw_bv-02-.10a",0x04000, 0x04000, CRC(6074a86b) SHA1(0ce1bd74450144fd3c6556787d6c5c5d4531d830) ) // different
 	ROM_LOAD( "bw_bv-01.7a",  0x08000, 0x04000, CRC(b960c707) SHA1(086cb0f22fb59922bf0369bf6b382a241d979ec3) )
-	ROM_LOAD( "bw_bv-00-.4a", 0x0c000, 0x04000, CRC(1f83804c) SHA1(afd5eb0822db4fd982062945ca27e66ed9680645) )  // different
+	ROM_LOAD( "bw_bv-00-.4a", 0x0c000, 0x04000, CRC(1f83804c) SHA1(afd5eb0822db4fd982062945ca27e66ed9680645) ) // different
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-	ROM_LOAD( "bw_bv-06-.10d",0x0a000, 0x02000, CRC(eca00fcb) SHA1(c7affbb900e3940257f8cebc91266328a4a5dca3) )  // different
-	ROM_LOAD( "bw_bv-05-.9d", 0x0c000, 0x02000, CRC(1e393300) SHA1(8d847256eb5dbccf5f524ec3aa836073d70b4edc) )  // different
-	ROM_LOAD( "bw_bv-04-.7d", 0x0e000, 0x02000, CRC(6548c5bb) SHA1(d12cc8d0d5692c3de766f5c42c818dd8f685760a) )  // different
+	ROM_LOAD( "bw_bv-06-.10d",0x0a000, 0x02000, CRC(eca00fcb) SHA1(c7affbb900e3940257f8cebc91266328a4a5dca3) ) // different
+	ROM_LOAD( "bw_bv-05-.9d", 0x0c000, 0x02000, CRC(1e393300) SHA1(8d847256eb5dbccf5f524ec3aa836073d70b4edc) ) // different
+	ROM_LOAD( "bw_bv-04-.7d", 0x0e000, 0x02000, CRC(6548c5bb) SHA1(d12cc8d0d5692c3de766f5c42c818dd8f685760a) ) // different
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) // encrypted
 	ROM_LOAD( "bw_bv-03.13a", 0x00000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
@@ -801,7 +812,7 @@ ROM_START( zavigaj )
 	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "as08.10d", 0x0a000, 0x02000, CRC(b6187b3a) SHA1(d2d7c5b185f59986f45d8ec3ddf9b95364e57d96) )
 	ROM_LOAD( "as07.9d",  0x0c000, 0x02000, CRC(dc1170e3) SHA1(c8e4d1564fd272d726d0e4ffd4f33f67f1b37cd7) )
-	ROM_LOAD( "as06-.7d", 0x0e000, 0x02000, CRC(b02d270c) SHA1(beea3d44d367543b5b5075c5892580e690691e75) )  // different
+	ROM_LOAD( "as06-.7d", 0x0e000, 0x02000, CRC(b02d270c) SHA1(beea3d44d367543b5b5075c5892580e690691e75) ) // different
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) // encrypted
 	ROM_LOAD( "as05.13a", 0x00000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )

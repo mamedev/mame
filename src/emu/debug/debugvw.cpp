@@ -14,6 +14,7 @@
 #include "debugcpu.h"
 #include "dvbpoints.h"
 #include "dvdisasm.h"
+#include "dvepoints.h"
 #include "dvmemory.h"
 #include "dvrpoints.h"
 #include "dvstate.h"
@@ -369,6 +370,9 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 		case DVT_REGISTER_POINTS:
 			return append(new debug_view_registerpoints(machine(), osdupdate, osdprivate));
 
+		case DVT_EXCEPTION_POINTS:
+			return append(new debug_view_exceptionpoints(machine(), osdupdate, osdprivate));
+
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);
 	}
@@ -496,23 +500,37 @@ void debug_view_expression::set_context(symbol_table *context)
 bool debug_view_expression::recompute()
 {
 	bool changed = m_dirty;
+	bool failed = false;
 
 	// if dirty, re-evaluate
 	if (m_dirty)
 	{
-		std::string oldstring(m_parsed.original_string());
+		std::string const oldstring(m_parsed.original_string());
 		try
 		{
 			m_parsed.parse(m_string);
 		}
-		catch (expression_error &)
+		catch (expression_error const &)
 		{
-			m_parsed.parse(oldstring);
+			failed = true;
+		}
+		if (failed && (oldstring != m_string))
+		{
+			// parsing failed on changing the expression input
+			try
+			{
+				// try falling back to the previous string
+				m_parsed.parse(oldstring);
+				failed = false;
+			}
+			catch (expression_error const &)
+			{
+			}
 		}
 	}
 
-	// if we have a parsed expression, evalute it
-	if (!m_parsed.is_empty())
+	// if we have a parsed expression, evaluate it
+	if (!failed && !m_parsed.is_empty())
 	{
 		// recompute the value of the expression
 		try
@@ -524,7 +542,7 @@ bool debug_view_expression::recompute()
 				changed = true;
 			}
 		}
-		catch (expression_error &)
+		catch (expression_error const &)
 		{
 		}
 	}

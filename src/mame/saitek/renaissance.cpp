@@ -460,6 +460,14 @@ ROM_END
 
 ROM_START( renaissaa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("sx7_518c.u3", 0x8000, 0x8000, CRC(c909ff4d) SHA1(d6509f5a267d98287197195bd2949a0a190758f1) ) // MBM27C256H-10
+
+	ROM_REGION( 795951, "screen", 0 )
+	ROM_LOAD("simultano.svg", 0, 795951, CRC(ac9942bb) SHA1(f9252e5bf7b8af698a403c3f8f5ea9e475e0bf0b) )
+ROM_END
+
+ROM_START( renaissab )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sx7_518b.u3", 0x8000, 0x8000, CRC(a0c3ffe8) SHA1(fa170a6d4d54d41de77e0bb72f969219e6f376af) ) // MBM27C256H-10
 
 	ROM_REGION( 795951, "screen", 0 )
@@ -477,3 +485,4 @@ ROM_END
 //    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1989, renaissa,  0,        0,      ren,     ren,   ren_state, empty_init, "Saitek / Heuristic Software", "Kasparov Renaissance (set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, renaissaa, renaissa, 0,      ren,     ren,   ren_state, empty_init, "Saitek / Heuristic Software", "Kasparov Renaissance (set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, renaissab, renaissa, 0,      ren,     ren,   ren_state, empty_init, "Saitek / Heuristic Software", "Kasparov Renaissance (set 3)", MACHINE_SUPPORTS_SAVE )

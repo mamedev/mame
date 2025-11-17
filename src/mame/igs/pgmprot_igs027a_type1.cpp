@@ -187,6 +187,8 @@ void pgm_arm_type1_state::cavepgm_mem(address_map &map)
 
 void pgm_arm_type1_state::machine_start()
 {
+	pgm_state::machine_start();
+
 	save_item(NAME(m_value0));
 	save_item(NAME(m_value1));
 	save_item(NAME(m_valuekey));

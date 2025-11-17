@@ -1124,8 +1124,8 @@ INPUT_PORTS_END
 
 void konamim2_state::cr589_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 0.5);
-	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":speaker", 0.5, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":speaker", 0.5, 1);
 	device = device->subdevice("cdda");
 }
 
@@ -1170,12 +1170,11 @@ void konamim2_state::konamim2(machine_config &config)
 	m_screen->set_screen_update("bda:vdu", FUNC(m2_vdu_device::screen_update));
 
 	// Sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// TODO!
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -1211,8 +1210,8 @@ void konamim2_state::add_ymz280b(machine_config &config)
 {
 	// TODO: The YMZ280B outputs are actually routed to a speaker in each gun
 	YMZ280B(config, m_ymz280b, XTAL(16'934'400));
-	m_ymz280b->add_route(0, "lspeaker", 0.5);
-	m_ymz280b->add_route(1, "rspeaker", 0.5);
+	m_ymz280b->add_route(0, "speaker", 0.5, 0);
+	m_ymz280b->add_route(1, "speaker", 0.5, 1);
 }
 
 void konamim2_state::add_mt48t58(machine_config &config)

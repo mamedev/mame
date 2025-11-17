@@ -21,6 +21,8 @@ class mcd_isa_device : public cdrom_image_device,
 public:
 	// construction/destruction
 	mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual void call_unload() override;
 
 protected:
 	virtual uint16_t dack16_r(int line) override;

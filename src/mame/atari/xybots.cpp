@@ -168,51 +168,57 @@ uint32_t xybots_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified via schematics:
-
-					    PRIEN = ~(~MOPIX3 & ~MOPIX2 & ~MOPIX1) = (MOPIX3-0 > 1)
-
-					    if (PRIEN)
-					        PF/MO = (~MOPRI3-0 > PFCOL3-0)
-					    else
-					        PF/MO = (~MOPRI3-0 >= PFCOL3-0)
-
-					    if (PF/MO | ~(PRIEN & MOCOL3))
-					        GPC(P3-0) = PFPIX3-0
-					    else
-					        GPC(P3-0) = ~MOCOL3-0
-					*/
-					int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) ^ 15;
-					int const pfcolor = (pf[x] >> 4) & 0x0f;
-					int const prien = ((mo[x] & 0x0f) > 1);
-
-					if (prien)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (mopriority <= pfcolor)
+						if (mo[x] != 0xffff)
 						{
-							/* this first case doesn't make sense from the schematics, but it has
-							   the correct effect */
-							if (mo[x] & 0x80)
-								pf[x] = (mo[x] ^ 0x2f0) & atari_motion_objects_device::DATA_MASK;
+							/* verified via schematics:
+
+							    PRIEN = ~(~MOPIX3 & ~MOPIX2 & ~MOPIX1) = (MOPIX3-0 > 1)
+
+							    if (PRIEN)
+							        PF/MO = (~MOPRI3-0 > PFCOL3-0)
+							    else
+							        PF/MO = (~MOPRI3-0 >= PFCOL3-0)
+
+							    if (PF/MO | ~(PRIEN & MOCOL3))
+							        GPC(P3-0) = PFPIX3-0
+							    else
+							        GPC(P3-0) = ~MOCOL3-0
+							*/
+							int const mopriority = (mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT) ^ 15;
+							int const pfcolor = (pf[x] >> 4) & 0x0f;
+							int const prien = ((mo[x] & 0x0f) > 1);
+
+							if (prien)
+							{
+								if (mopriority <= pfcolor)
+								{
+									/* this first case doesn't make sense from the schematics, but it has
+									   the correct effect */
+									if (mo[x] & 0x80)
+										pf[x] = (mo[x] ^ 0x2f0) & atari_motion_objects_device::DATA_MASK;
+									else
+										pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+								}
+							}
 							else
-								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							{
+								if (mopriority < pfcolor)
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							}
 						}
 					}
-					else
-					{
-						if (mopriority < pfcolor)
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
-					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -383,15 +389,14 @@ void xybots_state::xybots(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_1, ASSERT_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ATARI_JSA_I(config, m_jsa, 0);
 	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);
-	m_jsa->add_route(0, "rspeaker", 1.0);
-	m_jsa->add_route(1, "lspeaker", 1.0);
+	m_jsa->add_route(0, "speaker", 1.0, 1);
+	m_jsa->add_route(1, "speaker", 1.0, 0);
 	config.device_remove("jsa:pokey");
 	config.device_remove("jsa:tms");
 }

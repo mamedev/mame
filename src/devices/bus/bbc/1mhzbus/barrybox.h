@@ -3,6 +3,8 @@
 #ifndef MAME_BUS_BBC_1MHZBUS_BARRYBOX_H
 #define MAME_BUS_BBC_1MHZBUS_BARRYBOX_H
 
+#pragma once
+
 #include "1mhzbus.h"
 
 

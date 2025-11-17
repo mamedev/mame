@@ -408,8 +408,8 @@ authors:hap
 		<element ref="blackb"><bounds xc="37.5" y="18.8" width="9.1" height="2" /></element>
 
 		<!-- hidden input above YES/NO buttons to press both -->
-		<element ref="nothing" inputtag="IN.0" inputmask="0x01" clickthrough="yes"><bounds xc="37.5" yc="18.6" width="6.8" height="1.5" /></element>
-		<element ref="nothing" inputtag="IN.0" inputmask="0x02" clickthrough="no"> <bounds xc="37.5" yc="18.6" width="6.8" height="1.5" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x01" clickthrough="no"> <bounds xc="37.5" yc="18.6" width="6.8" height="1.5" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x02" clickthrough="yes"><bounds xc="37.5" yc="18.6" width="6.8" height="1.5" /></element>
 
 		<element ref="blackb"><bounds xc="37.5" yc="18.6" width="7.8" height="3" /></element>
 		<element ref="box2"><bounds xc="37.5" yc="18.6" width="7" height="1.7" /></element>

@@ -34,7 +34,8 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int KEY_BUFFER_SIZE = 4096;
+const u32 KEY_BUFFER_CHUNK_SIZE = 0x1000;
+const u32 KEY_BUFFER_MAX_SIZE = 0x800000;
 const char32_t INVALID_CHAR = '?';
 
 
@@ -47,7 +48,7 @@ const char32_t INVALID_CHAR = '?';
 struct char_info
 {
 	char32_t ch;
-	const char *alternate;  // alternative string, in UTF-8
+	const char *alternate; // alternative string, in UTF-8
 
 	static const char_info *find(char32_t target);
 };
@@ -344,7 +345,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 	build_codes();
 	if (!m_keyboards.empty())
 	{
-		m_buffer.resize(KEY_BUFFER_SIZE);
+		m_buffer.resize(KEY_BUFFER_CHUNK_SIZE);
 		m_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
 	}
 
@@ -460,15 +461,9 @@ void natural_keyboard::post(std::u32string_view text, const attotime &rate)
 	// set the fixed rate
 	m_current_rate = rate;
 
-	// iterate over characters or until the buffer is full up
+	// iterate over characters
 	for (char32_t ch : text)
-	{
-		if (full())
-			break;
-
-		// fetch next character
 		post_char(ch, true);
-	}
 }
 
 
@@ -832,10 +827,19 @@ void natural_keyboard::internal_post(char32_t ch)
 	}
 
 	// add to the buffer, resizing if necessary
-	m_buffer[m_bufend++] = ch;
-	if ((m_bufend + 1) % m_buffer.size() == m_bufbegin)
-		m_buffer.resize(m_buffer.size() + KEY_BUFFER_SIZE);
-	m_bufend %= m_buffer.size();
+	m_buffer[m_bufend] = ch;
+	size_t size = m_buffer.size();
+
+	if ((m_bufend + 1) % size == m_bufbegin)
+	{
+		if (size >= KEY_BUFFER_MAX_SIZE)
+			return;
+
+		m_buffer.insert(m_buffer.begin() + m_bufbegin, KEY_BUFFER_CHUNK_SIZE, INVALID_CHAR);
+		m_bufbegin += KEY_BUFFER_CHUNK_SIZE;
+	}
+
+	m_bufend = (m_bufend + 1) % size;
 }
 
 

@@ -101,6 +101,7 @@ const tiny_rom_entry *cuda_device::device_rom_region() const
 cuda_device::cuda_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
+	macseconds_interface(),
 	write_reset(*this),
 	write_nmi(*this),
 	write_linechange(*this),
@@ -218,27 +219,9 @@ void cuda_device::pc_w(u8 data)
 				}
 
 				system_time systime;
-				struct tm cur_time, macref;
 				machine().current_datetime(systime);
+				u32 seconds = get_local_seconds(systime);
 
-				cur_time.tm_sec = systime.local_time.second;
-				cur_time.tm_min = systime.local_time.minute;
-				cur_time.tm_hour = systime.local_time.hour;
-				cur_time.tm_mday = systime.local_time.mday;
-				cur_time.tm_mon = systime.local_time.month;
-				cur_time.tm_year = systime.local_time.year - 1900;
-				cur_time.tm_isdst = 0;
-
-				macref.tm_sec = 0;
-				macref.tm_min = 0;
-				macref.tm_hour = 0;
-				macref.tm_mday = 1;
-				macref.tm_mon = 0;
-				macref.tm_year = 4;
-				macref.tm_isdst = 0;
-				u32 ref = (u32)mktime(&macref);
-
-				u32 seconds = (u32)((u32)mktime(&cur_time) - ref);
 				m_maincpu->write_internal_ram(0xae - 0x90, seconds & 0xff);
 				m_maincpu->write_internal_ram(0xad - 0x90, (seconds >> 8) & 0xff);
 				m_maincpu->write_internal_ram(0xac - 0x90, (seconds >> 16) & 0xff);

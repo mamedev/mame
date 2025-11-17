@@ -69,8 +69,8 @@ void db60xg_device::device_add_mconfig(machine_config &config)
 	m_cpu->write_sci_tx<0>().set([this] (int state) { m_connector->do_midi_tx(state); });
 
 	SWP00(config, m_swp00);
-	m_swp00->add_route(0, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_swp00->add_route(1, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_swp00->add_route(0, DEVICE_SELF_OWNER, 1.0, 0);
+	m_swp00->add_route(1, DEVICE_SELF_OWNER, 1.0, 1);
 }
 
 ROM_START( db60xg )

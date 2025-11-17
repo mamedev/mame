@@ -20,7 +20,6 @@
 #include "infoxml.h"
 #include "mame.h"
 
-#include "osdnet.h"
 #include "mameopts.h"
 #include "pluginopts.h"
 #include "dinetwork.h"
@@ -28,6 +27,8 @@
 #include "fileio.h"
 #include "romload.h"
 #include "uiinput.h"
+
+#include "osdepend.h"
 
 #include "path.h"
 
@@ -172,17 +173,17 @@ void menu_network_devices::populate()
 	for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 	{
 		int curr = network.get_interface();
-		const char *title = nullptr;
-		for (auto &entry : get_netdev_list())
+		std::string_view title;
+		for (auto &entry : machine().osd().list_network_devices())
 		{
-			if (entry->id == curr)
+			if (entry.id == curr)
 			{
-				title = entry->description;
+				title = entry.description;
 				break;
 			}
 		}
 
-		item_append(network.device().tag(), title ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
+		item_append(network.device().tag(), std::string(!title.empty() ? title : "------"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
 	}
 
 	item_append(menu_item_type::SEPARATOR);
@@ -200,30 +201,34 @@ bool menu_network_devices::handle(event const *ev)
 	}
 	else if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 	{
-		// FIXME: this conflates presumably arbitrary interface ID numbers with 0-based indices
 		device_network_interface *const network = (device_network_interface *)ev->itemref;
-		auto const &interfaces = get_netdev_list();
+		auto const interfaces = machine().osd().list_network_devices();
 		int curr = network->get_interface();
+		auto const found = std::find_if(
+				std::begin(interfaces),
+				std::end(interfaces),
+				[curr] (osd::network_device_info const &info) { return info.id == curr; });
+		auto index = std::distance(interfaces.begin(), found);
 		if (ev->iptkey == IPT_UI_LEFT)
-			curr--;
-		else
-			curr++;
-		if (curr == -2)
-			curr = interfaces.size() - 1;
-		network->set_interface(curr);
+			--index;
+		else if (std::end(interfaces) == found)
+			index = 0;
+		else if (std::size(interfaces) <= ++index)
+			index = -1;
+		network->set_interface((0 <= index) ? interfaces[index].id : -1);
 
 		curr = network->get_interface();
-		const char *title = nullptr;
+		std::string_view title;
 		for (auto &entry : interfaces)
 		{
-			if (entry->id == curr)
+			if (entry.id == curr)
 			{
-				title = entry->description;
+				title = entry.description;
 				break;
 			}
 		}
 
-		ev->item->set_subtext(title ? title : "------");
+		ev->item->set_subtext(!title.empty() ? title : "------");
 		return true;
 	}
 	else

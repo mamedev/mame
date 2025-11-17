@@ -1189,6 +1189,7 @@ offs_t m16c_disassembler::disassemble(std::ostream &stream, offs_t pc, const m16
 		else
 			util::stream_format(stream, "%-8s#%d, ", BIT(op1, 0) ? "sbjnz.w" : "sbjnz.b", op2 & 0x07);
 		dasm_ea(stream, pc, opcodes, op2 & 0x0f, BIT(op1, 0));
+		stream << ", ";
 		format_label(stream, pc0 + 2 + s8(opcodes.r8(pc)));
 		++pc;
 		flags |= STEP_COND;

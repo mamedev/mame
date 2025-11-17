@@ -98,21 +98,22 @@ private:
 
 	std::unique_ptr<util::disasm_interface> m_vax_dasm;
 
-	PAIR            m_vma_tmp; // do we have int reg for this?
-	PAIR            m_rv;
-	PAIR            m_sch;
-	PAIR            m_rsp;
-	PAIR            m_amc;    // Microdode PC
-	PAIR            m_ppc;    // previous program counter
-	bool            m_fp;
-	bool            m_jzdra_waiting;
-	u32             m_consts[0x10] = { 0x4, 0x2, 0x8, 0x1, 0x0, 0, 0, 0x66, 0, 0xc00000, 0xffffffff, 0x1f0000, 0x4000000, 0, 0, 0 };
-	PAIR            m_reg[0x20];
-	int             m_icount;
-	u32             m_op_size;
+	PAIR             m_vma_tmp; // do we have int reg for this?
+	PAIR             m_rv;
+	PAIR             m_sch;
+	PAIR             m_rsp;
+	PAIR             m_amc;    // Microcode PC
+	PAIR             m_ppc;    // previous program counter
+	bool             m_fp;
+	bool             m_jzdra_waiting;
+	u32              m_consts[0x10] = { 0x4, 0x2, 0x8, 0x1, 0x0, 0, 0, 0x66, 0, 0xc00000, 0xffffffff, 0x1f0000, 0x4000000, 0, 0, 0 };
+	PAIR             m_reg[0x20];
+	int              m_icount;
+	u32              m_op_size;
 
-	std::deque<u32> m_pcm_queue;
-	u8              m_mem_reg[6];
+	u8               m_pcm_queue_size;
+	u32              m_pcm_queue[6];
+	u8               m_mem_reg[6];
 };
 
 DECLARE_DEVICE_TYPE(KL1839VM1, kl1839vm1_device)

@@ -483,33 +483,36 @@ uint32_t atarisy1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* high priority MO? */
-					if (mo[x] & atari_motion_objects_device::PRIORITY_MASK)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						/* only gets priority if MO pen is not 1 */
-						if ((mo[x] & 0x0f) != 1)
-							pf[x] = 0x300 + ((pf[x] & 0x0f) << 4) + (mo[x] & 0x0f);
-					}
-
-					/* low priority */
-					else
-					{
-						/* priority pens for playfield color 0 */
-						if ((pf[x] & 0xf8) != 0 || !(m_playfield_priority_pens & (1 << (pf[x] & 0x07))))
-							pf[x] = mo[x];
+						if (mo[x] != 0xffff)
+						{
+							if (mo[x] & atari_motion_objects_device::PRIORITY_MASK)
+							{
+								// high priority MO - only gets priority if MO pen is not 1
+								if ((mo[x] & 0x0f) != 1)
+									pf[x] = 0x300 + ((pf[x] & 0x0f) << 4) + (mo[x] & 0x0f);
+							}
+							else
+							{
+								// low priority - priority pens for playfield color 0
+								if ((pf[x] & 0xf8) != 0 || !(m_playfield_priority_pens & (1 << (pf[x] & 0x07))))
+									pf[x] = mo[x];
+							}
+						}
 					}
 				}
-		}
+			});
 
-	/* add the alpha on top */
+	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

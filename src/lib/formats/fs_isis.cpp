@@ -45,17 +45,17 @@ namespace {
 
 		virtual meta_data volume_metadata() override;
 
-		virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
+		virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 
-		virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+		virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 
-		virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+		virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
-		virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+		virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 
-		virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+		virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
-		virtual err_t format(const meta_data &meta) override;
+		virtual std::error_condition format(const meta_data &meta) override;
 
 	private:
 		using sect_map = std::bitset<DD_SECTORS>;
@@ -225,24 +225,24 @@ meta_data isis_impl::volume_metadata()
 	return res;
 }
 
-std::pair<err_t, meta_data> isis_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> isis_impl::metadata(const std::vector<std::string> &path)
 {
 	if (path.size() != 1) {
-		return std::make_pair(ERR_NOT_FOUND, meta_data{});
+		return std::make_pair(error::not_found, meta_data{});
 	}
 
 	ensure_dir_loaded();
 
 	auto it = scan_dir(path.front());
 	if (it == m_dir.end()) {
-		return std::make_pair(ERR_NOT_FOUND, meta_data{});
+		return std::make_pair(error::not_found, meta_data{});
 	}
 
 	auto meta = get_metadata(*it);
-	return std::make_pair(ERR_OK, std::move(meta));
+	return std::make_pair(std::error_condition(), std::move(meta));
 }
 
-std::pair<err_t, std::vector<dir_entry>> isis_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> isis_impl::directory_contents(const std::vector<std::string> &path)
 {
 	if (path.empty()) {
 		ensure_dir_loaded();
@@ -254,16 +254,16 @@ std::pair<err_t, std::vector<dir_entry>> isis_impl::directory_contents(const std
 				dir_entries.emplace_back(dir_entry_type::file, std::move(meta));
 			}
 		}
-		return std::make_pair(ERR_OK, dir_entries);
+		return std::make_pair(std::error_condition(), dir_entries);
 	} else {
-		return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>{});
+		return std::make_pair(error::not_found, std::vector<dir_entry>{});
 	}
 }
 
-err_t isis_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition isis_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
 	if (!path.empty()) {
-		return ERR_INVALID;
+		return error::invalid_name;
 	}
 
 	auto name = meta.get_string(meta_name::name);
@@ -274,13 +274,13 @@ err_t isis_impl::file_create(const std::vector<std::string> &path, const meta_da
 	std::string filename = name.substr(0, pt_pos);
 
 	if (filename.size() < 1 || filename.size() > 6 || !validate_filename(filename)) {
-		return ERR_INVALID;
+		return error::invalid_name;
 	}
 
 	if (pt_pos != std::string::npos) {
 		auto ext = name.substr(pt_pos + 1);
 		if (ext.size() < 1 || ext.size() > 3 || !validate_filename(ext)) {
-			return ERR_INVALID;
+			return error::invalid_name;
 		}
 		filename.push_back('.');
 		filename += ext;
@@ -288,14 +288,14 @@ err_t isis_impl::file_create(const std::vector<std::string> &path, const meta_da
 
 	// Check that file can be created by user
 	if (!user_can_create(filename)) {
-		return ERR_INVALID;
+		return error::unsupported;
 	}
 
 	// Check that file doesn't exist
 	ensure_dir_loaded();
 	auto it = scan_dir(filename);
 	if (it != m_dir.end()) {
-		return ERR_INVALID;
+		return error::already_exists;
 	}
 
 	// Find a free entry in directory
@@ -305,13 +305,13 @@ err_t isis_impl::file_create(const std::vector<std::string> &path, const meta_da
 		}
 	}
 	if (it == m_dir.end()) {
-		return ERR_NO_SPACE;
+		return error::no_space;
 	}
 
 	// Allocate space
 	lba_list lbas;
 	if (!allocate(0, lbas)) {
-		return ERR_NO_SPACE;
+		return error::no_space;
 	}
 
 	// Fill dir entry
@@ -326,42 +326,42 @@ err_t isis_impl::file_create(const std::vector<std::string> &path, const meta_da
 	// Update directory & map
 	store_dir_map();
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-std::pair<err_t, std::vector<u8>> isis_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> isis_impl::file_read(const std::vector<std::string> &path)
 {
 	const auto& [ lbas, size ] = find_file(path);
 	if (lbas != nullptr) {
 		auto file_data = get_file_content(*lbas, size);
-		return std::make_pair(ERR_OK, std::move(file_data));
+		return std::make_pair(std::error_condition(), std::move(file_data));
 	}
-	return std::make_pair(ERR_NOT_FOUND, std::vector<u8>{});
+	return std::make_pair(error::not_found, std::vector<u8>{});
 }
 
-err_t isis_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition isis_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	if (path.size() != 1) {
-		return ERR_NOT_FOUND;
+		return error::not_found;
 	}
 
 	// Check that file is user-writeable
 	const auto& filename = path.front();
 	if (!user_can_write(filename)) {
-		return ERR_INVALID;
+		return error::unsupported;
 	}
 
 	// ISIS.T0 can only be 2944 bytes long
 	bool is_t0 = filename == ISIS_T0;
 	if (is_t0 && data.size() != ISIS_T0_SIZE) {
-		return ERR_INVALID;
+		return error::incorrect_size;
 	}
 
 	// Check that file already exists
 	ensure_dir_loaded();
 	auto it = scan_dir(filename);
 	if (it == m_dir.end()) {
-		return ERR_NOT_FOUND;
+		return error::not_found;
 	}
 
 	// De-allocate current blocks
@@ -372,7 +372,7 @@ err_t isis_impl::file_write(const std::vector<std::string> &path, const std::vec
 	if (is_t0) {
 		allocate_t0(lbas);
 	} else if (!allocate(data.size(), lbas)) {
-		return ERR_NO_SPACE;
+		return error::no_space;
 	}
 
 	// Update dir entry
@@ -386,10 +386,10 @@ err_t isis_impl::file_write(const std::vector<std::string> &path, const std::vec
 	// Update directory & map
 	store_dir_map();
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
-err_t isis_impl::format(const meta_data &meta)
+std::error_condition isis_impl::format(const meta_data &meta)
 {
 	entry dir_e;
 	dir_e.m_alloc_state = DIR_IN_USE;
@@ -442,7 +442,7 @@ err_t isis_impl::format(const meta_data &meta)
 	}
 
 	store_dir_map();
-	return ERR_OK;
+	return std::error_condition();
 }
 
 isis_impl::lba_t isis_impl::ts_2_lba(const track_sect &ts) const
@@ -786,14 +786,14 @@ isis_impl::lba_list isis_impl::get_file_allocation(lba_t first_link, unsigned si
 		res.push_back(curr_map);
 		// Get a linkage block
 		auto map_sect = m_blockdev.get(curr_map);
-		auto prev_ptr = lba_from_2b(map_sect , 0);
-		auto next_ptr = lba_from_2b(map_sect , 2);
+		auto prev_ptr = lba_from_2b(*map_sect , 0);
+		auto next_ptr = lba_from_2b(*map_sect , 2);
 		if (prev_lba != prev_ptr) {
 			throw std::runtime_error(util::string_format("Incorrect backward linking in sector %d", curr_map));
 		}
 		// Scan all pointers in linkage block
 		for (u32 i = 4; i < SECTOR_SIZE; i += 2) {
-			auto ptr = lba_from_2b(map_sect , i);
+			auto ptr = lba_from_2b(*map_sect , i);
 			if (size > 0) {
 				if (ptr < 0) {
 					throw std::runtime_error(util::string_format("Unexpected end of pointer list in sector %d", curr_map));
@@ -839,7 +839,7 @@ std::vector<u8> isis_impl::get_file_content(const lba_list& sects, unsigned size
 		if ((idx % (PTRS_PER_BLOCK + 1)) != 0) {
 			unsigned to_copy = std::min(size, SECTOR_SIZE);
 			auto data_sect = m_blockdev.get(sects[ idx ]);
-			memcpy(res.data() + pos, data_sect.rodata(), to_copy);
+			data_sect->read(0, res.data() + pos, to_copy);
 			size -= to_copy;
 			pos += to_copy;
 		}
@@ -856,7 +856,7 @@ void isis_impl::store_file_content(const lba_list& sects, const std::vector<u8>&
 		lba_t link_lba = sects[ idx ];
 		auto blk = m_blockdev.get(link_lba);
 		// Pointer to previous block
-		lba_to_2b(prev_ptr, blk, 0);
+		lba_to_2b(prev_ptr, *blk, 0);
 		prev_ptr = link_lba;
 		lba_t next_ptr;
 		if (sects.size() - idx > (PTRS_PER_BLOCK + 1)) {
@@ -867,10 +867,10 @@ void isis_impl::store_file_content(const lba_list& sects, const std::vector<u8>&
 			next_ptr = -1;
 		}
 		// Pointer to next block
-		lba_to_2b(next_ptr, blk, 2);
+		lba_to_2b(next_ptr, *blk, 2);
 		// Pointers to data blocks
 		for (unsigned j = 0; j < PTRS_PER_BLOCK; j++) {
-			lba_to_2b((j + idx + 1 < sects.size()) ? sects[ j + idx + 1 ] : -1, blk, 4 + 2 * j);
+			lba_to_2b((j + idx + 1 < sects.size()) ? sects[ j + idx + 1 ] : -1, *blk, 4 + 2 * j);
 		}
 	}
 	// Write data blocks
@@ -883,7 +883,7 @@ void isis_impl::store_file_content(const lba_list& sects, const std::vector<u8>&
 		}
 		u32 count = std::min<u32>(to_go, SECTOR_SIZE);
 		auto blk = m_blockdev.get(sects[ idx ]);
-		blk.copy(0, ptr, count);
+		blk->write(0, ptr, count);
 		ptr += count;
 		to_go -= count;
 	}

@@ -1,4 +1,4 @@
-/* porttime.h -- portable interface to millisecond timer */
+/** @file porttime.h portable interface to millisecond timer. */
 
 /* CHANGE LOG FOR PORTTIME
   10-Jun-03 Mark Nelson & RBD
@@ -25,8 +25,16 @@ extern "C" {
 #endif
 
 #ifndef PMEXPORT
+#ifdef _WINDLL
+#define PMEXPORT __declspec(dllexport)
+#else
 #define PMEXPORT 
 #endif
+#endif
+
+/** @defgroup grp_porttime PortTime: Millisecond Timer
+    @{
+*/
 
 typedef enum {
     ptNoError = 0,         /* success */
@@ -34,54 +42,56 @@ typedef enum {
     ptAlreadyStarted,      /* cannot start timer because it is already started */
     ptAlreadyStopped,      /* cannot stop timer because it is already stopped */
     ptInsufficientMemory   /* memory could not be allocated */
-} PtError;
+} PtError; /**< @brief @enum  PtError PortTime error code; a common return type.
+            * No error is indicated by zero; errors are indicated by < 0.
+            */
 
-
+/** real time or time offset in milliseconds. */
 typedef int32_t PtTimestamp;
 
-typedef void (PtCallback)( PtTimestamp timestamp, void *userData );
+/** a function that gets a current time */
+typedef void (PtCallback)(PtTimestamp timestamp, void *userData);
 
-/*
-    Pt_Start() starts a real-time service.
+/** start a real-time clock service.
 
-    resolution is the timer resolution in ms. The time will advance every
-    resolution ms.
+    @param resolution the timer resolution in ms. The time will advance every
+    \p resolution ms.
 
-    callback is a function pointer to be called every resolution ms.
+    @param callback a function pointer to be called every resolution ms.
 
-    userData is passed to callback as a parameter.
+    @param userData is passed to \p callback as a parameter.
 
-    return value:
-    Upon success, returns ptNoError. See PtError for other values.
+    @return #ptNoError on success. See #PtError for other values.
 */
 PMEXPORT PtError Pt_Start(int resolution, PtCallback *callback, void *userData);
 
-/*
-    Pt_Stop() stops the timer.
+/** stop the timer.
 
-    return value:
-    Upon success, returns ptNoError. See PtError for other values.
+    @return #ptNoError on success. See #PtError for other values.
 */
 PMEXPORT PtError Pt_Stop(void);
 
-/*
-    Pt_Started() returns true iff the timer is running.
+/** test if the timer is running.
+ 
+    @return TRUE or FALSE
 */
 PMEXPORT int Pt_Started(void);
 
-/* 
-    Pt_Time() returns the current time in ms.
+/** get the current time in ms.
+
+    @return the current time
 */
 PMEXPORT PtTimestamp Pt_Time(void);
 
-/*
-    Pt_Sleep() pauses, allowing other threads to run.
+/** pauses the current thread, allowing other threads to run.
 
-    duration is the length of the pause in ms. The true duration 
+    @param duration the length of the pause in ms. The true duration 
     of the pause may be rounded to the nearest or next clock tick
-    as determined by resolution in Pt_Start().
+    as determined by resolution in #Pt_Start().
 */
 PMEXPORT void Pt_Sleep(int32_t duration);
+
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -9,11 +9,17 @@
 #include "emupal.h"
 #include "tilemap.h"
 
-class edevices_device : public device_t
+class edevices_device : public device_t, public device_gfx_interface
 {
 public:
 	edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> edevices_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: edevices_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
 
 	template <typename T> void set_bg_videoram_tag(T &&tag) { m_bg_videoram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_mlow_videoram_tag(T &&tag) { m_mlow_videoram.set_tag(std::forward<T>(tag)); }
@@ -24,8 +30,6 @@ public:
 	template <typename T> void set_mhigh_scrollram_tag(T &&tag) { m_mhigh_scrollram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_vidattrram_tag(T &&tag) { m_vidattrram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_spriteram_tag(T &&tag) { m_spriteram.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_palette_tag(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
 
 	void set_spritexoffset(int offset)
 	{
@@ -71,8 +75,6 @@ private:
 	required_shared_ptr<uint16_t> m_mhigh_scrollram;
 	required_shared_ptr<uint16_t> m_vidattrram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	/* misc */
 	int m_which = 0;
@@ -83,6 +85,13 @@ class edevices_sforce_device : public edevices_device
 {
 public:
 	edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> edevices_sforce_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: edevices_sforce_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
+
 protected:
 	virtual int get_priority(const uint16_t *source) override;
 };

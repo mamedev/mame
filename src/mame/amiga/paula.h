@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Aaron Giles, Dirk Best
+// copyright-holders: Aaron Giles, Dirk Best, Angelo Salese
 /***************************************************************************
 
     MOS Technology/Commodore 8364 "Paula"
@@ -65,7 +65,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	template <u8 ch> void audxlch_w(u16 data);

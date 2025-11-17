@@ -78,7 +78,7 @@ u32 kaneko16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 void kaneko16_berlwall_state::video_start()
 {
 	m_bg15_bright = 0xff;
-	u8 *RAM  =   memregion("gfx3")->base();
+	u8 *RAM = memregion("bitmap")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
@@ -96,8 +96,8 @@ void kaneko16_berlwall_state::video_start()
 		{
 			for (int y = 0; y < 256; y++)
 			{
-				int addr  = screen * (256 * 256) + x + y * 256;
-				int data = RAM[addr * 2 + 0] * 256 + RAM[addr * 2 + 1];
+				const int addr  = screen * (256 * 256) + x + y * 256;
+				const int data = RAM[addr * 2 + 0] * 256 + RAM[addr * 2 + 1];
 
 				int r = (data & 0x07c0) >>  6;
 				int g = (data & 0xf800) >> 11;
@@ -162,14 +162,11 @@ void kaneko16_berlwall_state::render_15bpp_bitmap(bitmap_rgb32 &bitmap, const re
 	if (!m_bg15_bitmap[0].valid())
 		return;
 
-	int select  =   m_bg15_select;
-	int scroll  =   m_bg15_scroll[ 0 ];
+	const int screen = m_bg15_select & 0x1f;
+	const bool flip = BIT(m_bg15_select, 5);
 
-	int screen  =   select & 0x1f;
-	int flip    =   select & 0x20;
-
-	int scrollx =   (scroll >> 0) & 0xff;
-	int scrolly =   (scroll >> 8) & 0xff;
+	int scrollx = (m_bg15_scroll[0] >> 0) & 0xff;
+	int scrolly = (m_bg15_scroll[0] >> 8) & 0xff;
 
 	if (!flip)
 	{
@@ -186,19 +183,12 @@ void kaneko16_berlwall_state::render_15bpp_bitmap(bitmap_rgb32 &bitmap, const re
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u16 const *srcbitmap;
-		if (!flip)  srcbitmap = &m_bg15_bitmap[screen].pix(        (y - scrolly) & 0xff  );
-		else        srcbitmap = &m_bg15_bitmap[screen].pix( 255 - ((y - scrolly) & 0xff) );
-
+		u16 const *const srcbitmap = &m_bg15_bitmap[screen].pix((flip ? ~(y - scrolly) : (y - scrolly)) & 0xff);
 		u32 *const dstbitmap = &bitmap.pix(y);
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			u16 pix;
-
-			if (!flip)  pix = srcbitmap[        (x - scrollx) & 0xff  ];
-			else        pix = srcbitmap[ 255 - ((x - scrollx) & 0xff) ];
-
+			const u16 pix = srcbitmap[(flip ? ~(x - scrollx) : (x - scrollx)) & 0xff];
 			dstbitmap[x] = pal[pix];
 		}
 	}

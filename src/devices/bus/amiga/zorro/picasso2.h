@@ -58,6 +58,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_PICASSO2P, bus::amiga::zorro, picasso2p_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_PICASSO2P, bus::amiga::zorro, picasso2p_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_PICASSO2_H

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "m24_kbd.h"
 
-DEFINE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device, "m24_kbd", "Olivetti M24 Keyboard")
+DEFINE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device, "m24_kbd", "Olivetti M24 Keyboard and Mouse")
 
 ROM_START( m24_keyboard )
 	ROM_REGION(0x800, "mcu", 0)
@@ -192,10 +192,16 @@ INPUT_PORTS_START( m24_keyboard )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Btn") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Middle Btn") PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Btn") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Left Btn") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Middle Btn") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Right Btn") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(80) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(80) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -208,6 +214,8 @@ m24_keyboard_device::m24_keyboard_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, M24_KEYBOARD, tag, owner, clock)
 	, m_rows(*this, "ROW.%u", 0)
 	, m_mousebtn(*this, "MOUSEBTN")
+	, m_mousex(*this, "MOUSEX")
+	, m_mousey(*this, "MOUSEY")
 	, m_out_data(*this)
 	, m_mcu(*this, "mcu")
 {
@@ -248,7 +256,15 @@ void m24_keyboard_device::p1_w(uint8_t data)
 
 uint8_t m24_keyboard_device::p2_r()
 {
-	return (m_keypress << 7) | m_mousebtn->read();
+	uint8_t mx = m_mousex->read();
+	uint8_t my = m_mousey->read();
+
+	// Generate appropriate square waves in response to changing mouse
+	// co-ordinates.  The +1 is to put one signal 90 degrees out of phase with
+	// respect to the other, to produce the required "quadrature" encoding,
+	// which lets the MCU determine the direction of movement.
+	return (m_keypress << 7) | m_mousebtn->read() |
+      BIT(mx+1, 1) | BIT(mx, 1) << 1 | BIT(my, 1) << 2 | BIT(my+1, 1) << 3;
 }
 
 int m24_keyboard_device::t0_r()

@@ -240,52 +240,84 @@ Interrupts:
 
 /*************************************
  *
+ *  Slither SN76489 I/O
+ *
+ *************************************/
+
+template <unsigned Which>
+void slither_state::sn76489_ctrl_w(int state)
+{
+	// write to the sound chip
+	if (!state && m_sn76489_ctrl[Which])
+		m_sn[Which]->write(m_pia[Which + 1]->b_output());
+
+	m_sn76489_ctrl[Which] = bool(state);
+}
+
+
+
+/*************************************
+ *
+ *  Slither trackball I/O
+ *
+ *************************************/
+
+template <unsigned Which>
+uint8_t slither_state::trak_r()
+{
+	return m_trak[Which + (m_flip ? 2 : 0)]->read();
+}
+
+
+
+/*************************************
+ *
  *  Data CPU memory handlers
  *
  *************************************/
 
-void qix_state::main_map(address_map &map)
+void qix_state::qix_main_map(address_map &map)
 {
-	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8000, 0x83ff).ram().share("sharedram");
 	map(0x8400, 0x87ff).ram();
 	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
-	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
-	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
-	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::video_firq_r), FUNC(qix_state::video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::data_firq_ack_r), FUNC(qix_state::data_firq_ack_w));
+	map(0x9000, 0x93ff).rw(m_sndpia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9400, 0x97ff).r(m_pia[0], FUNC(pia6821_device::read)).w(FUNC(qix_state::pia_w));
+	map(0x9800, 0x9bff).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9c00, 0x9fff).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xa000, 0xffff).rom();
 }
 
 
-void qix_state::kram3_main_map(address_map &map)
+void kram3_state::main_map(address_map &map)
 {
-	map(0x8000, 0x83ff).ram().share("share1");
+	map(0x8000, 0x83ff).ram().share("sharedram");
 	map(0x8400, 0x87ff).ram();
 	map(0x8800, 0x8bff).nopr();   /* 6850 ACIA */
-	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(qix_state::qix_video_firq_r), FUNC(qix_state::qix_video_firq_w));
-	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(qix_state::qix_data_firq_ack_r), FUNC(qix_state::qix_data_firq_ack_w));
-	map(0x9000, 0x93ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9400, 0x97ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(qix_state::qix_pia_w));
-	map(0x9800, 0x9bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x9c00, 0x9fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0xa000, 0xffff).bankr("bank0");
+	map(0x8c00, 0x8c00).mirror(0x3fe).rw(FUNC(kram3_state::video_firq_r), FUNC(kram3_state::video_firq_w));
+	map(0x8c01, 0x8c01).mirror(0x3fe).rw(FUNC(kram3_state::data_firq_ack_r), FUNC(kram3_state::data_firq_ack_w));
+	map(0x9000, 0x93ff).rw(m_sndpia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9400, 0x97ff).r(m_pia[0], FUNC(pia6821_device::read)).w(FUNC(kram3_state::pia_w));
+	map(0x9800, 0x9bff).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9c00, 0x9fff).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xffff).bankr(m_mainbank);
 }
 
 
 
 void zookeep_state::main_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("share1");
+	map(0x0000, 0x03ff).ram().share("sharedram");
 	map(0x0400, 0x07ff).ram();
 	map(0x0800, 0x0bff).nopr();   /* ACIA */
-	map(0x0c00, 0x0c00).mirror(0x3fe).rw(FUNC(zookeep_state::qix_video_firq_r), FUNC(zookeep_state::qix_video_firq_w));
-	map(0x0c01, 0x0c01).mirror(0x3fe).rw(FUNC(zookeep_state::qix_data_firq_ack_r), FUNC(zookeep_state::qix_data_firq_ack_w));
-	map(0x1000, 0x13ff).rw(m_sndpia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1400, 0x17ff).r(m_pia0, FUNC(pia6821_device::read)).w(FUNC(zookeep_state::qix_pia_w));
-	map(0x1800, 0x1bff).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1c00, 0x1fff).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).mirror(0x3fe).rw(FUNC(zookeep_state::video_firq_r), FUNC(zookeep_state::video_firq_w));
+	map(0x0c01, 0x0c01).mirror(0x3fe).rw(FUNC(zookeep_state::data_firq_ack_r), FUNC(zookeep_state::data_firq_ack_w));
+	map(0x1000, 0x13ff).rw(m_sndpia[0], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1400, 0x17ff).r(m_pia[0], FUNC(pia6821_device::read)).w(FUNC(zookeep_state::pia_w));
+	map(0x1800, 0x1bff).rw(m_pia[1], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1c00, 0x1fff).rw(m_pia[2], FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -604,7 +636,7 @@ void qix_state::qix_base(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809E(config, m_maincpu, MAIN_CLOCK_OSC/4/4);  /* 1.25 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::qix_main_map);
 
 	// high interleave needed to ensure correct text in service mode
 	// Zookeeper settings and high score table seem especially sensitive to this
@@ -612,21 +644,21 @@ void qix_state::qix_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIA6821(config, m_pia0);
-	m_pia0->readpa_handler().set_ioport("P1");
-	m_pia0->set_port_a_input_overrides_output_mask(0xff);
-	m_pia0->readpb_handler().set_ioport("COIN");
+	PIA6821(config, m_pia[0]);
+	m_pia[0]->readpa_handler().set_ioport("P1");
+	m_pia[0]->set_port_a_input_overrides_output_mask(0xff);
+	m_pia[0]->readpb_handler().set_ioport("COIN");
 
-	PIA6821(config, m_pia1);
-	m_pia1->readpa_handler().set_ioport("SPARE");
-	m_pia1->set_port_a_input_overrides_output_mask(0xff);
-	m_pia1->readpb_handler().set_ioport("IN0");
+	PIA6821(config, m_pia[1]);
+	m_pia[1]->readpa_handler().set_ioport("SPARE");
+	m_pia[1]->set_port_a_input_overrides_output_mask(0xff);
+	m_pia[1]->readpb_handler().set_ioport("IN0");
 
-	PIA6821(config, m_pia2);
-	m_pia2->readpa_handler().set_ioport("P2");
-	m_pia2->set_port_a_input_overrides_output_mask(0xff);
-	m_pia2->writepb_handler().set(FUNC(qix_state::qix_coinctl_w));
-	m_pia2->tspb_handler().set_constant(0);
+	PIA6821(config, m_pia[2]);
+	m_pia[2]->readpa_handler().set_ioport("P2");
+	m_pia[2]->set_port_a_input_overrides_output_mask(0xff);
+	m_pia[2]->writepb_handler().set(FUNC(qix_state::coinctr_w));
+	m_pia[2]->tspb_handler().set_constant(0);
 
 	/* video hardware */
 	qix_video(config);
@@ -639,13 +671,13 @@ void qix_state::qix(machine_config &config)
 	qix_audio(config);
 }
 
-void qix_state::kram3(machine_config &config)
+void kram3_state::kram3(machine_config &config)
 {
 	qix(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::kram3_main_map);
-	m_maincpu->lic().set(FUNC(qix_state::kram3_lic_maincpu_changed));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kram3_state::main_map);
+	m_maincpu->lic().set(FUNC(kram3_state::lic_maincpu_changed));
 
-	kram3_video(config);
+	video(config);
 }
 
 /***************************************************************************
@@ -660,6 +692,7 @@ void qixmcu_state::mcu(machine_config &config)
 	qix(config);
 
 	/* basic machine hardware */
+	constexpr XTAL COIN_CLOCK_OSC = XTAL(4'000'000);     /* 4 MHz */
 
 	M68705P3(config, m_mcu, COIN_CLOCK_OSC); /* 1.00 MHz */
 	m_mcu->portb_r().set(FUNC(qixmcu_state::mcu_portb_r));
@@ -667,10 +700,10 @@ void qixmcu_state::mcu(machine_config &config)
 	m_mcu->porta_w().set(FUNC(qixmcu_state::mcu_porta_w));
 	m_mcu->portb_w().set(FUNC(qixmcu_state::mcu_portb_w));
 
-	m_pia0->readpb_handler().set(FUNC(qixmcu_state::coin_r));
-	m_pia0->writepb_handler().set(FUNC(qixmcu_state::coin_w));
+	m_pia[0]->readpb_handler().set(FUNC(qixmcu_state::coin_r));
+	m_pia[0]->writepb_handler().set(FUNC(qixmcu_state::coin_w));
 
-	m_pia2->writepb_handler().set(FUNC(qixmcu_state::coinctrl_w));
+	m_pia[2]->writepb_handler().set(FUNC(qixmcu_state::coinctrl_w));
 }
 
 
@@ -703,20 +736,20 @@ void slither_state::slither(machine_config &config)
 
 	m_maincpu->set_clock(SLITHER_CLOCK_OSC/4/4);   /* 1.34 MHz */
 
-	m_pia1->readpa_handler().set(FUNC(slither_state::trak_lr_r));
-	m_pia1->cb2_handler().set(FUNC(slither_state::sn76489_0_ctrl_w));
-	m_pia1->readpb_handler().set_constant(0);
+	m_pia[1]->readpa_handler().set(FUNC(slither_state::trak_r<1>));
+	m_pia[1]->cb2_handler().set(FUNC(slither_state::sn76489_ctrl_w<0>));
+	m_pia[1]->readpb_handler().set_constant(0);
 
-	m_pia2->readpa_handler().set(FUNC(slither_state::trak_ud_r));
-	m_pia2->writepb_handler().set_nop();
-	m_pia2->cb2_handler().set(FUNC(slither_state::sn76489_1_ctrl_w));
-	m_pia2->readpb_handler().set_constant(0);
+	m_pia[2]->readpa_handler().set(FUNC(slither_state::trak_r<0>));
+	m_pia[2]->writepb_handler().set_nop();
+	m_pia[2]->cb2_handler().set(FUNC(slither_state::sn76489_ctrl_w<1>));
+	m_pia[2]->readpb_handler().set_constant(0);
 
 	/* video hardware */
-	slither_video(config);
+	video(config);
 
 	/* audio hardware */
-	slither_audio(config);
+	audio(config);
 }
 
 
@@ -1337,7 +1370,7 @@ static const uint8_t xor2_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,11, 6,99,
 };
 
-int qix_state::kram3_permut1(int idx, int value)
+static inline int kram3_permut1(int idx, int value)
 {
 	switch (idx)
 	{
@@ -1349,7 +1382,7 @@ int qix_state::kram3_permut1(int idx, int value)
 	}
 }
 
-int qix_state::kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table)
+static inline int kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table)
 {
 	int xorval = 0;
 
@@ -1370,7 +1403,7 @@ int qix_state::kram3_permut2(int tbl_index, int idx, const uint8_t *xor_table)
 	return xorval;
 }
 
-int qix_state::kram3_decrypt(int address, int value)
+static inline int kram3_decrypt(int address, int value)
 {
 	int indx1 = (BIT(address,1) << 1) | BIT(address,5);
 	int indx2 = (BIT(address,7) << 1) | BIT(address,3);
@@ -1396,11 +1429,11 @@ int qix_state::kram3_decrypt(int address, int value)
 	return ((bits2 & 0xe) << 4) | ((bits1 & 0x8) << 1) | ((bits2 & 0x1) << 3) | ((bits1 & 0x7) << 0);
 }
 
-void qix_state::init_kram3()
+void kram3_state::init_kram3()
 {
 	//const uint8_t *patch;
-	assert(m_bank0);
-	assert(m_bank1);
+	assert(m_mainbank);
+	assert(m_videobank);
 
 	/********************************
 
@@ -1418,41 +1451,41 @@ void qix_state::init_kram3()
 
 	//patch = memregion("user1")->base();
 	uint8_t *rom = memregion("maincpu")->base();
-	m_decrypted = std::make_unique<uint8_t[]>(0x6000);
+	m_main_decrypted = std::make_unique<uint8_t[]>(0x6000);
 
-	memcpy(m_decrypted.get(),&rom[0xa000],0x6000);
+	memcpy(m_main_decrypted.get(),&rom[0xa000],0x6000);
 	for (int i = 0xa000; i < 0x10000; ++i)
 	{
-		m_decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
+		m_main_decrypted[i - 0xa000] = kram3_decrypt(i, rom[i]);
 	}
 
-	m_bank0->configure_entry(0, memregion("maincpu")->base() + 0xa000);
-	m_bank0->configure_entry(1, m_decrypted.get());
-	m_bank0->set_entry(0);
+	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0xa000);
+	m_mainbank->configure_entry(1, m_main_decrypted.get());
+	m_mainbank->set_entry(0);
 
 	//patch = memregion("user2")->base();
 	rom = memregion("videocpu")->base();
-	m_decrypted2 = std::make_unique<uint8_t[]>(0x6000);
+	m_video_decrypted = std::make_unique<uint8_t[]>(0x6000);
 
-	memcpy(m_decrypted2.get(),&rom[0xa000],0x6000);
+	memcpy(m_video_decrypted.get(),&rom[0xa000],0x6000);
 	for (int i = 0xa000; i < 0x10000; ++i)
 	{
-		m_decrypted2[i-0xa000] = kram3_decrypt(i, rom[i]);
+		m_video_decrypted[i - 0xa000] = kram3_decrypt(i, rom[i]);
 	}
 
-	m_bank1->configure_entry(0, memregion("videocpu")->base() + 0xa000);
-	m_bank1->configure_entry(1, m_decrypted2.get());
-	m_bank1->set_entry(0);
+	m_videobank->configure_entry(0, memregion("videocpu")->base() + 0xa000);
+	m_videobank->configure_entry(1, m_video_decrypted.get());
+	m_videobank->set_entry(0);
 }
 
-void qix_state::kram3_lic_maincpu_changed(int state)
+void kram3_state::lic_maincpu_changed(int state)
 {
-	m_bank0->set_entry( state ? 1 : 0 );
+	m_mainbank->set_entry(state ? 1 : 0);
 }
 
-void qix_state::kram3_lic_videocpu_changed(int state)
+void kram3_state::lic_videocpu_changed(int state)
 {
-	m_bank1->set_entry( state ? 1 : 0 );
+	m_videobank->set_entry(state ? 1 : 0);
 }
 
 /*************************************
@@ -1476,7 +1509,7 @@ GAMEL(1982, elecyoyoa, elecyoyo, mcu,       elecyoyo, qixmcu_state,  empty_init,
 
 GAME( 1982, kram,      0,        mcu,       kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram (rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, krama,     kram,     mcu,       kram,     qixmcu_state,  empty_init,   ROT0,   "Taito America Corporation", "Kram", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, krame,     kram,     kram3,     kram,     qix_state,     init_kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, krame,     kram,     kram3,     kram,     kram3_state,   init_kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, zookeep,   0,        zookeep,   zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, zookeep2,  zookeep,  zookeep,   zookeep,  zookeep_state, empty_init,   ROT0,   "Taito America Corporation", "Zoo Keeper (set 2)", MACHINE_SUPPORTS_SAVE )

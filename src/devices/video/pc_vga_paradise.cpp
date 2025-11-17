@@ -305,6 +305,8 @@ wd90c00_vga_device::wd90c00_vga_device(const machine_config &mconfig, device_typ
 	, m_cnf14_read_cb(*this, 1)
 	, m_cnf13_read_cb(*this, 1)
 	, m_cnf12_read_cb(*this, 1)
+	, m_cnf_write_ddr_cb(*this, 0xff)
+	, m_vclk2(0)
 {
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(wd90c00_vga_device::crtc_map), this));
 }
@@ -312,6 +314,16 @@ wd90c00_vga_device::wd90c00_vga_device(const machine_config &mconfig, device_typ
 wd90c00_vga_device::wd90c00_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: wd90c00_vga_device(mconfig, WD90C00, tag, owner, clock)
 {
+}
+
+void wd90c00_vga_device::device_start()
+{
+	pvga1a_vga_device::device_start();
+	if (m_vclk2 == 0)
+	{
+		m_vclk2 = 42'000'000;
+		logerror("VCLK2 unset, using fallback to 42 MHz\n");
+	}
 }
 
 void wd90c00_vga_device::device_reset()
@@ -411,8 +423,9 @@ void wd90c00_vga_device::recompute_params()
 		case 2:
 		// TODO: wd90c30 selects this for 1024x768 interlace mode
 		// (~40 Hz, should be 43 according to defined video clocks in WD9710 driver .inf)
+		// NOTE: it's also reused by teradrive Video mode
 		default:
-			xtal = XTAL(42'000'000).value();
+			xtal = XTAL(m_vclk2).value();
 			break;
 	}
 
@@ -464,7 +477,9 @@ u8 wd90c00_vga_device::egasw_r(offs_t offset)
 void wd90c00_vga_device::egasw_w(offs_t offset, u8 data)
 {
 	LOG("PR11 EGA Switch W %02x\n", data);
-	m_pr11 = data & 0xff;
+	// NOTE: teradrive and megapc will flush the entire CRTC range after setup mode
+	// expecting bit 7 still high on reads afterwards (pullup)
+	m_pr11 = (data & m_cnf_write_ddr_cb()) | (m_pr11 & ~m_cnf_write_ddr_cb());
 }
 
 /*

@@ -65,7 +65,7 @@ public:
 	dlair_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
+		m_speaker(*this, "speaker_sound"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_ldv1000(*this, "ld_ldv1000"),
@@ -736,13 +736,12 @@ void dlair_state::dlair_base(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(dlair_state::irq0_line_hold),  attotime::from_hz((double)MASTER_CLOCK_US/8/16/16/16/16));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK_US/8));
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.port_b_read_callback().set_ioport("DSW2");
-	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.33, 1);
 }
 
 
@@ -750,8 +749,8 @@ void dlair_state::dlair_pr7820(machine_config &config)
 {
 	dlair_base(config);
 	PIONEER_PR7820(config, m_pr7820, 0);
-	m_pr7820->add_route(0, "lspeaker", 1.0);
-	m_pr7820->add_route(1, "rspeaker", 1.0);
+	m_pr7820->add_route(0, "speaker", 1.0, 0);
+	m_pr7820->add_route(1, "speaker", 1.0, 1);
 	m_pr7820->add_ntsc_screen(config, "screen");
 }
 
@@ -760,8 +759,8 @@ void dlair_state::dlair_ldv1000(machine_config &config)
 {
 	dlair_base(config);
 	PIONEER_LDV1000HLE(config, m_ldv1000, 0);
-	m_ldv1000->add_route(0, "lspeaker", 1.0);
-	m_ldv1000->add_route(1, "rspeaker", 1.0);
+	m_ldv1000->add_route(0, "speaker", 1.0, 0);
+	m_ldv1000->add_route(1, "speaker", 1.0, 1);
 	m_ldv1000->add_ntsc_screen(config, "screen");
 }
 
@@ -786,8 +785,8 @@ void dlair_state::dleuro(machine_config &config)
 
 	PHILIPS_22VP932(config, m_22vp932, 0);
 	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
-	m_22vp932->add_route(0, "lspeaker", 1.0);
-	m_22vp932->add_route(1, "rspeaker", 1.0);
+	m_22vp932->add_route(0, "speaker", 1.0, 0);
+	m_22vp932->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_22vp932->add_pal_screen(config, "screen");
@@ -796,12 +795,11 @@ void dlair_state::dleuro(machine_config &config)
 	PALETTE(config, m_palette, FUNC(dlair_state::dleuro_palette), 16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
-	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.33, 0);
+	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.33, 1);
 }
 
 

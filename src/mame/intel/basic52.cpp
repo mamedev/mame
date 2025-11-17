@@ -23,7 +23,7 @@ Sound: BASIC-31 has sound, and BASIC-52 doesn't. The sound command is PWM.
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/i8255.h"
 #include "bus/rs232/terminal.h"
 #include "bus/rs232/rs232.h"
@@ -121,7 +121,7 @@ void basic52_state::basic31(machine_config &config)
 	/* basic machine hardware */
 	I8031(config, m_maincpu, XTAL(11'059'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &basic52_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &basic52_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(basic52_state::port1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(basic52_state::port3_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::port3_r));
@@ -142,7 +142,7 @@ void basic52_state::basic52(machine_config &config)
 	/* basic machine hardware */
 	I8052(config.replace(), m_maincpu, XTAL(11'059'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &basic52_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &basic52_state::io_map);
 	m_maincpu->port_out_cb<3>().set(FUNC(basic52_state::port3_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::port3_r));
 }

@@ -95,8 +95,8 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 	}
 
 
-	const uint32_t page1_addr = 0x40 * m_video_regs[0x20];
-	const uint32_t page2_addr = 0x40 * m_video_regs[0x21];
+	const uint32_t page1_addr = m_video_regs[0x20];
+	const uint32_t page2_addr = m_video_regs[0x21];
 	const uint32_t sprite_addr = 0x40 * m_video_regs[0x22];
 
 	uint16_t *page1_scroll = m_video_regs + 0x10;
@@ -110,11 +110,11 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(false, false, false, 0, cliprect, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
-			m_renderer->draw_page(false, false, false, 0, cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
-			m_renderer->draw_sprites(false, 0, false, 0, false, cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
+			m_renderer->draw_page(cliprect, scanline, i, page1_addr, page1_scroll, page1_regs, mem, m_paletteram, m_scrollram, 0);
+			m_renderer->draw_page(cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
+			m_renderer->draw_sprites(cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
-
+		
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
 	}
 
@@ -131,7 +131,11 @@ void spg2xx_video_device::do_sprite_dma(uint32_t len)
 
 	for (uint32_t j = 0; j < len; j++)
 	{
-		m_spriteram[(dst + j) & 0x3ff] = mem.read_word(src + j);
+		int dest = dst + j;
+		// jak_dpma does a full length transfer offset from the start, which causes corruption
+		// on the options screen if we wrap, assume DMA just writes to nowhere if it goes out of bounds
+		if (dest < 0x400)
+			m_spriteram[dest] = mem.read_word(src + j);
 	}
 
 	m_video_regs[0x72] = 0;

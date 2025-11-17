@@ -120,14 +120,14 @@ authors:hap
 		<element ref="text_b2"><bounds x="5.125" y="6.7" width="1.75" height="0.25" /></element>
 		<element ref="text_b3"><bounds x="6.2375" y="6.7" width="1.9" height="0.25" /></element>
 
-		<element ref="nothing" clickthrough="no"><bounds x="6.25" y="4.9" width="1.2" height="0.5" /></element>
 		<element ref="switch" inputtag="IN.1" inputmask="0x0f" inputraw="yes"><bounds x="6.3" y="4.925" width="1" height="0.25" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="6.25" y="4.9" width="1.2" height="0.5" /></element>
 		<element ref="text_s1"><bounds x="5.15" y="4.925" width="1.5" height="0.25" /></element>
 		<element ref="text_ro"><bounds x="5.825" y="4.875" width="0.35" height="0.35" /></element>
 		<element ref="nothing" inputtag="IN.1" inputmask="0x0f" inputraw="yes"><bounds x="5.8" y="4.85" width="0.4" height="0.4" /></element>
 
-		<element ref="nothing" clickthrough="no"><bounds x="6.25" y="7.2" width="1.2" height="0.5" /></element>
 		<element ref="switch" inputtag="IN.2" inputmask="0x07" inputraw="yes"><bounds x="6.3" y="7.275" width="1" height="0.25" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="6.25" y="7.2" width="1.2" height="0.5" /></element>
 		<element ref="text_s2"><bounds x="5.15" y="7.275" width="1.5" height="0.25" /></element>
 		<element ref="text_rg"><bounds x="5.825" y="7.225" width="0.35" height="0.35" /></element>
 		<element ref="nothing" inputtag="IN.2" inputmask="0x07" inputraw="yes"><bounds x="5.8" y="7.2" width="0.4" height="0.4" /></element>

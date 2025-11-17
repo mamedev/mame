@@ -16,8 +16,6 @@
 class esq_5505_5510_pump_device : public device_t, public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
 	esq_5505_5510_pump_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_esp(T &&tag) { m_esp.set_tag(std::forward<T>(tag)); }
@@ -73,7 +71,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// internal state:
@@ -103,7 +101,7 @@ private:
 #endif
 
 #if !PUMP_FAKE_ESP_PROCESSING && PUMP_REPLACE_ESP_PROGRAM
-	std::vector<stream_buffer::sample_t> e;
+	std::vector<sound_stream::sample_t> e;
 	int ei;
 #endif
 };

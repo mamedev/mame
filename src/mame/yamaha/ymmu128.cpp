@@ -127,9 +127,9 @@ u16 mu128_state::pe_r()
 	if(BIT(m_pe, 4)) {
 		if(BIT(m_pe, 0)) {
 			if(BIT(m_pe, 2))
-				return m_lcd->data_read() << 8;
+				return m_lcd->data_r() << 8;
 			else
-				return m_lcd->control_read() << 8;
+				return m_lcd->control_r() << 8;
 		} else
 			return 0x0000;
 	}
@@ -142,9 +142,9 @@ void mu128_state::pe_w(u16 data)
 	if(BIT(m_pe, 4) && !BIT(data, 4)) {
 		if(!BIT(data, 0)) {
 			if(BIT(data, 2))
-				m_lcd->data_write(data >> 8);
+				m_lcd->data_w(data >> 8);
 			else
-				m_lcd->control_write(data >> 8);
+				m_lcd->control_w(data >> 8);
 		}
 	}
 
@@ -186,18 +186,17 @@ void mu128_state::mu128(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP30(config, m_swp30m);
 	m_swp30m->set_addrmap(AS_DATA, &mu128_state::swp30_map);
-	m_swp30m->add_route(0, "lspeaker", 1.0);
-	m_swp30m->add_route(1, "rspeaker", 1.0);
+	m_swp30m->add_route(0, "speaker", 1.0, 0);
+	m_swp30m->add_route(1, "speaker", 1.0, 1);
 
 	SWP30(config, m_swp30s);
 	m_swp30s->set_addrmap(AS_DATA, &mu128_state::swp30_map);
-	m_swp30s->add_route(0, "lspeaker", 1.0);
-	m_swp30s->add_route(1, "rspeaker", 1.0);
+	m_swp30s->add_route(0, "speaker", 1.0, 0);
+	m_swp30s->add_route(1, "speaker", 1.0, 1);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set_inputline(m_maincpu, 0);
 	I8251(config, m_sci, 10_MHz_XTAL); // uPD71051GU-10
@@ -242,4 +241,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1998, mu128, 0, 0, mu128,  mu128, mu128_state, empty_init, "Yamaha", "MU128", MACHINE_NOT_WORKING )
+CONS( 1998, mu128, 0, 0, mu128,  mu128, mu128_state, empty_init, "Yamaha", "MU128", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

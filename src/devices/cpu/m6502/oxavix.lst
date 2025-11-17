@@ -4,7 +4,7 @@
 
 callf_xa3
 	read_stack(SP);
-	write_special_stack(get_codebank());
+	write_special_stack(SP, get_codebank());
 	dec_special_stack();
 	TMP2 = read_pc();
 	PC++;
@@ -40,7 +40,7 @@ retf_imp
 	inc_SP();
 	PC = set_h(PC, read_stack(SP));
 	inc_special_stack();
-	TMP2 = read_special_stack();
+	TMP2 = read_special_stack(SP);
 	set_codebank(TMP2);
 	read_pc();
 	PC++;
@@ -55,7 +55,7 @@ brk_xav_imp
 		read_pc();
 	PC++;
 	}
-	write_special_stack(get_codebank());
+	write_special_stack(SP, get_codebank());
 	set_codebank(0x00); // epo_efdx, rad_ping and rad_mtrk strongly suggest that interrupts must force bank 0 as code jumps to a ROM pointer stored earlier / a fixed pointer to a rom address in bank 0
 	dec_special_stack();
 	write_stack(SP, PC >> 8);
@@ -123,7 +123,7 @@ rti_xav_imp
 	inc_SP();
 	PC = set_h(PC, read_stack(SP));
 	inc_special_stack();
-	TMP2 = read_special_stack();
+	TMP2 = read_special_stack(SP);
 	set_codebank(TMP2);
 	prefetch();
 

@@ -83,7 +83,6 @@ protected:
 	memory_view m_io_view;
 	required_memory_bank_array<4> m_bank_rom;
 	optional_region_ptr<u8> m_char_rom; // required for ATM2, absent in ATM1
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	required_device<beta_disk_device> m_beta;
 	required_device<ata_interface_device> m_ata;

@@ -55,7 +55,6 @@ void defines_verbose()
 	osd_printf_verbose("\n");
 	osd_printf_verbose("Build defines 1:    ");
 	MACRO_VERBOSE(LSB_FIRST);
-	MACRO_VERBOSE(PTR64);
 	MACRO_VERBOSE(MAME_NOASM);
 	MACRO_VERBOSE(MAME_DEBUG);
 	MACRO_VERBOSE(BIGENDIAN);

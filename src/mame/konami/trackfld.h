@@ -63,11 +63,11 @@ private:
 	void trackfld_videoram_w(offs_t offset, uint8_t data);
 	void trackfld_colorram_w(offs_t offset, uint8_t data);
 	void atlantol_gfxbank_w(uint8_t data);
-	uint8_t trackfld_SN76496_r();
+	uint8_t trackfld_SN76489a_r();
 	uint8_t trackfld_speech_r();
 	void trackfld_VLM5030_control_w(uint8_t data);
-	void konami_SN76496_latch_w(uint8_t data) { m_SN76496_latch = data; }
-	void konami_SN76496_w(uint8_t data) { m_sn->write(m_SN76496_latch); }
+	void konami_SN76489a_latch_w(uint8_t data) { m_SN76489a_latch = data; }
+	void konami_SN76489a_w(uint8_t data) { m_sn->write(m_SN76489a_latch); }
 
 	void hyprolyb_sound_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
@@ -93,7 +93,7 @@ private:
 	optional_device<ls259_device> m_mainlatch;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<trackfld_audio_device> m_soundbrd;
-	optional_device<sn76496_device> m_sn;
+	optional_device<sn76489a_device> m_sn;
 	optional_device<vlm5030_device> m_vlm;
 	required_device<dac_8bit_r2r_device> m_dac;
 	required_device<screen_device> m_screen;
@@ -111,7 +111,7 @@ private:
 	bool     m_irq_mask = false;
 	bool     m_nmi_mask = false;
 
-	uint8_t m_SN76496_latch = 0;
+	uint8_t m_SN76489a_latch = 0;
 
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);

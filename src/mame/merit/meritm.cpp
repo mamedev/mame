@@ -435,7 +435,7 @@ void meritm_state::crt250_questions_hi_w(uint8_t data)
 
 void meritm_state::crt250_questions_bank_w(uint8_t data)
 {
-	uint32_t questions_address;
+	uint32_t questions_address = 0;
 
 	if ((m_bank & 0x07) != 0)
 	{
@@ -455,22 +455,57 @@ void meritm_state::crt250_questions_bank_w(uint8_t data)
 	}
 	else
 	{
-		switch(data)
+		if (!BIT(data, 7))
 		{
-			case 0x6c: questions_address = 0x00000; break;
-			case 0x6d: questions_address = 0x10000; break;
-			case 0x6e: questions_address = 0x20000; break;
-			case 0x6f: questions_address = 0x30000; break;
-			case 0x5c: questions_address = 0x40000; break;
-			case 0x5d: questions_address = 0x50000; break;
-			case 0x5e: questions_address = 0x60000; break;
-			case 0x5f: questions_address = 0x70000; break;
-			case 0x3c: questions_address = 0x80000; break;
-			case 0x3d: questions_address = 0x90000; break;
-			case 0x3e: questions_address = 0xa0000; break;
-			case 0x3f: questions_address = 0xb0000; break;
-			default: logerror( "crt250_questions_bank_w: unknown data = %02x\n", data ); return;
+			switch(data)
+			{
+				case 0x6c: questions_address = 0x00000; break;
+				case 0x6d: questions_address = 0x10000; break;
+				case 0x6e: questions_address = 0x20000; break;
+				case 0x6f: questions_address = 0x30000; break;
+				case 0x5c: questions_address = 0x40000; break;
+				case 0x5d: questions_address = 0x50000; break;
+				case 0x5e: questions_address = 0x60000; break;
+				case 0x5f: questions_address = 0x70000; break;
+				case 0x3c: questions_address = 0x80000; break;
+				case 0x3d: questions_address = 0x90000; break;
+				case 0x3e: questions_address = 0xa0000; break;
+				case 0x3f: questions_address = 0xb0000; break;
+				default: logerror( "crt250_questions_bank_w: unknown data = %02x\n", data ); return;
+			}
 		}
+		else
+		{
+			switch(data)
+			{
+				case 0xe8: questions_address = 0x000000; break;
+				case 0xe9: questions_address = 0x010000; break;
+				case 0xea: questions_address = 0x020000; break;
+				case 0xeb: questions_address = 0x030000; break;
+				case 0xec: questions_address = 0x040000; break;
+				case 0xed: questions_address = 0x050000; break;
+				case 0xee: questions_address = 0x060000; break;
+				case 0xef: questions_address = 0x070000; break;
+				case 0xd8: questions_address = 0x080000; break;
+				case 0xd9: questions_address = 0x090000; break;
+				case 0xda: questions_address = 0x0a0000; break;
+				case 0xdb: questions_address = 0x0b0000; break;
+				case 0xdc: questions_address = 0x0c0000; break;
+				case 0xdd: questions_address = 0x0d0000; break;
+				case 0xde: questions_address = 0x0e0000; break;
+				case 0xdf: questions_address = 0x0f0000; break;
+				case 0xb8: questions_address = 0x100000; break;
+				case 0xb9: questions_address = 0x110000; break;
+				case 0xba: questions_address = 0x120000; break;
+				case 0xbb: questions_address = 0x130000; break;
+				case 0xbc: questions_address = 0x140000; break;
+				case 0xbd: questions_address = 0x150000; break;
+				case 0xbe: questions_address = 0x160000; break;
+				case 0xbf: questions_address = 0x170000; break;
+				default: logerror( "crt250_questions_bank_w: unknown data = %02x\n", data ); return;
+			}
+		}
+
 		logerror( "Reading question byte at %06X\n", questions_address | m_questions_loword_address);
 		*dst = m_region_extra->base()[questions_address | m_questions_loword_address];
 	}
@@ -1415,6 +1450,26 @@ ROM_START( pbss330ca ) /* Dallas DS1204V security key attached to CRT-254 connec
 	ROM_LOAD( "qs9233-01_u5-r0",  0x80000, 0x40000, CRC(740b1274) SHA1(14eab68fc137b905a5a2739c7081900a48cba562) )
 ROM_END
 
+/* With this set, Merit has moved to the Megatouch brand name, updating the product code from 9234-xx-xx to 9235-xx-xx */
+ROM_START( megat ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9235-01 U1-ROA C1994 MII */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9235-00-01_u9-r0",   0x00000, 0x10000, CRC(3f491589) SHA1(d1fcbec2bd47a6734a08c42f6960313c3a9c9895) ) /* 9235-00-01  941007 */
+	ROM_LOAD( "9235-00-01_u10-r0",  0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Also found as PBC U10 */
+	ROM_LOAD( "9235-00-01_u11-r0",  0x20000, 0x10000, CRC(905db7e3) SHA1(fe4b8d4904aff3ee004e11d2d30d748589a00cbd) )
+	ROM_LOAD( "9235-00-01_u12-r0",  0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) /* Also found as PBC U12 */
+	ROM_LOAD( "9235-00-01_u13-r0",  0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) /* Also found as PBC U13 */
+	ROM_LOAD( "9235-00-01_u14-r0",  0x50000, 0x10000, CRC(aa4c99e5) SHA1(d7efd82836448e2ae73ccef204f4dce227eec237) )
+	ROM_LOAD( "9235-00-01_u15-r0a", 0x60000, 0x10000, CRC(a40ed5e4) SHA1(23d274e19adfc881d1bc413fc91be9fe0d25cab4) )
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9235-01_u1-r0a_c1994_mii", 0x000000, 0x000022, BAD_DUMP CRC(c77fbe2a) SHA1(e99db50b28cbeb1a97be53ec7188a970a75d89db) )
+
+	ROM_REGION( 0x180000, "extra", 0 ) // question roms - twice the size of other sets? NM27C040Q ROMs
+	ROM_LOAD( "qs9235-00-01_u7-r0",  0x000000, 0x80000, CRC(16643f83) SHA1(347af99f535a8b473c8780067d5132add7fa0d8c) ) /* These 3 roms are on CRT-256 satellite PCB */
+	ROM_LOAD( "qs9235-00-01_u6-r0",  0x080000, 0x80000, CRC(0a358743) SHA1(cc7c1b75e391204a7bdae2e1cecd9b55b572f8d5) )
+	ROM_LOAD( "qs9235-00-01_u5-r0a", 0x100000, 0x80000, CRC(ec0c18f6) SHA1(ae4f60f516097607249dbd902f8aacfe95acb065) ) /* only U5 was rev A */
+ROM_END
+
 /*
 Basically this Pit Boss Megatouch set is Pit Boss Supertouch 30 v2.0 but marks the first time Merit
  started using the Megatouch name.
@@ -1422,7 +1477,7 @@ Basically this Pit Boss Megatouch set is Pit Boss Supertouch 30 v2.0 but marks t
 NOTE: Once again U10, U12 & U13 doesn't change between this set and the Pit Boss Supertouch 30 sets
       and the question roms are the same data with a new label and game number ID
 */
-ROM_START( megat ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9234-20 U1-RO C1994 MII */
+ROM_START( megata ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9234-20 U1-RO C1994 MII */
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9234-20-01_u9-r0a",  0x00000, 0x10000, CRC(5a9fd092) SHA1(756b6a925dafb17451e7dc37c95a26d09ecfe2d7) ) /* 9234-20-01 R0A 940519 */
 	ROM_LOAD( "9234-20-01_u10-r0a", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) /* Also found as PBC U10 */
@@ -2495,7 +2550,8 @@ GAME( 1992, pitbosssm, pitbosss, crt250, pitbosss,  meritm_state, empty_init, RO
 
 /* CRT-250 + CRT-252 + CRT-256 + CRT-258 */
 GAME( 1994, mtjpoker,  0,        crt250_crt252_crt258, mtjpoker,   meritm_state, empty_init, ROT0, "Merit", "Merit Touch Joker Poker (9132-00)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, megat,     0,        crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megatouch (9234-20-01 R0A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megat,     0,        crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megatouch (9235-00-01 R0A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, megata,    megat,    crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Megatouch (9234-20-01 R0A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, pbst30,    0,        crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-10-01 R0)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, pbst30a,   pbst30,   crt250_crt252_crt258, pbst30,     meritm_state, empty_init, ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01 R0A)", MACHINE_IMPERFECT_GRAPHICS )
 

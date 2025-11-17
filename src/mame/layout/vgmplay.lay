@@ -108,9 +108,10 @@ license:CC0-1.0
 		</rect>
 		<image>
 			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<color red="0.7" green="0.7" blue="0.2" />
 			<data><![CDATA[
 				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
-					<path fill="#E5E533" stroke="none" d="M 50,0 l 100,0 l 0,100 l -100,0 z" />
+					<path fill="#FFFFFF" stroke="none" d="M 50,0 l 100,0 l 0,100 l -100,0 z" />
 				</svg>
 			]]></data>
 		</image>
@@ -122,9 +123,11 @@ license:CC0-1.0
 		</rect>
 		<image>
 			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<color state="0" red="1.0" green="0.3" blue="0.1" />
+			<color state="1" red="0.7" green="0.7" blue="0.2" />
 			<data><![CDATA[
 				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
-					<path fill="#E5E533" stroke="none" d="M 55,0 l 30,0 l 0,100 l -30,0 z m 60,0 l 30,0 l 0,100 l -30,0 z" />
+					<path fill="#FFFFFF" stroke="none" d="M 55,0 l 30,0 l 0,100 l -30,0 z m 60,0 l 30,0 l 0,100 l -30,0 z" />
 				</svg>
 			]]></data>
 		</image>
@@ -136,9 +139,11 @@ license:CC0-1.0
 		</rect>
 		<image>
 			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<color state="0" red="0.7" green="0.7" blue="0.2" />
+			<color state="1" red="1.0" green="0.3" blue="0.1" />
 			<data><![CDATA[
 				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
-					<path fill="#E5E533" stroke="none" d="M 40,0 l 120,50 l -120,50 z" />
+					<path fill="#FFFFFF" stroke="none" d="M 40,0 l 120,50 l -120,50 z" />
 				</svg>
 			]]></data>
 		</image>
@@ -150,9 +155,10 @@ license:CC0-1.0
 		</rect>
 		<image>
 			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<color red="0.7" green="0.7" blue="0.2" />
 			<data><![CDATA[
 				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
-					<path fill="#E5E533" stroke="none" d="M 10,0 l 15,0 l 0,45 l 85,-45 l 0,45 l 85,-45 l 0,100 l -85,-45 l 0,45 l -85,-45 l 0,45 l -15,0 z" />
+					<path fill="#FFFFFF" stroke="none" d="M 10,0 l 15,0 l 0,45 l 85,-45 l 0,45 l 85,-45 l 0,100 l -85,-45 l 0,45 l -85,-45 l 0,45 l -15,0 z" />
 				</svg>
 			]]></data>
 		</image>
@@ -164,9 +170,11 @@ license:CC0-1.0
 		</rect>
 		<image>
 			<bounds xc="5.5" yc="2.5" width="4" height="2" />
+			<color state="0" red="0.7" green="0.7" blue="0.2" />
+			<color state="1" red="1.0" green="0.3" blue="0.1" />
 			<data><![CDATA[
 				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" viewBox="0 0 200 100">
-					<path fill="#E5E533" stroke="none" d="M 120,15 l 40,0 a 40,40,0,0,1,0,80 l -120,0 a 40,40,0,0,1,0,-80 l 30,0 l 0,-15 l 40,25 l -40,25 l 0,-15 l -30,0 a 20,20,0,0,0,0,40 l 120,0 a 20,20,0,0,0,0,-40 l -40,0 z" />
+					<path fill="#FFFFFF" stroke="none" d="M 120,15 l 40,0 a 40,40,0,0,1,0,80 l -120,0 a 40,40,0,0,1,0,-80 l 30,0 l 0,-15 l 40,25 l -40,25 l 0,-15 l -30,0 a 20,20,0,0,0,0,40 l 120,0 a 20,20,0,0,0,0,-40 l -40,0 z" />
 				</svg>
 			]]></data>
 		</image>
@@ -269,10 +277,10 @@ license:CC0-1.0
 	<view name="Full View">
 		<collection name="Controls">
 			<element ref="button_l1"><bounds x="0"  y="4" width="11" height="5" /></element>
-			<element ref="button_l2"><bounds x="12" y="4" width="11" height="5" /></element>
-			<element ref="button_l3"><bounds x="24" y="4" width="11" height="5" /></element>
+			<element ref="button_l2" name="playing"><bounds x="12" y="4" width="11" height="5" /></element>
+			<element ref="button_l3" name="playing"><bounds x="24" y="4" width="11" height="5" /></element>
 			<element ref="button_l4"><bounds x="36" y="4" width="11" height="5" /></element>
-			<element ref="button_l5"><bounds x="48" y="4" width="11" height="5" /></element>
+			<element ref="button_l5" name="loop"><bounds x="48" y="4" width="11" height="5" /></element>
 
 			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0001"><bounds x="0"  y="4" width="11" height="5" /><color alpha="0.15" /></element>
 			<element ref="hl1" inputtag="CONTROLS" inputmask="0x0002"><bounds x="12" y="4" width="11" height="5" /><color alpha="0.15" /></element>

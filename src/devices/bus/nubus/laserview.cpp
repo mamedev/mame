@@ -3,8 +3,8 @@
 /***************************************************************************
 
   Sigma Designs fixed-resolution monochrome video card
-  1664x1200 or 832x600 according to the ad, and exist as mode entries
-  in the declaration ROM.
+  1664x1200 or 832x600 according to the ad, but more modes exist
+  in the dumped v3.0 declaration ROM.
 
   VRAM at Fs000000, mirrored at Fs900000.
   Fs0BFFEC: write 0x04 to enable VBL, 0x01 to ack VBL
@@ -18,10 +18,15 @@
   99.108 MHz
   16.0 MHz
 
-  CRTC parameters are always programmed for 1664x1200, the card apparently
-  doubles up the output for the 832x600 mode.
+  Modes in the declaration ROM shown by SlotsParse are:
+  832x600
+  1664x1200
+  640x480
+  1280x960
+  512x384
+  1024x768
 
-  TODO: Find what makes it sense the higher resolution mode.
+  TODO: Figure out how to set the other modes.  A software driver, possibly?
 
 ***************************************************************************/
 
@@ -64,7 +69,7 @@ namespace {
 		required_device<screen_device> m_screen;
 
 		std::unique_ptr<u32[]> m_vram;
-		u16 m_htotal, m_hvis, m_vtotal, m_vvis;
+		u16 m_htotal, m_hvis, m_vtotal, m_vvis, m_stride;
 		u32 m_vbl_disable;
 		u8 m_prot_latch;
 	};
@@ -133,12 +138,12 @@ void nubus_laserview_device::device_reset()
 u32 nubus_laserview_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
-	for (int y = 0; y < 600; y++)
+	for (int y = 0; y < m_vvis; y++)
 	{
 		u16 *scanline = &bitmap.pix(y);
-		for (int x = 0; x < 832/8; x++)
+		for (int x = 0; x < m_hvis/8; x++)
 		{
-			u8 const pixels = vram8[(y * 104) + x + 0x20];
+			u8 const pixels = vram8[(y * (m_stride >> 4)) + x + 0x20];
 
 			*scanline++ = BIT(pixels, 7);
 			*scanline++ = BIT(pixels, 6);
@@ -166,23 +171,7 @@ void nubus_laserview_device::regs_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x00f9:
-			m_prot_latch = ~data;
-			break;
-
-		case 0x0493:
-			m_vvis = (m_vvis & 0xff) | (data << 8);
-			break;
-
-		case 0x0687:
-			m_hvis = (m_hvis & 0xff) | (data << 8);
-			break;
-
-		case 0x078f:
-			m_vtotal = (m_vtotal & 0xff) | (data << 8);
-			break;
-
-		case 0x0883:
-			m_htotal = (m_htotal & 0xff) | (data<<8);
+			m_prot_latch = data ^ 0xff;
 			break;
 
 		case 0x08ff:
@@ -194,23 +183,7 @@ void nubus_laserview_device::regs_w(offs_t offset, u8 data)
 			break;
 
 		case 0x20f9:
-			m_prot_latch = ~data ^ 0xff;
-			break;
-
-		case 0xb095:
-			m_vvis = (m_vvis & 0xff00) | data;
-			break;
-
-		case 0xdd91:
-			m_vtotal = (m_vtotal & 0xff00) | data;
-			break;
-
-		case 0x8085:
-			m_htotal = (m_htotal & 0xff00) | data;
-			break;
-
-		case 0x8089:
-			m_hvis = (m_hvis & 0xff00) | data;
+			m_prot_latch = data;
 			break;
 
 		case 0xffef:
@@ -228,8 +201,53 @@ void nubus_laserview_device::regs_w(offs_t offset, u8 data)
 				lower_slot_irq();
 			}
 			break;
-	}
 
+		default:
+			// the code to set the CRTC params dirties up bits 8-15 of the address, so ignore it
+			switch (offset & 0xff)
+			{
+			case 0x81:
+				m_htotal = (m_htotal & 0xff00) | data;
+				break;
+
+			case 0x83:
+				m_htotal = (m_htotal & 0xff) | (data << 8);
+				break;
+
+			case 0x85:
+				m_hvis = (m_hvis & 0xff00) | data;
+				break;
+
+			case 0x87:
+				m_hvis = (m_hvis & 0xff) | (data << 8);
+				break;
+
+			case 0x89:
+				m_stride = (m_stride & 0xff00) | data;
+				break;
+
+			case 0x8b:
+				m_stride = (m_stride & 0xff) | (data << 8);
+				break;
+
+			case 0x91:
+				m_vtotal = (m_vtotal & 0xff00) | data;
+				break;
+
+			case 0x93:
+				m_vtotal = (m_vtotal & 0xff) | (data << 8);
+				break;
+
+			case 0x95:
+				m_vvis = (m_vvis & 0xff00) | data;
+				break;
+
+			case 0x97:
+				m_vvis = (m_vvis & 0xff) | (data << 8);
+				break;
+			}
+			break;
+	}
 }
 
 u8 nubus_laserview_device::regs_r(offs_t offset)
@@ -242,6 +260,7 @@ u8 nubus_laserview_device::regs_r(offs_t offset)
 		case 0xff08:
 			return m_prot_latch;
 
+		// monitor sense?  DIP switches?
 		case 0xfffc:
 			return 0xe4;
 	}

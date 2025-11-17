@@ -762,7 +762,7 @@ void data_node::set_attribute_int(const char *name, long long value)
 
 
 //-------------------------------------------------
-//  set_attribute_int - set a new attribute and
+//  set_attribute_float - set a new attribute and
 //  float value on the node
 //-------------------------------------------------
 

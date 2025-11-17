@@ -183,10 +183,9 @@ void isa16_calchase_jamma_if::device_add_mconfig(machine_config &config)
 {
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220Y
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_12BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_12BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	DAC_12BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 void isa16_calchase_jamma_if::device_start()

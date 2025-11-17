@@ -137,8 +137,7 @@ void dkmb_state::dkmb(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(65536);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

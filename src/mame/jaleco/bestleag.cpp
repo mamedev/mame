@@ -388,12 +388,11 @@ void bestleag_state::bestleag(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bestleag);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x800);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH); /* Hand-tuned */
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.00, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.00, 1);
 }
 
 

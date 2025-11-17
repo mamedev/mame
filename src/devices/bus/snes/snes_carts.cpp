@@ -20,6 +20,7 @@
 #include "sfx.h"
 #include "sgb.h"
 #include "spc7110.h"
+#include "st018.h"
 #include "sufami.h"
 #include "upd.h"
 
@@ -40,7 +41,7 @@ void snes_cart(device_slot_interface &device)
 	device.option_add_internal("lorom_sgb2",    SNS_LOROM_SUPERGB2);    // SuperGB2 base cart - unsupported
 	device.option_add_internal("lorom_st010",   SNS_LOROM_SETA10);
 	device.option_add_internal("lorom_st011",   SNS_LOROM_SETA11);
-	device.option_add_internal("lorom_st018",   SNS_LOROM);             // Cart + ST018 - unsupported
+	device.option_add_internal("lorom_st018",   SNS_LOROM_ST018);
 	device.option_add_internal("lorom_sufami",  SNS_LOROM_SUFAMI);      // Sufami Turbo base cart
 	device.option_add_internal("hirom",         SNS_HIROM);
 	device.option_add_internal("hirom_bsx",     SNS_HIROM_BSX);         // HiROM + BS-X slot - unsupported

@@ -17,8 +17,6 @@
 #include "softfloat3/source/include/softfloat.h"
 
 #define LOG_TLB     (1U << 1)
-#define LOG_IOP     (1U << 2)
-#define LOG_RISCOS  (1U << 3)
 
 //#define VERBOSE     (LOG_GENERAL|LOG_TLB)
 
@@ -384,24 +382,6 @@ void mips1core_device_base::execute_run()
 	{
 		// debugging
 		debugger_instruction_hook(m_pc);
-
-		if (VERBOSE & LOG_IOP)
-		{
-			if ((m_pc & 0x1fffffff) == 0x00012C48 || (m_pc & 0x1fffffff) == 0x0001420C || (m_pc & 0x1fffffff) == 0x0001430C)
-			{
-				u32 ptr = m_r[5];
-				u32 length = m_r[6];
-				if (length >= 4096)
-					length = 4095;
-				while (length)
-				{
-					load<u8>(ptr, [](char c) { printf("%c", c); });
-					ptr++;
-					length--;
-				}
-				fflush(stdout);
-			}
-		}
 
 		// fetch instruction
 		fetch(m_pc, [this](u32 const op)
@@ -847,154 +827,6 @@ std::unique_ptr<util::disasm_interface> mips1core_device_base::create_disassembl
 
 void mips1core_device_base::generate_exception(u32 exception, bool refill)
 {
-	if ((VERBOSE & LOG_RISCOS) && (exception == EXCEPTION_SYSCALL))
-	{
-		static char const *const sysv_syscalls[] =
-		{
-			"syscall",      "exit",         "fork",         "read",         "write",        "open",         "close",        "wait",         "creat",        "link",
-			"unlink",       "execv",        "chdir",        "time",         "mknod",        "chmod",        "chown",        "brk",          "stat",         "lseek",
-			"getpid",       "mount",        "umount",       "setuid",       "getuid",       "stime",        "ptrace",       "alarm",        "fstat",        "pause",
-			"utime",        "stty",         "gtty",         "access",       "nice",         "statfs",       "sync",         "kill",         "fstatfs",      "setpgrp",
-			nullptr,        "dup",          "pipe",         "times",        "profil",       "plock",        "setgid",       "getgid",       "signal",       "msgsys",
-			"sysmips",      "acct",         "shmsys",       "semsys",       "ioctl",        "uadmin",       nullptr,        "utssys",       nullptr,        "execve",
-			"umask",        "chroot",       "ofcntl",       "ulimit",       nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,
-			"advfs",        "unadvfs",      "rmount",       "rumount",      "rfstart",      nullptr,        "rdebug",       "rfstop",       "rfsys",        "rmdir",
-			"mkdir",        "getdents",     nullptr,        nullptr,        "sysfs",        "getmsg",       "putmsg",       "poll",         "sigreturn",    "accept",
-			"bind",         "connect",      "gethostid",    "getpeername",  "getsockname",  "getsockopt",   "listen",       "recv",         "recvfrom",     "recvmsg",
-			"select",       "send",         "sendmsg",      "sendto",       "sethostid",    "setsockopt",   "shutdown",     "socket",       "gethostname",  "sethostname",
-			"getdomainname","setdomainname","truncate",     "ftruncate",    "rename",       "symlink",      "readlink",     "lstat",        "nfsmount",     "nfssvc",
-			"getfh",        "async_daemon", "old_exportfs", "mmap",         "munmap",       "getitimer",    "setitimer",    nullptr,        nullptr,        nullptr,
-			nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,
-			nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,        nullptr,
-			"cacheflush",   "cachectl",     "fchown",       "fchmod",       "wait3",        "mmap",         "munmap",       "madvise",      "getpagesize",  "setreuid",
-			"setregid",     "setpgid",      "getgroups",    "setgroups",    "gettimeofday", "getrusage",    "getrlimit",    "setrlimit",    "exportfs",     "fcntl"
-		};
-
-		static char const *const bsd_syscalls[] =
-		{
-			"syscall",      "exit",         "fork",         "read",         "write",        "open",         "close",        nullptr,        "creat",        "link",
-			"unlink",       "execv",        "chdir",        nullptr,        "mknod",        "chmod",        "chown",        "brk",          nullptr,        "lseek",
-			"getpid",       "omount",       "oumount",      nullptr,        "getuid",       nullptr,        "ptrace",       nullptr,        nullptr,        nullptr,
-			nullptr,        nullptr,        nullptr,        "access",       nullptr,        nullptr,        "sync",         "kill",         "stat",         nullptr,
-			"lstat",        "dup",          "pipe",         nullptr,        "profil",       nullptr,        nullptr,        "getgid",       nullptr,        nullptr,
-			nullptr,        "acct",         nullptr,        nullptr,        "ioctl",        "reboot",       nullptr,        "symlink",      "readlink",     "execve",
-			"umask",        "chroot",       "fstat",        nullptr,        "getpagesize",  "mremap",       "vfork",        nullptr,        nullptr,        "sbrk",
-			"sstk",         "mmap",         "vadvise",      "munmap",       "mprotec",      "madvise",      "vhangup",      nullptr,        "mincore",      "getgroups",
-			"setgroups",    "getpgrp",      "setpgrp",      "setitimer",    "wait3",        "swapon",       "getitimer",    "gethostname",  "sethostname",  "getdtablesize",
-			"dup2",         "getdopt",      "fcntl",        "select",       "setdopt",      "fsync",        "setpriority",  "socket",       "connect",      "accept",
-			"getpriority",  "send",         "recv",         "sigreturn",    "bind",         "setsockopt",   "listen",       nullptr,        "sigvec",       "sigblock",
-			"sigsetmask",   "sigpause",     "sigstack",     "recvmsg",      "sendmsg",      nullptr,        "gettimeofday", "getrusage",    "getsockopt",   nullptr,
-			"readv",        "writev",       "settimeofday", "fchown",       "fchmod",       "recvfrom",     "setreuid",     "setregid",     "rename",       "truncate",
-			"ftruncate",    "flock",        nullptr,        "sendto",       "shutdown",     "socketpair",   "mkdir",        "rmdir",        "utimes",       "sigcleanup",
-			"adjtime",      "getpeername",  "gethostid",    "sethostid",    "getrlimit",    "setrlimit",    "killpg",       nullptr,        "setquota",     "quota",
-			"getsockname",  "sysmips",      "cacheflush",   "cachectl",     "debug",        nullptr,        nullptr,        nullptr,        "nfssvc",       "getdirentries",
-			"statfs",       "fstatfs",      "unmount",      "async_daemon", "getfh",        "getdomainname","setdomainname",nullptr,        "quotactl",     "old_exportfs",
-			"mount",        "hdwconf",      "exportfs",     "nfsfh_open",   "libattach",    "libdetach"
-		};
-
-		static char const *const msg_syscalls[] = { "msgget", "msgctl", "msgrcv", "msgsnd" };
-		static char const *const shm_syscalls[] = { "shmat", "shmctl", "shmdt", "shmget" };
-		static char const *const sem_syscalls[] = { "semctl", "semget", "semop" };
-		static char const *const mips_syscalls[] = { "mipskopt", "mipshwconf", "mipsgetrusage", "mipswait", "mipscacheflush", "mipscachectl" };
-
-		unsigned const asid = (m_cop0[COP0_EntryHi] & EH_ASID) >> 6;
-		switch (m_r[2])
-		{
-		case 1000: // indirect
-			switch (m_r[4])
-			{
-			case 1049: // msgsys
-				LOGMASKED(LOG_RISCOS, "asid %d syscall msgsys:%s() (%s)\n",
-					asid, (m_r[5] < std::size(msg_syscalls)) ? msg_syscalls[m_r[5]] : "unknown", machine().describe_context());
-				break;
-
-			case 1052: // shmsys
-				LOGMASKED(LOG_RISCOS, "asid %d syscall shmsys:%s() (%s)\n",
-					asid, (m_r[5] < std::size(shm_syscalls)) ? shm_syscalls[m_r[5]] : "unknown", machine().describe_context());
-				break;
-
-			case 1053: // semsys
-				LOGMASKED(LOG_RISCOS, "asid %d syscall semsys:%s() (%s)\n",
-					asid, (m_r[5] < std::size(sem_syscalls)) ? sem_syscalls[m_r[5]] : "unknown", machine().describe_context());
-				break;
-
-			case 2151: // bsd_sysmips
-				switch (m_r[5])
-				{
-				case 0x100: // mipskopt
-					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:mipskopt(\"%s\") (%s)\n",
-						asid, debug_string(m_r[6]), machine().describe_context());
-					break;
-
-				default:
-					if ((m_r[5] > 0x100) && (m_r[5] - 0x100) < std::size(mips_syscalls))
-						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:%s() (%s)\n",
-							asid, mips_syscalls[m_r[5] - 0x100], machine().describe_context());
-					else
-						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:unknown %d (%s)\n",
-							asid, m_r[5], machine().describe_context());
-					break;
-				}
-				break;
-
-			default:
-				if ((m_r[4] > 2000) && (m_r[4] - 2000 < std::size(bsd_syscalls)) && bsd_syscalls[m_r[4] - 2000])
-					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_%s() (%s)\n",
-						asid, bsd_syscalls[m_r[4] - 2000], machine().describe_context());
-				else
-					LOGMASKED(LOG_RISCOS, "asid %d syscall indirect:unknown %d (%s)\n",
-						asid, m_r[4], machine().describe_context());
-				break;
-			}
-			break;
-
-		case 1003: // read
-		case 1006: // close
-		case 1054: // ioctl
-		case 1169: // fcntl
-			LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d) (%s)\n",
-				asid, sysv_syscalls[m_r[2] - 1000], m_r[4], machine().describe_context());
-			break;
-
-		case 1004: // write
-			if (m_r[4] == 1 || m_r[4] == 2)
-				LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d, \"%s\") (%s)\n",
-					asid, sysv_syscalls[m_r[2] - 1000], m_r[4], debug_string(m_r[5], m_r[6]), machine().describe_context());
-			else
-				LOGMASKED(LOG_RISCOS, "asid %d syscall %s(%d) (%s)\n",
-					asid, sysv_syscalls[m_r[2] - 1000], m_r[4], machine().describe_context());
-			break;
-
-		case 1005: // open
-		case 1008: // creat
-		case 1009: // link
-		case 1010: // unlink
-		case 1012: // chdir
-		case 1018: // stat
-		case 1033: // access
-			LOGMASKED(LOG_RISCOS, "asid %d syscall %s(\"%s\") (%s)\n",
-				asid, sysv_syscalls[m_r[2] - 1000], debug_string(m_r[4]), machine().describe_context());
-			break;
-
-		case 1059: // execve
-			LOGMASKED(LOG_RISCOS, "asid %d syscall execve(\"%s\", [ %s ], [ %s ]) (%s)\n",
-				asid, debug_string(m_r[4]), debug_string_array(m_r[5]), debug_string_array(m_r[6]), machine().describe_context());
-			break;
-
-		case 1060: // umask
-			LOGMASKED(LOG_RISCOS, "asid %d syscall umask(%#o) (%s)\n",
-				asid, m_r[4] & 0777, machine().describe_context());
-			break;
-
-		default:
-			if ((m_r[2] > 1000) && (m_r[2] - 1000 < std::size(sysv_syscalls)) && sysv_syscalls[m_r[2] - 1000])
-				LOGMASKED(LOG_RISCOS, "asid %d syscall %s() (%s)\n", asid, sysv_syscalls[m_r[2] - 1000], machine().describe_context());
-			else
-				LOGMASKED(LOG_RISCOS, "asid %d syscall unknown %d (%s)\n", asid, m_r[2], machine().describe_context());
-			break;
-		}
-	}
-
 	// set the exception PC
 	m_cop0[COP0_EPC] = m_pc;
 
@@ -1009,15 +841,16 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 	}
 	m_branch_state = EXCEPTION;
 
-	// shift the exception bits
-	SR = (SR & ~SR_KUIE) | ((SR << 2) & SR_KUIEop);
-
 	if (refill)
 		m_pc = (SR & SR_BEV) ? 0xbfc00100 : 0x80000000;
 	else
 		m_pc = (SR & SR_BEV) ? 0xbfc00180 : 0x80000080;
 
+	// hook exception in caller context enabling debugger access to memory parameters
 	debugger_exception_hook(exception);
+
+	// shift the exception bits
+	SR = (SR & ~SR_KUIE) | ((SR << 2) & SR_KUIEop);
 
 	if (SR & SR_KUp)
 		debugger_privilege_hook();
@@ -1488,64 +1321,6 @@ void mips1core_device_base::fetch(u32 address, std::function<void(u32)> &&apply)
 	}
 
 	apply(data);
-}
-
-std::string mips1core_device_base::debug_string(u32 string_pointer, unsigned const limit)
-{
-	auto const suppressor(machine().disable_side_effects());
-
-	bool done = false;
-	bool mapped = false;
-	std::string result("");
-
-	while (!done)
-	{
-		done = true;
-		load<u8>(string_pointer++, [limit, &done, &mapped, &result](u8 byte)
-		{
-			mapped = true;
-			if (byte != 0)
-			{
-				result += byte;
-
-				done = result.length() == limit;
-			}
-		});
-	}
-
-	if (!mapped)
-		result.assign("[unmapped]");
-
-	return result;
-}
-
-std::string mips1core_device_base::debug_string_array(u32 array_pointer)
-{
-	auto const suppressor(machine().disable_side_effects());
-
-	bool done = false;
-	std::string result("");
-
-	while (!done)
-	{
-		done = true;
-		load<u32>(array_pointer, [this, &done, &result](u32 string_pointer)
-		{
-			if (string_pointer != 0)
-			{
-				if (!result.empty())
-					result += ", ";
-
-				result += '\"' + debug_string(string_pointer) + '\"';
-
-				done = false;
-			}
-		});
-
-		array_pointer += 4;
-	}
-
-	return result;
 }
 
 void mips1_device_base::device_start()

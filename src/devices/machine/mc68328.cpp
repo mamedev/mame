@@ -972,6 +972,15 @@ u16 mc68328_device::csd_lsw_r() // 0x11e, 0x12e, 0x13e, 0x14e
 //  MMU/chip-select hardware - EZ variant
 //-------------------------------------------------
 
+void mc68ez328_device::scr_w(u8 data)
+{
+	if (data & SCR_WDTH8)
+	{
+		m_pasel = 0xff;
+	}
+	mc68328_base_device::scr_w(data);
+}
+
 u8 mc68ez328_device::revision_r(offs_t offset)
 {
 	LOGMASKED(LOG_PLL, "%s: revision_r: Silicon Revision[%d] = %02x\n", machine().describe_context(), offset, 0x01);
@@ -2668,7 +2677,7 @@ void mc68328_base_device::update_gptimer_state()
 		}
 		else
 		{
-			timer->adjust(attotime::from_ticks(regs.tcmp, get_timer_frequency<Timer>()));
+			timer->adjust(attotime::from_hz(get_timer_frequency<Timer>()));
 		}
 	}
 	else
@@ -2683,39 +2692,30 @@ TIMER_CALLBACK_MEMBER(mc68328_base_device::timer_tick)
 	timer_regs &regs = get_timer_regs(Timer);
 	emu_timer *timer = get_timer(Timer);
 
-	regs.tcn = regs.tcmp;
-	regs.tstat |= TSTAT_COMP;
-
-	if ((regs.tctl & TCTL_FRR) == TCTL_FRR_RESTART)
+	u32 frequency = get_timer_frequency<Timer>();
+	if (frequency > 0)
 	{
-		u32 frequency = get_timer_frequency<Timer>();
-		if (frequency > 0)
-		{
-			attotime period = attotime::from_hz(frequency) * regs.tcmp;
-			regs.tcn = 0x0000;
-			timer->adjust(period);
-		}
-		else
-		{
-			timer->adjust(attotime::never);
-		}
+		attotime period = attotime::from_hz(frequency);
+		timer->adjust(period);
 	}
 	else
 	{
-		u32 frequency = get_timer_frequency<Timer>();
-		if (frequency > 0)
-		{
-			attotime period = attotime::from_hz(frequency) * 0x10000;
-			timer->adjust(period);
-		}
-		else
-		{
-			timer->adjust(attotime::never);
-		}
+		timer->adjust(attotime::never);
 	}
-	if ((regs.tctl & TCTL_IRQEN) == TCTL_IRQEN_ENABLE)
+
+	regs.tcn++;
+	if (regs.tcn == regs.tcmp)
 	{
-		set_interrupt_line(get_timer_int(Timer), 1);
+		regs.tstat |= TSTAT_COMP;
+		if ((regs.tctl & TCTL_FRR) == TCTL_FRR_RESTART)
+		{
+			regs.tcn = 0x0000;
+		}
+
+		if ((regs.tctl & TCTL_IRQEN) == TCTL_IRQEN_ENABLE)
+		{
+			set_interrupt_line(get_timer_int(Timer), 1);
+		}
 	}
 }
 

@@ -70,7 +70,7 @@ For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select B
 	<software name="alienc">
 		<description>Alien Cresta</description>
 		<year>1981</year>
-		<publisher>Dubois and McNamara Software</publisher>
+		<publisher>Dubois &amp; McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2032">
 				<rom name="alien.bee" size="0x2032" crc="85d5dff6" sha1="59fcbf3880aafc6e9c8acfd383d708188cf3f16c"/>
@@ -125,7 +125,7 @@ For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select B
 	<software name="battle">
 		<description>Battle Station</description>
 		<year>1981</year>
-		<publisher>Dubois and McNamara Software</publisher>
+		<publisher>Dubois &amp; McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x0d99">
 				<rom name="battle.bee" size="0x0d99" crc="3bda1a0c" sha1="2e88b696b037221578693f9606f151a1857e713a"/>
@@ -312,7 +312,7 @@ For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select B
 	<software name="centiped">
 		<description>Centipede Attack</description>
 		<year>1981</year>
-		<publisher>Dubois and McNamara Software</publisher>
+		<publisher>Dubois &amp; McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x103b">
 				<rom name="centiped.bee" size="0x103b" crc="ee69a9a5" sha1="2f21568013d1fa0a2c0e163edfa12ed3867f0341"/>
@@ -741,7 +741,7 @@ For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select B
 	<software name="ghost">
 		<description>Ghost Hunter</description>
 		<year>1981</year>
-		<publisher>Dubois and McNamara Software</publisher>
+		<publisher>Dubois &amp; McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1ddf">
 				<rom name="ghost.bee" size="0x1ddf" crc="810ab06e" sha1="86207ddb56aefd5ccf0636fe60d4785de1710dce"/>
@@ -906,7 +906,7 @@ For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select B
 	<software name="hoppy">
 		<description>Hoppy</description>
 		<year>1981</year>
-		<publisher>Dubois and McNamara Software</publisher>
+		<publisher>Dubois &amp; McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x1f42">
 				<rom name="hoppy.bee" size="0x1f42" crc="d9f7aa71" sha1="3879abed2b1f06cf8c3d26eff5b6bb20fd0f9765"/>
@@ -950,7 +950,7 @@ For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select B
 	<software name="jungle">
 		<description>Jungle Raiders</description>
 		<year>1981</year>
-		<publisher>Dubois and McNamara Software</publisher>
+		<publisher>Dubois &amp; McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x174d">
 				<rom name="jungle.bee" size="0x174d" crc="acf1fd7e" sha1="2c1a08f3138fdbf64788be6db7e9b8c7c9ffb9f7"/>
@@ -972,7 +972,7 @@ For the pc85-based models (pc85, pc85b, pc85s, ppc) it's recommended to select B
 	<software name="killbeet">
 		<description>Killer Beetles</description>
 		<year>1981</year>
-		<publisher>Dubois and McNamara Software</publisher>
+		<publisher>Dubois &amp; McNamara Software</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x196e">
 				<rom name="killer.bee" size="0x196e" crc="263cb3b0" sha1="9ed8970460eba6fb6f69ce294390e4d675200500"/>

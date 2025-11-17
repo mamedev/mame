@@ -132,9 +132,9 @@ uint8_t galaxold_state::scramblb_protection_2_r()
 
 void galaxold_state::_4in1_bank_w(uint8_t data)
 {
-	m__4in1_bank = data & 0x03;
-	galaxold_gfxbank_w(0, m__4in1_bank);
-	membank("bank1")->set_entry(m__4in1_bank);
+	m_4in1_bank = data & 0x03;
+	galaxold_gfxbank_w(0, m_4in1_bank);
+	membank("bank1")->set_entry(m_4in1_bank);
 }
 
 void galaxold_state::init_4in1()
@@ -153,7 +153,7 @@ void galaxold_state::init_4in1()
 
 	_4in1_bank_w(0); /* set the initial CPU bank */
 
-	save_item(NAME(m__4in1_bank));
+	save_item(NAME(m_4in1_bank));
 }
 
 void galaxold_state::init_bullsdrtg()
@@ -181,4 +181,15 @@ void galaxold_state::init_bullsdrtg()
 void galaxold_state::init_superbikg()
 {
 	save_item(NAME(m_superbikg_latch));
+}
+
+void galaxold_state::init_dkongjrv()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	membank("bank1")->configure_entry(0, &rom[0x8000]);
+	membank("bank1")->configure_entry(1, &rom[0x4000]);
+
+	membank("bank2")->configure_entry(0, &rom[0xa000]);
+	membank("bank2")->configure_entry(1, &rom[0x6000]);
 }

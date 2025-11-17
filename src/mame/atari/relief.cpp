@@ -251,55 +251,62 @@ uint32_t relief_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			uint8_t const *const pri = &priority_bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &priority_bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
-					 *      PF/M = PFXS
-					 *
-					 *      --- CS0 is set to 1 if the MO is transparent
-					 *      CS0=!MPX0*!MPX1*!MPX2*!MPX3
-					 *
-					 *      --- CS1 is 1 to select playfield pixels or 0 to select MO pixels
-					 *      !CS1=MPX5*MPX6*MPX7*!CS0
-					 *          +!MPX4*MPX5*MPX6*MPX7
-					 *          +PFXS*!CS0
-					 *          +!MPX4*PFXS
-					 *
-					 *      --- CRA10 is the 0x200 bit of the color RAM index; set for the top playfield only
-					 *      CRA10:=CS1*PFXS
-					 *
-					 *      --- CRA9 is the 0x100 bit of the color RAM index; set for MOs only
-					 *      !CA9:=CS1
-					 *
-					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
-					 */
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					uint8_t const *const pri = &priority_bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
+							 *      PF/M = PFXS
+							 *
+							 *      --- CS0 is set to 1 if the MO is transparent
+							 *      CS0=!MPX0*!MPX1*!MPX2*!MPX3
+							 *
+							 *      --- CS1 is 1 to select playfield pixels or 0 to select MO pixels
+							 *      !CS1=MPX5*MPX6*MPX7*!CS0
+							 *          +!MPX4*MPX5*MPX6*MPX7
+							 *          +PFXS*!CS0
+							 *          +!MPX4*PFXS
+							 *
+							 *      --- CRA10 is the 0x200 bit of the color RAM index; set for the top playfield only
+							 *      CRA10:=CS1*PFXS
+							 *
+							 *      --- CRA9 is the 0x100 bit of the color RAM index; set for MOs only
+							 *      !CA9:=CS1
+							 *
+							 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
+							 */
 
-					// compute the CS0 signal
-					int cs0 = 0;
-					cs0 = ((mo[x] & 0x0f) == 0);
+							// compute the CS0 signal
+							int cs0 = 0;
+							cs0 = ((mo[x] & 0x0f) == 0);
 
-					// compute the CS1 signal
-					int cs1 = 1;
-					if ((!cs0 && (mo[x] & 0xe0) == 0xe0) ||
-						((mo[x] & 0xf0) == 0xe0) ||
-						(!pri[x] && !cs0) ||
-						(!pri[x] && !(mo[x] & 0x10)))
-						cs1 = 0;
+							// compute the CS1 signal
+							int cs1 = 1;
+							if ((!cs0 && (mo[x] & 0xe0) == 0xe0) ||
+								((mo[x] & 0xf0) == 0xe0) ||
+								(!pri[x] && !cs0) ||
+								(!pri[x] && !(mo[x] & 0x10)))
+								cs1 = 0;
 
-					// MO is displayed if cs1 == 0
-					if (!cs1)
-						pf[x] = mo[x];
+							// MO is displayed if cs1 == 0
+							if (!cs1)
+								pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }
 

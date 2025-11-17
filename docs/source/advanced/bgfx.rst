@@ -86,8 +86,8 @@ bgfx_path
     the *bgfx* folder in your MAME installation folder.
 bgfx_backend
     Selects a rendering backend for BGFX to use.  Possible choices include
-    ``d3d9``, ``d3d11``, ``d3d12``, ``opengl``, ``gles``, ``metal``, and
-    ```vulkan``. The default is ``**auto**``, which will let MAME choose the
+    ``auto``, ``d3d9``, ``d3d11``, ``d3d12``, ``opengl``, ``gles``, ``metal``, and
+    ``vulkan``. The default is ``auto``, which will let MAME choose the
     best selection for you.
 
     * ``d3d9`` -- Direct3D 9.0 Renderer (Requires Windows XP or higher)
@@ -101,6 +101,7 @@ bgfx_backend
       newer)
     * ``vulkan`` -- Vulkan Renderer (Requires Windows or Linux with compatible
       GPU drivers.
+    * ``auto`` -- MAME will automatically choose the best selection for you.
 bgfx_debug
     Enables BGFX debugging features.  Most users will not need to use this.
 bgfx_screen_chains

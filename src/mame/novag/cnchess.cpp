@@ -89,15 +89,11 @@ void cnchess_state::machine_start()
 void cnchess_state::init_board(u8 data)
 {
 	// 1st row
-	m_board->write_piece(0, 0, 3);
-	m_board->write_piece(0, 8, 3);
-	m_board->write_piece(0, 1, 4);
-	m_board->write_piece(0, 7, 4);
-	m_board->write_piece(0, 2, 5);
-	m_board->write_piece(0, 6, 5);
-	m_board->write_piece(0, 3, 6);
-	m_board->write_piece(0, 5, 6);
-	m_board->write_piece(0, 4, 7);
+	for (int i = 0; i < 5; i++)
+	{
+		m_board->write_piece(0, i, 3 + i);
+		m_board->write_piece(0, 8 - i, 3 + i);
+	}
 
 	// cannons
 	m_board->write_piece(2, 1, 2);

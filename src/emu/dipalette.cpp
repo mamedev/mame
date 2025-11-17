@@ -22,16 +22,19 @@
 //  device_palette_interface - constructor
 //-------------------------------------------------
 
-device_palette_interface::device_palette_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "palette"),
-		m_palette(nullptr),
-		m_pens(nullptr),
-		m_format(BITMAP_FORMAT_RGB32),
-		m_shadow_table(nullptr),
-		m_shadow_group(0),
-		m_hilight_group(0),
-		m_white_pen(0),
-		m_black_pen(0)
+device_palette_interface::device_palette_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "palette"),
+	m_palette(nullptr),
+	m_pens(nullptr),
+	m_format(BITMAP_FORMAT_RGB32),
+	m_shadow_table(nullptr),
+	m_shadow_mode(0),
+	m_shadow_group(0),
+	m_highlight_group(0),
+	m_shadow_factor(1.0),
+	m_highlight_factor(1.0),
+	m_white_pen(0),
+	m_black_pen(0)
 {
 }
 
@@ -100,6 +103,14 @@ void device_palette_interface::interface_post_start()
 		device().save_item(NAME(m_indirect_colors));
 		device().save_item(NAME(m_indirect_pens));
 	}
+
+	// save shadow configuration if applicable
+	device().save_item(NAME(m_shadow_mode));
+
+	if (m_shadow_group != 0)
+		device().save_item(NAME(m_shadow_factor));
+	if (m_highlight_group != 0)
+		device().save_item(NAME(m_highlight_factor));
 }
 
 
@@ -110,7 +121,7 @@ void device_palette_interface::interface_post_start()
 
 void device_palette_interface::interface_pre_save()
 {
-	// fill the save arrays with updated pen and brightness information
+	// fill the save arrays with updated pen and contrast information
 	int numcolors = m_palette->num_colors();
 	for (int index = 0; index < numcolors; index++)
 	{
@@ -127,13 +138,21 @@ void device_palette_interface::interface_pre_save()
 
 void device_palette_interface::interface_post_load()
 {
-	// reset the pen and brightness for each entry
+	// reset the pen and contrast for each entry
 	int numcolors = m_palette->num_colors();
 	for (int index = 0; index < numcolors; index++)
 	{
 		set_pen_color(index, m_save_pen[index]);
 		set_pen_contrast(index, m_save_contrast[index]);
 	}
+
+	// reset shadow configuration
+	set_shadow_mode(m_shadow_mode);
+
+	if (m_shadow_group != 0)
+		set_shadow_factor(m_shadow_factor);
+	if (m_highlight_group != 0)
+		set_highlight_factor(m_highlight_factor);
 }
 
 
@@ -277,7 +296,7 @@ u32 device_palette_interface::transpen_mask(gfx_element &gfx, u32 color, indirec
 //  for 1 of 4 shadow tables
 //-------------------------------------------------
 
-void device_palette_interface::set_shadow_dRGB32(int mode, int dr, int dg, int db, bool noclip)
+void device_palette_interface::set_shadow_dRGB32(u32 mode, int dr, int dg, int db, bool noclip)
 {
 	shadow_table_data &stable = m_shadow_tables[mode];
 
@@ -343,8 +362,8 @@ void device_palette_interface::allocate_palette(u32 numentries)
 	int numgroups = 1;
 	if (palette_shadows_enabled())
 		m_shadow_group = numgroups++;
-	if (palette_hilights_enabled())
-		m_hilight_group = numgroups++;
+	if (palette_highlights_enabled())
+		m_highlight_group = numgroups++;
 	if (numentries * numgroups > 65536)
 		throw emu_fatalerror("%s(%s): Palette has more than 65536 colors.", device().shortname(), device().tag());
 
@@ -354,7 +373,7 @@ void device_palette_interface::allocate_palette(u32 numentries)
 	// configure the groups
 	if (m_shadow_group != 0)
 		set_shadow_factor(PALETTE_DEFAULT_SHADOW_FACTOR);
-	if (m_hilight_group != 0)
+	if (m_highlight_group != 0)
 		set_highlight_factor(PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 
 	// set the initial colors to a standard rainbow
@@ -453,30 +472,30 @@ void device_palette_interface::allocate_shadow_tables()
 		}
 	}
 
-	// if we have hilights, allocate shadow tables
-	if (m_hilight_group != 0)
+	// if we have highlights, allocate shadow tables
+	if (m_highlight_group != 0)
 	{
-		m_hilight_array.resize(65536);
+		m_highlight_array.resize(65536);
 
 		// palettized mode gets a single 64k table in slots 1 and 3
 		if (m_format == BITMAP_FORMAT_IND16)
 		{
-			m_shadow_tables[1].base = m_shadow_tables[3].base = &m_hilight_array[0];
+			m_shadow_tables[1].base = m_shadow_tables[3].base = &m_highlight_array[0];
 			for (int i = 0; i < 65536; i++)
-				m_hilight_array[i] = (i < numentries) ? (i + 2 * numentries) : i;
+				m_highlight_array[i] = (i < numentries) ? (i + 2 * numentries) : i;
 		}
 
 		// RGB mode gets two 32k tables in slots 1 and 3
 		else
 		{
-			m_shadow_tables[1].base = &m_hilight_array[0];
-			m_shadow_tables[3].base = &m_hilight_array[32768];
+			m_shadow_tables[1].base = &m_highlight_array[0];
+			m_shadow_tables[3].base = &m_highlight_array[32768];
 			configure_rgb_shadows(1, PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 		}
 	}
 
 	// set the default table
-	m_shadow_table = m_shadow_tables[0].base;
+	m_shadow_table = m_shadow_tables[m_shadow_mode].base;
 }
 
 
@@ -485,13 +504,13 @@ void device_palette_interface::allocate_shadow_tables()
 //  for the RGB tables
 //-------------------------------------------------
 
-void device_palette_interface::configure_rgb_shadows(int mode, float factor)
+void device_palette_interface::configure_rgb_shadows(u32 mode, float factor)
 {
 	// only applies to RGB direct modes
 	assert(m_format != BITMAP_FORMAT_IND16);
 
 	// verify the shadow table
-	assert(mode >= 0 && mode < std::size(m_shadow_tables));
+	assert(mode < std::size(m_shadow_tables));
 	shadow_table_data &stable = m_shadow_tables[mode];
 	assert(stable.base != nullptr);
 

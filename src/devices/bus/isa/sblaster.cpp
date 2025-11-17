@@ -19,12 +19,23 @@
 
 #include "speaker.h"
 
+#define LOG_CMD    (1U << 1)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
+
+#define LOGCMD(...)     LOGMASKED(LOG_CMD,  __VA_ARGS__)
+
+
 #define SIXTEENBIT  0x01
 #define STEREO      0x02
 #define SIGNED      0x04
 #define ADPCM2      0x08
 #define ADPCM3      0x10
 #define ADPCM4      0x20
+#define SILENCE     0xff
 
 #define IRQ_DMA8    0x01
 #define IRQ_DMA16   0x02
@@ -64,7 +75,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 5x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
 	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1, -1, -1,  1, -1,  1, /* 7x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
+	3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
 	1,  1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* Ax */
 		4, -1,  4, -1,  4, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
@@ -315,13 +326,13 @@ void sb_device::process_fifo(uint8_t cmd)
 {
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
-		logerror("SB: unemulated or undefined fifo command %02x\n",cmd);
+		LOG("SB: unemulated or undefined fifo command %02x\n", cmd);
 		m_dsp.fifo_ptr = 0;
 	}
 	else if(m_dsp.fifo_ptr == m_cmd_fifo_length[cmd])
 	{
 		/* get FIFO params */
-//        printf("SB FIFO command: %02x\n", cmd);
+		LOGCMD("SB FIFO command: %02x\n", cmd);
 		switch(cmd)
 		{
 			case 0x10:  // Direct DAC
@@ -432,6 +443,12 @@ void sb_device::process_fifo(uint8_t cmd)
 				m_dsp.dma_throttled = false;
 				drq_w(1);
 				m_dsp.flags = ADPCM3;
+				break;
+
+			case 0x80:  // Play silence
+				m_dsp.flags = SILENCE;
+				m_dsp.play_length = m_dsp.fifo[1] + (m_dsp.fifo[2]<<8) + 1;
+				m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
 				break;
 
 			case 0xd0:  // halt 8-bit DMA
@@ -1152,11 +1169,10 @@ DEFINE_DEVICE_TYPE(ISA16_SOUND_BLASTER_16, isa16_sblaster16_device, "isa_sblaste
 
 void sb_device::common(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 
 	PC_JOY(config, m_joy);
 
@@ -1169,16 +1185,16 @@ void isa8_sblaster1_0_device::device_add_mconfig(machine_config &config)
 	common(config);
 
 	YM3812(config, m_ym3812, ym3812_StdClock);
-	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 3.0);
-	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 3.0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 3.0, 0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 3.0, 1);
 
 	SAA1099(config, m_saa1099_1, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
-	m_saa1099_1->add_route(0, "lspeaker", 0.5);
-	m_saa1099_1->add_route(1, "rspeaker", 0.5);
+	m_saa1099_1->add_route(0, "speaker", 0.5, 0);
+	m_saa1099_1->add_route(1, "speaker", 0.5, 1);
 
 	SAA1099(config, m_saa1099_2, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
-	m_saa1099_2->add_route(0, "lspeaker", 0.5);
-	m_saa1099_2->add_route(1, "rspeaker", 0.5);
+	m_saa1099_2->add_route(0, "speaker", 0.5, 0);
+	m_saa1099_2->add_route(1, "speaker", 0.5, 1);
 }
 
 void isa8_sblaster1_5_device::device_add_mconfig(machine_config &config)
@@ -1186,8 +1202,8 @@ void isa8_sblaster1_5_device::device_add_mconfig(machine_config &config)
 	common(config);
 
 	YM3812(config, m_ym3812, ym3812_StdClock);
-	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	/* no CM/S support (empty sockets) */
 }
 
@@ -1196,10 +1212,10 @@ void isa16_sblaster16_device::device_add_mconfig(machine_config &config)
 	common(config);
 
 	ymf262_device &ymf262(YMF262(config, "ymf262", ymf262_StdClock));
-	ymf262.add_route(0, "lspeaker", 1.0);
-	ymf262.add_route(1, "rspeaker", 1.0);
-	ymf262.add_route(2, "lspeaker", 1.0);
-	ymf262.add_route(3, "rspeaker", 1.0);
+	ymf262.add_route(0, "speaker", 1.0, 0);
+	ymf262.add_route(1, "speaker", 1.0, 1);
+	ymf262.add_route(2, "speaker", 1.0, 0);
+	ymf262.add_route(3, "speaker", 1.0, 1);
 }
 
 //**************************************************************************
@@ -1700,6 +1716,14 @@ TIMER_CALLBACK_MEMBER(sb_device::timer_tick)
 					break;
 			}
 			break;
+		case SILENCE:
+			m_dsp.play_length--;
+			if(!m_dsp.play_length)
+			{
+				m_timer->adjust(attotime::never, 0);
+				irq_w(1, IRQ_DMA8);
+			}
+			return;
 		default:
 			logerror("SB: unimplemented sample type %x\n", m_dsp.flags);
 	}

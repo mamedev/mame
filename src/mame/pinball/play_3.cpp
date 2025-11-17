@@ -596,10 +596,9 @@ void play_3_state::play_3(machine_config &config)
 	m_audiocpu->wait_cb().set_constant(1);
 	m_audiocpu->clear_cb().set(FUNC(play_3_state::clear_a_r));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	AY8910(config, m_ay1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	AY8910(config, m_ay2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	SPEAKER(config, "speaker", 2).front();
+	AY8910(config, m_ay1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
+	AY8910(config, m_ay2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 	m_ay1->set_resistors_load(6900, 6900, 6900);
 	m_ay2->set_resistors_load(6900, 6900, 6900);
 	m_ay1->port_a_write_callback().set_nop();
@@ -614,8 +613,7 @@ void play_3_state::spain82(machine_config &config)
 	config.device_remove("audiocpu");
 	config.device_remove("ay1");
 	config.device_remove("ay2");
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 
 	EFO_SOUND3(config, m_sound3);
 }
@@ -640,8 +638,7 @@ void play_3_state::sklflite(machine_config &config)
 	config.device_remove("audiocpu");
 	config.device_remove("ay1");
 	config.device_remove("ay2");
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 
 	EFO_ZSU1(config, m_zsu);
 }

@@ -8,7 +8,7 @@
 
     TODO:
     - segfaults on soft reset;
-    - jetwave: fix debug mode;
+    - jetwave motors/sensors
 
     Hardware overview:
 
@@ -169,32 +169,44 @@ Check drivers/gticlub.cpp for details on the bottom board.
 */
 
 #include "emu.h"
+
+#include "k001005.h"
+#include "k001006.h"
+#include "k001604.h"
+#include "k054156_k054157_k056832.h"
+#include "konami_helper.h"
+#include "konppc.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/adc083x.h"
 #include "machine/eepromser.h"
 #include "machine/k056230.h"
-#include "konppc.h"
 #include "machine/watchdog.h"
 #include "sound/k054539.h"
 #include "sound/k056800.h"
-#include "k001005.h"
-#include "k001006.h"
-#include "k001604.h"
-#include "k054156_k054157_k056832.h"
-#include "konami_helper.h"
+
 #include "emupal.h"
 #include "speaker.h"
 
+#define LOG_SYSREG (1 << 1)
+
+#define LOG_ALL (LOG_SYSREG)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGSYSREG(...) LOGMASKED(LOG_SYSREG, __VA_ARGS__)
 
 namespace {
 
 class zr107_state : public driver_device
 {
 public:
-	zr107_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	zr107_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dsp(*this, "dsp"),
@@ -204,15 +216,15 @@ public:
 		m_workram(*this, "workram"),
 		m_k001005(*this, "k001005"),
 		m_k001006_1(*this, "k001006_1"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_sharc_dataram(*this, "sharc_dataram"),
+		m_konppc(*this, "konppc"),
 		m_in(*this, "IN%u", 0U),
 		m_out4(*this, "OUT4"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
-		m_pcb_digit(*this, "pcbdigit%u", 0U),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_sharc_dataram(*this, "sharc_dataram"),
-		m_konppc(*this, "konppc")
+		m_pcb_digit(*this, "pcbdigit%u", 0U)
 	{ }
 
 	void zr107(machine_config &config);
@@ -220,6 +232,9 @@ public:
 	void driver_init();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
@@ -229,19 +244,19 @@ protected:
 	required_shared_ptr<uint32_t> m_workram;
 	required_device<k001005_device> m_k001005;
 	required_device<k001006_device> m_k001006_1;
-	required_ioport_array<5> m_in;
-	required_ioport m_out4, m_eepromout;
-	required_ioport_array<3> m_analog;
-	output_finder<2> m_pcb_digit;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint32_t> m_sharc_dataram;
 	required_device<konppc_device> m_konppc;
+	required_ioport_array<5> m_in;
+	required_ioport m_out4, m_eepromout;
+	optional_ioport_array<3> m_analog;
+	output_finder<2> m_pcb_digit;
 
-	int m_ccu_vcth;
-	int m_ccu_vctl;
-	uint8_t m_sound_ctrl;
-	uint8_t m_sound_intck;
+	int32_t m_ccu_vcth = 0;
+	int32_t m_ccu_vctl = 0;
+	uint8_t m_sound_ctrl = 0;
+	uint8_t m_sound_intck = 0;
 
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
@@ -255,16 +270,13 @@ protected:
 
 	void sharc_memmap(address_map &map) ATTR_COLD;
 	void sound_memmap(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 };
 
 class midnrun_state : public zr107_state
 {
 public:
-	midnrun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: zr107_state(mconfig, type, tag),
+	midnrun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		zr107_state(mconfig, type, tag),
 		m_k056832(*this, "k056832")
 	{ }
 
@@ -286,8 +298,8 @@ private:
 class jetwave_state : public zr107_state
 {
 public:
-	jetwave_state(const machine_config &mconfig, device_type type, const char *tag)
-		: zr107_state(mconfig, type, tag),
+	jetwave_state(const machine_config &mconfig, device_type type, const char *tag) :
+		zr107_state(mconfig, type, tag),
 		m_k001604(*this, "k001604"),
 		m_k001006_2(*this, "k001006_2")
 	{ }
@@ -319,7 +331,7 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 K056832_CB_MEMBER(midnrun_state::tile_callback)
 {
-	*color += layer * 0x40;
+	color += layer * 0x40;
 }
 
 void midnrun_state::video_start()
@@ -391,7 +403,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 2: // Parallel data register
-			osd_printf_debug("Parallel data = %02X\n", data);
+			LOGSYSREG("Parallel data = %02X\n", data);
 			break;
 
 		case 3: // System Register 0
@@ -407,7 +419,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			*/
 			m_eepromout->write(data & 0x07, 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			osd_printf_debug("System register 0 = %02X\n", data);
+			LOGSYSREG("System register 0 = %02X\n", data);
 			break;
 
 		case 4: // System Register 1
@@ -421,20 +433,20 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 			    0x02 = ADDI (ADC DI)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
-			if (data & 0x80)    // CG Board 1 IRQ Ack
+			if (BIT(data, 7))    // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
-			if (data & 0x40)    // CG Board 0 IRQ Ack
+			if (BIT(data, 6))    // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			m_konppc->set_cgboard_id((data >> 4) & 3);
 			m_out4->write(data, 0xff);
-			osd_printf_debug("System register 1 = %02X\n", data);
+			LOGSYSREG("System register 1 = %02X\n", data);
 			break;
 
 		case 5: // System Register 2
 			/*
 			    0x01 = AFE
 			*/
-			m_watchdog->reset_line_w(data & 0x01);
+			m_watchdog->reset_line_w(BIT(data, 0));
 			break;
 
 		default:
@@ -452,14 +464,17 @@ uint32_t zr107_state::ccu_r(offs_t offset, uint32_t mem_mask)
 			// Midnight Run polls the vertical counter in vblank
 			if (ACCESSING_BITS_24_31)
 			{
-				m_ccu_vcth ^= 0xff;
-				r |= m_ccu_vcth << 24;
+				int32_t const vcth = m_ccu_vcth ^ 0xff;
+				if (!machine().side_effects_disabled())
+					m_ccu_vcth = vcth;
+				r |= vcth << 24;
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				m_ccu_vctl++;
-				m_ccu_vctl &= 0x1ff;
-				r |= (m_ccu_vctl >> 2) << 8;
+				int32_t const vctl = (m_ccu_vctl + 1) & 0x1ff;
+				if (!machine().side_effects_disabled())
+					m_ccu_vctl = vctl;
+				r |= (vctl >> 2) << 8;
 			}
 		}
 	}
@@ -482,6 +497,13 @@ void zr107_state::machine_start()
 
 	// configure fast RAM regions for DRC
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, false, m_workram);
+
+	m_ccu_vcth = m_ccu_vctl = 0;
+
+	save_item(NAME(m_ccu_vcth));
+	save_item(NAME(m_ccu_vctl));
+	save_item(NAME(m_sound_ctrl));
+	save_item(NAME(m_sound_intck));
 }
 
 void midnrun_state::main_memmap(address_map &map)
@@ -492,13 +514,13 @@ void midnrun_state::main_memmap(address_map &map)
 	map(0x74060000, 0x7406003f).rw(FUNC(midnrun_state::ccu_r), FUNC(midnrun_state::ccu_w));
 	map(0x74080000, 0x74081fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x740a0000, 0x740a3fff).r(m_k056832, FUNC(k056832_device::rom_word_r));
-	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));        // 21N 21K 23N 23K
+	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(midnrun_state::sysreg_r), FUNC(midnrun_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));    // LANC Buffer RAM (27E)
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
 	map(0x7fe00000, 0x7fffffff).rom().region("prgrom", 0);
@@ -512,14 +534,14 @@ void jetwave_state::main_memmap(address_map &map)
 	map(0x74010000, 0x7401ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x74020000, 0x7403ffff).rw(m_k001604, FUNC(k001604_device::tile_r), FUNC(k001604_device::tile_w));
 	map(0x74040000, 0x7407ffff).rw(m_k001604, FUNC(k001604_device::char_r), FUNC(k001604_device::char_w));
-	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));      // 21N 21K 23N 23K
+	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc)); // 21N 21K 23N 23K
 	map(0x78010000, 0x7801ffff).w(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x78040000, 0x7804000f).rw(m_k001006_1, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0007).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(jetwave_state::sysreg_r), FUNC(jetwave_state::sysreg_w));
 	map(0x7e008000, 0x7e009fff).m(m_k056230, FUNC(k056230_device::regs_map));  // LANC registers
-	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));    // LANC Buffer RAM (27E)
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w)); // LANC Buffer RAM (27E)
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("datarom", 0);
 	map(0x7f800000, 0x7f9fffff).rom().region("prgrom", 0);
@@ -532,7 +554,7 @@ void jetwave_state::main_memmap(address_map &map)
 
 void zr107_state::sound_ctrl_w(uint8_t data)
 {
-	if (!(data & 1))
+	if (BIT(~data, 0))
 		m_audiocpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 
 	m_sound_ctrl = data;
@@ -541,7 +563,7 @@ void zr107_state::sound_ctrl_w(uint8_t data)
 void zr107_state::sound_memmap(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x100000, 0x103fff).ram();     // Work RAM
+	map(0x100000, 0x103fff).ram(); // Work RAM
 	map(0x200000, 0x2004ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00);
 	map(0x200000, 0x2004ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0x00ff);
 	map(0x400000, 0x40001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
@@ -553,10 +575,10 @@ void zr107_state::sound_memmap(address_map &map)
 
 void zr107_state::sharc_memmap(address_map &map)
 {
-	map(0x400000, 0x41ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
+	map(0x400000, 0x41ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<0>), FUNC(konppc_device::cgboard_shared_sharc_w<0>));
 	map(0x500000, 0x5fffff).ram().share(m_sharc_dataram).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[offset] & 0xffff; }));
 	map(0x600000, 0x6fffff).rw(m_k001005, FUNC(k001005_device::read), FUNC(k001005_device::write));
-	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
+	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<0>), FUNC(konppc_device::cgboard_comm_sharc_w<0>));
 }
 
 /*****************************************************************************/
@@ -595,8 +617,8 @@ static INPUT_PORTS_START( midnrun )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )   PORT_NAME("Shift Up")   PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down") PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Auto Shift") PORT_4WAY PORT_TOGGLE PORT_CONDITION("IN3", 0x02, EQUALS, 0x02)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )       PORT_NAME("AT/MT Switch")                     PORT_CONDITION("IN3", 0x02, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )      PORT_NAME("Service Button")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )       PORT_NAME("AT/MT Switch")                     PORT_CONDITION("IN3", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
@@ -614,16 +636,16 @@ static INPUT_PORTS_START( midnrun )
 	PORT_DIPSETTING( 0x00, "Button" )
 	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x01, "Single" )
-	PORT_DIPSETTING( 0x00, "Twin" ) //unused
+	PORT_DIPSETTING( 0x00, "Twin" ) // unused
 
 	PORT_START("ANALOG1")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
 
 	PORT_START("ANALOG2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
 
 	PORT_START("ANALOG3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(25) PORT_KEYDELTA(16)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jetwave )
@@ -631,15 +653,20 @@ static INPUT_PORTS_START( jetwave )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/View")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("T-Center") //Non-analog acell
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Angle")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Left Turn") //Non-analog left
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right Turn") //Non-analog right
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("IN0", 0x18, NOTEQUALS, 0x18) // T-Center
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Angle")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Tilt Left") PORT_PLAYER(2) PORT_CONDITION("IN3", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Tilt Right") PORT_PLAYER(2) PORT_CONDITION("IN3", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// digital controls when in dev mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Accelerator (Dev)") PORT_CONDITION("IN3", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Handle Left (Dev)") PORT_CONDITION("IN3", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Handle Right (Dev)") PORT_CONDITION("IN3", 0x01, EQUALS, 0x00)
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x0c, 0x0c, "Network ID" ) PORT_DIPLOCATION("SW:4,3")
@@ -647,22 +674,18 @@ static INPUT_PORTS_START( jetwave )
 	PORT_DIPSETTING( 0x08, "2" )
 	PORT_DIPSETTING( 0x04, "3" )
 	PORT_DIPSETTING( 0x00, "4" )
-	// TODO: make these two less confusing
-	PORT_DIPNAME( 0x02, 0x00, "Drive System" ) PORT_DIPLOCATION("SW:2") //Sensors for force feedback. Todo: "Disable" the sensors so this switch can be set to off without errors.
+	PORT_DIPNAME( 0x02, 0x00, "Drive System" ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) ) // Disables and bypasses all sensor checks. This disables the force feedback on actual hardware.
 	PORT_DIPSETTING( 0x02, DEF_STR( On ) ) // Enables the sensors/normal use.
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) ) //Disables and bypasses all sensor checks. This disables the force feedback on actual hardware.
 	PORT_DIPNAME( 0x01, 0x01, "Running Mode" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x01, "Product" ) //Enables the analog inputs; normal usage
-	PORT_DIPSETTING( 0x00, "Check" ) //Disables them for use with a JAMMA interface; intended for development purposes.
+	PORT_DIPSETTING( 0x01, "Production" ) // Enables the analog inputs; normal usage
+	PORT_DIPSETTING( 0x00, "Developer" ) // Disables them for use with a JAMMA interface; intended for development purposes.
 
 	PORT_START("ANALOG1")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering") PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Handle") PORT_MINMAX(0x70,0x90) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_REVERSE
 
 	PORT_START("ANALOG2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Accelerator") PORT_MINMAX(0x00,0x90) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
-
-	PORT_START("ANALOG3") //actually required else MAME will crash if this port is removed.
-	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Accelerator") PORT_MINMAX(0x00,0x20) PORT_SENSITIVITY(25) PORT_KEYDELTA(4)
 INPUT_PORTS_END
 
 
@@ -673,15 +696,15 @@ double zr107_state::adc0838_callback(uint8_t input)
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * m_analog[0]->read()) / 255.0;
+		return (double)(5 * m_analog[0].read_safe(0)) / 255.0;
 	case ADC083X_CH1:
-		return (double)(5 * m_analog[1]->read()) / 255.0;
+		return (double)(5 * m_analog[1].read_safe(0)) / 255.0;
 	case ADC083X_CH2:
-		return (double)(5 * m_analog[2]->read()) / 255.0;
+		return (double)(5 * m_analog[2].read_safe(0)) / 255.0;
 	case ADC083X_VREF:
-		return 5;
-	default:
-		return 0;
+		return 5.0;
+	case ADC083X_AGND: default:
+		return 0.0;
 	}
 }
 
@@ -724,9 +747,9 @@ void zr107_state::machine_reset()
 void zr107_state::zr107(machine_config &config)
 {
 	// basic machine hardware
-	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   // PowerPC 403GA 32MHz
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2); // PowerPC 403GA 32MHz
 
-	M68000(config, m_audiocpu, XTAL(64'000'000)/8);    // 8MHz
+	M68000(config, m_audiocpu, XTAL(64'000'000)/8); // 8MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zr107_state::sound_memmap);
 
 	ADSP21062(config, m_dsp, XTAL(36'000'000));
@@ -757,26 +780,26 @@ void zr107_state::zr107(machine_config &config)
 	K056800(config, m_k056800, XTAL(18'432'000));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
 	k054539_1.set_device_rom_tag("k054539");
 	k054539_1.timer_handler().set(FUNC(zr107_state::k054539_irq_gen));
-	k054539_1.add_route(0, "lspeaker", 0.75);
-	k054539_1.add_route(1, "rspeaker", 0.75);
+	k054539_1.add_route(0, "speaker", 0.75, 0);
+	k054539_1.add_route(1, "speaker", 0.75, 1);
 
 	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
 	k054539_2.set_device_rom_tag("k054539");
-	k054539_2.add_route(0, "lspeaker", 0.75);
-	k054539_2.add_route(1, "rspeaker", 0.75);
+	k054539_2.add_route(0, "speaker", 0.75, 0);
+	k054539_2.add_route(1, "speaker", 0.75, 1);
 
 	adc0838_device &adc(ADC0838(config, "adc0838"));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));
 
 	KONPPC(config, m_konppc, 0);
+	m_konppc->set_dsp_tag(0, m_dsp);
 	m_konppc->set_num_boards(1);
-	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_ZR107);
+	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_ZR107);
 }
 
 void midnrun_state::midnrun(machine_config &config)
@@ -804,7 +827,7 @@ void jetwave_state::jetwave(machine_config &config)
 
 	// video hardware
 	m_screen->set_size(1024, 1024);
-	m_screen->set_visarea(40, 511 + 40, 27, 383 + 27);      // needs CRTC emulation
+	m_screen->set_visarea(40, 511 + 40, 27, 383 + 27); // needs CRTC emulation
 	m_screen->set_screen_update(FUNC(jetwave_state::screen_update));
 
 	m_palette->set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
@@ -817,20 +840,13 @@ void jetwave_state::jetwave(machine_config &config)
 	K001006(config, m_k001006_2, 0);
 	m_k001006_2->set_gfx_region("textures");
 
-	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
+	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
 
 /*****************************************************************************/
 
 void zr107_state::driver_init()
 {
-	m_ccu_vcth = m_ccu_vctl = 0;
-
-	save_item(NAME(m_ccu_vcth));
-	save_item(NAME(m_ccu_vctl));
-	save_item(NAME(m_sound_ctrl));
-	save_item(NAME(m_sound_intck));
-
 	m_dsp->enable_recompiler();
 }
 

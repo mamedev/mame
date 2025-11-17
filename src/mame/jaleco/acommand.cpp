@@ -509,16 +509,15 @@ void acommand_state::acommand(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_txtmap, m_palette, 0x2700);
 
 	// assume amplified stereo
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki[0], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 /***************************************************************************

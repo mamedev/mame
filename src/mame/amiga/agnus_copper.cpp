@@ -92,10 +92,12 @@ void agnus_copper_device::device_start()
 	save_item(NAME(m_pc));
 	save_item(NAME(m_state_waiting));
 	save_item(NAME(m_state_waitblit));
+	save_item(NAME(m_state_skipping));
 	save_item(NAME(m_waitval));
 	save_item(NAME(m_waitmask));
 	save_item(NAME(m_pending_data));
 	save_item(NAME(m_pending_offset));
+	save_item(NAME(m_xpos_state));
 }
 
 
@@ -202,6 +204,7 @@ inline void agnus_copper_device::set_pc(u8 ch, bool is_sync)
 {
 	m_pc = m_lc[ch];
 	m_state_waiting = false;
+	m_state_skipping = false;
 	LOGPC("%s: COPJMP%d new PC = %08x%s\n"
 		, machine().describe_context()
 		, ch + 1
@@ -230,9 +233,33 @@ void agnus_copper_device::copins_w(u16 data)
 //**************************************************************************
 
 // executed on scanline == 0
-void agnus_copper_device::vblank_sync()
+void agnus_copper_device::vblank_sync(bool state)
 {
-	set_pc(0, true);
+	if (state)
+	{
+		set_pc(0, true);
+		m_xpos_state = 0;
+	}
+	m_vertical_blank = state;
+}
+
+// check current copper cycle at end of scanline
+// - auntaadv (gameplay), WAITs with $xxd9
+// - gunbee WAITs with $xxe1 at beginning of copper lists, before setting fmode.
+//   Will desync scrolling by a whole lot if we don't add a +6 here
+// cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
+void agnus_copper_device::suspend_offset(int xpos, int hblank_width)
+{
+	m_xpos_state = (xpos == 511) ? 0 : xpos - hblank_width;
+	// TODO: commented out, causes issues in too many places
+	//m_xpos_state += 6;
+//  assert(m_xpos_state > 0);
+}
+
+// restore at start
+int agnus_copper_device::restore_offset()
+{
+	return m_xpos_state;
 }
 
 // TODO: h/vblank checks against xpos/vpos
@@ -309,22 +336,27 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		word0 = (word0 >> 1) & 0xff;
 		if (word0 >= m_cdang_setting)
 		{
-			if (delay[word0] == 0)
+			// SKIP applies to valid MOVEs only
+			// - apocalyps (gameplay, chain of SKIPs & WAIT)
+			// - rbisland (loading screen at least, tries to SKIP a CDANG MOVE)
+			if (m_state_skipping)
 			{
-				//LOGCHIPSET("%02X.%02X: Write to %s = %04x\n", ypos, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				LOGCHIPSET("%02X.%02X: MOVE $dff%03x = %04x\n",
-					ypos,
-					xpos / 2,
-					word0 << 1,
-					word1
-				);
-				m_host_space->write_word(0xdff000 | (word0 << 1), word1);
+				LOGINST("  (Ignored)\n");
+				m_state_skipping = false;
+				// TODO: verify timings
+				// may depend on num of planes enabled (move_offset) or opcode fetch above is enough.
+				xpos += COPPER_CYCLES_TO_PIXELS(2);
+				return xpos;
 			}
-			else    // additional 2 cycles needed for non-Agnus registers
-			{
-				m_pending_offset = word0;
-				m_pending_data = word1;
-			}
+			// delay write to the next available DMA slot if not in blanking area
+			// - suprfrog & abreed (bottom playfield rows).
+			// - beast, biochall and cd32 bios wants this to be 0x5c
+			const bool horizontal_blank = xpos <= 0x5c;
+			const int move_offset = horizontal_blank || m_vertical_blank ? 0 : std::max(num_planes - 4, 0);
+
+			m_pending_offset = word0;
+			m_pending_data = word1;
+			xpos += COPPER_CYCLES_TO_PIXELS(move_offset);
 		}
 
 		/* illegal writes suspend until next frame */
@@ -336,6 +368,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 			m_waitmask = 0xffff;
 			m_state_waitblit = false;
 			m_state_waiting = true;
+			m_state_skipping = false;
 
 			return 511;
 		}
@@ -351,7 +384,8 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
-			const int wait_offset = std::max(num_planes - 4, 0) + 1;
+			const bool horizontal_blank = xpos <= 0x5c;
+			const int wait_offset = horizontal_blank || m_vertical_blank ? 0 : std::max(num_planes - 4, 0) + 1;
 
 			LOGINST("  WAIT %04x & %04x (currently %04x, num planes %d +%d)\n",
 				m_waitval,
@@ -361,6 +395,7 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 				wait_offset
 			);
 
+			m_state_skipping = false;
 			m_state_waiting = true;
 			xpos += COPPER_CYCLES_TO_PIXELS(wait_offset);
 		}
@@ -369,23 +404,15 @@ int agnus_copper_device::execute_next(int xpos, int ypos, bool is_blitter_busy, 
 		else
 		{
 			int curpos = (ypos << 8) | (xpos >> 1);
+			m_state_skipping = ((curpos & m_waitmask) >= (m_waitval & m_waitmask)
+				&& (!m_state_waitblit || !(is_blitter_busy)));
 
-			LOGINST("  SKIP %04x & %04x (currently %04x)\n",
+			LOGINST("  SKIP %04x & %04x (currently %04x) - %s\n",
 				m_waitval,
 				m_waitmask,
-				(ypos << 8) | (xpos >> 1)
+				(ypos << 8) | (xpos >> 1),
+				m_state_skipping ? "Skipping" : "Not skipped"
 			);
-
-			/* if we're past the wait time, stop it and hold up 2 cycles */
-			if ((curpos & m_waitmask) >= (m_waitval & m_waitmask) &&
-				(!m_state_waitblit || !(is_blitter_busy)))
-			{
-				LOGINST("  Skipped\n");
-
-				/* count the cycles it out have taken to fetch the next instruction */
-				m_pc += 4;
-				xpos += COPPER_CYCLES_TO_PIXELS(2);
-			}
 		}
 	}
 

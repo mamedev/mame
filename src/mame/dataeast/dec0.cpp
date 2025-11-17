@@ -1848,10 +1848,10 @@ void dec0_state::dec0(machine_config &config)
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
 	ym2.irq_handler().set("audio_irq", FUNC(input_merger_device::in_w<1>));
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.72);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.32);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(20'000'000) / 2 / 10, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.72);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.66);
 }
 
 
@@ -1877,7 +1877,7 @@ void dec0_state::dec1(machine_config &config)
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000)/4)); /* verified on pcb */
 	ym2.irq_handler().set_inputline(m_audiocpu, 1);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); /* verified on pcb */
 	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -2038,7 +2038,7 @@ void automat_state::secretab(machine_config &config) // all clocks verified on P
 	ym2203a.add_route(3, "mono", 0.35);
 
 	ym3812_device &ym3812(YM3812(config, "ym3812", 20_MHz_XTAL / 8));
-	ym3812.add_route(ALL_OUTPUTS, "mono", 0.80);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	LS157(config, m_adpcm_select[0], 0);
 	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
@@ -2095,7 +2095,7 @@ void dec0_state::bandit(machine_config &config)
 	mcu.port_out_cb<3>().set(FUNC(dec0_state::dec0_mcu_port3_w));
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
+	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
 	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb));
 }
 
@@ -2289,7 +2289,6 @@ void dec0_state::midresb(machine_config &config)
 	M68705R3(config, m_mcu, XTAL(3'579'545));
 
 	subdevice<ym3812_device>("ym2")->irq_handler().set_inputline(m_audiocpu, 0);
-	subdevice<ym3812_device>("ym2")->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// bootleg doesn't seem to support row/col scroll (or enable is different)
 //  m_tilegen[0]->disable_16x16();
@@ -4358,7 +4357,7 @@ GAME( 1988, robocopw,   robocop,  robocop,    robocop,    robocop_state,  empty_
 GAME( 1988, robocopj,   robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu,   robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East USA",         "Robocop (US, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East USA",         "Robocop (US, revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state,     init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state,     init_hbarrel,    ROT90,  "Data East USA / Incredible Technologies",         "Bandit (US prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Incredible Technologies credited during ending (select track #75). MIG for the ending screen (which may be a btanb).
 GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   hippodrm_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasyj,  hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )

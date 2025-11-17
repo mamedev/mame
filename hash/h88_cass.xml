@@ -10,7 +10,8 @@ license:CC0-1.0
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
 		<info name="alt_title" value="Heath/Wintek Terminal Debugger"/>
-		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="developer" value="Heath Corp." />
+		<info name="developer" value="Wintek Corp." />
 		<info name="distributor" value="Heath Corp."/>
 		<info name="release" value="197806xx"/>
 		<info name="version" value="02.05.00"/>
@@ -27,7 +28,8 @@ license:CC0-1.0
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
 		<info name="alt_title" value="Heath/Wintek Terminal Debugger"/>
-		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="developer" value="Heath Corp." />
+		<info name="developer" value="Wintek Corp." />
 		<info name="distributor" value="Heath Corp."/>
 		<info name="release" value="197806xx"/>
 		<info name="version" value="02.06.00"/>
@@ -44,7 +46,8 @@ license:CC0-1.0
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
 		<info name="alt_title" value="Extended Benton Harbor Basic"/>
-		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="developer" value="Heath Corp." />
+		<info name="developer" value="Wintek Corp." />
 		<info name="distributor" value="Heath Corp."/>
 		<info name="release" value="197806xx"/>
 		<info name="version" value="10.05.00"/>
@@ -61,7 +64,8 @@ license:CC0-1.0
 		<year>1978</year>
 		<publisher>Heath Corp.</publisher>
 		<info name="alt_title" value="Extended Benton Harbor Basic"/>
-		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="developer" value="Heath Corp." />
+		<info name="developer" value="Wintek Corp." />
 		<info name="distributor" value="Heath Corp."/>
 		<info name="release" value="197806xx"/>
 		<info name="version" value="10.05.01"/>
@@ -78,7 +82,8 @@ license:CC0-1.0
 		<year>1979</year>
 		<publisher>Heath Corp.</publisher>
 		<info name="alt_title" value="Extended Benton Harbor Basic"/>
-		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="developer" value="Heath Corp." />
+		<info name="developer" value="Wintek Corp." />
 		<info name="distributor" value="Heath Corp."/>
 		<info name="release" value="197905xx"/>
 		<info name="version" value="10.06.00"/>
@@ -129,7 +134,8 @@ license:CC0-1.0
 		<year>1979</year>
 		<publisher>Heath Corp.</publisher>
 		<info name="alt_title" value="TED-8"/>
-		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="developer" value="Heath Corp." />
+		<info name="developer" value="Wintek Corp." />
 		<info name="distributor" value="Heath Corp."/>
 		<info name="release" value="197803xx"/>
 		<info name="version" value="03.05.00"/>
@@ -146,7 +152,8 @@ license:CC0-1.0
 		<year>1979</year>
 		<publisher>Heath Corp.</publisher>
 		<info name="alt_title" value="TED-8"/>
-		<info name="developer" value="Heath Corp./Wintek Corp."/>
+		<info name="developer" value="Heath Corp." />
+		<info name="developer" value="Wintek Corp." />
 		<info name="distributor" value="Heath Corp."/>
 		<info name="release" value="197803xx"/>
 		<info name="version" value="03.05.00"/>

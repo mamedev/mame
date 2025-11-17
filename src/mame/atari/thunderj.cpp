@@ -204,123 +204,136 @@ uint32_t thunderj_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			uint8_t const *const pri = &priority_bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &priority_bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
-					 *      PF/M=MPX0*!MPX1*!MPX2*!MPX3*!MPX4*!MPX5*!MPX6*!MPX7
-					 *          +PFX3*PFX8*PFX9*!MPR0
-					 *          +PFX3*PFX8*!MPR0*!MPR1
-					 *          +PFX3*PFX9*!MPR1
-					 *
-					 *      --- CS1 is 1 if the playfield should be displayed
-					 *      CS1=PF/M*!ALBG*!APIX0*!APIX1
-					 *         +!MPX0*!MPX1*!MPX2*!MPX3*!ALBG*!APIX0*!APIX1
-					 *
-					 *      --- CS0 is 1 if the MOs should be displayed
-					 *      CS0=!PF/M*MPX0*!ALBG*!APIX0*!APIX1
-					 *         +!PF/M*MPX1*!ALBG*!APIX0*!APIX1
-					 *         +!PF/M*MPX2*!ALBG*!APIX0*!APIX1
-					 *         +!PF/M*MPX3*!ALBG*!APIX0*!APIX1
-					 *
-					 *      --- CRA10 is the 0x200 bit of the color RAM index; set if pf is displayed
-					 *      CRA10:=CS1
-					 *
-					 *      --- CRA9 is the 0x100 bit of the color RAM index; set if mo is displayed
-					 *          or if the playfield selected is playfield #2
-					 *      CRA9:=PFXS*CS1
-					 *          +!CS1*CS0
-					 *
-					 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
-					 *      CRA8:=CS1*PFX7
-					 *          +!CS1*MPX7*CS0
-					 *          +!CS1*!CS0*ALC4
-					 *
-					 *      CRA7:=CS1*PFX6
-					 *          +!CS1*MPX6*CS0
-					 *
-					 *      CRA6:=CS1*PFX5
-					 *          +MPX5*!CS1*CS0
-					 *          +!CS1*!CS0*ALC3
-					 *
-					 *      CRA5:=CS1*PFX4
-					 *          +MPX4*!CS1*CS0
-					 *          +!CS1*ALC2*!CS0
-					 *
-					 *      CRA4:=CS1*PFX3
-					 *          +!CS1*MPX3*CS0
-					 *          +!CS1*!CS0*ALC1
-					 *
-					 *      CRA3:=CS1*PFX2
-					 *          +MPX2*!CS1*CS0
-					 *          +!CS1*!CS0*ALC0
-					 *
-					 *      CRA2:=CS1*PFX1
-					 *          +MPX1*!CS1*CS0
-					 *          +!CS1*!CS0*APIX1
-					 *
-					 *      CRA1:=CS1*PFX0
-					 *          +MPX0*!CS1*CS0
-					 *          +!CS1*!CS0*APIX0
-					 */
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority signals special rendering and doesn't draw anything
-					if (mopriority & 4)
-						continue;
-
-					// determine pf/m signal
-					int pfm = 0;
-					if ((mo[x] & 0xff) == 1)
-						pfm = 1;
-					else if (pf[x] & 8)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					uint8_t const *const pri = &priority_bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						int const pfpriority = (pri[x] & 0x80) ? ((pri[x] >> 2) & 3) : (pri[x] & 3);
-						if (((pfpriority == 3) && !(mopriority & 1)) ||
-							((pfpriority & 1) && (mopriority == 0)) ||
-							((pfpriority & 2) && !(mopriority & 2)))
-							pfm = 1;
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- PF/M is 1 if playfield has priority, or 0 if MOs have priority
+							 *      PF/M=MPX0*!MPX1*!MPX2*!MPX3*!MPX4*!MPX5*!MPX6*!MPX7
+							 *          +PFX3*PFX8*PFX9*!MPR0
+							 *          +PFX3*PFX8*!MPR0*!MPR1
+							 *          +PFX3*PFX9*!MPR1
+							 *
+							 *      --- CS1 is 1 if the playfield should be displayed
+							 *      CS1=PF/M*!ALBG*!APIX0*!APIX1
+							 *         +!MPX0*!MPX1*!MPX2*!MPX3*!ALBG*!APIX0*!APIX1
+							 *
+							 *      --- CS0 is 1 if the MOs should be displayed
+							 *      CS0=!PF/M*MPX0*!ALBG*!APIX0*!APIX1
+							 *         +!PF/M*MPX1*!ALBG*!APIX0*!APIX1
+							 *         +!PF/M*MPX2*!ALBG*!APIX0*!APIX1
+							 *         +!PF/M*MPX3*!ALBG*!APIX0*!APIX1
+							 *
+							 *      --- CRA10 is the 0x200 bit of the color RAM index; set if pf is displayed
+							 *      CRA10:=CS1
+							 *
+							 *      --- CRA9 is the 0x100 bit of the color RAM index; set if mo is displayed
+							 *          or if the playfield selected is playfield #2
+							 *      CRA9:=PFXS*CS1
+							 *          +!CS1*CS0
+							 *
+							 *      --- CRA8-1 are the low 8 bits of the color RAM index; set as expected
+							 *      CRA8:=CS1*PFX7
+							 *          +!CS1*MPX7*CS0
+							 *          +!CS1*!CS0*ALC4
+							 *
+							 *      CRA7:=CS1*PFX6
+							 *          +!CS1*MPX6*CS0
+							 *
+							 *      CRA6:=CS1*PFX5
+							 *          +MPX5*!CS1*CS0
+							 *          +!CS1*!CS0*ALC3
+							 *
+							 *      CRA5:=CS1*PFX4
+							 *          +MPX4*!CS1*CS0
+							 *          +!CS1*ALC2*!CS0
+							 *
+							 *      CRA4:=CS1*PFX3
+							 *          +!CS1*MPX3*CS0
+							 *          +!CS1*!CS0*ALC1
+							 *
+							 *      CRA3:=CS1*PFX2
+							 *          +MPX2*!CS1*CS0
+							 *          +!CS1*!CS0*ALC0
+							 *
+							 *      CRA2:=CS1*PFX1
+							 *          +MPX1*!CS1*CS0
+							 *          +!CS1*!CS0*APIX1
+							 *
+							 *      CRA1:=CS1*PFX0
+							 *          +MPX0*!CS1*CS0
+							 *          +!CS1*!CS0*APIX0
+							 */
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority signals special rendering and doesn't draw anything
+							if (mopriority & 4)
+								continue;
+
+							// determine pf/m signal
+							int pfm = 0;
+							if ((mo[x] & 0xff) == 1)
+								pfm = 1;
+							else if (pf[x] & 8)
+							{
+								int const pfpriority = (pri[x] & 0x80) ? ((pri[x] >> 2) & 3) : (pri[x] & 3);
+								if (((pfpriority == 3) && !(mopriority & 1)) ||
+									((pfpriority & 1) && (mopriority == 0)) ||
+									((pfpriority & 2) && !(mopriority & 2)))
+									pfm = 1;
+							}
+
+							// if pfm is low, we display the mo
+							if (!pfm)
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+
+							// don't erase yet -- we need to make another pass later
+						}
 					}
-
-					// if pfm is low, we display the mo
-					if (!pfm)
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
-
-					// don't erase yet -- we need to make another pass later
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_vad->alpha().draw(screen, bitmap, cliprect, 0, 0);
 
 	// now go back and process the upper bit of MO priority
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority might mean palette kludges
-					if (mopriority & 4)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// if bit 2 is set, start setting high palette bits
-						if (mo[x] & 2)
-							m_vad->mob().apply_stain(bitmap, pf, mo, x, y);
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority might mean palette kludges
+							if (mopriority & 4)
+							{
+								// if bit 2 is set, start setting high palette bits
+								if (mo[x] & 2)
+									m_vad->mob().apply_stain(bitmap, pf, mo, x, y);
+							}
+						}
 					}
 				}
-		}
+			});
+
 	return 0;
 }
 

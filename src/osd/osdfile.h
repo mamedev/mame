@@ -63,7 +63,7 @@ class osd_file
 {
 public:
 	/// \brief Smart pointer to a file handle
-	typedef std::unique_ptr<osd_file> ptr;
+	using ptr = std::unique_ptr<osd_file>;
 
 	/// \brief Open a new file handle
 	///
@@ -204,13 +204,29 @@ namespace osd
 	class directory
 	{
 	public:
-		typedef std::unique_ptr<directory> ptr;
+		using ptr = std::unique_ptr<directory>;
 
-		// osd::directory::entry contains basic information about a file when iterating through
-		// a directory
+		// osd::directory::entry contains basic information about a file
 		class entry
 		{
+		private:
+			struct entry_deleter
+			{
+				// we allocate extra space after the entry for the name
+				// ensure the size isn't passed to operator ::delete in case the runtime library checks it
+				void operator()(entry *object) const
+				{
+					if (object)
+					{
+						object->~entry();
+						::operator delete(object, std::align_val_t(alignof(entry)));
+					}
+				}
+			};
+
 		public:
+			using ptr = std::unique_ptr<entry, entry_deleter>;
+
 			enum class entry_type
 			{
 				NONE,
@@ -250,7 +266,7 @@ namespace osd
 /// \param [in] path The path in question.
 /// \return An allocated pointer to an osd::directory::entry representing
 ///   info on the path; even if the file does not exist.
-std::unique_ptr<osd::directory::entry> osd_stat(std::string const &path);
+osd::directory::entry::ptr osd_stat(std::string const &path);
 
 
 /***************************************************************************

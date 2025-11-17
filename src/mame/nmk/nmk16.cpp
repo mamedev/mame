@@ -207,6 +207,7 @@ Reference of music tempo:
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "cpu/z80/z80.h"
+#include "machine/input_merger.h"
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
@@ -331,7 +332,7 @@ u8 nmk16_state::powerins_bootleg_fake_ym2203_r()
 ***************************************************************************/
 void nmk16_state::tharrier_mcu_control_w(u16 data)
 {
-//  LOG("%04x: mcu_control_w %02x\n",m_maincpu->pc(),data);
+//  LOG("%06x: mcu_control_w %02x\n", m_maincpu->pc(), data);
 }
 
 u16 nmk16_state::tharrier_mcu_r(offs_t offset, u16 mem_mask)
@@ -347,13 +348,17 @@ u16 nmk16_state::tharrier_mcu_r(offs_t offset, u16 mem_mask)
 
 		int res;
 
-		if (m_maincpu->pc()==0x8aa) res = (m_mainram[0x9064/2])|0x20; // Task Force Harrier
-		else if (m_maincpu->pc()==0x8ce) res = (m_mainram[0x9064/2])|0x60; // Task Force Harrier
+		if (m_maincpu->pc() == 0x8aa) res = (m_mainram[0x9064/2]) | 0x20; // Task Force Harrier
+		else if (m_maincpu->pc() == 0x8ce) res = (m_mainram[0x9064/2]) | 0x60; // Task Force Harrier
 		else
 		{
-			res = to_main[m_prot_count++];
-			if (m_prot_count == sizeof(to_main))
-				m_prot_count = 0;
+			res = to_main[m_prot_count];
+			if (!machine().side_effects_disabled())
+			{
+				m_prot_count++;
+				if (m_prot_count == sizeof(to_main))
+					m_prot_count = 0;
+			}
 		}
 
 		return res << 8;
@@ -440,7 +445,7 @@ void tharrierb_state::mcu_portc_w(u8 data)
 
 u8 tharrierb_state::mcu_portd_r()
 {
-	u8 select = m_mcu_portc & 0x07;
+	const u8 select = m_mcu_portc & 0x07;
 
 	if (select < 5)
 		return m_inputs[select]->read();
@@ -474,15 +479,15 @@ void nmk16_state::scroll_w(offs_t offset, u8 data)
 {
 	m_scroll[Layer][offset] = data;
 
-	if (offset & 2)
+	if (BIT(offset, 1))
 	{
-		m_bg_tilemap[Layer]->set_scrolly(0,((m_scroll[Layer][2] << 8) | m_scroll[Layer][3]));
+		m_bg_tilemap[Layer]->set_scrolly(0, ((m_scroll[Layer][2] << 8) | m_scroll[Layer][3]));
 	}
 	else
 	{
 		if ((m_bgvideoram[Layer].bytes() > 0x4000) && (offset == 0))
 		{
-			int newbank = (m_scroll[Layer][0] >> 4) & ((m_bgvideoram[Layer].bytes() >> 14) - 1);
+			const int newbank = (m_scroll[Layer][0] >> 4) & ((m_bgvideoram[Layer].bytes() >> 14) - 1);
 			if (m_tilerambank != newbank)
 			{
 				m_tilerambank = newbank;
@@ -491,7 +496,7 @@ void nmk16_state::scroll_w(offs_t offset, u8 data)
 
 			}
 		}
-		m_bg_tilemap[Layer]->set_scrollx(0,(m_scroll[Layer][0] << 8) | m_scroll[Layer][1]);
+		m_bg_tilemap[Layer]->set_scrollx(0, (m_scroll[Layer][0] << 8) | m_scroll[Layer][1]);
 	}
 }
 
@@ -512,10 +517,10 @@ void nmk16_state::vandyke_map(address_map &map)
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::vandyke_scroll_w));
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x094000, 0x097fff).ram(); // what is this?
-	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::vandykeb_map(address_map &map)
@@ -533,10 +538,10 @@ void nmk16_state::vandykeb_map(address_map &map)
 //  map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).nopw();    // just in case...
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x094000, 0x097fff).ram(); // what is this?
-	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::manybloc_map(address_map &map)
@@ -551,10 +556,10 @@ void nmk16_state::manybloc_map(address_map &map)
 	map(0x08001c, 0x08001d).nopw();            // See notes at the top of the driver
 	map(0x08001f, 0x08001f).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09cfff).ram().w(FUNC(nmk16_state::manybloc_scroll_w)).share("scrollram");
-	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09cfff).ram().w(FUNC(nmk16_state::manybloc_scroll_w)).share(m_gunnail_scrollram);
+	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
 }
 
 void nmk16_tomagic_state::tomagic_map(address_map &map)
@@ -568,19 +573,19 @@ void nmk16_tomagic_state::tomagic_map(address_map &map)
 	map(0x080018, 0x080019).w(FUNC(nmk16_tomagic_state::tilebank_w));
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
-	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_tomagic_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x08c000, 0x08c1ff).writeonly().share(m_gunnail_scrollram);
+	map(0x08c200, 0x08c3ff).writeonly().share(m_gunnail_scrollramy);
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_tomagic_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x094001, 0x094001).w(m_oki[0], FUNC(okim6295_device::write));
 	map(0x094003, 0x094003).r(m_oki[0], FUNC(okim6295_device::read));
-	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_tomagic_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_tomagic_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
 }
 
 void nmk16_tomagic_state::tomagic_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
-	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xc000, 0xdfff).ram();
 }
 
@@ -603,14 +608,15 @@ void nmk16_state::tharrier_map(address_map &map)
 	map(0x080012, 0x080013).nopw();
 //  map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
 //  map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
+//  map(0x08001c, 0x08001d) sound reset
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x080202, 0x080203).portr("IN2");
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09c7ff).ram(); // Unused txvideoram area?
-	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void tharrierb_state::tharrierb_map(address_map &map)
@@ -625,11 +631,11 @@ void tharrierb_state::tharrierb_map(address_map &map)
 	map(0x08001c, 0x08001d).unmaprw(); // sound cpu reset
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x090000, 0x093fff).ram().w(FUNC(tharrierb_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x090000, 0x093fff).ram().w(FUNC(tharrierb_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09cfff).ram(); // verified in test mode
-	map(0x09d000, 0x09d7ff).ram().w(FUNC(tharrierb_state::txvideoram_w)).share("txvideoram");
+	map(0x09d000, 0x09d7ff).ram().w(FUNC(tharrierb_state::txvideoram_w)).share(m_txvideoram);
 	map(0x09d800, 0x09dfff).ram(); // verified in test mode
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(tharrierb_state::mainram_strange_w)).share("mainram");
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(tharrierb_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::tharrier_sound_map(address_map &map)
@@ -666,9 +672,9 @@ void nmk16_state::mustang_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
 	map(0x08c002, 0x08c087).nopw();    // ??
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::mustangb_map(address_map &map)
@@ -684,9 +690,9 @@ void nmk16_state::mustangb_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
 	map(0x08c002, 0x08c087).nopw();    // ??
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::mustangb3_map(address_map &map)
@@ -704,9 +710,9 @@ void nmk16_state::mustangb3_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
 	map(0x08c002, 0x08c087).nopw();
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::mustangb3_sound_map(address_map &map)
@@ -731,15 +737,15 @@ void nmk16_state::twinactn_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
 	map(0x08c002, 0x08c087).nopw();    // ??
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::acrobatm_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x80000, 0x8ffff).ram().share("mainram");
+	map(0x80000, 0x8ffff).ram().share(m_mainram);
 	map(0xc0000, 0xc0001).portr("IN0");
 	map(0xc0002, 0xc0003).portr("IN1");
 	map(0xc0008, 0xc0009).portr("DSW1");
@@ -751,14 +757,14 @@ void nmk16_state::acrobatm_map(address_map &map)
 	map(0xc001f, 0xc001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0xc4000, 0xc45ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc8000, 0xc8007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0xcc000, 0xcffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+	map(0xcc000, 0xcffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 }
 
 void nmk16_state::acrobatmbl_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x80000, 0x8ffff).ram().share("mainram");
+	map(0x80000, 0x8ffff).ram().share(m_mainram);
 	map(0xc0000, 0xc0001).portr("IN0");
 	map(0xc0002, 0xc0003).portr("IN1");
 	map(0xc0008, 0xc0009).portr("DSW1");
@@ -768,8 +774,25 @@ void nmk16_state::acrobatmbl_map(address_map &map)
 	map(0xc001e, 0xc001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
 	map(0xc4000, 0xc45ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc8000, 0xc8007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0xcc000, 0xcffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+	map(0xcc000, 0xcffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+}
+
+void nmk16_state::hachamfb2_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x08000a, 0x08000b).portr("DSW2");
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
+	map(0x08001e, 0x08001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
 }
 
 void nmk16_state::bioship_map(address_map &map)
@@ -788,8 +811,8 @@ void nmk16_state::bioship_map(address_map &map)
 	map(0x08c000, 0x08c007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0xff00);
 	map(0x08c010, 0x08c017).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0xff00);
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<1>)).share("bgvideoram1");
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
 void nmk16_state::hachamf_map(address_map &map)
@@ -808,9 +831,9 @@ void nmk16_state::hachamf_map(address_map &map)
 
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram"); // Main RAM, inc sprites, shared with MCU
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram); // Main RAM, inc sprites, shared with MCU
 }
 
 void nmk16_state::tdragon_map(address_map &map)
@@ -818,7 +841,7 @@ void nmk16_state::tdragon_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x044022, 0x044023).nopr();  // No Idea (ROM mirror? - does this even exist on originals?)
 
-	map(0x080000, 0x08ffff).mirror(0x030000).ram().share("mainram");
+	map(0x080000, 0x08ffff).mirror(0x030000).ram().share(m_mainram);
 
 	map(0x0c0000, 0x0c0001).mirror(0x020000).portr("IN0");
 	map(0x0c0002, 0x0c0003).mirror(0x020000).portr("IN1");
@@ -832,8 +855,8 @@ void nmk16_state::tdragon_map(address_map &map)
 
 	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 }
 
 // No sprites without this. Is it actually protection?
@@ -846,7 +869,7 @@ void nmk16_state::tdragonb_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x044022, 0x044023).r(FUNC(nmk16_state::tdragonb_prot_r));
-	map(0x0b0000, 0x0bffff).ram().share("mainram");
+	map(0x0b0000, 0x0bffff).ram().share(m_mainram);
 	map(0x0c0000, 0x0c0001).portr("IN0");
 	map(0x0c0002, 0x0c0003).portr("IN1");
 	map(0x0c0008, 0x0c0009).portr("DSW1");
@@ -856,8 +879,8 @@ void nmk16_state::tdragonb_map(address_map &map)
 	map(0x0c001e, 0x0c001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
 	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 }
 
 void nmk16_state::tdragonb3_map(address_map &map)
@@ -871,7 +894,7 @@ void nmk16_state::tdragonb3_map(address_map &map)
 void nmk16_state::tdragonb2_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0b0000, 0x0bffff).ram().share("mainram");
+	map(0x0b0000, 0x0bffff).ram().share(m_mainram);
 	map(0x08e294, 0x08e925).portr("IN1");
 	map(0x0c0000, 0x0c0001).portr("IN0");
 	map(0x0c0002, 0x0c0003).nopr(); // leftover from the original?
@@ -889,14 +912,14 @@ void nmk16_state::tdragonb2_map(address_map &map)
 	map(0x0c4006, 0x0c4007).nopw(); // duplicate value of the above
 	map(0x0c4018, 0x0c4019).nopr(); // ??
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 }
 
 void nmk16_state::ssmissin_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x0b0000, 0x0bffff).ram().share("mainram");
+	map(0x0b0000, 0x0bffff).ram().share(m_mainram);
 	map(0x0c0000, 0x0c0001).portr("IN0");
 	map(0x0c0004, 0x0c0005).portr("IN1");
 	map(0x0c0006, 0x0c0007).portr("DSW1");
@@ -906,8 +929,8 @@ void nmk16_state::ssmissin_map(address_map &map)
 	map(0x0c001f, 0x0c001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x0d0000, 0x0d07ff).mirror(0x1800).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram"); //mirror for airattck
+	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x0d0000, 0x0d07ff).mirror(0x1800).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram); //mirror for airattck
 }
 
 void nmk16_state::ssmissin_sound_map(address_map &map)
@@ -917,18 +940,6 @@ void nmk16_state::ssmissin_sound_map(address_map &map)
 	map(0x9000, 0x9000).w(FUNC(nmk16_state::ssmissin_okibank_w));
 	map(0x9800, 0x9800).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-}
-
-void nmk16_state::oki1_map(address_map &map)
-{
-	map(0x00000, 0x1ffff).rom().region("oki1", 0);
-	map(0x20000, 0x3ffff).bankr("okibank1");
-}
-
-void nmk16_state::oki2_map(address_map &map)
-{
-	map(0x00000, 0x1ffff).rom().region("oki2", 0);
-	map(0x20000, 0x3ffff).bankr("okibank2");
 }
 
 void nmk16_state::strahl_map(address_map &map)
@@ -945,10 +956,10 @@ void nmk16_state::strahl_map(address_map &map)
 	map(0x84000, 0x84007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x88000, 0x88007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0x00ff);
 	map(0x8c000, 0x8c7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x90000, 0x93fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x90000, 0x93fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x94000, 0x97fff).ram().w(FUNC(nmk16_state::bgvideoram_w<1>)).share("bgvideoram1");
-	map(0x9c000, 0x9c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0xf0000, 0xfffff).ram().share("mainram");
+	map(0x9c000, 0x9c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0xf0000, 0xfffff).ram().share(m_mainram);
 }
 
 void nmk16_state::strahljbl_map(address_map &map)
@@ -963,10 +974,10 @@ void nmk16_state::strahljbl_map(address_map &map)
 	map(0x84000, 0x84007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x88000, 0x88007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0x00ff);
 	map(0x8c000, 0x8c7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x90000, 0x93fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x90000, 0x93fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x94000, 0x97fff).ram().w(FUNC(nmk16_state::bgvideoram_w<1>)).share("bgvideoram1");
-	map(0x9c000, 0x9c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0xf0000, 0xfffff).ram().share("mainram");
+	map(0x9c000, 0x9c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0xf0000, 0xfffff).ram().share(m_mainram);
 }
 
 void nmk16_state::macross_map(address_map &map)
@@ -983,9 +994,27 @@ void nmk16_state::macross_map(address_map &map)
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
+}
+
+void nmk16_state::macrossbl_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080008, 0x080009).portr("DSW1");
+	map(0x08000a, 0x08000b).portr("DSW2");
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
+	map(0x08001e, 0x08001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x098000, 0x09bfff).ram(); // TODO: something's mapped here for protection
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
 }
 
 void nmk16_state::gunnail_map(address_map &map)
@@ -1001,12 +1030,12 @@ void nmk16_state::gunnail_map(address_map &map)
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
-	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
+	map(0x08c000, 0x08c1ff).writeonly().share(m_gunnail_scrollram);
+	map(0x08c200, 0x08c3ff).writeonly().share(m_gunnail_scrollramy);
 	map(0x08c400, 0x08c7ff).nopw();   // unknown
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
 }
 
 void nmk16_state::gunnailb_map(address_map &map)
@@ -1022,19 +1051,19 @@ void nmk16_state::gunnailb_map(address_map &map)
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
-	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
+	map(0x08c000, 0x08c1ff).writeonly().share(m_gunnail_scrollram);
+	map(0x08c200, 0x08c3ff).writeonly().share(m_gunnail_scrollramy);
 	map(0x08c400, 0x08c7ff).nopw();   // unknown
-	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
 	map(0x194001, 0x194001).w(m_oki[0], FUNC(okim6295_device::write));
 }
 
 void nmk16_state::gunnailb_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xc000, 0xdfff).ram();
 }
 
@@ -1061,15 +1090,15 @@ void nmk16_state::macross2_map(address_map &map)
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // to Z80
 	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x130000, 0x130007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0x140000, 0x14ffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x1f0000, 0x1fffff).ram().share("mainram");
+	map(0x140000, 0x14ffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x1f0000, 0x1fffff).ram().share(m_mainram);
 }
 
 void nmk16_state::tdragon2_map(address_map &map)
 { // mainram address scrambled
 	macross2_map(map);
-	map(0x1f0000, 0x1fffff).rw(FUNC(nmk16_state::mainram_swapped_r), FUNC(nmk16_state::mainram_swapped_w)).share("mainram");
+	map(0x1f0000, 0x1fffff).rw(FUNC(nmk16_state::mainram_swapped_r), FUNC(nmk16_state::mainram_swapped_w)).share(m_mainram);
 }
 
 void nmk16_state::tdragon3h_map(address_map &map)
@@ -1092,18 +1121,18 @@ void nmk16_state::raphero_map(address_map &map)
 	map(0x100019, 0x100019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // to Z80
 	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x1301ff).ram().w(FUNC(nmk16_state::raphero_scroll_w)).share("scrollram");
-	map(0x130200, 0x1303ff).ram().share("scrollramy");
+	map(0x130000, 0x1301ff).ram().w(FUNC(nmk16_state::raphero_scroll_w)).share(m_gunnail_scrollram);
+	map(0x130200, 0x1303ff).ram().share(m_gunnail_scrollramy);
 	map(0x130400, 0x1307ff).ram();
-	map(0x140000, 0x14ffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x1f0000, 0x1fffff).rw(FUNC(nmk16_state::mainram_swapped_r), FUNC(nmk16_state::mainram_swapped_w)).share("mainram");
+	map(0x140000, 0x14ffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x1f0000, 0x1fffff).rw(FUNC(nmk16_state::mainram_swapped_r), FUNC(nmk16_state::mainram_swapped_w)).share(m_mainram);
 }
 
 void nmk16_state::raphero_sound_mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xc800, 0xc800).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xc808, 0xc808).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1116,7 +1145,7 @@ void nmk16_state::raphero_sound_mem_map(address_map &map)
 void nmk16_state::macross2_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");    // banked ROM
+	map(0x8000, 0xbfff).bankr(m_audiobank);    // banked ROM
 	map(0xa000, 0xa000).nopr(); // IRQ ack? watchdog?
 	map(0xc000, 0xdfff).ram();
 	map(0xe001, 0xe001).w(FUNC(nmk16_state::macross2_audiobank_w));
@@ -1155,8 +1184,8 @@ void nmk16_state::bjtwin_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094001, 0x094001).w(FUNC(nmk16_state::tilebank_w));
 	map(0x094003, 0x094003).w(FUNC(nmk16_state::bjtwin_scroll_w));    // sabotenb specific?
-	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x09c000, 0x09cfff).mirror(0x1000).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
 }
 
 void nmk16_state::powerins_map(address_map &map)
@@ -1174,7 +1203,7 @@ void nmk16_state::powerins_map(address_map &map)
 	map(0x130000, 0x130007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
 	map(0x140000, 0x143fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
-	map(0x180000, 0x18ffff).ram().share("mainram");
+	map(0x180000, 0x18ffff).ram().share(m_mainram);
 }
 
 // powerinsa: same as the original one but without the sound CPU (and inferior sound HW)
@@ -1204,6 +1233,29 @@ void nmk16_state::powerins_bootleg_audio_io_map(address_map &map)
 	map(0x90, 0x97).w("nmk112", FUNC(nmk112_device::okibank_w));
 }
 
+
+void nmk16_state::oki1_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom().region("oki1", 0);
+	map(0x20000, 0x3ffff).bankr(m_okibank[0]);
+}
+
+void nmk16_state::oki2_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom().region("oki2", 0);
+	map(0x20000, 0x3ffff).bankr(m_okibank[1]);
+}
+
+void nmk16_state::nmk112_oki0_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki0_map));
+}
+
+void nmk16_state::nmk112_oki1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).m("nmk112", FUNC(nmk112_device::oki1_map));
+}
+
 void nmk16_state::powerinsa_oki_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom().region("oki1", 0);
@@ -1215,6 +1267,7 @@ void nmk16_state::tdragonb2_oki_map(address_map &map)
 	map(0x00000, 0x1ffff).rom().region("oki", 0);
 	map(0x20000, 0x3ffff).bankr(m_okibank[0]);
 }
+
 
 static INPUT_PORTS_START( vandyke )
 	PORT_START("IN0")
@@ -1790,9 +1843,6 @@ static INPUT_PORTS_START( mustang )
 	PORT_DIPSETTING(      0xc000, "3" )
 	PORT_DIPSETTING(      0x8000, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hachamf_prot )
@@ -2087,13 +2137,6 @@ static INPUT_PORTS_START( strahl )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( strahljbl )
-	PORT_INCLUDE(strahl)
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( acrobatm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -2200,9 +2243,6 @@ static INPUT_PORTS_START( acrobatmbl )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bioship )
@@ -2466,9 +2506,6 @@ static INPUT_PORTS_START( tdragonb )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW2:8") // The manual states this dip is "Unused"
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_START("COIN")  // referenced by Seibu sound board
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tdragonb2 )
@@ -4168,14 +4205,14 @@ static GFXDECODE_START( gfx_bioship )
 	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x300, 16 ) // color 0x300-0x3ff
 	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // color 0x100-0x1ff
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) // color 0x200-0x2ff
-	GFXDECODE_ENTRY( "gfx4",    0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
+	GFXDECODE_ENTRY( "bg2tile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x000, 16 ) // color 0x000-0x0ff
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_strahl )
 	GFXDECODE_ENTRY( "fgtile",  0, gfx_8x8x4_packed_msb,               0x000, 16 ) // color 0x000-0x0ff
 	GFXDECODE_ENTRY( "bgtile",  0, gfx_8x8x4_col_2x2_group_packed_msb, 0x300, 16 ) // color 0x300-0x3ff
 	GFXDECODE_ENTRY( "sprites", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x100, 16 ) // color 0x100-0x1ff
-	GFXDECODE_ENTRY( "gfx4",    0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) // color 0x200-0x2ff
+	GFXDECODE_ENTRY( "bg2tile", 0, gfx_8x8x4_col_2x2_group_packed_msb, 0x200, 16 ) // color 0x200-0x2ff
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_powerins )
@@ -4407,24 +4444,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	constexpr int PROM_START_OFFSET = 0x75; // previous entries are never addressed
 	constexpr int PROM_FRAME_OFFSET = 0x0b; // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
 
-	u8 *prom = m_vtiming_prom->base();
-	int len = m_vtiming_prom->bytes();
+	u8 const *const prom = m_vtiming_prom->base();
+	const int len = m_vtiming_prom->bytes();
 
-	int scanline = param;
+	const int scanline = param;
 
 	// every PROM entry is addressed each 2 scanlines, so only even lines are actually addressing it:
 	if ((scanline & 0x1) == 0x0)
 	{
-		u8 address = ((((scanline / 2) + PROM_FRAME_OFFSET) % (0x100 - PROM_START_OFFSET)) + PROM_START_OFFSET) % len;
+		const u8 address = ((((scanline / 2) + PROM_FRAME_OFFSET) % (0x100 - PROM_START_OFFSET)) + PROM_START_OFFSET) % len;
 
 		LOG("nmk16_scanline: Scanline: %03d - Current PROM entry: %03d\n", scanline, address);
 
-		u8 val = prom[address];
+		const u8 val = prom[address];
 
 		// Interrupt requests are triggered at rising edge of bit 7:
 		if (BIT(val & ~m_vtiming_val, TRIGG_INDEX))
 		{
-			u8 int_level = bitswap<3>(val, IPL2_INDEX, IPL1_INDEX, IPL0_INDEX);
+			const u8 int_level = bitswap<3>(val, IPL2_INDEX, IPL1_INDEX, IPL0_INDEX);
 			if (int_level > 0)
 			{
 				LOG("nmk16_scanline: Triggered interrupt: IRQ%d at scanline: %03d\n", int_level, scanline);
@@ -4486,7 +4523,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_hacky_scanline)
 	const int IRQ1_SCANLINE_1 = VBIN_SCANLINE + 52;    // 52 lines after VBIN and 68 from the start of frame
 	const int IRQ1_SCANLINE_2 = IRQ1_SCANLINE_1 + 128; // 128 lines after IRQ1_SCANLINE_1
 
-	int scanline = param;
+	const int scanline = param;
 
 	if (scanline == VBOUT_SCANLINE) // vblank-out irq
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -4517,9 +4554,22 @@ void nmk16_state::set_hacky_interrupt_timing(machine_config &config)
 void nmk16_state::sprite_dma()
 {
 	// 2 buffers confirmed on PCB, 1 on sabotenb
-	memcpy(m_spriteram_old2.get(),m_spriteram_old.get(), 0x1000);
+	memcpy(m_spriteram_old2.get(), m_spriteram_old.get(), 0x1000);
 	memcpy(m_spriteram_old.get(), m_mainram + m_sprdma_base / 2, 0x1000);
 	//m_maincpu->spin_until_time(attotime::from_usec(694)); // stop cpu during DMA?
+}
+
+void nmk16_state::configure_nmk004(machine_config &config)
+{
+	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_nmk004->set_rom_tag("oki1", "oki2");
+	m_nmk004->set_rombank_tag(m_okibank[0], m_okibank[1]);
+	m_nmk004->ym_read_callback().set("ymsnd", FUNC(ym2203_device::read));
+	m_nmk004->ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
+	m_nmk004->oki_read_callback<0>().set(m_oki[0], FUNC(okim6295_device::read));
+	m_nmk004->oki_write_callback<0>().set(m_oki[0], FUNC(okim6295_device::write));
+	m_nmk004->oki_read_callback<1>().set(m_oki[1], FUNC(okim6295_device::read));
+	m_nmk004->oki_write_callback<1>().set(m_oki[1], FUNC(okim6295_device::write));
 }
 
 // OSC : 10MHz, 12MHz, 4MHz, 4.9152MHz
@@ -4542,7 +4592,7 @@ void nmk16_state::tharrier(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4596,13 +4646,13 @@ void nmk16_state::mustang(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, 8000000);
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -4638,7 +4688,7 @@ void nmk16_state::mustangb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4651,8 +4701,9 @@ void nmk16_state::mustangb(machine_config &config)
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -4675,7 +4726,7 @@ void nmk16_state::mustangb3(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -4711,13 +4762,13 @@ void nmk16_state::bioship(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bioship);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bioship)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, bioship)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, XTAL(8'000'000));
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 Mhz (verified)
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -4749,13 +4800,13 @@ void nmk16_state::vandyke(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, 8000000);
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -4789,7 +4840,7 @@ void nmk16_state::vandykeb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4812,14 +4863,14 @@ void nmk16_state::acrobatm(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, XTAL(16'000'000)/2);
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -4856,7 +4907,7 @@ void nmk16_state::acrobatmbl(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 768);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
@@ -4870,10 +4921,29 @@ void nmk16_state::acrobatmbl(machine_config &config)
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
+
+void nmk16_state::hachamfb2(machine_config &config)
+{
+	acrobatmbl(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::hachamfb2_map);
+
+	config.device_remove("mcu");
+}
+
+void nmk16_state::macrossbl(machine_config &config)
+{
+	acrobatmbl(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macrossbl_map);
+
+	config.device_remove("mcu");
 }
 
 void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden sound hardware
@@ -4894,7 +4964,7 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4907,8 +4977,9 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -4934,7 +5005,7 @@ void nmk16_state::tdragonb2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -4958,13 +5029,13 @@ void nmk16_state::tdragon(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, 8000000);
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -5062,8 +5133,9 @@ void tdragon_prot_state::mcu_side_shared_w(offs_t offset, u8 data)
 
 u8 tdragon_prot_state::mcu_side_shared_r(offs_t offset)
 {
-	u8 retval = m_maincpu->space(AS_PROGRAM).read_byte((offset));
-	LOG("%s: mcu_side_shared_r offset %08x (retval %02x)\n", machine().describe_context(), offset, retval);
+	const u8 retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	if (!machine().side_effects_disabled())
+		LOG("%s: mcu_side_shared_r offset %08x (retval %02x)\n", machine().describe_context(), offset, retval);
 	return retval;
 }
 
@@ -5103,7 +5175,7 @@ void nmk16_state::ssmissin(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5129,14 +5201,14 @@ void nmk16_state::strahl(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, strahl)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, 8000000);
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -5169,8 +5241,8 @@ void nmk16_state::strahljbl(machine_config &config)
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_strahl));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_strahl);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,strahl)
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, strahl)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -5182,8 +5254,9 @@ void nmk16_state::strahljbl(machine_config &config)
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
+	seibu_sound.coin_io_callback().set_constant(0xff); // unused
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -5203,13 +5276,13 @@ void nmk16_state::hachamf(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, 8000000);
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -5280,13 +5353,13 @@ void nmk16_state::macross(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, XTAL(16'000'000)/2); // verified on PCB
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -5318,13 +5391,13 @@ void nmk16_state::blkheart(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, 8000000);
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -5355,13 +5428,13 @@ void nmk16_state::gunnail(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, gunnail)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	NMK004(config, m_nmk004, XTAL(16'000'000)/2); // verified on PCB
-	m_nmk004->reset_cb().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	configure_nmk004(config);
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/8)); // verified on PCB
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
@@ -5422,7 +5495,7 @@ void nmk16_state::macross2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross2)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5437,15 +5510,17 @@ void nmk16_state::macross2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::tdragon2(machine_config &config)
@@ -5466,7 +5541,7 @@ void nmk16_state::tdragon2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross2)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross2)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5481,15 +5556,17 @@ void nmk16_state::tdragon2(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::tdragon3h(machine_config &config)
@@ -5527,7 +5604,7 @@ void nmk16_state::raphero(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross2);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, gunnail)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5542,15 +5619,17 @@ void nmk16_state::raphero(machine_config &config)
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::bjtwin(machine_config &config)
@@ -5567,20 +5646,22 @@ void nmk16_state::bjtwin(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bjtwin);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,bjtwin)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, bjtwin)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::cactus(machine_config &config)
@@ -5703,7 +5784,7 @@ void nmk16_state::powerins(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,powerins)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, powerins)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5714,15 +5795,17 @@ void nmk16_state::powerins(machine_config &config)
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW); // verified on PCB
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 }
 
 void nmk16_state::powerinsa(machine_config &config)
@@ -5748,7 +5831,7 @@ void nmk16_state::powerinsa(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,powerins)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, powerins)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -5788,22 +5871,24 @@ void nmk16_state::powerinsb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerins);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 2048);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,powerins)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, powerins)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
-	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
-	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
-
 	nmk112_device &nmk112(NMK112(config, "nmk112", 0));
 	nmk112.set_rom0_tag("oki1");
 	nmk112.set_rom1_tag("oki2");
+
+	OKIM6295(config, m_oki[0], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[0]->set_addrmap(0, &nmk16_state::nmk112_oki0_map);
+
+	OKIM6295(config, m_oki[1], XTAL(16'000'000) / 4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.15);
+	m_oki[1]->set_addrmap(0, &nmk16_state::nmk112_oki1_map);
 
 	// Sound code talks to one YM2203, but it's not fitted on the board
 }
@@ -5861,7 +5946,7 @@ void nmk16_state::manybloc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tharrier);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, manybloc)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -6212,6 +6297,17 @@ void nmk16_state::init_acrobatmbl()
 	rom[0x6d6/2] = 0x3510;
 }
 
+void nmk16_state::init_macrossbl()
+{
+	// the protection (?) does some calculation of the data it finds in the 0x98000 - 0x9bfff range
+	// and checks the result equals a hard-coded value (0xe400). Given it isn't known what the
+	// game expects there (maybe some part of the strange extra program ROMs), for now the expected
+	// return value is hacked to 0x0000
+
+	u16 *rom = (u16 *)memregion("maincpu")->base();
+	rom[0x1c4 / 2] = 0x0000;
+}
+
 void nmk16_state::init_gunnailb()
 {
 	decode_gfx();
@@ -6272,13 +6368,13 @@ void afega_state::afega_map(address_map &map)
 	map(0x084000, 0x084003).ram().w(FUNC(afega_state::afega_scroll_w<0>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x084004, 0x084007).ram().w(FUNC(afega_state::afega_scroll_w<1>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x088000, 0x0885ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
-	map(0x08c000, 0x08c003).ram().w(FUNC(afega_state::afega_scroll_w<0>)).share("afega_scroll_0");   // Scroll
-	map(0x08c004, 0x08c007).ram().w(FUNC(afega_state::afega_scroll_w<1>)).share("afega_scroll_1");   //
-	map(0x090000, 0x093fff).ram().w(FUNC(afega_state::bgvideoram_w<0>)).share("bgvideoram0");    // Layer 0                  // ?
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(afega_state::txvideoram_w)).share("txvideoram");  // Layer 1
+	map(0x08c000, 0x08c003).ram().w(FUNC(afega_state::afega_scroll_w<0>)).share(m_afega_scroll[0]);   // Scroll
+	map(0x08c004, 0x08c007).ram().w(FUNC(afega_state::afega_scroll_w<1>)).share(m_afega_scroll[1]);   //
+	map(0x090000, 0x093fff).ram().w(FUNC(afega_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);    // Layer 0                  // ?
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(afega_state::txvideoram_w)).share(m_txvideoram);  // Layer 1
 
-	map(0x0c0000, 0x0cffff).ram().w(FUNC(afega_state::mainram_strange_w)).share("mainram");
-	map(0x0f0000, 0x0fffff).ram().w(FUNC(afega_state::mainram_strange_w)).share("mainram");
+	map(0x0c0000, 0x0cffff).ram().w(FUNC(afega_state::mainram_strange_w)).share(m_mainram);
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(afega_state::mainram_strange_w)).share(m_mainram);
 }
 
 // firehawk has 0x100000 bytes of program ROM (at least the switchable version) so the above can't work.
@@ -6294,13 +6390,13 @@ void afega_state::firehawk_map(address_map &map)
 	map(0x284000, 0x284003).ram().w(FUNC(afega_state::afega_scroll_w<0>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x284004, 0x284007).ram().w(FUNC(afega_state::afega_scroll_w<1>));  // Scroll on redhawkb (mirror or changed?..)
 	map(0x288000, 0x2885ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
-	map(0x28c000, 0x28c003).ram().w(FUNC(afega_state::afega_scroll_w<0>)).share("afega_scroll_0");   // Scroll
-	map(0x28c004, 0x28c007).ram().w(FUNC(afega_state::afega_scroll_w<1>)).share("afega_scroll_1");   //
-	map(0x290000, 0x293fff).ram().w(FUNC(afega_state::bgvideoram_w<0>)).share("bgvideoram0");    // Layer 0                  // ?
-	map(0x29c000, 0x29c7ff).ram().w(FUNC(afega_state::txvideoram_w)).share("txvideoram");  // Layer 1
+	map(0x28c000, 0x28c003).ram().w(FUNC(afega_state::afega_scroll_w<0>)).share(m_afega_scroll[0]);   // Scroll
+	map(0x28c004, 0x28c007).ram().w(FUNC(afega_state::afega_scroll_w<1>)).share(m_afega_scroll[1]);   //
+	map(0x290000, 0x293fff).ram().w(FUNC(afega_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);    // Layer 0                  // ?
+	map(0x29c000, 0x29c7ff).ram().w(FUNC(afega_state::txvideoram_w)).share(m_txvideoram);  // Layer 1
 
-	map(0x3c0000, 0x3cffff).ram().w(FUNC(afega_state::mainram_strange_w)).share("mainram");
-	map(0x3f0000, 0x3fffff).ram().w(FUNC(afega_state::mainram_strange_w)).share("mainram");
+	map(0x3c0000, 0x3cffff).ram().w(FUNC(afega_state::mainram_strange_w)).share(m_mainram);
+	map(0x3f0000, 0x3fffff).ram().w(FUNC(afega_state::mainram_strange_w)).share(m_mainram);
 }
 
 
@@ -6319,7 +6415,7 @@ void afega_state::spec2k_oki1_banking_w(u8 data)
 		m_oki[1]->set_rom_bank(1);
 }
 
-void afega_state::afega_sound_cpu(address_map &map)
+void afega_state::afega_sound_map(address_map &map)
 {
 	map(0x0003, 0x0003).nopw(); // bug in sound prg?
 	map(0x0004, 0x0004).nopw(); // bug in sound prg?
@@ -6330,7 +6426,7 @@ void afega_state::afega_sound_cpu(address_map &map)
 	map(0xf80a, 0xf80a).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));      // M6295
 }
 
-void afega_state::firehawk_sound_cpu(address_map &map)
+void afega_state::firehawk_sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
@@ -6391,7 +6487,9 @@ void afega_state::stagger1(machine_config &config)
 	set_hacky_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, XTAL(4'000'000)); // verified on PCB
-	m_audiocpu->set_addrmap(AS_PROGRAM, &afega_state::afega_sound_cpu);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &afega_state::afega_sound_map);
+
+	INPUT_MERGER_ANY_HIGH(config, "audioirq").output_handler().set_inputline(m_audiocpu, 0);
 
 	// video hardware
 	set_screen_lowres(config);
@@ -6401,16 +6499,16 @@ void afega_state::stagger1(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch->data_pending_callback().set("audioirq", FUNC(input_merger_any_high_device::in_w<0>));
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(4'000'000))); // verified on PCB
-	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.irq_handler().set("audioirq", FUNC(input_merger_any_high_device::in_w<1>));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	OKIM6295(config, m_oki[0], XTAL(4'000'000)/4, okim6295_device::PIN7_HIGH); // verified on PCB
@@ -6421,7 +6519,6 @@ void afega_state::redhawki(machine_config &config)
 {
 	stagger1(config);
 
-	// basic machine hardware
 	// video hardware
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_redhawki));
 }
@@ -6430,7 +6527,6 @@ void afega_state::redhawkb(machine_config &config)
 {
 	stagger1(config);
 
-	// basic machine hardware
 	// video hardware
 	m_gfxdecode->set_info(gfx_redhawkb);
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_redhawkb));
@@ -6440,11 +6536,9 @@ void afega_state::grdnstrm(machine_config &config)
 {
 	stagger1(config);
 
-	// basic machine hardware
-
 	// video hardware
 	m_gfxdecode->set_info(gfx_grdnstrm);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,grdnstrm)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, grdnstrm)
 	m_screen->set_screen_update(FUNC(afega_state::screen_update_firehawk));
 }
 
@@ -6455,7 +6549,7 @@ void afega_state::grdnstrmk(machine_config &config) // Side by side with PCB, th
 	// video hardware
 	m_screen->set_refresh_hz(57); // Side by side with PCB, MAME is too fast at 56
 	m_gfxdecode->set_info(gfx_grdnstrm);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,grdnstrm)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, grdnstrm)
 }
 
 void afega_state::popspops(machine_config &config)
@@ -6474,7 +6568,7 @@ void afega_state::firehawk(machine_config &config)
 	set_hacky_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, 4000000);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &afega_state::firehawk_sound_cpu);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &afega_state::firehawk_sound_map);
 
 	// video hardware
 	set_screen_lowres(config);
@@ -6484,7 +6578,7 @@ void afega_state::firehawk(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grdnstrm);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 768);
-	MCFG_VIDEO_START_OVERRIDE(afega_state,grdnstrm)
+	MCFG_VIDEO_START_OVERRIDE(afega_state, grdnstrm)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -6523,7 +6617,7 @@ void nmk16_state::twinactn(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state, macross)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -6569,7 +6663,7 @@ ROM_START( vandyke )
 	ROM_LOAD16_BYTE( "vdk-1.16",  0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "vdk-2.15",  0x00001, 0x20000, CRC(9d741cc2) SHA1(2d101044fba5fc5b7d63869a0a053c42fdc2598b) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) // 64k for sound CPU code
+	ROM_REGION(0x10000, "nmk004", 0 ) // 64k for sound CPU code
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
@@ -6602,7 +6696,7 @@ ROM_START( vandykejal )
 	ROM_LOAD16_BYTE( "vdk-1.16",   0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "jaleco2.15", 0x00001, 0x20000, CRC(170e4d2e) SHA1(6009d19d30e345fea93e039d165061e2b20ff058) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) // 64k for sound CPU code
+	ROM_REGION(0x10000, "nmk004", 0 ) // 64k for sound CPU code
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
@@ -6635,7 +6729,7 @@ ROM_START( vandykejal2 )
 	ROM_LOAD16_BYTE( "vdk-even.16",  0x00000, 0x20000, CRC(cde05a84) SHA1(dab5981d7dad9abe86cfe011da8ca0b11d484a3f) ) // Hand written labels, dated 2/12
 	ROM_LOAD16_BYTE( "vdk-odd.15",   0x00001, 0x20000, CRC(0f6fea40) SHA1(3acbe72c251d51b028d8c66274263a2b39b042ea) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) // 64k for sound CPU code
+	ROM_REGION(0x10000, "nmk004", 0 ) // 64k for sound CPU code
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "fgtile", 0 )
@@ -6918,7 +7012,7 @@ ROM_START( mustang )
 	ROM_LOAD16_BYTE( "2.bin",    0x00000, 0x20000, CRC(bd9f7c89) SHA1(a0af46a8ff82b90bece2515e1bd74e7a7ddf5379) )
 	ROM_LOAD16_BYTE( "3.bin",    0x00001, 0x20000, CRC(0eec36a5) SHA1(c549fbcd3e2741a6d0f2633ded6a85909d37f633) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) // 64k for sound CPU code
+	ROM_REGION(0x10000, "nmk004", 0 ) // 64k for sound CPU code
 	ROM_LOAD( "90058-7",    0x00000, 0x10000, CRC(920a93c8) SHA1(7660ca419e2fd98848ae7f5994994eaed023151e) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -6949,7 +7043,7 @@ ROM_START( mustangs )
 	ROM_LOAD16_BYTE( "90058-2",    0x00000, 0x20000, CRC(833aa458) SHA1(a9924f7044397e3a36c674b064173ffae80a79ec) )
 	ROM_LOAD16_BYTE( "90058-3",    0x00001, 0x20000, CRC(e4b80f06) SHA1(ce589cebb5ea85c89eb44796b821a4bd0c44b9a8) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) // 64k for sound CPU code
+	ROM_REGION(0x10000, "nmk004", 0 ) // 64k for sound CPU code
 	ROM_LOAD( "90058-7",    0x00000, 0x10000, CRC(920a93c8) SHA1(7660ca419e2fd98848ae7f5994994eaed023151e) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7151,7 +7245,7 @@ ROM_START( acrobatm )
 	ROM_LOAD( "am-01.ic42",  0x000000, 0x100000, CRC(5672bdaa) SHA1(5401a104d72904de19b73125451767bc63d36809) ) // Sprites
 	ROM_LOAD( "am-02.ic29",  0x100000, 0x080000, CRC(b4c0ace3) SHA1(5d638781d588cfbf4025d002d5a2309049fe1ee5) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "nmk004", 0 )
 	ROM_LOAD( "4.ic74",    0x00000, 0x10000, CRC(176905fb) SHA1(135a184f44bedd93b293b9124fa0bd725e0ee93b) )
 
 	ROM_REGION( 0x80000, "oki1", 0 )    // OKIM6295 samples
@@ -7195,9 +7289,80 @@ ROM_START( acrobatmbl ) // this bootleg has a PIC performing simple protection c
 	ROM_LOAD( "1.14y", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
+ROM_START( hachamfb2 ) // same PCB as acrobatmbl, but no PIC
+	ROM_REGION( 0x40000, "maincpu", 0 ) // extremely similar to the original
+	ROM_LOAD16_BYTE( "10e", 0x00000, 0x20000, CRC(45867475) SHA1(c5e528e1a034ab5f148e4d17de3a584de32b2909) )
+	ROM_LOAD16_BYTE( "10c", 0x00001, 0x20000, CRC(8c8e6a3c) SHA1(8e1b050f935bb71d48120d495c1c60b56e0100ac) )
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "tile.10l", 0x000000, 0x020000, CRC(a2c1e25d) SHA1(cf09cbfd9afc7e3907fef6b26fb269b743f2e036) )   // 8x8 tiles
+
+	ROM_REGION( 0x100000, "bgtile", 0 )
+	ROM_LOAD( "bg.9w", 0x000000, 0x100000, CRC(df9653a4) SHA1(4a3204a98d7738c7895169fcece922fdf355f4fa) )
+
+	ROM_REGION( 0x100000, "sprites", 0 ) // same as the prototype but doubled up
+	ROM_LOAD16_BYTE( "b.2k",  0x000000, 0x080000, CRC(cb213740) SHA1(596d7b7da9cd7d1d09a34c58d811352c0ebd4682) )
+	ROM_IGNORE(                         0x080000 ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "c.2m",  0x000001, 0x080000, CRC(4d7ddc5e) SHA1(28ef045824daa77c524353f24fd541efe849756c) )
+	ROM_IGNORE(                         0x080000 ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "2.12w",             0x00000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x00000, 0x18000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "1.14y", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+ROM_END
+
+// bootleg with Raiden sounds
+// code changes are fairly minimal: added a protection (?) routine (see init_macrossbl), a routine for the Seibu sound handling,
+// hacked out the original's protection
+ROM_START( macrossbl )
+	ROM_REGION( 0x180000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "prog2a.2m", 0x00000, 0x40000, CRC(f2ad50fd) SHA1(eb106b44aa7801ebf3b2787823a28f14f9d09264) )
+	ROM_LOAD16_BYTE( "prog1a.2m", 0x00001, 0x40000, CRC(eed8135f) SHA1(a3575f04891b62937844f71ef4bf3c44bfced1c7) )
+	ROM_LOAD16_BYTE( "prog2b.4m", 0x80000, 0x80000, CRC(06501426) SHA1(49e86ebf8911029b41722c6f73e6475087cbc232) ) // way more stuff than the original?
+	ROM_LOAD16_BYTE( "prog1b.4m", 0x80001, 0x80000, CRC(1aa5aac2) SHA1(c526fc89f697d2658e87342026eaeaf67967443f) ) // way more stuff than the original?
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "tile.1m", 0x000000, 0x020000, CRC(bbd8242d) SHA1(7cf4897be1278e1190f499f00bc78384817a5160) ) // same as the original
+
+	ROM_REGION( 0x280000, "bgtile", 0 ) // TODO: fix ROM loading
+	ROM_LOAD( "gfx_4.4m", 0x000000, 0x080000, CRC(45bec81b) SHA1(b1bcbc90cee0aa9c65f6b0a3510b16c1ffb2b6b9) )
+	ROM_LOAD( "gfx_5.4m", 0x080000, 0x080000, CRC(a489452b) SHA1(80bbcc20a518839d31b1fb5d0911a231b50cb737) )
+	ROM_LOAD( "gfx_6.4m", 0x100000, 0x080000, CRC(840df239) SHA1(d629769be0be0b17400cb726c673813155f3eca7) )
+	ROM_LOAD( "gfx_7.4m", 0x180000, 0x080000, CRC(bd8605b5) SHA1(d07794bd530f48eb43b711c3e29707ffa6671162) )
+	ROM_LOAD( "gfx_8.4m", 0x200000, 0x080000, CRC(ea677d02) SHA1(36266c634ebbb7147d32836f6b3ee43b2e23148e) )
+
+	ROM_REGION( 0x300000, "sprites", 0 ) // TODO: fix ROM loading
+	ROM_LOAD( "gfx_a.4m", 0x000000, 0x080000, CRC(521eac30) SHA1(ec581016b2a87387a8623a142c63c528f83339aa) )
+	ROM_LOAD( "gfx_b.4m", 0x080000, 0x080000, CRC(3b9331e2) SHA1(4ceef84825deb4fe0088bd15e97257deafe3d1f9) )
+	ROM_LOAD( "gfx_c.4m", 0x100000, 0x080000, CRC(67a0d998) SHA1(2d8440080d845c5a1c3f67f18ec801bfe97e2617) )
+	ROM_LOAD( "gfx_d.4m", 0x180000, 0x080000, CRC(a4997da3) SHA1(bd8694613dc5efd76d036ed5f82eac21b7997827) )
+	ROM_LOAD( "gfx_e.4m", 0x200000, 0x080000, CRC(75eb6779) SHA1(621d1545106bed43dd6e07162376d298c72f2393) )
+	ROM_LOAD( "gfx_f.4m", 0x280000, 0x080000, CRC(a279361d) SHA1(28ed87dca44868e5091d9bb89c56a7f985d5047c) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD( "snd.512",           0x00000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x00000, 0x18000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "oki.512", 0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+
+	// no htiming PROM on PCB
+
+	ROM_REGION( 0x0100, "vtiming", 0 )
+	ROM_LOAD( "82s135.bin", 0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) // same as the original
+
+	ROM_REGION( 0x0020, "color", 0 )
+	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(8371e42d) SHA1(6cfd70dfa00e85ec1df8832d41df331cc3e3733a) ) // same as the original
+ROM_END
+
 /*
 
-S.B.S. Gomorrah / Bio-ship Paladin (UPL, 1993)
+S.B.S. Gomorrah / Bio-ship Paladin (UPL, 1990)
 Hardware info by Guru
 
 PCB Layout
@@ -7256,14 +7421,14 @@ ROM_START( bioship )
 	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "sbs-g_03.ic194",  0x000000, 0x80000, CRC(60e00d7b) SHA1(36fd02a7842ce1e79b8c4cfbe9c97052bef4aa62) ) // Sprites
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg2tile", 0 )
 	ROM_LOAD( "sbs-g_02.ic4",  0x000000, 0x80000, CRC(f31eb668) SHA1(67d6d56ea203edfbae4db658399bf61f14134206) ) // Background
 
 	ROM_REGION16_BE(0x20000, "tilerom", 0 )    // Background tilemaps (used at runtime)
 	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
 	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "nmk004", 0 )
 	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
 
 	ROM_REGION(0x80000, "oki1", 0 ) // Oki sample data
@@ -7296,14 +7461,14 @@ ROM_START( sbsgomo )
 	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD( "sbs-g_03.ic194",  0x000000, 0x80000, CRC(60e00d7b) SHA1(36fd02a7842ce1e79b8c4cfbe9c97052bef4aa62) ) // Sprites
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg2tile", 0 )
 	ROM_LOAD( "sbs-g_02.ic4",  0x000000, 0x80000, CRC(f31eb668) SHA1(67d6d56ea203edfbae4db658399bf61f14134206) ) // Background
 
 	ROM_REGION16_BE(0x20000, "tilerom", 0 )    // Background tilemaps (used at runtime)
 	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
 	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "nmk004", 0 )
 	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
 
 	ROM_REGION(0x80000, "oki1", 0 ) // Oki sample data
@@ -7327,7 +7492,7 @@ ROM_START( blkheart )
 	ROM_LOAD16_BYTE( "blkhrt.7",  0x00000, 0x20000, CRC(5bd248c0) SHA1(0649f4f8682404aeb3fc80643fcabc2d7836bb23) )
 	ROM_LOAD16_BYTE( "blkhrt.6",  0x00001, 0x20000, CRC(6449e50d) SHA1(d8cd126d921c95478346da96c20da01212395d77) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Code for (unknown?) CPU
+	ROM_REGION( 0x10000, "nmk004", 0 )        // Code for NMK004 CPU
 	ROM_LOAD( "4.bin",      0x00000, 0x10000, CRC(7cefa295) SHA1(408f46613b3620cee31dec43281688d231b47ddd) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7357,7 +7522,7 @@ ROM_START( blkheartj )
 	ROM_LOAD16_BYTE( "7.bin",  0x00000, 0x20000, CRC(e0a5c667) SHA1(3ef39b2dc1f7ffdddf586f0b3080ecd1f362ec37) )
 	ROM_LOAD16_BYTE( "6.bin",  0x00001, 0x20000, CRC(7cce45e8) SHA1(72491e30d1f9be2eede21fdde5a7484d4f65cfbf) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // Code for (unknown?) CPU
+	ROM_REGION( 0x10000, "nmk004", 0 )        // Code for NMK004 CPU
 	ROM_LOAD( "4.bin",      0x00000, 0x10000, CRC(7cefa295) SHA1(408f46613b3620cee31dec43281688d231b47ddd) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7396,7 +7561,7 @@ ROM_START( tdragon )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "91070.4",    0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )  // Sprites
 
-	ROM_REGION( 0x010000, "audiocpu", 0 ) // NMK004 sound data
+	ROM_REGION( 0x010000, "nmk004", 0 ) // NMK004 sound data
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
@@ -7429,7 +7594,7 @@ ROM_START( tdragon1 )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "91070.4",    0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )  // Sprites
 
-	ROM_REGION( 0x010000, "audiocpu", 0 ) // NMK004 sound data
+	ROM_REGION( 0x010000, "nmk004", 0 ) // NMK004 sound data
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x080000, "oki1", 0 )   // OKIM6295 samples
@@ -7632,7 +7797,7 @@ ROM_START( airattcka )
 	ROM_LOAD( "82s147.uh6", 0x0000, 0x0200, CRC(ed0bd072) SHA1(66a6d435d8587c82ae96dd09c39ed5749fe00e24) )  // 82S147 - only half space used. A5 tied to GND
 ROM_END
 
-ROM_START( strahl )
+ROM_START( strahl ) // UPL 91074 PCB
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "strahl-02.ic82", 0x00000, 0x20000, CRC(e6709a0d) SHA1(ec5741f6a708ac2a6831fb65198d81dc7e6c5aea) )
 	ROM_LOAD16_BYTE( "strahl-01.ic83", 0x00001, 0x20000, CRC(bfd021cf) SHA1(fcf252c42a58e2f7e9982869931447ee8aa5baaa) )
@@ -7648,10 +7813,10 @@ ROM_START( strahl )
 	ROM_LOAD( "strl4-02.57",  0x080000, 0x80000, CRC(2a38552b) SHA1(82335fc6aa3de9145dd84952e5ed423493bf7141) )
 	ROM_LOAD( "strl5-03.58",  0x100000, 0x80000, CRC(a0e7d210) SHA1(96a762a3a1cdeaa91bde50429e0ac665fb81190b) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg2tile", 0 )
 	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) // Tiles
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "nmk004", 0 )
 	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )    // Oki sample data
@@ -7685,10 +7850,10 @@ ROM_START( strahlj )
 	ROM_LOAD( "strl4-02.57",  0x080000, 0x80000, CRC(2a38552b) SHA1(82335fc6aa3de9145dd84952e5ed423493bf7141) )
 	ROM_LOAD( "strl5-03.58",  0x100000, 0x80000, CRC(a0e7d210) SHA1(96a762a3a1cdeaa91bde50429e0ac665fb81190b) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg2tile", 0 )
 	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) // Tiles
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "nmk004", 0 )
 	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )    // Oki sample data
@@ -7722,10 +7887,10 @@ ROM_START( strahlja )
 	ROM_LOAD( "strl4-02.57",  0x080000, 0x80000, CRC(2a38552b) SHA1(82335fc6aa3de9145dd84952e5ed423493bf7141) )
 	ROM_LOAD( "strl5-03.58",  0x100000, 0x80000, CRC(a0e7d210) SHA1(96a762a3a1cdeaa91bde50429e0ac665fb81190b) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x80000, "bg2tile", 0 )
 	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) // Tiles
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, "nmk004", 0 )
 	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )    // Oki sample data
@@ -7758,7 +7923,7 @@ ROM_START( strahljbl ) // N0 892 PCB, this bootleg uses SEIBU sound system
 	ROM_LOAD( "d.8m",  0x000000, 0x100000, CRC(09ede4d4) SHA1(5c5dcc57f78145b9c6e711a32afc0aab7a5a0450) )
 	ROM_LOAD( "5.4m",  0x100000, 0x080000, CRC(a0e7d210) SHA1(96a762a3a1cdeaa91bde50429e0ac665fb81190b) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 ) // same as original
+	ROM_REGION( 0x80000, "bg2tile", 0 ) // same as original
 	ROM_LOAD( "4.4m", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) // Tiles
 
 	ROM_REGION(0x20000, "audiocpu", 0 )
@@ -7782,7 +7947,7 @@ ROM_START( hachamf )
 	// has 'WAKAUS' for the game name string, and appears to have programs for multiple games, depending on port 7 reads
 	ROM_LOAD( "nmk-113.bin", 0x00000, 0x04000, CRC(f3072715) SHA1(cee6534de6645c41cbbb1450ad3e5207e44460c7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
+	ROM_REGION( 0x10000, "nmk004", 0 ) // NMK004 sound data
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7818,7 +7983,7 @@ ROM_START( hachamfa) // reportedly a Korean PCB / version
 	// has 'WAKAUS' for the game name string, and appears to have programs for multiple games, depending on port 7 reads
 	ROM_LOAD( "nmk-113.bin", 0x00000, 0x04000, CRC(f3072715) SHA1(cee6534de6645c41cbbb1450ad3e5207e44460c7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
+	ROM_REGION( 0x10000, "nmk004", 0 ) // NMK004 sound data
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 ) // Smaller NMK logo plus alternate  Distributed by UPL  Company Limited  starting at tile 0xF80
@@ -7850,7 +8015,7 @@ ROM_START( hachamfb ) // Thunder Dragon conversion - unprotected prototype or bo
 	ROM_LOAD16_BYTE( "8.bin",  0x00000, 0x20000, CRC(14845b65) SHA1(5cafd07a8a6f5ccbb36de7a90571f8b33ecf273e) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "7.bin",  0x00001, 0x20000, CRC(069ca579) SHA1(0db4c3c41e17fca613d11de89b388a4af206ec6b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
+	ROM_REGION( 0x10000, "nmk004", 0 ) // NMK004 sound data
 	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7877,12 +8042,12 @@ ROM_START( hachamfb ) // Thunder Dragon conversion - unprotected prototype or bo
 	ROM_LOAD( "82s135.ic50", 0x0000, 0x0100, BAD_DUMP CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) )  // 82S135 - Used the dump from hachamfp
 ROM_END
 
-ROM_START( hachamfp ) // Protoype Location Test Release; Hand-written labels with various dates. 68K program ROM has 19th Sep. 1991 string.
+ROM_START( hachamfp ) // Prototype Location Test Release; Hand-written labels with various dates. 68K program ROM has 19th Sep. 1991 string.
 	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_BYTE( "kf-68-pe-b.ic7",  0x00000, 0x20000, CRC(b98a525e) SHA1(161c3b3360068e606e4d4104cc172b9736a52eeb) ) // Label says "KF 9/25 II 68 PE B"
 	ROM_LOAD16_BYTE( "kf-68-po-b.ic6",  0x00001, 0x20000, CRC(b62ad179) SHA1(60a66fb9eb3fc792d172e1f4507a806ac2ad4217) ) // Label says "KF 9/25 II 68 PO B"
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // NMK004 sound data
+	ROM_REGION( 0x10000, "nmk004", 0 ) // NMK004 sound data
 	ROM_LOAD( "kf-snd.ic4",  0x00000, 0x10000, CRC(f7cace47) SHA1(599f6406f5bea69d77f39847d5d5fa361cdb7d00) ) // Label says "KF 9/20 SND"
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -7913,7 +8078,7 @@ ROM_START( macross )
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "921a03",        0x00000, 0x80000, CRC(33318d55) SHA1(c99f85e09bd334dc8ce138b08cbed2331b0d67dd) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        // sound program (unknown CPU)
+	ROM_REGION( 0x10000, "nmk004", 0 )        // sound program (NMK004)
 	ROM_LOAD( "921a02",      0x00000, 0x10000, CRC(77c082c7) SHA1(be07aa14d0116f830f98e11a19f1debb48a5230e) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -8018,7 +8183,7 @@ ROM_START( gunnail )
 	ROM_LOAD16_BYTE( "3e.u131",  0x00000, 0x40000, CRC(61d985b2) SHA1(96daca603f18accb47f98a3e584b2c84fc5a2ca4) )
 	ROM_LOAD16_BYTE( "3o.u133",  0x00001, 0x40000, CRC(f114e89c) SHA1(a12f5278167f446bb5277e87289c41b5aa365c86) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )     // Code for NMK004 CPU
+	ROM_REGION( 0x10000, "nmk004", 0 )     // Code for NMK004 CPU
 	ROM_LOAD( "92077_2.u101",      0x00000, 0x10000, CRC(cd4e55f8) SHA1(92182767ca0ec37ec4949bd1a88c2efdcdcb60ed) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -8055,7 +8220,7 @@ ROM_START( gunnailp )
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
 	ROM_LOAD16_WORD_SWAP( "3.u132",  0x00000, 0x80000, CRC(93570f03) SHA1(54fb203b5bfceb0ac86627bff3e67863f460fe73) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )     // Code for NMK004 CPU
+	ROM_REGION( 0x10000, "nmk004", 0 )     // Code for NMK004 CPU
 	ROM_LOAD( "92077_2.u101",      0x00000, 0x10000, CRC(cd4e55f8) SHA1(92182767ca0ec37ec4949bd1a88c2efdcdcb60ed) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
@@ -8126,11 +8291,11 @@ ROM_START( macross2 ) // Title screen shows Kanji characters & Macross II
 	ROM_LOAD16_WORD_SWAP( "bp932an.a07", 0x000000, 0x200000, CRC(aa1b21b9) SHA1(133822e3d8628aa4eb3e62fbd054956799423b98) ) // Sprites
 	ROM_LOAD16_WORD_SWAP( "bp932an.a08", 0x200000, 0x200000, CRC(67eb2901) SHA1(25e0f9fda1a8c0c2b59616dd153cb6dcb459d2d9) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a06", 0x040000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a06", 0x000000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a05", 0x040000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a05", 0x000000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "mcrs2bpr.9",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8156,11 +8321,11 @@ ROM_START( macross2k ) // Title screen only shows Macross II, no Kanji.  Suspect
 	ROM_LOAD16_WORD_SWAP( "bp932an.a07", 0x000000, 0x200000, CRC(aa1b21b9) SHA1(133822e3d8628aa4eb3e62fbd054956799423b98) ) // Sprites
 	ROM_LOAD16_WORD_SWAP( "bp932an.a08", 0x200000, 0x200000, CRC(67eb2901) SHA1(25e0f9fda1a8c0c2b59616dd153cb6dcb459d2d9) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a06", 0x040000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a06", 0x000000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a05", 0x040000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a05", 0x000000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "mcrs2bpr.9",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8186,11 +8351,11 @@ ROM_START( macross2g )
 	ROM_LOAD16_WORD_SWAP( "bp932an.a07", 0x000000, 0x200000, CRC(aa1b21b9) SHA1(133822e3d8628aa4eb3e62fbd054956799423b98) ) // Sprites
 	ROM_LOAD16_WORD_SWAP( "bp932an.a08", 0x200000, 0x200000, CRC(67eb2901) SHA1(25e0f9fda1a8c0c2b59616dd153cb6dcb459d2d9) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a06", 0x040000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a06", 0x000000, 0x200000, CRC(ef0ffec0) SHA1(fd72cc77e02d1a00bf27e77a33d7dab5f6ba1cb4) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "bp932an.a05", 0x040000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "bp932an.a05", 0x000000, 0x100000, CRC(b5335abb) SHA1(f4eaf4e465eeca31741d432ee46ed39ffcd92cca) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "mcrs2bpr.9",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8216,11 +8381,11 @@ ROM_START( tdragon2 )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8249,11 +8414,11 @@ ROM_START( tdragon3h )
 	ROM_LOAD16_BYTE( "conny.1", 0x000001, 0x100000, CRC(37b32460) SHA1(7b689a7e23a9428c6d36f0791a64e7a9a41e7cfa) )
 	ROM_LOAD16_WORD_SWAP( "conny.5", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", ROMREGION_ERASEFF )   // only 1 oki on this PCB
+	ROM_REGION( 0x200000, "oki1", ROMREGION_ERASEFF )   // only 1 oki on this PCB
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "conny.6", 0x040000, 0x100000, CRC(564f87ed) SHA1(010dd001fda28d9c15ca09a0d12cac438a46cd54) )  // all banked
-	ROM_LOAD( "conny.7", 0x140000, 0x100000, CRC(2e767f6f) SHA1(34e3f747716eb7a585340791c2cfbfde57681d69) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "conny.6", 0x000000, 0x100000, CRC(564f87ed) SHA1(010dd001fda28d9c15ca09a0d12cac438a46cd54) )  // all banked
+	ROM_LOAD( "conny.7", 0x100000, 0x100000, CRC(2e767f6f) SHA1(34e3f747716eb7a585340791c2cfbfde57681d69) )
 
 	ROM_REGION( 0x0100, "htiming", 0 ) // not dumped for this set
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, BAD_DUMP CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8279,11 +8444,11 @@ ROM_START( tdragon2a )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8309,11 +8474,11 @@ ROM_START( bigbang )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8339,11 +8504,11 @@ ROM_START( bigbanga )
 	ROM_LOAD16_WORD_SWAP( "ww930917.7", 0x000000, 0x200000, CRC(b98873cb) SHA1(cc19200865176e940ff68e12de81f029b51c2084) )  // Sprites
 	ROM_LOAD16_WORD_SWAP( "ww930918.8", 0x200000, 0x200000, CRC(baee84b2) SHA1(b325b00e6147266dbdc840e03556004531dc2038) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930916.4", 0x040000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
+	ROM_REGION( 0x200000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930916.4", 0x000000, 0x200000, CRC(07c35fe6) SHA1(33547bd88764704310f2ef8cf3bfe21ceb56d5b7) )  // all banked
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ww930915.3", 0x040000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
+	ROM_REGION( 0x200000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ww930915.3", 0x000000, 0x200000, CRC(82025bab) SHA1(ac6053700326ea730d00ec08193e2c8a2a019f0b) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.bpr",  0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) )  // 82S129
@@ -8432,18 +8597,13 @@ ROM_START( arcadian )
 	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  // 16x16 tiles
 	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  // 16x16 tiles
 
-	ROM_REGION( 0x440000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
-	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
+	ROM_REGION( 0x400000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.6", 0x000000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_LOAD( "rhp94099.7", 0x200000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
 
-	ROM_REGION( 0x440000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
-	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
-
-	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "prom1.u19",      0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) ) // unknown
-	ROM_LOAD( "prom2.u53",      0x0100, 0x0100, CRC(e6ead349) SHA1(6d81b1c0233580aa48f9718bade42d640e5ef3dd) ) // unknown
-	ROM_LOAD( "prom3.u60",      0x0200, 0x0100, CRC(304f98c6) SHA1(8dfd9bf719087ec30c83efe95c4561666c7d1801) ) // unknown
+	ROM_REGION( 0x400000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.5", 0x000000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
+	ROM_LOAD( "rhp94099.6", 0x200000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "prom1.u19", 0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  // 82S129
@@ -8473,13 +8633,13 @@ ROM_START( raphero )
 	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  // 16x16 tiles
 	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  // 16x16 tiles
 
-	ROM_REGION( 0x440000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
-	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
+	ROM_REGION( 0x400000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.6", 0x000000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_LOAD( "rhp94099.7", 0x200000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
 
-	ROM_REGION( 0x440000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
-	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_REGION( 0x400000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.5", 0x000000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
+	ROM_LOAD( "rhp94099.6", 0x200000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "prom1.u19", 0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  // 82S129
@@ -8509,13 +8669,13 @@ ROM_START( rapheroa )
 	ROM_LOAD16_WORD_SWAP( "rhp94099.9", 0x200000, 0x200000, CRC(ea2e47f0) SHA1(97dfa8f95f27b36deb5ce1c80e3d727bad24e52b) )  // 16x16 tiles
 	ROM_LOAD16_WORD_SWAP( "rhp94099.10",0x400000, 0x200000, CRC(512cb839) SHA1(4a2c5ac88e4bf8a6f07c703277c4d33e649fd192) )  // 16x16 tiles
 
-	ROM_REGION( 0x440000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.6", 0x040000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
-	ROM_LOAD( "rhp94099.7", 0x240000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
+	ROM_REGION( 0x400000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.6", 0x000000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_LOAD( "rhp94099.7", 0x200000, 0x200000, CRC(0d99547e) SHA1(2d9630bd55d27010f9d1d2dbdbd07ac265e8ebe6) )  // all banked
 
-	ROM_REGION( 0x440000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "rhp94099.5", 0x040000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
-	ROM_LOAD( "rhp94099.6", 0x240000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
+	ROM_REGION( 0x400000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "rhp94099.5", 0x000000, 0x200000, CRC(515eba93) SHA1(c35cb5f31f4bc7327be5777624af168f9fb364a5) )  // all banked
+	ROM_LOAD( "rhp94099.6", 0x200000, 0x200000, CRC(f1a80e5a) SHA1(218bd7b0c3d8b283bf96b95bf888228810699370) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "prom1.u19", 0x0000, 0x0100, CRC(4299776e) SHA1(683d14d2ace14965f0fcfe0f0540c1b77d2cece5) )  // 82S129
@@ -8545,11 +8705,11 @@ ROM_START( sabotenb )
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic100.sb5",  0x000000, 0x200000, CRC(b20f166e) SHA1(074d770fd6d233040a80a92f4467d81f961c650b) )  // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic30.sb6",    0x040000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic30.sb6",    0x000000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic27.sb7",    0x000000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8577,11 +8737,11 @@ ROM_START( sabotenba )
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic100.sb5",  0x000000, 0x200000, CRC(b20f166e) SHA1(074d770fd6d233040a80a92f4467d81f961c650b) )  // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic30.sb6",    0x040000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic30.sb6",    0x000000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic27.sb7",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic27.sb7",    0x000000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8606,11 +8766,11 @@ ROM_START( cactus )
 	ROM_LOAD16_BYTE( "s-03.bin",    0x000001, 0x100000, CRC(bc1781b8) SHA1(5000f2111c5981428a772a9dcae2c7c8f1f6958b) )
 	ROM_LOAD16_BYTE( "s-04.bin",    0x000000, 0x100000, CRC(f823885e) SHA1(558b2bed207ccff8f1425cbb9dadc1ec0b70a65b) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "s-01.bin",    0x040000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "s-01.bin",    0x000000, 0x100000, CRC(288407af) SHA1(78c08fae031337222681c593dc86a08df6a34a4b) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "s-02.bin",    0x040000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "s-02.bin",    0x000000, 0x100000, CRC(43e33a7e) SHA1(51068b63f4415712eaa25dcf1ee6b0cc2850974e) ) // all banked
 ROM_END
 
 ROM_START( bjtwin )
@@ -8631,11 +8791,11 @@ ROM_START( bjtwin )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "93087-5.bin", 0x000000, 0x100000, CRC(bb06245d) SHA1(c91e2284d95370b8ef2eb1b9d6305fdd6cde23a0) ) // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-6.bin",    0x040000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-6.bin",    0x000000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-7.bin",    0x040000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-7.bin",    0x000000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8662,11 +8822,11 @@ ROM_START( bjtwina )
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "93087-5.bin", 0x000000, 0x100000, CRC(bb06245d) SHA1(c91e2284d95370b8ef2eb1b9d6305fdd6cde23a0) ) // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-6.bin",    0x040000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-6.bin",    0x000000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "93087-7.bin",    0x040000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "93087-7.bin",    0x000000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8693,13 +8853,13 @@ ROM_START( bjtwinp )
 	ROM_LOAD16_BYTE( "u4.ic100", 0x000000, 0x080000, CRC(6501b1fb) SHA1(1c0832c3bb33aac1e5cd8845d77bc09222548ef8) )
 	ROM_LOAD16_BYTE( "u5.ic100", 0x000001, 0x080000, CRC(8394e2ba) SHA1(bb921ccf1f5221611449ed3537d60395d8a1c1e9) )
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "bottom.ic30",    0x040000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
-	ROM_LOAD( "top.ic30",       0x0c0000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "bottom.ic30",    0x000000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
+	ROM_LOAD( "top.ic30",       0x080000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "top.ic27",       0x040000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
-	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "top.ic27",       0x000000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
+	ROM_LOAD( "bottom.ic27",    0x080000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8730,13 +8890,13 @@ ROM_START( bjtwinpa )
 	ROM_LOAD16_BYTE( "ic100_1.bin", 0x000000, 0x080000, CRC(2ea7e460) SHA1(b8dc13994ae2433fc7c38412c9ea6f10f945bca5) )
 	ROM_LOAD16_BYTE( "ic100_2.bin", 0x000001, 0x080000, CRC(ec85e1b7) SHA1(2f9a60ad2beb22d1b41dab7db3634b8e36cfce3e) )
 
-	ROM_REGION( 0x140000, "oki1", 0 ) // OKIM6295 samples
-	ROM_LOAD( "bottom.ic30",    0x040000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
-	ROM_LOAD( "top.ic30",       0x0c0000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
+	ROM_REGION( 0x100000, "oki1", 0 ) // OKIM6295 samples
+	ROM_LOAD( "bottom.ic30",    0x000000, 0x80000, CRC(b5ef197f) SHA1(89d675f921dead585c2fef44105a7aea2f1f399c) ) // all banked
+	ROM_LOAD( "top.ic30",       0x080000, 0x80000, CRC(ab50531d) SHA1(918987f01a8b1b007721d2b365e2b2fc536bd676) )
 
-	ROM_REGION( 0x140000, "oki2", 0 ) // OKIM6295 samples
-	ROM_LOAD( "top.ic27",       0x040000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
-	ROM_LOAD( "bottom.ic27",    0x0c0000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
+	ROM_REGION( 0x100000, "oki2", 0 ) // OKIM6295 samples
+	ROM_LOAD( "top.ic27",       0x000000, 0x80000, CRC(adb2f256) SHA1(ab7bb6683799203d0f46705f2fd241c6de914e77) ) // all banked
+	ROM_LOAD( "bottom.ic27",    0x080000, 0x80000, CRC(6ebeb9e4) SHA1(b547b2fbcc0a35d6183dd4f19684b04839690a2b) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
@@ -8763,11 +8923,11 @@ ROM_START( nouryoku )
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ic100.5",    0x000000, 0x200000, CRC(24d3e24e) SHA1(71e38637953ec98bf308824aaef5628803aead21) )  // Sprites
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic30.6",     0x040000, 0x100000, CRC(feea34f4) SHA1(bee467e74dbad497c6f5f6b38b7e52001e767012) )  // all banked
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic30.6",     0x000000, 0x100000, CRC(feea34f4) SHA1(bee467e74dbad497c6f5f6b38b7e52001e767012) )  // all banked
 
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD( "ic27.7",     0x040000, 0x100000, CRC(8a69fded) SHA1(ee73f1789bcc672232606a4b3b28087fea1c5c69) )  // all banked
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD( "ic27.7",     0x000000, 0x100000, CRC(8a69fded) SHA1(ee73f1789bcc672232606a4b3b28087fea1c5c69) )  // all banked
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, BAD_DUMP CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129 - taken from bjtwin
@@ -8796,14 +8956,13 @@ ROM_START( nouryokup )
 	ROM_LOAD16_BYTE( "obj1even.u9.ic100", 0x100000, 0x080000, CRC(e01567e8) SHA1(69775752b61ce103d91e127f1fbf7c94b960b835) )
 	ROM_LOAD16_BYTE( "obj1odd.u8.ic100",  0x100001, 0x080000, CRC(4a383085) SHA1(45351eb67c90936e500b527e9f93c1f70b67bd9a) )
 
+	ROM_REGION( 0x100000, "oki1", 0 )   // OKIM6295 samples
+	ROM_LOAD("soundpcm0.bottom.ic30", 0x000000, 0x080000, CRC(34ded136) SHA1(00fe1d6327483bb9e73802beca3ce6d808a20ceb) )
+	ROM_LOAD("soundpcm1.top.ic30",    0x080000, 0x080000, CRC(a8d2abf7) SHA1(5619437e3e1f70f78cb2aeb2d619511be11e02e1) )
 
-	ROM_REGION( 0x140000, "oki1", 0 )   // OKIM6295 samples
-	ROM_LOAD("soundpcm0.bottom.ic30", 0x040000, 0x080000, CRC(34ded136) SHA1(00fe1d6327483bb9e73802beca3ce6d808a20ceb) )
-	ROM_LOAD("soundpcm1.top.ic30",    0x0c0000, 0x080000, CRC(a8d2abf7) SHA1(5619437e3e1f70f78cb2aeb2d619511be11e02e1) )
-
-	ROM_REGION( 0x140000, "oki2", 0 )   // OKIM6295 samples
-	ROM_LOAD("soundpcm2.top.ic27",    0x040000, 0x080000, CRC(29d0a15d) SHA1(a235eec225dd5006dd1f4e21d78fd647335f45dc) )
-	ROM_LOAD("soundpcm3.bottom.ic27", 0x0c0000, 0x080000, CRC(c764e749) SHA1(8399d3b6807bd263eee607c5625618d19688b394) )
+	ROM_REGION( 0x100000, "oki2", 0 )   // OKIM6295 samples
+	ROM_LOAD("soundpcm2.top.ic27",    0x000000, 0x080000, CRC(29d0a15d) SHA1(a235eec225dd5006dd1f4e21d78fd647335f45dc) )
+	ROM_LOAD("soundpcm3.bottom.ic27", 0x080000, 0x080000, CRC(c764e749) SHA1(8399d3b6807bd263eee607c5625618d19688b394) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "9.ic51",      0x0000, 0x0100, BAD_DUMP CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129 - taken from bjtwin
@@ -8894,13 +9053,13 @@ ROM_START( powerins )
 	ROM_LOAD16_WORD_SWAP( "93095-18.u122", 0x600000, 0x100000, CRC(b135e3f2) SHA1(339fb4007ca0f379b7554a1c4f711f494a371fb2) )
 	ROM_LOAD16_WORD_SWAP( "93095-19.u123", 0x700000, 0x100000, CRC(67695537) SHA1(4c78ce3e36f27d2a6a9e50e8bf896335d4d0958a) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-10.u48", 0x040000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
-	ROM_LOAD( "93095-11.u49", 0x140000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-10.u48", 0x000000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
+	ROM_LOAD( "93095-11.u49", 0x100000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-8.u46",  0x040000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
-	ROM_LOAD( "93095-9.u47",  0x140000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-8.u46",  0x000000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
+	ROM_LOAD( "93095-9.u47",  0x100000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -8938,13 +9097,13 @@ ROM_START( powerinsj )
 	ROM_LOAD16_WORD_SWAP( "93095-18.u122", 0x600000, 0x100000, CRC(b135e3f2) SHA1(339fb4007ca0f379b7554a1c4f711f494a371fb2) )
 	ROM_LOAD16_WORD_SWAP( "93095-19.u123", 0x700000, 0x100000, CRC(67695537) SHA1(4c78ce3e36f27d2a6a9e50e8bf896335d4d0958a) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-10.u48", 0x040000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
-	ROM_LOAD( "93095-11.u49", 0x140000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-10.u48", 0x000000, 0x100000, CRC(329ac6c5) SHA1(e809b94e2623141f5a48995cfa97fe1ead7ab40b) )
+	ROM_LOAD( "93095-11.u49", 0x100000, 0x100000, CRC(75d6097c) SHA1(3c89a7c9b12087e2d969b822419d3e5f98f5cb1d) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "93095-8.u46",  0x040000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
-	ROM_LOAD( "93095-9.u47",  0x140000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "93095-8.u46",  0x000000, 0x100000, CRC(f019bedb) SHA1(4b6e10f85671c75b666e547887d403d6e607cec8) )
+	ROM_LOAD( "93095-9.u47",  0x100000, 0x100000, CRC(adc83765) SHA1(9e760443f9de21c1bb7e33eaa1541023fcdc60ab) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -8992,17 +9151,17 @@ ROM_START( powerinspu )
 	ROM_LOAD16_BYTE( "fo7.mo7.27c040", 0x700001, 0x80000, CRC(9ab1998c) SHA1(fadaa4a46cefe0093ee1ebeddbae63143fa7bb5a) )
 	ROM_LOAD16_BYTE( "fe7.me7.27c040", 0x700000, 0x80000, CRC(1ab0c88a) SHA1(8bc72732f5911e0d4e0cf12fd2fb12d67e03299e) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ao0.ad00.27c040", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ao1.ad01.27c040", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "ao2.ad02.27c040", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "ao3.ad03.27c040", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ao0.ad00.27c040", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ao1.ad01.27c040", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "ao2.ad02.27c040", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "ao3.ad03.27c040", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ad10.ad10.27c040", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ad11.ad11.27c040", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "ad12.ad12.27c040", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "ad13.ad13.27c040", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ad10.ad10.27c040", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ad11.ad11.27c040", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "ad12.ad12.27c040", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "ad13.ad13.27c040", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -9050,17 +9209,17 @@ ROM_START( powerinspj )
 	ROM_LOAD16_BYTE( "fo7.mo7.27c040", 0x700001, 0x80000, CRC(9ab1998c) SHA1(fadaa4a46cefe0093ee1ebeddbae63143fa7bb5a) )
 	ROM_LOAD16_BYTE( "fe7.me7.27c040", 0x700000, 0x80000, CRC(1ab0c88a) SHA1(8bc72732f5911e0d4e0cf12fd2fb12d67e03299e) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ao0.ad00.27c040", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ao1.ad01.27c040", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "ao2.ad02.27c040", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "ao3.ad03.27c040", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ao0.ad00.27c040", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ao1.ad01.27c040", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "ao2.ad02.27c040", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "ao3.ad03.27c040", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "ad10.ad10.27c040", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
-	ROM_LOAD( "ad11.ad11.27c040", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "ad12.ad12.27c040", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "ad13.ad13.27c040", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "ad10.ad10.27c040", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) ) // located on OS93089 SUB daughterboard
+	ROM_LOAD( "ad11.ad11.27c040", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "ad12.ad12.27c040", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "ad13.ad13.27c040", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 
 	ROM_REGION( 0x0100, "htiming", 0 )
 	ROM_LOAD( "20.u54",       0x0000,   0x0100, CRC(38bd0e2f) SHA1(20d311869642cd96bb831fdf4a458e0d872f03eb) ) // 82S129
@@ -9120,7 +9279,7 @@ ROM_START( powerinsa )
 	ROM_LOAD16_WORD_SWAP( "rom8",  0x400000, 0x200000, CRC(b02fdd6d) SHA1(1e2c52b4e9999f0b564fcf13ff41b097ad7d0c39) )
 	ROM_LOAD16_WORD_SWAP( "rom7",  0x600000, 0x200000, CRC(92ab9996) SHA1(915ec8f383cc3652c3816a9b56ee54e22e104a5c) )
 
-	ROM_REGION( 0x080000, "oki1", 0 )   // 8 bit ADPCM (banked)
+	ROM_REGION( 0x080000, "oki1", 0 )   // 4 bit ADPCM (banked)
 	ROM_LOAD( "rom5", 0x000000, 0x080000, CRC(88579c8f) SHA1(13083934ab294c9b08d3e36f55c00a6a2e5a0507) )
 ROM_END
 
@@ -9211,17 +9370,17 @@ ROM_START( powerinsb )
 	ROM_LOAD16_BYTE( "12p.bin", 0x700001, 0x80000, CRC(9ab1998c) SHA1(fadaa4a46cefe0093ee1ebeddbae63143fa7bb5a) )
 	ROM_LOAD16_BYTE( "11q.bin", 0x700000, 0x80000, CRC(1ab0c88a) SHA1(8bc72732f5911e0d4e0cf12fd2fb12d67e03299e) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "4a.bin", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
-	ROM_LOAD( "4b.bin", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "4c.bin", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "4d.bin", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "4a.bin", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
+	ROM_LOAD( "4b.bin", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "4c.bin", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "4d.bin", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "5a.bin", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
-	ROM_LOAD( "5b.bin", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "5c.bin", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "5d.bin", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "5a.bin", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
+	ROM_LOAD( "5b.bin", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "5c.bin", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "5d.bin", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 
 	ROM_REGION( 0x0220, "proms", 0 ) // unknown
 	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, CRC(67d5ec4b) SHA1(87d32948a0c88277dcdd0eaa035bde40fc7db5fe) )
@@ -9263,17 +9422,17 @@ ROM_START( powerinsc )
 	ROM_LOAD16_BYTE( "23.040.u96", 0x700000, 0x80000,  CRC(625c5b7b) SHA1(ddac164cd92459bdce5905b31eccded9b1c06086) )
 	ROM_LOAD16_BYTE( "12.040.u92", 0x700001, 0x80000,  CRC(08c4e478) SHA1(172dd9532a9240014afb4817b61a3e8122be8f0c) )
 
-	ROM_REGION( 0x240000, "oki1", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "9.040.u32", 0x040000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
-	ROM_LOAD( "8.040.u30", 0x0c0000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
-	ROM_LOAD( "7.040.u33", 0x140000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
-	ROM_LOAD( "6.040.u31", 0x1c0000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
+	ROM_REGION( 0x200000, "oki1", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "9.040.u32", 0x000000, 0x80000, CRC(8cd6824e) SHA1(aa6d8917558de4f2aa8d80527209b9fe91122eb3) )
+	ROM_LOAD( "8.040.u30", 0x080000, 0x80000, CRC(e31ae04d) SHA1(c08d58a4250d8bdb68b8e5012624f345936520e1) )
+	ROM_LOAD( "7.040.u33", 0x100000, 0x80000, CRC(c4c9f599) SHA1(1d74acd626406052bec533a918ca24e14a2578f2) )
+	ROM_LOAD( "6.040.u31", 0x180000, 0x80000, CRC(f0a9f0e1) SHA1(4221e0824cdc8bcd6ea1c3811f4e3b7cd99478f2) )
 
-	ROM_REGION( 0x240000, "oki2", 0 )   // 8 bit ADPCM (banked)
-	ROM_LOAD( "5.040.u36", 0x040000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
-	ROM_LOAD( "4.040.u34", 0x0c0000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
-	ROM_LOAD( "3.040.u37", 0x140000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
-	ROM_LOAD( "2.040.u35", 0x1c0000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
+	ROM_REGION( 0x200000, "oki2", 0 )   // 4 bit ADPCM (banked)
+	ROM_LOAD( "5.040.u36", 0x000000, 0x80000, CRC(62557502) SHA1(d72abdaec1c6f55f9b0099b7a8a297e0e14f920c) )
+	ROM_LOAD( "4.040.u34", 0x080000, 0x80000, CRC(dbc86bd7) SHA1(6f1bc3c7e6976fdcd4b2341cea07002fb0cefb14) )
+	ROM_LOAD( "3.040.u37", 0x100000, 0x80000, CRC(5839a2bd) SHA1(53988086ef97b2671044f6da9d97b1886900b64d) )
+	ROM_LOAD( "2.040.u35", 0x180000, 0x80000, CRC(446f9dc3) SHA1(5c81eb9a7cbea995db9a10d3b6460d02e104825f) )
 ROM_END
 
 ROM_START( manybloc )
@@ -10533,7 +10692,7 @@ GAME( 1990, mustang,    0,        mustang,      mustang,      nmk16_state,      
 GAME( 1990, mustangs,   mustang,  mustang,      mustang,      nmk16_state,        empty_init,           ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", 0 )
 
 GAME( 1990, bioship,    0,        bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", 0 ) // US version but no regional notice
-GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah", 0 )
+GAME( 1990, sbsgomo,    bioship,  bioship,      bioship,      nmk16_state,        empty_init,           ROT0,   "UPL",                          "Space Battle Ship Gomorrah (Japan)", 0 )
 
 GAME( 1990, vandyke,    0,        vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL",                          "Vandyke (Japan)", 0 )
 GAME( 1990, vandykejal, vandyke,  vandyke,      vandyke,      nmk16_state,        empty_init,           ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)", 0 )
@@ -10597,7 +10756,7 @@ GAME( 1993, powerinspu, powerins, powerins,    powerinj,      nmk16_state,      
 GAME( 1993, powerinspj, powerins, powerins,    powerinj,      nmk16_state,        empty_init,           ROT0,   "Atlus",                        "Gouketsuji Ichizoku (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // boots as 93.10.20 just like the other sets, but code is different
 GAME( 1993, powerinsa,  powerins, powerinsa,   powerins,      nmk16_state,        init_powerinsa,       ROT0,   "bootleg",                      "Power Instinct (USA, bootleg set 1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1993, powerinsb,  powerins, powerinsb,   powerins,      nmk16_state,        empty_init,           ROT0,   "bootleg",                      "Power Instinct (USA, bootleg set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1993, powerinsc,  powerins, powerinsc,   powerins,      nmk16_state,        empty_init,           ROT0,   "bootleg",                      "Power Instinct (USA, bootleg set 3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different sprites' format not implemented
+GAME( 1993, powerinsc,  powerins, powerinsc,   powerins,      nmk16_state,        empty_init,           ROT0,   "bootleg (Electronic Devices)", "Power Instinct (USA, bootleg set 3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different sprites' format not implemented
 
 // Non NMK boards
 
@@ -10605,15 +10764,17 @@ GAME( 1993, powerinsc,  powerins, powerinsc,   powerins,      nmk16_state,      
 GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_tharrier,        ROT270, "Bee-Oh",                       "Many Block", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // clone board, different sound / bg hardware, but similar memory maps, same tx layer, sprites etc.
-GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 )
+GAME( 1997, tomagic,    0,        tomagic,      tomagic,      nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 )
 
 // these use the Seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
 GAME( 1991, acrobatmbl, acrobatm, acrobatmbl,   acrobatmbl,   nmk16_state, init_acrobatmbl,      ROT270, "bootleg",                       "Acrobat Mission (bootleg with Raiden sounds)", 0 )
+GAME( 1991, hachamfb2,  hachamf,  hachamfb2,    hachamfb,     nmk16_state, empty_init,           ROT0,   "bootleg",                       "Hacha Mecha Fighter (bootleg with Raiden sounds)", 0 )
 GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, encrypted)", 0 )
 GAME( 1991, tdragonb3,  tdragon,  tdragonb3,    tdragonb,     nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg with Raiden sounds, unencrypted)", 0 )
-GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
+GAME( 1992, strahljbl,  strahl,   strahljbl,    strahl,       nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
+GAME( 199?, macrossbl,  macross,  macrossbl,    macross,      nmk16_state, init_macrossbl,       ROT270, "bootleg",                       "Super Spacefortress Macross / Chou-Jikuu Yousai Macross (bootleg with Raiden sounds)", MACHINE_NOT_WORKING ) // not looked at yet
 
 // these are bootlegs with tharrier like sound hw
 GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state,     empty_init,       ROT0,   "bootleg (Lettering)",           "US AAF Mustang (Lettering bootleg)", 0 )

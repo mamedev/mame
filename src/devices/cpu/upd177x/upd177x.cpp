@@ -782,13 +782,11 @@ void upd177x_cpu_device::execute_run()
 }
 
 
-void upd177x_cpu_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void upd177x_cpu_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
 	const int smpl = m_dac_sign ? -m_dac : m_dac;
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		buffer.put_int(sampindex, smpl, 256);
+		stream.put_int(0, sampindex, smpl, 256);
 	}
 }

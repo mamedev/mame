@@ -14,9 +14,11 @@ public:
 	specnext_tiles_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	specnext_tiles_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - (OVER_BORDER << 1); m_offset_v = offset_v - OVER_BORDER; return *this; }
-	specnext_tiles_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
+	specnext_tiles_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; tilemap_update(); return *this; }
 	specnext_tiles_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 	void tilemap_update();
+
+	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; }
 
 	void control_w(u8 control) { m_control = control; tilemap_update(); }
 	void default_flags_w(u8 default_flags) { m_default_flags = default_flags; m_tilemap[0]->mark_all_dirty(); m_tilemap[1]->mark_all_dirty(); }
@@ -33,7 +35,7 @@ public:
 	void clip_y1_w(u8 clip_y1) { m_clip_y1 = clip_y1; }
 	void clip_y2_w(u8 clip_y2) { m_clip_y2 = clip_y2; }
 
-	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode = 0xff);
+	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode = 0xff, u8 priority_mask = 0xff);
 
 protected:
 	static constexpr u8 OVER_BORDER = 32;
@@ -49,6 +51,7 @@ protected:
 	tilemap_t *m_tilemap[2];
 
 private:
+	u8 m_global_transparent;
 	u16 m_palette_base_offset;
 	u16 m_palette_alt_offset;
 	bool m_tm_palette_select;

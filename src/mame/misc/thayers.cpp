@@ -680,15 +680,14 @@ void thayers_state::thayers(machine_config &config)
 	screen.set_screen_update(m_player, FUNC(pioneer_ldv1000hle_device::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_player->add_route(0, "lspeaker", 1.0);
-	m_player->add_route(1, "rspeaker", 1.0);
+	SPEAKER(config, "speaker", 2).front();
+	m_player->add_route(0, "speaker", 1.0, 0);
+	m_player->add_route(1, "speaker", 1.0, 1);
 
 	SSI263HLE(config, m_ssi, 860000);
 	m_ssi->ar_callback().set(FUNC(thayers_state::ssi_data_request_w));
-	m_ssi->add_route(0, "lspeaker", 1.0);
-	m_ssi->add_route(1, "lspeaker", 1.0);
+	m_ssi->add_route(0, "speaker", 1.0, 0);
+	m_ssi->add_route(1, "speaker", 1.0, 0);
 }
 
 

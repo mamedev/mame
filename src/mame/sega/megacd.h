@@ -7,9 +7,9 @@
 #pragma once
 
 #include "cpu/m68000/m68000.h"
-#include "machine/lc89510.h"
-#include "megacdcd.h"
 #include "sound/rf5c68.h"
+
+#include "megacdcd.h"
 #include "screen.h"
 #include "tilemap.h"
 
@@ -119,7 +119,7 @@ protected:
 	required_device<timer_device> m_dma_timer;
 	//required_device<timer_device> m_hock_timer;
 
-	required_shared_ptr<uint16_t> m_prgram;
+	std::unique_ptr<uint16_t[]> m_prgram;
 	required_shared_ptr<uint16_t> m_dataram;
 	required_shared_ptr<uint16_t> m_font_bits;
 
@@ -138,6 +138,7 @@ protected:
 
 
 	uint8_t segacd_ram_writeprotect_bits = 0;
+	u32 m_write_boundary = 0;
 	int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
 	int segacd_memory_priority_mode = 0;
 	int segacd_stampsize = 0;
