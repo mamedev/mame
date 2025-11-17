@@ -50,6 +50,7 @@
 
 
 #define VECTOR_WIDTH_DENOM 512
+#define DOT_BITMAP_SIZE 16
 
 // 20000 is needed for mhavoc (see MT 06668) 10000 is enough for other games
 #define MAX_POINTS 20000
@@ -77,7 +78,9 @@ vector_device::vector_device(const machine_config &mconfig, const char *tag, dev
 		device_video_interface(mconfig, *this),
 		m_vector_list(nullptr),
 		m_min_intensity(255),
-		m_max_intensity(0)
+		m_max_intensity(0),
+		m_dot_bitmap(DOT_BITMAP_SIZE, DOT_BITMAP_SIZE),
+		m_dot_texture(nullptr)
 {
 }
 
@@ -89,6 +92,26 @@ void vector_device::device_start()
 
 	/* allocate memory for tables */
 	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
+
+	// Draw a circle texture for vector points.
+	const float mid = (DOT_BITMAP_SIZE - 1) * 0.5f;
+	for (int y = 0; y < DOT_BITMAP_SIZE; y++)
+	{
+		for (int x = 0; x < DOT_BITMAP_SIZE; x++)
+		{
+			float center_dist = sqrtf((x - mid) * (x - mid) + (y - mid) * (y - mid));
+			float edge_dist = DOT_BITMAP_SIZE * 0.5f - center_dist;
+			float bright = fmaxf(0, fminf(255, edge_dist * 255.0f));
+			m_dot_bitmap.pix(y, x) = rgb_t(255, bright, bright, bright);
+		}
+	}
+	m_dot_texture = machine().render().texture_alloc(render_texture::hq_scale);
+	m_dot_texture->set_bitmap(m_dot_bitmap, m_dot_bitmap.cliprect(), TEXFORMAT_ARGB32);
+}
+
+void vector_device::device_stop()
+{
+	machine().render().texture_free(m_dot_texture);
 }
 
 /*
@@ -181,10 +204,6 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		// normalize width
 		beam_width *= 1.0f / (float)VECTOR_WIDTH_DENOM;
 
-		// apply point scale for points
-		if (lastx == curpoint->x && lasty == curpoint->y)
-			beam_width *= vector_options::s_beam_dot_size;
-
 		coords.x0 = ((float)lastx - xoffs) * xscale;
 		coords.y0 = ((float)lasty - yoffs) * yscale;
 		coords.x1 = ((float)curpoint->x - xoffs) * xscale;
@@ -192,11 +211,29 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (curpoint->intensity != 0)
 		{
-			screen.container().add_line(
-				coords.x0, coords.y0, coords.x1, coords.y1,
-				beam_width,
-				(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
-				flags);
+			if (lastx == curpoint->x && lasty == curpoint->y) {
+				// apply point scale for points.
+				beam_width *= vector_options::s_beam_dot_size;
+				// Shift by half the beam width in each direction.
+				const float beam_x = beam_width * 0.5f * (xscale / yscale);
+				const float beam_y = beam_width * 0.5f;
+				// Make dots twice as bright as lines.
+				const int dot_intensity = std::min(255, curpoint->intensity * 2);
+				screen.container().add_quad(
+					coords.x0 - beam_x, coords.y0 - beam_y,
+					coords.x1 + beam_x, coords.y1 + beam_y,
+					(dot_intensity << 24) | (curpoint->col & 0xffffff),
+					m_dot_texture,
+					flags);
+			}
+			else
+			{
+				screen.container().add_line(
+					coords.x0, coords.y0, coords.x1, coords.y1,
+					beam_width,
+					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
+					flags);
+			}
 		}
 
 		lastx = curpoint->x;
