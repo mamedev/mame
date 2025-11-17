@@ -204,6 +204,13 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 	{
 		m_rcv_bit_count++;
 	}
+	
+	u8 tmp = m_rcv_flags;
+	receive_register_reset();
+	if (tmp != m_rcv_flags)
+		printf("changed from %x =>  %x\n", tmp, m_rcv_flags);
+		
+	m_rcv_flags = tmp;
 }
 
 void device_serial_interface::receive_register_reset()
