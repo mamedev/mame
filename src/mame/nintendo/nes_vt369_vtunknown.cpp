@@ -1208,6 +1208,11 @@ ROM_START( s5_520 )
 	ROM_LOAD( "s5_520_gamebox.u4", 0x00000, 0x1000000, CRC(19a7608e) SHA1(e2560752be0eda30cb935d601ee96a41215a277c) )
 ROM_END
 
+ROM_START( 500in1hh )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "500in1.bin", 0x00000, 0x1000000, CRC(50f44c1a) SHA1(8ba3d2b71d0619b3ae45bcbcc6d58162f93b1069) )
+ROM_END
+
 ROM_START( f5_620 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "f5_620in1.u4", 0x00000, 0x1000000, CRC(e3ec27c8) SHA1(d377ccf9bdbe60f6d484360b4b13c3b132628676) )
@@ -1414,6 +1419,8 @@ CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fa
 CONS( 202?, s10_520,   0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1)",  MACHINE_NOT_WORKING )
 // similar to above, but no scramble?
 CONS( 202?, s5_520,    0,  0,  vt36x_16mb,          vt369, vt36x_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
+// fewer games, but does have the scramble
+CONS( 202?, 500in1hh,  0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
 
 // there were also 'F1' units, shaped like a car, ROM may or may not be the same
 CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
