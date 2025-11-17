@@ -80,17 +80,19 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &_name, 
 		name = name.substr(0, separator);
 	}
 
-	CFStringRef font_name;
-	if (name == "default")
-	{
+	// Translate generic names into platform-specific real ones
+	if (name == "serif")
+		name = "Times";
+	else if (name == "sans-serif")
+		name = "Helvetica";
+	else if (name == "monospace")
+		name = "Courier";
+	else if (name == "default")
 		// Arial Unicode MS comes with Mac OS X 10.5 and later and is the only Mac default font with
 		// the Unicode characters used by the vgmplay and aristmk5 layouts.
-		font_name = CFStringCreateWithCString(nullptr, "Arial Unicode MS", kCFStringEncodingUTF8);
-	}
-	else
-	{
-		font_name = CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8);
-	}
+		name = "Arial Unicode MS";
+
+	CFStringRef font_name = CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8);
 
 	if (!font_name)
 	{

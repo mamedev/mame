@@ -63,7 +63,6 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 
 	// accept qualifiers from the name
 	std::string name(_name);
-	if (name.compare("default")==0) name = "Tahoma";
 	bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 	bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
@@ -77,6 +76,16 @@ bool osd_font_windows::open(std::string const &font_path, std::string const &_na
 		italic |= (style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos);
 		name = name.substr(0, separator);
 	}
+
+	// Translate generic names into platform-specific real ones:
+	if (name == "serif")
+		name = "Times New Roman";
+	else if (name == "sans-serif")
+		name = "Arial";
+	else if (name == "monospace")
+		name = "Courier New";
+	else if (name == "default")
+		name = "Tahoma";
 
 	// build a basic LOGFONT description of what we want
 	LOGFONT logfont;
