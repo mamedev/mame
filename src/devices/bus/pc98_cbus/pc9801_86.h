@@ -86,25 +86,6 @@ private:
 	u8 m_joy_sel;
 };
 
-class pc9801_speakboard_device : public pc9801_86_device
-{
-public:
-	// construction/destruction
-	pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
-	virtual void io_map(address_map &map) override ATTR_COLD;
-private:
-	required_device<ym2608_device>  m_opna_slave;
-};
-
 class otomichan_kai_device : public pc9801_86_device
 {
 public:
@@ -128,7 +109,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_86, pc9801_86_device)
-DECLARE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device)
 DECLARE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device)
 
 

@@ -43,7 +43,7 @@ TODO:
 
 #define LOGLATCH(...)     LOGMASKED(LOG_LATCH, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(AMD98, amd98_device, "amd98", "System Sacom AMD-98")
+DEFINE_DEVICE_TYPE(AMD98, amd98_device, "amd98", "System Sacom AMD-98 sound card")
 
 amd98_device::amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMD98, tag, owner, clock)

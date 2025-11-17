@@ -5591,6 +5591,8 @@ if (BUSES["PC98_CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/slot.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/sound.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/sound.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/speakboard.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/speakboard.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/wavestar.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/wavestar.h",
 	}
