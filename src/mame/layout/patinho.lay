@@ -245,7 +245,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 	</element>
 
 	<element name="switch" defstate="0">
-		<image state="0">
+		<image state="1">
 		<data><![CDATA[
 			<svg width="24" height="46">
 				<polyline style="fill:#808080" points="6,0 18,0 24,17  24,29 0,29 0,17"/>
@@ -254,7 +254,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			</svg>
 		]]></data></image>
 
-		<image state="1">
+		<image state="0">
 		<data><![CDATA[
 			<svg width="24" height="46">
 				<polyline style="fill:#808080" points="6,46 18,46 24,29  24,17 0,17 0,29"/>
@@ -958,12 +958,13 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 
 		<repeat count="12">
 			<param name="i" start="0" increment="1"/>
+			<param name="n" start="11" increment="-1"/>
 			<param name="x_label" start="157" increment="85"/>
 			<param name="x_switch" start="160" increment="85"/>
 			<param name="mask" start="0x800" rshift="1" />
 
 			<element ref="str_num_~i~"><bounds x="~x_label~" y="780" width="18" height="16"/></element>
-			<element name="rc~i~" ref="switch" inputtag="rc" inputmask="~mask~">
+			<element name="rc~n~" ref="switch" inputtag="rc" inputmask="~mask~">
 				<bounds x="~x_switch~" y="830" width="20" height="30"/>
 			</element>
 		</repeat>
