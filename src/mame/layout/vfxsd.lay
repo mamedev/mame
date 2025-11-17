@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<param name="f_bold" value="Nonexistent Sans|Bold,Liberation Sans|Bold,Helvetica|Bold,Arial|Bold,default" />
-	<param name="f_italic" value="Nonexistent Sans|Italic,Liberation Sans|Italic,Helvetica|Italic,Arial|Italic,default" />
-	<param name="f_bold_italic" value="Nonexistent Sans|BoldItalic,Liberation Sans|BoldItalic,Helvetica|BoldItalic,Arial|BoldItalic,default" />
-	<param name="f_regular" value="Nonexistent Sans|Regular,Liberation Sans|Regular,Helvetica|Regular,Arial|Regular,default" />
+	<param name="f_bold" value="Nonexistent Sans|Bold,sans-serif|Bold,default" />
+	<param name="f_italic" value="Nonexistent Sans|Italic,sans-serif|Italic,default" />
+	<param name="f_bold_italic" value="Nonexistent Sans|BoldItalic,sans-serif|BoldItalic,default" />
+	<param name="f_regular" value="Nonexistent Sans|Regular,sans-serif|Regular,default" />
 
 	<!-- Decoration definitions -->
 	<element name="drawing_triangle_down">
