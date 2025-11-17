@@ -10380,30 +10380,33 @@ The disks have had their OEM IDs modified by Windows
 		</part>
 	</software>
 
-	<software name="alfonstra" supported="no">
+	<software name="alfonstra">
 	    <description>Alfons på äventyr i trafiken (Swedish)</description>
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
+		<notes><![CDATA[
+Disks have been converted from IMG due to unusual structure.
+]]></notes>
 		<info name="copy_protection" value="Serial number required: 8H-046-015934" />
 		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1511424">
-				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 1).img" size="1511424" crc="6c282ca4" sha1="6e074d5953abd623c0fd4a0f1d1b7b3f12a0750e"/>
+			<dataarea name="flop" size = "1472273">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 1).imd" size="1472273" crc="db44d2e0" sha1="3b74e2367aeea6d3497d942790104baabc873226"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1511424">
-				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 2).img" size="1511424" crc="257185bf" sha1="870b9d0837051e0cfbdd7e1a049c69600b6c2bdb"/>
+			<dataarea name="flop" size = "1469207">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 2).imd" size="1469207" crc="f5c87604" sha1="980a6a2bfdfd51eb06a93ebfeff04322c3acbe83"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1511424">
-				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 3).img" size="1511424" crc="30eb5699" sha1="9a3289e89151c450922950002e82868400aaeadb"/>
+			<dataarea name="flop" size = "1470229">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 3).imd" size="1470229" crc="1f9d305e" sha1="75a65b7d5807fc0fc5af0ab391a702638b05b6ec"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size = "1511424">
-				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 4).img" size="1511424" crc="1d8c7e93" sha1="351f45eec5bc9ac2c490e4a8ed3b6eca493cbec3"/>
+			<dataarea name="flop" size = "843743">
+				<rom name="Alfons paa aeventyr i trafiken (Swedish) (Disk 4).imd" size="843743" crc="1bd0dd00" sha1="fe2fdb481813aa16600b76ec86f5af089e49c197"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17247,25 +17250,28 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		</part>
 	</software>
 
-	<software name="alfonshk" supported="no">
+	<software name="alfonshk">
 	    <description>Kom till Alfons hemliga kalas (Swedish)</description>
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
+		<notes><![CDATA[
+Disks have been converted from IMG due to unusual structure.
+]]></notes>
 		<info name="copy_protection" value="Serial number required: 8G-046-016181" />
 		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1511424">
-				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 1).img" size="1511424" crc="7d5e6b2d" sha1="d1ec271304dc2113660a56adc2cf5d687dd72ddd"/>
+			<dataarea name="flop" size = "1472273">
+				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 1).imd" size="1472273" crc="b166385b" sha1="e1e23e30f8e4e2e6ac04c4611c14070fffe93a56"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1511424">
-				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 2).img" size="1511424" crc="0932c0cd" sha1="0f34b3caacce55dab03a7acb24859993463bbbe6"/>
+			<dataarea name="flop" size = "1471251">
+				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 2).imd" size="1471251" crc="0441394e" sha1="27b73a88bfcf172ecbe8b23083d95a18946cccfb"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1511424">
-				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 3).img" size="1511424" crc="dc26a1d5" sha1="1a8db7c67f2114682f1dbf00f350f5373ec14e38"/>
+			<dataarea name="flop" size = "1471251">
+				<rom name="Kom till Alfons hemliga kalas (Swedish) (Disk 3).imd" size="1471251" crc="0e7ad0ed" sha1="f72b12a1e6440dd211fafca2b07f773d65bc21a4"/>
 			</dataarea>
 		</part>
 	</software>
