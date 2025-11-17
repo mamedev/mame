@@ -13,6 +13,8 @@
 
 #include "patinho.lh"
 
+namespace {
+
 class patinho_feio_state : public driver_device {
 public:
 	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -357,6 +359,8 @@ ROM_START( patinho )
 	ROM_REGION( 0x02a, "micro_pre_loader", 0 )
 	ROM_LOAD( "micro-pre-loader.bin", 0x000, 0x02a, CRC(1921feab) SHA1(bb063102e44e9ab963f95b45710141dc2c5046b0) )
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT         CLASS               INIT               COMPANY                                           FULLNAME         FLAGS
 COMP( 1972, patinho, 0,      0,      patinho_feio, patinho_feio, patinho_feio_state, init_patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
