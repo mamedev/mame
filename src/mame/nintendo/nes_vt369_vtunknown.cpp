@@ -1061,6 +1061,11 @@ ROM_START( vibes240 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( retro620 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "620in1_retrofc.bin", 0x00000, 0x1000000, CRC(2698f4e5) SHA1(8b9551c22071c48a7ebc1635ca37ebe7a3b33c4b) ) // BGA on subboard
+ROM_END
+
 ROM_START( t3_630 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128n10tfi01.bin", 0x00000, 0x1000000, CRC(7458a598) SHA1(cd35dda56c4531095c7026c88e02e35b1aae730a) )
@@ -1404,6 +1409,8 @@ CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, em
 CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "630 Games in 1 Handheld (T3)", MACHINE_NOT_WORKING )
 
 CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 202?, retro620, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
