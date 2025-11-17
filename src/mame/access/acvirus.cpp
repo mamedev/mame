@@ -80,6 +80,7 @@
 #include "virusa.lh"
 #include "virusb.lh"
 #include "virusc.lh"
+#include "virusrckxl.lh"
 
 
 namespace {
@@ -109,6 +110,7 @@ public:
 	void virusa(machine_config &config) ATTR_COLD;
 	void virusb(machine_config &config) ATTR_COLD;
 	void virusc(machine_config &config) ATTR_COLD;
+	void virusrckxl(machine_config &config) ATTR_COLD;
 
 	void init_virus() ATTR_COLD;
 
@@ -205,6 +207,7 @@ u8 acvirus_state::p4_r()
 void acvirus_state::p4_w(u8 data)
 {
 	m_leds->write_mx(data);
+	// logerror("LED write_mx data: %02X\n", data);
 
 	if (BIT(m_scan, 3))
 		m_led_pattern = data;
@@ -219,6 +222,7 @@ void acvirus_state::p5_w(u8 data)
 
 	m_scan = data & 15;
 	m_leds->matrix(1 << m_scan, m_led_pattern);
+	// logerror("LED matrix: %d pattern: %02X\n", m_scan, m_led_pattern);
 }
 
 void acvirus_state::prog_map(address_map &map)
@@ -306,7 +310,7 @@ void acvirus_state::virus_common(machine_config &config)
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
-	PWM_DISPLAY(config, m_leds).set_size(8, 8);
+	PWM_DISPLAY(config, m_leds).set_size(16, 8);
 
 	SPEAKER(config, "speaker", 2).front();
 }
@@ -359,6 +363,11 @@ void acvirus_state::virusc(machine_config &config)
 	config.set_default_layout(layout_virusc);
 }
 
+void acvirus_state::virusrckxl(machine_config &config)
+{
+	virusc(config);
+	config.set_default_layout(layout_virusrckxl);
+}
 
 INPUT_PORTS_START( virusa_knobs )
 	PORT_START("knob_0")
@@ -822,5 +831,5 @@ SYST( 1997, virusa,     0, 0, virusa, virusa, acvirus_state, empty_init, "Access
 SYST( 1999, virusb,     0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 2002, virusc,     0, 0, virusc, virusc, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 2001, virusrck,   0, 0, virusb, virusrck, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2002, virusrckxl, 0, 0, virusc, virusrck, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2002, virusrckxl, 0, 0, virusrckxl, virusrck, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 2004, viruscl,    0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

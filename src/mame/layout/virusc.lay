@@ -674,8 +674,6 @@ license:CC0-1.0
 		<element ref="on_off_text"><bounds x="1522" y="42" width="43" height="9"/></element>
 
 
-<!-- FIXME: All input tags and input masks here are incorrect. They're just place holders for now -->
-
 		<group ref="knob_0_6_12"><!-- MASTER VOLUME --><bounds x="99" y="105" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_2"/>
 		<group ref="knob"><bounds x="99" y="105" width="77" height="77"/></group>
@@ -1004,13 +1002,11 @@ license:CC0-1.0
 		<element ref="category_text"><bounds x="690" y="558" width="38" height="8"/></element>
 
 
-		<!-- FIXME: knob type -->
 		<group ref="knob_minus_plus"><!-- SOFT KNOB 1 --><bounds x="751" y="467" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_9"/>
 		<group ref="knob"><bounds x="751" y="467" width="77" height="77"/></group>
 		<element ref="soft_knob_1_text"><bounds x="750" y="547" width="80" height="12"/></element>
 
-		<!-- FIXME: knob type -->
 		<group ref="knob_minus_plus"><!-- SOFT KNOB 2 --><bounds x="859" y="467" width="77" height="77"/></group>
 		<param name="knob_input" value="knob_10"/>
 		<group ref="knob"><bounds x="859" y="467" width="77" height="77"/></group>
@@ -1132,7 +1128,6 @@ license:CC0-1.0
 		<element ref="filt_2_text"><bounds x="1459" y="300" width="31" height="12"/></element>
 
 		<element ref="mode_text"><bounds x="1400" y="300" width="30" height="12"/></element>
-		<!-- TODO: lines -->
 
 		<element ref="led" name="6.0"><!-- 6B0 --><bounds x="1513" y="230" width="11" height="11"/></element>
 		<element ref="led" name="6.1"><!-- 6B1 --><bounds x="1558" y="230" width="11" height="11"/></element>
