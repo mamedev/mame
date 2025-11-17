@@ -738,6 +738,7 @@ private:
 	uint32_t screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_feverch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_flaming7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_megaline(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -774,6 +775,7 @@ private:
 	void cbaai_map(address_map &map) ATTR_COLD;
 	void feverch_map(address_map &map) ATTR_COLD;
 	void feverch_portmap(address_map &map) ATTR_COLD;
+	void flam7_w4_map(address_map &map) ATTR_COLD;
 	void flaming7_map(address_map &map) ATTR_COLD;
 	void lucky8_map(address_map &map) ATTR_COLD;
 	void lucky8p_map(address_map &map) ATTR_COLD;
@@ -1260,10 +1262,12 @@ void goldstar_state::video_start()
 	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel_tilemap[0]->set_scroll_cols(64);
 	m_reel_tilemap[1]->set_scroll_cols(64);
 	m_reel_tilemap[2]->set_scroll_cols(64);
+	m_reel_tilemap[3]->set_scroll_cols(64);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -1797,6 +1801,40 @@ uint32_t wingco_state::screen_update_lucky8(screen_device &screen, bitmap_rgb32 
 			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
 			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 		}
+	}
+
+	if (m_enable_reg & 0x02)
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t wingco_state::screen_update_flaming7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+	if (!(m_enable_reg & 0x01))
+		return 0;
+
+	if (m_enable_reg & 0x08)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+				// all three reels tilemaps
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+				m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
+		}
+
+		const rectangle visible1(0*8, (14+49)*8-1,  4*8,  (4+7)*8-1);
+		const rectangle visible2(0*8, (14+49)*8-1, 12*8, (12+7)*8-1);
+		const rectangle visible3(0*8, (14+49)*8-1, 20*8, (20+7)*8-1);
+		const rectangle visible4(0*8,       9*8-1,  6*8,     10*8-1);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[3]->draw(screen, bitmap, visible4, 0, 0);
 	}
 
 	if (m_enable_reg & 0x02)
@@ -4511,18 +4549,18 @@ void wingco_state::flaming7_map(address_map &map)
 	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
 
 	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
-//  map(0x9a00, 0x9fff).ram();
+	map(0x9a00, 0x9fff).ram().w(FUNC(wingco_state::reel_ram_w<3>)).share(m_reel_ram[3]);
 	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
-//  map(0xa200, 0xa7ff).ram();
+	map(0xa200, 0xa7ff).ram();
 	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
-//  map(0xaa00, 0xafff).ram();
+	map(0xaa00, 0xafff).ram();
 
-//  map(0xb000, 0xb03f).ram();
-	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
-	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
-//  map(0xb0c0, 0xb0ff).ram();
-	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
-	map(0xb180, 0xb7ff).ram();
+	map(0xb000, 0xb03f).ram();
+	map(0xb041, 0xb08f).ram().share(m_reel_scroll[0]);  // offsetted 1 byte to cover the first tile of the 12-tiles symbols
+	map(0xb081, 0xb0bf).ram().share(m_reel_scroll[1]);  // offsetted 1 byte to cover the first tile of the 12-tiles symbols
+	map(0xb0c1, 0xb0ff).ram().share(m_reel_scroll[3]);  // offsetted 1 byte to mantain compatibility
+	map(0xb101, 0xb13f).ram().share(m_reel_scroll[2]);  // offsetted 1 byte to cover the first tile of the 12-tiles symbols 
+	map(0xb140, 0xb7ff).ram();
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports (92)
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports (9B)
@@ -4545,6 +4583,38 @@ void wingco_state::flaming7_map(address_map &map)
 
 */
 
+void wingco_state::flam7_w4_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x9a00, 0x9fff).ram().w(FUNC(wingco_state::reel_ram_w<3>)).share(m_reel_ram[3]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa200, 0xa7ff).ram();
+	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xaa00, 0xafff).ram();
+
+	map(0xb000, 0xb03f).ram();
+	map(0xb040, 0xb08f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb0c0, 0xb0ff).ram().share(m_reel_scroll[3]);
+	map(0xb100, 0xb13f).ram().share(m_reel_scroll[2]); 
+	map(0xb140, 0xb7ff).ram();
+
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports (92)
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports (9B)
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input/Output Ports (90)
+	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  // no sound... only use both ports for DSWs
+	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));  // sound
+//  map(0xc000, 0xd3ff).ram();
+	map(0xf800, 0xffff).ram();
+}
 
 /* need to check item by item...
 
@@ -16033,7 +16103,7 @@ void wingco_state::flam7_w4(machine_config &config)
 	lucky8(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flam7_w4_map);
 
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
@@ -16046,6 +16116,8 @@ void wingco_state::flaming7(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wingco_state::screen_update_flaming7));
 
 	m_gfxdecode->set_info(gfx_flaming7);
 	PALETTE(config.replace(), m_palette, FUNC(wingco_state::cm_palette), 256);
@@ -16062,6 +16134,8 @@ void wingco_state::flam7_tw(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::flaming7_map);
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wingco_state::screen_update_flaming7));
 
 	m_gfxdecode->set_info(gfx_flam7_tw);
 	PALETTE(config.replace(), m_palette, FUNC(wingco_state::cm_palette), 256);
@@ -28357,6 +28431,46 @@ ROM_START( fl7_tw )  // Serial 00000050E9B7.
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
 
+
+ROM_START( fl7_twa )  // Serial 00000050E9B7.
+	ROM_REGION( 0x08000, "maincpu", 0 )
+	ROM_LOAD( "6v5.50_tw.u20",  0x0000, 0x08000, CRC(03fa721d) SHA1(683ad47b07896c8d8eb6b6fe9d02e4b2b16833d8) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "m27c1001_tw.u1",  0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",  0x0000, 0x8000, CRC(23ae8d1a) SHA1(d9b7c442b6c7c58380a84b63cab7748f1c902fba) )
+
+	// Bipolar PROM dump borrowed from main sets
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
+	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+ROM_END
+
+ROM_START( fl7_twb )  // Serial 00000050E9B7.
+	ROM_REGION( 0x08000, "maincpu", 0 )
+	ROM_LOAD( "7v5_500_tw.u20",  0x0000, 0x08000, CRC(c2b605f6) SHA1(3e4b2f5327843eaff2a32f78b93ce08277abea8a) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "m27c1001_tw.u1",  0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "27c256.u3",  0x0000, 0x8000, CRC(23ae8d1a) SHA1(d9b7c442b6c7c58380a84b63cab7748f1c902fba) )
+
+	// Bipolar PROM dump borrowed from main sets
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
+	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+ROM_END
+
+
 // Special 7's
 ROM_START( special7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -31510,13 +31624,15 @@ GAME(  2002, mbs2euro,   0,        mbstar,   mbstar,   wingco_state,   init_mbs2
 
 
 // --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   init_fl7_3121,  ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",          0 )
-GAME(  199?, fl7_50,     0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_500,    fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_2000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )
-GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs bg layer and window, and scroll ram fix
-GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, unknown version)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS )  // needs bg layer and window
-GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // needs prg decryption, bg layer and window
+GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   init_fl7_3121,  ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",  0 )
+GAME(  199?, fl7_50,     0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              0 )
+GAME(  199?, fl7_500,    fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             0 )
+GAME(  199?, fl7_2000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            0 )
+GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   0 )
+GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v7.3) Set 1",               0 )
+GAME(  199?, fl7_twa,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v6.5) Set 2",               0 )
+GAME(  199?, fl7_twb,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v7.5) Set 3",               MACHINE_NOT_WORKING ) // encrypted
+GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted)",                MACHINE_UNEMULATED_PROTECTION )
 
 
 // --- Wing W-6 hardware ---
