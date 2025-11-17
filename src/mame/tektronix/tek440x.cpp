@@ -93,6 +93,26 @@ constexpr int MAP_CPU_WR = 7;
 constexpr offs_t MAXRAM = 0x200000;	// +1MB
 //constexpr offs_t MAXRAM = 0x400000;	// +3MB
 
+
+// ncr5385 raises IRQ too fast for Tek4404 software
+DECLARE_DEVICE_TYPE(NCR5385_TEK, ncr5385_tek_device)
+
+class ncr5385_tek_device : public ncr5385_device
+{
+
+
+public:
+	ncr5385_tek_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	ncr5385_device(mconfig, tag, owner, clock)
+	{
+
+		printf("Using NCR5385 with required timing changes for tek4404\n");
+	}
+};
+
+DEFINE_DEVICE_TYPE(NCR5385_TEK, ncr5385_tek_device, "ncr5385_tek", "NCR5385 with Tek4404 required timing")
+
+
 // have m_readXX / m_writeXX use MMU translation
 // OR
 // do MMU translation inside memory_r / memory_w
@@ -796,100 +816,6 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	if (m_boot)
 		return m_prom[offset & 0x3fff];
 
-#if 0
-if (OFF16_TO_OFF8(offset) == 0x7538)
-{
-	// AO contains function to be executed
-	uint32_t a0 = m_maincpu->get_A0();
-
-	if (a0 == 0x13820)
-	{
-		//LOG("tek4404: KERNEL:  DisplayState\n");
-	}
-	else
-	if (a0 == 0xba28)
-		LOG("tek4404: KERNEL:  TRAP 15\n");
-	else
-	if (a0 == 0x14c82)
-		LOG("tek4404: KERNEL:  CLOCK_alrm_resetting\n");
-	else
-	if (a0 == 0x10728)
-		LOG("tek4404: KERNEL:  screenOutput_buffer\n");
-	else
-	if (a0 == 0x1283e)
-		LOG("tek4404: KERNEL:  scsi_read_ncr5385_status\n");
-	else
-	if (a0 == 0x10ad0)
-		LOG("tek4404: KERNEL:  MMU_page_fault_stuff_possibly\n");
-	else
-	if (a0 == 0x106c0)
-		LOG("tek4404: KERNEL:  DUART keyboard reading\n");
-	else
-		LOG("tek4404: KERNEL:  UNKNOWN function 0x%x **************** \n", a0);
-
-}
-#endif
-
-#if 0
-// TRAP 15 argument
-if (OFF16_TO_OFF8(offset) == 0xba3c)
-{
-	uint32_t a4 = m_maincpu->get_A4();
-
-	a4 = BIT(a4, 0, 11) | BIT(m_map[a4 >> 11], 0, 11) << 11;
-
-	LOG("tek4404: KERNEL:  TRAP 15  0x%x\n", m_vm->read16(OFF8_TO_OFF16(a4), mem_mask));
-}
-
-// debugging ncr5385 delays
-if (OFF16_TO_OFF8(offset) == 0x12620)
-	LOG("tek4404:  scsi_writing_block START\n");
-if (OFF16_TO_OFF8(offset) == 0x126c8)
-	LOG("tek4404:  scsi_writing_block END\n");
-
-if (OFF16_TO_OFF8(offset) == 0x12454)
-	LOG("tek4404: scsi_write block START\n");
-if (OFF16_TO_OFF8(offset) == 0x125ea)
-	LOG("tek4404: %10s: scsi block END\n", machine().time().as_string(8));
-#endif
-
-
-#if 0
-if (OFF16_TO_OFF8(offset) == 0x104b4)
-	LOG("tek4404: %10s: IRQ1_handler ********\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x6009a)
-	LOG("tek4404: %10s: IRQ2_handler ********\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x740a72)
-	LOG("tek4404: %10s: IRQ4_handler ********\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x10642)
-	LOG("tek4404: %10s: IRQ5_handler ********\n", machine().time().as_string(8));
-//if (OFF16_TO_OFF8(offset) == 0x1330c)
-//	LOG("tek4404: %10s: IRQ6_handler ********\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x743956)
-	LOG("tek4404: %10s: IRQ7_handler ********\n", machine().time().as_string(8));
-
-if (OFF16_TO_OFF8(offset) == 0x1062e)
-	LOG("tek4404: %10s: scsi_IRQ3_handler ********\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x1283e)
-	LOG("tek4404: %10s: scsi_read_ncr5385_status\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x127de)
-	LOG("tek4404: %10s: set_flags_handling_clear_pending\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x1279a)
-	LOG("tek4404: %10s: scsi_wait_for_data_full_clear\n", machine().time().as_string(8));
-if (OFF16_TO_OFF8(offset) == 0x127f4)
-	LOG("tek4404: %10s: scsi_update_pending_flags\n", machine().time().as_string(8));
-
-if (OFF16_TO_OFF8(offset) == 0x12770)
-	LOG("tek4404: SCSI_wait_full\n");
-if (OFF16_TO_OFF8(offset) == 0x12746)
-	LOG("tek4404: SCSI_wait_empty\n");
-if (OFF16_TO_OFF8(offset) == 0x1279a)
-	LOG("tek4404: SCSI_wait_empty_with_interrupts\n");
-if (OFF16_TO_OFF8(offset) == 0x11f1e)
-	LOG("tek4404: scsi_wait_then_write\n");
-#endif
-
-
 	if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
 	{
 			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
@@ -1472,11 +1398,11 @@ void tek440x_state::timer_irq(int state)
 // to handle offset 0x1xx reads resetting TPInt...
 u16 tek440x_state::timer_r(offs_t offset)
 {
-	//LOG("timer_r %08x pc(%08x)\n", offset, m_maincpu->pc());
+	LOGMASKED(LOG_GENERAL,"%10s: timer_r %08x pc(%08x)\n", machine().time().as_string(8), offset, m_maincpu->pc());
 
 	if (m_u244latch)
 	{
-		//LOG("timer_r: M68K_IRQ_1 clear\n");
+		LOGMASKED(LOG_GENERAL,"timer_r: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_u244latch = 0;
 	}
@@ -1492,7 +1418,7 @@ void tek440x_state::timer_w(offs_t offset, u16 data)
 
 	if (m_u244latch)
 	{
-		LOG("timer_w: M68K_IRQ_1 clear\n");
+		LOGMASKED(LOG_GENERAL,"timer_w: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_u244latch = 0;
 	}
@@ -1719,7 +1645,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set([this](int state)
     {
-		printf("vblank %d\n", state);
+		LOGMASKED(LOG_GENERAL,"%10s: vblank(%d) vint(%d)\n", machine().time().as_string(8), state,m_vint_enable);
 		if (state && m_vint_enable)
 		{
 			m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
@@ -1792,7 +1718,6 @@ m_printer->in_pb_callback().set_constant(0xb0);		// HACK:  vblank always checks 
 		{
 			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
 
-			LOGMASKED(LOG_SCSI, "ncr5385_device.set_inputline(M68K_IRQ_3)\n");
 			adapter.irq().set_inputline(m_maincpu, M68K_IRQ_3);
 		});
 
