@@ -853,7 +853,8 @@ protected:
 private:
 	required_shared_ptr_array<uint8_t, 3> m_reel_attrram;
 
-	void enable_w(uint8_t data);
+	void enablebg_w(uint8_t data);
+	void enablerl_w(uint8_t data);
 	void coincount_w(uint8_t data);
 
 	template <uint8_t Which> void reel_attrram_w(offs_t offset, uint8_t data);
@@ -2096,30 +2097,40 @@ uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_rgb3
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	m_bg_tilemap->set_scrolly(0, -16);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	// enable reels (render all the five layers)
-	if (!(m_enable_reg & 0x01))
+	if (m_enable_reg & 0x04)
 	{
-		for (int i = 0; i < 64; i++)
+		if (m_reel_ena & 0x01)
 		{
-			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
-			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
-			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			// title ( bg + fg )
+			m_bg_tilemap->set_scrolly(0, -16);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 		}
+		else
+		{
+			// playfield ( reels + fg )
+			for (int i = 0; i < 64; i++)
+			{
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			}
 
-		// are these hardcoded, or registers?
-		rectangle const visible1(0*8, (15+48)*8-1,  4*8,  (4+7)*8-1);
-		rectangle const visible2(0*8, (15+48)*8-1, 12*8, (12+7)*8-1);
-		rectangle const visible3(0*8, (15+48)*8-1, 20*8, (20+7)*8-1);
+			// are these hardcoded, or registers?
+			rectangle const visible1(11*8, (11+52)*8-1,  4*8,  (4+7)*8-1);
+			rectangle const visible2(11*8, (11+52)*8-1, 12*8, (12+7)*8-1);
+			rectangle const visible3(11*8, (11+52)*8-1, 20*8, (20+7)*8-1);
 
-		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
-		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
-		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		}
 	}
 
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	// common ( fg )
+	if (m_enable_reg & 0x01)
+	{
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	}
 
 	return 0;
 }
@@ -2183,9 +2194,9 @@ uint32_t unkch_state::screen_update_unkchx(screen_device &screen, bitmap_rgb32 &
 
 	if (m_enable_reg & 0x08)
 	{
-		if(m_vidreg==0)  // nuevo registro
+		if(m_vidreg == 0)
 		{
-			for (int i= 0; i < 32; i++)
+			for (int i = 0; i < 32; i++)
 			{
 				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i*2]);
 				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i*2]);
@@ -2707,9 +2718,16 @@ void sanghopm_state::coincount_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(4, data & 0x01);  // counter5 payout
 }
 
-void sanghopm_state::enable_w(uint8_t data)
+void sanghopm_state::enablebg_w(uint8_t data)
+{
+	m_reel_ena = data;
+//	logerror("enablebg: %02x\n", data);
+}
+
+void sanghopm_state::enablerl_w(uint8_t data)
 {
 	m_enable_reg = data;
+//	logerror("enablerl: %02x\n", data);
 }
 
 void cmaster_state::coincount_w(uint8_t data)
@@ -3644,13 +3662,14 @@ void sanghopm_state::star100_readport(address_map &map)
 	map(0x20, 0x20).portr("DSW4-0");  // the first 4 bits map to DSW4 1 to 4.
 	map(0x21, 0x21).portr("DSW4-1");  // the first 4 bits map to DSW4 5 to 8.
 
+	map(0x23, 0x23).w(FUNC(sanghopm_state::enablerl_w));   // enable/disable reels-fg register.
 	map(0x24, 0x24).w(FUNC(sanghopm_state::coincount_w));  // coin counters.
 
 	map(0x25, 0x25).portr("DSW2");
 	map(0x26, 0x26).portr("DSW3");
 
-	map(0xe0, 0xe0).nopw();           // Writing 0's and 1's constantly.  Watchdog feeder?
-	map(0xe1, 0xe1).w(FUNC(sanghopm_state::enable_w));     // enable/disable reels register.
+	map(0xe0, 0xe0).nopw();                                // bit0 = watchdog feeder
+	map(0xe1, 0xe1).w(FUNC(sanghopm_state::enablebg_w));   // enable/disable bg register.
 
 }
 
@@ -31436,7 +31455,7 @@ GAME(  199?, goldfrui,   goldstar, goldfrui, goldstar, goldstar_state, empty_ini
 GAME(  2001, super9,     goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271B)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
 GAME(  2001, super9a,    goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271C)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
 GAME(  2001, wcherry,    0,        wcherry,  wcherry,  goldstar_state, init_wcherry,   ROT0, "Videostar",         "Win Cherry (ver 0.16 - 19990219)",            0 )
-GAME(  199?, star100,    0,        star100,  star100,  sanghopm_state, empty_init,     ROT0, "Sang Ho",           "Ming Xing 100 (Star 100)",                    MACHINE_IMPERFECT_COLORS )
+
 
 // are these really Dyna, or bootlegs?
 GAMEL( 199?, ncb3,       0,        ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
@@ -31640,7 +31659,7 @@ GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flam
 GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v7.3) Set 1",               0 )
 GAME(  199?, fl7_twa,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v6.5) Set 2",               0 )
 GAME(  199?, fl7_twb,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v7.5) Set 3",               MACHINE_NOT_WORKING ) // encrypted
-GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted)",                MACHINE_UNEMULATED_PROTECTION )
+GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted)",                0 )
 
 
 // --- Wing W-6 hardware ---
@@ -31741,36 +31760,41 @@ GAME( 2006, halltsk,     0,        nfm,      nfm,       cmaster_state,  init_tsk
 
 
 // Super Cherry Master sets...
-GAMEL(1994, scmaster,    0,         unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.1)",                                   0,    layout_unkch )
-GAMEL(1994, scmastera,   scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
-GAMEL(1994, animalhsb,   scmaster,  rolling,  unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 3)",                                         0,    layout_unkch )
-GAMEL(1994, animalhsc,   scmaster,  rolling,  unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 4)",                                         0,    layout_unkch )
+GAMEL( 1994, scmaster,    0,         unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.1)",                                   0,    layout_unkch )
+GAMEL( 1994, scmastera,   scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Super Cherry Master (v1.0)",                                   0,    layout_unkch )
+GAMEL( 1994, animalhsb,   scmaster,  rolling,  unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 3)",                                         0,    layout_unkch )
+GAMEL( 1994, animalhsc,   scmaster,  rolling,  unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Animal House (set 4)",                                         0,    layout_unkch )
 
 // these have 'cherry 1994' in the program roms, but also "Super Cherry / New Cherry Gold '99".
 // Probably hacks of a 1994 version of Super Cherry Master.
-GAMEL(1999, unkch1,      scmaster,  unkch,    unkch,     unkch_state,    init_unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
-GAMEL(1999, unkch2,      scmaster,  unkch,    unkch,     unkch_state,    init_unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           0,    layout_unkch )
-GAMEL(1999, unkch3,      scmaster,  unkch,    unkch3,    unkch_state,    init_unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
-GAMEL(1999, unkch4,      scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
+GAMEL( 1999, unkch1,      scmaster,  unkch,    unkch,     unkch_state,    init_unkch1,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 1)", 0,    layout_unkch )
+GAMEL( 1999, unkch2,      scmaster,  unkch,    unkch,     unkch_state,    init_unkch1,    ROT0, "bootleg", "Super Cherry Gold (bootleg of Super Cherry Master)",           0,    layout_unkch )
+GAMEL( 1999, unkch3,      scmaster,  unkch,    unkch3,    unkch_state,    init_unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
+GAMEL( 1999, unkch4,      scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
 
-GAMEL(1996, cherry96,    0,         unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (1997/01/04, bootleg)",                         0,    layout_unkchx )
-GAMEL(1996, cherry96a,   cherry96,  unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (1996/06/01, bootleg)",                         0,    layout_unkchx )
+GAMEL( 1996, cherry96,    0,         unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (1997/01/04, bootleg)",                         0,    layout_unkchx )
+GAMEL( 1996, cherry96a,   cherry96,  unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (1996/06/01, bootleg)",                         0,    layout_unkchx )
 
-GAME( 1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
+GAME(  1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
 
-GAMEL(1997, cmast97bl18, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.8, bootleg)",                            0,    layout_unkchx )
-GAMEL(1997, cmast97bl16, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.6, bootleg)",                            0,    layout_unkchx )
+GAMEL( 1997, cmast97bl18, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.8, bootleg)",                            0,    layout_unkchx )
+GAMEL( 1997, cmast97bl16, cmast97,   unkchx,   unkchx,    unkch_state,    empty_init,     ROT0, "bootleg", "Cherry Master '97 (v1.6, bootleg)",                            0,    layout_unkchx )
 
-GAMEL(1998, cherry98,    0,         unkchx,   unkch5,    unkch_state,    empty_init,     ROT0, "bootleg", "New Cherry '98 (v4.3 1998/09/07, Gamemax bootleg, set 1)",     0,    layout_unkchx )
-GAMEL(1998, cherry98a,   cherry98,  unkchx,   unkch5,    unkch_state,    empty_init,     ROT0, "bootleg", "New Cherry '98 (v4.3 1998/09/07, Gamemax bootleg, set 2)",     0,    layout_unkchx )
+GAMEL( 1998, cherry98,    0,         unkchx,   unkch5,    unkch_state,    empty_init,     ROT0, "bootleg", "New Cherry '98 (v4.3 1998/09/07, Gamemax bootleg, set 1)",     0,    layout_unkchx )
+GAMEL( 1998, cherry98a,   cherry98,  unkchx,   unkch5,    unkch_state,    empty_init,     ROT0, "bootleg", "New Cherry '98 (v4.3 1998/09/07, Gamemax bootleg, set 2)",     0,    layout_unkchx )
 
+
+// Sang-Ho custom HW (RAMDAC)
+GAME(  199?, star100,     0,         star100,  star100,   sanghopm_state, empty_init,     ROT0, "Sang Ho",             "Ming Xing 100 (Star 100)",                         0 )
+GAMEL( 1997, crazybon,    0,         crazybon, crazybon,  cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, Sang-Ho HW, set 1)",     0,    layout_crazybon ) // Windows ME desktop...
+GAMEL( 1997, crazybona,   crazybon,  crazybon, crazybon,  cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, Sang-Ho HW, set 2)",     0,    layout_crazybon ) // Windows ME desktop...
 
 
 // ******************* Stealth sets *******************
 // These have hidden games inside that can be switched
 // to avoid inspections, police or whatever purposes
 
-//    YEAR  NAME         PARENT    MACHINE    INPUT     STATE           INIT            ROT   COMPANY                    FULLNAME                                                                    FLAGS                                           LAYOUT
+//     YEAR  NAME        PARENT    MACHINE    INPUT     STATE           INIT            ROT   COMPANY                    FULLNAME                                                                    FLAGS                                           LAYOUT
 GAMEL( 198?, cmpacman,   0,        cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, unencrypted, set 1)", 0,                                              layout_cmpacman ) // need to press K to switch between games...
 GAMEL( 198?, cmpacmana,  cmpacman, cm,        cmpacman, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, unencrypted, set 2)", 0,                                              layout_cmpacman ) // need to press K to switch between games...
 GAMEL( 198?, cmpacmanb,  cmpacman, cm,        cmpacman, cmaster_state,  init_cmpacmanb, ROT0, "<unknown>",               "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, encrypted)",          0,                                              layout_cmpacman ) // need to press K to switch between games...
@@ -31783,8 +31807,6 @@ GAMEL( 198?, cmtetrise,  cmtetris, cm,        cmtetris, cmaster_state,  empty_in
 GAMEL( 198?, cmtetrisf,  cmtetris, cm,        cmtetris, cmaster_state,  empty_init,     ROT0, "bootleg",                 "Tetris + Cherry Master (unencrypted bootleg, set 2)",                      0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
 GAMEL( 198?, cmtetriskr, cmtetris, cmtetriskr,cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Global Money Fever (Corsica, v8.01, Korean bootleg)",             MACHINE_NOT_WORKING,                            layout_cmpacman ) // starts with coins already inserted in Tetris mode, need to press K/L to switch between games...
 GAMEL( 1992, cmasteroid, cmtetris, cm,        cmtetris, cmaster_state,  empty_init,     ROT0, "bootleg (Aidonis Games)", "Asteroids 1981 (Tetris + Cherry Master with space graphics)",              0,                                              layout_cmpacman ) // needs layout
-GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, Shanho HW, set 1)",                              0,                                              layout_crazybon ) // Windows ME desktop...
-GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, Shanho HW, set 2)",                              0,                                              layout_crazybon ) // Windows ME desktop...
 GAMEL( 1988, lucky8tet,  lucky8,   lucky8tet, lucky8tet, wingco_state,  init_l8tet,     ROT0, "bootleg",                 "Tetris + New Lucky 8 Lines (W-4 + W4BET-VID sub board with MCU)",          MACHINE_UNEMULATED_PROTECTION,                  layout_lucky8p1 )
 
 
