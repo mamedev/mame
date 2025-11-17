@@ -149,7 +149,7 @@ license:CC0-1.0
 	<element name="up_down_arrows">
 		<image><data><![CDATA[
 			<svg width="8" height="120">
-				<path fill="#ffffff" stroke="none" d="
+				<path fill="#cccccc" stroke="none" d="
 					m 4,0 4,6 -8,0 z
 					m 0,120 4,-6 -8,-0 z"/>
 			</svg>
@@ -159,7 +159,7 @@ license:CC0-1.0
 	<element name="lines_for_knob_lables">
 		<image><data><![CDATA[
 			<svg width="46" height="117">
-				<path fill="none" stroke="#888888" d="
+				<path fill="none" stroke="#666666" d="
 					m 6.2,2.4 40,-2
 					m 0,10 -37,10
 					m -6,16 43,-16
@@ -207,18 +207,18 @@ license:CC0-1.0
 		</repeat>
 	</group>
 
+	<element name="access_logo_text"><text string="access"><color red="0" green="0" blue="0"/></text></element>
 	<element name="virus_slogan_text"><text string="ADVANCED SIMULATED ANALOG SYNTHESIZER"><color red="0" green="0" blue="0"/></text></element>
-
 	<element name="virus_logo_text">
 		<text string="VIRUS">
 			<bounds x="0" y="0" width="874" height="230"/>
 			<color red="0.67" green="0.67" blue="0.67" alpha="0.33"/>
 		</text>
 	</element>
-	<element name="rack_r_text"><text string="r"><color red="0.7" green="0.18" blue="0.18" alpha="0.19"/></text></element>
-	<element name="rack_a_text"><text string="a"><color red="0.7" green="0.18" blue="0.18" alpha="0.19"/></text></element>
-	<element name="rack_c_text"><text string="c"><color red="0.7" green="0.18" blue="0.18" alpha="0.19"/></text></element>
-	<element name="rack_k_text"><text string="k"><color red="0.7" green="0.18" blue="0.18" alpha="0.19"/></text></element>
+	<element name="rack_r_text"><text string="r"><color red="0.9" green="0.18" blue="0.18" alpha="0.19"/></text></element>
+	<element name="rack_a_text"><text string="a"><color red="0.9" green="0.18" blue="0.18" alpha="0.19"/></text></element>
+	<element name="rack_c_text"><text string="c"><color red="0.9" green="0.18" blue="0.18" alpha="0.19"/></text></element>
+	<element name="rack_k_text"><text string="k"><color red="0.9" green="0.18" blue="0.18" alpha="0.19"/></text></element>
 
 	<element name="input_text"><text string="INPUT"><color red="0" green="0" blue="0"/></text></element>
 	<element name="phones_text"><text string="PHONES"><color red="0" green="0" blue="0"/></text></element>
@@ -248,51 +248,51 @@ license:CC0-1.0
 	<element name="plus_text"><text string="+"><color red="0" green="0" blue="0"/></text></element>
 	<element name="program_text"><text string="PROGRAM"><color red="0" green="0" blue="0"/></text></element>
 
-	<element name="osc_text"><text string="OSC"><color red="1" green="1" blue="1"/></text></element>
-	<element name="filt_text"><text string="FILT"><color red="1" green="1" blue="1"/></text></element>
-	<element name="env_text"><text string="ENV"><color red="1" green="1" blue="1"/></text></element>
-	<element name="lfo_text"><text string="LFO"><color red="1" green="1" blue="1"/></text></element>
-	<element name="efx_text"><text string="EFX"><color red="1" green="1" blue="1"/></text></element>
-	<element name="arpg_text"><text string="ARPG"><color red="1" green="1" blue="1"/></text></element>
-	<element name="edit_text"><text string="EDIT"><color red="1" green="1" blue="1"/></text></element>
-	<element name="slash_ctrl_text"><text string="/CTRL"><color red="1" green="1" blue="1"/></text></element>
+	<element name="osc_text"><text string="OSC"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="filt_text"><text string="FILT"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="env_text"><text string="ENV"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="lfo_text"><text string="LFO"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="efx_text"><text string="EFX"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="arpg_text"><text string="ARPG"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="edit_text"><text string="EDIT"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="slash_ctrl_text"><text string="/CTRL"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="value_text"><text string="VALUE"><color red="1" green="1" blue="1"/></text></element>
-	<element name="attack_text"><text string="ATTACK"><color red="1" green="1" blue="1"/></text></element>
+	<element name="value_text"><text string="VALUE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="attack_text"><text string="ATTACK"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="shape_text"><text string="SHAPE"><color red="1" green="1" blue="1"/></text></element>
-	<element name="cutoff_text"><text string="CUTOFF"><color red="1" green="1" blue="1"/></text></element>
-	<element name="decay_text"><text string="DECAY"><color red="1" green="1" blue="1"/></text></element>
+	<element name="shape_text"><text string="SHAPE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="cutoff_text"><text string="CUTOFF"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="decay_text"><text string="DECAY"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="rate_text"><text string="RATE"><color red="1" green="1" blue="1"/></text></element>
-	<element name="rev_time_slash_rate_text"><text string="REV TIME/RATE"><color red="1" green="1" blue="1"/></text></element>
-	<element name="mode_text"><text string="MODE"><color red="1" green="1" blue="1"/></text></element>
+	<element name="rate_text"><text string="RATE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="rev_time_slash_rate_text"><text string="REV TIME/RATE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="mode_text"><text string="MODE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="wave_sel_slash_pw_text"><text string="WAVE SEL/PW"><color red="1" green="1" blue="1"/></text></element>
-	<element name="cutoff_2_text"><text string="CUTOFF2"><color red="1" green="1" blue="1"/></text></element>
-	<element name="sustain_text"><text string="SUSTAIN"><color red="1" green="1" blue="1"/></text></element>
+	<element name="wave_sel_slash_pw_text"><text string="WAVE SEL/PW"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="cutoff_2_text"><text string="CUTOFF2"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="sustain_text"><text string="SUSTAIN"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="damping_slash_depth_text"><text string="DAMPING/DEPTH"><color red="1" green="1" blue="1"/></text></element>
-	<element name="soft_knob_1_text"><text string="SOFT KNOB 1"><color red="1" green="1" blue="1"/></text></element>
-	<element name="octaves_text"><text string="OCTAVES"><color red="1" green="1" blue="1"/></text></element>
+	<element name="damping_slash_depth_text"><text string="DAMPING/DEPTH"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="soft_knob_1_text"><text string="SOFT KNOB 1"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="octaves_text"><text string="OCTAVES"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="semitone_text"><text string="SEMITONE"><color red="1" green="1" blue="1"/></text></element>
-	<element name="resonance_text"><text string="RESONANCE"><color red="1" green="1" blue="1"/></text></element>
-	<element name="sus_time_text"><text string="SUS TIME"><color red="1" green="1" blue="1"/></text></element>
+	<element name="semitone_text"><text string="SEMITONE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="resonance_text"><text string="RESONANCE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="sus_time_text"><text string="SUS TIME"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="contour_text"><text string="CONTOUR"><color red="1" green="1" blue="1"/></text></element>
-	<element name="delay_text"><text string="DELAY"><color red="1" green="1" blue="1"/></text></element>
-	<element name="soft_knob_2_text"><text string="SOFT KNOB 2"><color red="1" green="1" blue="1"/></text></element>
-	<element name="pattern_text"><text string="PATTERN"><color red="1" green="1" blue="1"/></text></element>
+	<element name="contour_text"><text string="CONTOUR"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="delay_text"><text string="DELAY"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="soft_knob_2_text"><text string="SOFT KNOB 2"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="pattern_text"><text string="PATTERN"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="detune_text"><text string="DETUNE"><color red="1" green="1" blue="1"/></text></element>
-	<element name="env_amount_text"><text string="ENV AMOUNT"><color red="1" green="1" blue="1"/></text></element>
-	<element name="release_text"><text string="RELEASE"><color red="1" green="1" blue="1"/></text></element>
+	<element name="detune_text"><text string="DETUNE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="env_amount_text"><text string="ENV AMOUNT"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="release_text"><text string="RELEASE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	<element name="key_follow_text"><text string="KEY FOLLOW"><color red="1" green="1" blue="1"/></text></element>
-	<element name="feedback_text"><text string="FEEDBACK"><color red="1" green="1" blue="1"/></text></element>
-	<element name="master_volume_text"><text string="MASTER VOLUME"><color red="1" green="1" blue="1"/></text></element>
-	<element name="note_length_text"><text string="NOTE LENGTH"><color red="1" green="1" blue="1"/></text></element>
+	<element name="key_follow_text"><text string="KEY FOLLOW"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="feedback_text"><text string="FEEDBACK"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="master_volume_text"><text string="MASTER VOLUME"><color red="0.8" green="0.8" blue="0.8"/></text></element>
+	<element name="note_length_text"><text string="NOTE LENGTH"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
 	<element name="jack">
 		<image><data><![CDATA[
@@ -316,6 +316,7 @@ license:CC0-1.0
 		<element ref="panel_sheet_hole"><bounds x="1614" y="23" width="33" height="20"/></element>
 		<element ref="panel_sheet_hole"><bounds x="1614" y="137" width="33" height="20"/></element>
 
+		<element ref="access_logo_text"><bounds x="47" y="79" width="79" height="28"/></element>
 		<element ref="virus_logo_text"><bounds x="30" y="-25" width="874" height="230"/></element>
 		<element ref="virus_slogan_text"><bounds x="1370" y="17" width="200" height="10"/></element>
 
