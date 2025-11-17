@@ -238,8 +238,8 @@ White screen, [68k] stalls on bootstrap
 	<software name="amjfaith">
 		<description>George Michael - Faith</description>
 		<year>1987</year>
-		<info name="release" value="19871217" />
 		<publisher>AMJ</publisher>
+		<info name="release" value="19871217" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="791357">
 				<rom name="faith.msa" size="791357" crc="22541b09" sha1="686c3f9fe4044a5f3bc520856125db82f782a894" offset="0" />
@@ -263,8 +263,8 @@ White screen, [68k] stalls on bootstrap
 	<software name="amjholiday">
 		<description>Madonna - Holiday</description>
 		<year>1987</year>
-		<info name="release" value="19871217" />
 		<publisher>AMJ</publisher>
+		<info name="release" value="19871217" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="691393">
 				<rom name="holiday.msa" size="691393" crc="741419db" sha1="71c807baba4c1284ac792db6f5212aff6c735797" offset="0" />
@@ -300,8 +300,8 @@ White screen, [68k] stalls on bootstrap
 	<software name="amjmjway">
 		<description>Michael Jackson - The Way You Make Me Feel</description>
 		<year>1987</year>
-		<info name="release" value="19871128" />
 		<publisher>AMJ</publisher>
+		<info name="release" value="19871128" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="667586">
 				<rom name="mj_way.msa" size="667586" crc="e7a2e84a" sha1="c2a11a07f5105dcab8dc0ab55003ad617d9a1252" offset="0" />
