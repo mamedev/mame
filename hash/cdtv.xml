@@ -227,7 +227,7 @@ cdtv/cd32: cursor is uncontrollable, [joytest] reset counter
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced_military_systems" sha1="4b362db61f9bb8e8b78b09303c0b41c6e7338bdd" status="baddump" />
+				<disk name="advanced_military_systems" sha1="868a3f0034805f345f45c183e0071074c692de1a" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -551,7 +551,7 @@ Requires disc swap with an audio CD for load sequence procedure (cfr. tutorial)
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cdremix_ii" sha1="f6f482ce6b53b5cb0fc3df0bbb447abea7d5a8ff" status="baddump" />
+				<disk name="cdremix_ii" sha1="d85e3ffccaca28699956cbddd450ba621982595e" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -584,7 +584,7 @@ Fills log with [DDFSTRT]=0xc underruns
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="chaos_in_andromeda" sha1="573b8b81c336e3a72460ccca226d3ec69993c90e" status="baddump" />
+				<disk name="chaos_in_andromeda" sha1="915092ac424d163eea1368c4192030f1a3ad6461" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -712,7 +712,7 @@ cd32: Cubulus boot OK
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cubulus_magic_serpent" sha1="14dcce3ec0536d54d4832ff8acaf3805808b45e2" status="baddump" />
+				<disk name="cubulus_magic_serpent" sha1="4964ee4d44d25d0af56c1c8c6733d7fc1e14f502" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -1379,7 +1379,7 @@ cd32: outputs a very quiet [CDDA] redbook if you move on main menu with an analo
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="pandoras_cd" sha1="1962d53ddf8aefa684fc5b74920432073ceb0699" status="baddump" />
+				<disk name="pandoras_cd" sha1="6f4f7cfce23eab1f7565ff39c39f85dc3f1b1e77" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -1613,7 +1613,7 @@ cd32: Shiftrix boot OK
 		<!-- Likely a good dump, gave the same result when reading multiple times -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="shiftrix_lettrix" sha1="696acf15b0e9c30d95195db7c99029692978827d" status="baddump" />
+				<disk name="shiftrix_lettrix" sha1="a53a95bd78c4570332d530ec1d9b278793ecb3a3" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -2124,7 +2124,7 @@ cd32: hangs when explaining the hourglass icon in tutorial
 		<!-- Read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="town_with_no_name" sha1="6591cde09a5a24dd3b4f22af98ee6727c1714861" status="baddump" />
+				<disk name="town_with_no_name" sha1="8e50daec997c41c5d4f783402007bbdac2ef1ca8" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
