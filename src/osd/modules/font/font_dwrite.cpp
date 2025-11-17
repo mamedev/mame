@@ -359,8 +359,6 @@ public:
 
 		// accept qualifiers from the name
 		std::string name(_name);
-		if (name.compare("default") == 0)
-			name = "Segoe UI";
 		bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 
@@ -374,6 +372,16 @@ public:
 			italic |= (style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos);
 			name = name.substr(0, separator);
 		}
+
+		// Translate generic names into platform-specific real ones
+		if (name == "serif")
+			name = "Times New Roman";
+		else if (name == "sans-serif")
+			name = "Arial";
+		else if (name == "monospace")
+			name = "Courier New";
+		else if (name == "default")
+			name = "Segoe UI";
 
 		// convert the face name
 		std::wstring familyName = text::to_wstring(name);
