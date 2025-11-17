@@ -1782,7 +1782,8 @@ m_printer->in_pb_callback().set_constant(0xb0);		// HACK:  vblank always checks 
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5385", NCR5385).clock(40_MHz_XTAL / 4).machine_config(
+	// clock crystal p2.2-25
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5385", NCR5385).clock(3.6864_MHz_XTAL).machine_config(
 		[this](device_t *device)
 		{
 			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
