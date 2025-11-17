@@ -746,7 +746,7 @@ DISCRETE_STEP(dss_op_amp_osc)
 			}
 			/* we need to mix any bias and all modulation voltages together. */
 			v = DSS_OP_AMP_OSC__VMOD1 - OP_AMP_NORTON_VBE;
-			if (v < 0) v = 0;
+			// v is not clipped. this voltage can be minus, and for charge/discharging "C" by +/- direction.
 			charge[0] += v / info->r1;
 			if (info->r6 != 0)
 			{
