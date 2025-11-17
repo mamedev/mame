@@ -33284,6 +33284,9 @@ tomsadvs
 toratora
 toratorab
 
+@source:misc/toysoldier.cpp
+toysoldier                      // (c) 2003 Paokai
+
 @source:misc/triplex.cpp
 triplex
 
