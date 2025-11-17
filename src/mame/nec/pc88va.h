@@ -152,17 +152,16 @@ private:
 	uint8_t m_fdc_ctrl_2 = 0;
 	bool m_xtmask = false;
 	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
+	TIMER_CALLBACK_MEMBER(fdc_timer);
+	template <unsigned N> TIMER_CALLBACK_MEMBER(fdc_motor_start);
 	void tc_w(int state);
 
 	void fdc_irq(int state);
 	static void floppy_formats(format_registration &fr);
-	void pc88va_fdc_update_ready(floppy_image_device *, int);
+	void fdc_update_ready(floppy_image_device *, int);
 	uint8_t fake_subfdc_r();
-	uint8_t pc88va_fdc_r(offs_t offset);
-	void pc88va_fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

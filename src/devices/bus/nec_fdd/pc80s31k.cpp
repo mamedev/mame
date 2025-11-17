@@ -540,6 +540,7 @@ void pc88va2_fd_if_device::device_reset()
 //  m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 	m_xtmask = false;
 	m_dmae = false;
+	m_fdc->set_unscaled_clock(4'792'320);
 }
 
 void pc88va2_fd_if_device::host_io(address_map &map)
@@ -561,9 +562,11 @@ TIMER_CALLBACK_MEMBER(pc88va2_fd_if_device::fdc_timer_cb)
 {
 	if(m_xtmask)
 	{
+		m_write_irq(0);
 		m_write_irq(1);
-//      m_write_irq(0);
 	}
+
+	m_fdc_timer->adjust(attotime::from_msec(100));
 }
 
 void pc88va2_fd_if_device::fdc_update_ready(floppy_image_device *, int)
@@ -631,7 +634,9 @@ void pc88va2_fd_if_device::host_drive_rate_w(u8 data)
 	//m_fdd[0]->get_device()->ds_w(!BIT(data, 4));
 	//m_fdd[1]->get_device()->ds_w(!BIT(data, 4));
 
-	// TODO: is this correct? sounds more like a controller clock change, while TD1/TD0 should do the rate change
+	// TODO: needs source xtal for 4.8 MHz, does it bump Z80 clock too?
+	// 8 MHz just uses MASTER_CLOCK
+	m_fdc->set_unscaled_clock(clk ? 7'987'200 : 4'792'320);
 	m_fdc->set_rate(clk ? 500000 : 250000);
 }
 
@@ -720,7 +725,7 @@ u8 pc88va2_fd_if_device::host_ready_r()
 {
 	// TODO: easy to implement, but no SW accesses it so far
 	if (!machine().side_effects_disabled())
-		logerror("Unhandled read $1b6!\n");
+		popmessage("host_ready_r: Unhandled read $1b6");
 
 	return 0;
 }
