@@ -1685,18 +1685,23 @@ msgstr " (uobičajeno)"
 msgid "No plugins found"
 msgstr ""
 
-#: src/frontend/mame/ui/quitmenu.cpp:37
+#: src/frontend/mame/ui/quitmenu.cpp:24
 #, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press %1$s to quit\n"
-"Press %2$s to return to emulation"
+msgctxt "menu-quit"
+msgid "Are you sure you want to quit?"
+msgstr "Da li ste sigurni da želite da napustite program?"
+
+#: src/frontend/mame/ui/quitmenu.cpp:35
+#, c-format
+msgctxt "menu-quit"
+msgid "Quit"
 msgstr ""
-"Da li ste sigurni da želite da napustite program?\n"
-"\n"
-"Pritisnite %1$s za napuštaǌe programa\n"
-"Pritisnite %2$s za nastavak emulacije"
+
+#: src/frontend/mame/ui/quitmenu.cpp:36
+#, c-format
+msgctxt "menu-quit"
+msgid "Return to emulation"
+msgstr ""
 
 #: src/frontend/mame/ui/info_pty.cpp:22
 msgid "Pseudo Terminals"
