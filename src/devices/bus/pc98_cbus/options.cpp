@@ -10,7 +10,6 @@
 #include "pc9801_02.h"
 #include "pc9801_14.h"
 #include "pc9801_26.h"
-#include "pc9801_27.h"
 #include "pc9801_55.h"
 #include "pc9801_86.h"
 #include "pc9801_118.h"
