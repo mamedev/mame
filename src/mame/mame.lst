@@ -40558,6 +40558,9 @@ waidrive
 xtrmhnt2
 xtrmhunt
 
+@source:sega/dcchk.cpp
+dcacchk
+
 @source:sega/dccons.cpp
 dc
 dcdev
