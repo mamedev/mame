@@ -39886,6 +39886,9 @@ mc400
 mcword
 mcword_de
 
+@source:psion/mc600.cpp
+mc600
+
 @source:psion/psion.cpp
 psion1
 psioncm
