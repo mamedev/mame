@@ -94,7 +94,7 @@ constexpr int MAP_CPU_WR = 7;
 constexpr offs_t MAXRAM = 0x200000;	// +1MB
 //constexpr offs_t MAXRAM = 0x400000;	// +3MB
 
-
+#if 0
 // ncr5385 raises IRQ too fast for Tek4404 software
 DECLARE_DEVICE_TYPE(NCR5385_TEK, ncr5385_tek_device)
 
@@ -112,6 +112,7 @@ public:
 };
 
 DEFINE_DEVICE_TYPE(NCR5385_TEK, ncr5385_tek_device, "ncr5385_tek", "NCR5385 with Tek4404 required timing")
+#endif
 
 
 // have m_readXX / m_writeXX use MMU translation
