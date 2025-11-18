@@ -16152,6 +16152,10 @@ void wingco_state::flam7_w4(machine_config &config)
 
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wingco_state::screen_update_flaming7));
+
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, flaming7)
+
 	DS2401(config, m_fl7w4_id);
 }
 
