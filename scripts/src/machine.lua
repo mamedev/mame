@@ -631,6 +631,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/82c100.h,MACHINES["82C100"] = true
+---------------------------------------------------
+
+if (MACHINES["82C100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/82c100.cpp",
+		MAME_DIR .. "src/devices/machine/82c100.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/82c606.h,MACHINES["82C606"] = true
+---------------------------------------------------
+
+if (MACHINES["82C606"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/82c606.cpp",
+		MAME_DIR .. "src/devices/machine/82c606.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
 ---------------------------------------------------
 
@@ -2954,6 +2978,7 @@ end
 --@src/devices/machine/psion_asic3.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic4.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic5.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic7.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic9.h,MACHINES["PSION_ASIC"] = true
 ---------------------------------------------------
 
@@ -2969,6 +2994,8 @@ if (MACHINES["PSION_ASIC"]~=null) then
 		MAME_DIR .. "src/devices/machine/psion_asic4.h",
 		MAME_DIR .. "src/devices/machine/psion_asic5.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic5.h",
+		MAME_DIR .. "src/devices/machine/psion_asic7.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic7.h",
 		MAME_DIR .. "src/devices/machine/psion_asic9.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic9.h",
 	}
