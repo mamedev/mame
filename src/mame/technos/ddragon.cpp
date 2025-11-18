@@ -666,7 +666,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x40, "4" )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
+	PORT_DIPSETTING(    0x00, "Free Play")
 
 	PORT_START("EXTRA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -675,6 +675,18 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(ddragon_state::subcpu_bus_free_r))
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ddragonj )
+	PORT_INCLUDE(ddragon)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
 
@@ -2263,34 +2275,34 @@ void ddragon_state::init_ddragon6809()
  *
  *************************************/
 
-GAME( 1987, ddragon,      0,        ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragona,     ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 2)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonu,     ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 1)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonua,    ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 2)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonub,    ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 3)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonj,     ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan",                         "Double Dragon (Japan set 1)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonja,    ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan",                         "Double Dragon (Japan set 2)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonbl2,   ddragon,  ddragon,     ddragon,  ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragonbl,    ddragon,  ddragonbl,   ddragon,  ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with HD6309)",         MACHINE_SUPPORTS_SAVE ) // according to dump notes
-GAME( 1987, ddragonbla,   ddragon,  ddragonbla,  ddragon,  ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with MC6803)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ddragon6809,  ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
-GAME( 1987, ddragon6809a, ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
+GAME( 1987, ddragon,      0,        ddragon,     ddragon,   ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragona,     ddragon,  ddragon,     ddragon,   ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito license)",         "Double Dragon (World set 2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonu,     ddragon,  ddragon,     ddragon,   ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonua,    ddragon,  ddragon,     ddragon,   ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 2)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonub,    ddragon,  ddragon,     ddragon,   ddragon_state,  init_ddragon,     ROT0, "Technos Japan (Taito America license)", "Double Dragon (US set 3)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonj,     ddragon,  ddragon,     ddragonj,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan",                         "Double Dragon (Japan set 1)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonja,    ddragon,  ddragon,     ddragonj,  ddragon_state,  init_ddragon,     ROT0, "Technos Japan",                         "Double Dragon (Japan set 2)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonbl2,   ddragon,  ddragon,     ddragon,   ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragonbl,    ddragon,  ddragonbl,   ddragon,   ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with HD6309)",         MACHINE_SUPPORTS_SAVE ) // according to dump notes
+GAME( 1987, ddragonbla,   ddragon,  ddragonbla,  ddragon,   ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with MC6803)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ddragon6809,  ddragon,  ddragon6809, ddragon,   ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
+GAME( 1987, ddragon6809a, ddragon,  ddragon6809, ddragon,   ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
 
-GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ddragon2bl,   ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II: The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2,  ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2,  ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2j,    ddragon2, ddragon2,    ddragon2,  ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2bl,   ddragon2, ddragon2,    ddragon2,  ddragon_state,  init_ddragon2,    ROT0, "bootleg",       "Double Dragon II: The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // these were conversions of Double Dragon
-GAME( 1991, tstrike,      0,        darktowr,    tstrike,  darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Thunder Strike (set 1)",        MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
-GAME( 1991, tstrikea,     tstrike,  darktowr,    tstrike,  darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Thunder Strike (set 2, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, ddungeon,     0,        darktowr,    ddungeon, darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dangerous Dungeons (set 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, ddungeone,    ddungeon, darktowr,    ddungeon, darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Dangerous Dungeons (set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, darktowr,     0,        darktowr,    darktowr, darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dark Tower",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tstrike,      0,        darktowr,    tstrike,   darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Thunder Strike (set 1)",        MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
+GAME( 1991, tstrikea,     tstrike,  darktowr,    tstrike,   darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Thunder Strike (set 2, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ddungeon,     0,        darktowr,    ddungeon,  darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dangerous Dungeons (set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, ddungeone,    ddungeon, darktowr,    ddungeon,  darktowr_state, init_darktowr,    ROT0, "East Coast Coin Company", "Dangerous Dungeons (set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, darktowr,     0,        darktowr,    darktowr,  darktowr_state, init_darktowr,    ROT0, "The Game Room",           "Dark Tower",                    MACHINE_SUPPORTS_SAVE )
 
 // these run on their own board, but are basically the same game. Toffy even has 'Dangerous Dungeons' text in it
-GAME( 1993, toffy,        0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Toffy (encrypted)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1993, toffya,       toffy,     toffy,      toffy,    toffy_state,    empty_init,       ROT0, "Midas",                   "Toffy (unencrypted)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffy,        0,         toffy,      toffy,     toffy_state,    init_toffy,       ROT0, "Midas",                   "Toffy (encrypted)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1993, toffya,       toffy,     toffy,      toffy,     toffy_state,    empty_init,       ROT0, "Midas",                   "Toffy (unencrypted)",           MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, stoffy,       0,         toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas",                   "Super Toffy",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stoffyu,      stoffy,    toffy,      toffy,    toffy_state,    init_toffy,       ROT0, "Midas (Unico license)",   "Super Toffy (Unico license)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stoffy,       0,         toffy,      toffy,     toffy_state,    init_toffy,       ROT0, "Midas",                   "Super Toffy",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stoffyu,      stoffy,    toffy,      toffy,     toffy_state,    init_toffy,       ROT0, "Midas (Unico license)",   "Super Toffy (Unico license)",   MACHINE_SUPPORTS_SAVE )
