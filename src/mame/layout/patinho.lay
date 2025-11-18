@@ -1,485 +1,1397 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Felipe Sanches
+copyright-holders:Felipe Sanches, Nicoly Sampaio, Felipe Nascimento
 
 Front panel of the Patinho Feio mini-computer with clickable buttons, switches and lamps.
 -->
 
 <mamelayout version="2">
 
+<!-- define elements -->
+
+	<element name="ula">
+		<image><data><![CDATA[
+			<svg width="210" height="270">
+				<path
+					fill="#a11022" stroke="#000" stroke-width="10"
+					d="m 5,5 v 120 l 85,10 -85,10 v 120 l 200,-40 v -180 z"
+				/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="rotary_switch" defstate="0">
+		<!-- button_surrond_border -->
+		<disk>
+			<bounds x="0" y="0" width="37" height="37"/>
+			<color red="0" green="0" blue="0"/>
+		</disk>
+
+		<!-- button_surrond -->
+		<disk>
+			<bounds x="2" y="2" width="33" height="33"/>
+			<color red="0.04" green="0.09" blue="0.1"/>
+		</disk>
+
+		<!-- button_border -->
+		<disk>
+			<bounds x="4" y="4" width="29" height="29"/>
+			<color red="0" green="0.32" blue="0"/>
+		</disk>
+
+		<!-- button -->
+		<disk>
+			<bounds x="6" y="6" width="25" height="25"/>
+			<color red="0" green="0.5" blue="0"/>
+		</disk>
+
+		<!-- arrow -->
+		<image state="0">
+			<bounds x="7" y="10" width="20" height="20"/>
+			<data><![CDATA[
+				<svg width="20" height="20">
+					<path 
+						fill="#b3b3b3" stroke="#808080" stroke-width="1"
+						d="m 5.5,0.5 4,4 -8,8 6,6 8,-8 4,4 v -14 z" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds x="10" y="10" width="20" height="20"/>
+			<data><![CDATA[
+				<svg width="20" height="20">
+					<path 
+						fill="#b3b3b3" stroke="#808080" stroke-width="1"
+						d="m 0.5,14.5 4,-4 8,8 6,-6 -8,-8 4,-4 h -14 z" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="state_lamp" defstate="0">
+		<!-- external border -->
+		<disk>
+			<bounds x="0" y="0" width="36" height="36"/>
+			<color red="0" green="0" blue="0"/>
+		</disk>
+
+		<!-- surround border -->
+		<disk>
+			<bounds x="2" y="2" width="32" height="32"/>
+			<color red="0.04" green="0.09" blue="0.1"/>
+		</disk>
+
+		<!-- internal border -->
+		<disk>
+			<bounds x="7" y="7" width="22" height="22"/>
+			<color red="0.29" green="0.35" blue="0.44"/>
+		</disk>
+
+		<!-- lamp -->
+		<disk state="0">
+			<bounds x="8" y="8" width="20" height="20"/>
+			<color red="0.40" green="0.48" blue="0.61"/>
+		</disk>
+		<disk state="1">
+			<bounds x="8" y="8" width="20" height="20"/>
+			<color red="1" green="1" blue="1"/>
+		</disk>
+	</element>
+
+	<element name="diagram_rect">
+		<image><data><![CDATA[
+			<svg width="78" height="70">
+				<path
+					fill="#598162" stroke="#000" stroke-width="1"
+					d="m 38,0 v 16.5 m -37.5,0 v 53 h 77 v -53 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_01">
+		<image><data><![CDATA[
+			<svg width="384" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 8.5,0.5 h -8 v 33 h 78
+					m 211,0 h 93 v -33 h -8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_02">
+		<image><data><![CDATA[
+			<svg width="238" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 8.5,0.5 h -8 v 33 h 15
+					m 207,0 h 15 v -33 h -8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_03">
+		<image><data><![CDATA[
+			<svg width="351" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 8.5,0.5 h -8 v 33 h 15
+					m 320,0 h 15 v -33 h -8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_04">
+		<image><data><![CDATA[
+			<svg width="405" height="147">
+				<path
+					fill="none" stroke="#000" stroke-width="1"
+					d="
+					m 213.5,30.5 v -30 h 149 v 12
+					m -169,18 v -30 h -135 v 13
+					m 106,103 h -56 v 30 h 9
+					m 167,0 h 6 v -30 h -46 v -12
+					m -134,-63 h 9 v -18 h -119 v 18 h 9
+					m 386,0 h 9 v -18 h -76 v 18 h 9" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_05">
+		<image><data><![CDATA[
+			<svg width="186" height="93">
+				<g stroke="#000" fill="none" stroke-width="1">
+					<path d="
+						m 128,0.5 h -7 l -18,31
+						m -46,-31 h 7 l 18,31
+					"/>
+				</g>
+				<g fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+					<path d="
+						m 14,91 h -12 v -47 h 182 v 47 h -12
+					"/>
+				</g>
+				<g fill="#d45500">
+					<rect x="6" y="48" width="174" height="39"/>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_06">
+		<image><data><![CDATA[
+			<svg width="226" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="4"
+					d="
+					m 141,9 v -7 h -84 v 7
+					m -55,8 v 17
+					m 222,-34 v 32 h -112 v -7"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="diagram_07">
+		<image><data><![CDATA[
+			<svg width="339" height="34">
+				<path
+					fill="none" stroke="#000" stroke-width="4"
+					d="
+					m 336,0 v 32 h -112 v -6
+					m -137,-17 v -7 h -85 v 30 h 112 v -6
+					m 139,-17 v -7 h -84 v 7"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="left_arrow">
+		<image><data><![CDATA[
+			<svg width="22" height="14">
+				<path
+					fill="#000"
+					d="m 22,0 v 14 l -22,-7 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="right_arrow">
+		<image><data><![CDATA[
+			<svg width="22" height="14">
+				<path
+					fill="#000"
+					d="m 0,14 v -14 l 22,7 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="down_arrow">
+		<image><data><![CDATA[
+			<svg width="14" height="22">
+				<path
+					fill="#000"
+					d="m 0,0 h 14 l -7,22 z" />
+			</svg>
+		]]></data></image>
+	</element>
+
+
 	<element name="bit_lamp" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
 		<disk state="0"><color red="0.3" green="0.02" blue="0.02" /></disk>
 	</element>
 
-	<element name="button" defstate="0">
-		<disk state="1"><color red="0.10" green="0.70" blue="0.10" /></disk>
-		<disk state="0"><color red="0.05" green="0.2" blue="0.05" /></disk>
+	<element name="switch" defstate="0">
+		<image state="1">
+		<data><![CDATA[
+			<svg width="24" height="46">
+				<polyline style="fill:#808080" points="6,0 18,0 24,17  24,29 0,29 0,17"/>
+				<rect style="fill:#303030" x="6" y="0" width="12" height="4"/>
+				<polyline style="fill:#505050" points="6,4 18,4 24,29 0,29"/>
+			</svg>
+		]]></data></image>
+
+		<image state="0">
+		<data><![CDATA[
+			<svg width="24" height="46">
+				<polyline style="fill:#808080" points="6,46 18,46 24,29  24,17 0,17 0,29"/>
+				<rect style="fill:#303030" x="6" y="40" width="12" height="4"/>
+				<polyline style="fill:#505050" points="6,42 18,42 24,17 0,17"/>
+			</svg>
+		]]></data></image>
 	</element>
 
-	<element name="rectangle">
-		<rect><color red="0.3" green="0.9" blue="0.6" /></rect>
+
+	<element name="button" defstate="0">
+		<!-- button_surrond_border -->
+		<disk>
+			<bounds x="0" y="0" width="42" height="42"/>
+			<color red="0" green="0" blue="0" />
+		</disk>
+
+		<!-- button_surrond -->
+		<disk>
+			<bounds x="2" y="2" width="38" height="38"/>
+			<color red="0.04" green="0.09" blue="0.1"/>
+		</disk>
+
+		<!-- button_border -->
+		<disk>
+			<bounds x="4" y="4" width="34" height="34"/>
+			<color red="0" green="0.32" blue="0" />
+		</disk>
+
+		<!-- button -->
+		<disk state="0">
+			<bounds x="6" y="6" width="30" height="30"/>
+			<color red="0" green="0.5" blue="0" />
+		</disk>
+		<disk state="1">
+			<bounds x="6" y="6" width="30" height="30"/>
+			<color red="0" green="1" blue="0" />
+		</disk>
+	</element>
+
+	<element name="sqr_button" defstate="0">
+		<!-- button_surrond_border -->
+		<rect>
+			<bounds x="0" y="0" width="56" height="46"/>
+			<color red="0" green="0" blue="0" />
+		</rect>
+
+		<!-- button_surrond -->
+		<rect>
+			<bounds x="4" y="4" width="48" height="38"/>
+			<color red="0.3" green="0.3" blue="0.3" />
+		</rect>
+
+		<!-- button_border -->
+		<rect>
+			<bounds x="8" y="8" width="40" height="30"/>
+			<color red="0.8" green="0.8" blue="0.8" />
+		</rect>
+
+		<!-- button -->
+		<rect state="0">
+			<bounds x="12" y="12" width="32" height="22"/>
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect state="1">
+			<bounds x="12" y="12" width="30" height="30"/>
+			<color red="1" green="1" blue="1" />
+		</rect>
+	</element>
+
+	<element name="memory_rect">
+		<rect>
+			<bounds x="0" y="0" width="311" height="67"/>
+			<color red="0" green="0" blue="0"/>
+		</rect>
+		<rect>
+			<bounds x="2" y="2" width="308" height="64"/>
+			<color red="0.83" green="0.33" blue="0" />
+		</rect>
+	</element>
+
+	<element name="bold_rect">
+		<rect>
+			<bounds x="0" y="0" width="369" height="73"/>
+			<color red="0" green="0" blue="0"/>
+		</rect>
+		<rect>
+			<bounds x="4" y="4" width="361" height="65"/>
+			<color red="0.83" green="0.33" blue="0" />
+		</rect>
+	</element>
+
+	<element name="circle">
+		<disk><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<element name="line">
+		<rect><color red="0" green="0" blue="0" /></rect>
+	</element>
+
+	<element name="panel_background">
+		<rect><color red="0.47" green="0.64" blue="0.51" /></rect>
 	</element>
 
 	<element name="str_flags_t">
-		<text string="TRANSBORDO"><color red="0" green="0" blue="0" /></text>
+		<text string="T R A N S B O R D O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_flags_v">
 		<text string="VAI - UM"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_ula">
-		<text string="UNIDADE ARITMÉTICA E LÓGICA" ><color red="0" green="0" blue="0" /></text>
+		<text string="U  N  I  D  A  D  E">
+			<bounds x="0" y="0" width="163" height="15"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="A R I T M É T I C A   E   L Ó G I C A">
+			<bounds x="0" y="16" width="165" height="16"></bounds><color red="0" green="0" blue="0" />
+		</text>
 	</element>
-
 	<element name="str_rc">
-		<text string="DADOS DO PAINEL"><color red="0" green="0" blue="0" /></text>
+		<text string="D  A  D  O  S         D  O         P  A  I  N  E  L"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_pc">
-		<text string="ENDEREÇO DE INSTRUÇÃO"><color red="0" green="0" blue="0" /></text>
+		<text string="E  N  D  E  R  E  Ç  O     D  E     I  N  S  T  R  U  Ç  Ã  O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_mem_addr">
-		<text string="ENDEREÇO DA MEMÓRIA"><color red="0" green="0" blue="0" /></text>
+		<text string="E  N  D  E  R  E  Ç  O        N  A        M  E  M  Ó  R  I  A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_acc">
-		<text string="ACUMULADOR"><color red="0" green="0" blue="0" /></text>
+		<text string="A  C  U  M  U  L  A  D  O  R"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_opcode">
-		<text string="CÓDIGO DE INSTRUÇÃO"><color red="0" green="0" blue="0" /></text>
+		<text string="C Ó D I G O   D E   I N S T R U Ç Ã O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_mem_data">
-		<text string="DADOS DA MEMÓRIA"><color red="0" green="0" blue="0" /></text>
+		<text string="D A D O S     D A    M E M Ó R I A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_mem">
 		<text string="MEMÓRIA"><color red="0" green="0" blue="0" /></text>
 	</element>
 
-
 	<element name="str_NORMAL">
-		<text string="NORMAL"><color red="0" green="0" blue="0" /></text>
+		<text string="N O R M A L"><color red="0" green="0" blue="0" /></text>
 	</element>
-
-
 	<element name="str_CICLOUNICO">
-			<text string="CICLO ÚNICO">
-			<color red="0" green="0" blue="0" /></text>
+		<text string="C I C L O  Ú N I C O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_INSTRUCAOUNICA">
-			<text string="INSTRUÇÃO ÚNICA">
-			<color red="0" green="0" blue="0" /></text>
+		<text string="I N S T R U Ç Ã O">
+			<bounds x="0" y="0" width="68" height="12"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="Ú N I C A">
+			<bounds x="0" y="13" width="68" height="12"></bounds><color red="0" green="0" blue="0" />
+		</text>
 	</element>
-
 	<element name="str_ENDERECAMENTO">
 		<text string="ENDEREÇAMENTO"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_ARMAZENAMENTO">
 		<text string="ARMAZENAMENTO"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_EXPOSICAO">
-		<text string="EXPOSIÇÃO"><color red="0" green="0" blue="0" /></text>
+		<text string="E X P O S I Ç Ã O"><color red="0" green="0" blue="0" /></text>
 	</element>
-
-
-
 	<element name="str_ESPERA">
-		<text string="ESPERA"><color red="0" green="0" blue="0" /></text>
+		<text string="E S P E R A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_INTERRUPCAO">
 		<text string="INTERRUPÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_PARTIDA">
-		<text string="PARTIDA"><color red="0" green="0" blue="0" /></text>
+		<text string="P A R T I D A"><color red="0" green="0" blue="0" /></text>
 	</element>
-
 	<element name="str_PREPARACAO">
 		<text string="PREPARAÇÃO"><color red="0" green="0" blue="0" /></text>
 	</element>
 
+	<element name="str_OCTAL"><text string="OCTAL"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_HEXADECIMAL"><text string="HEXADECIMAL"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_HEXAD"><text string="HEXAD"><color red="0" green="0" blue="0" /></text></element>
+
+	<element name="str_entrada_dados">
+		<text string="E N T R A D A     M A N U A L     D E     D A D O S"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="str_fases_operacao">
+		<text string="F  A  S  E  S    D  E    O  P  E  R  A  Ç  Ã  O"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="str_modo_operacao">
+		<text string="M O D O   D E   O P E R A Ç Ã O"><color red="0" green="0" blue="0" /></text>
+	</element>
+	<element name="str_memoria"><text string="M E M Ó R I A"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_comando"><text string="C O M A N D O"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_enderecamento_spaces"><text string="E N D E R E Ç A M E N T O"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_memoria_spaces"><text string="M   E   M   Ó   R   I   A"><color red="0" green="0" blue="0" /></text></element>
+	<element name="str_entrada_saida">
+		<text string="E N T R A D A">
+			<bounds x="0" y="0" width="48" height="18"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="E">
+			<bounds x="0" y="20" width="48" height="18"></bounds><color red="0" green="0" blue="0" />
+		</text>
+		<text string="S A Í D A">
+			<bounds x="0" y="40" width="48" height="18"></bounds><color red="0" green="0" blue="0" />
+		</text>
+	</element>
+
+	<element name="str_busca"><text string="B U S C A"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_execucao"><text string="E X E C U Ç Ã O"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_indexacao"><text string="INDEXAÇÃO"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_indireto"><text string="I N D I R E T O"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_parado"><text string="PARADO"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_externo"><text string="EXTERNO"><color red="0" green="0" blue="0"/></text></element>
+
+	<element name="str_fixo"><text string="F I X O"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_sequencial"><text string="SEQÜENCIAL"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_liberada"><text string="LIBERADA"><color red="0" green="0" blue="0"/></text></element>
+	<element name="str_protegida"><text string="PROTEGIDA"><color red="0" green="0" blue="0"/></text></element>
+
+	<!-- numeros 0-9 -->
+	<repeat count="10">
+		<param name="i" start="0" increment="1"/>
+		<element name="str_num_~i~">
+			<!-- text background -->
+			<rect>
+				<color red="0.47" green="0.64" blue="0.51" />
+				<bounds x="0" y="0" width="18" height="16"/>
+			</rect>
+			<!-- text value -->
+			<text string="~i~">
+				<color red="0" green="0" blue="0"/>
+				<bounds x="0" y="0" width="18" height="16"/>
+			</text>
+		</element>
+	</repeat>
+	<!-- numeros 10-11 -->
+	<repeat count="2">
+		<param name="i" start="10" increment="1"/>
+		<element name="str_num_~i~">
+			<!-- text background -->
+			<rect>
+				<color red="0.47" green="0.64" blue="0.51" />
+				<bounds x="0" y="0" width="18" height="16"/>
+			</rect>
+			<!-- text value -->
+			<text string="~i~">
+				<color red="0" green="0" blue="0"/>
+				<bounds x="4" y="0" width="14" height="16"/>
+			</text>
+		</element>
+	</repeat>
+
 <!-- define background -->
 
-	<view name="Front panel">
-		<screen index="0">
-			<bounds left="0" top="0" right="1000" bottom="1000" />
-		</screen>
+	<view name="Default layout">
+		<bounds x="0" y="0" width="1280" height="1200" />
 
-<!-- define lamps -->
-
-		<element ref="rectangle">
-			<bounds x="150" y="100" width="625" height="450" />
+		<element ref="panel_background">
+			<bounds x="-33" y="-980" width="1343" height="2218" />
 		</element>
 
-		<element name="mem_data7" ref="bit_lamp" inputtag="mem_data" inputmask="0x080">
-			<bounds x="190" y="440" width="20" height="20" />
+		<!-- define orange rectangles -->
+		<element ref="bold_rect">
+			<bounds x="158" y="65" width="369" height="73"/>
 		</element>
 
-		<element name="mem_data6" ref="bit_lamp" inputtag="mem_data" inputmask="0x040">
-			<bounds x="215" y="440" width="20" height="20" />
-		</element>
+		<!-- define lamps -->
 
-		<element name="mem_data5" ref="bit_lamp" inputtag="mem_data" inputmask="0x020">
-			<bounds x="240" y="440" width="20" height="20" />
-		</element>
+		<!-- ENDEREÇO NA MEMÓRIA -->
+		<repeat count="12">
+			<param name="lamp_x" start="762" increment="28"/>
+			<param name="lamp_id" start="11" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="mem_addr~lamp_id~" ref="bit_lamp" inputtag="mem_addr" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="74" width="11" height="11" />
+			</element>
+		</repeat>
 
-		<element name="mem_data4" ref="bit_lamp" inputtag="mem_data" inputmask="0x010">
-			<bounds x="265" y="440" width="20" height="20" />
-		</element>
+		<element ref="str_mem_addr"><bounds x="782" y="121" width="290" height="16" /></element>
 
-		<element name="mem_data3" ref="bit_lamp" inputtag="mem_data" inputmask="0x008">
-			<bounds x="290" y="440" width="20" height="20" />
-		</element>
+		<!-- ENDEREÇO DE INSTRUÇÃO -->
+		<repeat count="12">
+			<param name="lamp_x" start="762" increment="28"/>
+			<param name="lamp_id" start="11" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="pc~lamp_id~" ref="bit_lamp" inputtag="PC" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="190" width="11" height="11" />
+			</element>
+		</repeat>
 
-		<element name="mem_data2" ref="bit_lamp" inputtag="mem_data" inputmask="0x004">
-			<bounds x="315" y="440" width="20" height="20" />
-		</element>
+		<element ref="str_pc"><bounds x="779" y="235" width="300" height="16" /></element>
 
-		<element name="mem_data1" ref="bit_lamp" inputtag="mem_data" inputmask="0x002">
-			<bounds x="340" y="440" width="20" height="20" />
-		</element>
-
-		<element name="mem_data0" ref="bit_lamp" inputtag="mem_data" inputmask="0x001">
-			<bounds x="365" y="440" width="20" height="20" />
-		</element>
-
-		<element ref="str_mem_data">
-			<bounds x="200" y="470" width="200" height="20" />
-		</element>
-
-		<element name="opcode7" ref="bit_lamp" inputtag="opcode" inputmask="0x080">
-			<bounds x="190" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode6" ref="bit_lamp" inputtag="opcode" inputmask="0x040">
-			<bounds x="215" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode5" ref="bit_lamp" inputtag="opcode" inputmask="0x020">
-			<bounds x="240" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode4" ref="bit_lamp" inputtag="opcode" inputmask="0x010">
-			<bounds x="265" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode3" ref="bit_lamp" inputtag="opcode" inputmask="0x008">
-			<bounds x="290" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode2" ref="bit_lamp" inputtag="opcode" inputmask="0x004">
-			<bounds x="315" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode1" ref="bit_lamp" inputtag="opcode" inputmask="0x002">
-			<bounds x="340" y="340" width="20" height="20" />
-		</element>
-
-		<element name="opcode0" ref="bit_lamp" inputtag="opcode" inputmask="0x001">
-			<bounds x="365" y="340" width="20" height="20" />
-		</element>
-
-		<element ref="str_opcode">
-			<bounds x="200" y="370" width="200" height="20" />
-		</element>
-
-		<element name="acc7" ref="bit_lamp" inputtag="ACC" inputmask="0x080">
-			<bounds x="190" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc6" ref="bit_lamp" inputtag="ACC" inputmask="0x040">
-			<bounds x="215" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc5" ref="bit_lamp" inputtag="ACC" inputmask="0x020">
-			<bounds x="240" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc4" ref="bit_lamp" inputtag="ACC" inputmask="0x010">
-			<bounds x="265" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc3" ref="bit_lamp" inputtag="ACC" inputmask="0x008">
-			<bounds x="290" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc2" ref="bit_lamp" inputtag="ACC" inputmask="0x004">
-			<bounds x="315" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc1" ref="bit_lamp" inputtag="ACC" inputmask="0x002">
-			<bounds x="340" y="240" width="20" height="20" />
-		</element>
-
-		<element name="acc0" ref="bit_lamp" inputtag="ACC" inputmask="0x001">
-			<bounds x="365" y="240" width="20" height="20" />
-		</element>
-
-		<element ref="str_acc">
-			<bounds x="200" y="270" width="200" height="20" />
-		</element>
-
-		<element name="rc11" ref="bit_lamp" inputtag="RC" inputmask="0x800">
-			<bounds x="440" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc10" ref="bit_lamp" inputtag="RC" inputmask="0x400">
-			<bounds x="465" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc9" ref="bit_lamp" inputtag="RC" inputmask="0x200">
-			<bounds x="490" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc8" ref="bit_lamp" inputtag="RC" inputmask="0x100">
-			<bounds x="515" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc7" ref="bit_lamp" inputtag="RC" inputmask="0x080">
-			<bounds x="540" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc6" ref="bit_lamp" inputtag="RC" inputmask="0x040">
-			<bounds x="565" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc5" ref="bit_lamp" inputtag="RC" inputmask="0x020">
-			<bounds x="590" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc4" ref="bit_lamp" inputtag="RC" inputmask="0x010">
-			<bounds x="615" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc3" ref="bit_lamp" inputtag="RC" inputmask="0x008">
-			<bounds x="640" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc2" ref="bit_lamp" inputtag="RC" inputmask="0x004">
-			<bounds x="665" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc1" ref="bit_lamp" inputtag="RC" inputmask="0x002">
-			<bounds x="690" y="490" width="20" height="20" />
-		</element>
-
-		<element name="rc0" ref="bit_lamp" inputtag="RC" inputmask="0x001">
-			<bounds x="715" y="490" width="20" height="20" />
-		</element>
-
-		<element ref="str_rc">
-			<bounds x="450" y="520" width="299" height="20" />
-		</element>
-
+		<!-- transbordo -->
 		<element name="flags1" ref="bit_lamp" inputtag="FLAGS" inputmask="0x002">
-			<bounds x="465" y="310" width="20" height="20" />
+			<bounds x="765" y="272" width="11" height="11" />
 		</element>
 
+		<element ref="str_flags_t"><bounds x="722" y="297" width="101" height="15" /></element>
+
+		<!-- vai-um -->
 		<element name="flags0" ref="bit_lamp" inputtag="FLAGS" inputmask="0x001">
-			<bounds x="690" y="310" width="20" height="20" />
+			<bounds x="1069" y="272" width="11" height="11" />
 		</element>
 
-		<element ref="str_flags_t">
-			<bounds x="400" y="350" width="199" height="20" />
+		<element ref="str_flags_v"><bounds x="1052" y="297" width="57" height="16" /></element>
+
+		<!-- ula -->
+		<element ref="str_ula"><bounds x="830" y="390" width="165" height="30" /></element>
+
+		<!-- DADOS DO PAINEL -->
+		<repeat count="12">
+			<param name="lamp_x" start="762" increment="28"/>
+			<param name="lamp_id" start="11" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="rc~lamp_id~" ref="bit_lamp" inputtag="rc" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="480" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_OCTAL"><bounds x="129" y="774" width="32" height="12"/></element>
+		<element ref="str_HEXADECIMAL"><bounds x="129" y="892" width="64" height="12"/></element>
+
+
+		<element ref="str_rc"><bounds x="805" y="527" width="240" height="16" /></element>
+
+		<!-- ACUMULADOR -->
+		<repeat count="8">
+			<param name="lamp_x" start="233" increment="28"/>
+			<param name="lamp_id" start="7" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="acc~lamp_id~" ref="bit_lamp" inputtag="ACC" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="190" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_acc"><bounds x="266" y="237" width="140" height="16" /></element>
+
+		<!-- CÓDIGO DE INSTRUÇÃO -->
+		<repeat count="8">
+			<param name="lamp_x" start="233" increment="28"/>
+			<param name="lamp_id" start="7" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="opcode~lamp_id~" ref="bit_lamp" inputtag="opcode" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="310" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_opcode"><bounds x="239" y="356" width="200" height="16" /></element>
+
+		<!-- DADOS DA MEMÓRIA -->
+		<repeat count="8">
+			<param name="lamp_x" start="233" increment="28"/>
+			<param name="lamp_id" start="7" increment="-1"/>
+			<param name="mask" start="0x800" rshift="1" />
+			<element name="mem_data~lamp_id~" ref="bit_lamp" inputtag="mem_data" inputmask="~mask~">
+				<bounds x="~lamp_x~" y="430" width="11" height="11" />
+			</element>
+		</repeat>
+
+		<element ref="str_mem_data"><bounds x="248" y="476" width="176" height="16" /></element>
+
+		<!-- define horizontal lines -->
+		<element ref="line">
+			<bounds x="68" y="38" width="1180" height="4" />
 		</element>
 
-		<element ref="str_flags_v">
-			<bounds x="650" y="350" width="99" height="20" />
+		<element ref="line">
+			<bounds x="525" y="80" width="232" height="4" />
 		</element>
 
-		<element name="pc11" ref="bit_lamp" inputtag="PC" inputmask="0x800">
-			<bounds x="440" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="1089" y="80" width="157" height="4" />
 		</element>
 
-		<element name="pc10" ref="bit_lamp" inputtag="PC" inputmask="0x400">
-			<bounds x="465" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="32" y="97" width="126" height="4" />
 		</element>
 
-		<element name="pc9" ref="bit_lamp" inputtag="PC" inputmask="0x200">
-			<bounds x="490" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="109" y="121" width="51" height="4" />
 		</element>
 
-		<element name="pc8" ref="bit_lamp" inputtag="PC" inputmask="0x100">
-			<bounds x="515" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="109" y="195" width="118" height="4" />
 		</element>
 
-		<element name="pc7" ref="bit_lamp" inputtag="PC" inputmask="0x080">
-			<bounds x="540" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="447" y="195" width="308" height="4" />
 		</element>
 
-		<element name="pc6" ref="bit_lamp" inputtag="PC" inputmask="0x040">
-			<bounds x="565" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="1089" y="195" width="157" height="4" />
 		</element>
 
-		<element name="pc5" ref="bit_lamp" inputtag="PC" inputmask="0x020">
-			<bounds x="590" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="109" y="315" width="116" height="4" />
 		</element>
 
-		<element name="pc4" ref="bit_lamp" inputtag="PC" inputmask="0x010">
-			<bounds x="615" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="447" y="315" width="428" height="4" />
 		</element>
 
-		<element name="pc3" ref="bit_lamp" inputtag="PC" inputmask="0x008">
-			<bounds x="640" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="955" y="328" width="291" height="4" />
 		</element>
 
-		<element name="pc2" ref="bit_lamp" inputtag="PC" inputmask="0x004">
-			<bounds x="665" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="577" y="344" width="298" height="4" />
 		</element>
 
-		<element name="pc1" ref="bit_lamp" inputtag="PC" inputmask="0x002">
-			<bounds x="690" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="109" y="415" width="75" height="4" />
 		</element>
 
-		<element name="pc0" ref="bit_lamp" inputtag="PC" inputmask="0x001">
-			<bounds x="715" y="240" width="20" height="20" />
+		<element ref="line">
+			<bounds x="183" y="435" width="42" height="4" />
 		</element>
 
-		<element ref="str_pc">
-			<bounds x="450" y="270" width="299" height="20" />
+		<element ref="line">
+			<bounds x="447" y="435" width="130" height="4" />
 		</element>
 
-		<element name="mem_addr11" ref="bit_lamp" inputtag="mem_addr" inputmask="0x800">
-			<bounds x="440" y="140" width="20" height="20" />
+		<element ref="line">
+			<bounds x="68" y="451" width="117" height="4" />
 		</element>
 
-		<element name="mem_addr10" ref="bit_lamp" inputtag="mem_addr" inputmask="0x400">
-			<bounds x="465" y="140" width="20" height="20" />
+		<element ref="line">
+			<bounds x="577" y="486" width="178" height="4" />
 		</element>
 
-		<element name="mem_addr9" ref="bit_lamp" inputtag="mem_addr" inputmask="0x200">
-			<bounds x="490" y="140" width="20" height="20" />
+		<element ref="line">
+			<bounds x="32" y="527" width="545" height="4" />
 		</element>
 
-		<element name="mem_addr8" ref="bit_lamp" inputtag="mem_addr" inputmask="0x100">
-			<bounds x="515" y="140" width="20" height="20" />
+		<!-- define 'FASES DE OPERACAO' lines -->
+		<element ref="line">
+			<bounds x="72" y="568" width="1" height="192" />
+		</element>
+		<element ref="line">
+			<bounds x="72" y="568" width="96" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="72" y="760" width="446" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="422" y="568" width="96" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="517" y="568" width="1" height="192" />
 		</element>
 
-		<element name="mem_addr7" ref="bit_lamp" inputtag="mem_addr" inputmask="0x080">
-			<bounds x="540" y="140" width="20" height="20" />
+		<!-- BUSCA -->
+		<element ref="line">
+			<bounds x="72" y="617" width="56" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="194" y="617" width="56" height="1" />
 		</element>
 
-		<element name="mem_addr6" ref="bit_lamp" inputtag="mem_addr" inputmask="0x040">
-			<bounds x="565" y="140" width="20" height="20" />
+		<!-- EXECUÇÃO -->
+		<element ref="line">
+			<bounds x="250" y="617" width="1" height="18" />
+		</element>
+		<element ref="line">
+			<bounds x="250" y="617" width="45" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="384" y="617" width="45" height="1" />
 		</element>
 
-		<element name="mem_addr5" ref="bit_lamp" inputtag="mem_addr" inputmask="0x020">
-			<bounds x="590" y="140" width="20" height="20" />
+		<!-- INDEXAÇÃO -->
+		<element ref="line">
+			<bounds x="428" y="617" width="1" height="18" />
+		</element>
+		<element ref="line">
+			<bounds x="428" y="617" width="8" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="510" y="617" width="8" height="1" />
 		</element>
 
-		<element name="mem_addr4" ref="bit_lamp" inputtag="mem_addr" inputmask="0x010">
-			<bounds x="615" y="140" width="20" height="20" />
+		<!-- 1-5 -->
+		<repeat count="5">
+			<param name="line_left" start="72" increment="89"/>
+			<param name="line_top_right" start="128" increment="89"/>
+			<element ref="line">
+				<bounds x="~line_left~" y="634" width="34" height="1" />
+			</element>
+			<element ref="line">
+				<bounds x="~line_top_right~" y="634" width="34" height="1" />
+			</element>
+			<element ref="line">
+				<bounds x="~line_left~" y="669" width="90" height="1" />
+			</element>
+			<element ref="line">
+				<bounds x="~line_left~" y="634" width="1" height="36" />
+			</element>
+		</repeat>
+
+		<!-- INDIRETO -->
+		<element ref="line">
+			<bounds x="118" y="706" width="1" height="55" />
+		</element>
+		<element ref="line">
+			<bounds x="118" y="706" width="133" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="337" y="706" width="133" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="469" y="706" width="1" height="55" />
 		</element>
 
-		<element name="mem_addr3" ref="bit_lamp" inputtag="mem_addr" inputmask="0x008">
-			<bounds x="640" y="140" width="20" height="20" />
+		<!-- 6 -->
+		<element ref="line">
+			<bounds x="118" y="726" width="77" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="217" y="726" width="77" height="1" />
 		</element>
 
-		<element name="mem_addr2" ref="bit_lamp" inputtag="mem_addr" inputmask="0x004">
-			<bounds x="665" y="140" width="20" height="20" />
+		<element ref="line">
+			<bounds x="293" y="726" width="1" height="34" />
 		</element>
 
-		<element name="mem_addr1" ref="bit_lamp" inputtag="mem_addr" inputmask="0x002">
-			<bounds x="690" y="140" width="20" height="20" />
+		<!-- 7 -->
+		<element ref="line">
+			<bounds x="293" y="726" width="77" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="393" y="726" width="77" height="1" />
 		</element>
 
-		<element name="mem_addr0" ref="bit_lamp" inputtag="mem_addr" inputmask="0x001">
-			<bounds x="715" y="140" width="20" height="20" />
+		<!-- define vertical lines -->
+		<element ref="line">
+			<bounds x="32" y="97" width="4" height="430" />
 		</element>
 
-		<element ref="str_mem_addr">
-			<bounds x="450" y="170" width="299" height="20" />
+		<element ref="line">
+			<bounds x="68" y="38" width="4" height="415" />
 		</element>
 
-		<element name="NORMAL" ref="button" inputtag="BUTTONS" inputmask="0x001">
-			<bounds x="40" y="640" width="40" height="40" />
+		<element ref="line">
+			<bounds x="109" y="121" width="4" height="296" />
 		</element>
 
+		<element ref="line">
+			<bounds x="183" y="415" width="4" height="40" />
+		</element>
+
+		<element ref="line">
+			<bounds x="577" y="80" width="4" height="236" />
+		</element>
+
+		<element ref="line">
+			<bounds x="577" y="344" width="4" height="187" />
+		</element>
+
+		<element ref="line">
+			<bounds x="1246" y="38" width="4" height="295" />
+		</element>
+
+		<!-- define "PARADO" and "EXTERNO" lines-->
+		<repeat count="2">
+			<param name="line_x_top_left" start="565" increment="110"/>
+			<param name="line_y_left" start="564" increment="110"/>
+			<param name="line_x_bottom" start="564" increment="110"/>
+			<param name="line_y_right" start="626" increment="110"/>
+			<param name="line_x_top_right" start="622" increment="110"/>
+			<element ref="line">
+				<bounds x="~line_x_top_left~" y="633" width="4" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_left~" y="633" width="1" height="37"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_bottom~" y="668" width="62" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_right~" y="633" width="1" height="37"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_top_right~" y="633" width="4" height="1"/>
+			</element>
+		</repeat>
+
+		<!-- define 'ENTRADA MANUAL DE DADOS' horizontal lines -->
+		<repeat count="12">
+			<param name="line1_x" start="123" increment="85"/>
+			<element ref="line">
+				<bounds x="~line1_x~" y="845" width="86" height="1" />
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="123" y="788" width="32" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="176" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="262" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="346" y="788" width="32" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="378" y="788" width="32" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="432" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="517" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="602" y="788" width="32" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="633" y="788" width="32" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="687" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="772" y="788" width="64" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="857" y="788" width="32" height="4" />
+		</element>
+
+		<element ref="line">
+			<bounds x="889" y="788" width="32" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="942" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="1027" y="788" width="64" height="1" />
+		</element>
+		<element ref="line">
+			<bounds x="1112" y="788" width="32" height="1" />
+		</element>
+
+		<element ref="line">
+			<bounds x="123" y="884" width="342" height="4" />
+		</element>
+		<element ref="line">
+			<bounds x="803" y="884" width="342" height="4" />
+		</element>
+
+		<!-- define 'ENTRADA MANUAL DE DADOS' vertical lines -->
+		<repeat count="13">
+			<param name="line1_x" start="123" increment="85"/>
+			<element ref="line">
+				<bounds x="~line1_x~" y="788" width="1" height="58" />
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="123" y="788" width="4" height="100" />
+		</element>
+		<element ref="line">
+			<bounds x="1143" y="788" width="4" height="100" />
+		</element>
+
+		<element ref="line">
+			<bounds x="376" y="788" width="4" height="10" />
+		</element>
+		<element ref="line">
+			<bounds x="632" y="788" width="4" height="10" />
+		</element>
+		<element ref="line">
+			<bounds x="887" y="788" width="4" height="10" />
+		</element>
+
+		<element ref="line">
+			<bounds x="462" y="875" width="4" height="12" />
+		</element>
+		<element ref="line">
+			<bounds x="803" y="875" width="4" height="12" />
+		</element>
+
+		<!-- define 'MEMORIA' lines -->
+		<element ref="line">
+			<bounds x="378" y="942" width="116" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="378" y="942" width="1" height="24"/>
+		</element>
+		<element ref="line">
+			<bounds x="693" y="942" width="1" height="24"/>
+		</element>
+		<element ref="line">
+			<bounds x="578" y="942" width="116" height="1"/>
+		</element>
+
+		<element ref="memory_rect">
+			<bounds x="381" y="946" width="311" height="67"/>
+		</element>
+
+		<repeat count="12">
+			<param name="i" start="0" increment="1"/>
+			<param name="n" start="11" increment="-1"/>
+			<param name="x_label" start="157" increment="85"/>
+			<param name="x_switch" start="160" increment="85"/>
+			<param name="mask" start="0x800" rshift="1" />
+
+			<element ref="str_num_~i~"><bounds x="~x_label~" y="780" width="18" height="16"/></element>
+			<element name="rc~n~" ref="switch" inputtag="rc" inputmask="~mask~">
+				<bounds x="~x_switch~" y="830" width="20" height="30"/>
+			</element>
+		</repeat>
+
+		<!-- define 'MODO DE OPERACAO' lines -->
+		<repeat count="6">
+			<param name="line_x_top_left" start="63" increment="105"/>
+			<param name="line_y_left" start="63" increment="105"/>
+			<param name="line_x_bottom" start="63" increment="105"/>
+			<param name="line_y_right" start="168" increment="105"/>
+			<param name="line_x_top_right" start="155" increment="105"/>
+			<element ref="line">
+				<bounds x="~line_x_top_left~" y="965" width="13" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_left~" y="965" width="1" height="50"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_bottom~" y="1014" width="105" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_right~" y="965" width="1" height="50"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_top_right~" y="965" width="13" height="1"/>
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="63" y="1057" width="210" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="63" y="1014" width="1" height="43"/>
+		</element>
+		<element ref="line">
+			<bounds x="63" y="1014" width="630" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="693" y="1014" width="1" height="43"/>
+		</element>
+		<element ref="line">
+			<bounds x="485" y="1057" width="210" height="1"/>
+		</element>
+
+		<!-- define 'COMANDO' lines -->
+		<repeat count="3">
+			<param name="line_x_top_left" start="884" increment="105"/>
+			<param name="line_y_left" start="884" increment="105"/>
+			<param name="line_x_bottom" start="884" increment="105"/>
+			<param name="line_y_right" start="989" increment="105"/>
+			<param name="line_x_top_right" start="976" increment="105"/>
+			<element ref="line">
+				<bounds x="~line_x_top_left~" y="965" width="14" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_left~" y="965" width="1" height="50"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_bottom~" y="1014" width="105" height="1"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_y_right~" y="965" width="1" height="50"/>
+			</element>
+			<element ref="line">
+				<bounds x="~line_x_top_right~" y="965" width="14" height="1"/>
+			</element>
+		</repeat>
+
+		<element ref="line">
+			<bounds x="884" y="1057" width="108" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="884" y="1014" width="1" height="44"/>
+		</element>
+		<element ref="line">
+			<bounds x="884" y="1014" width="315" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="1199" y="1014" width="1" height="44"/>
+		</element>
+		<element ref="line">
+			<bounds x="1092" y="1057" width="108" height="1"/>
+		</element>
+
+		<!-- define 'PREPARACAO' lines -->
+		<element ref="line">
+			<bounds x="1094" y="1160" width="14" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="1094" y="1111" width="1" height="50"/>
+		</element>
+		<element ref="line">
+			<bounds x="1094" y="1111" width="106" height="1"/>
+		</element>
+		<element ref="line">
+			<bounds x="1200" y="1111" width="1" height="50"/>
+		</element>
+		<element ref="line">
+			<bounds x="1187" y="1160" width="14" height="1"/>
+		</element>
+
+		<!-- define buttons -->
+		<!-- NORMAL -->
+		<element name="MODE_BUTTON0" ref="button" inputtag="BUTTONS" inputmask="0x001">
+			<bounds x="93" y="994" width="42" height="42" />
+		</element>
 		<element ref="str_NORMAL">
-			<bounds x="12" y="610" width="150" height="20" />
+			<bounds x="83" y="960" width="70" height="16" />
 		</element>
 
-		<element name="CICLOUNICO" ref="button" inputtag="BUTTONS" inputmask="0x002">
-			<bounds x="190" y="640" width="40" height="40" />
+		<!-- CICLOUNICO -->
+		<element name="MODE_BUTTON1" ref="button" inputtag="BUTTONS" inputmask="0x002">
+			<bounds x="200" y="994" width="42" height="42"  />
 		</element>
-
 		<element ref="str_CICLOUNICO">
-			<bounds x="162" y="610" width="150" height="20" />
+			<bounds x="184" y="961" width="78" height="11" />
 		</element>
 
-		<element name="INSTRUCAOUNICA" ref="button" inputtag="BUTTONS" inputmask="0x004">
-			<bounds x="340" y="640" width="40" height="40" />
+		<!-- INSTRUCAOUNICA -->
+		<element name="MODE_BUTTON2" ref="button" inputtag="BUTTONS" inputmask="0x004">
+			<bounds x="310" y="994" width="42" height="42"  />
 		</element>
-
 		<element ref="str_INSTRUCAOUNICA">
-			<bounds x="312" y="610" width="150" height="20" />
+			<bounds x="293" y="960" width="70" height="22" />
 		</element>
 
-		<element name="ENDERECAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x008">
-			<bounds x="490" y="640" width="40" height="40" />
+		<!-- ENDERECAMENTO -->
+		<element name="MODE_BUTTON3" ref="button" inputtag="BUTTONS" inputmask="0x008">
+			<bounds x="413" y="994" width="42" height="42"  />
 		</element>
-
 		<element ref="str_ENDERECAMENTO">
-			<bounds x="462" y="610" width="150" height="20" />
+			<bounds x="393" y="960" width="78" height="16" />
 		</element>
 
-		<element name="ARMAZENAMENTO" ref="button" inputtag="BUTTONS" inputmask="0x010">
-			<bounds x="640" y="640" width="40" height="40" />
+		<!-- ARMAZENAMENTO -->
+		<element name="MODE_BUTTON4" ref="button" inputtag="BUTTONS" inputmask="0x010">
+			<bounds x="520" y="994" width="42" height="42"  />
 		</element>
-
 		<element ref="str_ARMAZENAMENTO">
-			<bounds x="612" y="610" width="150" height="20" />
+			<bounds x="497" y="960" width="79" height="16" />
 		</element>
 
-		<element name="EXPOSICAO" ref="button" inputtag="BUTTONS" inputmask="0x020">
-			<bounds x="790" y="640" width="40" height="40" />
+		<!-- EXPOSICAO -->
+		<element name="MODE_BUTTON5" ref="button" inputtag="BUTTONS" inputmask="0x020">
+			<bounds x="626" y="994" width="42" height="42"  />
 		</element>
-
 		<element ref="str_EXPOSICAO">
-			<bounds x="762" y="610" width="150" height="20" />
+			<bounds x="603" y="960" width="78" height="13" />
 		</element>
 
+		<!-- ESPERA -->
 		<element name="ESPERA" ref="button" inputtag="BUTTONS" inputmask="0x040">
-			<bounds x="340" y="740" width="40" height="40" />
+			<bounds x="915" y="994" width="42" height="42"  />
 		</element>
-
 		<element ref="str_ESPERA">
-			<bounds x="308" y="710" width="166" height="20" />
+			<bounds x="907" y="960" width="64" height="16" />
 		</element>
 
+		<!-- INTERRUPCAO -->
 		<element name="INTERRUPCAO" ref="button" inputtag="BUTTONS" inputmask="0x080">
-			<bounds x="506" y="740" width="40" height="40" />
+			<bounds x="1022" y="994" width="42" height="42"  />
 		</element>
-
 		<element ref="str_INTERRUPCAO">
-			<bounds x="474" y="710" width="166" height="20" />
+			<bounds x="1004" y="960" width="76" height="14" />
 		</element>
 
-		<element name="PARTIDA" ref="button" inputtag="BUTTONS" inputmask="0x100">
-			<bounds x="673" y="740" width="40" height="40" />
+		<!-- PARTIDA -->
+		<element name="PARTIDA" ref="sqr_button" inputtag="BUTTONS" inputmask="0x100">
+			<bounds x="1120" y="992" width="56" height="46"  />
 		</element>
-
 		<element ref="str_PARTIDA">
-			<bounds x="641" y="710" width="166" height="20" />
+			<bounds x="1114" y="960" width="67" height="16" />
 		</element>
 
+		<!-- PREPARACAO -->
 		<element name="PREPARACAO" ref="button" inputtag="BUTTONS" inputmask="0x200">
-			<bounds x="840" y="740" width="40" height="40" />
+			<bounds x="1128" y="1092" width="42" height="42"  />
+		</element>
+		<element ref="str_PREPARACAO">
+			<bounds x="1114" y="1152" width="70" height="16" />
 		</element>
 
-		<element ref="str_PREPARACAO">
-			<bounds x="808" y="710" width="166" height="20" />
+		<!-- define circles -->
+		<element ref="circle">
+			<bounds x="574" y="76" width="11" height="11" />
 		</element>
+
+		<element ref="circle">
+			<bounds x="1241" y="76" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="106" y="190" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="574" y="190" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="1241" y="190" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="106" y="312" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="574" y="312" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="574" y="431" width="11" height="11" />
+		</element>
+
+		<element ref="circle">
+			<bounds x="574" y="483" width="11" height="11" />
+		</element>
+
+		<!-- define panel diagrams -->
+		<element ref="diagram_rect">
+			<bounds x="123" y="195" width="78" height="70" />
+		</element>
+
+		<!-- simple line diagrams -->
+		<element ref="diagram_01">
+			<bounds x="151" y="130" width="384" height="34" />
+		</element>
+
+		<repeat count="3">
+			<param name="diagram_y" start="210" increment="120"/>
+			<element ref="diagram_02">
+				<bounds x="218" y="~diagram_y~" width="238" height="34" />
+			</element>
+		</repeat>
+
+		<element ref="diagram_03">
+			<bounds x="746" y="94" width="351" height="34" />
+		</element>
+		<element ref="diagram_03">
+			<bounds x="746" y="210" width="351" height="34" />
+		</element>
+		<element ref="diagram_03">
+			<bounds x="746" y="500" width="351" height="34" />
+		</element>
+
+		<!-- ula diagrams -->
+		<element ref="diagram_04">
+			<bounds x="712" y="265" width="405" height="147" />
+		</element>
+
+		<element ref="ula"><bounds x="875" y="278" width="81" height="104" /></element>
+
+		<!-- switch diagrams -->
+		<element ref="diagram_05">
+			<bounds x="782" y="624" width="186" height="93" />
+		</element>
+
+		<element ref="diagram_05">
+			<bounds x="1014" y="624" width="186" height="93" />
+		</element>
+
+		<!-- bold line diagrams-->
+		<repeat count="3">
+			<param name="diagram_y" start="180" increment="120"/>
+			<element ref="diagram_06">
+				<bounds x="223" y="~diagram_y~" width="226" height="34" />
+			</element>
+		</repeat>
+
+		<element ref="diagram_07">
+			<bounds x="753" y="63" width="339" height="34" />
+		</element>
+		<element ref="diagram_07">
+			<bounds x="753" y="180" width="339" height="34" />
+		</element>
+		<element ref="diagram_07">
+			<bounds x="753" y="469" width="339" height="34" />
+		</element>
+
+		<!-- define arrows -->
+
+		<element ref="down_arrow">
+			<bounds x="63" y="375" width="14" height="22" />
+		</element>
+		<element ref="down_arrow">
+			<bounds x="104" y="375" width="14" height="22" />
+		</element>
+
+
+		<element ref="left_arrow">
+			<bounds x="538" y="75" width="22" height="14" />
+		</element>
+		<element ref="left_arrow">
+			<bounds x="622" y="75" width="22" height="14" />
+		</element>
+		<element ref="left_arrow">
+			<bounds x="1148" y="75" width="22" height="14" />
+		</element>
+
+		<element ref="left_arrow">
+			<bounds x="622" y="190" width="22" height="14" />
+		</element>
+		<element ref="left_arrow">
+			<bounds x="1148" y="190" width="22" height="14" />
+		</element>
+
+		<element ref="left_arrow">
+			<bounds x="622" y="480" width="22" height="14" />
+		</element>
+
+		<element ref="left_arrow">
+			<bounds x="479" y="522" width="22" height="14" />
+		</element>
+
+
+		<element ref="right_arrow">
+			<bounds x="203" y="190" width="22" height="14" />
+		</element>
+		<element ref="right_arrow">
+			<bounds x="504" y="190" width="22" height="14" />
+		</element>
+
+		<element ref="right_arrow">
+			<bounds x="203" y="310" width="22" height="14" />
+		</element>
+		<element ref="right_arrow">
+			<bounds x="504" y="310" width="22" height="14" />
+		</element>
+		<element ref="right_arrow">
+			<bounds x="629" y="310" width="22" height="14" />
+		</element>
+		
+		<element ref="right_arrow">
+			<bounds x="629" y="339" width="22" height="14" />
+		</element>
+
+		<element ref="right_arrow">
+			<bounds x="504" y="430" width="22" height="14" />
+		</element>
+
+		<!-- Endereçamento: Fixo/Sequencial -->
+		<element ref="rotary_switch" inputtag="BUTTONS" inputmask="0x400">
+			<bounds x="856" y="650" width="37" height="37" />
+		</element>
+
+		<!-- Memória: Liberada/Protegida -->
+		<element ref="rotary_switch" inputtag="BUTTONS" inputmask="0x800">
+			<bounds x="1088" y="650" width="37" height="37" />
+		</element>
+
+		<!-- 'FASES DE OPERACAO' lamps -->
+		<repeat count="5">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="108" increment="89"/>
+			<element ref="str_num_~i~"><bounds x="~x~" y="626" width="18" height="16"/></element>
+		</repeat> <!-- labels -->
+		<repeat count="5">
+			<param name="lamp_x" start="98" increment="89"/>
+			<element ref="state_lamp">
+				<bounds x="~lamp_x~" y="651" width="36" height="36" />
+			</element>
+		</repeat> <!-- lamps -->
+
+		<element ref="str_num_6"><bounds x="197" y="717" width="18" height="16"/></element>
+		<element ref="state_lamp">
+			<bounds x="187" y="742" width="36" height="36" />
+		</element>
+
+		<element ref="str_num_7"><bounds x="374" y="717" width="18" height="16"/></element>
+		<element ref="state_lamp">
+			<bounds x="364" y="742" width="36" height="36" />
+		</element>
+
+		<element ref="state_lamp">
+			<bounds x="579" y="651" width="36" height="36" />
+		</element>
+		<element ref="state_lamp">
+			<bounds x="688" y="651" width="36" height="36" />
+		</element>
+
+		<!-- texts -->
+		<element ref="str_entrada_dados"><bounds x="476" y="872" width="321" height="17"/></element>
+		<element ref="str_fases_operacao"><bounds x="176" y="561" width="240" height="16"/></element>
+		<element ref="str_modo_operacao"><bounds x="290" y="1049" width="185" height="16"/></element>
+		<element ref="str_memoria"><bounds x="499" y="931" width="75" height="16"/></element>
+		<element ref="str_comando"><bounds x="1003" y="1050" width="80" height="16"/></element>
+
+		<element ref="str_enderecamento_spaces"><bounds x="809" y="711" width="136" height="16"/></element>
+		<element ref="str_memoria"><bounds x="1070" y="711" width="80" height="16"/></element>
+
+		<element ref="str_memoria_spaces"><bounds x="284" y="154" width="115" height="16"/></element>
+
+		<repeat count="3">
+			<param name="y1" start="169" increment="120"/>
+			<param name="y2" start="215" increment="120"/>
+
+			<element ref="str_OCTAL"><bounds x="228" y="~y1~" width="32" height="12"/></element>
+			<element ref="str_HEXAD"><bounds x="228" y="~y2~" width="32" height="12"/></element>
+		</repeat>
+
+		<repeat count="2">
+			<param name="y1" start="50" increment="115"/>
+			<param name="y2" start="96" increment="120"/>
+
+			<element ref="str_OCTAL"><bounds x="755" y="~y1~" width="32" height="12"/></element>
+			<element ref="str_HEXAD"><bounds x="755" y="~y2~" width="32" height="12"/></element>
+		</repeat>
+		<element ref="str_OCTAL"><bounds x="755" y="456" width="32" height="12"/></element>
+		<element ref="str_HEXAD"><bounds x="755" y="505" width="32" height="12"/></element>
+
+		<element ref="str_entrada_saida"><bounds x="137" y="222" width="48" height="36"/></element>
+
+		<!-- fases de operação -->
+		<element ref="str_busca"><bounds x="136" y="610" width="55" height="16"/></element>
+		<element ref="str_execucao"><bounds x="297" y="610" width="85" height="16"/></element>
+		<element ref="str_indexacao"><bounds x="440" y="610" width="69" height="16"/></element>
+		<element ref="str_indireto"><bounds x="255" y="698" width="80" height="16"/></element>
+
+		<element ref="str_parado"><bounds x="574" y="625" width="46" height="16"/></element>
+		<element ref="str_externo"><bounds x="682" y="625" width="50" height="16"/></element>
+
+		<!-- switches -->
+		<element ref="str_fixo"><bounds x="795" y="615" width="40" height="16"/></element>
+		<element ref="str_sequencial"><bounds x="913" y="615" width="72" height="16"/></element>
+		<element ref="str_liberada"><bounds x="1012" y="615" width="56" height="16"/></element>
+		<element ref="str_protegida"><bounds x="1146" y="615" width="68" height="16"/></element>
 
 	</view>
 </mamelayout>
