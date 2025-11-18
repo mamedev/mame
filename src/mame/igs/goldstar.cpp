@@ -695,6 +695,7 @@ protected:
 
 private:
 	DECLARE_VIDEO_START(bingowng);
+	DECLARE_VIDEO_START(flaming7);
 	DECLARE_VIDEO_START(magical);
 
 	void magodds_outb850_w(uint8_t data);
@@ -1263,12 +1264,10 @@ void goldstar_state::video_start()
 	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel_tilemap[0]->set_scroll_cols(64);
 	m_reel_tilemap[1]->set_scroll_cols(64);
 	m_reel_tilemap[2]->set_scroll_cols(64);
-	m_reel_tilemap[3]->set_scroll_cols(64);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -1485,6 +1484,25 @@ VIDEO_START_MEMBER(wingco_state, bingowng)
 	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_reel_tilemap[0]->set_scroll_cols(64);
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	// is there an enable reg for this game?
+	m_enable_reg = 0x0b;
+}
+
+VIDEO_START_MEMBER(wingco_state, flaming7)
+{
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
+	m_reel_tilemap[3]->set_scroll_cols(64);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -16149,6 +16167,8 @@ void wingco_state::flaming7(machine_config &config)
 	m_gfxdecode->set_info(gfx_flaming7);
 	PALETTE(config.replace(), m_palette, FUNC(wingco_state::cm_palette), 256);
 
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, flaming7)
+
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
@@ -16166,6 +16186,8 @@ void wingco_state::flam7_tw(machine_config &config)
 
 	m_gfxdecode->set_info(gfx_flam7_tw);
 	PALETTE(config.replace(), m_palette, FUNC(wingco_state::cm_palette), 256);
+
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, flaming7)
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
