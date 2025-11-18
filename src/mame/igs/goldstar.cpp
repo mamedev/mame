@@ -3033,7 +3033,6 @@ void wingco_state::system_outputc_w(uint8_t data)
 {
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
-//  popmessage("system_outputc_w %02x",data);
 
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -4437,7 +4436,7 @@ void wingco_state::lucky8_map(address_map &map)
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
 	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
-	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x9800, 0x99ff).mirror(0x200).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);  // all reels use mirrors?
 	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
 	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
@@ -4776,7 +4775,7 @@ void wingco_state::wcat3_map(address_map &map)
 	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
 	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
-	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x9800, 0x99ff).mirror(0x200).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);  // all reels use mirrors?
 	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
 	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
