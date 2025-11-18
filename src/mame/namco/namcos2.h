@@ -191,6 +191,12 @@ enum
 
 	std::unique_ptr<u8[]> m_eeprom;
 
+	required_shared_ptr<u8> m_dpram; /* 2Kx8 */
+	optional_shared_ptr<u16> m_spriteram;
+	u16 m_gfx_ctrl = 0;
+	u8 m_finallap_prot_count = 0;
+	bool m_sendval = false;
+
 	u16 dpram_word_r(offs_t offset);
 	virtual void dpram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 dpram_byte_r(offs_t offset);
@@ -210,6 +216,7 @@ enum
 	void video_start_metlhawk();
 	void video_start_sgunner();
 
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -226,12 +233,6 @@ enum
 
 	int get_pos_irq_scanline() { return (m_c116->get_reg(5) - 32) & 0xff; }
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
-
-	required_shared_ptr<u8> m_dpram; /* 2Kx8 */
-	optional_shared_ptr<u16> m_spriteram;
-	u16 m_gfx_ctrl = 0;
-	u8 m_finallap_prot_count = 0;
-	bool m_sendval = false;
 
 	optional_device<namco_c45_road_device> m_c45_road;
 	optional_device<namcos2_sprite_device> m_ns2sprite;
