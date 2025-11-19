@@ -98,7 +98,7 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	const u8 *screen_location = m_host_ram_ptr + ((m_ula_shadow_en ? 7 : 5) << 14) + (timex_alt ? 0x2000 : 0);
 
-	const u16 x2_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1)) % (SCREEN_AREA.width() << 1);
+	const u16 x2_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1) + m_ula_fine_scroll_x) % (SCREEN_AREA.width() << 1);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();
@@ -123,7 +123,7 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 				{
 					*pix = pen;
 					*prio |= pcode;
-					if (hpos < clip.right())
+					if (!off2 && (hpos < clip.right()))
 					{
 						*(pix + 1) = pen;
 						*(prio + 1) |= pcode;
@@ -164,7 +164,7 @@ void screen_ula_device::draw_hires(bitmap_rgb32 &bitmap, const rectangle &clip, 
 	const rgb_t pap = pi.first;
 	const rgb_t ink = pi.second;
 
-	const u16 x_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1)) % (SCREEN_AREA.width() << 1);
+	const u16 x_min = ((clip.left() - m_offset_h) + (m_ula_scroll_x << 1) + m_ula_fine_scroll_x) % (SCREEN_AREA.width() << 1);
 	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
 	{
 		u16 hpos = clip.left();
@@ -265,6 +265,7 @@ void screen_ula_device::device_add_mconfig(machine_config &config)
 	m_ula_clip_y2 = 192;
 	m_ula_scroll_x = 0;
 	m_ula_scroll_y = 0;
+	m_ula_fine_scroll_x = 0;
 }
 
 void screen_ula_device::device_start()

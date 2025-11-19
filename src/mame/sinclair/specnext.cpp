@@ -118,7 +118,7 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "dma")
 		, m_i2c(*this, "i2c")
-		, m_sdcard(*this, "sdcard")
+		, m_sdcards(*this, "sdcard%u", 0U)
 		, m_ay(*this, "ay%u", 0U)
 		, m_dac(*this, "dac%u", 0U)
 		, m_palette(*this, "palette")
@@ -343,7 +343,7 @@ private:
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
 	optional_device<i2c_ds1307_device> m_i2c;
-	required_device<spi_sdcard_device> m_sdcard;
+	required_device_array<spi_sdcard_device, 2> m_sdcards;
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device_array<dac_byte_interface, 4> m_dac;
 	required_device<device_palette_interface> m_palette;
@@ -1111,7 +1111,8 @@ void specnext_state::port_e7_reg_w(u8 data)
 		m_port_e7_reg = 0xff;
 
 	// bit 7 = fpga flash, bit 3 = rpi1, bit 2 = rpi0, bit 1 = sd1, bit 0 = sd0
-	m_sdcard->spi_ss_w(BIT(~m_port_e7_reg, 0));
+	m_sdcards[0]->spi_ss_w(BIT(~m_port_e7_reg, 0));
+	m_sdcards[1]->spi_ss_w(BIT(~m_port_e7_reg, 1));
 }
 
 u8 specnext_state::spi_data_r()
@@ -1132,9 +1133,12 @@ void specnext_state::spi_data_w(u8 data)
 #else
 	for (u8 m = 0x80; m; m >>= 1)
 	{
-		m_sdcard->spi_mosi_w(m_spi_mosi_dat & m ? 1 : 0);
-		m_sdcard->spi_clock_w(CLEAR_LINE);
-		m_sdcard->spi_clock_w(ASSERT_LINE);
+		for (int i = 0; i < 2; ++i)
+		{
+			m_sdcards[i]->spi_mosi_w(m_spi_mosi_dat & m ? 1 : 0);
+			m_sdcards[i]->spi_clock_w(CLEAR_LINE);
+			m_sdcards[i]->spi_clock_w(ASSERT_LINE);
+		}
 	}
 #endif
 }
@@ -1339,13 +1343,17 @@ TIMER_CALLBACK_MEMBER(specnext_state::spi_clock)
 	{
 		if (m_spi_clock_state)
 		{
-			m_sdcard->spi_clock_w(ASSERT_LINE);
+			m_sdcards[0]->spi_clock_w(ASSERT_LINE);
+			m_sdcards[1]->spi_clock_w(ASSERT_LINE);
 			m_spi_clock_cycles--;
 		}
 		else
 		{
-			m_sdcard->spi_mosi_w(BIT(m_spi_mosi_dat, m_spi_clock_cycles - 1));
-			m_sdcard->spi_clock_w(CLEAR_LINE);
+			m_sdcards[0]->spi_mosi_w(BIT(m_spi_mosi_dat, m_spi_clock_cycles - 1));
+			m_sdcards[0]->spi_clock_w(CLEAR_LINE);
+
+			m_sdcards[1]->spi_mosi_w(BIT(m_spi_mosi_dat, m_spi_clock_cycles - 1));
+			m_sdcards[1]->spi_clock_w(CLEAR_LINE);
 		}
 
 		m_spi_clock_state = !m_spi_clock_state;
@@ -2152,7 +2160,6 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_palette_sub_idx = 0;
 		break;
 	case 0x41:
-		m_screen->update_now();
 		palette_val_w(0b00, (nr_wr_dat << 1) | BIT(nr_wr_dat, 1) | BIT(nr_wr_dat, 0));
 		if (m_nr_43_palette_autoinc_disable == 0)
 			++m_nr_palette_idx;
@@ -2162,6 +2169,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		nr_42_ulanext_format_w(nr_wr_dat);
 		break;
 	case 0x43:
+		m_screen->update_now();
 		m_nr_43_palette_autoinc_disable = BIT(nr_wr_dat, 7);
 		m_nr_43_palette_write_select = BIT(nr_wr_dat, 4, 3);
 		nr_43_active_sprite_palette_w(BIT(nr_wr_dat, 3));
@@ -2501,6 +2509,7 @@ void specnext_state::nr_07_cpu_speed_w(u8 data)
 
 void specnext_state::nr_14_global_transparent_rgb_w(u8 data)
 {
+	m_screen->update_now();
 	m_nr_14_global_transparent_rgb = data;
 	m_ula_scr->set_global_transparent(data);
 	m_tiles->set_global_transparent(data);
@@ -3049,10 +3058,10 @@ INPUT_PORTS_START(specnext)
 	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_BUTTON5)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON5)   PORT_NAME("Joystick (R) C")
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON1)   PORT_NAME("Joystick (R) A")
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_BUTTON8)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON8)   PORT_NAME("Joystick (R) Start")
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_BUTTON4)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON4)   PORT_NAME("Joystick (R) Y")
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_BUTTON6)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON6)   PORT_NAME("Joystick (R) Z")
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_BUTTON3)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON3)   PORT_NAME("Joystick (R) X")
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_BUTTON7)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON7)   PORT_NAME("Joystick (R) Mode")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_BUTTON4)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON4)   PORT_NAME("Joystick (R) Y")
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_BUTTON6)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON6)   PORT_NAME("Joystick (R) Z")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_BUTTON3)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON3)   PORT_NAME("Joystick (R) X")
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_BUTTON7)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON7)   PORT_NAME("Joystick (R) Mode")
 
 	PORT_MODIFY("NMI")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI MF") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_mf_nmi), 0)
@@ -3770,11 +3779,16 @@ void specnext_state::tbblue(machine_config &config)
 	I2C_DS1307(config, m_i2c);
 	m_i2c->sda_callback().set([this](int state) { m_i2c_sda_data = state & 1; });
 
-	SPI_SDCARD(config, m_sdcard, 0);
-	m_sdcard->set_prefer_sdhc();
-	m_sdcard->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
+	SPI_SDCARD(config, m_sdcards[0], 0);
+	m_sdcards[0]->set_prefer_sdhc();
+	m_sdcards[0]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
+
+	SPI_SDCARD(config, m_sdcards[1], 0);
+	m_sdcards[1]->set_prefer_sdhc();
+	m_sdcards[1]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
 
 	SPEAKER(config.replace(), "speakers", 2).front();
+	m_speaker->add_route(ALL_OUTPUTS, "speakers", 0.50, 1);
 
 	DAC_8BIT_R2R(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speakers", 0.75, 0);
 	DAC_8BIT_R2R(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speakers", 0.75, 0);
