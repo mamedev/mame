@@ -50,8 +50,15 @@ This driver is based on the service manual for the Six-Trak (probably Rev C),
 and is intended as an educational tool.
 
 
-When the RAM is not initialized, all programs will be silent, the synth will be
-out of tune, and the pitch wheel will not be calibrated.
+*** Tuning and initialization ***
+
+If the NVRAM images are present in the .zip file, the synth will be initialized
+to factory settings. The initialization steps below will not be required.
+
+The NVRAM images are optional. If not present, all programs will be silent, the
+synth will be out of tune, and the pitch wheel will not be calibrated. To tune
+and calibrate, see below. In this case, patches will need to be programmed
+manually or configured via MIDI SYSEX.
 
 A basic test patch can be configured by pressing:
 CONTROL RECORD + SELECT 8 (C + NUMPAD 8)
@@ -736,10 +743,9 @@ u64 sixtrak_state::iorq_wait_state(offs_t offset, u64 current_time)
 
 void sixtrak_state::memory_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x47ff).ram().share("nvram1");
-	map(0x4800, 0x4fff).ram().share("nvram2");
-	map(0x5000, 0x57ff).mirror(0x0800).ram().share("nvram3");
+	map(0x0000, 0x3fff).rom();  // U128 (27128)
+	map(0x4000, 0x4fff).ram().share("nvram_a");  // U119, U117 (6116)
+	map(0x5000, 0x57ff).mirror(0x0800).ram().share("nvram_b");  // U112 (6116)
 	map(0x6000, 0x6001).mirror(0x1ffe).w("midiacia", FUNC(acia6850_device::write));
 	map(0xe000, 0xe001).mirror(0x1ffe).r("midiacia", FUNC(acia6850_device::read));
 }
@@ -798,9 +804,8 @@ void sixtrak_state::sixtrak(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sixtrak_state::memory_map);
 	m_maincpu->set_addrmap(AS_IO, &sixtrak_state::io_map);
 
-	NVRAM(config, "nvram1", nvram_device::DEFAULT_ALL_0);  // U119 (6116)
-	NVRAM(config, "nvram2", nvram_device::DEFAULT_ALL_0);  // U117 (6116)
-	NVRAM(config, "nvram3", nvram_device::DEFAULT_ALL_0);  // U112 (6116)
+	NVRAM(config, "nvram_a", nvram_device::DEFAULT_ALL_0);  // U119, U117 (6116)
+	NVRAM(config, "nvram_b", nvram_device::DEFAULT_ALL_0);  // U112 (6116)
 
 	PIT8253(config, m_pit);  // U133
 	m_pit->set_clk<1>(8_MHz_XTAL / 4);  // U134 (74LS93), QB.
@@ -1111,14 +1116,21 @@ INPUT_PORTS_END
 
 // The firmware version can be displayed by pressing RECORD TRACK and SELECT 5.
 ROM_START(sixtrak)
-	ROM_REGION(0x4000, "maincpu", 0)  // U128 (27128)
 	ROM_DEFAULT_BIOS("v11")
-
 	ROM_SYSTEM_BIOS(0, "v11", "Six-Trak V11 (1985)")  // Last official release.
-	ROMX_LOAD("trak-11.bin", 0x000000, 0x004000, CRC(4d361d4f) SHA1(f14d4291c1a6a3e9462ae9786641cef11a9aac9a), ROM_BIOS(0))
-
 	ROM_SYSTEM_BIOS(1, "v9", "Six-Trak V9")
+
+	ROM_REGION(0x4000, "maincpu", 0)  // U128 (27128)
+	ROMX_LOAD("trak-11.bin", 0x000000, 0x004000, CRC(4d361d4f) SHA1(f14d4291c1a6a3e9462ae9786641cef11a9aac9a), ROM_BIOS(0))
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
+
+	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1) | ROM_OPTIONAL)
+
+	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
+	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1) | ROM_OPTIONAL)
 ROM_END
 
 }  // anonymous namespace
