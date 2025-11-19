@@ -703,6 +703,17 @@ ROM_START( xavbaseb )
 	ROM_LOAD( "xpbaseball.bin", 0x000000, 0x800000, CRC(e9ed692d) SHA1(537e390e972156dc7da66ee127ae4c8052038ee5) )
 ROM_END
 
+ROM_START( xavgolf )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "pglfa.u5", 0x000000, 0x800000, CRC(781399d6) SHA1(4797a978f00fc10a34a79a9a09a8355eb92283f2) )
+
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
+	// this is a bit strange, it tries to use a bitmap mode with extra address bit set
+	// and expects the ROM to appear as if it were swapped
+	ROM_COPY( "bios", 0x400000, 0x000000, 0x400000 )
+	ROM_COPY( "bios", 0x000000, 0x400000, 0x400000 )
+ROM_END
+
 ROM_START( xavbowl )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpbowling.bin", 0x000000, 0x800000, CRC(2873460b) SHA1(ea8e2392f5a12961a23eb66dca8e07dec81ce8c8) )
@@ -1027,6 +1038,7 @@ void superxavix_doradraw_state::init_doradraw()
 
 CONS( 2004, xavtenni, 0,       0, superxavix_i2c_24c04, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbaseb, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavgolf,  0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Golf (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbowl,  0,       0, superxavix_i2c_24c04, xavix_bowl, superxavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 CONS( 2005, xavbowlj, xavbowl, 0, superxavix_i2c_24c04, xavix_bowl, superxavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT, PT2-BWL-11, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^^
 CONS( 2004, xavbox,   0,       0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Boxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'

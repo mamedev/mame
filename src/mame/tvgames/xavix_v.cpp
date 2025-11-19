@@ -1007,10 +1007,12 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	// some games have the top bit set, why?
 	m_spritereg &= 0x7f;
 
-	if ((m_spritereg == 0x00) || (m_spritereg == 0x01))
+	if ((m_spritereg == 0x00) || (m_spritereg == 0x01) || (m_spritereg == 0x05))
 	{
 		// 8-bit addressing  (Tile Number)
 		// 16-bit addressing (Tile Number) (rad_rh)
+
+		// xavgolf uses 0x05, how does it differ?
 		alt_addressing = 1;
 	}
 	else if (m_spritereg == 0x02)
@@ -1436,8 +1438,19 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 					start, start * 0x800, step, size, unused);
 			}
 
+			// xavgolf title is 308c (start) needs to be 188c
+			// xavgolf menu  is 30fc (start) needs to be 18fc
+
+			// xavbaseb xavix logo is 1500
+			//          title      is 14e0
+
+			// 0x800 (offset multiplier) * 0x1000 = 0x800000 (24 bit address - usual xavix address space)
+			// 0x2000 being set implies address beyond 24-bit space = extended xavix modes
+
 			// anpanmdx title screen ends up with a seemingly incorrect value for start
 			// when it does the scroller.  There is presumably an opcode or math bug causing this.
+			// (although 0x7xxx has bits 0x2000 and 0x4000 set, pushing the addressing beyond even
+			//  double the usual XaviX address space)
 			//if (start >= 0x7700)
 			/// start -= 0x3c00;
 
