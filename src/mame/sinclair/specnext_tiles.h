@@ -18,7 +18,7 @@ public:
 	specnext_tiles_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 	void tilemap_update();
 
-	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; }
+	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; tilemap_update(); }
 
 	void control_w(u8 control) { m_control = control; tilemap_update(); }
 	void default_flags_w(u8 default_flags) { m_default_flags = default_flags; m_tilemap[0]->mark_all_dirty(); m_tilemap[1]->mark_all_dirty(); }
