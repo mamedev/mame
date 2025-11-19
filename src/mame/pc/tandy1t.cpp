@@ -55,7 +55,6 @@ TODO:
 * Correct clock frequencies for later models.
 * "Export" models (different clock crystals, probably different video
   timings).
-* Tandy 1000A control port 3DD.
 * Correct DIP switches/jumpers for each model.
 * Properly combine interrupt/DMA signals from ISA but and onboard
   peripherals.
@@ -79,6 +78,8 @@ TODO:
 
 #include "screen.h"
 #include "softlist_dev.h"
+
+#include "endianness.h"
 
 
 DECLARE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device)
@@ -247,6 +248,11 @@ private:
 	uint8_t tandy1000hx_eeprom_out_r();
 	void tandy1000hx_eeprom_w(uint8_t data);
 	void tandy1000_set_bios_bank();
+
+	uint8_t vga_vram8_r(offs_t offset);
+	uint16_t vga_vram16_r(offs_t offset);
+	void vga_vram8_w(offs_t offset, uint8_t data);
+	void vga_vram16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	TIMER_CALLBACK_MEMBER(update_clock);
 
@@ -562,6 +568,29 @@ void tandy1000_state::tandy1000_set_bios_bank()
 	m_biosbank->set_entry(bank & 0x07);
 }
 
+
+uint8_t tandy1000_state::vga_vram8_r(offs_t offset)
+{
+	return util::little_endian_cast<uint8_t>(reinterpret_cast<uint16_t *>(m_ram->pointer()))[offset];
+}
+
+uint16_t tandy1000_state::vga_vram16_r(offs_t offset)
+{
+	return little_endianize_int16(reinterpret_cast<uint16_t *>(m_ram->pointer())[offset]);
+}
+
+void tandy1000_state::vga_vram8_w(offs_t offset, uint8_t data)
+{
+	util::little_endian_cast<uint8_t>(reinterpret_cast<uint16_t *>(m_ram->pointer()))[offset] = data;
+}
+
+void tandy1000_state::vga_vram16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = little_endianize_int16(data);
+	COMBINE_DATA(&reinterpret_cast<uint16_t *>(m_ram->pointer())[offset]);
+}
+
+
 TIMER_CALLBACK_MEMBER(tandy1000_state::update_clock)
 {
 	// FIXME: correct clocks for later models
@@ -586,25 +615,47 @@ MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
 
 void tandy1000_state::machine_start()
 {
+	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
+	address_space &vram_space = m_video->space(0);
+
 	if (m_ram->size() > (128 * 1024))
-		m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128 * 1024) - 1, &m_ram->pointer()[128 * 1024]);
-	if (m_maincpu->space(AS_PROGRAM).data_width() == 8)
+		mem_space.install_ram(0, m_ram->size() - (128 * 1024) - 1, &m_ram->pointer()[128 * 1024]);
+	if (mem_space.data_width() == 8)
 	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
+		mem_space.install_readwrite_handler(
 				m_ram->size() - (128*1024), 640*1024 - 1,
 				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)),
 				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)));
 	}
 	else
 	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
+		assert(mem_space.data_width() == 16);
+		mem_space.install_readwrite_handler(
 				m_ram->size() - (128*1024), 640*1024 - 1,
 				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)),
 				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)),
 				0xffff);
 	}
 
-	m_video->space(0).install_ram(0, (128 * 1024) - 1, &m_ram->pointer()[0]);
+	if ((mem_space.data_width() == vram_space.data_width()) || (util::endianness::native == util::endianness::little))
+	{
+		m_video->space(0).install_ram(0, (128 * 1024) - 1, &m_ram->pointer()[0]);
+	}
+	else if (vram_space.data_width() == 8)
+	{
+		m_video->space(0).install_readwrite_handler(
+				0, (128 * 1024) - 1,
+				read8sm_delegate(*this, FUNC(tandy1000_state::vga_vram8_r)),
+				write8sm_delegate(*this, FUNC(tandy1000_state::vga_vram8_w)));
+	}
+	else
+	{
+		assert(vram_space.data_width() == 16);
+		m_video->space(0).install_readwrite_handler(
+				0, (128 * 1024) - 1,
+				read16sm_delegate(*this, FUNC(tandy1000_state::vga_vram16_r)),
+				write16s_delegate(*this, FUNC(tandy1000_state::vga_vram16_w)));
+	}
 
 	if (subdevice<nvram_device>("nvram"))
 		subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
