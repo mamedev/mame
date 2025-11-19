@@ -517,17 +517,17 @@ text
     stretched horizontally to fill its bounds. If the ``align`` attribute is
     absent, the text will be centred.
 
-		You can also specify the font to use using the ``font`` attribute. This 
-		contains a comma (``,``)-separated list of fonts to use in order of preference.
-		Font styles (Regular, Bold, Italic,oldItalic) are specified after the font name
-		separated by a vertical bar (``|``).
+    You can also specify the font to use using the ``font`` attribute. This 
+    contains a comma (``,``)-separated list of fonts to use in order of preference.
+    Font styles (Regular, Bold, Italic,oldItalic) are specified after the font name
+    separated by a vertical bar (``|``).
 
-		There are also three standard fonts available: ``serif``, ``sans-serif``
-		and ``monospace``; these can be given styles as above. Finally there is 
-		``default`` as a fallback if no other fonts can be found.
+    There are also three standard fonts available: ``serif``, ``sans-serif``
+    and ``monospace``; these can be given styles as above. Finally there is 
+    ``default`` as a fallback if no other fonts can be found.
 
-		A complex font specification might look like
-		 ``font="Helvetica|Regular,Arial|Bold,sans-serif|BoldItalic,default"``
+    A complex font specification might look like
+    ``font="Helvetica|Regular,Arial|Bold,sans-serif|BoldItalic,default"``
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
