@@ -44,8 +44,8 @@ debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t 
 //  debug_view_disasm - constructor
 //-------------------------------------------------
 
-debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate)
-	: debug_view(machine, DVT_DISASSEMBLY, osdupdate, osdprivate),
+debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate, bool source_code_debugging /* = false */)
+	: debug_view(machine, source_code_debugging ? DVT_SOURCE : DVT_DISASSEMBLY, osdupdate, osdprivate),
 		m_right_column(DASM_RIGHTCOL_RAW),
 		m_backwards_steps(3),
 		m_dasm_width(DEFAULT_DASM_WIDTH),
@@ -314,10 +314,16 @@ int debug_view_disasm::address_position(offs_t pc) const
 	return -1;
 }
 
+bool debug_view_disasm::update_previous_pc(offs_t pc)
+{
+	bool pc_changed = (pc != m_previous_pc);
+	m_previous_pc = pc;
+	return pc_changed;
+}
+
 void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 {
-	bool pc_changed = pc != m_previous_pc;
-	m_previous_pc = pc;
+	bool pc_changed = update_previous_pc(pc);
 	if(strcmp(m_expression.string(), "curpc")) {
 		if(m_expression.dirty()) {
 			m_topleft.x = 0;
@@ -489,10 +495,10 @@ void debug_view_disasm::redraw()
 //  currently selected address in the view
 //-------------------------------------------------
 
-offs_t debug_view_disasm::selected_address()
+std::optional<offs_t> debug_view_disasm::selected_address()
 {
 	flush_updates();
-	return m_dasm[m_cursor.y].m_address;
+	return std::optional<offs_t>(m_dasm[m_cursor.y].m_address);
 }
 
 
