@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<param name="f_bold" value="Nonexistent Sans|Bold,sans-serif|Bold,default" />
-	<param name="f_italic" value="Nonexistent Sans|Italic,sans-serif|Italic,default" />
-	<param name="f_bold_italic" value="Nonexistent Sans|BoldItalic,sans-serif|BoldItalic,default" />
-	<param name="f_regular" value="Nonexistent Sans|Regular,sans-serif|Regular,default" />
+	<param name="f_regular" value="sans-serif|Regular,default" />
+	<param name="f_bold" value="sans-serif|Bold,default" />
+	<param name="f_italic" value="sans-serif|Italic,default" />
+	<param name="f_bold_italic" value="sans-serif|BoldItalic,default" />
 
 	<!-- Decoration definitions -->
 	<element name="drawing_triangle_down">
@@ -435,8 +435,8 @@
 	<element name="text_L_I_env3">
 		<text string="Env3" font="~f_italic~" align="1" />
 	</element>
-	<element name="text_tracks">
-		<text string="Tracks" font="~f_regular~" />
+	<element name="text_B_tracks">
+		<text string="Tracks" font="~f_bold~" />
 	</element>
 	<element name="text_I_1_6">
 		<text string="1-6" font="~f_italic~" />
@@ -477,8 +477,8 @@
 	<element name="text_L_I_storage">
 		<text string="Storage" font="~f_italic~" align="1" />
 	</element>
-	<element name="text_edit">
-		<text string="Edit" font="~f_regular~" />
+	<element name="text_B_edit">
+		<text string="Edit" font="~f_bold~" />
 	</element>
 	<element name="text_L_B_system">
 		<text string="System" font="~f_bold~" align="1" />
@@ -516,7 +516,7 @@
 	<element name="text_L_I_in">
 		<text string="In" font="~f_italic~" align="1" />
 	</element>
-	<element name="text_L_I_ft__sw_">
+	<element name="text_L_I_ft_sw_">
 		<text string="Ft. Sw." font="~f_italic~" align="1" />
 	</element>
 	<element name="text_L_I_pedal_cv">
@@ -531,7 +531,7 @@
 	<element name="text_I_mono">
 		<text string="Mono" font="~f_italic~" />
 	</element>
-	<element name="text_I_aux__out">
+	<element name="text_I_aux_out">
 		<text string="Aux. Out" font="~f_italic~" />
 	</element>
 	<element name="text_I_main_out">
@@ -543,11 +543,11 @@
 	<element name="text_S_music_production_synthesizer">
 		<text string="MUSIC PRODUCTION SYNTHESIZER" font="~f_regular~" align="3" />
 	</element>
-	<element name="text_B_S_ensoniq">
-		<text string="ensoniq" font="~f_bold~" align="3" />
+	<element name="text_S_ensoniq">
+		<text string="ensoniq" font="~f_regular~" align="3" />
 	</element>
-	<element name="text_S_3__2__v__o__i__c__e">
-		<text string="3  2  V  O  I  C  E" font="~f_regular~" align="3" />
+	<element name="text_S_3_2_v_o_i_c_e">
+		<text string="3      2      -      V      O      I      C      E" font="~f_regular~" align="3" />
 	</element>
 	<element name="text_S_sd_1">
 		<text string="SD-1" font="~f_regular~" align="3" />
@@ -1023,10 +1023,10 @@
 			<bounds x="0" y="102" width="90" height="1.2" />
 		</element>
 		<element ref="text_L_B_volume">
-			<bounds x="0" y="97.7" width="35" height="4.3" />
+			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<element ref="text_L_B_data_entry">
-			<bounds x="47.5" y="97.7" width="35" height="4.3" />
+			<bounds x="47.5" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<element ref="button_15_8x5_dark" id="button_63__decrement" inputtag="buttons_32" inputmask="0x80000000">
 			<bounds x="47.5" y="60" width="15.8" height="5" />
@@ -1054,46 +1054,46 @@
 			<bounds x="0" y="102" width="245" height="1.2" />
 		</element>
 		<element ref="text_B_bankset">
-			<bounds x="0" y="97.7" width="15" height="4.3" />
+			<bounds x="0" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_sounds">
-			<bounds x="15" y="97.7" width="15" height="4.3" />
+			<bounds x="15.8" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_presets">
-			<bounds x="30" y="97.7" width="15" height="4.3" />
+			<bounds x="31.6" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_seq">
-			<bounds x="45" y="97.7" width="15" height="4.3" />
+			<bounds x="47.4" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_0">
-			<bounds x="95" y="97.7" width="15" height="4.3" />
+			<bounds x="87" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_1">
-			<bounds x="110" y="97.7" width="15" height="4.3" />
+			<bounds x="102.8" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_2">
-			<bounds x="125" y="97.7" width="15" height="4.3" />
+			<bounds x="118.6" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_3">
-			<bounds x="140" y="97.7" width="15" height="4.3" />
+			<bounds x="134.4" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_4">
-			<bounds x="155" y="97.7" width="15" height="4.3" />
+			<bounds x="150.2" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_5">
-			<bounds x="170" y="97.7" width="15" height="4.3" />
+			<bounds x="166" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_6">
-			<bounds x="185" y="97.7" width="15" height="4.3" />
+			<bounds x="181.8" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_7">
-			<bounds x="200" y="97.7" width="15" height="4.3" />
+			<bounds x="197.6" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_8">
-			<bounds x="215" y="97.7" width="15" height="4.3" />
+			<bounds x="213.4" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_B_9">
-			<bounds x="230" y="97.7" width="15" height="4.3" />
+			<bounds x="229.2" y="96.87737" width="15.8" height="4.44107" />
 		</element>
 		<group ref="vfd">
 			<bounds x="12" y="32.50936" width="221" height="18.48129" />
@@ -1267,175 +1267,175 @@
 			<bounds x="120" y="102" width="63.2" height="1.2" />
 		</element>
 		<element ref="text_L_I_replace">
-			<bounds x="0" y="73.4" width="15" height="4.3" />
+			<bounds x="0" y="73.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_program">
-			<bounds x="0" y="77.7" width="15" height="4.3" />
+			<bounds x="0" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_select">
-			<bounds x="120" y="73.4" width="15" height="4.3" />
+			<bounds x="120" y="73.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_voice">
-			<bounds x="120" y="77.7" width="15" height="4.3" />
+			<bounds x="120" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_copy">
-			<bounds x="135" y="77.7" width="15" height="4.3" />
+			<bounds x="135.8" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_write">
-			<bounds x="150" y="77.7" width="15" height="4.3" />
+			<bounds x="151.6" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_compare">
-			<bounds x="165" y="77.7" width="15" height="4.3" />
+			<bounds x="167.4" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_patch">
-			<bounds x="0" y="53.4" width="15" height="4.3" />
+			<bounds x="0" y="53.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_select">
-			<bounds x="0" y="57.7" width="15" height="4.3" />
+			<bounds x="0" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_midi">
-			<bounds x="15" y="57.7" width="15" height="4.3" />
+			<bounds x="15.8" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_effects">
-			<bounds x="30" y="57.7" width="15" height="4.3" />
+			<bounds x="31.6" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_key">
-			<bounds x="0" y="33.4" width="15" height="4.3" />
+			<bounds x="0" y="33.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_zone">
-			<bounds x="0" y="37.7" width="15" height="4.3" />
+			<bounds x="0" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_trans_">
-			<bounds x="15" y="33.4" width="15" height="4.3" />
+			<bounds x="15.8" y="33.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_pose">
-			<bounds x="15" y="37.7" width="15" height="4.3" />
+			<bounds x="15.8" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_release">
-			<bounds x="30" y="37.7" width="15" height="4.3" />
+			<bounds x="31.6" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_volume">
-			<bounds x="0" y="17.7" width="15" height="4.3" />
+			<bounds x="0" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_pan">
-			<bounds x="15" y="17.7" width="15" height="4.3" />
+			<bounds x="15.8" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_timbre">
-			<bounds x="30" y="17.7" width="15" height="4.3" />
+			<bounds x="31.6" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_wave">
-			<bounds x="120" y="57.7" width="15" height="4.3" />
+			<bounds x="120" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_mod">
-			<bounds x="135" y="53.4" width="15" height="4.3" />
+			<bounds x="135.8" y="53.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_mixer">
-			<bounds x="135" y="57.7" width="15" height="4.3" />
+			<bounds x="135.8" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_program">
-			<bounds x="150" y="53.4" width="15" height="4.3" />
+			<bounds x="151.6" y="53.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_control">
-			<bounds x="150" y="57.7" width="15" height="4.3" />
+			<bounds x="151.6" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_effects">
-			<bounds x="165" y="57.7" width="15" height="4.3" />
+			<bounds x="167.4" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_pitch">
-			<bounds x="120" y="37.7" width="15" height="4.3" />
+			<bounds x="120" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_pitch">
-			<bounds x="135" y="33.4" width="15" height="4.3" />
+			<bounds x="135.8" y="33.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_mod">
-			<bounds x="135" y="37.7" width="15" height="4.3" />
+			<bounds x="135.8" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_filters">
-			<bounds x="150" y="37.7" width="15" height="4.3" />
+			<bounds x="151.6" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_output">
-			<bounds x="165" y="37.7" width="15" height="4.3" />
+			<bounds x="167.4" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_lfo">
-			<bounds x="120" y="17.7" width="15" height="4.3" />
+			<bounds x="120" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_env1">
-			<bounds x="135" y="17.7" width="15" height="4.3" />
+			<bounds x="135.8" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_env2">
-			<bounds x="150" y="17.7" width="15" height="4.3" />
+			<bounds x="151.6" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_env3">
-			<bounds x="165" y="17.7" width="15" height="4.3" />
+			<bounds x="167.4" y="16.8" width="15.8" height="4.44107" />
 		</element>
-		<element ref="text_tracks">
+		<element ref="text_B_tracks">
 			<bounds x="15.8" y="74.00965" width="31.6" height="3.17557" />
 		</element>
 		<element ref="text_I_1_6">
-			<bounds x="15" y="77.7" width="15" height="4.3" />
+			<bounds x="15.8" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_I_7_12">
-			<bounds x="30" y="77.7" width="15" height="4.3" />
+			<bounds x="31.6" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_rec">
-			<bounds x="60" y="77.7" width="15" height="4.3" />
+			<bounds x="60" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_stop">
-			<bounds x="75" y="73.4" width="15" height="4.3" />
+			<bounds x="75.8" y="73.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I__cont">
-			<bounds x="75" y="77.7" width="15" height="4.3" />
+			<bounds x="75.8" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_play">
-			<bounds x="90" y="77.7" width="15" height="4.3" />
+			<bounds x="91.6" y="76.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_click">
-			<bounds x="60" y="57.7" width="15" height="4.3" />
+			<bounds x="60" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_seq">
-			<bounds x="75" y="53.4" width="15" height="4.3" />
+			<bounds x="75.8" y="53.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_control">
-			<bounds x="75" y="57.7" width="15" height="4.3" />
+			<bounds x="75.8" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_locate">
-			<bounds x="90" y="57.7" width="15" height="4.3" />
+			<bounds x="91.6" y="56.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_song">
-			<bounds x="60" y="37.7" width="15" height="4.3" />
+			<bounds x="60" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_seq">
-			<bounds x="75" y="37.7" width="15" height="4.3" />
+			<bounds x="75.8" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_track">
-			<bounds x="90" y="37.7" width="15" height="4.3" />
+			<bounds x="91.6" y="36.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_master">
-			<bounds x="60" y="17.7" width="15" height="4.3" />
+			<bounds x="60" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_storage">
-			<bounds x="75" y="17.7" width="15" height="4.3" />
+			<bounds x="75.8" y="16.8" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_midi">
-			<bounds x="90" y="13.4" width="15" height="4.3" />
+			<bounds x="91.69" y="13.2" width="15.8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_control">
-			<bounds x="90" y="17.7" width="15" height="4.3" />
+			<bounds x="91.69" y="16.8" width="15.8" height="4.44107" />
 		</element>
-		<element ref="text_edit">
+		<element ref="text_B_edit">
 			<bounds x="60" y="34.00965" width="47.4" height="3.17557" />
 		</element>
 		<element ref="text_L_B_system">
-			<bounds x="60" y="8.2" width="35" height="4.3" />
+			<bounds x="60" y="6.05893" width="35" height="4.44107" />
 		</element>
 		<element ref="text_L_B_sequencer">
-			<bounds x="60" y="97.7" width="25" height="4.3" />
+			<bounds x="60" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<element ref="text_L_B_performance">
-			<bounds x="0" y="97.7" width="35" height="4.3" />
+			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<element ref="text_L_B_programming">
-			<bounds x="120" y="97.7" width="35" height="4.3" />
+			<bounds x="120" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<element ref="button_15_8x10_medium" id="button_29_replace_program" inputtag="buttons_0" inputmask="0x20000000">
 			<bounds x="0" y="82" width="15.8" height="10" />
@@ -1588,58 +1588,58 @@
 			<bounds x="837" y="18" width="6" height="6" />
 		</element>
 		<element ref="text_L_I_power">
-			<bounds x="97" y="10" width="10" height="4.3" />
+			<bounds x="97" y="10" width="10" height="4.44107" />
 		</element>
 		<element ref="text_L_I_line">
-			<bounds x="131" y="10" width="8" height="4.3" />
+			<bounds x="131" y="10" width="8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_fuse">
-			<bounds x="165" y="10" width="10" height="4.3" />
+			<bounds x="165" y="10" width="10" height="4.44107" />
 		</element>
 		<element ref="text_I_midi">
-			<bounds x="477" y="10" width="87" height="4.3" />
+			<bounds x="477" y="10" width="87" height="4.44107" />
 		</element>
 		<element ref="text_L_I_thru">
-			<bounds x="480" y="14.55" width="8" height="4.3" />
+			<bounds x="480" y="14.32737" width="8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_out">
-			<bounds x="518" y="14.55" width="8" height="4.3" />
+			<bounds x="518" y="14.32737" width="8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_in">
-			<bounds x="558" y="14.55" width="4" height="4.3" />
+			<bounds x="558" y="14.32737" width="4" height="4.44107" />
 		</element>
-		<element ref="text_L_I_ft__sw_">
-			<bounds x="640" y="10" width="12" height="4.3" />
+		<element ref="text_L_I_ft_sw_">
+			<bounds x="640" y="10" width="12" height="4.44107" />
 		</element>
 		<element ref="text_L_I_pedal_cv">
-			<bounds x="663" y="10" width="17" height="4.3" />
+			<bounds x="663" y="10" width="17" height="4.44107" />
 		</element>
 		<element ref="text_L_I_left">
-			<bounds x="692" y="10" width="8" height="4.3" />
+			<bounds x="692" y="10" width="8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_right">
-			<bounds x="717" y="10" width="10" height="4.3" />
+			<bounds x="717" y="10" width="10" height="4.44107" />
 		</element>
 		<element ref="text_I_mono">
-			<bounds x="690" y="14.55" width="38" height="4.3" />
+			<bounds x="690" y="14.32737" width="38" height="4.44107" />
 		</element>
-		<element ref="text_I_aux__out">
-			<bounds x="690" y="5.7" width="38" height="4.3" />
+		<element ref="text_I_aux_out">
+			<bounds x="690" y="4.87737" width="38" height="4.44107" />
 		</element>
 		<element ref="text_L_I_left">
-			<bounds x="742" y="10" width="8" height="4.3" />
+			<bounds x="742" y="10" width="8" height="4.44107" />
 		</element>
 		<element ref="text_L_I_right">
-			<bounds x="767" y="10" width="10" height="4.3" />
+			<bounds x="767" y="10" width="10" height="4.44107" />
 		</element>
 		<element ref="text_I_mono">
-			<bounds x="740" y="14.55" width="38" height="4.3" />
+			<bounds x="740" y="14.32737" width="38" height="4.44107" />
 		</element>
 		<element ref="text_I_main_out">
-			<bounds x="740" y="5.7" width="38" height="4.3" />
+			<bounds x="740" y="4.87737" width="38" height="4.44107" />
 		</element>
 		<element ref="text_L_I_phones">
-			<bounds x="790" y="10" width="15" height="4.3" />
+			<bounds x="790" y="10" width="15" height="4.44107" />
 		</element>
 	</group>
 	<group name="WheelArea">
@@ -1663,16 +1663,16 @@
 			<bounds x="66.5" y="99" width="41.5" height="1.2" />
 		</element>
 		<element ref="text_L_I_patch">
-			<bounds x="31" y="5.4" width="15" height="4.3" />
+			<bounds x="31" y="6.77737" width="15" height="4.44107" />
 		</element>
 		<element ref="text_L_I_select">
-			<bounds x="31" y="9.7" width="15" height="4.3" />
+			<bounds x="31" y="10.37737" width="15" height="4.44107" />
 		</element>
 		<element ref="text_L_B_pitch">
-			<bounds x="29.5" y="94.7" width="15" height="4.3" />
+			<bounds x="29.5" y="93.87737" width="15" height="4.44107" />
 		</element>
 		<element ref="text_L_B_mod">
-			<bounds x="66.5" y="94.7" width="15" height="4.3" />
+			<bounds x="66.5" y="93.87737" width="15" height="4.44107" />
 		</element>
 		<element ref="psel_9x12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
 			<bounds x="6" y="2" width="9" height="12" />
@@ -2207,16 +2207,16 @@
 			<bounds x="53" y="99" width="33" height="1.2" />
 		</element>
 		<element ref="text_L_I_patch">
-			<bounds x="31" y="5.4" width="15" height="4.3" />
+			<bounds x="31" y="6.77737" width="15" height="4.44107" />
 		</element>
 		<element ref="text_L_I_select">
-			<bounds x="31" y="9.7" width="15" height="4.3" />
+			<bounds x="31" y="10.37737" width="15" height="4.44107" />
 		</element>
 		<element ref="text_L_B_pitch">
-			<bounds x="20" y="94.7" width="15" height="4.3" />
+			<bounds x="20" y="93.87737" width="15" height="4.44107" />
 		</element>
 		<element ref="text_L_B_mod">
-			<bounds x="53" y="94.7" width="15" height="4.3" />
+			<bounds x="53" y="93.87737" width="15" height="4.44107" />
 		</element>
 		<element ref="psel_9x12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
 			<bounds x="6" y="2" width="9" height="12" />
@@ -2544,7 +2544,7 @@
 			<bounds x="0" y="102" width="30" height="1.2" />
 		</element>
 		<element ref="text_L_B_volume">
-			<bounds x="0" y="97.7" width="35" height="4.3" />
+			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<param name="slider_id" value="volume" />
 		<param name="port_name" value="analog_volume" />
@@ -2558,7 +2558,7 @@
 			<bounds x="0" y="102" width="40" height="1.2" />
 		</element>
 		<element ref="text_L_B_patch_select">
-			<bounds x="0" y="97.7" width="35" height="4.3" />
+			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<element ref="psel_9x12" id="patch_select_1" inputtag="patch_select" inputmask="0x2">
 			<bounds x="0" y="55" width="9" height="12" />
@@ -2579,7 +2579,7 @@
 			<bounds x="0" y="102" width="59.8" height="1.2" />
 		</element>
 		<element ref="text_L_B_data_entry">
-			<bounds x="0" y="97.7" width="35" height="4.3" />
+			<bounds x="0" y="96.87737" width="35" height="4.44107" />
 		</element>
 		<element ref="button_15_8x5_dark" id="button_63__decrement" inputtag="buttons_32" inputmask="0x80000000">
 			<bounds x="0" y="60" width="15.8" height="5" />
@@ -2647,13 +2647,13 @@
 			<bounds x="837" y="129.5" width="6" height="6" />
 		</element>
 		<element ref="text_L_I_cartridge">
-			<bounds x="720" y="17.7" width="56" height="4.3" />
+			<bounds x="720" y="16.87737" width="57" height="4.44107" />
 		</element>
 		<element ref="text_S_music_production_synthesizer">
 			<bounds x="13" y="7" width="88" height="4.44107" />
 		</element>
-		<element ref="text_B_S_ensoniq">
-			<bounds x="762" y="92" width="68" height="9" />
+		<element ref="text_S_ensoniq">
+			<bounds x="762" y="92.25157" width="70" height="11.7935" />
 		</element>
 		<element ref="text_S_3_2_v_o_i_c_e">
 			<bounds x="14" y="96.68311" width="65" height="8.35699" />
