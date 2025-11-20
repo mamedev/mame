@@ -644,6 +644,7 @@ public:
 	void bingownga(machine_config &config) ATTR_COLD;
 	void cbaai(machine_config &config) ATTR_COLD;
 	void feverch(machine_config &config) ATTR_COLD;
+	void fevchw4(machine_config &config) ATTR_COLD;
 	void flam7_tw(machine_config &config) ATTR_COLD;
 	void flam7_w4(machine_config &config) ATTR_COLD;
 	void flaming7(machine_config &config) ATTR_COLD;
@@ -737,6 +738,7 @@ private:
 	uint8_t nvram_r(offs_t offset);
 
 	void magodds_palette(palette_device &palette) const ATTR_COLD;
+	template <uint8_t Which> uint32_t screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_feverch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1783,6 +1785,7 @@ uint32_t cmast97_state::screen_update_jpknight(screen_device &screen, bitmap_rgb
 }
 
 
+template <uint8_t Which>
 uint32_t wingco_state::screen_update_lucky8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
@@ -1797,11 +1800,17 @@ uint32_t wingco_state::screen_update_lucky8(screen_device &screen, bitmap_rgb32 
 			for (int i = 0; i < 64; i++)
 			{
 				// only one reels tilemap
-				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+				m_reel_tilemap[Which]->set_scrolly(i, m_reel_scroll[Which][i]);
 			}
 
 			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
-			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			const rectangle visible2(0*8, (14+48)*8-1, 15*8, (15+5)*8-1);
+
+			if(Which==0)
+				m_reel_tilemap[Which]->draw(screen, bitmap, visible1, 0, 0);
+			else
+				m_reel_tilemap[Which]->draw(screen, bitmap, visible2, 0, 0);
+
 		}
 		else
 		{
@@ -1828,6 +1837,7 @@ uint32_t wingco_state::screen_update_lucky8(screen_device &screen, bitmap_rgb32 
 
 	return 0;
 }
+
 
 uint32_t wingco_state::screen_update_flaming7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -15970,7 +15980,7 @@ void wingco_state::lucky8(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(wingco_state::screen_update_lucky8));
+	screen.set_screen_update(FUNC(wingco_state::screen_update_lucky8<0>));
 	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
@@ -16113,6 +16123,12 @@ void wingco_state::lucky8t(machine_config &config)
 
 	// sound hardware
 	SN76489(config.replace(), "snsnd", 0);  // unused device
+}
+
+void wingco_state::fevchw4(machine_config &config)
+{
+	lucky8(config);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(wingco_state::screen_update_lucky8<1>));
 }
 
 void wingco_state::animalw(machine_config &config)
@@ -31783,7 +31799,7 @@ GAME(  199?, special7b,  special7, flam7_tw, flaming7, wingco_state,   init_spec
 GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
 GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
 GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
-GAME(  1986, feverchw4,  feverch,  lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAMEL( 1986, feverchw4,  feverch,  fevchw4,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 0,          layout_lucky8p1 )
 
 // --- Wing W-7 hardware ---
 GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
