@@ -45,7 +45,11 @@ inline uint8_t superxavix_state::get_next_bit_sx()
 {
 	if (m_tmp_databit == 0)
 	{
-		m_bit = m_extra[m_tmp_dataaddress&0x7fffff];
+		// the higher bit set when accessing video expands the address space
+		if ((m_tmp_dataaddress & 0x1000000) && m_extra)
+			m_bit = m_extra[m_tmp_dataaddress&0x7fffff];
+		else
+			m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
 	}
 
 	uint8_t ret = m_bit >> m_tmp_databit;
@@ -644,7 +648,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 void superxavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
-	m_use_superxavix_extra = false;
 	xavix_state::draw_tilemap(screen, bitmap, cliprect, which);
 }
 
@@ -992,11 +995,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 void superxavix_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	if (m_extra && m_allow_superxavix_extra_rom_sprites)
-		m_use_superxavix_extra = true;
-
 	xavix_state::draw_sprites(screen, bitmap, cliprect);
-	m_use_superxavix_extra = false;
 }
 
 
@@ -1258,19 +1257,9 @@ void xavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
 
 void superxavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
 {
-	if (m_use_superxavix_extra)
+	for (int i = 0; i < bpp; i++)
 	{
-		for (int i = 0; i < bpp; i++)
-		{
-			dat |= (get_next_bit_sx() << i);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < bpp; i++)
-		{
-			dat |= (get_next_bit() << i);
-		}
+		dat |= (get_next_bit_sx() << i);
 	}
 }
 
@@ -1458,7 +1447,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 			{
 				if (start & 0x4000)
 				{
-					start &= 0x1fff;
+					start &= 0x3fff;
 					start ^= 0xc00;
 				}
 			}

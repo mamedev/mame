@@ -704,14 +704,15 @@ ROM_START( xavbaseb )
 ROM_END
 
 ROM_START( xavgolf )
-	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "temp", ROMREGION_ERASE00 )
 	ROM_LOAD( "pglfa.u5", 0x000000, 0x800000, CRC(781399d6) SHA1(4797a978f00fc10a34a79a9a09a8355eb92283f2) )
 
+	// the glob seems to get split between the regular space, and the 'extra' space superxavix has
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_COPY( "temp", 0x000000, 0x000000, 0x400000 )
+
 	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
-	// this is a bit strange, it tries to use a bitmap mode with extra address bit set
-	// and expects the ROM to appear as if it were swapped
-	ROM_COPY( "bios", 0x400000, 0x000000, 0x400000 )
-	ROM_COPY( "bios", 0x000000, 0x400000, 0x400000 )
+	ROM_COPY( "temp", 0x400000, 0x000000, 0x400000 )
 ROM_END
 
 ROM_START( xavbowl )
@@ -797,7 +798,7 @@ ROM_START( domfitex )
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000,  CRC(841fe3cd) SHA1(8678b8a0c5198b24169a84dbe3ae979bb0838f23) )
 
-	ROM_REGION( 0x0800000, "extra_u3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(1dc844ea) SHA1(c23da9006227f7fe4982998c17759d403a47472a) )
 ROM_END
 
@@ -1014,7 +1015,6 @@ void superxavix_i2c_jmat_state::init_xavmusic()
 	init_xavix();
 	// is sprite yflip broken on (some?) revisions of SuperXaviX hardware, or is there a CPU bug causing this
 	m_disable_sprite_yflip = true;
-	m_allow_superxavix_extra_rom_sprites = false;
 }
 
 void superxavix_piano_pc_state::init_piano_pc()
