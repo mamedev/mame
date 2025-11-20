@@ -1448,11 +1448,20 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 			// 0x2000 being set implies address beyond 24-bit space = extended xavix modes
 
 			// anpanmdx title screen ends up with a seemingly incorrect value for start
-			// when it does the scroller.  There is presumably an opcode or math bug causing this.
-			// (although 0x7xxx has bits 0x2000 and 0x4000 set, pushing the addressing beyond even
-			//  double the usual XaviX address space)
-			//if (start >= 0x7700)
-			/// start -= 0x3c00;
+			// when it does the scroller.
+			// It has values of 0x7xxx which has bits 0x2000 and 0x4000 set, pushing the addressing beyond
+			// even double the usual XaviX address space)
+			//
+			// maybe addresses above 24-bit present the ROM data to the system in an unusual order
+			// (this might also apply to sprites)
+			if (m_extra)
+			{
+				if (start & 0x4000)
+				{
+					start &= 0x1fff;
+					start ^= 0xc00;
+				}
+			}
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
