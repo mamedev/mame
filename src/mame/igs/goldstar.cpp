@@ -31136,6 +31136,10 @@ void wingco_state::init_special7()
 			case 0x3811: rom[i] ^= 0x00; if (BIT(rom[i], 1)) rom[i] ^= 0x80; if (BIT(rom[i], 4)) rom[i] ^= 0x08; if (BIT(rom[i], 6)) rom[i] ^= 0x20; break;
 		}
 	}
+
+	// bypassing the serial protection
+	rom[0x60ac] = 0x00;
+	rom[0x60b7] = 0x00;
 }
 
 void wingco_state::init_fl7_3121()
