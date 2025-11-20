@@ -37,12 +37,10 @@ Each of the 6 voice chips (CEM3394) has 8 CV-controlled parameters:
 Known hardware revisions:
 - Model 610 Rev A: serial numbers 1-900.
 - Model 610 Rev B: serial numbers 901-?.
+  Contrast sixtrak_rev_a() and sixtrak_rev_b() for the differences. In summary:
     * MM5837 noise generator replaced with a transistor-based noise source.
-    * Improved autotune circuit. U146-2 disconnected from U148-5, and connected
-        to U146-6: the tuning flipflop's D input is connected to the flipflop's
-        /Q output, instead of being connected to bit 3 of the tuning latch (
-        port 0x0d). Improves timing accuracy by removing firmware reaction time
-        from the equation.
+    * Improved autotune circuit.
+
  - Model 610 Rev C: serial numbers ?-?.
     * No known differences.
 
@@ -91,8 +89,10 @@ For all other functionality, see the owner's manual.
 #include "machine/pit8253.h"
 #include "machine/rescap.h"
 #include "sound/cem3394.h"
+#include "sound/flt_rc.h"
 #include "sound/flt_vol.h"
 #include "sound/mixer.h"
+#include "sound/mm5837.h"
 #include "sound/va_eg.h"
 #include "speaker.h"
 
@@ -166,7 +166,8 @@ class sixtrak_state : public driver_device
 public:
 	sixtrak_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
 
-	void sixtrak(machine_config &config) ATTR_COLD;
+	void sixtrak_rev_a(machine_config &config) ATTR_COLD;
+	void sixtrak_rev_b(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(wheel_moved);
 	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed);
@@ -203,9 +204,12 @@ private:
 	void memory_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
+	void sixtrak_common(machine_config &config, device_sound_interface &noise) ATTR_COLD;
+
 	required_device<z80_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<ttl7474_device> m_tuning_ff;  // U146A
+	required_device<output_latch_device> m_tune_control;  // U148 (CD40174)
 	required_device_array<cem3394_device, 6> m_voices;
 	required_device_array<va_rc_eg_device, 6> m_gain_rc;
 	required_device_array<va_rc_eg_device, 6> m_freq_rc;
@@ -245,6 +249,7 @@ sixtrak_state::sixtrak_state(const machine_config &mconfig, device_type type, co
 	, m_maincpu(*this, "maincpu")
 	, m_pit(*this, "pit")
 	, m_tuning_ff(*this, "tuningff")
+	, m_tune_control(*this, "tune_control")
 	, m_voices(*this, "cem3394_%u", 1U)
 	, m_gain_rc(*this, "gain_rc_%u", 1U)
 	, m_freq_rc(*this, "freq_rc_%u", 1U)
@@ -533,8 +538,6 @@ void sixtrak_state::tuning_counter_out_changed(int state)
 
 void sixtrak_state::tuning_ff_comp_out_changed(int state)
 {
-	m_tuning_ff->d_w(state);
-
 	// The autotune implementation on the Six-Trak depends on behavior of the
 	// 8253 that does not seem to be accurately emulated in pit8253.cpp.
 	// Specifically, the Six-Trak expects that:
@@ -764,7 +767,7 @@ void sixtrak_state::io_map(address_map &map)
 	map(0x0a, 0x0a).mirror(0xf0).w(FUNC(sixtrak_state::dac_high_w));
 	map(0x0b, 0x0b).mirror(0xf0).w("led_latch_0", FUNC(output_latch_device::write));
 	map(0x0c, 0x0c).mirror(0xf0).w("led_latch_1", FUNC(output_latch_device::write));
-	map(0x0d, 0x0d).mirror(0xf0).w("tune_latch", FUNC(output_latch_device::write));
+	map(0x0d, 0x0d).mirror(0xf0).w(m_tune_control, FUNC(output_latch_device::write));
 	map(0x0e, 0x0e).mirror(0xf0).w(FUNC(sixtrak_state::voice_select_w));
 	map(0x0f, 0x0f).mirror(0xf0).w(FUNC(sixtrak_state::param_select_w));
 	map(0x18, 0x18).mirror(0xe0).w(FUNC(sixtrak_state::digit_w));
@@ -798,7 +801,7 @@ void sixtrak_state::machine_reset()
 	update_master_volume();
 }
 
-void sixtrak_state::sixtrak(machine_config &config)
+void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interface &noise)
 {
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);  // U134 (74LS93), QA.
 	m_maincpu->set_addrmap(AS_PROGRAM, &sixtrak_state::memory_map);
@@ -834,13 +837,12 @@ void sixtrak_state::sixtrak(machine_config &config)
 
 	config.set_default_layout(layout_sequential_sixtrak);
 
-	auto &u148 = OUTPUT_LATCH(config, "tune_latch");  // CD40174
-	u148.bit_handler<0>().set([this] (int state) { m_mute->set_gain(state ? 1.0 : 0.0); });
-	u148.bit_handler<1>().set(FUNC(sixtrak_state::tuning_counter_gate_w));
-	u148.bit_handler<2>().set(m_tuning_ff, FUNC(ttl7474_device::preset_w));
-	// Bit 3 not connected in Rev B and later.
-	u148.bit_handler<4>().set(m_tuning_ff, FUNC(ttl7474_device::clear_w));
-	u148.bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));
+	OUTPUT_LATCH(config, m_tune_control);  // U148, CD40174
+	m_tune_control->bit_handler<0>().set([this] (int state) { m_mute->set_gain(state ? 1.0 : 0.0); });
+	m_tune_control->bit_handler<1>().set(FUNC(sixtrak_state::tuning_counter_gate_w));
+	m_tune_control->bit_handler<2>().set(m_tuning_ff, FUNC(ttl7474_device::preset_w));
+	m_tune_control->bit_handler<4>().set(m_tuning_ff, FUNC(ttl7474_device::clear_w));
+	m_tune_control->bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));
 
 	auto &u102 = OUTPUT_LATCH(config, "led_latch_0");  // 74LS174
 	u102.bit_handler<0>().set_output("led_track_1").invert();
@@ -891,8 +893,6 @@ void sixtrak_state::sixtrak(machine_config &config)
 	constexpr double C_VCO_JITTER[6] = {-0.9781, 0.0426, 0.6231, -0.4256, 0.2138, -0.0607};
 	constexpr double C_VCO = CAP_U(0.002);
 
-	auto &noise = SIXTRAK_TRANSISTOR_NOISE(config, "noise");
-
 	for (int i = 0; i < 6; ++i)
 	{
 		noise.add_route(0, m_voices[i], 1.0, cem3394_device::AUDIO_INPUT);
@@ -932,6 +932,39 @@ void sixtrak_state::sixtrak(machine_config &config)
 	FILTER_VOLUME(config, m_master_vol).add_route(0, "mono", VOLTAGE_TO_AUDIO_SCALER);
 
 	SPEAKER(config, "mono").front_center();
+}
+
+void sixtrak_state::sixtrak_rev_a(machine_config &config)
+{
+	// In contrast to the Rev B, the Rev A uses an MM5837 as the noise source.
+	// Could not find a schematic for Rev A, so using the configuration and
+	// component values from the Sente voice board, which is based on the
+	// Six-Trak.
+
+	auto &noise = MM5837_STREAM(config, "noise", 0);
+	// The actual VDD is -6.5. But according to comments on sente6vb.cpp, that
+	// sounds too low, and it is possible the mapping in mm5837 is wrong. Using
+	// -8.0 as per sente6vb.cpp.
+	noise.set_vdd(-8.0);
+	noise.add_route(ALL_OUTPUTS, "ac_noise", 1.0);
+
+	auto &ac_noise = FILTER_RC(config, "ac_noise");
+	ac_noise.set_rc(filter_rc_device::HIGHPASS, RES_K(68) + RES_K(1), 0, 0, CAP_U(2.2));
+
+	sixtrak_common(config, ac_noise);
+
+	// On the Rev A, the D input of the tuning flip-flop is controlled by the
+	// firmware.
+	m_tune_control->bit_handler<3>().set([this] (int state) { m_tuning_ff->d_w(state); });
+}
+
+void sixtrak_state::sixtrak_rev_b(machine_config &config)
+{
+	sixtrak_common(config, SIXTRAK_TRANSISTOR_NOISE(config, "noise"));
+
+	// On the Rev B and C, the D input of the tuning flip-flop is attached to
+	// its /Q output.
+	m_tuning_ff->comp_output_cb().append([this] (int state) { m_tuning_ff->d_w(state); });
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(sixtrak_state::wheel_moved)
@@ -1133,6 +1166,27 @@ ROM_START(sixtrak)
 	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1) | ROM_OPTIONAL)
 ROM_END
 
+// Firmware versions V11 and V9 are compatible with both Rev A and Rev B / C of
+// the Six-Trak.
+ROM_START(sixtraka)
+	ROM_DEFAULT_BIOS("v11")
+	ROM_SYSTEM_BIOS(0, "v11", "Six-Trak V11 (1985)")  // Last official release.
+	ROM_SYSTEM_BIOS(1, "v9", "Six-Trak V9")
+
+	ROM_REGION(0x4000, "maincpu", 0)  // U128 (27128)
+	ROMX_LOAD("trak-11.bin", 0x000000, 0x004000, CRC(4d361d4f) SHA1(f14d4291c1a6a3e9462ae9786641cef11a9aac9a), ROM_BIOS(0))
+	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
+
+	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1) | ROM_OPTIONAL)
+
+	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
+	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1) | ROM_OPTIONAL)
+ROM_END
+
 }  // anonymous namespace
 
-SYST(1984, sixtrak, 0, 0, sixtrak, sixtrak, sixtrak_state, empty_init, "Sequential Circuits", "Six-Trak (Model 610) Rev B/C", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+SYST(1984, sixtrak, 0, 0, sixtrak_rev_b, sixtrak, sixtrak_state, empty_init, "Sequential Circuits", "Six-Trak (Model 610) Rev B/C", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+SYST(1984, sixtraka, sixtrak, 0, sixtrak_rev_a, sixtrak, sixtrak_state, empty_init, "Sequential Circuits", "Six-Trak (Model 610) Rev A", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
