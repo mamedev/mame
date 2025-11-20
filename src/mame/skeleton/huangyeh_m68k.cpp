@@ -145,8 +145,7 @@ void huangyeh_m68k_state::audio_program_map(address_map &map)
 
 void huangyeh_m68k_state::adpcm_bank_w(uint8_t data)
 {
-
-		m_oki->set_rom_bank(data & 0x01);
+	m_oki->set_rom_bank(data & 0x01);
 }
 
 void huangyeh_m68k_state::ramdac_map(address_map &map)
