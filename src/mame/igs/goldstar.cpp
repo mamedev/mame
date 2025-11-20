@@ -21399,7 +21399,10 @@ ROM_START( lucky8l )
 	ROM_LOAD( "w4.g14", 0x0000, 0x2000, CRC(27f533be) SHA1(bffa6adecf814f4d4675907905960aad0de42969) ) // 57C49B-35, had its own little circuit board to convert it to fit in a 16 pin IC - silkscreend T82S129
 	ROM_COPY( "proms",  0x1800, 0x0000, 0x0100 )
 
-	ROM_REGION( 0x117, "proms2", 0 )
+	ROM_REGION( 0x20, "proms2", 0 )  // borrowed from parent.
+	ROM_LOAD( "d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x117, "proms2pld", 0 )  // this pld has not enough data for the reels palette... bad dump?
 	ROM_LOAD( "w4.d13", 0x0000, 0x0117, CRC(37173040) SHA1(bc561cf7cb11c3a1b2677b14779ce2957e3b778d) ) // GAL16V8D
 
 	ROM_REGION( 0x2000, "unkprom", 0 )
@@ -31716,7 +31719,7 @@ GAMEL( 1991, lucky8h,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_ini
 GAMEL( 1989, lucky8i,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Eagle/Wing",        "New Lucky 8 Lines (set 9, W-4, Eagle, licensed by Wing)",  0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 199?, lucky8j,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
 GAMEL( 1989, lucky8k,    lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8l,  wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          MACHINE_WRONG_COLORS,  layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
+GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8l,  wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          0,                     layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
 GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8m,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 12, W-4, encrypted)",               0,                     layout_lucky8 )
 GAMEL( 1989, lucky8n,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8n,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 13)",                               0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 1988, lucky8o,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines (set 14, W-4, Yamate)",                  0,                     layout_lucky8 )    // 2 control sets...
