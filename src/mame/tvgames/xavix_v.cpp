@@ -45,11 +45,32 @@ inline uint8_t superxavix_state::get_next_bit_sx()
 {
 	if (m_tmp_databit == 0)
 	{
+		int address = m_tmp_dataaddress;
+
+		// do the upper bits being set have some special meaning
+		// or have we missed some segment register use by the time we get here?
+
+		// xavjmat (popira type game) ends up with this bit
+		// set in 24-bit sprite mode (mode 0x07) due to upper bit
+		// of sprites being set.
+		if (address & 0x4000000)
+		{
+			// ??
+		}
+
+		// anpanmdx has this set, this is an alternative to the
+		// code to detect it in draw_bitmap_layer
+		if (address & 0x2000000)
+		{
+			address &= 0x1ffffff;
+			address ^= 0x0600000;
+		}
+
 		// the higher bit set when accessing video expands the address space
-		if ((m_tmp_dataaddress & 0x1000000) && m_extra)
-			m_bit = m_extra[m_tmp_dataaddress&0x7fffff];
+		if ((address & 0x1000000) && m_extra)
+			m_bit = m_extra[address&0x7fffff];
 		else
-			m_bit = read_full_data_sp_bypass(m_tmp_dataaddress);
+			m_bit = read_full_data_sp_bypass(address);
 	}
 
 	uint8_t ret = m_bit >> m_tmp_databit;
@@ -1443,6 +1464,9 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 			//
 			// maybe addresses above 24-bit present the ROM data to the system in an unusual order
 			// (this might also apply to sprites)
+
+			// we currently detect this in get_next_bit_sx instead
+			/*
 			if (m_extra)
 			{
 				if (start & 0x4000)
@@ -1451,6 +1475,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 					start ^= 0xc00;
 				}
 			}
+			*/
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
