@@ -209,11 +209,14 @@ void pc_t1t_device::device_start()
 
 	// colors
 	for (int i = 0; i < 16; i++)
-		set_pen_color(i, tga_palette[i]);
+		set_indirect_color(i, tga_palette[i]);
 
 	// b/w mode shades
 	for (int i = 0; i < 16; i++)
-		set_pen_color(16 + i, pal4bit(i), pal4bit(i), pal4bit(i));
+		set_indirect_color(16 + i, rgb_t(pal4bit(i), pal4bit(i), pal4bit(i)));
+
+	for (int i = 0; i < 16; i++)
+		set_pen_indirect(i, 0);
 
 	save_item(NAME(m_vga_addr));
 	save_item(NAME(m_palette_mask));
@@ -367,7 +370,6 @@ void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
 
 MC6845_UPDATE_ROW( pc_t1t_device::text_inten_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t const rowbase = row_base(ra);
 	uint32_t *p = &bitmap.pix(y);
 
@@ -378,8 +380,8 @@ MC6845_UPDATE_ROW( pc_t1t_device::text_inten_update_row )
 		uint16_t const vram = space(0).read_word(rowbase | offset);
 		uint8_t const chr = vram & 0x00ff;
 		uint8_t const attr = vram >> 8;
-		auto const fg = pal[m_palette_base + palette_r(BIT(attr, 0, 4))];
-		auto const bg = pal[m_palette_base + palette_r(BIT(attr, 4, 4))];
+		auto const fg = palette_r(BIT(attr, 0, 4));
+		auto const bg = palette_r(BIT(attr, 4, 4));
 
 		uint8_t data = chr_gen_r(chr, ra);
 		if (i == cursor_x && (m_pc_framecnt & 0x08))
@@ -399,7 +401,6 @@ MC6845_UPDATE_ROW( pc_t1t_device::text_inten_update_row )
 
 MC6845_UPDATE_ROW( pcvideo_t1000_device::text_blink_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t const rowbase = row_base(ra);
 	uint32_t *p = &bitmap.pix(y);
 
@@ -413,9 +414,9 @@ MC6845_UPDATE_ROW( pcvideo_t1000_device::text_blink_update_row )
 		uint16_t const vram = space(0).read_word(rowbase | offset);
 		uint8_t const chr = vram & 0x00ff;
 		uint8_t const attr = vram >> 8;
-		auto const fg = pal[m_palette_base + palette_r(BIT(attr, 0, 4))];
-		//auto const bg = pal[m_palette_base + palette_r(BIT(attr, 4, 3) | (BIT(m_color_sel, 4) << 3))];
-		auto const bg = pal[m_palette_base + palette_r(BIT(attr, 4, 3))];
+		auto const fg = palette_r(BIT(attr, 0, 4));
+		//auto const bg = palette_r(BIT(attr, 4, 3) | (BIT(m_color_sel, 4) << 3));
+		auto const bg = palette_r(BIT(attr, 4, 3));
 
 		uint8_t data = chr_gen_r(chr, ra);
 		if (i == cursor_x)
@@ -442,7 +443,6 @@ MC6845_UPDATE_ROW( pcvideo_t1000_device::text_blink_update_row )
 
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::text_blink_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t const rowbase = row_base(ra);
 	uint32_t *p = &bitmap.pix(y);
 
@@ -452,8 +452,8 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::text_blink_update_row )
 		uint16_t const vram = space(0).read_word(rowbase | offset);
 		uint8_t const chr = vram & 0x00ff;
 		uint8_t const attr = vram >> 8;
-		auto const fg = pal[m_palette_base + palette_r(BIT(attr, 0, 4))];
-		auto const bg = pal[m_palette_base + palette_r(BIT(attr, 4, 3))];
+		auto const fg = palette_r(BIT(attr, 0, 4));
+		auto const bg = palette_r(BIT(attr, 4, 3));
 
 		uint8_t data = chr_gen_r(chr, ra);
 		if (i == cursor_x)
@@ -481,7 +481,6 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::text_blink_update_row )
 
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t const rowbase = row_base(ra);
 	uint32_t *p = &bitmap.pix(y);
 
@@ -490,8 +489,8 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 		uint16_t const offset = ((ma + i) << 1) & 0x3fff;
 		uint8_t chr = space(0).read_byte(rowbase + offset);
 		uint8_t const attr = space(0).read_byte(rowbase + offset + 1);
-		auto const fg = pal[m_palette_base + palette_r(BIT(attr, 0, 3))];
-		auto const bg = pal[m_palette_base + palette_r(BIT(attr, 4, 3))];
+		auto const fg = palette_r(BIT(attr, 0, 3));
+		auto const bg = palette_r(BIT(attr, 4, 3));
 		uint16_t code = chr & 0x1f;
 		if((attr & 0x88) == 0x88)
 		{
@@ -522,7 +521,6 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 
 MC6845_UPDATE_ROW( pc_t1t_device::gfx_4bpp_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 	uint32_t const rowbase = row_base(ra);
 
@@ -531,14 +529,14 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_4bpp_update_row )
 		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
 		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  4, 4))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  4, 4))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  0, 4))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  0, 4))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data, 12, 4))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data, 12, 4))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  8, 4))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  8, 4))];
+		*p++ = palette_r(BIT(data,  4, 4));
+		*p++ = palette_r(BIT(data,  4, 4));
+		*p++ = palette_r(BIT(data,  0, 4));
+		*p++ = palette_r(BIT(data,  0, 4));
+		*p++ = palette_r(BIT(data, 12, 4));
+		*p++ = palette_r(BIT(data, 12, 4));
+		*p++ = palette_r(BIT(data,  8, 4));
+		*p++ = palette_r(BIT(data,  8, 4));
 	}
 }
 
@@ -548,7 +546,6 @@ MC6845_UPDATE_ROW( pcvideo_t1000_device::gfx_2bpp_update_row )
 	// Unlike the PCjr, the Tandy 1000 seems to ignore the VRAM addressing
 	// configuration in this mode - the BIOS sets ARDM0 and ADRM1 to zero for
 	// CGA-compatible modes, but one bit of RA must be used for VRAM addressing.
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 	uint32_t const rowbase = m_display_base | ((uint32_t(ra) << 13) & 0x02000);
 
@@ -557,20 +554,19 @@ MC6845_UPDATE_ROW( pcvideo_t1000_device::gfx_2bpp_update_row )
 		uint16_t const offset = ((ma + i) << 1) & 0x01fff;
 		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  6, 2))];
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  4, 2))];
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  2, 2))];
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  0, 2))];
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data, 14, 2))];
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data, 12, 2))];
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data, 10, 2))];
-		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  8, 2))];
+		*p++ = palette_cga_2bpp_r(BIT(data,  6, 2));
+		*p++ = palette_cga_2bpp_r(BIT(data,  4, 2));
+		*p++ = palette_cga_2bpp_r(BIT(data,  2, 2));
+		*p++ = palette_cga_2bpp_r(BIT(data,  0, 2));
+		*p++ = palette_cga_2bpp_r(BIT(data, 14, 2));
+		*p++ = palette_cga_2bpp_r(BIT(data, 12, 2));
+		*p++ = palette_cga_2bpp_r(BIT(data, 10, 2));
+		*p++ = palette_cga_2bpp_r(BIT(data,  8, 2));
 	}
 }
 
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::gfx_2bpp_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 	uint32_t const rowbase = row_base(ra);
 
@@ -579,21 +575,20 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::gfx_2bpp_update_row )
 		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
 		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  6, 2))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  4, 2))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  2, 2))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  0, 2))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data, 14, 2))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data, 12, 2))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data, 10, 2))];
-		*p++ = pal[m_palette_base + palette_r(BIT(data,  8, 2))];
+		*p++ = palette_r(BIT(data,  6, 2));
+		*p++ = palette_r(BIT(data,  4, 2));
+		*p++ = palette_r(BIT(data,  2, 2));
+		*p++ = palette_r(BIT(data,  0, 2));
+		*p++ = palette_r(BIT(data, 14, 2));
+		*p++ = palette_r(BIT(data, 12, 2));
+		*p++ = palette_r(BIT(data, 10, 2));
+		*p++ = palette_r(BIT(data,  8, 2));
 	}
 }
 
 
 MC6845_UPDATE_ROW( pc_t1t_device::gfx_2bpp_high_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 	uint32_t const rowbase = row_base(ra);
 
@@ -602,25 +597,24 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_2bpp_high_update_row )
 		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
 		uint16_t const data = space(0).read_word(rowbase | offset);
 
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data, 15, 7))];
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data, 14, 6))];
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data, 13, 5))];
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data, 12, 4))];
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data, 11, 3))];
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data, 10, 2))];
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data,  9, 1))];
-		*p++ = pal[m_palette_base + palette_r(bitswap<2>(data,  8, 0))];
+		*p++ = palette_r(bitswap<2>(data, 15, 7));
+		*p++ = palette_r(bitswap<2>(data, 14, 6));
+		*p++ = palette_r(bitswap<2>(data, 13, 5));
+		*p++ = palette_r(bitswap<2>(data, 12, 4));
+		*p++ = palette_r(bitswap<2>(data, 11, 3));
+		*p++ = palette_r(bitswap<2>(data, 10, 2));
+		*p++ = palette_r(bitswap<2>(data,  9, 1));
+		*p++ = palette_r(bitswap<2>(data,  8, 0));
 	}
 }
 
 
 MC6845_UPDATE_ROW( pcvideo_t1000_device::gfx_1bpp_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 	uint32_t const rowbase = row_base(ra);
-	auto const fg = pal[m_palette_base + palette_r(BIT(m_color_sel, 0, 4))];
-	auto const bg = pal[m_palette_base + palette_r(0)];
+	auto const fg = palette_r(BIT(m_color_sel, 0, 4));
+	auto const bg = palette_r(0);
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -648,11 +642,10 @@ MC6845_UPDATE_ROW( pcvideo_t1000_device::gfx_1bpp_update_row )
 
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::gfx_1bpp_update_row )
 {
-	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
 	uint32_t const rowbase = row_base(ra);
-	auto const fg = pal[m_palette_base + palette_r(1)];
-	auto const bg = pal[m_palette_base + palette_r(0)];
+	auto const fg = palette_r(1);
+	auto const bg = palette_r(0);
 
 	for (int i = 0; i < x_count; i++)
 	{
@@ -733,6 +726,17 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::crtc_update_row )
 		default:
 			pc_t1t_device::crtc_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
+	}
+}
+
+
+void pc_t1t_device::set_palette_base(uint8_t base)
+{
+	if (base != m_palette_base)
+	{
+		m_palette_base = base;
+		for (unsigned i = 0; 16 > i; ++i)
+			set_pen_indirect(i, base + m_palette_reg[i]);
 	}
 }
 
@@ -839,7 +843,7 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 		m_mc6845->set_clock(XTAL(14'318'181) / 16);
 
 	// color or b/w?
-	m_palette_base = mono ? 16 : 0;
+	set_palette_base(mono ? 16 : 0);
 }
 
 
@@ -911,6 +915,7 @@ void pc_t1t_device::vga_data_w(uint8_t data)
 	if (BIT(m_vga_addr, 4))
 	{
 		m_palette_reg[m_vga_addr & 0x0f] = data & 0x0f;
+		set_pen_indirect(m_vga_addr & 0x0f, m_palette_base + (data & 0x0f));
 	}
 	else switch (m_vga_addr & 0x0f)
 	{
