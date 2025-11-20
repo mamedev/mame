@@ -119,7 +119,15 @@ protected:
 	virtual void device_post_load() override ATTR_COLD;
 
 private:
-	pen_t palette_cga_2bpp_r(uint8_t index) const { return palette_r(index ? (BIT(m_color_sel, 5) | (index << 1) | (BIT(m_color_sel, 4) << 3)) : BIT(m_color_sel, 0, 4)); }
+	pen_t palette_cga_2bpp_r(uint8_t index) const
+	{
+		if (!index)
+			return palette_r(BIT(m_color_sel, 0, 4));
+		else if (BIT(m_mode_sel, 2) && (2 == index))
+			return palette_r((BIT(m_color_sel, 4) << 3) | (index << 1));
+		else
+			return palette_r((BIT(m_color_sel, 4) << 3) | (index << 1) | BIT(m_color_sel, 5));
+	}
 
 	void mode_switch();
 	void vga_data_w(uint8_t data);
