@@ -28574,25 +28574,6 @@ ROM_START( fl7_twa )  // Serial 00000014D7A1.
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
 
-ROM_START( fl7_twb )  // Serial unknown. Encrypted.
-	ROM_REGION( 0x08000, "maincpu", 0 )
-	ROM_LOAD( "7v5_500_tw.u20",  0x0000, 0x08000, CRC(c2b605f6) SHA1(3e4b2f5327843eaff2a32f78b93ce08277abea8a) )
-
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "m27c1001_tw.u1",  0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
-
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "27c256.u3",  0x0000, 0x8000, CRC(23ae8d1a) SHA1(d9b7c442b6c7c58380a84b63cab7748f1c902fba) )
-
-	// Bipolar PROM dump borrowed from main sets
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
-	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
-
-	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
-	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
-ROM_END
-
 
 // Special 7's
 ROM_START( special7 )
@@ -31793,7 +31774,6 @@ GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flam
 
 GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7's (Taiwanese Hardware, v7.3)",                   0 )
 GAME(  199?, fl7_twa,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7's (Taiwanese Hardware, v6.5)",                   0 )
-GAME(  199?, fl7_twb,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7's (Taiwanese Hardware, encrypted, v7.5)",        MACHINE_NOT_WORKING ) // encrypted
 
 // special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )
