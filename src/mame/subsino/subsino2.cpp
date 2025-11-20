@@ -3388,8 +3388,8 @@ ROM_START( trea2000 ) // same PCB as new2001
 	ROM_REGION( 0x80000, "samples", 0 ) // SS9904
 	ROM_LOAD( "t2000_alpha_2_v105.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) ) // same as new2001
 
-	ROM_REGION( 0x28, "eeprom", ROMREGION_ERASEFF )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, NO_DUMP ) // TODO: handcrafted to pass protection check
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds1971.bin", 0x00, 0x28, CRC(41e15587) SHA1(0f93e0256f2520e4be2433c74059a9113b57a474) )
 ROM_END
 
 /***************************************************************************
