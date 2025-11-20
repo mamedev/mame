@@ -398,7 +398,7 @@ void z8002_device::Interrupt()
 	else
 	if (m_irq_req & Z8000_SEGTRAP)
 	{
-		//standard_irq_callback(SEGT_LINE, m_pc);
+		standard_irq_callback(SEGT_LINE, m_pc);
 		m_irq_vec = m_iack_in[0](m_pc);
 
 		CHANGE_FCW(fcw | F_S_N | F_SEG_Z8001());/* switch to segmented (on Z8001) system mode */
@@ -488,7 +488,7 @@ void z8002_device::clear_internal_state()
 	m_op_valid = 0;
 	m_regs.Q[0] = m_regs.Q[1] = m_regs.Q[2] = m_regs.Q[3] = 0;
 	m_nmi_state = 0;
-	m_irq_state[0] = m_irq_state[1] = 0;
+	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
 }
 
 void z8002_device::register_debug_state()
@@ -672,7 +672,7 @@ void z8002_device::execute_set_input(int irqline, int state)
 			m_irq_req |= Z8000_NMI;
 		}
 	}
-	else if (irqline < 2)
+	else if (irqline < 3)
 	{
 		m_irq_state[irqline] = state;
 		if (irqline == NVI_LINE)
@@ -688,7 +688,7 @@ void z8002_device::execute_set_input(int irqline, int state)
 					m_irq_req |= Z8000_NVI;
 			}
 		}
-		else
+		else if (irqline == VI_LINE)
 		{
 			if (state == CLEAR_LINE)
 			{
@@ -699,6 +699,17 @@ void z8002_device::execute_set_input(int irqline, int state)
 			{
 				if (m_fcw & F_VIE)
 					m_irq_req |= Z8000_VI;
+			}
+		}
+		else
+		{
+			if (state == CLEAR_LINE)
+			{
+				m_irq_req &= ~Z8000_SEGTRAP;
+			}
+			else
+			{
+				m_irq_req |= Z8000_SEGTRAP;
 			}
 		}
 	}

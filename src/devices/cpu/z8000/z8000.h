@@ -87,6 +87,7 @@ public:
 	{
 		NVI_LINE = 0,
 		VI_LINE = 1,
+		SEGT_LINE = 2,
 		NMI_LINE = INPUT_LINE_NMI
 	};
 
@@ -167,7 +168,7 @@ protected:
 		uint64_t  Q[4];  /* RQ0,RQ4,..RQ12 */
 	} m_regs;             /* registers */
 	int m_nmi_state;      /* NMI line state */
-	int m_irq_state[2];   /* IRQ line states (NVI, VI) */
+	int m_irq_state[3];   /* IRQ line states (NVI, VI, SEGT) */
 	int m_mi;
 	bool m_halt;
 	memory_access<23, 1, 0, ENDIANNESS_BIG>::cache m_cache;
