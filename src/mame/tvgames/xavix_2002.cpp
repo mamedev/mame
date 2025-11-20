@@ -1025,8 +1025,9 @@ void superxavix_super_tv_pc_state::init_stvpc()
 void superxavix_i2c_jmat_state::init_xavmusic()
 {
 	init_xavix();
-	// is sprite yflip broken on (some?) revisions of SuperXaviX hardware, or is there a CPU bug causing this
+	// is sprite fliping broken on (some?) revisions of SuperXaviX hardware, or is there a CPU bug causing this
 	m_disable_sprite_yflip = true;
+	m_disable_sprite_xflip = true;
 }
 
 void superxavix_piano_pc_state::init_piano_pc()

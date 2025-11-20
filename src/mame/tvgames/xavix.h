@@ -410,6 +410,7 @@ protected:
 	uint8_t tmap1_regs_r(offs_t offset);
 	uint8_t tmap2_regs_r(offs_t offset);
 
+	uint8_t spriteregs_r(void);
 	void spriteregs_w(uint8_t data);
 
 	uint8_t pal_ntsc_r();
@@ -577,6 +578,7 @@ protected:
 
 	bool m_disable_memory_bypass = false;
 	bool m_disable_sprite_yflip = false;
+	bool m_disable_sprite_xflip = false;
 	bool m_disable_tile_regs_flip = false;
 	int m_video_hres_multiplier;
 };

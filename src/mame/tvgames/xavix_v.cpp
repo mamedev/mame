@@ -50,14 +50,6 @@ inline uint8_t superxavix_state::get_next_bit_sx()
 		// do the upper bits being set have some special meaning
 		// or have we missed some segment register use by the time we get here?
 
-		// xavjmat (popira type game) ends up with this bit
-		// set in 24-bit sprite mode (mode 0x07) due to upper bit
-		// of sprites being set.
-		if (address & 0x4000000)
-		{
-			// ??
-		}
-
 		// anpanmdx has this set, this is an alternative to the
 		// code to detect it in draw_bitmap_layer
 		if (address & 0x2000000)
@@ -1107,6 +1099,14 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		if (m_disable_sprite_yflip)
 			flipy = 0;
 
+		// many elements in xavmusic and xavjmat also require xflip to be disabled, maybe sprite flipping
+		// is broken on SuperXaviX?
+		//
+		// non-super games, such as Gururuin world, use sprite mode 4, and expect flipping to work
+		// while the SuperXaviX games use a mix of mode 4 and mode 7 and don't want it
+		if (m_disable_sprite_xflip)
+			flipx = 0;
+
 		int drawheight = 16;
 		int drawwidth = 16;
 
@@ -1719,6 +1719,10 @@ void xavix_state::tmap2_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_tmap2_regs[offset]);
 }
 
+uint8_t xavix_state::spriteregs_r(void)
+{
+	return m_spritereg;
+}
 
 void xavix_state::spriteregs_w(uint8_t data)
 {
