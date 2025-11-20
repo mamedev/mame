@@ -782,6 +782,7 @@ void pcvideo_t1000_device::mode_switch()
 		m_mc6845->set_clock(XTAL(14'318'181) / 8);
 	else
 		m_mc6845->set_clock(XTAL(14'318'181) / 16);
+	m_mc6845->set_hpixels_per_column((hresad && !hresck) ? 16 : 8);
 }
 
 
