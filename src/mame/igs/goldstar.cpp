@@ -28347,6 +28347,8 @@ ROM_END
 
   W4 hardware.
 
+  Program 5XXXX V6 01A
+
   GFX sets:
   1) Red, White & Blue 7's
   2) Hollywood Nights.
@@ -28395,7 +28397,7 @@ ROM_END
   Flaming 7's
   Cyberdyne Systems.
 
-  Main - 50.
+  Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
 */
@@ -28418,12 +28420,11 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
 
-
 /*
   Flaming 7's
   Cyberdyne Systems.
 
-  Main - 500.
+  Cyberdyne Systems 7V5.00 (CB500), 500 bonus.
   Custom Hardware.
 
 */
@@ -28446,22 +28447,27 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
 
-ROM_START( fl7_1000 )
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CB1000), 1000 bonus.
+  Custom Hardware.
+
+*/
+ROM_START( fl7_1000 )  // Serial 00000031A9EE
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "27c512_main.7v5.00.u20",  0x0000, 0x8000, CRC(1134503c) SHA1(ef4a2e724bea8729f989343233c4e1230fea27ec) )
+	ROM_LOAD( "27c512_main.7v5.00.u22",  0x0000, 0x8000, CRC(1134503c) SHA1(ef4a2e724bea8729f989343233c4e1230fea27ec) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "27c1001_cyberdyne.u1",  0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "fl7_gfx_cb_nn_d7.u3",   0x0000, 0x8000, CRC(23ae8d1a) SHA1(d9b7c442b6c7c58380a84b63cab7748f1c902fba) )
+	ROM_LOAD( "27c256.u3",   0x0000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
 
-	// Proper palette device dump
-	ROM_REGION( 0x2000, "paldev", 0 )
-	ROM_LOAD( "27ch650.u2", 0x0000, 0x2000, CRC(ee937765) SHA1(c1b3ebafbca63c35353b26c9cba188aa9f266f9d) )
-
-	ROM_REGION( 0x100, "proms", 0 )
-	ROM_COPY( "paldev",  0x1800, 0x0000, 0x0100 )  // srctag, srcoffs, offset, length
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
 	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
@@ -28471,7 +28477,7 @@ ROM_END
   Flaming 7's
   Cyberdyne Systems.
 
-  Main - 2000.
+  Cyberdyne Systems 7V5.00 (CYB1092), 2000 bonus.
   Custom Hardware.
 
 */
@@ -28499,7 +28505,7 @@ ROM_END
   Flaming 7's
   Cyberdyne Systems.
 
-  2000 Bonus. Egyptian Gold.
+  Cyberdyne Systems 7V5.00 (CYB1092), 2000 bonus, Egyptian Gold edition.
   Custom Hardware.
 
 */
@@ -28527,10 +28533,9 @@ ROM_END
   Flaming 7's (unknown version)
   Taiwanese Hardware.
 
-  Needs proper graphics ROM decryption and gfxdecode...
+  Flaming 7's TW - Cherry Bonus - Nevada Numbers - Diamonds 7's
 
 */
-// Flaming 7's TW - Cherry Bonus - Nevada Numbers - Diamonds 7's
 ROM_START( fl7_tw )  // Serial 00000050E9B7.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_tw.u20",  0x0000, 0x10000, CRC(50927a1b) SHA1(2557069f497b23f13978294f3ac108229d9db544) )  // identical halves.
@@ -28550,8 +28555,7 @@ ROM_START( fl7_tw )  // Serial 00000050E9B7.
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
 
-
-ROM_START( fl7_twa )  // Serial 00000050E9B7.
+ROM_START( fl7_twa )  // Serial 00000014D7A1.
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "6v5.50_tw.u20",  0x0000, 0x08000, CRC(03fa721d) SHA1(683ad47b07896c8d8eb6b6fe9d02e4b2b16833d8) )
 
@@ -28570,7 +28574,7 @@ ROM_START( fl7_twa )  // Serial 00000050E9B7.
 	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
 
-ROM_START( fl7_twb )  // Serial 00000050E9B7.
+ROM_START( fl7_twb )  // Serial unknown. Encrypted.
 	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "7v5_500_tw.u20",  0x0000, 0x08000, CRC(c2b605f6) SHA1(3e4b2f5327843eaff2a32f78b93ce08277abea8a) )
 
@@ -31778,18 +31782,20 @@ GAMEL( 1993, bingownga,  bingowng, bingownga,bingownga,wingco_state,   empty_ini
 GAME(  2002, mbs2euro,   0,        mbstar,   mbstar,   wingco_state,   init_mbs2,      ROT0, "Auto-Data Graz",    "Mega Bonus Star II (Euro, Millennium Edition)",            MACHINE_NOT_WORKING )  // need more work in memory map, inputs, and reels alignment.
 
 
-// --- Flaming 7's hardware (W-4 derivative) ---
-GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   init_fl7_3121,  ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",  0 )
-GAME(  199?, fl7_50,     0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              0 )
-GAME(  199?, fl7_500,    fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             0 )
-GAME(  199?, fl7_1000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 1000 Bonus)",            MACHINE_NOT_WORKING ) // need to check program and gfx roms
-GAME(  199?, fl7_2000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            0 )
-GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   0 )
+// --- Flaming 7's hardware (W-4 custom derivative) ---
+GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   init_fl7_3121,  ROT0, "Cyberdyne Systems", "Flaming 7's (W4 Hardware, prg 5XXXX V6 01A, Red, White & Blue 7's + Hollywood Nights)",  0 )
 
-GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v7.3)",                     0 )
-GAME(  199?, fl7_twa,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, v6.5)",                     0 )
-GAME(  199?, fl7_twb,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7 (Taiwanese Hardware, encrypted, v7.5)",          MACHINE_NOT_WORKING ) // encrypted
+GAME(  199?, fl7_50,     0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus)",   0 )
+GAME(  199?, fl7_500,    fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (Cyberdyne Systems 7V5.00 (CB500), 500 bonus)",    0 )
+GAME(  199?, fl7_1000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (Cyberdyne Systems 7V5.00 (CB1000), 1000 bonus)",  0 )
+GAME(  199?, fl7_2000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (Cyberdyne Systems 7V5.00 (CYB1092), 2000 bonus)", 0 )
+GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (Cyberdyne Systems 7V5.00 (CYB1092), 2000 bonus, Egyptian Gold edition)", 0 )
 
+GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7's (Taiwanese Hardware, v7.3)",                   0 )
+GAME(  199?, fl7_twa,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7's (Taiwanese Hardware, v6.5)",                   0 )
+GAME(  199?, fl7_twb,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7's (Taiwanese Hardware, encrypted, v7.5)",        MACHINE_NOT_WORKING ) // encrypted
+
+// special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )
 GAME(  199?, special7a,  special7, flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 2)",         0 )
 GAME(  199?, special7b,  special7, flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 3)",         0 )
