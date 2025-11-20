@@ -16,12 +16,15 @@
       the BIGBLUE video array.
 
     TODO:
-    * Tandy 1000 colour select register in 320*200 2BPP mode.
     * Extended addressing for Tandy 1000 machines supporting more than
       128K VRAM.
     * Extended page register for later Tandy 1000 machines.
     * Tandy 1000 640*200 secondary pixel organisation.
+    * Composite output colours.
+    * Correct output colours for monochrome modes.
     * Border colours.
+    * Confirm whether colours are translated via the palette registers for
+      Tandy 1000 CGA compatibility features.
 
 ***************************************************************************/
 
@@ -402,9 +405,10 @@ MC6845_UPDATE_ROW( pcvideo_t1000_device::text_blink_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		// TODO: Colour selection register bit 4 supposedly sets the background
+		// Documentation says colour select register bit 4 sets the background
 		// intensity, but the BIOS sets this bit, resulting in a grey background
-		// in DOS (rather than black).  Is this correct?
+		// in DOS (rather than black).  CGA documentation says the same thing,
+		// but according to the schematics, it doesn't actually use it, either.
 		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
 		uint16_t const vram = space(0).read_word(rowbase | offset);
 		uint8_t const chr = vram & 0x00ff;
@@ -539,7 +543,32 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_4bpp_update_row )
 }
 
 
-MC6845_UPDATE_ROW( pc_t1t_device::gfx_2bpp_update_row )
+MC6845_UPDATE_ROW( pcvideo_t1000_device::gfx_2bpp_update_row )
+{
+	// Unlike the PCjr, the Tandy 1000 seems to ignore the VRAM addressing
+	// configuration in this mode - the BIOS sets ARDM0 and ADRM1 to zero for
+	// CGA-compatible modes, but one bit of RA must be used for VRAM addressing.
+	rgb_t const *const pal = palette()->entry_list_raw();
+	uint32_t *p = &bitmap.pix(y);
+	uint32_t const rowbase = m_display_base | ((uint32_t(ra) << 13) & 0x02000);
+
+	for (int i = 0; i < x_count; i++)
+	{
+		uint16_t const offset = ((ma + i) << 1) & 0x01fff;
+		uint16_t const data = space(0).read_word(rowbase | offset);
+
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  6, 2))];
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  4, 2))];
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  2, 2))];
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  0, 2))];
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data, 14, 2))];
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data, 12, 2))];
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data, 10, 2))];
+		*p++ = pal[m_palette_base + palette_cga_2bpp_r(BIT(data,  8, 2))];
+	}
+}
+
+MC6845_UPDATE_ROW( pcvideo_pcjr_device::gfx_2bpp_update_row )
 {
 	rgb_t const *const pal = palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(y);
@@ -657,9 +686,6 @@ MC6845_UPDATE_ROW( pc_t1t_device::crtc_update_row )
 		case T1000_TEXT_INTEN:
 			text_inten_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
-		case T1000_GFX_2BPP:
-			gfx_2bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-			break;
 		case T1000_GFX_2BPP_HIGH:
 			gfx_2bpp_high_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
@@ -679,6 +705,9 @@ MC6845_UPDATE_ROW( pcvideo_t1000_device::crtc_update_row )
 		case T1000_GFX_1BPP:
 			gfx_1bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
+		case T1000_GFX_2BPP:
+			gfx_2bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
 		default:
 			pc_t1t_device::crtc_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
@@ -694,6 +723,9 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::crtc_update_row )
 			break;
 		case T1000_GFX_1BPP:
 			gfx_1bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case T1000_GFX_2BPP:
+			gfx_2bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case PCJX_TEXT:
 			pcjx_text_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
@@ -729,28 +761,9 @@ void pcvideo_t1000_device::mode_switch()
 	else if (!hresad)
 	{
 		if (!c16col)
-		{
-			// FIXME: this palette setup hack is completely wrong
 			m_update_row_type = T1000_GFX_2BPP;
-			if (m_color_sel)
-			{
-				m_palette_reg[0] = 0x00;
-				m_palette_reg[1] = 0x0b;
-				m_palette_reg[2] = 0x0d;
-				m_palette_reg[3] = 0x0f;
-			}
-			else
-			{
-				m_palette_reg[0] = 0x00;
-				m_palette_reg[1] = 0x0a;
-				m_palette_reg[2] = 0x0c;
-				m_palette_reg[3] = 0x0e;
-			}
-		}
 		else
-		{
 			m_update_row_type = T1000_GFX_4BPP;
-		}
 	}
 	else
 	{

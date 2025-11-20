@@ -47,7 +47,6 @@ protected:
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( text_inten_update_row );
 	MC6845_UPDATE_ROW( gfx_4bpp_update_row );
-	MC6845_UPDATE_ROW( gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( gfx_2bpp_high_update_row );
 
 	void default_map(address_map &map) ATTR_COLD;
@@ -117,6 +116,8 @@ protected:
 	virtual void device_post_load() override ATTR_COLD;
 
 private:
+	uint8_t palette_cga_2bpp_r(uint8_t index) const { return palette_r(index ? (BIT(m_color_sel, 5) | (index << 1) | (BIT(m_color_sel, 4) << 3)) : BIT(m_color_sel, 0, 4)); }
+
 	void mode_switch();
 	void vga_data_w(uint8_t data);
 	void mode_select_w(uint8_t data);
@@ -127,6 +128,7 @@ private:
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( text_blink_update_row );
+	MC6845_UPDATE_ROW( gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( gfx_1bpp_update_row );
 
 	uint8_t m_mode_sel;
@@ -212,6 +214,7 @@ private:
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( text_blink_update_row );
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
+	MC6845_UPDATE_ROW( gfx_2bpp_update_row );
 	MC6845_UPDATE_ROW( gfx_1bpp_update_row );
 };
 
