@@ -701,6 +701,7 @@ private:
 	void magodds_outb850_w(uint8_t data);
 	void magodds_outb860_w(uint8_t data);
 	void fl7w4_outc802_w(uint8_t data);
+	void flaming7_outputc_w(uint8_t data);	
 	void system_outputa_w(uint8_t data);
 	void system_outputb_w(uint8_t data);
 	void system_outputc_w(uint8_t data);
@@ -2649,6 +2650,8 @@ void goldstar_state::p2_lamps_w(uint8_t data)
 	m_lamps[8 + 6] = BIT(data, 6);
 	m_lamps[8 + 7] = BIT(data, 7);
 
+	m_ticket_dispenser->motor_w(BIT(data,1));
+	
 //  popmessage("p2 lamps: %02X", data);
 }
 
@@ -3038,8 +3041,30 @@ void wingco_state::system_outputc_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_ticket_dispenser->motor_w(!BIT(data, 7));
+
+	m_reel_tilemap[0]->mark_all_dirty();
+	m_reel_tilemap[1]->mark_all_dirty();
+	m_reel_tilemap[2]->mark_all_dirty();	
+	
 //  popmessage("system_outputc_w %02x",data);
 }
+
+void wingco_state::flaming7_outputc_w(uint8_t data)
+{
+	m_nmi_enable = data & 8;
+	m_vidreg = data & 2;
+
+
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	
+	m_reel_tilemap[0]->mark_all_dirty();
+	m_reel_tilemap[1]->mark_all_dirty();
+	m_reel_tilemap[2]->mark_all_dirty();
+	
+	//  popmessage("system_outputc_w %02x",data);
+}
+
 
 void wingco_state::megaline_outputa_w(uint8_t data)
 {
@@ -14388,7 +14413,8 @@ static INPUT_PORTS_START( flam7_w4 )
 
 	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)   PORT_NAME("WT RXD")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
+//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)   PORT_NAME("IN4-3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)   PORT_NAME("IN4-4 Active")  // This one is active in real PCB.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)   PORT_NAME("IN4-5")
@@ -14537,7 +14563,8 @@ static INPUT_PORTS_START( flaming7 )
 
 	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)   PORT_NAME("WT RXD")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
+//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)   PORT_NAME("IN4-3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)   PORT_NAME("IN4-4 Active")  // this one is active in real PCB.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)   PORT_NAME("IN4-5")
@@ -14546,7 +14573,7 @@ static INPUT_PORTS_START( flaming7 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Books / Stats / Setup") PORT_TOGGLE
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Credits Out" )          PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPNAME( 0x03, 0x01, "Credits Out" )          PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "Amusement (no credits out)" )
 	PORT_DIPSETTING(    0x02, "Ticket Printer" )
 	PORT_DIPSETTING(    0x01, "Hopper Payout" )
@@ -15963,7 +15990,7 @@ void wingco_state::lucky8(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// payout hardware
-	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(200));
+	HOPPER(config, m_ticket_dispenser, attotime::from_msec(100));
 }
 
 void wingco_state::cbaai(machine_config &config)
@@ -16175,6 +16202,8 @@ void wingco_state::flaming7(machine_config &config)
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
+	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::flaming7_outputc_w));
+		
 	DS2401(config, m_fl7w4_id);
 }
 
@@ -16194,6 +16223,8 @@ void wingco_state::flam7_tw(machine_config &config)
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
+	
+	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::flaming7_outputc_w));
 
 	DS2401(config, m_fl7w4_id);
 }
@@ -28399,6 +28430,26 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
 ROM_END
 
+ROM_START( fl7_1000 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "27c512_main.7v5.00.u20",  0x0000, 0x8000, CRC(1134503c) SHA1(ef4a2e724bea8729f989343233c4e1230fea27ec) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001_cyberdyne.u1",  0x00000, 0x20000, CRC(e6099723) SHA1(31e73a81166dd0d50d51ead38d348e36018d0698) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gfx_cb_nn_d7.u3",   0x0000, 0x8000, CRC(23ae8d1a) SHA1(d9b7c442b6c7c58380a84b63cab7748f1c902fba) )
+
+	// Proper palette device dump
+	ROM_REGION( 0x2000, "paldev", 0 )
+	ROM_LOAD( "27ch650.u2", 0x0000, 0x2000, CRC(ee937765) SHA1(c1b3ebafbca63c35353b26c9cba188aa9f266f9d) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_COPY( "paldev",  0x1800, 0x0000, 0x0100 )  // srctag, srcoffs, offset, length
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
+	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+ROM_END
 
 /*
   Flaming 7's
@@ -31715,6 +31766,7 @@ GAME(  2002, mbs2euro,   0,        mbstar,   mbstar,   wingco_state,   init_mbs2
 GAME(  199?, fl7_3121,   0,        flam7_w4, flam7_w4, wingco_state,   init_fl7_3121,  ROT0, "Cyberdyne Systems", "Flaming 7 (W4 Hardware, Red, White & Blue 7's + Hollywood Nights)",  0 )
 GAME(  199?, fl7_50,     0,        flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 50 Bonus)",              0 )
 GAME(  199?, fl7_500,    fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 500 Bonus)",             0 )
+GAME(  199?, fl7_1000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 1000 Bonus)",            MACHINE_NOT_WORKING ) // need to check program and gfx roms
 GAME(  199?, fl7_2000,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Main, 2000 Bonus)",            0 )
 GAME(  199?, fl7_2k16,   fl7_50,   flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7 (Custom Hardware, Egyptian Gold, 2000 Bonus)",   0 )
 
