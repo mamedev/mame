@@ -191,6 +191,18 @@ Requires Disk BASIC
 		</part>
 	</software>
 
+	<software name="dbbasic" supported="yes">
+		<description>dB-BASIC 1.0</description>
+		<year>1983</year>
+		<publisher>dB-SOFT</publisher>
+		<info name="usage" value="In DISK MONITOR, type l 1,&#34;dB-BASIC&#34;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="db-basic.d88" size="305328" crc="7e929237" sha1="e4333bd908b4a48b1050d39168ca216dfcf9948c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="games01" supported="yes">
 		<description>Games Vol. 01</description>
 		<year>200?</year>
@@ -297,6 +309,28 @@ FRONT LINE: works
 		</part>
 	</software>
 
+	<software name="ipls2d01" supported="yes">
+		<description>Compilation Disk IPLS2D-001</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[
+Compliation of various games and BASIC versions.
+BASIC MZ-1Z001: works
+BASIC SB-5520: not working (probably for MZ-80B?)
+FLIGHT SIMULATOR: works
+HUBASIC V2.0: works
+SUPERCOLOR BASIC: works
+POWER FAIL: works
+HEY SHEEP: works
+PLAZMA LINE: works
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="ipls2d-001.d88" size="305328" crc="b12ecaef" sha1="c5f4508fe8b70570d1ac1d1ecf25cd7970ab2378"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="miranda" supported="yes">
 		<description>Miranda</description>
 		<year>200?</year>
@@ -305,6 +339,30 @@ FRONT LINE: works
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="305328">
 				<rom name="miranda.d88" size="305328" crc="c5cad887" sha1="ed092e7752c04ab0842c68195b00b98b09ebf388"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mz1z001" supported="yes">
+		<description>BASIC MZ-1Z001 DISK</description>
+		<year>2023</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[This is a disk version of MZ-1Z001 BASIC, not MZ-2Z001 disk BASIC]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="mz1z001.d88" size="305328" crc="31905cb3" sha1="b39554c8cfb50656b6c37f69ae233f237a472582"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1z002dta" supported="no">
+		<description>BASIC MZ-1Z002 Data</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[Requires disk BASIC - presumably MZ-2Z002]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="1z002-data.d88" size="305328" crc="49a3acf0" sha1="afd8430ab420f62667a3888e2669f3ad5f3d3ec5"/>
 			</dataarea>
 		</part>
 	</software>
