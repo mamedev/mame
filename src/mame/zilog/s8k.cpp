@@ -31,6 +31,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
 #include "cpu/z8000/z8000.h"
+#include "machine/z8010.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
@@ -38,6 +39,9 @@
 #include "machine/ram.h"
 
 #include "s8k.lh"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 class s8k_16_daisy_device : public device_t, public z80_daisy_chain_interface
 {
@@ -75,11 +79,19 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
+		m_local_ram(*this, "local_ram", 0x800, ENDIANNESS_BIG),
+		m_view_code(*this, "memview_code"),
+		m_view_data(*this, "memview_data"),
+		m_view_stck(*this, "memview_stck"),
+		m_mmu_code(*this, "mmu0_code"),
+		m_mmu_data(*this, "mmu1_data"),
+		m_mmu_stck(*this, "mmu2_stck"),
 		m_daisy(*this, "s8k_16_daisy"),
 		m_sio(*this, "sio%u", 0U),
 		m_ctc(*this, "ctc%u", 0U),
 		m_pio(*this, "pio0"),
 		m_dsw(*this, "DSW"),
+		m_jp_seg(*this, "JP_SEG"),
 		m_start_btn(*this),
 		m_normal_led(*this, "normal_led"),
 		m_busack_led(*this, "busack_led")
@@ -96,12 +108,16 @@ protected:
 
 	required_device<z8001_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	memory_share_creator<uint16_t> m_local_ram;
+	memory_view m_view_code, m_view_data, m_view_stck;
+	required_device<z8010_device> m_mmu_code, m_mmu_data, m_mmu_stck;
 	required_device<s8k_16_daisy_device> m_daisy;
 	required_device_array<z80sio_device, 4> m_sio;
 	required_device_array<z80ctc_device, 3> m_ctc;
 	required_device<z80pio_device> m_pio;
 
 	required_ioport m_dsw;	// DIP switch
+	required_ioport m_jp_seg;
 	devcb_write_line m_start_btn;
 
 	output_finder<> m_normal_led;
@@ -110,6 +126,20 @@ protected:
 private:
 	uint8_t reg_scr_r();
 	void reg_scr_w(uint8_t data);
+	uint8_t reg_sbr_r();
+	void reg_sbr_w(uint8_t data);
+	uint8_t reg_nbr_r();
+	void reg_nbr_w(uint8_t data);
+	uint8_t reg_snvr_r();
+	uint8_t reg_trpl_r();
+	uint8_t reg_if1l_r();
+
+	z8010_device *select_code_mmu(offs_t offset);
+	z8010_device *select_data_mmu(offs_t offset);
+
+	bool translate_addr(int spacenum, bool write, offs_t &offset);
+	uint16_t ram_r(address_space &space, offs_t offset, uint16_t mask);
+	void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mask);
 
 	uint8_t comms_r(offs_t offset);
 	void comms_w(offs_t offset, uint8_t data);
@@ -124,20 +154,43 @@ private:
 	void centronics_fault_w(uint8_t data);
 	void centronics_ack_w(uint8_t data);
 
+	uint16_t segtack_r();
 	uint16_t nmiack_r();
 
 	void normal_led_w(int state);
 
-	void mem_map(address_map &map) ATTR_COLD;
+	void install_memory();
+
+	void stack_mem(address_map &map) ATTR_COLD;
+	void data_mem(address_map &map) ATTR_COLD;
+	void program_mem(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void spec_io_map(address_map &map) ATTR_COLD;
 
 	void daisy_interrupt(int state);
+	void segt_interrupt(int state);
+
+	offs_t m_memsize = 0;
 
 	// Board registers
-	uint8_t m_reg_scr = 0;	// System Configuration Register
-	uint8_t m_reg_sbr = 0;	// System Break Register
-	uint8_t m_reg_nbr = 0;	// Normal Break Register
+	uint8_t m_reg_scr	= 0; // System Configuration Register
+	uint8_t m_reg_sbr	= 0; // System Break Register
+	uint8_t m_reg_nbr	= 0; // Normal Break Register
+	uint8_t m_reg_snvr	= 0; // Segment Violation Register
+	uint8_t m_reg_trpl	= 0; // Segment trap memory address low-byte
+	uint8_t m_reg_if1l	= 0; // Segment trap instruction low-byte
+
+	bool m_is_seg_os = false;
+	bool m_is_seg_user = false;
+
+	// --- ZBI peripherals (TEMPORARY!!!) ---
+
+	uint8_t m_ecc_reg = 0;
+
+	uint8_t ecc_reg_r();
+	void ecc_reg_w(uint8_t data);
+
+	// --- ZBI peripherals ---
 
 	uint16_t m_nmi_code = 0;
 
@@ -151,8 +204,9 @@ private:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MAIN_CLOCK	5528650 /* 5.5 Mhz (44.440 Mhz / 8) */
-#define CTC_CLOCK	(2.4576_MHz_XTAL / 2)
+#define MAIN_CLOCK 		5528650 /* 5.5 Mhz (44.440 Mhz / 8) */
+#define MASTER_CLOCK	(4 * MAIN_CLOCK) /* 22.1 Mhz */
+#define CTC_CLOCK		(2.4576_MHz_XTAL / 2)
 
 // System Configuration Register control bits 0-4
 #define S8K_SCR_BD_MEMON	0x01	// 1 = use off-board memory
@@ -173,7 +227,11 @@ static INPUT_PORTS_START( s8k )
 	PORT_START("FP")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")  PORT_CODE(KEYCODE_PLUS_PAD) PORT_WRITE_LINE_MEMBER(FUNC(s8k_state::start_btn_w))
 
-	// NOTE: DIP switches set logic 0 when 'on'!
+	PORT_START("JP_SEG")
+	PORT_CONFNAME(0x01, 0x00, "Support segmented OS")
+	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(	0x01, DEF_STR( Yes ) )
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x30, 0x20, "Serial console baud rate" )	PORT_DIPLOCATION("U70:1,4")
 	PORT_DIPSETTING(	0x00, "300 baud" )
@@ -199,6 +257,18 @@ void s8k_state::start_btn_w(int state)
 //  ADDRESS MAPS
 //**************************************************************************
 
+uint8_t s8k_state::ecc_reg_r()
+{
+	LOG("%s -> ECC REGISTER READ! \n");
+	return m_ecc_reg;
+}
+
+void s8k_state::ecc_reg_w(uint8_t data)
+{
+	LOG("%s -> ECC REGISTER WRITTEN: %02x\n", machine().describe_context(), data);
+	m_ecc_reg = data;
+}
+
 uint8_t s8k_state::reg_scr_r()
 {
 	return m_reg_scr;
@@ -206,9 +276,76 @@ uint8_t s8k_state::reg_scr_r()
 
 void s8k_state::reg_scr_w(uint8_t data)
 {
-	logerror("%s reg_scr_w: %02x\n", machine().describe_context(), data);
+	uint8_t diff = data ^ m_reg_scr;
 
-	m_reg_scr = data & 0x0f;	// Mask off read-only nibble
+	LOG("%s reg_scr_w: %02x\n", machine().describe_context(), data);
+
+	if(diff & S8K_SCR_BD_MEMON)
+	{
+		if(data & S8K_SCR_BD_MEMON)
+		{
+			m_view_code.disable();
+			m_view_data.disable();
+			m_view_stck.disable();
+		}
+		else
+		{
+			m_view_code.select(0);
+			m_view_data.select(0);
+			m_view_stck.select(0);
+		}
+	}
+
+	if(diff & S8K_SCR_MMU_ONH)
+	{
+		m_maincpu->space(AS_PROGRAM).invalidate_caches(read_or_write::READWRITE);
+		m_maincpu->space(AS_DATA).invalidate_caches(read_or_write::READWRITE);
+		m_maincpu->space(z8001_device::AS_STACK).invalidate_caches(read_or_write::READWRITE);
+	}
+
+	if(diff & S8K_SCR_SEG_USER)
+	{
+		m_is_seg_user = data & S8K_SCR_SEG_USER;
+	}
+
+	m_reg_scr = (m_reg_scr & 0xf0) | ( data & 0x0f );	// Mask off read-only nibble
+}
+
+uint8_t s8k_state::reg_sbr_r()
+{
+	return m_reg_sbr;
+}
+
+void s8k_state::reg_sbr_w(uint8_t data)
+{
+	LOG("%s reg_SBR_w: %02x\n", machine().describe_context(), data);
+	m_reg_sbr = data;
+}
+
+uint8_t s8k_state::reg_nbr_r()
+{
+	return m_reg_nbr;
+}
+
+void s8k_state::reg_nbr_w(uint8_t data)
+{
+	LOG("%s reg_NBR_w: %02x\n", machine().describe_context(), data);
+	m_reg_nbr = data;
+}
+
+uint8_t s8k_state::reg_snvr_r()
+{
+	return m_reg_snvr;
+}
+
+uint8_t s8k_state::reg_trpl_r()
+{
+	return m_reg_trpl;
+}
+
+uint8_t s8k_state::reg_if1l_r()
+{
+	return m_reg_if1l;
 }
 
 uint8_t s8k_state::comms_r(offs_t offset)
@@ -259,11 +396,38 @@ void s8k_state::comms_w(offs_t offset, uint8_t data)
 
 uint8_t s8k_state::mmu_cmd_r(offs_t offset)
 {
+	if((offset & 1) == 0)
+	{
+		uint8_t reg = (uint8_t)(offset >> 8);
+
+		if((offset & 0x2) == 0)
+			return m_mmu_code->read(reg);
+		if((offset & 0x4) == 0)
+			return m_mmu_data->read(reg);
+		if((offset & 0x8) == 0)
+			return m_mmu_stck->read(reg);
+	}
+
 	return 0xff;
 }
 
 void s8k_state::mmu_cmd_w(offs_t offset, uint8_t data)
 {
+	if((offset & 1) == 0)
+	{
+		uint8_t reg = (uint8_t)(offset >> 8);
+
+		if((offset & 0x2) == 0)
+			m_mmu_code->write(reg, data);
+		if((offset & 0x4) == 0)
+			m_mmu_data->write(reg, data);
+		if((offset & 0x8) == 0)
+			m_mmu_stck->write(reg, data);
+
+		m_maincpu->space(AS_PROGRAM).invalidate_caches(read_or_write::READWRITE);
+		m_maincpu->space(AS_DATA).invalidate_caches(read_or_write::READWRITE);
+		m_maincpu->space(z8001_device::AS_STACK).invalidate_caches(read_or_write::READWRITE);
+	}
 }
 
 void s8k_state::io_map(address_map &map)
@@ -271,7 +435,7 @@ void s8k_state::io_map(address_map &map)
 	/*
 
 	=========================================================
-				System I/O Space Memory Map
+					System I/O Space Memory Map
 	=========================================================
 	I/O Space      Device Class            Current use
 	=========================================================
@@ -296,9 +460,18 @@ void s8k_state::io_map(address_map &map)
 
 	map.unmap_value_high();
 	map(0xff81, 0xffbf).rw(FUNC(s8k_state::comms_r), FUNC(s8k_state::comms_w));
+
 	map(0xffc1, 0xffc1).rw(FUNC(s8k_state::reg_scr_r), FUNC(s8k_state::reg_scr_w));
+	map(0xffc9, 0xffc9).rw(FUNC(s8k_state::reg_sbr_r), FUNC(s8k_state::reg_sbr_w));
+	map(0xffd1, 0xffd1).rw(FUNC(s8k_state::reg_nbr_r), FUNC(s8k_state::reg_nbr_w));
+	map(0xffd9, 0xffd9).r(FUNC(s8k_state::reg_snvr_r));
 	map(0xffe1, 0xffe1).w("s8k_16_daisy", FUNC(s8k_16_daisy_device::reti_w));
 	//map(0xffe9, 0xffe9).w(FUNC(s8k_state::reset());
+	map(0xfff1, 0xfff1).r(FUNC(s8k_state::reg_trpl_r));
+	map(0xfff9, 0xfff9).r(FUNC(s8k_state::reg_if1l_r));
+
+	// ------------ ZBI peripherals (TESTING!!!) ----------
+	map(0x0000, 0x0000).rw(FUNC(s8k_state::ecc_reg_r), FUNC(s8k_state::ecc_reg_w));
 }
 
 void s8k_state::spec_io_map(address_map &map)
@@ -307,16 +480,250 @@ void s8k_state::spec_io_map(address_map &map)
 	map(0x00f0, 0x20fc).rw(FUNC(s8k_state::mmu_cmd_r), FUNC(s8k_state::mmu_cmd_w));
 }
 
-void s8k_state::mem_map(address_map &map)
+void s8k_state::program_mem(address_map &map)
 {
 	map.unmap_value_low();
-	map(0x0000, 0x3fff).rom().region("maincpu", 0);
-	map(0x4000, 0x47ff).ram();
+}
+
+void s8k_state::data_mem(address_map &map)
+{
+	map.unmap_value_low();
+}
+
+void s8k_state::stack_mem(address_map &map)
+{
+	map.unmap_value_low();
+}
+
+z8010_device *s8k_state::select_code_mmu(offs_t offset)
+{
+	z8010_device *mmu = m_mmu_code;
+	uint8_t seg = (uint8_t)(offset >> 16);
+
+	LOG("%s CODE MMU SELECT, offset: %06x\n", machine().describe_context(), offset);
+
+	if(m_is_seg_os)
+	{
+		if(m_is_seg_user && m_normal_led)	//Use normal LED as N/S indicator
+		{
+			if(seg < 64)
+				mmu = m_mmu_data;
+			else
+				mmu = m_mmu_stck;
+		}
+	}
+	else	// Non-seg OS
+	{
+		if((seg & 0x3f) < 2)	// OS segs 0,1,64,65
+		{
+			if(m_normal_led)	// Trying to access in normal mode?
+			{
+				// SEGTRAP!
+				m_reg_snvr = seg;
+				m_reg_if1l = offset;
+				mmu = nullptr;
+				segt_interrupt(1);
+			}
+		}
+		else if(m_is_seg_user)
+		{
+			if(seg < 64)
+				mmu = m_mmu_data;
+			else
+				mmu = m_mmu_stck;
+		}
+	}
+
+	return mmu;
+}
+
+z8010_device *s8k_state::select_data_mmu(offs_t offset)
+{
+	z8010_device *mmu = m_mmu_stck;
+	uint8_t seg = (uint8_t)(offset >> 16);
+	uint8_t seg_offs = (uint8_t)(offset >> 8);
+
+	LOG("%s DATA MMU SELECT, offset: %06x\n", machine().describe_context(), offset);
+
+	if(m_is_seg_os)
+	{
+		if(!m_normal_led)	// System mode
+		{
+			mmu = m_mmu_code;
+		}
+		else if(m_is_seg_user)
+		{
+			if(seg < 64)
+			{
+				mmu = m_mmu_data;
+			}
+		}
+		else if(seg_offs < m_reg_nbr)
+		{
+			mmu = m_mmu_data;
+		}
+	}
+	else	// Non-seg OS
+	{
+		if((seg & 0x3f) < 2)	// OS segs 0,1,64,65
+		{
+			if(m_normal_led)	// Trying to access in normal mode?
+			{
+				// SEGTRAP!
+				m_reg_snvr = seg;
+				m_reg_trpl = offset;
+				mmu = nullptr;
+				segt_interrupt(1);
+			}
+			else if(seg_offs < m_reg_sbr)
+			{
+				mmu = m_mmu_data;
+			}
+		}
+		else if(m_is_seg_user)
+		{
+			if(seg < 64)
+			{
+				mmu = m_mmu_data;
+			}
+		}
+		else if(seg_offs < m_reg_nbr)
+		{
+			mmu = m_mmu_data;
+		}
+	}
+
+	return mmu;
+}
+
+bool s8k_state::translate_addr(int spacenum, bool write, offs_t &offset)
+{
+	bool stack_access = (spacenum == z8001_device::AS_STACK);
+
+	offset <<= 1;
+
+	if(stack_access)
+	{
+		m_ctc[0]->trg3(1);
+		m_ctc[0]->trg3(0);
+	}
+
+	if(m_reg_scr & S8K_SCR_MMU_ONH)
+	{
+		bool code_access = (spacenum == AS_PROGRAM);
+		z8010_device *mmu = code_access ?
+							select_code_mmu(offset) : select_data_mmu(offset);
+
+		if(mmu)
+		{
+			int st = code_access ?
+						(m_maincpu->is_ifetch1() ?
+							z8002_device::ST_IFETCH_1 :
+							z8002_device::ST_IFETCH_N) :
+						(stack_access ?
+							z8002_device::ST_REQ_STACK :
+							z8002_device::ST_REQ_DATA);
+
+			LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
+
+			offset &= 0x3fffff;	// Mask off seg bit 7 to disable URS checking in MMUs
+
+			return !mmu->translate(offset, write, true, m_busack_led, st);
+		}
+	}
+	else if(offset < m_ram->size())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+uint16_t s8k_state::ram_r(address_space &space, offs_t offset, uint16_t mask)
+{
+	if(translate_addr(space.spacenum(), false, offset))
+	{
+		const uint8_t *memptr = m_ram->pointer() + offset;
+
+		return (((mask & 0xff00) & ((uint16_t)(memptr[0]) << 8)) |
+				((mask & 0x00ff) & ((uint16_t)(memptr[1]))));
+	}
+	else if(space.spacenum() == AS_PROGRAM)
+		return 0x8d07;	// NOP instruction
+	else
+		return 0;
+}
+
+void s8k_state::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mask)
+{
+	if(translate_addr(space.spacenum(), true, offset))
+	{
+		uint8_t *memptr = m_ram->pointer() + offset;
+
+		if(mask & 0xff00)
+			memptr[0] = (uint8_t)(data >> 8);
+		if(mask & 0x00ff)
+			memptr[1] = (uint8_t)(data);
+	}
+}
+
+// NOTE: Stack address space is only used for m_ctc[0]->trg3(). Is this needed?
+void s8k_state::install_memory()
+{
+	void *LROM, *LRAM;
+
+	m_memsize = m_ram->size();
+
+	address_space& pspace = m_maincpu->space(AS_PROGRAM);
+	address_space& dspace = m_maincpu->space(AS_DATA);
+	address_space& sspace = m_maincpu->space(z8001_device::AS_STACK);
+
+	// Install handlers over entire address space
+	pspace.install_readwrite_handler(0x000000, 0x7fffff,
+		read16_delegate(*this, FUNC(s8k_state::ram_r)), write16_delegate(*this, FUNC(s8k_state::ram_w)));
+	dspace.install_readwrite_handler(0x000000, 0x7fffff,
+		read16_delegate(*this, FUNC(s8k_state::ram_r)), write16_delegate(*this, FUNC(s8k_state::ram_w)));
+	sspace.install_readwrite_handler(0x000000, 0x7fffff,
+		read16_delegate(*this, FUNC(s8k_state::ram_r)), write16_delegate(*this, FUNC(s8k_state::ram_w)));
+
+	pspace.install_view(0x0000, 0x7fff, m_view_code);
+	dspace.install_view(0x0000, 0x7fff, m_view_data);
+	sspace.install_view(0x0000, 0x7fff, m_view_stck);
+
+	LROM = memregion("maincpu")->base();
+	LRAM = memshare("local_ram")->ptr();
+	m_view_code[0].install_rom(0x0000, 0x3fff, LROM);
+	m_view_data[0].install_rom(0x0000, 0x3fff, LROM);
+	m_view_data[0].install_ram(0x4000, 0x47ff, LRAM);
+	m_view_stck[0].install_ram(0x4000, 0x47ff, LRAM);
+	//m_view_data[0].install_ram(0x7800, 0x7fff, LRAM);
 }
 
 //**************************************************************************
 //  INTERRUPT HANDLING
 //**************************************************************************
+
+void s8k_state::segt_interrupt(int state)
+{
+	m_maincpu->set_input_line(z8001_device::SEGT_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+uint16_t s8k_state::segtack_r()
+{
+	uint16_t code = (m_mmu_code->segtack_r() |
+					 m_mmu_data->segtack_r() |
+					 m_mmu_stck->segtack_r());
+
+	// Locally triggered?
+	if(code == 0)
+	{
+		segt_interrupt(0);
+	}
+
+	LOG("%s SEGTRAP: %d\n", machine().describe_context(), code);
+
+	return code;
+}
 
 uint16_t s8k_state::nmiack_r()
 {
@@ -347,6 +754,8 @@ uint16_t s8k_state::nmiack_r()
 void s8k_state::normal_led_w(int state)
 {
 	m_normal_led = !state;
+
+	LOG("%s NORMAL/SYSTEM MODE CHANGE: %d\n", machine().describe_context(), state);
 }
 
 //-------------------------------------------------
@@ -430,20 +839,36 @@ static const z80_daisy_config s8k_16_daisy_chain[] =
 
 void s8k_state::machine_start()
 {
-	m_normal_led.resolve();
-	m_busack_led.resolve();
+	install_memory();
 
+	m_normal_led.resolve();
 	m_normal_led = 0;
+	m_busack_led.resolve();
 	m_busack_led = 0;
 
 	save_item(NAME(m_reg_scr));
 	save_item(NAME(m_reg_sbr));
 	save_item(NAME(m_reg_nbr));
+	save_item(NAME(m_reg_snvr));
+	save_item(NAME(m_reg_trpl));
+	save_item(NAME(m_reg_if1l));
 }
 
 void s8k_state::machine_reset()
 {
 	m_reg_scr = (uint8_t)(m_dsw->read());
+	m_is_seg_os = !!(m_jp_seg->read());
+	m_is_seg_user = false;
+
+	m_reg_sbr = 0;
+	m_reg_nbr = 0;
+	m_reg_snvr = 0;
+	m_reg_trpl = 0;
+	m_reg_if1l = 0;
+
+	m_view_code.select(0);
+	m_view_data.select(0);
+	m_view_stck.select(0);
 }
 
 //**************************************************************************
@@ -454,18 +879,27 @@ void s8k_state::s8k(machine_config &config)
 {
 	/* basic machine hardware */
 	Z8001(config, m_maincpu, MAIN_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &s8k_state::mem_map);
-	m_maincpu->set_addrmap(AS_DATA, &s8k_state::mem_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &s8k_state::program_mem);
+	m_maincpu->set_addrmap(AS_DATA, &s8k_state::data_mem);
+	m_maincpu->set_addrmap(z8001_device::AS_STACK, &s8k_state::stack_mem);
 	m_maincpu->set_addrmap(AS_IO, &s8k_state::io_map);
 	m_maincpu->set_addrmap(z8001_device::AS_SIO, &s8k_state::spec_io_map);
+	m_maincpu->segtack().set(FUNC(s8k_state::segtack_r));
 	m_maincpu->nmiack().set(FUNC(s8k_state::nmiack_r));
 	m_maincpu->viack().set("s8k_16_daisy", FUNC(s8k_16_daisy_device::viack_r));
 	m_maincpu->ns().set(FUNC(s8k_state::normal_led_w));
 
-	RAM(config, RAM_TAG).set_default_size("512K").set_default_value(0).set_extra_options("256K,512K,1M,2M,4M,8M,16M");
+	RAM(config, RAM_TAG).set_default_size("512K").set_default_value(0).set_extra_options("256K,512K,1M,2M,4M");
 
 	S8K_16_DAISY(config, m_daisy, 0);
 	m_daisy->set_daisy_config(s8k_16_daisy_chain);
+
+	Z8010(config, m_mmu_code, MAIN_CLOCK);
+	m_mmu_code->out_segt_cb().set(FUNC(s8k_state::segt_interrupt));
+	Z8010(config, m_mmu_data, MAIN_CLOCK);
+	m_mmu_data->out_segt_cb().set(FUNC(s8k_state::segt_interrupt));
+	Z8010(config, m_mmu_stck, MAIN_CLOCK);
+	m_mmu_stck->out_segt_cb().set(FUNC(s8k_state::segt_interrupt));
 
 	config.set_default_layout(layout_s8k);
 
@@ -540,7 +974,6 @@ void s8k_state::s8k(machine_config &config)
 	m_ctc[0]->set_clk<0>(CTC_CLOCK);
 	m_ctc[0]->set_clk<1>(CTC_CLOCK);
 	m_ctc[0]->set_clk<2>(CTC_CLOCK);
-	//m_ctc[0]->set_clk<3>(CTC_CLOCK);
 	m_ctc[0]->zc_callback<0>().set(m_sio[0], FUNC(z80sio_device::rxca_w));
 	m_ctc[0]->zc_callback<0>().append(m_sio[0], FUNC(z80sio_device::txca_w));
 	m_ctc[0]->zc_callback<1>().set(m_sio[0], FUNC(z80sio_device::rxcb_w));
@@ -579,7 +1012,7 @@ void s8k_state::s8k(machine_config &config)
 	m_pio->out_int_callback().set(FUNC(s8k_state::daisy_interrupt));
 
 	centronics_device &centronics(CENTRONICS(config, "pio0:printer1", centronics_devices, nullptr));
-	centronics.strobe_handler().set(m_pio, FUNC(z80pio_device::strobe_b));
+	centronics.strobe_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
 	centronics.busy_handler().set(FUNC(s8k_state::centronics_busy_w));
 	centronics.select_handler().set(FUNC(s8k_state::centronics_select_w));
 	centronics.fault_handler().set(FUNC(s8k_state::centronics_fault_w));
