@@ -359,10 +359,29 @@ public:
 
 		// accept qualifiers from the name
 		std::string name(_name);
-		if (name.compare("default") == 0)
-			name = "Segoe UI";
 		bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
+
+		if (name.find('|') != std::string::npos)
+		{
+			// Handle the "Font Family|Style" type of font name:
+			// Separate it into family and style, and extract bold and italic style information.
+			std::string::size_type const separator = name.rfind('|');
+			std::string const style((std::string::npos != separator) ? name.substr(separator + 1) : std::string());
+			bold |= (style.find("Bold") != std::string::npos) || (style.find("Black") != std::string::npos);
+			italic |= (style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos);
+			name = name.substr(0, separator);
+		}
+
+		// Translate generic names into platform-specific real ones
+		if (name == "serif")
+			name = "Times New Roman";
+		else if (name == "sans-serif")
+			name = "Arial";
+		else if (name == "monospace")
+			name = "Courier New";
+		else if (name == "default")
+			name = "Segoe UI";
 
 		// convert the face name
 		std::wstring familyName = text::to_wstring(name);

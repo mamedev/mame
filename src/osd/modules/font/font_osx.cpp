@@ -9,6 +9,7 @@
 
 #ifdef SDLMAME_MACOSX
 
+#include "corestr.h"
 #include "emucore.h"
 #include "fileio.h"
 #include "osdcore.h"
@@ -52,21 +53,46 @@ private:
 	CGFloat m_height, m_baseline;
 };
 
-bool osd_font_osx::open(std::string const &font_path, std::string const &name, int &height)
+bool osd_font_osx::open(std::string const &font_path, std::string const &_name, int &height)
 {
-	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", name);
+	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", _name);
 
-	CFStringRef font_name;
-	if (name == "default")
+	std::string name(_name);
+
+	CTFontSymbolicTraits traits = 0;
+	CTFontSymbolicTraits trait_mask = kCTFontTraitBold | kCTFontTraitItalic;
+
+	if (name.find('|') != std::string::npos)
 	{
+		// Handle the "Font Family|Style" type of font name:
+		// Separate it into family and style, and extract bold and italic style information
+		// into CTFontSymbolicTraits.
+		std::string::size_type const separator = name.rfind('|');
+		std::string const style((std::string::npos != separator) ? name.substr(separator + 1) : std::string());
+		if ((style.find("Bold") != std::string::npos) || (style.find("Black") != std::string::npos))
+		{
+			traits |= kCTFontTraitBold;
+		}
+		if ((style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos))
+		{
+			traits |= kCTFontTraitItalic;
+		}
+		name = name.substr(0, separator);
+	}
+
+	// Translate generic names into platform-specific real ones
+	if (name == "serif")
+		name = "Times";
+	else if (name == "sans-serif")
+		name = "Helvetica";
+	else if (name == "monospace")
+		name = "Courier";
+	else if (name == "default")
 		// Arial Unicode MS comes with Mac OS X 10.5 and later and is the only Mac default font with
 		// the Unicode characters used by the vgmplay and aristmk5 layouts.
-		font_name = CFStringCreateWithCString(nullptr, "Arial Unicode MS", kCFStringEncodingUTF8);
-	}
-	else
-	{
-		font_name = CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8);
-	}
+		name = "Arial Unicode MS";
+
+	CFStringRef font_name = CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8);
 
 	if (!font_name)
 	{
@@ -81,12 +107,24 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &name, i
 		return false;
 	}
 
-	CTFontDescriptorRef const font_descriptor(CTFontDescriptorCreateWithNameAndSize(font_name, 0.0));
+	CTFontDescriptorRef font_descriptor(CTFontDescriptorCreateWithNameAndSize(font_name, 0.0));
 	CFRelease(font_name);
 	if (!font_descriptor)
 	{
 		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font descriptor for \"%s\"\n", name);
 		return false;
+	}
+
+	if (traits != 0)
+	{
+		CTFontDescriptorRef styled_descriptor(CTFontDescriptorCreateCopyWithSymbolicTraits(font_descriptor, traits, trait_mask));
+		CFRelease(font_descriptor);
+		if (!styled_descriptor)
+		{
+			osd_printf_verbose("osd_font_osx::open: failed to create styled CoreText font descriptor for \"%s\" with traits=%08x\n", name, traits);
+			return false;
+		}
+		font_descriptor = styled_descriptor;
 	}
 
 	CTFontRef const ct_font(CTFontCreateWithFontDescriptor(font_descriptor, POINT_SIZE, &CGAffineTransformIdentity));

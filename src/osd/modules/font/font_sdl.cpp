@@ -67,19 +67,30 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	bool bakedstyles = false;
 
 	std::string name(_name);
-	if (name.compare("default") == 0)
-	{
-		name = "Liberation Sans|Regular";
-	}
 
 	// accept qualifiers from the name
 	bool const underline = (strreplace(name, "[U]", "") + strreplace(name, "[u]", "") > 0);
 	bool const strike = (strreplace(name, "[S]", "") + strreplace(name, "[s]", "") > 0);
-	std::string::size_type const separator = name.rfind('|');
-	std::string const family(name.substr(0, separator));
-	std::string const style((std::string::npos != separator) ? name.substr(separator + 1) : std::string());
 
-	// first up, try it as a filename
+	// Handle the "Font Family|Style" type of font name:
+	// Separate it into family and style, and extract bold and italic style information.
+	std::string::size_type const separator = name.rfind('|');
+	std::string family(name.substr(0, separator));
+	std::string style((std::string::npos != separator) ? name.substr(separator + 1) : "Regular");
+	bool bold = (style.find("Bold") != std::string::npos) || (style.find("Black") != std::string::npos);
+	bool italic = (style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos);
+
+	// Translate generic names into platform-specific real ones:
+	if (family == "serif")
+		family = "Liberation Serif";
+	else if (family == "sans-serif")
+		family = "Liberation Sans";
+	else if (family == "monospace")
+		family = "Liberation Mono";
+	else if (family == "default")
+		family = "Liberation Sans";
+
+		// first up, try it as a filename
 	TTF_Font_ptr font = TTF_OpenFont_Magic(family, POINT_SIZE, 0);
 
 	// if no success, try the font path
@@ -91,6 +102,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 		if (!file.open(family))
 		{
 			std::string full_name = file.fullpath();
+			osd_printf_verbose("Searching font %s in '%s'/s\n", family, full_name);
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE, 0);
 			if (font)
 				osd_printf_verbose("Found font %s\n", full_name);
@@ -114,12 +126,14 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 		return false;
 	}
 
+	osd_printf_verbose("Found font '%s' style '%s'\n", TTF_FontFaceFamilyName(font.get()), TTF_FontFaceStyleName(font.get()));
+
 	// apply styles
 	int styleflags = 0;
 	if (!bakedstyles)
 	{
-		if ((style.find("Bold") != std::string::npos) || (style.find("Black") != std::string::npos)) styleflags |= TTF_STYLE_BOLD;
-		if ((style.find("Italic") != std::string::npos) || (style.find("Oblique") != std::string::npos)) styleflags |= TTF_STYLE_ITALIC;
+		if (bold) styleflags |= TTF_STYLE_BOLD;
+		if (italic) styleflags |= TTF_STYLE_ITALIC;
 	}
 	styleflags |= underline ? TTF_STYLE_UNDERLINE : 0;
 	// SDL_ttf 2.0.9 and earlier does not define TTF_STYLE_STRIKETHROUGH
@@ -129,6 +143,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	if (strike)
 		osd_printf_warning("Ignoring strikethrough for SDL_TTF older than 2.0.10\n");
 #endif // PATCHLEVEL
+	osd_printf_verbose("setting style flags %x\n", styleflags);
 	TTF_SetFontStyle(font.get(), styleflags);
 
 	height = TTF_FontLineSkip(font.get());
