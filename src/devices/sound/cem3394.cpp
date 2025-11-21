@@ -54,7 +54,7 @@ static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
 
 
 // pulse shaping parameters
-// can be enabled with set_limit_pw(true)
+// can be enabled with configure_limit_pw(true)
 // examples:
 //    hat trick - skidding ice sounds too loud if minimum width is too big
 //    snake pit - melody during first level too soft if minimum width is too small
@@ -100,7 +100,7 @@ static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
          0.0 == no resonance
         +2.5 == oscillation
 
-    FILTER_FREQENCY
+    FILTER_FREQUENCY
         -3.0 ... +4.0
         -0.375 V/octave
          0.0 == 1300Hz
@@ -610,7 +610,7 @@ void cem3394_device::set_voltage_internal(int input, double voltage)
 			break;
 
 		// filter frequency varies from -3.0 to +4.0, at 0.375V/octave
-		case FILTER_FREQENCY:
+		case FILTER_FREQUENCY:
 			m_filter_frequency = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
 			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_FREQ=%6.3fV -> freq=%f\n", voltage, m_filter_frequency);
 			break;
@@ -712,7 +712,7 @@ double cem3394_device::get_parameter(int input)
 			else
 				return voltage * (1.0 / 2.5);
 
-		case FILTER_FREQENCY:
+		case FILTER_FREQUENCY:
 			return m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
 	}
 	return 0.0;

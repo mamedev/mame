@@ -384,7 +384,7 @@ void sixtrak_state::update_cvs()
 		cem3394_device::VCO_FREQUENCY,
 		cem3394_device::FINAL_GAIN,
 		cem3394_device::FILTER_RESONANCE,
-		cem3394_device::FILTER_FREQENCY,
+		cem3394_device::FILTER_FREQUENCY,
 		cem3394_device::MIXER_BALANCE,
 		cem3394_device::MODULATION_AMOUNT,
 		cem3394_device::PULSE_WIDTH,
@@ -609,7 +609,7 @@ void sixtrak_state::update_tuning_timer()
 	bool tuning_filter = false;
 	if (voice->get_parameter(cem3394_device::FILTER_RESONANCE) > 0.9)
 	{
-		freq = voice->get_parameter(cem3394_device::FILTER_FREQENCY);
+		freq = voice->get_parameter(cem3394_device::FILTER_FREQUENCY);
 		tuning_filter = true;
 	}
 	else
@@ -901,7 +901,7 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 		m_gain_rc[i]->add_route(0, m_voices[i], 1.0, cem3394_device::FINAL_GAIN);
 
 		VA_RC_EG(config, m_freq_rc[i]).set_r(RES_M(1));
-		m_freq_rc[i]->add_route(0, m_voices[i], 1.0, cem3394_device::FILTER_FREQENCY);
+		m_freq_rc[i]->add_route(0, m_voices[i], 1.0, cem3394_device::FILTER_FREQUENCY);
 
 		CEM3394(config, m_voices[i]);
 		const double c_vco = C_VCO + C_VCO * C_VCO_JITTER[i] * 0.025;  // +/- 2.5%.

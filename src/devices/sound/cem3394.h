@@ -10,6 +10,8 @@ class cem3394_device : public device_t, public device_sound_interface
 {
 public:
 	// inputs
+	// Each of these CV inputs can either be specified with `set_voltage()`, or
+	// provided via a sound stream.
 	enum
 	{
 		AUDIO_INPUT = 0,  // not valid for set_voltage()
@@ -19,7 +21,7 @@ public:
 		PULSE_WIDTH,
 		MIXER_BALANCE,
 		FILTER_RESONANCE,
-		FILTER_FREQENCY,
+		FILTER_FREQUENCY,
 		FINAL_GAIN,
 		INPUT_COUNT
 	};
@@ -57,7 +59,7 @@ public:
 	//    PULSE_WIDTH:        width fraction, from 0.0 to 1.0
 	//    MIXER_BALANCE:      balance, from -1.0 to 1.0
 	//    FILTER_RESONANCE:   resonance, from 0.0 to 1.0
-	//    FILTER_FREQENCY:    frequency, in Hz
+	//    FILTER_FREQUENCY:   frequency, in Hz
 	//    FINAL_GAIN:         gain, in dB
 	// Requesting a parameter associated with a streaming input will force a
 	// stream update.
