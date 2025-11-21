@@ -694,7 +694,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot2", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart2_load));
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("640K").set_extra_options("64k, 128K, 256K, 512K");
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ibmpcjr_cart");

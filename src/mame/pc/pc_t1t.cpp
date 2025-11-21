@@ -530,12 +530,8 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_4bpp_update_row )
 		uint16_t const data = space(0).read_word(rowbase | offset);
 
 		*p++ = palette_r(BIT(data,  4, 4));
-		*p++ = palette_r(BIT(data,  4, 4));
-		*p++ = palette_r(BIT(data,  0, 4));
 		*p++ = palette_r(BIT(data,  0, 4));
 		*p++ = palette_r(BIT(data, 12, 4));
-		*p++ = palette_r(BIT(data, 12, 4));
-		*p++ = palette_r(BIT(data,  8, 4));
 		*p++ = palette_r(BIT(data,  8, 4));
 	}
 }
@@ -783,7 +779,7 @@ void pcvideo_t1000_device::mode_switch()
 		m_mc6845->set_clock(XTAL(14'318'181) / 8);
 	else
 		m_mc6845->set_clock(XTAL(14'318'181) / 16);
-	m_mc6845->set_hpixels_per_column((hresad && !hresck) ? 16 : 8);
+	m_mc6845->set_hpixels_per_column(!grph ? 8 : (!hresad && c16col) ? 4 : (hresad && !c4colhr) ? 16 : 8);
 }
 
 
@@ -840,15 +836,10 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 
 	// determine MC6845 input clock
 	if (high_bw)
-	{
 		m_mc6845->set_clock(XTAL(14'318'181) / 8);
-		m_mc6845->set_hpixels_per_column(8); // TODO: what happens if color2 is set?
-	}
 	else
-	{
 		m_mc6845->set_clock(XTAL(14'318'181) / 16);
-		m_mc6845->set_hpixels_per_column((graphics && color2) ? 16 : 8);
-	}
+	m_mc6845->set_hpixels_per_column(!graphics ? 8 : color16 ? 4 : color2 ? 16 : 8);
 
 	// color or b/w?
 	set_palette_base(mono ? 16 : 0);
