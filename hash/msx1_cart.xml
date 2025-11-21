@@ -1217,6 +1217,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="3dbomber">
+		<description>3-D Bomberman (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="3-d bomberman (japan).rom" size="0x8000" crc="782989f0" sha1="1993ea04f59578a219a896bc423bf583231d1c92" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="3dgolf">
 		<description>3-D Golf Simulation (Japan)</description>
 		<year>1983</year>
@@ -1391,6 +1403,18 @@ kept for now until finding out what those bytes affect...
 			<feature name="slot" value="korean_hydlide2" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="adventure kid (korea).rom" size="0x20000" crc="01181477" sha1="0f984330ed5dc929e1207cf6afcc9a35837408d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akarui">
+		<description>Akarui Nouen (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="akarui nouen (japan).rom" size="0x4000" crc="30a5049d" sha1="8a05e795d5f548e256910acc0227bbb46851039d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2006,6 +2030,18 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="bablkund">
+		<description>Babbulkund 1999 (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="babbulkund 1999 (japan).rom" size="0x4000" crc="d90b7733" sha1="65f3b9a0aca59688b8c1afc883a2a5b1a7efa528" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="backtof">
 		<description>Back to the Future (Japan)</description>
 		<year>1986</year>
@@ -2502,6 +2538,30 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="binaryla">
+		<description>Binary Land (Japan)</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="binary land (japan).rom" size="0x4000" crc="fbacbc7a" sha1="ef476e25fb6b7221ca778a379117885450dd36f0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biotech">
+		<description>Biotech (Japan)</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="biotech (japan).rom" size="0x4000" crc="701ca810" sha1="565bca08b1a07a367548ea6b4dcb9f80a6e49b01" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blckonyx">
 		<description>The Black Onyx (Japan)</description>
 		<year>1985</year>
@@ -2695,6 +2755,30 @@ kept for now until finding out what those bytes affect...
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x2000">
 				<rom name="bomber man (1986)(korea soft bank)[a].rom" size="0x2000" crc="c9a2c37e" sha1="8976f8b8ab2a82f626a73c781d0a21899ae68dae" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="bmanspec">
+		<description>Bomber Man Special (Japan)</description>
+		<year>1986</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bomber man special (japan).rom" size="0x8000" crc="600f53de" sha1="7f9e577475e228dcbc97fffd7cb6e1f6e9ff36a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="express">
+		<description>Bousou Tokkyuu SOS - Stop The Express (Japan)</description>
+		<year>1985</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="bomber man special (japan).rom" size="0x8000" crc="600f53de" sha1="7f9e577475e228dcbc97fffd7cb6e1f6e9ff36a1" />
 			</dataarea>
 		</part>
 	</software>
