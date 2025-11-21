@@ -309,7 +309,7 @@ FRONT LINE: works
 		</part>
 	</software>
 
-	<software name="ipls2d01" supported="yes">
+	<software name="ipls2d01" supported="partial">
 		<description>Compilation Disk IPLS2D-001</description>
 		<year>200?</year>
 		<publisher>Unknown</publisher>
@@ -343,7 +343,7 @@ PLAZMA LINE: works
 		</part>
 	</software>
 
-	<software name="mz1z001" supported="yes">
+	<software name="mz1z001" supported="partial">
 		<description>BASIC MZ-1Z001 DISK</description>
 		<year>2023</year>
 		<publisher>Sharp</publisher>
