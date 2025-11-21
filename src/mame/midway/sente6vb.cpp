@@ -295,7 +295,7 @@ void sente6vb_device::update_counter_0_timer()
 
 			// if the filter resonance is high, then they're calibrating the filter frequency
 			if (m_cem_device[i]->get_parameter(cem3394_device::FILTER_RESONANCE) > 0.9)
-				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::FILTER_FREQENCY);
+				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::FILTER_FREQUENCY);
 
 			// otherwise, they're calibrating the VCO frequency
 			else
@@ -392,7 +392,7 @@ void sente6vb_device::chip_select_w(uint8_t data)
 		cem3394_device::VCO_FREQUENCY,
 		cem3394_device::FINAL_GAIN,
 		cem3394_device::FILTER_RESONANCE,
-		cem3394_device::FILTER_FREQENCY,
+		cem3394_device::FILTER_FREQUENCY,
 		cem3394_device::MIXER_BALANCE,
 		cem3394_device::MODULATION_AMOUNT,
 		cem3394_device::PULSE_WIDTH,
@@ -424,7 +424,7 @@ void sente6vb_device::chip_select_w(uint8_t data)
 					"VCO_FREQUENCY",
 					"FINAL_GAIN",
 					"FILTER_RESONANCE",
-					"FILTER_FREQENCY",
+					"FILTER_FREQUENCY",
 					"MIXER_BALANCE",
 					"MODULATION_AMOUNT",
 					"PULSE_WIDTH",
