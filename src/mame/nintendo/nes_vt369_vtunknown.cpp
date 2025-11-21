@@ -1061,6 +1061,11 @@ ROM_START( vibes240 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( retro620 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "620in1_retrofc.bin", 0x00000, 0x1000000, CRC(2698f4e5) SHA1(8b9551c22071c48a7ebc1635ca37ebe7a3b33c4b) ) // BGA on subboard
+ROM_END
+
 ROM_START( t3_630 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128n10tfi01.bin", 0x00000, 0x1000000, CRC(7458a598) SHA1(cd35dda56c4531095c7026c88e02e35b1aae730a) )
@@ -1201,6 +1206,16 @@ ROM_START( s10_520 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s10_white_520.bin", 0x00000, 0x1000000, CRC(552ffddb) SHA1(6a1be8bead43eceb51e674499159e850d4c115be) )
 	ROM_FILL( 0x07f3d9, 1, 0x64 ) // bug in init code? how does this work on hardware
+ROM_END
+
+ROM_START( s5_520 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s5_520_gamebox.u4", 0x00000, 0x1000000, CRC(19a7608e) SHA1(e2560752be0eda30cb935d601ee96a41215a277c) )
+ROM_END
+
+ROM_START( 500in1hh )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "500in1.bin", 0x00000, 0x1000000, CRC(50f44c1a) SHA1(8ba3d2b71d0619b3ae45bcbcc6d58162f93b1069) )
 ROM_END
 
 ROM_START( f5_620 )
@@ -1395,6 +1410,8 @@ CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, em
 
 CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 202?, retro620, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
@@ -1407,6 +1424,10 @@ CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,  
 CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
 // different version, same packaging.  Larger ROM, fewer duplicates etc.
 CONS( 202?, s10_520,   0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1)",  MACHINE_NOT_WORKING )
+// similar to above, but no scramble?
+CONS( 202?, s5_520,    0,  0,  vt36x_16mb,          vt369, vt36x_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
+// fewer games, but does have the scramble
+CONS( 202?, 500in1hh,  0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
 
 // there were also 'F1' units, shaped like a car, ROM may or may not be the same
 CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
