@@ -4206,8 +4206,8 @@ ROM_START( blushark )
 	ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
 
-	ROM_REGION( 0x28, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, NO_DUMP ) // TODO: handcrafted to pass protection check
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(581f6bfb) SHA1(2b6e9e4800e22913474551c5c70b66933003c12f) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
 
@@ -4219,8 +4219,7 @@ GAME( 1996, strain,      0,        mtrain,   strain,   subsino2_state, init_mtra
 GAME( 1995, tbonusal,    0,        tbonusal, tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph,    0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
-
-GAME( 199?, blushark,    0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "hack?",                            "Blue Shark (Subsino, Ver. 1.0)",        MACHINE_NOT_WORKING )
+GAME( 199?, blushark,    wtrnymph, mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "hack?",                            "Blue Shark (Subsino, Ver. 1.0)",        MACHINE_NOT_WORKING )
 
 GAME( 1998, expcard,     0,        expcard,  expcard,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
 GAME( 1999, jgaoshou,    expcard,  jgaoshou, jgaoshou, subsino2_state, empty_init,    ROT0, "Subsino",                          "Jiyou Gaoshou (China, Ver 1.2)",        MACHINE_IMPERFECT_GRAPHICS ) // missing GFX ROM
