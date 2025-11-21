@@ -1,0 +1,1018 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license: CC0-1.0
+-->
+<mamelayout version="2">
+
+	<!-- undefined lamp - used for lamps with undefined locations and purposes -->
+	<element name="undefined_lamp">
+		<disk state="1"><color red="1.0" green="1.0" blue="0.2" /></disk>
+		<disk state="0"><color red="0.1" green="0.1" blue="0.0" /></disk>
+	</element>
+
+	<!-- 7-segment LED -->
+	<element name="led_on">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<element name="led_dot_on">
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="light_all_tiles_sign">
+		<text string="LIGHT ALL 26 TILES FOR" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="LIGHT ALL 26 TILES FOR" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="available_letters_sign">
+		<text string="LETTERS AVAILABLE">
+			<color red="0.60" green="0.60" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="0.7" />
+		</text>
+		<text string="GAME ENDS AFTER 100 TILES">
+			<color red="1.00" green="0.05" blue="0.05" />
+			<bounds x="0.00" y="0.70" width="1.0" height="0.3" />
+		</text>
+	</element>
+	<element name="points_sign">
+		<text string="POINTS">
+			<color red="0.60" green="0.60" blue="0.05" />
+			<bounds x="0.00" y="0.00" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+	<!-- 16-segment LED -->
+	<element name="available_letter">
+		<led16seg>
+			<color red="1.0" green="0.8" blue="0.25" />
+		</led16seg>
+	</element>
+
+	<element name="tile_jackpot">
+		<text string="TILE" state="1">
+			<color red="1.00" green="0.50" blue="0.17" />
+			<bounds x="0.05" y="0.00" width="0.90" height="0.65" />
+		</text>
+		<text string="TILE" state="0">
+			<color red="0.50" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.00" width="0.90" height="0.65" />
+		</text>
+		<text string="JACKPOT" state="1">
+			<color red="1.00" green="0.50" blue="0.17" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.50" />
+		</text>
+		<text string="JACKPOT" state="0">
+			<color red="0.50" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.50" />
+		</text>
+	</element>
+
+	<element name="letters_held">
+		<text string="LETTERS" state="1">
+			<color red="1.00" green="0.50" blue="0.17" />
+			<bounds x="0.05" y="0.00" width="0.90" height="0.50" />
+		</text>
+		<text string="LETTERS" state="0">
+			<color red="0.50" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.00" width="0.90" height="0.50" />
+		</text>
+		<text string="HELD" state="1">
+			<color red="1.00" green="0.50" blue="0.17" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.50" />
+		</text>
+		<text string="HELD" state="0">
+			<color red="0.50" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.50" />
+		</text>
+	</element>
+
+	<element name="try_again">
+		<rect state="1"><color red="0.00" green="1.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.00" green="0.10" blue="0.00" /></rect>
+		<text string="TRY">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="AGAIN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<!-- category name lamps -->
+	<element name="people_and_places">
+		<rect state="1"><color red="0.11" green="0.07" blue="0.00" /></rect>
+		<rect state="0"><color red="0.06" green="0.04" blue="0.00" /></rect>
+		<text string="People &amp; Places" state="1">
+			<color red="0.94" green="0.61" blue="0.00" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+		<text string="People &amp; Places" state="0">
+			<color red="0.22" green="0.14" blue="0.00" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+	</element>
+	<element name="tv_and_films">
+		<rect state="1"><color red="0.19" green="0.00" blue="0.03" /></rect>
+		<rect state="0"><color red="0.10" green="0.00" blue="0.02" /></rect>
+		<text string="TV &amp; Films" state="1">
+			<color red="0.78" green="0.00" blue="0.13" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+		<text string="TV &amp; Films" state="0">
+			<color red="0.38" green="0.00" blue="0.06" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+	</element>
+	<element name="technology">
+		<rect state="1"><color red="0.15" green="0.00" blue="0.08" /></rect>
+		<rect state="0"><color red="0.08" green="0.00" blue="0.04" /></rect>
+		<text string="Technology" state="1">
+			<color red="0.61" green="0.00" blue="0.32" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+		<text string="Technology" state="0">
+			<color red="0.30" green="0.00" blue="0.16" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+	</element>
+	<element name="music">
+		<rect state="1"><color red="0.04" green="0.09" blue="0.09" /></rect>
+		<rect state="0"><color red="0.02" green="0.05" blue="0.05" /></rect>
+		<text string="Music" state="1">
+			<color red="0.19" green="0.39" blue="0.39" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+		<text string="Music" state="0">
+			<color red="0.08" green="0.18" blue="0.18" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+	</element>
+	<element name="sport">
+		<rect state="1"><color red="0.13" green="0.08" blue="0.13" /></rect>
+		<rect state="0"><color red="0.07" green="0.04" blue="0.07" /></rect>
+		<text string="Sport" state="1">
+			<color red="0.55" green="0.32" blue="0.55" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+		<text string="Sport" state="0">
+			<color red="0.26" green="0.16" blue="0.26" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+	</element>
+	<element name="mystery">
+		<rect state="1"><color red="0.12" green="0.11" blue="0.00" /></rect>
+		<rect state="0"><color red="0.06" green="0.06" blue="0.00" /></rect>
+		<text string="Mystery" state="1">
+			<color red="1.00" green="0.91" blue="0.00" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+		<text string="Mystery" state="0">
+			<color red="0.24" green="0.22" blue="0.00" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+	</element>
+	<element name="pot_luck">
+		<rect state="1"><color red="0.00" green="0.08" blue="0.11" /></rect>
+		<rect state="0"><color red="0.00" green="0.04" blue="0.06" /></rect>
+		<text string="Pot Luck" state="1">
+			<color red="0.00" green="0.65" blue="0.91" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+		<text string="Pot Luck" state="0">
+			<color red="0.00" green="0.08" blue="0.11" />
+			<bounds x="0.10" y="0.05" width="0.8" height="0.9" />
+		</text>
+	</element>
+
+	<!-- Marquee Letter Lamps -->
+	<element name="marquee_letter_s">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.00" blue="0.00" /></rect>
+		<text string="S" state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+		<text string="S" state="0"><color red="0.5" green="0.5" blue="0.5" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+	</element>
+	<element name="marquee_letter_c">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.00" blue="0.00" /></rect>
+		<text string="C" state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+		<text string="C" state="0"><color red="0.5" green="0.5" blue="0.5" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+	</element>
+	<element name="marquee_letter_r">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.00" blue="0.00" /></rect>
+		<text string="R" state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+		<text string="R" state="0"><color red="0.5" green="0.5" blue="0.5" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+	</element>
+	<element name="marquee_letter_a">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.00" blue="0.00" /></rect>
+		<text string="A" state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+		<text string="A" state="0"><color red="0.5" green="0.5" blue="0.5" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+	</element>
+	<element name="marquee_letter_b">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.00" blue="0.00" /></rect>
+		<text string="B" state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+		<text string="B" state="0"><color red="0.5" green="0.5" blue="0.5" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+	</element>
+	<element name="marquee_letter_l">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.00" blue="0.00" /></rect>
+		<text string="L" state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+		<text string="L" state="0"><color red="0.5" green="0.5" blue="0.5" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+	</element>
+	<element name="marquee_letter_e">
+		<rect state="1"><color red="1.00" green="0.00" blue="0.00" /></rect>
+		<rect state="0"><color red="0.50" green="0.00" blue="0.00" /></rect>
+		<text string="E" state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+		<text string="E" state="0"><color red="0.5" green="0.5" blue="0.5" /><bounds x="0.00" y="0.00" width="1.00" height="1.00" /></text>
+	</element>
+
+	<!-- Tile Lamps -->
+	<element name="tile_a">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="A"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_b">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="B"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_c">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="C"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_d">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="D"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="2"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_e">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="E"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_f">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="F"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_g">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="G"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="2"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_h">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="H"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_i">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="I"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_j">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="J"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="8"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_k">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="K"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="5"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_l">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="L"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_m">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="M"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_n">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="N"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_o">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="O"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_p">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="P"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_q">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="Q"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="10"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_r">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="R"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_s">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="S"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_t">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="T"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_u">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="U"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_v">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="V"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_w">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="W"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_x">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="X"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="8"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_y">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="Y"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+	<element name="tile_z">
+		<rect state="1"><color red="1.00" green="0.94" blue="0.73" /></rect>
+		<rect state="0"><color red="0.10" green="0.27" blue="0.21" /></rect>
+		<text string="Z"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.05" y="0.05" width="0.90" height="0.90" /></text>
+		<text string="10"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0.70" y="0.70" width="0.30" height="0.30" /></text>
+	</element>
+
+	<!-- Prize Lamps -->
+	<element name="award_doubled">
+		<text string="AWARD DOUBLED" state="1">
+			<color red="1.00" green="0.50" blue="0.17" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="AWARD DOUBLED" state="0">
+			<color red="0.50" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+	<element name="jackpot">
+		<text string="Jackpot" state="1">
+			<color red="1.00" green="0.50" blue="0.17" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+		<text string="Jackpot" state="0">
+			<color red="0.50" green="0.00" blue="0.01" />
+			<bounds x="0.05" y="0.30" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<element name="1pound_award">
+		<text string="£1" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£1" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="2pound_award">
+		<text string="£2" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£2" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="3pound_award">
+		<text string="£3" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£4" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="5pound_award">
+		<text string="£5" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£5" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="10pound_award">
+		<text string="£10" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£10" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="20pound_award">
+		<text string="£20" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+		<text string="£20" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.90" />
+		</text>
+	</element>
+	<element name="20pound_jackpot">
+		<text string="£20" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.00" width="0.90" height="0.80" />
+		</text>
+		<text string="£20" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.00" width="0.90" height="0.80" />
+		</text>
+		<text string="JACKPOT" state="1">
+			<color red="1.00" green="0.70" blue="0.00" />
+			<bounds x="0.05" y="0.80" width="0.90" height="0.20" />
+		</text>
+		<text string="JACKPOT" state="0">
+			<color red="0.10" green="0.07" blue="0.00" />
+			<bounds x="0.05" y="0.80" width="0.90" height="0.20" />
+		</text>
+	</element>
+
+	<element name="150points">
+		<text string="150" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+		<text string="150" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<element name="200points">
+		<text string="200" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+		<text string="200" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<element name="250points">
+		<text string="250" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+		<text string="250" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<element name="300points">
+		<text string="300" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+		<text string="300" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<element name="350points">
+		<text string="350" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+		<text string="350" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<element name="400points">
+		<text string="400" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="1">
+			<color red="1.00" green="0.5" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+		<text string="400" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.05" width="0.90" height="0.45" />
+		</text>
+		<text string="POINTS" state="0">
+			<color red="0.50" green="0.0" blue="0.0" />
+			<bounds x="0.05" y="0.50" width="0.90" height="0.45" />
+		</text>
+	</element>
+
+	<view name="Control Panel">
+		<screen index="0">
+			<bounds x="1100" y="0" width="800" height="600" />
+		</screen>
+
+		<element ref="points_sign" state="0">
+			<bounds x="1350" y="-290" width="300" height="80" />
+		</element>
+
+		<!-- 7-segment display -->
+		<!-- most-significant digit -->
+		<element name="lamp149"  ref="led_on">
+			<bounds x="1290" y="-190" width="20" height="70" />
+		</element>
+		<element name="lamp144"  ref="led_on">
+			<bounds x="1310" y="-210" width="60" height="20" />
+		</element>
+		<element name="lamp145"  ref="led_on">
+			<bounds x="1370" y="-190" width="20" height="70" />
+		</element>
+		<element name="lamp150"  ref="led_on">
+			<bounds x="1310" y="-120" width="60" height="20" />
+		</element>
+		<element name="lamp148"  ref="led_on">
+			<bounds x="1290" y="-100" width="20" height="70" />
+		</element>
+		<element name="lamp147"  ref="led_on">
+			<bounds x="1310" y="-30"  width="60" height="20" />
+		</element>
+		<element name="lamp146"  ref="led_on">
+			<bounds x="1370" y="-100" width="20" height="70" />
+		</element>
+		<element name="lamp151"  ref="led_dot_on">
+			<bounds x="1395" y="-30"  width="20" height="20" />
+		</element>
+
+		<!-- middle digit -->
+		<element name="lamp165"  ref="led_on">
+			<bounds x="1440" y="-190" width="20" height="70" />
+		</element>
+		<element name="lamp160"  ref="led_on">
+			<bounds x="1460" y="-210" width="60" height="20" />
+		</element>
+		<element name="lamp161"  ref="led_on">
+			<bounds x="1520" y="-190" width="20" height="70" />
+		</element>
+		<element name="lamp166"  ref="led_on">
+			<bounds x="1460" y="-120" width="60" height="20" />
+		</element>
+		<element name="lamp164"  ref="led_on">
+			<bounds x="1440" y="-100" width="20" height="70" />
+		</element>
+		<element name="lamp163"  ref="led_on">
+			<bounds x="1460" y="-30"  width="60" height="20" />
+		</element>
+		<element name="lamp162"  ref="led_on">
+			<bounds x="1520" y="-100" width="20" height="70" />
+		</element>
+		<element name="lamp167"  ref="led_dot_on">
+			<bounds x="1545" y="-30"  width="20" height="20" />
+		</element>
+
+		<!-- least-significant digit -->
+		<element name="lamp181"  ref="led_on">
+			<bounds x="1590" y="-190" width="20" height="70" />
+		</element>
+		<element name="lamp176"  ref="led_on">
+			<bounds x="1610" y="-210" width="60" height="20" />
+		</element>
+		<element name="lamp177"  ref="led_on">
+			<bounds x="1670" y="-190" width="20" height="70" />
+		</element>
+		<element name="lamp182"  ref="led_on">
+			<bounds x="1610" y="-120" width="60" height="20" />
+		</element>
+		<element name="lamp180"  ref="led_on">
+			<bounds x="1590" y="-100" width="20" height="70" />
+		</element>
+		<element name="lamp179"  ref="led_on">
+			<bounds x="1610" y="-30"  width="60" height="20" />
+		</element>
+		<element name="lamp178"  ref="led_on">
+			<bounds x="1670" y="-100" width="20" height="70" />
+		</element>
+		<element name="lamp183"  ref="led_dot_on">
+			<bounds x="1695" y="-30"  width="20" height="20" />
+		</element>
+
+		<!-- Scrabble marquee -->
+		<element name="lamp77" ref="marquee_letter_s" state="0">
+			<bounds x="1100" y="-400" width="100" height="100" />
+		</element>
+		<element name="lamp76" ref="marquee_letter_c" state="0">
+			<bounds x="1200" y="-400" width="100" height="100" />
+		</element>
+		<element name="lamp75" ref="marquee_letter_r" state="0">
+			<bounds x="1300" y="-400" width="100" height="100" />
+		</element>
+		<element name="lamp74" ref="marquee_letter_a" state="0">
+			<bounds x="1400" y="-400" width="100" height="100" />
+		</element>
+		<element name="lamp61" ref="marquee_letter_b" state="0">
+			<bounds x="1500" y="-400" width="100" height="100" />
+		</element>
+		<element name="lamp60" ref="marquee_letter_b" state="0">
+			<bounds x="1600" y="-400" width="100" height="100" />
+		</element>
+		<element name="lamp59" ref="marquee_letter_l" state="0">
+			<bounds x="1700" y="-400" width="100" height="100" />
+		</element>
+		<element name="lamp58" ref="marquee_letter_e" state="0">
+			<bounds x="1800" y="-400" width="100" height="100" />
+		</element>
+
+<!--
+
+ Lamp 141 has an unknown function.  During the attract mode, it flickers as if it was meant to be to the left of the A tile.
+ Pictures of the game have no lamp to the right of the A tile.
+ Lamp 141 is part of the lamp test
+
+        <element name="lamp141" ref="undefined_lamp" state="0">
+            <bounds x="800" y="-290" width="90" height="90" />
+        </element>
+
+ -->
+
+		<!-- Tiles -->
+		<element name="lamp140" ref="tile_a" state="0">
+			<bounds x="880" y="-290" width="90" height="90" />
+		</element>
+		<element name="lamp139" ref="tile_b" state="0">
+			<bounds x="980" y="-290" width="90" height="90" />
+		</element>
+		<element name="lamp138" ref="tile_c" state="0">
+			<bounds x="1080" y="-290" width="90" height="90" />
+		</element>
+		<element name="lamp137" ref="tile_d" state="0">
+			<bounds x="1180" y="-290" width="90" height="90" />
+		</element>
+
+		<element name="lamp124" ref="tile_e" state="0">
+			<bounds x="1740" y="-290" width="90" height="90" />
+		</element>
+		<element name="lamp123" ref="tile_f" state="0">
+			<bounds x="1840" y="-290" width="90" height="90" />
+		</element>
+		<element name="lamp122" ref="tile_g" state="0">
+			<bounds x="1940" y="-290" width="90" height="90" />
+		</element>
+		<element name="lamp121" ref="tile_h" state="0">
+			<bounds x="2040" y="-290" width="90" height="90" />
+		</element>
+
+		<element name="lamp133" ref="tile_i" state="0">
+			<bounds x="830" y="-195" width="90" height="90" />
+		</element>
+		<element name="lamp134" ref="tile_j" state="0">
+			<bounds x="946" y="-195" width="90" height="90" />
+		</element>
+		<element name="lamp135" ref="tile_k" state="0">
+			<bounds x="1064" y="-195" width="90" height="90" />
+		</element>
+		<element name="lamp136" ref="tile_l" state="0">
+			<bounds x="1180" y="-195" width="90" height="90" />
+		</element>
+
+		<element name="lamp120" ref="tile_m" state="0">
+			<bounds x="1740" y="-195" width="90" height="90" />
+		</element>
+		<element name="lamp119" ref="tile_n" state="0">
+			<bounds x="1856" y="-195" width="90" height="90" />
+		</element>
+		<element name="lamp118" ref="tile_o" state="0">
+			<bounds x="1974" y="-195" width="90" height="90" />
+		</element>
+		<element name="lamp117" ref="tile_p" state="0">
+			<bounds x="2090" y="-195" width="90" height="90" />
+		</element>
+
+		<element name="lamp128" ref="tile_q" state="0">
+			<bounds x="780" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp129" ref="tile_r" state="0">
+			<bounds x="880" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp130" ref="tile_s" state="0">
+			<bounds x="980" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp131" ref="tile_t" state="0">
+			<bounds x="1080" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp132" ref="tile_u" state="0">
+			<bounds x="1180" y="-100" width="90" height="90" />
+		</element>
+
+		<element name="lamp116" ref="tile_v" state="0">
+			<bounds x="1740" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp115" ref="tile_w" state="0">
+			<bounds x="1840" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp114" ref="tile_x" state="0">
+			<bounds x="1940" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp113" ref="tile_y" state="0">
+			<bounds x="2040" y="-100" width="90" height="90" />
+		</element>
+		<element name="lamp112" ref="tile_z" state="0">
+			<bounds x="2140" y="-100" width="90" height="90" />
+		</element>
+
+		<!-- Light All Tiles for 20 pound jackpot sign -->
+		<element name="lamp89" ref="light_all_tiles_sign" state="0">
+			<bounds x="1900" y="0" width="390" height="40" />
+		</element>
+		<element name="lamp88" ref="20pound_jackpot" state="0">
+			<bounds x="1900" y="40" width="390" height="160" />
+		</element>
+
+		<element name="lamp87" ref="award_doubled" state="0">
+			<bounds x="1920" y="220" width="350" height="50" />
+		</element>
+
+		<element name="lamp104" ref="tile_jackpot" state="0">
+			<bounds x="710" y="0" width="340" height="125" />
+		</element>
+		<element name="lamp125" ref="letters_held" state="0">
+			<bounds x="2140" y="-290" width="180" height="90" />
+		</element>
+
+		 <!--
+
+		  Lamp 126 turns on whenever the prizes are doubled.  However, there is already a lamp for this that is part of the lamp test.
+		  Lamp 126's timing during the attract mode is identical to the 'letters held' lamp
+		  Lamp 126 is not part of the lamp test
+
+		         <element name="lamp126" ref="undefined_lamp" state="0">
+		             <bounds x="780" y="-290" width="90" height="90" />
+		         </element>
+
+		  -->
+
+
+		<!-- Try Again lamps -->
+		<element name="lamp103" ref="try_again" state="0">
+			<bounds x="800" y="205" width="250" height="125" />
+		</element>
+		<element name="lamp102" ref="try_again" state="0">
+			<bounds x="800" y="340" width="250" height="125" />
+		</element>
+		<element name="lamp101" ref="try_again" state="0">
+			<bounds x="800" y="475" width="250" height="125" />
+		</element>
+
+		<!-- Category lamps -->
+		<element name="lamp86" ref="people_and_places" state="0">
+			<bounds x="1910" y="300" width="380" height="60" />
+		</element>
+		<element name="lamp85" ref="tv_and_films" state="0">
+			<bounds x="1910" y="360" width="380" height="60" />
+		</element>
+		<element name="lamp84" ref="technology" state="0">
+			<bounds x="1910" y="420" width="380" height="60" />
+		</element>
+		<element name="lamp83" ref="music" state="0">
+			<bounds x="1910" y="480" width="380" height="60" />
+		</element>
+		<element name="lamp82" ref="sport" state="0">
+			<bounds x="1910" y="540" width="380" height="60" />
+		</element>
+		<element name="lamp81" ref="mystery" state="0">
+			<bounds x="1910" y="600" width="380" height="60" />
+		</element>
+		<element name="lamp80" ref="pot_luck" state="0">
+			<bounds x="1910" y="660" width="380" height="60" />
+		</element>
+
+		<!-- Award lamps -->
+		<element name="lamp72" ref="1pound_award" state="0">
+			<bounds x="900" y="800" width="200" height="80" />
+		</element>
+		<element name="lamp71" ref="150points" state="0">
+			<bounds x="900" y="920" width="200" height="40" />
+		</element>
+		<element name="lamp70" ref="award_doubled" state="0">
+			<bounds x="900" y="960" width="200" height="20" />
+		</element>
+
+		<element name="lamp69" ref="2pound_award" state="0">
+			<bounds x="1100" y="800" width="200" height="80" />
+		</element>
+		<element name="lamp68" ref="200points" state="0">
+			<bounds x="1100" y="920" width="200" height="40" />
+		</element>
+		<element name="lamp67" ref="award_doubled" state="0">
+			<bounds x="1100" y="960" width="200" height="20" />
+		</element>
+
+		<element name="lamp66" ref="3pound_award" state="0">
+			<bounds x="1300" y="800" width="200" height="80" />
+		</element>
+		<element name="lamp65" ref="250points" state="0">
+			<bounds x="1300" y="920" width="200" height="40" />
+		</element>
+		<element name="lamp64" ref="award_doubled" state="0">
+			<bounds x="1300" y="960" width="200" height="20" />
+		</element>
+
+		<element name="lamp57" ref="5pound_award" state="0">
+			<bounds x="1500" y="800" width="200" height="80" />
+		</element>
+		<element name="lamp56" ref="300points" state="0">
+			<bounds x="1500" y="920" width="200" height="40" />
+		</element>
+		<element name="lamp55" ref="award_doubled" state="0">
+			<bounds x="1500" y="960" width="200" height="20" />
+		</element>
+
+		<element name="lamp54" ref="10pound_award" state="0">
+			<bounds x="1700" y="800" width="200" height="80" />
+		</element>
+		<element name="lamp53" ref="350points" state="0">
+			<bounds x="1700" y="920" width="200" height="40" />
+		</element>
+		<element name="lamp52" ref="award_doubled" state="0">
+			<bounds x="1700" y="960" width="200" height="20" />
+		</element>
+
+		<element name="lamp51" ref="20pound_award" state="0">
+			<bounds x="1900" y="800" width="200" height="80" />
+		</element>
+		<element name="lamp50" ref="jackpot" state="0">
+			<bounds x="1900" y="880" width="200" height="40" />
+		</element>
+		<element name="lamp49" ref="400points" state="0">
+			<bounds x="1900" y="920" width="200" height="40" />
+		</element>
+		<element name="lamp48" ref="award_doubled" state="0">
+			<bounds x="1900" y="960" width="200" height="20" />
+		</element>
+
+	  <!--
+
+	      Other lamps that are on:
+	      14, 15
+	      224, 225, 226: remain on during the lamp test
+
+	      14, 15 turn off when collecting money from the bank
+
+
+	      <element name="lamp14" ref="undefined_lamp" state="0">
+	      <bounds x="1018" y="728" width="7" height="7" />
+	      </element>
+	      <element name="lamp15" ref="undefined_lamp" state="0">
+	      <bounds x="1026" y="728" width="7" height="7" />
+	      </element>
+	      <element name="lamp224" ref="undefined_lamp" state="0">
+	      <bounds x="1014" y="736" width="7" height="7" />
+	      </element>
+	      <element name="lamp225" ref="undefined_lamp" state="0">
+	      <bounds x="1022" y="736" width="7" height="7" />
+	      </element>
+	      <element name="lamp226" ref="undefined_lamp" state="0">
+	      <bounds x="1030" y="736" width="7" height="7" />
+	      </element>
+	  -->
+
+		<!-- Letters available -->
+		<element ref="available_letters_sign" state="0">
+			<bounds x="1180" y="600" width="640" height="100" />
+		</element>
+
+		<element name="digit0" ref="available_letter" state="0">
+			<bounds x="1180" y="700" width="80" height="100" />
+		</element>
+		<element name="digit1" ref="available_letter" state="0">
+			<bounds x="1260" y="700" width="80" height="100" />
+		</element>
+		<element name="digit2" ref="available_letter" state="0">
+			<bounds x="1340" y="700" width="80" height="100" />
+		</element>
+		<element name="digit3" ref="available_letter" state="0">
+			<bounds x="1420" y="700" width="80" height="100" />
+		</element>
+		<element name="digit4" ref="available_letter" state="0">
+			<bounds x="1500" y="700" width="80" height="100" />
+		</element>
+		<element name="digit5" ref="available_letter" state="0">
+			<bounds x="1580" y="700" width="80" height="100" />
+		</element>
+		<element name="digit6" ref="available_letter" state="0">
+			<bounds x="1660" y="700" width="80" height="100" />
+		</element>
+		<element name="digit7" ref="available_letter" state="0">
+			<bounds x="1740" y="700" width="80" height="100" />
+		</element>
+
+
+	</view>
+</mamelayout>
