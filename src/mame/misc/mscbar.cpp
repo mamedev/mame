@@ -19,15 +19,15 @@
   U12 W27C512-45Z - eeprom
   Y1 10.7386 xtal mhz
   
-  At back Mainboard.
+  At back.
   MUSICBAR VER 201.
 
   Led Board
-    Size 29 x 20.5cm.
+  size 29 x 20.5cm.
 
-  the LED board says GHY1-PCB and BYP-020
+  The LED board says GHY1-PCB and BYP-020
   U5 Two JFC 95101
-
+  
   02 - led - Middle - double up
   06 - led - Bottom
   24 - led - roulette
