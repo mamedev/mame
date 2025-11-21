@@ -840,9 +840,15 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 
 	// determine MC6845 input clock
 	if (high_bw)
+	{
 		m_mc6845->set_clock(XTAL(14'318'181) / 8);
+		m_mc6845->set_hpixels_per_column(8); // TODO: what happens if color2 is set?
+	}
 	else
+	{
 		m_mc6845->set_clock(XTAL(14'318'181) / 16);
+		m_mc6845->set_hpixels_per_column((graphics && color2) ? 16 : 8);
+	}
 
 	// color or b/w?
 	set_palette_base(mono ? 16 : 0);
