@@ -297,6 +297,9 @@ void macportable_state::scc_w(offs_t offset, u16 data)
 
 u16 macportable_state::iwm_r(offs_t offset, u16 mem_mask)
 {
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
+
 	u16 result = m_swim->read((offset >> 8) & 0xf);
 	return (result << 8) | result;
 }
@@ -307,6 +310,9 @@ void macportable_state::iwm_w(offs_t offset, u16 data, u16 mem_mask)
 		m_swim->write((offset >> 8) & 0xf, data & 0xff);
 	else
 		m_swim->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 u16 macportable_state::autovector_r(offs_t offset)

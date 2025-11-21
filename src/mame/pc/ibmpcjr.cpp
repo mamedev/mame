@@ -129,7 +129,11 @@ INPUT_PORTS_END
 void pcjr_state::machine_start()
 {
 	auto const ramsize = m_ram->size();
-	m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram->pointer());
+	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
+	address_space &vram_space = m_video->space(0);
+	assert(mem_space.data_width() == vram_space.data_width());
+
+	mem_space.install_ram(0, ramsize - 1, m_ram->pointer());
 
 	m_pc_int_delay_timer = timer_alloc(FUNC(pcjr_state::delayed_irq), this);
 	m_pcjr_watchdog = timer_alloc(FUNC(pcjr_state::watchdog_expired), this);
@@ -138,9 +142,9 @@ void pcjr_state::machine_start()
 	// TODO: fix when this is really understood
 	memory_share *const vram = memshare("vram");
 	if (vram)
-		m_video->space(0).install_ram(0, (128 * 1024) - 1, &vram[0]);
+		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, vram->bytes() - 1), &vram[0]);
 	else
-		m_video->space(0).install_ram(0, (128 * 1024) - 1, m_ram->pointer());
+		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, ramsize - 1), m_ram->pointer());
 }
 
 void pcjr_state::machine_reset()

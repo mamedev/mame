@@ -14,7 +14,7 @@ FDD 2HD bridge for 1st gen HW
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(FDD_2HD_BRIDGE, fdd_2hd_bridge_device, "pc98_fdd_2hd", "PC-98 2HD FDD bridge")
+DEFINE_DEVICE_TYPE(FDD_2HD_BRIDGE, fdd_2hd_bridge_device, "pc98_fdd_2hd", "NEC PC-98 2HD FDD bridge")
 
 fdd_2hd_bridge_device::fdd_2hd_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FDD_2HD_BRIDGE, tag, owner, clock)

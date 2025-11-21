@@ -1,20 +1,74 @@
 // license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 /*
-    Patinho Feio
+    Patinho Feio - University of São Paulo, 1972
 */
 
 #include "emu.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "softlist.h"
 #include "cpu/patinhofeio/patinhofeio_cpu.h"
-#include "patinhofeio.h"
+#include "teleprinter.h"
+#include "softlist.h"
+
 #include "patinho.lh"
 
-/*
-    driver init function
-*/
+namespace {
+
+class patinho_feio_state : public driver_device {
+public:
+	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_decwriter(*this, "decwriter")
+		, m_tty(*this, "teletype")
+		, m_mode_button(*this, "MODE_BUTTON%u", 0U)
+	{ }
+
+	void init_patinho_feio();
+
+	void decwriter_data_w(uint8_t data);
+	void decwriter_kbd_input(u8 data);
+	TIMER_CALLBACK_MEMBER(decwriter_callback);
+
+	void teletype_data_w(uint8_t data);
+	void teletype_kbd_input(u8 data);
+	TIMER_CALLBACK_MEMBER(teletype_callback);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( tape_load );
+
+	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);
+
+	void patinho_feio(machine_config &config);
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	void load_tape(const char* name);
+	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
+
+	required_device<patinho_feio_cpu_device> m_maincpu;
+	required_device<teleprinter_device> m_decwriter;
+	required_device<teleprinter_device> m_tty;
+
+private:
+	output_finder<6> m_mode_button;
+	uint8_t* paper_tape_data = nullptr;
+	uint32_t paper_tape_length = 0;
+	uint32_t paper_tape_address = 0;
+
+	emu_timer *m_decwriter_timer = nullptr;
+	emu_timer *m_teletype_timer = nullptr;
+	output_manager *m_out = nullptr;
+	uint8_t m_prev_ACC = 0;
+	uint8_t m_prev_opcode = 0;
+	uint8_t m_prev_mem_data = 0;
+	uint16_t m_prev_mem_addr = 0;
+	uint16_t m_prev_PC = 0;
+	uint8_t m_prev_FLAGS = 0;
+	uint16_t m_prev_RC = 0;
+};
+
+
 void patinho_feio_state::init_patinho_feio()
 {
 	m_out = &output();
@@ -29,17 +83,9 @@ void patinho_feio_state::init_patinho_feio()
 
 void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode){
 	char lamp_id[11];
-	static char const *const button_names[] = {
-		"NORMAL",
-		"CICLOUNICO",
-		"INSTRUCAOUNICA",
-		"ENDERECAMENTO",
-		"ARMAZENAMENTO",
-		"EXPOSICAO"
-	};
 
 	for (int i=0; i<6; i++){
-		m_out->set_value(button_names[i], (mode == i) ? 1 : 0);
+		m_mode_button[i] = (mode == i) ? 1 : 0;
 	}
 
 	for (int i=0; i<8; i++){
@@ -189,6 +235,8 @@ void patinho_feio_state::machine_start(){
 	m_teletype_timer = timer_alloc(FUNC(patinho_feio_state::teletype_callback), this);
 	m_decwriter_timer = timer_alloc(FUNC(patinho_feio_state::decwriter_callback), this);
 
+	m_mode_button.resolve();
+
 	// Copy some programs directly into RAM.
 	// This is a hack for setting up the computer
 	// while we don't support loading programs
@@ -208,37 +256,41 @@ void patinho_feio_state::machine_start(){
 }
 
 static INPUT_PORTS_START( patinho_feio )
-	PORT_START("RC")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 0") PORT_CODE(KEYCODE_EQUALS) PORT_TOGGLE
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 1") PORT_CODE(KEYCODE_MINUS) PORT_TOGGLE
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 2") PORT_CODE(KEYCODE_0) PORT_TOGGLE
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 3") PORT_CODE(KEYCODE_9) PORT_TOGGLE
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 4") PORT_CODE(KEYCODE_8) PORT_TOGGLE
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 5") PORT_CODE(KEYCODE_7) PORT_TOGGLE
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 6") PORT_CODE(KEYCODE_6) PORT_TOGGLE
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 7") PORT_CODE(KEYCODE_5) PORT_TOGGLE
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 8") PORT_CODE(KEYCODE_4) PORT_TOGGLE
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 7") PORT_CODE(KEYCODE_3) PORT_TOGGLE
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 10") PORT_CODE(KEYCODE_2) PORT_TOGGLE
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RC bit 11") PORT_CODE(KEYCODE_1) PORT_TOGGLE
+	/* Address/Data input Switches */
+	PORT_START("SWITCHES")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #0") PORT_CODE(KEYCODE_EQUALS) PORT_TOGGLE
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #1") PORT_CODE(KEYCODE_MINUS) PORT_TOGGLE
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #2") PORT_CODE(KEYCODE_0) PORT_TOGGLE
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #3") PORT_CODE(KEYCODE_9) PORT_TOGGLE
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #4") PORT_CODE(KEYCODE_8) PORT_TOGGLE
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #5") PORT_CODE(KEYCODE_7) PORT_TOGGLE
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #6") PORT_CODE(KEYCODE_6) PORT_TOGGLE
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #7") PORT_CODE(KEYCODE_5) PORT_TOGGLE
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #8") PORT_CODE(KEYCODE_4) PORT_TOGGLE
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #9") PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #10") PORT_CODE(KEYCODE_2) PORT_TOGGLE
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Switch #11") PORT_CODE(KEYCODE_1) PORT_TOGGLE
 
 	PORT_START("BUTTONS")
 	/* Modo de Operacao: EXECUCAO */
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NORMAL") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CICLO UNICO") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INSTRUCAO UNICA") PORT_CODE(KEYCODE_D)
+
 	/* Modo de Operacao: MEMORIA */
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ARMAZENAMENTO") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EXPOSICAO") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO") PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ARMAZENAMENTO") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EXPOSICAO") PORT_CODE(KEYCODE_H)
+
 	/* Comando: */
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESPERA") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTERRUPCAO") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PARTIDA") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREPARACAO") PORT_CODE(KEYCODE_R)
-	/* Switches */
-	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO (Fixo/Sequencial)") PORT_CODE(KEYCODE_N) PORT_TOGGLE
-	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMORIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESPERA") PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("INTERRUPCAO") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PARTIDA") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PREPARACAO") PORT_CODE(KEYCODE_M)
+
+	/* Memory Toggle Switches */
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENDERECAMENTO (Fixo/Sequencial)") PORT_CODE(KEYCODE_I) PORT_TOGGLE
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMORIA (Liberada/Protegida)") PORT_CODE(KEYCODE_O) PORT_TOGGLE
 INPUT_PORTS_END
 
 void patinho_feio_state::patinho_feio(machine_config &config)
@@ -246,7 +298,7 @@ void patinho_feio_state::patinho_feio(machine_config &config)
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
 	PATO_FEIO_CPU(config, m_maincpu, 500000);
-	m_maincpu->rc_read().set_ioport("RC");
+	m_maincpu->rc_read().set_ioport("SWITCHES");
 	m_maincpu->buttons_read().set_ioport("BUTTONS");
 	m_maincpu->set_update_panel_cb(FUNC(patinho_feio_state::update_panel));
 
@@ -307,6 +359,8 @@ ROM_START( patinho )
 	ROM_REGION( 0x02a, "micro_pre_loader", 0 )
 	ROM_LOAD( "micro-pre-loader.bin", 0x000, 0x02a, CRC(1921feab) SHA1(bb063102e44e9ab963f95b45710141dc2c5046b0) )
 ROM_END
+
+} // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE       INPUT         CLASS               INIT               COMPANY                                           FULLNAME         FLAGS
 COMP( 1972, patinho, 0,      0,      patinho_feio, patinho_feio, patinho_feio_state, init_patinho_feio, "Escola Politecnica - Universidade de Sao Paulo", "Patinho Feio" , MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

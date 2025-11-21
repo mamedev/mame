@@ -416,6 +416,7 @@ const double XTAL::known_xtals[] = {
 	 28'636'363, // 28.636363_MHz_XTAL     Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier), NEC PC-88xx
 	 28'640'000, // 28.64_MHz_XTAL         Fuuki FG-1c AI AM-2 PCB
 	 28'700'000, // 28.7_MHz_XTAL          -
+	 28'759'500, // 28.7595_MHz_XTAL       Videx UltraTerm
 	 29'376'000, // 29.376_MHz_XTAL        Qume QVT-103
 	 29'491'200, // 29.4912_MHz_XTAL       Xerox Alto-II system clock (tagged 29.4MHz in the schematics)
 	 30'000'000, // 30_MHz_XTAL            Impera Magic Card

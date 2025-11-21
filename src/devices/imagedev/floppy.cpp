@@ -36,13 +36,15 @@
 
 #include <algorithm>
 
-/*
-    Debugging flags. Set to 0 or 1.
-*/
+// Some debug output
 
-// Show step operation
-#define TRACE_STEP 0
-#define TRACE_AUDIO 0
+#define LOG_STEP        (1U << 1)
+#define LOG_TRACK       (1U << 2)
+#define LOG_SOUND       (1U << 3)
+#define LOG_MACDRIVE    (1U << 4)
+#define VERBOSE 0
+
+#include "logmacro.h"
 
 #define PITCH_SEEK_SAMPLES 1
 
@@ -215,13 +217,48 @@ floppy_connector::floppy_connector(const machine_config &mconfig, const char *ta
 	device_t(mconfig, FLOPPY_CONNECTOR, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	formats(nullptr),
-	m_enable_sound(false),
 	m_sectoring_type(floppy_image::SOFT)
 {
 }
 
 floppy_connector::~floppy_connector()
 {
+}
+
+//-------------------------------------------
+// Activate floppy sounds with default lists
+//-------------------------------------------
+
+void floppy_connector::enable_sound(bool doit)
+{
+	if (doit)
+		enable_sound(nullptr, floppy35_samples, floppy525_samples, nullptr);
+	else
+		enable_sound(nullptr);
+}
+
+//-------------------------------------------
+// Activate floppy sounds with single custom list
+//-------------------------------------------
+
+void floppy_connector::enable_sound(const floppy_sound_device::floppysoundentry *samples)
+{
+	enable_sound(nullptr, nullptr, samples, nullptr);
+}
+
+//------------------------------------------------------
+// Activate floppy sounds with lists for various formats
+//------------------------------------------------------
+
+void floppy_connector::enable_sound(const floppy_sound_device::floppysoundentry *samples3,
+						const floppy_sound_device::floppysoundentry *samples35,
+						const floppy_sound_device::floppysoundentry *samples525,
+						const floppy_sound_device::floppysoundentry *samples8 )
+{
+	m_samples3 = samples3;
+	m_samples35 = samples35;
+	m_samples525 = samples525;
+	m_samples8 = samples8;
 }
 
 void floppy_connector::device_start()
@@ -234,7 +271,7 @@ void floppy_connector::device_config_complete()
 	if(dev)
 	{
 		dev->set_formats(formats);
-		dev->enable_sound(m_enable_sound);
+		dev->enable_sound(m_samples3, m_samples35, m_samples525, m_samples8);
 		dev->set_sectoring_type(m_sectoring_type);
 	}
 }
@@ -512,6 +549,19 @@ const software_list_loader &floppy_image_device::get_software_list_loader() cons
 }
 
 
+void floppy_image_device::enable_sound(const floppy_sound_device::floppysoundentry *samples3,
+						const floppy_sound_device::floppysoundentry *samples35,
+						const floppy_sound_device::floppysoundentry *samples525,
+						const floppy_sound_device::floppysoundentry *samples8 )
+{
+	m_samples3 = samples3;
+	m_samples35 = samples35;
+	m_samples525 = samples525;
+	m_samples8 = samples8;
+	m_make_sound = (samples3 || samples35 || samples525 || samples8);
+}
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -540,7 +590,33 @@ void floppy_image_device::device_start()
 	m_ready_counter = 0;
 	m_phases = 0;
 
-	if (m_make_sound) m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
+	const floppy_sound_device::floppysoundentry *samples = nullptr;
+
+	// Determine a suitable sample set if available
+	// If there is no matching set, try another one or give up if nothing is left.
+	if (m_make_sound)
+	{
+		if (m_form_factor == floppy_image::FF_3)
+			samples = m_samples3;
+
+		// Use this if there is no 3" sample set or if the drive is a 3.5"
+		if (samples == nullptr || m_form_factor == floppy_image::FF_35)
+			samples = m_samples35;
+
+		if (m_form_factor == floppy_image::FF_8)
+			samples = m_samples8;
+
+		// Use this as default
+		if (samples == nullptr || m_form_factor == floppy_image::FF_525)
+			samples = m_samples525;
+	}
+
+	// If this is also missing, there will be no sound output
+	if (samples != nullptr)
+	{
+		m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
+		m_sound_out->set_samples(samples);
+	}
 
 	save_item(NAME(m_dir));
 	save_item(NAME(m_stp));
@@ -715,6 +791,8 @@ void floppy_image_device::call_unload()
 		mon_w(1);
 	}
 
+	if (m_make_sound) m_sound_out->unload();
+
 	set_ready(true);
 }
 
@@ -858,7 +936,6 @@ TIMER_CALLBACK_MEMBER(floppy_image_device::index_resync)
 		if(m_idx && m_ready) {
 			m_ready_counter--;
 			if(!m_ready_counter) {
-				// logerror("Drive spun up\n");
 				set_ready(false);
 			}
 		}
@@ -920,11 +997,6 @@ void floppy_image_device::track_changed()
 
 void floppy_image_device::stp_w(int state)
 {
-	// Before spin-up is done, ignore step pulses
-	// TODO: There are reports about drives supporting step operation with
-	// stopped spindle. Need to check that on real drives.
-	// if (m_ready_counter > 0) return;
-
 	if ( m_stp != state ) {
 		cache_clear();
 		m_stp = state;
@@ -937,7 +1009,7 @@ void floppy_image_device::stp_w(int state)
 			}
 			if(ocyl != m_cyl)
 			{
-				if (TRACE_STEP) logerror("track %d\n", m_cyl);
+				LOGMASKED(LOG_TRACK, "track %d\n", m_cyl);
 				// Do we want a stepper sound?
 				// We plan for 5 zones with possibly specific sounds
 				if (m_make_sound) m_sound_out->step(m_cyl*5/m_tracks);
@@ -991,7 +1063,7 @@ void floppy_image_device::seek_phase_w(int _phases)
 	cache_clear();
 
 	if(next_pos != cur_pos) {
-		if (TRACE_STEP) logerror("track %d.%d\n", m_cyl, m_subcyl);
+		LOGMASKED(LOG_STEP, "track %d.%d\n", m_cyl, m_subcyl);
 		if (m_make_sound) m_sound_out->step(m_subcyl);
 	}
 
@@ -1334,145 +1406,162 @@ uint32_t floppy_image_device::get_variant() const
 //===================================================================
 //   Floppy sound
 //
-//   In order to enable floppy sound you must call
-//      enable_sound(true)
-//   and you must put audio samples (44100Hz, mono) with names as
-//   shown in floppy_sample_names into the directory samples/floppy
-//   Sound will be disabled when these samples are missing.
+//   MZ, August 2015
+//       Updated November 2025
 //
-//   MZ, Aug 2015
+//   In order to activate floppy sounds (spinning, head steps, seeks)
+//   you need to call enable_sound on the floppy_connector. The default is
+//   no sound. The volume may be set in the OSD menu. If the sample files
+//   cannot be loaded, sound is disabled.
+//
+//   void enable_sound(bool):
+//        Enables/disables sounds with default sound definitions (floppy.h).
+//
+//   void enable_sound(floppy_sound_device::floppy_sound_entry *):
+//        Enables sounds with the provided sound definition (same for every form factor)
+//
+//   void enable_sound(floppy_sound_device::floppy_sound_entry *,... (4 times))
+//        Enables sounds with the provided sound definitions for 3", 3.5",
+//        5.25", and 8" drives. Unused options may be set to nullptr. The
+//        form factor determines which sample set is used.
+//
+//   Some macros are defined to simplify the sound sample setup.
+//   The default lists for 3.5" and 5.25" are contained in floppy.h.
+//
+//   FLOPPY_SOUND(name)
+//      SAMPLES_DIR(subdirectory in samples dir; must be first entry)
+//      SPIN_SAMPLE(spin_kind, file name without extension)
+//      SEEK_SAMPLE(actual_rate, max_rate, file name w/o ext)
+//      STEP_SAMPLE(file name w/o ext)
+//      STEP_SAMPLE_RANGE(first_track, last_track, file name w/o ext)
+//   FLOPPY_SOUND_END
+//
+//   The spin_kind is one of
+//      START_EMPTY            start spinning without a disk in the drive
+//      SPIN_EMPTY             spinning w/o disk
+//      END_EMPTY              stop spinning w/o disk
+//      START_LOADED_INITIAL   start spinning with a disk, first time after insertion
+//      START_LOADED           start spinning with a disk
+//      SPIN_LOADED            spinning with a disk
+//      END_LOADED             stop spinning with a disk
+//
+//   Not all spin_kinds need to be defined. See the array replace_sample for
+//   the rules by which samples are used when the proper ones are not available.
+//   The ultimate default is SPIN_LOADED.
+//
+//   The seek samples are chosen by the detected step rate n (in milliseconds).
+//   The seek sample whose max_rate is minimally higher than n is used, and the
+//   playback is pitched up or down related to the sample's actual rate.
+//   If the detected rate varies (as with the Amiga), a different sample is only
+//   picked when the newly detected rate is more than 10% off the current
+//   one to avoid stuttering sound output and unrealistic changes in pitch.
+//
+//   Step sounds are played when the interval between them is long enough, so no
+//   seek sound would be produced. If only one step sample shall be used,
+//   the range should be set as (0,99), which is done by the STEP_SAMPLE macro.
+//   Otherwise, the step sample is played whose range contains the current
+//   track.
+//
 //===================================================================
-
-enum
-{
-	QUIET=-1,
-	SPIN_START_EMPTY=0,
-	SPIN_START_LOADED,
-	SPIN_EMPTY,
-	SPIN_LOADED,
-	SPIN_END
-};
-
-enum
-{
-	STEP_SINGLE=0,
-	STEP_SEEK2,
-	STEP_SEEK6,
-	STEP_SEEK12,
-	STEP_SEEK20
-};
-
-/*
-    Unless labeled "constructed", all samples were recorded from real floppy drives.
-    The 3.5" floppy drive is a Sony MPF420-1.
-    The 5.25" floppy drive is a Chinon FZ502.
-*/
-static const char *const floppy35_sample_names[] =
-{
-// Subdirectory
-	"*floppy",
-// Spinning sounds
-	"35_spin_start_empty",
-	"35_spin_start_loaded",
-	"35_spin_empty",
-	"35_spin_loaded",
-	"35_spin_end",
-// Stepping sounds
-	"35_step_1_1",
-// Seeking sounds
-	"35_seek_2ms",      // constructed
-	"35_seek_6ms",
-	"35_seek_12ms",
-	"35_seek_20ms",
-	nullptr
-};
-
-static const char *const floppy525_sample_names[] =
-{
-// Subdirectory
-	"*floppy",
-// Spinning sounds
-	"525_spin_start_empty",
-	"525_spin_start_loaded",
-	"525_spin_empty",
-	"525_spin_loaded",
-	"525_spin_end",
-// Stepping sounds
-	"525_step_1_1",
-// Seeking sounds
-	"525_seek_2ms",    // unrealistically fast, but needed for 3.5 (constructed)
-	"525_seek_6ms",
-	"525_seek_12ms",
-	"525_seek_20ms",
-	nullptr
-};
 
 floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: samples_device(mconfig, FLOPPYSOUND, tag, owner, clock),
 		m_sound(nullptr),
-		m_step_base(0),
-		m_spin_samples(0),
-		m_step_samples(0),
-		m_spin_samplepos(0),
-		m_step_samplepos(0),
-		m_seek_sound_timeout(0),
-		m_zones(0),
-		m_spin_playback_sample(QUIET),
-		m_step_playback_sample(QUIET),
-		m_seek_playback_sample(QUIET),
+		m_samplelist(nullptr),
 		m_motor_on(false),
 		m_with_disk(false),
-		m_loaded(false),
+		m_spin_kind(QUIET),
+		m_spin_sample(QUIET),
+		m_spin_samplepos(0),
+		m_step_sample(QUIET),
+		m_step_samplepos(0),
+		m_seek_sample(QUIET),
+		m_seek_samplepos(0.0),
 		m_seek_pitch(1.0),
-		m_seek_samplepos(0.0)
+		m_seek_sound_timeout(0),
+		m_last_step_time(),
+		m_firstturn(true),
+		m_samples_available(false),
+		m_in_seek(false),
+		m_step_rate(0.0)
 {
 }
 
 void floppy_sound_device::register_for_save_states()
 {
-	save_item(NAME(m_step_base));
-	save_item(NAME(m_spin_samples));
-	save_item(NAME(m_step_samples));
+	save_item(NAME(m_spin_kind));
+	save_item(NAME(m_spin_sample));
 	save_item(NAME(m_spin_samplepos));
+	save_item(NAME(m_step_sample));
 	save_item(NAME(m_step_samplepos));
+	save_item(NAME(m_seek_sample));
 	save_item(NAME(m_seek_samplepos));
-	save_item(NAME(m_seek_sound_timeout));
-	save_item(NAME(m_zones));
-	save_item(NAME(m_spin_playback_sample));
-	save_item(NAME(m_step_playback_sample));
-	save_item(NAME(m_seek_playback_sample));
-	save_item(NAME(m_motor_on));
-	save_item(NAME(m_with_disk));
-	save_item(NAME(m_loaded));
 	save_item(NAME(m_seek_pitch));
+	save_item(NAME(m_firstturn));
+	save_item(NAME(m_in_seek));
+	save_item(NAME(m_step_rate));
 }
 
 void floppy_sound_device::device_start()
 {
-	// What kind of drive do we have?
-	bool is525 = strstr(tag(), "525") != nullptr;
-	set_samples_names(is525 ? floppy525_sample_names : floppy35_sample_names);
+	// Set up floppy sound samples
+	// We need to prepare a samples list for the samples_device
+	// First entry is the subdirectory in the samples path (marked with a
+	// leading asterisk)
+	floppysoundentry flop = m_samplelist[0];
+
+	if (flop.type != DIR)
+		throw emu_fatalerror("Missing DIR entry in floppy samples list.");
+
+	// Create the asterisked first entry for the subdirectory
+	m_dir = '*';
+	m_dir += flop.filename;
+	m_samplenames.push_back(m_dir.c_str());
+
+	// Max 100 entries so we don't loop forever when END is missing
+	for (int i=1; i < 100 && flop.type != END; i++)
+	{
+		flop = m_samplelist[i];
+		if (flop.type == DIR)
+			throw emu_fatalerror("Duplicate DIR entry in floppy samples list.");
+		m_samplenames.push_back(flop.filename);
+	}
+
+	if (flop.type != END)
+		throw emu_fatalerror("Missing END entry in floppy samples list.");
+
+	// Put an end to the list
+	m_samplenames.push_back(nullptr);
+
+	set_samples_names(&m_samplenames[0]);
 
 	m_motor_on = false;
-
-	// Offsets in the sample collection
-	m_spin_samples = 5;
-	m_step_base = 5;
-	m_step_samples = 1;
-	m_zones = 1;             // > 1 needs more than one step sample
-
-	m_spin_samplepos = m_step_samplepos = m_seek_samplepos = 0;
-	m_spin_playback_sample = m_step_playback_sample = QUIET;
+	m_spin_kind = QUIET;
+	m_spin_sample = QUIET;
+	m_step_sample = QUIET;
+	m_spin_samplepos = 0;
+	m_step_samplepos = 0;
+	m_seek_samplepos = 0;
 
 	// Read audio samples. The samples are stored in the list m_samples.
-	m_loaded = load_samples();
+	m_samples_available = load_samples();
 
 	// If we don't have all samples, don't allocate a stream or access sample data.
-	if (m_loaded)
+	if (m_samples_available)
 	{
 		m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
 	}
 	register_for_save_states();
+
+	m_last_step_time = attotime::zero;
+	m_in_seek = false;
+	m_step_rate = 0;
+	m_firstturn = true;
+}
+
+void floppy_sound_device::set_samples(const floppysoundentry *samples)
+{
+	m_samplelist = samples;
 }
 
 /*
@@ -1486,20 +1575,29 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 	{
 		m_sound->update(); // required
 
-		if ((m_spin_playback_sample==QUIET || m_spin_playback_sample==SPIN_END) && running) // motor was either off or already spinning down
+		if ((m_spin_kind==QUIET || m_spin_kind==END_EMPTY || m_spin_kind==END_LOADED ) && running) // motor was either off or already spinning down
 		{
 			m_spin_samplepos = 0;
-			m_spin_playback_sample = withdisk ? SPIN_START_LOADED : SPIN_START_EMPTY; // (re)start the motor sound
+			// 3.5" floppy disks have a special first turn sound when the
+			// spindle motor latch meets the central metal hub hole.
+			m_spin_kind = withdisk? (m_firstturn? START_LOADED_INITIAL : START_LOADED) : START_EMPTY;
+			m_firstturn = false;
 		}
 		else
 		{
 			// Motor has been running and is turned off now
-			if ((m_spin_playback_sample == SPIN_EMPTY || m_spin_playback_sample == SPIN_LOADED) && !running)
+			if ((m_spin_kind == SPIN_EMPTY || m_spin_kind == SPIN_LOADED) && !running)
 			{
 				m_spin_samplepos = 0;
-				m_spin_playback_sample = SPIN_END; // go to spin down sound when loop is finished
+				m_spin_kind = withdisk? END_LOADED : END_EMPTY; // go to spin down sound when loop is finished
 			}
 		}
+
+		m_spin_sample = (m_spin_kind==QUIET)? QUIET : find_spin(m_spin_kind);
+		if (m_spin_sample != QUIET)
+			LOGMASKED(LOG_SOUND, "Spin sample file = %s (%d)\n", m_samplenames[m_spin_sample], m_spin_sample);
+		else
+			LOGMASKED(LOG_SOUND, "Spin off\n");
 	}
 	m_motor_on = running;
 	m_with_disk = withdisk;
@@ -1507,93 +1605,183 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 
 /*
     Activate the step sound.
-    The zone parameter should be used to select specific samples for the
-    current head position (if available). Its value should range from 0 to 4.
 */
-void floppy_sound_device::step(int zone)
+void floppy_sound_device::step(int track)
 {
 	if (samples_loaded())
 	{
 		m_sound->update();  // required
 
-		// Pick one of the step samples
-		// TODO: This is only preliminary, need to complete that.
-		if (zone >= m_zones) zone = m_zones-1;
-		m_step_playback_sample = (zone * m_step_samples) + (machine().rand() % m_step_samples);
+		m_step_sample = find_step(track);
 
-		if (m_step_samplepos > 0)
+		attotime now = machine().time();
+		double rate = 0;
+		rate = (m_last_step_time == attotime::zero)? 0 : (now - m_last_step_time).as_double() * 1000;
+		m_last_step_time = now;
+
+		bool recalc = false;
+
+		// Cases:
+		// step, previous step sample completed (step_samplepos == 0) -> new step output
+		// step, previous step sample not completed (step_samplepos > 0) ->
+		//     not in seek -> determine seek sample, freeze step output
+		//     in seek -> continue with seek sample
+		// (seek sample timeout is set to twice the step rate)
+
+		// If the step rate changed by more than 10%, we have to change the
+		// seek sample
+		if (m_step_rate == 0)
 		{
-			if (m_seek_playback_sample == QUIET)
+			recalc = true;
+			m_step_rate = rate;
+		}
+		else
+		{
+			if (rate > 0 && rate < 1000) // safe values
 			{
-				// The last step sample was not completed;
-				// we need to find out the step rate
-				// With a sample rate of 44100 Hz we can calculate the
-				// rate from the sample position
-				// 2ms = 88
-				// 6ms = 265
-				// 12ms = 529
-				// 20ms = 882
-
-				if (m_step_samplepos < 100)
+				double raterel = (m_step_rate - rate) / m_step_rate;
+				if (raterel < 0) raterel = -raterel;
+				if (raterel > 0.1 && m_in_seek)
 				{
-					// Should only used for 3.5 drives
-					m_seek_playback_sample = STEP_SEEK2;
-					m_seek_pitch = 1.0;  // don't use a pitch
+					recalc = true;
+					LOGMASKED(LOG_SOUND, "Step rate has changed from %.1f to %.1f\n", m_step_rate, rate);
 				}
-				else
-				{
-					if (m_step_samplepos < 400)       // Use this for 8 ms also
-					{
-						m_seek_playback_sample = STEP_SEEK6;
-						m_seek_pitch = 265.0 / m_step_samplepos;
-					}
-					else
-					{
-						if (m_step_samplepos < 600)
-						{
-							m_seek_playback_sample = STEP_SEEK12;
-							m_seek_pitch = 529.0 / m_step_samplepos;
-						}
-						else
-						{
-							if (m_step_samplepos < 1200)
-							{
-								m_seek_playback_sample = STEP_SEEK20;
-								m_seek_pitch = 882.0 / m_step_samplepos;
-							}
-							else
-								// For 30ms and longer we replay the step sound
-								m_seek_playback_sample = QUIET;
-						}
-					}
-				}
-
-				// Start the new seek sound from the beginning.
-				m_seek_samplepos = 0;
+				m_step_rate = rate;
 			}
+		}
 
-			// Changing the pitch does not always sound convincing
-			if (!PITCH_SEEK_SAMPLES) m_seek_pitch = 1;
+		if (m_step_samplepos > 0 && m_step_rate < 100)   // in seek, or transitioning into seek
+		{
+			LOGMASKED(LOG_SOUND, "Step sample not completed ... doing seek. Rate = %.1f, recalc = %d, seek_pos = %d\n", m_step_rate, recalc, m_seek_samplepos);
 
-			if (TRACE_AUDIO) logerror("Seek sample = %d, pitch = %f\n", m_seek_playback_sample, m_seek_pitch);
+			if (recalc || !m_in_seek)
+			{
+				int newseek = find_seek(m_step_rate, track, m_seek_pitch);
+
+				// Start the new seek sound from the beginning (but only if
+				// we changed it, or we will get ugly sounds in the output)
+				if (newseek != m_seek_sample) m_seek_samplepos = 0;
+
+				m_seek_sample = newseek;
+
+				// Changing the pitch does not always sound convincing
+				if (!PITCH_SEEK_SAMPLES) m_seek_pitch = 1.0;
+
+				LOGMASKED(LOG_SOUND, "Step rate = %.1fms, seek sample = %s, pitch = %f\n", m_step_rate, m_samplenames[m_seek_sample], m_seek_pitch);
+			}
 
 			// Set the timeout for the seek sound. When it expires,
 			// we assume that the seek process is over, and we'll play the
 			// rest of the step sound.
 			// This will be retriggered with each step pulse.
-			m_seek_sound_timeout = m_step_samplepos * 2;
+			m_seek_sound_timeout = (int)(m_step_rate * 2 * 44.1);
 		}
 		else
 		{
+			LOGMASKED(LOG_SOUND, "Step sample completed\n");
+			m_in_seek = false;
 			// Last step sample was completed, this is not a seek process
-			m_seek_playback_sample = QUIET;
+			m_seek_sample = QUIET;
+			m_seek_samplepos = 0;
 		}
 
 		// If we switch to the seek sample, let's keep the position of the
 		// step sample; else reset the step sample position.
-		if (m_seek_playback_sample == QUIET)
+		if (m_seek_sample == QUIET)
+		{
 			m_step_samplepos = 0;
+			m_in_seek = false;
+		}
+		else
+		{
+			m_in_seek = true;
+		}
 	}
+}
+
+/*
+    Find a suitable spinning sound in the list. The possible kinds are
+    enumerated in spinsound_t.
+*/
+int floppy_sound_device::find_spin(int kind) {
+
+	// If a sample is not available (left), take the one on the right.
+	// Simple index replacement.
+	int replace_sample[7] =
+	{
+		/* START_EMPTY -> */            SPIN_EMPTY,
+		/* SPIN_EMPTY -> */             SPIN_LOADED,
+		/* END_EMPTY -> */              END_LOADED,
+		/* START_LOADED_INITIAL -> */   START_LOADED,
+		/* START_LOADED -> */           SPIN_LOADED,
+		/* SPIN_LOADED -> */            QUIET,
+		/* END_LOADED -> */             SPIN_LOADED
+	};
+
+	while (kind != QUIET)
+	{
+		for (int i=1; m_samplelist[i].type != END; i++)
+		{
+			if ((m_samplelist[i].type == SPIN) && (m_samplelist[i].use == kind))
+				return i; // found it
+		}
+		// Not found, take another kind (maybe try several times)
+		kind = replace_sample[kind];
+	}
+	return QUIET;  // not found
+}
+
+/*
+    Find a suitable step sample. The samples may be different by track.
+    In the definition, the range must be specified, where 0, 99 is used for
+    all tracks (all emulated drives have less than 99 tracks).
+*/
+int floppy_sound_device::find_step(int track) {
+
+	for (int i=1; m_samplelist[i].type != END; i++)
+	{
+		if ((m_samplelist[i].type == STEP) && (m_samplelist[i].mintrack <= track && m_samplelist[i].maxtrack >= track))
+		{
+			LOGMASKED(LOG_SOUND, "Found step sample %d, name %s\n", i, m_samplelist[i].filename);
+			return i;
+		}
+	}
+	return QUIET;
+}
+
+/*
+    Find a suitable seek sample. We allow for a given sample to be played
+    for a rate that is in some range around that sample, defined in the list.
+    That is, each seek sample defines its actual rate (e.g. 6 ms) and the
+    slowest rate that it may be used for (e.g. 8 ms). If the determined rate
+    is 7 ms, the 6 ms sample will be chosen, and playback will be pitched down
+    by 6/7 = 0.86. If the rate is 5 ms, playback will be pitched up by 6/5 = 1.2,
+    unless there is a sample for a faster rate that covers 5 ms.
+
+    If the determined rate is slower than the maximum rate (here, 8 ms), the
+    next sample will be used for a slower rate (e.g. 10 ms) if available. If
+    there is no slower rate, -1 is returned. The caller should then use single
+    step sounds.
+*/
+int floppy_sound_device::find_seek(double rate, int track, double& pitch) {
+	int maxrate = 100;
+	int index = QUIET;
+
+	for (int i=1; m_samplelist[i].type != END; i++)
+	{
+		if ((m_samplelist[i].type == SEEK) && (m_samplelist[i].mintrack <= track && m_samplelist[i].maxtrack >= track))
+		{
+			if ((m_samplelist[i].use < maxrate) && (m_samplelist[i].use >= rate))
+			{
+				index = i;
+				maxrate = m_samplelist[i].use;
+			}
+		}
+	}
+	if (index != QUIET)
+		pitch = m_samplelist[index].rate / (double)rate;
+
+	return index;
 }
 
 //-------------------------------------------------
@@ -1607,7 +1795,6 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 	// one sample rate of 44100 for all samples
 
 	int16_t out;
-	int m_idx = 0;
 	int sampleend = 0;
 
 	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
@@ -1615,67 +1802,86 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 		out = 0;
 
 		// Motor sound
-		if (m_spin_playback_sample != QUIET)
+		if (m_spin_sample != QUIET)
 		{
-			m_idx = m_spin_playback_sample;
-			sampleend = m_sample[m_idx].data.size();
-			out = m_sample[m_idx].data[m_spin_samplepos++];
+			// The samples list starts at 0 with the first entry after DIR,
+			// so we adjust by -1
+			sampleend = m_sample[m_spin_sample-1].data.size();
+			out = m_sample[m_spin_sample-1].data[m_spin_samplepos++];
 
 			if (m_spin_samplepos >= sampleend)
 			{
+				LOGMASKED(LOG_SOUND, "Spin sample %d completed\n", m_spin_sample);
 				// Motor sample has completed
-				switch (m_spin_playback_sample)
+				switch (m_spin_kind)
 				{
-				case SPIN_START_EMPTY:
+				case START_EMPTY:
 					// After start, switch to the continued spinning sound
-					m_spin_playback_sample = SPIN_EMPTY; // move to looping sound
+					m_spin_kind = SPIN_EMPTY; // move to looping sound
 					break;
-				case SPIN_START_LOADED:
+				case START_LOADED:
+				case START_LOADED_INITIAL:
 					// After start, switch to the continued spinning sound
-					m_spin_playback_sample = SPIN_LOADED; // move to looping sound
+					m_spin_kind = SPIN_LOADED; // move to looping sound
 					break;
 				case SPIN_EMPTY:
 					// As long as the motor pin is asserted, restart the sample
 					// play the spindown sample
-					if (!m_motor_on) m_spin_playback_sample = SPIN_END; // motor was turned off already (during spin-up maybe) -> spin down
+					if (!m_motor_on) m_spin_kind = END_EMPTY; // motor was turned off already (during spin-up maybe) -> spin down
 					break;
 				case SPIN_LOADED:
-					if (!m_motor_on) m_spin_playback_sample = SPIN_END; // motor was turned off already (during spin-up maybe) -> spin down
+					if (!m_motor_on) m_spin_kind = END_LOADED; // motor was turned off already (during spin-up maybe) -> spin down
 					break;
-				case SPIN_END:
+				case END_EMPTY:
+				case END_LOADED:
 					// Spindown sample over, be quiet or restart if the
 					// motor has been restarted
 					if (m_motor_on)
-						m_spin_playback_sample = m_with_disk ? SPIN_START_LOADED : SPIN_START_EMPTY;
+					{
+						LOGMASKED(LOG_SOUND, "Restart spinning sound\n");
+						m_spin_kind = m_with_disk ? START_LOADED : START_EMPTY;
+					}
 					else
-						m_spin_playback_sample = QUIET;
+						m_spin_kind = QUIET;
+					break;
+
+				default:
 					break;
 				}
+
+				m_spin_sample = (m_spin_kind==QUIET)? QUIET : find_spin(m_spin_kind);
+				if (m_spin_sample != QUIET)
+					LOGMASKED(LOG_SOUND, "Spin sample file = %s (%d)\n", m_samplenames[m_spin_sample], m_spin_sample);
+				else
+					LOGMASKED(LOG_SOUND, "Spin off\n");
+
 				// Restart the selected sample
 				m_spin_samplepos = 0;
 			}
 		}
 
 		// Seek sound
-		// As long as we have a seek sound, there is no step sound
+		// As long as we have a seek sound, there is a pending step sound
 		if (m_seek_sound_timeout == 1)
 		{
+			LOGMASKED(LOG_SOUND, "Finish step sound\n");
 			// Not retriggered; switch back to the last step sound
-			m_seek_playback_sample = QUIET;
+			m_seek_sample = QUIET;
 			m_seek_sound_timeout = 0;
 			// Skip 1/100 sec to dampen the loudest pulse
 			// yep, a somewhat dirty trick; we don't have to record yet another sample
 			m_step_samplepos += 441;
 		}
 
-		if (m_seek_playback_sample != QUIET)
+		if (m_seek_sample != QUIET)
 		{
 			m_seek_sound_timeout--;
 
-			m_idx = m_step_base + m_seek_playback_sample;
-			sampleend = m_sample[m_idx].data.size();
+			sampleend = m_sample[m_seek_sample-1].data.size();
+
 			// Mix it into the stream value
-			out += m_sample[m_idx].data[(int)m_seek_samplepos];
+			out += m_sample[m_seek_sample-1].data[(int)m_seek_samplepos];
+
 			// By adding different values than 1, we can change the playback speed
 			// This will be used to adjust the seek sound
 			m_seek_samplepos += m_seek_pitch;
@@ -1687,18 +1893,17 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 		else
 		{
 			// Stepper sound
-			if (m_step_playback_sample != QUIET)
+			if (m_step_sample != QUIET)
 			{
-				m_idx = m_step_base + m_step_playback_sample;
-				sampleend = m_sample[m_idx].data.size();
+				sampleend = m_sample[m_step_sample-1].data.size();
 
 				// Mix it into the stream value
-				out += m_sample[m_idx].data[m_step_samplepos++];
+				out += m_sample[m_step_sample-1].data[m_step_samplepos++];
 				if (m_step_samplepos >= sampleend)
 				{
 					// Step sample done
 					m_step_samplepos = 0;
-					m_step_playback_sample = QUIET;
+					m_step_sample = QUIET;
 				}
 			}
 		}
@@ -2866,7 +3071,7 @@ bool mac_floppy_device::wpt_r()
 	m_reg = (m_reg & 7) | (m_actual_ss ? 8 : 0);
 
 	if(0 && (m_reg != 4 && m_reg != 12 && m_reg != 5 && m_reg != 13))
-		logerror("fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], m_image.get());
+		LOGMASKED(LOG_MACDRIVE, "fdc disk sense reg %x %s %p\n", m_reg, regnames[m_reg], m_image.get());
 
 	switch(m_reg) {
 	case 0x0: // Step direction
@@ -2945,43 +3150,43 @@ void mac_floppy_device::seek_phase_w(int phases)
 	if(m_strb && !prev_strb) {
 		switch(m_reg) {
 		case 0x0: // Step to cylinder + 1
-			logerror("cmd step dir +1\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd step dir +1\n");
 			dir_w(0);
 			break;
 
 		case 0x1: // Step on
-			logerror("cmd step on\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd step on\n");
 			stp_w(0);
 			// There should be a delay, but it's not necessary
 			stp_w(1);
 			break;
 
 		case 0x2: // Motor on
-			logerror("cmd motor on\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd motor on\n");
 			floppy_image_device::mon_w(0);
 			break;
 
 		case 0x3: // End eject
-			logerror("cmd end eject\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd end eject\n");
 			break;
 
 		case 0x4: // Step to cylinder - 1
-			logerror("cmd step dir -1\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd step dir -1\n");
 			dir_w(1);
 			break;
 
 		case 0x6: // Motor off
-			logerror("cmd motor off\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd motor off\n");
 			floppy_image_device::mon_w(1);
 			break;
 
 		case 0x7: // Start eject
-			logerror("cmd start eject\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd start eject\n");
 			unload();
 			break;
 
 		case 0x9: // MFM mode on
-			logerror("cmd mfm on\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd mfm on\n");
 			if(m_has_mfm) {
 				m_mfm = true;
 				track_changed();
@@ -2989,18 +3194,18 @@ void mac_floppy_device::seek_phase_w(int phases)
 			break;
 
 		case 0xc: // Clear m_dskchg
-			logerror("cmd clear m_dskchg\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd clear m_dskchg\n");
 			m_dskchg = 1;
 			break;
 
 		case 0xd: // GCR mode on
-			logerror("cmd gcr on\n");
+			LOGMASKED(LOG_MACDRIVE, "cmd gcr on\n");
 			m_mfm = false;
 			track_changed();
 			break;
 
 		default:
-			logerror("cmd reg %x %s\n", m_reg, regnames[m_reg]);
+			LOGMASKED(LOG_MACDRIVE, "cmd reg %x %s\n", m_reg, regnames[m_reg]);
 			break;
 		}
 	}

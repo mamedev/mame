@@ -1,18 +1,18 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-    Sega System Control Unit (c) 1995 Sega
+Sega System Control Unit (c) 1995 Sega
 
-    TODO:
-    - make a screen_device subclass, add pixel timers & irq callbacks to it;
-    - A-Bus external interrupts;
-    - Pad signal (lightgun I presume);
-    - Improve DMA, use DRQ model and timers, make them subdevices?
-    (old DMA TODO)
-    - Remove CD transfer DMA hack (tied with CD block bug(s)?)
-    - Add timings(but how fast are each DMA?).
-    - Add level priority & DMA status register.
+TODO:
+- make a screen_device subclass, add pixel timers & irq callbacks to it;
+- A-Bus external interrupts;
+- Pad signal (lightgun I presume);
+- Improve DMA, use DRQ model and timers, make them subdevices?
+(old DMA TODO)
+- Remove CD transfer DMA hack (tied with CD block bug(s)?)
+- Add timings(but how fast are each DMA?).
+- Add level priority & DMA status register.
 
 ***************************************************************************/
 /**********************************************************************************
@@ -93,7 +93,7 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 **********************************************************************************/
 
 #include "emu.h"
-#include "sega_scu.h"
+#include "saturn_scu.h"
 
 
 
@@ -102,7 +102,18 @@ xxxx xxxx x--- xx-- xx-- xx-- xx-- xx-- UNUSED
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(SEGA_SCU, sega_scu_device, "sega_scu", "Sega System Control Unit")
+DEFINE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device, "saturn_scu", "Sega Saturn System Control Unit")
+
+//-------------------------------------------------
+//  saturn_scu_device - constructor
+//-------------------------------------------------
+
+saturn_scu_device::saturn_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SATURN_SCU, tag, owner, clock),
+	m_scudsp(*this, "scudsp"),
+	m_hostcpu(*this, finder_base::DUMMY_TAG)
+{
+}
 
 
 //**************************************************************************
@@ -116,48 +127,38 @@ DEFINE_DEVICE_TYPE(SEGA_SCU, sega_scu_device, "sega_scu", "Sega System Control U
 //map(0x0010, 0x0013) DMA enable
 //map(0x0014, 0x0017) DMA start factor
 
-void sega_scu_device::regs_map(address_map &map)
+void saturn_scu_device::regs_map(address_map &map)
 {
-	map(0x0000, 0x0017).rw(FUNC(sega_scu_device::dma_lv0_r), FUNC(sega_scu_device::dma_lv0_w));
-	map(0x0020, 0x0037).rw(FUNC(sega_scu_device::dma_lv1_r), FUNC(sega_scu_device::dma_lv1_w));
-	map(0x0040, 0x0057).rw(FUNC(sega_scu_device::dma_lv2_r), FUNC(sega_scu_device::dma_lv2_w));
+	map(0x0000, 0x0017).rw(FUNC(saturn_scu_device::dma_lv0_r), FUNC(saturn_scu_device::dma_lv0_w));
+	map(0x0020, 0x0037).rw(FUNC(saturn_scu_device::dma_lv1_r), FUNC(saturn_scu_device::dma_lv1_w));
+	map(0x0040, 0x0057).rw(FUNC(saturn_scu_device::dma_lv2_r), FUNC(saturn_scu_device::dma_lv2_w));
 	// Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
-	map(0x005c, 0x005f).r(FUNC(sega_scu_device::dma_status_r));
-//  map(0x0060, 0x0063).w(FUNC(sega_scu_device::dma_force_stop_w));
-	map(0x007c, 0x007f).r(FUNC(sega_scu_device::dma_status_r));
+	map(0x005c, 0x005f).r(FUNC(saturn_scu_device::dma_status_r));
+//  map(0x0060, 0x0063).w(FUNC(saturn_scu_device::dma_force_stop_w));
+	map(0x007c, 0x007f).r(FUNC(saturn_scu_device::dma_status_r));
 	map(0x0080, 0x0083).rw(m_scudsp, FUNC(scudsp_cpu_device::program_control_r), FUNC(scudsp_cpu_device::program_control_w));
 	map(0x0084, 0x0087).w(m_scudsp, FUNC(scudsp_cpu_device::program_w));
 	map(0x0088, 0x008b).w(m_scudsp, FUNC(scudsp_cpu_device::ram_address_control_w));
 	map(0x008c, 0x008f).rw(m_scudsp, FUNC(scudsp_cpu_device::ram_address_r), FUNC(scudsp_cpu_device::ram_address_w));
-	map(0x0090, 0x0093).w(FUNC(sega_scu_device::t0_compare_w));
-	map(0x0094, 0x0097).w(FUNC(sega_scu_device::t1_setdata_w));
-	map(0x009a, 0x009b).w(FUNC(sega_scu_device::t1_mode_w));
-	map(0x00a0, 0x00a3).rw(FUNC(sega_scu_device::irq_mask_r), FUNC(sega_scu_device::irq_mask_w));
-	map(0x00a4, 0x00a7).rw(FUNC(sega_scu_device::irq_status_r), FUNC(sega_scu_device::irq_status_w));
-//  map(0x00a8, 0x00ab).w(FUNC(sega_scu_device::abus_irqack_w));
-//  map(0x00b0, 0x00b7).rw(FUNC(sega_scu_device::abus_set_r), FUNC(sega_scu_device::abus_set_w));
-//  map(0x00b8, 0x00bb).rw(FUNC(sega_scu_device::abus_refresh_r), FUNC(sega_scu_device::abus_refresh_w));
-//  map(0x00c4, 0x00c7).rw(FUNC(sega_scu_device::sdram_r), FUNC(sega_scu_device::sdram_w));
-	map(0x00c8, 0x00cb).r(FUNC(sega_scu_device::version_r));
+	map(0x0090, 0x0093).w(FUNC(saturn_scu_device::t0_compare_w));
+	map(0x0094, 0x0097).w(FUNC(saturn_scu_device::t1_setdata_w));
+	map(0x009a, 0x009b).w(FUNC(saturn_scu_device::t1_mode_w));
+	map(0x00a0, 0x00a3).rw(FUNC(saturn_scu_device::irq_mask_r), FUNC(saturn_scu_device::irq_mask_w));
+	map(0x00a4, 0x00a7).rw(FUNC(saturn_scu_device::irq_status_r), FUNC(saturn_scu_device::irq_status_w));
+//  map(0x00a8, 0x00ab).w(FUNC(saturn_scu_device::abus_irqack_w));
+//  map(0x00b0, 0x00b7).rw(FUNC(saturn_scu_device::abus_set_r), FUNC(saturn_scu_device::abus_set_w));
+//  map(0x00b8, 0x00bb).rw(FUNC(saturn_scu_device::abus_refresh_r), FUNC(saturn_scu_device::abus_refresh_w));
+//  map(0x00c4, 0x00c7).rw(FUNC(saturn_scu_device::sdram_r), FUNC(saturn_scu_device::sdram_w));
+	map(0x00c8, 0x00cb).r(FUNC(saturn_scu_device::version_r));
 }
 
-//-------------------------------------------------
-//  sega_scu_device - constructor
-//-------------------------------------------------
-
-sega_scu_device::sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEGA_SCU, tag, owner, clock),
-	m_scudsp(*this, "scudsp"),
-	m_hostcpu(*this, finder_base::DUMMY_TAG)
-{
-}
 
 //-------------------------------------------------
 //  add_device_mconfig - device-specific machine
 //  configuration addiitons
 //-------------------------------------------------
 
-uint16_t sega_scu_device::scudsp_dma_r(offs_t offset, uint16_t mem_mask)
+uint16_t saturn_scu_device::scudsp_dma_r(offs_t offset, uint16_t mem_mask)
 {
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = offset;
@@ -168,7 +169,7 @@ uint16_t sega_scu_device::scudsp_dma_r(offs_t offset, uint16_t mem_mask)
 }
 
 
-void sega_scu_device::scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void saturn_scu_device::scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = offset;
@@ -178,12 +179,12 @@ void sega_scu_device::scudsp_dma_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	m_hostspace->write_word(addr, data,mem_mask);
 }
 
-void sega_scu_device::device_add_mconfig(machine_config &config)
+void saturn_scu_device::device_add_mconfig(machine_config &config)
 {
-	SCUDSP(config, m_scudsp, XTAL(57'272'727)/4); // 14 MHz
-	m_scudsp->out_irq_callback().set(DEVICE_SELF, FUNC(sega_scu_device::scudsp_end_w));
-	m_scudsp->in_dma_callback().set(FUNC(sega_scu_device::scudsp_dma_r));
-	m_scudsp->out_dma_callback().set(FUNC(sega_scu_device::scudsp_dma_w));
+	SCUDSP(config, m_scudsp, XTAL(57'272'727) / 4); // 14 MHz
+	m_scudsp->out_irq_callback().set(DEVICE_SELF, FUNC(saturn_scu_device::scudsp_end_w));
+	m_scudsp->in_dma_callback().set(FUNC(saturn_scu_device::scudsp_dma_r));
+	m_scudsp->out_dma_callback().set(FUNC(saturn_scu_device::scudsp_dma_w));
 }
 
 
@@ -191,7 +192,7 @@ void sega_scu_device::device_add_mconfig(machine_config &config)
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void sega_scu_device::device_start()
+void saturn_scu_device::device_start()
 {
 	save_item(NAME(m_ist));
 	save_item(NAME(m_ism));
@@ -235,9 +236,9 @@ void sega_scu_device::device_start()
 
 	m_hostspace = &m_hostcpu->space(AS_PROGRAM);
 
-	m_dma_timer[0] = timer_alloc(FUNC(sega_scu_device::dma_tick<DMALV0_ID>), this);
-	m_dma_timer[1] = timer_alloc(FUNC(sega_scu_device::dma_tick<DMALV1_ID>), this);
-	m_dma_timer[2] = timer_alloc(FUNC(sega_scu_device::dma_tick<DMALV2_ID>), this);
+	m_dma_timer[0] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV0_ID>), this);
+	m_dma_timer[1] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV1_ID>), this);
+	m_dma_timer[2] = timer_alloc(FUNC(saturn_scu_device::dma_tick<DMALV2_ID>), this);
 }
 
 
@@ -245,12 +246,12 @@ void sega_scu_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void sega_scu_device::device_reset()
+void saturn_scu_device::device_reset()
 {
 	m_ism = 0xbfff;
 	m_ist = 0;
 
-	for(int i=0;i<3;i++)
+	for(int i = 0; i < 3; i++)
 	{
 		m_dma[i].start_factor = 7;
 		m_dma_timer[i]->reset();
@@ -264,13 +265,13 @@ void sega_scu_device::device_reset()
 //  device_reset_after_children
 //-------------------------------------------------
 
-void sega_scu_device::device_reset_after_children()
+void saturn_scu_device::device_reset_after_children()
 {
 	m_scudsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 template <int Level>
-TIMER_CALLBACK_MEMBER(sega_scu_device::dma_tick)
+TIMER_CALLBACK_MEMBER(saturn_scu_device::dma_tick)
 {
 	const int irqlevel = Level == 0 ? 5 : 6;
 	const int irqvector = 0x4b - Level;
@@ -281,7 +282,7 @@ TIMER_CALLBACK_MEMBER(sega_scu_device::dma_tick)
 	else
 		m_ist |= (irqmask);
 
-	update_dma_status((uint8_t)Level,false);
+	update_dma_status((uint8_t)Level, false);
 	machine().scheduler().synchronize(); // force resync
 }
 
@@ -293,7 +294,7 @@ TIMER_CALLBACK_MEMBER(sega_scu_device::dma_tick)
 //  DMA
 //**************************************************************************
 
-uint32_t sega_scu_device::dma_common_r(uint8_t offset,uint8_t level)
+uint32_t saturn_scu_device::dma_common_r(uint8_t offset,uint8_t level)
 {
 	switch(offset)
 	{
@@ -315,7 +316,7 @@ uint32_t sega_scu_device::dma_common_r(uint8_t offset,uint8_t level)
 	return 0;
 }
 
-void sega_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
+void saturn_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 {
 	switch(offset)
 	{
@@ -361,15 +362,15 @@ void sega_scu_device::dma_common_w(uint8_t offset,uint8_t level,uint32_t data)
 	}
 }
 
-inline void sega_scu_device::update_dma_status(uint8_t level,bool state)
+inline void saturn_scu_device::update_dma_status(uint8_t level,bool state)
 {
 	if(state)
-		m_status|=(0x10 << 4 * level);
+		m_status |= (0x10 << 4 * level);
 	else
-		m_status&=~(0x10 << 4 * level);
+		m_status &= ~(0x10 << 4 * level);
 }
 
-void sega_scu_device::handle_dma_direct(uint8_t level)
+void saturn_scu_device::handle_dma_direct(uint8_t level)
 {
 	uint32_t tmp_src,tmp_dst,total_size;
 	uint8_t cd_transfer_flag;
@@ -454,7 +455,7 @@ void sega_scu_device::handle_dma_direct(uint8_t level)
 	m_dma_timer[level]->adjust(m_hostcpu->cycles_to_attotime(total_size/4));
 }
 
-void sega_scu_device::handle_dma_indirect(uint8_t level)
+void saturn_scu_device::handle_dma_indirect(uint8_t level)
 {
 	/*Helper to get out of the cycle*/
 	uint8_t job_done = 0;
@@ -526,7 +527,7 @@ void sega_scu_device::handle_dma_indirect(uint8_t level)
 }
 
 
-inline void sega_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift)
+inline void saturn_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,uint8_t *src_shift)
 {
 	uint32_t src_data;
 
@@ -545,7 +546,7 @@ inline void sega_scu_device::dma_single_transfer(uint32_t src, uint32_t dst,uint
 	*src_shift ^= 1;
 }
 
-inline void sega_scu_device::dma_start_factor_ack(uint8_t event)
+inline void saturn_scu_device::dma_start_factor_ack(uint8_t event)
 {
 	int i;
 
@@ -559,14 +560,14 @@ inline void sega_scu_device::dma_start_factor_ack(uint8_t event)
 	}
 }
 
-uint32_t sega_scu_device::dma_lv0_r(offs_t offset)  { return dma_common_r(offset,0); }
-void sega_scu_device::dma_lv0_w(offs_t offset, uint32_t data) { dma_common_w(offset,0,data); }
-uint32_t sega_scu_device::dma_lv1_r(offs_t offset)  { return dma_common_r(offset,1); }
-void sega_scu_device::dma_lv1_w(offs_t offset, uint32_t data) { dma_common_w(offset,1,data); }
-uint32_t sega_scu_device::dma_lv2_r(offs_t offset)  { return dma_common_r(offset,2); }
-void sega_scu_device::dma_lv2_w(offs_t offset, uint32_t data) { dma_common_w(offset,2,data); }
+uint32_t saturn_scu_device::dma_lv0_r(offs_t offset)  { return dma_common_r(offset,0); }
+void saturn_scu_device::dma_lv0_w(offs_t offset, uint32_t data) { dma_common_w(offset,0,data); }
+uint32_t saturn_scu_device::dma_lv1_r(offs_t offset)  { return dma_common_r(offset,1); }
+void saturn_scu_device::dma_lv1_w(offs_t offset, uint32_t data) { dma_common_w(offset,1,data); }
+uint32_t saturn_scu_device::dma_lv2_r(offs_t offset)  { return dma_common_r(offset,2); }
+void saturn_scu_device::dma_lv2_w(offs_t offset, uint32_t data) { dma_common_w(offset,2,data); }
 
-uint32_t sega_scu_device::dma_status_r()
+uint32_t saturn_scu_device::dma_status_r()
 {
 	return m_status;
 }
@@ -575,12 +576,12 @@ uint32_t sega_scu_device::dma_status_r()
 //  Timers
 //**************************************************************************
 
-void sega_scu_device::t0_compare_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void saturn_scu_device::t0_compare_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t0c);
 }
 
-void sega_scu_device::t1_setdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void saturn_scu_device::t1_setdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_t1s);
 }
@@ -589,19 +590,19 @@ void sega_scu_device::t1_setdata_w(offs_t offset, uint32_t data, uint32_t mem_ma
  ---- ---x ---- ---- T1MD Timer 1 mode (0=each line, 1=only at timer 0 lines)
  ---- ---- ---- ---x TENB Timers enable
  */
-void sega_scu_device::t1_mode_w(uint16_t data)
+void saturn_scu_device::t1_mode_w(uint16_t data)
 {
 	m_t1md = BIT(data,8);
 	m_tenb = BIT(data,0);
 }
 
 
-void sega_scu_device::check_scanline_timers(int scanline,int y_step)
+void saturn_scu_device::check_scanline_timers(int scanline, int y_step)
 {
 	if(m_tenb == false)
 		return;
 
-	int timer0_compare = (m_t0c & 0x3ff)*y_step;
+	int timer0_compare = (m_t0c & 0x3ff) * y_step;
 
 	// Timer 0
 	if(scanline == timer0_compare)
@@ -637,23 +638,23 @@ void sega_scu_device::check_scanline_timers(int scanline,int y_step)
 //  Interrupt
 //**************************************************************************
 
-uint32_t sega_scu_device::irq_mask_r()
+uint32_t saturn_scu_device::irq_mask_r()
 {
 	return m_ism;
 }
 
-uint32_t sega_scu_device::irq_status_r()
+uint32_t saturn_scu_device::irq_status_r()
 {
 	return m_ist;
 }
 
-void sega_scu_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void saturn_scu_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ism);
 	test_pending_irqs();
 }
 
-void sega_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void saturn_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(mem_mask != 0xffffffff)
 		logerror("%s IST write %08x with %08x\n",this->tag(),data,mem_mask);
@@ -662,7 +663,7 @@ void sega_scu_device::irq_status_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	test_pending_irqs();
 }
 
-void sega_scu_device::test_pending_irqs()
+void saturn_scu_device::test_pending_irqs()
 {
 	int i;
 	const int irq_level[32] = { 0xf, 0xe, 0xd, 0xc,
@@ -688,7 +689,7 @@ void sega_scu_device::test_pending_irqs()
 	}
 }
 
-void sega_scu_device::vblank_out_w(int state)
+void saturn_scu_device::vblank_out_w(int state)
 {
 	if(!state)
 		return;
@@ -702,7 +703,7 @@ void sega_scu_device::vblank_out_w(int state)
 		m_ist |= (IRQ_VBLANK_OUT);
 }
 
-void sega_scu_device::vblank_in_w(int state)
+void saturn_scu_device::vblank_in_w(int state)
 {
 	if(!state)
 		return;
@@ -716,7 +717,7 @@ void sega_scu_device::vblank_in_w(int state)
 		m_ist |= (IRQ_VBLANK_IN);
 }
 
-void sega_scu_device::hblank_in_w(int state)
+void saturn_scu_device::hblank_in_w(int state)
 {
 	if(!state)
 		return;
@@ -730,7 +731,7 @@ void sega_scu_device::hblank_in_w(int state)
 		m_ist |= (IRQ_HBLANK_IN);
 }
 
-void sega_scu_device::vdp1_end_w(int state)
+void saturn_scu_device::vdp1_end_w(int state)
 {
 	if(!state)
 		return;
@@ -744,7 +745,7 @@ void sega_scu_device::vdp1_end_w(int state)
 		m_ist |= (IRQ_VDP1_END);
 }
 
-void sega_scu_device::sound_req_w(int state)
+void saturn_scu_device::sound_req_w(int state)
 {
 	if(!state)
 		return;
@@ -758,7 +759,7 @@ void sega_scu_device::sound_req_w(int state)
 		m_ist |= (IRQ_SOUND_REQ);
 }
 
-void sega_scu_device::smpc_irq_w(int state)
+void saturn_scu_device::smpc_irq_w(int state)
 {
 	if(!state)
 		return;
@@ -769,7 +770,7 @@ void sega_scu_device::smpc_irq_w(int state)
 		m_ist |= (IRQ_SMPC);
 }
 
-void sega_scu_device::scudsp_end_w(int state)
+void saturn_scu_device::scudsp_end_w(int state)
 {
 	if(!state)
 		return;
@@ -785,7 +786,7 @@ void sega_scu_device::scudsp_end_w(int state)
 //  Miscellanea
 //**************************************************************************
 
-uint32_t sega_scu_device::version_r()
+uint32_t saturn_scu_device::version_r()
 {
 	return 4; // correct for stock Saturn at least
 }

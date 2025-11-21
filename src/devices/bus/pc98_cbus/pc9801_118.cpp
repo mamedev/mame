@@ -33,7 +33,7 @@ TODO:
 #define XTAL_5B 24.576_MHz_XTAL
 #define XTAL_5D 33.8688_MHz_XTAL
 
-DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118")
+DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118 sound card")
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)

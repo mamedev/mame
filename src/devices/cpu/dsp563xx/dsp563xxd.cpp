@@ -17,7 +17,7 @@ u32 dsp563xx_disassembler::opcode_alignment() const
 
 offs_t dsp563xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-    u32 opcode = opcodes.r32(pc);
+    u32 opcode = opcodes.r32(pc) & 0xffffff;
     u8 kmove = t_move[opcode >> 8];
     u8 knpar = kmove || opcode >= 0x100000 ? 0 : t_npar[opcode];
     u8 kipar = knpar ? 0 : t_ipar[opcode & 0xff];

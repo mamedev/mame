@@ -267,7 +267,7 @@ uint8_t pc88va_state::fake_subfdc_r()
 	return machine().rand();
 }
 
-uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
+uint8_t pc88va_state::fdc_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		LOGFDC("Unhandled read $%04x\n", (offset << 1) + 0x1b0);
@@ -285,7 +285,7 @@ uint8_t pc88va_state::pc88va_fdc_r(offs_t offset)
 	return 0xff;
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
+TIMER_CALLBACK_MEMBER(pc88va_state::fdc_timer)
 {
 	if(m_xtmask)
 	{
@@ -296,17 +296,13 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 	m_fdc_timer->adjust(attotime::from_msec(100));
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_0)
+template <unsigned N>
+TIMER_CALLBACK_MEMBER(pc88va_state::fdc_motor_start)
 {
-	m_fdd[0]->get_device()->mon_w(0);
+	m_fdd[N]->get_device()->mon_w(0);
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
-{
-	m_fdd[1]->get_device()->mon_w(0);
-}
-
-void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
+void pc88va_state::fdc_update_ready(floppy_image_device *, int)
 {
 	if (!BIT(m_fdc_ctrl_2, 5))
 		return;
@@ -335,7 +331,7 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 		m_fdc->set_ready_line_connected(1);
 }
 
-void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
+void pc88va_state::fdc_w(offs_t offset, uint8_t data)
 {
 	switch(offset << 1)
 	{
@@ -375,7 +371,9 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 			//m_fdd[0]->get_device()->ds_w(!BIT(data, 4));
 			//m_fdd[1]->get_device()->ds_w(!BIT(data, 4));
 
-			// TODO: is this correct? sounds more like a controller clock change, while TD1/TD0 should do the rate change
+			// TODO: needs source xtal for 4.8 MHz
+			// 8 MHz just uses MASTER_CLOCK
+			m_fdc->set_unscaled_clock(clk ? 7'987'200 : 4'792'320);
 			m_fdc->set_rate(clk ? 500000 : 250000);
 			break;
 		}
@@ -456,7 +454,7 @@ void pc88va_state::pc88va_fdc_w(offs_t offset, uint8_t data)
 
 			//m_fdd[0]->get_device()->mon_w(!(BIT(data, 5)));
 
-			pc88va_fdc_update_ready(nullptr, 0);
+			fdc_update_ready(nullptr, 0);
 
 			break;
 		}
@@ -777,7 +775,7 @@ void pc88va_state::io_map(address_map &map)
 	map(0x019a, 0x019b).w(FUNC(pc88va_state::backupram_wp_0_w)); //Backup RAM write permission
 //  map(0x01a0, 0x01a7) V50 TCU
 	map(0x01a8, 0x01a8).w(FUNC(pc88va_state::timer3_ctrl_reg_w)); // General-purpose timer 3 control port
-	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::pc88va_fdc_r), FUNC(pc88va_state::pc88va_fdc_w)).umask16(0x00ff); // FDC related (765)
+	map(0x01b0, 0x01b7).rw(FUNC(pc88va_state::fdc_r), FUNC(pc88va_state::fdc_w)).umask16(0x00ff); // FDC related (765)
 	map(0x01b8, 0x01bb).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
 //  map(0x01c0, 0x01c1) keyboard scan code, polled thru IRQ1 ...
 	map(0x01c1, 0x01c1).lr8(NAME([this] () { return m_keyb.data; }));
@@ -1339,11 +1337,11 @@ void pc88va_state::machine_start()
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	m_fdc_timer = timer_alloc(FUNC(pc88va_state::pc88va_fdc_timer), this);
+	m_fdc_timer = timer_alloc(FUNC(pc88va_state::fdc_timer), this);
 	m_fdc_timer->adjust(attotime::never);
 
-	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_0), this);
-	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::pc88va_fdc_motor_start_1), this);
+	m_motor_start_timer[0] = timer_alloc(FUNC(pc88va_state::fdc_motor_start<0>), this);
+	m_motor_start_timer[1] = timer_alloc(FUNC(pc88va_state::fdc_motor_start<1>), this);
 	m_motor_start_timer[0]->adjust(attotime::never);
 	m_motor_start_timer[1]->adjust(attotime::never);
 
@@ -1353,11 +1351,11 @@ void pc88va_state::machine_start()
 	floppy_image_device *floppy;
 	floppy = m_fdd[0]->get_device();
 	if(floppy)
-		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::fdc_update_ready, this));
 
 	floppy = m_fdd[1]->get_device();
 	if(floppy)
-		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::fdc_update_ready, this));
 
 	m_fdd[0]->get_device()->set_rpm(300);
 	m_fdd[1]->get_device()->set_rpm(300);
@@ -1381,6 +1379,7 @@ void pc88va_state::machine_reset()
 
 	m_fdc_mode = 0;
 	m_xtmask = false;
+	m_fdc->set_unscaled_clock(4'792'320);
 
 	// shinraba never write to port $32,
 	// and it expects that the sound irq actually runs otherwise it enters in debug mode
@@ -1479,7 +1478,8 @@ void pc88va_state::pc88va(machine_config &config)
 
 	pc88va_sasi(config);
 
-	UPD765A(config, m_fdc, 4000000, true, true);
+	// switchable between 8 and 4.8 MHz
+	UPD765A(config, m_fdc, 4'792'320, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(pc88va_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>));
 	FLOPPY_CONNECTOR(config, m_fdd[0], pc88va_floppies, "525hd", pc88va_state::floppy_formats).enable_sound(true);

@@ -30,7 +30,7 @@ TODO:
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K")
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K sound card")
 
 pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_26, tag, owner, clock)

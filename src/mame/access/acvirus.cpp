@@ -79,6 +79,10 @@
 
 #include "virusa.lh"
 #include "virusb.lh"
+#include "virusc.lh"
+#include "viruscl.lh"
+#include "virusrck.lh"
+#include "virusrckxl.lh"
 
 
 namespace {
@@ -108,6 +112,9 @@ public:
 	void virusa(machine_config &config) ATTR_COLD;
 	void virusb(machine_config &config) ATTR_COLD;
 	void virusc(machine_config &config) ATTR_COLD;
+	void viruscl(machine_config &config) ATTR_COLD;
+	void virusrck(machine_config &config) ATTR_COLD;
+	void virusrckxl(machine_config &config) ATTR_COLD;
 
 	void init_virus() ATTR_COLD;
 
@@ -204,6 +211,7 @@ u8 acvirus_state::p4_r()
 void acvirus_state::p4_w(u8 data)
 {
 	m_leds->write_mx(data);
+	// logerror("LED write_mx data: %02X\n", data);
 
 	if (BIT(m_scan, 3))
 		m_led_pattern = data;
@@ -218,6 +226,7 @@ void acvirus_state::p5_w(u8 data)
 
 	m_scan = data & 15;
 	m_leds->matrix(1 << m_scan, m_led_pattern);
+	// logerror("LED matrix: %d pattern: %02X\n", m_scan, m_led_pattern);
 }
 
 void acvirus_state::prog_map(address_map &map)
@@ -305,7 +314,7 @@ void acvirus_state::virus_common(machine_config &config)
 	HD44780(config, m_lcdc, 270000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 16);
 
-	PWM_DISPLAY(config, m_leds).set_size(8, 8);
+	PWM_DISPLAY(config, m_leds).set_size(16, 8);
 
 	SPEAKER(config, "speaker", 2).front();
 }
@@ -355,9 +364,26 @@ void acvirus_state::virusc(machine_config &config)
 	m_dsp->set_hard_omr(0xe);
 
 	PALETTE(config, "palette", FUNC(acvirus_state::red_palette_init), 2);
-	// TODO: config.set_default_layout(layout_virusc);
+	config.set_default_layout(layout_virusc);
 }
 
+void acvirus_state::viruscl(machine_config &config)
+{
+	virusb(config);
+	config.set_default_layout(layout_viruscl);
+}
+
+void acvirus_state::virusrck(machine_config &config)
+{
+	virusb(config);
+	config.set_default_layout(layout_virusrck);
+}
+
+void acvirus_state::virusrckxl(machine_config &config)
+{
+	virusc(config);
+	config.set_default_layout(layout_virusrckxl);
+}
 
 INPUT_PORTS_START( virusa_knobs )
 	PORT_START("knob_0")
@@ -499,7 +525,7 @@ INPUT_PORTS_START( virusc_knobs )
 	PORT_ADJUSTER(64, "Osc: Wave Sel / PW") PORT_MINMAX(0, 127)
 
 	PORT_START("knob_13")
-	PORT_ADJUSTER(64, "Osc: Detune") PORT_MINMAX(0, 127)
+	PORT_ADJUSTER(64, "Osc: Detune 2/3") PORT_MINMAX(0, 127)
 
 	PORT_START("knob_14")
 	PORT_ADJUSTER(64, "Osc: FM Amount") PORT_MINMAX(0, 127)
@@ -674,23 +700,23 @@ static INPUT_PORTS_START( virusc )
 	PORT_INCLUDE( virusc_knobs )
 
 	PORT_START("ROW0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_1) PORT_NAME("ArpEdit")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_2) PORT_NAME("ModFxEdit")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_3) PORT_NAME("DelayEdit") // hold at boot: RAM test & key test
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_4) PORT_NAME("ArpSwitch")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_5) PORT_NAME("ModFxSelect")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_6) PORT_NAME("LFO: Edit")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_7) PORT_NAME("LFO: Amount")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_1) PORT_NAME("Arp: Edit")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_2) PORT_NAME("Effects: Edit")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_3) PORT_NAME("Delay: Edit") // hold at boot: RAM test & key test
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_4) PORT_NAME("Arp: On")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_5) PORT_NAME("Effects: Select")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_6) PORT_NAME("LFOs/Mod: Edit")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_7) PORT_NAME("LFOs/Mod: Amount")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("ROW1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_8) PORT_NAME("LFO: Select")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_9) PORT_NAME("LFO: Shape")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_0) PORT_NAME("Edit")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Q) PORT_NAME("Global")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_W) PORT_NAME("OSC: Edit")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_E) PORT_NAME("Sync")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_NAME("OSC 1: Select")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_8) PORT_NAME("LFOs/Mod: Select")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_9) PORT_NAME("LFOs/Mod: Shape")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_0) PORT_NAME("Edit")//?
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Q) PORT_NAME("Global")//?
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_W) PORT_NAME("Osc: Edit")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_E) PORT_NAME("Osc: Sync")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_R) PORT_NAME("Osc 1: Select")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("ROW2")
@@ -704,7 +730,7 @@ static INPUT_PORTS_START( virusc )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("ROW3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_A) PORT_NAME("OSC 2: Select")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_A) PORT_NAME("Osc 2: Select")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_S) PORT_NAME("Part -")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_D) PORT_NAME("Parameter <")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_F) PORT_NAME("Value -")
@@ -714,9 +740,9 @@ static INPUT_PORTS_START( virusc )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("ROW4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_K) PORT_NAME("OSC 3: Select")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_L) PORT_NAME("OSC 3: Switch")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Z) PORT_NAME("Filter Edit")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_K) PORT_NAME("Osc 3: Select")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_L) PORT_NAME("Osc 3 On")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_Z) PORT_NAME("Filters: Edit")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_X) PORT_NAME("Filter 1 Mode") // hold at boot: "GlobalBuff checks"
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_C) PORT_NAME("Filter 2 Mode")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_CODE(KEYCODE_V) PORT_NAME("Filter 1 Select")
@@ -820,6 +846,6 @@ ROM_END
 SYST( 1997, virusa,     0, 0, virusa, virusa, acvirus_state, empty_init, "Access", "Virus A", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 1999, virusb,     0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus B (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 SYST( 2002, virusc,     0, 0, virusc, virusc, acvirus_state, empty_init, "Access", "Virus C", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2001, virusrck,   0, 0, virusb, virusrck, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2002, virusrckxl, 0, 0, virusc, virusrck, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-SYST( 2004, viruscl,    0, 0, virusb, virusb, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2001, virusrck,   0, 0, virusrck, virusrck, acvirus_state, empty_init, "Access", "Virus Rack (Ver. T)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2002, virusrckxl, 0, 0, virusrckxl, virusrck, acvirus_state, empty_init, "Access", "Virus Rack XL", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+SYST( 2004, viruscl,    0, 0, viruscl, virusb, acvirus_state, empty_init, "Access", "Virus Classic", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

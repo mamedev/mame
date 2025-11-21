@@ -41,9 +41,11 @@ the 286 based Tandy 1000 TL/2, TL/3, RLX, RLX-B and the 8086 based Tandy 1000RL 
 used XTA (8-bit IDE) hard disks.
 
 TODO:
-* The Tandy 1000 did not have a built-in DMA controller - the DMA
-  controller was supplied on a memory expansion board if present.  With
-  the base 128K RAM, the DMA controller should not be present.
+* The Tandy 1000, 1000A and 1000 HX did not have a built-in DMA
+  controller - the DMA controller was supplied on a memory expansion
+  board if present.  With the base 128K or 256K RAM, the DMA controller
+  should not be present.  If the BIOS detects additional RAM, it will
+  assume the DMA controller is present and fail to boot if it isn't.
 * The original Tandy 1000 used an 8255 PPI for the keyboard interface
   before it was integrated into a custom chip for the Tandy 1000A.
 * Wait states when accessing the sound chip.
@@ -53,7 +55,6 @@ TODO:
 * Correct clock frequencies for later models.
 * "Export" models (different clock crystals, probably different video
   timings).
-* Tandy 1000A control port 3DD.
 * Correct DIP switches/jumpers for each model.
 * Properly combine interrupt/DMA signals from ISA but and onboard
   peripherals.
@@ -77,6 +78,8 @@ TODO:
 
 #include "screen.h"
 #include "softlist_dev.h"
+
+#include "endianness.h"
 
 
 DECLARE_DEVICE_TYPE(T1000_MOTHERBOARD, t1000_mb_device)
@@ -175,7 +178,6 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_isa_slots(*this, "isa%u", 1U)
 		, m_plus_slot(*this, "plus")
-		, m_vram_bank(0)
 	{
 	}
 
@@ -247,6 +249,11 @@ private:
 	void tandy1000hx_eeprom_w(uint8_t data);
 	void tandy1000_set_bios_bank();
 
+	uint8_t vga_vram8_r(offs_t offset);
+	uint16_t vga_vram16_r(offs_t offset);
+	void vga_vram8_w(offs_t offset, uint8_t data);
+	void vga_vram16_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	TIMER_CALLBACK_MEMBER(update_clock);
 
 	DECLARE_MACHINE_RESET(tandy1000rl);
@@ -254,16 +261,16 @@ private:
 	static void cfg_fdc_35(device_t *device) ATTR_COLD;
 	static void cfg_fdc_525(device_t *device) ATTR_COLD;
 
-	void tandy1000_16_io(address_map &map) ATTR_COLD;
-	void tandy1000_286_map(address_map &map) ATTR_COLD;
-	void tandy1000_286_bank_map(address_map &map) ATTR_COLD;
-	void tandy1000_bank_io(address_map &map) ATTR_COLD;
-	void tandy1000_bank_map(address_map &map) ATTR_COLD;
+	void tandy1000_map(address_map &map) ATTR_COLD;
 	void tandy1000_io(address_map &map) ATTR_COLD;
 	void tandy1000x_io(address_map &map) ATTR_COLD;
 	void tandy1000hx_io(address_map &map) ATTR_COLD;
-	void tandy1000_map(address_map &map) ATTR_COLD;
+	void tandy1000_bank_map(address_map &map) ATTR_COLD;
+	void tandy1000_16_io(address_map &map) ATTR_COLD;
+	void tandy1000_bank_io(address_map &map) ATTR_COLD;
 	void tandy1000tx_io(address_map &map) ATTR_COLD;
+	void tandy1000_286_map(address_map &map) ATTR_COLD;
+	void tandy1000_286_bank_map(address_map &map) ATTR_COLD;
 };
 
 /* tandy 1000 eeprom
@@ -561,6 +568,29 @@ void tandy1000_state::tandy1000_set_bios_bank()
 	m_biosbank->set_entry(bank & 0x07);
 }
 
+
+uint8_t tandy1000_state::vga_vram8_r(offs_t offset)
+{
+	return util::little_endian_cast<uint8_t>(reinterpret_cast<uint16_t *>(m_ram->pointer()))[offset];
+}
+
+uint16_t tandy1000_state::vga_vram16_r(offs_t offset)
+{
+	return little_endianize_int16(reinterpret_cast<uint16_t *>(m_ram->pointer())[offset]);
+}
+
+void tandy1000_state::vga_vram8_w(offs_t offset, uint8_t data)
+{
+	util::little_endian_cast<uint8_t>(reinterpret_cast<uint16_t *>(m_ram->pointer()))[offset] = data;
+}
+
+void tandy1000_state::vga_vram16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = little_endianize_int16(data);
+	COMBINE_DATA(&reinterpret_cast<uint16_t *>(m_ram->pointer())[offset]);
+}
+
+
 TIMER_CALLBACK_MEMBER(tandy1000_state::update_clock)
 {
 	// FIXME: correct clocks for later models
@@ -585,24 +615,47 @@ MACHINE_RESET_MEMBER(tandy1000_state, tandy1000rl)
 
 void tandy1000_state::machine_start()
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128 * 1024) - 1, &m_ram->pointer()[128 * 1024]);
-	if (m_maincpu->space(AS_PROGRAM).data_width() == 8)
+	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
+	address_space &vram_space = m_video->space(0);
+
+	if (m_ram->size() > (128 * 1024))
+		mem_space.install_ram(0, m_ram->size() - (128 * 1024) - 1, &m_ram->pointer()[128 * 1024]);
+	if (mem_space.data_width() == 8)
 	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
+		mem_space.install_readwrite_handler(
 				m_ram->size() - (128*1024), 640*1024 - 1,
 				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)),
 				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)));
 	}
 	else
 	{
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(
+		assert(mem_space.data_width() == 16);
+		mem_space.install_readwrite_handler(
 				m_ram->size() - (128*1024), 640*1024 - 1,
 				read8sm_delegate(*this, FUNC(tandy1000_state::vram_r)),
 				write8sm_delegate(*this, FUNC(tandy1000_state::vram_w)),
 				0xffff);
 	}
 
-	m_video->space(0).install_ram(0, (128 * 1024) - 1, &m_ram->pointer()[0]);
+	if ((mem_space.data_width() == vram_space.data_width()) || (util::endianness::native == util::endianness::little))
+	{
+		m_video->space(0).install_ram(0, (128 * 1024) - 1, &m_ram->pointer()[0]);
+	}
+	else if (vram_space.data_width() == 8)
+	{
+		m_video->space(0).install_readwrite_handler(
+				0, (128 * 1024) - 1,
+				read8sm_delegate(*this, FUNC(tandy1000_state::vga_vram8_r)),
+				write8sm_delegate(*this, FUNC(tandy1000_state::vga_vram8_w)));
+	}
+	else
+	{
+		assert(vram_space.data_width() == 16);
+		m_video->space(0).install_readwrite_handler(
+				0, (128 * 1024) - 1,
+				read16sm_delegate(*this, FUNC(tandy1000_state::vga_vram16_r)),
+				write16s_delegate(*this, FUNC(tandy1000_state::vga_vram16_w)));
+	}
 
 	if (subdevice<nvram_device>("nvram"))
 		subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
@@ -777,17 +830,6 @@ void tandy1000_state::tandy1000_286_bank_map(address_map &map)
 	map(0xf0000, 0xfffff).rom().region("rom", 0x70000);
 }
 
-static const gfx_layout t1000_charlayout =
-{
-	8, 16,
-	256,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 2048, 4096, 6144, 8192, 10240, 12288, 14336, 16384, 18432, 20480, 22528, 24576, 26624, 28672, 30720 },
-	8
-};
-
 
 void tandy1000_state::cfg_fdc_35(device_t *device)
 {
@@ -802,10 +844,6 @@ void tandy1000_state::cfg_fdc_525(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
-static GFXDECODE_START( gfx_t1000 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
-GFXDECODE_END
-
 void tandy1000_state::tandy1000_common(machine_config &config)
 {
 	// FIXME: pass correct clocks in
@@ -814,13 +852,6 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 	m_mb->set_cputag(m_maincpu);
 	m_mb->int_callback().set_inputline(m_maincpu, 0);
 	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-
-	/* video hardware */
-	PCVIDEO_T1000(config, m_video, 0);
-	m_video->set_screen("pcvideo_t1000:screen");
-	m_video->set_chr_gen_tag("gfx1");
-
-	GFXDECODE(config, "gfxdecode", m_video, gfx_t1000);
 
 	/* sound hardware */
 	NCR8496(config, "sn76496", XTAL(14'318'181) / 4).add_route(ALL_OUTPUTS, "mb:mono", 0.80);
@@ -858,6 +889,9 @@ void tandy1000_state::t1000x(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000x_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
+	PCVIDEO_T1000X(config, m_video, 0);
+	m_video->set_screen("pcvideo_t1000:screen");
+
 	tandy1000_common(config);
 
 	tandy1000_90key(config);
@@ -870,6 +904,9 @@ void tandy1000_state::t1000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_map);
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	PCVIDEO_T1000(config, m_video, 0);
+	m_video->set_screen("pcvideo_t1000:screen");
 
 	tandy1000_common(config);
 
@@ -924,6 +961,9 @@ void tandy1000_state::t1000rl(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_bank_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
+	PCVIDEO_T1000X(config, m_video, 0);
+	m_video->set_screen("pcvideo_t1000:screen");
+
 	tandy1000_common(config);
 
 	tandy1000_101key(config);
@@ -956,6 +996,9 @@ void tandy1000_state::t1000tl2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_286_map);
 	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_16_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	PCVIDEO_T1000X(config, m_video, 0);
+	m_video->set_screen("pcvideo_t1000:screen");
 
 	tandy1000_common(config);
 
@@ -999,8 +1042,7 @@ ROM_START( t1000a )
 	ROM_LOAD("t1000hx.e0", 0x00000, 0x10000, CRC(61dbf242) SHA1(555b58d8aa8e0b0839259621c44b832d993beaef))  // not sure about this one
 	ROM_LOAD("v010100.f0", 0x10000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9))
 
-	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
+	// character ROM is internal to VIDEO-ARRAY at U50
 ROM_END
 
 ROM_START( t1000ex )
@@ -1014,9 +1056,7 @@ ROM_START( t1000ex )
 	ROM_REGION(0x400, "kbdc", 0)
 	ROM_LOAD("8048.u8", 0x000, 0x400, NO_DUMP)
 
-	// Most likely part of big blue at u28
-	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u28", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
+	// character ROM most likely part of big blue at u28
 ROM_END
 
 // The T1000SL and T1000SL/2 only differ in amount of RAM installed and BIOS version (SL/2 has v01.04.04)
@@ -1038,8 +1078,7 @@ ROM_START( t1000sl )
 	ROM_SYSTEM_BIOS( 3, "v020001", "v020001" )
 	ROMX_LOAD("v020001.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(3) )
 
-	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u25", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
+	// character ROM location?  U25?
 ROM_END
 
 
@@ -1061,8 +1100,7 @@ ROM_START( t1000tl )
 	ROM_REGION(0x80, "eeprom", 0)
 	ROM_LOAD("8040346_9346.u12", xxx ) // 64x16 eeprom
 
-	ROM_REGION(0x08000, "gfx1", 0)
-	ROM_LOAD("8079027.u24", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
+	// character ROM location?  U24?
 ROM_END
 #endif
 
@@ -1075,9 +1113,7 @@ ROM_START( t1000 )
 	ROM_SYSTEM_BIOS( 1, "v010100", "v010100" )
 	ROMX_LOAD("v010100.f0", 0x10000, 0x10000, CRC(b6760881) SHA1(8275e4c48ac09cf36685db227434ca438aebe0b9), ROM_BIOS(1))
 
-	// Part of VIDEO-ARRAY at U76
-	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u76", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
+	// character ROM is part of VIDEO-ARRAY at U76
 ROM_END
 
 ROM_START( t1000hx )
@@ -1088,8 +1124,7 @@ ROM_START( t1000hx )
 	ROM_REGION(0x400, "kbdc", 0)
 	ROM_LOAD("8048.u9", 0x000, 0x400, NO_DUMP)
 
-	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u31", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // internal to BIGBLUE at U31
+	// character ROM is internal to BIGBLUE at U31
 
 	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASE00)
 ROM_END
@@ -1098,9 +1133,7 @@ ROM_START( t1000sx )
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_LOAD("8040328.u41", 0x18000, 0x8000, CRC(4e2b9f0b) SHA1(e79a9ed9e885736e30d9b135557f0e596ce5a70b))
 
-	// Part of BIGBLUE at U30
-	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u30", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450))
+	// character ROM is part of BIGBLUE at U30
 ROM_END
 
 
@@ -1110,10 +1143,8 @@ ROM_START( t1000tx )
 	// The machine already boots up with just this one rom
 	ROM_LOAD("t1000tx.bin", 0x18000, 0x8000, BAD_DUMP CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
 
-	// No character rom is listed in the schematics?
-	// It is most likely part of the big blue chip at u36
-	ROM_REGION(0x08000,"gfx1", 0)
-	ROM_LOAD("8079027.u36", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
+	// No character ROM is listed in the schematics?
+	// It is most likely part of the big blue chip at U36
 ROM_END
 
 
@@ -1125,7 +1156,7 @@ ROM_START( t1000rl )
 	ROM_LOAD("8079073.u23", 0x00000, 0x80000, CRC(6fab50f7) SHA1(2ccc02bee4c250dc1b7c17faef2590bc158860b0) )
 
 	ROM_REGION(0x08000,"gfx1", 0)
-	/* Character rom located at U3 w/label "8079027 // NCR // 609-2495004 // F841030 A9025" */
+	/* Character ROM located at U3 w/label "8079027 // NCR // 609-2495004 // F841030 A9025" */
 	ROM_LOAD("8079027.u3", 0x00000, 0x04000, CRC(33d64a11) SHA1(b63da2a656b6c0a8a32f2be8bdcb51aed983a450)) // TODO: Verify location
 ROM_END
 
@@ -1175,8 +1206,8 @@ ROM_END
 COMP( 1984, t1000,    ibm5150, 0,      t1000,    t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000",      0 )
 COMP( 1987, t1000hx,  ibm5150, 0,      t1000hx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 HX",   0 )
 COMP( 1987, t1000sx,  ibm5150, 0,      t1000sx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SX",   0 )
-COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   0 )
-COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   0 )
-COMP( 1988, t1000tl,  ibm5150, 0,      t1000tl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL",   0 )
-COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", 0 )
-COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", 0 )
+COMP( 1987, t1000tx,  ibm5150, 0,      t1000tx,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TX",   MACHINE_NOT_WORKING )
+COMP( 1989, t1000rl,  ibm5150, 0,      t1000rl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 RL",   MACHINE_NOT_WORKING )
+COMP( 1988, t1000tl,  ibm5150, 0,      t1000tl,  t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL",   MACHINE_NOT_WORKING )
+COMP( 1989, t1000tl2, ibm5150, 0,      t1000tl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 TL/2", MACHINE_NOT_WORKING )
+COMP( 1988, t1000sl2, ibm5150, 0,      t1000sl2, t1000, tandy1000_state, empty_init, "Tandy Radio Shack", "Tandy 1000 SL/2", MACHINE_NOT_WORKING )

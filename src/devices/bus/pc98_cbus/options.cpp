@@ -17,6 +17,7 @@
 #include "mpu_pc98.h"
 #include "sb16_ct2720.h"
 #include "sound.h"
+#include "speakboard.h"
 #include "wavestar.h"
 
 void pc98_cbus_devices(device_slot_interface &device)
@@ -28,12 +29,12 @@ void pc98_cbus_devices(device_slot_interface &device)
 	device.option_add("pc9801_55l", PC9801_55L);
 	device.option_add("pc9801_86",  PC9801_86);
 	device.option_add("pc9801_118", PC9801_118);
-	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
 
 //  Spark Board
 	device.option_add("amd98",      AMD98);
 	device.option_add("mpu_pc98",   MPU_PC98);
 	device.option_add("sb16",       SB16_CT2720);
+	device.option_add("speakboard", SPEAKBOARD);
 	device.option_add("wavestar",   QVISION_WAVESTAR);
 
 	// File Bay
