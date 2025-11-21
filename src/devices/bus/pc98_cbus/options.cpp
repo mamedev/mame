@@ -10,6 +10,7 @@
 #include "pc9801_02.h"
 #include "pc9801_14.h"
 #include "pc9801_26.h"
+#include "pc9801_27.h"
 #include "pc9801_55.h"
 #include "pc9801_86.h"
 #include "pc9801_118.h"
@@ -25,6 +26,7 @@ void pc98_cbus_devices(device_slot_interface &device)
 	// official HW
 	device.option_add("pc9801_14",  PC9801_14);
 	device.option_add("pc9801_26",  PC9801_26);
+	device.option_add("pc9801_27",  PC9801_27);
 	device.option_add("pc9801_55u", PC9801_55U);
 	device.option_add("pc9801_55l", PC9801_55L);
 	device.option_add("pc9801_86",  PC9801_86);
@@ -67,6 +69,7 @@ void pc98_cbus_ram_devices(device_slot_interface &device)
 // TODO: add just a subset for now, all needs to be verified if compatible with C-Bus.
 void pc88va_cbus_devices(device_slot_interface &device)
 {
+	device.option_add("pc9801_27",  PC9801_27);
 //	device.option_add("pc9801_55u", PC9801_55U);
 //	device.option_add("pc9801_55l", PC9801_55L);
 	device.option_add("mif_201",    MIF201);

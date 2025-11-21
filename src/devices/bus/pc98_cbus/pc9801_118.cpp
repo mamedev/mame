@@ -166,12 +166,12 @@ void pc9801_118_device::io_map(address_map &map)
 	map(0xa460, 0xa460).rw(FUNC(pc9801_118_device::id_r), FUNC(pc9801_118_device::ext_w));
 }
 
-uint8_t pc9801_118_device::id_r(offs_t offset)
+u8 pc9801_118_device::id_r(offs_t offset)
 {
 	return 0x80 | (m_ext_reg & 1);
 }
 
-void pc9801_118_device::ext_w(offs_t offset, uint8_t data)
+void pc9801_118_device::ext_w(offs_t offset, u8 data)
 {
 	m_ext_reg = BIT(data, 0);
 	if (m_ext_reg)

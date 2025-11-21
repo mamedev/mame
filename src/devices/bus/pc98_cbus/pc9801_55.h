@@ -41,14 +41,14 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	// optional information overrides
+
 //  virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
-	virtual uint8_t dack_r(int line) override;
-	virtual void dack_w(int line, uint8_t data) override;
+	virtual u8 dack_r(int line) override;
+	virtual void dack_w(int line, u8 data) override;
 
 private:
 	required_device<nscsi_bus_device> m_scsi_bus;

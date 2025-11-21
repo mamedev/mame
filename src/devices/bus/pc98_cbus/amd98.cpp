@@ -173,13 +173,13 @@ void amd98_device::io_map(address_map &map)
 	);
 }
 
-void amd98_device::ay3_address_w(uint8_t data)
+void amd98_device::ay3_address_w(u8 data)
 {
 	LOGLATCH("AMD-98 AY3 latch %02x\n", data);
 	m_ay3_latch = data;
 }
 
-void amd98_device::ay3_data_latch_w(uint8_t data)
+void amd98_device::ay3_data_latch_w(u8 data)
 {
 	// TODO: actually goes 0 -> 1 -> 0
 	// TODO: thexder is the odd one: uses 0x00 -> 0x40 -> 0x47 (address) -> 0x40 -> 0x40 -> 0x43 (data) -> 0x40

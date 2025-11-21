@@ -104,7 +104,7 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	m_opna->add_route(1, "speaker", 0.50, 0);
 	m_opna->add_route(2, "speaker", 0.50, 1);
 
-	// 2x burr brown pcm61p
+	// 2x Burr-Brown pcm61p
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 

@@ -33,7 +33,6 @@
 #include "machine/upd765.h"
 
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 
@@ -68,7 +67,6 @@
 #include "formats/nfd_dsk.h"
 
 #define RTC_TAG      "rtc"
-#define SASIBUS_TAG  "sasi"
 
 #define ATTRSEL_REG 0
 #define WIDTH40_REG 2
@@ -148,10 +146,6 @@ public:
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
-		, m_sasibus(*this, SASIBUS_TAG)
-		, m_sasi_data_out(*this, "sasi_data_out")
-		, m_sasi_data_in(*this, "sasi_data_in")
-		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
 	{
 	}
 
@@ -181,10 +175,6 @@ protected:
 	required_device<pic8259_device> m_pic2;
 private:
 	required_device<pc98_memsw_device> m_memsw;
-	optional_device<scsi_port_device> m_sasibus;
-	optional_device<output_latch_device> m_sasi_data_out;
-	optional_device<input_buffer_device> m_sasi_data_in;
-	optional_device<input_buffer_device> m_sasi_ctrl_in;
 
 //  Infrastructure declaration
 protected:
@@ -195,7 +185,6 @@ protected:
 	void config_keyboard(machine_config &config);
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
-	void pc9801_sasi(machine_config &config);
 	void pc9801_common(machine_config &config);
 	void config_floppy_525hd(machine_config &config);
 	void config_floppy_35hd(machine_config &config);
@@ -219,13 +208,6 @@ private:
 	void nmi_ctrl_w(offs_t offset, uint8_t data);
 
 	u8 ppi_sys_portb_r();
-
-	void sasi_data_w(uint8_t data);
-	uint8_t sasi_data_r();
-	void write_sasi_io(int state);
-	void write_sasi_req(int state);
-	uint8_t sasi_status_r();
-	void sasi_ctrl_w(uint8_t data);
 
 	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
 
@@ -333,11 +315,6 @@ private:
 	uint8_t m_gfx_ff = 0;
 	uint8_t m_txt_scroll_reg[8]{};
 	uint8_t m_pal_clut[4]{};
-
-//  SASI
-	uint8_t m_sasi_data = 0;
-	int m_sasi_data_enable = 0;
-	uint8_t m_sasi_ctrl = 0;
 
 //  Mouse
 protected:
