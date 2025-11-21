@@ -410,7 +410,7 @@ protected:
 	uint8_t tmap1_regs_r(offs_t offset);
 	uint8_t tmap2_regs_r(offs_t offset);
 
-	uint8_t spriteregs_r(void);
+	uint8_t spriteregs_r();
 	void spriteregs_w(uint8_t data);
 
 	uint8_t pal_ntsc_r();

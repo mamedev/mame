@@ -60,7 +60,7 @@ inline uint8_t superxavix_state::get_next_bit_sx()
 
 		// the higher bit set when accessing video expands the address space
 		if ((address & 0x1000000) && m_extra)
-			m_bit = m_extra[address&0x7fffff];
+			m_bit = m_extra[address & 0x7fffff];
 		else
 			m_bit = read_full_data_sp_bypass(address);
 	}
@@ -1719,8 +1719,10 @@ void xavix_state::tmap2_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_tmap2_regs[offset]);
 }
 
-uint8_t xavix_state::spriteregs_r(void)
+uint8_t xavix_state::spriteregs_r()
 {
+	// xavjmat relies on being able to read this back or the sprite addresses
+	// in some of the stages get calculated incorrectly
 	return m_spritereg;
 }
 
