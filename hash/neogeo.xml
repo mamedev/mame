@@ -11448,6 +11448,34 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bbb2">
+		<description>Bang Bang Busters 2 (demo)</description>
+		<year>2025</year>
+		<publisher>PixelHeart</publisher>
+		<info name="developer" value="Studio Story Bird" />
+		<info name="developer" value="Visco" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="070-p1.bin" offset="0x000000" size="0x100000" crc="3659f253" sha1="78474a0dbf812e987cae7b7ca0f8d00c35060939" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="070-s1.bin" crc="e53ef3d0" sha1="ef3ade7aadc1b57a20c1830bf1d3444dfc9ce1fb" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="070-m1.bin" crc="bff0ad49" sha1="e75296afefe011a2b96245065b3d97739e3c338e" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x400000">
+				<rom name="070-v1.bin" offset="0x000000" size="0x400000" crc="f1dda8dd" sha1="2cc21436eca6eaa08f8de82fc5252e1f4a335333" />
+			</dataarea>
+			<dataarea name="sprites" size="0x1000000">
+				<rom loadflag="load16_byte" name="070-c1.bin" offset="0x000000" size="0x800000" crc="739173e2" sha1="5703a97bba12c63411700341abe4e2981650d59e" />
+				<rom loadflag="load16_byte" name="070-c2.bin" offset="0x000001" size="0x800000" crc="9a439c98" sha1="faa43e7c892d1ec76da6e88ccf85b5262faf0f93" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cpbarrel">
 		<description>Captain Barrel</description>
 		<year>2024</year>
@@ -11509,6 +11537,38 @@ license:CC0-1.0
 	</software>
 
 	<software name="ddragon1">
+		<description>Double Dragon One (beta 3, 20250916)</description>
+		<year>2025</year>
+		<publisher>OzzyOuzo</publisher>
+		<info name="developer" value="Case de Ruivo" />
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<info name="version" value="beta 3 Sep 16 2025" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
+				<rom loadflag="load16_word_swap" name="doubled-p1.bin" offset="0x000000" size="0x100000" crc="5991da92" sha1="c7387217e28c03483ea5d92fa062bb834f8d0534" />
+				<rom loadflag="load16_word_swap" name="doubled-p2.bin" offset="0x100000" size="0x400000" crc="7e5ed6b8" sha1="cae16c7d27512f94a242bff167393a2c56c0220d" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="doubled-s1.bin" crc="714afb4b" sha1="63b69781585e503e7fa6a62bcf1e6742f8cb3921" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="doubled-m1.bin" crc="43295479" sha1="5f08b91444e89f918cd239019b6df540b5d158fc" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="doubled-v1.bin" offset="0x000000" size="0x800000" crc="f01e97dc" sha1="3bfb92c2cfb937ddf02299b6ac14c6851b6c1f11" />
+				<rom name="doubled-v2.bin" offset="0x800000" size="0x800000" crc="79156c41" sha1="8f8835139390c021b201384c304d235300b47af7" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="doubled-c1.bin" offset="0x000000" size="0x1000000" crc="fd883db8" sha1="9b5c2e916a38438290d9b82eb7b5f34e8b27f660" />
+				<rom loadflag="load16_byte" name="doubled-c2.bin" offset="0x000001" size="0x1000000" crc="718050d3" sha1="4bab6c856a8e91d4d8dab12257211e6c6e82b306" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon1_b2" cloneof="ddragon1">
 		<description>Double Dragon One (beta 2, 20250903)</description>
 		<year>2025</year>
 		<publisher>OzzyOuzo</publisher>
