@@ -145,6 +145,9 @@ static INPUT_PORTS_START( mscbar )
 	PORT_START("P1")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // For Hopper.
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_C)  //  will cause error 76.
+	
+    PORT_START("P3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(8) PORT_CODE(KEYCODE_K) // Coin
 INPUT_PORTS_END
 
 void mscbar_state::ay1_port_a_w(uint8_t data)
@@ -247,6 +250,7 @@ void mscbar_state::mscbar(machine_config &config)
 	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.port_out_cb<1>().set(FUNC(mscbar_state::p1_port_w));
+	maincpu.port_in_cb<3>().set_ioport("P3");
 	maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
