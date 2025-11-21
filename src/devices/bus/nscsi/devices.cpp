@@ -25,7 +25,7 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("tape", NSCSI_TAPE);
 	device.option_add("s1410", NSCSI_S1410);
-	device.option_add("dt510", NSCSI_DT510);
+	device.option_add("dtc510", NSCSI_DTC510);
 	device.option_add("cw7501", CW7501);
 	device.option_add("cdr4210", CDR4210);
 	device.option_add("cdrn820s", CDRN820S);

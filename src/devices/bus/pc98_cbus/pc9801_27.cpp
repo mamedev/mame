@@ -31,7 +31,7 @@ pc9801_27_device::pc9801_27_device(const machine_config &mconfig, const char *ta
 
 static void sasi_devices(device_slot_interface &device)
 {
-	device.option_add("harddisk", NSCSI_DT510);
+	device.option_add("harddisk", NSCSI_DTC510);
 }
 
 

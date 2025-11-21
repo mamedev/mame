@@ -28,20 +28,20 @@ References:
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NSCSI_DT510, nscsi_dt510_device, "scsi_dt510", "Data Technology DTC-510 5.25 Inch Winchester Disk Controller")
+DEFINE_DEVICE_TYPE(NSCSI_DTC510, nscsi_dtc510_device, "scsi_dtc510", "Data Technology DTC-510 5.25 Inch Winchester Disk Controller")
 
-nscsi_dt510_device::nscsi_dt510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_harddisk_device(mconfig, NSCSI_DT510, tag, owner, clock)
+nscsi_dtc510_device::nscsi_dtc510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_harddisk_device(mconfig, NSCSI_DTC510, tag, owner, clock)
 {
 	std::fill(std::begin(m_param), std::end(m_param), 0);
 }
 
-void nscsi_dt510_device::device_reset()
+void nscsi_dtc510_device::device_reset()
 {
 	nscsi_harddisk_device::device_reset();
 }
 
-bool nscsi_dt510_device::scsi_command_done(uint8_t command, uint8_t length)
+bool nscsi_dtc510_device::scsi_command_done(uint8_t command, uint8_t length)
 {
 	switch(command >> 5) {
 	case 0: return length == 6;
@@ -52,7 +52,7 @@ bool nscsi_dt510_device::scsi_command_done(uint8_t command, uint8_t length)
 	return false;
 }
 
-void nscsi_dt510_device::scsi_command()
+void nscsi_dtc510_device::scsi_command()
 {
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 
@@ -180,7 +180,7 @@ void nscsi_dt510_device::scsi_command()
 	}
 }
 
-uint8_t nscsi_dt510_device::scsi_get_data(int id, int pos)
+uint8_t nscsi_dtc510_device::scsi_get_data(int id, int pos)
 {
 	switch(scsi_cmdbuf[0]) {
 	case SC_READ_SECTOR_BUFFER:
@@ -191,7 +191,7 @@ uint8_t nscsi_dt510_device::scsi_get_data(int id, int pos)
 	}
 }
 
-void nscsi_dt510_device::scsi_put_data(int id, int pos, uint8_t data)
+void nscsi_dtc510_device::scsi_put_data(int id, int pos, uint8_t data)
 {
 
 	if (scsi_cmdbuf[0] == 0xc2 && id == 4)
@@ -231,13 +231,13 @@ void nscsi_dt510_device::scsi_put_data(int id, int pos, uint8_t data)
 }
 
 // Byte transfer rate (5Mb/s)
-attotime nscsi_dt510_device::scsi_data_byte_period()
+attotime nscsi_dtc510_device::scsi_data_byte_period()
 {
 	return attotime::from_nsec(1600);
 }
 
 // Command execution delay
-attotime nscsi_dt510_device::scsi_data_command_delay()
+attotime nscsi_dtc510_device::scsi_data_command_delay()
 {
 	switch(scsi_cmdbuf[0]) {
 	case SC_READ:

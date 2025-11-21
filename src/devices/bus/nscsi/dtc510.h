@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-#ifndef MAME_BUS_NSCSI_DT510_H
-#define MAME_BUS_NSCSI_DT510_H
+#ifndef MAME_BUS_NSCSI_DTC510_H
+#define MAME_BUS_NSCSI_DTC510_H
 
 #pragma once
 
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/hd.h"
 
-class nscsi_dt510_device : public nscsi_harddisk_device
+class nscsi_dtc510_device : public nscsi_harddisk_device
 {
 public:
-	nscsi_dt510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_dtc510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// SCSI status returns
@@ -83,6 +83,6 @@ protected:
 	uint8_t m_param[10];
 };
 
-DECLARE_DEVICE_TYPE(NSCSI_DT510, nscsi_dt510_device)
+DECLARE_DEVICE_TYPE(NSCSI_DTC510, nscsi_dtc510_device)
 
-#endif // MAME_BUS_NSCSI_DT510_H
+#endif // MAME_BUS_NSCSI_DTC510_H
