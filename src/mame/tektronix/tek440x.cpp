@@ -72,13 +72,12 @@
 
 #include "tek4404.lh"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_MMU (1U << 1)
 #define LOG_FPU (1U << 2)
 #define LOG_SCSI (1U << 3)
 #define LOG_IRQ (1U << 4)
 
-#define VERBOSE LOG_GENERAL
+#define VERBOSE (LOG_GENERAL|LOG_IRQ)
 #include "logmacro.h"
 
 // mapcntl bits
