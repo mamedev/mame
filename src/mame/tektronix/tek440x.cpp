@@ -80,6 +80,9 @@
 #define VERBOSE (LOG_GENERAL|LOG_IRQ)
 #include "logmacro.h"
 
+// tek4404 MSU uses a 6502 that is slow to ACK
+unsigned constexpr TEK4404_ACK_DELAY = 20'000;
+
 // mapcntl bits
 constexpr int MAP_VM_ENABLE = 4;
 constexpr int MAP_SYS_WR_ENABLE = 5;
@@ -92,27 +95,6 @@ constexpr int MAP_CPU_WR = 7;
 
 constexpr offs_t MAXRAM = 0x200000;	// +1MB
 //constexpr offs_t MAXRAM = 0x400000;	// +3MB
-
-#if 0
-// ncr5385 raises IRQ too fast for Tek4404 software
-DECLARE_DEVICE_TYPE(NCR5385_TEK, ncr5385_tek_device)
-
-class ncr5385_tek_device : public ncr5385_device
-{
-
-
-public:
-	ncr5385_tek_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	ncr5385_device(mconfig, tag, owner, clock)
-	{
-
-		printf("Using NCR5385 with required timing changes for tek4404\n");
-	}
-};
-
-DEFINE_DEVICE_TYPE(NCR5385_TEK, ncr5385_tek_device, "ncr5385_tek", "NCR5385 with Tek4404 required timing")
-#endif
-
 
 // have m_readXX / m_writeXX use MMU translation
 // OR
@@ -1720,6 +1702,8 @@ m_printer->in_pb_callback().set_constant(0xb0);		// HACK:  vblank always checks 
 			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
 
 			adapter.irq().set_inputline(m_maincpu, M68K_IRQ_3);
+			
+			adapter.set_ack_delay_ns(TEK4404_ACK_DELAY);
 		});
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
