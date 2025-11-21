@@ -543,9 +543,8 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_4bpp_update_row )
 
 MC6845_UPDATE_ROW( pcvideo_t1000_device::gfx_2bpp_update_row )
 {
-	// Unlike the PCjr, the Tandy 1000 seems to ignore the VRAM addressing
-	// configuration in this mode - the BIOS sets ARDM0 and ADRM1 to zero for
-	// CGA-compatible modes, but one bit of RA must be used for VRAM addressing.
+	// Unlike the PCjr, the Tandy 1000 ignores the VRAM addressing configuration
+	// in this mode.
 	uint32_t *p = &bitmap.pix(y);
 	uint32_t const rowbase = m_display_base | ((uint32_t(ra) << 13) & 0x02000);
 
@@ -611,14 +610,16 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_2bpp_high_update_row )
 
 MC6845_UPDATE_ROW( pcvideo_t1000_device::gfx_1bpp_update_row )
 {
+	// Unlike the PCjr, the Tandy 1000 ignores the VRAM addressing configuration
+	// in this mode.
 	uint32_t *p = &bitmap.pix(y);
-	uint32_t const rowbase = row_base(ra);
+	uint32_t const rowbase = m_display_base | ((uint32_t(ra) << 13) & 0x02000);
 	auto const fg = palette_r(BIT(m_color_sel, 0, 4));
 	auto const bg = palette_r(0);
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
+		uint16_t const offset = ((ma + i) << 1) & 0x01fff;
 		uint16_t const data = space(0).read_word(rowbase | offset);
 
 		*p++ = BIT(data,  7) ? fg : bg;
@@ -1007,8 +1008,6 @@ void pcvideo_t1000x_device::page_w(uint8_t data)
 
 	// extra page bit for 256K VRAM
 	m_base_mask |= uint32_t(0x01) << 17;
-
-	m_page = data;
 }
 
 

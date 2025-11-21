@@ -123,10 +123,10 @@ private:
 	{
 		if (!index)
 			return palette_r(BIT(m_color_sel, 0, 4));
-		else if (BIT(m_mode_sel, 2) && (2 == index))
-			return palette_r((BIT(m_color_sel, 4) << 3) | (index << 1));
-		else
+		else if (!BIT(m_mode_sel, 2))
 			return palette_r((BIT(m_color_sel, 4) << 3) | (index << 1) | BIT(m_color_sel, 5));
+		else
+			return palette_r((BIT(m_color_sel, 4) << 3) | bitswap<3>(index, 1, 0, 0));
 	}
 
 	void mode_switch();

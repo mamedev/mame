@@ -587,6 +587,7 @@ void tandy1000_state::vga_vram8_w(offs_t offset, uint8_t data)
 void tandy1000_state::vga_vram16_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = little_endianize_int16(data);
+	mem_mask = little_endianize_int16(mem_mask);
 	COMBINE_DATA(&reinterpret_cast<uint16_t *>(m_ram->pointer())[offset]);
 }
 
