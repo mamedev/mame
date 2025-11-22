@@ -1173,7 +1173,8 @@ u8 tek440x_state::videocntl_r()
 
 void tek440x_state::videocntl_w(u8 data)
 {
-	if (0)
+
+#if 0
 	if (m_videocntl != data)
 	{
 		LOG("m_videocntl %02x\n", data);
@@ -1182,6 +1183,7 @@ void tek440x_state::videocntl_w(u8 data)
 		LOG("m_videocntl ScreenInv  %2d\n", BIT(data, 4));
 		LOG("m_videocntl ScreenPan  %2d\n", data & 15);
 	}
+#endif
 
 	m_vint_enable = BIT(data, 6);
 	if (!m_vint_enable)
