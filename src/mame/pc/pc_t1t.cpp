@@ -4,6 +4,50 @@
 
     IBM PCjr and Tandy 1000 graphics emulation
 
+    The PCjr and Tandy 1000 map video RAM directly into the CPU's memory
+    space as well as proving a 32K window into video RAM in the CPU's
+    address space at B8000.  The PCjr always maps video RAM at 00000, while
+    the Tandy 1000 can map it at any multiple of 20000.  The video hardware
+    has priority when accessing video RAM.Wait states will be generated if
+    the CPU attempts to access video RAM while it is in use by the video
+    hardware.  This means it is safe to access video RAM during active
+    display, with no side effects besides the performance penalty.  This
+    allows a minimally configured system to use only video RAM, with no
+    additional RAM connected to the CPU.
+
+    The PCjr can have one or two 64K banks of video RAM.  If only one bank
+    is present, it is mirrored at 10000.  If two banks are present, one
+    bank stores even bytes while the other stores odd bytes, and the video
+    hardware reads both banks in parallel, doubling the bandwidth and
+    reducing the chance of wait states being required when the CPU accesses
+    video RAM.
+
+    The Tandy 1000 supports a single 128K bank of video RAM.  The
+    Tandy 1000A theoretically supports 128K of video RAM using 64K*1 DRAMs,
+    or 512K of video RAM using 256K*1 DRAMs, but the board is only wired
+    for the first option.  The data path to the video RAM is eight bits
+    wide in both cases.
+
+    The Tandy 1000 SX and Tandy 1000 HX support up to 256K of video RAM
+    using 64K*4 DRAMs (256K DRAMs are theoretically supported, but the
+    boards are not wired for this option).  The data path to the video RAM
+    is sixteen bits wide, doubling the bandwidth compared to the early
+    models, and reducing the performance impact of accessing video RAM from
+    the CPU.
+
+    The PCjr and Tandy 1000 support the same resolutions, pixel formats and
+    video RAM layouts as each other.  However, only the MC6845 registers,
+    status register, lightpen registers and page register are compatible.
+    The registers for configuring the video chip and setting the palette
+    are not compatible.  Software must use the BIOS to set video modes or
+    deal with the differences.
+
+    The PCjr and Tandy 1000 provide CGA compatibility in different ways.
+    The PCjr allows CGA-compatible video modes to be selected using BIOS
+    calls and configures the video chip appropriately.  The Tandy 1000
+    provides CGA-compatible configuration registers to cater to software
+    that accesses a CGA card directly.
+
     Note that in the IBM PC Junior world, the term VGA refers to the Video
     Gate Array, which is unrelated to the more well-known Video Graphics
     Array introduced with the PS/2.
@@ -46,6 +90,10 @@ enum
 	T1000_GFX_2BPP,
 	T1000_GFX_2BPP_HIGH,
 	T1000_GFX_4BPP,
+	PCJR_TEXT_INTEN_HIGH_8BIT,
+	PCJR_TEXT_BLINK_HIGH_8BIT,
+	PCJR_GFX_2BPP_HIGH_8BIT,
+	PCJR_GFX_4BPP_HIGH_8BIT,
 	PCJX_TEXT
 };
 
@@ -189,6 +237,7 @@ pcvideo_pcjr_device::pcvideo_pcjr_device(
 	pc_t1t_device(mconfig, PCVIDEO_PCJR, tag, owner, clock, 8, 17, 3, 0),
 	m_jxkanji(*this, finder_base::DUMMY_TAG),
 	m_vsync_cb(*this),
+	m_16bit(false),
 	m_address_data_ff(0),
 	m_mode_ctrl_1(0),
 	m_mode_ctrl_2(0)
@@ -294,7 +343,7 @@ void pcvideo_pcjr_device::device_post_load()
 	pc_t1t_device::device_post_load();
 
 	// ensure correct video update function is selected;
-	pc_pcjr_mode_switch();
+	mode_switch();
 }
 
 
@@ -373,13 +422,41 @@ MC6845_UPDATE_ROW( pc_t1t_device::text_inten_update_row )
 	uint32_t const rowbase = row_base(ra);
 	uint32_t *p = &bitmap.pix(y);
 
-	if (y == 0) logerror("t1000_text_inten_update_row\n");
 	for (int i = 0; i < x_count; i++)
 	{
 		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
 		uint16_t const vram = space(0).read_word(rowbase | offset);
 		uint8_t const chr = vram & 0x00ff;
 		uint8_t const attr = vram >> 8;
+		auto const fg = palette_r(BIT(attr, 0, 4));
+		auto const bg = palette_r(BIT(attr, 4, 4));
+
+		uint8_t data = chr_gen_r(chr, ra);
+		if (i == cursor_x && (m_pc_framecnt & 0x08))
+			data = 0xff;
+
+		*p++ = BIT(data, 7) ? fg : bg;
+		*p++ = BIT(data, 6) ? fg : bg;
+		*p++ = BIT(data, 5) ? fg : bg;
+		*p++ = BIT(data, 4) ? fg : bg;
+		*p++ = BIT(data, 3) ? fg : bg;
+		*p++ = BIT(data, 2) ? fg : bg;
+		*p++ = BIT(data, 1) ? fg : bg;
+		*p++ = BIT(data, 0) ? fg : bg;
+	}
+}
+
+MC6845_UPDATE_ROW( pcvideo_pcjr_device::text_inten_high_8bit_update_row )
+{
+	// insufficient bandwidth to read both bytes, so the attribute becomes the character as well
+	uint32_t const rowbase = row_base(ra);
+	uint32_t *p = &bitmap.pix(y);
+
+	for (int i = 0; i < x_count; i++)
+	{
+		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
+		uint8_t const attr = space(0).read_byte(rowbase | offset | 1);
+		uint8_t const chr = attr;
 		auto const fg = palette_r(BIT(attr, 0, 4));
 		auto const bg = palette_r(BIT(attr, 4, 4));
 
@@ -478,6 +555,42 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::text_blink_update_row )
 	}
 }
 
+MC6845_UPDATE_ROW( pcvideo_pcjr_device::text_blink_high_8bit_update_row )
+{
+	uint32_t const rowbase = row_base(ra);
+	uint32_t *p = &bitmap.pix(y);
+
+	for (int i = 0; i < x_count; i++)
+	{
+		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
+		uint8_t const attr = space(0).read_byte(rowbase | offset | 1);
+		uint8_t const chr = attr;
+		auto const fg = palette_r(BIT(attr, 0, 4));
+		auto const bg = palette_r(BIT(attr, 4, 3));
+
+		uint8_t data = chr_gen_r(chr, ra);
+		if (i == cursor_x)
+		{
+			if (m_pc_framecnt & 0x08)
+				data = 0xff;
+		}
+		else
+		{
+			if ((attr & 0x80) && (m_pc_framecnt & 0x10))
+				data = 0x00;
+		}
+
+		*p++ = BIT(data, 7) ? fg : bg;
+		*p++ = BIT(data, 6) ? fg : bg;
+		*p++ = BIT(data, 5) ? fg : bg;
+		*p++ = BIT(data, 4) ? fg : bg;
+		*p++ = BIT(data, 3) ? fg : bg;
+		*p++ = BIT(data, 2) ? fg : bg;
+		*p++ = BIT(data, 1) ? fg : bg;
+		*p++ = BIT(data, 0) ? fg : bg;
+	}
+}
+
 
 MC6845_UPDATE_ROW( pcvideo_pcjr_device::pcjx_text_update_row )
 {
@@ -533,6 +646,24 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_4bpp_update_row )
 		*p++ = palette_r(BIT(data,  0, 4));
 		*p++ = palette_r(BIT(data, 12, 4));
 		*p++ = palette_r(BIT(data,  8, 4));
+	}
+}
+
+MC6845_UPDATE_ROW( pcvideo_pcjr_device::gfx_4bpp_high_8bit_update_row )
+{
+	// insufficient bandwidth to read both bytes, so pairs of columns get duplicated
+	uint32_t *p = &bitmap.pix(y);
+	uint32_t const rowbase = row_base(ra);
+
+	for (int i = 0; i < x_count; i++)
+	{
+		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
+		uint8_t const data = space(0).read_byte(rowbase | offset | 1);
+
+		*p++ = palette_r(BIT(data, 4, 4));
+		*p++ = palette_r(BIT(data, 0, 4));
+		*p++ = palette_r(BIT(data, 4, 4));
+		*p++ = palette_r(BIT(data, 0, 4));
 	}
 }
 
@@ -600,6 +731,28 @@ MC6845_UPDATE_ROW( pc_t1t_device::gfx_2bpp_high_update_row )
 		*p++ = palette_r(bitswap<2>(data, 10, 2));
 		*p++ = palette_r(bitswap<2>(data,  9, 1));
 		*p++ = palette_r(bitswap<2>(data,  8, 0));
+	}
+}
+
+MC6845_UPDATE_ROW( pcvideo_pcjr_device::gfx_2bpp_high_8bit_update_row )
+{
+	// insufficient bandwidth to read both bytes, so the image end up monochrome
+	uint32_t *p = &bitmap.pix(y);
+	uint32_t const rowbase = row_base(ra);
+
+	for (int i = 0; i < x_count; i++)
+	{
+		uint16_t const offset = ((ma + i) << 1) & m_offset_mask;
+		uint8_t const data = space(0).read_byte(rowbase | offset | 1);
+
+		*p++ = palette_r(bitswap<2>(data, 7, 7));
+		*p++ = palette_r(bitswap<2>(data, 6, 6));
+		*p++ = palette_r(bitswap<2>(data, 5, 5));
+		*p++ = palette_r(bitswap<2>(data, 4, 4));
+		*p++ = palette_r(bitswap<2>(data, 3, 3));
+		*p++ = palette_r(bitswap<2>(data, 2, 2));
+		*p++ = palette_r(bitswap<2>(data, 1, 1));
+		*p++ = palette_r(bitswap<2>(data, 0, 0));
 	}
 }
 
@@ -717,6 +870,18 @@ MC6845_UPDATE_ROW( pcvideo_pcjr_device::crtc_update_row )
 		case T1000_GFX_2BPP:
 			gfx_2bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
+		case PCJR_TEXT_INTEN_HIGH_8BIT:
+			text_inten_high_8bit_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case PCJR_TEXT_BLINK_HIGH_8BIT:
+			text_blink_high_8bit_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case PCJR_GFX_2BPP_HIGH_8BIT:
+			gfx_2bpp_high_8bit_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case PCJR_GFX_4BPP_HIGH_8BIT:
+			gfx_4bpp_high_8bit_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
 		case PCJX_TEXT:
 			pcjx_text_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
@@ -793,7 +958,7 @@ void pcvideo_t1000_device::mode_switch()
 // bit1 - 1 = enable blink
 // bit3 - 1 = 2 color graphics
 
-void pcvideo_pcjr_device::pc_pcjr_mode_switch()
+void pcvideo_pcjr_device::mode_switch()
 {
 	bool const high_bw  = BIT(m_mode_ctrl_1, 0);
 	bool const graphics = BIT(m_mode_ctrl_1, 1);
@@ -813,13 +978,13 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 		if (m_jxkanji)
 			m_update_row_type = PCJX_TEXT;
 		else if (blink)
-			m_update_row_type = T1000_TEXT_BLINK;
+			m_update_row_type = (!high_bw || m_16bit) ? T1000_TEXT_BLINK : PCJR_TEXT_BLINK_HIGH_8BIT;
 		else
-			m_update_row_type = T1000_TEXT_INTEN;
+			m_update_row_type = (!high_bw || m_16bit) ? T1000_TEXT_INTEN : PCJR_TEXT_INTEN_HIGH_8BIT;
 	}
 	else if (color16)
 	{
-		m_update_row_type = T1000_GFX_4BPP;
+		m_update_row_type = (!high_bw || m_16bit) ? T1000_GFX_4BPP : PCJR_GFX_4BPP_HIGH_8BIT;
 	}
 	else if (color2)
 	{
@@ -827,7 +992,7 @@ void pcvideo_pcjr_device::pc_pcjr_mode_switch()
 	}
 	else if (high_bw)
 	{
-		m_update_row_type = T1000_GFX_2BPP_HIGH;
+		m_update_row_type = m_16bit ? T1000_GFX_2BPP_HIGH : PCJR_GFX_2BPP_HIGH_8BIT;
 	}
 	else
 	{
@@ -946,11 +1111,11 @@ void pcvideo_pcjr_device::vga_data_w(uint8_t data)
 	{
 		case 0x00:
 			m_mode_ctrl_1 = data & 0x1f;
-			pc_pcjr_mode_switch();
+			mode_switch();
 			break;
 		case 0x03:
 			m_mode_ctrl_2 = data & 0x0f;
-			pc_pcjr_mode_switch();
+			mode_switch();
 			break;
 		case 0x04:  // reset register
 			break;

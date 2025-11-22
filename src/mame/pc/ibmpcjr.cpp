@@ -1,5 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+/*
+TODO:
+* POST gives "ERROR H" with 64K RAM (you can press Enter to get past
+  it).
+* Cartridge BASIC always rejects "SCREEN 4" (320*200 4BPP) and
+  "SCREEN 5" (640*200 2BPP).  These are graphics modes that require at
+  least 128K RAM.  However, it does accept "WIDTH 80" when 128K or more
+  RAM is present, so it isn't just failing to detect the RAM size
+  altogether.
+* IBM JX (5510) is a completely different machine and should be moved
+  out of this driver and emulated properly.
+*/
 #include "emu.h"
 
 #include "pc_t1t.h"
@@ -142,17 +154,21 @@ void pcjr_state::machine_start()
 	m_pcjr_watchdog = timer_alloc(FUNC(pcjr_state::watchdog_expired), this);
 	m_keyb_signal_timer = timer_alloc(FUNC(pcjr_state::kb_signal), this);
 
-	// TODO: JX isn't emulated properly at all, and should probably be moved to a separate driver
-	// TODO: PCjr video RAM maps to main RAM differently when only 64K is present
-	// * ERROR H on boot with 64K RAM due to incorrect mapping
-	// * 64kought should have glitches in 320*200*4 and 640*200*2 scenes with 64K RAM
+	// TODO: JX isn't emulated properly at all, and should be moved to a separate driver
 	memory_share *const vram = memshare("vram");
 	if (vram)
+	{
+		m_video->set_16bit(true);
 		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, vram->bytes() - 1), &vram[0]);
-	else if (ramsize > (64 * 1024))
-		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, ramsize - 1), m_ram->pointer());
+	}
 	else
-		vram_space.install_ram(0, ramsize - 1, 0x010000, m_ram->pointer());
+	{
+		m_video->set_16bit(ramsize > (64 * 1024));
+		if (ramsize > (64 * 1024))
+			vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, ramsize - 1), m_ram->pointer());
+		else
+			vram_space.install_ram(0, ramsize - 1, 0x010000, m_ram->pointer());
+	}
 }
 
 void pcjr_state::machine_reset()
