@@ -301,6 +301,8 @@ private:
 
 	void sgp_map(address_map &map) ATTR_COLD;
 
+	int m_dack;
+
 // TODO: stuff backported from PC88/PC98 as QoL that should really be common
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;

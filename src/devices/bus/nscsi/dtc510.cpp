@@ -91,7 +91,7 @@ void nscsi_dtc510_device::scsi_command()
 			scsi_status_complete(SS_NOT_READY);
 			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
-			m_seek = 0;
+			// lba = 0;
 			scsi_status_complete(SS_GOOD);
 		}
 		break;
@@ -101,7 +101,7 @@ void nscsi_dtc510_device::scsi_command()
 			scsi_status_complete(SS_NOT_READY);
 			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
-			m_seek = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
+			//lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 			scsi_status_complete(SS_GOOD);
 		}
 		break;
@@ -121,7 +121,8 @@ void nscsi_dtc510_device::scsi_command()
 		{
 			const auto &info = image->get_info();
 			auto block = std::make_unique<uint8_t[]>(info.sectorbytes);
-			memset(&block[0], 0x6c, info.sectorbytes);
+			const u8 fill_byte = scsi_cmdbuf[3] == 0 ? 0xe5 : scsi_cmdbuf[3];
+			memset(&block[0], fill_byte, info.sectorbytes);
 			lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 			for(; lba < (info.cylinders * info.heads * info.sectors); lba++) {
 				image->write(lba, block.get());

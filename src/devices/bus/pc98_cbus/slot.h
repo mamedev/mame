@@ -99,6 +99,7 @@ public:
 
 	u8 dack_r(int line);
 	void dack_w(int line, u8 data);
+	void eop_w(int line, int state);
 
 	// from card to C-Bus
 	void int_w(int Line, int state) { m_int_cb[Line](state); }
@@ -137,6 +138,7 @@ public:
 	virtual void remap(int space_id, offs_t start, offs_t end) {}
 	virtual u8 dack_r(int line);
 	virtual void dack_w(int line, u8 data);
+	virtual void eop_w(int state);
 
 	void set_bus(pc98_cbus_root_device *cbus_device) { m_bus = cbus_device; }
 

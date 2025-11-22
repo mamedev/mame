@@ -105,7 +105,7 @@ protected:
 	virtual attotime scsi_data_command_delay() override;
 
 	uint8_t m_param[10];
-	u32 m_seek;
+	//u32 m_seek;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_DTC510, nscsi_dtc510_device)

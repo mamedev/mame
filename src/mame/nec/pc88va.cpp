@@ -1198,7 +1198,15 @@ void pc88va_state::int4_irq_w(int state)
 
 void pc88va_state::tc_w(int state)
 {
-	m_fdc->tc_w(state);
+	switch(m_dack)
+	{
+		case 0:
+			m_cbus_root->eop_w(0, state);
+			break;
+		case 2:
+			m_fdc->tc_w(state);
+			break;
+	}
 }
 
 void pc88va_state::floppy_formats(format_registration &fr)
@@ -1241,6 +1249,8 @@ void pc88va_state::machine_start()
 	m_fdd[0]->get_device()->set_rpm(300);
 	m_fdd[1]->get_device()->set_rpm(300);
 	m_fdc->set_rate(250000);
+
+	save_item(NAME(m_dack));
 }
 
 void pc88va_state::machine_reset()
@@ -1267,6 +1277,8 @@ void pc88va_state::machine_reset()
 	m_misc_ctrl = 0x00;
 	m_sound_irq_enable = true;
 	m_sound_irq_pending = false;
+
+	m_dack = -1;
 }
 
 // NOTE: PC-88VA implementation omits some C-Bus lines compared to PC-98.
@@ -1309,6 +1321,10 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_maincpu->in_memr_cb().set([this] (offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
 	m_maincpu->out_memw_cb().set([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
+	m_maincpu->out_dack_cb<0>().set([this] (int state) { if (!state) m_dack = 0; });
+	m_maincpu->out_dack_cb<1>().set([this] (int state) { if (!state) m_dack = 1; });
+	m_maincpu->out_dack_cb<2>().set([this] (int state) { if (!state) m_dack = 2; });
+	m_maincpu->out_dack_cb<3>().set([this] (int state) { if (!state) m_dack = 3;});
 
 	pc88va_cbus(config);
 

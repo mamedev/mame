@@ -77,7 +77,7 @@ ioport_constructor pc9801_27_device::device_input_ports() const
 
 void pc9801_27_device::device_start()
 {
-	m_bus->set_dma_channel(0, this, false);
+	m_bus->set_dma_channel(0, this, true);
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_sasi_ack));
@@ -222,6 +222,14 @@ void pc9801_27_device::dack_w(int line, u8 data)
 	data_w(data);
 }
 
+void pc9801_27_device::eop_w(int state)
+{
+	if (state)
+	{
+		m_control &= 0xfd;
+		update_drq();
+	}
+}
 
 void pc9801_27_device::sasi_req_w(int state)
 {
@@ -283,7 +291,7 @@ void pc9801_27_device::sasi_bsy_w(int state)
 
 void pc9801_27_device::update_irq()
 {
-	//printf("%d %d %d %d\n", m_sasi_req, m_sasi_msg, m_sasi_cd, m_sasi_io);
+//	printf("%d %d %d %d\n", m_sasi_req, m_sasi_msg, m_sasi_cd, m_sasi_io);
 	//if (m_sasi_req && !m_sasi_msg && m_sasi_cd && m_sasi_io)
 	if (m_sasi->req_r() && !m_sasi->msg_r() && m_sasi->cd_r() && m_sasi->io_r())
 	{

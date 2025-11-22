@@ -149,6 +149,12 @@ void pc98_cbus_root_device::dack_w(int line, u8 data)
 		m_dma_device[line]->dack_w(line, data);
 }
 
+void pc98_cbus_root_device::eop_w(int line, int state)
+{
+	if (m_dma_eop[line] && m_dma_device[line])
+		m_dma_device[line]->eop_w(state);
+}
+
 void pc98_cbus_root_device::set_dma_channel(u8 channel, device_pc98_cbus_slot_interface *dev, bool do_eop)
 {
 	m_dma_device[channel] = dev;
@@ -175,6 +181,10 @@ u8 device_pc98_cbus_slot_interface::dack_r(int line)
 }
 
 void device_pc98_cbus_slot_interface::dack_w(int line, u8 data)
+{
+}
+
+void device_pc98_cbus_slot_interface::eop_w(int state)
 {
 }
 

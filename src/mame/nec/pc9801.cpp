@@ -1215,10 +1215,19 @@ void pc9801_state::dma_hrq_changed(int state)
 
 void pc9801_state::tc_w(int state)
 {
-	/* floppy terminal count */
-	m_fdc_2hd->tc_w(state);
-	if(m_fdc_2dd)
-		m_fdc_2dd->tc_w(state);
+	switch (m_dack)
+	{
+		case 0:
+			m_cbus_root->eop_w(0, state);
+			break;
+		case 2:
+		case 3:
+			m_fdc_2hd->tc_w(state);
+			if(m_fdc_2dd)
+				m_fdc_2dd->tc_w(state);
+			break;
+	}
+
 
 //  logerror("TC %02x\n",state);
 }
