@@ -81,10 +81,10 @@
     in the texture header tells the rasterizer which texture map to use. The rasterizer then can average two texture
     maps to do mip mapping. More information can be found on the 2B manual, on the 'Texturing' and 'Data Format' chapters.
     - The rasterizer supports 128x128 'microtextures' which are typically used to add more details to a texture when it is
-	close enough to the viewer.
-	- Polygons are rendered from front-to-back. A fill buffer is used to track which pixels in the framebuffer have already
-	been drawn to and prevents them from being overwritten. The real hardware does this to ensure that the polygons closest
-	to the camera are rendered first, in case the renderer runs out of time and has to skip ahead to the next frame.
+    close enough to the viewer.
+    - Polygons are rendered from front-to-back. A fill buffer is used to track which pixels in the framebuffer have already
+    been drawn to and prevents them from being overwritten. The real hardware does this to ensure that the polygons closest
+    to the camera are rendered first, in case the renderer runs out of time and has to skip ahead to the next frame.
 
 *********************************************************************************************************************************/
 
@@ -2116,7 +2116,7 @@ u32 *model2_state::geo_texture_parameters( geo_state *geo, u32 opcode, u32 *inpu
 	(void)opcode;
 
 	/* read in the index */
-	index = *input++;
+	index = (*input++) >> 2;
 
 	/* read in the conut */
 	count = *input++;

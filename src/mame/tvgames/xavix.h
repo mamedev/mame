@@ -410,6 +410,7 @@ protected:
 	uint8_t tmap1_regs_r(offs_t offset);
 	uint8_t tmap2_regs_r(offs_t offset);
 
+	uint8_t spriteregs_r();
 	void spriteregs_w(uint8_t data);
 
 	uint8_t pal_ntsc_r();
@@ -577,6 +578,7 @@ protected:
 
 	bool m_disable_memory_bypass = false;
 	bool m_disable_sprite_yflip = false;
+	bool m_disable_sprite_xflip = false;
 	bool m_disable_tile_regs_flip = false;
 	int m_video_hres_multiplier;
 };
@@ -602,7 +604,6 @@ public:
 	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag)
 		, m_xavix2002io(*this, "xavix2002io")
-		, m_allow_superxavix_extra_rom_sprites(true)
 		, m_sx_crtc_1(*this, "sx_crtc_1")
 		, m_sx_crtc_2(*this, "sx_crtc_2")
 		, m_sx_plt_loc(*this, "sx_plt_loc")
@@ -631,8 +632,6 @@ protected:
 	required_device<xavix2002_io_device> m_xavix2002io;
 
 	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
-
-	bool m_allow_superxavix_extra_rom_sprites; // config does not need saving
 
 	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
 	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
@@ -713,8 +712,6 @@ private:
 
 	optional_region_ptr<uint8_t> m_extra;
 	required_ioport_array<3> m_exio;
-
-	bool m_use_superxavix_extra; // does not need saving
 };
 
 

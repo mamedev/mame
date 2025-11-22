@@ -61,11 +61,13 @@ public:
 	void haunthig(machine_config &config) ATTR_COLD;
 	void tripfev(machine_config &config) ATTR_COLD;
 
+	void init_crzybug2() ATTR_COLD;
 	void init_crzybugs() ATTR_COLD;
 	void init_crzybugsj() ATTR_COLD;
 	void init_hauntedh() ATTR_COLD;
 	void init_jking04() ATTR_COLD;
 	void init_krzykeno() ATTR_COLD;
+	void init_texashld() ATTR_COLD;
 	void init_tripfev() ATTR_COLD;
 	void init_wldfruit() ATTR_COLD;
 
@@ -1150,6 +1152,20 @@ void igs_m027xa_state::init_krzykeno()
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
+void igs_m027xa_state::init_crzybug2()
+{
+	crzybug2_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
+	//m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
+void igs_m027xa_state::init_texashld()
+{
+	texashld_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
+	//m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 // These use the MX10EXAQC (80c51XA from Philips)
@@ -1175,6 +1191,6 @@ GAMEL( 2003, jking04,       0,        tripfev,    jking04,       igs_m027xa_stat
 
 GAMEL( 2006, krzykeno,      0,        haunthig,   krzykeno,      igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING, layout_krzykeno ) // touch pad
 
-GAME(  200?, crzybug2,      0,        base,       base,          igs_m027xa_state, empty_init,     ROT0, "IGS", "Crazy Bugs II (V102US)", MACHINE_NOT_WORKING ) // no internal ROM dump
+GAME(  200?, crzybug2,      0,        base,       base,          igs_m027xa_state, init_crzybug2,  ROT0, "IGS", "Crazy Bugs II (V102US)", MACHINE_NOT_WORKING ) // no internal ROM dump
 
-GAME(  200?, texashld,      0,        base,       base,          igs_m027xa_state, empty_init,     ROT0, "IGS", "Texas Holdem (V015US)", MACHINE_NOT_WORKING ) // no internal ROM dump
+GAME(  200?, texashld,      0,        base,       base,          igs_m027xa_state, init_texashld,  ROT0, "IGS", "Texas Holdem (V015US)", MACHINE_NOT_WORKING ) // no internal ROM dump

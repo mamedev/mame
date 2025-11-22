@@ -475,7 +475,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
-//	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
+//  m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
 	FLOPPY_CONNECTOR(config, "upd765:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 

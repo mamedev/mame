@@ -480,7 +480,7 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint16_t offset = (ma + i) & 0x7ff;	
+		uint16_t offset = (ma + i) & 0x7ff;
 		uint8_t chr = m_ram[offset];
 		uint8_t data = (BIT(chr, 7) ? chr_base1 : chr_base0)[(chr & 0x7f) * 16];
 		rgb_t fg = rgb_t::white();

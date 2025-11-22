@@ -523,6 +523,13 @@ mpc60
 @source:akai/mpc3000.cpp
 mpc3000
 
+@source:akai/s3000.cpp
+s2000
+s3000
+s3000xl
+cd3000i
+cd3000xl
+
 @source:alesis/alesis.cpp
 hr16
 hr16b
@@ -35824,6 +35831,7 @@ typo240
 36pcase
 168pcase
 240in1ar
+500in1hh
 a6plus
 d12power
 d9_500
@@ -35893,12 +35901,14 @@ pactin
 rbbrite
 rd5_240
 red5mam
+retro620
 rtvgc300
 rtvgc300cr
 rtvgc300fz
 rtvgc300pj
 s10_520
 s10fake
+s5_520
 sealvt
 supr200
 sy888b
@@ -35923,6 +35933,7 @@ g6_666
 g7_666
 g9_666
 gbox2019
+gbox2022
 gprnrs1
 gprnrs16
 hhgc319
@@ -42038,6 +42049,7 @@ smspaln
 smssdisp
 
 @source:sega/sms_bootleg.cpp
+atgsms
 smssgame
 smssgamea
 
@@ -43403,6 +43415,7 @@ am1000
 
 @source:skeleton/amcoe_au1250.cpp
 burningr
+creepyrl
 
 @source:skeleton/amusement_6502.cpp
 unkamus
@@ -43860,6 +43873,7 @@ lggp40
 arthurkn
 arthurkn100
 fruitcat
+pharmyst
 
 @source:skeleton/lilith.cpp
 lilith
@@ -44797,6 +44811,9 @@ ptrain
 ptraina
 qbeebing
 queenbee
+queenbee107u
+queenbee117a
+queenbee123a
 queenbeeb
 queenbeei
 queenbeesa
@@ -47814,10 +47831,13 @@ xavbowl
 xavbowlj
 xavbox
 xavcheck
+xavgolf
+xavgolfj
 xavjmat
 xavmusic
 xavpkjr
 xavtenni
+xavtennij
 
 @source:ultimachine/rambo.cpp
 metamaq2

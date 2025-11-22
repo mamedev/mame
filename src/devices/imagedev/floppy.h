@@ -22,137 +22,7 @@ namespace fs {
 	class meta_data;
 };
 
-/*
-    Floppy drive sound
-*/
-
-class floppy_sound_device : public samples_device
-{
-public:
-	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void motor(bool on, bool withdisk);
-	void step(int track);
-	void unload() { m_firstturn = true; }
-	bool samples_loaded() { return m_samples_available; }
-	void register_for_save_states();
-
-	enum
-	{
-		QUIET=-1,       // also used for the sample index when there is no sound
-		START_EMPTY=0,
-		SPIN_EMPTY,
-		END_EMPTY,
-		START_LOADED_INITIAL,
-		START_LOADED,
-		SPIN_LOADED,        // mandatory; this sample is a fallback for all other spin samples
-		END_LOADED
-	};
-
-	enum {
-		END=0,
-		DIR,
-		SPIN,
-		STEP,
-		SEEK
-	};
-
-	struct floppysoundentry {
-		int type;        // end of list, spin, step, or seek
-		int mintrack;    // valid from here (including), meaningless for spin entries
-		int maxtrack;    // to here (including), meaningless for spin entries
-		int rate;        // actual rate of the seek sample
-		int use;         // max rate for seek entries, type for spin entries, meaningless for step
-		const char *filename;
-	};
-
-	void set_samples(const floppysoundentry *samples);
-
-protected:
-	void device_start() override ATTR_COLD;
-
-private:
-	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream) override;
-	sound_stream*   m_sound;
-
-	const  floppysoundentry *m_samplelist;
-	std::vector<const char*> m_samplenames;     // Constructed list for samples_device
-
-	std::string m_dir;          // Subdirectory which contains the samples
-	bool   m_motor_on;
-	bool   m_with_disk;
-	int    m_spin_kind;
-	int    m_spin_sample;
-	int    m_spin_samplepos;
-	int    m_step_sample;
-	int    m_step_samplepos;
-	int    m_seek_sample;
-	double m_seek_samplepos;    // we may using a non-integer pitch
-	double m_seek_pitch;
-	int    m_seek_sound_timeout;
-	attotime m_last_step_time;
-
-	 // Used to pick a different sound sample when the disk is spun the first
-	 // time, in particular with 3.5" drives
-	 bool m_firstturn;
-	 bool m_samples_available;
-	 bool m_in_seek;
-	 double m_step_rate;
-
-	 int find_spin(int kind);
-	 int find_step(int track);
-	 int find_seek(double rate, int track, double& pitch);
-};
-
-#define SAMPLES_DIR(dir) { floppy_sound_device::DIR, 0, 0, 0, 0, dir },
-#define SAMPLES_END { floppy_sound_device::END, 0, 0, 0, 0, nullptr },
-#define SPIN_SAMPLE(type, file) { floppy_sound_device::SPIN, 0, 99, 0, type, file },
-#define STEP_SAMPLE(file) { floppy_sound_device::STEP, 0, 99, 0, 0, file },
-#define STEP_SAMPLE_RANGE(from, to, file) { floppy_sound_device::STEP, from, to, 0, 0, file },
-#define SEEK_SAMPLE(nomrate, maxrate, file) { floppy_sound_device::SEEK, 0, 99, nomrate, maxrate, file },
-
-#define FLOPPY_SOUND(name) static const floppy_sound_device::floppysoundentry name[] = {
-#define FLOPPY_SOUND_END SAMPLES_END };
-
-/*
-    Unless labeled "constructed", all samples were recorded from real floppy drives.
-    The 3.5" floppy drive is a Sony MPF420-1.
-    The 5.25" floppy drive is a Chinon FZ502.
-*/
-
-FLOPPY_SOUND(floppy525_samples)
-	SAMPLES_DIR("floppy")
-
-	SPIN_SAMPLE( floppy_sound_device::START_EMPTY,  "525_spin_start_empty" )
-	SPIN_SAMPLE( floppy_sound_device::START_LOADED, "525_spin_start_loaded" )
-	SPIN_SAMPLE( floppy_sound_device::SPIN_EMPTY,   "525_spin_empty" )
-	SPIN_SAMPLE( floppy_sound_device::SPIN_LOADED,  "525_spin_loaded" )
-	SPIN_SAMPLE( floppy_sound_device::END_LOADED,   "525_spin_end" )
-
-	SEEK_SAMPLE( 6, 9, "525_seek_6ms" )
-	SEEK_SAMPLE( 12, 15, "525_seek_12ms" )
-	SEEK_SAMPLE( 20, 50, "525_seek_20ms" )
-
-	STEP_SAMPLE( "525_step_1_1" )
-
-FLOPPY_SOUND_END
-
-FLOPPY_SOUND(floppy35_samples)
-	SAMPLES_DIR("floppy")
-
-	SPIN_SAMPLE( floppy_sound_device::START_EMPTY,  "35_spin_start_empty" )
-	SPIN_SAMPLE( floppy_sound_device::START_LOADED, "35_spin_start_loaded" )
-	SPIN_SAMPLE( floppy_sound_device::SPIN_EMPTY,   "35_spin_empty" )
-	SPIN_SAMPLE( floppy_sound_device::SPIN_LOADED,  "35_spin_loaded" )
-	SPIN_SAMPLE( floppy_sound_device::END_LOADED,   "35_spin_end" )
-
-	STEP_SAMPLE( "35_step_1_1" )
-
-	SEEK_SAMPLE( 2, 3, "35_seek_2ms" )        // constructed
-	SEEK_SAMPLE( 6, 9, "35_seek_6ms" )
-	SEEK_SAMPLE( 12, 15, "35_seek_12ms" )
-	SEEK_SAMPLE( 20, 50, "35_seek_20ms" )
-FLOPPY_SOUND_END
+class floppy_sound_device;
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -288,11 +158,7 @@ public:
 	static void default_pc_floppy_formats(format_registration &fr);
 
 	// Enable sound
-	// Settings are forwarded from the connector
-	void    enable_sound(const floppy_sound_device::floppysoundentry *samples3,
-						const floppy_sound_device::floppysoundentry *samples35,
-						const floppy_sound_device::floppysoundentry *samples525,
-						const floppy_sound_device::floppysoundentry *samples8 );
+	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
 	struct fs_enum;
@@ -408,12 +274,7 @@ protected:
 	void cache_weakness_setup();
 
 	// Sound
-	bool m_make_sound;
-	const floppy_sound_device::floppysoundentry *m_samples3;
-	const floppy_sound_device::floppysoundentry *m_samples35;
-	const floppy_sound_device::floppysoundentry *m_samples525;
-	const floppy_sound_device::floppysoundentry *m_samples8;
-
+	bool    m_make_sound;
 	floppy_sound_device* m_sound_out;
 };
 
@@ -534,6 +395,46 @@ DECLARE_DEVICE_TYPE(OAD34V, oa_d34v_device)
 DECLARE_DEVICE_TYPE(MFD51W, mfd51w_device)
 DECLARE_DEVICE_TYPE(MFD75W, mfd75w_device)
 
+
+/*
+    Floppy drive sound
+*/
+
+class floppy_sound_device : public samples_device
+{
+public:
+	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void motor(bool on, bool withdisk);
+	void step(int track);
+	bool samples_loaded() { return m_loaded; }
+	void register_for_save_states();
+
+protected:
+	void device_start() override ATTR_COLD;
+
+private:
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream) override;
+	sound_stream*   m_sound;
+
+	int         m_step_base;
+	int         m_spin_samples;
+	int         m_step_samples;
+	int         m_spin_samplepos;
+	int         m_step_samplepos;
+	int         m_seek_sound_timeout;
+	int         m_zones;
+	int         m_spin_playback_sample;
+	int         m_step_playback_sample;
+	int         m_seek_playback_sample;
+	bool        m_motor_on;
+	bool        m_with_disk;
+	bool        m_loaded;
+	double      m_seek_pitch;
+	double      m_seek_samplepos;
+};
+
+
 class floppy_connector: public device_t,
 						public device_slot_interface
 {
@@ -566,14 +467,7 @@ public:
 	virtual ~floppy_connector();
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
-	void enable_sound(bool doit);
-	void enable_sound(const floppy_sound_device::floppysoundentry *samples);
-
-	void enable_sound(  const floppy_sound_device::floppysoundentry *samples3,
-						const floppy_sound_device::floppysoundentry *samples35,
-						const floppy_sound_device::floppysoundentry *samples525,
-						const floppy_sound_device::floppysoundentry *samples8 );
-
+	void enable_sound(bool doit) { m_enable_sound = doit; }
 	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
 
 	floppy_image_device *get_device();
@@ -584,12 +478,7 @@ protected:
 
 private:
 	std::function<void (format_registration &fr)> formats;
-
-	const floppy_sound_device::floppysoundentry *m_samples3;
-	const floppy_sound_device::floppysoundentry *m_samples35;
-	const floppy_sound_device::floppysoundentry *m_samples525;
-	const floppy_sound_device::floppysoundentry *m_samples8;
-
+	bool m_enable_sound;
 	uint32_t m_sectoring_type;
 };
 

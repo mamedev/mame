@@ -29,7 +29,7 @@ protected:
 
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(u8 command, u8 length) override;
-//	virtual attotime scsi_data_command_delay() override;
+//  virtual attotime scsi_data_command_delay() override;
 
 	virtual TIMER_CALLBACK_MEMBER(cdda_fader_cb);
 private:

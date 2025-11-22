@@ -3364,6 +3364,7 @@ void upd72069_device::auxcmd_w(uint8_t data)
 	case 0x47: // start clock
 	case 0x34: // reset standby
 	case 0x33: // enable external mode
+	case 0x80: // Not a valid auxcmd, but the Akai S3000 sends it and expects an ACK.
 		main_phase = PHASE_RESULT;
 		result[0] = ST0_UNK;
 		result_pos = 1;

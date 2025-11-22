@@ -12,7 +12,7 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 	case 0: { // -
 		break;
 		}
-	case 1: { // 
+	case 1: { //
 		break;
 		}
 	case 2: { // abs a
@@ -1332,7 +1332,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 	case 0: { // -
 		break;
 		}
-	case 1: { // 
+	case 1: { //
 		break;
 		}
 	case 2: { // #[i],x0
@@ -14806,7 +14806,7 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 	case 0: { // -
 		break;
 		}
-	case 1: { // 
+	case 1: { //
 		break;
 		}
 	case 2: { // #[i],x0
@@ -27100,7 +27100,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 0: { // -
 		break;
 		}
-	case 1: { // 
+	case 1: { //
 		break;
 		}
 	case 2: { // move x:(r+[o]),x0

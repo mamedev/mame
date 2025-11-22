@@ -1410,33 +1410,33 @@ uint32_t tms3203x_device::modillegal_def(uint32_t op, uint8_t ar, uint32_t *&def
 #define ABSF(dreg, sreg)                                                \
 {                                                                       \
 	int32_t man = FREGMAN(sreg);                                        \
-	int8_t fexp = FREGEXP(sreg);									    \
+	int8_t fexp = FREGEXP(sreg);                                        \
 	CLR_NZVUF();                                                        \
 	m_r[dreg] = m_r[sreg];                                              \
-	if (fexp == -128)													\
-	{	/* if sreg was misformed, it should come out 80:00000000 */     \
-		m_r[dreg].set_mantissa(0);										\
-	}																	\
-	else																\
+	if (fexp == -128)                                                   \
+	{   /* if sreg was misformed, it should come out 80:00000000 */     \
+		m_r[dreg].set_mantissa(0);                                      \
+	}                                                                   \
+	else                                                                \
 	if (man < 0)                                                        \
 	{                                                                   \
 		if (man == (int32_t)0x80000000)                                 \
 		{                                                               \
-			if (fexp == 127)									        \
+			if (fexp == 127)                                            \
 			{ /* total overflow result: 7F:7FFFFFFFF */                 \
-			    IREG(TMR_ST) |= VFLAG | LVFLAG;                         \
-				m_r[dreg].set_mantissa(0x7fffffff);						\
-			}															\
-			else														\
+				IREG(TMR_ST) |= VFLAG | LVFLAG;                         \
+				m_r[dreg].set_mantissa(0x7fffffff);                     \
+			}                                                           \
+			else                                                        \
 			{ /* man overflow -80000000 to +80000000 : increment exp */ \
-				m_r[dreg].set_exponent(fexp + 1);						\
-				m_r[dreg].set_mantissa(0);								\
-			}															\
-        }																\
-		else															\
+				m_r[dreg].set_exponent(fexp + 1);                       \
+				m_r[dreg].set_mantissa(0);                              \
+			}                                                           \
+		}                                                               \
+		else                                                            \
 		{ /* normal case */                                             \
 			m_r[dreg].set_mantissa(-man); /* aka (~man)+1 */            \
-		}																\
+		}                                                               \
 	}                                                                   \
 	OR_NZF(m_r[dreg]);                                                  \
 }

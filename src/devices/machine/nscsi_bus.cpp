@@ -17,6 +17,8 @@
 #define VERBOSE (LOG_UNSUPPORTED)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
+
+
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_BUS,       nscsi_bus_device, "nscsi_bus",       "SCSI Bus (new)")

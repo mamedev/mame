@@ -831,7 +831,7 @@ void funcube_state::funcube2_map(address_map &map)
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
 
-//	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
+//  map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
@@ -2739,10 +2739,10 @@ ROM_END
 
 void funcube_state::init_funcube()
 {
-//	uint16_t *main_cpu = (uint16_t *) memregion("maincpu")->base();
+//  uint16_t *main_cpu = (uint16_t *) memregion("maincpu")->base();
 //
-//	main_cpu[0x064/2] = 0x0000;
-//	main_cpu[0x066/2] = 0x042a; // PIC protection?
+//  main_cpu[0x064/2] = 0x0000;
+//  main_cpu[0x066/2] = 0x042a; // PIC protection?
 
 }
 

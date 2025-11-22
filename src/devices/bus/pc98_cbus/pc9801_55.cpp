@@ -94,7 +94,7 @@ void pc9801_55_device::scsi_drq_w(int state)
 u8 pc9801_55_device::dack_r(int line)
 {
 	//if (!m_dma_enable)
-	//	return 0xff;
+	//  return 0xff;
 	const u8 res = m_wdc->dma_r();
 	return res;
 }
@@ -102,7 +102,7 @@ u8 pc9801_55_device::dack_r(int line)
 void pc9801_55_device::dack_w(int line, u8 data)
 {
 	//if (!m_dma_enable)
-	//	return;
+	//  return;
 
 	m_wdc->dma_w(data);
 }
