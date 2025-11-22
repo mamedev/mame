@@ -4399,7 +4399,7 @@ ROM_START( ccly ) // IGS PCB-0415-05-GD - no XA, contrary to the other regions s
 	ROM_LOAD( "rom.u21", 0x00000, 0x80000, CRC(f5fd7279) SHA1(4d91c0655bd852c8ff1f0fc9c882e87b37830268) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "rom.u9", 0x000000, 0x080000, CRC(776f198c) SHA1(e567ef98160ccb51688189eac13594ab6aaf13bc) )
+	ROM_LOAD16_WORD_SWAP( "rom.u9", 0x000000, 0x080000, CRC(776f198c) SHA1(e567ef98160ccb51688189eac13594ab6aaf13bc) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "rom.u8", 0x000000, 0x400000, CRC(5b9863ba) SHA1(c4080076e03994056ac94d7c0a5ffcabd9505f9a) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
@@ -4418,7 +4418,7 @@ ROM_START( cjsxp ) // IGS PCB-0362-02-FP. 3 banks of 8 switches.
 	ROM_LOAD( "v103cn.u18", 0x00000, 0x80000, CRC(9fb75727) SHA1(47c1c640e618b7fb49b0254639880a1b4104b932) ) // no label
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD16_WORD_SWAP( "text.u15", 0x00000, 0x80000, CRC(3ac39fa3) SHA1(cff8086fa31ef50d220f1434ba8dd4f9b96b2150) )
+	ROM_LOAD( "text.u15", 0x00000, 0x80000, CRC(3ac39fa3) SHA1(cff8086fa31ef50d220f1434ba8dd4f9b96b2150) )
 
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "cg.u14", 0x000000, 0x200000, CRC(a6b52a44) SHA1(e801060d99eefabb214b7446fd5695e351874d40) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
