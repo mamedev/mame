@@ -257,6 +257,56 @@ void isa8_fdc_at_device::device_start()
 	isa8_upd765_fdc_device::device_start();
 }
 
+isa8_fdc_6300p_device::isa8_fdc_6300p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_upd765_fdc_device(mconfig, ISA8_FDC_6300P, tag, owner, clock)
+{
+}
+
+void isa8_fdc_6300p_device::device_add_mconfig(machine_config &config)
+{
+	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
+	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_irq_w));
+	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "525hd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
+}
+
+void isa8_fdc_6300p_device::rc_map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(isa8_fdc_6300p_device::rc_r), FUNC(isa8_fdc_6300p_device::rc_w));
+}
+
+void isa8_fdc_6300p_device::map(address_map &map)
+{
+	map(0x2, 0x2).rw(FUNC(isa8_fdc_6300p_device::dor_r), FUNC(isa8_fdc_6300p_device::dor_w));
+	map(0x4, 0x5).m(m_fdc, FUNC(upd765a_device::map));
+}
+
+void isa8_fdc_6300p_device::device_start()
+{
+	set_isa_device();
+	m_isa->install_device(0x0065, 0x0065, *this, &isa8_fdc_6300p_device::rc_map);
+	m_isa->install_device(0x03f0, 0x03f7, *this, &isa8_fdc_6300p_device::map);
+	m_isa->set_dma_channel(2, this, true);
+
+	isa8_upd765_fdc_device::device_start();
+
+	m_fdc->set_rate(300000);
+
+	save_item(NAME(m_rate));
+}
+
+uint8_t isa8_fdc_6300p_device::rc_r()
+{
+	return m_rate;
+}
+
+void isa8_fdc_6300p_device::rc_w(uint8_t data)
+{
+	static const int rates[4] = { 500000, 300000, 250000, 250000 };
+	m_rate = rates[data&3];
+	m_fdc->set_rate(m_rate);
+}
+
 isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SMC, tag, owner, clock)
 {
 }
@@ -342,6 +392,7 @@ void isa8_ec1841_0003_device::device_add_mconfig(machine_config &config)
 
 DEFINE_DEVICE_TYPE(ISA8_FDC_XT,      isa8_fdc_xt_device,      "isa8_fdc_xt",      "ISA 8bits XT FDC hookup")
 DEFINE_DEVICE_TYPE(ISA8_FDC_AT,      isa8_fdc_at_device,      "isa8_fdc_at",      "ISA 8bits AT FDC hookup")
+DEFINE_DEVICE_TYPE(ISA8_FDC_6300P,   isa8_fdc_6300p_device,   "isa8_fdc_6300p",   "ISA 8bits 6300 Plus FDC hookup")
 DEFINE_DEVICE_TYPE(ISA8_FDC_SMC,     isa8_fdc_smc_device,     "isa8_fdc_smc",     "ISA 8bits SMC FDC hookup")
 DEFINE_DEVICE_TYPE(ISA8_FDC_PS2,     isa8_fdc_ps2_device,     "isa8_fdc_ps2",     "ISA 8bits PS/2 FDC hookup")
 DEFINE_DEVICE_TYPE(ISA8_FDC_SUPERIO, isa8_fdc_superio_device, "isa8_fdc_superio", "ISA 8bits SUPERIO FDC hookup")

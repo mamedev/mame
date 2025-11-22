@@ -97,6 +97,25 @@ protected:
 	void map(address_map &map) ATTR_COLD;
 };
 
+class isa8_fdc_6300p_device : public isa8_upd765_fdc_device {
+public:
+	isa8_fdc_6300p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+	void map(address_map &map) ATTR_COLD;
+	void rc_map(address_map &map) ATTR_COLD;
+
+    uint8_t rc_r();
+    void rc_w(uint8_t data);
+
+private:
+    int m_rate;
+};
+
 class isa8_fdc_smc_device : public isa8_fdc_device {
 public:
 	isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -141,6 +160,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ISA8_FDC_XT,      isa8_fdc_xt_device)
 DECLARE_DEVICE_TYPE(ISA8_FDC_AT,      isa8_fdc_at_device)
+DECLARE_DEVICE_TYPE(ISA8_FDC_6300P,   isa8_fdc_6300p_device)
 DECLARE_DEVICE_TYPE(ISA8_FDC_SMC,     isa8_fdc_smc_device)
 DECLARE_DEVICE_TYPE(ISA8_FDC_PS2,     isa8_fdc_ps2_device)
 DECLARE_DEVICE_TYPE(ISA8_FDC_SUPERIO, isa8_fdc_superio_device)

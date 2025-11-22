@@ -127,6 +127,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("fdc", ISA8_FDC_SUPERIO);
 	device.option_add("fdc_xt", ISA8_FDC_XT);
 	device.option_add("fdc_at", ISA8_FDC_AT);
+	device.option_add("fdc_6300p", ISA8_FDC_6300P);
 	device.option_add("fdc_smc", ISA8_FDC_SMC);
 	device.option_add("fdc_ps2", ISA8_FDC_PS2);
 	device.option_add("fdc344", ISA8_FDC344);

@@ -321,7 +321,6 @@ private:
 	uint8_t m_trapio_reg_idx;
 	uint16_t m_trapio_reg[4][4];
 
-	static void cfg_m20_format(device_t *device);
 	static void cfg_no_serial_mouse(device_t *device);
 	void kbc_map(address_map &map) ATTR_COLD;
 
@@ -862,7 +861,7 @@ void att6300p_state::att6300p_vio_map(address_map &map)
 static INPUT_PORTS_START( att6300p )
 	PORT_START("DSW1")
 
-	PORT_DIPNAME( 0x01, 0x01, "Drive B Type")           PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Drive B Type")           PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, "96 TPI" )
 	PORT_DIPSETTING(    0x00, "48 TPI" )
 	PORT_DIPNAME( 0x02, 0x02, "Drive A Type")           PORT_DIPLOCATION("DSW1:2")
@@ -902,19 +901,6 @@ static INPUT_PORTS_START( att6300p )
 	PORT_DIPSETTING(    0x00, "64K" )
 	PORT_DIPSETTING(    0x80, "32K" )
 INPUT_PORTS_END
-
-void att6300p_state::floppy_formats(format_registration &fr)
-{
-	fr.add_pc_formats();
-	fr.add(FLOPPY_NASLITE_FORMAT);
-	fr.add(FLOPPY_M20_FORMAT);
-}
-
-void att6300p_state::cfg_m20_format(device_t *device)
-{
-	device->subdevice<floppy_connector>("fdc:0")->set_formats(att6300p_state::floppy_formats);
-	device->subdevice<floppy_connector>("fdc:1")->set_formats(att6300p_state::floppy_formats);
-}
 
 void att6300p_state::cfg_no_serial_mouse(device_t *device)
 {
@@ -980,7 +966,7 @@ void att6300p_state::att6300p(machine_config &config)
 	m_isabus->iochck_callback().set(FUNC(att6300p_state::chck_w));
 
 	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
-	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
+	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_6300p", true);
 	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
 	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
