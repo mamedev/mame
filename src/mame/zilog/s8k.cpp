@@ -1003,6 +1003,7 @@ void s8k_state::s8k(machine_config &config)
 	m_ctc[2]->zc_callback<0>().append(m_sio[3], FUNC(z80sio_device::txca_w));
 	m_ctc[2]->zc_callback<1>().set(m_sio[3], FUNC(z80sio_device::rxcb_w));
 	m_ctc[2]->zc_callback<1>().append(m_sio[3], FUNC(z80sio_device::txcb_w));
+	m_ctc[2]->zc_callback<2>().set(m_ctc[2], FUNC(z80ctc_device::trg3));
 	m_ctc[2]->intr_callback().set(FUNC(s8k_state::daisy_interrupt));
 
 	Z80PIO(config, m_pio, MAIN_CLOCK);
