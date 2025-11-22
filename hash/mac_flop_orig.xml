@@ -1168,62 +1168,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizardryiv">
-		<description>Wizardry VI: Bane of the Cosmic Forge</description>
-		<year>1990</year>
-		<publisher>Sir-Tech Software</publisher>
-		<info name="programmer" value="D. W. Bradley" />
-		<info name="programmer" value="Gary Speegle" />
-		<info name="programmer" value="Chris Appel" />
-		<info name="programmer" value="Renata Dolnick" />
-		<info name="programmer" value="Suzanne Snelling" />
-		<info name="programmer" value="Paul McCall" />
-		<info name="programmer" value="Brenda Garno" />
-		<info name="programmer" value="Steve Miller" />
-		<info name="programmer" value="Jeff Noyle" />
-		<info name="programmer" value="David Triggerson" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="macplus,macse,macclasc" />
-		<!--Dump released: 2022-11-18-->
-		<!--roleplaying game-->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk a" />
-			<dataarea name="flop" size="1296283">
-				<rom name="wizardry vi - disk a.moof" size="1296283" crc="22159b3f" sha1="2515df08c939890e4d3d74bbdf15fa808449df8c" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk b" />
-			<dataarea name="flop" size="1296283">
-				<rom name="wizardry vi - disk b.moof" size="1296283" crc="01713dfc" sha1="e74c53efda0418be6faf4c2805e3a219e89ed91b" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk c" />
-			<dataarea name="flop" size="1312667">
-				<rom name="wizardry vi - disk c.moof" size="1312667" crc="9342391e" sha1="3536f44b32b91a990a2e1055727b7e8223adb035" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk d" />
-			<dataarea name="flop" size="1296283">
-				<rom name="wizardry vi - disk d.moof" size="1296283" crc="ab262766" sha1="fd3cfd1ec5bf7a5439b6bdf4cdfef91a0f48814f" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk e" />
-			<dataarea name="flop" size="1296283">
-				<rom name="wizardry vi - disk e.moof" size="1296283" crc="cb5d778a" sha1="f740c2524a9fcdb42048a59fbe7a50648fe3ff49" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk f" />
-			<dataarea name="flop" size="1296283">
-				<rom name="wizardry vi - disk f.moof" size="1296283" crc="c048d63c" sha1="73a3d1d05b99ff8ae81d735ac79efd4a13d240c8" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="airborne">
 		<description>Airborne!</description>
 		<year>1984</year>
@@ -3680,6 +3624,34 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="earlwvbb">
+		<description>Earl Weaver Baseball (version 1.5)</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Eddie Dombrower" />
+		<info name="programmer" value=" W. Mark Whittlesey" />
+		<info name="programmer" value=" Bill Rommerdahl" />
+		<info name="programmer" value=" William Buckley" />
+		<info name="usage" value="Requires a 1 MB Mac Plus or later." />
+		<info name="version" value="1.5" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k,mac512ke" />
+		<!-- Dump released: 2025-09-29 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296257">
+				<rom name="earl weaver baseball v1.5 disk 1.moof" size="1296257" crc="480e22b2" sha1="2e25a19d9ec61f341dc8ad16798f06c2c8109e48" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296266">
+				<rom name="earl weaver baseball v1.5 disk 2.moof" size="1296266" crc="470a02c8" sha1="ee8f3f64ee3d8d4446c443098931a95d86389544" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fokkertps">
 		<description>Fokker Triplane Flight Simulator (version 1985-10-31)</description>
 		<year>1985</year>
@@ -4038,6 +4010,73 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="649150">
 				<rom name="uninvited disk 2.moof" size="649150" crc="04c6f91e" sha1="d70db8a9e11db1243703c87b711be37147530bff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardry2">
+		<description>Wizardry II: The Knight of Diamonds (version 4.0)</description>
+		<year>1992</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew C. Greenberg" />
+		<info name="programmer" value="Robert J. Woodhead" />
+		<info name="programmer" value="Terry Monks" />
+		<info name="usage" value="Self-boots and runs on Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="4.0" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2025-09-29. Redumped 2025-10-31 to fix self-boot. -->
+		<!-- role-playing game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296245">
+				<rom name="wizardry ii v4.0.moof" size="1296245" crc="6ce903c4" sha1="4189f0c367dba60cc0df469930928ae35aa505aa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardry4">
+		<description>Wizardry VI: Bane of the Cosmic Forge</description>
+		<year>1990</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="D. W. Bradley" />
+		<info name="programmer" value="Gary Speegle" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="macplus,macse,macclasc" />
+		<!--Dump released: 2022-11-18-->
+		<!--role-playing game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk a.moof" size="1296283" crc="22159b3f" sha1="2515df08c939890e4d3d74bbdf15fa808449df8c" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk b.moof" size="1296283" crc="01713dfc" sha1="e74c53efda0418be6faf4c2805e3a219e89ed91b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1312667">
+				<rom name="wizardry vi - disk c.moof" size="1312667" crc="9342391e" sha1="3536f44b32b91a990a2e1055727b7e8223adb035" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk d.moof" size="1296283" crc="ab262766" sha1="fd3cfd1ec5bf7a5439b6bdf4cdfef91a0f48814f" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk e.moof" size="1296283" crc="cb5d778a" sha1="f740c2524a9fcdb42048a59fbe7a50648fe3ff49" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F" />
+			<dataarea name="flop" size="1296283">
+				<rom name="wizardry vi - disk f.moof" size="1296283" crc="c048d63c" sha1="73a3d1d05b99ff8ae81d735ac79efd4a13d240c8" />
 			</dataarea>
 		</part>
 	</software>

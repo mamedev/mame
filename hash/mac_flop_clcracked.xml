@@ -924,24 +924,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizard110">
-		<description>Wizardry: Proving Grounds of the Mad Overlord (version 1.10) (san inc crack)</description>
-		<year>1985</year>
-		<publisher>Sir-Tech Software</publisher>
-		<info name="programmer" value="Andrew C. Greenberg" />
-		<info name="programmer" value="Robert J. Woodhead" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<info name="version" value="1.10" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
-		<!--Dump released: 2023-01-15-->
-		<!--roleplaying game-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="419284">
-				<rom name="wizardry (san inc crack).dc42" size="419284" crc="49024d6f" sha1="73cbae1c015dcc3f01d1f596a9aa6460261990a2" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="simcity11">
 		<description>SimCity (version 1.1) (4am crack)</description>
 		<year>1989</year>
@@ -2269,6 +2251,34 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="earlwvbb">
+		<description>Earl Weaver Baseball (version 1.5) (san inc crack)</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Eddie Dombrower" />
+		<info name="programmer" value=" W. Mark Whittlesey" />
+		<info name="programmer" value=" Bill Rommerdahl" />
+		<info name="programmer" value=" William Buckley" />
+		<info name="usage" value="Requires a 1 MB Mac Plus or later." />
+		<info name="version" value="1.5" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k,mac512ke" />
+		<!-- Dump released: 2025-09-29 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="838484">
+				<rom name="earl weaver baseball v1.5 (san inc crack) disk 1.dc42" size="838484" crc="484bad80" sha1="5114a21d82f49e1bf215416fb91c9e1f10ba5489" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="838484">
+				<rom name="earl weaver baseball v1.5 (san inc crack) disk 2.dc42" size="838484" crc="3f7302bd" sha1="9268721bc30f706851ca8784abe08c25e95d010b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="feathspc">
 		<description>Feathers &amp; Space (version 1.1) (san inc crack)</description>
 		<year>1985</year>
@@ -2697,6 +2707,43 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="419284">
 				<rom name="uninvited v2.1d1 (san inc crack) disk 2.dc42" size="419284" crc="27b3b930" sha1="6f81015f09e9bd51696d6e37bc387bbf24f493f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardry1">
+		<description>Wizardry: Proving Grounds of the Mad Overlord (version 1.10) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew C. Greenberg" />
+		<info name="programmer" value="Robert J. Woodhead" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="1.10" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!--Dump released: 2023-01-15-->
+		<!--roleplaying game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="wizardry (san inc crack).dc42" size="419284" crc="49024d6f" sha1="73cbae1c015dcc3f01d1f596a9aa6460261990a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizardry2">
+		<description>Wizardry II: The Knight of Diamonds (version 4.0) (san inc crack)</description>
+		<year>1992</year>
+		<publisher>Sir-Tech Software</publisher>
+		<info name="programmer" value="Andrew C. Greenberg" />
+		<info name="programmer" value="Robert J. Woodhead" />
+		<info name="programmer" value="Terry Monks" />
+		<info name="usage" value="Self-boots and runs on Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="4.0" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2025-09-29 -->
+		<!-- role-playing game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="838484">
+				<rom name="wizardry ii v4.0 (san inc crack).dc42" size="838484" crc="5ee6a755" sha1="b9c99ab4a26aa72d42cdaaea2981d600841e65ce" />
 			</dataarea>
 		</part>
 	</software>
