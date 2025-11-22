@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="st_flop" description="Atari ST demo disk images">
+<softwarelist name="st_flop_demos" description="Atari ST demo disk images">
 
 	<!-- https://www.pouet.net/prod.php?which=102708 -->
 	<software name="amjfaith">
