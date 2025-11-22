@@ -72,19 +72,21 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	device_gfx_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_pri_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_priority)),
+	m_mix_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_mix)),
 	m_read_spritetile(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetile)),
 	m_read_spriteformat(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spriteformat)),
 	m_read_spritetable(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetable)),
 	m_read_cliptable(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_cliptable)),
 	m_read_spritelist(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritelist)),
-	m_palxor(0),
 	m_buffer(0),
 	m_external_prifill(false),
+	m_alt_precision(false),
+	m_transpen(255),
 	m_colbase(0),
 	m_colors(16),
 	m_granularity(256),
 	m_draw_2_lists(true),
-	m_device_allocates_spriteram_and_bitmaps(true)
+	m_device_allocates_spriteram(true)
 {
 	std::fill(std::begin(m_position), std::end(m_position), 0);
 	std::fill(std::begin(m_scrolloffs), std::end(m_scrolloffs), 0);
@@ -99,25 +101,20 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 
 /**************************************************************************************/
 
-template<class BitmapClass>
 void namco_c355spr_device::zdrawgfxzoom(
-	BitmapClass *dest_bmp, const rectangle &clip, gfx_element *gfx,
+	bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	u32 code, u32 color, bool flipx, bool flipy, int hpos, int vpos,
 	int hsize, int vsize, u8 prival,
-
-	bitmap_ind8 *pri_buffer,
-	int sprite_screen_width, int  sprite_screen_height,
-	bitmap_ind8 *pri_bitmap)
+	int sprite_screen_width, int sprite_screen_height)
 {
 	if (!hsize || !vsize) return;
 	if (!gfx) return;
 
-	const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const pen_t *palpen = &gfx->palette().pen(pal);
-
-	const u8 *source_base = gfx->get_data(code % gfx->elements());
 	if (sprite_screen_width && sprite_screen_height)
 	{
+		const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+
+		const u8 *source_base = gfx->get_data(code % gfx->elements());
 		/* compute sprite increment per screen pixel */
 		int dx = (gfx->width() << 16) / sprite_screen_width;
 		int dy = (gfx->height() << 16) / sprite_screen_height;
@@ -176,42 +173,16 @@ void namco_c355spr_device::zdrawgfxzoom(
 			for (int y = vpos; y < ey; y++)
 			{
 				u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
-				auto *const dest = &dest_bmp->pix(y);
+				u16 *const dest = &dest_bmp.pix(y);
 				int x_index = x_index_base;
-				u8 *pri = nullptr;
-
-				if (dest_bmp->bpp() == 32)
-					pri = &pri_bitmap->pix(y);
-
 				for (int x = hpos; x < ex; x++)
 				{
-					if (dest_bmp->bpp() == 16)
+					const u8 c = source[x_index >> 16];
+					if (c != m_transpen)
 					{
-						const u8 c = source[x_index >> 16];
-						if (c != 0xff)
-						{
-							dest[x] = ((prival & 0xf) << 12) | ((pal + c) & 0xfff);
-						}
-						x_index += dx;
+						dest[x] = ((prival & 0xf) << 12) | ((pal + c) & 0xfff);
 					}
-					else if (dest_bmp->bpp() == 32)
-					{
-						int c = source[x_index >> 16];
-						if (c != 15)
-						{
-							if (prival >= pri[x])
-							{
-								dest[x] = palpen[c];
-								dest[x] |= 0xff000000;
-							}
-							else // sprites can have a 'masking' effect on other sprites
-							{
-								dest[x] = 0x00000000;
-							}
-						}
-
-						x_index += dx;
-					}
+					x_index += dx;
 				}
 				y_index += dy;
 			}
@@ -219,148 +190,56 @@ void namco_c355spr_device::zdrawgfxzoom(
 	}
 }
 
-void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri)
+bool namco_c355spr_device::default_mix(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
 {
-	if (m_palxor)
+	if ((src & 0xff) != 0xff)
 	{
-		for (int y = clip.min_y; y <= clip.max_y; y++)
-		{
-			u16 *const src = &m_renderbitmap.pix(y);
-			u16 *const dest = &dest_bmp.pix(y);
-			for (int x = clip.min_x; x <= clip.max_x; x++)
-			{
-				if (src[x] != 0xffff)
-				{
-					u8 srcpri = (src[x] >> 12) & 0xf;
-					u16 c = src[x] & 0xfff;
-					if (srcpri == pri)
-					{
-						if ((c & 0xff) != 0xff)
-						{
-							switch (c & 0xff)
-							{
-							case 0:
-								dest[x] = 0x4000|(dest[x] & 0x1fff);
-								break;
-							case 1:
-								dest[x] = 0x6000|(dest[x] & 0x1fff);
-								break;
-							default:
-								dest[x] = gfx(0)->colorbase() + c;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
+		dest = colbase + src;
+		return true;
 	}
-	else
+	return false;
+}
+
+void namco_c355spr_device::copybitmap(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, int pri)
+{
+	for (int y = clip.min_y; y <= clip.max_y; y++)
 	{
-		for (int y = clip.min_y; y <= clip.max_y; y++)
+		u16 *const src = &m_renderbitmap.pix(y);
+		u16 *const dest = &dest_bmp.pix(y);
+		u8 *const destpri = &screen.priority().pix(y);
+		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
-			u16 *const src = &m_renderbitmap.pix(y);
-			u16 *const dest = &dest_bmp.pix(y);
-			for (int x = clip.min_x; x <= clip.max_x; x++)
+			if (src[x] != 0xffff)
 			{
-				if (src[x] != 0xffff)
-				{
-					u8 srcpri = (src[x] >> 12) & 0xf;
-					u16 c = src[x] & 0xfff;
-					if (srcpri == pri)
-					{
-						if ((c & 0xff) != 0xff)
-						{
-							if (c == 0xffe)
-							{
-								dest[x] |= 0x800;
-							}
-							else
-							{
-								dest[x] = gfx(0)->colorbase() + c;
-							}
-						}
-					}
-				}
+				const u8 srcpri = (src[x] >> 12) & 0xf;
+				const u16 c = src[x] & 0xfff;
+				m_mix_cb(dest[x], destpri[x], gfx(0)->colorbase(), c, srcpri, pri);
 			}
 		}
 	}
 }
 
-void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri)
+void namco_c355spr_device::copybitmap(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, int pri)
 {
 	device_palette_interface &palette = gfx(0)->palette();
-	const pen_t *pal = &palette.pen(gfx(0)->colorbase());
-	if (m_palxor)
+	const pen_t *pal = palette.pens();
+	for (int y = clip.min_y; y <= clip.max_y; y++)
 	{
-		for (int y = clip.min_y; y <= clip.max_y; y++)
+		u16 *const src = &m_renderbitmap.pix(y);
+		u16 *const srcrender = &m_screenbitmap.pix(y);
+		u32 *const dest = &dest_bmp.pix(y);
+		u8 *const destpri = &screen.priority().pix(y);
+		for (int x = clip.min_x; x <= clip.max_x; x++)
 		{
-			u16 *const src = &m_renderbitmap.pix(y);
-			u16 *const srcrender = &m_screenbitmap.pix(y);
-			u32 *const dest = &dest_bmp.pix(y);
-			for (int x = clip.min_x; x <= clip.max_x; x++)
+			if (src[x] != 0xffff)
 			{
-				if (src[x] != 0xffff)
-				{
-					u8 srcpri = (src[x] >> 12) & 0xf;
-					u16 c = src[x] & 0xfff;
-					if (srcpri == pri)
-					{
-						if ((c & 0xff) != 0xff)
-						{
-							switch (c & 0xff)
-							{
-							case 0:
-								srcrender[x] = 0x4000|(srcrender[x] & 0x1fff);
-								break;
-							case 1:
-								srcrender[x] = 0x6000|(srcrender[x] & 0x1fff);
-								break;
-							default:
-								srcrender[x] = c;
-								break;
-							}
-							dest[x] = pal[srcrender[x]];
-						}
-					}
-				}
-				else if (srcrender[x] != 0xffff)
+				const u8 srcpri = (src[x] >> 12) & 0xf;
+				const u16 c = src[x] & 0xfff;
+				if (m_mix_cb(srcrender[x], destpri[x], gfx(0)->colorbase(), c, srcpri, pri))
 					dest[x] = pal[srcrender[x]];
 			}
-		}
-	}
-	else
-	{
-		for (int y = clip.min_y; y <= clip.max_y; y++)
-		{
-			u16 *const src = &m_renderbitmap.pix(y);
-			u16 *const srcrender = &m_screenbitmap.pix(y);
-			u32 *const dest = &dest_bmp.pix(y);
-			for (int x = clip.min_x; x <= clip.max_x; x++)
-			{
-				if (src[x] != 0xffff)
-				{
-					u8 srcpri = (src[x] >> 12) & 0xf;
-					u16 c = src[x] & 0xfff;
-					if (srcpri == pri)
-					{
-						if ((c & 0xff) != 0xff)
-						{
-							if (c == 0xffe)
-							{
-								srcrender[x] |= 0x800;
-							}
-							else
-							{
-								srcrender[x] = c;
-							}
-							dest[x] = pal[srcrender[x]];
-						}
-					}
-				}
-				else if (srcrender[x] != 0xffff)
-					dest[x] = pal[srcrender[x]];
-			}
+			else if (srcrender[x] != 0xffff)
+				dest[x] = pal[gfx(0)->colorbase() + srcrender[x]];
 		}
 	}
 }
@@ -374,6 +253,9 @@ void namco_c355spr_device::device_start()
 
 	m_pri_cb.resolve();
 
+	screen().register_screen_bitmap(m_renderbitmap);
+	screen().register_screen_bitmap(m_screenbitmap);
+
 	std::fill(std::begin(m_position), std::end(m_position), 0x0000);
 
 	for (int i = 0; i < 2; i++)
@@ -382,7 +264,7 @@ void namco_c355spr_device::device_start()
 		m_sprite_end[i] = m_spritelist[i].get();
 	}
 
-	if (m_device_allocates_spriteram_and_bitmaps)
+	if (m_device_allocates_spriteram)
 	{
 		for (int i = 0; i < 2; i++)
 		{
@@ -390,9 +272,6 @@ void namco_c355spr_device::device_start()
 			std::fill_n(m_spriteram[i].get(), 0x20000 / 2, 0);
 			save_pointer(NAME(m_spriteram[i]), 0x20000 / 2, i);
 		}
-
-		screen().register_screen_bitmap(m_renderbitmap);
-		screen().register_screen_bitmap(m_screenbitmap);
 	}
 
 	m_read_spritetile.resolve();
@@ -400,6 +279,7 @@ void namco_c355spr_device::device_start()
 	m_read_spritetable.resolve();
 	m_read_cliptable.resolve();
 	m_read_spritelist.resolve();
+	m_mix_cb.resolve();
 
 	save_item(NAME(m_position));
 
@@ -430,7 +310,7 @@ u16 namco_c355spr_device::position_r(offs_t offset)
 /**************************************************************************************************************/
 
 template<class BitmapClass>
-void namco_c355spr_device::draw_sprites(BitmapClass &bitmap, const rectangle &cliprect, int pri)
+void namco_c355spr_device::draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri)
 {
 	if (pri == 0)
 	{
@@ -440,17 +320,17 @@ void namco_c355spr_device::draw_sprites(BitmapClass &bitmap, const rectangle &cl
 				build_sprite_list_and_render_sprites(cliprect);
 		}
 	}
-	copybitmap(bitmap, cliprect, pri);
+	copybitmap(screen, bitmap, cliprect, pri);
 }
 
 void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
 {
-	draw_sprites(bitmap, cliprect, pri);
+	draw_sprites(screen, bitmap, cliprect, pri);
 }
 
 void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
 {
-	draw_sprites( bitmap, cliprect, pri);
+	draw_sprites(screen, bitmap, cliprect, pri);
 }
 
 void namco_c355spr_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -470,7 +350,7 @@ void namco_c355spr_device::vblank(int state)
 		if (m_buffer > 0)
 			build_sprite_list_and_render_sprites(screen().visible_area());
 
-		if (m_buffer > 1)
+		if ((m_buffer > 1) && m_device_allocates_spriteram)
 			std::copy_n(m_spriteram[0].get(), 0x20000/2, m_spriteram[1].get());
 	}
 }
@@ -494,7 +374,7 @@ u16 namco_c355spr_device::read_spritetile(int entry)
 u16 namco_c355spr_device::read_spritetable(int entry, u8 attr, int whichlist)
 {
 	u16 *ram;
-	int buffer = std::max(0, m_buffer - 1);
+	const int buffer = std::max(0, m_buffer - 1);
 	if (whichlist == 0)
 		ram = &m_spriteram[buffer][0x00000 / 2];
 	else
@@ -513,7 +393,7 @@ u16 namco_c355spr_device::read_cliptable(int entry, u8 attr)
 u16 namco_c355spr_device::read_spritelist(int entry, int whichlist)
 {
 	u16 *ram;
-	int buffer = std::max(0, m_buffer - 1);
+	const int buffer = std::max(0, m_buffer - 1);
 	if (whichlist == 0)
 		ram = &m_spriteram[buffer][0x02000 / 2];
 	else
@@ -550,13 +430,12 @@ void namco_c355spr_device::build_sprite_list_and_render_sprites(const rectangle 
 
 	build_sprite_list(1);
 
-	render_sprites(cliprect, nullptr, m_renderbitmap, 0);
+	render_sprites(cliprect);
 }
 
-template<class BitmapClass>
-void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 *pri_bitmap, BitmapClass &temp_bitmap, int alt_precision)
+void namco_c355spr_device::render_sprites(const rectangle cliprect)
 {
-	temp_bitmap.fill(0xffff, cliprect);
+	m_renderbitmap.fill(0xffff, cliprect);
 	for (int no = 0; no < 2; no++)
 	{
 		c355_sprite *sprite_ptr = m_spritelist[no].get();
@@ -574,7 +453,7 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 						int sprite_screen_height;
 						int sprite_screen_width;
 
-						if (alt_precision)
+						if (m_alt_precision)
 						{
 							sprite_screen_width = ((sprite_ptr->x[ind] + (sprite_ptr->zoomx[ind] << 4)) >> 16) - (sprite_ptr->x[ind] >> 16);
 							sprite_screen_height = ((sprite_ptr->y[ind] + (sprite_ptr->zoomy[ind] << 4)) >> 16) - (sprite_ptr->y[ind] >> 16);
@@ -586,7 +465,7 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 						}
 
 						zdrawgfxzoom(
-							&temp_bitmap,
+							m_renderbitmap,
 							clip,
 							gfx(0),
 							m_code2tile(sprite_ptr->tile[ind]) + sprite_ptr->offset,
@@ -594,9 +473,7 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 							sprite_ptr->flipx, sprite_ptr->flipy,
 							sprite_ptr->x[ind] >> 16, sprite_ptr->y[ind] >> 16,
 							sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
-							nullptr,
-							sprite_screen_width, sprite_screen_height,
-							pri_bitmap);
+							sprite_screen_width, sprite_screen_height);
 					}
 				}
 			}
@@ -605,32 +482,13 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 
 	}
 }
 
-void namco_c355spr_device::copybitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
-{
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-	{
-		u32 const *const src = &temp_bitmap.pix(y);
-		u32 *const dst = &bitmap.pix(y);
-
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
-		{
-			u32 const srcpix = src[x];
-
-			if ((srcpix & 0xff000000) == 0xff000000)
-			{
-				dst[x] = srcpix & 0x00ffffff;
-			}
-		}
-	}
-}
-
-void namco_c355spr_device::draw_dg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
+void namco_c355spr_device::draw_dg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	build_sprite_list(0);
 
-	render_sprites(cliprect, &pri_bitmap, temp_bitmap, 1);
+	render_sprites(cliprect);
 
-	copybitmap(screen, bitmap, cliprect, pri_bitmap, temp_bitmap);
+	copybitmap(screen, bitmap, cliprect);
 }
 
 void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, int no)
@@ -642,7 +500,7 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 	 */
 	const u16 palette = m_read_spritetable(which, 6, no);
 
-	int priority = m_pri_cb(palette);
+	const int priority = m_pri_cb(palette);
 
 	if (priority == -1)
 	{
@@ -661,16 +519,12 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 	/* m_read_spritetable(which, 6, no)   contains priority/palette */
 	/* m_read_spritetable(which, 7, no)   is used in Lucky & Wild, possibly for sprite-road priority */
 
-	int xscroll = (s16)m_position[1];
-	int yscroll = (s16)m_position[0];
-
-	xscroll &= 0x1ff; if (xscroll & 0x100) xscroll |= ~0x1ff;
-	yscroll &= 0x1ff; if (yscroll & 0x100) yscroll |= ~0x1ff;
+	int xscroll = util::sext<s16>(m_position[1], 9);
+	int yscroll = util::sext<s16>(m_position[0], 9);
 
 	if (screen().height() > 384)
 	{ /* Medium Resolution: system21 adjust */
-			xscroll = (s16)m_position[1];
-			xscroll &= 0x3ff; if (xscroll & 0x200) xscroll |= ~0x3ff;
+			xscroll = util::sext<s16>(m_position[1], 10);
 			if (yscroll < 0)
 			{ /* solvalou */
 				yscroll += 0x20;
@@ -686,13 +540,13 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 	hpos -= xscroll;
 	vpos -= yscroll;
 
-	int clipentry = (palette >> 8) & 0xf;
+	const int clipentry = (palette >> 8) & 0xf;
 	rectangle clip;
 	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
 	sprite_ptr->clip = clip;
 
-	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
-	vpos &= 0x7ff; if (vpos & 0x400) vpos |= ~0x7ff; /* sign extend */
+	hpos = util::sext(hpos & 0x7ff, 11); /* sign extend */
+	vpos = util::sext(vpos & 0x7ff, 11); /* sign extend */
 
 	int tile_index   = m_read_spriteformat(spriteformatram_offset, 0);
 	const u16 format = m_read_spriteformat(spriteformatram_offset, 1);
@@ -746,7 +600,7 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 	sprite_ptr->flipx = flipx;
 	sprite_ptr->flipy = flipy;
 	sprite_ptr->size = num_rows * num_cols;
-	sprite_ptr->color = (palette & (m_colors-1)) ^ m_palxor;
+	sprite_ptr->color = palette & (m_colors - 1);
 
 	u32 source_height_remaining = num_rows * 16;
 	u32 screen_height_remaining = vsize;

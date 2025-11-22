@@ -1774,7 +1774,7 @@ void namcos2_state::configure_c355spr_standard(machine_config &config)
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_mix_callback(FUNC(namcos2_state::sprite_mix_callback));
 	m_c355spr->set_color_base(0);
 }
 

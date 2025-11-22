@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -31,7 +32,7 @@ public:
 	void set_transparent_color(pen_t pen) { m_transparent_color = pen; }
 	void set_xoffset(int xoffset) { m_xoffset = xoffset; }
 
-	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
+	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint8_t prival = 0, uint8_t primask = uint8_t(~0));
 
 protected:
 	// device-level overrides

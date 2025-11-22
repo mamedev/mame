@@ -166,29 +166,31 @@ protected:
 private:
 	required_device_array<namco_c355spr_device, 2> m_c355spr;
 	required_device_array<palette_device, 2> m_palette;
-	uint16_t m_video_enable[2];
-	required_shared_ptr<uint16_t> m_rso_shared_ram;
+	required_shared_ptr<u16> m_rso_shared_ram;
 	required_device<c140_device> m_c140_16a;
 	required_device<c140_device> m_c140_16g;
 
 	required_device_array<namcos21_3d_device, 2> m_namcos21_3d;
 	required_device_array<namcos21_dsp_c67_device, 2> m_namcos21_dsp_c67;
 
-	uint32_t m_led_mst = 0;
-	uint32_t m_led_slv = 0;
+	u16 m_video_enable[2]{};
+	u32 m_led_mst = 0;
+	u32 m_led_slv = 0;
 
-	uint32_t led_mst_r();
-	void led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t led_slv_r();
-	void led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	template<int Screen> uint16_t video_enable_r();
-	template<int Screen> void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t rso_r(offs_t offset);
-	void rso_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	u32 led_mst_r();
+	void led_mst_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 led_slv_r();
+	void led_slv_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	template<int Screen> u16 video_enable_r();
+	template<int Screen> void video_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 rso_r(offs_t offset);
+	void rso_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	// using ind16 for now because namco_c355spr_device::zdrawgfxzoom does not support rgb32, will probably need to be improved for LD use
-	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void cpu_mst_map(address_map &map) ATTR_COLD;
 	void cpu_slv_map(address_map &map) ATTR_COLD;
 	void psn_b1_cpu_map(address_map &map) ATTR_COLD;
@@ -208,7 +210,31 @@ void gal3_state::video_start()
 	save_item(NAME(m_video_enable));
 }
 
-uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+bool gal3_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+{
+	if (srcpri == pri)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			switch (src & 0xff)
+			{
+			case 0:
+				dest = 0x4000 | (dest & 0x1fff);
+				break;
+			case 1:
+				dest = 0x6000 | (dest & 0x1fff);
+				break;
+			default:
+				dest = colbase + (src ^ 0xf00);
+				break;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+u32 gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
@@ -220,17 +246,17 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bit
 	static int pivot = 15;
 	int pri;
 
-	if( machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )    pivot+=1;
-	if( machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) ) pivot-=1;
+	if (machine().input().code_pressed_once(KEYCODE_H) && (pivot < 15)) pivot += 1;
+	if (machine().input().code_pressed_once(KEYCODE_J) && (pivot > 0)) pivot -= 1;
 
-	for( pri=0; pri<pivot; pri++ )
+	for (pri = 0; pri < pivot; pri++)
 	{
 		m_c355spr[0]->draw(screen, bitmap, cliprect, pri);
 	}
 
-/*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
+/*  CopyVisiblePolyFrameBuffer(bitmap, cliprect,0,0x7fbf);
 
-    for( pri=pivot; pri<15; pri++ )
+    for (pri = pivot; pri < 15; pri++)
     {
        m_c355spr[0]->draw(screen, bitmap, cliprect, pri);
     }*/
@@ -238,24 +264,24 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bit
 	// CPU Diag LEDs
 	mst[17]='\0', slv[17]='\0';
 /// printf("mst=0x%x\tslv=0x%x\n", m_led_mst, m_led_slv);
-	for(i=16;i<32;i++)
+	for (i = 16; i < 32; i++)
 	{
 		int t;
-		if(i<24)
-			t=i;
+		if (i < 24)
+			t = i;
 		else
-			t=i+1;
+			t = i + 1;
 		mst[8]=' '; slv[8]=' ';
 
-		if(m_led_mst&(1<<i))
-			mst[t-16]='*';
+		if (m_led_mst & (1 << i))
+			mst[t - 16] = '*';
 		else
-			mst[t-16]='O';
+			mst[t - 16] = 'O';
 
-		if(m_led_slv&(1<<i))
-			slv[t-16]='*';
+		if (m_led_slv & (1 << i))
+			slv[t - 16] = '*';
 		else
-			slv[t-16]='O';
+			slv[t - 16] = 'O';
 	}
 
 	popmessage("LED_MST:  %s\nLED_SLV:  %s\n2D Layer: 0-%d (Press H for +, J for -)\n", mst, slv, pivot);
@@ -263,7 +289,7 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
@@ -272,17 +298,17 @@ uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bi
 	static int pivot = 15;
 	int pri;
 
-	if( machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )    pivot+=1;
-	if( machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) ) pivot-=1;
+	if (machine().input().code_pressed_once(KEYCODE_H) && (pivot < 15)) pivot += 1;
+	if (machine().input().code_pressed_once(KEYCODE_J) && (pivot > 0)) pivot -= 1;
 
-	for( pri=0; pri<pivot; pri++ )
+	for (pri = 0; pri < pivot; pri++)
 	{
 		m_c355spr[1]->draw(screen, bitmap, cliprect, pri);
 	}
 
-/*  CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
+/*  CopyVisiblePolyFrameBuffer(bitmap, cliprect,0,0x7fbf);
 
-    for( pri=pivot; pri<15; pri++ )
+    for (pri = pivot; pri < 15; pri++)
     {
        m_c355spr[1]->draw(screen, bitmap, cliprect, pri);
     }*/
@@ -293,39 +319,39 @@ uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bi
 
 /***************************************************************************************/
 
-uint32_t gal3_state::led_mst_r()
+u32 gal3_state::led_mst_r()
 {
 	return m_led_mst;
 }
 
-void gal3_state::led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void gal3_state::led_mst_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_led_mst);
 }
 
-uint32_t gal3_state::led_slv_r()
+u32 gal3_state::led_slv_r()
 {
 	return m_led_slv;
 }
 
-void gal3_state::led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void gal3_state::led_slv_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_led_slv);
 }
 
 template<int Screen>
-uint16_t gal3_state::video_enable_r()
+u16 gal3_state::video_enable_r()
 {
 	return m_video_enable[Screen];
 }
 
 template<int Screen>
-void gal3_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gal3_state::video_enable_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_video_enable[Screen]); // 0xff53, instead of 0x40 in namcos21
 }
 
-uint16_t gal3_state::rso_r(offs_t offset)
+u16 gal3_state::rso_r(offs_t offset)
 {
 	/*store $5555 @$0046, and readback @$0000
 	read @$0144 and store at A6_21e & A4_5c
@@ -334,7 +360,7 @@ uint16_t gal3_state::rso_r(offs_t offset)
 	return m_rso_shared_ram[offset];
 }
 
-void gal3_state::rso_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void gal3_state::rso_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_rso_shared_ram[offset]);
 }
@@ -638,7 +664,7 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[0]->set_palette(m_palette[0]);
 	m_c355spr[0]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[0]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr[0]->set_palxor(0xf); // reverse mapping
+	m_c355spr[0]->set_mix_callback(FUNC(gal3_state::sprite_mix_callback));
 	m_c355spr[0]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[0]->set_external_prifill(true);
 
@@ -668,7 +694,7 @@ void gal3_state::gal3(machine_config &config)
 	m_c355spr[1]->set_palette(m_palette[1]);
 	m_c355spr[1]->set_scroll_offsets(0x26, 0x19);
 	m_c355spr[1]->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr[1]->set_palxor(0xf); // reverse mapping
+	m_c355spr[1]->set_mix_callback(FUNC(gal3_state::sprite_mix_callback));
 	m_c355spr[1]->set_color_base(0x1000); // TODO : verify palette offset
 	m_c355spr[1]->set_external_prifill(true);
 
