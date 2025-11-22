@@ -175,8 +175,8 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ガッタンゴットン" />
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="8448">
-				<rom name="guttang gottong (1981)(konami)(jp).bin" size="8448" crc="0f70fa69" sha1="4e4900f42cbc76e4e795ed32ee18b2e27246e90f" offset="00000" status="baddump" />
+			<dataarea name="rom" size="9216">
+				<rom name="guttang gottong (1981)(konami)(jp).bin" size="9216" crc="4fcb8e75" sha1="976cb6b260d1276cf0ff01c62ba11c56420d0856" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -291,8 +291,8 @@ and why some of the dumps below have weird size?
 		<info name="alt_title" value="ワンダーホール" />
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="8320">
-				<rom name="wonder hole (1982)(irem)(jp).bin" size="8320" crc="aba2cece" sha1="bcb7442c6d320eb166e224c3ac0f50514906ad4c" offset="00000" status="baddump" />
+			<dataarea name="rom" size="8192">
+				<rom name="wonder hole (1982)(irem)(jp).bin" size="8192" crc="5274f575" sha1="667f09f256bd8b2fb7f77681d10426970961490f" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -316,9 +316,10 @@ and why some of the dumps below have weird size?
 		<publisher>Takara ~ Monkey Punch</publisher>
 		<info name="serial" value="18" />
 		<info name="alt_title" value="アップアップバルーン" />
+		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="8320">
-				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8320" crc="68c85890" sha1="0c94d2d55a6a6e66531137e124f2e0a3a176b252" offset="00000" status="baddump" />
+			<dataarea name="rom" size="8192">
+				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8192" crc="be4e2bd5" sha1="3ab3de253c573a5f7292d34e87ec869900f59101" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -446,6 +447,8 @@ and why some of the dumps below have weird size?
 			<dataarea name="rom" size="20480">
 				<rom name="basic-f (198x)(sord)(jp).bin" size="20480" crc="47be051f" sha1="9942b8f05a441b5dee7ab31ec5b8a643f7e268b8" offset="00000"/>
 			</dataarea>
+			<dataarea name="ram" size="0x1000">
+			</dataarea>
 		</part>
 	</software>
 
@@ -456,6 +459,8 @@ and why some of the dumps below have weird size?
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="basic-g (198x)(sord)(jp).bin" size="16384" crc="107b5ddc" sha1="071fa84c7b10d9d7841c504564825609ebf66140" offset="00000"/>
+			</dataarea>
+			<dataarea name="ram" size="0x1000">
 			</dataarea>
 		</part>
 	</software>
@@ -483,8 +488,8 @@ and why some of the dumps below have weird size?
 		</part>
 	</software>
 
-	<software name="peditor">
-		<description>P-Editor</description>
+	<software name="pdesign">
+		<description>P-Designer</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
 		<part name="cart" interface="m5_cart">
@@ -536,8 +541,8 @@ and why some of the dumps below have weird size?
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="10904">
-				<rom name="baseball (19xx)(-).bin" size="10904" crc="46e94dae" sha1="56d11bb9e4e8431ff4f6dfa592b096dd613084c3" offset="00000" status="baddump" />
+			<dataarea name="rom" size="11264">
+				<rom name="baseball (19xx)(-).bin" size="11264" crc="e79e9cd5" sha1="b7899280a775f89f457260c18b947c9d297add67" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -594,7 +599,7 @@ and why some of the dumps below have weird size?
 come from... they might be eventually removed -->
 
 <!-- Actualy this is wordmaze translated into Czech 1990 by ROS-->
-	<software name="unk_maze" supported="no">
+	<software name="unk_maze" cloneof="wordmaze" supported="no">
 		<description>Unknown CSMAZE</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -605,15 +610,14 @@ come from... they might be eventually removed -->
 		</part>
 	</software>
 
-<!-- This displays garbage charset when launched with ramsize 36k or 68k -->
-	<software name="unk_intr" supported="no">
-		<description>Unknown Intruder</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires 36k or more RAM?" />
+	<software name="spaceintr" supported="yes">
+		<description>Space Intruders</description>
+		<year>1987</year>
+		<publisher>&lt;QuickSilva ltd.&gt;</publisher>
+		<info name="usage" value="Requires 36k or more RAM" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="5376">
-				<rom name="zzz-unk-intruder.bin" size="5376" crc="12859c5d" sha1="fd8fc752be6afcbf016f8a33e21ad9e1b7c50c48" offset="00000" status="baddump" />
+			<dataarea name="rom" size="6144">
+				<rom name="spaceintruders.bin" size="6144" crc="2de02cf5" sha1="fd8fc752be6afcbf016f8a33e21ad9e1b7c50c48" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -621,7 +625,7 @@ come from... they might be eventually removed -->
 
 
 <!-- This is only Sord memory expansion -->
-	<software name="em_5" supported="no">
+	<software name="em_5" supported="yes">
 		<description>EM-5 Expansion memory 32Kb</description>
 		<year>198?</year>
 		<publisher>Sord</publisher>
@@ -634,7 +638,7 @@ come from... they might be eventually removed -->
 
 <!-- Homebrew memory modules -->
 
-	<software name="64kbi" supported="no">
+	<software name="64kbi" supported="yes">
 		<description>EM-64 Expansion memory 64Kb</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
@@ -645,7 +649,7 @@ come from... they might be eventually removed -->
 		</part>
 	</software>
 
-	<software name="64kbf" supported="no">
+	<software name="64kbf" supported="yes">
 		<description>64Kbf Expansion memory 64Kb</description>
 		<year>199?</year>
 		<publisher>unknown</publisher>
@@ -659,7 +663,7 @@ come from... they might be eventually removed -->
 		</part>
 	</software>
 
-	<software name="64krx" supported="no">
+	<software name="64krx" supported="yes">
 		<description>64Krx Expansion board 64Kb</description>
 		<year>199?</year>
 		<publisher>unknown</publisher>
@@ -680,7 +684,7 @@ come from... they might be eventually removed -->
 
 	<!-- Brno mod ROMs -->
 
-	<software name="brno_con" supported="no">
+	<software name="brno_con" supported="yes">
 		<description>Boot for Brno ramdisk [console version]</description>
 		<year>1989</year>
 		<publisher>&lt;Pavel Brychta a spol.&gt;</publisher>
@@ -691,7 +695,7 @@ come from... they might be eventually removed -->
 		</part>
 	</software>
 
-	<software name="brno_win" supported="no">
+	<software name="brno_win" supported="yes">
 		<description>Boot for Brno ramdisk [windows version]</description>
 		<year>1989</year>
 		<publisher>&lt;Ladislav Novak&gt;</publisher>

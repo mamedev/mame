@@ -91,6 +91,14 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
+	device_m5_cart_interface* get_loaded_card() const noexcept { return m_cart; }
+
+	uint32_t get_rom_size() const noexcept
+	{
+		auto* card = get_loaded_card();
+		return card ? card->get_rom_size() : 0;
+	}
+
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
