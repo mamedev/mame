@@ -4399,7 +4399,7 @@ ROM_START( ccly ) // IGS PCB-0415-05-GD - no XA, contrary to the other regions s
 	ROM_LOAD( "rom.u21", 0x00000, 0x80000, CRC(f5fd7279) SHA1(4d91c0655bd852c8ff1f0fc9c882e87b37830268) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "rom.u9", 0x000000, 0x080000, CRC(776f198c) SHA1(e567ef98160ccb51688189eac13594ab6aaf13bc) )
+	ROM_LOAD16_WORD_SWAP( "rom.u9", 0x000000, 0x080000, CRC(776f198c) SHA1(e567ef98160ccb51688189eac13594ab6aaf13bc) )
 
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "rom.u8", 0x000000, 0x400000, CRC(5b9863ba) SHA1(c4080076e03994056ac94d7c0a5ffcabd9505f9a) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
