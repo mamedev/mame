@@ -77,9 +77,6 @@
               cancel                            放弃
 
  Known issues:
- * ccly and cjsxp show a black screen when they should show their
-   bookkeeping and input test modes
-   the tile RAM is populated but the palette is black
  * klxyj102cn/klxyj104cn occasionally think the hopper is empty in
    "Joystick" mode - why?
 
