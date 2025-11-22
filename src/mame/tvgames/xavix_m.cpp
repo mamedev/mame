@@ -1099,6 +1099,7 @@ void xavix_state::machine_start()
 	if (m_nvram)
 		m_nvram->set_base(&m_mainram[0x4000 - nvram_size], nvram_size);
 
+	m_sound->set_default_tempo(m_default_audio_tempo_override);
 
 	save_item(NAME(m_extbusctrl));
 	save_item(NAME(m_ioevent_enable));

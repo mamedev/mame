@@ -69,7 +69,8 @@ public:
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
 		m_anport(*this, "anport"),
-		m_math(*this, "math")
+		m_math(*this, "math"),
+		m_default_audio_tempo_override(0x80)
 	{
 		m_video_hres_multiplier = 1;
 	}
@@ -98,6 +99,7 @@ public:
 	void xavix_43mhz(machine_config &config);
 
 	void init_xavix();
+	void init_xavix_slowenv();
 	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
 
 	uint8_t sound_current_page() const;
@@ -581,6 +583,7 @@ protected:
 	bool m_disable_sprite_xflip = false;
 	bool m_disable_tile_regs_flip = false;
 	int m_video_hres_multiplier;
+	uint8_t m_default_audio_tempo_override; // hack, used to init the sound hardware tempo registers
 };
 
 class xavix_guru_state : public xavix_state

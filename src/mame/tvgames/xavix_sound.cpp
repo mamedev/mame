@@ -71,6 +71,7 @@ xavix_sound_device::xavix_sound_device(const machine_config &mconfig, const char
 	, m_readregs_cb(*this, 0xff)
 	, m_writeregs_cb(*this)
 	, m_readsamples_cb(*this, 0x80)
+	, m_tempo_reset_value(0x00)
 {
 }
 
@@ -143,14 +144,14 @@ void xavix_sound_device::device_reset()
 	// - Many titles either never program any tp or only write tp[3] (e.g. hikara, popira).
 	//   If left at 0x00, non-VM0 voices can 'stick on' because their envelopes never
 	//   progress to zero.
-	// - We set a generic default of 0x40 which is a compromise across titles.
+	// - We set a default of either 0x40 (closest to hw recordings for karaoke titles) or 0x80 (closest for games).
 	// - This results in the engine also generating audio IRQs for those the affected tempo groups, however,
 	//   in practice this does not seem to cause any issues and reflects the actual hardware behaviour.
-	// - With this generic default, some games sound unnaturally long/echoey (e.g. taitons2) while others become too abrupt.
-	// - When device-/title-specific initialization is confirmed, replace the generic default
+	// - With a default of 0x40, some games sound unnaturally long/echoey (e.g. taitons2) while others become too abrupt.
+	// - When device-/title-specific initialization is confirmed, replace the default value hack
 	//   with those exact defaults and remove the heuristic.
 	for (int i = 0; i < 4; i++)
-		m_tempo_div[i] = 0x40; // initialised by hardware to 0x00
+		set_tempo(i, m_tempo_reset_value); // initialised by hardware to 0x00, but that doesn't give results matching hardware?!
 
 	for (int v = 0; v < 16; v++)
 	{
@@ -391,13 +392,6 @@ void xavix_sound_device::enable_voice(int voice, bool update_only)
 
 	if (update_only)
 		return;
-
-	// udance enables what seems like an invalid voice when it should be silent, not clear what the hardware would do in this case
-	if (!update_only && !(new_type & 1) && wave_addr == wave_loop_addr)
-	{
-		m_voice[voice].enabled = 0;
-		return;
-	}
 
 	// Full (re)start
 	m_voice[voice].enabled = 1;
