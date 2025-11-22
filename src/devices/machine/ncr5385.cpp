@@ -770,9 +770,6 @@ int ncr5385_device::state_step()
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 
-			// REQUIRED delay for device to keep up
-			// See notes at start of this file
-			delay = m_ack_delay;
 			LOGMASKED(LOG_GENERAL, "%10s: XFI_OUT_ACK delay %d\n", machine().time().as_string(8), delay);
 		}
 		else
