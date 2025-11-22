@@ -20,6 +20,10 @@ II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB p
     ROM contains original non-autostart Monitor and Integer BASIC; apparently
     Autostart + Integer is also possible.
 
+    To boot a floppy disk from the monitor, assuming the disk controller is in
+    slot 6, input the command 6^P (where ^P stands for control-P).  The monitor
+    command ^B will enter BASIC directly.
+
 II Plus: RAM options reduced to 16/32/48 KB.
     ROM expanded to 12KB from $D000-$FFFF containing Applesoft BASIC and
     the Autostart Monitor.  Applesoft is a licensed version of Microsoft's
@@ -1446,7 +1450,7 @@ ROM_START(space84)
 	ROM_LOAD ( "341-0012.d8",  0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
 	ROM_LOAD ( "341-0013.e0",  0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
 	ROM_LOAD ( "341-0014.e8",  0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
-	ROM_LOAD( "space84_f.bin", 0x3000, 0x1000, CRC(4e741069) SHA1(ca1f16da9fb40e966ee4a899964cd6a7e140ab50))
+	ROM_LOAD( "space84_f.bin", 0x3000, 0x1000, BAD_DUMP CRC(6acfe2a2) SHA1(07b19cd96101634543a3690b9f0d650e4d4d5675)) // single-bit corruption patched at $F010, $F810, $FCF0, $FD10
 ROM_END
 
 ROM_START(am64)
@@ -1607,15 +1611,15 @@ COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_ini
 COMP( 1982, uniap2en, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 // reverse font direction + wider character cell -\/
-COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, space84,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
+COMP( 1985, space84,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_SUPPORTS_SAVE )
 COMP( 1985, am64,     apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
 //COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, laser2c,  apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, albert,   apple2, 0,      albert,   apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, am100,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )

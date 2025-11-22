@@ -9091,13 +9091,13 @@ static INPUT_PORTS_START( daimyojn )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( mjkokryu )
+static INPUT_PORTS_START( mjnigiri )
 	// The manual provides four sets of standard settings:
 	//       標準設定　コインプールタイプ　Ａ              標準設定　コインプールタイプ　Ｂ              標準設定　メダルコーナータイプ                標準設定　アミューズコーナータイプ
 	// SW 1   ON OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF        ON OFF OFF  ON OFF OFF  ON OFF  ON OFF
 	// SW 2  OFF OFF OFF OFF OFF OFF  ON  ON  ON OFF       OFF OFF OFF OFF OFF OFF  ON  ON  ON OFF       OFF OFF OFF OFF OFF OFF  ON  ON OFF  ON       OFF OFF OFF OFF OFF OFF  ON  ON OFF  ON
 	// SW 3   ON  ON OFF OFF OFF  ON OFF OFF OFF OFF        ON  ON OFF OFF OFF  ON OFF OFF OFF OFF       OFF OFF  ON OFF OFF  ON OFF OFF OFF OFF        ON OFF  ON OFF OFF  ON OFF OFF  ON OFF
-	// SW 4  OFF  ON  ON  ON  ON OFF OFF OFF OFF OFF       OFF  ON  ON  ON  ON OFF OFF OFF OFF OFF       OFF OFF  ON  ON  ON OFF OFF OFF OFF OFF       OFF OFF  ON  ON  ON OFF  ON OFF OFF OFF
+	// SW 4  OFF  ON  ON  ON  ON OFF OFF OFF OFF OFF       OFF  ON  ON  ON  ON OFF OFF OFF OFF OFF       OFF OFF  ON  ON  ON OFF OFF OFF OFF OFF       OFF OFF  ON  ON  ON OFF OFF OFF OFF OFF
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // pay
@@ -9184,7 +9184,7 @@ static INPUT_PORTS_START( mjkokryu )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Service_Mode) )                PORT_DIPLOCATION("DIP-SW4:1")         // モード切替
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Service_Mode) )                PORT_DIPLOCATION("DIP-SW4:1")         // モード                          モード切替 in mjkokryu manual
 	PORT_DIPSETTING(    0x01, DEF_STR(Off) )                                                               // 通常ゲーム
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // テストモード
 	PORT_DIPNAME( 0x02, 0x00, "Don Den Button" )                     PORT_DIPLOCATION("DIP-SW4:2")         // F.FLOP機能のボタン変更
@@ -9199,15 +9199,9 @@ static INPUT_PORTS_START( mjkokryu )
 	PORT_DIPNAME( 0x10, 0x00, "Double Bet" )                         PORT_DIPLOCATION("DIP-SW4:5")         // W-BET機能
 	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                               // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
-	PORT_DIPNAME( 0x20, 0x20, "Event Mode" )                         PORT_DIPLOCATION("DIP-SW4:6")         // イベントモード
-	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                               // 無
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
-	PORT_DIPNAME( 0x40, 0x40, "Challenge Mode" )                     PORT_DIPLOCATION("DIP-SW4:7")         // チャレンジモード
-	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                               // 無
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
-	PORT_DIPNAME( 0x80, 0x80, "Slump Support" )                      PORT_DIPLOCATION("DIP-SW4:8")         // スランプサポート
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                               // 無
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP-SW4:6" )                                                      // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-SW4:7" )                                                      // OFF固定
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW4:8" )                                                      // OFF固定
 
 	PORT_START("DSW5")
 	PORT_DIPNAME( 0x01, 0x00, "Credits Per Note 1 / 2" )             PORT_DIPLOCATION("DIP-SW1:9")         // NOTE RATE
@@ -9234,9 +9228,7 @@ static INPUT_PORTS_START( mjkokryu )
 	PORT_DIPSETTING(    0x20, DEF_STR(Normal) )                                                            // 通常
 	PORT_DIPSETTING(    0x00, "Fixed minimum bet" )                                                        // 最低RATE固定
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP-SW4:9" )                                                      // OFF固定
-	PORT_DIPNAME( 0x80, 0x80, "Payout Rate Setting" )                PORT_DIPLOCATION("DIP-SW4:10")        // 払出しレートの設定              TODO: what does this do?
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                               // 無
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP-SW4:10" )                                                     // OFF固定
 
 	PORT_START("BET")
 	PORT_DIPNAME( 0x40, 0x40, "Bets?" )
@@ -9247,6 +9239,35 @@ static INPUT_PORTS_START( mjkokryu )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( mjkokryu )
+	// The manual provides four sets of standard settings:
+	//       標準設定　コインプールタイプ　Ａ              標準設定　コインプールタイプ　Ｂ              標準設定　メダルコーナータイプ                標準設定　アミューズコーナータイプ
+	// SW 1   ON OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF       OFF OFF OFF  ON  ON  ON OFF  ON  ON OFF        ON OFF OFF  ON OFF OFF  ON OFF  ON OFF
+	// SW 2  OFF OFF OFF OFF OFF OFF  ON  ON  ON OFF       OFF OFF OFF OFF OFF OFF  ON  ON  ON OFF       OFF OFF OFF OFF OFF OFF  ON  ON OFF  ON       OFF OFF OFF OFF OFF OFF  ON  ON OFF  ON
+	// SW 3   ON  ON OFF OFF OFF  ON OFF OFF OFF OFF        ON  ON OFF OFF OFF  ON OFF OFF OFF OFF       OFF OFF  ON OFF OFF  ON OFF OFF OFF OFF        ON OFF  ON OFF OFF  ON OFF OFF  ON OFF
+	// SW 4  OFF  ON  ON  ON  ON OFF OFF OFF OFF OFF       OFF  ON  ON  ON  ON OFF OFF OFF OFF OFF       OFF OFF  ON  ON  ON OFF OFF OFF OFF OFF       OFF OFF  ON  ON  ON OFF  ON OFF OFF OFF
+
+	PORT_INCLUDE( mjnigiri )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x20, 0x20, "Event Mode" )                         PORT_DIPLOCATION("DIP-SW4:6")         // イベントモード
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x40, 0x40, "Challenge Mode" )                     PORT_DIPLOCATION("DIP-SW4:7")         // チャレンジモード
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+	PORT_DIPNAME( 0x80, 0x80, "Slump Support" )                      PORT_DIPLOCATION("DIP-SW4:8")         // スランプサポート
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
+
+	PORT_MODIFY("DSW5")
+	PORT_DIPNAME( 0x80, 0x80, "Payout Rate Setting" )                PORT_DIPLOCATION("DIP-SW4:10")        // 払出しレートの設定              TODO: what does this do?
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                                               // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                                // 有
 
 INPUT_PORTS_END
 
@@ -13436,6 +13457,6 @@ GAME( 2002, mjtenho,     0,        daimyojn,  daimyojn,   hanakanz_state, empty_
 
 GAME( 2004, momotaro,    0,        momotaro,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan, T027-RB-01)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
-GAME( 2007, mjnigiri,    0,        mjnigiri,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Nigiri Itcho!! (Japan, T038-PB-002)",                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2007, mjnigiri,    0,        mjnigiri,  mjnigiri,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Nigiri Itcho!! (Japan, T038-PB-002)",                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 GAME( 2008, mjkokryu,    0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Kokuryu (Japan, T040-RB-03)",                            MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

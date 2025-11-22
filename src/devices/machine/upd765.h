@@ -11,8 +11,8 @@ class floppy_image_device;
 
 /*
  * ready = true if the ready line is physically connected to the floppy drive
- * select = true if the fdc controls the floppy drive selection
- * mode = mode_t::AT, mode_t::PS2 or mode_t::M30 for the fdcs that have reset-time selection
+ * select = true if the FDC controls the floppy drive selection
+ * mode = mode_t::AT, mode_t::PS2 or mode_t::M30 for the FDC's that have reset-time selection
  */
 
 class upd765_family_device : public device_t {
@@ -51,7 +51,7 @@ public:
 	void tc_line_w(int state) { tc_w(state == ASSERT_LINE); }
 	void reset_w(int state);
 
-	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
+	void set_rate(int rate); // rate in bps, to be used when the FDC is externally frequency-controlled
 
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
@@ -583,6 +583,8 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 
 	void cr1_w(uint8_t data);
+	int c4_r() { return BIT(m_cr1, 4); }
+	int c6_r() { return BIT(m_cr1, 6); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

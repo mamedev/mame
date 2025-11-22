@@ -207,119 +207,6 @@ void pc9801vm_state::ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_ide[m_ide_sel]->cs1_w(offset, data, mem_mask);
 }
 
-uint8_t pc9801_state::sasi_data_r()
-{
-	uint8_t data = m_sasi_data_in->read();
-
-	if(m_sasi_ctrl_in->read() & 0x80)
-		m_sasibus->write_ack(1);
-	return data;
-}
-
-void pc9801_state::sasi_data_w(uint8_t data)
-{
-	m_sasi_data = data;
-
-	if (m_sasi_data_enable)
-	{
-		m_sasi_data_out->write(m_sasi_data);
-		if(m_sasi_ctrl_in->read() & 0x80)
-			m_sasibus->write_ack(1);
-	}
-}
-
-void pc9801_state::write_sasi_io(int state)
-{
-	m_sasi_ctrl_in->write_bit2(state);
-
-	m_sasi_data_enable = !state;
-
-	if (m_sasi_data_enable)
-	{
-		m_sasi_data_out->write(m_sasi_data);
-	}
-	else
-	{
-		m_sasi_data_out->write(0);
-	}
-	if((m_sasi_ctrl_in->read() & 0x9c) == 0x8c)
-		m_pic2->ir1_w(m_sasi_ctrl & 1);
-	else
-		m_pic2->ir1_w(0);
-}
-
-void pc9801_state::write_sasi_req(int state)
-{
-	m_sasi_ctrl_in->write_bit7(state);
-
-	if (!state)
-		m_sasibus->write_ack(0);
-
-	if((m_sasi_ctrl_in->read() & 0x9C) == 0x8C)
-		m_pic2->ir1_w(m_sasi_ctrl & 1);
-	else
-		m_pic2->ir1_w(0);
-
-	m_dmac->dreq0_w(!(state && !(m_sasi_ctrl_in->read() & 8) && (m_sasi_ctrl & 2)));
-}
-
-
-uint8_t pc9801_state::sasi_status_r()
-{
-	uint8_t res = 0;
-
-	if(m_sasi_ctrl & 0x40) // read status
-	{
-	/*
-	    x--- ---- REQ
-	    -x-- ---- ACK
-	    --x- ---- BSY
-	    ---x ---- MSG
-	    ---- x--- CD
-	    ---- -x-- IO
-	    ---- ---x INT?
-	*/
-		res |= m_sasi_ctrl_in->read();
-	}
-	else // read drive info
-	{
-/*
-        xx-- ---- unknown but tested
-        --xx x--- SASI-1 media type
-        ---- -xxx SASI-2 media type
-*/
-		//res |= 7 << 3; // read mediatype SASI-1
-		//res |= 7;   // read mediatype SASI-2
-	}
-	return res;
-}
-
-void pc9801_state::sasi_ctrl_w(uint8_t data)
-{
-	/*
-	    x--- ---- channel enable
-	    -x-- ---- read switch
-	    --x- ---- sel
-	    ---- x--- reset line
-	    ---- --x- dma enable
-	    ---- ---x irq enable
-	*/
-
-	m_sasibus->write_sel(BIT(data, 5));
-
-	if(m_sasi_ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
-	{
-		m_sasibus->write_rst(1);
-//      m_timer_rst->adjust(attotime::from_nsec(100));
-	}
-	else
-		m_sasibus->write_rst(0); // TODO
-
-	m_sasi_ctrl = data;
-
-//  m_sasibus->write_sel(BIT(data, 0));
-}
-
 void pc9801_state::pc9801_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -365,8 +252,8 @@ void pc9801_state::pc9801_io(address_map &map)
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::dmapg4_w)).umask16(0xff00);
 	map(0x0050, 0x0057).m("fdd_2d", FUNC(pc80s31k_device::host_map)).umask16(0xff00);
 	map(0x0068, 0x0068).w(FUNC(pc9801_state::pc9801_video_ff_w)); //mode FF / <undefined>
-	map(0x0080, 0x0080).rw(FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
-	map(0x0082, 0x0082).rw(FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
+//	map(0x0080, 0x0080).rw(FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
+//	map(0x0082, 0x0082).rw(FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
 	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
 	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
@@ -1787,10 +1674,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
-
-	save_item(NAME(m_sasi_data));
-	save_item(NAME(m_sasi_data_enable));
-	save_item(NAME(m_sasi_ctrl));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -2019,27 +1902,6 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus_root->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
 }
 
-void pc9801_state::pc9801_sasi(machine_config &config)
-{
-	SCSI_PORT(config, m_sasibus, 0);
-	m_sasibus->set_data_input_buffer("sasi_data_in");
-	m_sasibus->io_handler().set(FUNC(pc9801_state::write_sasi_io)); // bit2
-	m_sasibus->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3));
-	m_sasibus->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4));
-	m_sasibus->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit5));
-	m_sasibus->ack_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit6));
-	m_sasibus->req_handler().set(FUNC(pc9801_state::write_sasi_req));
-	m_sasibus->set_slot_device(1, "harddisk", PC9801_SASI, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	output_latch_device &sasi_out(OUTPUT_LATCH(config, "sasi_data_out"));
-	m_sasibus->set_output_latch(sasi_out);
-	INPUT_BUFFER(config, "sasi_data_in");
-	INPUT_BUFFER(config, "sasi_ctrl_in");
-
-	m_dmac->in_ior_callback<0>().set(FUNC(pc9801_state::sasi_data_r));
-	m_dmac->out_iow_callback<0>().set(FUNC(pc9801_state::sasi_data_w));
-}
-
 void pc9801vm_state::cdrom_headphones(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
@@ -2198,7 +2060,6 @@ void pc9801_state::pc9801(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
-	pc9801_sasi(config);
 	UPD1990A(config, m_rtc);
 
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_r));

@@ -2,7 +2,17 @@
 // copyright-holders:AJR, R. Belmont
 /***************************************************************************
 
-    Skeleton driver for Akai MPC60 MIDI Production Center.
+    mpc60.cpp - Akai / Roger Linn MPC3000 music workstation
+    Driver by R. Belmont and AJR
+
+    Hardware:
+        CPU: 80186 at 10 MHz
+        Floppy: uPD72065
+        LCD: LC7981
+        UARTs: MB89371 (x2)
+        Panel controller CPU: NEC uPD78C11 @ 12 MHz
+          (internal ROM is not dumped but the panel works fine without it)
+        Sound DSP: L4003
 
 ***************************************************************************/
 
@@ -29,10 +39,12 @@
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
+#include "sound/l4003.h"
 #include "video/hd61830.h"
 
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 #include "mpc60.lh"
 
@@ -47,6 +59,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_panelcpu(*this, "panelcpu")
+		, m_dsp(*this, "dsp")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
 		, m_ppi(*this, "ppi")
@@ -88,6 +101,7 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void panel_map(address_map &map) ATTR_COLD;
 	void lcd_map(address_map &map) ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
 
 	uint8_t subcpu_pa_r();
 	uint8_t subcpu_pb_r();
@@ -107,6 +121,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7810_device> m_panelcpu;
+	required_device<l4003_sound_device> m_dsp;
 	required_device<upd72065_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<i8255_device> m_ppi;
@@ -167,6 +182,7 @@ void mpc60_state::mem_map(address_map &map)
 
 void mpc60_state::io_map(address_map &map)
 {
+	map(0x0000, 0x0003).m(m_dsp, FUNC(l4003_sound_device::map));
 	map(0x0080, 0x0083).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
 	map(0x0090, 0x0090).w(FUNC(mpc60_state::fdc_tc_w));
 	map(0x00a0, 0x00a0).rw(m_fdc, FUNC(upd72065_device::dma_r), FUNC(upd72065_device::dma_w));
@@ -192,6 +208,12 @@ void mpc60_state::lcd_map(address_map &map)
 {
 	map.global_mask(0x07ff);
 	map(0x0000, 0x07ff).ram();
+}
+
+void mpc60_state::dsp_map(address_map &map)
+{
+	// MPC60 maxes out at 1024K 12-bit words.  We make those 16-bit words for convenience so it's 2048K bytes
+	map(0x000000, 0x1fffff).ram();
 }
 
 uint8_t mpc60_state::subcpu_pa_r()
@@ -462,28 +484,28 @@ static INPUT_PORTS_START(mpc60)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Play Start") PORT_CODE(KEYCODE_L)
 
 	PORT_START("PB0")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Crash") PORT_CODE(KEYCODE_PGUP)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Crash2") PORT_CODE(KEYCODE_NUMLOCK)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ride Cymbal") PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ride Bell") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bass") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tom 4") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Crash 2") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Perc 4") PORT_CODE(KEYCODE_ASTERISK)
 
 	PORT_START("PB1")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("High Tom") PORT_CODE(KEYCODE_PGDN)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Mid Tom") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Low Tom") PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Floor Tom") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Snare 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tom 3") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Crash 1") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Perc 3") PORT_CODE(KEYCODE_SLASH_PAD)
 
 	PORT_START("PB2")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt Snare") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Snare") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Open") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Pedal") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Snare 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tom 2") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ride 2") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Perc 2") PORT_CODE(KEYCODE_NUMLOCK)
 
 	PORT_START("PB3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Side Stick") PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bass") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Closed") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Loose") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tom 1") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ride 1") PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Perc 1") PORT_CODE(KEYCODE_PGUP)
 
 	PORT_START("VARIATION")
 	PORT_ADJUSTER(100, "NOTE VARIATION") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpc60_state::variation_changed), 1)
@@ -515,6 +537,22 @@ void mpc60_state::mpc60(machine_config &config)
 	m_panelcpu->an2_func().set(FUNC(mpc60_state::an2_r));
 	m_panelcpu->an3_func().set(FUNC(mpc60_state::an3_r));
 	m_panelcpu->an4_func().set(FUNC(mpc60_state::an4_r));
+
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "outputs", 8).unknown();
+
+	L4003(config, m_dsp, 35.84_MHz_XTAL);
+	m_dsp->set_addrmap(AS_DATA, &mpc60_state::dsp_map);
+	m_dsp->add_route(0, "speaker", 1.0, 0);
+	m_dsp->add_route(1, "speaker", 1.0, 1);
+	m_dsp->add_route(2, "outputs", 1.0, 0);
+	m_dsp->add_route(3, "outputs", 1.0, 1);
+	m_dsp->add_route(4, "outputs", 1.0, 2);
+	m_dsp->add_route(5, "outputs", 1.0, 3);
+	m_dsp->add_route(6, "outputs", 1.0, 4);
+	m_dsp->add_route(7, "outputs", 1.0, 5);
+	m_dsp->add_route(8, "outputs", 1.0, 6);
+	m_dsp->add_route(9, "outputs", 1.0, 7);
 
 	// IC24 and IC25
 	INPUT_MERGER_ANY_HIGH(config, "rxrdy").output_handler().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));

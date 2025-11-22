@@ -136,20 +136,20 @@ void pc98_cbus_root_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 	space(AS_IO).write_word(offset << 1, data, mem_mask);
 }
 
-uint8_t pc98_cbus_root_device::dack_r(int line)
+u8 pc98_cbus_root_device::dack_r(int line)
 {
 	if (m_dma_device[line])
 		return m_dma_device[line]->dack_r(line);
 	return 0xff;
 }
 
-void pc98_cbus_root_device::dack_w(int line, uint8_t data)
+void pc98_cbus_root_device::dack_w(int line, u8 data)
 {
 	if (m_dma_device[line])
 		m_dma_device[line]->dack_w(line, data);
 }
 
-void pc98_cbus_root_device::set_dma_channel(uint8_t channel, device_pc98_cbus_slot_interface *dev, bool do_eop)
+void pc98_cbus_root_device::set_dma_channel(u8 channel, device_pc98_cbus_slot_interface *dev, bool do_eop)
 {
 	m_dma_device[channel] = dev;
 	m_dma_eop[channel] = do_eop;
@@ -169,12 +169,12 @@ device_pc98_cbus_slot_interface::~device_pc98_cbus_slot_interface()
 {
 }
 
-uint8_t device_pc98_cbus_slot_interface::dack_r(int line)
+u8 device_pc98_cbus_slot_interface::dack_r(int line)
 {
 	return 0;
 }
 
-void device_pc98_cbus_slot_interface::dack_w(int line, uint8_t data)
+void device_pc98_cbus_slot_interface::dack_w(int line, u8 data)
 {
 }
 

@@ -2116,7 +2116,7 @@ u32 *model2_state::geo_texture_parameters( geo_state *geo, u32 opcode, u32 *inpu
 	(void)opcode;
 
 	/* read in the index */
-	index = *input++;
+	index = (*input++) >> 2;
 
 	/* read in the conut */
 	count = *input++;

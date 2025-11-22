@@ -33,7 +33,7 @@ TODO:
 #define XTAL_5B 24.576_MHz_XTAL
 #define XTAL_5D 33.8688_MHz_XTAL
 
-DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118")
+DEFINE_DEVICE_TYPE(PC9801_118, pc9801_118_device, "pc9801_118", "NEC PC-9801-118 sound card")
 
 pc9801_118_device::pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -166,12 +166,12 @@ void pc9801_118_device::io_map(address_map &map)
 	map(0xa460, 0xa460).rw(FUNC(pc9801_118_device::id_r), FUNC(pc9801_118_device::ext_w));
 }
 
-uint8_t pc9801_118_device::id_r(offs_t offset)
+u8 pc9801_118_device::id_r(offs_t offset)
 {
 	return 0x80 | (m_ext_reg & 1);
 }
 
-void pc9801_118_device::ext_w(offs_t offset, uint8_t data)
+void pc9801_118_device::ext_w(offs_t offset, u8 data)
 {
 	m_ext_reg = BIT(data, 0);
 	if (m_ext_reg)

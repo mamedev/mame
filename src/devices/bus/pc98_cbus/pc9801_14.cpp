@@ -36,7 +36,7 @@ TODO:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_14, pc9801_14_device, "pc9801_14", "NEC PC-9801-14")
+DEFINE_DEVICE_TYPE(PC9801_14, pc9801_14_device, "pc9801_14", "NEC PC-9801-14 music card")
 
 pc9801_14_device::pc9801_14_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_14, tag, owner, clock)
@@ -63,8 +63,8 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 	});
 
 	I8255(config, m_ppi);
-	m_ppi->out_pa_callback().set([this](uint8_t data) { LOG("TMS3631: PA envelope 1 %02x\n", data); });
-	m_ppi->out_pb_callback().set([this](uint8_t data) { LOG("TMS3631: PB envelope 2 %02x\n", data); });
+	m_ppi->out_pa_callback().set([this](u8 data) { LOG("TMS3631: PA envelope 1 %02x\n", data); });
+	m_ppi->out_pb_callback().set([this](u8 data) { LOG("TMS3631: PB envelope 2 %02x\n", data); });
 //  m_ppi->in_pc_callback().set_constant(0x08);
 	m_ppi->out_pc_callback().set(m_tms, FUNC(tms3631_device::data_w));
 

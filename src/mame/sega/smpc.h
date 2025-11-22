@@ -1,20 +1,16 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, R. Belmont
-// TODO: make separate device when code is decoupled better
-//void stv_SMPC_w(offs_t offset, uint8_t data);
-//uint8_t stv_SMPC_r(offs_t offset);
-//void saturn_SMPC_w(offs_t offset, uint8_t data);
-//uint8_t saturn_SMPC_r(offs_t offset);
 
-#ifndef MAME_MACHINE_SMPC_H
-#define MAME_MACHINE_SMPC_H
+#ifndef MAME_SEGA_SMPC_H
+#define MAME_SEGA_SMPC_H
 
 #pragma once
 
-#include "screen.h"
 #include "bus/sat_ctrl/ctrl.h"
 #include "machine/nvram.h"
+
 #include "dirtc.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -24,7 +20,6 @@
 // ======================> smpc_hle_device
 
 class smpc_hle_device : public device_t,
-						public device_memory_interface,
 						public device_rtc_interface
 {
 public:
@@ -32,9 +27,7 @@ public:
 	smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-//  void io_map(address_map &map) ATTR_COLD;
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	void io_map(address_map &map) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi_r );
 
@@ -88,7 +81,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual space_config_vector memory_space_config() const override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_y2k() const override { return true; }
@@ -177,8 +169,6 @@ private:
 
 	required_device<screen_device> m_screen;
 
-	void smpc_regs(address_map &map) ATTR_COLD;
-
 	void ireg_w(offs_t offset, uint8_t data);
 	void command_register_w(uint8_t data);
 	uint8_t oreg_r(offs_t offset);
@@ -199,4 +189,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device)
 
-#endif // MAME_MACHINE_SMPC_H
+#endif // MAME_SEGA_SMPC_H

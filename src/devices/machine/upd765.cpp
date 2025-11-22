@@ -3234,11 +3234,30 @@ void tc8566af_device::device_start()
 
 void tc8566af_device::cr1_w(uint8_t data)
 {
-	m_cr1 = data;
-
-	if(m_cr1 & 0x02) {
+	// Enable CR0 - FDC Terminal Count
+	if(BIT(data, 1)) {
 		// Not sure if this inverted or not
-		tc_w((m_cr1 & 0x01) ? true : false);
+		tc_w(BIT(data, 0) ? true : false);
+		m_cr1 &= ~0x03;
+		m_cr1 |= data & 0x03;
+	}
+
+	// Enable CR2 - Standby Mode
+	if(BIT(data, 3)) {
+		m_cr1 &= ~0x0c;
+		m_cr1 |= data & 0x0c;
+	}
+
+	// Enable CR4 - Control 4
+	if(BIT(data, 5)) {
+		m_cr1 &= ~0x30;
+		m_cr1 |= data & 0x30;
+	}
+
+	// Enable CR6 - Control 6
+	if(BIT(data, 7)) {
+		m_cr1 &= ~0xc0;
+		m_cr1 |= data & 0xc0;
 	}
 }
 

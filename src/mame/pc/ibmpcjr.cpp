@@ -129,18 +129,30 @@ INPUT_PORTS_END
 void pcjr_state::machine_start()
 {
 	auto const ramsize = m_ram->size();
-	m_maincpu->space(AS_PROGRAM).install_ram(0, ramsize - 1, m_ram->pointer());
+	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
+	address_space &vram_space = m_video->space(0);
+	assert(mem_space.data_width() == vram_space.data_width());
+
+	if (ramsize > (64 * 1024))
+		mem_space.install_ram(0, ramsize - 1, m_ram->pointer());
+	else
+		mem_space.install_ram(0, ramsize - 1, 0x010000, m_ram->pointer());
 
 	m_pc_int_delay_timer = timer_alloc(FUNC(pcjr_state::delayed_irq), this);
 	m_pcjr_watchdog = timer_alloc(FUNC(pcjr_state::watchdog_expired), this);
 	m_keyb_signal_timer = timer_alloc(FUNC(pcjr_state::kb_signal), this);
 
-	// TODO: fix when this is really understood
+	// TODO: JX isn't emulated properly at all, and should probably be moved to a separate driver
+	// TODO: PCjr video RAM maps to main RAM differently when only 64K is present
+	// * ERROR H on boot with 64K RAM due to incorrect mapping
+	// * 64kought should have glitches in 320*200*4 and 640*200*2 scenes with 64K RAM
 	memory_share *const vram = memshare("vram");
 	if (vram)
-		m_video->space(0).install_ram(0, (128 * 1024) - 1, &vram[0]);
+		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, vram->bytes() - 1), &vram[0]);
+	else if (ramsize > (64 * 1024))
+		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, ramsize - 1), m_ram->pointer());
 	else
-		m_video->space(0).install_ram(0, (128 * 1024) - 1, m_ram->pointer());
+		vram_space.install_ram(0, ramsize - 1, 0x010000, m_ram->pointer());
 }
 
 void pcjr_state::machine_reset()
@@ -682,7 +694,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	GENERIC_CARTSLOT(config, "cartslot2", generic_plain_slot, "ibmpcjr_cart", "bin,jrc").set_device_load(FUNC(pcjr_state::cart2_load));
 
 	/* internal ram */
-	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K, 256K, 512K");
+	RAM(config, m_ram).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("ibmpcjr_cart");
@@ -701,6 +713,8 @@ void pcjr_state::ibmpcjx(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjx_map);
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjx_io);
+
+	m_video->set_kanji_tag("kanji");
 
 	config.device_remove("fdc:0");
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats, true);
@@ -748,6 +762,6 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY                            FULLNAME     FLAGS
-COMP( 1983, ibmpcjr, ibm5150, 0,      ibmpcjr, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
-COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY                            FULLNAME           FLAGS
+COMP( 1983, ibmpcjr, ibm5150, 0,      ibmpcjr, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM PCjr (4860)", MACHINE_IMPERFECT_COLORS )
+COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM JX (5510)",   MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

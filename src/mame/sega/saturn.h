@@ -13,10 +13,10 @@
 
 #include "315-5881_crypt.h"
 #include "315-5838_317-0229_comp.h"
-#include "machine/sega_scu.h"
-#include "machine/smpc.h"
-#include "machine/timer.h"
+#include "saturn_scu.h"
+#include "smpc.h"
 
+#include "machine/timer.h"
 #include "sound/scsp.h"
 
 #include "emupal.h"
@@ -66,7 +66,6 @@ protected:
 
 	memory_region *m_cart_reg[4];
 	std::unique_ptr<uint8_t[]>     m_backupram;
-//  std::unique_ptr<uint32_t[]>    m_scu_regs;
 	std::unique_ptr<uint16_t[]>    m_vdp2_regs;
 	std::unique_ptr<uint32_t[]>    m_vdp2_vram;
 	std::unique_ptr<uint32_t[]>    m_vdp2_cram;
@@ -124,7 +123,7 @@ protected:
 	required_device<m68000_base_device> m_audiocpu;
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
-	required_device<sega_scu_device> m_scu;
+	required_device<saturn_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

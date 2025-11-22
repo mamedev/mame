@@ -22,6 +22,7 @@ Game                               Year  PCB ID                    CPU          
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Captain Shark                      06    M1.2 (CS350P016)          ASTRO V102PX-006   ASTRO V06      ASTRO F02 2005-05-29                       Encrypted
 Dino Dino                          05    T-3802A                   ASTRO V102PX-010   ASTRO V05      ASTRO F02 2003-03-12                       Encrypted
+Foxy Ruby                          09    _P (CS350P071)            ASTRO V102PX-002   ASTRO V07      ASTRO ROHS BA21C00009                      Encrypted
 Go & Stop                          04    K2 (CS350P011)            no markings        ASTRO V05      ASTRO F01 2007-06-03                       Encrypted
 Hacher (hack)                      05?   M1.2                      ?                  ?              ASTRO F02 2005-02-18                       Encrypted
 Happy Farm (IN.01.02B)             11    P1                        ASTRO V102PX-008   ASTRO V07      ASTRO ROHS BA21C00009 N011483              Encrypted
@@ -112,6 +113,7 @@ TODO:
 - westvent and clones: needs verifying of inputs, outputs and layout.
 - keno21: doesn't manage to read the CPU code. bp 1160,1,{D5=0x2188;g} for now to go further.
 - crzcircus: needs verifying of inputs, outputs and layout.
+- foxyruby: needs verifying of inputs, outputs and layout.
 
 magibomb sets Q/A as of 18.07.2025:
 MAGIC BOMB\A3.0 (magibomb_a30 run protected)
@@ -420,6 +422,7 @@ public:
 
 	void crzcircus(machine_config &config) ATTR_COLD;
 	void dinodino(machine_config &config) ATTR_COLD;
+	void foxyruby(machine_config &config) ATTR_COLD;
 	void gostopac(machine_config &config) ATTR_COLD;
 	void hacher(machine_config &config) ATTR_COLD;
 	void hapfarm(machine_config &config) ATTR_COLD;
@@ -444,6 +447,7 @@ public:
 
 	void init_gostopac() ATTR_COLD { decrypt_rom(gostopac_table); }
 	void init_px001() ATTR_COLD { decrypt_rom(v102_px001_table); }
+	void init_px002() ATTR_COLD { decrypt_rom(v102_px002_table); }
 	void init_px005() ATTR_COLD { decrypt_rom(v102_px005_table); }
 	void init_px006() ATTR_COLD { decrypt_rom(v102_px006_table); }
 	void init_px007() ATTR_COLD { decrypt_rom(v102_px007_table); }
@@ -467,6 +471,7 @@ private:
 
 	void crzcircus_map(address_map &map) ATTR_COLD;
 	void dinodino_map(address_map &map) ATTR_COLD;
+	void foxyruby_map(address_map &map) ATTR_COLD;
 	void gostopac_map(address_map &map) ATTR_COLD;
 	void hacher_map(address_map &map) ATTR_COLD;
 	void hapfarm_map(address_map &map) ATTR_COLD;
@@ -508,6 +513,7 @@ private:
 	// so they can be copied over if needed by future dumps
 	static const decryption_info gostopac_table;
 	static const decryption_info v102_px001_table;
+	static const decryption_info v102_px002_table;
 	static const decryption_info v102_px005_table;
 	static const decryption_info v102_px006_table;
 	static const decryption_info v102_px007_table;
@@ -1273,8 +1279,8 @@ void zoo_state::lwitch_map(address_map &map)
 void zoo_state::hapfarm_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
-	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x480000, 0x483fff).ram().share("nvram"); // battery
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xb00000, 0xb00001).portr("CPUCODE_IN");
 	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1291,8 +1297,8 @@ void zoo_state::hapfarm_map(address_map &map)
 void zoo_state::hapfarm_in0102b_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
-	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0x300000, 0x303fff).ram().share("nvram"); // battery
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa80000, 0xa80001).portr("CPUCODE_IN");
 	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
@@ -1340,6 +1346,24 @@ void zoo_state::crzcircus_map(address_map &map)
 	map(0xc00000, 0xc00001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff);
 	map(0xd00000, 0xd03fff).ram().share("nvram"); // battery
 	map(0xd80000, 0xd801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+}
+
+void zoo_state::foxyruby_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x500000, 0x503fff).ram().share("nvram"); // battery
+	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
+	map(0x980000, 0x980001).portr("CPUCODE_IN");
+	map(0xb00000, 0xb001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc80000, 0xc80000).w(FUNC(zoo_state::oki_bank_w));
+	map(0xd80001, 0xd80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe00000, 0xe00fff).ram().share(m_spriteram);
+	map(0xe02000, 0xe02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xe04000, 0xe04001).portr("INPUTS");
+	map(0xe08001, 0xe08001).w(FUNC(zoo_state::eeprom_w));
+	map(0xe0a000, 0xe0a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xe0e000, 0xe0e001).portr("EEPROM_IN");
+//  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
 void astoneag_state::astoneag_map(address_map &map)
@@ -1874,6 +1898,12 @@ void zoo_state::lwitch(machine_config &config)
 {
 	winbingo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::lwitch_map);
+}
+
+void zoo_state::foxyruby(machine_config &config)
+{
+	winbingo(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::foxyruby_map);
 }
 
 void zoo_state::hapfarm(machine_config &config)
@@ -3978,6 +4008,28 @@ ROM_START( crzcircus )
 	ROM_LOAD( "crzcircus_cpucode.key", 0x00, 0x02, CRC(ab1539f0) SHA1(051861faa374e2de66f629b3789bdfb04c80e138) )
 ROM_END
 
+ROM_START( foxyruby )
+	ROM_REGION16_BE( 0x40000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION16_BE( 0x40000, "encrypted_rom", 0 )
+	ROM_LOAD16_BYTE( "1_foxy_ruby_us.01.01.a.u26", 0x00000, 0x20000, CRC(1c5b8b97) SHA1(f52df61c5bf60a3426afe0558ca057dedf5168e3) ) // read as F29C51001T
+	ROM_LOAD16_BYTE( "2_foxy_ruby_us.01.01.a.u25", 0x00001, 0x20000, CRC(41914d8c) SHA1(bce787cf10bd8995ca80cef4018fd989a4310425) ) // read as F29C51001T
+
+	ROM_REGION( 0x1000000, "sprites", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx29f1610mc.u51", 0x0000000, 0x200000, CRC(f116c767) SHA1(a05abd89d0015831a2953bbf0a7b95178f9ca6e4) ) // silkscreened 'ROM # 3' on PCB under the chip
+	ROM_LOAD( "mx29f1610mc.u30", 0x0800000, 0x200000, CRC(820fa9f6) SHA1(ae7fb4f9f4b6321f5c67f3bb563c8622446ef732) ) // silkscreened 'ROM # 4' on PCB under the chip
+	// rom 7 not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_foxy_ruby.rom5", 0x00000, 0x80000, CRC(211a8dba) SHA1(9512bc97a4205df72f1875a6688dda75aaaf1aaf) ) // read as A29040
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(8623a18d) SHA1(7547702edaae72e9e4eb9d55665011fab8dd6959) ) // factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "foxyruby_cpucode.key", 0x00, 0x02, CRC(5bb17b89) SHA1(ac6dd51b168ed93dd29ead451a7d482b88571860) )
+ROM_END
+
 
 void astrocorp_state::init_showhand()
 {
@@ -4158,6 +4210,38 @@ const zoo_state::decryption_info zoo_state::v102_px001_table = {
 		}
 	},
 	{ 12, 10, 8, 11, 9, 7, 2, 4, 6, 5, 3 }
+};
+
+const zoo_state::decryption_info zoo_state::v102_px002_table = {
+	{
+		{
+			{ 8, 11, 9 },
+			{
+				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
+				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
+				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
+				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
+				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
+				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
+				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
+				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
+			}
+		},
+		{
+			{ 12, 11, 10 },
+			{
+				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
+				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
+				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
+				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
+				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
+				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
+				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
+				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
+			}
+		}
+	},
+	{ 12, 9, 8, 10, 11, 7, 2, 4, 6, 5, 3 }
 };
 
 const zoo_state::decryption_info zoo_state::v102_px005_table = {
@@ -4477,6 +4561,7 @@ GAMEL( 2007,  astoneag_aa05h,  astoneag, astoneag,        astoneag,       astone
 GAMEL( 2006,  cptshark,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_winbingo ) // 13:50:11 Apr 21 2006
 GAME(  2007,  crzcircus,       0,        crzcircus,       winbingo,       zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Crazy Circus (Ver. US.01.7)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Dec 25 2007
 GAMEL( 2005,  dinodino,        0,        dinodino,        dinodino,       zoo_state,       init_px010,     ROT0, "Astro Corp.",                  "Dino Dino (Ver. A1.1, 01/13/2005)",            MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_dinodino ) // 13/01.2005 10:59
+GAME ( 2009,  foxyruby,        0,        foxyruby,        magibomb_aa72d, zoo_state,       init_px002,     ROT0, "Astro Corp.",                  "Foxy Ruby (Ver. US.01.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2009/06/17
 GAME(  2004,  gostopac,        0,        gostopac,        gostopac,       zoo_state,       init_gostopac,  ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
 GAME ( 2011,  hapfarm_in0102b, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02

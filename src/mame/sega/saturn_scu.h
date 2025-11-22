@@ -1,13 +1,8 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
 
-    Sega System Control Unit (c) 1995 Sega
-
-***************************************************************************/
-
-#ifndef MAME_MACHINE_SEGA_SCU_H
-#define MAME_MACHINE_SEGA_SCU_H
+#ifndef MAME_SEGA_SATURN_SCU_H
+#define MAME_SEGA_SATURN_SCU_H
 
 #pragma once
 
@@ -35,13 +30,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> sega_scu_device
+// ======================> saturn_scu_device
 
-class sega_scu_device : public device_t
+class saturn_scu_device : public device_t
 {
 public:
 	// construction/destruction
-	sega_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	void regs_map(address_map &map) ATTR_COLD;
@@ -137,7 +132,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(SEGA_SCU, sega_scu_device)
+DECLARE_DEVICE_TYPE(SATURN_SCU, saturn_scu_device)
 
 
 
@@ -146,4 +141,4 @@ DECLARE_DEVICE_TYPE(SEGA_SCU, sega_scu_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_SEGA_SCU_H
+#endif // MAME_SEGA_SATURN_SCU_H

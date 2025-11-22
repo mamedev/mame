@@ -3373,6 +3373,24 @@ ROM_START( new2001 )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(71281d72) SHA1(1661181a5a5331083d649b10a7d3a36062e617c0) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
+ROM_START( trea2000 ) // same PCB as new2001
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "t2000_alpha_1_v107.u21", 0x080000, 0x040000, CRC(20377102) SHA1(f9d2b50a62c7c89141a5232937067cd75ece33e8) )
+	ROM_RELOAD(                         0x0c0000, 0x040000 )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "t2000_alpha_3_v105.0.u25", 0x00000, 0x40000, CRC(5a4c0a75) SHA1(32f71892455f55e38e0e6cef65a8430a5fcdb5ee) )
+	ROM_LOAD32_BYTE( "t2000_alpha_4_v105.1.u26", 0x00002, 0x40000, CRC(0af5454f) SHA1(2bbbaa7b8671accf8766a35316f6736b4c3e2bbc) )
+	ROM_LOAD32_BYTE( "t2000_alpha_5_v105.2.u27", 0x00001, 0x40000, CRC(f07386be) SHA1(dfe04022532a90089393dd4bd5c0082c341c5a1a) )
+	ROM_LOAD32_BYTE( "t2000_alpha_6_v105.3.u28", 0x00003, 0x40000, CRC(585c66f7) SHA1(8ef31af9bc45dd79610fcfe4681424429af442ba) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // SS9904
+	ROM_LOAD( "t2000_alpha_2_v105.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) ) // same as new2001
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds1971.bin", 0x00, 0x28, CRC(41e15587) SHA1(0f93e0256f2520e4be2433c74059a9113b57a474) )
+ROM_END
 
 /***************************************************************************
 
@@ -4162,6 +4180,36 @@ void subsino2_state::init_wtrnymph()
 	subsino_decrypt(memregion("program")->base() + 0x8100, victor5_bitswaps, victor5_xors, 0x7f00);
 }
 
+// runs on the same original PCB as mtrain, wtrnymph. All labels are hand-written and the copyright is Subsino 1981. Is this an hack?
+ROM_START( blushark )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	// code starts at 0x8100!
+	ROM_LOAD( "1 v1.0.u17", 0x00000, 0x10000, CRC(e659142c) SHA1(f1608f7164a624ea48d4579715959af15ae75c28) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "2_v1.u2", 0x00000, 0x40000, CRC(e720ac2b) SHA1(4b2b89075a848e24fb16f98f0da2f18606ae8e10) )
+	ROM_LOAD32_BYTE( "3_v1.u3", 0x00002, 0x40000, CRC(4c5c4ef8) SHA1(62076c27129af3649e244d8095056fddcfeaddfc) )
+	ROM_LOAD32_BYTE( "4_v1.u4", 0x00001, 0x40000, CRC(d3367795) SHA1(7ca4f3c2472c70b17a5929d492c8bc54fae27950) )
+	ROM_LOAD32_BYTE( "5_v1.u5", 0x00003, 0x40000, CRC(d0806709) SHA1(feb98c5892050e57eac35126b6e573883c23a335) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "6_v1.u27", 0x00000, 0x40000, CRC(943ac197) SHA1(4880aca75a135d1932eb8c4de05013b0b60069e9) ) // same as trsocean in subsino/subsino.cpp
+	ROM_RELOAD(           0x40000, 0x40000 )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d.u6",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u18", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u19", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(581f6bfb) SHA1(2b6e9e4800e22913474551c5c70b66933003c12f) BAD_DUMP ) // handcrafted to pass protection check
+ROM_END
+
 
 GAME( 1997, mtrain,      0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.4)",                0 )  // inside the program ROM says 1997, but on screen shows 1996
 GAME( 1996, mtraina,     mtrain,   mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
@@ -4171,6 +4219,7 @@ GAME( 1996, strain,      0,        mtrain,   strain,   subsino2_state, init_mtra
 GAME( 1995, tbonusal,    0,        tbonusal, tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph,    0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
+GAME( 199?, blushark,    wtrnymph, mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "hack?",                            "Blue Shark (Subsino, Ver. 1.0)",        MACHINE_NOT_WORKING )
 
 GAME( 1998, expcard,     0,        expcard,  expcard,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
 GAME( 1999, jgaoshou,    expcard,  jgaoshou, jgaoshou, subsino2_state, empty_init,    ROT0, "Subsino",                          "Jiyou Gaoshou (China, Ver 1.2)",        MACHINE_IMPERFECT_GRAPHICS ) // missing GFX ROM
@@ -4189,6 +4238,8 @@ GAME( 1999, bishjan,     0,        bishjan,  bishjan,  subsino2_state, empty_ini
 GAME( 1999, xiaoao,      bishjan,  xiaoao,   bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Xiao Ao Jiang Hu (China, Ver. 1.00)",   MACHINE_NO_SOUND )
 
 GAME( 2000, new2001,     0,        new2001,  new2001,  subsino2_state, empty_init,    ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
+
+GAME( 2000, trea2000,    0,        new2001,  new2001,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Treasure 2000 (Ver. 107)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 GAME( 2006, xplan,       0,        xplan,    xplan,    subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Plan (Ver. 101)",                     MACHINE_NOT_WORKING )
 

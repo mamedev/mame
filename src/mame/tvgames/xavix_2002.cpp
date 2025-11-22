@@ -189,10 +189,10 @@ static INPUT_PORTS_START( xavix_jmat )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 
 INPUT_PORTS_END
 
@@ -703,6 +703,30 @@ ROM_START( xavbaseb )
 	ROM_LOAD( "xpbaseball.bin", 0x000000, 0x800000, CRC(e9ed692d) SHA1(537e390e972156dc7da66ee127ae4c8052038ee5) )
 ROM_END
 
+ROM_START( xavgolf )
+	ROM_REGION( 0x800000, "temp", ROMREGION_ERASE00 )
+	ROM_LOAD( "pglfa.u5", 0x000000, 0x800000, CRC(781399d6) SHA1(4797a978f00fc10a34a79a9a09a8355eb92283f2) )
+
+	// the glob seems to get split between the regular space, and the 'extra' space superxavix has
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_COPY( "temp", 0x000000, 0x000000, 0x400000 )
+
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
+	ROM_COPY( "temp", 0x400000, 0x000000, 0x400000 )
+ROM_END
+
+ROM_START( xavgolfj )
+	ROM_REGION( 0x800000, "temp", ROMREGION_ERASE00 )
+	ROM_LOAD( "pglfj.u5", 0x000000, 0x800000, CRC(d3f23cfd) SHA1(ce2d204e9abeb82a5793a613429ead009989ecd4) )
+
+	// the glob seems to get split between the regular space, and the 'extra' space superxavix has
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_COPY( "temp", 0x000000, 0x000000, 0x400000 )
+
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
+	ROM_COPY( "temp", 0x400000, 0x000000, 0x400000 )
+ROM_END
+
 ROM_START( xavbowl )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpbowling.bin", 0x000000, 0x800000, CRC(2873460b) SHA1(ea8e2392f5a12961a23eb66dca8e07dec81ce8c8) )
@@ -786,7 +810,7 @@ ROM_START( domfitex )
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000,  CRC(841fe3cd) SHA1(8678b8a0c5198b24169a84dbe3ae979bb0838f23) )
 
-	ROM_REGION( 0x0800000, "extra_u3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(1dc844ea) SHA1(c23da9006227f7fe4982998c17759d403a47472a) )
 ROM_END
 
@@ -1001,9 +1025,9 @@ void superxavix_super_tv_pc_state::init_stvpc()
 void superxavix_i2c_jmat_state::init_xavmusic()
 {
 	init_xavix();
-	// is sprite yflip broken on (some?) revisions of SuperXaviX hardware, or is there a CPU bug causing this
+	// is sprite fliping broken on (some?) revisions of SuperXaviX hardware, or is there a CPU bug causing this
 	m_disable_sprite_yflip = true;
-	m_allow_superxavix_extra_rom_sprites = false;
+	m_disable_sprite_xflip = true;
 }
 
 void superxavix_piano_pc_state::init_piano_pc()
@@ -1027,6 +1051,8 @@ void superxavix_doradraw_state::init_doradraw()
 
 CONS( 2004, xavtenni, 0,       0, superxavix_i2c_24c04, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbaseb, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavgolf,  0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Golf (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavgolfj, xavgolf, 0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Golf (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbowl,  0,       0, superxavix_i2c_24c04, xavix_bowl, superxavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 CONS( 2005, xavbowlj, xavbowl, 0, superxavix_i2c_24c04, xavix_bowl, superxavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT, PT2-BWL-11, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^^
 CONS( 2004, xavbox,   0,       0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Boxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'

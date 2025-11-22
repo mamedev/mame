@@ -18,7 +18,7 @@ TODO:
 #include "emu.h"
 #include "wavestar.h"
 
-DEFINE_DEVICE_TYPE(QVISION_WAVESTAR, qvision_wavestar_device, "qvision_wavestar", "QVision WaveStar")
+DEFINE_DEVICE_TYPE(QVISION_WAVESTAR, qvision_wavestar_device, "qvision_wavestar", "QVision WaveStar sound card")
 
 qvision_wavestar_device::qvision_wavestar_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QVISION_WAVESTAR, tag, owner, clock)

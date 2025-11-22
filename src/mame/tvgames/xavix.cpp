@@ -187,7 +187,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
 
 	// Sprite Registers
-	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
+	map(0x6fd8, 0x6fd8).rw(FUNC(xavix_state::spriteregs_r), FUNC(xavix_state::spriteregs_w));
 
 	// Sprite DMA
 	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::spritefragment_dma_status_r), FUNC(xavix_state::spritefragment_dma_trg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401

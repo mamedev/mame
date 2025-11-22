@@ -1515,6 +1515,7 @@ astoneag_aa05h
 cptshark
 crzcircus
 dinodino
+foxyruby
 gostopac
 hacher
 hapfarm
@@ -1704,6 +1705,7 @@ tmek51p
 @source:atari/atarigx2.cpp
 motofren
 motofrenft
+motofrenfta
 motofrenmd
 motofrenmf
 rrreveng
@@ -2222,6 +2224,7 @@ orbit
 
 @source:atari/pofo.cpp
 pofo
+pofo2
 
 @source:atari/pong.cpp
 breakout
@@ -15437,6 +15440,7 @@ captcommr1
 captcommu
 cawing
 cawingj
+cawingjr
 cawingr1
 cawingu
 cawingur1
@@ -17899,8 +17903,10 @@ mjifb3
 mjsenka
 mjsiyoub
 mjtensin
+mjtensina
 mjvegas
 mjvegasa
+mjvegasb
 mjyarou
 mjyarou2
 openmj
@@ -20699,9 +20705,11 @@ feverchw4
 fl7_3121
 fl7_50
 fl7_500
+fl7_1000
 fl7_2000
 fl7_2k16
 fl7_tw
+fl7_twa
 goldfrui
 goldstar
 goldstbl
@@ -20841,6 +20849,9 @@ skillcha
 skillchb
 skillmst
 skillmsta
+special7
+special7a
+special7b
 srmagic
 star100
 super7
@@ -21024,6 +21035,7 @@ mgcs2h
 mgcs2l
 
 @source:igs/igs_m027xa.cpp
+crzybug2
 crzybugs
 crzybugs103jp
 crzybugs200us
@@ -21033,6 +21045,7 @@ haunthig101us
 haunthig107us
 jking04
 krzykeno
+texashld
 tripfev
 tripfev105us
 tripfev107us
@@ -22209,6 +22222,7 @@ dbreed
 dbreedjm72
 dbreedm72
 dkgensan
+dkgensana
 dkgensanm72
 dkgensanm82
 gallop
@@ -24563,6 +24577,7 @@ jongkyo
 
 @source:kiwako/koikoi.cpp
 koikoi
+koikoip2
 
 @source:kiwako/mrjong.cpp
 blkbustr
@@ -25752,6 +25767,7 @@ ppp2nda
 sogeki
 sscopefh
 sscopex
+sscopexu
 thrild2
 thrild2a
 thrild2c
@@ -35786,6 +35802,7 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+fingerd
 k10_2l
 k10_5l
 lxpcli
@@ -35807,6 +35824,7 @@ typo240
 36pcase
 168pcase
 240in1ar
+500in1hh
 a6plus
 d12power
 d9_500
@@ -35817,6 +35835,7 @@ dgun2577
 dgun2593
 dvnimbus
 egame150
+f5_620
 gb50_150
 gbox2020
 gcs2mgp
@@ -35875,11 +35894,14 @@ pactin
 rbbrite
 rd5_240
 red5mam
+retro620
 rtvgc300
 rtvgc300cr
 rtvgc300fz
 rtvgc300pj
+s10_520
 s10fake
+s5_520
 sealvt
 supr200
 sy888b
@@ -35898,9 +35920,13 @@ zonefusn
 bittboy
 bl339
 fapocket
+g3_800
 g5_500
+g6_666
+g7_666
 g9_666
 gbox2019
+gbox2022
 gprnrs1
 gprnrs16
 hhgc319
@@ -39871,6 +39897,9 @@ mc400
 mcword
 mcword_de
 
+@source:psion/mc600.cpp
+mc600
+
 @source:psion/psion.cpp
 psion1
 psioncm
@@ -40543,6 +40572,9 @@ vfurlong
 waidrive
 xtrmhnt2
 xtrmhunt
+
+@source:sega/dcchk.cpp
+dcacchk
 
 @source:sega/dccons.cpp
 dc
@@ -42010,6 +42042,7 @@ smspaln
 smssdisp
 
 @source:sega/sms_bootleg.cpp
+atgsms
 smssgame
 smssgamea
 
@@ -42716,6 +42749,7 @@ prpht600
 
 @source:sequential/sixtrak.cpp
 sixtrak
+sixtraka
 
 @source:seta/albazc.cpp
 hanaroku
@@ -43831,6 +43865,7 @@ lggp40
 arthurkn
 arthurkn100
 fruitcat
+pharmyst
 
 @source:skeleton/lilith.cpp
 lilith
@@ -44757,6 +44792,7 @@ victor6b
 
 @source:subsino/subsino2.cpp
 bishjan
+blushark
 expcard
 humlan
 jgaoshou
@@ -44775,6 +44811,7 @@ saklove
 squeenb
 strain
 tbonusal
+trea2000
 treacity
 treacity202
 treamary
@@ -47783,6 +47820,8 @@ xavbowl
 xavbowlj
 xavbox
 xavcheck
+xavgolf
+xavgolfj
 xavjmat
 xavmusic
 xavpkjr
@@ -47950,7 +47989,7 @@ raiders5ta
 @source:upl/xxmissio.cpp
 xxmissio
 
-@source:usp/patinho_feio.cpp
+@source:usp/patinhofeio.cpp
 patinho
 
 @source:ussr/apogee.cpp

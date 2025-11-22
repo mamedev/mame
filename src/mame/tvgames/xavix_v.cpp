@@ -45,7 +45,24 @@ inline uint8_t superxavix_state::get_next_bit_sx()
 {
 	if (m_tmp_databit == 0)
 	{
-		m_bit = m_extra[m_tmp_dataaddress&0x7fffff];
+		int address = m_tmp_dataaddress;
+
+		// do the upper bits being set have some special meaning
+		// or have we missed some segment register use by the time we get here?
+
+		// anpanmdx has this set, this is an alternative to the
+		// code to detect it in draw_bitmap_layer
+		if (address & 0x2000000)
+		{
+			address &= 0x1ffffff;
+			address ^= 0x0600000;
+		}
+
+		// the higher bit set when accessing video expands the address space
+		if ((address & 0x1000000) && m_extra)
+			m_bit = m_extra[address & 0x7fffff];
+		else
+			m_bit = read_full_data_sp_bypass(address);
 	}
 
 	uint8_t ret = m_bit >> m_tmp_databit;
@@ -644,7 +661,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 void superxavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
-	m_use_superxavix_extra = false;
 	xavix_state::draw_tilemap(screen, bitmap, cliprect, which);
 }
 
@@ -992,11 +1008,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 void superxavix_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	if (m_extra && m_allow_superxavix_extra_rom_sprites)
-		m_use_superxavix_extra = true;
-
 	xavix_state::draw_sprites(screen, bitmap, cliprect);
-	m_use_superxavix_extra = false;
 }
 
 
@@ -1007,10 +1019,12 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 	// some games have the top bit set, why?
 	m_spritereg &= 0x7f;
 
-	if ((m_spritereg == 0x00) || (m_spritereg == 0x01))
+	if ((m_spritereg == 0x00) || (m_spritereg == 0x01) || (m_spritereg == 0x05))
 	{
 		// 8-bit addressing  (Tile Number)
 		// 16-bit addressing (Tile Number) (rad_rh)
+
+		// xavgolf uses 0x05, how does it differ?
 		alt_addressing = 1;
 	}
 	else if (m_spritereg == 0x02)
@@ -1084,6 +1098,14 @@ void xavix_state::draw_sprites_line(screen_device &screen, bitmap_rgb32 &bitmap,
 		// many elements, including the XaviX logo on xavmusic have yflip set, but don't want it, why?
 		if (m_disable_sprite_yflip)
 			flipy = 0;
+
+		// many elements in xavmusic and xavjmat also require xflip to be disabled, maybe sprite flipping
+		// is broken on SuperXaviX?
+		//
+		// non-super games, such as Gururuin world, use sprite mode 4, and expect flipping to work
+		// while the SuperXaviX games use a mix of mode 4 and mode 7 and don't want it
+		if (m_disable_sprite_xflip)
+			flipx = 0;
 
 		int drawheight = 16;
 		int drawwidth = 16;
@@ -1256,19 +1278,9 @@ void xavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
 
 void superxavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
 {
-	if (m_use_superxavix_extra)
+	for (int i = 0; i < bpp; i++)
 	{
-		for (int i = 0; i < bpp; i++)
-		{
-			dat |= (get_next_bit_sx() << i);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < bpp; i++)
-		{
-			dat |= (get_next_bit() << i);
-		}
+		dat |= (get_next_bit_sx() << i);
 	}
 }
 
@@ -1436,10 +1448,34 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 					start, start * 0x800, step, size, unused);
 			}
 
+			// xavgolf title is 308c (start) needs to be 188c
+			// xavgolf menu  is 30fc (start) needs to be 18fc
+
+			// xavbaseb xavix logo is 1500
+			//          title      is 14e0
+
+			// 0x800 (offset multiplier) * 0x1000 = 0x800000 (24 bit address - usual xavix address space)
+			// 0x2000 being set implies address beyond 24-bit space = extended xavix modes
+
 			// anpanmdx title screen ends up with a seemingly incorrect value for start
-			// when it does the scroller.  There is presumably an opcode or math bug causing this.
-			//if (start >= 0x7700)
-			/// start -= 0x3c00;
+			// when it does the scroller.
+			// It has values of 0x7xxx which has bits 0x2000 and 0x4000 set, pushing the addressing beyond
+			// even double the usual XaviX address space)
+			//
+			// maybe addresses above 24-bit present the ROM data to the system in an unusual order
+			// (this might also apply to sprites)
+
+			// we currently detect this in get_next_bit_sx instead
+			/*
+			if (m_extra)
+			{
+				if (start & 0x4000)
+				{
+					start &= 0x3fff;
+					start ^= 0xc00;
+				}
+			}
+			*/
 
 			int base = start * 0x800;
 			int base2 = topadr * 0x8;
@@ -1683,6 +1719,12 @@ void xavix_state::tmap2_regs_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_tmap2_regs[offset]);
 }
 
+uint8_t xavix_state::spriteregs_r()
+{
+	// xavjmat relies on being able to read this back or the sprite addresses
+	// in some of the stages get calculated incorrectly
+	return m_spritereg;
+}
 
 void xavix_state::spriteregs_w(uint8_t data)
 {
