@@ -1958,7 +1958,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->in_memr_callback().set(FUNC(pc9801_state::dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(pc9801_state::dma_write_byte));
 	m_dmac->in_ior_callback<0>().set([this] () { return m_cbus_root->dack_r(0); });
-	m_dmac->out_iow_callback<0>().set([this] (u8 data) { return m_cbus_root->dack_w(0, data); });
+	m_dmac->out_iow_callback<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
 	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));

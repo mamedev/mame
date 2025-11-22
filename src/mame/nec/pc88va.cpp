@@ -1284,7 +1284,7 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
 	m_cbus_root->drq_cb<0>().set(m_maincpu, FUNC(v50_device::dreq_w<0>)).invert();
 	m_maincpu->in_ior_cb<0>().set([this] () { return m_cbus_root->dack_r(0); });
-	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { return m_cbus_root->dack_w(0, data); });
+	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
 	// should be 3 slots for each iteration here
 	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc88va_cbus_devices, nullptr);
