@@ -52,11 +52,6 @@ public:
 
 	ncr5385_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	void set_ack_delay_ns(u32 ackdelay)
-	{
-		m_ack_delay = ackdelay;
-	}
-
 	void map(address_map &map) ATTR_COLD;
 
 	u8 dma_r();
@@ -124,9 +119,6 @@ private:
 
 	bool m_int_state;
 	bool m_dreq_state;
-
-	// tuning for target device speed
-	u32 m_ack_delay;
 };
 
 DECLARE_DEVICE_TYPE(NCR5385, ncr5385_device)
