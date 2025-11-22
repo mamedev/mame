@@ -88,26 +88,26 @@ u16 swp00_device::interpolation_step(u32 speed, u32 sample_counter)
 	// Phase is incorrect, and very weird
 
 	if(speed >= 0x78)
-        return 0x7f;
+		return 0x7f;
 
-    u32 k0 = speed >> 3;
-    u32 k1 = speed & 7;
+	u32 k0 = speed >> 3;
+	u32 k1 = speed & 7;
 
-    if(speed >= 0x58) {
-        k0 -= 10;
+	if(speed >= 0x58) {
+		k0 -= 10;
 		u32 a = (4 << k0) - 1;
-        u32 b = (2 << k0) - 1;
-        static const u8 mx[8] = { 0x00, 0x80, 0x88, 0xa8, 0xaa, 0xea, 0xee, 0xfe };
-        return ((mx[k1] << (sample_counter & 7)) & 0x80) ? a : b;
+		u32 b = (2 << k0) - 1;
+		static const u8 mx[8] = { 0x00, 0x80, 0x88, 0xa8, 0xaa, 0xea, 0xee, 0xfe };
+		return ((mx[k1] << (sample_counter & 7)) & 0x80) ? a : b;
 	}
 
-    k0 = 10 - k0;
+	k0 = 10 - k0;
 
 	if(sample_counter & util::make_bitmask<u32>(k0))
 		return 0;
 
 	static const u16 mx[8] = { 0xaaaa, 0xeaaa, 0xeaea, 0xeeea, 0xeeee, 0xfeee, 0xfefe, 0xfffe };
-    return (mx[k1] << ((sample_counter >> k0) & 0xf)) & 0x8000 ? 1 : 0;
+	return (mx[k1] << ((sample_counter >> k0) & 0xf)) & 0x8000 ? 1 : 0;
 }
 
 
@@ -277,7 +277,7 @@ void swp00_device::streaming_block::read_8c(memory_access<24, 0, 0, ENDIANNESS_L
 		dpcm_step(wave.read_byte(m_address + m_dpcm_pos));
 		m_dpcm_pos++;
 	}
-		
+
 	val0 = m_dpcm_s0;
 	val1 = m_dpcm_s1;
 }
@@ -323,7 +323,7 @@ std::pair<s16, bool> swp00_device::streaming_block::step(memory_access<24, 0, 0,
 			}
 		}
 	}
-	return std::make_pair(result, false);				
+	return std::make_pair(result, false);
 }
 
 template<int sel> void swp00_device::streaming_block::phase_w(u8 data)
@@ -614,7 +614,7 @@ void swp00_device::envelope_block::decay_speed_w(u8 data)
 		m_decay_speed = data;
 		m_envelope_mode = DECAY;
 
-	} else if(m_envelope_mode == DECAY_DONE) 
+	} else if(m_envelope_mode == DECAY_DONE)
 		m_decay_speed = data;
 }
 
@@ -700,7 +700,7 @@ s32 swp00_device::filter_block::step(s16 input, s32 lmod, u32 sample_counter)
 			m_k += swp00_device::interpolation_step(m_speed & 0x7f, sample_counter);
 			if(m_k > m_k_target)
 				m_k = m_k_target;
-		
+
 		} else if(m_k > m_k_target) {
 			m_k -= swp00_device::interpolation_step(m_speed & 0x7f, sample_counter);
 			if(m_k < m_k_target)
@@ -941,7 +941,7 @@ s32 swp00_device::mixer_block::volume_apply(s32 level, s32 sample)
 		return 0;
 
 	s32 e = level >> 8;
-	s32 m = level & 0xff; 
+	s32 m = level & 0xff;
 	s64 mul = (0x1000000 - (m << 15)) >> e;
 	return (sample * mul) >> 24;
 }
@@ -1738,7 +1738,7 @@ u8 swp00_device::state_r()
 
 	case 4:  // panning l
 		return m_mixer[chan].status_panl();
-									   
+
 	case 5:  // panning r
 		return m_mixer[chan].status_panr();
 	}

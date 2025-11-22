@@ -868,7 +868,7 @@ void apple2e_state::memexp_w(offs_t offset, u8 data)
 			break;
 
 		case 3:
-//			printf("Write %02x to RAM[%x]\n", data, m_exp_liveptr);
+//          printf("Write %02x to RAM[%x]\n", data, m_exp_liveptr);
 			if (m_exp_liveptr <= m_exp_addrmask)
 			{
 				m_exp_ram[m_exp_liveptr] = data;

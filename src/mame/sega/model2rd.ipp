@@ -142,7 +142,7 @@ u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, cons
 			v1 = v0, v0--, vfrac = 0x100; // bottom edge of texture
 	}
 
-	// read the four texels from the texture sheet 
+	// read the four texels from the texture sheet
 	u32 tex00 = get_texel(tex_x, tex_y, u0, v0, sheet) << 4;
 	u32 tex01 = get_texel(tex_x, tex_y, u1, v0, sheet) << 4;
 	u32 tex10 = get_texel(tex_x, tex_y, u0, v1, sheet) << 4;
@@ -259,7 +259,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 
 		float z = recip_approx(ooz);
 
-		s32 mml = -object.texlod + fast_log2(z);	// equivalent to log2(z^2)
+		s32 mml = -object.texlod + fast_log2(z);    // equivalent to log2(z^2)
 		s32 level = std::clamp(mml >> 7, 0, max_level);
 
 		// we give texture coordinates 8 fractional bits

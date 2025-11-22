@@ -378,7 +378,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 0d1840 bcc r                 - r:ar(8) cc:cc(0) cond
 	if($cc) {
- 		m_npc = m_pc + $r;
+		m_npc = m_pc + $r;
 	}
 
 0b4000 bchg #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)

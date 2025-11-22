@@ -88,8 +88,8 @@ license:CC0-1.0
 		     currently unsupported element rotations with arbitrary angles:
 
 		<rect>
-			<color red="0.6" green="0.6" blue="0.6"/>
-			<bounds x="22" y="2" width="3" height="12"/>
+		    <color red="0.6" green="0.6" blue="0.6"/>
+		    <bounds x="22" y="2" width="3" height="12"/>
 		</rect>
 		-->
 		<disk>

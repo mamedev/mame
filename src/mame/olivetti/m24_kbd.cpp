@@ -263,8 +263,13 @@ uint8_t m24_keyboard_device::p2_r()
 	// co-ordinates.  The +1 is to put one signal 90 degrees out of phase with
 	// respect to the other, to produce the required "quadrature" encoding,
 	// which lets the MCU determine the direction of movement.
-	return (m_keypress << 7) | m_mousebtn->read() |
-      BIT(mx+1, 1) | BIT(mx, 1) << 1 | BIT(my, 1) << 2 | BIT(my+1, 1) << 3;
+	return
+			(m_keypress << 7) |
+			m_mousebtn->read() |
+			BIT(mx + 1, 1) |
+			BIT(mx, 1) << 1 |
+			BIT(my, 1) << 2 |
+			BIT(my + 1, 1) << 3;
 }
 
 int m24_keyboard_device::t0_r()

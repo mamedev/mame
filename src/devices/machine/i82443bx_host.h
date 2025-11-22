@@ -66,7 +66,7 @@ public:
 	    T &&gui_tag
 	) : i82443bx_bridge_device(mconfig, tag, owner, clock)
 	{
-		set_ids_bridge(0x80867191, 0x00);
+	    set_ids_bridge(0x80867191, 0x00);
 	    //set_multifunction_device(true);
 	    //m_vga.set_tag(std::forward<T>(gui_tag));
 	}*/

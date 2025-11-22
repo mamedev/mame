@@ -24,7 +24,7 @@ besides rudimentary ROM banking and port I/O.
 Pharaoh's Gold has a 'Wing' string plus other strings typically associated to Wing games.
 
 TODO:
-- arthurkn uploads code to NVRAM if missing, fruitcat and pharmyst seemingly need 
+- arthurkn uploads code to NVRAM if missing, fruitcat and pharmyst seemingly need
   NVRAM pre-populated, thus currently run off the rails when calling to NVRAM, seem
   to fortuitously recover, but never populate tile RAM
 - arthurkn runs correctly and needs the following:

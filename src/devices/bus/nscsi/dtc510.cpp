@@ -56,7 +56,7 @@ void nscsi_dtc510_device::scsi_command()
 {
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 
-//	printf("CMD %02x %02x\n", scsi_cmdbuf[0], scsi_cmdbuf[1]);
+//  printf("CMD %02x %02x\n", scsi_cmdbuf[0], scsi_cmdbuf[1]);
 
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
@@ -215,10 +215,10 @@ void nscsi_dtc510_device::scsi_put_data(int id, int pos, uint8_t data)
 		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 		break;
 
-//	case SC_INIT_DRIVE_PARAMS:
-//		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
-//		params[pos] = data;
-//		break;
+//  case SC_INIT_DRIVE_PARAMS:
+//      LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
+//      params[pos] = data;
+//      break;
 //
 	case SC_WRITE_SECTOR_BUFFER:
 		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');

@@ -709,7 +709,7 @@ private:
 	void magodds_outb850_w(uint8_t data);
 	void magodds_outb860_w(uint8_t data);
 	void fl7w4_outc802_w(uint8_t data);
-	void flaming7_outputc_w(uint8_t data);	
+	void flaming7_outputc_w(uint8_t data);
 	void system_outputa_w(uint8_t data);
 	void system_outputb_w(uint8_t data);
 	void system_outputc_w(uint8_t data);
@@ -2668,7 +2668,7 @@ void goldstar_state::p2_lamps_w(uint8_t data)
 	m_lamps[8 + 7] = BIT(data, 7);
 
 	m_ticket_dispenser->motor_w(BIT(data,1));
-	
+
 //  popmessage("p2 lamps: %02X", data);
 }
 
@@ -2759,13 +2759,13 @@ void sanghopm_state::coincount_w(uint8_t data)
 void sanghopm_state::enablebg_w(uint8_t data)
 {
 	m_reel_ena = data;
-//	logerror("enablebg: %02x\n", data);
+//  logerror("enablebg: %02x\n", data);
 }
 
 void sanghopm_state::enablerl_w(uint8_t data)
 {
 	m_enable_reg = data;
-//	logerror("enablerl: %02x\n", data);
+//  logerror("enablerl: %02x\n", data);
 }
 
 void cmaster_state::coincount_w(uint8_t data)
@@ -3061,8 +3061,8 @@ void wingco_state::system_outputc_w(uint8_t data)
 
 	m_reel_tilemap[0]->mark_all_dirty();
 	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();	
-	
+	m_reel_tilemap[2]->mark_all_dirty();
+
 //  popmessage("system_outputc_w %02x",data);
 }
 
@@ -3074,11 +3074,11 @@ void wingco_state::flaming7_outputc_w(uint8_t data)
 
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	
+
 	m_reel_tilemap[0]->mark_all_dirty();
 	m_reel_tilemap[1]->mark_all_dirty();
 	m_reel_tilemap[2]->mark_all_dirty();
-	
+
 	//  popmessage("system_outputc_w %02x",data);
 }
 
@@ -3766,7 +3766,7 @@ void sanghopm_state::star100_readport(address_map &map)
 
 void cb3_state::ncb3_map(address_map &map)
 {
-//	map(0x0000, 0xb7ff).rom();
+//  map(0x0000, 0xb7ff).rom();
 	map(0x0000, 0xffff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xc7ff).ram();
@@ -4638,7 +4638,7 @@ void wingco_state::flaming7_map(address_map &map)
 	map(0xb041, 0xb08f).ram().share(m_reel_scroll[0]);  // offsetted 1 byte to cover the first tile of the 12-tiles symbols
 	map(0xb081, 0xb0bf).ram().share(m_reel_scroll[1]);  // offsetted 1 byte to cover the first tile of the 12-tiles symbols
 	map(0xb0c1, 0xb0ff).ram().share(m_reel_scroll[3]);  // offsetted 1 byte to mantain compatibility
-	map(0xb101, 0xb13f).ram().share(m_reel_scroll[2]);  // offsetted 1 byte to cover the first tile of the 12-tiles symbols 
+	map(0xb101, 0xb13f).ram().share(m_reel_scroll[2]);  // offsetted 1 byte to cover the first tile of the 12-tiles symbols
 	map(0xb140, 0xb7ff).ram();
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports (92)
@@ -4680,7 +4680,7 @@ void wingco_state::flam7_w4_map(address_map &map)
 	map(0xb040, 0xb08f).ram().share(m_reel_scroll[0]);
 	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
 	map(0xb0c0, 0xb0ff).ram().share(m_reel_scroll[3]);
-	map(0xb100, 0xb13f).ram().share(m_reel_scroll[2]); 
+	map(0xb100, 0xb13f).ram().share(m_reel_scroll[2]);
 	map(0xb140, 0xb7ff).ram();
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports (92)
@@ -14588,7 +14588,7 @@ static INPUT_PORTS_START( flam7_w4 )
 
 	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)   PORT_NAME("WT RXD")
-//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)   PORT_NAME("IN4-3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)   PORT_NAME("IN4-4 Active")  // This one is active in real PCB.
@@ -14738,7 +14738,7 @@ static INPUT_PORTS_START( flaming7 )
 
 	PORT_START("IN4")  // b811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)   PORT_NAME("WT RXD")
-//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)   PORT_NAME("COUT RTS")  // related to hopper...
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)   PORT_NAME("IN4-3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)   PORT_NAME("IN4-4 Active")  // this one is active in real PCB.
@@ -15471,7 +15471,7 @@ static GFXDECODE_START( gfx_chry10 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_cb3c )
-//	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,    0, 16 )
+//  GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_lsb,    0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x3_layout,       0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, cb3c_tiles8x32_layout, 128,  8 )
 GFXDECODE_END
@@ -16385,7 +16385,7 @@ void wingco_state::flaming7(machine_config &config)
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
 
 	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::flaming7_outputc_w));
-		
+
 	DS2401(config, m_fl7w4_id);
 }
 
@@ -16405,7 +16405,7 @@ void wingco_state::flam7_tw(machine_config &config)
 
 	// to do serial protection.
 	m_ppi[0]->out_pc_callback().set(FUNC(wingco_state::fl7w4_outc802_w));
-	
+
 	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::flaming7_outputc_w));
 
 	DS2401(config, m_fl7w4_id);
@@ -30941,7 +30941,7 @@ void cb3_state::init_cb3c()
 		rom[i] = bitswap<8>(rom[i], 1, 0, 6, 4, 7, 5, 3, 2);
 	}
 
-	// skip checksum 
+	// skip checksum
 	rom[0x0004] = 0x00;
 	rom[0x0005] = 0x02;
 	rom[0x0269] = 0xbb;

@@ -85,7 +85,7 @@ private:
 void dcchk_state::md_68k_map(address_map &map)
 {
 	map.unmap_value_high();
-//	map(0x000000, 0x3fffff).rw(m_md_cart, FUNC(megadrive_cart_slot_device::base_r), FUNC(megadrive_cart_slot_device::base_w));
+//  map(0x000000, 0x3fffff).rw(m_md_cart, FUNC(megadrive_cart_slot_device::base_r), FUNC(megadrive_cart_slot_device::base_w));
 	map(0x000000, 0x07ffff).rom().region("bios", 0);
 	// $400000 maple bus interactions
 
@@ -96,7 +96,7 @@ void dcchk_state::md_68k_map(address_map &map)
 
 	// TODO: checked at startup, still used for Maple interactions?
 //  map(0xa10000, 0xa100ff) I/O
-//	map(0xa10000, 0xa100ff).m(*this, FUNC(dcchk_state::md_ioctrl_map));
+//  map(0xa10000, 0xa100ff).m(*this, FUNC(dcchk_state::md_ioctrl_map));
 
 //  map(0xa11000, 0xa110ff) memory mode register
 //  map(0xa11100, 0xa111ff) Z80 BUSREQ/BUSACK
@@ -148,7 +148,7 @@ void dcchk_state::md_68k_map(address_map &map)
 
 //  map(0xa11400, 0xa1dfff) <unmapped> (no DTACK generation, freezes machine without additional HW)
 //  map(0xa12000, 0xa120ff).m(m_exp, FUNC(...::fdc_map));
-//	map(0xa13000, 0xa130ff).rw(m_md_cart, FUNC(megadrive_cart_slot_device::time_r), FUNC(megadrive_cart_slot_device::time_w));
+//  map(0xa13000, 0xa130ff).rw(m_md_cart, FUNC(megadrive_cart_slot_device::time_r), FUNC(megadrive_cart_slot_device::time_w));
 //  map(0xa14000, 0xa14003) TMSS lock
 //  map(0xa15100, 0xa153ff) 32X registers if present, <unmapped> otherwise
 //  map(0xc00000, 0xdfffff) VDP and PSG (with mirrors and holes)

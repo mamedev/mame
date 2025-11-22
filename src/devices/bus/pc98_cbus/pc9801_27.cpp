@@ -23,7 +23,7 @@ pc9801_27_device::pc9801_27_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, PC9801_27, tag, owner, clock)
 	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_sasibus(*this, "sasi")
-//	, m_harddisk(*this, "sasi:0:harddisk")
+//  , m_harddisk(*this, "sasi:0:harddisk")
 	, m_sasi(*this, "sasi:7:sasicb")
 	, m_bios(*this, "bios")
 {
@@ -247,7 +247,7 @@ void pc9801_27_device::sasi_cd_w(int state)
 
 void pc9801_27_device::sasi_io_w(int state)
 {
- 	LOG("IO %d -> %d\n", m_sasi_io, state);
+	LOG("IO %d -> %d\n", m_sasi_io, state);
 	if (m_sasi_io != state)
 		update_irq();
 	m_sasi_io = state;
@@ -256,7 +256,7 @@ void pc9801_27_device::sasi_io_w(int state)
 
 void pc9801_27_device::sasi_msg_w(int state)
 {
- 	LOG("MSG %d -> %d\n", m_sasi_msg, state);
+	LOG("MSG %d -> %d\n", m_sasi_msg, state);
 	if (m_sasi_msg != state)
 		update_irq();
 
@@ -265,7 +265,7 @@ void pc9801_27_device::sasi_msg_w(int state)
 
 void pc9801_27_device::sasi_ack_w(int state)
 {
- 	LOG("ACK %d -> %d\n", m_sasi_ack, state);
+	LOG("ACK %d -> %d\n", m_sasi_ack, state);
 	m_sasi_ack = state;
 }
 
@@ -292,6 +292,6 @@ void pc9801_27_device::update_irq()
 
 void pc9801_27_device::update_drq()
 {
-//	m_bus->drq_w(0, !(m_sasi_req && !(m_sasi_cd) && BIT(m_control, 1)));
+//  m_bus->drq_w(0, !(m_sasi_req && !(m_sasi_cd) && BIT(m_control, 1)));
 	m_bus->drq_w(0, m_sasi->req_r() && !m_sasi->cd_r() && BIT(m_control, 1));
 }

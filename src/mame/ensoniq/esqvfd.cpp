@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device, "esq2x40_vfx", "Ensoniq 2x40
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
 static const uint16_t font[] = {
-	        // FEDC BA98 7654 3210
+			// FEDC BA98 7654 3210
 	0x0000, // 0000 0000 0000 0000 (space)
 	0x0000, // 0000 0000 0000 0000 ! (not defined)
 	0x0009, // 0000 0000 0000 1001 ".

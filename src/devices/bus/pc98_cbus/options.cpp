@@ -70,8 +70,8 @@ void pc98_cbus_ram_devices(device_slot_interface &device)
 void pc88va_cbus_devices(device_slot_interface &device)
 {
 	device.option_add("pc9801_27",  PC9801_27);
-//	device.option_add("pc9801_55u", PC9801_55U);
-//	device.option_add("pc9801_55l", PC9801_55L);
+//  device.option_add("pc9801_55u", PC9801_55U);
+//  device.option_add("pc9801_55l", PC9801_55L);
 	device.option_add("mif_201",    MIF201);
 	device.option_add("mpu_pc98",   MPU_PC98);
 }

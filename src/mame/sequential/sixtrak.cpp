@@ -621,7 +621,7 @@ void sixtrak_state::update_tuning_timer()
 	const attotime t = attotime::from_hz(freq);
 	m_tuning_timer->adjust(t, 0, t);
 	LOGMASKED(LOG_AUTOTUNE, "Autotuning voice: %d is_filter: %d frequency: %f\n",
-	          loudest_voice, tuning_filter, freq);
+			  loudest_voice, tuning_filter, freq);
 }
 
 TIMER_CALLBACK_MEMBER(sixtrak_state::tuning_timer_tick)
@@ -984,10 +984,10 @@ DECLARE_INPUT_CHANGED_MEMBER(sixtrak_state::dac_trimmer_changed)
 	const u16 prev_dac_value = m_dac_value;
 	m_dac_value = 0;
 	LOGMASKED(LOG_CALIBRATION, "DAC inverter trimmer adjusted ( 0V). V: %f, -V: %f, offset: %f\n",
-	          get_dac_v(false), get_dac_v(true), get_dac_v(false) - get_dac_v(true));
+			  get_dac_v(false), get_dac_v(true), get_dac_v(false) - get_dac_v(true));
 	m_dac_value = 0x0fff;
 	LOGMASKED(LOG_CALIBRATION, "DAC inverter trimmer adjusted (-4V). V: %f, -V: %f\n",
-	          get_dac_v(false), get_dac_v(true));
+			  get_dac_v(false), get_dac_v(true));
 	m_dac_value = prev_dac_value;
 }
 
