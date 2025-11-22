@@ -3219,16 +3219,8 @@ protected:
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 					// get the width of the string
-					float aspect = 1.0f;
-					s32 width;
-
-					while (1)
-					{
-						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit]);
-						if (width < bounds.width())
-							break;
-						aspect *= 0.95f;
-					}
+					s32 width = font->string_width(ourheight / num_shown, 1.0f, m_stopnames[fruit]);
+					float aspect = width > bounds.width() ? (float) bounds.width() / (float) width : 1.0f;
 
 					float curx = bounds.left() + (bounds.width() - width) / 2.0f;
 
@@ -3368,15 +3360,8 @@ private:
 				else // render text (fallback)
 				{
 					// get the width of the string
-					float aspect = 1.0f;
-					s32 width;
-					while (1)
-					{
-						width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
-						if (width < bounds.width())
-							break;
-						aspect *= 0.95f;
-					}
+					s32 width = font->string_width(dest.height(), 1.0f, m_stopnames[fruit]);
+					float aspect = width > bounds.width() ? (float) bounds.width() / (float) width : 1.0f;
 
 					float curx = bounds.left();
 
@@ -3716,16 +3701,8 @@ void layout_element::component::draw_text(
 		const render_color &color)
 {
 	// get the width of the string
-	float aspect = 1.0f;
-	s32 width;
-
-	while (1)
-	{
-		width = font.string_width(bounds.height(), aspect, str);
-		if (width < bounds.width())
-			break;
-		aspect *= 0.95f;
-	}
+	s32 width = font.string_width(bounds.height(), 1.0f, str);
+	float aspect = (align == 3 || width > bounds.width()) ? (float) bounds.width() / (float) width : 1.0f;
 
 	// get alignment
 	float curx;
@@ -3739,6 +3716,11 @@ void layout_element::component::draw_text(
 		// right
 		case 2:
 			curx = bounds.right() - width;
+			break;
+		
+		// stretch
+		case 3:
+			curx = bounds.left();
 			break;
 
 		// default to center

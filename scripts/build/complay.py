@@ -452,7 +452,7 @@ class LayoutChecker(Minifyer):
             if 'string' not in attrs:
                 self.handle_error('Element text missing attribute string')
             align = self.check_int_attribute(name, attrs, 'align', None)
-            if (align is not None) and ((0 > align) or (2 < align)):
+            if (align is not None) and ((0 > align) or (3 < align)):
                 self.handle_error('Element text attribute align "%s" not in valid range 0-2' % (attrs['align'], ))
             self.check_component(name, attrs)
         elif 'simplecounter' == name:

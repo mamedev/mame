@@ -512,9 +512,10 @@ text
     Draws text in using the UI font in the specified colour.  The text to draw
     must be supplied using a ``string`` attribute.  An ``align`` attribute may
     be supplied to set text alignment.  If present, the ``align`` attribute must
-    be an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and
-    2 (two) means right-aligned.  If the ``align`` attribute is absent, the text
-    will be centred.
+    be an integer, where 0 (zero) means centred, 1 (one) means left-aligned,
+    2 (two) means right-aligned, and 3 (three) means that the text will be
+    stretched horizontally to fill its bounds. If the ``align`` attribute is
+    absent, the text will be centred.
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
