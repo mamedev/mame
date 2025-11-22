@@ -10,6 +10,7 @@ TODO:
 - Hookup to OMTI-5000 series;
 
 References:
+- http://www.bitsavers.org/pdf/dtc/DTC-500/09-00231A_DTC_500DB_Intelligent_Controllers_Mar86.pdf
 - http://www.bitsavers.org/pdf/sms/omti_5x00/3001206_OMTI_5000_Series_Reference_Aug85.pdf
 - DTC-510B manual
 
@@ -20,13 +21,18 @@ References:
 
 #include "multibyte.h"
 
-#define LOG_COMMAND (1U << 1)
-#define LOG_DATA    (1U << 2)
+#define LOG_COMMAND (1U << 1) // raw for now
+//#define LOG_DATA    (1U << 2)
+#define LOG_C2      (1U << 3) // log assign parameter data
 
-#define VERBOSE (LOG_COMMAND | LOG_DATA)
+#define VERBOSE (LOG_GENERAL | LOG_COMMAND)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
+
+#define LOGCOMMAND(...)    LOGMASKED(LOG_COMMAND, __VA_ARGS__)
+#define LOGC2(...)         LOGMASKED(LOG_C2, __VA_ARGS__)
+
 
 DEFINE_DEVICE_TYPE(NSCSI_DTC510, nscsi_dtc510_device, "scsi_dtc510", "Data Technology DTC-510 5.25 Inch Winchester Disk Controller")
 
@@ -45,7 +51,8 @@ bool nscsi_dtc510_device::scsi_command_done(uint8_t command, uint8_t length)
 {
 	switch(command >> 5) {
 	case 0: return length == 6;
-	case 1: return length == 6;
+	case 1: return length == ((command == 0x26) ? 12 : 10);
+	case 2: return length == 6;
 	case 6: return length == 6;
 	case 7: return length == 6;
 	}
@@ -54,14 +61,21 @@ bool nscsi_dtc510_device::scsi_command_done(uint8_t command, uint8_t length)
 
 void nscsi_dtc510_device::scsi_command()
 {
+	// TODO: don't clear sense buffer on every command!
+	// (mutuated from s1410)
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 
-//  printf("CMD %02x %02x\n", scsi_cmdbuf[0], scsi_cmdbuf[1]);
+	LOGCOMMAND("CMD %02x %02x %02x %02x %02x %02x\n",
+		scsi_cmdbuf[0], scsi_cmdbuf[1], scsi_cmdbuf[2],
+		scsi_cmdbuf[3], scsi_cmdbuf[4], scsi_cmdbuf[5]
+	);
+
+//  if (scsi_cmdbuf[0] == 0x01 && scsi_cmdbuf[1] == 0x01 && scsi_cmdbuf[5] == 0x01)
+//      machine().debug_break();
 
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
-	case SC_REZERO_UNIT:
-	case SC_REASSIGN_BLOCKS:
+	case SC_FORMAT_BAD_TRACK:
 	case SC_READ:
 	case SC_WRITE:
 		if (scsi_cmdbuf[1] >> 5) {
@@ -72,16 +86,32 @@ void nscsi_dtc510_device::scsi_command()
 		}
 		break;
 
+	case SC_RECALIBRATE:
+		if (scsi_cmdbuf[1] >> 5) {
+			scsi_status_complete(SS_NOT_READY);
+			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+		} else {
+			m_seek = 0;
+			scsi_status_complete(SS_GOOD);
+		}
+		break;
+
 	case SC_SEEK:
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
 			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
+			m_seek = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
 			scsi_status_complete(SS_GOOD);
 		}
 		break;
 
 	case SC_REQUEST_SENSE:
+		// TODO: hangs if a request sense is issued
+		//scsi_sense_buffer[0] = SK_NO_ERROR;
+		//scsi_sense_buffer[1] = (m_seek >> 16) & 0x1f;
+		//scsi_sense_buffer[2] = (m_seek >> 8) & 0xff;
+		//scsi_sense_buffer[3] = (m_seek >> 0) & 0xff;
 		scsi_data_in(SBUF_SENSE, 4);
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -112,7 +142,7 @@ void nscsi_dtc510_device::scsi_command()
 
 			int track_length = blocks*bytes_per_sector;
 			auto block = std::make_unique<uint8_t[]>(track_length);
-			memset(&block[0], 0x6c, track_length);
+			memset(&block[0], 0xe5, track_length);
 
 			if(!image->write(lba, &block[0])) {
 				logerror("%s: HD WRITE ERROR !\n", tag());
@@ -124,28 +154,20 @@ void nscsi_dtc510_device::scsi_command()
 		}
 		break;
 
-	case SC_FORMAT_ALT_TRACK:
+	case SC_ASSIGN_ALT_TRACK:
+	{
+		// TODO: unimplemented
 		if (scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
 			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 
-		scsi_data_out(2, 3);
 		scsi_status_complete(SS_GOOD);
 		break;
+	}
 
-	case SC_INIT_DRIVE_PARAMS:
-		scsi_data_out(2, 8);
-		scsi_status_complete(SS_GOOD);
-		break;
-
-	case SC_WRITE_SECTOR_BUFFER:
-		scsi_data_out(2, bytes_per_sector);
-		scsi_status_complete(SS_GOOD);
-		break;
-
-	case SC_READ_SECTOR_BUFFER:
+	case SC_WRITE_FILE_MARK:
 		scsi_data_in(2, bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -159,23 +181,20 @@ void nscsi_dtc510_device::scsi_command()
 		scsi_status_complete(SS_GOOD);
 		break;
 
-	case SC_READ_ECC_BURST:
-	case SC_RAM_DIAG:
-	case SC_DRIVE_DIAG:
-	case SC_CONTROLLER_DIAG:
-	case SC_READ_LONG:
-	case SC_WRITE_LONG:
-		scsi_status_complete(SS_GOOD);
-		break;
-
-	case 0xc2:
-
+	case SC_ASSIGN_DISK_PARAMETERS:
 		scsi_data_out(4, 10);
 		//scsi_status_complete(SS_GOOD);
 		break;
 
+	case SC_RETENTION:
+	case SC_RAM_DIAGNOSTICS:
+	case SC_WRITE_ECC:
+		scsi_status_complete(SS_GOOD);
+		break;
+
 	default:
 		logerror("%s: command %02x ***UNKNOWN***\n", tag(), scsi_cmdbuf[0]);
+		scsi_status_complete(SS_CHECK_CONDITION);
 		break;
 	}
 }
@@ -183,8 +202,6 @@ void nscsi_dtc510_device::scsi_command()
 uint8_t nscsi_dtc510_device::scsi_get_data(int id, int pos)
 {
 	switch(scsi_cmdbuf[0]) {
-	case SC_READ_SECTOR_BUFFER:
-		return block[pos];
 
 	default:
 		return nscsi_harddisk_device::scsi_get_data(id, pos);
@@ -193,13 +210,21 @@ uint8_t nscsi_dtc510_device::scsi_get_data(int id, int pos)
 
 void nscsi_dtc510_device::scsi_put_data(int id, int pos, uint8_t data)
 {
-
-	if (scsi_cmdbuf[0] == 0xc2 && id == 4)
+	if (scsi_cmdbuf[0] == SC_ASSIGN_DISK_PARAMETERS && id == 4)
 	{
-		// printf("scsi_put_data %d %d %02x\n", id, pos, data);
 		m_param[pos] = data;
 		if (pos == 9)
 		{
+			LOGC2("Step Pulse Width %02x\n", m_param[0]);
+			LOGC2("Step Period %02x\n", m_param[1]);
+			LOGC2("Step Mode %02x\n", m_param[2]);
+			LOGC2("Number of Heads %d\n", m_param[3] + 1);
+			LOGC2("Cylinder address %d\n", ((m_param[4] << 8) | m_param[5]) + 1);
+			LOGC2("WSI %d\n", (((m_param[7] & 3) << 8) | m_param[6]) + 1);
+			LOGC2("H/S %d TYPE %d\n", BIT(m_param[7], 3), (m_param[7] >> 4) & 3);
+			LOGC2("Sectors per track %d\n", m_param[8] + 1);
+			LOGC2("<reserved %02x>\n", m_param[9]);
+
 			scsi_status_complete(SS_GOOD);
 		}
 
@@ -211,20 +236,7 @@ void nscsi_dtc510_device::scsi_put_data(int id, int pos, uint8_t data)
 	}
 
 	switch(scsi_cmdbuf[0]) {
-	case SC_FORMAT_ALT_TRACK:
-		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
-		break;
-
-//  case SC_INIT_DRIVE_PARAMS:
-//      LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
-//      params[pos] = data;
-//      break;
-//
-	case SC_WRITE_SECTOR_BUFFER:
-		LOGMASKED(LOG_DATA, "s1410: scsi_put_data, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
-		block[pos] = data;
-		break;
-
+	// ...
 	default:
 		return nscsi_harddisk_device::scsi_put_data(id, pos, data);
 	}
@@ -243,6 +255,8 @@ attotime nscsi_dtc510_device::scsi_data_command_delay()
 	case SC_READ:
 	case SC_WRITE:
 	case SC_SEEK:
+	case SC_ASSIGN_ALT_TRACK:
+	case SC_RETENTION:
 		// average seek time of NEC D5126A hard disk
 		return attotime::from_msec(85);
 
