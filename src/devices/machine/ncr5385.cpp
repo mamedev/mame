@@ -44,7 +44,6 @@ ncr5385_device::ncr5385_device(machine_config const &mconfig, char const *tag, d
 	, m_dreq(*this)
 	, m_int_state(false)
 	, m_dreq_state(false)
-	, m_ack_delay(0)
 {
 }
 

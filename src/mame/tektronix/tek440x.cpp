@@ -1702,8 +1702,6 @@ m_printer->in_pb_callback().set_constant(0xb0);		// HACK:  vblank always checks 
 			ncr5385_device &adapter = downcast<ncr5385_device &>(*device);
 
 			adapter.irq().set_inputline(m_maincpu, M68K_IRQ_3);
-			
-			adapter.set_ack_delay_ns(TEK4404_ACK_DELAY);
 		});
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
