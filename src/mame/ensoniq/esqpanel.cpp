@@ -831,21 +831,21 @@ static INPUT_PORTS_START(esqpanel2x40_vfx_device)
 	PORT_START("buttons_0")
 	for (int i = 0; i < 32; i++)
 	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYPAD);
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), i)
 	}
 
 	PORT_START("buttons_32")
 	for (int i = 0; i < 32; i++)
 	{
-		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYBOARD);
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYPAD);
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
 	}
 
 	PORT_START("patch_select")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD);
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD);
 	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::patch_select_change), 1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD);
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD);
 	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::patch_select_change), 1)
 
 	PORT_START("analog_pitch_bend")

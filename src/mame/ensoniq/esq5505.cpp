@@ -955,6 +955,9 @@ void esq5505_state::ks32(machine_config &config)
 }
 
 static INPUT_PORTS_START( vfx )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eps )
 #if KEYBOARD_HACK
 	PORT_START("KEY0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq5505_state::key_stroke), 0x80)
@@ -1254,10 +1257,10 @@ void esq5505_state::init_denib()
 } // Anonymous namespace
 
 
-CONS( 1988, eps,    0,     0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1988, eps,    0,     0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1989, vfx,    0,     0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_IMPERFECT_TIMING )  // 2x40 VFD
 CONS( 1989, vfxsd,  0,     0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_IMPERFECT_TIMING )  // 2x40 VFD
-CONS( 1990, eps16p, eps,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, eps16p, eps,   0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1990, sd1,    sd132, 0, sd1,   vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_IMPERFECT_TIMING )  // 2x40 VFD
 CONS( 1990, sq1,    0,     0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )       // 2x16 LCD
 CONS( 1990, sqrack, sq1,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )       // 2x16 LCD
