@@ -2350,6 +2350,7 @@ void vegas_state::cartfury(machine_config &config)
 	m_ioasic->set_upper(495/*433,  495 others? */);
 	m_ioasic->set_yearoffs(80);
 	m_ioasic->irq_handler().set(FUNC(vegas_state::ioasic_irq));
+	m_ioasic->aux_output_handler().set(FUNC(vegas_state::wheel_board_w));
 	//m_ioasic->set_auto_ack(1)
 }
 
