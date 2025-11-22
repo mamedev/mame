@@ -523,6 +523,13 @@ mpc60
 @source:akai/mpc3000.cpp
 mpc3000
 
+@source:akai/s3000.cpp
+s2000
+s3000
+s3000xl
+cd3000i
+cd3000xl
+
 @source:alesis/alesis.cpp
 hr16
 hr16b
