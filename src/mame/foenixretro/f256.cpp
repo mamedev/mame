@@ -2,6 +2,7 @@
 // copyright-holders:Daniel Tremblay
 #include "emu.h"
 #include "f256.h"
+#include "f256k_rom.h"
 #include "tiny_vicky.h"
 #include "cpu/m6502/w65c02s.h"
 
@@ -1982,35 +1983,13 @@ static INPUT_PORTS_START(f256k)
 INPUT_PORTS_END
 
 ROM_START(f256k)
-	ROM_REGION(0x10'0000,ROM_TAG,0)
-    // Offsets are based on the REGION base address - offset by 0x10 because of map.
-    ROM_LOAD("xdev.bin",             0x08'2000, 0x2000, CRC(5cee0cb0) SHA1(a5fb10ad914069f506847150bdd387371e73f1de))
-    ROM_LOAD("sb01.bin",             0x08'4000, 0x2000, CRC(21f06e73) SHA1(bbeefb52d4b126b61367169c21599180f3358af7))
-    ROM_LOAD("sb02.bin",             0x08'6000, 0x2000, CRC(6ed611b9) SHA1(4a03aa286f6274e6974a3cecdedad651a58f5fb1))
-    ROM_LOAD("sb03.bin",             0x08'8000, 0x2000, CRC(653f849d) SHA1(65942d98f26b86499e6359170aa2d0c6e16124ff))
-    ROM_LOAD("sb04.bin",             0x08'a000, 0x2000, CRC(f4aa6049) SHA1(11f02fee6ec412f0c96b27b0b149f72cf1770d15))
-    ROM_LOAD("dos.bin",              0x08'c000, 0x2000, CRC(f3673c4e) SHA1(9c6b70067d7195d4a6bbd7f379b8e5382bf8cc1b))
-    ROM_LOAD("pexec.bin",            0x08'e000, 0x2000, CRC(937c1374) SHA1(40566a51d2ef7321a42fe926b03dee3571c78202))
-	ROM_LOAD("3b.bin",               0x0F'6000, 0x2000, CRC(7c5d2f27) SHA1(bd1ece74b02a210cfe5a1ed15a0febefc39a1861))
-    ROM_LOAD("3c.bin",               0x0F'8000, 0x2000, CRC(2e2295d1) SHA1(9049b83d4506b49701669c335ded2879c7992751))
-    ROM_LOAD("3d.bin",               0x0F'a000, 0x2000, CRC(97743cb7) SHA1(693fa7762528eca6a75c9ea30a603dadc4d55cf9))
-    ROM_LOAD("3e.bin",               0x0F'c000, 0x2000, CRC(9012398f) SHA1(4ae1e37aa3ad4c2b498bf1797d591d7fa25a9d43))
-    ROM_LOAD("3f.bin",               0x0F'e000, 0x2000, CRC(b9ddda5e) SHA1(2f21ef84a269cc2ed25c6441c9451f61dbb5b285))
-    ROM_LOAD("docs_superbasic1.bin", 0x09'6000, 0x2000, CRC(ad6398cd) SHA1(d926ae72f8f3af2a0b15ac165bc680db2e647740))
-    ROM_LOAD("docs_superbasic2.bin", 0x09'8000, 0x2000, CRC(3cf07824) SHA1(b92e88a99ccf51461f45d317e3e555c5d62792eb))
-    ROM_LOAD("docs_superbasic3.bin", 0x09'a000, 0x2000, CRC(838cb5df) SHA1(103b182ad76c185c4a779f4865c48c5fc71e2a14))
-    ROM_LOAD("docs_superbasic4.bin", 0x09'c000, 0x2000, CRC(bf7841b9) SHA1(7dcbf77c46d680a1c47ac11ed871b832a1479e8e))
-    ROM_LOAD("help.bin",             0x09'4000, 0x2000, CRC(b7d63466) SHA1(bd1dafb5849dee61fd48ece16a409e56de62f464))
+    ROM_REGION(0x10'0000,ROM_TAG,0)
 
-    // Load the file manager application
-    ROM_LOAD("fm.00",              0x0A'0000, 0x2000, CRC(f877c712) SHA1(18d7b2a484ef6dc2ee4a83b6a4dd28ffc3ffe26f))
-    ROM_LOAD("fm.01",              0x0A'2000, 0x2000, CRC(de843f4b) SHA1(f132ebf997a57fd15fcaa51ab9ff9a4aa40183a0))
-    ROM_LOAD("fm.02",              0x0A'4000, 0x2000, CRC(9c90cf7d) SHA1(0ed0a09f7bb1eeb0a99141e9d4625d027448b7ea))
-    ROM_LOAD("fm.03",              0x0A'6000, 0x2000, CRC(7dfe0934) SHA1(48d2aa2f4c926f7a81e9eab312883e4e573e7cd9))
-    ROM_LOAD("fm.04",              0x0A'8000, 0x2000, CRC(3bc5832d) SHA1(5a8491e4c6e4e56e4017ece97615f7eb5aa928e3))
-    ROM_LOAD("fm.05",              0x0A'a000, 0x2000, CRC(48dcadc7) SHA1(52e051d5e8446deddfc469f7aed0f18fb2483715))
-    ROM_LOAD("fm.06",              0x0A'c000, 0x2000, CRC(035c3c8a) SHA1(649601087b7b95a4f432f362428e98291648434c))
-    ROM_LOAD("fm.07",              0x0A'e000, 0x2000, CRC(76f749d4) SHA1(a3e7e881f4c4fd39c94385de2c8d7546a2239d96))
+    #define ROM_BLOCK(offset, filename, size, crc, sha1) \
+        ROM_LOAD(filename, 0x80000 + (offset * 0x2000), size, crc sha1)
+
+    F256K_ROM_TABLE(ROM_BLOCK)
+    #undef ROM_BLOCK
 
     ROM_REGION(0x0800,FONT_TAG,0)
     ROM_LOAD("f256jr_font_micah_jan25th.bin", 0x0000, 0x0800, CRC(6d66da85) SHA1(377dc27ff3a4ae2d80d740b2d16373f8e639eef6))
