@@ -118,8 +118,8 @@ intensity).  Alpha ranges from 0.0 (fully transparent) to 1.0 (opaque).  Colour
 channel values are not pre-multiplied by the alpha value.
 
 Component and view item colour is specified using ``color`` elements.
-Meaningful attributes are ``red``, ``green``, ``blue`` and ``alpha``.  This
-example ``color`` element specifies all channel values:
+Meaningful attributes are ``red``, ``green``, ``blue`` and ``alpha`` and ``hex``.  This
+example ``color`` element specifies all channel values individually:
 
 .. code-block:: XML
 
@@ -129,6 +129,20 @@ Any omitted channel attributes default to 1.0 (full intensity or opaque).  It
 is an error if any channel value falls outside the range of 0.0 to 1.0
 (inclusive).
 
+Alternatively, you can specify a single hex value, for either RGB (six hex digits)
+or RGBA (eight hex digits):
+
+.. code-block:: XML
+
+    <color hex="d9664c" />
+
+(RGB) or
+
+.. code-block:: XML
+
+    <color hex="d9664cff" />
+
+(RGBA).
 
 .. _layfile-concepts-params:
 
