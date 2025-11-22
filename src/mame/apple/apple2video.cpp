@@ -955,7 +955,16 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// always update the flash timer here so it's smooth regardless of mode switches
-	m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
+	if (Model == model::IIE || Model == model::IIGS)
+	{
+		// video scanner overflow flash timer every 16 frames, ~1.87 Hz (NTSC)
+		m_flash = screen.frame_number() & 0x10;
+	}
+	else
+	{
+		// approximate 555 flash timer, ~2 Hz cycle
+		m_flash = (machine().time() * 4).seconds() & 1;
+	}
 
 	int text_start_row = 0;
 
