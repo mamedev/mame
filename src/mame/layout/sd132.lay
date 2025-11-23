@@ -1174,7 +1174,7 @@
 			<bounds x="155.3" y="36.2" width="9.4828" height="4.8852" />
 		</element>
 		<element ref="multipage_7_0_x_4_3">
-			<bounds x="169.74" y="36.2" width="9.4828" height="4.8852" />
+			<bounds x="172.14" y="36.2" width="9.4828" height="4.8852" />
 		</element>
 		<element ref="multipage_7_0_x_4_3">
 			<bounds x="120.79" y="16.2" width="9.4828" height="4.8852" />
@@ -1312,7 +1312,7 @@
 			<bounds x="151.6" y="37.7" width="15.8" height="4.3" />
 		</element>
 		<element ref="text_L_output">
-			<bounds x="165" y="37.7" width="15.8" height="4.3" />
+			<bounds x="167.4" y="37.7" width="15.8" height="4.3" />
 		</element>
 		<element ref="text_L_lfo">
 			<bounds x="120" y="17.7" width="15.8" height="4.3" />
@@ -1459,7 +1459,7 @@
 			<bounds x="151.6" y="42" width="15.8" height="5" />
 		</element>
 		<element ref="button_15_8x5_dark" id="button_17_output" inputtag="buttons_0" inputmask="0x00020000">
-			<bounds x="165" y="42" width="15.8" height="5" />
+			<bounds x="167.4" y="42" width="15.8" height="5" />
 		</element>
 		<element ref="button_15_8x5_dark" id="button_10_lfo" inputtag="buttons_0" inputmask="0x00000400">
 			<bounds x="120" y="22" width="15.8" height="5" />
