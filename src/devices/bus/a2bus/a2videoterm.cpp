@@ -279,28 +279,28 @@ const tiny_rom_entry *a2bus_aevm80_device::device_rom_region() const
 static INPUT_PORTS_START( a2videoterm )
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x0f, 0x00, "Primary Character Set")
-	PORT_CONFSETTING(0x00, "Normal")
-	PORT_CONFSETTING(0x01, "Normal Uppercase")
+	PORT_CONFSETTING(0x00, "ASCII")
+	PORT_CONFSETTING(0x01, "ASCII Uppercase")
 	PORT_CONFSETTING(0x02, "APL")
-	PORT_CONFSETTING(0x03, "Block Graphics")
+	PORT_CONFSETTING(0x03, "Epson (Block Graphics)")
 	PORT_CONFSETTING(0x04, "French")
 	PORT_CONFSETTING(0x05, "German")
 	PORT_CONFSETTING(0x06, "Katakana")
 	PORT_CONFSETTING(0x07, "Spanish")
-	PORT_CONFSETTING(0x08, "Super/Subscript")
-	//PORT_CONFSETTING(0x09, "Symbol")
+	PORT_CONFSETTING(0x08, "Super & Subscript")
+	PORT_CONFSETTING(0x09, "Symbol")
 	PORT_CONFSETTING(0x0a, "Inverse Video")
 	PORT_CONFNAME(0xf0, 0xa0, "Alternate Character Set")
-	PORT_CONFSETTING(0x00, "Normal")
-	PORT_CONFSETTING(0x10, "Normal Uppercase")
+	PORT_CONFSETTING(0x00, "ASCII")
+	PORT_CONFSETTING(0x10, "ASCII Uppercase")
 	PORT_CONFSETTING(0x20, "APL")
-	PORT_CONFSETTING(0x30, "Block Graphics")
+	PORT_CONFSETTING(0x30, "Epson (Block Graphics)")
 	PORT_CONFSETTING(0x40, "French")
 	PORT_CONFSETTING(0x50, "German")
 	PORT_CONFSETTING(0x60, "Katakana")
 	PORT_CONFSETTING(0x70, "Spanish")
-	PORT_CONFSETTING(0x80, "Super/Subscript")
-	//PORT_CONFSETTING(0x90, "Symbol")
+	PORT_CONFSETTING(0x80, "Super & Subscript")
+	PORT_CONFSETTING(0x90, "Symbol")
 	PORT_CONFSETTING(0xa0, "Inverse Video")
 INPUT_PORTS_END
 
@@ -452,7 +452,7 @@ uint8_t a2bus_videx80_device::read_c800(uint16_t offset)
 	}
 	else
 	{
-		return m_ram[(offset-0x400) + m_rambank];
+		return m_ram[(offset & 0x1ff) + m_rambank];
 	}
 }
 
@@ -461,10 +461,10 @@ uint8_t a2bus_videx80_device::read_c800(uint16_t offset)
 -------------------------------------------------*/
 void a2bus_videx80_device::write_c800(uint16_t offset, uint8_t data)
 {
-	if (offset >= 0x400)
+	if (offset >= 0x400 && offset < 0x600)
 	{
 //        printf("%02x to VRAM at %x\n", data, offset-0x400+m_rambank);
-		m_ram[(offset-0x400) + m_rambank] = data;
+		m_ram[(offset & 0x1ff) + m_rambank] = data;
 	}
 }
 
