@@ -33410,6 +33410,38 @@ Puts a TSR [mouse] driver during DOS boot, doesn't work in game? (verify)
 		</part>
 	</software>
 
+	<!-- 3.5" release known to exist -->
+	<software name="metlfrce" supported="partial">
+		<description>Metal Force</description>
+		<year>1993</year>
+		<publisher>遊演体 (You-en-tai)</publisher>
+		<notes><![CDATA[
+[PC-9801-86] DAC doesn't work
+]]></notes>
+		<info name="alt_title" value="メタルフォース" />
+		<info name="release" value="1993xxxx" />
+		<info name="usage" value="Supports Speakboard sound card (ADPCM), boot with data disk in drive B: to skip Opening" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="metal force (system disk).hdm" size="1261568" crc="f36c66b7" sha1="96155fff45b67b10ad983f7654d00353572cf9d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Opening Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="metal force (opening disk).hdm" size="1261568" crc="90ac1ef1" sha1="d54c94aa8a01f1ac3a6b068f697ed46115d48904" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Metal Force (Data disk).hdm" size="1261568" crc="6c133aaa" sha1="ce3d8cf0aad2b1fd2efdec6bd949b5034790f1f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="metalor" supported="yes">
 		<description>Cyber Block Metal Orange</description>
 		<year>1991</year>
@@ -58034,7 +58066,7 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="gaogao1" supported="no">
+	<software name="gaogao1" supported="yes">
 		<description>Gao Gao! 1st - Radical Sequence</description>
 		<year>1994</year>
 		<publisher>フォア・ナイン (Fournine)</publisher>
@@ -58559,12 +58591,13 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="grounsed" supported="no">
+	<software name="grounsed" supported="yes">
 		<description>Grounseed</description>
 		<year>1996</year>
 		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
 		<info name="alt_title" value="グランシード" />
 		<info name="release" value="19960607" />
+		<info name="developer" value="Exit" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="311292">
