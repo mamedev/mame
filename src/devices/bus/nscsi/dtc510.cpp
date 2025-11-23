@@ -248,7 +248,9 @@ void nscsi_dtc510_device::scsi_put_data(int id, int pos, uint8_t data)
 // Byte transfer rate (5Mb/s)
 attotime nscsi_dtc510_device::scsi_data_byte_period()
 {
-	return attotime::from_nsec(1600);
+	// Too slow, won't complete a DMA cycle when fetching IPL for pc9801
+	//	return attotime::from_nsec(1600);
+	return attotime::from_nsec(1100);
 }
 
 // Command execution delay
