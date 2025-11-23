@@ -102,7 +102,7 @@ void funtech_h8_state::video_start()
 
 TILE_GET_INFO_MEMBER(funtech_h8_state::get_tile_info)
 {
-	uint16_t const tile = m_tileram[tile_index] + ((m_attrram[tile_index] & 0x0f) << 8) | (m_tilebank << 12);
+	uint16_t const tile = m_tileram[tile_index] | ((m_attrram[tile_index] & 0x0f) << 8) | (m_tilebank << 12);
 	uint16_t const color = (m_attrram[tile_index] >> 4);
 
 	tileinfo.set(0, tile, color, 0);
@@ -123,7 +123,7 @@ void funtech_h8_state::attrram_w(offs_t offset, uint8_t data)
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(funtech_h8_state::get_reel_tile_info)
 {
-	uint16_t const tile = m_reel_tileram[Which][tile_index] + ((m_reel_attrram[Which][tile_index] & 0x0f) << 8);
+	uint16_t const tile = m_reel_tileram[Which][tile_index] | ((m_reel_attrram[Which][tile_index] & 0x0f) << 8);
 	uint16_t const color = (m_reel_attrram[Which][tile_index] >> 4);
 
 	tileinfo.set(1, tile, color, 0);
