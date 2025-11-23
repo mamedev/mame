@@ -2,46 +2,46 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	s3000.cpp - Akai S2000, S2800, S3000, CD3000i, S3200, S3000XL,
-				S3200XL, and CD3000XL rackmount 16-bit samplers.
-	Driver by R. Belmont
+    s3000.cpp - Akai S2000, S2800, S3000, CD3000i, S3200, S3000XL,
+                S3200XL, and CD3000XL rackmount 16-bit samplers.
+    Driver by R. Belmont
 
-	These rackmount samplers are all built on variants of what became the
-	MPC3000 hardware.  The major difference is the lack of the 7810/7811
-	sub-CPU to manage the panel, since without drum pads there's no need
-	for ultra-low-latency response from the panel.
+    These rackmount samplers are all built on variants of what became the
+    MPC3000 hardware.  The major difference is the lack of the 7810/7811
+    sub-CPU to manage the panel, since without drum pads there's no need
+    for ultra-low-latency response from the panel.
 
-	The S2000 is the lowest end model, with a slightly slower CPU, no SCSI, a smaller
-	LCD, and fewer controls.  The S2800 has the same LCD and front panel as the S3000
-	but again is bare-bones on features.
+    The S2000 is the lowest end model, with a slightly slower CPU, no SCSI, a smaller
+    LCD, and fewer controls.  The S2800 has the same LCD and front panel as the S3000
+    but again is bare-bones on features.
 
-	"XL" models have double the ROM space for a more advanced OS and come with
-	things that were optional expansions on the base models built in.
+    "XL" models have double the ROM space for a more advanced OS and come with
+    things that were optional expansions on the base models built in.
 
-	Hardware:
-		CPU: NEC V53 (32 MHz on 3x00, 31.94 MHz on 2000)
-		Floppy: uPD72069
-		SCSI: MB89352
-		LCD: LC7981 (3x00 and 2800) or HD44780 (2000)
-		Sound DSP: L7A1045-L6048
-		Filter (XL models and S3200 only): L7A0906-L6029 DFL
-		Effects DSP (XL models only): L7A1414-L6038 DFX
+    Hardware:
+        CPU: NEC V53 (32 MHz on 3x00, 31.94 MHz on 2000)
+        Floppy: uPD72069
+        SCSI: MB89352
+        LCD: LC7981 (3x00 and 2800) or HD44780 (2000)
+        Sound DSP: L7A1045-L6048
+        Filter (XL models and S3200 only): L7A0906-L6029 DFL
+        Effects DSP (XL models only): L7A1414-L6038 DFX
 
-	Working:
-		- Keyboard matrix on all models
-		- LED outputs should be correct for all models
-		- MIDI In on all models
-		- SCSI CD-ROM on CD3000i and CD3000XL
-		- Loading and playing sounds from CD-ROM on CD3000XL
+    Working:
+        - Keyboard matrix on all models
+        - LED outputs should be correct for all models
+        - MIDI In on all models
+        - SCSI CD-ROM on CD3000i and CD3000XL
+        - Loading and playing sounds from CD-ROM on CD3000XL
 
-	TODOs:
-		- Floppy hookup is not yet correct.
-		- S3000 and CD3000i don't find any sample RAM.  The XL models and S2000
-		  both use the MPC3000 approach of actually testing the memory and find
-		  all 32 megs fine.  This appears to be related to the other bits in the
-		  ID register.
-		- Many Akai factory CD sounds have clipping, need to check if that's
-		  an L6028 volume issue or bad loop points (or both).
+    TODOs:
+        - Floppy hookup is not yet correct.
+        - S3000 and CD3000i don't find any sample RAM.  The XL models and S2000
+          both use the MPC3000 approach of actually testing the memory and find
+          all 32 megs fine.  This appears to be related to the other bits in the
+          ID register.
+        - Many Akai factory CD sounds have clipping, need to check if that's
+          an L6028 volume issue or bad loop points (or both).
 
 ***************************************************************************/
 
@@ -354,8 +354,10 @@ void s3000_state::s3000(machine_config &config)
 
 	UPD72069(config, m_fdc, V53_CLKOUT);
 	m_fdc->set_ready_line_connected(false); // uPD READY pin is grounded on schematic
+	m_fdc->set_ts_line_connected(false);    // actually connected to DSKCHG (!) but this is sufficient for now
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_fdc->intrq_wr_callback().append(m_maincpu, FUNC(v53a_device::dsr_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
 
 	FLOPPY_CONNECTOR(config, m_floppy, s3000_state::floppies, "35hd", add_formats).enable_sound(true);
 
