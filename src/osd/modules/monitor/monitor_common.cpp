@@ -43,10 +43,7 @@ std::shared_ptr<osd_monitor_info> monitor_module_base::monitor_from_handle(std::
 
 void monitor_module_base::add_monitor(std::shared_ptr<osd_monitor_info> monitor)
 {
-	// a set not a list
-	if (std::find(list().begin(), list().end(), monitor) == list().end())
-		list().push_back(monitor);
-
+	list().push_back(monitor);
 	m_monitor_index[monitor->oshandle()] = monitor;
 }
 
