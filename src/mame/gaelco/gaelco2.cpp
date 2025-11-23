@@ -40,7 +40,7 @@
 
 #include "gaelco_ds5002fp.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/ds5002fp.h"
 #include "machine/eepromser.h"
 #include "sound/gaelco.h"
 
@@ -3114,7 +3114,8 @@ ROM_START( wrally2 ) // Program ROMs from 31/Jul/1995, graphics ROMs from 14/Jun
 	ROM_LOAD16_BYTE( "dallas_usa_wr-2_1_63_usa_c584_31-7.bin", 0x000001, 0x080000, CRC(5c106494) SHA1(a8b93fad5b2e6d88b9a671ac44d7278abc8ea872) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+	// 'bugfixed' version of DS5002FP code, from Gaelco's repair archives
+	ROM_LOAD( "wrally2_ds5002fp_sram_new.bin", 0x00000, 0x8000, CRC(bcf47f69) SHA1(8d2d5df2b2ed5ebc5c96241381ba687101dea834) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	// These are the default states stored in NVRAM
@@ -3153,7 +3154,9 @@ ROM_START( wrally2a ) // REF: 950510-1
 	ROM_LOAD16_BYTE( "wr2_63.ic63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+	// 'older' version of DS5002FP code, from Gaelco's repair archives
+	// very similar to dumped version, except 0xff fill instead of 0x00 and minor change to startup code
+	ROM_LOAD( "wrally2_ds5002fp_sram_old.bin", 0x00000, 0x8000, CRC(b0e25571) SHA1(9afc51d9366ee0ae0bc0818516fe1c5ac5c390b0) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	// These are the default states stored in NVRAM

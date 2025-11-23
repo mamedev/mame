@@ -24,7 +24,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/msm6242.h"
 #include "machine/z80scc.h"
 #include "video/hd44780.h"

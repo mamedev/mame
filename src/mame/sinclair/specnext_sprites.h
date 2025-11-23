@@ -30,6 +30,7 @@ public:
 
 	void mirror_tie_w(bool mirror_tie) { m_mirror_tie = mirror_tie; }
 	void mirror_index_w(u8 mirror_index) { m_mirror_index = mirror_index & 0x07; }
+	u8 status_r();
 	void io_w(offs_t addr, u8 data);
 	void mirror_data_w(u8 mirror_data);
 	void mirror_inc_w(bool mirror_inc) { m_mirror_inc = mirror_inc; }

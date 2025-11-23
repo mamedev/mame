@@ -353,7 +353,7 @@ void _8080bw_state::lrescue_sh_port_2_w(uint8_t data)
 /*                                                     */
 /*******************************************************/
 
-void _8080bw_state::cosmo_sh_port_2_w(uint8_t data)
+void cosmo_state::sh_port_2_w(uint8_t data)
 {
 	/* inverted flip screen bit */
 	invadpt2_sh_port_2_w(data ^ 0x20);

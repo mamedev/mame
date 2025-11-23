@@ -326,10 +326,11 @@ void seibuspi_tilemap_state::tilemap_dma_start_w(u32 data)
 
 void seibuspi_base_state::palette_dma_start_w(u32 data)
 {
+	const size_t palette_ram_size = m_palette_ram.bytes();
 	const int dma_length = (m_video_dma_length + 1) * 2;
 
 	// safety check
-	if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_length & 3) != 3 || dma_length > m_palette_ram_size || (m_video_dma_address + dma_length) > 0x40000)
+	if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_length & 3) != 3 || dma_length > palette_ram_size || (m_video_dma_address + dma_length) > 0x40000)
 		popmessage("Pal DMA %X %X, contact MAMEdev", m_video_dma_address, m_video_dma_length); // shouldn't happen
 	if (m_video_dma_address < 0x800)
 		logerror("palette_dma_start_w in I/O area: %X\n", m_video_dma_address);
@@ -349,13 +350,14 @@ void seibuspi_base_state::palette_dma_start_w(u32 data)
 
 void seibuspi_base_state::sprite_dma_start_w(u16 data)
 {
+	const size_t sprite_ram_size = m_sprite_ram.bytes();
 	// safety check
-	if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_address + m_sprite_ram_size) > 0x40000)
+	if (!DWORD_ALIGNED(m_video_dma_address) || (m_video_dma_address + sprite_ram_size) > 0x40000)
 		popmessage("Sprite DMA %X, contact MAMEdev", m_video_dma_address); // shouldn't happen
 	if (m_video_dma_address < 0x800)
 		logerror("sprite_dma_start_w in I/O area: %X\n", m_video_dma_address);
 
-	std::copy_n(&m_mainram[m_video_dma_address / 4], m_sprite_ram_size / 4, &m_sprite_ram[0]);
+	std::copy_n(&m_mainram[m_video_dma_address / 4], sprite_ram_size / 4, &m_sprite_ram[0]);
 }
 
 
@@ -481,7 +483,8 @@ void seibuspi_base_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cl
 	if (m_layer_enable & 0x10)
 		return;
 
-	for (int a = 0; a < (m_sprite_ram_size / 4); a += 2)
+	const size_t sprite_ram_length = m_sprite_ram.length();
+	for (int a = 0; a < sprite_ram_length; a += 2)
 	{
 		/*
 		    Word 0
@@ -706,9 +709,6 @@ void seibuspi_base_state::video_start()
 	save_item(NAME(m_video_dma_length));
 	save_item(NAME(m_video_dma_address));
 	save_item(NAME(m_layer_enable));
-
-	save_pointer(NAME(m_palette_ram), m_palette_ram_size/4);
-	save_pointer(NAME(m_sprite_ram), m_sprite_ram_size/4);
 }
 
 void seibuspi_tilemap_state::video_start()
@@ -738,16 +738,7 @@ void seibuspi_tilemap_state::video_start()
 	else
 		m_bg_fore_layer_position = 0x8000;
 
-	m_tilemap_ram_size = 0x4000;
-	m_palette_ram_size = 0x3000;
-	m_sprite_ram_size = 0x1000;
-	m_sprite_bpp = 6;
-
-	m_tilemap_ram = make_unique_clear<u32[]>(m_tilemap_ram_size/4);
-	m_palette_ram = make_unique_clear<u32[]>(m_palette_ram_size/4);
-	m_sprite_ram = make_unique_clear<u32[]>(m_sprite_ram_size/4);
-
-	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
+	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram.bytes(), 32, ENDIANNESS_LITTLE, 2);
 
 	m_text_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seibuspi_tilemap_state::get_text_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 64,32);
 	m_back_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seibuspi_tilemap_state::get_back_tile_info)), TILEMAP_SCAN_COLS, 16,16, 32,32);
@@ -795,8 +786,6 @@ void seibuspi_tilemap_state::video_start()
 	save_item(NAME(m_back_layer_d14));
 	save_item(NAME(m_midl_layer_d14));
 	save_item(NAME(m_fore_layer_d14));
-
-	save_pointer(NAME(m_tilemap_ram), m_tilemap_ram_size/4);
 }
 
 VIDEO_START_MEMBER(seibuspi_state,ejanhs)
@@ -814,14 +803,7 @@ void sys386f_state::video_start()
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
 
-	m_palette_ram_size = 0x4000;
-	m_sprite_ram_size = 0x2000;
-	m_sprite_bpp = 8;
-
-	m_palette_ram = make_unique_clear<u32[]>(m_palette_ram_size/4);
-	m_sprite_ram = make_unique_clear<u32[]>(m_sprite_ram_size/4);
-
-	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
+	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram.bytes(), 32, ENDIANNESS_LITTLE, 2);
 
 	memset(m_alpha_table, 0, 0x2000); // no alpha blending
 }

@@ -566,7 +566,7 @@ void k052109_device::update_scroll()
 	{
 		u8 scrollctrl = m_scrollctrl >> (tmap * 3) & 7;
 
-		static int rows_table[4] = { 1, 1, 32, 256 };
+		static const int rows_table[4] = { 1, 1, 32, 256 };
 		int rows = rows_table[scrollctrl & 3];
 		int cols = BIT(scrollctrl, 2) ? 64 : 1;
 

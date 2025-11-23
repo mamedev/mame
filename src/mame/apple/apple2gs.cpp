@@ -45,7 +45,7 @@
     bit 3: CPS Follow
     bit 4: Counter Delay
     bit 5: AppleTalk Delay
-    bit 6: Joystick Delay (reverse logic: 0 = delay is ON)
+    bit 6: Joystick Delay
     bit 7: C/D cache disable
 
     $C05D is the speed percentage:
@@ -93,7 +93,8 @@ namespace {
 #define A2GS_MASTER_CLOCK (XTAL(28'636'363))
 #define A2GS_14M    (A2GS_MASTER_CLOCK/2)
 #define A2GS_7M     (A2GS_MASTER_CLOCK/4)
-#define A2GS_1M     (A2GS_MASTER_CLOCK/28)
+#define A2GS_2_8M   (A2GS_MASTER_CLOCK/10)
+#define A2GS_1M     (XTAL(1021800))
 
 #define A2GS_UPPERBANK_TAG "inhbank"
 #define A2GS_AUXUPPER_TAG "inhaux"
@@ -519,7 +520,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(A2GS_1M);
 		}
 	}
 
@@ -539,11 +540,11 @@ private:
 
 		if (isfast)
 		{
-			m_maincpu->set_unscaled_clock(A2GS_14M/5);
+			m_maincpu->set_unscaled_clock(A2GS_2_8M);
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(A2GS_1M);
 		}
 	}
 
@@ -655,7 +656,10 @@ u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 	// regardless of the language card config.
 	if (!(m_shadow & SHAD_IOLC))
 	{
-		return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
+		if (m_inh_slot != -1 && (m_slotdevice[m_inh_slot]->inh_type() & INH_READ) == INH_READ)
+			return m_slotdevice[m_inh_slot]->read_inh_rom(offset | 0xFFE0);
+		else
+			return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 	}
 	else    // else vector fetches from bank 0 RAM
 	{
@@ -847,7 +851,7 @@ void apple2gs_state::machine_reset()
 	m_slow_counter = 0;
 
 	// always assert full speed on reset
-	m_maincpu->set_unscaled_clock(A2GS_14M/5);
+	m_maincpu->set_unscaled_clock(A2GS_2_8M);
 	m_last_speed = true;
 
 	m_sndglu_ctrl = 0;
@@ -882,9 +886,6 @@ void apple2gs_state::machine_reset()
 	auxbank_update();
 	update_slotrom_banks();
 
-	// reset the slots
-	m_a2bus->reset_bus();
-
 	// Apple-specific initial state
 	m_scc->ctsa_w(0);
 	m_scc->dcda_w(0);
@@ -896,7 +897,7 @@ void apple2gs_state::machine_reset()
 	m_accel_unlocked = false;
 	m_accel_stage = 0;
 	m_accel_slotspk = 0x41; // speaker and slot 6 slow
-	m_accel_gsxsettings = 0;
+	m_accel_gsxsettings = 0x49; // paddle slow, CPS, GS
 	m_accel_percent = 0;    // 100% speed
 	m_accel_present = false;
 	m_accel_temp_slowdown = false;
@@ -971,7 +972,7 @@ void apple2gs_state::update_speed()
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(isfast ? A2GS_14M / 5 : A2GS_1M);
+			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M);
 		}
 		m_last_speed = isfast;
 	}
@@ -1430,7 +1431,7 @@ void apple2gs_state::do_io(int offset)
 
 		case 0x70:  // PTRIG triggers paddles on read or write
 			// Zip paddle slowdown (does ZipGS also use the old Zip flag?)
-			if ((m_accel_present) && !BIT(m_accel_gsxsettings, 6))
+			if ((m_accel_present) && BIT(m_accel_gsxsettings, 6))
 			{
 				m_accel_temp_slowdown = true;
 				m_acceltimer->adjust(attotime::from_msec(5));
@@ -1696,8 +1697,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x46:  // INTFLAG
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
 
-		case 0x60: // button 3 on IIgs
-			return (m_gameio->sw3_r() ? 0x80 : 0x00) | uFloatingBus7;
+		case 0x60: // button 3 on IIgs, inverted
+			return (m_gameio->sw3_r() ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x61: // button 0 or Open Apple
 			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
@@ -1707,8 +1708,8 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x62: // button 1 or Option
 			return ((m_gameio->sw1_r() || (m_adb_p3_last & 0x10)) ? 0x80 : 0) | uFloatingBus7;
 
-		case 0x63: // button 2 or SHIFT key
-			return (m_gameio->sw2_r() ? 0x80 : 0x00) | uFloatingBus7;
+		case 0x63: // button 2, inverted (no shift key mod)
+			return (m_gameio->sw2_r() ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x64:  // joy 1 X axis
 			if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
@@ -1754,18 +1755,18 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					return m_accel_percent | 0x0f;
 				}
-				else if (offset == 0x5b)
+				else if (offset == 0x5b) // Zip status flags
 				{
+					// bits 0-1 are cache size: [8, 16, 32, 64]kB
+					const u8 b01 = 0x03;
+					// bit 3 is set if a temporary delay is active due to slot or softswitch access
+					const u8 b3 = m_accel_temp_slowdown ? 0x08 : 0x00;
+					// bit 4 is set if the Zip is disabled
+					const u8 b4 = m_accel_fast ? 0x00 : 0x10;
 					// bit 7 is a 1.0035 millisecond clock; the value changes every 0.50175 milliseconds
-					const int time = machine().time().as_ticks(1.0f / 0.00050175f);
-					if (time & 1)
-					{
-						return 0x03;
-					}
-					else
-					{
-						return 0x83;
-					}
+					const int time = machine().time().as_ticks(1.0F / 0.00050175F);
+					const u8 b7 = (time & 1) ? 0x80 : 0x00;
+					return b7 | b4 | b3 | b01;
 				}
 				else if (offset == 0x5c)
 				{
@@ -2063,6 +2064,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				m_accel_gsxsettings = data & 0xf8;
 				m_accel_gsxsettings |= 0x01;    // indicate this is a GS
 			}
+			do_io(offset);
 			break;
 
 		case 0x5a: // Zip accelerator unlock
@@ -2085,9 +2087,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				else if (m_accel_unlocked)
 				{
 					// disable acceleration
+					m_accel_fast = false;
 					accel_normal_speed();
-					m_accel_unlocked = false;
-					m_accel_stage = 0;
 				}
 			}
 			do_io(offset);
@@ -2096,6 +2097,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x5b: // Zip full speed
 			if (m_accel_unlocked)
 			{
+				m_accel_fast = true;
 				accel_full_speed();
 			}
 			do_io(offset);
@@ -2114,6 +2116,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			{
 				m_accel_percent = data;
 			}
+			do_io(offset);
 			break;
 
 		case 0x68: // STATEREG
@@ -3741,7 +3744,7 @@ INPUT_PORTS_END
 void apple2gs_state::apple2gs(machine_config &config)
 {
 	/* basic machine hardware */
-	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
+	G65816(config, m_maincpu, A2GS_2_8M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
@@ -3809,7 +3812,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	ADDRESS_MAP_BANK(config, A2GS_C300_TAG).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
 
 	/* serial */
-	SCC85C30(config, m_scc, A2GS_14M / 2);
+	SCC85C30(config, m_scc, A2GS_7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
@@ -3840,7 +3843,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	A2BUS_SLOT(config, "sl6", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 
-	IWM(config, m_iwm, A2GS_7M, A2GS_MASTER_CLOCK/14);
+	IWM(config, m_iwm, A2GS_7M, A2GS_1M*2);
 	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));

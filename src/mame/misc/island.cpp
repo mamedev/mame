@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
 

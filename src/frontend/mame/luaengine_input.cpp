@@ -395,13 +395,13 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_field_type["minvalue"] = sol::property(
 			[] (ioport_field const &f)
 			{
-				const bool has_minmax = f.is_analog() || f.type() == IPT_ADJUSTER;
+				const bool has_minmax = f.is_analog() || (f.type() == IPT_ADJUSTER);
 				return has_minmax ? std::make_optional(f.minval()) : std::nullopt;
 			});
 	ioport_field_type["maxvalue"] = sol::property(
 			[] (ioport_field const &f)
 			{
-				const bool has_minmax = f.is_analog() || f.type() == IPT_ADJUSTER;
+				const bool has_minmax = f.is_analog() || (f.type() == IPT_ADJUSTER);
 				return has_minmax ? std::make_optional(f.maxval()) : std::nullopt;
 			});
 	ioport_field_type["sensitivity"] = sol::property(

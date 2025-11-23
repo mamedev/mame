@@ -645,7 +645,7 @@ void st0020_device::draw_single_sprites(bitmap_ind16 &bitmap, const rectangle &c
 		int yscale = ydim / 8;
 
 		/* Let's approximate to the nearest greater integer value
-			to avoid holes in between tiles */
+		    to avoid holes in between tiles */
 		if (xscale & 0xffff)
 			xscale += (1 << 16) / 16;
 		if (yscale & 0xffff)

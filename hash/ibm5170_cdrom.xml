@@ -195,6 +195,31 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- http://redump.org/disc/69748/ -->
+	<software name="abspinball">
+		<description>Absolute Pinball (Europe)</description>
+		<year>1996</year>
+		<publisher>21st Century Entertainment, Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="absolute pinball (europe) (1996)" sha1="9758201f0f9d5578b0f72f7e53ab49a71daf7c31" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/20998/ -->
+	<software name="abspinballu" cloneof="abspinball">
+		<description>Absolute Pinball (USA)</description>
+		<year>1996</year>
+		<publisher>21st Century Entertainment, Ltd.</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="absolute pinball (usa) (1996)" sha1="10ef1b4ab7e885f24b27e2a41c35fd15b44d8b4c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95 -->
 	<software name="aceventd">
 		<description>Ace Ventura (Germany)</description>
@@ -230,13 +255,27 @@ Black colored OEM CD with no id whatsoever
 		</part>
 	</software>
 
+	<!-- Windows 95/98 -->
+	<software name="acatari2">
+		<description>Aracde's Greatest Hits: The Atari Collection 2</description>
+		<year>1998</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Atari" />
+		<info name="developer" value="Digital Eclipse, Inc." />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="arcade's greatest hits - the atari collection 2 (1998)" sha1="34775aaab4326c80a9551fcdec8aa0acd2d8ef88" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!-- Direct X 3.0 -->
 	<software name="acmidway2">
-		<description>Arcade's Greatest Hits - The Midway Collection 2</description>
+		<description>Arcade's Greatest Hits: The Midway Collection 2</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
-
+		<info name="developer" value="Digital Eclipse, Inc." />
+		<info name="developer" value="Midway" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="arcade's greatest hits - the midway collection 2 (1997)(gt interactive)" sha1="ff8fe48c76edd0fc5dc1321ea85e9d367b5e6400" />
@@ -1219,10 +1258,27 @@ Cannot read sound configuration from Windows 95
 		<description>Atari Arcade Hits 1</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
+		<info name="developer" value="Atari" />
+		<info name="developer" value="Digital Eclipse Software, Inc." />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atari arcade hits 1 (1999)(hasbro interactive)" sha1="89f9ef71790e880fd8c72bec268f424b5b04e189" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<software name="atariac2">
+		<description>Atari Arcade Hits 2</description>
+		<year>2000</year>
+		<publisher>Hasbro Interactive</publisher>
+		<info name="developer" value="Atari" />
+		<info name="developer" value="Digital Eclipse Software, Inc." />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="atari arcade hits 2 (2000)" sha1="6c2d97e0a5d60b882fd64a4438e86a35f8dddb36" />
 			</diskarea>
 		</part>
 	</software>
@@ -6144,6 +6200,20 @@ Looks too dark on s3_764 (verify)
 		</part>
 	</software>
 
+	<!-- Windows 95/98 -->
+	<software name="robotronx">
+		<description>Robotron X</description>
+		<year>1996</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="Midway" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="robotron x (1996)" sha1="ac87cb96b55f7daa84b6f90cfda7aaee509d7564" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95 / 98 -->
 	<!-- Pentium class 75 MHz -->
 	<software name="roadrashi" supported="no">
@@ -8459,7 +8529,7 @@ Installation and Open Circulation CDs are bootable.
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="English, Norwegian" />
 			<diskarea name="cdrom">
-				<disk name="en-us,no-no windows nt 3.1 service pack 2.chd" sha1="f3fee15a27e2b12754780221557bcb45f94547f6" />
+				<disk name="en-us,no-no windows nt 3.1 service pack 2" sha1="f3fee15a27e2b12754780221557bcb45f94547f6" />
 			</diskarea>
 		</part>
 		<part name="cdrom2" interface="cdrom">

@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "zip100.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 
 DEFINE_DEVICE_TYPE(ZIP100_IDE, zip100_ide_device, "zip100_ide", "Iomega Zip 100MB IDE Drive")
 

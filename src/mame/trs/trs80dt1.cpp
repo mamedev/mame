@@ -33,7 +33,7 @@ the printer data goes to B800 which is a spare address range in the real machine
 **********************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "video/i8275.h"
 #include "machine/7474.h"
 #include "machine/x2212.h"

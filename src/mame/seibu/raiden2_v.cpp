@@ -41,7 +41,7 @@ void raiden2_state::m_videoram_private_w(offs_t offset, u16 data)
 void raiden2_state::draw_sprites(const rectangle &cliprect)
 {
 	// causes a blank square in the corner of zero team, but otherwise the thrusters of the ship in the r2 intro are clipped, using 0x8000 as a sign bit instead of this logic works for r2, but not zero team
-	static constexpr s32 ZEROTEAM_MASK_X = 0x1ff; 
+	static constexpr s32 ZEROTEAM_MASK_X = 0x1ff;
 	static constexpr s32 ZEROTEAM_MASK_Y = 0x1ff;
 
 	m_sprite_bitmap.fill(0xf, cliprect);

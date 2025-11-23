@@ -681,24 +681,57 @@ void _8080bw_state::astropal(machine_config &config)
 /*                                                     */
 /*******************************************************/
 
-void _8080bw_state::cosmo_map(address_map &map)
+void cosmo_state::machine_start()
+{
+	//_8080bw_state::machine_start();
+
+	MACHINE_START_CALL_MEMBER(extra_8080bw);
+
+	stars_init();
+
+	save_item(NAME(m_stars_sidescroll));
+	save_item(NAME(m_star_speed));
+	save_item(NAME(m_rng_offs));
+	save_item(NAME(m_bright_star));
+	save_item(NAME(m_stars));
+	save_item(NAME(m_star_rng_origin));
+	save_item(NAME(m_star_rng_origin_frame));
+}
+
+void cosmo_state::stars_w(uint8_t data)
+{
+	m_stars_sidescroll = data & 0x08;  // Sideways
+	m_star_speed = data & 0x07;  // Speed
+}
+
+uint8_t cosmo_state::stars_r()
+{
+	// Returns 6 bits from the RNG
+	uint8_t rng = ~m_stars[m_rng_offs];
+	m_rng_offs += m_screen->frame_number();
+	m_rng_offs %= STAR_RNG_PERIOD;
+	return rng & 0x3f;
+}
+
+void cosmo_state::program_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
 	map(0x4000, 0x57ff).rom();
+	map(0x5800, 0x5800).r(FUNC(cosmo_state::stars_r)).w(FUNC(cosmo_state::stars_w));
 	map(0x5c00, 0x5fff).ram().share("colorram");
 }
 
-// at least one of these MWA8_NOPs must be sound related
-void _8080bw_state::cosmo_io_map(address_map &map)
+// at least one of ports 0-2 must be sound related
+void cosmo_state::io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("IN0").nopw();
-	map(0x01, 0x01).portr("IN1").nopw();
-	map(0x02, 0x02).portr("IN2").nopw();
-	map(0x03, 0x03).w(FUNC(_8080bw_state::invadpt2_sh_port_1_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::cosmo_sh_port_2_w));
+	map(0x00, 0x00).portr("IN0").lw8(NAME([this] (uint8_t data) { logerror("port 0 write @ %x = %x\n", m_maincpu->pc(), data); }));
+	map(0x01, 0x01).portr("IN1").lw8(NAME([this] (uint8_t data) { logerror("port 1 write @ %x = %x\n", m_maincpu->pc(), data); }));
+	map(0x02, 0x02).portr("IN2").lw8(NAME([this] (uint8_t data) { logerror("port 2 write @ %x = %x\n", m_maincpu->pc(), data); }));
+	map(0x03, 0x03).w(FUNC(cosmo_state::invadpt2_sh_port_1_w));
+	map(0x05, 0x05).w(FUNC(cosmo_state::sh_port_2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	map(0x07, 0x07).nopw();
+	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { logerror("port 7 write @ %x = %x\n", m_maincpu->pc(), data); }));
 }
 
 
@@ -715,21 +748,21 @@ static INPUT_PORTS_START( cosmo )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" ) // must be HIGH normally or the joystick won't work
 INPUT_PORTS_END
 
-void _8080bw_state::cosmo(machine_config &config)
+void cosmo_state::cosmo(machine_config &config)
 {
 	mw8080bw_root(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::cosmo_map);
-	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::cosmo_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmo_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &cosmo_state::io_map);
 
 	WATCHDOG_TIMER(config, m_watchdog);
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	// video hardware
-	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_cosmo));
+	m_screen->set_raw(MW8080BW_PIXEL_CLOCK*4, MW8080BW_HTOTAL*4, MW8080BW_HBEND*4, MW8080BW_HPIXCOUNT*4, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART);
+	m_screen->set_screen_update(FUNC(cosmo_state::screen_update));
 
-	PALETTE(config, m_palette, palette_device::RBG_3BIT);
+	PALETTE(config, m_palette, FUNC(cosmo_state::palette_init), 72);
 
 	// sound hardware
 	invaders_samples_audio(config);
@@ -5092,6 +5125,24 @@ ROM_START( mlander )
 	ROM_LOAD( "02.bin",     0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+
+// I/O board - Taito # CV070005/CVN00002
+// CPU board - Taito # AA017757 label= CVN00004
+// ROM board - Taito # AA017756 label= CVN00003
+ROM_START( mlandera )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // all labels handwritten
+	ROM_LOAD( "ml-1_u36.u36",       0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) ) // 2516
+	ROM_LOAD( "ml-2_u35.u35",       0x0800, 0x0800, CRC(752fb664) SHA1(18bb304b1ad9124693982e13ccc7be5dfe391b04) ) // 2516
+	ROM_LOAD( "ml-3_u34.u34",       0x1000, 0x0800, CRC(64e53458) SHA1(629f2434eea4d31dc9db0ee7bc8364cd2bf08a04) ) // 2516
+	ROM_LOAD( "ml-4_u33.u33",       0x1800, 0x0800, CRC(c9a74571) SHA1(b1671d19eff17f7adb274013c8f11eb044ebdd28) ) // 2516
+	ROM_LOAD( "ml-5_u32_rev_d.u32", 0x4000, 0x0800, CRC(db5e57cd) SHA1(ef8ff9c533cca269fd54e8535002a78febf9f9d0) ) // 2516
+	ROM_LOAD( "ml-6_u31.u31",       0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) ) // 2716
+
+	ROM_REGION( 0x0800, "proms", 0 )        // color map
+	ROM_LOAD( "cv01.bin", 0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02.bin", 0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+ROM_END
+
 ROM_START( grescue )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lrescue.1",    0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) )
@@ -6064,7 +6115,8 @@ GAME( 1980, laser,       spcewarl, invadpt2,  spclaser,  _8080bw_state,  empty_i
 
 GAME( 1979, lrescue,     0,        lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito",                              "Lunar Rescue",                                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, grescue,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "Taito (Universal license?)",         "Galaxy Rescue",                                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mlander,     lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue, set 1)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1980, mlandera,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue, set 2)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1979, lrescuem,    lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,   lrescue,  lrescuem2, lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Model Racing)",             "Lunar Rescue (Model Racing bootleg, set 2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescueabl,  lrescue,  lrescue,   lrescue,   _8080bw_state,  empty_init,    ROT270, "bootleg (Artic)",                    "Lunar Rescue (Artic bootleg)",                                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -6109,7 +6161,7 @@ GAME( 1979, galxwarst2,  galxwars, invadpt2,  galxwars,  _8080bw_state,  empty_i
 GAME( 1979, starw,       galxwars, invnomb,   galxwars,  invaders_state, empty_init,    ROT270, "bootleg",                            "Star Wars (bootleg of Galaxy Wars, set 1)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1979, starw1,      galxwars, starw1,    galxwars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Yamashita)",                "Star Wars (bootleg of Galaxy Wars, set 2)",                       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, cosmo,       0,        cosmo,     cosmo,     _8080bw_state,  empty_init,    ROT90,  "TDS & MINTS",                        "Cosmo",                                                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, cosmo,       0,        cosmo,     cosmo,     cosmo_state,    empty_init,    ROT90,  "TDS & MINTS",                        "Cosmo",                                                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1980?,invrvnge,    0,        invrvnge,  invrvnge,  invrvnge_state, init_invrvnge, ROT270, "Zenitone-Microsec Ltd.",             "Invader's Revenge (set 1)",                                       MACHINE_SUPPORTS_SAVE ) // Copyright is either late-1980, or early-1981
 GAME( 1980?,invrvngea,   invrvnge, invrvnge,  invrvnge,  invrvnge_state, init_invrvnge, ROT270, "Zenitone-Microsec Ltd.",             "Invader's Revenge (set 2)",                                       MACHINE_SUPPORTS_SAVE )

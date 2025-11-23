@@ -540,6 +540,7 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SNK_HNG64_H

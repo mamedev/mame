@@ -169,6 +169,7 @@ private:
 	u32 m_sprite_attribute_table;
 	u8 m_background_color;
 	u16 m_hit; // HBlank interrupt rate
+	bool m_ie2;
 	u8 m_vs, m_hs; // Vertical/Horizontal scroll modes
 	// window
 	bool m_rigt;
@@ -183,6 +184,8 @@ private:
 	u16 m_hvcounter_latch;
 	u32 m_vram_mask;
 	bool m_sprite_collision, m_sprite_overflow;
+	u16 m_hpage, m_vpage;
+	void calculate_plane_sizes();
 
 	bitmap_rgb32 m_bitmap;
 	bool render_line(int scanline);

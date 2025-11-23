@@ -15,7 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "bus/rs232/rs232.h"
 #include "machine/eepromser.h"
 #include "sound/spkrdev.h"

@@ -59,7 +59,7 @@ protected:
 	// device_a2bus_card_interface overrides
 	virtual u8 read_c0nx(u8 offset) override;
 	virtual void write_c0nx(u8 offset, u8 data) override;
-	virtual bool take_c800() override { return false; }
+	virtual void reset_from_bus() override;
 
 private:
 	// object finders
@@ -87,6 +87,12 @@ void a2bus_byte8251_device::device_reset()
 {
 	// Update data rate
 	m_brg->control_w(m_switches->read());
+}
+
+void a2bus_byte8251_device::reset_from_bus()
+{
+	m_usart->reset();
+	m_brg->reset();
 }
 
 INPUT_CHANGED_MEMBER(a2bus_byte8251_device::rate_changed)

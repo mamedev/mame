@@ -17,7 +17,7 @@ TODO: figure out keycodes (are they translated externally?)
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
 #include "emupal.h"

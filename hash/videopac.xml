@@ -1882,7 +1882,8 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<description>Popeye (Europe)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="programmer" value="Gil Williamson" />
+		<info name="programmer" value="Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
@@ -1895,7 +1896,8 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<description>Popeye (Brazil)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="programmer" value="Gil Williamson" />
+		<info name="programmer" value="Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
@@ -1908,7 +1910,8 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<description>Q*bert (Europe)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="programmer" value="Gil Williamson" />
+		<info name="programmer" value="Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
@@ -2216,7 +2219,8 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<description>Tutankham (Europe, prototype)</description>
 		<year>198?</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="programmer" value="Gil Williamson and Charles Dear" />
+		<info name="programmer" value="Gil Williamson" />
+		<info name="programmer" value="Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
@@ -2657,7 +2661,8 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<description>Norseman (Europe)</description>
 		<year>1983</year>
 		<publisher>GST Video</publisher>
-		<info name="programmer" value="Andy Eltisand, Jake Dowding" />
+		<info name="programmer" value="Andy Eltisand" />
+		<info name="programmer" value="Jake Dowding" />
 		<info name="serial" value="57" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
@@ -2904,7 +2909,8 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 		<description>Route 66</description>
 		<year>2007</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="programmer" value="Rafael Cardoso, René van den Enden" />
+		<info name="programmer" value="Rafael Cardoso" />
+		<info name="programmer" value="René van den Enden" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x800">

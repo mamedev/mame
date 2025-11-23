@@ -62,7 +62,7 @@ NOTE: There is manual for Run Deep which is (c) 1988 by World Games. Is Cream Co
 #include "decmxc06.h"
 
 #include "cpu/m6502/r65c02.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"

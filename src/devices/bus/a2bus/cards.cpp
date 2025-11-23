@@ -102,7 +102,6 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("videoterm", A2BUS_VIDEOTERM);           // Videx VideoTerm
 	device.option_add("ssc", A2BUS_SSC);                       // Apple Super Serial Card
 	device.option_add("ssi", APRICORN_SSI);                    // Apricorn Super Serial Imager
-	device.option_add("swyft", A2BUS_SWYFT);                   // IAI SwyftCard
 	device.option_add("themill", A2BUS_THEMILL);               // Stellation Two The Mill (6809 card)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II
@@ -157,6 +156,9 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("vistaa800", A2BUS_VISTAA800);           // Vista A800 8" Disk Controller Card
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
 	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
+	device.option_add("romcard", A2BUS_ROMCARDUSER);           // Apple II ROM Card that loads a custom ROM image
+	device.option_add("romcardfp", A2BUS_ROMCARDFP);           // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
+	device.option_add("romcardint", A2BUS_ROMCARDINT);         // Apple II ROM Card with Autostart Monitor + Integer BASIC
 }
 
 void apple2e_cards(device_slot_interface &device)
@@ -240,6 +242,9 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("vistaa800", A2BUS_VISTAA800);           // Vista A800 8" Disk Controller Card
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
 	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
+	device.option_add("romcard", A2BUS_ROMCARDUSER);           // Apple II ROM Card that loads a custom ROM image
+	device.option_add("romcardfp", A2BUS_ROMCARDFP);           // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
+	device.option_add("romcardint", A2BUS_ROMCARDINT);         // Apple II ROM Card with Autostart Monitor + Integer BASIC
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -256,7 +261,6 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("videoterm", A2BUS_VIDEOTERM);           // Videx VideoTerm
 	device.option_add("ssc", A2BUS_SSC);                       // Apple Super Serial Card
 	device.option_add("ssi", APRICORN_SSI);                    // Apricorn Super Serial Imager
-	device.option_add("swyft", A2BUS_SWYFT);                   // IAI SwyftCard
 	device.option_add("themill", A2BUS_THEMILL);               // Stellation Two The Mill (6809 card)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II

@@ -548,6 +548,22 @@ v50_device::v50_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+void v53_device::tout1_w(int state)
+{
+	if (!BIT(m_SCTL, 0))
+	{
+		m_scu->write_rxc(state);
+		m_scu->write_txc(state);
+	}
+
+	m_tout1_w(state);
+}
+
+void v53_device::sint_w(int state)
+{
+	m_sint_w(state);
+}
+
 u8 v53_device::io_read_byte(offs_t a)
 {
 	if (check_OPHA(a))
@@ -785,6 +801,9 @@ void v53_device::execute_set_input(int irqline, int state)
 void v53_device::device_add_mconfig(machine_config &config)
 {
 	v5x_add_mconfig(config);
+
+	m_tcu->out_handler<1>().set(FUNC(v53_device::tout1_w));
+	m_scu->sint_handler().set(FUNC(v53_device::sint_w));
 }
 
 device_memory_interface::space_config_vector v53_device::memory_space_config() const
@@ -799,6 +818,8 @@ device_memory_interface::space_config_vector v53_device::memory_space_config() c
 v53_device::v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: v33_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(v53_device::internal_port_map), this))
 	, device_v5x_interface(mconfig, *this, true)
+	, m_sint_w(*this)
+	, m_tout1_w(*this)
 {
 }
 

@@ -26,7 +26,7 @@
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/74259.h"
 #include "machine/timekpr.h"
 #include "screen.h"

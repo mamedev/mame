@@ -13,8 +13,11 @@
 // Peripheral boards
 
 // storage
+#include "bk_altpro.h"
 #include "bk_kmd.h"
+#include "bk_samara.h"
 #include "dsd4432.h"
+#include "dvk_dwhle.h"
 #include "dvk_kgd.h"
 #include "dvk_kmd.h"
 #include "dvk_mx.h"
@@ -22,6 +25,7 @@
 #include "qg640.h"
 #include "qtx.h"
 #include "tdl12.h"
+#include "terak_v.h"
 #include "uknc_kmd.h"
 
 // serial ports
@@ -31,18 +35,23 @@
 
 void qbus_cards(device_slot_interface &device)
 {
-	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
-	device.option_add("qts1", TTI_QTS1);
 	device.option_add("dsd4432", DSD4432);
+	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
+	device.option_add("qg640", MATROX_QG640);
+	device.option_add("qts1", TTI_QTS1);
+	device.option_add("tdl12", TDL12);
+	device.option_add("terak_v", TERAK_V);
+
+	device.option_add("altpro", BK_ALTPRO);
+	device.option_add("by", BK_KMD);
+	device.option_add("dw", DVK_DWHLE);
 	device.option_add("irps", BK_IRPS);
 	device.option_add("kgd", DVK_KGD);
 	device.option_add("ktlk", DVK_KTLK);
 	device.option_add("mx", DVK_MX);
 	device.option_add("my", DVK_KMD);
 	device.option_add("mz", UKNC_KMD);
-	device.option_add("qg640", MATROX_QG640);
-	device.option_add("by", BK_KMD);
-	device.option_add("tdl12", TDL12);
+	device.option_add("samara", BK_SAMARA);
 }
 
 

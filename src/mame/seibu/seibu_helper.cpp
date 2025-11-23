@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Nicola Salmoria
 /*
-	Helper for common decryption method in Seibu Kaihatsu hardwares.
+    Helper for common decryption method in Seibu Kaihatsu hardwares.
 */
 
 #include "emu.h"

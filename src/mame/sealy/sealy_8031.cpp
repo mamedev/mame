@@ -25,7 +25,7 @@ unmarked chip at C6 (RAM?)
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/6821pia.h"
 #include "machine/at28c16.h"
 #include "sound/okim6295.h"

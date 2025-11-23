@@ -187,7 +187,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
 
 	// Sprite Registers
-	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
+	map(0x6fd8, 0x6fd8).rw(FUNC(xavix_state::spriteregs_r), FUNC(xavix_state::spriteregs_w));
 
 	// Sprite DMA
 	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::spritefragment_dma_status_r), FUNC(xavix_state::spritefragment_dma_trg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
@@ -2833,8 +2833,8 @@ CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02_2mb,  tomshoot,xavix_i2c_
 // トミカ カーナビドライブ / トミー
 CONS( 2003, tcarnavi,  0,          0,  xavix_4mb_nv,     tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// ちゃんぴよんピンボール
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// 痛快！娯楽活劇 ちゃんぴよんピンボール
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,  init_xavix,    "Tomy / SSD Company LTD",                       "Tsuukai! Goraku Katsugeki - Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // 日本一周 僕はプラレール運転士
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

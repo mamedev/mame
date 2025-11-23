@@ -105,6 +105,8 @@ protected:
 
 	void tcu_clock_update();
 
+	virtual void sint_w(int state) = 0;
+
 	required_device<pit8253_device> m_tcu;
 	required_device<v5x_dmau_device> m_dmau;
 	required_device<v5x_icu_device> m_icu;
@@ -183,9 +185,10 @@ protected:
 		return 0;
 	}
 
+
 private:
 	void tout1_w(int state);
-	void sint_w(int state);
+	virtual void sint_w(int state) override;
 
 	devcb_write_line m_tout1_callback;
 	devcb_read8 m_icu_slave_ack;
@@ -243,6 +246,22 @@ public:
 	auto txrdy_handler_cb() { return m_scu.lookup()->txrdy_handler(); }
 	auto txempty_handler_cb() { return m_scu.lookup()->txempty_handler(); }
 	auto syndet_handler_cb() { return m_scu.lookup()->syndet_handler(); }
+	auto sint_handler_cb() { return m_sint_w.bind(); }
+
+	void dsr_w(int state) { m_scu->write_dsr(state); }
+	void cts_w(int state) { m_scu->write_cts(state); }
+
+	template <unsigned Timer> auto v53_tout_handler()
+	{
+		if (Timer != 1)
+		{
+			return m_tcu.lookup()->out_handler<Timer>();
+		}
+		else
+		{
+			return m_tout1_w.bind();
+		}
+	}
 
 protected:
 	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -272,7 +291,12 @@ protected:
 	u8 SCTL_r();
 	void SCTL_w(u8 data);
 
+	void tout1_w(int state);
+
+	virtual void sint_w(int state) override;
+
 private:
+	devcb_write_line m_sint_w, m_tout1_w;
 	u8 m_SCTL;
 };
 

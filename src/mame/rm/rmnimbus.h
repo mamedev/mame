@@ -13,7 +13,7 @@
 #pragma once
 
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
 #include "bus/scsi/scsi.h"

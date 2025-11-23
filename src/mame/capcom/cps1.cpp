@@ -1608,20 +1608,15 @@ static INPUT_PORTS_START( unsquad )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
 
-/* To access the hidden pattern test modes, turn the "Service Mode" dip to ON, and hold down "P1 Button 1"
+/* Final Fight button 3 is not officially documented and does not exist on the control panel, probably a leftover.
+   Pressing it will allow you to escape from grabs and choke holds instantly.
+
+   To access the hidden pattern test modes, turn the "Service Mode" dip to ON, and hold down "P1 Button 1"
    ('Ctrl') or "P1 Button 2" ('Alt') during the bootup test. Button 1 will load the Scroll (Background) test,
-   and Button 2 will load an Obj (Sprite) viewer. */
+   and Button 2 will load an Obj (Sprite) viewer.
+*/
 static INPUT_PORTS_START( ffight )
-	PORT_INCLUDE( cps1_2b )
-
-#if 0
-/* The button below is not officially documented and does not exist on the control panel, probably a leftover.
-   Pressing it will allow you to escape from grabs and choke holds instantly. */
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME ("P1 Button 3 (Cheat)")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME ("P2 Button 3 (Cheat)")
-#endif
+	PORT_INCLUDE( cps1_3b )
 
 	PORT_START("DSWA")
 	CPS1_COINAGE_1( "SW(A)" )
@@ -6918,6 +6913,43 @@ ROM_START( cawingj )
 	ROM_REGION( 0x0200, "bboardplds", 0 )
 	ROM_LOAD( "ca22b.1a",     0x0000, 0x0117, CRC(5152e678) SHA1(ac61df30cd073b26f2145e3ea0c513ec804d047a) )
 	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )    /* seen the same pcb with LWIO.12E */
+ROM_END
+
+/* B-Board 91634B-2, Japan Resale Ver. */
+ROM_START( cawingjr )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "usnj_23.8f", 0x00000, 0x80000, CRC(bbe45b1e) SHA1(0191083148ccb3b4755f81f46b51ec23f50cdace) )
+	ROM_LOAD16_WORD_SWAP( "usnj_22.7f", 0x80000, 0x80000, CRC(54872f9f) SHA1(1d556ffe0294a5788f797ce226972470b23cec93) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD64_WORD( "usn_01.3a", 0x000000, 0x80000, CRC(c08ffb8b) SHA1(a546237590786af19d9dd9a8428ab1147be1212f) )
+	ROM_LOAD64_WORD( "usn_02.4a", 0x000002, 0x80000, CRC(37b1b27a) SHA1(c27ed4bba1efd3376e5871689c242485f015014f) )
+	ROM_LOAD64_WORD( "usn_03.5a", 0x000004, 0x80000, CRC(9f89a540) SHA1(6948b7fe0e52af4d97b6b1457e97f454b9c047ef) )
+	ROM_LOAD64_WORD( "usn_04.6a", 0x000006, 0x80000, CRC(1f31f1d0) SHA1(c2c5f454d245c8621204a9d35400a4ba8c265a16) )
+
+	ROM_REGION( 0x28000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "usn_09.12f", 0x00000, 0x08000, CRC(0eb8a1d4) SHA1(434b42100ebe85f937c5e01dff90c6ead769946b) )
+	ROM_CONTINUE(           0x10000, 0x18000 )  // second half of ROM is unused, not mapped in memory
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "usn_18.11c",  0x00000, 0x20000, CRC(4a613a2c) SHA1(06e10644fc60925b85d2ca0888c9fa057bfe996a) )   // == ca_18.11c
+	ROM_LOAD( "usn_19.12c",  0x20000, 0x20000, CRC(74584493) SHA1(5cfb15f1b9729323707972646313aee8ab3ac4eb) )   // == ca_19.12c
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "ara63b.1a",    0x0000, 0x0117, BAD_DUMP CRC(f5569c93) SHA1(7db7cf23639036590eef1e5e309f08560859efaf) ) /* Handcrafted but works on actual PCB.  Redump needed */
+	ROM_LOAD( "iob1.12d",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
+	ROM_LOAD( "bprg1.11d",    0x0000, 0x0117, CRC(31793da7) SHA1(400fa7ac517421c978c1ee7773c30b9ed0c5d3f3) )
+
+	ROM_REGION( 0x0200, "cboardplds", 0 )
+	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* B-Board 89624B-3 */
@@ -15009,6 +15041,7 @@ GAME( 1990, cawingr1,    cawing,   cps1_10MHz, cawing,     cps_state, empty_init
 GAME( 1990, cawingu,     cawing,   cps1_10MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "Carrier Air Wing (USA 901130)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cawingur1,   cawing,   cps1_10MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "Carrier Air Wing (USA 901012)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cawingj,     cawing,   cps1_10MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "U.S. Navy (Japan 901012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, cawingjr,    cawing,   cps1_12MHz, cawing,     cps_state, empty_init,    ROT0,   "Capcom", "U.S. Navy (Japan Resale Ver. 901130)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, nemo,        0,        cps1_10MHz, nemo,       cps_state, empty_init,    ROT0,   "Capcom", "Nemo (World 901130)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemor1,      nemo,     cps1_10MHz, nemo,       cps_state, empty_init,    ROT0,   "Capcom", "Nemo (World 901109)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, nemoj,       nemo,     cps1_10MHz, nemo,       cps_state, empty_init,    ROT0,   "Capcom", "Nemo (Japan 901120, 88622B-3 ROM board)", MACHINE_SUPPORTS_SAVE )

@@ -2,343 +2,68 @@
 // copyright-holders:Angelo Salese,Carl
 /**************************************************************************************************
 
-    PC-9801 (c) 1981 NEC
+PC-9801 (c) 1981 NEC
 
-    TODO:
-    - text scrolling, μPD52611 (cfr. clipping in edge & arcus2, madoum* too?);
-    - Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
-      Should really be 61.xx instead, understand how CRTC really switches clock;
-    - AGDC emulation, μPD72120;
-    - GP-IB emulation, μPD7210;
-    - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
-    - Write a PC80S31K device for 2d type floppies
-      (also used on PC-6601SR, PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-    - FDC (note: epdiag FDC test looks a good candidate for all this):
-        - Has on board dip-switches, we currently just return 2HD/2DD autodetect;
-        - 3'5 floppy disks don't load at all ($4be I/O port is the extra accessor);
-        - fix FDC duplication: according to docs I/O ports $90-$95 are basically mirrors
-          with a subset of the drive related flags.
-          Sounds like a afterthought of having 2HD/2DD separate boards from vanilla class;
-        - Move vanilla FDC 2HD/2DD to a separate (legacy?) bus, and split pc9801f (default: 2DD)
-          from pc9801m (2HD) and vanilla pc9801 (none);
-        - floppy sounds never silences when drive is idle (disabled for the time being);
-        - epdiag throws ID invalid when run with PORT EXC on (DIP-SW 3-1 -> 0);
-    - CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
-      only);
-    - SASI/SCSI support (fully supported by now?);
-    - IDE sports an hack to not make 512 to 256 sector byte translations.
-      Apparently a SDIP setting is responsible for this?
-    - Remove kludge for POR bit in a20_ctrl_w fn;
-    - I/O:
-        - HW Dip-switches (where applicable) needs a serious clean-up and naming/position
-          fixing in some cases;
-        - Export mouse support to an actual PC9871 device;
-        - Implement IF-SEGA/98 support (Sega Saturn peripheral compatibility for Windows,
-          cfr. BeOS PnP driver);
-    - clean-up functions/variables naming by actual documentation nomenclature;
-    - derive machine configs & romsets by actual default options, examples:
-        - 3.5 built-in floppy drives vs. default 5.25;
-        - separate pc9801f (2DD) available romset to pc9801 (none) & pc9801m (2HD), and
-          remove the correlated machine config option;
-        - cbus available number of slots & built-in or provided boards;
-        - separate machines HDD hooks by SASI/SCSI/IDE;
-        - load actual IDE bioses from IPL romsets where applicable
-          (late era 9801 and 9821 class machines);
-        - pinpoint machines that uses GRCG instead of EGC, we are currently too lenient and support
-          latter on most (use dbuster and hypbingo to checkout);
-        - Improve opacity of video flip/flop registers, consider using an address space instead of
-          current array format;
+References:
+- https://www.pc-9800.net/index.htm
+- https://www.webtech.co.jp/company/doc/undocumented_mem/index.html
+- https://web.archive.org/web/20190331142002/http://www.geocities.jp/retro_zzz/machines/nec/9801/mdl98cpu.html
 
-    TODO (PC-9801F)
-    - it currently hooks up half size kanji ROMs, causing missing text in many games;
+TODO:
+- C-Bus SCSI support, remove IDE ROM loads where doesn't belong by default;
+\- load actual IDE BIOSes from IPL romsets where applicable (pc9801bx onward, all pc9821)
+- Port over pc88va SASI version in common C-Bus option;
+- Remove kludge for POR bit in a20_ctrl_w fn;
+\- Causes "SYSTEM SHUTDOWN"s on OS installs/reboots (soft reset the machine manually);
+- CMT support (-03/-13/-36 i/f or cbus only, supported by i86/V30 fully compatible machines
+  only);
+- DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
+- Incomplete FDC inner semantics with the dual ports;
+\- floppy sounds never silences when drive is idle (disabled for the time being);
+\- epdiag: throws ID invalid when run with auto-detect 2HD/2DD mode (DIP-SW 3-1 -> 0);
+- Export mouse support to an actual PC9871 device;
+- GP-IB emulation, μPD7210;
+- Per-system dip-switches/configurations;
+- Disable EGC use where it's not mounted normally (test thru dbuster and hypbingo)
 
-    TODO (PC-9801RS):
-    - several unemulated extra f/f features;
-    - keyboard shift doesn't seem to disable properly (fixed by now?);
-    - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
-    - clean-up duplicate code;
+TODO (pc9801/pc9801f):
+- Move vanilla FDC 2HD/2DD to a separate (legacy?) bus, and split pc9801f (default: 2DD)
+  from pc9801m (2HD) and vanilla pc9801 (none);
+- it currently hooks up half size kanji ROMs, causing missing text in many games;
 
-    TODO (PC-9801RX?):
-    - Identify model type, it clearly accesses PCI, the extended 3'5 floppy I/O at 0x4be and
-      it's not a 286 CPU;
-    - Floppy boot fails;
+TODO (pc9801rs):
+- Remove IDE hack to not make 512 to 256 sector byte translations
+\- probably need a working C-Bus IDE in place, or a SCSI option;
 
-    TODO (PC-9801US / PC-9801FS):
-    - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
-    - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
-    - pc9801fs at least: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS,
-      incompatible with 512 bps or IDE itself?
+TODO (pc9801us / pc9801fs):
+- "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
+- RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
+- pc9801fs: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS
+\- wants specifically (the internal) SCSI?
 
-    TODO (PC-9801BX2)
-    - "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
-    - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
-    - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
-    - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
-      size;
+TODO (pc9801bx2):
+- "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
+- Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
+- A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
+- unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
+  size;
 
-    TODO: (PC-9801UX)
-    - "I/O Error" on any 3.5" floppy, specific to this romset (i.e. those works on pc9821).
-      It never access $4be, it must fail earlier than that.
-
-===================================================================================================
-
-    This series features a huge number of models released between 1982 and 1997. They
-    were not IBM PC-compatible, but they had similar hardware (and software: in the
-    1990s, they run MS Windows as OS)
-    TODO: move this table in a markdown, upgrade
-
-    Models:
-
-                      |  CPU                          |   RAM    |            Drives                                     | CBus| Release |
-    PC-9801           |  8086 @ 5                     |  128 KB  | -                                                     |  6  | 1982/10 |
-    PC-9801F1         |  8086-2 @ 5/8                 |  128 KB  | 5"2DDx1                                               |  4  | 1983/10 |
-    PC-9801F2         |  8086-2 @ 5/8                 |  128 KB  | 5"2DDx2                                               |  4  | 1983/10 |
-    PC-9801E          |  8086-2 @ 5/8                 |  128 KB  | -                                                     |  6  | 1983/11 |
-    PC-9801F3         |  8086-2 @ 5/8                 |  256 KB  | 5"2DDx1, 10M SASI HDD                                 |  2  | 1984/10 |
-    PC-9801M2         |  8086-2 @ 5/8                 |  256 KB  | 5"2HDx2                                               |  4  | 1984/11 |
-    PC-9801M3         |  8086-2 @ 5/8                 |  256 KB  | 5"2HDx1, 20M SASI HDD                                 |  3  | 1985/02 |
-    PC-9801U2         |  V30 @ 8                      |  128 KB  | 3.5"2HDx2                                             |  2  | 1985/05 |
-    PC-98XA1          |  80286 @ 8                    |  512 KB  | -                                                     |  6  | 1985/05 |
-    PC-98XA2          |  80286 @ 8                    |  512 KB  | 5"2DD/2HDx2                                           |  6  | 1985/05 |
-    PC-98XA3          |  80286 @ 8                    |  512 KB  | 5"2DD/2HDx1, 20M SASI HDD                             |  6  | 1985/05 |
-    PC-9801VF2        |  V30 @ 8                      |  384 KB  | 5"2DDx2                                               |  4  | 1985/07 |
-    PC-9801VM0        |  V30 @ 8/10                   |  384 KB  | -                                                     |  4  | 1985/07 |
-    PC-9801VM2        |  V30 @ 8/10                   |  384 KB  | 5"2DD/2HDx2                                           |  4  | 1985/07 |
-    PC-9801VM4        |  V30 @ 8/10                   |  384 KB  | 5"2DD/2HDx2, 20M SASI HDD                             |  4  | 1985/10 |
-    PC-98XA11         |  80286 @ 8                    |  512 KB  | -                                                     |  6  | 1986/05 |
-    PC-98XA21         |  80286 @ 8                    |  512 KB  | 5"2DD/2HDx2                                           |  6  | 1986/05 |
-    PC-98XA31         |  80286 @ 8                    |  512 KB  | 5"2DD/2HDx1, 20M SASI HDD                             |  6  | 1986/05 |
-    PC-9801UV2        |  V30 @ 8/10                   |  384 KB  | 3.5"2DD/2HDx2                                         |  2  | 1986/05 |
-    PC-98LT1          |  V50 @ 8                      |  384 KB  | 3.5"2DD/2HDx1                                         |  0  | 1986/11 |
-    PC-98LT2          |  V50 @ 8                      |  384 KB  | 3.5"2DD/2HDx1                                         |  0  | 1986/11 |
-    PC-9801VM21       |  V30 @ 8/10                   |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1986/11 |
-    PC-9801VX0        |  80286 @ 8 & V30 @ 8/10       |  640 KB  | -                                                     |  4  | 1986/11 |
-    PC-9801VX2        |  80286 @ 8 & V30 @ 8/10       |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1986/11 |
-    PC-9801VX4        |  80286 @ 8 & V30 @ 8/10       |  640 KB  | 5"2DD/2HDx2, 20M SASI HDD                             |  4  | 1986/11 |
-    PC-9801VX4/WN     |  80286 @ 8 & V30 @ 8/10       |  640 KB  | 5"2DD/2HDx2, 20M SASI HDD                             |  4  | 1986/11 |
-    PC-98XL1          |  80286 @ 8 & V30 @ 8/10       | 1152 KB  | -                                                     |  4  | 1986/12 |
-    PC-98XL2          |  80286 @ 8 & V30 @ 8/10       | 1152 KB  | 5"2DD/2HDx2                                           |  4  | 1986/12 |
-    PC-98XL4          |  80286 @ 8 & V30 @ 8/10       | 1152 KB  | 5"2DD/2HDx1, 20M SASI HDD                             |  4  | 1986/12 |
-    PC-9801VX01       |  80286-10 @ 8/10 & V30 @ 8/10 |  640 KB  | -                                                     |  4  | 1987/06 |
-    PC-9801VX21       |  80286-10 @ 8/10 & V30 @ 8/10 |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1987/06 |
-    PC-9801VX41       |  80286-10 @ 8/10 & V30 @ 8/10 |  640 KB  | 5"2DD/2HDx2, 20M SASI HDD                             |  4  | 1987/06 |
-    PC-9801UV21       |  V30 @ 8/10                   |  640 KB  | 3.5"2DD/2HDx2                                         |  2  | 1987/06 |
-    PC-98XL^2         |  i386DX-16 @ 16 & V30 @ 8     |  1.6 MB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1987/10 |
-    PC-98LT11         |  V50 @ 8                      |  640 KB  | 3.5"2DD/2HDx1                                         |  0  | 1987/10 |
-    PC-98LT21         |  V50 @ 8                      |  640 KB  | 3.5"2DD/2HDx1                                         |  0  | 1987/10 |
-    PC-9801UX21       |  80286-10 @ 10 & V30 @ 8      |  640 KB  | 3.5"2DD/2HDx2                                         |  3  | 1987/10 |
-    PC-9801UX41       |  80286-10 @ 10 & V30 @ 8      |  640 KB  | 3.5"2DD/2HDx2, 20M SASI HDD                           |  3  | 1987/10 |
-    PC-9801LV21       |  V30 @ 8/10                   |  640 KB  | 3.5"2DD/2HDx2                                         |  0  | 1988/03 |
-    PC-9801CV21       |  V30 @ 8/10                   |  640 KB  | 3.5"2DD/2HDx2                                         |  2  | 1988/03 |
-    PC-9801UV11       |  V30 @ 8/10                   |  640 KB  | 3.5"2DD/2HDx2                                         |  2  | 1988/03 |
-    PC-9801RA2        |  i386DX-16 @ 16 & V30 @ 8     |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1988/07 |
-    PC-9801RA5        |  i386DX-16 @ 16 & V30 @ 8     |  1.6 MB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1988/07 |
-    PC-9801RX2        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1988/07 |
-    PC-9801RX4        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2, 20M SASI HDD                             |  4  | 1988/07 |
-    PC-98LT22         |  V50 @ 8                      |  640 KB  | 3.5"2DD/2HDx1                                         |  0  | 1988/11 |
-    PC-98LS2          |  i386SX-16 @ 16 & V30 @ 8     |  1.6 MB  | 5"2DD/2HDx2                                           |  0  | 1988/11 |
-    PC-98LS5          |  i386SX-16 @ 16 & V30 @ 8     |  1.6 MB  | 5"2DD/2HDx2, 40M SASI HDD                             |  0  | 1988/11 |
-    PC-9801VM11       |  V30 @ 8/10                   |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1988/11 |
-    PC-9801LV22       |  V30 @ 8/10                   |  640 KB  | 3.5"2DD/2HDx2                                         |  0  | 1989/01 |
-    PC-98RL2          |  i386DX-20 @ 16/20 & V30 @ 8  |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1989/02 |
-    PC-98RL5          |  i386DX-20 @ 16/20 & V30 @ 8  |  1.6 MB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1989/02 |
-    PC-9801EX2        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2                                         |  3  | 1989/04 |
-    PC-9801EX4        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2, 20M SASI HDD                           |  3  | 1989/04 |
-    PC-9801ES2        |  i386SX-16 @ 16 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2                                         |  3  | 1989/04 |
-    PC-9801ES5        |  i386SX-16 @ 16 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  3  | 1989/04 |
-    PC-9801LX2        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2                                         |  0  | 1989/04 |
-    PC-9801LX4        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2, 20M SASI HDD                           |  0  | 1989/04 |
-    PC-9801LX5        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  0  | 1989/06 |
-    PC-98DO           |  V30 @ 8/10                   |  640 KB  | 5"2DD/2HDx2                                           |  1  | 1989/06 |
-    PC-9801LX5C       |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  0  | 1989/06 |
-    PC-9801RX21       |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1989/10 |
-    PC-9801RX51       |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1989/10 |
-    PC-9801RA21       |  i386DX-20 @ 16/20 & V30 @ 8  |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1989/11 |
-    PC-9801RA51       |  i386DX-20 @ 16/20 & V30 @ 8  |  1.6 MB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1989/11 |
-    PC-9801RS21       |  i386SX-16 @ 16 & V30 @ 8     |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1989/11 |
-    PC-9801RS51       |  i386SX-16 @ 16 & V30 @ 8     |  640 KB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1989/11 |
-    PC-9801N          |  V30 @ 10                     |  640 KB  | 3.5"2DD/2HDx1                                         |  0  | 1989/11 |
-    PC-9801TW2        |  i386SX-20 @ 20 & V30 @ 8     |  640 KB  | 3.5"2DD/2HDx2                                         |  2  | 1990/02 |
-    PC-9801TW5        |  i386SX-20 @ 20 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  2  | 1990/02 |
-    PC-9801TS5        |  i386SX-20 @ 20 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  2  | 1990/06 |
-    PC-9801NS         |  i386SX-12 @ 12               |  1.6 MB  | 3.5"2DD/2HDx1                                         |  0  | 1990/06 |
-    PC-9801TF5        |  i386SX-20 @ 20 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  2  | 1990/07 |
-    PC-9801NS-20      |  i386SX-12 @ 12               |  1.6 MB  | 3.5"2DD/2HDx1, 20M SASI HDD                           |  0  | 1990/09 |
-    PC-98RL21         |  i386DX-20 @ 20 & V30 @ 8     |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1990/09 |
-    PC-98RL51         |  i386DX-20 @ 20 & V30 @ 8     |  1.6 MB  | 5"2DD/2HDx1, 40M SASI HDD                             |  4  | 1990/09 |
-    PC-98DO+          |  V33A @ 8/16                  |  640 KB  | 5"2DD/2HDx2                                           |  1  | 1990/10 |
-    PC-9801DX2        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1990/11 |
-    PC-9801DX/U2      |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2                                         |  4  | 1990/11 |
-    PC-9801DX5        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1990/11 |
-    PC-9801DX/U5      |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  4  | 1990/11 |
-    PC-9801NV         |  V30HL @ 8/16                 |  1.6 MB  | 3.5"2DD/2HDx1                                         |  0  | 1990/11 |
-    PC-9801DS2        |  i386SX-16 @ 16 & V30 @ 8     |  640 KB  | 5"2DD/2HDx2                                           |  4  | 1991/01 |
-    PC-9801DS/U2      |  i386SX-16 @ 16 & V30 @ 8     |  640 KB  | 3.5"2DD/2HDx2                                         |  4  | 1991/01 |
-    PC-9801DS5        |  i386SX-16 @ 16 & V30 @ 8     |  640 KB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1991/01 |
-    PC-9801DS/U5      |  i386SX-16 @ 16 & V30 @ 8     |  640 KB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  4  | 1991/01 |
-    PC-9801DA2        |  i386DX-20 @ 16/20 & V30 @ 8  |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1991/01 |
-    PC-9801DA/U2      |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2                                         |  4  | 1991/01 |
-    PC-9801DA5        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2, 40M SASI HDD                             |  4  | 1991/01 |
-    PC-9801DA/U5      |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  4  | 1991/01 |
-    PC-9801DA7        |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 5"2DD/2HDx2, 100M SCSI HDD                            |  4  | 1991/02 |
-    PC-9801DA/U7      |  80286-12 @ 10/12 & V30 @ 8   |  640 KB  | 3.5"2DD/2HDx2, 100M SCSI HDD                          |  4  | 1991/02 |
-    PC-9801UF         |  V30 @ 8/16                   |  640 KB  | 3.5"2DD/2HDx2                                         |  2  | 1991/02 |
-    PC-9801UR         |  V30 @ 8/16                   |  640 KB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  2  | 1991/02 |
-    PC-9801UR/20      |  V30 @ 8/16                   |  640 KB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 20M SASI HDD          |  2  | 1991/02 |
-    PC-9801NS/E       |  i386SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1991/06 |
-    PC-9801NS/E20     |  i386SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 20M SASI HDD          |  0  | 1991/06 |
-    PC-9801NS/E40     |  i386SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 40M SASI HDD          |  0  | 1991/06 |
-    PC-9801TW7        |  i386SX-20 @ 20 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2, 100M SCSI HDD                          |  2  | 1991/07 |
-    PC-9801TF51       |  i386SX-20 @ 20 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  2  | 1991/07 |
-    PC-9801TF71       |  i386SX-20 @ 20 & V30 @ 8     |  1.6 MB  | 3.5"2DD/2HDx2, 100M SCSI HDD                          |  2  | 1991/07 |
-    PC-9801NC         |  i386SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1991/10 |
-    PC-9801NC40       |  i386SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 40M SASI HDD          |  0  | 1991/10 |
-    PC-9801CS2        |  i386SX-16 @ 16               |  640 KB  | 3.5"2DD/2HDx2                                         |  2  | 1991/10 |
-    PC-9801CS5        |  i386SX-16 @ 16               |  640 KB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  2  | 1991/10 |
-    PC-9801CS5/W      |  i386SX-16 @ 16               |  3.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  2  | 1991/11 |
-    PC-98GS1          |  i386SX-20 @ 20 & V30 @ 8     |  2.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  3  | 1991/11 |
-    PC-98GS2          |  i386SX-20 @ 20 & V30 @ 8     |  2.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD, 1xCD-ROM                 |  3  | 1991/11 |
-    PC-9801FA2        |  i486SX-16 @ 16               |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1992/01 |
-    PC-9801FA/U2      |  i486SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx2                                         |  4  | 1992/01 |
-    PC-9801FA5        |  i486SX-16 @ 16               |  1.6 MB  | 5"2DD/2HDx2, 40M SCSI HDD                             |  4  | 1992/01 |
-    PC-9801FA/U5      |  i486SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx2, 40M SCSI HDD                           |  4  | 1992/01 |
-    PC-9801FA7        |  i486SX-16 @ 16               |  1.6 MB  | 5"2DD/2HDx2, 100M SCSI HDD                            |  4  | 1992/01 |
-    PC-9801FA/U7      |  i486SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx2, 100M SCSI HDD                          |  4  | 1992/01 |
-    PC-9801FS2        |  i386SX-20 @ 16/20            |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1992/05 |
-    PC-9801FS/U2      |  i386SX-20 @ 16/20            |  1.6 MB  | 3.5"2DD/2HDx2                                         |  4  | 1992/05 |
-    PC-9801FS5        |  i386SX-20 @ 16/20            |  1.6 MB  | 5"2DD/2HDx2, 40M SCSI HDD                             |  4  | 1992/05 |
-    PC-9801FS/U5      |  i386SX-20 @ 16/20            |  1.6 MB  | 3.5"2DD/2HDx2, 40M SCSI HDD                           |  4  | 1992/05 |
-    PC-9801FS7        |  i386SX-20 @ 16/20            |  1.6 MB  | 5"2DD/2HDx2, 100M SCSI HDD                            |  4  | 1992/01 |
-    PC-9801FS/U7      |  i386SX-20 @ 16/20            |  1.6 MB  | 3.5"2DD/2HDx2, 100M SCSI HDD                          |  4  | 1992/01 |
-    PC-9801NS/T       |  i386SL(98) @ 20              |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1992/01 |
-    PC-9801NS/T40     |  i386SL(98) @ 20              |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 40M SASI HDD          |  0  | 1992/01 |
-    PC-9801NS/T80     |  i386SL(98) @ 20              |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 80M SASI HDD          |  0  | 1992/01 |
-    PC-9801NL         |  V30H @ 8/16                  |  640 KB  | 1.25 MB RAM Disk                                      |  0  | 1992/01 |
-    PC-9801FX2        |  i386SX-12 @ 10/12            |  1.6 MB  | 5"2DD/2HDx2                                           |  4  | 1992/05 |
-    PC-9801FX/U2      |  i386SX-12 @ 10/12            |  1.6 MB  | 3.5"2DD/2HDx2                                         |  4  | 1992/05 |
-    PC-9801FX5        |  i386SX-12 @ 10/12            |  1.6 MB  | 5"2DD/2HDx2, 40M SCSI HDD                             |  4  | 1992/05 |
-    PC-9801FX/U5      |  i386SX-12 @ 10/12            |  1.6 MB  | 3.5"2DD/2HDx2, 40M SCSI HDD                           |  4  | 1992/05 |
-    PC-9801US         |  i386SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx2                                         |  2  | 1992/07 |
-    PC-9801US40       |  i386SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx2, 40M SASI HDD                           |  2  | 1992/07 |
-    PC-9801US80       |  i386SX-16 @ 16               |  1.6 MB  | 3.5"2DD/2HDx2, 80M SASI HDD                           |  2  | 1992/07 |
-    PC-9801NS/L       |  i386SX-20 @ 10/20            |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1992/07 |
-    PC-9801NS/L40     |  i386SX-20 @ 10/20            |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 40M SASI HDD          |  0  | 1992/07 |
-    PC-9801NA         |  i486SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1992/11 |
-    PC-9801NA40       |  i486SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 40M SASI HDD          |  0  | 1992/11 |
-    PC-9801NA120      |  i486SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 120M SASI HDD         |  0  | 1992/11 |
-    PC-9801NA/C       |  i486SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1992/11 |
-    PC-9801NA40/C     |  i486SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 40M SASI HDD          |  0  | 1992/11 |
-    PC-9801NA120/C    |  i486SX-20 @ 20               |  2.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk, 120M SASI HDD         |  0  | 1992/11 |
-    PC-9801NS/R       |  i486SX(J) @ 20               |  1.6 MB  | 3.5"2DD/2HDx1 (3mode), 1.25MB RAM Disk                |  0  | 1993/01 |
-    PC-9801NS/R40     |  i486SX(J) @ 20               |  1.6 MB  | 3.5"2DD/2HDx1 (3mode), 1.25MB RAM Disk, 40M SASI HDD  |  0  | 1993/01 |
-    PC-9801NS/R120    |  i486SX(J) @ 20               |  1.6 MB  | 3.5"2DD/2HDx1 (3mode), 1.25MB RAM Disk, 120M SASI HDD |  0  | 1993/01 |
-    PC-9801BA/U2      |  i486DX2-40 @ 40              |  1.6 MB  | 3.5"2DD/2HDx2                                         |  3  | 1993/01 |
-    PC-9801BA/U6      |  i486DX2-40 @ 40              |  3.6 MB  | 3.5"2DD/2HDx1, 40M SASI HDD                           |  3  | 1993/01 |
-    PC-9801BA/M2      |  i486DX2-40 @ 40              |  1.6 MB  | 5"2DD/2HDx2                                           |  3  | 1993/01 |
-    PC-9801BX/U2      |  i486SX-20 @ 20               |  1.6 MB  | 3.5"2DD/2HDx2                                         |  3  | 1993/01 |
-    PC-9801BX/U6      |  i486SX-20 @ 20               |  3.6 MB  | 3.5"2DD/2HDx1, 40M SASI HDD                           |  3  | 1993/01 |
-    PC-9801BX/M2      |  i486SX-20 @ 20               |  1.6 MB  | 5"2DD/2HDx2                                           |  3  | 1993/01 |
-    PC-9801NX/C       |  i486SX(J) @ 20               |  1.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1993/07 |
-    PC-9801NX/C120    |  i486SX(J) @ 20               |  3.6 MB  | 3.5"2DD/2HDx1, 1.25MB RAM Disk                        |  0  | 1993/07 |
-    PC-9801P40/D      |  i486SX(J) @ 20               |  5.6 MB  | 40MB IDE HDD                                          |  0  | 1993/07 |
-    PC-9801P80/W      |  i486SX(J) @ 20               |  7.6 MB  | 80MB IDE HDD                                          |  0  | 1993/07 |
-    PC-9801P80/P      |  i486SX(J) @ 20               |  7.6 MB  | 80MB IDE HDD                                          |  0  | 1993/07 |
-    PC-9801BA2/U2     |  i486DX2-66 @ 66              |  3.6 MB  | 3.5"2DD/2HDx2                                         |  3  | 1993/11 |
-    PC-9801BA2/U7     |  i486DX2-66 @ 66              |  3.6 MB  | 3.5"2DD/2HDx1, 120MB IDE HDD                          |  3  | 1993/11 |
-    PC-9801BA2/M2     |  i486DX2-66 @ 66              |  3.6 MB  | 5"2DD/2HDx2                                           |  3  | 1993/11 |
-    PC-9801BS2/U2     |  i486SX-33 @ 33               |  3.6 MB  | 3.5"2DD/2HDx2                                         |  3  | 1993/11 |
-    PC-9801BS2/U7     |  i486SX-33 @ 33               |  3.6 MB  | 3.5"2DD/2HDx1, 120MB IDE HDD                          |  3  | 1993/11 |
-    PC-9801BS2/M2     |  i486SX-33 @ 33               |  3.6 MB  | 5"2DD/2HDx2                                           |  3  | 1993/11 |
-    PC-9801BX2/U2     |  i486SX-25 @ 25               |  1.8 MB  | 3.5"2DD/2HDx2                                         |  3  | 1993/11 |
-    PC-9801BX2/U7     |  i486SX-25 @ 25               |  3.6 MB  | 3.5"2DD/2HDx1, 120MB IDE HDD                          |  3  | 1993/11 |
-    PC-9801BX2/M2     |  i486SX-25 @ 25               |  1.8 MB  | 5"2DD/2HDx2                                           |  3  | 1993/11 |
-    PC-9801BA3/U2     |  i486DX-66 @ 66               |  3.6 MB  | 3.5"2DD/2HDx2                                         |  3  | 1995/01 |
-    PC-9801BA3/U2/W   |  i486DX-66 @ 66               |  7.6 MB  | 3.5"2DD/2HDx2, 210MB IDE HDD                          |  3  | 1995/01 |
-    PC-9801BX3/U2     |  i486SX-33 @ 33               |  1.6 MB  | 3.5"2DD/2HDx2                                         |  3  | 1995/01 |
-    PC-9801BX3/U2/W   |  i486SX-33 @ 33               |  5.6 MB  | 3.5"2DD/2HDx2, 210MB IDE HDD                          |  3  | 1995/01 |
-    PC-9801BX4/U2     |  AMD/i 486DX2-66 @ 66         |  2 MB    | 3.5"2DD/2HDx2                                         |  3  | 1995/07 |
-    PC-9801BX4/U2/C   |  AMD/i 486DX2-66 @ 66         |  2 MB    | 3.5"2DD/2HDx2, 2xCD-ROM                               |  3  | 1995/07 |
-    PC-9801BX4/U2-P   |  Pentium ODP @ 66             |  2 MB    | 3.5"2DD/2HDx2                                         |  3  | 1995/09 |
-    PC-9801BX4/U2/C-P |  Pentium ODP @ 66             |  2 MB    | 3.5"2DD/2HDx2, 2xCD-ROM                               |  3  | 1995/09 |
-
-    For more info (e.g. optional hardware), see http://www.geocities.jp/retro_zzz/machines/nec/9801/mdl98cpu.html
-
-    PC-9821 Series
-
-    PC-9821 (1992) - aka 98MULTi, desktop computer, 386 based
-    PC-9821A series (1993->1994) - aka 98MATE A, desktop computers, 486 based
-    PC-9821B series (1993) - aka 98MATE B, desktop computers, 486 based
-    PC-9821C series (1993->1996) - aka 98MULTi CanBe, desktop & tower computers, various CPU
-    PC-9821Es (1994) - aka 98FINE, desktop computer with integrated LCD, successor of the PC-98T
-    PC-9821X series (1994->1995) - aka 98MATE X, desktop computers, Pentium based
-    PC-9821V series (1995) - aka 98MATE Valuestar, desktop computers, Pentium based
-    PC-9821S series (1995->1996) - aka 98Pro, tower computers, PentiumPro based
-    PC-9821R series (1996->2000) - aka 98MATE R, desktop & tower & server computers, various CPU
-    PC-9821C200 (1997) - aka CEREB, desktop computer, Pentium MMX based
-    PC-9821 Ne/Ns/Np/Nm (1993->1995) - aka 98NOTE, laptops, 486 based
-    PC-9821 Na/Nb/Nw (1995->1997) - aka 98NOTE Lavie, laptops, Pentium based
-    PC-9821 Lt/Ld (1995) - aka 98NOTE Light, laptops, 486 based
-    PC-9821 La/Ls (1995->1997) - aka 98NOTE Aile, laptops, Pentium based
-
-====
-
-Documentation notes (for unemulated stuff, courtesy of T. Kodaka and T. Kono):
-
-IDE:
-(r/w)
-0x430: IDE drive switch
-0x432: IDE drive switch
-0x435: <unknown>
-
-                                                    (ISA correlated i/o)
-----------------------------------------------------------
-0x0640      |WORD|R/W|Data Register                |01F0h
-0x0642      |BYTE| R |Error Register               |01F1h
-0x0642      |BYTE| W |Write Precomp Register       |01F1h
-0x0644      |BYTE|R/W|Sector Count                 |01F2h
-0x0646      |BYTE|R/W|Sector Number                |01F3h
-0x0648      |BYTE|R/W|Cylinder Low                 |01F4h
-0x064A      |BYTE|R/W|Cylinder High                |01F5h
-0x064C      |BYTE|R/W|SDH Register                 |01F6h
-0x064E      |BYTE| R |Status Register              |01F7h
-0x064E      |BYTE| W |Command Register             |01F7h
-0x074C      |BYTE| R |Alternate Status Register    |03F6h
-0x074C      |BYTE| W |Digital Output Register      |03F6h
-0x074E      |BYTE| R |Digital Input Register       |03F7h
-
-Video F/F (i/o 0x68):
-KAC mode (video ff = 5) is basically how the kanji ROM could be accessed, 1=thru the CG window ports, 0=thru the kanji
-window RAM at 0xa4***.
-My guess is that the system locks up or doesn't have any data if the wrong port is being accessed.
-
-Ext Video F/F (i/o 0x6a):
-0000 011x enables EGC
-0000 111x enables PC-98GS
-0010 000x enables multicolor (a.k.a. 256 colors mode)
-0010 001x enables 65'536 colors
-0010 010x 64k color palette related (?)
-0010 011x full screen reverse (?)
-0010 100x text and gfxs synthesis (?)
-0010 101x 256 color palette registers fast write (?)
-0010 110x 256 color overscan (?)
-0100 000x (0) CRT (1) Plasma/LCD
-0100 001x text and gfxs right shifted one dot (undocumented behaviour)
-0100 010x hi-res mode in PC-9821
-0110 000x EEGC mode
-0110 001x VRAM config (0) plain (1) packed
-0110 011x AGDC mode
-0110 100x 480 lines
-0110 110x VRAM bitmap orientation (0) MSB left-to-right LSB (1) LSB left-to-right MSB
-1000 001x CHR GDC clock (0) 2,5 MHz (1) 5 MHz
-1000 010x BMP GDC clock
-1000 111x related to GFX accelerator cards (like Vision864)
-1100 010x chart GDC operating mode (?)
-(everything else is undocumented / unknown)
+TODO (pc9801ux):
+- "I/O Error" on any 3.5" floppy, specific to this romset (i.e. those works on pc9821).
+  It never access $4be, not a 3-mode floppy or needs some specific setup?
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "pc9801.h"
+
+#include "bus/nec_fdd/pc80s31k.h"
+#include "bus/pc98_54simm/options.h"
+#include "bus/pc98_54simm/slot.h"
+#include "bus/pc98_61simm/options.h"
+#include "bus/pc98_61simm/slot.h"
+
+#include "bus/pc98_cbus/options.h"
 
 #include "machine/input_merger.h"
 
@@ -441,7 +166,8 @@ u8 pc9801vm_state::ide_ctrl_hack_r()
 	if (!machine().side_effects_disabled())
 	{
 		// HACK: RS IDE driver will try to do 512 to 256 byte sector translations
-		// MEMSW has no setting for this, is it concealed?
+		// Never initializes buffer at $457, and MEMSW has no setting for this.
+
 		// SDIP based machines don't need this (they will default to 512 bps, shadowed from
 		// gaiji $ac403 bit 6).
 		address_space &ram = m_maincpu->space(AS_PROGRAM);
@@ -481,146 +207,16 @@ void pc9801vm_state::ide_cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_ide[m_ide_sel]->cs1_w(offset, data, mem_mask);
 }
 
-uint8_t pc9801_state::sasi_data_r()
-{
-	uint8_t data = m_sasi_data_in->read();
-
-	if(m_sasi_ctrl_in->read() & 0x80)
-		m_sasibus->write_ack(1);
-	return data;
-}
-
-void pc9801_state::sasi_data_w(uint8_t data)
-{
-	m_sasi_data = data;
-
-	if (m_sasi_data_enable)
-	{
-		m_sasi_data_out->write(m_sasi_data);
-		if(m_sasi_ctrl_in->read() & 0x80)
-			m_sasibus->write_ack(1);
-	}
-}
-
-void pc9801_state::write_sasi_io(int state)
-{
-	m_sasi_ctrl_in->write_bit2(state);
-
-	m_sasi_data_enable = !state;
-
-	if (m_sasi_data_enable)
-	{
-		m_sasi_data_out->write(m_sasi_data);
-	}
-	else
-	{
-		m_sasi_data_out->write(0);
-	}
-	if((m_sasi_ctrl_in->read() & 0x9c) == 0x8c)
-		m_pic2->ir1_w(m_sasi_ctrl & 1);
-	else
-		m_pic2->ir1_w(0);
-}
-
-void pc9801_state::write_sasi_req(int state)
-{
-	m_sasi_ctrl_in->write_bit7(state);
-
-	if (!state)
-		m_sasibus->write_ack(0);
-
-	if((m_sasi_ctrl_in->read() & 0x9C) == 0x8C)
-		m_pic2->ir1_w(m_sasi_ctrl & 1);
-	else
-		m_pic2->ir1_w(0);
-
-	m_dmac->dreq0_w(!(state && !(m_sasi_ctrl_in->read() & 8) && (m_sasi_ctrl & 2)));
-}
-
-
-uint8_t pc9801_state::sasi_status_r()
-{
-	uint8_t res = 0;
-
-	if(m_sasi_ctrl & 0x40) // read status
-	{
-	/*
-	    x--- ---- REQ
-	    -x-- ---- ACK
-	    --x- ---- BSY
-	    ---x ---- MSG
-	    ---- x--- CD
-	    ---- -x-- IO
-	    ---- ---x INT?
-	*/
-		res |= m_sasi_ctrl_in->read();
-	}
-	else // read drive info
-	{
-/*
-        xx-- ---- unknown but tested
-        --xx x--- SASI-1 media type
-        ---- -xxx SASI-2 media type
-*/
-		//res |= 7 << 3; // read mediatype SASI-1
-		//res |= 7;   // read mediatype SASI-2
-	}
-	return res;
-}
-
-void pc9801_state::sasi_ctrl_w(uint8_t data)
-{
-	/*
-	    x--- ---- channel enable
-	    -x-- ---- read switch
-	    --x- ---- sel
-	    ---- x--- reset line
-	    ---- --x- dma enable
-	    ---- ---x irq enable
-	*/
-
-	m_sasibus->write_sel(BIT(data, 5));
-
-	if(m_sasi_ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
-	{
-		m_sasibus->write_rst(1);
-//      m_timer_rst->adjust(attotime::from_nsec(100));
-	}
-	else
-		m_sasibus->write_rst(0); // TODO
-
-	m_sasi_ctrl = data;
-
-//  m_sasibus->write_sel(BIT(data, 0));
-}
-
-uint8_t pc9801_state::f0_r(offs_t offset)
-{
-	if(offset == 0)
-	{
-		// iterate thru all devices to check if an AMD98 is present
-		// TODO: move to cbus
-		// TODO: is this really part of PC-98 spec or it's coming from the device itself, as dip/jumper?
-		for (amd98_device &amd98 : device_type_enumerator<amd98_device>(machine().root_device()))
-		{
-			logerror("%s: Read AMD98 ID %s\n", machine().describe_context(), amd98.tag());
-			return 0x18; // return the right ID
-		}
-
-		logerror("%s: Read port 0 from 0xf0 (AMD98 check?)\n", machine().describe_context());
-		return 0; // card not present
-	}
-
-	return 0xff;
-}
-
 void pc9801_state::pc9801_map(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x00000, 0x9ffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
 	map(0xa0000, 0xa3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w)); //TVRAM
 	map(0xa8000, 0xbffff).rw(FUNC(pc9801_state::gvram_r), FUNC(pc9801_state::gvram_w)); //bitmap VRAM
+	map(0xc0000, 0xdffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_slot_r), FUNC(pc98_cbus_root_device::mem_slot_w));
 //  map(0xcc000, 0xcffff).rom().region("sound_bios", 0); //sound BIOS
-	map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
-	map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
+//  map(0xd6000, 0xd6fff).rom().region("fdc_bios_2dd", 0); //floppy BIOS 2dd
+//  map(0xd7000, 0xd7fff).rom().region("fdc_bios_2hd", 0); //floppy BIOS 2hd
 	map(0xe8000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -635,7 +231,6 @@ void pc9801_state::pc9801_common_io(address_map &map)
 	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0040, 0x0043).rw(m_sio_kbd, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0xff00); //i8255 printer port / i8251 keyboard
-	map(0x0050, 0x0057).lr8(NAME([] (offs_t offset) { return 0xff; })).umask16(0xff00);
 	map(0x0050, 0x0053).w(FUNC(pc9801_state::nmi_ctrl_w)).umask16(0x00ff); // NMI FF / host FDD 2d (PC-80S31K)
 	map(0x0060, 0x0063).rw(m_hgdc[0], FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff); //upd7220 character ports / <undefined>
 	map(0x0064, 0x0064).w(FUNC(pc9801_state::vrtc_clear_w));
@@ -651,18 +246,20 @@ void pc9801_state::pc9801_common_io(address_map &map)
 
 void pc9801_state::pc9801_io(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw("cbus_root", FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
 	pc9801_common_io(map);
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::dmapg4_w)).umask16(0xff00);
+	map(0x0050, 0x0057).m("fdd_2d", FUNC(pc80s31k_device::host_map)).umask16(0xff00);
 	map(0x0068, 0x0068).w(FUNC(pc9801_state::pc9801_video_ff_w)); //mode FF / <undefined>
-	map(0x0080, 0x0080).rw(FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
-	map(0x0082, 0x0082).rw(FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
+//  map(0x0080, 0x0080).rw(FUNC(pc9801_state::sasi_data_r), FUNC(pc9801_state::sasi_data_w));
+//  map(0x0082, 0x0082).rw(FUNC(pc9801_state::sasi_status_r), FUNC(pc9801_state::sasi_ctrl_w));
 	map(0x0090, 0x0090).r(m_fdc_2hd, FUNC(upd765a_device::msr_r));
 	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801_a0_w)); //upd7220 bitmap ports / display registers
 	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
-	map(0x00f0, 0x00ff).r(FUNC(pc9801_state::f0_r)).umask16(0x00ff);
 }
 
 /*************************************
@@ -691,7 +288,7 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 	if((m_font_addr & 0x7c00) == 0x0800)
 		return m_kanji_rom[pcg_offset | 0];
 
-	// rxtrain wants the LR setting for PCG area ...
+	// rxtrain wants the LR setting for PCG area
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 	{
 		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
@@ -748,15 +345,20 @@ void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 	}
 }
 
-
+// TODO: port 0xf1 (IDE select on later machines)
 uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
+	if(offset == 0)
+	{
+		// for amd98 ID port
+		return m_cbus_root->io_r(0xf0 >> 1, 0x00ff);
+	}
 	if(offset == 0x01)
 		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x03)
 		return (m_gate_a20 ^ 1) | (m_nmi_ff << 1);
 
-	return f0_r(offset);
+	return 0xff;
 }
 
 void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
@@ -873,26 +475,26 @@ void pc9801vm_state::egc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t pc9801vm_state::grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = upd7220_grcg_r((offset + 0x4000) | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r(offset + 0x4000, mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 void pc9801vm_state::grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w((offset + 0x4000) | (m_vram_bank << 16), data, mem_mask);
+	upd7220_grcg_w(offset + 0x4000, data, mem_mask);
 }
 
 uint16_t pc9801vm_state::grcg_gvram0_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = upd7220_grcg_r(offset | (m_vram_bank << 16), mem_mask);
+	uint16_t ret = upd7220_grcg_r(offset, mem_mask);
 	return bitswap<16>(ret,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
 }
 
 void pc9801vm_state::grcg_gvram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = bitswap<16>(data,8,9,10,11,12,13,14,15,0,1,2,3,4,5,6,7);
-	upd7220_grcg_w(offset | (m_vram_bank << 16), data, mem_mask);
+	upd7220_grcg_w(offset, data, mem_mask);
 }
 
 /*
@@ -1147,12 +749,6 @@ void pc9801vm_state::artic_wait_w(u8 data)
 	m_maincpu->spin_until_time(attotime::from_nsec(600));
 }
 
-uint8_t pc9801vm_state::midi_r()
-{
-	/* unconnect, needed by Amaranth KH to boot */
-	return 0xff;
-}
-
 uint8_t pc9801_state::pic_r(offs_t offset)
 {
 	return ((offset >= 4) ? m_pic2 : m_pic1)->read(offset & 3);
@@ -1168,21 +764,25 @@ void pc9801_state::ipl_bank(address_map &map)
 	map(0x00000, 0x2ffff).rom().region("ipl", 0);
 }
 
-void pc9801vm_state::pc9801ux_map(address_map &map)
+void pc9801vm_state::pc9801vm_map(address_map &map)
 {
+	map(0x000000, 0x09ffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
+
 	map(0x0a0000, 0x0a3fff).rw(FUNC(pc9801vm_state::tvram_r), FUNC(pc9801vm_state::tvram_w));
 	map(0x0a4000, 0x0a4fff).rw(FUNC(pc9801vm_state::pc9801rs_knjram_r), FUNC(pc9801vm_state::pc9801rs_knjram_w));
 	map(0x0a8000, 0x0bffff).rw(FUNC(pc9801vm_state::grcg_gvram_r), FUNC(pc9801vm_state::grcg_gvram_w));
+	map(0x0c0000, 0x0dffff).rw("cbus_root", FUNC(pc98_cbus_root_device::mem_slot_r), FUNC(pc98_cbus_root_device::mem_slot_w));
+
 	map(0x0e0000, 0x0e7fff).rw(FUNC(pc9801vm_state::grcg_gvram0_r), FUNC(pc9801vm_state::grcg_gvram0_w));
 	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
-void pc9801vm_state::pc9801ux_io(address_map &map)
+void pc9801vm_state::pc9801vm_io(address_map &map)
 {
+	map(0x0000, 0xffff).rw(m_cbus_root, FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
 //  map.unmap_value_high();
 	pc9801_common_io(map);
 	map(0x0020, 0x002f).w(FUNC(pc9801vm_state::dmapg8_w)).umask16(0xff00);
-//  map(0x0050, 0x0057).noprw(); // 2dd ppi?
 	map(0x005c, 0x005f).r(FUNC(pc9801vm_state::timestamp_r)); // artic
 	map(0x005f, 0x005f).w(FUNC(pc9801vm_state::artic_wait_w));
 	map(0x0068, 0x006b).w(FUNC(pc9801vm_state::pc9801rs_video_ff_w)).umask16(0x00ff); //mode FF / <undefined>
@@ -1203,25 +803,50 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 }
 
+void pc9801vm_state::pc9801ux_map(address_map &map)
+{
+	pc9801vm_map(map);
+	map(0x000000, 0x09ffff).rw("simm", FUNC(pc9801_54_simm_device::read), FUNC(pc9801_54_simm_device::write));
+	map(0x100000, 0x7fffff).rw("simm", FUNC(pc9801_54_simm_device::read_ext), FUNC(pc9801_54_simm_device::write_ext));
+//  map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+//  map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+}
+
+void pc9801vm_state::pc9801vx_map(address_map &map)
+{
+	pc9801vm_map(map);
+	map(0x000000, 0x09ffff).rw("simm", FUNC(pc9801_54_simm_device::read), FUNC(pc9801_54_simm_device::write));
+	map(0x100000, 0x8fffff).rw("simm", FUNC(pc9801_54_simm_device::read_ext), FUNC(pc9801_54_simm_device::write_ext));
+}
+
+void pc9801vm_state::pc9801dx_map(address_map &map)
+{
+	pc9801vm_map(map);
+	map(0x000000, 0x09ffff).rw("simm", FUNC(pc9801_54_simm_device::read), FUNC(pc9801_54_simm_device::write));
+	map(0x100000, 0xefffff).rw("simm", FUNC(pc9801_54_simm_device::read_ext), FUNC(pc9801_54_simm_device::write_ext));
+}
+
 void pc9801vm_state::pc9801rs_map(address_map &map)
 {
-	pc9801ux_map(map);
+	pc9801vm_map(map);
+	map(0x000000, 0x09ffff).rw("simm", FUNC(pc9801_54_simm_device::read), FUNC(pc9801_54_simm_device::write));
 //  map(0x0d8000, 0x0d9fff).rom().region("ide",0);
 	map(0x0da000, 0x0dbfff).ram(); // ide ram
+	map(0x100000, 0xefffff).rw("simm", FUNC(pc9801_54_simm_device::read_ext), FUNC(pc9801_54_simm_device::write_ext));
 	map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
 void pc9801vm_state::pc9801rs_io(address_map &map)
 {
-//  map.unmap_value_high();
-	pc9801ux_io(map);
+	map.unmap_value_high();
+	pc9801vm_io(map);
+	map(0x00f0, 0x00f0).lr8(NAME([] () { return 0; }));
 	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_hack_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
 	map(0x0740, 0x074f).rw(FUNC(pc9801vm_state::ide_cs1_r), FUNC(pc9801vm_state::ide_cs1_w));
 	map(0x1e8c, 0x1e8f).noprw(); // temp
 	map(0xbfdb, 0xbfdb).w(FUNC(pc9801vm_state::mouse_freq_w));
-	map(0xe0d0, 0xe0d3).r(FUNC(pc9801vm_state::midi_r));
 }
 
 void pc9801us_state::pc9801us_io(address_map &map)
@@ -1251,7 +876,11 @@ void pc9801us_state::pc9801us_io(address_map &map)
 
 void pc9801bx_state::pc9801bx2_map(address_map &map)
 {
-	pc9801rs_map(map);
+	pc9801vm_map(map);
+	map(0x000000, 0x09ffff).rw("simm", FUNC(pc9801_61_simm_device::read), FUNC(pc9801_61_simm_device::write));
+
+	map(0x0da000, 0x0dbfff).ram(); // ide ram
+
 //  map(0x000a0000, 0x000a3fff).rw(FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
 //  map(0x000a4000, 0x000a4fff).rw(FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
 //  map(0x000a8000, 0x000bffff).rw(FUNC(pc9821_state::pc9821_grcg_gvram_r), FUNC(pc9821_state::pc9821_grcg_gvram_w));
@@ -1260,6 +889,12 @@ void pc9801bx_state::pc9801bx2_map(address_map &map)
 //  map(0x000da000, 0x000dbfff).ram(); // ide ram (declared in RS)
 //  map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+
+	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
+	map(0x00f00000, 0x00ffffff).view(m_hole_15M_view);
+	m_hole_15M_view[0](0x00f00000, 0x00ffffff).rw("simm", FUNC(pc9801_61_simm_device::read_15m_ext), FUNC(pc9801_61_simm_device::write_15m_ext));
+
+	map(0x01000000, 0x013fffff).rw("simm", FUNC(pc9801_61_simm_device::read_16m_ext), FUNC(pc9801_61_simm_device::write_16m_ext));
 	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
@@ -1299,11 +934,30 @@ void pc9801bx_state::gdc_31kHz_w(offs_t offset, u8 data)
 //      popmessage("31kHz register set %02x, contact MAMEdev", data);
 }
 
+u8 pc9801bx_state::hole_15m_control_r(offs_t offset)
+{
+	return m_hole_15m;
+}
+
+void pc9801bx_state::hole_15m_control_w(offs_t offset, u8 data)
+{
+	m_hole_15m = data;
+	if (BIT(data, 2))
+		m_hole_15M_view.select(0);
+	else
+		m_hole_15M_view.disable();
+
+	if (data & 0xfb)
+		popmessage("hole_15m_control_w: undocumented trigger %02x", data);
+}
+
 void pc9801bx_state::pc9801bx2_io(address_map &map)
 {
 	pc9801us_io(map);
 	// NOP legacy SDIP bank access
 	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) { a20_ctrl_w(3, data); }));
+	map(0x043b, 0x043b).rw(FUNC(pc9801bx_state::hole_15m_control_r), FUNC(pc9801bx_state::hole_15m_control_w));
+	map(0x0530, 0x0533).lr8(NAME([] () { return 0; })); // SIMM control unit
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
 	map(0x8f1f, 0x8f1f).lw8(NAME([this] (offs_t offset, u8 data) {
@@ -1315,24 +969,16 @@ void pc9801bx_state::pc9801bx2_io(address_map &map)
 	}));
 }
 
-/*uint8_t pc9801_state::winram_r(offs_t offset)
-{
-    offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
-    return
-}
-
-
-void pc9801_state::winram_w(offs_t offset, uint8_t data)
-{
-    offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
-}*/
-
+/*
+ * uPD7220 maps
+ */
 
 void pc9801_state::upd7220_1_map(address_map &map)
 {
 	map(0x00000, 0x03fff).ram().share("video_ram_1");
 }
 
+// TODO: this may need the bank reg or the pre-vm models may have had less gvram
 void pc9801_state::upd7220_2_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram().share("video_ram_2");
@@ -1398,14 +1044,6 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
-
-	PORT_START("ROM_LOAD")
-	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2HD BIOS" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( No ) )
-	PORT_CONFNAME( 0x02, 0x02, "Load floppy 2DD BIOS" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( No ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc9801rs )
@@ -1445,9 +1083,9 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_DIPSETTING(    0x80, "V30" )
 	PORT_DIPSETTING(    0x00, "I386" )
 
-	PORT_MODIFY("ROM_LOAD")
+	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x04, "Load IDE BIOS" )
+	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
@@ -1577,10 +1215,19 @@ void pc9801_state::dma_hrq_changed(int state)
 
 void pc9801_state::tc_w(int state)
 {
-	/* floppy terminal count */
-	m_fdc_2hd->tc_w(state);
-	if(m_fdc_2dd)
-		m_fdc_2dd->tc_w(state);
+	switch (m_dack)
+	{
+		case 0:
+			m_cbus_root->eop_w(0, state);
+			break;
+		case 2:
+		case 3:
+			m_fdc_2hd->tc_w(state);
+			if(m_fdc_2dd)
+				m_fdc_2dd->tc_w(state);
+			break;
+	}
+
 
 //  logerror("TC %02x\n",state);
 }
@@ -1699,10 +1346,14 @@ void pc9801_state::set_dma_channel(int channel, int state)
 }
 
 /*
-ch1 cs-4231a
-ch2 FDC
-ch3 SCSI
-*/
+ * ch0 expansion slot or internal SASI/SCSI
+ * ch1 memory refresh on vanilla/VM classes, expansion slot or internal HDD setting otherwise
+ * ch2 1MB FDC
+ * ch3 640KB FDC
+ *
+ * NOTE: PC-H98, PC-98RL & PC-98XL very different and changes configuration
+ * depending on boot mode. cfr. io_dma.txt
+ */
 
 void pc9801_state::dack0_w(int state) { /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
 void pc9801_state::dack1_w(int state) { /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
@@ -1978,28 +1629,6 @@ static void pc9801_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-static void pc9801_cbus_devices(device_slot_interface &device)
-{
-	// official HW
-//  PC-9801-14
-	device.option_add("pc9801_26",  PC9801_26);
-	device.option_add("pc9801_55u", PC9801_55U);
-	device.option_add("pc9801_55l", PC9801_55L);
-	device.option_add("pc9801_86",  PC9801_86);
-	device.option_add("pc9801_118", PC9801_118);
-	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
-//  Spark Board
-	device.option_add("amd98",      AMD98);
-	device.option_add("mpu_pc98",   MPU_PC98);
-	device.option_add("sb16",       SB16_CT2720);
-
-	// doujinshi HW
-// MAD Factory / Doujin Hard (同人ハード)
-// MAD Factory Chibi-Oto: an ADPCM override for -86
-// MAD Factory Otomi-chan: "TORIE9211 MAD FACTORY" printed on proto PCB, just overrides for ADPCM for -86?
-	device.option_add("otomichan_kai", OTOMICHAN_KAI);
-}
-
 //  Jast Sound, could be installed independently
 
 void pc9801_state::fdc_2dd_irq(int state)
@@ -2054,17 +1683,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
-
-	int ram_size = m_ram->size() - (640*1024);
-
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	space.install_ram(0, (ram_size < 0) ? m_ram->size() - 1 : (640*1024) - 1, m_ram->pointer());
-	if(ram_size > 0)
-		space.install_ram(1024*1024, (1024*1024) + ram_size - 1, &m_ram->pointer()[(640*1024)]);
-
-	save_item(NAME(m_sasi_data));
-	save_item(NAME(m_sasi_data_enable));
-	save_item(NAME(m_sasi_ctrl));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -2098,7 +1716,10 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_egc.start));
 	save_item(NAME(m_egc.mask));
 
-	save_item(NAME(m_grcg.mode));
+	save_item(STRUCT_MEMBER(m_grcg, mode));
+	//  save_pointer(STRUCT_MEMBER(m_grcg, tile), 4);
+	save_item(STRUCT_MEMBER(m_grcg, tile_index));
+
 	save_item(NAME(m_vram_bank));
 }
 
@@ -2130,28 +1751,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
-	uint8_t op_mode;
-	uint8_t *ROM;
-	uint8_t *PRG = memregion("fdc_data")->base();
-
-	// TODO: this loading shouldn't happen dynamically but actually be tied to specific floppy configs
-	// pc9801 has no floppy as default
-	// pc9801f has an internal 2DD disk drive
-	// pc9801m has an internal 2HD
-	// and ofc you can actually mount external units,
-	// cfr. PC-9801-08 (2dd), PC-9801-15 (8' unit) and likely others.
-	ROM = memregion("fdc_bios_2dd")->base();
-	op_mode = (ioport("ROM_LOAD")->read() & 2) >> 1;
-
-	for(int i=0;i<0x1000;i++)
-		ROM[i] = PRG[i+op_mode*0x8000];
-
-	ROM = memregion("fdc_bios_2hd")->base();
-	op_mode = ioport("ROM_LOAD")->read() & 1;
-
-	for(int i=0;i<0x1000;i++)
-		ROM[i] = PRG[i+op_mode*0x8000+0x10000];
-
 	m_beeper->set_state(0);
 }
 
@@ -2173,13 +1772,19 @@ MACHINE_RESET_MEMBER(pc9801vm_state,pc9801rs)
 
 	if(memregion("ide"))
 	{
-		if(!(ioport("ROM_LOAD")->read() & 4))
+		if(!(ioport("BIOS_LOAD")->read() & 4))
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base());
 		else
 			m_maincpu->space(AS_PROGRAM).install_rom(0xd8000, 0xd9fff, memregion("ide")->base() + 0x2000);
 	}
 
 	m_dac1bit_disable = true;
+
+	// flashb in particular don't initialize the mask in 16 color mode
+	m_egc.regs[0] = 0xfff0;
+	m_egc.regs[1] = 0x00ff;
+	m_egc.mask = 0xffff;
+	m_egc.regs[7] = 0x000f;
 }
 
 MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
@@ -2206,6 +1811,8 @@ void pc98_base_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_DCP_FORMAT);
 	fr.add(FLOPPY_DIP_FORMAT);
 	fr.add(FLOPPY_NFD_FORMAT);
+	// *nix/FreeBSD may distribute with this
+	fr.add(FLOPPY_IMG_FORMAT);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
@@ -2242,6 +1849,11 @@ void pc9801_state::config_video(machine_config &config)
 	m_hgdc[1]->set_display_pixels(FUNC(pc9801_state::hgdc_display_pixels));
 }
 
+void pc9801vm_state::config_video(machine_config &config)
+{
+	pc9801_state::config_video(config);
+	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
+}
 
 void pc9801_state::config_keyboard(machine_config &config)
 {
@@ -2288,56 +1900,15 @@ void pc9801_state::pc9801_mouse(machine_config &config)
 
 void pc9801_state::pc9801_cbus(machine_config &config)
 {
-	PC9801CBUS_SLOT(config, m_cbus[0], pc9801_cbus_devices, "pc9801_26");
-	m_cbus[0]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[0]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[0]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir2_w));
-	m_cbus[0]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<0>));
-	m_cbus[0]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<0>));
-
-	PC9801CBUS_SLOT(config, m_cbus[1], pc9801_cbus_devices, nullptr);
-	m_cbus[1]->set_memspace(m_maincpu, AS_PROGRAM);
-	m_cbus[1]->set_iospace(m_maincpu, AS_IO);
-	m_cbus[1]->int_cb<0>().set("ir3", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<1>().set("ir5", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<2>().set("ir6", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<3>().set("ir9", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
-	m_cbus[1]->int_cb<5>().set("ir12", FUNC(input_merger_device::in_w<1>));
-	m_cbus[1]->int_cb<6>().set("ir13", FUNC(input_merger_device::in_w<1>));
-//  TODO: six max slots
-
-	INPUT_MERGER_ANY_HIGH(config, "ir3").output_handler().set("pic8259_master", FUNC(pic8259_device::ir3_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir5").output_handler().set("pic8259_master", FUNC(pic8259_device::ir5_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir6").output_handler().set("pic8259_master", FUNC(pic8259_device::ir6_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir9").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir12").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
-	INPUT_MERGER_ANY_HIGH(config, "ir13").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
-}
-
-void pc9801_state::pc9801_sasi(machine_config &config)
-{
-	SCSI_PORT(config, m_sasibus, 0);
-	m_sasibus->set_data_input_buffer("sasi_data_in");
-	m_sasibus->io_handler().set(FUNC(pc9801_state::write_sasi_io)); // bit2
-	m_sasibus->cd_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit3));
-	m_sasibus->msg_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit4));
-	m_sasibus->bsy_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit5));
-	m_sasibus->ack_handler().set("sasi_ctrl_in", FUNC(input_buffer_device::write_bit6));
-	m_sasibus->req_handler().set(FUNC(pc9801_state::write_sasi_req));
-	m_sasibus->set_slot_device(1, "harddisk", PC9801_SASI, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	output_latch_device &sasi_out(OUTPUT_LATCH(config, "sasi_data_out"));
-	m_sasibus->set_output_latch(sasi_out);
-	INPUT_BUFFER(config, "sasi_data_in");
-	INPUT_BUFFER(config, "sasi_ctrl_in");
-
-	m_dmac->in_ior_callback<0>().set(FUNC(pc9801_state::sasi_data_r));
-	m_dmac->out_iow_callback<0>().set(FUNC(pc9801_state::sasi_data_w));
+	PC98_CBUS_ROOT(config, m_cbus_root, 0);
+	m_cbus_root->int_cb<0>().set("pic8259_master", FUNC(pic8259_device::ir3_w));
+	m_cbus_root->int_cb<1>().set("pic8259_master", FUNC(pic8259_device::ir5_w));
+	m_cbus_root->int_cb<2>().set("pic8259_master", FUNC(pic8259_device::ir6_w));
+	m_cbus_root->int_cb<3>().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
+	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
+	m_cbus_root->int_cb<5>().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
+	m_cbus_root->int_cb<6>().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
+	m_cbus_root->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
 }
 
 void pc9801vm_state::cdrom_headphones(device_t *device)
@@ -2395,6 +1966,9 @@ void pc9801_state::pc9801_common(machine_config &config)
 	m_dmac->out_eop_callback().set(FUNC(pc9801_state::tc_w));
 	m_dmac->in_memr_callback().set(FUNC(pc9801_state::dma_read_byte));
 	m_dmac->out_memw_callback().set(FUNC(pc9801_state::dma_write_byte));
+	m_dmac->in_ior_callback<0>().set([this] () { return m_cbus_root->dack_r(0); });
+	m_dmac->out_iow_callback<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
+
 	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
 	m_dmac->out_dack_callback<0>().set(FUNC(pc9801_state::dack0_w));
@@ -2423,7 +1997,6 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 	config_keyboard(config);
 	pc9801_mouse(config);
-	pc9801_cbus(config);
 
 	pc9801_serial(config);
 
@@ -2432,10 +2005,11 @@ void pc9801_state::pc9801_common(machine_config &config)
 	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));
 	m_fdc_2hd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
-	FLOPPY_CONNECTOR(config, "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
-	FLOPPY_CONNECTOR(config, "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc98");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2453,22 +2027,35 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 void pc9801_state::config_floppy_525hd(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
 }
 
 void pc9801_state::config_floppy_35hd(machine_config &config)
 {
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config.replace(), "upd765_2hd:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:0", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:1", pc9801_floppies, "35hd", pc9801_state::floppy_formats);
 }
 
 void pc9801_state::pc9801(machine_config &config)
 {
-	I8086(config, m_maincpu, 5000000); // 5 MHz for vanilla, 8 MHz for direct children
+	I8086(config, m_maincpu, 5'000'000); // 5 MHz for vanilla, 8 MHz for direct children
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	pc9801_cbus(config);
+	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus3", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus4", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus5", 0, "cbus_root", pc98_cbus_devices, nullptr);
+
+	// RAM 128KB (vanilla/F1/F2) ~ 256KB (F3/M2/M3) ~ 640KB (max)
+	// TODO: really dedicates this space in N slots above
+	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
+//  RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 
 	pc9801_common(config);
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801_state::ppi_sys_beep_portc_w));
@@ -2476,16 +2063,12 @@ void pc9801_state::pc9801(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
 
-	// TODO: maybe force dips to avoid beep error
-	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
-
 	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
 	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
 	m_fdc_2dd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
-	FLOPPY_CONNECTOR(config, "upd765_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
-	pc9801_sasi(config);
 	UPD1990A(config, m_rtc);
 
 	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_r));
@@ -2493,16 +2076,36 @@ void pc9801_state::pc9801(machine_config &config)
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
+
+	PC80S31K(config, "fdd_2d", XTAL(31'948'800) / 8);
 }
 
-void pc9801vm_state::pc9801rs(machine_config &config)
+void pc9801_state::pc9801f(machine_config &config)
 {
-	I386SX(config, m_maincpu, MAIN_CLOCK_X1*8); // unknown clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801rs_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801rs_io);
+	pc9801(config);
+	PC98_CBUS_SLOT(config.replace(), "cbus1", 0, "cbus_root", pc98_cbus_devices, "fdd_2dd");
+}
+
+void pc9801_state::pc9801m(machine_config &config)
+{
+	pc9801(config);
+	PC98_CBUS_SLOT(config.replace(), "cbus1", 0, "cbus_root", pc98_cbus_devices, "fdd_2hd");
+}
+
+void pc9801vm_state::pc9801vm(machine_config &config)
+{
+	V30(config, m_maincpu, 10'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801vm_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	pc9801_common(config);
+	pc9801_cbus(config);
+	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_26");
+	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus3", 0, "cbus_root", pc98_cbus_devices, nullptr);
+
 	m_ppi_sys->out_pc_callback().set(FUNC(pc9801vm_state::ppi_sys_dac_portc_w));
 	// TODO: verify if it needs invert();
 	m_pit->out_handler<1>().set( m_dac1bit, FUNC(speaker_sound_device::level_w));
@@ -2512,15 +2115,16 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_ipl).set_map(&pc9801vm_state::ipl_bank).set_options(ENDIANNESS_LITTLE, 16, 18, 0x18000);
 
+	// RAM 384KB (VM0/VM2/VM4) ~ 640KB (VM21/VM11)
+	PC98_CBUS_SLOT(config, "cbus_ram", 0, "cbus_root", pc98_cbus_ram_devices, "640kb");
+//  RAM(config, m_ram).set_default_size("640K").set_extra_options("384K");
+
 	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
 
 	m_dmac->set_clock(MAIN_CLOCK_X1*8); // unknown clock
 
-	pc9801_ide(config);
 	UPD4990A(config, m_rtc);
-
-	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,3712K,7808K,14M");
 
 	m_fdc_2hd->intrq_wr_callback().set(FUNC(pc9801vm_state::fdc_irq_w));
 	m_fdc_2hd->drq_wr_callback().set(FUNC(pc9801vm_state::fdc_drq_w));
@@ -2529,79 +2133,114 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 	m_dmac->in_ior_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
 
-	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
-
 //  DAC_1BIT(config, m_dac1bit, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);
+
+	// analog mode optional on earlier VM, with PC-9801-24 gfx board
 	PALETTE(config, m_palette, FUNC(pc9801vm_state::pc9801_palette), 16 + 16);
 }
 
-void pc9801vm_state::pc9801vm(machine_config &config)
-{
-	pc9801rs(config);
-	V30(config.replace(), m_maincpu, 10000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	m_ram->set_default_size("640K").set_extra_options("640K"); // ???
-
-	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
-}
-
-// UV is essentially a VM with 3.5 drives
-// Released as UV2 (384KB RAM), UV21 (640KB RAM) then UV11 (UV21 but smaller?)
+// UV is essentially a VM with 3.5" drives
+// Released as UV2, UV21 then UV11 (UV21 but smaller?)
 void pc9801vm_state::pc9801uv(machine_config &config)
 {
 	pc9801vm(config);
 
 	config_floppy_35hd(config);
 
-	m_ram->set_default_size("640K").set_extra_options("384K");
+	// RAM 384KB (UV2) ~ 640KB (UV21/ UV11)
+//  m_ram->set_default_size("640K").set_extra_options("384K");
 }
 
 void pc9801vm_state::pc9801ux(machine_config &config)
 {
-	pc9801rs(config);
+	pc9801vm(config);
 	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
-	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
 	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
 	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_35hd(config);
 //  AM9157A(config, "i8237", 10000000); // unknown clock
-}
 
-void pc9801vm_state::pc9801dx(machine_config &config)
-{
-	pc9801rs(config);
-	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 12000000));
-	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801ux_map);
-	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801ux_io);
-	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
-	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
 
-	config_floppy_525hd(config);
-//  AM9157A(config, "i8237", 10000000); // unknown clock
+	// RAM 640 KB ~ 6.6MB
+	config.device_remove("cbus_ram");
+	PC9801_54_SIMM(config, "simm", pc9801ux_simm_options, "2mb");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("640K,4M,7M");
+
+	// 20MB SASI HDD (UV41 only)
 }
 
 void pc9801vm_state::pc9801vx(machine_config &config)
 {
-	pc9801ux(config);
+	pc9801vm(config);
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801vx_map);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
+	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
+	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_525hd(config);
 
 	// TODO: EGC initial buggy revision
 	// Reportedly has a bug with a RMW op, details TBD
 	// ...
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
 
-	// minimum RAM: 640 kB
-	// maximum RAM: 8.6 MB
+	// RAM 640 KB ~ 8.6MB
+	config.device_remove("cbus_ram");
+	PC9801_54_SIMM(config, "simm", pc9801vx_simm_options, "2mb");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("640K,4M,7M,8M,9M");
+
 	// GDC & EGC, DAC1BIT built-in
 	// Either 2x 5.25 or 2x 3.5 internal floppy drives
 	// 4x C-Bus slots (3x plus 1x dedicated RAM?)
+}
+
+void pc9801vm_state::pc9801dx(machine_config &config)
+{
+	pc9801vm(config);
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 12000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801dx_map);
+	maincpu.set_addrmap(AS_IO, &pc9801vm_state::pc9801vm_io);
+	maincpu.set_a20_callback(FUNC(pc9801vm_state::a20_286));
+	maincpu.set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	config_floppy_525hd(config);
+//  AM9157A(config, "i8237", 10000000); // unknown clock
+
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
+
+	// RAM 640KB ~ 14.6MB
+	config.device_remove("cbus_ram");
+	PC9801_54_SIMM(config, "simm", pc9801dx_simm_options, "2mb");
+}
+
+void pc9801vm_state::pc9801rs(machine_config &config)
+{
+	pc9801vm(config);
+	I386SX(config.replace(), m_maincpu, MAIN_CLOCK_X1*8); // 16 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801rs_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801rs_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	MCFG_MACHINE_START_OVERRIDE(pc9801vm_state, pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801rs)
+
+	pc9801_ide(config);
+
+	// RAM 640KB ~ 14.6MB (with dedicated memory slot)
+	config.device_remove("cbus_ram");
+	PC9801_54_SIMM(config, "simm", pc9801dx_simm_options, "2mb");
+//  RAM(config, m_ram).set_default_size("2M").set_extra_options("640K,4M,8M,14M,15M");
 }
 
 void pc9801us_state::pc9801us(machine_config &config)
@@ -2621,6 +2260,10 @@ void pc9801us_state::pc9801us(machine_config &config)
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	PC98_SDIP(config, "sdip", 0);
+
+	// RAM 640KB ~ 14.6MB
+	// m_ram->set_default_size("2M");
+	// m_ram->set_extra_options("640K,4M,8M,14M,15M");
 }
 
 void pc9801us_state::pc9801fs(machine_config &config)
@@ -2643,6 +2286,10 @@ void pc9801us_state::pc9801fs(machine_config &config)
 //  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	PC98_SDIP(config, "sdip", 0);
+
+	// RAM 640KB ~ 14.6MB
+	// m_ram->set_default_size("2M");
+	// m_ram->set_extra_options("640K,4M,8M,14M,15M");
 }
 
 void pc9801bx_state::pc9801bx2(machine_config &config)
@@ -2661,8 +2308,12 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 
 	PC98_SDIP(config, "sdip", 0);
 
-	// minimum RAM: 1.8 / 3.6 MB (?)
-	// maximum RAM: 19.6 MB
+	// RAM 1.8 MB (U2/M2) / 3.6 MB (U7) ~ 19.6 MB (from EMS?)
+	config.device_remove("simm");
+	PC9801_61_SIMM(config, "simm", pc9801bx2_simm_options, "2mb");
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("640K,4M,7M,8M,14M,20M");
+
 	// GDC & EGC, DAC1BIT built-in
 	// 2x 3.5/5.25 internal floppy drives or 1x 3.5 and 120MB IDE HDD
 	// 1x mountable File Bay
@@ -2710,15 +2361,6 @@ ROM_START( pc9801 )
 	ROM_LOAD16_BYTE( "ruq1g 06.bin", 0x04000, 0x2000, CRC(d4ea8a62) SHA1(c899ea64ce8652a5b6976d62466efe2864cfb049) )
 	ROM_LOAD16_BYTE( "ruq4g 06.bin", 0x04001, 0x2000, CRC(c1470ae5) SHA1(4eb31b2ad0b8f0dfad99bb67ada9e5853d5af4a1) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
-
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x800, "kbd_mcu", ROMREGION_ERASEFF)
-	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected through a i8251 UART, needs decapping
-
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// TODO: original dump, needs heavy bitswap mods
 	ROM_LOAD( "sfz4w 00.bin",   0x00000, 0x02000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
@@ -2727,7 +2369,22 @@ ROM_START( pc9801 )
 	// bad dump, 8x16 charset? (it's on the kanji board)
 	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) )
 
-	LOAD_KANJI_ROMS
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// original pc9801f dump, half size
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
+
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	// raw extracted from pc9801vm (after driver_init conversion)
+	ROM_LOAD( "kanji.bin", 0, 0x100000, BAD_DUMP CRC(2de4336f) SHA1(dd783d4dca5812561f853ad0307ae90420292f09) )
+
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -2744,18 +2401,39 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "urm05-02.bin", 0x10000, 0x4000, CRC(ffefec65) SHA1(106e0d920e857e59da12225a489ca2756ca405c1) )
 	ROM_LOAD16_BYTE( "urm06-02.bin", 0x10001, 0x4000, CRC(1147760b) SHA1(4e0299091dfd53ac7988d40c5a6775a10389faac) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2dd", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "chargen", 0 )
+	// note: ROM labels of following two may be swapped
+	//original is a bad dump, this is taken from i386 model
+	ROM_LOAD( "d23128c-17.bin", 0x00000, 0x00800, BAD_DUMP CRC(eea57180) SHA1(4aa037c684b72ad4521212928137d3369174eb1e) )
+	//bad dump, 8x16 charset? (it's on the kanji board)
+	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) )
 
-	ROM_REGION16_LE( 0x1000, "fdc_bios_2hd", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// original pc9801f dump, half size
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
 
-	ROM_REGION( 0x20000, "fdc_data", ROMREGION_ERASEFF )
-	// 2dd fdc bios, presumably bad size (should be 0x800 for each rom)
-	ROM_LOAD16_BYTE( "urf01-01.bin", 0x00000, 0x4000, BAD_DUMP CRC(2f5ae147) SHA1(69eb264d520a8fc826310b4fce3c8323867520ee) )
-	ROM_LOAD16_BYTE( "urf02-01.bin", 0x00001, 0x4000, BAD_DUMP CRC(62a86928) SHA1(4160a6db096dbeff18e50cbee98f5d5c1a29e2d1) )
-	ROM_LOAD( "2hdif.rom", 0x10000, 0x1000, BAD_DUMP CRC(9652011b) SHA1(b607707d74b5a7d3ba211825de31a8f32aec8146) ) // needs dumping from a board
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	// raw extracted from pc9801vm (after driver_init conversion)
+	ROM_LOAD( "kanji.bin", 0, 0x100000, BAD_DUMP CRC(2de4336f) SHA1(dd783d4dca5812561f853ad0307ae90420292f09) )
 
-	ROM_REGION( 0x800, "kbd_mcu", ROMREGION_ERASEFF)
-	ROM_LOAD( "mcu.bin", 0x0000, 0x0800, NO_DUMP ) //connected through a i8251 UART, needs decapping
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+ROM_END
+
+/*
+M2 - 8086 8
+*/
+
+ROM_START( pc9801m2 )
+	ROM_REGION16_LE( 0x18000, "ipl", ROMREGION_ERASEFF )
+	// from CSCP package, same as F?
+	ROM_LOAD( "ipl_efm.rom", 0x00000, 0x18000, BAD_DUMP CRC(be00c88b) SHA1(1e7c0e61db5441f2a91c56c4085a7024c8d07c10) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	// note: ROM labels of following two may be swapped
@@ -2764,13 +2442,30 @@ ROM_START( pc9801f )
 	//bad dump, 8x16 charset? (it's on the kanji board)
 	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) )
 
-	LOAD_KANJI_ROMS
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// original pc9801f dump, half size
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_CONTINUE(                      0x20000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_CONTINUE(                      0x20001, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_CONTINUE(                      0x60000, 0x4000  )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_CONTINUE(                      0x60001, 0x4000  )
+
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	// raw extracted from pc9801vm (after driver_init conversion)
+	ROM_LOAD( "kanji.bin", 0, 0x100000, BAD_DUMP CRC(2de4336f) SHA1(dd783d4dca5812561f853ad0307ae90420292f09) )
+
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 ROM_END
+
+
 
 /*
 VM - V30 8/10
 
-TODO: missing itf roms, if they exist
+missing itf roms, if they exist
 */
 
 ROM_START( pc9801vm )
@@ -2908,6 +2603,8 @@ ROM_END
 
 /*
 US - i386SX @ 16 MHz
+
+Built-in 2.5 IDE interface
 */
 
 ROM_START( pc9801us )
@@ -2930,8 +2627,9 @@ ROM_START( pc9801us )
 	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
 	LOAD_KANJI_ROMS
-	// SASI HDDs
-//  LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 /*
@@ -2959,12 +2657,15 @@ ROM_START( pc9801fs )
 
 	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
+
+//  ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
+//  ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
 ROM_END
 
 /*
 RX - 80286 12 (no V30?)
 
-The bios is from a 386 model not an RX
+The bios accesses PCI registers and $4be, can't be an RX
 */
 
 ROM_START( pc9801rx )
@@ -2994,11 +2695,16 @@ ROM_START( pc9801rs )
 
 	/* following is an emulator memory dump, should be checked and eventually nuked if nothing worth is there */
 	ROM_REGION( 0x100000, "memory", 0 )
+	// refs for an "EPSON SCANNER"
 	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
-	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
+	// 1-filled
+	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )
+	// sound BIOS at $cc000
 	ROM_LOAD( "c8000.rom", 0xc8000, 0x8000, CRC(f2a262b0) SHA1(fe97d2068d18bbb7425d9774e2e56982df2aa1fb) )
-	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
-	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )  // contains n-88 basic (86) v2.0
+	// 1-filled
+	ROM_LOAD( "d0000.rom", 0xd0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )
+	// n-88 basic (86) v2.0
+	ROM_LOAD( "e8000.rom", 0xe8000, 0x8000, CRC(4e32081e) SHA1(e23571273b7cad01aa116cb7414c5115a1093f85) )
 	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
 	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
 
@@ -3010,14 +2716,26 @@ ROM_START( pc9801rs )
 ROM_END
 
 /*
-BX2/U2 - 486SX @ 25 MHz
+BX2/U2 - 486SX @ 25 MHz, ODP upgradeable
 
-Yet another franken-romset done with direct memory dump, shrug
+RAM 1.8MB to 19.6MB
+Floppy 3.5" x 2
+C-Bus x 3
+EGC
+
+BX2/U7
+minimum RAM bumped to 3.6MB
+Floppy 3.5" x 1
+120 MB IDE built-in
+
+BX2/M2
+Floppy 5.25" x 2, otherwise same as U2
 
 */
 
 ROM_START( pc9801bx2 )
 	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+	// baddump: getitf98 format
 	ROM_LOAD( "pc98bank0.bin",  0x00000, 0x08000, BAD_DUMP CRC(bfd100cc) SHA1(cf8e6a5679cca7761481abef0ba4b35ead39efdb) )
 	ROM_LOAD( "pc98bank1.bin",  0x08000, 0x08000, BAD_DUMP CRC(d0562af8) SHA1(2c4fd27eb598f4b8a00f3e86941ba27007d58e47) )
 	ROM_LOAD( "pc98bank2.bin",  0x10000, 0x08000, BAD_DUMP CRC(12818a14) SHA1(9c31e8ac85d78fa779d6bbc2095557065294ec09) )
@@ -3038,7 +2756,9 @@ ROM_START( pc9801bx2 )
 	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
 
 	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 void pc9801_state::init_pc9801_kanji()
@@ -3179,8 +2899,71 @@ void pc9801vm_state::init_pc9801vm_kanji()
 // specifically happening for PC9801RS. This will be hopefully put into stone with driver splits at some point in future.
 
 // "vanilla" class (i86, E/F/M)
-COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+COMP( 1982, pc9801,     0,        0, pc9801,    pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801",   MACHINE_NOT_WORKING ) // genuine dump
+//COMP(1983, pc9801e same with 8MHz CPU bump
+COMP( 1983, pc9801f,    pc9801,   0, pc9801f,   pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801F",  MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1984, pc9801m2,   pc9801,   0, pc9801m,   pc9801,   pc9801_state, empty_init,   "NEC",   "PC-9801M2", MACHINE_NOT_WORKING )
+//COMP(1985, pc9801m3 same with slotted SASI + 20MB
+
+// VM class (V30)
+//COMP(1985, pc9801u2
+//COMP(1985, pc9801vf2
+COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING ) // genuine dump
+COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING ) // genuine dump
+
+// VX class (i286 + V30, first model using an EGC)
+// original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
+// (PC-9801VX4/WN PC-9801VX41/WN)
+COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING )
+
+// CV class (V30, compact version with monitor built-in like a Macintosh)
+//COMP(1988, pc9801cv
+
+// RX class (i286 + V30)
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING )
+COMP( 1988, pc9801rx,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING )
+
+// RA class (i386dx + V30)
+//COMP(1988, pc9801ra
+
+// RS class (i386sx)
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     0 )
+//COMP( 1991, pc9801ds
+//COMP( 1991, pc9801cs
+//COMP( 1992, pc9801fx
+
+// DX class (i286)
+COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING )
+
+// DA class (i386DX + SDIP and EMS)
+//COMP( 1991, pc9801da
+
+// UF class (V30HL, Tower form factor)
+//COMP( 1991, pc9801uf
+//COMP( 1991, pc9801ur
+
+// FS class (i386SX + ?)
+COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING )
+
+// US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
+COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING )
+
+// FA class (i486sx)
+//COMP( 1992, pc9801fa
+
+// BX class (i486sx2, official nickname "98 FELLOW", the lower end of PC-9821 line at this point)
+//COMP( 1993, pc9801bx
+COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING )
+//COMP( 1993, pc9801bx3
+//COMP( 1995, pc9801bx4
+
+// BS class (i486sx, "98 FELLOW")
+//COMP( 1993, pc9801bs2
+
+// BA class (i486dx2, "98 FELLOW")
+//COMP( 1993, pc9801ba
+//COMP( 1993, pc9801ba2
+//COMP( 1995, pc9801ba3
 
 // N5200 (started as a vanilla PC-98 business line derivative,
 //        eventually diverged into its own thing and incorporated various Hyper 98 features.
@@ -3199,18 +2982,6 @@ COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9
 // JX series
 // ...
 
-// VM class (V30)
-COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-// UV class (V30)
-COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
-
-// UX class (i286)
-COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
-// VX class (first model using an EGC)
-// original VX0/VX2/VX4 released in Nov 1986, minor updates with OS pre-installed etc. in 1987
-COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801VX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
 // XA/XL class (1120 x 750 true color, nicknamed "High-reso")
 // ...
 
@@ -3222,33 +2993,14 @@ COMP( 1986, pc9801vx,   0,        0, pc9801vx,  pc9801rs, pc9801vm_state, init_p
 // OP-98 ("Office Processor", released around '91. Reports claims to be H98-like, with extra connectivity with NEC 7200 workstation)
 // ...
 
-// CV class (V30, compact version with monitor built-in like a Macintosh)
-// ...
-
-// RS class (i386SX)
-COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// DX class (i286)
-COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801DX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// DA class (i386SX + SDIP and EMS)
-// ...
-// UF/UR/US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
-COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// FS class (i386SX + ?)
-COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// FA class (i486SX)
-// ...
-// BX class (official nickname "98 FELLOW", last releases prior to 9821 line)
-COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2 (98 FELLOW)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-
 // PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
 // ...
 
 // Epson class knockoffs -> cfr. pc9801_epson.cpp
 
-// PC9821 -> cfr. pc9821.cpp
+// PC-9821 -> cfr. pc9821.cpp
 
-// PC98DO (PC88+PC98, V33 + μPD70008AC)
+// PC-98DO (PC88+PC98, V33 + μPD70008AC)
 // ...
 
 // PC-98LT / PC-98HA -> cfr. pc98ha.cpp
