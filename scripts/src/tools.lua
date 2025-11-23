@@ -837,3 +837,39 @@ if (_OPTIONS["osd"] == "sdl") then
 
 	strip()
 end
+
+--------------------------------------------------
+-- vmnet_helper
+--------------------------------------------------
+
+if _OPTIONS["targetos"] == "macosx" then
+	project("vmnet_helper")
+		uuid ("a0a2d516-f9ac-457f-9dfa-dcdb4ba040c6")
+		kind "ConsoleApp"
+
+		flags {
+			"Symbols", -- always include minimum symbols for executables
+		}
+
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			targetdir(MAME_DIR)
+		end
+
+		linkoptions {
+			"-sectcreate __TEXT __info_plist " .. _MAKE.esc(MAME_DIR) .. "src/tools/vmnet_helper.plist",
+		}
+
+		dependency {
+			{ "vmnet_helper", MAME_DIR .. "src/tools/vmnet_helper.plist", true },
+		}
+
+		links {
+			"vmnet.framework"
+		}
+
+		files {
+			MAME_DIR .. "src/tools/vmnet_helper.cpp",
+		}
+
+		strip()
+end
