@@ -24,6 +24,50 @@
 				]]></data>
 		</image>
 	</element>
+	<element name="multipage_0_8326114649681529_x_4_3">
+		<image>
+			<bounds x="0" y="0" width="3.3154" height="5.8" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="3.3154" height="5.8" viewBox="0 0 3.3154 5.8">
+						<path d="M 1 0.125 l 2.190439522654281 0 -0.9139932151810951 4.3       M 0 1.125 l 1.977882960984259 0 -0.9139932151810951 4.3" fill="none" stroke="#ffffff" stroke-width="0.25" />
+					</svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="multipage_7_0_x_4_3">
+		<image>
+			<bounds x="0" y="0" width="9.4828" height="5.8" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="9.4828" height="5.8" viewBox="0 0 9.4828 5.8">
+						<path d="M 1 0.125 l 8.357828057686127 0 -0.9139932151810951 4.3       M 0 1.125 l 8.145271496016106 0 -0.9139932151810951 4.3" fill="none" stroke="#ffffff" stroke-width="0.25" />
+					</svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="multipage_5_411974522292994_x_4_3">
+		<image>
+			<bounds x="0" y="0" width="7.8948" height="5.8" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="7.8948" height="5.8" viewBox="0 0 7.8948 5.8">
+						<path d="M 1 0.125 l 6.769802579979122 0 -0.9139932151810951 4.3       M 0 1.125 l 6.5572460183091 0 -0.9139932151810951 4.3" fill="none" stroke="#ffffff" stroke-width="0.25" />
+					</svg>
+				]]></data>
+		</image>
+	</element>
+	<element name="multipage_4_174012738853502_x_4_3">
+		<image>
+			<bounds x="0" y="0" width="6.6568" height="5.8" />
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="6.6568" height="5.8" viewBox="0 0 6.6568 5.8">
+						<path d="M 1 0.125 l 5.531840796539631 0 -0.9139932151810951 4.3       M 0 1.125 l 5.319284234869609 0 -0.9139932151810951 4.3" fill="none" stroke="#ffffff" stroke-width="0.25" />
+					</svg>
+				]]></data>
+		</image>
+	</element>
 	<element name="drawing_fake_ensoniq">
 		<image>
 			<bounds x="0" y="0" width="72" height="13" />
@@ -1114,11 +1158,53 @@
 	</group>
 	<group name="Buttons">
 		<bounds x="0" y="8.2" width="183.20000000000002" height="95.0" />
+		<element ref="multipage_0_8326114649681529_x_4_3">
+			<bounds x="10.075" y="56.2" width="3.3154" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="17.199" y="56.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="36.548" y="56.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="172.35" y="56.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="155.3" y="36.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="169.74" y="36.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="120.79" y="16.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="137.83" y="16.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="153.63" y="16.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="169.43" y="16.2" width="9.4828" height="5.8" />
+		</element>
 		<element ref="rect_white">
 			<bounds x="15.8" y="75.5" width="7.9" height="0.25" />
 		</element>
 		<element ref="rect_white">
 			<bounds x="37.9" y="75.5" width="7.9" height="0.25" />
+		</element>
+		<element ref="multipage_5_411974522292994_x_4_3">
+			<bounds x="82.961" y="56.2" width="7.8948" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="96.34" y="56.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_7_0_x_4_3">
+			<bounds x="64.937" y="16.2" width="9.4828" height="5.8" />
+		</element>
+		<element ref="multipage_4_174012738853502_x_4_3">
+			<bounds x="100.09" y="16.2" width="6.6568" height="5.8" />
 		</element>
 		<element ref="rect_white">
 			<bounds x="60" y="35.5" width="17.9" height="0.25" />
