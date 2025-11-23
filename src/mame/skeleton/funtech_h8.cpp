@@ -20,7 +20,6 @@ TODO:
 - unknown reads / writes;
 - reels alignment in some screens;
 - only accepts coins in test mode;
-- hopper;
 - NVRAM;
 - outputs (counters, lamps..),
 - maybe: seems to run too fast.
@@ -30,6 +29,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/h8/h83032.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
@@ -46,6 +46,7 @@ public:
 	funtech_h8_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "tileram", 0x800U, ENDIANNESS_BIG),
 		m_attrram(*this, "attrram", 0x800U, ENDIANNESS_BIG),
@@ -56,10 +57,12 @@ public:
 	void funtech_h8(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<h83030_device> m_maincpu;
+	required_device<hopper_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	memory_share_creator<uint8_t> m_tileram;
@@ -79,6 +82,8 @@ private:
 	template <uint8_t Which> void reel_attrram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void hopper_w(uint16_t data);
+
 	void program_map(address_map &map) ATTR_COLD;
 };
 
@@ -86,18 +91,16 @@ private:
 void funtech_h8_state::video_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8); // TODO
-	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8); // TODO
-	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8); // TODO
-	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8); // TODO
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_tilemap->set_transparent_pen(0);
 	m_reel_tilemap[0]->set_transparent_pen(0);
 	m_reel_tilemap[1]->set_transparent_pen(0);
 	m_reel_tilemap[2]->set_transparent_pen(0);
 	m_reel_tilemap[3]->set_transparent_pen(0);
-
-	save_item(NAME(m_tilebank));
 }
 
 TILE_GET_INFO_MEMBER(funtech_h8_state::get_tile_info)
@@ -158,17 +161,30 @@ uint32_t funtech_h8_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 }
 
 
+void funtech_h8_state::machine_start()
+{
+	save_item(NAME(m_tilebank));
+}
+
+void funtech_h8_state::hopper_w(uint16_t data)
+{
+	m_hopper->motor_w(BIT(data, 7));
+
+	if (data & 0xff7f)
+		logerror("%s hopper_w unknown bits written: %04x\n", data);
+}
+
+
 void funtech_h8_state::program_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x00000, 0x3ffff).rom();
 	map(0x40000, 0x47fff).ram(); // NVRAM?
-	// map(0x48000, 0x48001) // TODO: hopper
+	map(0x48000, 0x48001).w(FUNC(funtech_h8_state::hopper_w));
 	map(0x48008, 0x48009).portr("IN0").nopw(); // TODO: continuosly, alternatively writes 0xff00 and 0x00ff
 	map(0x4800a, 0x4800b).portr("DSW3_4");
 	// map(0x4800c, 0x4800d).w // writes here sometimes
 	map(0x4800e, 0x4800e).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//map(0x48ffe, 0x48fff).r // reads here sometimes
+	// map(0x48ffe, 0x48fff).r // reads here sometimes
 	map(0xa0000, 0xa01ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[0][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<0>));
 	map(0xa0200, 0xa03ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[1][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<1>));
 	map(0xa0400, 0xa05ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[2][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<2>));
@@ -191,14 +207,14 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) // TODO: hopper
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
@@ -271,7 +287,9 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW3:8" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW4:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW4:3" )
+	PORT_DIPNAME(           0x0400, 0x0400, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(                0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(                0x0400, DEF_STR( On ) )
 	PORT_DIPNAME(           0x1800, 0x1800, "Pool Bonus" )  PORT_DIPLOCATION("SW4:4,5")
 	PORT_DIPSETTING(                0x1800, "1000" )
 	PORT_DIPSETTING(                0x1000, "3000" )
@@ -295,7 +313,9 @@ void funtech_h8_state::funtech_h8(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &funtech_h8_state::program_map);
 	m_maincpu->read_port7().set_ioport("DSW1");
 	m_maincpu->read_porta().set_ioport("DSW2");
-	m_maincpu->write_portb().set([this] (uint8_t data) { m_tilebank = (data & 0x06) >> 1; }); // seems tile banking. TODO: Bit 5 also used.
+	m_maincpu->write_portb().set([this] (uint8_t data) { m_tilebank = (data & 0x06) >> 1; }); // TODO: Bit 5 also used.
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_size(512, 256);
@@ -332,4 +352,4 @@ ROM_END
 
 
 // puts the following strings in RAM: 1999-05-24, -TAIWAN-GAMEMAX-, --VERSION:U1.7--
-GAME( 1999, goldnegg, 0, funtech_h8, goldnegg, funtech_h8_state, empty_init, ROT0, "LSE", "Golden Egg (v1.7)", MACHINE_NOT_WORKING )
+GAME( 1999, goldnegg, 0, funtech_h8, goldnegg, funtech_h8_state, empty_init, ROT0, "LSE", "Golden Egg (version U1.8)", MACHINE_NOT_WORKING )
