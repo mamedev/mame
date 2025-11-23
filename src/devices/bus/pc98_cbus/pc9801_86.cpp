@@ -8,9 +8,6 @@ Mad Factory Otomi-chan Kai sound card
 Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
 additional DAC port
 
-SpeakBoard sound card seems to be derived design from -86, with an additional
-OPNA mapped at 0x58*
-
 Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
 It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
 expects this to be installed as default (cfr. datsumj).
