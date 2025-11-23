@@ -2,39 +2,46 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    s3000.cpp - Akai S2000, S2800, S3000, CD3000i, S3200, S3000XL,
-                S3200XL, and CD3000XL rackmount 16-bit samplers.
-    Driver by R. Belmont
+	s3000.cpp - Akai S2000, S2800, S3000, CD3000i, S3200, S3000XL,
+				S3200XL, and CD3000XL rackmount 16-bit samplers.
+	Driver by R. Belmont
 
-    These rackmount samplers are all built on variants of what became the
-    MPC3000 hardware.  The major difference is the lack of the 7810/7811
-    sub-CPU to manage the panel, since without drum pads there's no need
-    for ultra-low-latency response from the panel.
+	These rackmount samplers are all built on variants of what became the
+	MPC3000 hardware.  The major difference is the lack of the 7810/7811
+	sub-CPU to manage the panel, since without drum pads there's no need
+	for ultra-low-latency response from the panel.
 
-    The S2000 is the lowest end model, with a slightly slower CPU, no SCSI, a smaller
-    LCD, and fewer controls.  The S2800 has the same LCD and front panel as the S3000
-    but again is bare-bones on features.
+	The S2000 is the lowest end model, with a slightly slower CPU, no SCSI, a smaller
+	LCD, and fewer controls.  The S2800 has the same LCD and front panel as the S3000
+	but again is bare-bones on features.
 
-    "XL" models have double the ROM space for a more advanced OS and come with
-    things that were optional expansions on the base models built in.
+	"XL" models have double the ROM space for a more advanced OS and come with
+	things that were optional expansions on the base models built in.
 
-    Hardware:
-        CPU: NEC V53 (32 MHz on 3x00, 31.94 MHz on 2000)
-        Floppy: uPD72069
-        SCSI: MB89352
-        LCD: LC7981 (3x00 and 2800) or HD44780 (2000)
-        Sound DSP: L7A1045-L6048
-        Filter (XL models and S3200 only): L7A0906-L6029 DFL
-        Effects DSP (XL models only): L7A1414-L6038 DFX
+	Hardware:
+		CPU: NEC V53 (32 MHz on 3x00, 31.94 MHz on 2000)
+		Floppy: uPD72069
+		SCSI: MB89352
+		LCD: LC7981 (3x00 and 2800) or HD44780 (2000)
+		Sound DSP: L7A1045-L6048
+		Filter (XL models and S3200 only): L7A0906-L6029 DFL
+		Effects DSP (XL models only): L7A1414-L6038 DFX
 
-    TODOs:
-        - Floppy hookup is close but doesn't work.
-        - S3000 and CD3000i don't find any sample RAM.  The XL models and S2000
-          both use the MPC3000 approach of actually testing the memory and find
-          all 32 megs fine.  This appears to be related to the other bits in the
-          ID register.
-        - XL models don't read the key matrix properly, and it's unclear why
-          at the moment.  The scanning pattern looks identical to the non-XLs.
+	Working:
+		- Keyboard matrix on all models
+		- LED outputs should be correct for all models
+		- MIDI In on all models
+		- SCSI CD-ROM on CD3000i and CD3000XL
+		- Loading and playing sounds from CD-ROM on CD3000XL
+
+	TODOs:
+		- Floppy hookup is not yet correct.
+		- S3000 and CD3000i don't find any sample RAM.  The XL models and S2000
+		  both use the MPC3000 approach of actually testing the memory and find
+		  all 32 megs fine.  This appears to be related to the other bits in the
+		  ID register.
+		- Many Akai factory CD sounds have clipping, need to check if that's
+		  an L6028 volume issue or bad loop points (or both).
 
 ***************************************************************************/
 
@@ -119,7 +126,6 @@ private:
 	void s3000_io_map(address_map &map) ATTR_COLD;
 	void s3000xl_io_map(address_map &map) ATTR_COLD;
 	void cd3000_io_map(address_map &map) ATTR_COLD;
-	void cd3000xl_io_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
 
 	uint8_t dma_memr_cb(offs_t offset);
@@ -146,7 +152,7 @@ void s3000_state::machine_start()
 void s3000_state::machine_reset()
 {
 	m_maincpu->cts_w(CLEAR_LINE);   // grounded on schematic
-	m_fdc->ready_w(ASSERT_LINE);
+	m_fdc->ready_w(CLEAR_LINE);     // also grounded on schematic
 }
 
 void s3000_state::s2000_map(address_map &map)
@@ -182,6 +188,7 @@ void s3000_state::s2000_io_map(address_map &map)
 	map(0x0000, 0x001f).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0052, 0x0053).w(FUNC(s3000_state::klcs_portb_w));
 	map(0x0060, 0x0060).rw(m_s2klcd, FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w)).umask16(0x00ff);
 	map(0x0062, 0x0062).rw(m_s2klcd, FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
@@ -211,16 +218,11 @@ void s3000_state::s3000xl_io_map(address_map &map)
 	map(0x0000, 0x001f).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x0052, 0x0053).w(FUNC(s3000_state::klcs_portb_w)); // HACK: port B is configured for input but written to
 	map(0x0060, 0x0060).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x0062, 0x0062).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x00a0, 0x00a5).nopw(); // quiet writes to the effects DSP
-}
-
-void s3000_state::cd3000xl_io_map(address_map &map)
-{
-	s3000xl_io_map(map);
-	map(0x0060, 0x0061).r(FUNC(s3000_state::cd_id_r)).umask16(0x00ff);
 }
 
 // stock wave memory is 4x HM514400 1Mx4 = 2 MiB
@@ -352,14 +354,19 @@ void s3000_state::s3000(machine_config &config)
 
 	UPD72069(config, m_fdc, V53_CLKOUT);
 	m_fdc->set_ready_line_connected(false); // uPD READY pin is grounded on schematic
-	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(v53a_device::dsr_w));
-	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
+	m_fdc->intrq_wr_callback().append(m_maincpu, FUNC(v53a_device::dsr_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy, s3000_state::floppies, "35hd", add_formats).enable_sound(true);
 
 	HD61830(config, m_lcdc, 4.9152_MHz_XTAL / 2 / 2); // LC7981
 
+	auto &mdin(MIDI_PORT(config, "mdin"));
+	midiin_slot(mdin);
+	mdin.rxd_handler().set(m_maincpu, FUNC(v53a_device::rxd_w));
+
 	midiout_slot(MIDI_PORT(config, "mdout"));
+	m_maincpu->txd_handler_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 
 	NSCSI_BUS(config, "scsi");
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
@@ -379,14 +386,15 @@ void s3000_state::s3000(machine_config &config)
 			spc.out_dreq_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
 		});
 
-	// led0 - Select Program
-	// led1 - Edit Sample
-	// led2 - Edit Program
-	// led3 - MIDI
-	// led4 - Disk
-	// led5 - Tune Level
-	// led6 - Utility
-	// led7 - Help
+	//        S3000/CD3000i     S2000      S3000XL/CD3000XL
+	// led0 - Select Program    Load       Single
+	// led1 - Edit Sample       Effects    Multi
+	// led2 - Edit Program      Save       Sample
+	// led3 - MIDI              Sample     Effects
+	// led4 - Disk              Global     Edit
+	// led5 - Tune Level        Multi      Global
+	// led6 - Utility           Edit       Save
+	// led7 - Help              Single     Load
 	OUTPUT_LATCH(config, m_ledlatch);
 	m_ledlatch->bit_handler<0>().set_output("led0").invert();
 	m_ledlatch->bit_handler<1>().set_output("led1").invert();
@@ -433,6 +441,8 @@ void s3000_state::cd3000(machine_config &config)
 {
 	s3000(config);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::cd3000_io_map);
+
+	NSCSI_CONNECTOR(config.replace(), "scsi:4", default_scsi_devices, "cdrom");
 }
 
 void s3000_state::s3000xl(machine_config &config)
@@ -440,13 +450,15 @@ void s3000_state::s3000xl(machine_config &config)
 	s3000(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s3000xl_map);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::s3000xl_io_map);
+
+	m_klcs->in_pa_callback().set(FUNC(s3000_state::klcs_porta_r));
 }
 
 void s3000_state::cd3000xl(machine_config &config)
 {
-	s3000(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s3000xl_map);
-	m_maincpu->set_addrmap(AS_IO, &s3000_state::cd3000xl_io_map);
+	s3000xl(config);
+
+	NSCSI_CONNECTOR(config.replace(), "scsi:4", default_scsi_devices, "cdrom");
 }
 
 // KC = port A, KR = port B, KD = port C
@@ -461,14 +473,14 @@ void s3000_state::cd3000xl(machine_config &config)
 // 7 SELECT P/A  F1    3/Y     -/>        LEFT
 static INPUT_PORTS_START(s3000)
 	PORT_START("C0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 / W") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 / Z") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Utilities") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Utilities") PORT_CODE(KEYCODE_U)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / X") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / <") PORT_CODE(KEYCODE_EQUALS)
@@ -476,7 +488,7 @@ static INPUT_PORTS_START(s3000)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tune / Level") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tune / Level") PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mark / #") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Jump / .") PORT_CODE(KEYCODE_S)
@@ -484,28 +496,28 @@ static INPUT_PORTS_START(s3000)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Disk / E") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Disk / E") PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 / S") PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 / R") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIDI / D") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIDI / D") PORT_CODE(KEYCODE_R)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 / V") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 / U") PORT_CODE(KEYCODE_5)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit Prog / K") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit Prog / K") PORT_CODE(KEYCODE_E)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 / Q") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 / T") PORT_CODE(KEYCODE_4)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit Sample / J") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit Sample / J") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 / B") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Name") PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter/Play") PORT_CODE(KEYCODE_ENTER)
@@ -513,8 +525,132 @@ static INPUT_PORTS_START(s3000)
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select Prog / I") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / A") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select Prog / I") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / I") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / Y") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / >") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(s3000xl)
+	PORT_START("C0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load / H") PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8 / P") PORT_CODE(KEYCODE_F8)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 / W") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 / Z") PORT_CODE(KEYCODE_0)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save / G") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7 / O") PORT_CODE(KEYCODE_F7)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / X") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / <") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Global / F") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6 / N") PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mark / #") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Jump / .") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_NAME("Up Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit / E") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 / M") PORT_CODE(KEYCODE_F5)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 / S") PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 / V") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Effects / D") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 / L") PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 / R") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 / U") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample / C") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3 / K") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 / Q") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 / T") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Multi / B") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 / J") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Name") PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter/Play") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Down Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Single / A") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / I") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / Y") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / >") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(cd3000xl)
+	PORT_START("C0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load / H") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8 / P") PORT_CODE(KEYCODE_F8)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 / W") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 / Z") PORT_CODE(KEYCODE_0)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save / G") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7 / O") PORT_CODE(KEYCODE_F7)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / X") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / <") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Global / F") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6 / N") PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mark / #") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Jump / .") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_NAME("Up Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit / E") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 / M") PORT_CODE(KEYCODE_F5)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 / S") PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 / V") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Effects / D") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 / L") PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 / R") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 / U") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C5")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample / C") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3 / K") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 / Q") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 / T") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C6")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Multi / B") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 / J") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Name") PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter/Play") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Down Arrow")
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("C7")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Single / A") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / I") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / Y") PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / >") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
@@ -614,5 +750,5 @@ ROM_END
 CONS( 1993, s2000, 0, 0, s2000, s2000, s3000_state, empty_init, "Akai", "S2000", MACHINE_NOT_WORKING )
 CONS( 1993, s3000, 0, 0, s3000, s3000, s3000_state, empty_init, "Akai", "S3000", MACHINE_NOT_WORKING )
 CONS( 1993, cd3000i, 0, 0, cd3000, s3000, s3000_state, empty_init, "Akai", "CD3000i", MACHINE_NOT_WORKING)
-CONS( 1994, s3000xl, 0, 0, s3000xl, s3000, s3000_state, empty_init, "Akai", "S3000XL", MACHINE_NOT_WORKING)
-CONS( 1994, cd3000xl, 0, 0, cd3000xl, s3000, s3000_state, empty_init, "Akai", "CD3000XL", MACHINE_NOT_WORKING)
+CONS( 1994, s3000xl, 0, 0, s3000xl, s3000xl, s3000_state, empty_init, "Akai", "S3000XL", MACHINE_NOT_WORKING)
+CONS( 1994, cd3000xl, 0, 0, cd3000xl, cd3000xl, s3000_state, empty_init, "Akai", "CD3000XL", MACHINE_NOT_WORKING)
