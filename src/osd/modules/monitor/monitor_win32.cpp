@@ -98,11 +98,6 @@ protected:
 	int init_internal(const osd_options& options) override
 	{
 		// make a list of monitors
-
-		// add Apps monitor first
-		HMONITOR active_monitor = MonitorFromWindow(GetActiveWindow(), MONITOR_DEFAULTTONEAREST);
-		monitor_enum_callback(active_monitor, NULL, NULL, reinterpret_cast<std::intptr_t>(this));
-
 		EnumDisplayMonitors(nullptr, nullptr, monitor_enum_callback, reinterpret_cast<std::intptr_t>(this));
 
 		// if we're verbose, print the list of monitors
