@@ -1376,8 +1376,21 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$d = do_sub56(util::sext($i << 24, 48), $d);
 
 020000 tcc s1,d1             - cc:cc(12) s1:daos3(4, 3) d1:acc(3)
+	if($cc) {
+		$d1:w($s1);
+	}
+
 030000 tcc s1,d1 s2,d2       - cc:cc(12) s2:ar(8) s1:daos3(4, 3) d1:acc(3) d2:ar(0)
+	if($cc) {
+		$d1:w($s1);
+		$d2:w($s2);
+	}
+
 020800 tcc s2,d2             - cc:cc(12) s2:ar(8) d2:ar(0)
+	if($cc) {
+		$d2:w($s2);
+	}
+
 000006 trap                  -
 000010 trapcc                - cc:cc(0) cond
 0ac0c0 vsl s,i,l:ea          - s:acc(16) ea:eam1(8) i:imm1(4)
