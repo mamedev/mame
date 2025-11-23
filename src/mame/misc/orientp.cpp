@@ -90,7 +90,8 @@ Need Proper Layout.
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
+#include "cpu/mcs51/i80c52.h"
 
 #include "machine/nvram.h"
 #include "machine/i8255.h"
@@ -257,6 +258,7 @@ void orientp_state::data_map(address_map &map)
 	map(0xf900, 0xf903).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xfb02, 0xfb03).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0xfc20, 0xfc20).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xfc40, 0xfc40).w(FUNC(orientp_state::pr_out)); // Read - Write - 0x16 to mcu at p0
     map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
 }
@@ -324,7 +326,7 @@ void orientp_state::orientp(machine_config &config)
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", XTAL(10'738'000) / 6, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 
 }
 
