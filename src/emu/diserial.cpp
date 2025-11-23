@@ -205,12 +205,11 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 		m_rcv_bit_count++;
 	}
 	
-	u8 tmp = m_rcv_flags;
-	receive_register_reset();
-	if (tmp != m_rcv_flags)
-		printf("changed from %x =>  %x\n", tmp, m_rcv_flags);
+	// no params have changed and already syncronised
+	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
+		return;
 		
-	m_rcv_flags = tmp;
+	receive_register_reset();
 }
 
 void device_serial_interface::receive_register_reset()
