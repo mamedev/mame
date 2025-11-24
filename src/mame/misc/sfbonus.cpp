@@ -1336,7 +1336,7 @@ ROM_END
 
 
 /* Skill Fruit Bonus */
-ROM_START( sfbonus )
+ROM_START( sfbonus )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfbb19r.bin", 0x00000, 0x40000, CRC(e185c0b7) SHA1(241aa3dc65f4399c465e43c5f7079f66f9998f01) )
 
@@ -1594,7 +1594,7 @@ ROM_END
 
 
 /* Hold & Spin II */
-ROM_START( hldspin2 )
+ROM_START( hldspin2 )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs2b28r.bin", 0x00000, 0x40000, CRC(43c2a1b1) SHA1(da1e6d72e03297b014cb947e5c28769ad8457dec) )
 
@@ -2712,7 +2712,7 @@ ROM_START( anibonusxo3 )
 	ROM_LOAD16_BYTE( "abrom6a.bin", 0x00001, 0x80000, CRC(22d2abbe) SHA1(65d82ed0fc799c4248696f1b2ef76e7e88bf7fb7) )
 ROM_END
 
-ROM_START( anibonuso2 )
+ROM_START( anibonuso2 )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab14a.bin", 0x00000, 0x40000, CRC(a8a0eea5) SHA1(c37a470b997ee5dbc976858c024bd67ed88061ce) )
 
@@ -3035,7 +3035,7 @@ ROM_START( sfruitb )
 	ROM_LOAD( "sfb25e.id", 0x00, 0x20, CRC(a4ae87d4) SHA1(d19b6cc31b6011f5467ba6fe70cced8ca5ddffc9) )
 ROM_END
 
-ROM_START( sfruitbb1 )
+ROM_START( sfruitbb1 )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbb25r.bin", 0x00000, 0x40000, CRC(bcb51221) SHA1(6df07a52557d8305fec45c8a030141cb15204548) )
 
@@ -3200,7 +3200,7 @@ ROM_START( sfruitbh )
 	ROM_LOAD( "sfb22eb.id", 0x00, 0x20, CRC(eb57209c) SHA1(1ea1acdd92bb399fe0ed20a53ced47d8923af6dc) )
 ROM_END
 
-ROM_START( sfruitbbh )
+ROM_START( sfruitbbh )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbb22b.bin", 0x00000, 0x40000,  CRC(16abe969) SHA1(97ca2f223fb16c1003544c7454e470a31f54b3b3) )
 
@@ -3737,7 +3737,7 @@ ROM_START( fb4d2 )
 	ROM_LOAD( "fb415lt.id", 0x00, 0x20, CRC(f44d3e8c) SHA1(af462959a37c271c840324d74b2619691fadf8bd) )
 ROM_END
 
-ROM_START( fb4_14 )
+ROM_START( fb4_14 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "rom1.bin", 0x00000, 0x40000, CRC(166fc16c) SHA1(aa571cf010a308c9f615df3aa11c956ee246dc6a) )
 
@@ -4054,7 +4054,7 @@ ROM_START( ch2000 )
 	ROM_LOAD( "fb44e.id", 0x00, 0x20, CRC(6c5fd1e6) SHA1(a26901ed4d02dfd374d807b0d7255f73d19ca2b7) )
 ROM_END
 
-ROM_START( ch2000b1 )
+ROM_START( ch2000b1 ) // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2b44r.bin", 0x00000, 0x40000, CRC(c9f9b0c7) SHA1(97bc35dcf0608c6211f1dc9678b4b2232c70cdca) )
 
@@ -4130,7 +4130,7 @@ ROM_START( ch2000v2 )
 	ROM_LOAD( "fb41lt.id", 0x00, 0x20, CRC(21a07bba) SHA1(6fd88c243c554684e49667a8d2dc6b16348ae8dd) )
 ROM_END
 
-ROM_START( ch2000c1 )
+ROM_START( ch2000c1 )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2c44r.bin", 0x00000, 0x40000,  CRC(d898129f) SHA1(1fdc35dd0332ecd705665db3b268e5d05f9d65dd) )
 
@@ -4254,7 +4254,7 @@ ROM_START( ch2000o3 )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
 ROM_END
 
-ROM_START( ch2000o4 )
+ROM_START( ch2000o4 )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2k26.u6", 0x00000, 0x40000, CRC(a6bd9c2d) SHA1(ba9b18edcbebf78f310fb061a5ae75ffe8809d20) )
 
@@ -4318,7 +4318,7 @@ ROM_START( ch2000o7 )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
 ROM_END
 
-ROM_START( ch2000o8 )
+ROM_START( ch2000o8 )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2k36a.bin", 0x00000, 0x40000, CRC(0c9eb597) SHA1(c4d329fa90b7fcf546682a4a206d09115f0c52dc) )
 
@@ -4387,7 +4387,7 @@ ROM_START( pir2001 )
 	ROM_LOAD( "pi125e.id", 0x00, 0x20,  CRC(339852cb) SHA1(02977f8cbca378f22ff43c299a61b1f1da3c5d50) )
 ROM_END
 
-ROM_START( pir2001b1 )
+ROM_START( pir2001b1 )  // PCB S2000-B
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1b25r.bin", 0x00000, 0x40000, CRC(6f2624e4) SHA1(e1669d81bf708c65778d81ed4f5c793725edde3f) )
 
