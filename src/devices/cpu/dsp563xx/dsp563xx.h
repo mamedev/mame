@@ -152,15 +152,17 @@ protected:
 	inline void set_omr(u32 v) { m_omr = v; }
 	inline void set_sc(u32 v) { m_sc = v; }
 	inline void set_sp(u32 v) { m_sp = v; }
-	inline void set_sr(u32 v) { m_emr = v >> 16; m_mr = v >> 8; m_ccr = v; }
+	inline void set_sr(u32 v) { m_emr = (v >> 16) & 0xfb; m_mr = (v >> 8) & 0xef; m_ccr = v; }
 	inline void set_ssh(u32 v) { m_stackh[m_sp] = v; }
 	inline void set_ssl(u32 v) { m_stackl[m_sp] = v; }
 	inline void set_sz(u32 v) { m_sz = v; }
 	inline void set_vba(u32 v) { m_vba = v; }
-	inline void set_mr(u8 v) { m_mr = v; }
 	inline void set_ccr(u8 v) { m_ccr = v; }
+	inline void set_mr(u8 v) { m_mr = v & 0xef; }
+	inline void set_emr(u8 v) { m_emr = v & 0xfb; }
 	inline void set_com(u8 v) { m_omr = (m_omr & 0xffff00) | v; }
 	inline void set_eom(u8 v) { m_omr = (m_omr & 0xff00ff) | (v << 8); }
+	inline void set_scs(u8 v) { m_omr = (m_omr & 0x00ffff) | (v << 16); }
 
 	inline u64 get_a() const { return m_a; }
 	inline u32 get_ah() const { return std::clamp(s32(m_a >> 24), -0x00800000, 0x007fffff) & 0xffffff; }
@@ -199,9 +201,10 @@ protected:
 	inline u32 get_sz() const { return m_sz; }
 	inline u32 get_vba() const { return m_vba; }
 	inline u8 get_mr() const { return m_mr; }
-	inline u8 get_ccr() const { return m_mr; }
+	inline u8 get_ccr() const { return m_ccr; }
 	inline u8 get_com() const { return m_omr; }
 	inline u8 get_eom() const { return m_omr >> 8; }
+	inline u8 get_scs() const { return m_omr >> 16; }
 
 	inline bool test_cc() const { return (m_ccr & CCR_C) == 0; }
 	inline bool test_ge() const { return (m_ccr & (CCR_N|CCR_V)) == 0 || (m_ccr & (CCR_N|CCR_V)) == (CCR_N|CCR_V); }

@@ -1,5 +1,9 @@
 ....00                       -
 ....26 abs d                 - d:acc(3)
+	if($d & 0x80000000000000) {
+		$d:w((-$d) & 0xffffffffffffff);
+	}
+
 ....21 adc s,d               - s:xyr(4) d:acc(3)
 ....10 add s,d               - s:nacc(3) d:acc(3)
 	$d:w(do_add56(util::sext($s, 56), $d));
@@ -329,7 +333,6 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$d:w(do_add56(u64($i) << 24, $d));
 
 0140c0 add #i,d              - d:acc(3) i:eximm()
-	logerror("i=%x\n", util::sext(u64($i) << 24, 48));
 	$d:w(do_add56(util::sext(u64($i) << 24, 48), $d));
 
 014086 and #i,d              - i:imm6(8) d:acc(3)

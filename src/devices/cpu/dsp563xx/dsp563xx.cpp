@@ -180,8 +180,8 @@ void dsp563xx_device::execute_run()
 				m_npc = (m_pc + (ex ? 2 : 1)) & 0xffffff;
 				m_rep = false;
 			}
-		}
-		else {
+
+		} else {
 			m_npc = (m_pc + (ex ? 2 : 1)) & 0xffffff;
 			if(loop) {
 				if(m_lc != 1 || (m_emr & EMR_FV)) {

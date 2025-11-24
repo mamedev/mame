@@ -4,8 +4,8 @@
 // DSP563xx unit tests
 
 #include "emu.h"
-#include <cpu/dsp563xx/dsp56311.h>
-#include <cpu/dsp563xx/dsp563xxd.h>
+#include "cpu/dsp563xx/dsp56311.h"
+#include "cpu/dsp563xx/dsp563xxd.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -120,7 +120,7 @@ private:
 	std::array<u16, 128*64> m_chars;
 	s32 m_first_fail;
 	s32 m_selected_block;
-	u32 m_code_start, m_code_end, m_regs_start, m_regs_end;
+	u32 m_code_start, m_code_end, m_pre_start, m_pre_end, m_post_start, m_post_end;
 	u32 m_blocks, m_tests;
 	u32 m_cur_block, m_cur_test;
 	u8 m_cur_port;
@@ -148,6 +148,7 @@ private:
 
 	u32 code_r(offs_t address);
 	u32 done_r();
+	u32 jmp0_r();
 	void trigger_test(bool stop = false);
 
 	void any_w(const char *name, std::map<u32, u32> &area, offs_t offset, u32 data);
@@ -173,6 +174,10 @@ utdsp563xx_state::utdsp563xx_state(const machine_config &mconfig, device_type ty
 
 u32 utdsp563xx_state::code_r(offs_t address)
 {
+	auto i = m_p_data.find(address);
+	if(i != m_p_data.end())
+		return i->second;
+
 	u32 clen = m_code_end - m_code_start;
 	if(address >= clen)
 		return 0x0c0fff;
@@ -187,7 +192,7 @@ u32 utdsp563xx_state::done_r()
 
 	if(m_initial_run) {
 		int result = 2;
-		for(int r = m_regs_start; r != m_regs_end; r++) {
+		for(int r = m_post_start; r != m_post_end; r++) {
 			u64 val = reg_actual_value(r);
 			m_reg_results[r] = val;
 			if(val != reg_expected_value(r))
@@ -215,12 +220,34 @@ u32 utdsp563xx_state::done_r()
 	return 0;
 }
 
+u32 utdsp563xx_state::jmp0_r()
+{
+	for(int i = m_pre_start; i != m_pre_end; i++) {
+		u64 val = reg_expected_value(i);
+		if(regs[i].m_reg >= MEM_P) {
+			auto &area = regs[i].m_reg == MEM_P ? m_p_data : regs[i].m_reg == MEM_X ? m_x_data : m_y_data;
+			area[regs[i].m_value >> 24] = val;
+
+		} else if(regs[i].m_reg >= F_CCR_C) {
+			u32 sr = m_cpu->state_int(DSP563XX_CCR);
+			if(val)
+				sr |= 1 << (regs[i].m_reg & 15);
+			else
+				sr &= ~(1 << (regs[i].m_reg & 15));
+			m_cpu->set_state_int(DSP563XX_SR, sr);
+
+		} else
+			m_cpu->set_state_int(regs[i].m_reg, val);
+	}
+	return 0x0c0000; // jmp 0
+}
+
 void utdsp563xx_state::p_map(address_map &map)
 {
 	map(0x000000*4, 0xffffff*4).rw(FUNC(utdsp563xx_state::p_r), FUNC(utdsp563xx_state::p_w));
 	map(0x000000*4, 0x000ffe*4).r(FUNC(utdsp563xx_state::code_r));
 	map(0x000fff*4, 0x000fff*4).r(FUNC(utdsp563xx_state::done_r));
-	map(0xc00000*4, 0xc00000*4).lr32(NAME([]() -> u32 { return 0x0c0000; })); // jmp 0
+	map(0xc00000*4, 0xc00000*4).r(FUNC(utdsp563xx_state::jmp0_r));
 }
 
 void utdsp563xx_state::any_w(const char *name, std::map<u32, u32> &area, offs_t offset, u32 data)
@@ -458,8 +485,10 @@ void utdsp563xx_state::machine_start()
 	save_item(NAME(m_chars));
 	save_item(NAME(m_code_start));
 	save_item(NAME(m_code_end));
-	save_item(NAME(m_regs_start));
-	save_item(NAME(m_regs_end));
+	save_item(NAME(m_pre_start));
+	save_item(NAME(m_pre_end));
+	save_item(NAME(m_post_start));
+	save_item(NAME(m_post_end));
 	save_item(NAME(m_initial_run));
 	save_item(NAME(m_cur_block));
 	save_item(NAME(m_cur_test));
@@ -624,28 +653,13 @@ void utdsp563xx_state::trigger_test(bool stop)
 	const testlist &tl = testlists[tb.m_testlist_start + m_cur_test];
 	m_code_start = tl.m_code_start;
 	m_code_end = tl.m_code_end;
-	m_regs_start = tl.m_post_start;
-	m_regs_end = tl.m_post_end;
+	m_pre_start = tl.m_pre_start;
+	m_pre_end = tl.m_pre_end;
+	m_post_start = tl.m_post_start;
+	m_post_end = tl.m_post_end;
 	m_p_data.clear();
 	m_x_data.clear();
 	m_y_data.clear();
-	for(int i = tl.m_pre_start; i != tl.m_pre_end; i++) {
-		u64 val = reg_expected_value(i);
-		if(regs[i].m_reg >= MEM_P) {
-			auto &area = regs[i].m_reg == MEM_P ? m_p_data : regs[i].m_reg == MEM_X ? m_x_data : m_y_data;
-			area[regs[i].m_value >> 24] = val;
-
-		} else if(regs[i].m_reg >= F_CCR_C) {
-			u32 sr = m_cpu->state_int(DSP563XX_CCR);
-			if(val)
-				sr |= 1 << (regs[i].m_reg & 15);
-			else
-				sr &= ~(1 << (regs[i].m_reg & 15));
-			m_cpu->set_state_int(DSP563XX_SR, sr);
-
-		} else
-			m_cpu->set_state_int(regs[i].m_reg, val);
-	}
 	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
