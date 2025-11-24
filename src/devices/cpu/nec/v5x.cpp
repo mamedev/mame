@@ -284,6 +284,7 @@ device_v5x_interface::device_v5x_interface(const machine_config &mconfig, nec_co
 	, m_DULA(0)
 	, m_OPHA(0)
 	, m_TCKS(0)
+	, m_brc_enable(false)
 {
 }
 
