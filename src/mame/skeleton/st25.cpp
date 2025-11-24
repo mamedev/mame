@@ -127,7 +127,7 @@ void st25_state::st25(machine_config &config)
 	OKIM6376(config, "oki", 4_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
 }
 
-ROM_START(stakeoff)
+ROM_START(stakeoffe)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -138,8 +138,21 @@ ROM_START(stakeoff)
 	ROM_LOAD("27c040.ic1",   0x00000, 0x80000, CRC(d9592e5e) SHA1(5de917a1c584a39a85e6f356d25924a65eaddf89))
 ROM_END
 
+ROM_START(superpasch)
+	ROM_REGION(0x4000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("124253.ic2", 0x00000, 0x80000, CRC(fe23b37a) SHA1(9d461b01d05c6e71e3d32800a429ad3f733d7274))
+
+	ROM_REGION(0x80000, "oki", 0)
+	ROM_LOAD("124254.ic1",   0x00000, 0x80000, CRC(f893b557) SHA1(194135c0cbcb270ebeb297c2f2e26e6101b44daf))
+ROM_END
+
+
 } // anonymous namespace
 
 
 //   YEAR  NAME      PARENT   MACHINE INPUT    CLASS   INIT        ROT   COMPANY         FULLNAME                                                  FLAGS
-GAME(2001, stakeoff,  0,       st25, st25, st25_state, empty_init, ROT0, u8"NSM/Löwen", "Super Take Off E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2001, stakeoffe,  0,       st25, st25, st25_state, empty_init, ROT0, "Panther", "Super Take Off E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2005, superpasch, 0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen", "Super Pasch",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
