@@ -53,15 +53,6 @@
 #include "bus/nscsi/devices.h"
 #include "cpu/nec/v5x.h"
 #include "imagedev/floppy.h"
-#include "formats/dfi_dsk.h"
-#include "formats/dsk_dsk.h"
-#include "formats/hxchfe_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/ipf_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/td0_dsk.h"
-#include "formats/pc_dsk.h"
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
@@ -77,6 +68,19 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/dfi_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/ipf_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/td0_dsk.h"
+#include "formats/pc_dsk.h"
+
+
+namespace {
 
 class s3000_state : public driver_device
 {
@@ -753,8 +757,10 @@ ROM_START( cd3000xl )
 	ROM_LOAD( "akai - cd3000xl - osv2.00.bin", 0x000000, 0x080000, CRC(6d4cc4ff) SHA1(89ee642e8e18e0ce218bb4766b620690323c26cc) )
 ROM_END
 
-CONS( 1993, s2000, 0, 0, s2000, s2000, s3000_state, empty_init, "Akai", "S2000", MACHINE_NOT_WORKING )
-CONS( 1993, s3000, 0, 0, s3000, s3000, s3000_state, empty_init, "Akai", "S3000", MACHINE_NOT_WORKING )
-CONS( 1993, cd3000i, 0, 0, cd3000, s3000, s3000_state, empty_init, "Akai", "CD3000i", MACHINE_NOT_WORKING)
-CONS( 1994, s3000xl, 0, 0, s3000xl, s3000xl, s3000_state, empty_init, "Akai", "S3000XL", MACHINE_NOT_WORKING)
-CONS( 1994, cd3000xl, 0, 0, cd3000xl, cd3000xl, s3000_state, empty_init, "Akai", "CD3000XL", MACHINE_NOT_WORKING)
+} // anonymous namespace
+
+SYST( 1993, s2000,    0, 0, s2000,    s2000,    s3000_state, empty_init, "Akai", "S2000", MACHINE_NOT_WORKING )
+SYST( 1993, s3000,    0, 0, s3000,    s3000,    s3000_state, empty_init, "Akai", "S3000", MACHINE_NOT_WORKING )
+SYST( 1993, cd3000i,  0, 0, cd3000,   s3000,    s3000_state, empty_init, "Akai", "CD3000i", MACHINE_NOT_WORKING)
+SYST( 1994, s3000xl,  0, 0, s3000xl,  s3000xl,  s3000_state, empty_init, "Akai", "S3000XL", MACHINE_NOT_WORKING)
+SYST( 1994, cd3000xl, 0, 0, cd3000xl, cd3000xl, s3000_state, empty_init, "Akai", "CD3000XL", MACHINE_NOT_WORKING)
