@@ -419,7 +419,7 @@ void utdsp563xx_state::draw_single_test()
 	while(pos != code_len) {
 		std::ostringstream os;
 		offs_t off = m_disassembler.disassemble(os, pos, data, data);
-		xprint(40*col, 2+PRE_PER_COLUMN+1+line, util::string_format("%02x: %s", pos, os.str()), 0, 7);
+		xprint(40*col, 2+PRE_PER_COLUMN+1+line, util::string_format("%02x: %06x %s", pos, data.r32(pos), os.str()), 0, 7);
 		line ++;
 		if(line == CODE_PER_COLUMN) {
 			line = 0;

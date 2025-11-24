@@ -326,10 +326,11 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$xy:m.write_dword($r + $o, $s:h);
 
 014080 add #i,d              - i:imm6(8) d:acc(3)
-	$d = do_add56(u64($i) << 24, $d);
+	$d:w(do_add56(u64($i) << 24, $d));
 
 0140c0 add #i,d              - d:acc(3) i:eximm()
-	$d = do_add56(util::sext($i << 24, 48), $d);
+	logerror("i=%x\n", util::sext(u64($i) << 24, 48));
+	$d:w(do_add56(util::sext(u64($i) << 24, 48), $d));
 
 014086 and #i,d              - i:imm6(8) d:acc(3)
 	u32 r = $d:1 & $i;
@@ -1370,10 +1371,10 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 000087 stop                  -
 014084 sub #i,d              - i:imm6(8) d:acc(3)
-	$d = do_sub56(u64($i) << 24, $d);
+	$d:w(do_sub56(u64($i) << 24, $d));
 
 0140c4 sub #i,d              - d:acc(3) i:eximm()
-	$d = do_sub56(util::sext($i << 24, 48), $d);
+	$d:w(do_sub56(util::sext(u64($i) << 24, 48), $d));
 
 020000 tcc s1,d1             - cc:cc(12) s1:daos3(4, 3) d1:acc(3)
 	if($cc) {

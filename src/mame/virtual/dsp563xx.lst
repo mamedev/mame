@@ -612,7 +612,7 @@ x0x1Combinations
 	44f400 babecc < x0=aabbcc x1=ddeeff y0=abcdef y1=123456 > x=ddeeffbabecc y=123456abcdef
 	44f400 aaaaaa 47f400 dddddd < x0=111111 x1=222222 y0=333333 y1=444444 > x=222222aaaaaa y=dddddd333333
 	44f400 aaaaaa 45f400 bbbbbb < x0=111111 x1=222222 y0=333333 y1=444444 > x=bbbbbbaaaaaa y=444444333333
-	44f400 aaaaaa 47f400 bbbbbb 200020 200038 < x0=111111 x1=222222 y0=333333 y1=444444 a=0 b=0 > a=00222222aaaaaa b=ffdddddd333333
+	44f400 aaaaaa 47f400 dddddd 200020 200038 < x0=111111 x1=222222 y0=333333 y1=444444 a=0 b=0 > a=00222222aaaaaa b=ffdddddd333333
 
 abs
 	200026 20002e < a=ff112233445566 b=00aabbccddeeff > a=00eeddccbbaa9a b=00aabbccddeeff

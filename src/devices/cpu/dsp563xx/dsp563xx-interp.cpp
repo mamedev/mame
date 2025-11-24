@@ -12,7 +12,7 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 	case 0: { // -
 		break;
 		}
-	case 1: { //
+	case 1: { // 
 		break;
 		}
 	case 2: { // abs a
@@ -1332,7 +1332,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 	case 0: { // -
 		break;
 		}
-	case 1: { //
+	case 1: { // 
 		break;
 		}
 	case 2: { // #[i],x0
@@ -14806,7 +14806,7 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 	case 0: { // -
 		break;
 		}
-	case 1: { //
+	case 1: { // 
 		break;
 		}
 	case 2: { // #[i],x0
@@ -27100,7 +27100,7 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 0: { // -
 		break;
 		}
-	case 1: { //
+	case 1: { // 
 		break;
 		}
 	case 2: { // move x:(r+[o]),x0
@@ -28094,25 +28094,27 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 154: { // add #[i],a
 		u64 d = get_a();
 		u32 i = BIT(opcode, 8, 6);
-		d = do_add56(u64(i) << 24, d);
+		set_a(do_add56(u64(i) << 24, d));
 		break;
 		}
 	case 155: { // add #[i],b
 		u64 d = get_b();
 		u32 i = BIT(opcode, 8, 6);
-		d = do_add56(u64(i) << 24, d);
+		set_b(do_add56(u64(i) << 24, d));
 		break;
 		}
 	case 156: { // add #[i],a
-		u64 d = get_a();
 		u32 i = exv;
-		d = do_add56(util::sext(i << 24, 48), d);
+		u64 d = get_a();
+		logerror("i=%x\n", util::sext(u64(i) << 24, 48));
+		set_a(do_add56(util::sext(u64(i) << 24, 48), d));
 		break;
 		}
 	case 157: { // add #[i],b
-		u64 d = get_b();
 		u32 i = exv;
-		d = do_add56(util::sext(i << 24, 48), d);
+		u64 d = get_b();
+		logerror("i=%x\n", util::sext(u64(i) << 24, 48));
+		set_b(do_add56(util::sext(u64(i) << 24, 48), d));
 		break;
 		}
 	case 158: { // and #[i],a
