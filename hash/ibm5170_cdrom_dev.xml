@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5170_cdrom_dev" description="IBM PC/AT CD-ROMs (development)">
+
+	<software name="win31ddk">
+		<description>Windows Device Development Kit Version 3.1</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="win31ddk" sha1="0208c3299cb206ea8b9b7d99e75131661898bae2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win31rk">
+		<description>Windows Resource Kit for Operating System Version 3.1</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="win31rk" sha1="0813d90cf00e296676ecd0259cd425ab50670e8a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win31sdk">
+		<description>Windows Software Development Kit Version 3.1</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="050-151-320" sha1="4840cb3624e4032456434e099cd0362bc278e680" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win32sdk">
+		<description>Win32 Software Development Kit (version 3.51)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="For Windows NT 3.51 and Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us win32 sdk 3.51.1057.1" sha1="56b0e2b3ec8976bac7f702dcb504cc788ba3edeb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31rk">
+		<description>Windows NT Resource Kit (version 3.1)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt resource kit 3.1" sha1="47cf0f58d254837f6ccfcdbf9f97da2a18954ac0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt31sdk">
+		<description>Win32 Software Development Kit and Device Driver Kit (version 3.1)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us win32 sdk and ddk 3.10.528.1" sha1="57c11eed25ff459ee793ed8dea867c3e498436f7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt35rk">
+		<description>Windows NT Resource Kit (version 3.5)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt resource kit 3.5" sha1="aadea0f25dae3f8030e490eb2d86a68be6530031" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt351rk">
+		<description>Windows NT Resource Kit (version 3.51)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt resource kit 3.51" sha1="ff198e230549abeaf45a5b5af9a5d414ac04a9ec" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40rk">
+		<description>Windows NT Workstation Resource Kit (version 4.0)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt workstation resource kit 4.0" sha1="44631b02771339ae053366ad1766a272a57bd96f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winnt40srk" cloneof="winnt40rk">
+		<description>Windows NT Server Resource Kit (version 3.1)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<info name="language" value="English" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="en-us windows nt server resource kit 4.0" sha1="c1111892c995c76d0cba8c9667fab569ec3fd178" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

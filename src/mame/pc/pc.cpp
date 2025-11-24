@@ -228,7 +228,13 @@ void pc_state::pccga(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "pc_apps_disk_list").set_original("ibm5150_apps");
+	SOFTWARE_LIST(config, "pc_boot_disk_list").set_original("ibm5150_boot");
+	SOFTWARE_LIST(config, "pc_demos_disk_list").set_original("ibm5150_demos");
+	SOFTWARE_LIST(config, "pc_dev_disk_list").set_original("ibm5150_dev");
+	SOFTWARE_LIST(config, "pc_drivers_disk_list").set_original("ibm5150_drivers");
+	SOFTWARE_LIST(config, "pc_games_disk_list").set_original("ibm5150_games");
+	SOFTWARE_LIST(config, "pc_os_disk_list").set_original("ibm5150_os");
 }
 
 
@@ -1391,7 +1397,13 @@ void pc_state::zenith(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("128K, 256K, 512K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "pc_apps_disk_list").set_original("ibm5150_apps");
+	SOFTWARE_LIST(config, "pc_boot_disk_list").set_original("ibm5150_boot");
+	SOFTWARE_LIST(config, "pc_demos_disk_list").set_original("ibm5150_demos");
+	SOFTWARE_LIST(config, "pc_dev_disk_list").set_original("ibm5150_dev");
+	SOFTWARE_LIST(config, "pc_drivers_disk_list").set_original("ibm5150_drivers");
+	SOFTWARE_LIST(config, "pc_games_disk_list").set_original("ibm5150_games");
+	SOFTWARE_LIST(config, "pc_os_disk_list").set_original("ibm5150_os");
 }
 
 ROM_START( zdsupers )
@@ -1956,7 +1968,13 @@ void pc_state::alphatp50(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K, 256K, 384K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "pc_apps_disk_list").set_original("ibm5150_apps");
+	SOFTWARE_LIST(config, "pc_boot_disk_list").set_original("ibm5150_boot");
+	SOFTWARE_LIST(config, "pc_demos_disk_list").set_original("ibm5150_demos");
+	SOFTWARE_LIST(config, "pc_dev_disk_list").set_original("ibm5150_dev");
+	SOFTWARE_LIST(config, "pc_drivers_disk_list").set_original("ibm5150_drivers");
+	SOFTWARE_LIST(config, "pc_games_disk_list").set_original("ibm5150_games");
+	SOFTWARE_LIST(config, "pc_os_disk_list").set_original("ibm5150_os");
 }
 
 ROM_START( alphatp50 )

@@ -564,9 +564,31 @@ void pcipc_state::pcipc_map_io(address_map &map)
 void pcipc_state::x86_softlists(machine_config &config)
 {
 	/* software lists */
-	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
-	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
-	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "pc_apps_disk_list").set_original("ibm5150_apps");
+	SOFTWARE_LIST(config, "pc_boot_disk_list").set_original("ibm5150_boot");
+	SOFTWARE_LIST(config, "pc_demos_disk_list").set_original("ibm5150_demos");
+	SOFTWARE_LIST(config, "pc_dev_disk_list").set_original("ibm5150_dev");
+	SOFTWARE_LIST(config, "pc_drivers_disk_list").set_original("ibm5150_drivers");
+	SOFTWARE_LIST(config, "pc_games_disk_list").set_original("ibm5150_games");
+	SOFTWARE_LIST(config, "pc_os_disk_list").set_original("ibm5150_os");
+	SOFTWARE_LIST(config, "at_apps_dos_disk_list").set_original("ibm5170_apps_dos");
+	SOFTWARE_LIST(config, "at_apps_win_disk_list").set_original("ibm5170_apps_win");
+	SOFTWARE_LIST(config, "at_boot_disk_list").set_original("ibm5170_boot");
+	SOFTWARE_LIST(config, "at_coverdisks_disk_list").set_original("ibm5170_coverdisks");
+	SOFTWARE_LIST(config, "at_dev_disk_list").set_original("ibm5170_dev");
+	SOFTWARE_LIST(config, "at_drivers_disk_list").set_original("ibm5170_drivers");
+	SOFTWARE_LIST(config, "at_games_dos_disk_list").set_original("ibm5170_games_dos");
+	SOFTWARE_LIST(config, "at_games_os2_disk_list").set_original("ibm5170_games_os2");
+	SOFTWARE_LIST(config, "at_games_win_disk_list").set_original("ibm5170_games_win");
+	SOFTWARE_LIST(config, "at_os_disk_list").set_original("ibm5170_os");
+	SOFTWARE_LIST(config, "at_apps_cdrom_list").set_original("ibm5170_cdrom_apps");
+	SOFTWARE_LIST(config, "at_dev_cdrom_list").set_original("ibm5170_cdrom_dev");
+	SOFTWARE_LIST(config, "at_drivers_cdrom_list").set_original("ibm5170_cdrom_drivers");
+	SOFTWARE_LIST(config, "at_games_dos_cdrom_list").set_original("ibm5170_cdrom_games_dos");
+	SOFTWARE_LIST(config, "at_games_linux_cdrom_list").set_original("ibm5170_cdrom_games_lin");
+	SOFTWARE_LIST(config, "at_games_os2_cdrom_list").set_original("ibm5170_cdrom_games_os2");
+	SOFTWARE_LIST(config, "at_games_win_cdrom_list").set_original("ibm5170_cdrom_games_win");
+	SOFTWARE_LIST(config, "at_os_cdrom_list").set_original("ibm5170_cdrom_os");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");

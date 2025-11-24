@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5170_cdrom_apps" description="IBM PC/AT CD-ROMs (applications)">
+
+	<!-- OS/2 -->
+	<software name="apak_os2">
+		<description>IBM AttachPak for OS/2 Warp Connect</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: archive.org -->
+			<feature name="part_number" value="27H9296"/>
+			<diskarea name="cdrom">
+				<disk name="apak_usa" sha1="ad7b97376326cad3665a65a711ef872c44a93120"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<software name="cdraw6" supported="no">
+		<description>Corel DRAW! 6</description>
+		<year>1995</year>
+		<publisher>Corel Corporation</publisher>
+		<notes><![CDATA[
+Install screen blanks out the background in several places [8514]
+Don't display icons in help, font master, probably others [8514]
+Draw: forgets fill colors on canvas when moving or zooming, leaves trails when moving toolkit panes, curves don't seem very accurate [8514]
+Draw: cannot color fill a bezier shape (verify)
+Photo Paint: cannot fill shapes, has artifacts with drawing [8514]
+Other stuff untested
+]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd1" sha1="db1f485ff98d9e80bd3c0d4b61945c7f6290ae1f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd2" sha1="bcee744ad708dcf1b25c56a6e5b0be1709d1389b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd3" sha1="cccb1d014ed22aa60ae1af9f43f979e630c0f3a0" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd4" sha1="7e88e8537ee0587554e60a77aeb4b2ecaad62f71" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS, Windows 95B, Windows 98, Windows Me, Windows 2000, Windows XP
+	     and El Torito bootable. -->
+	<software name="pmagic">
+		<description>PartitionMagic 8.05</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="release" value="20040505" />
+		<info name="usage" value="Windows installer accepts any string starting with &quot;PM805EN1-&quot; for a product key." />
+		<info name="version" value="8.05" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="partitionmagic 8.05" sha1="f783735693288fa20c8d2d7a614a3d0674ede2bf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS 5.0+, Windows 3.1+ -->
+	<software name="uffvmus" supported="no">
+		<description>Uffizi Virtual Museums</description>
+		<year>1995</year>
+		<!-- also on credited on disk: -->
+		<!-- "Scala" (for photographs) -->
+		<!-- "Le Scienze" (text?) -->
+		<publisher>Opera Multimedia</publisher>
+		<notes><![CDATA[
+Crashes on Windows 95 with Mtb30run general protection fault
+Has setup menu glitch with text [8514]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="uffizi_e1_09" sha1="5121f95753bdf9ffdc5e564259d153088953ac67" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="win30me">
+		<description>Windows Multimedia Extensions 1.0</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="win30me" sha1="0ef02709c3ed3544fc01983921eaace878cf5d80" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

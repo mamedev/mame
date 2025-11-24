@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5150_demos" description="IBM PC floppy disk (demoscene)">
+
+	<software name="8088mph" supported="no">
+		<description>8088 MPH (Final Version)</description>
+		<year>2015</year>
+		<publisher>Hornet + CRTC + DESiRE</publisher>
+		<notes><![CDATA[
+Prints "Metric cycle count of 1127 deviates 33%" with ibm5160
+Various GFX glitches, cfr. https://youtu.be/hNRO7lno_DM for side by side test
+Hangs at credits screen
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="8088mph final.360" size="368640" crc="a30504e8" sha1="5f637b83dca774b7104fed0d20195dd769e0838b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="8088mphp" cloneof="8088mph" supported="no">
+		<description>8088 MPH (Revision 2015 Party version)</description>
+		<year>2015</year>
+		<publisher>Hornet + CRTC + DESiRE</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="8088mph.360" size="368640" crc="4f5f4871" sha1="b7f61ad133edf7e80d2ccd0bc7767baf0b13f34d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

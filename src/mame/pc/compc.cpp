@@ -202,7 +202,13 @@ void compc_state::compc(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K, 640K");
 
 	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "pc_apps_disk_list").set_original("ibm5150_apps");
+	SOFTWARE_LIST(config, "pc_boot_disk_list").set_original("ibm5150_boot");
+	SOFTWARE_LIST(config, "pc_demos_disk_list").set_original("ibm5150_demos");
+	SOFTWARE_LIST(config, "pc_dev_disk_list").set_original("ibm5150_dev");
+	SOFTWARE_LIST(config, "pc_drivers_disk_list").set_original("ibm5150_drivers");
+	SOFTWARE_LIST(config, "pc_games_disk_list").set_original("ibm5150_games");
+	SOFTWARE_LIST(config, "pc_os_disk_list").set_original("ibm5150_os");
 }
 
 void compc_state::pc10iii(machine_config &config)

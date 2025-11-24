@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5170_cdrom_games_lin" description="IBM PC/AT CD-ROMs (Linux games)">
+
+	<!-- Linux -->
+	<!-- Source: http://redump.org/disc/118951/ -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition).cue" size="1368" crc="66417039" sha1="b7eab95eb3fbf42cbd2bec4a433ed1214d16039f" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 1).bin" size="418517232" crc="e7a144e7" sha1="539d5a0ea16970d6e9420a0a077e741d2f0ff6c3" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 2).bin" size="22407504" crc="b3d73bca" sha1="ffdb673f3c697176500dd6c5e5cee4c76cc83cc6" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 3).bin" size="21525504" crc="6e0add33" sha1="e53db937c7f84afb9e3c743a17fb753ada608738" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 4).bin" size="29816304" crc="e6510dc0" sha1="4d545259bf8eadad87e736c756704776829396d9" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 5).bin" size="20819904" crc="9bc13589" sha1="b3fd40f818bbfd84c5a05c838266d427eaeba3d8" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 6).bin" size="27346704" crc="e4693d9a" sha1="df1ecb36df0f18ef7004b1b726d1d3e1c05d572a" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 7).bin" size="27875904" crc="4c42650b" sha1="5a4e8291c1b0b3ec7d95a499c8b450bbd10b7d2c" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 8).bin" size="27875904" crc="b96b7527" sha1="38cacd012fcd4c023a7707cf2d0598ff76456650" /> -->
+	<!-- <rom name="Civilization - Call to Power (USA) (Linux) (Limited Edition) (Track 9).bin" size="36872304" crc="1ef537ec" sha1="0a6a40a00c27a1c4f30c0738c3bfc07532c40245" /> -->
+	<software name="civctple" supported="partial">
+		<description>Civilization: Call to Power (Limited Edition, v1.1)</description>
+		<year>1996</year>
+		<publisher>Activision</publisher>
+		<notes><![CDATA[
+Full game, but with netplay and map editing disabled. Bundled with Corel Linux OS Deluxe.
+]]></notes>
+		<info name="version" value="1.1" />
+		<info name="language" value="English" />
+		<sharedfeat name="platform" value="Linux" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civilization_call_to_power_le" sha1="94ad4b9e24bec7b32e32d1efe801c45025f673f5" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

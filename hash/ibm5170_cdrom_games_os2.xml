@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5170_cdrom_games_os2" description="IBM PC/AT CD-ROMs (OS/2 games)">
+
+	<!-- OS/2 Warp, untested -->
+	<software name="cgameos2">
+		<description>Classic Games for OS/2 Warp</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="classic games for os2 warp (1995)(ibm)" sha1="4a377af3d8de57c46870c8c3d56b0a5999123082" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

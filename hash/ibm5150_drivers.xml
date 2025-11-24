@@ -1,0 +1,147 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5150_drivers" description="IBM PC floppy disk (drivers)">
+
+	<software name="amouse7">
+		<!-- dumped via Kryoflux from original floppy, some modified sectors present -->
+		<description>AMouse Mouse Driver Disk</description>
+		<year>1991</year>
+		<publisher>ULTIMA Electronics Corp.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="AMouse-driver-disk-7.0.img" size="737280" crc="e49af872" sha1="4ee28d6149cf6c4e3fc8562a8fe6f738c6b1b83d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moustest" supported="no">
+		<!-- Dumped via Kryoflux, all tracks show as good and modified -->
+		<description>Mouse Software Test/Demo</description>
+		<year>1987</year>
+		<publisher>Mouse Systems</publisher>
+		<notes><![CDATA[
+Driver and test suite for unemulated Mouse Systems Mighty Mouse
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="disk1.img" size="368640" crc="ca451d20" sha1="0b1a6be07407c3a5fd15d9d17c61ccc8d1b94c5e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mousetb">
+		<description>Mouse/Trackball</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<info name="version" value="6.20 Rev. A" />
+		<info name="release" value="19921005"/>
+		<info name="serial" value="133446-002" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="133446-002.img" size="737280" crc="b8f7b556" sha1="548b551ed6e3242b8d361f803db2580a1a3995ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1hdu" supported="no">
+		<description>Olivetti Prodest PC1 HDU Install</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+		<notes><![CDATA[
+Throws "invalid himem.sys", "invalid emm386.exe" and "unrecognized command in config.sys" if autobooted
+Throws "invalid directory" if run from DOS
+]]></notes>
+		<info name="version" value="1.00" />
+		<info name="serial" value="718165 E" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="HDU-Install1.dsk" size="737280" crc="8d53e47f" sha1="583e93681b9bd65f521036bc90f0484a7b84033d" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pc1mouse" supported="no">
+		<description>Olivetti Prodest PC1 Mouse Driver</description>
+		<year>1988</year>
+		<publisher>Olivetti Prodest</publisher>
+		<notes><![CDATA[
+Causes unresponsive keyboard once installed on PC1
+]]></notes>
+		<info name="version" value="1.02" />
+		<info name="serial" value="961248 M" />
+		<info name="usage" value="Logitech mouse driver for Prodest PC1 only" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Driver Mouse.dsk" size="737280" crc="c7b67dd4" sha1="80fb80702e2a673d71df588ea42566ac3bf66f43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sicmouse" supported="no">
+		<description>SICOS Mouse</description>
+		<year>1990</year>
+		<publisher>SICOS</publisher>
+		<notes><![CDATA[
+Corrupt files
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SICOS\nMOUSE DRIVER\nMOUSE TESTER\nMENU MAKER"/>
+			<dataarea name="flop" size="368640">
+				<!-- files are corrupt -->
+				<rom name="sicos_mouse.img" size="368640" crc="3f927fd3" sha1="f1372c69d5d497ca6f3ce85ec144b714dfb2ab94" status="baddump"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SICOS PAINT\nThe SICOS mouse - paint program"/>
+			<dataarea name="flop" size="368640">
+				<!-- files are corrupt -->
+				<rom name="sicos_paint.img" size="368640" crc="b93dd558" sha1="3e78a30acf4adddbabb04babdc469b5c4ff4af4a" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgmous">
+		<!-- Dumped via Kryoflux, all tracks show as good, 62/80 modified -->
+		<description>SYSGRATION Mouse Driver 8.00 (5.25")</description>
+		<year>1993</year>
+		<publisher>Sysgration</publisher>
+		<info name="version" value="8.00"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="sysgration mouse driver 8.00 (5.25'').img" size="368640" crc="e90076f0" sha1="7859af0d7ce851e6862607dcbce2688fba0727f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgmous35" cloneof="sysgmous">
+		<!-- Dumped via Kryoflux, 28 tracks show as good and modified, rest unformatted -->
+		<description>SYSGRATION Mouse Driver 8.00 (3.5")</description>
+		<year>1993</year>
+		<publisher>Sysgration</publisher>
+		<info name="version" value="8.00"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="sysgration mouse driver 8.00.img" size="737280" crc="035866b5" sha1="2bb96732023e9fd11af235ae41e1d164dc7e751d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgmousa" cloneof="sysgmous">
+		<!-- Dumped via Kryoflux, all tracks show as good, 27/160 modified -->
+		<description>SYSGRATION Mouse Driver 7.03 (5.25")</description>
+		<year>1992</year>
+		<publisher>Sysgration</publisher>
+		<info name="version" value="7.03"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="sysgration mouse driver 7.03.img" size="737280" crc="7f3cce79" sha1="13221acdb74e5d8f24ec567ce60e1e69268010da"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

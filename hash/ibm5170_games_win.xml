@@ -1,0 +1,420 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5170_games_win" description="IBM PC/AT floppy disk (Windows games)">
+
+	<software name="bchessw">
+		<description>Battle Chess (Windows 3.x release)</description>
+		<year>1991</year>
+		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="Manual required" />
+		<info name="developer" value="Interplay" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (win 3.x) [Interplay] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="17d20a89" sha1="9d2babbfbd8c62556a30f4f21665ccd826e94496"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "737280">
+				<rom name="Battle Chess (win 3.x) [Interplay] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="f9883a21" sha1="dcf04cf8ca446322c3ac1f531a41851ad6181489"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caesarpw">
+		<description>Caesars Palace for Windows</description>
+		<year>1994</year>
+		<publisher>Virgin Games</publisher>
+		<notes>This release was dual Windows / Macintosh.</notes>
+		<sharedfeat name="platform" value="Windows 3.x" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Caesars Palace (Windows 3.x) [Virgin Games] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b8f024b3" sha1="124c9d51221d11147eed08db44f6275db991a646"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Caesars Palace (Macintosh) [Virgin Games] [1992] [3.5HD] [Disk 2 of 2].img" size="1474560" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wincr2">
+		<!-- converted from DDI format -->
+		<description>Classic Road 2</description>
+		<year>1994</year>
+		<publisher>Progress</publisher>
+		<info name="alt_title" value="クラシック・ロード2" />
+		<info name="usage" value="Requires Japanese Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- <rom name="0509_1.DDI" size="820224" crc="3a728485" sha1="ffb9f55a775a9fd221be3a3abf3eec1ab5042986"/> -->
+				<rom name="0509_1.img" size="1474560" crc="4ad1ee23" sha1="575079823ab1cd9db22f6e86b42c5b08a2a9518e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- <rom name="0509_2.DDI" size="783360" crc="6b932508" sha1="030f516ce91c2b9d6b99293ad644dad84f7361f4"/> -->
+				<rom name="0509_2.img" size="1474560" crc="90a0f484" sha1="6ca68e4a0787590b60da923c0355a9f65c47d6d6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<!-- <rom name="0509_3.DDI" size="552960" crc="8d2ee3c4" sha1="c2a50a9d5347632345eea0f49d489dfa7617c1dc"/> -->
+				<rom name="0509_3.img" size="1474560" crc="92441ad3" sha1="8765cc260b2e921a60d4b3b6ab3e8b13430bfc9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="classarc">
+		<description>Classics Arcade</description>
+		<year>1995</year>
+		<publisher>Impressions Software</publisher>
+		<notes>This pack includes: "Maze Craze", "Invaders", "Mine Trap", "Brick Buster", "Fighter Ace"</notes>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Classics Arcade [Impressions] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="0c94a2a1" sha1="dc63331d32b4cd5a6927e1b9e84babb9a5a691f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogz">
+		<description>Dogz, Your Computer Pet</description>
+		<year>1995</year>
+		<publisher>PF.Magic, Inc.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="dogz-disk1.img" size="1474560" crc="feb994f0" sha1="75099d994746e151bf9c5d7c94da23b43879b19d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="dogz-disk2.img" size="1474560" crc="05d3a216" sha1="203a0486d596ca98174606520779999ce0ef6397"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gayblade">
+		<description>GayBlade</description>
+		<year>1992</year>
+		<publisher>RJBest</publisher>
+		<info name="usage" value="Requires Windows 3.1"/>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pc disk1.img" size="1474560" crc="014119f1" sha1="bee96834f48e287bdc607d030e83276c1c56035c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="pc disk2.img" size="1474560" crc="cbf98649" sha1="e94671b751bcc4cc443770009fa4a84f3384e01d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- ISBN: 98-89973-26-7 -->
+	<software name="gilispa" supported="no">
+		<description>Gilis presentask (Swe)</description>
+		<year>1995</year>
+		<publisher>Gili Soft</publisher>
+		<info name="usage" value="Install from Windows 3.1 with: SETUP"/>
+		<!-- Dumped with a KryoFlux. From broken disk so reads as "Bad". -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4229062">
+				<rom name="gilis presentask - diskett 1.mfm" size="4229062" crc="517acdd2" sha1="260a905ffec0770d906b0717eecd2681d6717876" status="baddump"/>
+			</dataarea>
+		</part>
+		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1477688">
+				<rom name="gilis presentask - diskett 2.imd" size="1477688" crc="6739361d" sha1="7bf0a4565ce4c342a498c914462fc53cf0b62353"/>
+			</dataarea>
+		</part>
+		<!-- Dumped with a KryoFlux. Reads as "Good+Modified". -->
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1478710">
+				<rom name="gilis presentask - diskett 3.imd" size="1478710" crc="3ea9d9fe" sha1="8dabbfb2be7930eb0c269da5d882533fdf2ae54e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreamjean">
+		<description>I Dream of Jeannie</description>
+		<year>1996</year>
+		<publisher>Trendmasters</publisher>
+		<info name="usage" value="Windows 3.x required"/>
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="I Dream of Jeannie [Trendmasters] [1996] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8944c5d0" sha1="04d9a1359065db2fc93d013ff051788933c1c1c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeweldil">
+		<description>Jeweler's Dilemma (3.5" DD)</description>
+		<year>1992</year>
+		<publisher>Cinnabar Software</publisher>
+		<info name="developer" value="Cinnabar Software" />
+		<info name="version" value="1.0" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Jeweler's Dilemma [Cinnabar] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="87e52f11" sha1="b9311be18887acb98d704a5923259a26507205a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeweldil525" cloneof="jeweldil">
+		<description>Jeweler's Dilemma (5.25" HD)</description>
+		<year>1992</year>
+		<publisher>Cinnabar Software</publisher>
+		<info name="developer" value="Cinnabar Software" />
+		<info name="version" value="1.0" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Jeweler's Dilemma [Cinnabar] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="7975c7c1" sha1="fe397dff87a12b1ef36f253cd98eddc92637f35d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msarcade">
+		<description>Microsoft Arcade</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "Asteroids", "Battlezone", "Centipede", "Missile Command", "Tempest"</notes>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Arcade [Microsoft] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="c67a3e7c" sha1="57977ba651e20b3a731d756a19be60d121537ef9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msentp1">
+		<description>Microsoft Entertainment Pack</description>
+		<year>1990</year>
+		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "Tetris", "Minesweeper", "Cruel", "Golf", "TicTactics", "Taipei", "Pegged", "IdleWild"</notes>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack [Microsoft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7cbdfa34" sha1="aafedd723426a34d367f1c30e9d5748c5691b0a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msentp2">
+		<description>Microsoft Entertainment Pack 2</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "FreeCell", "JigSawed", "Pipe Dream", "Rodent's Revenge", "RattlerRace", "Stones", "Tut's Tomb", "IdleWild"</notes>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 2 [Microsoft] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="6e9bb9ed" sha1="f58f33d635c8177c170fa559c536effafa18e7b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 2 [Microsoft] [1991] [3.5DD] [Disk 2 of 2].img" size="737280" crc="e027bfe4" sha1="245cfab1538c06fd92732b95c9685c9b7e8f2f66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msentp3">
+		<description>Microsoft Entertainment Pack 3</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "Fuji Golf", "Klotski", "LifeGenesis", "SkieFree", "TetraVex", "TriPeaks", "WordZap", "IdleWild"</notes>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 3 [Microsoft] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ea49d42a" sha1="843c3ccc003b8a83d205bf07084eea0528622a9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msentp4">
+		<description>Microsoft Entertainment Pack 4</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<notes>This pack includes: "JezzBall", "Maxwell's Maniac", "Chip's Challenge", "Dr. Black Jack", "Tic Tac Drop", "Go Figure!", "Chess"</notes>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="732c46b7" sha1="b0c7d2d2b4b54b32620c6b9fbe75036459c40987"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 [Microsoft] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="154a3654" sha1="7d0892b35a845e6c26331f4de566cdfc30c1aac0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msentp4a" cloneof="msentp4">
+		<description>Microsoft Entertainment Pack 4 (alt)</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 (alt) [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="28a4bf38" sha1="24c8951ebf28a2511e14b68ede428f1cf965e32e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Microsoft Entertainment Pack 4 (alt) [Microsoft] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="c57a1fb2" sha1="274cb6dae354cb5494b210939372d712be990403"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfsim50">
+		<description>Microsoft Flight Simulator 5.0</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Flight Simulator 5.0 [Microsoft] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="27ac12e9" sha1="7b90626a7a4762e7c775d7d862cb8a0b19067c41"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Microsoft Flight Simulator 5.0 [Microsoft] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="0176da38" sha1="0888d6d01a9db15fa4c6c3b14b40fc0ce539b1ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msroa">
+		<description>Microsoft Return of Arcade</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<info name="usage" value="Requires Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="52469b53" sha1="70b4b69e56821ab549c80ae0ecad6cbd335d0631"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk2.img" size="1720320" crc="2c76da98" sha1="9899f3fac0dce1aef14bf5f9327d3941879eb314"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk3.img" size="1720320" crc="9ad15a6c" sha1="3eeb07612f20bbfccca4343ed213d3c8f1371450"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simantwin">
+		<description>SimAnt (Windows 3.x release)</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimAnt (win 3.x release) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="5ec6bb7d" sha1="7666d4e9b3d78ca109481c5225ebc51e286b51f8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimAnt (win 3.x release) [Maxis] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="a40d89ee" sha1="7c5effdd95af637577d01ffa0faa40290d63ba19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcityw">
+		<description>SimCity Classic (Windows 3.x release) (3.5")</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 2] [Install Disk].img" size="737280" crc="a2a24523" sha1="15970109725d27fce3609f83c367b07b9979df1a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 2 of 2] [Data Disk].img" size="737280" crc="7a72e17d" sha1="e7ba99908cd0cf491f9b3103b80ba29942729328"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcityw525" cloneof="simcityw">
+		<description>SimCity Classic (Windows 3.x release) (5.25")</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires Windows 3.x" />
+		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="5a87c7a4" sha1="6d668984561cbec5e2556925910c6275680f438d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simlifew">
+		<description>SimLife (Windows 3.x release)</description>
+		<year>1993</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Maxis" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 3].img" size="737280" crc="40136c47" sha1="4a80d0ec9c6cc7360bfeb23323b0a520b79a35b4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 2 of 3].img" size="737280" crc="bafc7365" sha1="b2c88c8a1010897d469b9dbbb85053e25ea93626"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 3 of 3].img" size="737280" crc="31cfd3d2" sha1="50314726fdc3f94fb86ab35d6887ae663503be87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetriscw">
+		<description>Tetris Classic (Windows 3.x release)</description>
+		<year>1992</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="developer" value="Sphere" />
+		<info name="version" value="Version 1.0 10/23/92" />
+		<sharedfeat name="platform" value="Windows 3.x" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tetris Classic (windows 3.x release) [Spectrum Holobyte] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="79804dc4" sha1="2ce4e7641a5d9422d79a85d300a7c0f9140ade88"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="Tetris Classic (windows 3.x release) [Spectrum Holobyte] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" crc="655bda8e" sha1="2a2053439e2bec82cb0be8cd4bae8035e9cf33a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

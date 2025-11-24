@@ -1,0 +1,1307 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5170_apps_win" description="IBM PC/AT floppy disk (Windows applications)">
+
+	<software name="3000icon">
+		<description>3000 Icons for Windows</description>
+		<year>1995</year>
+		<publisher>Explore the World of Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="win529.img" size="1474560" crc="9578bf9a" sha1="6dd7b4ac9e18c6d9cd6685230b5245321ffc43ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acerwin">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Acer/Win Supplement</description>
+		<year>1995</year>
+		<publisher>Acer</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="acer_win disk1.img" size="1474560" crc="1365df28" sha1="534190e095cbb74d6ffed459db101897a86e2b03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ezkitlte">
+		<!-- Dumped from three different sets of disks. -->
+		<description>ADSP-21xx EZ-KIT Lite</description>
+		<year>1996?</year>
+		<publisher>Analog Devices</publisher>
+		<info name="usage" value="1) Start Windows and open the Program Manager / 2) Choose File Run / 3) Type &quot;A:\SETUP&quot; and click OK"/>
+		<info name="version" value="2.0" />
+		<info name="serial" value="81-000759-02" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk (1 of 2)" />
+			<dataarea name="flop" size="1474560">
+				<rom name="81-000759-02 (disk 1).img" size="1474560" crc="65b9c7ff" sha1="fb366184f890144182a268f72bbc5263a2bcc9d3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk (2 of 2)" />
+			<dataarea name="flop" size="1474560">
+				<rom name="81-000759-02 (disk 2).img" size="1474560" crc="d656dd73" sha1="041ce95f4fb185266cdc35bba2c80daf2b69e9b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aftdark">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>After Dark for Windows</description>
+		<year>1990</year>
+		<publisher>Berkeley Systems</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="after dark.img" size="1474560" crc="0b6222f5" sha1="2a61d82ef15ee9fba2a738632da7626e935e5683"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- installs and runs, but MAME does not emulate a modem -->
+	<software name="aol15" supported="no">
+		<description>America Online for Windows 1.5</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="1.5" />
+		<info name="serial" value="00000926" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="America Online 00000926.img" size="1474560" crc="69790ac8" sha1="34b14ba376ca57232b3a423b18cdf6a45c9e6ae7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aol20" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>America Online for Windows 2.0</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="aol20 disk1.img" size="1474560" crc="bd162144" sha1="7a15f872c34c5e316575ba0c74fa8706acadb027"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aol20mi" cloneof="aol20" supported="no">
+		<description>America Online for Windows 2.0 MI (Manual Installer)</description>
+		<year>1994</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="2.0 MI" />
+		<info name="serial" value="00001061" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="AOL 2.0.img" size="1474560" crc="86606b15" sha1="eb953c7203363a5f173f38801d74387cee1909d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aol30" supported="no">
+		<description>America Online 3.0 for Windows</description>
+		<year>1996</year>
+		<publisher>America Online</publisher>
+		<info name="version" value="3.0" />
+		<info name="serial" value="RO2286" /> <!-- also matches a dump from a disk labelled R01792 -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Explore for 50 Hours Free - America Online - RO2286 - For Windows Version 3.0.img" size="1474560" crc="3d10bc4a" sha1="3d2ef1dd4010a4bf29dc1fa661c0ccb1e39be558"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ami">
+		<description>Amí (1.2b)</description>
+		<year>1990</year>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.2b" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_1.img" size="737280" crc="311ba808" sha1="393a9b6973784b1032ab3355560ab43bf2480b5d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_2.img" size="737280" crc="637f4961" sha1="de0cf9b62a880f3ee4419769b9be9354c6db4386"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="ami_3.img" size="737280" crc="a3ba8028" sha1="db324383d266ab93d8122f8aa55a3025b4dd5c4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amia" cloneof="ami">
+		<!-- Dumped via Kryoflux, shows as good with most tracks modified -->
+		<!-- Included with Commodore PC40-III -->
+		<description>Amí (1.00B, Commodore OEM)</description>
+		<year>1989</year>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.00B" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="ami.img" size="1228800" crc="5071b3bd" sha1="1d9abc49bc1b8287e0fe3603e7bca718848551a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amib" cloneof="ami">
+		<!-- Includes Microsoft Windows/286 version 2.1 -->
+		<description>Amí (1.0)</description>
+		<year>1988</year>
+		<publisher>SAMNA Corporation</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 SAE Setup, Build &amp; Displays 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk01.img" size="1228800" crc="ebe9e37b" sha1="e8040b3bbd2cf91da77c2351a44a2669c2e88ff9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 Displays 2 &amp; Utilities 1" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk02.img" size="1228800" crc="c9844f84" sha1="9a0d30d811fcb668639a92fd512fb0d7636535e8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Microsoft Windows/286 Utilities 2 &amp; Fonts" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk03.img" size="1228800" crc="471a8b4c" sha1="5d7d27b3b65aacf9fecf18a11c4b9a89ee4cca85"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Amí Program Disk" />
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk04.img" size="1228800" crc="6c261d8c" sha1="9160d5474af8abbdb4fd4e4e99d16250f1eab4a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tngclips">
+		<description>AudioClips Digital Sounds for Windows 3.1 - Star Trek: The Next Generation - "Encounter at Farpoint"</description>
+		<year>1992</year>
+		<publisher>Sound Source Unlimited</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="audioclips1.img" size="1474560" crc="e860f5c2" sha1="62774444f558111c0c638952078b6364be2a2467"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="audioclips2.img" size="737280" crc="7945c8d2" sha1="ca144550b9fd1357a943dcf6f7fbd3a1c6c6bcbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msbob">
+		<description>Bob (1.00a)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="1.00a" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="da78fa7d" sha1="6b45dc9310d534b9fb10fb5efcfaa5b5793a13e1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk02.img" size="1720320" crc="833277a5" sha1="6966562977957fd28acdb98a53a4c6236be9aa20"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk03.img" size="1720320" crc="60a7dda2" sha1="4b9e33275c6da0ee9b8a923e55a05d9281d335bf"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk04.img" size="1720320" crc="b9c1ddc7" sha1="41a84750793826bc7033dc77ade621872f9101e0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk05.img" size="1720320" crc="ad765681" sha1="58df2e2602ff60d0da196d425c4e93bce4e6814f"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk06.img" size="1720320" crc="e8be449d" sha1="f62f03bf86ee51937eaa05b528fdc96f71871c73"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk07.img" size="1720320" crc="724f9922" sha1="89023ef479d843908ecd2d111ecd213b2d7bf420"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk08.img" size="1720320" crc="25a88b00" sha1="f457a5ec85704a2d396e2d079a8f83977cf8bb04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msboba" cloneof="msbob">
+		<description>Bob (1.00)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1.img" size="1474560" crc="98474db4" sha1="a16cd99600589a926ff62ea29bd8b4def25db439"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk2.img" size="1720320" crc="3b0b1462" sha1="e77be0b10daafa67bc48a3801b418e438794b158"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk3.img" size="1720320" crc="c802bb17" sha1="a1356fc392d33e8f59c7ac8242801a6392fe2e75"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk4.img" size="1720320" crc="2d735e4a" sha1="1726e95359440b00658ce9e2ab975da225127035"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk5.img" size="1720320" crc="cb1a20ac" sha1="1581a17050c22a5267a007af6321b3e17b95302f"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk6.img" size="1720320" crc="94bf0f1d" sha1="e49a8a155c51354675cdc0272a409657fed3e251"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk7.img" size="1720320" crc="afb0e89c" sha1="cd456a4304f4dafa27d869350d3f713cc934beb4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpavfw">
+		<description>Central Point Anti-Virus for Windows</description>
+		<year>1992</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="usage" value="To start, type SETUP at A: and press ENTER." />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Setup Disk" />
+			<feature name="disk_serial" value="103347.001" />
+			<dataarea name="flop" size="2550386">
+				<rom name="103347.001.mfm" size="2550386" crc="414f1718" sha1="114de7a5b09659305cec8f9130ed9462ce0f0865" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<feature name="disk_serial" value="103348.001" />
+			<dataarea name="flop" size="2737329">
+				<rom name="103348.001.mfm" size="2737329" crc="8bbb6532" sha1="90d348477198b7fc119d49351d4379fcee4e0145" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas4win">
+		<description>Christmas For Windows (Release 4.0)</description>
+		<year>1995</year>
+		<publisher>TDA Help!</publisher>
+		<info name="developer" value="MakeItSo Software" />
+		<info name="version" value="4.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="ChristmasForWindows-Release4.img" size="1474560" crc="dd534c40" sha1="4822e3ac17b76e1940901b6deef018e70473ee8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas4win3" cloneof="xmas4win">
+		<description>Christmas For Windows (Release 3.0)</description>
+		<year>1995</year>
+		<publisher>TDA Help!</publisher>
+		<info name="developer" value="Sygenex" />
+		<info name="version" value="3.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Xmas4Windows.img" size="1474560" crc="617a3326" sha1="72c78772e988f2c4cc9d0a0498ecfa847594c3b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dawin">
+		<description>Direct Access Windows</description>
+		<year>1992</year>
+		<publisher>Fifth Generation Systems</publisher>
+		<info name="version" value="1.03" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<feature name="disk_serial" value="330-01320-300" />
+			<dataarea name="flop" size="737280">
+				<rom name="330-01320-300.img" size="737280" crc="9c2f6d28" sha1="ad618622259c238357ca2078cfd9e4c0d3aec985"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<feature name="disk_serial" value="330-01320-301" />
+			<dataarea name="flop" size="737280">
+				<rom name="330-01320-301.img" size="737280" crc="b3a69cc9" sha1="6301d20fc8e4ff9dbbeb6b8a68d41cdabc62abeb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<feature name="disk_serial" value="330-01320-302" />
+			<dataarea name="flop" size="737280">
+				<rom name="330-01320-302.img" size="737280" crc="2b098252" sha1="5e251214e624686648f5a0034189921b79f8ace4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excel3">
+		<description>Excel (Version 3.0a)</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Setup 1" />
+			<!-- 2 tracks modified (user registration) -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Setup 1).img" size="368640" crc="fedf10ed" sha1="4f856e45ab7f340353b10eb64e705021b8f5a1f2" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Setup 2" />
+			<!-- all tracks good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Setup 2).img" size="368640" crc="f9b3a545" sha1="c072e4b67bc410d11f8b60eb5b792cf6e3aa210c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Setup 3" />
+			<!-- 1 track bad + 3 modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Setup 3).img" size="368640" crc="4d1e1ba9" sha1="67f0c10dc434012432ba0ca8130c5e3fe93e0924" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Help 1" />
+			<!-- all tracks good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Help 1).img" size="368640" crc="3d41cd1a" sha1="4a899278e347e81d326344a624f34f6f6ce3b562"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Help 2" />
+			<!-- all tracks good and unmodified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Help 2).img" size="368640" crc="87f338ff" sha1="0b8d6462436b262eafd69eacd37b5f48eea151bc"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Help 3" />
+			<!-- 1 track modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Help 3).img" size="368640" crc="9b4c0239" sha1="a4ab1cd4c6f26b8cd6c13a9fc38ad868b6cba5de" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Library 1" />
+			<!-- 2 tracks modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Library 1).img" size="368640" crc="52de9e49" sha1="4c2a86544a210e830cd2621112ebb8dc8f7f72d8" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Library 2" />
+			<!-- 1 track bad -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Library 2).img" size="368640" crc="0d0446bc" sha1="20d07a0d1c04ba29e84b7b5dbd5d5649b435584e" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Library 3" />
+			<!-- 1 track bad + 1 modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="Microsoft Excel for Windows (USA) (Version 3.0) (Library 3).img" size="368640" crc="3e251d3b" sha1="565df94309afa5744c9cef5c4b2693a6eaa16f7b" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picbook">
+		<description>The Greatest Little PIC Book</description>
+		<year>1997?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Requires Windows 3.1 or later"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="the greatest little pic book (disk 1).img" size="1474560" crc="9907477b" sha1="35f5cd9f36a6e2c96aeb620fbe481bf940a9bd0b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="the greatest little pic book (disk 2).img" size="1474560" crc="7f040c24" sha1="33f08dc707bdf2020aaaf708f0a8a2791f8353b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hijaakp">
+		<description>HiJaak Pro</description>
+		<year>1993</year>
+		<publisher>Inset Systems</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 3 - Install Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="hijaak pro 2.0 (disk 1).img" size="1474560" crc="56de8bb6" sha1="f3cdf765ed17f2560e60ce0369a8a21ce41ee2d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="hijaak pro 2.0 (disk 2).img" size="1474560" crc="bb64cbae" sha1="8c5cea9e4bac29082429636edc9cbc3be0ce4986"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="hijaak pro 2.0 (disk 3).img" size="1474560" crc="1c26c012" sha1="704fd6d4d75957e52f03e3a2917d03d725f9a817"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hrencyc">
+		<!-- Dumped via Kryoflux, first track shows as modified on all disks -->
+		<description>Home Repair Encyclopedia</description>
+		<year>1995</year>
+		<publisher>Books That Work</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hrencyc_1.img" size="1474560" crc="8512464f" sha1="625a7c3c569aa4ce01e8386fde42c341d4e44c95" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hrencyc_2.img" size="1474560" crc="abd95d17" sha1="c344f76b787fb46bfde06318ab2e4db6a5010152" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="hrencyc_3.img" size="1474560" crc="2b0b5241" sha1="ab64dd723273198e104e81a5195da6c26a565f98" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Integration i Microsoft Office 97: Step by Step" by Susanne Freet et al. ISBN10: 91-644-0153-7 -->
+	<software name="iimso97">
+		<description>Integration i Microsoft Office 97: Step by Step (Swe)</description>
+		<year>1997</year>
+		<publisher>Bonnier DataMedia</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="integration i microsoft office 97 step by step (swe).img" size="1474560" crc="c2fffe8f" sha1="5276eba10b676447bfe7353e2d6b7864d58b0c47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="internet">
+		<description>Internet in a Box - Single-User Version</description>
+		<year>1994?</year>
+		<publisher>SPRY, Inc.</publisher>
+		<info name="usage" value="In Windows Program Manager, chose Run from the File menu and type a:\setup or b:\setup" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 3" />
+			<feature name="disk_serial" value="IB10-DSK-1of3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="ib10-dsk-1of3.img" size="1474560" crc="9f307ff0" sha1="17cd05ebee49ec2e8ef467a97449290106f1f0bd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 3" />
+			<feature name="disk_serial" value="IB10-DSK-2of3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="ib10-dsk-2of3.img" size="1474560" crc="1ea55a36" sha1="2a31ae85d384441ae72c51288c0c297d71483247"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 of 3" />
+			<feature name="disk_serial" value="IB10-DSK-3of3" />
+			<dataarea name="flop" size="1474560">
+				<rom name="ib10-dsk-3of3.img" size="1474560" crc="00570980" sha1="dcdf608cd6e2f87d90ecd190f42ffa1d0ff673b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nicklaus">
+		<description>Jack Nicklaus Screen Savers</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="jack nicklaus screen savers.img" size="1474560" crc="175f8c1b" sha1="2da53c4d4b3de47d7f4eb31772caf39101790322"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klmss">
+		<description>KLM's Screensaver</description>
+		<year>1994</year>
+		<publisher>KLM</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="klm.img" size="737280" crc="a8de7c26" sha1="b6b9413bacbb18268207482d05ccdb273b78a7af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mkorig" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Make Original Diskettes</description>
+		<year>1995</year>
+		<publisher>Acer</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mkorig disk1.img" size="1474560" crc="c1a77a4e" sha1="80eac5d9774514eb6798ddc25f22328b55c76ed5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prodpack">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Microsoft Productivity Pack for Windows</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="3.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodpack disk1.img" size="1474560" crc="67c7b595" sha1="ca17fdba8e2bcc267e38e47cd919ef7955b72494"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodpack disk2.img" size="1474560" crc="68093322" sha1="54cc63457af4926f542b0445aedefef28b0bb59c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msworks3">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Microsoft Works 3.0b</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="3.0b" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk1.img" size="1474560" crc="24ca92fe" sha1="f462e7da1704eccdc0fa6fcb51c938c585c98136"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk2.img" size="1474560" crc="ed3d23d3" sha1="4ad83f15aabf69d3ae845656c2cf76378446dc5e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk3.img" size="1474560" crc="0d207897" sha1="c1332a1f8c59c746306a2f374dbd3aa62861c8be"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="msworks disk4.img" size="1474560" crc="2c98fcd2" sha1="1733f95eb545eee83d6afcf69600094ecae08758"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crashgrd">
+		<description>Norton CrashGuard for Windows 95</description>
+		<year>1996?</year>
+		<publisher>Symantec</publisher>
+		<info name="usage" value="Please install Norton Utilities before installing Norton CrashGuard." />
+		<info name="serial" value="09-50-00081" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk V1.0" />
+			<dataarea name="flop" size="1474560">
+				<rom name="07-51-00309.img" size="1474560" crc="9be9f949" sha1="9e6b85cfcc6d53ae92accdfc0f581365cb979586"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Emergency Disk 1" />
+			<dataarea name="flop" size="1474560">
+				<rom name="07-51-00279.img" size="1474560" crc="b8d4b9a7" sha1="c63851497a3d63b415f3d98ceae34ca157eef752"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Emergency Disk 2" />
+			<dataarea name="flop" size="1474560">
+				<rom name="07-51-00280.img" size="1474560" crc="d181b5d5" sha1="22a115f25ad6397ca805efdcd4011eb9f710fa9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="netcom">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>NETCOM NetCruiser</description>
+		<year>1994</year>
+		<publisher>NETCOM</publisher>
+		<info name="version" value="1.51" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="netcom disk1.img" size="1474560" crc="ff7fa3f6" sha1="13099e622c0e1b1a127c433e8900e83b541a45dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct71">
+		<description>PC Tools 7.1 (3.5" HD)</description>
+		<year>1991</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="7.1" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="7e8f7399" sha1="1377f238ca940a0eebf4b55a9cf8700c57e5ba3b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="31af7146" sha1="2204f7d1c9c71371188694e8b6dbeefb98dd3262"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="1159604a" sha1="db5b665f84a584d8f23885a2b81010072dba54be"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools 7.1 [Central Point Software] [1991] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="1983e32c" sha1="809f5a1108f36da214bad7242a058b27e3fcf374"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct71_525" cloneof="pct71">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>PC Tools 7.1 (5.25" HD)</description>
+		<year>1991</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="7.1" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_1.img" size="1228800" crc="062b12dd" sha1="b7cca618cc0d80b77438700372e42d624bae8e5d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_2.img" size="1228800" crc="cce86276" sha1="da795768cda4625720faccb30c6b20377b5fc3dc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_3.img" size="1228800" crc="b5a89a5a" sha1="c7e70749fb9a1850eb26d9c455217da7314df1d8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_4.img" size="1228800" crc="e505d407" sha1="82426b2d00fbc41c095c3dc6b47045619adb09e8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_5.img" size="1228800" crc="4dd1e757" sha1="6906b8b1af5aa8ebeebdec4643e4528b69b68973"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="pct71_525_6.img" size="1228800" crc="a85217c9" sha1="5a12930041ae333d56aff308078eb16e4ff98030"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct8">
+		<description>PC Tools 8 (5.25" HD)</description>
+		<year>1992</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="8" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 1 of 6].img" size="1228800" crc="9e32b700" sha1="e3448a677db9da18f3933dcad536b712883276a5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 2 of 6].img" size="1228800" crc="58e67911" sha1="bb2b9b4447fbc3e469caa0d2ea651162e15a62da"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 3 of 6].img" size="1228800" crc="8950b0bb" sha1="ab3c91b07df198168d259643d05df123a67cebb9"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 4 of 6].img" size="1228800" crc="0fb54af3" sha1="909de4592581fcc56a47452a13f32c7f3455fdc7"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 5 of 6].img" size="1228800" crc="be00b76b" sha1="012617155cbcbb2ee1fbd3227ddfc585197f751d"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PC Tools 8 [Central Point Software] [1992] [5.25HD] [Disk 6 of 6].img" size="1228800" crc="25def657" sha1="ef253ae828ddd915c4e67a121b257368a21f7d2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct9">
+		<description>PC Tools Gold V9</description>
+		<year>1993</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="V9" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="a7e2b1a5" sha1="85c3196b9aec2a58200d10ac6acd1d77655920d1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="0b78eb9a" sha1="f486320b54eaaa590c0ea259180b7d338de5d091"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="bf0054b1" sha1="9795e47ce307fb4c4daf1d28a804651f69409e3a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="d824c738" sha1="25acb867fc0bff46a5d9c6e41f5bc3be8e6d0a65"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9 [Central Point Software] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="efb3b46c" sha1="6875770964eaca3786c1480aa2a33b8a23922a20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pct904">
+		<description>PC Tools Gold V9.0.4</description>
+		<year>1993</year>
+		<publisher>Central Point Software, Inc.</publisher>
+		<info name="version" value="V9" />
+		<info name="developer" value="Central Point Software, Inc." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="85195517" sha1="98d46c43764e552dda361845a0bd38c659d08a23"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="aa6dea57" sha1="327152d2a6ca23478235176320db62c6f87ec5e6"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="7e78e4a0" sha1="dc6b680c2a7b9c69a4eba8265c42f2d987dbbca2"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="6ab851b7" sha1="fd67cc806e868e9cb7416a1b5d5d52d4a94d74f8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="PC Tools Gold 9.0.4 [Central Point Software] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="39b3d819" sha1="30c656d02a7453b4d373c2b7a768a0f1afeb67f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phindows" supported="no">
+		<description>Phindows</description>
+		<year>1996</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="1.10" />
+		<info name="usage" value="Requires Win32" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="phindows.img" size="1474560" crc="2cd8fa94" sha1="14e7976d55deea3d7e191fc58ad2ad2a9654908f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="postnr">
+		<description>Postnummerkatalogen 1996 (Swe)</description>
+		<year>1996</year>
+		<publisher>Posten Sverige AB</publisher>
+		<info name="alt_title" value="Postnummerkatalogen A-Ö" />
+		<info name="usage" value="Sätt i disketten i din diskettdrive. Skriv A:start eller (B:start) tryck enter. I Windows välj Kör under arkiv, skriv A:start (B:start) klicka på OK." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="postnummerkatalogen 1996 (swe).img" size="1474560" crc="ef119023" sha1="47f33838d3e8aa0afe64173ece2d10223ed4b1e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prodigy">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Prodigy Service</description>
+		<year>1994</year>
+		<publisher>Prodigy</publisher>
+		<info name="version" value="9.18" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodigy disk1.img" size="1474560" crc="81c34e95" sha1="9ce2a7b88e4da7f9ac1196c05aa772c398355766"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="prodigy disk2.img" size="1474560" crc="99c0c50a" sha1="6842d1cd7c3c6f94a04cd104e79e1a0ebde8d8b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Windows (3.1?) -->
+	<software name="moneynet" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Reuters Money Network</description>
+		<year>1994</year>
+		<publisher>Reuters</publisher>
+		<notes><![CDATA[
+win95/win98: Punts with a "Severe" error message at start of install operation (broken version check)
+Missing [modem] features, assume requiring a connection to a Reuters device such as sk101bl
+]]></notes>
+		<info name="version" value="2.0R3" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk1.img" size="1474560" crc="c9422588" sha1="ded7282d49e32b21de24c9c64de1a1450ba84de7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk2.img" size="1474560" crc="8941e8e1" sha1="50dfc034d9a6ffd7626d58efb292f0ab0535fb09"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="moneynet disk3.img" size="1474560" crc="dcfc9b90" sha1="3968bdc94bf594d00fd966a531cf919380fd7aae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tagplus">
+		<description>Tågplusguiden - Vinter–Våren 1998</description>
+		<year>1998</year>
+		<publisher>Förlags AB Sveriges Kommunikationer</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="tagplus.img" size="1474560" crc="0791df49" sha1="9e6135848f43a84909d49bb147a300ef22c5611c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vinguide">
+		<description>Vinguiden 1.0 (Sweden)</description>
+		<year>1995</year>
+		<publisher>Scandinavian PC Systems</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4229016">
+				<rom name="21-046-015472.mfm" size="4229016" crc="5387eea6" sha1="a25043518a0e30ca515324bc0a866945b9b9d383" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wdel3">
+		<description>WinDelete 3.0</description>
+		<year>1996</year>
+		<publisher>IMSI</publisher>
+		<info name="alt_title" value="WinDelete 3.0 For Win 3.x Version 3.0 - 16 Bit" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="03WDXW3001" />
+			<dataarea name="flop" size="1474560">
+				<rom name="wdel3.img" size="1474560" crc="9c2e76b9" sha1="b6b6f18726ce0f4ae1aeb2c33b8e4793ca15f87a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword1">
+		<description>Word for Windows 1.0</description>
+		<year>1989</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup" />
+			<dataarea name="flop" size = "737280">
+				<rom name="setup.img" size="737280" crc="553cb9fa" sha1="c618d0a7714007b9b971bc63c4d2deaea56fdb07"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program" />
+			<dataarea name="flop" size = "737280">
+				<rom name="progrm.img" size="737280" crc="daa346c4" sha1="8fe7bced3d817788614d55747d7452154d3b37e0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="conver.img" size="737280" crc="85875a14" sha1="45f5f33caa485c76b671ba72a34a49fa9c52ee2e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="convr2.img" size="737280" crc="416fc793" sha1="30d46e6a6568c6aefca33d5223a1afd2b4055932"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="util1.img" size="737280" crc="64e30b02" sha1="06c0886543e4289474fc5549ecd0d8d986c08339"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="util2.img" size="737280" crc="27e4a32f" sha1="c2fb011041e7c1f06ea2be3746593413c44bbbdf"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Tutorial 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="tutrl1.img" size="737280" crc="808ccc36" sha1="87b8261827cfc0950f2d60a353ba73162cf5fd31"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Tutorial 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="tutrl2.img" size="737280" crc="426fc4b7" sha1="8e5295bcc11f63c0186ca7a0012550aaa751f632"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Help" />
+			<dataarea name="flop" size = "737280">
+				<rom name="help.img" size="737280" crc="d50900f3" sha1="9cd98aa432e38a6028fc1105e6ba5f24fe118d52"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Proofing Tools" />
+			<dataarea name="flop" size = "737280">
+				<rom name="prftls.img" size="737280" crc="4610c528" sha1="2b64e4906e7ff2b7b8268c8f97e91ddd580f15c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2">
+		<description>Word for Windows 2.0c (3.5")</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="cc84c6c2" sha1="8f175e961adcb95ae38b8c1f4934bc1d905dd4f1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk02.img" size="1474560" crc="3d3849b7" sha1="ac7f50eb3fc33356a6995edf5c4fc3ec4105dbca"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk03.img" size="1474560" crc="c8702fd5" sha1="6d0eb17a54ede4803571d607593274dfe992735e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk04.img" size="1474560" crc="a4b9bae8" sha1="94d38d803a6def6b37b997f6f5a3d59874db7eb3"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk05.img" size="1474560" crc="69105238" sha1="be379c3ea95d184fbcb59e4d880c4ebf40a8d17a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk06.img" size="1474560" crc="7aa5254c" sha1="92687a36db2cca40548950fef5e6f2d105ce5858"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2_525" cloneof="winword2">
+		<description>Word for Windows 2.0c (5.25")</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk01_2.0c_525.img" size="1228800" crc="50492e1f" sha1="069c5a35c8cdd0b1fe16cba0441ade22d9d9ff32"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk02_2.0c_525.img" size="1228800" crc="2ab4ed35" sha1="eb4fe02a5eeedc6b03e2f1433174405da92856df"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk03_2.0c_525.img" size="1228800" crc="e64d1550" sha1="5b60c9301097745b787bd2f804404d51aabeb5a8"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk04_2.0c_525.img" size="1228800" crc="a89719c0" sha1="17c2d56d5e50cdefe56c1e6dd7d63fe2b3529e97"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk05_2.0c_525.img" size="1228800" crc="4952d934" sha1="24a9f71e306ed0fee3df8e998825abbe731670de"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk06_2.0c_525.img" size="1228800" crc="f3345f09" sha1="a1ee64585f1104fc575eb8b623ad2d238c4ac0e2"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="disk07_2.0c_525.img" size="1228800" crc="40a9ee0c" sha1="ad924d4c79d0d7c3a3faaecb70a0eb6bb49e4803"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2a" cloneof="winword2">
+		<description>Word for Windows 2.0a (3.5")</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01 - Setup.img" size="1474560" crc="c1a20ea9" sha1="f469a6e63672891c2fa8c1646689e731974bbc32"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk02 - Program.img" size="1474560" crc="510b5a0a" sha1="9244bc791968238921ea21d230bc1e03748aaeda"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Drawing, Equation Editor"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk03 - Drawing, Equation Editor.img" size="1474560" crc="c8a26400" sha1="d2942f8cca81bf4257045ff3803dbea0c893cc27"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Proofing Tools"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk04 - Proofing Tools.img" size="1474560" crc="c8807e3f" sha1="9cc1398b83c28f5b2b25a954f24a0f68d312f971"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk05 - Conversions.img" size="1474560" crc="77018608" sha1="8eb809b3ad55ad6d94d01c1e0e6d89b5ea97e48b"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Online Help"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk06 - Online Help.img" size="1474560" crc="165ca0bd" sha1="39ff90b8f07a0f5ff0fc92c8e0aeb173befe018e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2b" cloneof="winword2">
+		<description>Word for Windows 2.0 (3.5")</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup - Disk 1"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-509" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-1.img" size="1474560" crc="16b22ae5" sha1="0bc6b567bb63f2b93cddef072a3dfbe30d485aff"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program - Disk 2"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-510" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-2.img" size="1474560" crc="3baf11b2" sha1="0a22eafd1870fc7b8ae031a6a567eb9ca5da1551"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Drawing/Equation Editor - Disk 3"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-511" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-3.img" size="1474560" crc="90efe1d2" sha1="de7d5531593493cde28e06c88b3413d3f5366615"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Proofing Tools - Disk 4"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-512" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-4.img" size="1474560" crc="d78979a6" sha1="05933331b83a81f38a0df78814cdd9f3b1a14052"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions - Disk 5"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-513" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-5.img" size="1474560" crc="dcde6ea9" sha1="5e0d6463f3f92fffb1a7d8d8c6c66faf943b207a"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Online Help - Disk 6"/>
+			<feature name="disk_serial" value="Disk Assy 059-051-522" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="msw20-6.img" size="1474560" crc="3b642f1d" sha1="fa4b08ee25860d3aa10085644a53447d28d60433"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2b_525" cloneof="winword2">
+		<!-- bad dump - disks have files and folders modified in 1999 and 2010 -->
+		<description>Word for Windows 2.0 (5.25")</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk01_525.img" size="1228800" crc="bbb94fe1" sha1="8337072add284e1993267d56b94548940dd9c12d" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk02_525.img" size="1228800" crc="b6d6584f" sha1="91e11376c95fc59d33eb2a03c59082ac069d009d" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk03_525.img" size="1228800" crc="961980e5" sha1="5e3c163ee606dba15d04bee92ae363ecd9e92b0b" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk04_525.img" size="1228800" crc="814e93cf" sha1="f9f2992b1a3a0981baa0fd9783c457df3e7cb65b" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk05_525.img" size="1228800" crc="6474b694" sha1="1b7f63f9bdd80360dc328d8417a256d2f85488bd" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk06_525.img" size="1228800" crc="7ae96b5b" sha1="bbe2d370c6e4ae1938ccd0709181d6cba4899940" status="baddump"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Disk07_525.img" size="1228800" crc="790cbc16" sha1="310cfdca7b19795c86e04586d48d7b1e4afede21" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2it" cloneof="winword2">
+		<description>Word for Windows 2.0 (3.5", Italian)</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<!-- 1024-byte footer removed from 1475584-byte images -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1.img" size="1474560" crc="d9d9ef21" sha1="3d019394f0468053b05478d7dbb944100dc8ce88"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk2.img" size="1474560" crc="9e5c86c0" sha1="2f0e7a8f0ceb0ad9fc3a5e64f7a46e6e96937c71"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk3.img" size="1474560" crc="298e4c62" sha1="93017d2e94717ae3c93acbf5a623f2772433ab66"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk4.img" size="1474560" crc="4eb5caec" sha1="55fa0fe14bc3149b041814d3a6d8e3c89f84bdcf"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk5.img" size="1474560" crc="c50ddd5b" sha1="fdad6fc0afc475aef1634ac7f603dd51f5bcf410"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk6.img" size="1474560" crc="02d83ae4" sha1="97b8700834f236e882be2c4bfdb6405fab1712c8"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk7.img" size="1474560" crc="f4ac68b9" sha1="f1aeb7217beafebd6934e7c23f2a1c5e54519071"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk8.img" size="1474560" crc="332cd1ff" sha1="8b3960e8fc87549df5b79e2909e6869d1dd149ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword2tr" cloneof="winword2">
+		<description>Word for Windows 2.0c (3.5", Turkish)</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk01tr.img" size="1474560" crc="5ac376cd" sha1="1c5dec19a91a95ae95ab402b621cbf55e4385f53"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk02tr.img" size="1474560" crc="2d9db19e" sha1="4a6c49ec0d9902bba7ba33d57921b7dbbda8e94c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk03tr.img" size="1474560" crc="d0eae336" sha1="0d080ad7624032832198ce145f8a31e9aa0feafa"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk04tr.img" size="1474560" crc="805a32d2" sha1="916cc34bf277864cef3e27931184c92e7526166e"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Disk05tr.img" size="1474560" crc="975d57c4" sha1="bb7c49b9aa57c9e47f026e795f9cc17ad9c00dc1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="writeon">
+		<description>Write On! for Windows</description>
+		<year>1994</year>
+		<publisher>The B&amp;N Companies</publisher>
+		<info name="usage" value="Insert the Diskette in Drive A or B. STEP 1. Type A: or B:, then hit ENTER. STEP 2. Type GO, then hit ENTER." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="write on for windows.img" size="1474560" crc="bb2e91e7" sha1="241863ebd4073889db37a3f508a42d7091532e17"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

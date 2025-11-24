@@ -1,0 +1,1209 @@
+<?xml version="1.0" ?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="ibm5170_drivers" description="IBM PC/AT floppy disk (drivers)">
+
+	<software name="scrlmous" supported="no">
+		<description>Genius Scroll Mouse</description>
+		<year>2004</year>
+		<publisher>KYE Systems Corp.</publisher>
+		<notes><![CDATA[
+Windows drivers for [PS/2] and [USB] optical mouse family (VID=0x0458)
+]]></notes>
+		<info name="alt_title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="12060321100-B" />
+			<dataarea name="flop" size="1474560">
+				<rom name="scroll mouse.img" size="1474560" crc="5ed59ff2" sha1="da4405fda8f12616f0fe4ab71ca0aac92933b22e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3c90xed" supported="no">
+		<description>3Com 3C90x EtherLink PCI NICs Drivers</description>
+		<year>1999</year>
+		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+Various 3C90x [PCI] drivers
+Subset of EtherCD
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows 95" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="3com 3c90x etherlink drivers.img" size="1474560" crc="dc648ec1" sha1="e3f78391fe3063d7d73eb46e47eb412ca75d5f36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3celc53" supported="no">
+		<description>3Com EtherLink III Lan PC Card (Version 5.3)</description>
+		<year>1996</year>
+		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3C589 LAN+Modem [ISA], [Jazz] and [PCMCIA] Ethernet card drivers
+Contains AutoLink software for NetWare DOS support
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5, Windows 95, DOS, OS/2" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="3com etherlink 3 lan pc card (version 5.3).img" size="1474560" crc="cf807155" sha1="f7e6e91e5b92e4cac38117fcdb8c2992e340341d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3cmlc22" supported="no">
+		<description>3Com Megahertz Lan 10-100 Cardbus PC Card (Version 2.2)</description>
+		<year>1999</year>
+		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3C575 LAN [ISA], [PCI], [Jazz] and [PCMCIA] Ethernet card drivers
+Contains AutoLink software for NetWare DOS support
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 4.0, Windows 95, DOS" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="3com megahertz lan 10-100 cardbus pc card (version 2.2).img" size="1474560" crc="396b570b" sha1="d45108ba37ba499b89e778b30c3ad58758046b2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3cmd501" supported="no">
+		<description>3Com Modem Driver (Version 5.01)</description>
+		<year>1998</year>
+		<publisher>3Com Corporation</publisher>
+		<notes><![CDATA[
+3Com and US Robotics [modem] drivers
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="3com modem driver (version 5.01).img" size="1474560" crc="f62b42a4" sha1="08d678bbdd85ec171327f023b49ea62aebbed7d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a4tiww7" supported="no">
+		<description>A4Tech iWheelWorks (version 7.0)</description>
+		<year>2000</year>
+		<publisher>A4Tech</publisher>
+		<notes><![CDATA[
+[PS/2] and [USB] optical mouse family drivers
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.1, Windows 95, Windows 98, Windows ME, Windows NT 4.0, Windows 2000, DOS" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="a4tech iwheelworks (version 7.0).img" size="1474560" crc="d514994a" sha1="1187b8595c5118d88b9bebf2bbdb74a057852dce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asuscd" supported="no">
+		<description>ASUS DVD / CD-ROM Drive Installation Disk Rev 1.5</description>
+		<year>1999</year>
+		<publisher>ASUSTek Computer</publisher>
+		<notes><![CDATA[
+ASUS [DVD] driver, supporting various early [PCI] chipsets (roughly up to Intel 82801AB/ICH), cfr. driver.txt
+]]></notes>
+		<info name="version" value="1.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="ASUSCD150.img" size="1474560" crc="c020bf23" sha1="5bc80b05edec41a8523d59711498f8c64ddd0778"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom20" supported="no">
+		<description>CD-ROM Device Driver Version 2.00</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="2.00" />
+		<info name="serial" value="PART NO: 53.00037.001" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="CD-ROM Device Driver.img" size="737280" crc="c7651d24" sha1="729a7cf901ad58990201da39a7bbd0967b6d2b20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom22">
+		<description>CD-ROM/DVD-ROM drive IDE/ATAPI interface V2.2</description>
+		<year>1999</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="version" value="2.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="CD-ROM_DVD-ROM_DRIVE_IDE_ATAPI_INTERFACE_v2.2.img" size="1474560" crc="a26cbdcb" sha1="e35eeb62c1b2c144defd3fbf0cd5ade5655e6505"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdrom32" supported="no">
+		<description>CD-ROM driver ATAPI (Version 3.2)</description>
+		<year>1999</year>
+		<publisher>CD Tech?</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="cdtech cd-rom driver atapi (version 3.2).img" size="1474560" crc="d41648aa" sha1="82728df751577e77591b544d4b77d781ad1457ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdgod55" supported="partial">
+		<description>CD-ROM God Boot Disk Version 5.5 BETA2</description>
+		<year>1998</year>
+		<publisher>Kristopher Marciniak</publisher>
+		<notes><![CDATA[
+Contains drivers for various makes and models; [ATAPI] CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers
+]]></notes>
+
+		<info name="version" value="5.5 BETA2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="cdgod55.img" size="1474560" crc="f31ebbea" sha1="76af4556a48abe31eb6eaec83ab6131ea79f788a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gd542x">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>CL GD542X Video</description>
+		<year>1994</year>
+		<publisher>Cirrus Logic</publisher>
+		<info name="version" value="1.43" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk1.img" size="1474560" crc="570265b9" sha1="2160115afec7d2e9d6304488cdac9de1548d34a1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk2.img" size="1474560" crc="627d6898" sha1="0f26472e2027e5afc5d1e33ad1a660fb6eb34b8a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk3.img" size="1474560" crc="3839eb78" sha1="9274cf9c2dae63a4cbbcfadc21d323411899ef8b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd542x disk4.img" size="1474560" crc="d081835e" sha1="f91b0e1b54309d17ee594c6b1e76889353b1412d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gd543x">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>CL GD543X Video</description>
+		<year>1995</year>
+		<publisher>Cirrus Logic</publisher>
+		<info name="version" value="1.22b" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd543x disk1.img" size="1474560" crc="8fb952d8" sha1="bbd3f3a11e3b36f629e2d59f67ee685e9eeefc75"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd543x disk2.img" size="1474560" crc="395fa9f9" sha1="a48a7a5d5a275b362c78c8e6c1ca2d47732108a4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gd543x disk3.img" size="1474560" crc="73730b04" sha1="758fea54ef90e8f31d0c94eee6e04b5807cfec74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prolin30" supported="no">
+		<description>Compaq ProLinea 486-based PC's - Microsoft Windows 3.0 Support Diskette</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<info name="version" value="1.00 Rev. A" />
+		<info name="release" value="19920527"/>
+		<info name="serial" value="142949-001" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="142949-001.img" size="737280" crc="958e0139" sha1="7d4f9656d9132d6351efd29355700584ce52d000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prolin31" supported="no">
+		<description>Compaq ProLinea 486-based PC's - Microsoft Windows 3.1 Support Diskette</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<info name="version" value="1.00 Rev. A" />
+		<info name="release" value="19920527"/>
+		<info name="serial" value="142948-001" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="142948-001.img" size="737280" crc="f7840aab" sha1="67ab7a61a2a3baa5246028d3d1540bd756ac40a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pds2keth" supported="no">
+		<description>Compex RL2000 PnP Series Ethernet Adapter</description>
+		<year>1997</year>
+		<publisher>PDS</publisher>
+		<notes><![CDATA[
+Compex RL2000(A) PnP drivers, [ISA], [EISA], [PCI], [Jazz]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="compex rl2000(a) pnp series ethernet adapter.img" size="1474560" crc="5f9c7545" sha1="efc5983466414aa6ca9edaae9d1dd6adc25cef84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="csc4237b" supported="no">
+		<description>Crystal Semiconductor Corp CS4237B (Version 1.80)</description>
+		<year>1996</year>
+		<!-- Cirrus Logic? -->
+		<publisher>Crystal Semiconductor Corp.</publisher>
+		<notes><![CDATA[
+[ISA] driver for CS4237B [WSS] chipset
+cs4232.inf hints for an expansion ROM check
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="crystal semiconductor corp cs4237b (version 1.80) (37bxx3d-141296-34).img" size="1474560" crc="adc33367" sha1="ead63de3a30fcf996a4c8cd2b9c6f914363ee7c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagnost" supported="no">
+		<description>Diagnostics - Test, Setup, and MDMI Utilities for Products with 640K of RAM Installed</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<notes><![CDATA[
+Needs identification about what Compaq based PC this runs with (I386 based?)
+]]></notes>
+		<info name="version" value="8.11 Rev. A" />
+		<info name="release" value="19921014"/>
+		<info name="serial" value="120200-012" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="120200-012.img" size="1474560" crc="f0e46fc9" sha1="797dac6401a6a11483db8ce9a3850f0e771e9668"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divaisdn" supported="no">
+		<description>DIVA T/A ISDN Modem Setup Wizard for Windows 3.x</description>
+		<year>1997</year>
+		<publisher>Eicon Technology Corporation</publisher>
+		<notes><![CDATA[
+Eicon ISDN [modem] drivers
+]]></notes>
+		<info name="version" value="1 Release 4" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 of 2" />
+			<feature name="disk_serial" value="706-110-01 000906196" />
+			<dataarea name="flop" size="1474560">
+				<rom name="706-110-01 000906196.img" size="1474560" crc="f47ea34a" sha1="571e700fddb2dab74583d2a1f7e04806a71bb634"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 of 2" />
+			<feature name="disk_serial" value="706-111-01 000906196" />
+			<dataarea name="flop" size="1474560">
+				<rom name="706-111-01 000906196.img" size="1474560" crc="37e42c2b" sha1="f06ff617990e61ecfc5777827b6b91a5d60a993b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gravutil">
+		<!-- included with UltraSound MAX card; includes Commander Keen 4 shareware -->
+		<description>Gravis Utilities V2.1</description>
+		<year>1993</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="GravisUtilities.img" size="737280" crc="35973f99" sha1="74a4bf84ba452f3d86420dcf28f9dd5b0d0aa19e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrasnd">
+		<description>Gravis UltraSound (GUS) Installation - V3.53</description>
+		<year>1994</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk1.img" size="1474560" crc="d1a8b7ab" sha1="e0027ee4cc10077a97d1e21e250bf159253b345f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk2.img" size="1474560" crc="7b7e4f0e" sha1="1eb3fd5564dae4e5993a2c9f3398c5a260b197a5"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk3.img" size="1474560" crc="c57f118e" sha1="715d5769729bc7b15b03748c1c63e092393dbfa6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk4.img" size="1474560" crc="1fafddb9" sha1="4cc40f709be068156b62029336acd03f7afa016b"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk5.img" size="1474560" crc="c6f8c717" sha1="04f275b0e0cbb676cea73597a1516afae2eb4b9b"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="353_Disk6.img" size="1474560" crc="59b15abe" sha1="35e485e64dd4828a935a25a8cf71fcfb11d371ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultrasnd205" cloneof="ultrasnd">
+		<!-- Included with Gravis Ultrasound Rev. 2.4 card -->
+		<description>Gravis UltraSound (GUS) Installation - V2.05</description>
+		<year>1993</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk1.img" size="1474560" crc="63eb9aee" sha1="c0b4c759aa92beed0a689ba22e9843649f193dee"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk2.img" size="1474560" crc="211b3496" sha1="0322d81c3599fffbe18dfef0f102e0e6fd15de6c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk3.img" size="1474560" crc="0a563568" sha1="eb59f75cb15bb904a681c60a1f97799a0cc3fbbd"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk4.img" size="1474560" crc="de0852eb" sha1="8d230bc0f4066212869b631b04d5c082db016f39"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="gus205_disk5.img" size="1474560" crc="4bbc6c6f" sha1="2447a9d6832660d52e07fb7e2e4a70701c28fe51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gusbonus" supported="no">
+		<!-- includes WinSoft Sound Station, UltraSound Studio -->
+		<description>Gravis UltraSound BONUS Software Installation v. 1.52</description>
+		<year>1994</year>
+		<publisher>Advanced Gravis</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bonus152_1.img" size="1474560" crc="b6fdc5b1" sha1="72c66435c1af013ccfe7be1031eeccc01311be31"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bonus152_2.img" size="1474560" crc="af96295d" sha1="5927d4503dc27accc6602f01bfea1530b8af35a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hscd414" supported="no">
+		<description>High-Speed CD-ROM Driver (Version 4.14)</description>
+		<year>199?</year>
+		<publisher>Philips</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="generic high-speed cd-rom driver (version 4.14).img" size="1474560" crc="64b819ca" sha1="f958326e367d786d268a2da8453581d8ede11585"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpdj420" supported="no">
+		<description>HP DeskJet 420 Series Printer Software v8.5 for Windows 98, Windows 95 or 3.1x (Den, Swe, Fin, Nor)</description>
+		<year>1998</year>
+		<publisher>Hewlett-Packard</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="c2642-10022.img" size="1474560" crc="e631efbc" sha1="3620c266ec00fb8ddc25a97e3c56f042a302b0d9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="c2642-10023.img" size="1474560" crc="866bd172" sha1="1fd91eec0f6e720de77058629c4e246ed1a5e8bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ezscsi31g" supported="no">
+		<!-- dumped via Kryoflux from original media, shows as unmodified -->
+		<description>Adaptec EZ-SCSI 3.1 (German)</description>
+		<year>1995</year>
+		<publisher>Adaptec, Inc.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="adaptec_ez-scsi_3.1_german_disk1.img" size="1474560" crc="0c19cd2a" sha1="fdd3cdf1941c985f641cdd1406806938cc6dbfc9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="adaptec_ez-scsi_3.1_german_disk2.img" size="1474560" crc="1c581b13" sha1="e70aae5ff6a1e619888908d7d5a672d08c30a73a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="adaptec_ez-scsi_3.1_german_disk3.img" size="1474560" crc="cf9f214d" sha1="adf919dad493764656d27b5f51af80053b028c7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltdrv52c" supported="no">
+		<description>LT Windows Modem V.90 Data+Fax Modem Version (Version 5.31)</description>
+		<year>1999</year>
+		<publisher>Lucent Technologies</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ltdrv52c pci modem driver (version 5.20c).img" size="1474560" crc="add60d61" sha1="7f91cd99fd5993f2a317f86a920adf4a0d4d4884"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpdj6x0" supported="no">
+		<description>HP DeskJet -kirjoitinohjelmisto DeskJet 600- ja 660C -kirjoittimille (Fin)</description>
+		<year>1995</year>
+		<publisher>Hewlett-Packard</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="c2184-10016.img" size="1474560" crc="601c263d" sha1="d7e8d4892a519aad964dd5f3b08fe73a9ebc066a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="c2184-10017.img" size="1474560" crc="6d69fd64" sha1="a3b11e36a0e5345a50ecebe15f0fa372bb5baf0d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="c2184-10018.img" size="1474560" crc="3e99bc78" sha1="2a9aa6bea9ca7f6197d53aa9c2cf2546c8c2e1ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpecd136" supported="no">
+		<description>HP SureStore External CD-Writer Plus Driver (Version 1.36)</description>
+		<year>1999</year>
+		<publisher>Hewlett-Packard</publisher>
+		<notes><![CDATA[
+External [SCSI] CD-R driver
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="hp surestore external cd-writer plus driver (version 1.36).img" size="1474560" crc="318bff31" sha1="5516f071e089d8c1273ed360a4344ec5fd25937c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iozipd51" supported="no">
+		<description>Iomega Zip-drive Tools (Version 5.1)</description>
+		<year>1996</year>
+		<publisher>Iomega</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="iomega tools software (version 5.1).img" size="1474560" crc="17330c5d" sha1="71ac936b58f52b92a7ea49f52c56b720efcaf609"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cldispdu">
+		<description>Cirrus Logic Display Drivers and Utilities (Version 1.30)</description>
+		<year>1993</year>
+		<publisher>Knowledge Dynamics Corp,</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="knowledge dynamics corp, cirrus logic supervga driver pt-521 (version 1.30) (disk 1).img" size="1474560" crc="9fd43bcd" sha1="f584a06007aba730e2fa63c5c5379080a854d74e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="knowledge dynamics corp, cirrus logic supervga driver pt-521 (version 1.30) (disk 2).img" size="1474560" crc="f7350f94" sha1="0ebe33544679b90aa0497bc03abc576cf24d08a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magnum6">
+		<description>Interact Magnum 6 Game Controller Driver for Windows 95</description>
+		<year>1996</year>
+		<publisher>Interact Multimedia Products</publisher>
+		<notes><![CDATA[
+Driver for [pc_joy:magnum6_pad]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="interact multimedia products windows 95 driver.img" size="1474560" crc="f5521075" sha1="f9f7ef6292aa431d1c6b34cad0bbd43c57f739f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magics20" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Magic S20 Sound Card</description>
+		<year>1994</year>
+		<publisher>Acer Inc.</publisher>
+		<notes><![CDATA[
+[ISA] based sound card with OPTi 82C929 and Crystal CS4231A chipsets
+]]></notes>
+		<info name="version" value="2.11A" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="magics20 disk1.img" size="1474560" crc="2355fc07" sha1="f2c810b45359ad8a8ff2f1c0181a57eebe151aa2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="magics20 disk2.img" size="1474560" crc="a2e4f6bf" sha1="8d9d430d55dc38db242a41b9cff2e0823969c48d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msip11">
+		<description>Microsoft IntelliPoint 1.1 for the Microsoft Mouse</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Setup"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="657f88ea" sha1="28624a650a44c1c8743d9448970f5b8c61fd0462"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2.img" size="1474560" crc="43c7fb48" sha1="65d02e9391dc4bb41776a0ba279a55b4b0f96c15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mswinspt">
+		<description>Microsoft Windows Support - User Programs</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<info name="version" value="7.27 Rev. A" />
+		<info name="release" value="19921005"/>
+		<info name="serial" value="140001-008" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="140001-008.img" size="1474560" crc="3bc2598e" sha1="2acf67844cd0b954ce06e195f5df336f29d1e752"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mitscd" supported="no">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Mitsumi IDE CD-ROM Driver</description>
+		<year>1994</year>
+		<publisher>Mitsumi</publisher>
+		<info name="version" value="1.21" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="mtm disk1.img" size="1474560" crc="b174a5a1" sha1="8e540c920ec5737786f4bb2d0c10bc5362cd3fdc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mitsmous">
+		<!-- from Acer CPR 1.2 recovery CD-ROM -->
+		<description>Mitsumi Mouse Driver (v7.22)</description>
+		<year>1994</year>
+		<publisher>Mitsumi</publisher>
+		<info name="version" value="7.22" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="mouse disk1.img" size="1474560" crc="df5ebedd" sha1="1e66014840879965547804943842a1428dd588ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mitsmous6" cloneof="mitsmous">
+		<description>Mitsumi Mouse Driver (v6.0)</description>
+		<year>1993</year>
+		<publisher>Mitsumi</publisher>
+		<info name="version" value="6.0" />
+		<info name="release" value="19931125"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="88372">
+				<rom name="mitsumi mouse driver 6.0.imd" size="88372" crc="0b009fd5" sha1="3cdad00105af7a69ba7bd941498f5816039a0596"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgcdrom">
+		<description>MS-DOS CD-ROM Extensions With Device Driver - Installation Disk Ver 1.25</description>
+		<year>1997</year>
+		<publisher>LG</publisher>
+		<info name="version" value="1.25" />
+		<info name="serial" value="P/N. 3171H-1011A / S0050802" />
+		<part name="flop1" interface="floppy_3_5">
+			<!-- 1024-byte footer removed from 1475584-byte image -->
+			<dataarea name="flop" size = "1474560">
+				<rom name="cd-driver-1.25.img" size="1474560" crc="2ae76e35" sha1="ddf5f96010cb183188af2dbc1e7f6a4e5e2c3f4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fastart" supported="no">
+		<description>MS-DOS FASTART/SYSTEM - The Compaq Personal Computer FASTART/SYSTEM Diskette</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<notes><![CDATA[
+cfr. diagnost
+]]></notes>
+		<info name="version" value="5.00 Rev. D" />
+		<info name="release" value="19920717"/>
+		<info name="serial" value="145149-001" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="145149-001.img" size="1474560" crc="66d0cb5e" sha1="dde3f0cb7e940252492ecb4563734f9d573276d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdossup">
+		<description>MS-DOS Support - User Programs</description>
+		<year>1992</year>
+		<publisher>Compaq</publisher>
+		<info name="version" value="7.25 Rev. A" />
+		<info name="release" value="19920930"/>
+		<info name="serial" value="139399-006" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="139399-006.img" size="1474560" crc="a27749d8" sha1="3d7a693f069ce4c29e56c3f05f414fe97bd3baf6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neccd110" supported="no">
+		<description>NEC Atapi-IDE CD-Rom Driver (Rev D011V110.ENG019)</description>
+		<year>1995</year>
+		<publisher>NEC</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="nec atapi-ide cd-rom drive ( rev d011v110.eng019).img" size="1474560" crc="9721fa23" sha1="62569c9620e2938613c9447d39958eee6ed615d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nd010pci" supported="no">
+		<description>NexNIC ND010 PCI Adapter (Ethernet/Fast Ethernet)</description>
+		<year>1998</year>
+		<publisher>Unex Technology Corporation</publisher>
+		<notes><![CDATA[
+Realtek OEM driver, RTL8139 [PCI] ethernet based.
+https://admin.pci-ids.ucw.cz/read/PC/10ec/8139/1429d010
+]]></notes>
+		<info name="version" value="3.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1153756">
+				<rom name="nexnic nd010 pci adapter (ethernet-fast ethernet) 3.02.imd" size="1153756" crc="192166ce" sha1="976a03cfdf875361c2ecb10c819b9486a4ad4f6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nokiamona" cloneof="nokiamon" supported="no">
+		<description>Nokia Monitor Setup for Windows 95 (Alt)</description>
+		<year>1995</year>
+		<publisher>Nokia</publisher>
+		<notes><![CDATA[
+Various Nokia [monitor] drivers, 44x-based
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="zk0001.img" size="1474560" crc="9ac0b2e8" sha1="8539cfe9990d0b6f842e0218c6536e9688898e4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nokiamon" supported="no">
+		<description>Nokia Monitor Setup for Windows 95</description>
+		<year>1998</year>
+		<publisher>Nokia</publisher>
+		<notes><![CDATA[
+Various Nokia [monitor] drivers, 44x-based
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="zk0004.img" size="1474560" crc="b4be6044" sha1="25b1967cfd372ad3f6b0855d54e52ae0d6e88c9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nusound" supported="no">
+		<description>NuSound PnP Install Disk</description>
+		<year>1995</year>
+		<publisher>Orchid</publisher>
+		<notes><![CDATA[
+[ISA] based sound card with Crystal CS4232 [WSS] and CS9233 chipsets
+]]></notes>
+		<info name="version" value="1.0" />
+		<info name="usage" value="Windows 95: 1. When NuSound is detected, select &quot;driver from disk&quot; and click &quot;OK&quot; / 2. To install applications, select &quot;start&quot; and &quot;run&quot; / 3. Type A:setup.exe (or B) and click &quot;OK&quot; / Windows: 1. From Program Manager select &quot;file&quot; and &quot;run&quot; / 2. Type A:setup.exe (or B) and click &quot;OK&quot;" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<feature name="disk_serial" value="26-00195-01" />
+			<dataarea name="flop" size="1474560">
+				<rom name="26-00195-01.img" size="1474560" crc="d894be2d" sha1="23ce8e94eaab86aa8864200d5df3ea64fdd32c80"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<feature name="disk_serial" value="26-00195-02" />
+			<dataarea name="flop" size="1455715">
+				<rom name="26-00195-02.imd" size="1455715" crc="835f05ef" sha1="84057a9b3d691554244b2af37a59b9a0d3f39e30"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<feature name="disk_serial" value="26-00195-03" />
+			<dataarea name="flop" size="1429654">
+				<rom name="26-00195-03.imd" size="1429654" crc="98314f6b" sha1="5313272d0dd1c05f6cd12c0bc5264191f1fff05f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oki400wp" supported="no">
+		<description>Oki OL 400w Printer Driver</description>
+		<!-- Year derived from file timestamps -->
+		<year>1995</year>
+		<publisher>Okidata</publisher>
+		<notes><![CDATA[
+Driver for a laser [printer]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="oki ol400w win3x disk1.img" size="1474560" crc="bff55368" sha1="074ffea26c06dc49ff3f7f34003a5927db2767bc"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="oki ol400w win3x disk2.img" size="1474560" crc="5dab6f33" sha1="1a262b58b648c7a38c2422fe93970f079f760c98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ontrakdm">
+		<description>Ontrack Disk Manager</description>
+		<year>1997</year>
+		<publisher>Quantum Data Systems</publisher>
+		<!-- TODO: test this -->
+		<part name="flop1" interface="floppy_3_5">
+			<!--
+			Ontrack Disk Manager
+			For Quantum ATA (IDE) Disk Drives
+			Quantum(TM)
+			Capacity for the Extraordinary(TM)
+
+			Supports ATA disk drives greater than 528 MB under DOS, Windows 3.1X, Windows 95, Windows NT and OS/2
+
+			For detailed installation instructions and to view the on-line manual: insert Disk Manager diskette and type "A: HELP". This diskette is bootable with Ontrack's OS Boot Kernel.
+
+			Rev. G
+			Quantum P/N: 77-109028-01
+			-->
+			<dataarea name="flop" size="1474560">
+				<rom name="77-109028-01.img" size="1474560" crc="565510f6" sha1="d862aec61ee23e9499db92b1d955c01939eabdeb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qnxtcp">
+		<description>QNX TCP/IP Runtime version 4.23</description>
+		<year>1996</year>
+		<publisher>QNX Software Systems</publisher>
+		<info name="version" value="4.23" />
+		<info name="usage" value="Requires QNX" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxtcp1.img" size="1474560" crc="9b1f7bcb" sha1="d364b3a16e9983e040e82a278a75106a7f25f6ea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="qnxtcp2.img" size="1474560" crc="6c958365" sha1="a3fd359dac7ddf0452cdf1f62eafee4edf81b743"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rlt81398" supported="no">
+		<description>Realtek RTL8139-810X Fast Ethernet Adapter (Version 5.502.1231.2001)</description>
+		<year>2002</year>
+		<publisher>Realtek</publisher>
+		<notes><![CDATA[
+Realtek drivers, RTL8139 [PCI] ethernet based.
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="realtek rtl8139-810x fast ethernet adapter (version 5.502.1231.2001).img" size="1474560" crc="07953bc3" sha1="40d0945d658fbefc2aa7c46b7f5e0c834b4d57be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rlt8139c" supported="no">
+		<description>Realtek RTL8139C PCI Fast Ethernet Adapter (Version 1.20)</description>
+		<year>2001</year>
+		<publisher>Realtek</publisher>
+		<notes><![CDATA[
+Realtek drivers, RTL8139C [PCI] ethernet based.
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="realtek rtl8139c pci fast ethernet adapter (version 1.20).img" size="1474560" crc="06fec5ff" sha1="9a00d8dbf12fe4680625983f1f79f6cfe3650a38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scroll3d" supported="no">
+		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial (v2.0)</description>
+		<year>1999</year>
+		<publisher>Aidem Systems Inc.</publisher>
+		<notes><![CDATA[
+PnP mouse for Windows 95/98 with IntelliMouse wheel support
+]]></notes>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="scroll3d.img" size="1474560" crc="45c103d4" sha1="714fd801da425f37d6277c3cfa0e08f7fd23e083"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scroll3da" cloneof="scroll3d" supported="no">
+		<description>Scroll 3D Mouse Setup Disk for PS/2 and Serial (v1.0?)</description>
+		<year>1996</year>
+		<publisher>Aidem Systems Inc.</publisher>
+		<notes><![CDATA[
+PnP mouse for Windows 95 with IntelliMouse wheel support
+]]></notes>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="4236544">
+				<rom name="scroll 3d mouse setup disk for ps2 and serial 2.0.mfm" size="4236544" crc="7e408ad4" sha1="7f88263de01478f42f2a937540fee0a70eae5dc5" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smartbrd">
+		<!-- Latest official Tasc SmartBoard DOS driver downloaded from archived (now-defunct) tasc.nl -->
+		<!-- INSTALL.EXE: SmartBoard drivers V1.1 (TASCDRV), 21-Aug-95 -->
+		<!-- SMARTBRD.EXE: SmartBoard test program V1.04, 30-Dec-94 -->
+		<description>SmartBoard Driver (DOS)</description>
+		<year>1995</year>
+		<publisher>Tasc</publisher>
+		<!-- TODO: test this -->
+		<info name="usage" value="SmartBoard SB20 or SB30 required." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="smartboard.img" size="737280" crc="bf1ca15d" sha1="d3d5a45d8cc0c08fdf8e249630da89090f79acbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="s3200pci" supported="no">
+		<description>SN-3200 PCI Ethernet Adapter Driver (Jun 15 1998)</description>
+		<year>1999</year>
+		<publisher>D-Link Systems</publisher><!-- Not 100% sure about it, but the drivers say Realtek, Seems to be a cloned N2000 Compatible Ethernet Adapter -->
+		<notes><![CDATA[
+Realtek drivers, RTL8029 [PCI] ethernet based.
+]]></notes>
+		<info name="alt_title" value="Realtek RTL8029 Ethernet Adapter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="sn-3200 pci ethernet adapter driver (jun 15 1998).img" size="1474560" crc="a8c75e47" sha1="8463297bb3a885813733bb2803d0472361a9d81f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16">
+		<description>Sound Blaster 16</description>
+		<year>1993</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16b_d1.img" size="1474560" crc="5d83ba59" sha1="36848f98099a197fb961e7a8815d42c85c127d0c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16b_d2.img" size="1474560" crc="6317ceb2" sha1="9f508e080b322dc367e03144240c78fc4af7e312"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16b_d3.img" size="1474560" crc="7938bbec" sha1="2ba6866eddb6dfd292ca63816bd97157b8f2bfe6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16oem">
+		<description>Sound Blaster 16 (Pioneer OEM)</description>
+		<year>1994</year>
+		<publisher>Pioneer</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation" />
+			<feature name="disk_serial" value="P/N: 1222301080" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16oem_1.img" size="1474560" crc="fceb25dd" sha1="401e8c86d00174a10fa9b70396899e3364b8f527"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories" />
+			<feature name="disk_serial" value="P/N: 1222301090" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16oem_2.img" size="1474560" crc="d7f148ee" sha1="d3624853558eb8c7fae8f9417d64eaaff371ae9a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16ve">
+		<description>Sound Blaster 16 Value Edition Drivers &amp; Applications (revision 2)</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk" />
+			<feature name="disk_serial" value="ZC/46/94 P/N : 0401730080" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16val1.img" size="1474560" crc="af590635" sha1="eb49575150fce2c791b37b51c747dad73b699260"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Applications Disk" />
+			<feature name="disk_serial" value="ZC/41/94 P/N : 0401730081" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16val2.img" size="1474560" crc="3640d9c1" sha1="13aa2fe8ba08e25c443b118cac9170e0bfc829cf"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories Disk" />
+			<feature name="disk_serial" value="ZC/46/94 P/N: 0401730082" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16val3.img" size="1474560" crc="ad35770e" sha1="2ae17a68c72ae475be82c2be5e687a4634aa4d8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16vea" cloneof="sb16ve">
+		<description>Sound Blaster 16 Value Edition Drivers &amp; Applications (revision 1)</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation - Disk 1 of 3" />
+			<feature name="disk_serial" value="S16V-STD-01-ENG - P/N: 1217791030" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="s16ve1_1.img" size="1474560" crc="bda7a034" sha1="cc78fc43818e7f4c06d1e1480b6ab7aa212c81ef"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Applications - Disk 2 of 3" />
+			<feature name="disk_serial" value="S16V-APP-01-ENG (Revision 1) - P/N: 1217791031" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="s16ve1_2.img" size="1474560" crc="1f810ee3" sha1="d69193c999056872703d72a3ef363503ef886f16"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories - Disk 3 of 3" />
+			<feature name="disk_serial" value="S16V-ACC-01-ENG (Revision 1) - P/N: 1217791032" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="s16ve1_3.img" size="1474560" crc="c65642a2" sha1="80001e5b86429ec7f26392b68935693056e33afa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16veb" cloneof="sb16ve">
+		<description>Sound Blaster 16 Value Edition Drivers &amp; Applications</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation" />
+			<feature name="disk_serial" value="P/N: 1217791030" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1217791030_INSTALLATION.img" size="1474560" crc="e4ef9a94" sha1="54bd30113860ef7c860ca24422324aaa719a841f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Applications" />
+			<feature name="disk_serial" value="P/N: 1217791031" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1217791031_APPLICATION.img" size="1474560" crc="4dc5ff1e" sha1="42622ce86fbba9d598dc33f692c9da529fc62d87"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories" />
+			<feature name="disk_serial" value="P/N: 1217791032" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1217791032_ACCESSORIES.img" size="1474560" crc="799ca75a" sha1="a7ba36ca9749dbdcc1a3d65bae415e0d5ec53c52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16cd">
+		<description>Sound Blaster 16 CD-ROM Installation</description>
+		<year>1993</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="CD-ROM_INSTALLATION_(CR563)_PN1213331006.img" size="737280" crc="e085efad" sha1="5fa696bf8eda2abbcfb582faea04fb98cfc3cd22"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16ide" supported="no">
+		<description>Creative IDE/EIDE - ATAPI drive Installation Disk</description>
+		<year>1999?</year>
+		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+Creative [IDE], [EIDE], [ATAPI] Windows 95/98 driver (sbide.sys)
+File modification dates ranges from 1992 to 1999, and setup.ins marked 2099
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="CREATIVE_DRIVERS_DISK_INSTALLATION_DISK_PN1200001301.img" size="1474560" crc="9ca3a1c7" sha1="c6cf3b49433a59f5552a963fdfa8d1099cb36d5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16tts" supported="partial">
+		<description>Sound Blaster 16 Value Edition Text-to-Speech</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<notes><![CDATA[
+Working in DOS (sbtalker\read.exe)
+Untested in Windows 3.1
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="P/N: 1213501030" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1213501030_TEXT_TO_SPEECH.img" size="1474560" crc="01a15e2d" sha1="b14333c6174d596152203375efcb8e31304eeaa3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sndwav32" supported="no">
+		<description>SoundWave 32 Series</description>
+		<year>1994</year>
+		<publisher>Orchid</publisher>
+		<notes><![CDATA[
+ADSP-2115 + AD1848KP [ISA] card with [SB16] and [MPU-401] compatibility, and [IDE] or [SCSI] option connectors
+]]></notes>
+		<info name="version" value="3.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install/Driver Disk #1" />
+			<dataarea name="flop" size="1419945">
+				<rom name="soundwave 32 series 3.0 (disk 1).imd" size="1419945" crc="017306e3" sha1="5a187ed0ddc3c309477f97cb8f50b768a7968dbd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Install/Driver Disk #2" />
+			<dataarea name="flop" size="1478710">
+				<rom name="soundwave 32 series 3.0 (disk 2).imd" size="1478710" crc="e0ac2ea6" sha1="4031d18ff855e1f985d07d66b804a9a2e35b9386"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Install/Driver Disk #3" />
+			<dataarea name="flop" size="1422500">
+				<rom name="soundwave 32 series 3.0 (disk 3).imd" size="1422500" crc="18d3bf4d" sha1="9f112e853334f7c97842b666a5bd6319d40b9e99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgwmd" supported="no">
+		<description>Sysgration Window Mouse Driver (Version 1.01)</description>
+		<year>1996</year>
+		<publisher>Sysgration Corporation</publisher>
+		<notes><![CDATA[
+[PS/2] and [Serial] mouse with scroll-wheel
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="sysgration window mouse driver (version 1.01).img" size="1474560" crc="0b99e05d" sha1="4a21b803f1b222abf74050049e375fc9d458019c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="usrfmd2" supported="no">
+		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 2.0)</description>
+		<year>1996</year>
+		<publisher>U.S. Robotics, Inc.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="usrobotics fax and i-modem driver disk (version 2.0).img" size="737280" crc="c14ba5aa" sha1="6a7a42bdf2185c9e387a20113876804b7b631f87"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="usrfmd37" supported="no">
+		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 3.7)</description>
+		<year>1997</year>
+		<publisher>U.S. Robotics, Inc.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="usrobotics fax and i-modem driver disk (version 3.7).img" size="1474560" crc="493ecc74" sha1="66cbb0d5026edd13df1f190caea41f83a10bde84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="usrim122" supported="no">
+		<description>U.S. Robotics I-modem Configuration Manager (Version 1.2.2)</description>
+		<year>1996</year>
+		<publisher>U.S. Robotics, Inc.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="usrobotics i-modem configuration manager (version 1.2.2).img" size="1474560" crc="1c810c4f" sha1="91c2b20582a981652b33133c9a94a9051c8fe627"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viewmid" supported="no">
+		<description>ViewSonic Monitor Installation Disk</description>
+		<year>1998</year>
+		<publisher>ViewSonic Corporation</publisher>
+		<notes><![CDATA[
+ViewSonic [monitor] driver, with various ICM color profiles
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="viewsonic monitor installation disk.img" size="1474560" crc="41a256cc" sha1="a98453b28bd2dba943d3e8c64cd98b9a460cd470"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wbxlaud" supported="no">
+		<description>WinBook XL Audio</description>
+		<year>1997</year>
+		<publisher>WinBook Computer</publisher>
+		<notes><![CDATA[
+Drivers for a WinBook XL laptop (Pentium, OPL3-SAx, 3C589 PCMCIA based)
+cfr. wbxlboot
+]]></notes>
+		<info name="serial" value="XL1A" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Audio - Windows 95 - DOS"/>
+			<dataarea name="flop" size = "1474560">
+				<rom name="WinBook XL Audio Windows 95 DOS XL1A.img" size="1474560" crc="57f622ed" sha1="0b4a1dac6e665ace47da65e46e28dfbfe392e4d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
