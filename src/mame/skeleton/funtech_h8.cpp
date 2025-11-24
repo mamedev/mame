@@ -18,11 +18,11 @@ TDA 1519 sound amplifier
 
 TODO:
 - unknown reads / writes;
-- reels alignment in some screens;
+- reels alignment in most screens;
 - only accepts coins in test mode;
 - NVRAM;
-- outputs (counters, lamps..),
-- maybe: seems to run too fast.
+- outputs (counters, lamps..);
+- does the H8 really run so slow or is there something else in play?
 */
 
 
@@ -171,7 +171,7 @@ void funtech_h8_state::hopper_w(uint16_t data)
 	m_hopper->motor_w(BIT(data, 7));
 
 	if (data & 0xff7f)
-		logerror("%s hopper_w unknown bits written: %04x\n", data);
+		logerror("%s hopper_w unknown bits written: %04x\n", machine().describe_context(), data);
 }
 
 
@@ -180,7 +180,7 @@ void funtech_h8_state::program_map(address_map &map)
 	map(0x00000, 0x3ffff).rom();
 	map(0x40000, 0x47fff).ram(); // NVRAM?
 	map(0x48000, 0x48001).w(FUNC(funtech_h8_state::hopper_w));
-	map(0x48008, 0x48009).portr("IN0").nopw(); // TODO: continuosly, alternatively writes 0xff00 and 0x00ff
+	map(0x48008, 0x48009).portr("IN0").nopw(); // TODO: continuously, alternatively writes 0xff00 and 0x00ff
 	map(0x4800a, 0x4800b).portr("DSW3_4");
 	// map(0x4800c, 0x4800d).w // writes here sometimes
 	map(0x4800e, 0x4800e).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -309,7 +309,7 @@ GFXDECODE_END
 
 void funtech_h8_state::funtech_h8(machine_config &config)
 {
-	H83030(config, m_maincpu, 12_MHz_XTAL);
+	H83030(config, m_maincpu, 12_MHz_XTAL / 6); // minimal speed for an H8 is 2 MHz and this seems to match available reference, but strange
 	m_maincpu->set_addrmap(AS_PROGRAM, &funtech_h8_state::program_map);
 	m_maincpu->read_port7().set_ioport("DSW1");
 	m_maincpu->read_porta().set_ioport("DSW2");
@@ -326,7 +326,7 @@ void funtech_h8_state::funtech_h8(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_goldnegg);
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200); // TODO
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 0x200);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -352,4 +352,4 @@ ROM_END
 
 
 // puts the following strings in RAM: 1999-05-24, -TAIWAN-GAMEMAX-, --VERSION:U1.7--
-GAME( 1999, goldnegg, 0, funtech_h8, goldnegg, funtech_h8_state, empty_init, ROT0, "LSE", "Golden Egg (version U1.8)", MACHINE_NOT_WORKING )
+GAME( 1999, goldnegg, 0, funtech_h8, goldnegg, funtech_h8_state, empty_init, ROT0, "LSE", "Golden Egg (version U1.8)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
