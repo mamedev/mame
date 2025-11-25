@@ -4184,15 +4184,18 @@ Hangs after entering name on VM class
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="alt_title" value="アドベンチャーランド" />
 		<info name="release" value="198407xx" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="348848">
 				<rom name="boot.d88" size="348848" crc="f914c48b" sha1="446a234f36465708df4ffabc0848b84a45cf6426" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="344496">
 				<rom name="adventureland.d88" size="344496" crc="eb33a2b4" sha1="63c84329954624c0d1b61c303412353418820b99" offset="0" />
 			</dataarea>
@@ -8631,16 +8634,24 @@ Errors with "Put the retail disk A into the drive", [FDC] chrn=(2, 1, -17, 512)
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="alt_title" value="ブラックプールの剣" />
 		<info name="release" value="198401xx" />
+		<info name="usage" value="Start with Boot and Disk B in 2D drives otherwise corrupted graphics will happen once loaded" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
+			<dataarea name="flop" size="348848">
+				<rom name="boot.d88" size="348848" crc="f914c48b" sha1="446a234f36465708df4ffabc0848b84a45cf6426" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="344496">
 				<rom name="disk a.d88" size="344496" crc="21eca713" sha1="2d11670eb8cb269bc7777a7237eb44b48263f691" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="348848">
 				<rom name="disk b.d88" size="348848" crc="05529277" sha1="409083c4b4bad399d64d931f2f835ef47a858837" offset="0" />
@@ -12557,8 +12568,10 @@ Course names draws a full square [kanji] block between nation and "GP" (verify)
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="release" value="198310xx" />
+		<info name="usage" value="Start with Boot and Disk B in 2D drives otherwise wont load after prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="348848">
