@@ -20,7 +20,9 @@ TODO: Test and use sh7604_wdt_device, sh7604_sci_device, and sh7604_bus_device a
 
 #include "sh7604.h"
 
-//#define VERBOSE 1
+#define LOG_DMA (1U << 1)
+
+#define VERBOSE (LOG_DMA)
 #include "logmacro.h"
 
 
@@ -727,7 +729,7 @@ void sh7604_device::sh2_do_dma(int dmach)
 			resume(SUSPEND_REASON_HALT);
 		}
 
-		LOG("SH2: DMA %d complete\n", dmach);
+		LOGMASKED(LOG_DMA, "SH2: DMA %d complete\n", dmach);
 		m_dmac[dmach].tcr = 0;
 		m_dmac[dmach].chcr |= 2;
 		m_dma_timer_active[dmach] = 0;
@@ -756,7 +758,7 @@ void sh7604_device::sh2_dmac_check(int dmach)
 
 			if (m_active_dma_incd[dmach] == 3 || m_active_dma_incs[dmach] == 3)
 			{
-				LOG("SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", m_active_dma_incd[dmach], m_active_dma_incs[dmach], m_active_dma_size[dmach], m_dmac[dmach].chcr);
+				LOGMASKED(LOG_DMA, "SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", m_active_dma_incd[dmach], m_active_dma_incs[dmach], m_active_dma_size[dmach], m_dmac[dmach].chcr);
 				return;
 			}
 			m_active_dma_src[dmach]   = m_dmac[dmach].sar;
@@ -765,7 +767,7 @@ void sh7604_device::sh2_dmac_check(int dmach)
 			if (!m_active_dma_count[dmach])
 				m_active_dma_count[dmach] = 0x1000000;
 
-			LOG("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dmach, m_active_dma_src[dmach], m_active_dma_dst[dmach], m_active_dma_count[dmach], m_dmac[dmach].chcr, m_active_dma_incs[dmach], m_active_dma_incd[dmach], m_active_dma_size[dmach]);
+			LOGMASKED(LOG_DMA, "SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dmach, m_active_dma_src[dmach], m_active_dma_dst[dmach], m_active_dma_count[dmach], m_dmac[dmach].chcr, m_active_dma_incs[dmach], m_active_dma_incd[dmach], m_active_dma_size[dmach]);
 
 			m_dma_timer_active[dmach] = 1;
 
@@ -807,7 +809,7 @@ void sh7604_device::sh2_dmac_check(int dmach)
 	{
 		if (m_dma_timer_active[dmach])
 		{
-			LOG("SH2: DMA %d cancelled in-flight\n", dmach);
+			LOGMASKED(LOG_DMA, "SH2: DMA %d cancelled in-flight\n", dmach);
 			//m_dma_complete_timer[dmach]->adjust(attotime::never);
 			m_dma_current_active_timer[dmach]->adjust(attotime::never, dmach);
 
@@ -859,7 +861,7 @@ uint8_t sh7604_device::tdr_r()
 void sh7604_device::tdr_w(uint8_t data)
 {
 	m_tdr = data;
-	//printf("%c", data & 0xff);
+	printf("%c", data & 0xff);
 }
 
 uint8_t sh7604_device::ssr_r()
@@ -1548,6 +1550,7 @@ uint32_t sh7604_device::vcrdma_r()
 template <int Channel>
 void sh7604_device::vcrdma_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	LOGMASKED(LOG_DMA, "%s: DMA VCRDMA%d write: %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
 	COMBINE_DATA(&m_vcrdma[Channel]);
 	m_irq_vector.dmac[Channel] = m_vcrdma[Channel] & 0x7f;
 	sh2_recalc_irq();
@@ -1562,6 +1565,7 @@ uint8_t sh7604_device::drcr_r()
 template <int Channel>
 void sh7604_device::drcr_w(uint8_t data)
 {
+	LOGMASKED(LOG_DMA, "%s: DMA DRCR%d write: %02x\n", machine().describe_context(), Channel, data);
 	m_dmac[Channel].drcr = data & 3;
 	sh2_recalc_irq();
 }
@@ -1575,6 +1579,7 @@ uint32_t sh7604_device::sar_r()
 template <int Channel>
 void sh7604_device::sar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	LOGMASKED(LOG_DMA, "%s: DMA SAR%d write: %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
 	COMBINE_DATA(&m_dmac[Channel].sar);
 }
 
@@ -1587,6 +1592,7 @@ uint32_t sh7604_device::dar_r()
 template <int Channel>
 void sh7604_device::dar_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	LOGMASKED(LOG_DMA, "%s: DMA DAR%d write: %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
 	COMBINE_DATA(&m_dmac[Channel].dar);
 }
 
@@ -1599,6 +1605,7 @@ uint32_t sh7604_device::dmac_tcr_r()
 template <int Channel>
 void sh7604_device::dmac_tcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	LOGMASKED(LOG_DMA, "%s: DMA TCR%d write: %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
 	COMBINE_DATA(&m_dmac[Channel].tcr);
 	m_dmac[Channel].tcr &= 0xffffff;
 }
@@ -1612,6 +1619,7 @@ uint32_t sh7604_device::chcr_r()
 template <int Channel>
 void sh7604_device::chcr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	LOGMASKED(LOG_DMA, "%s: DMA CHCR%d write: %08x & %08x\n", machine().describe_context(), Channel, data, mem_mask);
 	uint32_t old;
 	old = m_dmac[Channel].chcr;
 	COMBINE_DATA(&m_dmac[Channel].chcr);
@@ -1626,6 +1634,7 @@ uint32_t sh7604_device::dmaor_r()
 
 void sh7604_device::dmaor_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	LOGMASKED(LOG_DMA, "%s: DMA DMAOR write: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 	{
 		uint8_t old = m_dmaor & 0xf;
