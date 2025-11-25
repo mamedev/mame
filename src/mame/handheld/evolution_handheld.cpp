@@ -145,12 +145,12 @@ CONS( 2020, buttdtct,    0,       0,      evolhh, evolhh, evolution_handheldgame
 CONS( 2015, pokexyqz,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ロトム図鑑 サン＆ムーン ポケモン クイズ
-CONS( 2015, pokesmqz,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokedex Sun & Moon Pokemon Quiz Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokesmqz,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Rotom Zukan Sun & Moon Pokemon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 201?, tomyspt,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ほっぺちゃん スイ☆コレ　ホワイト
-CONS( 201?, hoppech,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan Sweet Collection (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, hoppech,     0,       0,      evolhh, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Hoppe-chan SuiColle (white, Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // 星座电子宠物机 (virtual pet by 育乐元)
 CONS( 2022, yuleyuan,    0,       0,      evolhh, evolhh, evolution_handheldgame_state, init_yuleyuan, "Yule Yuan", "Xingzuo Dianzi Chongwu Ji", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dumped from yellow model

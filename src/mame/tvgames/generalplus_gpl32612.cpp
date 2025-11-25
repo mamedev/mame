@@ -557,7 +557,7 @@ CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header  マーメイドアクアポット
-CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge PreCure Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these
