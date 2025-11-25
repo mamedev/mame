@@ -146,6 +146,8 @@ private:
 	uint8_t klcs_porta_r();
 	void klcs_portb_w(uint8_t data);
 
+	uint8_t ts_r();
+
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 	uint8_t m_key_scan_row;
@@ -266,6 +268,12 @@ void s3000_state::klcs_portb_w(uint8_t data)
 	}
 }
 
+uint8_t s3000_state::ts_r()
+{
+	const auto imagedev = m_floppy->get_device();
+	return imagedev->dskchg_r();
+}
+
 HD44780_PIXEL_UPDATE(s3000_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
@@ -364,6 +372,7 @@ void s3000_state::s3000(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_fdc->intrq_wr_callback().append(m_maincpu, FUNC(v53a_device::dsr_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
+	m_fdc->ts_rd_callback().set(FUNC(s3000_state::ts_r));
 
 	FLOPPY_CONNECTOR(config, m_floppy, s3000_state::floppies, "35hd", add_formats).enable_sound(true);
 

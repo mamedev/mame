@@ -198,6 +198,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	drq_cb(*this),
 	hdl_cb(*this),
 	idx_cb(*this),
+	ts_cb(*this, ASSERT_LINE),
 	us_cb(*this)
 {
 }
@@ -1613,6 +1614,8 @@ uint8_t upd765_family_device::get_st3(floppy_info &fi)
 
 		if (ts_connected)
 			st3 |= (fi.dev->twosid_r() ? 0x00 : ST3_TS);
+		else
+			st3 |= ts_cb() ? 0x00 : ST3_TS;
 	}
 	return st3;
 }
