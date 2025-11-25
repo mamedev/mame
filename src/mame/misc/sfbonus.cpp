@@ -3205,7 +3205,7 @@ ROM_START( sfruitbbh )  // PCB S2000-B
 	ROM_LOAD( "sfb22b_.id", 0x00, 0x20, CRC(29523bc1) SHA1(99ac1b7898c2f48ad3846bb59c8af6d04b5a6a55) )
 ROM_END
 
-ROM_START( sfruitbdh )
+ROM_START( sfruitbdh ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "sfbd22b.bin", 0x00000, 0x40000,  CRC(065bb398) SHA1(dd3092729bca420cdd338749d9bd779970dcd1c7) )
 
@@ -3279,7 +3279,7 @@ ROM_START( fb2gen )
 	ROM_LOAD( "fb2g18e.id", 0x00, 0x20, CRC(a62d1596) SHA1(a04c248e7441e5c8afe7fc30392fe053734de4ef) )
 ROM_END
 
-ROM_START( fb2genc1 )
+ROM_START( fb2genc1 ) // PCB S2000C
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "f2gc18r.bin", 0x00000, 0x40000, CRC(f0adc7a4) SHA1(109490212d8c0bd25d6beb271939a83c06e468c6) )
 
@@ -3317,7 +3317,7 @@ ROM_START( fb2genc2 )
 	ROM_LOAD( "fb2g18lt.id", 0x00, 0x20, CRC(8f36bc08) SHA1(53d970cb1a1055c459e64a09f4e495c52aa2ab9f) )
 ROM_END
 
-ROM_START( fb2gend1 )
+ROM_START( fb2gend1 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "f2gd18r.bin", 0x00000, 0x40000, CRC(6a97bc44) SHA1(ef1d611c009cb1f5ff674fa30413607e3fbcbc45) )
 
@@ -4949,7 +4949,7 @@ ROM_START( moneymac )
 	ROM_LOAD( "mm17ex.id", 0x00, 0x20,  CRC(6e5fffff) SHA1(dbabb86903be2b0a0588041cccc5545142587f69) )
 ROM_END
 
-ROM_START( moneymacd1 )
+ROM_START( moneymacd1 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "mmd17r.bin", 0x00000, 0x40000, CRC(66dbacdd) SHA1(9d0440a3d8c58860cd2e59310677320b6e40c46b) )
 
@@ -5084,7 +5084,7 @@ ROM_START( fb5c )
 	ROM_LOAD( "fb515sh.id", 0x00, 0x20, CRC(d20771d2) SHA1(6a61d89d1c583c587106003849091a6c4f8b0faf) )
 ROM_END
 
-ROM_START( fb5d )
+ROM_START( fb5d ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "fb5d15h.bin", 0x00000, 0x40000, CRC(231b4083) SHA1(a009cae4943ba8d6a56eb4d70bc8b50f98b62fde) )
 
@@ -5366,7 +5366,7 @@ ROM_START( fb6se )
 	ROM_LOAD( "fb6se14ex.id", 0x00, 0x20, CRC(188a49fb) SHA1(d94a238f34ff28c254a505adf49535871fd6e52f) )
 ROM_END
 
-ROM_START( fb6sed1 )
+ROM_START( fb6sed1 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "se6d14r.bin", 0x00000, 0x40000, CRC(70567bf1) SHA1(2e2bb317d558c4a8a008a695097f474b5e58ccf4) )
 
@@ -5597,7 +5597,7 @@ ROM_START( dvislando )
 ROM_END
 
 // Around The World
-ROM_START( atworld )
+ROM_START( atworld ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "awd14r.bin", 0x00000, 0x80000, CRC(9a40be4f) SHA1(30353d58190c54c6c51e62d6ce101396aba3717a) )
 
@@ -5821,7 +5821,7 @@ ROM_START( getrich )
 ROM_END
 
 
-ROM_START( mcircus )
+ROM_START( mcircus ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(bba311c5) SHA1(1571bc2842c07b169b009a374402ee01a61f98e7) )
 
