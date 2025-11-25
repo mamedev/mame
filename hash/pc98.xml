@@ -109,11 +109,29 @@ Uses [EGC], broken GFXs
 		</part>
 	</software>
 
-	<software name="n88bas61" supported="partial">
-		<description>N88 Disk BASIC v6.1</description>
-		<year>1983</year>
+	<!-- 2D format ought to exist -->
+	<!-- https://sanguisorba.github.io/basic/n88.htm -->
+	<software name="n88bas20" supported="partial">
+		<description>N88 Disk BASIC(86) (v2.0, 2HD)</description>
+		<year>1983?</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
+Identify exact type, PC-98H42(K)?
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1086448">
+				<rom name="n88-nihongo basic(86) v2.0 (system disk).d88" size="1086448" crc="14f2043c" sha1="cc3b769165f233175ecd85c59284e5ae91b1ff98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n88bas61" supported="partial">
+		<description>N88 Disk BASIC(86) (v6.1)</description>
+		<year>1983?</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Identify exact type
 Utility disk file "menu." has half height box lines
 Not extensively tested
 ]]></notes>
