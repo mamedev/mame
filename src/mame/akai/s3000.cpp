@@ -15,15 +15,15 @@
     LCD, and fewer controls.  The S2800 has the same LCD and front panel as the S3000
     but again is bare-bones on features.
 
-    "XL" models have double the ROM space for a more advanced OS and come with
-    things that were optional expansions on the base models built in.
+    "XL" models have more ROM and RAM space for a more advanced OS.  Note that the
+    S2000 is based on the XL hardware, not the base S3000/CD3000i hardware.
 
     Hardware:
         CPU: NEC V53 (32 MHz on 3x00, 31.94 MHz on 2000)
         Floppy: uPD72069
         SCSI: MB89352
         LCD: LC7981 (3x00 and 2800) or HD44780 (2000)
-        Sound DSP: L7A1045-L6048
+        Sound DSP: L7A1045-L6028
         Filter (XL models and S3200 only): L7A0906-L6029 DFL
         Effects DSP (XL models only): L7A1414-L6038 DFX
 
@@ -31,19 +31,25 @@
         - Keyboard matrix on all models
         - LED outputs should be correct for all models
         - MIDI In on all models
-        - SCSI CD-ROM on S2000, CD3000i, and CD3000XL
-        - Loading and playing sounds from CD-ROM on S2000 and CD3000XL
+        - SCSI CD-ROM and hard disk on S2000, CD3000i, and CD3000XL
+        - Loading and playing sounds from CD-ROM and hard disk on S2000
+          and CD3000XL
+        - S2000 can save its OS to a hard disk and boot from it instead
+          of floppy
+        - Floppy can be formatted successfully now, and S2000 boots the OS from
+          floppy correctly
 
     TODOs:
-        - Floppy hookup is not yet correct.
+        - Non-XL models appear not to read DiskChg via the uPD TS line like the
+          XLs do.  Need to find where it does that.
         - S3000 and CD3000i don't find any sample RAM.  The XL models and S2000
           both use the MPC3000 approach of actually testing the memory and find
           all 32 megs fine.  This appears to be related to the other bits in the
           ID register.
         - Many Akai factory CD sounds have clipping, need to check if that's
           an L6028 volume issue or bad loop points (or both).
-        - Split the data entry knob into a device so we can use it here without
-          more copy/pasting.
+        - Split the data entry knob into a device so we can share it across the
+          various Akai drivers.
 
 ***************************************************************************/
 
@@ -82,6 +88,9 @@
 
 namespace {
 
+static constexpr uint8_t BIT6 = 0x40;
+static constexpr uint8_t BIT7 = 0x80;
+
 class s3000_state : public driver_device
 {
 public:
@@ -95,10 +104,15 @@ public:
 		, m_mdout(*this, "mdout")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
+		, m_floppy_led(*this, "drive_led")
 		, m_klcs(*this, "klcs")
 		, m_ledlatch(*this, "ledlatch")
 		, m_keys(*this, "C%u", 0)
+		, m_dataentry(*this, "DATAENTRY")
 		, m_key_scan_row(0)
+		, m_last_dial(0)
+		, m_count_dial(0)
+		, m_quadrature_phase(0)
 	{ }
 
 	void s2000(machine_config &config);
@@ -116,9 +130,11 @@ private:
 	required_device<midi_port_device> m_mdout;
 	required_device<upd72069_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
+	output_finder<> m_floppy_led;
 	required_device<i8255_device> m_klcs;
 	required_device<output_latch_device> m_ledlatch;
 	required_ioport_array<8> m_keys;
+	required_ioport m_dataentry;
 
 	static void floppies(device_slot_interface &device);
 
@@ -133,6 +149,8 @@ private:
 	void s3000xl_io_map(address_map &map) ATTR_COLD;
 	void cd3000_io_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
+
+	void floppy_led_cb(floppy_image_device *, int state);
 
 	uint8_t dma_memr_cb(offs_t offset);
 	void dma_memw_cb(offs_t offset, uint8_t data);
@@ -150,11 +168,21 @@ private:
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(dial_timer_tick);
+
 	uint8_t m_key_scan_row;
+	int m_last_dial, m_count_dial, m_quadrature_phase;
 };
 
 void s3000_state::machine_start()
 {
+	save_item(NAME(m_key_scan_row));
+	save_item(NAME(m_last_dial));
+	save_item(NAME(m_count_dial));
+	save_item(NAME(m_quadrature_phase));
+
+	m_floppy_led.resolve();
+	m_floppy->get_device()->setup_led_cb(floppy_image_device::led_cb(&s3000_state::floppy_led_cb, this));
 }
 
 void s3000_state::machine_reset()
@@ -195,8 +223,8 @@ void s3000_state::s2000_io_map(address_map &map)
 {
 	map(0x0000, 0x001f).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x0052, 0x0053).w(FUNC(s3000_state::klcs_portb_w));
 	map(0x0060, 0x0060).rw(m_s2klcd, FUNC(hd44780_device::data_r), FUNC(hd44780_device::data_w)).umask16(0x00ff);
 	map(0x0062, 0x0062).rw(m_s2klcd, FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
@@ -225,8 +253,8 @@ void s3000_state::s3000xl_io_map(address_map &map)
 {
 	map(0x0000, 0x001f).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
+	map(0x0040, 0x0047).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x0052, 0x0053).w(FUNC(s3000_state::klcs_portb_w)); // HACK: port B is configured for input but written to
 	map(0x0060, 0x0060).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x0062, 0x0062).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
@@ -237,6 +265,11 @@ void s3000_state::s3000xl_io_map(address_map &map)
 void s3000_state::dsp_map(address_map &map)
 {
 	map(0x0000'0000, 0x01ff'ffff).ram();
+}
+
+void s3000_state::floppy_led_cb(floppy_image_device *, int state)
+{
+//  m_floppy_leds[floppy] = state;
 }
 
 // 00 = CD3000i (invalid with S3000/3200 ROM)
@@ -256,7 +289,47 @@ uint8_t s3000_state::cd_id_r()
 
 uint8_t s3000_state::klcs_porta_r()
 {
-	return m_keys[m_key_scan_row]->read();
+	uint8_t rv = m_keys[m_key_scan_row]->read() & ~0xc0;
+
+	if (m_count_dial)
+	{
+		const bool negative = (m_count_dial < 0);
+
+		switch (m_quadrature_phase >> 1)
+		{
+			case 0:
+				rv |= negative ? BIT7 : BIT6;
+				break;
+
+			case 1:
+				rv |= BIT6 | BIT7;
+				break;
+
+			case 2:
+				rv |= negative ? BIT6 : BIT7;
+				break;
+
+			case 3:
+				break;
+		}
+		m_quadrature_phase++;
+		m_quadrature_phase &= 7;
+
+		// generate a complete 4-part pulse train for each single change in the position
+		if (m_quadrature_phase == 0)
+		{
+			if (m_count_dial < 0)
+			{
+				m_count_dial++;
+			}
+			else
+			{
+				m_count_dial--;
+			}
+		}
+	}
+
+	return rv;
 }
 
 void s3000_state::klcs_portb_w(uint8_t data)
@@ -265,6 +338,27 @@ void s3000_state::klcs_portb_w(uint8_t data)
 	if (m_key_scan_row != 0)
 	{
 		m_key_scan_row = count_leading_zeros_32(m_key_scan_row) - 24;
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(s3000_state::dial_timer_tick)
+{
+	const int new_dial = m_dataentry->read();
+
+	if (new_dial != m_last_dial)
+	{
+		int diff = new_dial - m_last_dial;
+		if (diff > 0x80)
+		{
+			diff = 0x100 - diff;
+		}
+		if (diff < -0x80)
+		{
+			diff = -0x100 - diff;
+		}
+
+		m_count_dial += diff;
+		m_last_dial = new_dial;
 	}
 }
 
@@ -434,6 +528,8 @@ void s3000_state::s3000(machine_config &config)
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
 	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
 	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
+
+	TIMER(config, "dialtimer").configure_periodic(FUNC(s3000_state::dial_timer_tick), attotime::from_hz(60.0));
 }
 
 void s3000_state::s2000(machine_config &config)
@@ -550,6 +646,9 @@ static INPUT_PORTS_START(s3000)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / >") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("DATAENTRY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(s3000xl)
@@ -612,6 +711,9 @@ static INPUT_PORTS_START(s3000xl)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / <") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("DATAENTRY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(cd3000xl)
@@ -674,6 +776,9 @@ static INPUT_PORTS_START(cd3000xl)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / <") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("DATAENTRY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(s2000)
@@ -715,6 +820,9 @@ static INPUT_PORTS_START(s2000)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Page Down") PORT_CODE(KEYCODE_H)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("DATAENTRY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)
 INPUT_PORTS_END
 
 ROM_START( s2000 )
