@@ -174,28 +174,26 @@ inline u16 model2_state::float_to_zval( float floatval )
 
 	/* round the low bits and reduce to 12 */
 	mantissa += 0x400;
-	if (mantissa > 0x7fffff) { exponent++; mantissa = (mantissa & 0x7fffff) >> 1; }
+	if (mantissa > 0x7fffff)
+	{
+		exponent++;
+		mantissa = (mantissa & 0x7fffff) >> 1;
+	}
 	mantissa >>= 11;
 
-	/* if negative, clamp to 0 */
+	// if negative, clamp to 0
 	if (fpint < 0)
 		return 0x0000;
 
-	/* the rest depends on the exponent */
-	/* less than -12 is too small, return 0 */
-	if ( exponent < -12 )
-		return 0x0000;
-
-	/* between -12 and 0 create a denormal with exponent of 0 */
-	if ( exponent < 0 )
-		return (mantissa | 0x1000) >> -exponent;
-
-	/* between 0 and 14 create a FP value with exponent + 1 */
-	if ( exponent < 15 )
-		return (( exponent + 1 ) << 12) | mantissa;
-
-	/* above 14 is too large */
-	return 0xffff;
+	// the rest depends on the exponent
+	if (exponent < -12)
+		return 0x0000; // less than -12 is too small, return 0
+	else if (exponent < 0)
+		return (mantissa | 0x1000) >> -exponent; // between -12 and 0 create a denormal with exponent of 0
+	else if (exponent < 15)
+		return ((exponent + 1) << 12) | mantissa; // between 0 and 14 create a FP value with exponent + 1
+	else
+		return 0xffff; // above 14 is too large
 }
 
 static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *vout, model2_state::plane clip_plane)
