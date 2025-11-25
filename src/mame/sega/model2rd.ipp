@@ -69,7 +69,10 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	}
 }
 
-#define LERP(X, Y, A) (((X) + ((((Y) - (X)) * (A)) >> 8)) & 0x00ff00ff)
+constexpr u32 LERP(u32 x, u32 y, unsigned a)
+{
+	return (x + (((y - x) * a) >> 8)) & 0x00ff00ff;
+}
 
 template <bool Translucent>
 u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 u, s32 v)
@@ -181,7 +184,7 @@ u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, cons
 inline s32 ATTR_FORCE_INLINE fast_log2(float value)
 {
 	// return 0 for negative values; should never happen
-	if (UNEXPECTED(value < 0.0f))
+	if (UNEXPECTED(value < 0.0F))
 		return 0;
 
 	// we only need the exponent and highest 7 bits of mantissa
