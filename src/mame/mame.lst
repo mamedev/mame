@@ -33301,9 +33301,6 @@ tomsadvs
 toratora
 toratorab
 
-@source:misc/triplex.cpp
-triplex
-
 @source:misc/triton.cpp
 triton41
 triton51
@@ -46883,6 +46880,9 @@ zerowingw
 
 @source:torch/quadx.cpp
 quadx
+
+@source:torch/triplex.cpp
+triplex
 
 @source:toaplan/truxton2.cpp
 truxton2
