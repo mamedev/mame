@@ -10,15 +10,15 @@
     - MC68030RC25B CPU
     - MC68881RC25B FPU
     - Torch OpenChip DMA controller
-    - ROM 64k + 4x8k PROM with microcode for the dma controller
+    - ROM 64k + 4x8k PROM with microcode for the DMA controller
     - VTC VIC068PG
     - INMOS IMSG300G (video)
     - WD33C93A (SCSI)
     - SEEQ NQ8005A (ethernet)
     - SCN68562 (DUART)
-    - MC146... (DIP8, full label unreadable) (RTC)
+    - DS1216 (RTC)
     - X2444P NOVRAM
-    - XTALs: 50 MHz (next to DUART) and one with unreadable label
+    - XTALs: 50 MHz (next to DUART), 64 MHz (next do DMA controller)
     - 16 position rotary switch
 
     TODO:
@@ -33,6 +33,7 @@
 #include "emu.h"
 
 #include "cpu/m68000/m68030.h"
+#include "machine/ds1215.h"
 #include "machine/eepromser.h"
 #include "machine/scnxx562.h"
 #include "machine/wd33c9x.h"
