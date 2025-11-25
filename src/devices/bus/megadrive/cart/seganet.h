@@ -23,6 +23,7 @@ protected:
 
 	memory_bank_creator m_rom;
 	memory_view m_ram_view;
+	std::vector<u16> m_ram;
 };
 
 DECLARE_DEVICE_TYPE(MEGADRIVE_SEGANET, megadrive_seganet_device)
