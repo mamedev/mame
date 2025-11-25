@@ -2077,6 +2077,8 @@ void pc9801_state::pc9801(machine_config &config)
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 
+	// TODO: should be PC80S31, using 'K variant for the better BIOS instead
+	// (and no patch downstream).
 	PC80S31K(config, "fdd_2d", XTAL(31'948'800) / 8);
 }
 

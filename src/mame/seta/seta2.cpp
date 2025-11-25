@@ -2707,6 +2707,8 @@ U42, U43 & U47 are mask ROMs read as 27C322
 
 The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
+"15.5846kHz hsync, vsync between 60-61Hz (can't split the csync)"
+
 ***************************************************************************/
 
 ROM_START( funcube2 )

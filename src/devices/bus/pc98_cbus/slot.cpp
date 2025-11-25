@@ -69,8 +69,14 @@ void pc98_cbus_root_device::device_start()
 
 void pc98_cbus_root_device::device_reset()
 {
+	logerror("Unmap memory ranges\n");
 	space(AS_PROGRAM).unmap_readwrite(0, 0xffffff);
 	space(AS_IO).unmap_readwrite(0, 0xffff);
+}
+
+void pc98_cbus_root_device::device_reset_after_children()
+{
+	logerror("Remap card ranges\n");
 	remap(AS_PROGRAM, 0, 0xffffff);
 	remap(AS_IO, 0, 0xffff);
 }
