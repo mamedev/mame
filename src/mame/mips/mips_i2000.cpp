@@ -710,7 +710,7 @@ ROM_END
 #define rom_rc2030 rom_i2000
 #define rom_rs2030 rom_i2000
 
-}
+} // anonymous namespace
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS             INIT         COMPANY  FULLNAME       FLAGS */
 COMP(1989,  rc2030,    0,      0,      rc2030,    0,     mips_i2000_state, i2000_init, "MIPS",  "RC2030",      0)

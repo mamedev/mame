@@ -162,14 +162,14 @@
 
 #include "emu.h"
 
-#include "bus/midi/midi.h"
-#include "cpu/es5510/es5510.h"
-#include "cpu/m68000/m68000.h"
 #include "esqlcd.h"
 #include "esqpanel.h"
 #include "esqvfd.h"
-#include "formats/esq16_dsk.h"
-#include "formats/hxchfe_dsk.h"
+#include "vfxcart.h"
+
+#include "bus/midi/midi.h"
+#include "cpu/es5510/es5510.h"
+#include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "machine/mc68681.h"
@@ -177,16 +177,19 @@
 #include "machine/wd_fdc.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
+
 #include "emupal.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "vfxcart.h"
+
+#include "formats/esq16_dsk.h"
+#include "formats/hxchfe_dsk.h"
 
 #include <cstdarg>
 #include <cstdio>
 
 
-// #define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -463,9 +466,11 @@ void esq5505_state::eps_cpu_space_map(address_map &map)
 void esq5505_state::machine_start()
 {
 	LOG("machine_start()\n");
-	if (m_floppy_connector) {
+	if (m_floppy_connector)
+	{
 		floppy_image_device *floppy = m_floppy_connector->get_device();
-		if (floppy) {
+		if (floppy)
+		{
 			floppy->setup_load_cb(floppy_image_device::load_cb(&esq5505_state::floppy_load, this));
 			floppy->setup_unload_cb(floppy_image_device::unload_cb(&esq5505_state::floppy_unload, this));
 
@@ -473,27 +478,38 @@ void esq5505_state::machine_start()
 			m_dskchg_reset_timer = timer_alloc(FUNC(esq5505_state::floppy_dskchg_reset), this);
 
 			// Set DSKCHG according to whether there is a floppy in the drive.
-			if (floppy->exists()) {
-				LOG("\nFloppy Drive has Floppy '%s'\n", floppy->filename());
+			if (floppy->exists())
+			{
+				LOG("Floppy Drive has Floppy '%s'\n", floppy->filename());
 				m_floppy_dskchg = false;
-			} else {
-				LOG("\nFloppy Drive has No Floppy\n");
+			}
+			else
+			{
+				LOG("Floppy Drive has No Floppy\n");
 				m_floppy_dskchg = true;
 			}
-		} else {
-			LOG("\nFloppy Drive has No Image Device!\n");
 		}
-	} else {
-			LOG("\nNo Floppy Drive\n");
+		else
+		{
+			LOG("Floppy Drive has No Image Device!\n");
+		}
 	}
-	if (m_cart) {
+	else
+	{
+		LOG("No Floppy Drive\n");
+	}
+	if (m_cart)
+	{
 		m_cart->setup_load_cb(ensoniq_vfx_cartridge::load_cb(&esq5505_state::cartridge_load, this));
 		m_cart->setup_unload_cb(ensoniq_vfx_cartridge::unload_cb(&esq5505_state::cartridge_unload, this));
 
-		if (m_cart->exists()) {
-			LOG("\nCartridge Slot has Cartridge '%s'\n", m_cart->filename());
-		} else {
-			LOG("\nCartridge Slot has No Cartridge\n");
+		if (m_cart->exists())
+		{
+			LOG("Cartridge Slot has Cartridge '%s'\n", m_cart->filename());
+		}
+		else
+		{
+			LOG("Cartridge Slot has No Cartridge\n");
 		}
 	}
 }
@@ -501,20 +517,19 @@ void esq5505_state::machine_start()
 void esq5505_state::machine_reset()
 {
 	// Check our image devices for load status.
-	if (m_floppy_connector) {
+	if (m_floppy_connector)
+	{
 		floppy_image_device *floppy = m_floppy_connector->get_device();
-		if (floppy && floppy->exists()) {
+		if (floppy && floppy->exists())
 			floppy_load(floppy);
-		} else {
+		else
 			floppy_unload(floppy);
-		}
 	}
 
-	if (m_cart && m_cart->exists()) {
+	if (m_cart && m_cart->exists())
 		cartridge_load(m_cart);
-	} else {
+	else
 		cartridge_unload(m_cart);
-	}
 
 	// Default analog values: all values are 10 bits, left-justified within 16 bits.
 	m_analog_values[0] = 0x7fc0; // pitch mod: start in the center
@@ -532,13 +547,9 @@ uint16_t esq5505_state::lower_r(offs_t offset)
 	offset &= 0x7fff;
 
 	if (!machine().side_effects_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
-	{
 		return m_rom[offset];
-	}
 	else
-	{
 		return m_ram[offset];
-	}
 }
 
 void esq5505_state::lower_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -548,13 +559,9 @@ void esq5505_state::lower_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset < 0x4000)
 	{
 		if (m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
-		{
 			COMBINE_DATA(&m_ram[offset]);
-		}
 		else
-		{
 			LOG("Write to ROM: %x @ %x (fc=%x)\n", data, offset, m_maincpu->get_fc());
-		}
 	}
 	else
 	{

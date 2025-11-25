@@ -546,7 +546,7 @@ ROM_END
 #define rom_rc3230 rom_r3030
 #define rom_rs3230 rom_r3030
 
-}
+} // anonymous namespace
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS             INIT         COMPANY  FULLNAME       FLAGS */
 COMP(1990,  rc3230,    0,      0,      rc3230,    0,     mips_r3030_state, r3030_init, "MIPS",  "RC3230",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
