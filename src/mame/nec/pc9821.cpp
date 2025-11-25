@@ -1823,3 +1823,5 @@ COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lav
 
 // 98FiNE
 // ...
+
+// PS-98 (client-server system based on late PC-9821s)

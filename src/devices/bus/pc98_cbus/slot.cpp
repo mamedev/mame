@@ -11,6 +11,7 @@ References:
 - https://98epjunk.shakunage.net/sw/ext_card/ext_card.html
 - https://ja.wikipedia.org/wiki/C%E3%83%90%E3%82%B9
 - https://www.pc-9800.net/db2/db2_ga_index.htm
+- https://web.archive.org/web/20240921232349/https://radioc.web.fc2.com/column/pc98bas/pc98memmap_en.htm
 - http://ookumaneko.s1005.xrea.com/pcibios.htm (PCI era mapping)
 
 TODO:

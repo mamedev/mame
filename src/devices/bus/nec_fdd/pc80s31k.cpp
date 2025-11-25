@@ -254,7 +254,7 @@ void pc80s31_device::fdc_io(address_map &map)
 static void pc88_floppies(device_slot_interface &device)
 {
 	device.option_add("525sd", FLOPPY_525_SD);
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", TEAC_FD_55F);
 	device.option_add("525hd", FLOPPY_525_HD);
 	// TODO: eventually needs inheriting for pc88va3 (2TD with 9.3 MB capacity)
 }

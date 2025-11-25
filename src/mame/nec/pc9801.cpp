@@ -1624,12 +1624,10 @@ void pc9801vm_state::mouse_freq_w(offs_t offset, u8 data)
 
 static void pc9801_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", TEAC_FD_55F);
 	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("35hd", FLOPPY_35_HD);
 }
-
-//  Jast Sound, could be installed independently
 
 void pc9801_state::fdc_2dd_irq(int state)
 {
@@ -2967,6 +2965,7 @@ COMP( 1993, pc9801bx2,  0,        0, pc9801bx2, pc9801rs, pc9801bx_state, init_p
 //COMP( 1993, pc9801ba2
 //COMP( 1995, pc9801ba3
 
+// http://www.amy.hi-ho.ne.jp/nakajima-jr/kikaku/special3/office.htm
 // N5200 (started as a vanilla PC-98 business line derivative,
 //        eventually diverged into its own thing and incorporated various Hyper 98 features.
 //        Runs proprietary PTOS)
