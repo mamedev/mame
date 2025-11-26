@@ -368,9 +368,13 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 	{
 		// take into account any streaming voltage inputs
 		if (streaming_cv)
+		{
 			for (int i = 1; i < INPUT_COUNT; i++)
+			{
 				if (BIT(input_mask, i))
 					set_voltage_internal(i, stream.get(i, sampindex));
+			}
+		}
 
 		// get the current VCO position and step it forward
 		double vco_position = m_vco_position;

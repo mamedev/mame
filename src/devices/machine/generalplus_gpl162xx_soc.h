@@ -27,8 +27,6 @@ public:
 	{
 	}
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
-
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
 	auto portc_in() { return m_portc_in.bind(); }
@@ -45,33 +43,37 @@ public:
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
 
-	void vblank(int state) { m_spg_video->vblank(state); }
+	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
+	template <typename T> void set_cs_space(T &&tag, int no)
+	{
+		m_cs_space.set_tag(tag, no);
+		m_spg_video.lookup()->set_cs_video_space(tag, no, m_csbase);
+	}
 
-	virtual void device_add_mconfig(machine_config& config) override;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_spg_video->screen_update(screen, bitmap, cliprect); }
+
+	void vblank(int state) { m_spg_video->vblank(state); }
 
 	void set_bootmode(int mode) { m_boot_mode = mode; }
 	void set_alt_periodic_irq(bool alt) { m_alt_periodic_irq = alt; }
 
 	IRQ_CALLBACK_MEMBER(irq_vector_cb);
-	template <typename... T> void set_cs_config_callback(T &&... args) { m_cs_callback.set(std::forward<T>(args)...); }
 	void default_cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4 );
-
-	void set_cs_space(address_space* csspace) { m_cs_space = csspace; }
 
 	void set_legacy_video_mode() { m_spg_video->set_legacy_video_mode(); }
 	void set_disallow_resolution_control() { m_spg_video->set_disallow_resolution_control(); }
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
-	inline uint16_t get_ram_addr(uint32_t addr) { return m_mainram[addr]; }
+	uint16_t get_ram_addr(uint32_t addr) { return m_mainram[addr]; }
 
 protected:
 	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal);
 
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	virtual void device_post_load() override;
+	virtual void device_post_load() override ATTR_COLD;
 
 	void gcm394_internal_map(address_map &map) ATTR_COLD;
 	void base_internal_map(address_map &map) ATTR_COLD;
@@ -91,6 +93,10 @@ protected:
 	devcb_write16 m_portb_out;
 	devcb_write16 m_portc_out;
 	devcb_write16 m_portd_out;
+
+	devcb_read16 m_nand_read_cb;
+	optional_address_space m_cs_space;
+	uint32_t m_csbase;
 
 	uint16_t m_dma_params[8][4];
 	bool m_dma_latched[4];
@@ -165,12 +171,7 @@ protected:
 
 	uint16_t m_system_dma_memtype;
 
-	devcb_read16 m_nand_read_cb;
-	uint32_t m_csbase;
-
 	uint16_t internalrom_lower32_r(offs_t offset);
-
-	address_space* m_cs_space;
 
 	uint16_t cs_space_r(offs_t offset);
 	void cs_space_w(offs_t offset, uint16_t data);

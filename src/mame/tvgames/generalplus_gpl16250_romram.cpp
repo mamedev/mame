@@ -313,7 +313,6 @@ void wrlshunt_game_state::machine_start()
 void wrlshunt_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
-	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(1);
@@ -393,7 +392,6 @@ uint16_t jak_s500_game_state::portb_r()
 void jak_s500_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
-	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);

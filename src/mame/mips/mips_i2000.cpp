@@ -156,11 +156,11 @@ public:
 	}
 
 	// machine config
-	void i2000(machine_config &config);
-	void rs2030(machine_config &config);
-	void rc2030(machine_config &config);
+	void i2000(machine_config &config) ATTR_COLD;
+	void rs2030(machine_config &config) ATTR_COLD;
+	void rc2030(machine_config &config) ATTR_COLD;
 
-	void i2000_init();
+	void i2000_init() ATTR_COLD;
 
 protected:
 	// driver_device overrides

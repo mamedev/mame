@@ -154,11 +154,11 @@ public:
 	}
 
 	// machine config
-	void r3030(machine_config &config);
-	void rs3230(machine_config &config);
-	void rc3230(machine_config &config);
+	void r3030(machine_config &config) ATTR_COLD;
+	void rs3230(machine_config &config) ATTR_COLD;
+	void rc3230(machine_config &config) ATTR_COLD;
 
-	void r3030_init();
+	void r3030_init() ATTR_COLD;
 
 protected:
 	// driver_device overrides

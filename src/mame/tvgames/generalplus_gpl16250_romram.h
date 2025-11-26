@@ -6,10 +6,11 @@
 #pragma once
 
 #include "generalplus_gpl16250.h"
-#include "machine/generalplus_gpl162xx_soc.h"
 #include "generalplus_gpl16250_m.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "machine/generalplus_gpl162xx_soc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -125,10 +126,7 @@ public:
 	}
 
 protected:
-
 	virtual void machine_reset() override ATTR_COLD;
-
-private:
 };
 
 
