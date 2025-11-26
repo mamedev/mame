@@ -5,30 +5,28 @@ license:CC0-1.0
 -->
 <softwarelist name="vfxsd_flop" description="Ensoniq VFX-SD Disk Images">
 
-<software name="os137" supported="yes">
-	<description>VFX-SD Sequencer OS version 1.37</description>
-	<year>1989</year>
-	<publisher>Ensoniq</publisher>
+	<software name="os137" cloneof="os210" supported="yes">
+		<description>VFX-SD Sequencer OS version 1.37</description>
+		<year>1989</year>
+		<publisher>Ensoniq</publisher>
 
-	<part name="flop" interface="floppy_3_5">
-		<dataarea name="flop" size="819200">
-			<rom name="VFX_SD_OS_1_37.img" size="819200" crc="95e41779" sha1="7eee74120f51f131535cd2b386693e5524417ed2" />
-		</dataarea>
-	</part>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="VFX_SD_OS_1_37.img" size="819200" crc="95e41779" sha1="7eee74120f51f131535cd2b386693e5524417ed2" />
+			</dataarea>
+		</part>
+	</software>
 
-</software>
+	<software name="os210" supported="yes">
+		<description>VFX-SD Sequencer OS version 2.10</description>
+		<year>1990</year>
+		<publisher>Ensoniq</publisher>
 
-<software name="os210" supported="yes">
-	<description>VFX-SD Sequencer OS version 2.10</description>
-	<year>1990</year>
-	<publisher>Ensoniq</publisher>
-
-	<part name="flop" interface="floppy_3_5">
-		<dataarea name="flop" size="819200">
-			<rom name="VFX_SD_OS_2_10.img" size="819200" crc="0ca3d94e" sha1="429b56029f95cedfa2a2a809cb063a81d84c7005" />
-		</dataarea>
-	</part>
-
-</software>
+		<part name="flop" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="VFX_SD_OS_2_10.img" size="819200" crc="0ca3d94e" sha1="429b56029f95cedfa2a2a809cb063a81d84c7005" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
