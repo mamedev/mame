@@ -438,6 +438,10 @@
 #include "mdos_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_MFA_DSK
+#include "mfa_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_MFM_HD
 #include "mfm_hd.h"
 #endif
@@ -1211,6 +1215,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_M5_DSK
 	en.add(FLOPPY_M5_FORMAT); // m5_dsk.h
+#endif
+
+	en.category("MFA Mikrocomputer");
+#ifdef HAS_FORMATS_MFA_DSK
+	en.add(FLOPPY_MFA_FORMAT); // mfa_dsk.h
 #endif
 
 	en.category("Motorola MDOS");
