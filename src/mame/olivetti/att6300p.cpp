@@ -45,6 +45,7 @@
 
 #include "emu.h"
 
+#include "att6300p_fdc.h"
 #include "att6300p_mmu.h"
 #include "m24_kbd.h"
 
@@ -908,6 +909,11 @@ void att6300p_state::cfg_no_serial_mouse(device_t *device)
 	device->subdevice<rs232_port_device>("serport0")->set_default_option(nullptr);
 }
 
+void att6300p_mb_isa_devices(device_slot_interface &device)
+{
+	device.option_add("fdc_6300p", ISA8_FDC_6300P);
+}
+
 void att6300p_state::att6300p(machine_config &config)
 {
 	I80286(config, m_maincpu, 12_MHz_XTAL / 2);
@@ -966,7 +972,7 @@ void att6300p_state::att6300p(machine_config &config)
 	m_isabus->iochck_callback().set(FUNC(att6300p_state::chck_w));
 
 	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
-	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_6300p", true);
+	ISA8_SLOT(config, "mb2", 0, m_isabus, att6300p_mb_isa_devices, "fdc_6300p", true);
 	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
 	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
