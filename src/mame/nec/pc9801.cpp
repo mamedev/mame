@@ -137,30 +137,6 @@ bool pc9801_state::fdc_drive_ready_r(upd765a_device *fdc)
 	return (!floppy0->ready_r() || !floppy1->ready_r());
 }
 
-uint8_t pc9801_state::fdc_2dd_ctrl_r()
-{
-	u8 ret = 0;
-
-	// 2dd BIOS specifically tests if a disk is in any drive
-	// (does not happen on 2HD standalone)
-	ret |= fdc_drive_ready_r(m_fdc_2dd) << 4;
-
-	//popmessage("%d %d %02x", floppy0->ready_r(), floppy1->ready_r(), ret);
-
-	// TODO: dips et al.
-	return ret | 0x40;
-}
-
-void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
-{
-	logerror("%02x ctrl\n",data);
-	m_fdc_2dd->reset_w(BIT(data, 7));
-
-	m_fdc_2dd_ctrl = data;
-	m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-	m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-}
-
 u8 pc9801vm_state::ide_ctrl_hack_r()
 {
 	if (!machine().side_effects_disabled())
@@ -258,8 +234,8 @@ void pc9801_state::pc9801_io(address_map &map)
 	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801_a0_w)); //upd7220 bitmap ports / display registers
-	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
+//	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
+//	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
 }
 
 /*************************************
@@ -1223,8 +1199,10 @@ void pc9801_state::tc_w(int state)
 		case 2:
 		case 3:
 			m_fdc_2hd->tc_w(state);
-			if(m_fdc_2dd)
-				m_fdc_2dd->tc_w(state);
+			if (m_dack == 3)
+				m_cbus_root->eop_w(3, state);
+			//if(m_fdc_2dd)
+			//	m_fdc_2dd->tc_w(state);
 			break;
 	}
 
@@ -1629,18 +1607,6 @@ static void pc9801_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-void pc9801_state::fdc_2dd_irq(int state)
-{
-	logerror("IRQ 2DD %d\n",state);
-
-	// TODO: does this mask applies to the specific timer irq trigger only?
-	// (bit 0 of control)
-	if(m_fdc_2dd_ctrl & 8)
-	{
-		m_pic2->ir2_w(state);
-	}
-}
-
 void pc9801vm_state::fdc_irq_w(int state)
 {
 	if(m_fdc_mode & 1)
@@ -1688,8 +1654,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	MACHINE_START_CALL_MEMBER(pc9801_common);
 
 	m_fdc_2hd->set_rate(500000);
-	m_fdc_2dd->set_rate(250000);
-	// TODO: set_rpm for m_fdc_2dd?
+
 	m_sys_type = 0x00 >> 6;
 }
 
@@ -1903,10 +1868,12 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus_root->int_cb<1>().set("pic8259_master", FUNC(pic8259_device::ir5_w));
 	m_cbus_root->int_cb<2>().set("pic8259_master", FUNC(pic8259_device::ir6_w));
 	m_cbus_root->int_cb<3>().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
-	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w));
+	m_cbus_root->int_cb<4>().set("pic8259_slave", FUNC(pic8259_device::ir3_w)); // INT42
 	m_cbus_root->int_cb<5>().set("pic8259_slave", FUNC(pic8259_device::ir4_w));
 	m_cbus_root->int_cb<6>().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
+	m_cbus_root->int_cb<7>().set("pic8259_slave", FUNC(pic8259_device::ir2_w)); // INT41
 	m_cbus_root->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
+	m_cbus_root->drq_cb<3>().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
 }
 
 void pc9801vm_state::cdrom_headphones(device_t *device)
@@ -1969,6 +1936,9 @@ void pc9801_state::pc9801_common(machine_config &config)
 
 	m_dmac->in_ior_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<2>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
+	m_dmac->in_ior_callback<3>().set([this] () { return m_cbus_root->dack_r(3); });
+	m_dmac->out_iow_callback<3>().set([this] (u8 data) { m_cbus_root->dack_w(3, data); });
+
 	m_dmac->out_dack_callback<0>().set(FUNC(pc9801_state::dack0_w));
 	m_dmac->out_dack_callback<1>().set(FUNC(pc9801_state::dack1_w));
 	m_dmac->out_dack_callback<2>().set(FUNC(pc9801_state::dack2_w));
@@ -2061,16 +2031,7 @@ void pc9801_state::pc9801(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state, pc9801f)
 
-	UPD765A(config, m_fdc_2dd, 8'000'000, false, true);
-	m_fdc_2dd->intrq_wr_callback().set(FUNC(pc9801_state::fdc_2dd_irq));
-	m_fdc_2dd->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
-	FLOPPY_CONNECTOR(config, "fdc_2dd:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
-
 	UPD1990A(config, m_rtc);
-
-	m_dmac->in_ior_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_r));
-	m_dmac->out_iow_callback<3>().set(m_fdc_2dd, FUNC(upd765a_device::dma_w));
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);

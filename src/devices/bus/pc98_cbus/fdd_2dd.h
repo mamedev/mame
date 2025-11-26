@@ -8,6 +8,9 @@
 
 #include "slot.h"
 
+#include "imagedev/floppy.h"
+#include "machine/upd765.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -29,11 +32,22 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual u8 dack_r(int line) override;
+	virtual void dack_w(int line, u8 data) override;
+	virtual void eop_w(int state) override;
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
-	void io_map(address_map &map) ATTR_COLD;
+	required_device<upd765a_device> m_fdc;
 	required_memory_region m_bios;
+
+	void io_map(address_map &map) ATTR_COLD;
+
+	bool fdc_drive_ready_r(upd765a_device *fdc);
+	u8 ctrl_r();
+	void ctrl_w(u8 data);
+
+	u8 m_ctrl;
 };
 
 

@@ -139,7 +139,6 @@ public:
 		, m_dsw2(*this, "DSW2")
 		, m_ppi_mouse(*this, "ppi_mouse")
 		, m_fdc_2hd(*this, "fdc_2hd")
-		, m_fdc_2dd(*this, "fdc_2dd")
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
 		, m_cbus_root(*this, "cbus_root")
@@ -167,7 +166,6 @@ protected:
 	// TODO: should really be one FDC
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
-	optional_device<upd765a_device> m_fdc_2dd;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
 	required_device<pc98_cbus_root_device> m_cbus_root;
@@ -232,13 +230,6 @@ protected:
 	u8 m_fdc_2hd_ctrl = 0;
 
 	bool fdc_drive_ready_r(upd765a_device *fdc);
-private:
-	void fdc_2dd_irq(int state);
-
-	uint8_t fdc_2dd_ctrl_r();
-	void fdc_2dd_ctrl_w(uint8_t data);
-
-	u8 m_fdc_2dd_ctrl = 0;
 
 //  DMA
 protected:

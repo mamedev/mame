@@ -48503,10 +48503,14 @@ Eventually hangs with stuck [PC9801-26] sound note (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="tforce">
+	<software name="tforce" supported="no">
 		<description>Thunder Force</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 1, expected_size=100000, current_size=124448"
+May require [PC80S31] interface?
+]]></notes>
 		<info name="alt_title" value="サンダーフォース" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="351024">

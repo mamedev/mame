@@ -120,7 +120,7 @@ private:
 	address_space_config m_space_mem_config;
 	address_space_config m_space_io_config;
 
-	devcb_write_line::array<7> m_int_cb;
+	devcb_write_line::array<8> m_int_cb;
 	devcb_write_line::array<4> m_drq_cb;
 
 	device_pc98_cbus_slot_interface *m_dma_device[8];
