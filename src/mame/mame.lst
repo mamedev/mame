@@ -520,6 +520,9 @@ vx600
 @source:akai/mpc60.cpp
 mpc60
 
+@source:akai/mpc2000.cpp
+mpc2000xl
+
 @source:akai/mpc3000.cpp
 mpc3000
 

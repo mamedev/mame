@@ -85,6 +85,7 @@
 #include "formats/td0_dsk.h"
 #include "formats/pc_dsk.h"
 
+#include "s2000.lh"
 
 namespace {
 
@@ -269,7 +270,7 @@ void s3000_state::dsp_map(address_map &map)
 
 void s3000_state::floppy_led_cb(floppy_image_device *, int state)
 {
-//  m_floppy_leds[floppy] = state;
+	m_floppy_led = state;
 }
 
 // 00 = CD3000i (invalid with S3000/3200 ROM)
@@ -398,8 +399,10 @@ void s3000_state::dma_memw_cb(offs_t offset, uint8_t data)
 
 void s3000_state::s3000_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+//  palette.set_pen_color(0, rgb_t(138, 146, 148));
+//  palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(88, 247, 0)); // bright green
+	palette.set_pen_color(1, rgb_t(3, 179, 6));  // dark green
 }
 
 void s3000_state::floppies(device_slot_interface &device)
@@ -462,7 +465,7 @@ void s3000_state::s3000(machine_config &config)
 
 	UPD72069(config, m_fdc, V53_CLKOUT);
 	m_fdc->set_ready_line_connected(false); // uPD READY pin is grounded on schematic
-	m_fdc->set_ts_line_connected(false);    // actually connected to DSKCHG (!) but this is sufficient for now
+	m_fdc->set_ts_line_connected(false);    // actually connected to DSKCHG (!)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_fdc->intrq_wr_callback().append(m_maincpu, FUNC(v53a_device::dsr_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
@@ -523,7 +526,7 @@ void s3000_state::s3000(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	L7A1045(config, m_dsp, 33.8688_MHz_XTAL); // clock verified by schematic
+	L7A1045(config, m_dsp, 33.8688_MHz_XTAL);
 	m_dsp->set_addrmap(AS_DATA, &s3000_state::dsp_map);
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
 	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
@@ -550,6 +553,8 @@ void s3000_state::s2000(machine_config &config)
 	m_screen->set_visarea_full();
 
 	NSCSI_CONNECTOR(config.replace(), "scsi:5", default_scsi_devices, "cdrom");
+
+	config.set_default_layout(layout_s2000);
 }
 
 void s3000_state::cd3000(machine_config &config)
