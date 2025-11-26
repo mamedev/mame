@@ -113,6 +113,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+	m_maincpu->set_cs_space(m_memory, 0);
 	m_maincpu->dma_complete_callback().set(FUNC(generalplus_gpac800_game_state::dma_complete_hacks));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
@@ -753,8 +754,6 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0x007822, 0x00c7);
 	mem.write_word(0x007823, 0x0047);
 	mem.write_word(0x007824, 0x0047);
-
-	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_nandregion)
 	{
