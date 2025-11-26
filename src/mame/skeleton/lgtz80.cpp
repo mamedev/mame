@@ -24,9 +24,12 @@ besides rudimentary ROM banking and port I/O.
 Pharaoh's Gold has a 'Wing' string plus other strings typically associated to Wing games.
 
 TODO:
-- arthurkn uploads code to NVRAM if missing, fruitcat and pharmyst seemingly need
-  NVRAM pre-populated, thus currently run off the rails when calling to NVRAM, seem
-  to fortuitously recover, but never populate tile RAM
+- arthurkn uploads code to NVRAM if missing, fruitcat and pharmyst need NVRAM pre-populated
+  pharmyst's one is dumped, while fruitcat's isn't, thus it currently runs off the rails
+  when calling to NVRAM, seems to fortuitously recover, but never populates tile RAM.
+  Note that according to the dumper, NVRAM is probably populated by one of the customs,
+  since he removed battery from NVRAM many times and it hasn't stopped the PCB from
+  working
 - arthurkn runs correctly and needs the following:
   - reels' scrolling implementation is weird (hacky?)
   - outputs (lamps / meters)
@@ -34,7 +37,22 @@ TODO:
   - visible area is probably not 100% correct
   - in the bonus games which appear when hitting 3 "bars", reels remain on screen when they
     shouldn't
- - arthurkn100 locks when soft-reset
+- arthurkn100 locks when soft-reset
+- pharmyst stops after passing the system RAM with this check:
+  3979: ld   a,$C1
+  397B: ld   ($8D81),a
+  397E: ld   a,($8D81)
+  3981: and  a
+  3982: jr   nz,$397E
+  397E: ld   a,($8D81)
+  3981: and  a
+  3982: jr   nz,$397E
+  can be bypassed with bp 3982,1,{curpc=0x3984;g} for now.
+  Is this NVRAM byte also manipulated from a custom?
+  Apart from understanding what's going on, it needs the following:
+  - doesn't agree at all with the current reel implementation
+  - locks when soft-reset
+  - inputs, outputs
 */
 
 
@@ -111,11 +129,11 @@ private:
 
 	void tile_ram_w(offs_t offset, u8 data);
 	void tile_attr_ram_w(offs_t offset, u8 data);
-	template <uint8_t Which> void reel_ram_w(offs_t offset, u8 data);
-	template <uint8_t Which> void reel_attr_ram_w(offs_t offset, u8 data);
-	template <uint8_t Which> void reel_scroll_ram_w(offs_t offset, u8 data);
+	template <u8 Which> void reel_ram_w(offs_t offset, u8 data);
+	template <u8 Which> void reel_attr_ram_w(offs_t offset, u8 data);
+	template <u8 Which> void reel_scroll_ram_w(offs_t offset, u8 data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+	template <u8 Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void fruitcat_io_map(address_map &map) ATTR_COLD;
@@ -176,7 +194,7 @@ TILE_GET_INFO_MEMBER(lgtz80_state::get_tile_info)
 	tileinfo.set(0, tile, 0, 0);
 }
 
-template <uint8_t Which>
+template <u8 Which>
 TILE_GET_INFO_MEMBER(lgtz80_state::get_reel_tile_info)
 {
 	int const tile = m_reel_ram[Which][tile_index] | (m_reel_attr_ram[Which][tile_index] << 8);
@@ -196,21 +214,21 @@ void lgtz80_state::tile_attr_ram_w(offs_t offset, u8 data)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-template <uint8_t Which>
+template <u8 Which>
 void lgtz80_state::reel_ram_w(offs_t offset, u8 data)
 {
 	m_reel_ram[Which][offset] = data;
 	m_reel_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-template <uint8_t Which>
+template <u8 Which>
 void lgtz80_state::reel_attr_ram_w(offs_t offset, u8 data)
 {
 	m_reel_attr_ram[Which][offset] = data;
 	m_reel_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-template <uint8_t Which>
+template <u8 Which>
 void lgtz80_state::reel_scroll_ram_w(offs_t offset, u8 data)
 {
 	m_reel_scroll_ram[Which][offset] = data;
@@ -237,7 +255,6 @@ void lgtz80_state::control_w(u8 data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	// Bit 6 always set?
-
 	if (!BIT(data, 6))
 		logerror("%s: control_w bit 6 unset (%02X)\n", machine().describe_context(), data);
 
@@ -284,8 +301,9 @@ void lgtz80_state::fruitcat_io_map(address_map &map)
 	map(0x80, 0x80).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x81, 0x81).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x82, 0x82).w("ramdac", FUNC(ramdac_device::mask_w));
-	//map(0x88, 0x88).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x88, 0x88).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	// map(0x98, 0x98).w(); TODO
+	// map(0xb0, 0xb0).w(); TODO: probably lamps
 	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
 }
 
@@ -405,6 +423,40 @@ static INPUT_PORTS_START( arthurkn100 )
 	PORT_DIPSETTING(    0x00, "1 (Same as Key-In)" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pharmyst )
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "Ticket out" in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "Ticket notch" in test mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // tested in test mode, but no definition given
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("IN2")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) //  also works as down in system configuration
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // also works for exiting system configuration
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) // TODO: "Get" in test mode, is it take? also works as up in system configuration
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Low / Show Odds") // "Small" in test mode. Also works as change setting down in system configuration
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // "Coin out" in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) // "Stop A" in test mode
+
+	PORT_START("IN3") // not shown in key test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) // "Stop B" in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) // "Stop C" in test mode
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // "Check" in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // "Big" in test mode. Also works as change setting up in system configuration
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) // TODO: hopper
+
+// no DSW on PCB
+INPUT_PORTS_END
+
 
 GFXLAYOUT_RAW(gfx_8x32x8_raw, 8, 32, 8 * 8, 8 * 32 * 8);
 
@@ -521,6 +573,9 @@ ROM_START( pharmyst ) // no stickers on ROMs
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "m29f040.u2", 0x00000, 0x80000, CRC(62cfddc4) SHA1(be9c0376d56e03b91d4802d285f30f18224968e8) )
+
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROM_LOAD( "nvram.u7", 0x0000, 0x4000, CRC(36b1569d) SHA1(1ecff32999ad81bf3bc2f792317d555adea26fa5) )
 
 	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "atf16v8b-15pc.u21", 0x000, 0x117, NO_DUMP )
@@ -919,7 +974,7 @@ void lgtz80_state::init_pharmyst()
 } // anonymous namespace
 
 
-GAME( 2003?, fruitcat,    0,        fruitcat,    arthurkn,    lgtz80_state, init_fruitcat,    ROT0, "LGT",               "Fruit Cat (v2.00)",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 200?,  arthurkn,    0,        arthurkn,    arthurkn,    lgtz80_state, init_arthurkn,    ROT0, "LGT",               "Arthur's Knights",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 200?,  arthurkn100, arthurkn, arthurkn100, arthurkn100, lgtz80_state, init_arthurkn100, ROT0, "LGT (LSE license)", "Arthur's Knights (v1.00)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 200?,  pharmyst,    0,        fruitcat,    arthurkn,    lgtz80_state, init_pharmyst,    ROT0, "LGT",               "Pharaoh's Mystery",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003?, fruitcat,    0,        fruitcat,    arthurkn,    lgtz80_state, init_fruitcat,    ROT0, "LGT",               "Fruit Cat (v2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 200?,  arthurkn,    0,        arthurkn,    arthurkn,    lgtz80_state, init_arthurkn,    ROT0, "LGT",               "Arthur's Knights",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 200?,  arthurkn100, arthurkn, arthurkn100, arthurkn100, lgtz80_state, init_arthurkn100, ROT0, "LGT (LSE license)", "Arthur's Knights (v1.00)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2007,  pharmyst,    0,        fruitcat,    pharmyst,    lgtz80_state, init_pharmyst,    ROT0, "LGT",               "Pharaoh's Mystery (USA v3.00)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
