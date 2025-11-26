@@ -524,6 +524,16 @@ static INPUT_PORTS_START( rad_tetr )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vjstarzd )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( airblsjs )
 	PORT_START("IN0")
@@ -869,6 +879,7 @@ void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 	m_vid->set_is_sudoku();
 	m_vid->set_use_spritepages();
 	m_sys->set_alt_timer(); // for Carl Edwards'
+	m_sys->set_bank_on_low_writes(); // for rad_ftet
 }
 
 void elan_eu3a13_state::elan_eu3a13_pal(machine_config& config)
@@ -965,6 +976,12 @@ ROM_START( sudelan3 )
 	ROM_RELOAD(0x100000,0x100000)
 	ROM_RELOAD(0x200000,0x100000)
 	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
+ROM_START( vjstarzd )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ep1206a.u2", 0x00000, 0x80000, CRC(e5f39fa5) SHA1(5ac45bde6f4323998f2387cb62e1841ebe60e781) )
+	ROM_RELOAD(0x380000,0x80000) // for boot vectors
 ROM_END
 
 ROM_START( sudelan )
@@ -1065,6 +1082,10 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
 CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+
+// it isn't clear if the ELAN is generating the music on this, or if one of the other globs is an audio MCU
+// VJ Starz Dance Mat on box, VJ Starz Dancing Mat on screen
+CONS( 2003, vjstarzd, 0, 0, elan_eu3a05, vjstarzd, elan_eu3a05_state, empty_init, "Kidz Biz / Jakks Pacific", "VJ Starz Dance Mat", MACHINE_NOT_WORKING )
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
