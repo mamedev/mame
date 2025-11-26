@@ -766,7 +766,7 @@ void esq5505_state::common(machine_config &config)
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	MC68681(config, m_duart, 4000000);
+	MC68681(config, m_duart, 5000000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
