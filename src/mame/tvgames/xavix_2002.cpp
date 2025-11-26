@@ -306,6 +306,14 @@ static INPUT_PORTS_START( xavix_bowl )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( xavix_box )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(superxavix_i2c_jmat_state::unknown_random_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(superxavix_i2c_jmat_state::unknown_random_r))
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ban_ult )
 	PORT_INCLUDE(xavix)
 
@@ -1080,8 +1088,8 @@ CONS( 2005, xavgolf,  0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i
 CONS( 2005, xavgolfj, xavgolf, 0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Golf (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, xavbowl,  0,       0, superxavix_i2c_24c04, xavix_bowl, superxavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 CONS( 2005, xavbowlj, xavbowl, 0, superxavix_i2c_24c04, xavix_bowl, superxavix_i2c_bowl_state, init_xavix, "SSD Company LTD",         "XaviX Bowling (XaviXPORT, PT2-BWL-11, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // ^^
-CONS( 2004, xavbox,   0,       0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
-CONS( 2004, xavboxj,  xavbox,  0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
+CONS( 2004, xavbox,   0,       0, superxavix_i2c_jmat,  xavix_box,  superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
+CONS( 2004, xavboxj,  xavbox,  0, superxavix_i2c_jmat,  xavix_box,  superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // has IR 'Camera'
 // Bass Fishing PCB is just like Tennis except with an RF daughterboard.
 CONS( 2004, xavbassf, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
@@ -1139,16 +1147,16 @@ CONS( 2006, ban_bkgj, 0, 0, superxavix_i2c_24c04_4mb,xavix_i2c,  superxavix_i2c_
 CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Taikan Cast Off - Kamen Rider Kabuto Clock Up & Rider Kick!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！
-CONS( 2006, ban_ult, 0, 0, superxavix_i2c_24c02,    ban_ult,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Fight Ultraman - Ute! Hissatsu Kousen!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_ult, 0, 0, superxavix_i2c_24c02,    ban_ult,  superxavix_i2c_bowl_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Fight Ultraman - Ute! Hissatsu Kousen!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 体感大怪獣バトル あやつれ!ウルトラ大怪獣!
-CONS( 2007, ban_um2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ban_um2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_bowl_state, init_xavix, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let’s!TVプレイ ゲキワザ習得 ゲキレンジャー スーパーゲキレンジャーへの道
-CONS( 2007, ban_gkrj, 0, 0, superxavix_i2c_24c02_4mb,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Gekiwaza Shuutoku Gekiranger - Super Gekiranger e no Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ban_gkrj, 0, 0, superxavix_i2c_24c02_4mb,    ban_gkr,  superxavix_i2c_bowl_state, init_xavix, "Bandai / SSD Company LTD",  "Let's! TV Play Gekiwaza Shuutoku Gekiranger - Super Gekiranger e no Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Yes!プリキュア5 いっしょに変身!メタモルフォーゼ!
-CONS( 2007, ban_pr2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",   "Yes! PreCure 5: Issho to Henshin! Metamorphose! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, ban_pr2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_bowl_state, init_xavix, "Bandai / SSD Company LTD",   "Yes! PreCure 5: Issho to Henshin! Metamorphose! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
