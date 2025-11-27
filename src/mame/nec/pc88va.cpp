@@ -1324,7 +1324,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->out_dack_cb<0>().set([this] (int state) { if (!state) m_dack = 0; });
 	m_maincpu->out_dack_cb<1>().set([this] (int state) { if (!state) m_dack = 1; });
 	m_maincpu->out_dack_cb<2>().set([this] (int state) { if (!state) m_dack = 2; });
-	m_maincpu->out_dack_cb<3>().set([this] (int state) { if (!state) m_dack = 3;});
+	m_maincpu->out_dack_cb<3>().set([this] (int state) { if (!state) m_dack = 3; });
 
 	pc88va_cbus(config);
 
