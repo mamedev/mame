@@ -127,6 +127,78 @@ void st25_state::st25(machine_config &config)
 	OKIM6376(config, "oki", 4_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
 }
 
+ROM_START(alpha)
+	ROM_REGION(0x4000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("w27e40.ic2", 0x00000, 0x80000, CRC(3cba9ebe) SHA1(f49a00e0d6f6e34e7fa24bc4339e51c6834bba67))
+
+	ROM_REGION(0x80000, "oki", 0)
+	ROM_LOAD("w27e40.ic1",   0x00000, 0x80000, CRC(f893b557) SHA1(194135c0cbcb270ebeb297c2f2e26e6101b44daf))
+ROM_END
+
+ROM_START(amarillo)
+	ROM_REGION(0x4000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+    ROM_REGION(0x80000, "soundrom", 0) //????????
+    ROM_LOAD("27c4001_snd.bin", 0x00000, 0x80000, CRC(2ccf9464) SHA1(02b16fe7465ad28ce96f38390fafbceafca2d23c))
+
+    ROM_REGION(0x80000, "oki", 0)
+    ROM_LOAD("27c040_ic1.bin", 0x00000, 0x80000, CRC(2114485c) SHA1(ee0bb436367e87bacfe703d0a8ee98c5362e0014))
+
+    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_LOAD("27c040_ic2.bin", 0x00000, 0x80000, CRC(b5058562) SHA1(c96ca309ca8214dcaeeef41ac29e8c325c08a9d9))
+ROM_END
+
+ROM_START(arenau)
+	ROM_REGION(0x4000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+    ROM_REGION(0x80000, "oki", 0)
+    ROM_LOAD("ic1_27c4001", 0x00000, 0x80000, CRC(93cdf476) SHA1(5b80e76bd04056ff53c7e11cfc5364cea30e4aed))
+
+    ROM_REGION(0x40000, "maincpu", 0)
+    ROM_LOAD("ic2_27c2001", 0x00000, 0x40000, CRC(2348e6c3) SHA1(7708a2ffc3b5154bd1793fb7332e26125cdc9696))
+ROM_END
+
+ROM_START(avanti)
+	ROM_REGION(0x4000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+    ROM_REGION(0x80000, "oki", 0)
+    ROM_LOAD("avantie_w27e040_st1.bin", 0x00000, 0x80000, CRC(47defe53) SHA1(65c246e9051fa1b0f9a855331d55282c6b4ccbc0))
+
+    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_LOAD("avantie_w27e040_st2.bin", 0x00000, 0x80000, CRC(14278f3a) SHA1(82a8a5e35e0eee8f4dbcb0e7b6491528c6444fad))
+ROM_END
+
+ROM_START(ballermann)
+	ROM_REGION(0x4000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+    ROM_REGION(0x40000, "maincpu", 0)
+    ROM_LOAD("27c2001_ic2", 0x00000, 0x40000, CRC(a20915f1) SHA1(cd7e1339bc635a8e16381858b93fe28f04fa725d))
+
+    ROM_REGION(0x80000, "oki", 0)
+    ROM_LOAD("27c4001_ic1", 0x00000, 0x80000, CRC(1dd6fee1) SHA1(bdd0e478069f822d2b940aa449ec61e9f07d4b3b))
+ROM_END
+
+ROM_START(bigactione)
+	ROM_REGION(0x4000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("27c020a.ic2", 0x00000, 0x80000, CRC(177e3fee) SHA1(a4ca38dfdf79eb3524381ea3b6fa7700ad24a966))
+
+	ROM_REGION(0x2000, "nvram", 0)
+	ROM_LOAD("m48t18.ic3", 0x00000, 0x2000, CRC(5b1e8172) SHA1(3ee9dfcba8fea095b6e003ba20bbc57fbeb5359e))
+
+	ROM_REGION(0x80000, "oki", 0)
+	ROM_LOAD("27c040.ic1",   0x00000, 0x80000, CRC(8c708e53) SHA1(ef91a5a21ba69ad2870f7201bb4d90b4bc94c4ec))
+ROM_END
+
 ROM_START(stakeoffe)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
@@ -154,5 +226,12 @@ ROM_END
 
 
 //   YEAR  NAME      PARENT   MACHINE INPUT    CLASS   INIT        ROT   COMPANY         FULLNAME                                                  FLAGS
-GAME(2001, stakeoffe,  0,       st25, st25, st25_state, empty_init, ROT0, "Panther", "Super Take Off E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2005, superpasch, 0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen", "Super Pasch",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, ballermann, 0,       st25, st25, st25_state, empty_init, ROT0, "Panther", "Ballermann 6",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, arenau,     0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen", "Unimint Arena",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2000, bigactione, 0,       st25, st25, st25_state, empty_init, ROT0, "Panther", "Big Action 3000 E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2001, stakeoffe,  0,       st25, st25, st25_state, empty_init, ROT0, "Panther", "Super Take Off E",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2004, avanti,     0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen", "Avanti",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2005, alpha,      0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen", "Alpha",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2005, superpasch, 0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen", "Super Pasch",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2007, amarillo,   0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen", "Amarillo",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+
