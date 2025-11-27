@@ -1984,7 +1984,8 @@ void apple2e_state::do_io(int offset)
 
 u8 apple2e_state::c000_r(offs_t offset)
 {
-	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
+	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
 	{
@@ -2137,7 +2138,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 			break;
 	}
 
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 u8 apple2e_state::c000_iic_r(offs_t offset)
@@ -2269,14 +2270,9 @@ void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 
 u8 apple2e_state::laserprn_busy_r()
 {
-	u8 retval = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
-	if (m_centronics_busy)
-	{
-		retval |= 0x80;
-	}
-
-	return retval;
+	return (m_centronics_busy ? 0x80 : 0) | uFloatingBus7;
 }
 
 void apple2e_state::laserprn_w(u8 data)
@@ -2614,7 +2610,7 @@ void apple2e_state::update_iic_mouse()
 
 u8 apple2e_state::laser_mouse_r(offs_t offset)
 {
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{
