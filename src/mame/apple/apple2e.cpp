@@ -1348,7 +1348,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	// update character selection
 	if (m_kbd_lang_sel)
 	{
-		u8 charset_id = m_kbd_lang_sel->read() & 0x0f;
+		const u8 charset_id = m_kbd_lang_sel->read() & 0x0f;
 		if (m_video->get_iie_langsw() != charset_id)
 		{
 			m_video->set_iie_langsw(charset_id);
@@ -3597,7 +3597,7 @@ void apple2e_state::ay3600_data_ready_w(int state)
 
 		if (m_kbd_lang_sel)
 		{
-			u8 kbd_layout_id = (m_kbd_lang_sel->read() & 0xf0) >> 4;
+			const u8 kbd_layout_id = (m_kbd_lang_sel->read() & 0xf0) >> 4;
 			trans += kbd_layout_id * 0x400; // go to second half of the ROM (DVORAK on US IIc/IIe models) or beyond
 		}
 

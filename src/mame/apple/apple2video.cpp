@@ -113,9 +113,12 @@ void a2_video_device::txt_w(int state)
 
 void a2_video_device::mix_w(int state)
 {
-	// select mixed mode or nomix
-	screen().update_now();
-	m_mix = state;
+	if (m_mix != state)
+	{
+		// select mixed or full mode
+		screen().update_now();
+		m_mix = state;
+	}
 }
 
 void a2_video_device::scr_w(int state)
@@ -128,14 +131,22 @@ void a2_video_device::scr_w(int state)
 
 void a2_video_device::res_w(int state)
 {
-	// select lo-res or hi-res
-	screen().update_now();
-	m_hires = state;
+	if (m_hires != state)
+	{
+		// select lo-res or hi-res
+		screen().update_now();
+		m_hires = state;
+	}
 }
 
 void a2_video_device::an2_w(int state)
 {
-	m_an2 = state;
+	if (m_an2 != state)
+	{
+		// select katakana on II_J_PLUS
+		screen().update_now();
+		m_an2 = state;
+	}
 }
 
 void a2_video_device::an3_w(int state)
@@ -155,8 +166,30 @@ void a2_video_device::an3_w(int state)
 
 void a2_video_device::a80col_w(bool b80Col)
 {
-	screen().update_now();
-	m_80col = b80Col;
+	if (m_80col != b80Col)
+	{
+		// select 80 or 40 columns
+		screen().update_now();
+		m_80col = b80Col;
+	}
+}
+
+void a2_video_device::altcharset_w(bool altch)
+{
+	if (m_altcharset != altch)
+	{
+		// select primary or alternate (MouseText) character set
+		screen().update_now();
+		m_altcharset = altch;
+	}
+}
+
+void a2_video_device::set_GS_langsel(u8 langsel)
+{
+	// select primary language character set
+	if ((langsel & 0xe8) != (m_GS_langsel & 0xe8))
+		screen().update_now();
+	m_GS_langsel = langsel;
 }
 
 // 4-bit left rotate. Bits 4-6 of n must be a copy of bits 0-2.
@@ -400,9 +433,9 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 		{
 			code |= get_iie_langsw() * 0x100;
 		}
-		else if (Model == model::IIGS)
+		else if ((Model == model::IIGS) && BIT(m_GS_langsel, 3))
 		{
-			code |= get_GS_language() * 0x100;
+			code |= (m_GS_langsel >> 5) * 0x100;
 		}
 	}
 	else    // original II and II Plus
