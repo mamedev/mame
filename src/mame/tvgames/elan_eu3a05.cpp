@@ -819,7 +819,7 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_eu3a05_map);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a05_state::interrupt));
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&elan_eu3a05_state::elan_eu3a05_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&elan_eu3a05_state::elan_eu3a05_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -839,13 +839,13 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_gpio->read_2_callback().set_ioport("IN2");
 
 	ELAN_EU3A05_SYS(config, m_sys, 0);
-	m_sys->set_cpu("maincpu");
-	m_sys->set_addrbank("bank");
+	m_sys->set_cpu(m_maincpu);
+	m_sys->set_addrbank(m_bank);
 
 	ELAN_EU3A05_VID(config, m_vid, 0);
-	m_vid->set_cpu("maincpu");
-	m_vid->set_addrbank("bank");
-	m_vid->set_palette("palette");
+	m_vid->set_cpu(m_maincpu);
+	m_vid->set_addrbank(m_bank);
+	m_vid->set_palette(m_palette);
 	m_vid->set_entries(256);
 
 	/* sound hardware */
@@ -878,14 +878,14 @@ void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
 
 	ELAN_EU3A13_VID(config.replace(), m_vid, 0);
-	m_vid->set_cpu("maincpu");
-	m_vid->set_addrbank("bank");
-	m_vid->set_palette("palette");
+	m_vid->set_cpu(m_maincpu);
+	m_vid->set_addrbank(m_bank);
+	m_vid->set_palette(m_palette);
 	m_vid->set_entries(256);
 
 	ELAN_EU3A13_SYS(config.replace(), m_sys, 0);
-	m_sys->set_cpu("maincpu");
-	m_sys->set_addrbank("bank");
+	m_sys->set_cpu(m_maincpu);
+	m_sys->set_addrbank(m_bank);
 	m_sys->set_alt_timer(); // for Carl Edwards'
 }
 
