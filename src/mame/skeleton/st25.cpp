@@ -199,6 +199,17 @@ ROM_START(bigactione)
 	ROM_LOAD("27c040.ic1",   0x00000, 0x80000, CRC(8c708e53) SHA1(ef91a5a21ba69ad2870f7201bb4d90b4bc94c4ec))
 ROM_END
 
+ROM_START(bigkick)
+    ROM_REGION(0x80000, "oki", 0)
+    ROM_LOAD("w27e040_big_kick_st25_ic1", 0x00000, 0x80000, CRC(fa752fed) SHA1(5da6f37ebe0095fc74a1c54df86bb3ca492e92f4))
+
+    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_LOAD("w27e040_big_kick_st25_ic2", 0x00000, 0x80000, CRC(7277e039) SHA1(67e17c675aa68b3e828027c12ea7f51a6ead9549))
+
+    ROM_REGION(0x04000, "maskrom", 0)
+    ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+ROM_END
+
 ROM_START(boostersp)
     ROM_REGION(0x04000, "maskrom", 0)
     ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
@@ -211,6 +222,20 @@ ROM_START(boostersp)
 
     ROM_REGION(0x80000, "maincpu", 0)
     ROM_LOAD("w27e040_booster_speed_st25_ic2", 0x00000, 0x80000, CRC(9d86d9b9) SHA1(32c6845210807549bf7808b8815a0ac98f2b203a))
+ROM_END
+
+ROM_START(citytower)
+    ROM_REGION(0x40000, "nvram", 0)
+    ROM_LOAD("m27c2001dip32_city_tower_0705.bin", 0x00000, 0x40000, CRC(e4fbff9c) SHA1(f2081d43051e05ddc54879cf4080746eb8fa43f8))
+
+    ROM_REGION(0x80000, "oki", 0)
+    ROM_LOAD("panther_city_tower_musik_st1.bin", 0x00000, 0x80000, CRC(0dcf91a7) SHA1(2e29b55c83bfd649dd92c087eeaa887676755e9f))
+
+    ROM_REGION(0x80000, "maincpu", 0)
+    ROM_LOAD("panther_city_tower_st2.bin", 0x00000, 0x80000, CRC(454f200b) SHA1(087ca6b34fc7b5d14fc9ab3f32dc46254acb54a9))
+
+    ROM_REGION(0x04000, "maskrom", 0)
+    ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 ROM_END
 
 ROM_START(colossos)
@@ -233,6 +258,20 @@ ROM_START(galaktica)
 
     ROM_REGION(0x04000, "maskrom", 0)
     ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+ROM_END
+
+ROM_START(majesto)
+    ROM_REGION(0x80000, "oki", 0)
+    ROM_LOAD("majesto_st1_m27c4001_121308_17.09.98_euro.bin", 0x00000, 0x80000, CRC(59033ced) SHA1(39b0821dc2b347677f2803ba1a2c570231f89102))
+
+    ROM_REGION(0x04000, "maskrom", 0)
+    ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+    ROM_REGION(0x02000, "nvram", 0)
+    ROM_LOAD("majesto_2033_m48t18.bin", 0x00000, 0x02000, CRC(3e7d6bf6) SHA1(0863371517a4acb6744fa2ed98b01a675c008b9b))
+
+    ROM_REGION(0x40000, "maincpu", 0)
+    ROM_LOAD("majesto_m27c2001_st2_122559_28.09.02..bin", 0x00000, 0x40000, CRC(e08a308c) SHA1(7e015508949e32fd86334ae0e95baf11ca5e26b2))
 ROM_END
 
 ROM_START(stakeoffe)
@@ -275,6 +314,8 @@ ROM_END
 GAME(1996, tobago,     0,       st25, st25, st25_state, empty_init, ROT0, "Bergmann", "Tobago",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1997, ballermann, 0,       st25, st25, st25_state, empty_init, ROT0, "Panther",  "Ballermann 6",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1998, arenau,     0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Unimint Arena",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, citytower,  0,       st25, st25, st25_state, empty_init, ROT0, "Panther",  "City Tower",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, majesto,    0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Majesto",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2000, bigactione, 0,       st25, st25, st25_state, empty_init, ROT0, "Panther",  "Big Action 3000 E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2001, stakeoffe,  0,       st25, st25, st25_state, empty_init, ROT0, "Panther",  "Super Take Off E",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2002, boostersp,  0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Booster Speed",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
@@ -282,6 +323,7 @@ GAME(2003, colossos,   0,       st25, st25, st25_state, empty_init, ROT0, u8"Lö
 GAME(2004, avanti,     0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Avanti",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2005, alpha,      0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Alpha",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2005, superpasch, 0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Super Pasch",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2006, bigkick,    0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Big Kick",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2006, galaktica,  0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Galaktica",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2007, amarillo,   0,       st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Amarillo",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 
