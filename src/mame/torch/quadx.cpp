@@ -6,6 +6,20 @@
 
     UNIX workstation with VME bus
 
+    Hardware:
+    - MC68020RC16B CPU
+    - MC68881RC20A FPU
+    - XC68851RC16A MMU
+    - Torch OpenChip DMA controller
+    - ROM 64k + 4x8k PROM with microcode for the DMA controller
+    - INMOS IMSG170S50 (video)
+    - WD33C93JM (SCSI)
+    - SEEQ DQ8003 + DQ8020 (ethernet)
+    - SCN68562 (DUART)
+    - RTC (unknown model)
+    - X2444P NOVRAM
+    - XTALs: 14.7456 MHz, 16.6667 MHz, 20 MHz, 32 MHz
+
     Hardware (68030 prototype):
     - MC68030RC25B CPU
     - MC68881RC25B FPU
@@ -32,6 +46,7 @@
 
 #include "emu.h"
 
+#include "cpu/m68000/m68020.h"
 #include "cpu/m68000/m68030.h"
 #include "machine/ds1215.h"
 #include "machine/eepromser.h"
@@ -55,6 +70,7 @@ public:
 	{ }
 
 	void quadx(machine_config &config);
+	void quadxp(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -63,7 +79,7 @@ protected:
 private:
 	void mem_map(address_map &map) ATTR_COLD;
 
-	required_device<m68030_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 };
 
 
@@ -104,6 +120,12 @@ void quadx_state::machine_reset()
 
 void quadx_state::quadx(machine_config &config)
 {
+	M68020(config, m_maincpu, 32_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &quadx_state::mem_map);
+}
+
+void quadx_state::quadxp(machine_config &config)
+{
 	M68030(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadx_state::mem_map);
 }
@@ -114,6 +136,18 @@ void quadx_state::quadx(machine_config &config)
 //**************************************************************************
 
 ROM_START( quadx )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("torch_quadx.bin", 0x00000, 0x10000, CRC(02f8d5e8) SHA1(c9312fb87156eae1e05a2332e7a4fbbd72cb1f40)) // M27C512
+
+	// microcode for the dma controller "(C) Copyright 1988 TORCH Computers Ltd. v1.08m16.7"
+	ROM_REGION(0x8000, "microcode", 0)
+	ROM_LOAD32_BYTE("micro0.bin", 0x0000, 0x2000, CRC(0b66995f) SHA1(f1d1f437f8d523946352baa93848e875644eb32d)) // 1st half empty
+	ROM_LOAD32_BYTE("micro1.bin", 0x0001, 0x2000, CRC(eea8b592) SHA1(26ad2374cce8c25841f9c4708d21e190756838ee)) // 1st half empty
+	ROM_LOAD32_BYTE("micro2.bin", 0x0002, 0x2000, CRC(4d91698f) SHA1(ce15c37f55c3f9fae3ef249442c9e115ef61f588)) // 1st half empty
+	ROM_LOAD32_BYTE("micro3.bin", 0x0003, 0x2000, CRC(9b754db8) SHA1(9b44dd1ae3806969ddceb615954237e2cafed065)) // 1st half empty
+ROM_END
+
+ROM_START( quadxp )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("torch_quadx_proto.bin", 0x00000, 0x10000, CRC(2d71bc67) SHA1(999f478cda5dc6b9da845ae8580789da6292fc75)) // M27C512
 
@@ -133,5 +167,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1990, quadx, 0,      0,      quadx,   quadx, quadx_state, empty_init, "Torch Computers", "Quad X (68030 prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY  FULLNAME                              FLAGS
+COMP( 1988, quadx,  0,      0,      quadx,    quadx, quadx_state, empty_init, "Torch Computers", "Quad X",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, quadxp, 0,      0,      quadxp,   quadx, quadx_state, empty_init, "Torch Computers", "Quad X (68030 prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

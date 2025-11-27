@@ -46881,6 +46881,7 @@ zerowingw
 
 @source:torch/quadx.cpp
 quadx
+quadxp
 
 @source:torch/triplex.cpp
 triplex
