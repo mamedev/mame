@@ -53,10 +53,10 @@ and is intended as an educational tool.
 If the NVRAM images are present in the .zip file, the synth will be initialized
 to factory settings. The initialization steps below will not be required.
 
-The NVRAM images are optional. If not present, all programs will be silent, the
-synth will be out of tune, and the pitch wheel will not be calibrated. To tune
-and calibrate, see below. In this case, patches will need to be programmed
-manually or configured via MIDI SYSEX.
+Without default NVRAM content, all programs will be silent, the synth will be
+out of tune, and the pitch wheel will not be calibrated. To tune and calibrate,
+see below. In this case, patches will need to be programmed manually or
+configured via MIDI SYSEX.
 
 A basic test patch can be configured by pressing:
 CONTROL RECORD + SELECT 8 (C + NUMPAD 8)
@@ -1158,12 +1158,12 @@ ROM_START(sixtrak)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))
+	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1))
 ROM_END
 
 // Firmware versions V11 and V9 are compatible with both Rev A and Rev B / C of
@@ -1178,12 +1178,12 @@ ROM_START(sixtraka)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))
+	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1))
 ROM_END
 
 }  // anonymous namespace
