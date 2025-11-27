@@ -275,13 +275,11 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
 
-	ELAN_EU3A05_VID(config, m_vid, 0);
+	ELAN_EU3A13_VID(config, m_vid, 0);
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
 	m_vid->set_entries(256);
-	m_vid->set_is_pvmilfin();
-	m_vid->set_use_spritepages();
 	m_vid->set_force_basic_scroll();
 
 	/* sound hardware */

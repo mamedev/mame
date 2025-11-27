@@ -846,7 +846,7 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
-	m_vid->set_entries(256);
+	m_vid->set_entries(256);	
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -875,9 +875,14 @@ void elan_eu3a05_state::elan_eu3a05_pal(machine_config& config)
 void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 {
 	elan_eu3a05(config);
+
+	ELAN_EU3A13_VID(config.replace(), m_vid, 0);
+	m_vid->set_cpu("maincpu");
+	m_vid->set_addrbank("bank");
+	m_vid->set_palette("palette");
+	m_vid->set_entries(256);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
-	m_vid->set_is_sudoku();
-	m_vid->set_use_spritepages();
 	m_sys->set_alt_timer(); // for Carl Edwards'
 	m_sys->set_bank_on_low_writes(); // for rad_ftet
 }
@@ -891,12 +896,9 @@ void elan_eu3a13_state::elan_eu3a13_pal(machine_config& config)
 
 void elan_eu3a13_state::elan_eu3a13_pvmil8(machine_config& config)
 {
-	elan_eu3a05(config);
+	elan_eu3a13_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
-	m_vid->set_is_pvmilfin();
 	m_sys->set_alt_timer();
-	m_sys->set_pal(); // TODO: also set PAL clocks
-	m_screen->set_refresh_hz(50);
 }
 
 
