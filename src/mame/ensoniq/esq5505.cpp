@@ -766,7 +766,7 @@ void esq5505_state::common(machine_config &config)
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	MC68681(config, m_duart, 4000000);
+	MC68681(config, m_duart, 5000000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
@@ -874,6 +874,7 @@ void esq5505_state::sd132(machine_config &config, int panel_type)
 
 	// Like the SD-1 but with its own panel type
 	sd1(config, panel_type);
+	m_duart->set_clock(4000000);
 
 	m_maincpu->set_clock(clock);
 	m_otis->set_clock(clock);
@@ -1265,12 +1266,12 @@ void esq5505_state::init_denib()
 
 
 CONS( 1988, eps,    0,     0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,    0,     0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_IMPERFECT_TIMING )  // 2x40 VFD
-CONS( 1989, vfxsd,  0,     0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_IMPERFECT_TIMING )  // 2x40 VFD
+CONS( 1989, vfx,    0,     0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
+CONS( 1989, vfxsd,  0,     0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
 CONS( 1990, eps16p, eps,   0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,    sd132, 0, sd1,   vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_IMPERFECT_TIMING )  // 2x40 VFD
+CONS( 1990, sd1,    sd132, 0, sd1,   vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
 CONS( 1990, sq1,    0,     0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )       // 2x16 LCD
 CONS( 1990, sqrack, sq1,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )       // 2x16 LCD
 CONS( 1991, sq2,    0,     0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )       // 2x16 LCD
-CONS( 1991, sd132,  0,     0, sd132, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", 0 )                         // 2x40 VFD
+CONS( 1991, sd132,  0,     0, sd132, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_IMPERFECT_SOUND )                         // 2x40 VFD
 CONS( 1992, ks32,   sq2,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "KS-32",           MACHINE_NOT_WORKING)        // 2x16 LCD
