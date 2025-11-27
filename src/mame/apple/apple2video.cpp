@@ -945,7 +945,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 			screen_update<model::IIGS, false, false>(screen, *m_8bit_graphics, new_cliprect);
 		}
 
-		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
+		if ((beamy < BORDER_TOP) || (beamy >= (192 + BORDER_TOP)))
 		{
 			if (beamy >= (231+BORDER_TOP))
 			{
@@ -969,7 +969,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				scanline[col+BORDER_LEFT+600] = m_GSborder_colors[m_GSborder];
 			}
 
-			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy-(BORDER_TOP+4));
+			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy - BORDER_TOP);
 			for (int x = 0; x < 560; x++)
 			{
 				scanline[40 + BORDER_LEFT + x] = m_GSborder_colors[*a2pixel++];
