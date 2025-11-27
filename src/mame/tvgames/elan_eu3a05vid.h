@@ -21,10 +21,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void set_force_basic_scroll() { m_force_basic_scroll = true; }
-
 protected:
-	elan_eu3a05vid_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	elan_eu3a05vid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -36,6 +34,7 @@ protected:
 	int m_vrambase;
 	int m_spritebase;
 	bool m_use_spritepages;
+	bool m_force_basic_scroll;
 	uint8_t m_vidctrl = 0;
 private:
 	required_device<m6502_device> m_cpu;
@@ -91,8 +90,6 @@ private:
 
 	uint8_t read_unmapped(offs_t offset);
 	void write_unmapped(offs_t offset, uint8_t data);
-
-	bool m_force_basic_scroll;
 };
 
 class elan_eu3a13vid_device : public elan_eu3a05vid_device
@@ -101,10 +98,19 @@ public:
 	elan_eu3a13vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	elan_eu3a13vid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual int get_bytes_per_tile_entry() override;
+};
+
+class elan_ep3a19avid_device : public elan_eu3a13vid_device
+{
+public:
+	elan_ep3a19avid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)
 DECLARE_DEVICE_TYPE(ELAN_EU3A13_VID, elan_eu3a13vid_device)
+DECLARE_DEVICE_TYPE(ELAN_EP3A19A_VID, elan_ep3a19avid_device)
 
 #endif // MAME_TVGAMES_ELAN_EU3A05VID_H

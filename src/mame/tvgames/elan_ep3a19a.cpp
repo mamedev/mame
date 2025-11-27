@@ -275,12 +275,11 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
 
-	ELAN_EU3A13_VID(config, m_vid, 0);
+	ELAN_EP3A19A_VID(config, m_vid, 0);
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
 	m_vid->set_entries(256);
-	m_vid->set_force_basic_scroll();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

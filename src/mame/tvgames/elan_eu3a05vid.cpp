@@ -10,16 +10,16 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "Elan EU3A05 Video")
 DEFINE_DEVICE_TYPE(ELAN_EU3A13_VID, elan_eu3a13vid_device, "elan_eu3a13vid", "Elan EU3A13 Video")
-
+DEFINE_DEVICE_TYPE(ELAN_EP3A19A_VID, elan_ep3a19avid_device, "elan_ep3a19avid", "Elan EP3A19A Video")
 
 elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	elan_eu3a05commonvid_device(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_bank(*this, finder_base::DUMMY_TAG),
-	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this)),
-	m_force_basic_scroll(false)
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this))
 {
+	m_force_basic_scroll = false;
 }
 
 elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -31,8 +31,8 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 	m_use_spritepages = false;
 }
 
-elan_eu3a13vid_device::elan_eu3a13vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	elan_eu3a05vid_device(mconfig, ELAN_EU3A13_VID, tag, owner, clock)
+elan_eu3a13vid_device::elan_eu3a13vid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05vid_device(mconfig, type, tag, owner, clock)
 {
 	// these seem to be different to EU3A05 (but still hardcoded?) for EU3A13 based devices
 	m_vrambase = 0x200;
@@ -40,6 +40,17 @@ elan_eu3a13vid_device::elan_eu3a13vid_device(const machine_config &mconfig, cons
 	m_use_spritepages = true;
 }
 
+elan_eu3a13vid_device::elan_eu3a13vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a13vid_device(mconfig, ELAN_EU3A13_VID, tag, owner, clock)
+{
+}
+
+elan_ep3a19avid_device::elan_ep3a19avid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a13vid_device(mconfig, ELAN_EP3A19A_VID, tag, owner, clock)
+{
+	// this could be a EP3A19A specific behavior
+	m_force_basic_scroll = true;
+}
 
 device_memory_interface::space_config_vector elan_eu3a05vid_device::memory_space_config() const
 {
