@@ -864,7 +864,7 @@ void esq5505_state::sd1(machine_config &config, int panel_type)
 	vfxsd(config, panel_type);
 
 	// software list
-	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop");
+	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop").set_filter("sd1");
 }
 
 // Like the sd1, but with some clock speeds faster.
@@ -881,7 +881,7 @@ void esq5505_state::sd132(machine_config &config, int panel_type)
 	m_pump->set_clock(clock);
 
 	// software list
-	SOFTWARE_LIST(config, "sd132_flop").set_original("sd132_flop");
+	SOFTWARE_LIST(config.replace(), "sd1_flop").set_original("sd1_flop").set_filter("sd132");
 }
 
 // 32-voice machines with the VFX-SD type config
@@ -1095,8 +1095,15 @@ ROM_END
 
 ROM_START( sd1 )
 	ROM_REGION16_BE(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "sd1_21_300b_lower.bin", 0x000001, 0x020000, CRC(a1358a0c) SHA1(64ac5358aa46da37ca4195002cf358554e00878a) )
-	ROM_LOAD16_BYTE( "sd1_21_300b_upper.bin", 0x000000, 0x010000, CRC(465ba463) SHA1(899b0e83d0788c8d49c7b09ccf0b4a92b528c6e9) )
+	ROM_SYSTEM_BIOS(0, "410", "SD-1 v4.10")
+	ROM_LOAD16_BYTE_BIOS(0, "sd1_410_lo.bin", 0x000001, 0x020000, CRC(faa613a6) SHA1(60066765cddfa9d3b5d09057d8f83fb120f4e65e) )
+	ROM_LOAD16_BYTE_BIOS(0, "sd1_410_hi.bin", 0x000000, 0x010000, CRC(618c0aa8) SHA1(74acf458aa1d04a0a7a0cd5855c49e6855dbd301) )
+	ROM_SYSTEM_BIOS(1, "402", "SD-1 v4.02")
+	ROM_LOAD16_BYTE_BIOS(1, "sd1_32_402_lo.bin", 0x000001, 0x020000, CRC(5da2572b) SHA1(cb6ddd637ed13bfeb40a99df56000479e63fc8ec) )
+	ROM_LOAD16_BYTE_BIOS(1, "sd1_32_402_hi.bin", 0x000000, 0x010000, CRC(fc45c210) SHA1(23b81ebd9176112e6eae0c7c75b39fcb1656c953) )
+	ROM_SYSTEM_BIOS(2, "300", "SD-1 v3.00")
+	ROM_LOAD16_BYTE_BIOS(2, "sd1_21_300b_lower.bin", 0x000001, 0x020000, CRC(a1358a0c) SHA1(64ac5358aa46da37ca4195002cf358554e00878a) )
+	ROM_LOAD16_BYTE_BIOS(2, "sd1_21_300b_upper.bin", 0x000000, 0x010000, CRC(465ba463) SHA1(899b0e83d0788c8d49c7b09ccf0b4a92b528c6e9) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
 	ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
@@ -1110,7 +1117,6 @@ ROM_START( sd1 )
 	ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) )
 ROM_END
 
-// note: all known 4.xx BIOSes are for the 32-voice SD-1 and play out of tune on 21-voice h/w
 ROM_START( sd132 )
 	ROM_REGION16_BE(0x40000, "osrom", 0)
 	ROM_SYSTEM_BIOS(0, "410", "SD-1 v4.10")
