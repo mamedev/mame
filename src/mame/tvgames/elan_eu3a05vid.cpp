@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// ELAN EU3A05 / EU3A13 video implementation
-// also currently used for EP3A19A, which assumes EU3A13 type
-// although m_force_basic_scroll might be a hardware difference there
+// ELAN EU3A05 / EU3A13 / EP3A19A video implementations
+// There seem to be slight differences between which modes/features are available in each
+// chip, so using the correct hardware type is important.  As these are 'glob top' chips
+// they can't be fully identified without decapping.
 
 #include "emu.h"
 #include "elan_eu3a05vid.h"

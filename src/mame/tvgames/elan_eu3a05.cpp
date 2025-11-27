@@ -846,7 +846,7 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_vid->set_cpu("maincpu");
 	m_vid->set_addrbank("bank");
 	m_vid->set_palette("palette");
-	m_vid->set_entries(256);	
+	m_vid->set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
