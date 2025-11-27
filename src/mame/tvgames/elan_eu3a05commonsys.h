@@ -26,7 +26,6 @@ public:
 	uint8_t irq_vector_r(offs_t offset);
 
 	void set_alt_timer() { m_whichtimer = 1; }
-	void set_bank_on_low_writes() { m_bank_on_low_bank_writes = true; }
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

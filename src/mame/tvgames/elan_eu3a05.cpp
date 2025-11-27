@@ -875,6 +875,7 @@ void elan_eu3a05_state::elan_eu3a05_pal(machine_config& config)
 void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 {
 	elan_eu3a05(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
 
 	ELAN_EU3A13_VID(config.replace(), m_vid, 0);
 	m_vid->set_cpu("maincpu");
@@ -882,9 +883,10 @@ void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 	m_vid->set_palette("palette");
 	m_vid->set_entries(256);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
+	ELAN_EU3A13_SYS(config.replace(), m_sys, 0);
+	m_sys->set_cpu("maincpu");
+	m_sys->set_addrbank("bank");
 	m_sys->set_alt_timer(); // for Carl Edwards'
-	m_sys->set_bank_on_low_writes(); // for rad_ftet
 }
 
 void elan_eu3a13_state::elan_eu3a13_pal(machine_config& config)
