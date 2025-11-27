@@ -116,6 +116,13 @@ void quadx_state::quadx(machine_config &config)
 ROM_START( quadx )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("torch_quadx_proto.bin", 0x00000, 0x10000, CRC(2d71bc67) SHA1(999f478cda5dc6b9da845ae8580789da6292fc75)) // M27C512
+
+	// microcode for the dma controller "(C) Copyright 1990 CUBE i.t. Ltd. v2.00t"
+	ROM_REGION(0x8000, "microcode", 0)
+	ROM_LOAD32_BYTE("qy-0.bin", 0x0000, 0x2000, CRC(8ca1709a) SHA1(5b08e20b59c5b513a2710771a53576a9b3052a1c)) // 2nd half empty
+	ROM_LOAD32_BYTE("qy-1.bin", 0x0001, 0x2000, CRC(dfccd7c3) SHA1(18182053ba817c3f72a319dbeb0ebc497250d636)) // 2nd half empty
+	ROM_LOAD32_BYTE("qy-2.bin", 0x0002, 0x2000, CRC(114d6c9a) SHA1(611cb4a349f3a0686e9d66547492b3d5d76f4a3b)) // 2nd half empty
+	ROM_LOAD32_BYTE("qy-3.bin", 0x0003, 0x2000, CRC(5d4999f6) SHA1(b3c5aee014bfbbe67afb970d10eb87a81b3733ef)) // 2nd half empty
 ROM_END
 
 
