@@ -169,16 +169,15 @@ void mscbar_state::ay2_port_a_w(uint8_t data)
 
 void mscbar_state::ay2_port_b_w(uint8_t data)
 {
-for (uint8_t i = 0; i < 6; i++)
+    for (uint8_t i = 0; i < 6; i++)
     m_leds[i + 24] = BIT(~data, i);
-    m_leds[30] = BIT(~data, 6);
-	m_leds[31] = BIT(~data, 7);
+    m_leds[30] = BIT(~data, 6); // Unused - only used during led test - K1
+	m_leds[31] = BIT(~data, 7); // Unused - only used during led test - K1. after start the roulette will start to blink. special bonus led?
 }
+
 void mscbar_state::p1_port_w(uint8_t data)
 {
-	
-m_hopper->motor_w(BIT(data, 3));
-
+ m_hopper->motor_w(BIT(data, 3));
 }
 
 void mscbar_state::p3_port_w(uint8_t data)  // bit 3 and 5 are used.
