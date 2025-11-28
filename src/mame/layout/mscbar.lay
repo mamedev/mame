@@ -266,114 +266,8 @@ license:CC0-1.0
        x="60"
        y="54" 
     /></element>
-       <element name="led34"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="80"
-       y="54" 
-    /></element>
-       <element name="led35"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="100"
-       y="54" 
-    /></element>
-       <element name="led36"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="120"
-       y="54" 
-    /></element>
-       <element name="led37"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="140"
-       y="54" 
-    /></element>
-       <element name="led38"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="160"
-       y="54" 
-    /></element>
-       <element name="led39"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="180"
-       y="54" 
-    /></element>
-       <element name="led40"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="0"
-       y="72" 
-    /></element>
-       <element name="led41"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="20"
-       y="72" 
-    /></element>
-       <element name="led42"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="40"
-       y="72" 
-    /></element>
-       <element name="led43"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="60"
-       y="72" 
-    /></element>
-       <element name="led44"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="80"
-       y="72" 
-    /></element>
-       <element name="led45"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="100"
-       y="72" 
-    /></element>
-       <element name="led46"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="120"
-       y="72" 
-    /></element>
-       <element name="led47"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="140"
-       y="72" 
-    /></element>
-       <element name="led48"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="160"
-       y="72" 
-    /></element>
-	
 
-       <element name="digit0"
+ <element name="digit14"
  	   		ref="digit"><bounds 
 
        width="9.9822998"
@@ -381,7 +275,7 @@ license:CC0-1.0
        x="0.35392699"
        y="92.744644" 
     /></element>
- <element name="digit1"
+ <element name="digit12"
 	   		ref="digit"><bounds 
 
        width="9.9822998"
@@ -389,105 +283,99 @@ license:CC0-1.0
        x="12.351883"
        y="92.744644" 
     /></element>
- <element name="digit2"
+ <element name="digit10"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
        x="24.349838"
-       y="92.744644" 
-    /></element>
- <element name="digit3"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="36.347797"
-       y="92.744644" 
-    /></element>
- <element name="digit4"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="48.345753"
-       y="92.744644" 
-    /></element>
- <element name="digit5"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="60.343708"
-       y="92.744644" 
-    /></element>
- <element name="digit6"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="72.341667"
-       y="92.744644" 
-    /></element>
- <element name="digit7"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="84.339622"
        y="92.744644" 
     /></element>
  <element name="digit8"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
-       x="96.337578"
+       x="36.347797"
        y="92.744644" 
     /></element>
- <element name="digit9"
+ <element name="digit24"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
-       x="108.33553"
+       x="48.345753"
        y="92.744644" 
     /></element>
- <element name="digit10"
+ <element name="digit6"
+	   		ref="digit"><bounds 
+       width="9.9822998"
+       height="9.9840002"
+       x="60.343708"
+       y="92.744644" 
+    /></element>
+ <element name="digit4"
+	   		ref="digit"><bounds 
+       width="9.9822998"
+       height="9.9840002"
+       x="72.341667"
+       y="92.744644" 
+    /></element>
+ <element name="digit2"
+	   		ref="digit"><bounds 
+       width="9.9822998"
+       height="9.9840002"
+       x="84.339622"
+       y="92.744644" 
+    /></element>
+ <element name="digit0"
+	   		ref="digit"><bounds 
+       width="9.9822998"
+       height="9.9840002"
+       x="96.337578"
+       y="92.744644" 
+    /></element>
+ 
+ <!-- Top 7seg display modules -->
+
+ <!-- Credits -->
+ <element name="digit23"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
        x="0.35392699"
        y="104.74464" 
     /></element>
- <element name="digit11"
+ <element name="digit22"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
        x="12.351883"
        y="104.74464" 
     /></element>
- <element name="digit12"
+ <element name="digit21"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
        x="24.349838"
        y="104.74464" 
     /></element>
- <element name="digit13"
+ <element name="digit20"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
        x="36.347797"
        y="104.74464" 
     /></element>
- <element name="digit14"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="48.345753"
-       y="104.74464" 
-    /></element>
- <element name="digit15"
+
+ <!-- bonus -->
+
+ <element name="digit19"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
        x="60.343708"
        y="104.74464" 
     /></element>
- <element name="digit16"
+
+ <element name="digit18"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
@@ -501,114 +389,31 @@ license:CC0-1.0
        x="84.339622"
        y="104.74464" 
     /></element>
- <element name="digit18"
-	   		ref="digit"><bounds 
+
+	 <element name="digit16"
+	   ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
        x="96.337578"
        y="104.74464" 
     /></element>
- <element name="digit19"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="108.33553"
-       y="104.74464" 
-    /></element>
- <element name="digit20"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="0.35392699"
-       y="116.74464" 
-    /></element>
- <element name="digit21"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="12.351883"
-       y="116.74464" 
-    /></element>
- <element name="digit22"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="24.349838"
-       y="116.74464" 
-    /></element>
- <element name="digit23"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="36.347797"
-       y="116.74464" 
-    /></element>
- <element name="digit24"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="48.345753"
-       y="116.74464" 
-    /></element>
- <element name="digit25"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="60.343708"
-       y="116.74464" 
-    /></element>
+
+<!-- Middle 7seg display module -->
+
  <element name="digit26"
 	   		ref="digit"><bounds 
-       width="9.9822998"
+      width="9.9822998"
        height="9.9840002"
-       x="72.341667"
+       x="12.351883"
        y="116.74464" 
     /></element>
  <element name="digit27"
 	   		ref="digit"><bounds 
        width="9.9822998"
        height="9.9840002"
-       x="84.339622"
-       y="116.74464" 
-    /></element>
- <element name="digit28"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="96.337578"
-       y="116.74464" 
-    /></element>
- <element name="digit29"
-    	   		ref="digit"><bounds 
-   width="9.9822998"
-       height="9.9840002"
-       x="108.33553"
-       y="116.74464" 
-    /></element>
- <element name="digit30"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
        x="0.35392699"
-       y="128.74463" 
+       y="116.74464" 
     /></element>
- <element name="digit31"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="12.351883"
-       y="128.74463" 
-    /></element>
- 		<!-- 
-
- <element name="digit32"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="24.351883"
-       y="128.74463" 
-    /></element>
- -->
 
 	</view>
 </mamelayout>
