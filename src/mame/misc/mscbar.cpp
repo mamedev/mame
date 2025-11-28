@@ -74,7 +74,7 @@ public:
 	{ }
 
 	void mscbar(machine_config &config);
-	void mscbar_adpcm_bank_w(uint8_t data) ATTR_COLD;
+	void mscbar_adpcm_bank(uint8_t data) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -105,25 +105,24 @@ private:
 
 static INPUT_PORTS_START( mscbar )
 	PORT_START("KEYS1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 4")PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 3")PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 2")PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 1")PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 6")PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 7")PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 8")PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 9") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 4")PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 3")PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 2")PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 1")PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 6")PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 7")PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 8")PORT_CODE(KEYCODE_K)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 9") PORT_CODE(KEYCODE_L)
 
-
-	PORT_START("KEYS2")
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Credits") PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bonus") PORT_CODE(KEYCODE_P)
-	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_CODE(KEYCODE_A) // ???
-	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bet 5") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_HIGH)  PORT_CODE(KEYCODE_F) 
-	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_LOW)  PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_GAMBLE_DEAL ) PORT_NAME("Start") PORT_CODE(KEYCODE_H)
+    PORT_START("KEYS2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_GAMBLE_TAKE)  PORT_NAME("Credits") PORT_CODE(KEYCODE_Q) 
+	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bonus") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_T) // ???
+	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bet 5") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout") 
+	PORT_BIT(0x04, IP_ACTIVE_LOW,  IPT_GAMBLE_HIGH)  PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x02, IP_ACTIVE_LOW,  IPT_GAMBLE_LOW)   PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x01, IP_ACTIVE_LOW,  IPT_START1) PORT_NAME("Start / Take Score")
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
@@ -143,39 +142,40 @@ static INPUT_PORTS_START( mscbar )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // For Hopper.
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_C)  //  will cause error 76.
-	
-    PORT_START("P3")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(8) PORT_CODE(KEYCODE_K) // Coin
-INPUT_PORTS_END
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_C)  //  will cause error 76.
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // For Hopper.
+
+	PORT_START("P3")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(8)  // Coin
+    INPUT_PORTS_END
 
 void mscbar_state::ay1_port_a_w(uint8_t data)
-{
+{   data = data ^ 0xff;
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i] = BIT(data, i);
 }
 
 void mscbar_state::ay1_port_b_w(uint8_t data)
-{
+{   data = data ^ 0xff; 
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i + 8] = BIT(data, i);
 }
 
 void mscbar_state::ay2_port_a_w(uint8_t data)
-{
+{   data = data ^ 0xff; 
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i + 16] = BIT(data, i);
 }
 
 void mscbar_state::ay2_port_b_w(uint8_t data)
 {
+	
+    data = data ^ 0xff; 
 	for (uint8_t i = 0; i < 6; i++)
     m_leds[i + 24] = BIT(data, i);
-	m_leds[32] = BIT(data, 6);
-    m_leds[33] = BIT(data, 7);
+    m_leds[30] = BIT(data, 6);
+	m_leds[31] = BIT(data, 7);
 }
-
 void mscbar_state::p1_port_w(uint8_t data)
 {
 	
@@ -185,11 +185,10 @@ m_hopper->motor_w(BIT(data, 3));
 
 void mscbar_state::p3_port_w(uint8_t data)  // bit 3 and 5 are used.
 {
-	m_leds[30] = BIT(data, 3);
-	m_leds[31] = BIT(data, 5);
-	
+	m_leds[33] = BIT(data, 3);
+    m_leds[32] = BIT(data, 5);
 }
-
+	
 void mscbar_state::multiplex_7seg_w(uint8_t data)
 {
 
@@ -219,9 +218,8 @@ void mscbar_state::display_7seg_data_w(uint8_t data)
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
-void mscbar_state::mscbar_adpcm_bank_w(uint8_t data)
+void mscbar_state::mscbar_adpcm_bank(uint8_t data)
 {
-
 		m_oki->set_rom_bank(data & 0x07);
 }
 
@@ -229,18 +227,16 @@ void mscbar_state::mscbar_program_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("maincpu", 0);
 	map(0x1000, 0xffff).rom().region("eeprom",  0x1000);
-
 }
 
 void mscbar_state::mscbar_data_map(address_map &map)
 {
-	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8003).w("ay2", FUNC(ay8910_device::address_data_w)); 
 	map(0x9000, 0x9000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xb000, 0xb000).w(FUNC(mscbar_state::mscbar_adpcm_bank_w)); // 8 adpcm bank rom.
+	map(0xb000, 0xb000).w(FUNC(mscbar_state::mscbar_adpcm_bank)); /* adpcm bank */
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* HM6116LP-3: 2kb of Static RAM */
-
 }
 
 void mscbar_state::mscbar(machine_config &config)
@@ -249,9 +245,9 @@ void mscbar_state::mscbar(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
 	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
-	maincpu.port_out_cb<1>().set(FUNC(mscbar_state::p1_port_w));
+    maincpu.port_out_cb<1>().set(FUNC(mscbar_state::p1_port_w));
+    maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
 	maincpu.port_in_cb<3>().set_ioport("P3");
-	maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
     HOPPER(config, m_hopper, attotime::from_msec(100));
@@ -276,6 +272,7 @@ void mscbar_state::mscbar(machine_config &config)
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(mscbar_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(mscbar_state::ay2_port_b_w));
+   
     OKIM6295(config, m_oki,  XTAL(10'738'635) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
 }
 
@@ -283,6 +280,7 @@ void mscbar_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
+
 }
 
 ROM_START( mscbar )
@@ -303,5 +301,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT    STATE          INIT        ROT    COMPANY              FULLNAME                                                    FLAGS
-GAME( 20??, mscbar, 0,       mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",                       MACHINE_NOT_WORKING ) // Error 02. Need layout.
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                                   FLAGS
+GAME( 20??, mscbar, 0,       mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",                      MACHINE_NOT_WORKING |  ) // Error 02
