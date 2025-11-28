@@ -301,5 +301,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                                   FLAGS
-GAME( 20??, mscbar, 0,       mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",                      MACHINE_NOT_WORKING |  ) // Error 02
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                FLAGS
+GAME( 20??, mscbar, 0,       mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",    MACHINE_NOT_WORKING ) // Error 02
