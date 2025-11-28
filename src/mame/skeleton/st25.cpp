@@ -127,7 +127,7 @@ void st25_state::st25(machine_config &config)
 	OKIM6376(config, "oki", 4_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
 }
 
-ROM_START(alpha)
+ROM_START(alphar)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -464,7 +464,7 @@ GAME(2003, matrixx,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Lö
 GAME(2004, avanti,       0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Avanti",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2004, macaor,       0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Macao",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2004, multiclassic, 0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Multiclassic",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2005, alpha,        0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Alpha",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2005, alphar,       0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Alpha",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2005, superpasch,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Super Pasch",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2006, bigkick,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Big Kick",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2006, galaktica,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Galaktica",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
