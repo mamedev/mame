@@ -2492,7 +2492,7 @@ void model2_state::model2_screen(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// TODO: from System 24, might not be accurate for Model 2
 	m_screen->set_raw(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
-	m_screen->set_screen_update(FUNC(model2_state::screen_update_model2));
+	m_screen->set_screen_update(FUNC(model2_state::screen_update));
 
 	PALETTE(config, m_palette).set_entries(8192);
 }

@@ -220,8 +220,8 @@ protected:
 	void driveio_port_w(u8 data);
 	void push_geo_data(u32 data);
 	void reset_model2_scsp();
-	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//  void screen_vblank_model2(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//  void screen_vblank(int state);
 	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);

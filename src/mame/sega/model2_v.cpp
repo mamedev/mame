@@ -2403,7 +2403,7 @@ void model2_state::video_start()
 	save_pointer(NAME(m_gamma_table), 256);
 }
 
-u32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 model2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if the scroll color table was written to, we need to refresh the palette
 	if (m_palette_dirty)
