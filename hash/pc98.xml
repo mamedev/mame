@@ -53831,11 +53831,12 @@ Is this a data disk for missing main game dump?
 	</software>
 
 	<software name="yuutoden">
-		<description>Yuutoden</description>
+		<description>Youtoden</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="遊兎伝" />
 		<info name="release" value="198906xx" />
+		<!-- TODO: Krugman claims Program Disk and Data Disk labels -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">

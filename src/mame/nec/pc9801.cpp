@@ -234,8 +234,8 @@ void pc9801_state::pc9801_io(address_map &map)
 	map(0x0092, 0x0092).rw(m_fdc_2hd, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 	map(0x0094, 0x0094).rw(FUNC(pc9801_state::fdc_2hd_ctrl_r), FUNC(pc9801_state::fdc_2hd_ctrl_w));
 	map(0x00a0, 0x00af).rw(FUNC(pc9801_state::pc9801_a0_r), FUNC(pc9801_state::pc9801_a0_w)); //upd7220 bitmap ports / display registers
-//	map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
-//	map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
+//  map(0x00c8, 0x00cb).m(m_fdc_2dd, FUNC(upd765a_device::map)).umask16(0x00ff);
+//  map(0x00cc, 0x00cc).rw(FUNC(pc9801_state::fdc_2dd_ctrl_r), FUNC(pc9801_state::fdc_2dd_ctrl_w)); //upd765a 2dd / <undefined>
 }
 
 /*************************************
@@ -1202,7 +1202,7 @@ void pc9801_state::tc_w(int state)
 			if (m_dack == 3)
 				m_cbus_root->eop_w(3, state);
 			//if(m_fdc_2dd)
-			//	m_fdc_2dd->tc_w(state);
+			//  m_fdc_2dd->tc_w(state);
 			break;
 	}
 
@@ -1977,6 +1977,7 @@ void pc9801_state::pc9801_common(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc_2hd:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);//.enable_sound(true);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pc98");
+	SOFTWARE_LIST(config, "disk_orig_list").set_original("pc98_flop_orig");
 	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc98");
 
 	/* video hardware */
@@ -2898,6 +2899,7 @@ COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_p
 
 // DA class (i386DX + SDIP and EMS)
 //COMP( 1991, pc9801da
+// ROM mapping at https://bauxite.sakura.ne.jp/wiki/mypad.cgi?p=PC-98x1%2Fmisc%2FPC-9801DA%A4%CEROM
 
 // UF class (V30HL, Tower form factor)
 //COMP( 1991, pc9801uf

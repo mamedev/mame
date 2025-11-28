@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+From Krugman set unless otherwise specified.
+
+NOTE:
+- Add only stuff that doesn't fail in emulation with an "I/O Error" or a fail1 at mount,
+  make sure you prefix with pc98_flop_orig:* when testing (in case there's a pc98 alias already).
+
+-->
+<softwarelist name="pc98_flop_orig" description="NEC PC-98 original disk images">
+
+	<software name="cyclefgt" supported="yes">
+		<description>Cycle Fight</description>
+		<year>1992</year>
+		<publisher>コムパック (Compac)</publisher>
+		<notes><![CDATA[
+No cross cut on some line elements behind hills (verify)
+]]></notes>
+		<info name="alt_title" value="サイクルファイト" />
+		<info name="release" value="19921217" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk"/>
+			<dataarea name="flop" size="6949499">
+				<rom name="cycle fight (program disk).mfi" size="6949499" crc="1904e4d1" sha1="c214a4fd627a93d4037827cb7ab07bf03f6b8c0c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size="8573549">
+				<rom name="cycle fight (data disk).mfi" size="8573549" crc="bfb70201" sha1="5cb9c10bf6b6d46fe5e3e513c2aa4ef209273d84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="genesis" supported="no">
+		<description>Genesis</description>
+		<year>1985</year>
+		<publisher>スクウェア (Square)</publisher>
+		<notes><![CDATA[
+Fails at PC=0279D, goes on title screen by forcing aw=dw but then crashes with "E:" error
+]]></notes>
+		<info name="alt_title" value="ジェネシス" />
+		<info name="release" value="198510xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="6093271">
+				<rom name="genesis.mfi" size="6093271" crc="4e55149d" sha1="7be605b47a74e57f35b4a0f03f83c481b529decd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kazeslow">
+		<description>Kaze, Slowdown</description>
+		<year>1992</year>
+		<publisher>First Quarter</publisher>
+		<info name="alt_title" value="風、スローダウン" />
+		<info name="release" value="19920820" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="4445981">
+				<rom name="kaze, slowdown (disk a).mfi" size="4445981" crc="932457b0" sha1="498ced4b5e9ea48b12684b70158a4104596e2d1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
