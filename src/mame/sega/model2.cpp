@@ -15,7 +15,6 @@
 
     TODO (per-game issues)
     - doa, doaa: corrupted sound, eventually becomes silent;
-    - dynamcopc: corrupts palette for 2d;
     - hpyagu98: stops with 'Error #1' message during boot.
       Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
@@ -159,6 +158,8 @@ void model2_state::machine_start()
 	save_item(NAME(m_timerrun[1]));
 	save_item(NAME(m_timerrun[2]));
 	save_item(NAME(m_timerrun[3]));
+	save_item(NAME(m_videocontrol));
+	save_item(NAME(m_framenum));
 
 	save_item(NAME(m_geo_write_start_address));
 	save_item(NAME(m_geo_read_start_address));
@@ -352,25 +353,9 @@ u16 model2_state::colorxlat_r(offs_t offset)
 	return m_colorxlat[offset];
 }
 
-// Apparently original Model 2 doesn't have fifo control?
-u32 model2o_state::fifo_control_2o_r()
+u32 model2_state::fifo_control_r()
 {
-	return 0xffffffff;
-}
-
-u32 model2_state::fifo_control_2a_r()
-{
-	u32 r = 0;
-
-	if (m_copro_fifo_out->is_empty())
-	{
-		r |= 1;
-	}
-
-	// #### 1 if fifo empty, zerogun needs | 0x04 set
-	// TODO: 0x04 is probably fifo full, zeroguna stalls with a fresh nvram with that enabled?
-	return r;
-//  return r | 0x04;
+	return m_copro_fifo_out->is_empty() ? 1 : 0;
 }
 
 u32 model2_state::videoctl_r()
@@ -378,9 +363,9 @@ u32 model2_state::videoctl_r()
 	u8 framenum;
 
 	if(m_render_mode == false)
-		framenum = (m_screen->frame_number() & 2) << 1;
+		framenum = (m_framenum & 2) << 1;
 	else
-		framenum = (m_screen->frame_number() & 1) << 2;
+		framenum = (m_framenum & 1) << 2;
 
 	return (framenum) | (m_videocontrol & 3);
 }
@@ -1075,7 +1060,7 @@ void model2_state::model2_base_mem(address_map &map)
 
 	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram").flags(i960_cpu_device::BURST);
 
-	map(0x00980004, 0x00980007).r(FUNC(model2_state::fifo_control_2a_r));
+	map(0x00980004, 0x00980007).r(FUNC(model2_state::fifo_control_r));
 	map(0x0098000c, 0x0098000f).rw(FUNC(model2_state::videoctl_r), FUNC(model2_state::videoctl_w));
 	map(0x00980030, 0x0098003f).r(FUNC(model2_state::tgpid_r));
 
@@ -1264,7 +1249,6 @@ void model2o_state::model2o_mem(address_map &map)
 
 	map(0x00200000, 0x0021ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000).flags(i960_cpu_device::BURST);
-	map(0x00980004, 0x00980007).r(FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
 	map(0x01c80000, 0x01c80003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
@@ -2411,6 +2395,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 
 	if(scanline == 384)
 	{
+		m_framenum = m_screen->frame_number();
+
+		// if 60 Hz mode or frame number is even, trigger geometrizer to start new frame
+		if ((m_videocontrol & 1) == 0 || (m_framenum & 1) == 0)
+			geo_parse();
+
 		const u32 line = 1 << 0;
 		if (m_intena & line)
 		{

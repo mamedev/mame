@@ -166,10 +166,10 @@ static inline void apply_focus( model2_state::geo_state *geo, poly_vertex *p0)
 }
 
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
-inline u16 model2_state::float_to_zval( float floatval )
+inline u16 model2_state::float_to_zval( float floatval, s32 z_adjust )
 {
-	int32_t fpint = f2u(floatval);
-	int32_t exponent = ((fpint >> 23) & 0xff) - 127;
+	s32 fpint = f2u(floatval);
+	s32 exponent = ((fpint >> 23) & 0xff) - ((z_adjust >> 23) & 0xff);
 	u32 mantissa = fpint & 0x7fffff;
 
 	/* round the low bits and reduce to 12 */
@@ -322,7 +322,8 @@ u32 model2_state::polygon_count_r()
  *
  *******************************************/
 
-void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
+template <unsigned NumVerts>
+void model2_state::model2_3d_process_polygon( raster_state *raster, u32 attr )
 {
 	quad_m2 object;
 	u16 *th, *tp;
@@ -347,21 +348,31 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 	object.v[2].y = u2f( raster->command_buffer[12] << 8 );
 	object.v[2].pz = u2f( raster->command_buffer[13] << 8 );
 
-	/* extract P1(n) */
-	object.v[3].x = u2f( raster->command_buffer[14] << 8 );
-	object.v[3].y = u2f( raster->command_buffer[15] << 8 );
-	object.v[3].pz = u2f( raster->command_buffer[16] << 8 );
+	if (NumVerts == 4)
+	{
+		/* extract P1(n) */
+		object.v[3].x = u2f(raster->command_buffer[14] << 8);
+		object.v[3].y = u2f(raster->command_buffer[15] << 8);
+		object.v[3].pz = u2f(raster->command_buffer[16] << 8);
+	}
+	else
+	{
+		/* for triangles, the rope of P1(n) is achieved by P0(n-1) (linktype 3) */
+		raster->command_buffer[14] = raster->command_buffer[11];
+		raster->command_buffer[15] = raster->command_buffer[12];
+		raster->command_buffer[16] = raster->command_buffer[13];
+	}
 
 	/* always calculate the min z and max z value */
 	min_z = object.v[0].pz;
 	if ( object.v[1].pz < min_z ) min_z = object.v[1].pz;
 	if ( object.v[2].pz < min_z ) min_z = object.v[2].pz;
-	if ( object.v[3].pz < min_z ) min_z = object.v[3].pz;
+	if ( NumVerts == 4 && object.v[3].pz < min_z ) min_z = object.v[3].pz;
 
 	max_z = object.v[0].pz;
 	if ( object.v[1].pz > max_z ) max_z = object.v[1].pz;
 	if ( object.v[2].pz > max_z ) max_z = object.v[2].pz;
-	if ( object.v[3].pz > max_z ) max_z = object.v[3].pz;
+	if ( NumVerts == 4 && object.v[3].pz > max_z ) max_z = object.v[3].pz;
 
 	/* read in the texture information */
 
@@ -377,11 +388,14 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 	object.v[1].pu = *tp++;
 	object.v[2].pv = *tp++;
 	object.v[2].pu = *tp++;
-	object.v[3].pv = *tp++;
-	object.v[3].pu = *tp++;
+	if (NumVerts == 4)
+	{
+		object.v[3].pv = *tp++;
+		object.v[3].pu = *tp++;
+	}
 
 	/* update the address */
-	raster->command_buffer[0] += 8;
+	raster->command_buffer[0] += NumVerts * 2;
 
 	/* texture header data */
 	if ( raster->command_buffer[1] & 0x800000 )
@@ -439,10 +453,10 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 		int32_t clipped_verts;
 		poly_vertex verts_in[10], verts_out[10];
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < NumVerts; i++)
 			verts_in[i] = object.v[i];
 
-		clipped_verts = 4;
+		clipped_verts = NumVerts;
 
 		/* do clipping */
 		for (int i = 0; i < 4; i++)
@@ -457,224 +471,7 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 			triangle *ztri;
 
 			/* adjust and set the object z-sort value */
-			object.z = float_to_zval( zvalue + raster->z_adjust );
-
-			/* get our list read to add the triangles */
-			ztri = raster->tri_sorted_list[object.z];
-
-			/* go through the clipped vertex list, adding triangles */
-			for( i = 2; i < clipped_verts; i++ )
-			{
-				triangle    *tri;
-
-				tri = &raster->tri_list[raster->tri_list_index++];
-
-				if ( raster->tri_list_index >= MAX_TRIANGLES )
-				{
-					fatalerror( "SEGA 3D: Max triangle limit exceeded\n" );
-				}
-
-				/* copy the object information */
-				tri->z = object.z;
-				tri->texheader[0] = object.texheader[0];
-				tri->texheader[1] = object.texheader[1];
-				tri->texheader[2] = object.texheader[2];
-				tri->texheader[3] = object.texheader[3];
-				tri->luma = object.luma;
-				tri->texlod = object.texlod;
-
-				/* set the viewport */
-				tri->viewport[0] = raster->viewport[0];
-				tri->viewport[1] = raster->viewport[1];
-				tri->viewport[2] = raster->viewport[2];
-				tri->viewport[3] = raster->viewport[3];
-
-				/* set the center */
-				tri->center[0] = raster->center[raster->center_sel][0];
-				tri->center[1] = raster->center[raster->center_sel][1];
-
-				/* set the window */
-				tri->window = raster->cur_window;
-
-				memcpy( &tri->v[0], &verts_out[0], sizeof( poly_vertex ) );
-				memcpy( &tri->v[1], &verts_out[i-1], sizeof( poly_vertex ) );
-				memcpy( &tri->v[2], &verts_out[i], sizeof( poly_vertex ) );
-
-				/* add to our sorted list */
-				raster->tri_sorted_list[object.z] = tri;
-				tri->next = ztri;
-				ztri = tri;
-			}
-
-			/* keep around the min and max z values for this frame */
-			if ( object.z < raster->min_z ) raster->min_z = object.z;
-			if ( object.z > raster->max_z ) raster->max_z = object.z;
-		}
-	}
-
-	/* update linking */
-	switch( ((attr >> 8) & 3) )
-	{
-		case 0:
-		case 2:
-		{
-			/* reuse P0(n) and P1(n) */
-			for( i = 0; i < 6; i++ )                                        /* P0(n) -> P0(n-1) */
-				raster->command_buffer[2+i] = raster->command_buffer[11+i]; /* P1(n) -> P1(n-1) */
-		}
-		break;
-
-		case 1:
-		{
-			/* reuse P0(n-1) and P0(n) */
-			for( i = 0; i < 3; i++ )
-				raster->command_buffer[5+i] = raster->command_buffer[11+i]; /* P0(n) -> P1(n-1) */
-		}
-		break;
-
-		case 3:
-		{
-			/* reuse P1(n-1) and P1(n) */
-			for( i = 0; i < 3; i++ )
-				raster->command_buffer[2+i] = raster->command_buffer[14+i]; /* P1(n) -> P1(n-1) */
-		}
-		break;
-	}
-}
-
-void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
-{
-	triangle object;
-	u16 *th, *tp;
-	int32_t tho;
-	u32 i;
-	bool cull;
-	float zvalue;
-	float min_z, max_z;
-
-	/* extract P0(n-1) */
-	object.v[1].x = u2f( raster->command_buffer[2] << 8 );
-	object.v[1].y = u2f( raster->command_buffer[3] << 8 );
-	object.v[1].pz = u2f( raster->command_buffer[4] << 8 );
-
-	/* extract P1(n-1) */
-	object.v[0].x = u2f( raster->command_buffer[5] << 8 );
-	object.v[0].y = u2f( raster->command_buffer[6] << 8 );
-	object.v[0].pz = u2f( raster->command_buffer[7] << 8 );
-
-	/* extract P0(n) */
-	object.v[2].x = u2f( raster->command_buffer[11] << 8 );
-	object.v[2].y = u2f( raster->command_buffer[12] << 8 );
-	object.v[2].pz = u2f( raster->command_buffer[13] << 8 );
-
-	/* for triangles, the rope of P1(n) is achieved by P0(n-1) (linktype 3) */
-	raster->command_buffer[14] = raster->command_buffer[11];
-	raster->command_buffer[15] = raster->command_buffer[12];
-	raster->command_buffer[16] = raster->command_buffer[13];
-
-	/* always calculate the min z and max z values */
-	min_z = object.v[0].pz;
-	if ( object.v[1].pz < min_z ) min_z = object.v[1].pz;
-	if ( object.v[2].pz < min_z ) min_z = object.v[2].pz;
-
-	max_z = object.v[0].pz;
-	if ( object.v[1].pz > max_z ) max_z = object.v[1].pz;
-	if ( object.v[2].pz > max_z ) max_z = object.v[2].pz;
-
-	/* read in the texture information */
-
-	/* texture point data */
-	if ( raster->command_buffer[0] & 0x800000 )
-		tp = &raster->texture_ram[raster->command_buffer[0] & 0xffff];
-	else
-		tp = &raster->texture_rom[raster->command_buffer[0] & raster->texture_rom_mask];
-
-	object.v[0].pv = *tp++;
-	object.v[0].pu = *tp++;
-	object.v[1].pv = *tp++;
-	object.v[1].pu = *tp++;
-	object.v[2].pv = *tp++;
-	object.v[2].pu = *tp++;
-
-	/* update the address */
-	raster->command_buffer[0] += 6;
-
-	/* texture header data */
-	if ( raster->command_buffer[1] & 0x800000 )
-		th = &raster->texture_ram[raster->command_buffer[1] & 0xffff];
-	else
-		th = &raster->texture_rom[raster->command_buffer[1] & raster->texture_rom_mask];
-
-	object.texheader[0] = *th++;
-	object.texheader[1] = *th++;
-	object.texheader[2] = *th++;
-	object.texheader[3] = *th++;
-
-	/* extract the texture header offset */
-	tho = (attr >> 12) & 0x1f;
-
-	/* adjust for sign */
-	if ( tho & 0x10 )
-		tho |= -16;
-
-	/* update the address */
-	raster->command_buffer[1] += tho * 4;
-
-	/* set the luma value of this triangle */
-	object.luma = (raster->command_buffer[9] >> 15) & 0xff;
-
-	/* set the texture LOD of this triangle */
-	object.texlod = ((raster->command_buffer[10] >> 8) & 0x7f80) - 0x3f80;
-	object.texlod += raster->log_ram[raster->command_buffer[10] & 0x7fff];
-
-	/* determine whether we can cull this triangle */
-	cull = check_culling(raster,attr,min_z,max_z);
-
-	/* set the object's z value */
-	switch((attr >> 10) & 3)
-	{
-		case 0: // old value
-			zvalue = raster->triangle_z;
-			break;
-		case 1: // min z
-			zvalue = min_z;
-			break;
-		case 2: // max z
-			zvalue = max_z;
-			break;
-		case 3: // error
-		default:
-			zvalue = 1e10;
-			break;
-	}
-
-	raster->triangle_z = zvalue;
-
-	/* if we're not culling, do clipping and add to out triangle list */
-	if ( cull == false )
-	{
-		int32_t       clipped_verts;
-		poly_vertex verts_in[10], verts_out[10];
-
-		for (int i = 0; i < 3; i++)
-			verts_in[i] = object.v[i];
-
-		clipped_verts = 3;
-
-		/* do clipping */
-		for (int i = 0; i < 4; i++)
-		{
-			clipped_verts = clip_polygon(verts_in, clipped_verts, verts_out, raster->clip_plane[raster->center_sel][i]);
-			for (int j = 0; j < clipped_verts; j++)
-				verts_in[j] = verts_out[j];
-		}
-
-		if ( clipped_verts > 2 )
-		{
-			triangle *ztri;
-
-			/* adjust and set the object z-sort value */
-			object.z = float_to_zval( zvalue + raster->z_adjust );
+			object.z = float_to_zval( zvalue, raster->z_adjust );
 
 			/* get our list read to add the triangles */
 			ztri = raster->tri_sorted_list[object.z];
@@ -866,7 +663,7 @@ inline void model2_state::model2_3d_project( triangle *tri )
 }
 
 /* 3D Rasterizer frame start: Resets frame variables */
-void model2_state::model2_3d_frame_start()
+void model2_state::render_frame_start()
 {
 	raster_state *raster = m_raster.get();
 
@@ -886,12 +683,21 @@ void model2_state::model2_3d_frame_start()
 	raster->triangle_z = 1e10;
 
 	raster->cur_window = 0;
+
+	m_render_done = false;
 }
 
-void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void model2_state::render_polygons( bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	raster_state *raster = m_raster.get();
 	int32_t z;
+
+	// if the geometrizer hasn't presented a new frame, just copy the previous frame and bail
+	if (m_render_done)
+	{
+		copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
+		return;
+	}
 
 	/* if we have nothing to render, bail */
 	if ( raster->tri_list_index == 0 )
@@ -929,6 +735,8 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 	m_poly->wait("End of frame");
 
 	copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
+
+	m_render_done = true;
 }
 
 // direct framebuffer drawing (enabled with render test mode, Last Bronx title screen)
@@ -994,8 +802,8 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 					if ( raster->command_index < 17 )
 						return;
 
-					/* we have a full quad info, fill up our quad structure */
-					model2_3d_process_quad( raster, attr );
+					/* we have a full polygon info, fill up our polygon structure */
+					model2_3d_process_polygon<4>( raster, attr );
 
 					/* back up and wait for more data */
 					raster->command_index = 8;
@@ -1006,8 +814,8 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 					if ( raster->command_index < 14 )
 						return;
 
-					/* we have a full quad info, fill up our quad structure */
-					model2_3d_process_triangle( raster, attr );
+					/* we have a full polygon info, fill up our polygon structure */
+					model2_3d_process_polygon<3>(raster, attr);
 
 					/* back up and wait for more data */
 					raster->command_index = 8;
@@ -1131,7 +939,7 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 			case 0x08:  /* ZSort mode */
 			{
 				/* save the zsort mode value */
-				raster->z_adjust = u2f( raster->command_buffer[0] << 8 );
+				raster->z_adjust = raster->command_buffer[0] << 8;
 
 				/* done with this command */
 				raster->cur_command = 0;
@@ -2523,6 +2331,9 @@ void model2_state::geo_parse()
 	u32  op_count = 0;
 	bool end_code = false;
 
+	// reset raster frame variables
+	render_frame_start();
+
 	while( end_code == false && (input - m_bufferram) < 0x20000/4 && op_count++ < 0x8000 )
 	{
 		/* read in the opcode */
@@ -2585,6 +2396,7 @@ void model2_state::video_start()
 	save_item(NAME(m_render_test_mode));
 	save_item(NAME(m_render_unk));
 	save_item(NAME(m_render_mode));
+	save_item(NAME(m_render_done));
 	save_pointer(NAME(m_palram), 0x4000/2);
 	save_pointer(NAME(m_colorxlat), 0xc000/2);
 	save_pointer(NAME(m_lumaram), 0x8000);
@@ -2626,16 +2438,7 @@ u32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitm
 	if(m_render_test_mode == true)
 		draw_framebuffer( bitmap, cliprect );
 	else
-	{
-		model2_3d_frame_start();
-
-		/* let the geometry engine do it's thing */
-		// TODO: move it from here
-		geo_parse();
-
-		/* have the rasterizer output the frame */
-		model2_3d_frame_end( bitmap, cliprect );
-	}
+		render_polygons( bitmap, cliprect );
 
 	m_sys24_bitmap.fill(0, cliprect);
 
