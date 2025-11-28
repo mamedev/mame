@@ -271,7 +271,7 @@ public:
 		m_dsw(*this, "DSW"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U),
-		m_pcb_output(*this, "pcboutput%u", 0U),
+		m_wheel(*this, "wheel%u", 0U),
 		m_cg_view(*this, "cg_view")
 	{ }
 
@@ -307,7 +307,7 @@ private:
 	required_ioport m_dsw;
 	required_ioport_array<5> m_analog;
 	output_finder<2> m_pcb_digit;
-	output_finder<1> m_pcb_output;
+	output_finder<1> m_wheel;
 	memory_view m_cg_view;
 
 	bool m_sound_irq_enabled = false;
@@ -383,7 +383,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 		case 2:
 			// NWK-TR drive commands
-			m_pcb_output[0] = data;
+			m_wheel[0] = data;
 			break;
 		case 3:
 			/*
@@ -454,7 +454,7 @@ void nwktr_state::soundtimer_ack_w(uint16_t data)
 void nwktr_state::machine_start()
 {
 	m_pcb_digit.resolve();
-	m_pcb_output.resolve();
+	m_wheel.resolve();
 
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
