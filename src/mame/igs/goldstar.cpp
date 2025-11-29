@@ -30943,6 +30943,10 @@ void cb3_state::init_cb3c()
 	rom[0x0269] = 0xbb;
 	rom[0x026a] = 0x10;
 	rom[0xff02] = 0xc9;
+
+	// skip the 240 games limit
+	rom[0x1110] = 0x00;
+	rom[0x1111] = 0x00;
 }
 
 void cb3_state::init_cb3e()
