@@ -1296,6 +1296,7 @@ ROM_END
 
 ROM_START(ace1000)
 	ROM_REGION(0x1000,"gfx1",0)
+	// TBD: second half doesn't look like a normal character set
 	ROM_LOAD ( "1331409.u7", 0x0000, 0x1000, CRC(744c06e1) SHA1(e1c11495ee538f658d2918bfece8c4629f60fa13))
 
 	ROM_REGION(0x4000, "maincpu", ROMREGION_LE)
@@ -1305,6 +1306,9 @@ ROM_START(ace1000)
 	ROM_LOAD ( "1331404.g7", 0x2000, 0x0800, CRC(1bee5169) SHA1(0cd57b4a2a79e0fc7f35619edc1be00952947b82))
 	ROM_LOAD ( "1331405.g8", 0x1800, 0x0800, CRC(2a63f50a) SHA1(7cf424e7adbc84a4aa6f11d0132bf494bbb6a247))
 	ROM_LOAD ( "1331406.g10", 0x1000, 0x0800, CRC(bfdd3cc6) SHA1(20067d27eb3b5bb03e7b560e44383e0926e39cbb))
+
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD ( "348.bin", 0x000, 0x800, NO_DUMP) // EPROM for custom Key Tronic keyboard with INS8035(?) MCU (exact size unclear)
 ROM_END
 
 ROM_START(elppa)
@@ -1348,7 +1352,7 @@ ROM_END
 
 ROM_START(craft2p)
 	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD( "gc.bin",       0x000000, 0x001000, CRC(93e4a754) SHA1(25f5f5fd1cbd763d43362e80de3acc5b34a25963) )
+	ROM_LOAD( "gc.bin",       0x000000, 0x001000, CRC(93e4a754) SHA1(25f5f5fd1cbd763d43362e80de3acc5b34a25963) ) // both halves identical
 
 	ROM_REGION(0x4000,"maincpu",0)
 	// the d0 and e0 ROMs match the Unitron English ones, only f0 differs
@@ -1443,14 +1447,24 @@ ROM_END
 
 ROM_START(space84)
 	ROM_REGION(0x2000,"gfx1",0)
+	// Both 4K halves identical; PCB photos suggest this is an overdumped 2732 (not 2716, despite silkscreen)
 	ROM_LOAD( "space 84 mobo chargen.bin", 0x0000, 0x2000, CRC(ceb98990) SHA1(8b2758da611bcfdd3d144edabc63ef1df2ca787b) )
 
 	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "341-0011.d0",  0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
-	ROM_LOAD ( "341-0012.d8",  0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
-	ROM_LOAD ( "341-0013.e0",  0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
-	ROM_LOAD ( "341-0014.e8",  0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	// IBS SPACE 84 actually has 24K of firmware in three 2764 EPROMs.
+	// Unlike some extant 8K dumps, the original ROMs definitely contain more than just hacked copies of Applesoft BASIC and the autostart monitor.
+	ROM_LOAD ( "341-0011.d0",  0x1000, 0x0800, BAD_DUMP CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8",  0x1800, 0x0800, BAD_DUMP CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0",  0x2000, 0x0800, BAD_DUMP CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8",  0x2800, 0x0800, BAD_DUMP CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD( "space84_f.bin", 0x3000, 0x1000, BAD_DUMP CRC(6acfe2a2) SHA1(07b19cd96101634543a3690b9f0d650e4d4d5675)) // single-bit corruption patched at $F010, $F810, $FCF0, $FD10
+
+	ROM_REGION(0x1d6, "plds", 0)
+	ROM_LOAD( "80.f2", 0x000, 0x0eb, NO_DUMP) // N82S15x?
+	ROM_LOAD( "81.k3", 0x0eb, 0x0eb, NO_DUMP) // N82S15x?
+
+	ROM_REGION(0x400, "keyboard", 0)
+	ROM_LOAD( "d8748.bin", 0x000, 0x400, NO_DUMP)
 ROM_END
 
 ROM_START(am64)
@@ -1482,11 +1496,11 @@ ROM_START(ivelultr)
 ROM_END
 
 ROM_START(laser2c)
-	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD( "g1.bin",       0x000000, 0x001000, BAD_DUMP CRC(7ad15cc4) SHA1(88c60ec0b008eccdbece09d18fe905380ddc070f) )
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "g1.bin",       0x000000, 0x001000, BAD_DUMP CRC(7ad15cc4) SHA1(88c60ec0b008eccdbece09d18fe905380ddc070f) ) // both halves identical (TBD: is this really a bad dump?)
 
-	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "g2.bin",       0x000000, 0x001000, CRC(f1d92f9c) SHA1(a54d55201f04af4c24bf94450d2cd1fa87c2c259) )
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "g2.bin",       0x000000, 0x001000, CRC(f1d92f9c) SHA1(a54d55201f04af4c24bf94450d2cd1fa87c2c259) ) // probably video timing related
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD( "laser.bin",    0x001000, 0x002000, CRC(8b975094) SHA1(eea53530b4a3777afa00d2979abedf84fac62e08) )
@@ -1542,6 +1556,9 @@ ROM_START( basis108 )
 
 	ROM_REGION(0x800, "diskii", 0)
 	ROM_LOAD( "fdccard_fdc4_slot6.bin",  0x0000, 0x0800, CRC(2bd452bb) SHA1(10ba81d34117ef713c546d748bf0e1a8c04d1ae3) )
+
+	ROM_REGION(0x400, "keyboard", 0)
+	ROM_LOAD( "m5l8048-068p.ic1", 0x000, 0x400, NO_DUMP ) // Cherry keyboard with unique connector
 ROM_END
 
 // The bit1 and bit2 of each byte swap positions.
@@ -1563,13 +1580,17 @@ ROM_END
 
 ROM_START(albert)
 	ROM_REGION(0x2000,"gfx1",0)
+	// TBD: second half doesn't look like a normal character set
 	ROM_LOAD( "albert 95-6005_rom_2732.bin", 0x0000, 0x1000, CRC(30df7410) SHA1(cb884efb12992e8a0140fdf6368b0268b6c0df8c) )
 
-	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "albert_95-6004_rom_2732.bin", 0x0000, 0x1000, CRC(6d9a435f) SHA1(ce1da16659922daff5bc0065ff45b00d271108f9) )
+	ROM_REGION( 0x1000, "c000", 0 )
+	ROM_LOAD( "albert_95-6004_rom_2732.bin", 0x0000, 0x1000, CRC(6d9a435f) SHA1(ce1da16659922daff5bc0065ff45b00d271108f9) ) // onboard I/O slots
 
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "albert_main_rom_27128.bin", 0x0000, 0x4000, CRC(ccf5696b) SHA1(59504a51d91486289330266e851f2ea1719766c1) )
+
+	ROM_REGION(0x800, "keyboard", 0)
+	ROM_LOAD( "keyboard.bin", 0x000, 0x800, NO_DUMP ) // detached serial keyboard with custom layout; microcontroller type unknown
 ROM_END
 
 ROM_START(am100)
