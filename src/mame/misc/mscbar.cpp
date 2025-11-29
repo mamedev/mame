@@ -44,6 +44,7 @@
   Need layout.
   Meter In and Out.
   Verify Hooper hook up.
+  Verify P3 Led output.
 **************************************************************************/
 
 #include "emu.h"
