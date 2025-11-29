@@ -31,6 +31,10 @@ TODO (pc9801/pc9801f):
   from pc9801m (2HD) and vanilla pc9801 (none);
 - it currently hooks up half size kanji ROMs, causing missing text in many games;
 
+TODO (pc9801uv2):
+- Not enough software for the specific 3.5" 2DD format;
+- Verify dipswitches (needs 2DD fixed mode for sure)
+
 TODO (pc9801rs):
 - Remove IDE hack to not make 512 to 256 sector byte translations
 \- probably need a working C-Bus IDE in place, or a SCSI option;
@@ -1604,6 +1608,7 @@ static void pc9801_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", TEAC_FD_55F);
 	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35dd", FLOPPY_35_DD);
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
@@ -2102,13 +2107,14 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pc9801vm_state::pc9801_palette), 16 + 16);
 }
 
-// UV is essentially a VM with 3.5" drives
+// UV is essentially a VM with 3.5" 2DD drives
 // Released as UV2, UV21 then UV11 (UV21 but smaller?)
 void pc9801vm_state::pc9801uv(machine_config &config)
 {
 	pc9801vm(config);
 
-	config_floppy_35hd(config);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:0", pc9801_floppies, "35dd", pc9801_state::floppy_formats);
+	FLOPPY_CONNECTOR(config.replace(), "fdc_2hd:1", pc9801_floppies, "35dd", pc9801_state::floppy_formats);
 
 	// RAM 384KB (UV2) ~ 640KB (UV21/ UV11)
 //  m_ram->set_default_size("640K").set_extra_options("384K");
