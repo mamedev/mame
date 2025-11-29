@@ -35,6 +35,7 @@
 
 #include "bus/a2gameio/gameio.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
@@ -1039,6 +1040,8 @@ void laser3k_state::laser3k(machine_config &config)
 	APPLE2_GAMEIO(config, m_gamepad, apple2_gameio_device::joystick_options, nullptr);
 	m_gamepad->set_sw_pullups(true); // 3K9 pullups to +5V
 
+	I8048(config, "kbdmcu", 14_MHz_XTAL * 2 / 7).set_disable();
+
 	/* the 8048 isn't dumped, so substitute modified real Apple II h/w */
 	AY3600(config, m_ay3600, 0);
 	m_ay3600->x0().set_ioport("X0");
@@ -1071,6 +1074,9 @@ ROM_START(las3000)
 
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD ( "las3000.rom", 0x0000, 0x8000, CRC(9c7aeb09) SHA1(3302adf41e258cf50210c19736948c8fa65e91de))
+
+	ROM_REGION(0x400, "kbdmcu", 0)
+	ROM_LOAD ( "tmp8048p.u44", 0x000, 0x400, NO_DUMP)
 
 	ROM_REGION(0x100, "fdc", 0)
 	ROM_LOAD ( "l3kdisk.rom", 0x0000, 0x0100, CRC(2d4b1584) SHA1(989780b77e100598124df7b72663e5a31a3339c0))
