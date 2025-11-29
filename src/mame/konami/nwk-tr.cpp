@@ -192,9 +192,9 @@ Notes:
      TEXELFX - 3DFX 500-0004-02 BD0665.1 TMU (QFP208)
      PIXELFX - 3DFX 500-0003-03 F001701.1 FBI (QFP240)
       001604 - Konami Custom (QFP208)
-       MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
+   MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
      MACH111 - AMD MACH111 CPLD (Stamped '03161A', PLCC44)
-    PLCC44_SOCKET - empty PLCC44 socket
+   PLCC44_SOCKET - empty PLCC44 socket
       AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
       AM7201 - AMD AM7201 FIFO (PLCC32)
         PAL1 - AMD PALCE16V8 (stamped 'N676B4', DIP20)
@@ -336,7 +336,7 @@ uint32_t nwktr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	int const board = m_exrgb ? 1 : 0;
 
 	m_voodoo[board]->update(bitmap, cliprect);
-	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect);   // K001604 on slave board doesn't seem to output anything. Bug or intended?
+	m_k001604[0]->draw_front_layer(screen, bitmap, cliprect); // K001604 on slave board doesn't seem to output anything. Bug or intended?
 
 	return 0;
 }
@@ -379,12 +379,14 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 	{
 		case 0:
 		case 1:
-			m_pcb_digit[offset] = bitswap<7>(~data , 0, 1, 2, 3, 4, 5, 6);
+			m_pcb_digit[offset] = bitswap<7>(~data, 0, 1, 2, 3, 4, 5, 6);
 			break;
+
 		case 2:
 			// NWK-TR drive commands
 			m_wheel_motor = data;
 			break;
+
 		case 3:
 			/*
 			    The bit used for JVSTXEN changes between 3 and 4 based on the lower 2 bits of IN2.
@@ -421,7 +423,7 @@ void nwktr_state::sysreg_w(offs_t offset, uint8_t data)
 			// Racing Jam sets CG board ID to 2 when writing to the tilemap chip.
 			// This could mean broadcast to both CG boards?
 
-			m_exrgb = BIT(data, 0);       // Select which CG Board outputs signal
+			m_exrgb = BIT(data, 0); // Select which CG Board outputs signal
 
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
 			break;
