@@ -16350,6 +16350,7 @@ pb1000
 pb2000c
 
 @source:casio/pickytlk.cpp
+csf5550
 jd363
 jd364
 jd366
@@ -16358,6 +16359,7 @@ pickydis
 pickytlk
 plets300
 plets350
+rx850
 
 @source:casio/pv1000.cpp
 pv1000
@@ -16367,6 +16369,14 @@ pv2000
 
 @source:casio/rz1.cpp
 rz1
+
+@source:casio/superjr.cpp
+jd320
+jd360
+jd361
+jd362
+jd367
+jd5000
 
 @source:casio/sk1.cpp
 sk1
