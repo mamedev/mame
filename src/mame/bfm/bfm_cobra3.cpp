@@ -82,7 +82,6 @@ protected:
 
 uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 {
-	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
 
 	switch ( cs )
@@ -150,7 +149,6 @@ uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 
 void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 2);
 
 	switch (cs)
@@ -238,7 +236,7 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 				break;
 
 		default:
-				logerror("%08x maincpu write access(0) offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+				logerror("%s maincpu write access(0) offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
 				break;
 	}
 }
