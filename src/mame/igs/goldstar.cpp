@@ -13018,10 +13018,10 @@ static INPUT_PORTS_START( unkch5 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPNAME( 0x01, 0x00, "Double Up Game" )            PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPNAME( 0x02, 0x00, "Check Account (Allow Books)" ) PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW4:3")
@@ -32072,8 +32072,8 @@ GAMEL( 1999, unkch2,      scmaster,  unkch,    unkch,     unkch_state,    init_u
 GAMEL( 1999, unkch3,      scmaster,  unkch,    unkch3,    unkch_state,    init_unkch3,    ROT0, "bootleg", "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", 0,    layout_unkch ) // cards have been hacked to look like barrels, girl removed?
 GAMEL( 1999, unkch4,      scmaster,  unkch,    unkch4,    unkch_state,    init_unkch4,    ROT0, "bootleg", "Grand Cherry Master (bootleg of Super Cherry Master)",         0,    layout_unkch ) // by 'Toy System' Hungary
 
-GAMEL( 1996, cherry96,    0,         unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (1997/01/04, bootleg)",                         0,    layout_unkchx )
-GAMEL( 1996, cherry96a,   cherry96,  unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (1996/06/01, bootleg)",                         0,    layout_unkchx )
+GAMEL( 1996, cherry96,    0,         unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (ver 3.7, 1997/01/04, bootleg)",                0,    layout_unkchx )
+GAMEL( 1996, cherry96a,   cherry96,  unkchx,   unkch5,    unkch_state,    init_unkch4,    ROT0, "bootleg", "New Cherry '96 (ver 3.2, 1996/06/01, bootleg)",                0,    layout_unkchx )
 
 GAME(  1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
 
