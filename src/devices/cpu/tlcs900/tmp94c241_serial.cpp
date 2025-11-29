@@ -22,6 +22,7 @@ tmp94c241_serial_device::tmp94c241_serial_device(const machine_config &mconfig, 
 	m_baud_rate(0),
 	m_hz(0),
 	m_clock_count(0),
+	m_rx_clock_count(24),
 	m_tx_shift_register(0),
 	m_serial_in(0),
 	m_serial_in_prev(0),
@@ -43,6 +44,7 @@ void tmp94c241_serial_device::device_start()
 	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_hz));
 	save_item(NAME(m_clock_count));
+	save_item(NAME(m_rx_clock_count));
 	save_item(NAME(m_tx_shift_register));
 	save_item(NAME(m_serial_in));
 	save_item(NAME(m_serial_in_prev));
@@ -112,6 +114,7 @@ uint8_t tmp94c241_serial_device::scNcr_r()
 
 void tmp94c241_serial_device::scNcr_w(uint8_t data)
 {
+	m_rx_clock_count = 8;
 	m_serial_control = data;
 }
 
@@ -218,6 +221,16 @@ fc4619: f0 3f 41              ld (0x3f),A
 
 TIMER_CALLBACK_MEMBER(tmp94c241_serial_device::tx_timer_callback)
 {
+	if (m_rx_clock_count){
+		m_rx_clock_count--;
+
+		if (m_rx_clock_count == 0)
+		{
+			m_cpu->m_int_reg[(m_channel == 0) ? INTES0 : INTES1] |= 0x08;
+			m_cpu->m_check_irqs = 1;
+		}
+	}
+
 	if (m_hz && m_clock_count && (m_cpu->m_port_function[PORT_F] & (1 << (m_channel==0 ? 2: 6))))
 	{
 		//logerror("m_clock_count=%d and we'll call sck(%d).\n", m_clock_count, m_sck_in ^ 1);

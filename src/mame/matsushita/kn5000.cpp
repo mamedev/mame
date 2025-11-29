@@ -148,6 +148,7 @@ private:
 void kn5000_state::maincpu_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC9, IC10 (CS3)
+	map(0x008d7c, 0x008d7c).lr8(NAME([this] (offs_t o) { return 0x09; })); // Fool the self-test at address FB7824 of Program ROM v10 ;-) We still need proper HLE of the control panel MCUs.
 	map(0x008e4a, 0x008e54).r(FUNC(kn5000_state::cpanel_right_buttons_r));
 	map(0x008e5a, 0x008e64).r(FUNC(kn5000_state::cpanel_left_buttons_r));
 	map(0x008f38, 0x008f39).w(FUNC(kn5000_state::cpanel_leds_w));

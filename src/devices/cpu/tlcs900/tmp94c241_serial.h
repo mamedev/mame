@@ -53,6 +53,7 @@ protected:
 	uint32_t m_hz;
 
 	uint8_t m_clock_count;
+	uint8_t m_rx_clock_count;
 	uint8_t m_tx_shift_register;
 	uint8_t m_serial_in;
 	uint8_t m_serial_in_prev;
