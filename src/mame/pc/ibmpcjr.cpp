@@ -709,7 +709,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, false); // clocked through SED9420C
 
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 
