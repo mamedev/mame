@@ -20,7 +20,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 -->
 <softwarelist name="pc6001_cass" description="NEC PC-6001 cassettes">
 
-	<software name="amazon" supported="yes">
+	<software name="amazon" supported="partial">
 		<description>The Amazon</description>
 		<year>19??</year>
 		<publisher>T. Katayama</publisher>
@@ -32,7 +32,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="amita" supported="yes">
+	<software name="amita" supported="partial">
 		<description>Amita</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
@@ -44,7 +44,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="block" supported="yes">
+	<software name="block" supported="partial">
 		<description>Block</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
@@ -56,11 +56,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="brkthru" supported="yes">
+	<software name="brkthru" supported="partial">
 		<description>Break Through</description>
 		<year>19??</year>
 		<publisher>Compac</publisher>
         <info name="usage" value="Mode 2, Page 2" />
+		<info name="alt_title" value="ブレイク・スルー"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="24029">
 				<rom name="break through.cas" size="24029" crc="929dd694" sha1="8e9d3d90a0c506cfcde12139258050cd8608bc5d"/>
@@ -68,11 +69,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="doordoor" supported="yes">
+	<software name="doordoor" supported="partial">
 		<description>Door Door</description>
 		<year>1984</year>
 		<publisher>Enix</publisher>
         <info name="usage" value="Mode 2, Page 2" />
+		<info name="alt_title" value="ドアドア"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="32221">
 				<rom name="door door.p6" size="32221" crc="3bc496a3" sha1="f89c8ab94cf0004303714f605739efc0abf2a608"/>
@@ -80,11 +82,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="earthbnd" supported="yes">
-		<description>Earth Bound</description>
+	<software name="earthbnd" supported="partial">
+		<description>Earthbound</description>
 		<year>1984</year>
 		<publisher>X'tal Soft</publisher>
         <info name="usage" value="Mode 2, Page 2" />
+		<info name="alt_title" value="アースバウンド"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="41241">
 				<rom name="earth bound.cas" size="41241" crc="1c4cafba" sha1="d9d8b4088e1bc2cd3d7df9f238215f41bc4ae065"/>
@@ -92,11 +95,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="eggy" supported="yes">
+	<software name="eggy" supported="partial">
 		<description>Eggy</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Bothtech</publisher>
         <info name="usage" value="Mode 2, Page 1" />
+		<info name="alt_title" value="エギー"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="22307">
 				<rom name="eggy.cas" size="22307" crc="3c9e47d2" sha1="885c4964480dfcd12164a1ebab0f95aecd06cf2d"/>
@@ -104,11 +108,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="headon" supported="yes">
+	<software name="headon" supported="partial">
 		<description>Head On</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>ASCII</publisher>
         <info name="usage" value="Mode 1, Page 1" />
+		<info name="alt_title" value="ヘッド・オン"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="5711">
 				<rom name="head on.cas" size="5711" crc="91f7d594" sha1="e64442f2c32f0a7b6c62e1adcc4555fcc8149b66"/>
@@ -116,7 +121,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="jintori" supported="yes">
+	<software name="jintori" supported="partial">
 		<description>Jintori Game</description>
 		<year>19??</year>
 		<publisher>Hudson Soft</publisher>
@@ -128,7 +133,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="power" supported="yes">
+	<software name="power" supported="partial">
 		<description>Power Knight</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
@@ -140,7 +145,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="proracer" supported="yes">
+	<software name="proracer" supported="partial">
 		<description>Pro Racer</description>
 		<year>19??</year>
 		<publisher>Hudson Soft</publisher>
@@ -152,11 +157,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="pyramid" supported="yes">
+	<software name="pyramid" supported="partial">
 		<description>Pyramid</description>
 		<year>1983</year>
 		<publisher>Magic Soft</publisher>
         <info name="usage" value="Mode 2, Page 1" />
+		<info name="alt_title" value="ピラミッド"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="15263">
 				<rom name="pyramid.cas" size="15263" crc="7d3b4628" sha1="e1be45b435d599d3f7444f159c538e093ba63f3f"/>
@@ -164,11 +170,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="spcenemy" supported="yes">
+	<software name="spcenemy" supported="partial">
 		<description>Space Enemy</description>
-		<year>1982<year>
+		<year>1982</year>
 		<publisher>ASCII</publisher>
         <info name="usage" value="Mode 4, Page 3 - PC-6001 requires N60 Extended BASIC cartridge" />
+		<info name="alt_title" value="スペース・エネミー"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="5579">
 				<rom name="space enemy.cas" size="5579" crc="6601f428" sha1="4d922cef648f9efe001f25920bf1874ca5cbde52"/>
@@ -176,7 +183,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="suprball" supported="yes">
+	<software name="suprball" supported="partial">
 		<description>Super Ball</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
@@ -188,11 +195,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="trickboy" supported="yes">
+	<software name="trickboy" supported="partial">
 		<description>Trick Boy</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>T&amp;E Soft</publisher>
         <info name="usage" value="Mode 2, Page 2" />
+		<info name="alt_title" value="トリックボーイ"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="25800">
 				<rom name="trick boy.cas" size="25800" crc="dfad3c61" sha1="39798e7f7cb2802d977f5124dd053a0d85d4c018"/>
@@ -200,11 +208,12 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		</part>
 	</software>
 
-	<software name="txevious" supported="yes">
+	<software name="txevious" supported="partial">
 		<description>Tiny Xevious</description>
-		<year>19??</year>
-		<publisher>Namco</publisher>
+		<year>1984</year>
+		<publisher>Dempa Micomsoft</publisher>
         <info name="usage" value="Mode 4, Page 2 - PC-6001 requires N60 Extended BASIC cartridge" />
+		<info name="alt_title" value="タイニーゼビウス"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="17741">
 				<rom name="tiny xevious.cas" size="17741" crc="5e9e2dbf" sha1="90e2b187f3b042ef1883105a34e83fe69a58e38f"/>
