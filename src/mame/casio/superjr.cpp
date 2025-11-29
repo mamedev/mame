@@ -46,11 +46,9 @@ public:
 	void superjr(machine_config &config) ATTR_COLD;
 
 protected:
-	static inline constexpr u16 SCREEN_W = 95;
-	static inline constexpr u16 SCREEN_H = 32;
-
 	virtual void machine_start() override ATTR_COLD;
 
+private:
 	void kol_w(u8 data);
 	void koh_w(u8 data);
 	void port_w(u8 data);
@@ -153,21 +151,21 @@ u32 superjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 {
 	u16 offset = 0;
 
-	for (int i = 0; i < (SCREEN_W + 1) / 8; i++)
+	for (int i = 0; i < (m_screen->width() + 1) / 8; i++)
 	{
 		int const x = i * 8;
 
-		for (int j = 0; j < SCREEN_H; j++)
+		for (int j = 0; j < m_screen->height(); j++)
 		{
-			u16 *const row = &bitmap.pix(SCREEN_H - 1 - j);
+			u16 *const row = &bitmap.pix(m_screen->height() - 1 - j);
 
 			u8 const data1 = m_display_ram[offset];
 
 			for (int b = 0; b < 8; b++)
 			{
-				if (x + b < SCREEN_W)
+				if (x + b < m_screen->width())
 				{
-					row[SCREEN_W - (x + b + 1)] = BIT(data1, b);
+					row[m_screen->width() - (x + b + 1)] = BIT(data1, b);
 				}
 			}
 
@@ -193,15 +191,14 @@ void superjr_state::superjr(machine_config &config)
 	m_maincpu->port_r_cb().set(FUNC(superjr_state::port_r));
 	m_maincpu->in0_cb().set(FUNC(superjr_state::in0_r));
 	m_maincpu->input_flag_cb().set(FUNC(superjr_state::input_flag_read));
+	m_maincpu->set_addrmap(AS_PROGRAM, &superjr_state::superjr_mem);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(SCREEN_W, SCREEN_H);
-	m_screen->set_visarea(0, SCREEN_W - 1, 0, SCREEN_H - 1);
+	m_screen->set_size(95, 32);
+	m_screen->set_visarea(0, 95 - 1, 0, 32 - 1);
 	m_screen->set_screen_update(FUNC(superjr_state::screen_update));
 	m_screen->set_palette("palette");
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &superjr_state::superjr_mem);
 
 	PALETTE(config, "palette", FUNC(superjr_state::superjr_palette), 2);
 }

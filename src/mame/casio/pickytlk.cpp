@@ -102,10 +102,7 @@ protected:
 		, m_ko(0)
 		, m_port(0)
 		, m_opt(0)
-	{
-		m_screen_w = 127;
-		m_screen_h = 64;
-	}
+	{ }
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -144,9 +141,6 @@ protected:
 	required_ioport m_io_pen_x;
 	required_ioport m_io_pen_y;
 	required_ioport m_io_pen_y_rescale;
-
-	u16 m_screen_w;
-	u16 m_screen_h;
 
 	u16 m_ko;   // KO lines
 	u8 m_port;  // PORT lines (serial I/O)
@@ -330,20 +324,20 @@ u32 pickytlk_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	u16 offset = 0;
 
-	for (int i = 0; i < (m_screen_w + 1) / 8; i++)
+	for (int i = 0; i < (m_screen->width() + 1) / 8; i++)
 	{
 		int const x = i * 8;
 
-		for (int j = 0; j < m_screen_h; j++)
+		for (int j = 0; j < m_screen->height(); j++)
 		{
-			u16 *const row = &bitmap.pix(m_screen_h - 1 - j);
+			u16 *const row = &bitmap.pix(m_screen->height() - 1 - j);
 
 			u8 const data1 = m_display_ram[offset];
 			u8 const data2 = m_display_ram[offset + 0x400];
 
 			for (int b = 0; b < 8; b++)
 			{
-				if (x + b < m_screen_w)
+				if (x + b < m_screen->width())
 				{
 					row[x + b] = (BIT(data1, b) << 1) | BIT(data2, b);
 				}
@@ -388,8 +382,8 @@ void pickytlk_base_state::pickytlk(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(m_screen_w, m_screen_h);
-	m_screen->set_visarea(0, m_screen_w - 1, 0, m_screen_h - 1);
+	m_screen->set_size(127, 64);
+	m_screen->set_visarea(0, 127 - 1, 0, 64 - 1);
 	m_screen->set_screen_update(FUNC(pickytlk_base_state::screen_update));
 	m_screen->set_palette("palette");
 }
@@ -565,10 +559,7 @@ class csf_multicolor_state : public pickytlk_multicolor_state
 public:
 	csf_multicolor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pickytlk_multicolor_state(mconfig, type, tag)
-	{
-		m_screen_w = 95;
-		m_screen_h = 32;
-	}
+	{ }
 
 	void csf_multicolor(machine_config &config) ATTR_COLD;
 
@@ -583,22 +574,22 @@ u32 csf_multicolor_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 {
 	u16 offset = 0x200;
 
-	for (int j = 0; j < m_screen_h; j++)
+	for (int j = 0; j < m_screen->height(); j++)
 	{
-		for (int i = 0; i < (m_screen_w + 1) / 8; i++)
+		for (int i = 0; i < (m_screen->width() + 1) / 8; i++)
 		{
 			int const x = i * 8;
 
-			u16 *const row = &bitmap.pix(m_screen_h - 1 - j);
+			u16 *const row = &bitmap.pix(m_screen->height() - 1 - j);
 
 			u8 const data1 = m_display_ram[offset];
 			u8 const data2 = m_display_ram[offset + 0x300];
 
 			for (int b = 0; b < 8; b++)
 			{
-				if (x + b < m_screen_w)
+				if (x + b < m_screen->width())
 				{
-					row[m_screen_w - (x + b + 1)] = (BIT(data1, b) << 1) | BIT(data2, b);
+					row[m_screen->width() - (x + b + 1)] = (BIT(data1, b) << 1) | BIT(data2, b);
 				}
 			}
 
@@ -636,6 +627,8 @@ void csf_multicolor_state::csf_multicolor(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(pickytlk_multicolor_state::pickytlk_palette), 4);
 
+	m_screen->set_size(95, 32);
+	m_screen->set_visarea(0, 95 - 1, 0, 32 - 1);
 	m_screen->set_screen_update(FUNC(csf_multicolor_state::screen_update));
 }
 
@@ -694,22 +687,22 @@ u32 opinion_multicolor_state::screen_update(screen_device &screen, bitmap_ind16 
 
 	u16 offset = 0;
 
-	for (int j = 0; j < m_screen_h; j++)
+	for (int j = 0; j < m_screen->height(); j++)
 	{
-		for (int i = 0; i < (m_screen_w + 1) / 8; i++)
+		for (int i = 0; i < (m_screen->width() + 1) / 8; i++)
 		{
 			int const x = i * 8;
 
-			u16 *const row = &bitmap.pix(m_screen_h - 1 - j);
+			u16 *const row = &bitmap.pix(m_screen->height() - 1 - j);
 
 			u8 const data1 = m_display_ram[offset];
 			u8 const data2 = m_display_ram[offset + 0x400];
 
 			for (int b = 0; b < 8; b++)
 			{
-				if (x + b < m_screen_w)
+				if (x + b < m_screen->width())
 				{
-					row[m_screen_w - (x + b + 1)] = (BIT(data1, b) << 1) | BIT(data2, b);
+					row[m_screen->width() - (x + b + 1)] = (BIT(data1, b) << 1) | BIT(data2, b);
 				}
 			}
 
