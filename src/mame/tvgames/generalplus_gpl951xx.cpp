@@ -33,8 +33,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t cs0_r(offs_t offset) override;
-
-private:
 };
 
 void generalplus_gpspi_direct_game_state::machine_start()
@@ -44,7 +42,6 @@ void generalplus_gpspi_direct_game_state::machine_start()
 void generalplus_gpspi_direct_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
-	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -120,6 +117,7 @@ void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_confi
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0);
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+	m_maincpu->set_cs_space(m_memory, 0);
 
 	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspi_direct_game_state::cs_map_base);
 

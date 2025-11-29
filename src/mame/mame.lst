@@ -520,8 +520,18 @@ vx600
 @source:akai/mpc60.cpp
 mpc60
 
+@source:akai/mpc2000.cpp
+mpc2000xl
+
 @source:akai/mpc3000.cpp
 mpc3000
+
+@source:akai/s3000.cpp
+s2000
+s3000
+s3000xl
+cd3000i
+cd3000xl
 
 @source:alesis/alesis.cpp
 hr16
@@ -18525,8 +18535,12 @@ fmtownsux
 @source:fujitsu/secoinsa20.cpp
 secoinsa20
 
-@source:funtech/supracan.cpp
-supracan
+@source:funtech/funtech_h8.cpp
+goldnegg
+
+@source:funtech/funtech_z80.cpp
+fts2in1
+poker21
 
 @source:funworld/4roses.cpp
 4roses
@@ -20580,10 +20594,6 @@ kungfua
 @source:igs/dunhuang.cpp
 dunhuang
 
-@source:igs/funtech.cpp
-fts2in1
-poker21
-
 @source:igs/goldstar.cpp
 3cdpoker
 3cdpokera
@@ -21023,6 +21033,7 @@ zhongguo
 
 @source:igs/igs_m027_023vid.cpp
 mxsqy
+mxsqy102tw
 
 @source:igs/igs_m027_033vid.cpp
 huahuas5
@@ -33294,9 +33305,6 @@ tomsadvs
 toratora
 toratorab
 
-@source:misc/triplex.cpp
-triplex
-
 @source:misc/triton.cpp
 triton41
 triton51
@@ -43408,6 +43416,7 @@ am1000
 
 @source:skeleton/amcoe_au1250.cpp
 burningr
+creepyrl
 
 @source:skeleton/amusement_6502.cpp
 unkamus
@@ -44803,6 +44812,9 @@ ptrain
 ptraina
 qbeebing
 queenbee
+queenbee107u
+queenbee117a
+queenbee123a
 queenbeeb
 queenbeei
 queenbeesa
@@ -46867,6 +46879,13 @@ zerowing
 zerowing1
 zerowingw
 
+@source:torch/quadx.cpp
+quadx
+quadxp
+
+@source:torch/triplex.cpp
+triplex
+
 @source:toaplan/truxton2.cpp
 truxton2
 
@@ -47815,17 +47834,21 @@ tmy_thom
 udance
 xavaero
 xavbaseb
+xavbasebj
 xavbassf
 xavbowl
 xavbowlj
 xavbox
+xavboxj
 xavcheck
 xavgolf
 xavgolfj
 xavjmat
 xavmusic
+xavmusicj
 xavpkjr
 xavtenni
+xavtennij
 
 @source:ultimachine/rambo.cpp
 metamaq2
@@ -47833,6 +47856,9 @@ metamaq2
 @source:ultratec/minicom.cpp
 mcom4_02
 minicom
+
+@source:umc/supracan.cpp
+supracan
 
 @source:unicard/bbcbc.cpp
 bbcbc
@@ -48227,6 +48253,9 @@ vgmplay
 
 @source:virtual/wavesynth.cpp
 wavesynth
+
+@source:virtual/utdsp563xx.cpp
+utdsp563xx
 
 @source:visual/v100.cpp
 v100

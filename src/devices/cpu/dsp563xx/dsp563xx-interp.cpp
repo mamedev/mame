@@ -16,11 +16,17 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 2: { // abs a
-		unhandled("abs a");
+		u64 d = get_a();
+		if(d & 0x80000000000000) {
+		set_a((-d) & 0xffffffffffffff);
+		}
 		break;
 		}
 	case 3: { // abs b
-		unhandled("abs b");
+		u64 d = get_b();
+		if(d & 0x80000000000000) {
+		set_b((-d) & 0xffffffffffffff);
+		}
 		break;
 		}
 	case 4: { // adc x,a
@@ -28094,25 +28100,25 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 154: { // add #[i],a
 		u64 d = get_a();
 		u32 i = BIT(opcode, 8, 6);
-		d = do_add56(u64(i) << 24, d);
+		set_a(do_add56(u64(i) << 24, d));
 		break;
 		}
 	case 155: { // add #[i],b
 		u64 d = get_b();
 		u32 i = BIT(opcode, 8, 6);
-		d = do_add56(u64(i) << 24, d);
+		set_b(do_add56(u64(i) << 24, d));
 		break;
 		}
 	case 156: { // add #[i],a
 		u64 d = get_a();
 		u32 i = exv;
-		d = do_add56(util::sext(i << 24, 48), d);
+		set_a(do_add56(util::sext(u64(i) << 24, 48), d));
 		break;
 		}
 	case 157: { // add #[i],b
 		u64 d = get_b();
 		u32 i = exv;
-		d = do_add56(util::sext(i << 24, 48), d);
+		set_b(do_add56(util::sext(u64(i) << 24, 48), d));
 		break;
 		}
 	case 158: { // and #[i],a
@@ -56651,1369 +56657,3033 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 4177: { // sub #[i],a
 		u64 d = get_a();
 		u32 i = BIT(opcode, 8, 6);
-		d = do_sub56(u64(i) << 24, d);
+		set_a(do_sub56(u64(i) << 24, d));
 		break;
 		}
 	case 4178: { // sub #[i],b
 		u64 d = get_b();
 		u32 i = BIT(opcode, 8, 6);
-		d = do_sub56(u64(i) << 24, d);
+		set_b(do_sub56(u64(i) << 24, d));
 		break;
 		}
 	case 4179: { // sub #[i],a
 		u64 d = get_a();
 		u32 i = exv;
-		d = do_sub56(util::sext(i << 24, 48), d);
+		set_a(do_sub56(util::sext(u64(i) << 24, 48), d));
 		break;
 		}
 	case 4180: { // sub #[i],b
 		u64 d = get_b();
 		u32 i = exv;
-		d = do_sub56(util::sext(i << 24, 48), d);
+		set_b(do_sub56(util::sext(u64(i) << 24, 48), d));
 		break;
 		}
 	case 4181: { // tcc b,a
-		unhandled("tcc b,a");
+		bool cc = test_cc();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4182: { // tcc b,b
-		unhandled("tcc b,b");
+		bool cc = test_cc();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4183: { // tcc x0,a
-		unhandled("tcc x0,a");
+		bool cc = test_cc();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4184: { // tcc x0,b
-		unhandled("tcc x0,b");
+		bool cc = test_cc();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4185: { // tcc y0,a
-		unhandled("tcc y0,a");
+		bool cc = test_cc();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4186: { // tcc y0,b
-		unhandled("tcc y0,b");
+		bool cc = test_cc();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4187: { // tcc x1,a
-		unhandled("tcc x1,a");
+		bool cc = test_cc();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4188: { // tcc x1,b
-		unhandled("tcc x1,b");
+		bool cc = test_cc();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4189: { // tcc y1,a
-		unhandled("tcc y1,a");
+		bool cc = test_cc();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4190: { // tcc y1,b
-		unhandled("tcc y1,b");
+		bool cc = test_cc();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4191: { // tge b,a
-		unhandled("tge b,a");
+		bool cc = test_ge();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4192: { // tge b,b
-		unhandled("tge b,b");
+		bool cc = test_ge();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4193: { // tge x0,a
-		unhandled("tge x0,a");
+		bool cc = test_ge();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4194: { // tge x0,b
-		unhandled("tge x0,b");
+		bool cc = test_ge();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4195: { // tge y0,a
-		unhandled("tge y0,a");
+		bool cc = test_ge();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4196: { // tge y0,b
-		unhandled("tge y0,b");
+		bool cc = test_ge();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4197: { // tge x1,a
-		unhandled("tge x1,a");
+		bool cc = test_ge();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4198: { // tge x1,b
-		unhandled("tge x1,b");
+		bool cc = test_ge();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4199: { // tge y1,a
-		unhandled("tge y1,a");
+		bool cc = test_ge();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4200: { // tge y1,b
-		unhandled("tge y1,b");
+		bool cc = test_ge();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4201: { // tne b,a
-		unhandled("tne b,a");
+		bool cc = test_ne();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4202: { // tne b,b
-		unhandled("tne b,b");
+		bool cc = test_ne();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4203: { // tne x0,a
-		unhandled("tne x0,a");
+		bool cc = test_ne();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4204: { // tne x0,b
-		unhandled("tne x0,b");
+		bool cc = test_ne();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4205: { // tne y0,a
-		unhandled("tne y0,a");
+		bool cc = test_ne();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4206: { // tne y0,b
-		unhandled("tne y0,b");
+		bool cc = test_ne();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4207: { // tne x1,a
-		unhandled("tne x1,a");
+		bool cc = test_ne();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4208: { // tne x1,b
-		unhandled("tne x1,b");
+		bool cc = test_ne();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4209: { // tne y1,a
-		unhandled("tne y1,a");
+		bool cc = test_ne();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4210: { // tne y1,b
-		unhandled("tne y1,b");
+		bool cc = test_ne();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4211: { // tpl b,a
-		unhandled("tpl b,a");
+		bool cc = test_pl();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4212: { // tpl b,b
-		unhandled("tpl b,b");
+		bool cc = test_pl();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4213: { // tpl x0,a
-		unhandled("tpl x0,a");
+		bool cc = test_pl();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4214: { // tpl x0,b
-		unhandled("tpl x0,b");
+		bool cc = test_pl();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4215: { // tpl y0,a
-		unhandled("tpl y0,a");
+		bool cc = test_pl();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4216: { // tpl y0,b
-		unhandled("tpl y0,b");
+		bool cc = test_pl();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4217: { // tpl x1,a
-		unhandled("tpl x1,a");
+		bool cc = test_pl();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4218: { // tpl x1,b
-		unhandled("tpl x1,b");
+		bool cc = test_pl();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4219: { // tpl y1,a
-		unhandled("tpl y1,a");
+		bool cc = test_pl();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4220: { // tpl y1,b
-		unhandled("tpl y1,b");
+		bool cc = test_pl();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4221: { // tnn b,a
-		unhandled("tnn b,a");
+		bool cc = test_nn();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4222: { // tnn b,b
-		unhandled("tnn b,b");
+		bool cc = test_nn();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4223: { // tnn x0,a
-		unhandled("tnn x0,a");
+		bool cc = test_nn();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4224: { // tnn x0,b
-		unhandled("tnn x0,b");
+		bool cc = test_nn();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4225: { // tnn y0,a
-		unhandled("tnn y0,a");
+		bool cc = test_nn();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4226: { // tnn y0,b
-		unhandled("tnn y0,b");
+		bool cc = test_nn();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4227: { // tnn x1,a
-		unhandled("tnn x1,a");
+		bool cc = test_nn();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4228: { // tnn x1,b
-		unhandled("tnn x1,b");
+		bool cc = test_nn();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4229: { // tnn y1,a
-		unhandled("tnn y1,a");
+		bool cc = test_nn();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4230: { // tnn y1,b
-		unhandled("tnn y1,b");
+		bool cc = test_nn();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4231: { // tec b,a
-		unhandled("tec b,a");
+		bool cc = test_ec();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4232: { // tec b,b
-		unhandled("tec b,b");
+		bool cc = test_ec();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4233: { // tec x0,a
-		unhandled("tec x0,a");
+		bool cc = test_ec();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4234: { // tec x0,b
-		unhandled("tec x0,b");
+		bool cc = test_ec();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4235: { // tec y0,a
-		unhandled("tec y0,a");
+		bool cc = test_ec();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4236: { // tec y0,b
-		unhandled("tec y0,b");
+		bool cc = test_ec();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4237: { // tec x1,a
-		unhandled("tec x1,a");
+		bool cc = test_ec();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4238: { // tec x1,b
-		unhandled("tec x1,b");
+		bool cc = test_ec();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4239: { // tec y1,a
-		unhandled("tec y1,a");
+		bool cc = test_ec();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4240: { // tec y1,b
-		unhandled("tec y1,b");
+		bool cc = test_ec();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4241: { // tlc b,a
-		unhandled("tlc b,a");
+		u32 cc = get_lc();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4242: { // tlc b,b
-		unhandled("tlc b,b");
+		u32 cc = get_lc();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4243: { // tlc x0,a
-		unhandled("tlc x0,a");
+		u32 cc = get_lc();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4244: { // tlc x0,b
-		unhandled("tlc x0,b");
+		u32 cc = get_lc();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4245: { // tlc y0,a
-		unhandled("tlc y0,a");
+		u32 cc = get_lc();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4246: { // tlc y0,b
-		unhandled("tlc y0,b");
+		u32 cc = get_lc();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4247: { // tlc x1,a
-		unhandled("tlc x1,a");
+		u32 cc = get_lc();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4248: { // tlc x1,b
-		unhandled("tlc x1,b");
+		u32 cc = get_lc();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4249: { // tlc y1,a
-		unhandled("tlc y1,a");
+		u32 cc = get_lc();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4250: { // tlc y1,b
-		unhandled("tlc y1,b");
+		u32 cc = get_lc();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4251: { // tgt b,a
-		unhandled("tgt b,a");
+		bool cc = test_gt();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4252: { // tgt b,b
-		unhandled("tgt b,b");
+		bool cc = test_gt();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4253: { // tgt x0,a
-		unhandled("tgt x0,a");
+		bool cc = test_gt();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4254: { // tgt x0,b
-		unhandled("tgt x0,b");
+		bool cc = test_gt();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4255: { // tgt y0,a
-		unhandled("tgt y0,a");
+		bool cc = test_gt();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4256: { // tgt y0,b
-		unhandled("tgt y0,b");
+		bool cc = test_gt();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4257: { // tgt x1,a
-		unhandled("tgt x1,a");
+		bool cc = test_gt();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4258: { // tgt x1,b
-		unhandled("tgt x1,b");
+		bool cc = test_gt();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4259: { // tgt y1,a
-		unhandled("tgt y1,a");
+		bool cc = test_gt();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4260: { // tgt y1,b
-		unhandled("tgt y1,b");
+		bool cc = test_gt();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4261: { // tcs b,a
-		unhandled("tcs b,a");
+		bool cc = test_cs();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4262: { // tcs b,b
-		unhandled("tcs b,b");
+		bool cc = test_cs();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4263: { // tcs x0,a
-		unhandled("tcs x0,a");
+		bool cc = test_cs();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4264: { // tcs x0,b
-		unhandled("tcs x0,b");
+		bool cc = test_cs();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4265: { // tcs y0,a
-		unhandled("tcs y0,a");
+		bool cc = test_cs();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4266: { // tcs y0,b
-		unhandled("tcs y0,b");
+		bool cc = test_cs();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4267: { // tcs x1,a
-		unhandled("tcs x1,a");
+		bool cc = test_cs();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4268: { // tcs x1,b
-		unhandled("tcs x1,b");
+		bool cc = test_cs();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4269: { // tcs y1,a
-		unhandled("tcs y1,a");
+		bool cc = test_cs();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4270: { // tcs y1,b
-		unhandled("tcs y1,b");
+		bool cc = test_cs();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4271: { // tlt b,a
-		unhandled("tlt b,a");
+		bool cc = test_lt();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4272: { // tlt b,b
-		unhandled("tlt b,b");
+		bool cc = test_lt();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4273: { // tlt x0,a
-		unhandled("tlt x0,a");
+		bool cc = test_lt();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4274: { // tlt x0,b
-		unhandled("tlt x0,b");
+		bool cc = test_lt();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4275: { // tlt y0,a
-		unhandled("tlt y0,a");
+		bool cc = test_lt();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4276: { // tlt y0,b
-		unhandled("tlt y0,b");
+		bool cc = test_lt();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4277: { // tlt x1,a
-		unhandled("tlt x1,a");
+		bool cc = test_lt();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4278: { // tlt x1,b
-		unhandled("tlt x1,b");
+		bool cc = test_lt();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4279: { // tlt y1,a
-		unhandled("tlt y1,a");
+		bool cc = test_lt();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4280: { // tlt y1,b
-		unhandled("tlt y1,b");
+		bool cc = test_lt();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4281: { // teq b,a
-		unhandled("teq b,a");
+		bool cc = test_eq();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4282: { // teq b,b
-		unhandled("teq b,b");
+		bool cc = test_eq();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4283: { // teq x0,a
-		unhandled("teq x0,a");
+		bool cc = test_eq();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4284: { // teq x0,b
-		unhandled("teq x0,b");
+		bool cc = test_eq();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4285: { // teq y0,a
-		unhandled("teq y0,a");
+		bool cc = test_eq();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4286: { // teq y0,b
-		unhandled("teq y0,b");
+		bool cc = test_eq();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4287: { // teq x1,a
-		unhandled("teq x1,a");
+		bool cc = test_eq();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4288: { // teq x1,b
-		unhandled("teq x1,b");
+		bool cc = test_eq();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4289: { // teq y1,a
-		unhandled("teq y1,a");
+		bool cc = test_eq();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4290: { // teq y1,b
-		unhandled("teq y1,b");
+		bool cc = test_eq();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4291: { // tmi b,a
-		unhandled("tmi b,a");
+		bool cc = test_mi();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4292: { // tmi b,b
-		unhandled("tmi b,b");
+		bool cc = test_mi();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4293: { // tmi x0,a
-		unhandled("tmi x0,a");
+		bool cc = test_mi();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4294: { // tmi x0,b
-		unhandled("tmi x0,b");
+		bool cc = test_mi();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4295: { // tmi y0,a
-		unhandled("tmi y0,a");
+		bool cc = test_mi();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4296: { // tmi y0,b
-		unhandled("tmi y0,b");
+		bool cc = test_mi();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4297: { // tmi x1,a
-		unhandled("tmi x1,a");
+		bool cc = test_mi();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4298: { // tmi x1,b
-		unhandled("tmi x1,b");
+		bool cc = test_mi();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4299: { // tmi y1,a
-		unhandled("tmi y1,a");
+		bool cc = test_mi();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4300: { // tmi y1,b
-		unhandled("tmi y1,b");
+		bool cc = test_mi();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4301: { // tnr b,a
-		unhandled("tnr b,a");
+		bool cc = test_nr();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4302: { // tnr b,b
-		unhandled("tnr b,b");
+		bool cc = test_nr();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4303: { // tnr x0,a
-		unhandled("tnr x0,a");
+		bool cc = test_nr();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4304: { // tnr x0,b
-		unhandled("tnr x0,b");
+		bool cc = test_nr();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4305: { // tnr y0,a
-		unhandled("tnr y0,a");
+		bool cc = test_nr();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4306: { // tnr y0,b
-		unhandled("tnr y0,b");
+		bool cc = test_nr();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4307: { // tnr x1,a
-		unhandled("tnr x1,a");
+		bool cc = test_nr();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4308: { // tnr x1,b
-		unhandled("tnr x1,b");
+		bool cc = test_nr();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4309: { // tnr y1,a
-		unhandled("tnr y1,a");
+		bool cc = test_nr();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4310: { // tnr y1,b
-		unhandled("tnr y1,b");
+		bool cc = test_nr();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4311: { // tes b,a
-		unhandled("tes b,a");
+		bool cc = test_es();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4312: { // tes b,b
-		unhandled("tes b,b");
+		bool cc = test_es();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4313: { // tes x0,a
-		unhandled("tes x0,a");
+		bool cc = test_es();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4314: { // tes x0,b
-		unhandled("tes x0,b");
+		bool cc = test_es();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4315: { // tes y0,a
-		unhandled("tes y0,a");
+		bool cc = test_es();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4316: { // tes y0,b
-		unhandled("tes y0,b");
+		bool cc = test_es();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4317: { // tes x1,a
-		unhandled("tes x1,a");
+		bool cc = test_es();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4318: { // tes x1,b
-		unhandled("tes x1,b");
+		bool cc = test_es();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4319: { // tes y1,a
-		unhandled("tes y1,a");
+		bool cc = test_es();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4320: { // tes y1,b
-		unhandled("tes y1,b");
+		bool cc = test_es();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4321: { // tls b,a
-		unhandled("tls b,a");
+		bool cc = test_ls();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4322: { // tls b,b
-		unhandled("tls b,b");
+		bool cc = test_ls();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4323: { // tls x0,a
-		unhandled("tls x0,a");
+		bool cc = test_ls();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4324: { // tls x0,b
-		unhandled("tls x0,b");
+		bool cc = test_ls();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4325: { // tls y0,a
-		unhandled("tls y0,a");
+		bool cc = test_ls();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4326: { // tls y0,b
-		unhandled("tls y0,b");
+		bool cc = test_ls();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4327: { // tls x1,a
-		unhandled("tls x1,a");
+		bool cc = test_ls();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4328: { // tls x1,b
-		unhandled("tls x1,b");
+		bool cc = test_ls();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4329: { // tls y1,a
-		unhandled("tls y1,a");
+		bool cc = test_ls();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4330: { // tls y1,b
-		unhandled("tls y1,b");
+		bool cc = test_ls();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4331: { // tle b,a
-		unhandled("tle b,a");
+		bool cc = test_le();
+		u64 s1 = get_b();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4332: { // tle b,b
-		unhandled("tle b,b");
+		bool cc = test_le();
+		u64 s1 = get_b();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4333: { // tle x0,a
-		unhandled("tle x0,a");
+		bool cc = test_le();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4334: { // tle x0,b
-		unhandled("tle x0,b");
+		bool cc = test_le();
+		u32 s1 = get_x0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4335: { // tle y0,a
-		unhandled("tle y0,a");
+		bool cc = test_le();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4336: { // tle y0,b
-		unhandled("tle y0,b");
+		bool cc = test_le();
+		u32 s1 = get_y0();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4337: { // tle x1,a
-		unhandled("tle x1,a");
+		bool cc = test_le();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4338: { // tle x1,b
-		unhandled("tle x1,b");
+		bool cc = test_le();
+		u32 s1 = get_x1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4339: { // tle y1,a
-		unhandled("tle y1,a");
+		bool cc = test_le();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_a(s1);
+		}
 		break;
 		}
 	case 4340: { // tle y1,b
-		unhandled("tle y1,b");
+		bool cc = test_le();
+		u32 s1 = get_y1();
+		if(cc) {
+		set_b(s1);
+		}
 		break;
 		}
 	case 4341: { // tcc b,a r,r
-		unhandled("tcc b,a r,r");
+		bool cc = test_cc();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4342: { // tcc b,b r,r
-		unhandled("tcc b,b r,r");
+		bool cc = test_cc();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4343: { // tcc x0,a r,r
-		unhandled("tcc x0,a r,r");
+		bool cc = test_cc();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4344: { // tcc x0,b r,r
-		unhandled("tcc x0,b r,r");
+		bool cc = test_cc();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4345: { // tcc y0,a r,r
-		unhandled("tcc y0,a r,r");
+		bool cc = test_cc();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4346: { // tcc y0,b r,r
-		unhandled("tcc y0,b r,r");
+		bool cc = test_cc();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4347: { // tcc x1,a r,r
-		unhandled("tcc x1,a r,r");
+		bool cc = test_cc();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4348: { // tcc x1,b r,r
-		unhandled("tcc x1,b r,r");
+		bool cc = test_cc();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4349: { // tcc y1,a r,r
-		unhandled("tcc y1,a r,r");
+		bool cc = test_cc();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4350: { // tcc y1,b r,r
-		unhandled("tcc y1,b r,r");
+		bool cc = test_cc();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4351: { // tge b,a r,r
-		unhandled("tge b,a r,r");
+		bool cc = test_ge();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4352: { // tge b,b r,r
-		unhandled("tge b,b r,r");
+		bool cc = test_ge();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4353: { // tge x0,a r,r
-		unhandled("tge x0,a r,r");
+		bool cc = test_ge();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4354: { // tge x0,b r,r
-		unhandled("tge x0,b r,r");
+		bool cc = test_ge();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4355: { // tge y0,a r,r
-		unhandled("tge y0,a r,r");
+		bool cc = test_ge();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4356: { // tge y0,b r,r
-		unhandled("tge y0,b r,r");
+		bool cc = test_ge();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4357: { // tge x1,a r,r
-		unhandled("tge x1,a r,r");
+		bool cc = test_ge();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4358: { // tge x1,b r,r
-		unhandled("tge x1,b r,r");
+		bool cc = test_ge();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4359: { // tge y1,a r,r
-		unhandled("tge y1,a r,r");
+		bool cc = test_ge();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4360: { // tge y1,b r,r
-		unhandled("tge y1,b r,r");
+		bool cc = test_ge();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4361: { // tne b,a r,r
-		unhandled("tne b,a r,r");
+		bool cc = test_ne();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4362: { // tne b,b r,r
-		unhandled("tne b,b r,r");
+		bool cc = test_ne();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4363: { // tne x0,a r,r
-		unhandled("tne x0,a r,r");
+		bool cc = test_ne();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4364: { // tne x0,b r,r
-		unhandled("tne x0,b r,r");
+		bool cc = test_ne();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4365: { // tne y0,a r,r
-		unhandled("tne y0,a r,r");
+		bool cc = test_ne();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4366: { // tne y0,b r,r
-		unhandled("tne y0,b r,r");
+		bool cc = test_ne();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4367: { // tne x1,a r,r
-		unhandled("tne x1,a r,r");
+		bool cc = test_ne();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4368: { // tne x1,b r,r
-		unhandled("tne x1,b r,r");
+		bool cc = test_ne();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4369: { // tne y1,a r,r
-		unhandled("tne y1,a r,r");
+		bool cc = test_ne();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4370: { // tne y1,b r,r
-		unhandled("tne y1,b r,r");
+		bool cc = test_ne();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4371: { // tpl b,a r,r
-		unhandled("tpl b,a r,r");
+		bool cc = test_pl();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4372: { // tpl b,b r,r
-		unhandled("tpl b,b r,r");
+		bool cc = test_pl();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4373: { // tpl x0,a r,r
-		unhandled("tpl x0,a r,r");
+		bool cc = test_pl();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4374: { // tpl x0,b r,r
-		unhandled("tpl x0,b r,r");
+		bool cc = test_pl();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4375: { // tpl y0,a r,r
-		unhandled("tpl y0,a r,r");
+		bool cc = test_pl();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4376: { // tpl y0,b r,r
-		unhandled("tpl y0,b r,r");
+		bool cc = test_pl();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4377: { // tpl x1,a r,r
-		unhandled("tpl x1,a r,r");
+		bool cc = test_pl();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4378: { // tpl x1,b r,r
-		unhandled("tpl x1,b r,r");
+		bool cc = test_pl();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4379: { // tpl y1,a r,r
-		unhandled("tpl y1,a r,r");
+		bool cc = test_pl();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4380: { // tpl y1,b r,r
-		unhandled("tpl y1,b r,r");
+		bool cc = test_pl();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4381: { // tnn b,a r,r
-		unhandled("tnn b,a r,r");
+		bool cc = test_nn();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4382: { // tnn b,b r,r
-		unhandled("tnn b,b r,r");
+		bool cc = test_nn();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4383: { // tnn x0,a r,r
-		unhandled("tnn x0,a r,r");
+		bool cc = test_nn();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4384: { // tnn x0,b r,r
-		unhandled("tnn x0,b r,r");
+		bool cc = test_nn();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4385: { // tnn y0,a r,r
-		unhandled("tnn y0,a r,r");
+		bool cc = test_nn();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4386: { // tnn y0,b r,r
-		unhandled("tnn y0,b r,r");
+		bool cc = test_nn();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4387: { // tnn x1,a r,r
-		unhandled("tnn x1,a r,r");
+		bool cc = test_nn();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4388: { // tnn x1,b r,r
-		unhandled("tnn x1,b r,r");
+		bool cc = test_nn();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4389: { // tnn y1,a r,r
-		unhandled("tnn y1,a r,r");
+		bool cc = test_nn();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4390: { // tnn y1,b r,r
-		unhandled("tnn y1,b r,r");
+		bool cc = test_nn();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4391: { // tec b,a r,r
-		unhandled("tec b,a r,r");
+		bool cc = test_ec();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4392: { // tec b,b r,r
-		unhandled("tec b,b r,r");
+		bool cc = test_ec();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4393: { // tec x0,a r,r
-		unhandled("tec x0,a r,r");
+		bool cc = test_ec();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4394: { // tec x0,b r,r
-		unhandled("tec x0,b r,r");
+		bool cc = test_ec();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4395: { // tec y0,a r,r
-		unhandled("tec y0,a r,r");
+		bool cc = test_ec();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4396: { // tec y0,b r,r
-		unhandled("tec y0,b r,r");
+		bool cc = test_ec();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4397: { // tec x1,a r,r
-		unhandled("tec x1,a r,r");
+		bool cc = test_ec();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4398: { // tec x1,b r,r
-		unhandled("tec x1,b r,r");
+		bool cc = test_ec();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4399: { // tec y1,a r,r
-		unhandled("tec y1,a r,r");
+		bool cc = test_ec();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4400: { // tec y1,b r,r
-		unhandled("tec y1,b r,r");
+		bool cc = test_ec();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4401: { // tlc b,a r,r
-		unhandled("tlc b,a r,r");
+		u32 cc = get_lc();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4402: { // tlc b,b r,r
-		unhandled("tlc b,b r,r");
+		u32 cc = get_lc();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4403: { // tlc x0,a r,r
-		unhandled("tlc x0,a r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4404: { // tlc x0,b r,r
-		unhandled("tlc x0,b r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4405: { // tlc y0,a r,r
-		unhandled("tlc y0,a r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4406: { // tlc y0,b r,r
-		unhandled("tlc y0,b r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4407: { // tlc x1,a r,r
-		unhandled("tlc x1,a r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4408: { // tlc x1,b r,r
-		unhandled("tlc x1,b r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4409: { // tlc y1,a r,r
-		unhandled("tlc y1,a r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4410: { // tlc y1,b r,r
-		unhandled("tlc y1,b r,r");
+		u32 cc = get_lc();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4411: { // tgt b,a r,r
-		unhandled("tgt b,a r,r");
+		bool cc = test_gt();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4412: { // tgt b,b r,r
-		unhandled("tgt b,b r,r");
+		bool cc = test_gt();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4413: { // tgt x0,a r,r
-		unhandled("tgt x0,a r,r");
+		bool cc = test_gt();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4414: { // tgt x0,b r,r
-		unhandled("tgt x0,b r,r");
+		bool cc = test_gt();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4415: { // tgt y0,a r,r
-		unhandled("tgt y0,a r,r");
+		bool cc = test_gt();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4416: { // tgt y0,b r,r
-		unhandled("tgt y0,b r,r");
+		bool cc = test_gt();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4417: { // tgt x1,a r,r
-		unhandled("tgt x1,a r,r");
+		bool cc = test_gt();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4418: { // tgt x1,b r,r
-		unhandled("tgt x1,b r,r");
+		bool cc = test_gt();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4419: { // tgt y1,a r,r
-		unhandled("tgt y1,a r,r");
+		bool cc = test_gt();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4420: { // tgt y1,b r,r
-		unhandled("tgt y1,b r,r");
+		bool cc = test_gt();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4421: { // tcs b,a r,r
-		unhandled("tcs b,a r,r");
+		bool cc = test_cs();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4422: { // tcs b,b r,r
-		unhandled("tcs b,b r,r");
+		bool cc = test_cs();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4423: { // tcs x0,a r,r
-		unhandled("tcs x0,a r,r");
+		bool cc = test_cs();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4424: { // tcs x0,b r,r
-		unhandled("tcs x0,b r,r");
+		bool cc = test_cs();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4425: { // tcs y0,a r,r
-		unhandled("tcs y0,a r,r");
+		bool cc = test_cs();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4426: { // tcs y0,b r,r
-		unhandled("tcs y0,b r,r");
+		bool cc = test_cs();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4427: { // tcs x1,a r,r
-		unhandled("tcs x1,a r,r");
+		bool cc = test_cs();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4428: { // tcs x1,b r,r
-		unhandled("tcs x1,b r,r");
+		bool cc = test_cs();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4429: { // tcs y1,a r,r
-		unhandled("tcs y1,a r,r");
+		bool cc = test_cs();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4430: { // tcs y1,b r,r
-		unhandled("tcs y1,b r,r");
+		bool cc = test_cs();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4431: { // tlt b,a r,r
-		unhandled("tlt b,a r,r");
+		bool cc = test_lt();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4432: { // tlt b,b r,r
-		unhandled("tlt b,b r,r");
+		bool cc = test_lt();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4433: { // tlt x0,a r,r
-		unhandled("tlt x0,a r,r");
+		bool cc = test_lt();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4434: { // tlt x0,b r,r
-		unhandled("tlt x0,b r,r");
+		bool cc = test_lt();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4435: { // tlt y0,a r,r
-		unhandled("tlt y0,a r,r");
+		bool cc = test_lt();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4436: { // tlt y0,b r,r
-		unhandled("tlt y0,b r,r");
+		bool cc = test_lt();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4437: { // tlt x1,a r,r
-		unhandled("tlt x1,a r,r");
+		bool cc = test_lt();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4438: { // tlt x1,b r,r
-		unhandled("tlt x1,b r,r");
+		bool cc = test_lt();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4439: { // tlt y1,a r,r
-		unhandled("tlt y1,a r,r");
+		bool cc = test_lt();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4440: { // tlt y1,b r,r
-		unhandled("tlt y1,b r,r");
+		bool cc = test_lt();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4441: { // teq b,a r,r
-		unhandled("teq b,a r,r");
+		bool cc = test_eq();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4442: { // teq b,b r,r
-		unhandled("teq b,b r,r");
+		bool cc = test_eq();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4443: { // teq x0,a r,r
-		unhandled("teq x0,a r,r");
+		bool cc = test_eq();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4444: { // teq x0,b r,r
-		unhandled("teq x0,b r,r");
+		bool cc = test_eq();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4445: { // teq y0,a r,r
-		unhandled("teq y0,a r,r");
+		bool cc = test_eq();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4446: { // teq y0,b r,r
-		unhandled("teq y0,b r,r");
+		bool cc = test_eq();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4447: { // teq x1,a r,r
-		unhandled("teq x1,a r,r");
+		bool cc = test_eq();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4448: { // teq x1,b r,r
-		unhandled("teq x1,b r,r");
+		bool cc = test_eq();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4449: { // teq y1,a r,r
-		unhandled("teq y1,a r,r");
+		bool cc = test_eq();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4450: { // teq y1,b r,r
-		unhandled("teq y1,b r,r");
+		bool cc = test_eq();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4451: { // tmi b,a r,r
-		unhandled("tmi b,a r,r");
+		bool cc = test_mi();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4452: { // tmi b,b r,r
-		unhandled("tmi b,b r,r");
+		bool cc = test_mi();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4453: { // tmi x0,a r,r
-		unhandled("tmi x0,a r,r");
+		bool cc = test_mi();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4454: { // tmi x0,b r,r
-		unhandled("tmi x0,b r,r");
+		bool cc = test_mi();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4455: { // tmi y0,a r,r
-		unhandled("tmi y0,a r,r");
+		bool cc = test_mi();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4456: { // tmi y0,b r,r
-		unhandled("tmi y0,b r,r");
+		bool cc = test_mi();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4457: { // tmi x1,a r,r
-		unhandled("tmi x1,a r,r");
+		bool cc = test_mi();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4458: { // tmi x1,b r,r
-		unhandled("tmi x1,b r,r");
+		bool cc = test_mi();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4459: { // tmi y1,a r,r
-		unhandled("tmi y1,a r,r");
+		bool cc = test_mi();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4460: { // tmi y1,b r,r
-		unhandled("tmi y1,b r,r");
+		bool cc = test_mi();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4461: { // tnr b,a r,r
-		unhandled("tnr b,a r,r");
+		bool cc = test_nr();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4462: { // tnr b,b r,r
-		unhandled("tnr b,b r,r");
+		bool cc = test_nr();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4463: { // tnr x0,a r,r
-		unhandled("tnr x0,a r,r");
+		bool cc = test_nr();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4464: { // tnr x0,b r,r
-		unhandled("tnr x0,b r,r");
+		bool cc = test_nr();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4465: { // tnr y0,a r,r
-		unhandled("tnr y0,a r,r");
+		bool cc = test_nr();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4466: { // tnr y0,b r,r
-		unhandled("tnr y0,b r,r");
+		bool cc = test_nr();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4467: { // tnr x1,a r,r
-		unhandled("tnr x1,a r,r");
+		bool cc = test_nr();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4468: { // tnr x1,b r,r
-		unhandled("tnr x1,b r,r");
+		bool cc = test_nr();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4469: { // tnr y1,a r,r
-		unhandled("tnr y1,a r,r");
+		bool cc = test_nr();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4470: { // tnr y1,b r,r
-		unhandled("tnr y1,b r,r");
+		bool cc = test_nr();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4471: { // tes b,a r,r
-		unhandled("tes b,a r,r");
+		bool cc = test_es();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4472: { // tes b,b r,r
-		unhandled("tes b,b r,r");
+		bool cc = test_es();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4473: { // tes x0,a r,r
-		unhandled("tes x0,a r,r");
+		bool cc = test_es();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4474: { // tes x0,b r,r
-		unhandled("tes x0,b r,r");
+		bool cc = test_es();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4475: { // tes y0,a r,r
-		unhandled("tes y0,a r,r");
+		bool cc = test_es();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4476: { // tes y0,b r,r
-		unhandled("tes y0,b r,r");
+		bool cc = test_es();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4477: { // tes x1,a r,r
-		unhandled("tes x1,a r,r");
+		bool cc = test_es();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4478: { // tes x1,b r,r
-		unhandled("tes x1,b r,r");
+		bool cc = test_es();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4479: { // tes y1,a r,r
-		unhandled("tes y1,a r,r");
+		bool cc = test_es();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4480: { // tes y1,b r,r
-		unhandled("tes y1,b r,r");
+		bool cc = test_es();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4481: { // tls b,a r,r
-		unhandled("tls b,a r,r");
+		bool cc = test_ls();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4482: { // tls b,b r,r
-		unhandled("tls b,b r,r");
+		bool cc = test_ls();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4483: { // tls x0,a r,r
-		unhandled("tls x0,a r,r");
+		bool cc = test_ls();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4484: { // tls x0,b r,r
-		unhandled("tls x0,b r,r");
+		bool cc = test_ls();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4485: { // tls y0,a r,r
-		unhandled("tls y0,a r,r");
+		bool cc = test_ls();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4486: { // tls y0,b r,r
-		unhandled("tls y0,b r,r");
+		bool cc = test_ls();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4487: { // tls x1,a r,r
-		unhandled("tls x1,a r,r");
+		bool cc = test_ls();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4488: { // tls x1,b r,r
-		unhandled("tls x1,b r,r");
+		bool cc = test_ls();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4489: { // tls y1,a r,r
-		unhandled("tls y1,a r,r");
+		bool cc = test_ls();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4490: { // tls y1,b r,r
-		unhandled("tls y1,b r,r");
+		bool cc = test_ls();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4491: { // tle b,a r,r
-		unhandled("tle b,a r,r");
+		bool cc = test_le();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4492: { // tle b,b r,r
-		unhandled("tle b,b r,r");
+		bool cc = test_le();
+		u64 s1 = get_b();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4493: { // tle x0,a r,r
-		unhandled("tle x0,a r,r");
+		bool cc = test_le();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4494: { // tle x0,b r,r
-		unhandled("tle x0,b r,r");
+		bool cc = test_le();
+		u32 s1 = get_x0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4495: { // tle y0,a r,r
-		unhandled("tle y0,a r,r");
+		bool cc = test_le();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4496: { // tle y0,b r,r
-		unhandled("tle y0,b r,r");
+		bool cc = test_le();
+		u32 s1 = get_y0();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4497: { // tle x1,a r,r
-		unhandled("tle x1,a r,r");
+		bool cc = test_le();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4498: { // tle x1,b r,r
-		unhandled("tle x1,b r,r");
+		bool cc = test_le();
+		u32 s1 = get_x1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4499: { // tle y1,a r,r
-		unhandled("tle y1,a r,r");
+		bool cc = test_le();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_a(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4500: { // tle y1,b r,r
-		unhandled("tle y1,b r,r");
+		bool cc = test_le();
+		u32 s1 = get_y1();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_b(s1);
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4501: { // tcc r,r
-		unhandled("tcc r,r");
+		bool cc = test_cc();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4502: { // tge r,r
-		unhandled("tge r,r");
+		bool cc = test_ge();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4503: { // tne r,r
-		unhandled("tne r,r");
+		bool cc = test_ne();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4504: { // tpl r,r
-		unhandled("tpl r,r");
+		bool cc = test_pl();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4505: { // tnn r,r
-		unhandled("tnn r,r");
+		bool cc = test_nn();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4506: { // tec r,r
-		unhandled("tec r,r");
+		bool cc = test_ec();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4507: { // tlc r,r
-		unhandled("tlc r,r");
+		u32 cc = get_lc();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4508: { // tgt r,r
-		unhandled("tgt r,r");
+		bool cc = test_gt();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4509: { // tcs r,r
-		unhandled("tcs r,r");
+		bool cc = test_cs();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4510: { // tlt r,r
-		unhandled("tlt r,r");
+		bool cc = test_lt();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4511: { // teq r,r
-		unhandled("teq r,r");
+		bool cc = test_eq();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4512: { // tmi r,r
-		unhandled("tmi r,r");
+		bool cc = test_mi();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4513: { // tnr r,r
-		unhandled("tnr r,r");
+		bool cc = test_nr();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4514: { // tes r,r
-		unhandled("tes r,r");
+		bool cc = test_es();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4515: { // tls r,r
-		unhandled("tls r,r");
+		bool cc = test_ls();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4516: { // tle r,r
-		unhandled("tle r,r");
+		bool cc = test_le();
+		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
+		if(cc) {
+		set_r(BIT(opcode, 0, 3) & 7, s2);
+		}
 		break;
 		}
 	case 4517: { // trap

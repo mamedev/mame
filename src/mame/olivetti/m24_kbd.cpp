@@ -198,10 +198,10 @@ INPUT_PORTS_START( m24_keyboard )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(80) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_MINMAX(0, 255) PORT_SENSITIVITY(80) PORT_KEYDELTA(5)
 
 	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(80) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_MINMAX(0, 255) PORT_SENSITIVITY(80) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
 
@@ -263,8 +263,13 @@ uint8_t m24_keyboard_device::p2_r()
 	// co-ordinates.  The +1 is to put one signal 90 degrees out of phase with
 	// respect to the other, to produce the required "quadrature" encoding,
 	// which lets the MCU determine the direction of movement.
-	return (m_keypress << 7) | m_mousebtn->read() |
-      BIT(mx+1, 1) | BIT(mx, 1) << 1 | BIT(my, 1) << 2 | BIT(my+1, 1) << 3;
+	return
+			(m_keypress << 7) |
+			m_mousebtn->read() |
+			BIT(mx + 1, 1) |
+			BIT(mx, 1) << 1 |
+			BIT(my, 1) << 2 |
+			BIT(my + 1, 1) << 3;
 }
 
 int m24_keyboard_device::t0_r()

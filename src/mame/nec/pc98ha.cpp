@@ -6,6 +6,9 @@ PC98LT/HA class machine "Handy98" aka 1st Gen LCD PC98
 
 TODO:
 - compose common points from base pc98 class, decouple;
+- floppy boot for inufuto games (should autoboot, at least mazy.d88 boots in pc9801 with fdd_2dd
+  adapter);
+- memory card handling (needs a working SW);
 - identify LCDC used here, reg 2 is clearly H display (0x4f+1)*8=640
 - when idle for some time buzzer farts until a key is pressed (?);
 - add NVRAM saving:
@@ -94,7 +97,7 @@ u8 pc98lt_state::floppy_mode_r(offs_t offset)
 {
 	// floppy "mode" identifies drive capabilities, if 2dd/2hd exclusive or mixed type.
 	// and to my understanding it doesn't really read from write reg ...
-	return (m_floppy_mode & 3) | 0x08;
+	return (m_floppy_mode & 3) | 0xe4;
 }
 
 void pc98lt_state::floppy_mode_w(offs_t offset, u8 data)
@@ -109,18 +112,37 @@ void pc98lt_state::floppy_mode_w(offs_t offset, u8 data)
 
 u8 pc98lt_state::fdc_ctrl_r(offs_t offset)
 {
-	// TODO: doesn't work as intended, bit 4 is supposedly if the drive has a disk in or not according to documentation.
-	int ret = (m_fdc->subdevice<floppy_connector>("0")->get_device()->ready_r()) ? 0x10 : 0;
-	ret |= (m_fdc->subdevice<floppy_connector>("1")->get_device()->ready_r()) ? 0x10 : 0;
-	return ret | 0x64;
+	int ret = 0x6c;
+	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
+
+	if (floppy0 && floppy0->exists())
+		ret |= 0x10;
+
+	if (floppy1 && floppy1->exists())
+		ret |= 0x10;
+
+	return ret;
 }
 
 void pc98lt_state::fdc_ctrl_w(offs_t offset, u8 data)
 {
-	m_fdc->reset_w(BIT(data, 7));
+	const int fdcrst = BIT(data, 7);
+
+	if (BIT(m_fdc_ctrl, 7) != fdcrst)
+		m_fdc->reset_w(BIT(data, 7));
+
+	const int ttrg = BIT(data, 0);
+
+	if( ttrg && !BIT(m_fdc_ctrl, 0) )
+	{
+		m_vfo_timer->adjust(attotime::from_msec(100), 1);
+	}
+	//else if (!ttrg && BIT(m_fdc_ctrl, 0) )
+	//	m_vfo_timer->adjust(attotime::never);
 
 	m_fdc_ctrl = data;
-	if(data & 0x40)
+	if(BIT(data, 6))
 	{
 		m_fdc->set_ready_line_connected(0);
 		m_fdc->ready_w(0);
@@ -130,8 +152,6 @@ void pc98lt_state::fdc_ctrl_w(offs_t offset, u8 data)
 
 	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(!BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
-
-	// TODO: uses PC88VA/2DD style timer
 }
 
 void pc98lt_state::lt_map(address_map &map)
@@ -322,7 +342,7 @@ static INPUT_PORTS_START( pc98lt )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("PRNB")
-	PORT_DIPNAME( 0x01, 0x00, "PRNB" ) // checked on boot
+	PORT_DIPNAME( 0x01, 0x01, "PRNB" ) // checked on boot, should be 1 for 2DD format
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // CPUT LT/HA switch
@@ -388,6 +408,8 @@ void pc98lt_state::machine_start()
 	m_romdrv_bank->configure_entries( 0, 0x10,                 memregion("romdrv")->base(), 0x10000);
 	m_dict_bank->configure_entries(   0, 0x40,                 memregion("dict")->base(),    0x4000);
 
+	m_vfo_timer = timer_alloc(FUNC(pc98lt_state::vfo_timer_cb), this);
+
 	if (m_rtc != nullptr)
 	{
 		m_rtc->cs_w(1);
@@ -417,9 +439,16 @@ void pc98ha_state::machine_start()
 	save_pointer(NAME(m_ems_ram), ems_size);
 }
 
+void pc98lt_state::machine_reset()
+{
+	m_vfo_timer->adjust(attotime::never);
+	m_dack = -1;
+	m_fdc_ctrl = 0x80;
+}
+
 static void pc9801_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", TEAC_FD_55F);
 	device.option_add("525hd", FLOPPY_525_HD);
 //  device.option_add("35hd", FLOPPY_35_HD);
 }
@@ -429,6 +458,35 @@ void pc98lt_state::uart_irq_check()
 	m_maincpu->set_input_line(4, m_uart_irq_pending & m_uart_irq_mask ? ASSERT_LINE : CLEAR_LINE);
 }
 
+void pc98lt_state::tc_w(int state)
+{
+	switch(m_dack)
+	{
+		//case 2:
+		case 3:
+			m_fdc->tc_w(state);
+			break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(pc98lt_state::vfo_timer_cb)
+{
+	int state = (int)param;
+
+	if(BIT(m_fdc_ctrl, 2) && state)
+	{
+		//m_maincpu->set_input_line(INPUT_LINE_IRQ6, ASSERT_LINE);
+		m_fdc_irqs->in_w<1>(ASSERT_LINE);
+		// TODO: arbitrary timing, unknown ack cycle
+		m_vfo_timer->adjust(attotime::from_usec(100), 0);
+	}
+	else if (!state)
+	{
+		m_fdc_irqs->in_w<1>(CLEAR_LINE);
+		//m_vfo_timer->adjust(attotime::from_msec(100), 1);
+	}
+
+}
 
 
 void pc98lt_state::lt_config(machine_config &config)
@@ -444,6 +502,18 @@ void pc98lt_state::lt_config(machine_config &config)
 	m_maincpu->tout2_cb().set(m_sio_rs, FUNC(i8251_device::write_txc));
 	m_maincpu->tout2_cb().append(m_sio_rs, FUNC(i8251_device::write_rxc));
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->out_eop_cb().set(FUNC(pc98lt_state::tc_w));
+//	m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
+//	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_maincpu->in_ior_cb<3>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_maincpu->out_iow_cb<3>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_maincpu->in_memr_cb().set([this] (offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
+	m_maincpu->out_memw_cb().set([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
+	m_maincpu->out_dack_cb<0>().set([this] (int state) { if (!state) m_dack = 0; });
+	m_maincpu->out_dack_cb<1>().set([this] (int state) { if (!state) m_dack = 1; });
+	m_maincpu->out_dack_cb<2>().set([this] (int state) { if (!state) m_dack = 2; });
+	m_maincpu->out_dack_cb<3>().set([this] (int state) { if (!state) m_dack = 3; });
 
 	pc9801_serial(config);
 
@@ -473,11 +543,14 @@ void pc98lt_state::lt_config(machine_config &config)
 	UPD1990A(config, m_rtc);
 
 	UPD765A(config, m_fdc, 8'000'000, false, true);
-	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
-	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
-//	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
-	FLOPPY_CONNECTOR(config, "upd765:0", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", pc9801_floppies, "525hd", pc9801_state::floppy_formats);
+	m_fdc->intrq_wr_callback().set(m_fdc_irqs, FUNC(input_merger_device::in_w<0>));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
+//	m_fdc->drq_wr_callback().append(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
+	FLOPPY_CONNECTOR(config, "fdc:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
+
+	INPUT_MERGER_ANY_HIGH(config, m_fdc_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
+
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	// TODO: copied verbatim from base PC98, verify clock et al.

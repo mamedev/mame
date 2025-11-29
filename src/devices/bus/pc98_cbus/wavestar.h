@@ -11,7 +11,7 @@
 #include "cpu/h8/h83042.h"
 
 class qvision_wavestar_device : public device_t
-					          , public device_pc98_cbus_slot_interface
+							  , public device_pc98_cbus_slot_interface
 {
 public:
 	qvision_wavestar_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

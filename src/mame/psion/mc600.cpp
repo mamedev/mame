@@ -341,10 +341,10 @@ INPUT_CHANGED_MEMBER(mc600_state::key_on)
 
 //INPUT_CHANGED_MEMBER(mc600_state::reset)
 //{
-//	if (newval)
-//	{
-//		m_asic2->reset_w(0);
-//	}
+//  if (newval)
+//  {
+//      m_asic2->reset_w(0);
+//  }
 //}
 
 

@@ -109,11 +109,29 @@ Uses [EGC], broken GFXs
 		</part>
 	</software>
 
-	<software name="n88bas61" supported="partial">
-		<description>N88 Disk BASIC v6.1</description>
-		<year>1983</year>
+	<!-- 2D format ought to exist -->
+	<!-- https://sanguisorba.github.io/basic/n88.htm -->
+	<software name="n88bas20" supported="partial">
+		<description>N88 Disk BASIC(86) (v2.0, 2HD)</description>
+		<year>1983?</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
+Identify exact type, PC-98H42(K)?
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1086448">
+				<rom name="n88-nihongo basic(86) v2.0 (system disk).d88" size="1086448" crc="14f2043c" sha1="cc3b769165f233175ecd85c59284e5ae91b1ff98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n88bas61" supported="partial">
+		<description>N88 Disk BASIC(86) (v6.1)</description>
+		<year>1983?</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Identify exact type
 Utility disk file "menu." has half height box lines
 Not extensively tested
 ]]></notes>
@@ -2926,6 +2944,20 @@ Fails two CONFIG.SYS lines, errors out when executing N88BASIC /F:12 /T:RUN"INIT
 		</part>
 	</software>
 
+	<software name="versalnk" supported="no">
+		<description>Versa-Link</description>
+		<year>1986</year>
+		<publisher>Cosmo Sys. Lab.</publisher>
+		<notes><![CDATA[
+[Serial] and [modem] application
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="versa_link.hdm" size="1261568" crc="6d05987c" sha1="e3dd6b3d1c36bf4a82ad05d747917a3556d06bd8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Artbooks -->
 
 	<software name="agumixsl" supported="no">
@@ -4184,15 +4216,18 @@ Hangs after entering name on VM class
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="alt_title" value="アドベンチャーランド" />
 		<info name="release" value="198407xx" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="348848">
 				<rom name="boot.d88" size="348848" crc="f914c48b" sha1="446a234f36465708df4ffabc0848b84a45cf6426" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="344496">
 				<rom name="adventureland.d88" size="344496" crc="eb33a2b4" sha1="63c84329954624c0d1b61c303412353418820b99" offset="0" />
 			</dataarea>
@@ -8631,16 +8666,24 @@ Errors with "Put the retail disk A into the drive", [FDC] chrn=(2, 1, -17, 512)
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="alt_title" value="ブラックプールの剣" />
 		<info name="release" value="198401xx" />
+		<info name="usage" value="Start with Boot and Disk B in 2D drives otherwise corrupted graphics will happen once loaded" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
+			<dataarea name="flop" size="348848">
+				<rom name="boot.d88" size="348848" crc="f914c48b" sha1="446a234f36465708df4ffabc0848b84a45cf6426" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="344496">
 				<rom name="disk a.d88" size="344496" crc="21eca713" sha1="2d11670eb8cb269bc7777a7237eb44b48263f691" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="348848">
 				<rom name="disk b.d88" size="348848" crc="05529277" sha1="409083c4b4bad399d64d931f2f835ef47a858837" offset="0" />
@@ -12557,8 +12600,10 @@ Course names draws a full square [kanji] block between nation and "GP" (verify)
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="release" value="198310xx" />
+		<info name="usage" value="Start with Boot and Disk B in 2D drives otherwise wont load after prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="348848">
@@ -12750,6 +12795,7 @@ Fails to boot with "E4" error, access [FDC] chrn=(0, 0, 1, 512)
 Throws "E>" error with chrn=(0, 1, 1, 512) in 2dd mode
 ]]></notes>
 		<info name="alt_title" value="クルーズ チェイサー ブラスティー" />
+		<info name="release" value="198611xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="741376">
@@ -19015,11 +19061,13 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		</part>
 	</software>
 
-	<!-- Can't create the player disk -->
 	<software name="elysion" supported="no">
 		<description>Elysion (2HD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Can't create the player disk
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -19033,6 +19081,9 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		<description>Elysion (2DD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Hangs while booting
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
@@ -33410,6 +33461,38 @@ Puts a TSR [mouse] driver during DOS boot, doesn't work in game? (verify)
 		</part>
 	</software>
 
+	<!-- 3.5" release known to exist -->
+	<software name="metlfrce" supported="partial">
+		<description>Metal Force</description>
+		<year>1993</year>
+		<publisher>遊演体 (You-en-tai)</publisher>
+		<notes><![CDATA[
+[PC-9801-86] DAC doesn't work
+]]></notes>
+		<info name="alt_title" value="メタルフォース" />
+		<info name="release" value="1993xxxx" />
+		<info name="usage" value="Supports Speakboard sound card (ADPCM), boot with data disk in drive B: to skip Opening" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="metal force (system disk).hdm" size="1261568" crc="f36c66b7" sha1="96155fff45b67b10ad983f7654d00353572cf9d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Opening Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="metal force (opening disk).hdm" size="1261568" crc="90ac1ef1" sha1="d54c94aa8a01f1ac3a6b068f697ed46115d48904" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Metal Force (Data disk).hdm" size="1261568" crc="6c133aaa" sha1="ce3d8cf0aad2b1fd2efdec6bd949b5034790f1f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="metalor" supported="yes">
 		<description>Cyber Block Metal Orange</description>
 		<year>1991</year>
@@ -43739,11 +43822,16 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		</part>
 	</software>
 
-	<software name="sbest9py">
+	<software name="sbest9py" supported="no">
 		<description>Shin Best Nine Pro Yakyuu</description>
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Crashes when selecting game, executes code in [GVRAM]
+Never completes a make data disk, does it need an undumped data disk?
+]]></notes>
 		<info name="alt_title" value="新ベストナインプロ野球" />
+		<info name="usage" value="Needs 2DD set in options" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
 				<rom name="new_best_nine_baseball.d88" size="697008" crc="99ff784b" sha1="be37e0e68ed180aeb564e49c50ee7ef2d6b579d2" offset="0" />
@@ -48436,10 +48524,14 @@ Eventually hangs with stuck [PC9801-26] sound note (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="tforce">
+	<software name="tforce" supported="no">
 		<description>Thunder Force</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 1, expected_size=100000, current_size=124448"
+May require [PC80S31] interface?
+]]></notes>
 		<info name="alt_title" value="サンダーフォース" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="351024">
@@ -51162,17 +51254,6 @@ doesn't boot when converted to d88 (2DD)
 		</part>
 	</software>
 
-	<software name="versalnk" supported="no">
-		<description>Versa-Link</description>
-		<year>1986</year>
-		<publisher>Cosmo Sys. Lab.</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="versa_link.hdm" size="1261568" crc="6d05987c" sha1="e3dd6b3d1c36bf4a82ad05d747917a3556d06bd8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vipev16d">
 		<description>Viper V16 Demo</description>
 		<year>1995?</year>
@@ -53756,11 +53837,12 @@ Is this a data disk for missing main game dump?
 	</software>
 
 	<software name="yuutoden">
-		<description>Yuutoden</description>
+		<description>Youtoden</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="遊兎伝" />
 		<info name="release" value="198906xx" />
+		<!-- TODO: Krugman claims Program Disk and Data Disk labels -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -58034,7 +58116,7 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="gaogao1" supported="no">
+	<software name="gaogao1" supported="yes">
 		<description>Gao Gao! 1st - Radical Sequence</description>
 		<year>1994</year>
 		<publisher>フォア・ナイン (Fournine)</publisher>
@@ -58559,12 +58641,13 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="grounsed" supported="no">
+	<software name="grounsed" supported="yes">
 		<description>Grounseed</description>
 		<year>1996</year>
 		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
 		<info name="alt_title" value="グランシード" />
 		<info name="release" value="19960607" />
+		<info name="developer" value="Exit" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="311292">

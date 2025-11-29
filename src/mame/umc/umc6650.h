@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 
-#ifndef MAME_FUNTECH_UMC6650_H
-#define MAME_FUNTECH_UMC6650_H
+#ifndef MAME_UMC_UMC6650_H
+#define MAME_UMC_UMC6650_H
 
 #pragma once
 
@@ -30,4 +30,4 @@ private:
 
 DECLARE_DEVICE_TYPE(UMC6650, umc6650_device)
 
-#endif // MAME_FUNTECH_UMC6650_H
+#endif // MAME_UMC_UMC6650_H

@@ -184,7 +184,7 @@ cem3394_device &cem3394_device::configure(double r_vco, double c_vco, double c_v
 	m_hpf_k = 1.0 - exp((-1 / (R_AC * c_ac)) * m_inv_sample_rate);
 
 	LOGMASKED(LOG_CONFIG, "CEM3394 config - vco zero freq: %f, filter zero freq: %f, sample rate: %d\n",
-	          m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
+			  m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
 	return *this;
 }
 
@@ -368,9 +368,13 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 	{
 		// take into account any streaming voltage inputs
 		if (streaming_cv)
+		{
 			for (int i = 1; i < INPUT_COUNT; i++)
+			{
 				if (BIT(input_mask, i))
 					set_voltage_internal(i, stream.get(i, sampindex));
+			}
+		}
 
 		// get the current VCO position and step it forward
 		double vco_position = m_vco_position;

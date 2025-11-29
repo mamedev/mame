@@ -537,13 +537,13 @@ CONS( 2020, lxpcpp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 // said game also requires either extra RAM on the PCB (none visible) or a SoC that natively supports that
 //
 // not set as clones as each other because the games lists are different
-CONS( 201?, k10_5l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (5 languages)", MACHINE_NOT_WORKING )
-CONS( 201?, k10_2l,    0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (2 languages)", MACHINE_NOT_WORKING )
+CONS( 201?, k10_5l,    0, 0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (5 languages)", MACHINE_NOT_WORKING )
+CONS( 201?, k10_2l,    0, 0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Games Power 500-in-1 Ultra Thin Handheld Game (K10) (2 languages)", MACHINE_NOT_WORKING )
 
-CONS( 2022, tvkunio1,  0, 0,  nes_vt32_2mb, nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Bikkuri Nekketsu Shin Kiroku! Harukanaru Kin Medal (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // yellow unit
+// びっくり熱血新記録！はるかなる金メダル
+CONS( 2022, tvkunio1,  0, 0,  nes_vt32_2mb,  nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Bikkuri Nekketsu Shin Kiroku! Harukanaru Kin Medal (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // yellow unit
 
-CONS( 202?, micac250, 0,        0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Micro Arcade 250-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, micac250,  0, 0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Micro Arcade 250-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // title screen shows Finger Pump, box shows Finger Dancing
-CONS( 201?, fingerd,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Orb Gaming", "Finger Dancing", MACHINE_NOT_WORKING )
-
+CONS( 201?, fingerd,   0, 0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "Orb Gaming", "Finger Dancing", MACHINE_NOT_WORKING )

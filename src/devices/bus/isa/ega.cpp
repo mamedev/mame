@@ -969,7 +969,7 @@ uint8_t isa8_ega_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
-	if ( !machine().side_effects_disabled() && !( m_graphics_controller.data[5] & 0x10 ) )
+	if ( !machine().side_effects_disabled() )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];
@@ -987,9 +987,9 @@ uint8_t isa8_ega_device::read(offs_t offset)
 			int bit = 1;
 			for ( int p = 0; p < 4; p++ )
 			{
-				if ( !BIT(m_graphics_controller.data[7], p) )
+				if ( BIT(m_graphics_controller.data[7], p) )
 				{
-					if ( BIT(m_graphics_controller.data[2], p) != BIT(m_read_latch[p], i) )
+					if ( BIT(m_graphics_controller.data[2], p) != BIT(m_plane[p][offset & 0xffff], i) )
 					{
 						bit = 0;
 						break;

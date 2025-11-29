@@ -31,11 +31,13 @@ protected:
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	virtual u8 dack_r(int line) override;
 	virtual void dack_w(int line, u8 data) override;
+	virtual void eop_w(int state) override;
 
 private:
 	required_device<nscsi_bus_device> m_sasibus;
 	required_device<nscsi_callback_device> m_sasi;
 	required_memory_region m_bios;
+	required_ioport m_dsw;
 
 	u8 data_r();
 	void data_w(u8 data);

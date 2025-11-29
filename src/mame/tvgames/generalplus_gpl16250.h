@@ -52,13 +52,10 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-
 	required_device<sunplus_gcm394_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-
 	required_ioport_array<3> m_io;
-
 
 	optional_region_ptr<uint16_t> m_romregion;
 	required_device<full_memory_device> m_memory;
@@ -70,8 +67,6 @@ protected:
 
 	virtual uint16_t read_external_space(offs_t offset);
 	virtual void write_external_space(offs_t offset, uint16_t data);
-
-private:
 };
 
 

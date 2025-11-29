@@ -1,0 +1,1159 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:m1macrophage
+-->
+<mamelayout version="2">
+	<!-- labels -->
+	<element name="transparent"><rect><color red="0" green="0" blue="0" alpha="0"/></rect></element>
+	<repeat count="8">
+		<param name="i" start="1" increment="1"/>
+		<element name="txt_~i~"><text string="~i~"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	</repeat>
+	<element name="txt_polymod">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="POLY - MOD"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_lfo">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="LFO"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_wheelmod">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="WHEEL - MOD"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_oscillator_a">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="OSCILLATOR A"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_oscillator_b">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="OSCILLATOR B"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_mixer">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="MIXER"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_cass">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="CASSETTE"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_filter">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="FILTER"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_amp">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="AMPLIFIER"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_programmer">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="PROGRAMMER"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_source_amount">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="SOURCE AMOUNT"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_destination">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="DESTINATION"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_shape">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="SHAPE"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_prog_sel">
+		<rect><color red="0.16" green="0.16" blue="0.16"/></rect>
+		<text string="PROGRAM SELECT"><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="txt_freq_a"><text string="FREQ A"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_freq_b"><text string="FREQ B"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_pw_a"><text string="PW A"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_pw_b"><text string="PW B"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_filt_env"><text string="FILT ENV" align="1"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_osc_a"><text string="OSC A"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_osc_b"><text string="OSC B"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_osc_b_l"><text string="OSC B" align="1"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_noise"><text string="NOISE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_noise_l"><text string="NOISE" align="1"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_frequency"><text string="FREQUENCY"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_source_mix"><text string="SOURCE MIX"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_lfo_r"><text string="LFO" align="2"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_pulse_width"><text string="PULSE WIDTH"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_sync"><text string="SYNC"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_fine"><text string="FINE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_lo_freq"><text string="LO FREQ"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_attack"><text string="ATTACK"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_decay"><text string="DECAY"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_sustain"><text string="SUSTAIN"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_release"><text string="RELEASE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_cutoff"><text string="CUTOFF"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_resonance"><text string="RESONANCE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_env_amt"><text string="ENVELOPE AMOUNT"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_keyboard"><text string="KEYBOARD"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_pitch"><text string="PITCH"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_mod"><text string="MOD"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_save"><text string="SAVE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_load"><text string="LOAD"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_to_tape"><text string="TO TAPE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_from_tape"><text string="FROM TAPE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_glide"><text string="GLIDE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_master_tune"><text string="MASTER TUNE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_volume"><text string="VOLUME"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_unison"><text string="UNISON"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_tune"><text string="TUNE"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_A440"><text string="A-440"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_preset"><text string="PRESET"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_record"><text string="RECORD"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_bank"><text string="BANK"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_select"><text string="SELECT"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+	<element name="txt_program"><text string="PROGRAM"><color red="0.86" green="0.86" blue="0.86"/></text></element>
+
+	<!-- case elements -->
+	<element name="wood"><rect><color red="0.71" green="0.46" blue="0.28"/></rect></element>
+	<element name="edgewood"><rect><color red="0.50" green="0.30" blue="0.22"/></rect></element>
+	<element name="darkwood"><rect><color red="0.32" green="0.21" blue="0.18"/></rect></element>
+	<element name="panel"><rect><color red="0.16" green="0.16" blue="0.16"/></rect></element>
+	<element name="silverrect">
+		<image><data><![CDATA[
+			<rect fill="#a7a7a7" stroke="none" x="1" y="1" width="166" height="40" rx="10" ry="10"/>
+		]]></data></image>
+	</element>
+	<element name="script_warning" defstate="1">
+		<text state="1" string="*** to control knobs and wheels with a mouse, enable the layout plugin ***">
+			<color red="0.90" green="0.90" blue="0.90"/>
+		</text>
+	</element>
+
+	<!-- display elements -->
+	<element name="display"><rect><color red="0.15" green="0.08" blue="0.06"/></rect></element>
+	<element name="digit"><led7seg><color red="0.90" green="0.14" blue="0.35"/></led7seg></element>
+	<element name="led">
+		<disk>
+			<color state="0" red="0.25" green="0.07" blue="0.07"/>
+			<color state="1" red="0.85" green="0.15" blue="0.15"/>
+		</disk>
+	</element>
+
+	<!-- panel section elements -->
+	<element name="line"><rect><color red="0.75" green="0.75" blue="0.75"/></rect></element>
+	<element name="section_polymod">
+		<image><data><![CDATA[
+			<svg width="250" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="248" height="70" rx="10" ry="10"/>
+				<line stroke="#c0c0c0" stroke-width="1" x1="8" x2="128" y1="63" y2="63"/>
+				<line stroke="#c0c0c0" stroke-width="1" x1="154" x2="230" y1="56" y2="56"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_lfo">
+		<image><data><![CDATA[
+			<svg width="186" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="184" height="70" rx="10" ry="10"/>
+				<line stroke="#c0c0c0" stroke-width="1" x1="90" x2="166" y1="56" y2="56"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_wheelmod">
+		<image><data><![CDATA[
+			<svg width="250" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="248" height="70" rx="10" ry="10"/>
+				<line stroke="#c0c0c0" stroke-width="1" x1="78" x2="230" y1="56" y2="56"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_osc_a">
+		<image><data><![CDATA[
+			<svg width="264" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="262" height="70" rx="10" ry="10"/>
+				<line stroke="#c0c0c0" stroke-width="1" x1="90" x2="128" y1="56" y2="56"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_osc_b">
+		<image><data><![CDATA[
+			<svg width="408" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="406" height="70" rx="10" ry="10"/>
+				<line stroke="#c0c0c0" stroke-width="1" x1="155" x2="231" y1="56" y2="56"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_mixer">
+		<image><data><![CDATA[
+			<svg width="208" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="206" height="70" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_filter">
+		<image><data><![CDATA[
+			<svg width="288" height="148">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="286" height="146" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_cass">
+		<image><data><![CDATA[
+			<svg width="120" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="118" height="70" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_amp">
+		<image><data><![CDATA[
+			<svg width="264" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="262" height="70" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="section_programmer">
+		<image><data><![CDATA[
+			<svg width="578" height="72">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="576" height="70" rx="10" ry="10"/>
+				<line stroke="#c0c0c0" stroke-width="1" x1="291" x2="557" y1="56" y2="56"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<!-- button elements -->
+	<element name="wave_ramp">
+		<image><data><![CDATA[
+			<svg width="22" height="10">
+				<polyline fill="none" stroke="#c0c0c0" stroke-width="1" points="6,9 17,0 17,9"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="wave_triangle">
+		<image><data><![CDATA[
+			<svg width="22" height="10">
+				<polyline fill="none" stroke="#c0c0c0" stroke-width="1" points="5,9 11,0 16,9"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="wave_square">
+		<image><data><![CDATA[
+			<svg width="22" height="10">
+				<polyline fill="none" stroke="#c0c0c0" stroke-width="1" points="2,9 6,9 6,0 16,0 16,9 20,9"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="btn_black">
+		<rect>
+			<bounds x="0" y="0" width="22" height="28"/>
+			<color red="0.08" green="0.08" blue="0.08"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="1" width="20" height="10"/>
+			<color state="0" red="0.29" green="0.29" blue="0.29"/>
+			<color state="1" red="0.45" green="0.45" blue="0.45"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="11" width="20" height="17"/>
+			<color red="0.14" green="0.14" blue="0.14"/>
+		</rect>
+		<rect>
+			<bounds x="3" y="13" width="16" height="12"/>
+			<color state="0" red="0.26" green="0.26" blue="0.26"/>
+			<color state="1" red="0.45" green="0.45" blue="0.45"/>
+		</rect>
+	</element>
+	<element name="btn_grey">
+		<rect>
+			<bounds x="0" y="0" width="22" height="28"/>
+			<color red="0.08" green="0.08" blue="0.08"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="1" width="20" height="10"/>
+			<color state="0" red="0.60" green="0.60" blue="0.60"/>
+			<color state="1" red="0.73" green="0.73" blue="0.73"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="11" width="20" height="17"/>
+			<color red="0.49" green="0.49" blue="0.49"/>
+		</rect>
+		<rect>
+			<bounds x="3" y="13" width="16" height="12"/>
+			<color state="0" red="0.57" green="0.57" blue="0.57"/>
+			<color state="1" red="0.73" green="0.73" blue="0.73"/>
+		</rect>
+	</element>
+	<element name="btn_orange">
+		<rect>
+			<bounds x="0" y="0" width="22" height="28"/>
+			<color red="0.08" green="0.08" blue="0.08"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="1" width="20" height="10"/>
+			<color state="0" red="0.82" green="0.42" blue="0.17"/>
+			<color state="1" red="1.0" green="0.50" blue="0.18"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="11" width="20" height="17"/>
+			<color red="0.63" green="0.28" blue="0.12"/>
+		</rect>
+		<rect>
+			<bounds x="3" y="13" width="16" height="12"/>
+			<color state="0" red="0.79" green="0.39" blue="0.14"/>
+			<color state="1" red="1.0" green="0.50" blue="0.18"/>
+		</rect>
+	</element>
+	<group name="button">
+		<bounds x="0" y="0" width="38" height="52"/>
+		<element ref="~btn_label_top~"><bounds x="0" y="2" width="38" height="8"/></element>
+		<element ref="~btn_style~" inputtag="~btn_input~" inputmask="~btn_mask~">
+			<bounds x="8" y="12" width="22" height="28"/>
+		</element>
+		<element ref="led" name="~btn_led~"><bounds x="16" y="15" width="6" height="6"/></element>
+		<element ref="~btn_label_bottom~"><bounds x="0" y="44" width="38" height="8"/></element>
+	</group>
+	<group name="wave_button">
+		<bounds x="0" y="0" width="38" height="40"/>
+		<element ref="~wave~"><bounds x="8" y="0" width="22" height="10"/></element>
+		<element ref="btn_black" inputtag="~btn_input~" inputmask="~btn_mask~">
+			<bounds x="8" y="12" width="22" height="28"/>
+		</element>
+		<element ref="led" name="~btn_led~"><bounds x="16" y="15" width="6" height="6"/></element>
+	</group>
+
+	<!-- knob elements -->
+	<element name="knob_numbers_0_10">
+		<rect><bounds x="0" y="0" width="56" height="56"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="0" align="1"><bounds x="13" y="46" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="1" align="1"><bounds x="5" y="36" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="2" align="1"><bounds x="2" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="3" align="1"><bounds x="5" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="4" align="1"><bounds x="13" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="5" align="0"><bounds x="25" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="6" align="2"><bounds x="35" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="7" align="2"><bounds x="43" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="8" align="2"><bounds x="46" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="9" align="2"><bounds x="43" y="36" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="10" align="2"><bounds x="35" y="46" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="knob_numbers_5_5">
+		<rect><bounds x="0" y="0" width="56" height="56"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="5" align="1"><bounds x="13" y="46" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="4" align="1"><bounds x="5" y="36" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="3" align="1"><bounds x="2" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="2" align="1"><bounds x="5" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="1" align="1"><bounds x="13" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="0" align="0"><bounds x="25" y="0" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="1" align="2"><bounds x="35" y="3" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="2" align="2"><bounds x="43" y="12" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="3" align="2"><bounds x="46" y="24" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="4" align="2"><bounds x="43" y="36" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+		<text string="5" align="2"><bounds x="35" y="46" width="8" height="7"/><color red="0.86" green="0.86" blue="0.86"/></text>
+	</element>
+	<element name="knob_tickmarks">
+		<image><data><![CDATA[
+			<svg width="42" height="42">
+				<g stroke="#dbdbdb" stroke-width="0.5" transform="translate(20.5, 20.5)>
+					<line x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(30)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(60)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(90)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(120)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(150)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(210)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(240)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(270)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(300)" x1="0" y1="0" x2="0" y2="-21"/>
+					<line transform="rotate(330)" x1="0" y1="0" x2="0" y2="-21"/>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="knob_black">
+		<disk><bounds x="0" y="0" width="28" height="28"/><color red="0.63" green="0.63" blue="0.63"/></disk>
+		<disk><bounds x="2" y="2" width="24" height="24"/><color red="0.13" green="0.13" blue="0.13"/></disk>
+	</element>
+	<element name="knob_silver">
+		<disk><bounds x="0" y="0" width="28" height="28"/><color red="0.50" green="0.50" blue="0.50"/></disk>
+		<disk><bounds x="2" y="2" width="24" height="24"/><color red="0.67" green="0.67" blue="0.67"/></disk>
+	</element>
+	<element name="knob_black_value">
+		<simplecounter digits="1"><color red="0.86" green="0.86" blue="0.86"/></simplecounter>
+	</element>
+	<element name="knob_silver_value">
+		<simplecounter digits="1"><color red="0.0" green="0.0" blue="0.0"/></simplecounter>
+	</element>
+	<group name="knob">
+		<bounds x="0" y="0" width="56" height="62"/>
+		<element ref="~knob_numbers~"><bounds x="0" y="0" width="56" height="56"/></element>
+		<element ref="knob_tickmarks"><bounds x="7" y="7" width="42" height="42"/></element>
+		<element ref="~knob_style~" id="~knob_input~">
+			<bounds x="14" y="14" width="28" height="28"/>
+		</element>
+		<element ref="~knob_style~_value" inputtag="~knob_input~" inputmask="0xffff" inputraw="yes">
+			<bounds x="18" y="23" width="20" height="10"/>
+		</element>
+		<element ref="transparent" clickthrough="no">
+			<bounds x="18" y="23" width="20" height="10"/>
+		</element>
+		<element ref="~knob_label~"><bounds x="0" y="54" width="56" height="8"/></element>
+	</group>
+
+	<!-- wheel elements -->
+	<element name="section_wheel">
+		<image><data><![CDATA[
+			<svg width="112" height="194">
+				<rect fill="none" stroke="#c0c0c0" stroke-width="2" x="1" y="1" width="110" height="192" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="wheel_well"><rect><color red="0.08" green="0.08" blue="0.08"/></rect></element>
+	<element name="wheel_area"><rect><color red="0.14" green="0.14" blue="0.14"/></rect></element>
+	<element name="wheel_dent">
+		<rect><color red="0.25" green="0.25" blue="0.25"/><bounds x="0" y="0" width="14" height="14"/></rect>
+		<rect><color red="0.60" green="0.60" blue="0.60"/><bounds x="0" y="6" width="14" height="2"/></rect>
+	</element>
+	<group name="wheel">
+		<bounds x="0" y="0" width="18" height="98"/>
+		<element ref="wheel_well"><bounds x="0" y="0" width="18" height="98"/></element>
+		<element ref="wheel_area" id="~wheel_input~"><bounds x="2" y="6" width="14" height="86"/></element>
+		<element ref="wheel_dent" id="~wheel_input~_dent">
+			<animate inputtag="~wheel_input~" inputmask="0xffff"/>
+			<bounds state="100" x="2" y="6" width="14" height="14"/>
+			<bounds state="0" x="2" y="78" width="14" height="14"/>
+		</element>
+	</group>
+
+	<!-- keyboard elements -->
+	<element name="whitekey">
+		<rect>
+			<color state="0" red="0.94" green="0.94" blue="0.94"/>
+			<color state="1" red="0.50" green="0.50" blue="0.50"/>
+		</rect>
+	</element>
+	<element name="blackkey">
+		<rect>
+			<bounds x="0" y="0" width="18" height="130"/>
+			<color red="0.08" green="0.08" blue="0.08"/>
+		</rect>
+		<rect>
+			<bounds x="1" y="0" width="16" height="128"/>
+			<color state="0" red="0.18" green="0.18" blue="0.18"/>
+			<color state="1" red="0.50" green="0.50" blue="0.50"/>
+		</rect>
+	</element>
+	<group name="octave_var1">
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x01"><!-- C -->
+			<bounds x="0" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x04"><!-- D -->
+			<bounds x="34" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x10"><!-- E -->
+			<bounds x="68" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x20"><!-- F -->
+			<bounds x="102" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x80"><!-- G -->
+			<bounds x="136" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x02"><!-- A -->
+			<bounds x="170" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x08"><!-- B -->
+			<bounds x="204" y="0" width="32" height="202"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x02"><!-- C# -->
+			<bounds x="21" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x08"><!-- D# -->
+			<bounds x="61" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x40"><!-- F# -->
+			<bounds x="123" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x01"><!-- G# -->
+			<bounds x="159" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x04"><!-- A# -->
+			<bounds x="197" y="0" width="18" height="130"/>
+		</element>
+	</group>
+	<group name="octave_var2">
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x10"><!-- C -->
+			<bounds x="0" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x40"><!-- D -->
+			<bounds x="34" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x01"><!-- E -->
+			<bounds x="68" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x02"><!-- F -->
+			<bounds x="102" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x08"><!-- G -->
+			<bounds x="136" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x20"><!-- A -->
+			<bounds x="170" y="0" width="32" height="202"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x80"><!-- B -->
+			<bounds x="204" y="0" width="32" height="202"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x20"><!-- C# -->
+			<bounds x="21" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x80"><!-- D# -->
+			<bounds x="61" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x04"><!-- F# -->
+			<bounds x="123" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x10"><!-- G# -->
+			<bounds x="159" y="0" width="18" height="130"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x40"><!-- A# -->
+			<bounds x="197" y="0" width="18" height="130"/>
+		</element>
+	</group>
+
+
+	<view name="Default Layout">
+		<bounds x="0" y="0" width="1400" height="600"/>
+
+		<!-- case -->
+
+		<element ref="wood"><bounds x="14" y="282" width="1372" height="102"/></element>
+		<element ref="wood"><bounds x="22" y="586" width="1356" height="14"/></element>
+		<element ref="silverrect"><bounds x="1158" y="314" width="166" height="40"/></element>
+		<element ref="edgewood"><bounds x="14" y="0" width="1372" height="14"/></element>
+		<element ref="edgewood"><bounds x="0" y="0" width="14" height="600"/></element>
+		<element ref="darkwood"><bounds x="14" y="384" width="12" height="216"/></element>
+		<element ref="edgewood"><bounds x="1386" y="0" width="14" height="600"/></element>
+		<element ref="darkwood"><bounds x="1374" y="384" width="12" height="216"/></element>
+		<element ref="panel"><bounds x="14" y="14" width="1372" height="268"/></element>
+		<element ref="line"><bounds x="283" y="42" width="2" height="224"/></element>
+
+		<collection name="script warning">
+			<element ref="script_warning" id="warning"><bounds x="300" y="324" width="800" height="18"/></element>
+		</collection>
+
+		<!-- wheels -->
+
+		<element ref="panel"><bounds x="26" y="384" width="118" height="202"/></element>
+		<element ref="section_wheel"><bounds x="28" y="390" width="112" height="194"/></element>
+
+		<element ref="txt_pitch"><bounds x="53" y="534" width="28" height="10"/></element>
+		<param name="wheel_input" value="wheel_pitch"/>
+		<group ref="wheel"><bounds x="58" y="434" width="18" height="98"/></group>
+
+		<element ref="txt_mod"><bounds x="102" y="534" width="28" height="10"/></element>
+		<param name="wheel_input" value="wheel_mod"/>
+		<group ref="wheel"><bounds x="107" y="434" width="18" height="98"/></group>
+
+		<!-- Most knobs are black and the tickmarks are numbered from 0 to 10.  -->
+		<param name="knob_style" value="knob_black"/>
+		<param name="knob_numbers" value="knob_numbers_0_10"/>
+
+		<!-- poly mod -->
+
+		<param name="btn_style" value="btn_black"/>
+		<param name="btn_label_bottom" value="transparent"/>
+		<param name="btn_input" value="switch_row_1"/>
+
+		<element ref="section_polymod"><bounds x="24" y="42" width="250" height="72"/></element>
+		<element ref="txt_polymod"><bounds x="118" y="38" width="62" height="10"/></element>
+
+		<param name="knob_label" value="transparent"/>
+		<param name="knob_input" value="pot_4"/>
+		<group ref="knob"><bounds x="32" y="47" width="56" height="62"/></group>
+		<element ref="txt_filt_env"><bounds x="78" y="94" width="40" height="7"/></element>
+
+		<param name="knob_input" value="pot_3"/>
+		<group ref="knob"><bounds x="96" y="47" width="56" height="62"/></group>
+		<element ref="txt_osc_b_l"><bounds x="142" y="94" width="40" height="7"/></element>
+
+		<param name="btn_label_top" value="txt_freq_a"/>
+		<param name="btn_led" value="led_pmod_freq_a"/>
+		<param name="btn_mask" value="0x01"/>
+		<group ref="button"><bounds x="159" y="50" width="38" height="52"/></group>
+
+		<param name="btn_label_top" value="txt_pw_a"/>
+		<param name="btn_led" value="led_pmod_pw_a"/>
+		<param name="btn_mask" value="0x02"/>
+		<group ref="button"><bounds x="197" y="50" width="38" height="52"/></group>
+
+		<param name="btn_label_top" value="txt_filter"/>
+		<param name="btn_led" value="led_pmod_filt"/>
+		<param name="btn_mask" value="0x04"/>
+		<group ref="button"><bounds x="235" y="50" width="38" height="52"/></group>
+
+		<element ref="txt_destination"><bounds x="189" y="94" width="54" height="8"/></element>
+		<element ref="txt_source_amount"><bounds x="57" y="101" width="68" height="8"/></element>
+
+		<!-- lfo -->
+
+		<param name="btn_input" value="switch_row_1"/>
+		<element ref="section_lfo"><bounds x="88" y="118" width="186" height="72"/></element>
+		<element ref="txt_lfo"><bounds x="167" y="114" width="28" height="10"/></element>
+
+		<param name="knob_label" value="txt_frequency"/>
+		<param name="knob_input" value="pot_1"/>
+		<group ref="knob"><bounds x="96" y="123" width="56" height="62"/></group>
+
+		<param name="wave" value="wave_ramp"/>
+		<param name="btn_led" value="led_lfo_saw"/>
+		<param name="btn_mask" value="0x08"/>
+		<group ref="wave_button"><bounds x="159" y="126" width="38" height="40"/></group>
+
+		<param name="wave" value="wave_triangle"/>
+		<param name="btn_led" value="led_lfo_tri"/>
+		<param name="btn_mask" value="0x10"/>
+		<group ref="wave_button"><bounds x="197" y="126" width="38" height="40"/></group>
+
+		<param name="wave" value="wave_square"/>
+		<param name="btn_led" value="led_lfo_sqr"/>
+		<param name="btn_mask" value="0x20"/>
+		<group ref="wave_button"><bounds x="235" y="126" width="38" height="40"/></group>
+
+		<element ref="txt_shape"><bounds x="201" y="170" width="30" height="8"/></element>
+
+		<!-- wheel mod -->
+
+		<param name="btn_style" value="btn_black"/>
+		<param name="btn_label_bottom" value="transparent"/>
+		<param name="btn_input" value="switch_row_2"/>
+
+		<element ref="section_wheelmod"><bounds x="24" y="194" width="250" height="72"/></element>
+		<element ref="txt_wheelmod"><bounds x="115" y="190" width="68" height="10"/></element>
+
+		<param name="knob_numbers" value="knob_numbers_5_5"/>
+		<param name="knob_label" value="txt_source_mix"/>
+		<param name="knob_input" value="pot_2"/>
+		<group ref="knob"><bounds x="32" y="199" width="56" height="62"/></group>
+		<param name="knob_numbers" value="knob_numbers_0_10"/>
+		<element ref="txt_lfo_r"><bounds x="32" y="246" width="10" height="7"/></element>
+		<element ref="txt_noise_l"><bounds x="78" y="246" width="20" height="7"/></element>
+
+		<param name="btn_label_top" value="txt_freq_a"/>
+		<param name="btn_led" value="led_wmod_freq_a"/>
+		<param name="btn_mask" value="0x01"/>
+		<group ref="button"><bounds x="83" y="202" width="38" height="52"/></group>
+
+		<param name="btn_label_top" value="txt_freq_b"/>
+		<param name="btn_led" value="led_wmod_freq_b"/>
+		<param name="btn_mask" value="0x02"/>
+		<group ref="button"><bounds x="121" y="202" width="38" height="52"/></group>
+
+		<param name="btn_label_top" value="txt_pw_a"/>
+		<param name="btn_led" value="led_wmod_pw_a"/>
+		<param name="btn_mask" value="0x04"/>
+		<group ref="button"><bounds x="159" y="202" width="38" height="52"/></group>
+
+		<param name="btn_label_top" value="txt_pw_b"/>
+		<param name="btn_led" value="led_wmod_pw_b"/>
+		<param name="btn_mask" value="0x08"/>
+		<group ref="button"><bounds x="197" y="202" width="38" height="52"/></group>
+
+		<param name="btn_label_top" value="txt_filter"/>
+		<param name="btn_led" value="led_wmod_filt"/>
+		<param name="btn_mask" value="0x10"/>
+		<group ref="button"><bounds x="235" y="202" width="38" height="52"/></group>
+
+		<element ref="txt_destination"><bounds x="151" y="246" width="54" height="8"/></element>
+
+		<!-- oscillator A -->
+
+		<param name="btn_style" value="btn_black"/>
+		<param name="btn_label_top" value="transparent"/>
+		<param name="btn_input" value="switch_row_0"/>
+
+		<element ref="section_osc_a"><bounds x="294" y="42" width="264" height="72"/></element>
+		<element ref="txt_oscillator_a"><bounds x="389" y="38" width="74" height="10"/></element>
+
+		<param name="knob_label" value="txt_frequency"/>
+		<param name="knob_input" value="pot_5"/>
+		<group ref="knob"><bounds x="302" y="47" width="56" height="62"/></group>
+
+		<param name="wave" value="wave_ramp"/>
+		<param name="btn_led" value="led_osc_a_saw"/>
+		<param name="btn_mask" value="0x02"/>
+		<group ref="wave_button"><bounds x="365" y="50" width="38" height="40"/></group>
+
+		<param name="wave" value="wave_square"/>
+		<param name="btn_led" value="led_osc_a_sqr"/>
+		<param name="btn_mask" value="0x01"/>
+		<group ref="wave_button"><bounds x="403" y="50" width="38" height="40"/></group>
+
+		<param name="knob_label" value="txt_pulse_width"/>
+		<param name="knob_input" value="pot_13"/>
+		<group ref="knob"><bounds x="453" y="47" width="56" height="62"/></group>
+
+		<param name="btn_label_bottom" value="txt_sync"/>
+		<param name="btn_led" value="led_osc_a_sync"/>
+		<param name="btn_mask" value="0x04"/>
+		<group ref="button"><bounds x="519" y="50" width="38" height="52"/></group>
+
+		<element ref="txt_shape"><bounds x="388" y="94" width="30" height="8"/></element>
+
+		<!-- oscillator B -->
+
+		<param name="btn_style" value="btn_black"/>
+		<param name="btn_label_top" value="transparent"/>
+		<param name="btn_input" value="switch_row_0"/>
+
+		<element ref="section_osc_b"><bounds x="294" y="118" width="408" height="72"/></element>
+		<element ref="txt_oscillator_b"><bounds x="462" y="114" width="74" height="10"/></element>
+
+		<param name="knob_label" value="txt_frequency"/>
+		<param name="knob_input" value="pot_6"/>
+		<group ref="knob"><bounds x="302" y="123" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_fine"/>
+		<param name="knob_input" value="pot_7"/>
+		<group ref="knob"><bounds x="366" y="123" width="56" height="62"/></group>
+
+		<param name="wave" value="wave_ramp"/>
+		<param name="btn_led" value="led_osc_b_saw"/>
+		<param name="btn_mask" value="0x08"/>
+		<group ref="wave_button"><bounds x="430" y="126" width="38" height="40"/></group>
+
+		<param name="wave" value="wave_triangle"/>
+		<param name="btn_led" value="led_osc_b_tri"/>
+		<param name="btn_mask" value="0x10"/>
+		<group ref="wave_button"><bounds x="468" y="126" width="38" height="40"/></group>
+
+		<param name="wave" value="wave_square"/>
+		<param name="btn_led" value="led_osc_b_sqr"/>
+		<param name="btn_mask" value="0x20"/>
+		<group ref="wave_button"><bounds x="506" y="126" width="38" height="40"/></group>
+
+		<element ref="txt_shape"><bounds x="468" y="170" width="30" height="8"/></element>
+
+		<param name="knob_label" value="txt_pulse_width"/>
+		<param name="knob_input" value="pot_11"/>
+		<group ref="knob"><bounds x="554" y="123" width="56" height="62"/></group>
+
+		<param name="btn_label_bottom" value="txt_keyboard"/>
+		<param name="btn_led" value="led_osc_b_kbd"/>
+		<param name="btn_mask" value="0x40"/>
+		<group ref="button"><bounds x="656" y="126" width="38" height="52"/></group>
+
+		<param name="btn_label_bottom" value="txt_lo_freq"/>
+		<param name="btn_led" value="led_osc_b_lo"/>
+		<param name="btn_input" value="switch_row_2"/>
+		<param name="btn_mask" value="0x20"/>
+		<group ref="button"><bounds x="618" y="126" width="38" height="52"/></group>
+
+		<!-- mixer -->
+
+		<element ref="section_mixer"><bounds x="578" y="42" width="208" height="72"/></element>
+		<element ref="txt_mixer"><bounds x="664" y="38" width="36" height="10"/></element>
+
+		<param name="knob_label" value="txt_osc_a"/>
+		<param name="knob_input" value="pot_12"/>
+		<group ref="knob"><bounds x="586" y="47" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_osc_b"/>
+		<param name="knob_input" value="pot_10"/>
+		<group ref="knob"><bounds x="654" y="47" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_noise"/>
+		<param name="knob_input" value="pot_14"/>
+		<group ref="knob"><bounds x="722" y="47" width="56" height="62"/></group>
+
+		<!-- filter-->
+
+		<element ref="section_filter"><bounds x="806" y="42" width="288" height="148"/></element>
+		<element ref="txt_filter"><bounds x="930" y="38" width="40" height="10"/></element>
+
+		<param name="knob_label" value="txt_cutoff"/>
+		<param name="knob_input" value="pot_8"/>
+		<group ref="knob"><bounds x="826" y="47" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_resonance"/>
+		<param name="knob_input" value="pot_15"/>
+		<group ref="knob"><bounds x="890" y="47" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_env_amt"/>
+		<param name="knob_input" value="pot_9"/>
+		<group ref="knob"><bounds x="954" y="47" width="56" height="62"/></group>
+
+		<param name="btn_label_top" value="transparent"/>
+		<param name="btn_label_bottom" value="txt_keyboard"/>
+		<param name="btn_led" value="led_filt_kbd"/>
+		<param name="btn_input" value="switch_row_1"/>
+		<param name="btn_mask" value="0x40"/>
+		<group ref="button"><bounds x="1027" y="50" width="38" height="52"/></group>
+
+		<param name="knob_label" value="txt_attack"/>
+		<param name="knob_input" value="pot_16"/>
+		<group ref="knob"><bounds x="826" y="123" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_decay"/>
+		<param name="knob_input" value="pot_17"/>
+		<group ref="knob"><bounds x="890" y="123" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_sustain"/>
+		<param name="knob_input" value="pot_18"/>
+		<group ref="knob"><bounds x="954" y="123" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_release"/>
+		<param name="knob_input" value="pot_19"/>
+		<group ref="knob"><bounds x="1018" y="123" width="56" height="62"/></group>
+
+		<!-- amplifier -->
+
+		<element ref="section_amp"><bounds x="1108" y="118" width="264" height="72"/></element>
+		<element ref="txt_amp"><bounds x="1211" y="114" width="56" height="10"/></element>
+
+		<param name="knob_label" value="txt_attack"/>
+		<param name="knob_input" value="pot_20"/>
+		<group ref="knob"><bounds x="1116" y="123" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_decay"/>
+		<param name="knob_input" value="pot_21"/>
+		<group ref="knob"><bounds x="1180" y="123" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_sustain"/>
+		<param name="knob_input" value="pot_22"/>
+		<group ref="knob"><bounds x="1244" y="123" width="56" height="62"/></group>
+
+		<param name="knob_label" value="txt_release"/>
+		<param name="knob_input" value="pot_23"/>
+		<group ref="knob"><bounds x="1308" y="123" width="56" height="62"/></group>
+
+		<!-- cassette -->
+
+		<param name="btn_style" value="btn_grey"/>
+		<param name="btn_input" value="switch_row_4"/>
+
+		<element ref="section_cass"><bounds x="1250" y="42" width="122" height="72"/></element>
+		<element ref="txt_cass"><bounds x="1283" y="38" width="56" height="10"/></element>
+
+		<param name="btn_label_top" value="txt_save"/>
+		<param name="btn_label_bottom" value="txt_to_tape"/>
+		<param name="btn_led" value="led_to_cass"/>
+		<param name="btn_mask" value="0x10"/>
+		<group ref="button"><bounds x="1253" y="50" width="38" height="52"/></group>
+
+		<param name="btn_label_top" value="txt_load"/>
+		<param name="btn_label_bottom" value="txt_from_tape"/>
+		<param name="btn_led" value="led_from_cass"/>
+		<param name="btn_mask" value="0x20"/>
+		<group ref="button"><bounds x="1317" y="50" width="38" height="52"/></group>
+
+		<!-- programmer -->
+
+		<element ref="section_programmer"><bounds x="516" y="194" width="578" height="72"/></element>
+		<element ref="txt_programmer"><bounds x="767" y="190" width="76" height="10"/></element>
+
+		<param name="btn_style" value="btn_grey"/>
+		<param name="btn_label_top" value="transparent"/>
+		<param name="btn_label_bottom" value="txt_preset"/>
+		<param name="btn_led" value="led_preset"/>
+		<param name="btn_input" value="switch_row_4"/>
+		<param name="btn_mask" value="0x80"/>
+		<group ref="button"><bounds x="518" y="202" width="38" height="52"/></group>
+
+		<param name="btn_style" value="btn_orange"/>
+		<param name="btn_label_bottom" value="txt_record"/>
+		<param name="btn_led" value="led_record"/>
+		<param name="btn_mask" value="0x01"/>
+		<group ref="button"><bounds x="595" y="202" width="38" height="52"/></group>
+
+		<element ref="btn_grey" inputtag="switch_row_4" inputmask="0x02">
+			<bounds x="680" y="214" width="22" height="28"/>
+		</element>
+		<element ref="txt_bank"><bounds x="672" y="246" width="38" height="8"/></element>
+		<element ref="txt_select"><bounds x="672" y="254" width="38" height="8"/></element>
+
+		<element ref="display"><bounds x="730" y="214" width="40" height="30"/></element>
+		<element ref="digit" name="digit0"><bounds x="731" y="215" width="18" height="28"/></element>
+		<element ref="digit" name="digit1"><bounds x="751" y="215" width="18" height="28"/></element>
+		<element ref="txt_bank"><bounds x="724" y="246" width="24" height="8"/></element>
+		<element ref="txt_program"><bounds x="753" y="246" width="36" height="8"/></element>
+
+		<param name="btn_style" value="btn_grey"/>
+		<param name="btn_label_bottom" value="transparent"/>
+		<param name="btn_input" value="switch_row_3"/>
+		<repeat count="8">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="788" increment="38"/>
+			<param name="btn_led" value="led_ps~i~"/>
+			<param name="btn_mask" start="0x01" lshift="1"/>
+			<param name="btn_label_top" value="txt_~i~"/>
+			<group ref="button"><bounds x="~x~" y="202" width="38" height="52"/></group>
+		</repeat>
+
+		<element ref="txt_prog_sel"><bounds x="903" y="246" width="74" height="8"/></element>
+
+		<!-- knobs and buttons outside of any sections -->
+
+		<param name="knob_label" value="txt_glide"/>
+		<param name="knob_input" value="pot_0"/>
+		<group ref="knob"><bounds x="302" y="199" width="56" height="62"/></group>
+
+		<param name="btn_style" value="btn_black"/>
+		<param name="btn_label_top" value="transparent"/>
+		<param name="btn_label_bottom" value="txt_unison"/>
+		<param name="btn_led" value="led_unison"/>
+		<param name="btn_input" value="switch_row_0"/>
+		<param name="btn_mask" value="0x80"/>
+		<group ref="button"><bounds x="404" y="202" width="38" height="52"/></group>
+
+		<param name="knob_style" value="knob_silver"/>
+		<param name="knob_label" value="txt_master_tune"/>
+		<param name="knob_input" value="pot_tune"/>
+		<param name="knob_numbers" value="knob_numbers_5_5"/>
+		<group ref="knob"><bounds x="1116" y="47" width="56" height="62"/></group>
+
+		<param name="btn_style" value="btn_grey"/>
+		<param name="btn_label_bottom" value="txt_A440"/>
+		<param name="btn_led" value="led_a_440"/>
+		<param name="btn_input" value="switch_row_4"/>
+		<param name="btn_mask" value="0x04"/>
+		<group ref="button"><bounds x="1189" y="50" width="38" height="52"/></group>
+
+		<param name="btn_style" value="btn_black"/>
+		<param name="btn_label_bottom" value="txt_release"/>
+		<param name="btn_led" value="led_release"/>
+		<param name="btn_input" value="switch_row_1"/>
+		<param name="btn_mask" value="0x80"/>
+		<group ref="button"><bounds x="1125" y="202" width="38" height="52"/></group>
+
+		<param name="knob_label" value="txt_volume"/>
+		<param name="knob_input" value="pot_volume"/>
+		<param name="knob_numbers" value="knob_numbers_0_10"/>
+		<group ref="knob"><bounds x="1212" y="199" width="56" height="62"/></group>
+
+		<param name="btn_style" value="btn_grey"/>
+		<param name="btn_label_bottom" value="txt_tune"/>
+		<param name="btn_led" value="led_tune"/>
+		<param name="btn_input" value="switch_row_4"/>
+		<param name="btn_mask" value="0x08"/>
+		<group ref="button"><bounds x="1317" y="202" width="38" height="52"/></group>
+
+		<!-- keyboard -->
+
+		<param name="kbd_input_1" value="switch_row_8"/>
+		<param name="kbd_input_2" value="switch_row_9"/>
+		<group ref="octave_var1"><bounds x="148" y="384" width="236" height="202"/></group>
+
+		<param name="kbd_input_1" value="switch_row_9"/>
+		<param name="kbd_input_2" value="switch_row_10"/>
+		<group ref="octave_var2"><bounds x="386" y="384" width="236" height="202"/></group>
+
+		<param name="kbd_input_1" value="switch_row_11"/>
+		<param name="kbd_input_2" value="switch_row_12"/>
+		<group ref="octave_var1"><bounds x="624" y="384" width="236" height="202"/></group>
+
+		<param name="kbd_input_1" value="switch_row_12"/>
+		<param name="kbd_input_2" value="switch_row_13"/>
+		<group ref="octave_var2"><bounds x="862" y="384" width="236" height="202"/></group>
+
+		<param name="kbd_input_1" value="switch_row_14"/>
+		<param name="kbd_input_2" value="switch_row_15"/>
+		<group ref="octave_var1"><bounds x="1100" y="384" width="236" height="202"/></group>
+
+		<element ref="whitekey" inputtag="switch_row_15" inputmask="0x10">
+			<bounds x="1338" y="384" width="32" height="202"/>
+		</element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Default Layout"]
+				install_slider_callbacks(view)
+
+				add_slider(view, "wheel_pitch", "wheel_pitch_dent", "wheel_pitch")
+				add_slider(view, "wheel_mod", "wheel_mod_dent", "wheel_mod")
+
+				local knob_scale = 1.6
+				add_knob(view, "pot_tune", "pot_tune", knob_scale, VERTICAL)
+				add_knob(view, "pot_volume", "pot_volume", knob_scale, VERTICAL)
+
+				for i = 0, 23 do
+					local knob = "pot_" .. i
+					add_knob(view, knob, knob, knob_scale, VERTICAL)
+				end
+
+				view.items["warning"]:set_state(0)
+			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		VERTICAL = 0
+		HORIZONTAL = 1
+
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction)
+			table.insert(widgets, {
+				clickarea     = get_layout_item(view, clickarea_id),
+				field         = get_port_field(port_name),
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL) })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
+			if field == nil then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			return field
+		end
+
+		local function release_pointer(pointer_id)
+			if pointers[pointer_id] then
+				local field = widgets[pointers[pointer_id].selected_widget].field
+				if field.is_analog then
+					field:clear_value()
+				end
+			end
+			pointers[pointer_id] = nil
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				release_pointer(id)
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_x = x,
+							start_y = y,
+							start_value = widgets[i].field.port:read() }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's position.
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function forget_pointers()
+			for id, pointer in pairs(pointers) do
+				release_pointer(id)
+			end
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
+</mamelayout>

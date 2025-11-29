@@ -5,17 +5,22 @@
 */
 
 #include "emu.h"
+
+#include "teleprinter.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/patinhofeio/patinhofeio_cpu.h"
-#include "teleprinter.h"
+
 #include "softlist.h"
 
 #include "patinho.lh"
 
+
 namespace {
 
-class patinho_feio_state : public driver_device {
+class patinho_feio_state : public driver_device
+{
 public:
 	patinho_feio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -25,7 +30,15 @@ public:
 		, m_mode_button(*this, "MODE_BUTTON%u", 0U)
 	{ }
 
-	void init_patinho_feio();
+	void init_patinho_feio() ATTR_COLD;
+
+	void patinho_feio(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	void load_tape(const char* name);
+	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
 
 	void decwriter_data_w(uint8_t data);
 	void decwriter_kbd_input(u8 data);
@@ -38,13 +51,6 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( tape_load );
 
 	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);
-
-	void patinho_feio(machine_config &config);
-protected:
-	virtual void machine_start() override ATTR_COLD;
-
-	void load_tape(const char* name);
-	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
 
 	required_device<patinho_feio_cpu_device> m_maincpu;
 	required_device<teleprinter_device> m_decwriter;

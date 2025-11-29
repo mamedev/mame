@@ -11,6 +11,13 @@
  *   V53 (µPD70236)    V33 (µPD70136)
  *   V53A (µPD70236A)  V33A (µPD70136A)
  *
+ *   V40HL and V50HL (µPD70208h and µPD70216h) exist and have additional
+ *   features like the V53.
+ *   In particular, they have a V53 binary compatible SCTL register at $FFF7,
+ *   including 8/16 bit select and SCU clock source select.  They also have
+ *   the same independent baud rate generator as the V53.  If those variants
+ *   are added, that needs to be hooked up for proper emulation.
+ *
  * The peripherals are nearly identical between all four devices:
  *
  *   Name  Description             Device
@@ -135,12 +142,38 @@ void device_v5x_interface::TCKS_w(u8 data)
 void device_v5x_interface::interface_clock_changed(bool sync_on_new_clock_domain)
 {
 	tcu_clock_update();
+	brc_update();
 }
 
 void device_v5x_interface::tcu_clock_update()
 {
 	for (int i = 0; i < 3; i++)
 		m_tcu->set_clockin(i, BIT(m_TCKS, i + 2) ? m_tclk : device().clock() / double(4 << (m_TCKS & 3)));
+}
+
+void device_v5x_interface::BRC_w(u8 data)
+{
+	m_BRC = data;
+	brc_update();
+}
+
+void device_v5x_interface::brc_update()
+{
+	if (m_brc_enable)
+	{
+		const int divider = (m_BRC < 2) ? 2 : m_BRC;
+		const int period = (device().clock() / 2) / divider;
+
+		m_brc_timer->adjust(attotime::from_hz(period), 0, attotime::from_hz(period));
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(device_v5x_interface::brc_timer_tick)
+{
+	m_scu->write_txc(0);
+	m_scu->write_txc(1);
+	m_scu->write_rxc(0);
+	m_scu->write_rxc(1);
 }
 
 void device_v5x_interface::tclk_w(int state)
@@ -163,8 +196,10 @@ void device_v5x_interface::interface_pre_reset()
 	m_IULA = 0x00;
 	m_DULA = 0x00;
 	m_OPHA = 0x00;
+	m_BRC  = 0x00;
 
 	m_TCKS = 0x00;
+	m_brc_enable = false;
 	tcu_clock_update();
 }
 
@@ -177,6 +212,8 @@ void device_v5x_interface::interface_post_start()
 	device().save_item(NAME(m_DULA));
 	device().save_item(NAME(m_OPHA));
 	device().save_item(NAME(m_TCKS));
+	device().save_item(NAME(m_BRC));
+	device().save_item(NAME(m_brc_enable));
 }
 
 void device_v5x_interface::interface_post_load()
@@ -221,6 +258,9 @@ void device_v5x_interface::v5x_add_mconfig(machine_config &config)
 	m_icu->read_slave_ack_callback().set(FUNC(device_v5x_interface::get_pic_ack));
 
 	V5X_SCU(config, m_scu, 0);
+
+	TIMER(config, m_brc_timer, 0);
+	m_brc_timer->set_callback(FUNC(device_v5x_interface::brc_timer_tick));
 }
 
 void device_v5x_interface::remappable_io_map(address_map &map)
@@ -228,12 +268,13 @@ void device_v5x_interface::remappable_io_map(address_map &map)
 	map(0, INTERNAL_IO_ADDR_MASK).rw(FUNC(device_v5x_interface::temp_io_byte_r), FUNC(device_v5x_interface::temp_io_byte_w));
 }
 
-device_v5x_interface::device_v5x_interface(const machine_config &mconfig, nec_common_device &device, bool is_16bit)
+device_v5x_interface::device_v5x_interface(const machine_config &mconfig, nec_common_device &device, u32 clock, bool is_16bit)
 	: device_interface(device, "v5x")
 	, m_tcu(device, "tcu")
 	, m_dmau(device, "dmau")
 	, m_icu(device, "icu")
 	, m_scu(device, "scu")
+	, m_brc_timer(device, "brc_timer")
 	, m_internal_io_config("internal_io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, INTERNAL_IO_ADDR_WIDTH, 0, address_map_constructor(FUNC(device_v5x_interface::remappable_io_map), this))
 	, m_tclk(0.0)
 	, m_OPSEL(0)
@@ -243,6 +284,7 @@ device_v5x_interface::device_v5x_interface(const machine_config &mconfig, nec_co
 	, m_DULA(0)
 	, m_OPHA(0)
 	, m_TCKS(0)
+	, m_brc_enable(false)
 {
 }
 
@@ -528,7 +570,7 @@ device_memory_interface::space_config_vector v50_base_device::memory_space_confi
 
 v50_base_device::v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type)
 	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
-	, device_v5x_interface(mconfig, *this, is_16bit)
+	, device_v5x_interface(mconfig, *this, clock, is_16bit)
 	, m_tout1_callback(*this)
 	, m_icu_slave_ack(*this, 0)
 	, m_OPCN(0)
@@ -550,7 +592,7 @@ v50_device::v50_device(const machine_config &mconfig, const char *tag, device_t 
 
 void v53_device::tout1_w(int state)
 {
-	if (!BIT(m_SCTL, 0))
+	if (!BIT(m_SCTL, 4))
 	{
 		m_scu->write_rxc(state);
 		m_scu->write_txc(state);
@@ -635,7 +677,17 @@ void v53_device::SCTL_w(u8 data)
 
 	LOG("SCTL_w %02x\n", data);
 	m_SCTL = data & 0x1f;
+	m_brc_enable = BIT(data, 4);
 	install_peripheral_io();
+
+	if (m_brc_enable)
+	{
+		brc_update();
+	}
+	else
+	{
+		m_brc_timer->adjust(attotime::never, 0, attotime::never);
+	}
 }
 
 void v53_device::device_reset()
@@ -817,7 +869,7 @@ device_memory_interface::space_config_vector v53_device::memory_space_config() c
 
 v53_device::v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: v33_base_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(v53_device::internal_port_map), this))
-	, device_v5x_interface(mconfig, *this, true)
+	, device_v5x_interface(mconfig, *this, clock, true)
 	, m_sint_w(*this)
 	, m_tout1_w(*this)
 {

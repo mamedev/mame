@@ -1686,6 +1686,26 @@ static INPUT_PORTS_START( pacmansp )
 	PORT_DIPSETTING(    0x00, "Hard (Invalid)" ) // breaks the attract screen on this version
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( newpuc2 )
+	PORT_INCLUDE(pacman)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x30, 0x00, DEF_STR(Bonus_Life))   PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(0x00, "20000")
+	PORT_DIPSETTING(0x10, "25000")
+	PORT_DIPSETTING(0x20, "30000")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(newpuc2b)
+	PORT_INCLUDE(pacman)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x30, 0x00, DEF_STR(Bonus_Life))   PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(0x00, "30000")
+	PORT_DIPSETTING(0x10, "60000")
+	PORT_DIPSETTING(0x20, "90000")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pacmanpe )
 	PORT_INCLUDE( pacman )
 
@@ -8906,8 +8926,8 @@ GAME( 1981, pacmod,    puckman,  pacman,   pacman,   pacman_state,  empty_init, 
 GAME( 1981, pacmanjpm, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (JPM)",                     "Pac-Man (JPM bootleg)",                                    MACHINE_SUPPORTS_SAVE ) // aka 'Muncher', UK bootleg, JPM later made fruit machines etc.
 GAME( 1981, pacmanmr,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (Model Racing)",            "Pac-Man (Model Racing bootleg)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacmanpe,  puckman,  pacman,   pacmanpe, pacman_state,  empty_init,    ROT90,  "bootleg (Petaco SA)",               "Come Come (Petaco SA bootleg of Puck Man)",                MACHINE_SUPPORTS_SAVE ) // might have a speed-up button, check
-GAME( 1980, newpuc2,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 1)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, newpuc2b,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 2)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuc2,   puckman,  pacman,   newpuc2,  pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 1)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuc2b,  puckman,  pacman,   newpuc2b, pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 2)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1980, newpuckx,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "New Puck-X",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacheart,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Pac-Man (Hearts)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1981, bucaner,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Video Research)",             "Buccaneer (set 1)",                                        MACHINE_SUPPORTS_SAVE )

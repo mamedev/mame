@@ -32,13 +32,18 @@ TODO:
 // device type definition
 DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K sound card")
 
-pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_26, tag, owner, clock)
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opn(*this, "opn")
 	, m_joy(*this, "joy_p%u", 1U)
 	, m_bios(*this, "bios")
 	, m_irq_jp(*this, "JP6A1_JP6A3")
+{
+}
+
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_26_device(mconfig, PC9801_26, tag, owner, clock)
 {
 }
 

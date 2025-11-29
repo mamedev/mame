@@ -1,5 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+/*
+TODO:
+* POST gives "ERROR H" with 64K RAM (you can press Enter to get past
+  it).
+* Cartridge BASIC always rejects "SCREEN 4" (320*200 4BPP) and
+  "SCREEN 5" (640*200 2BPP).  These are graphics modes that require at
+  least 128K RAM.  However, it does accept "WIDTH 80" when 128K or more
+  RAM is present, so it isn't just failing to detect the RAM size
+  altogether.
+* IBM JX (5510) is a completely different machine and should be moved
+  out of this driver and emulated properly.
+*/
 #include "emu.h"
 
 #include "pc_t1t.h"
@@ -43,6 +55,7 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
+		m_sn76496(*this, "sn76496"),
 		m_cart1(*this, "cartslot1"),
 		m_cart2(*this, "cartslot2"),
 		m_ram(*this, RAM_TAG),
@@ -72,6 +85,7 @@ private:
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<sn76496_device> m_sn76496;
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_device<ram_device> m_ram;
@@ -142,17 +156,21 @@ void pcjr_state::machine_start()
 	m_pcjr_watchdog = timer_alloc(FUNC(pcjr_state::watchdog_expired), this);
 	m_keyb_signal_timer = timer_alloc(FUNC(pcjr_state::kb_signal), this);
 
-	// TODO: JX isn't emulated properly at all, and should probably be moved to a separate driver
-	// TODO: PCjr video RAM maps to main RAM differently when only 64K is present
-	// * ERROR H on boot with 64K RAM due to incorrect mapping
-	// * 64kought should have glitches in 320*200*4 and 640*200*2 scenes with 64K RAM
+	// TODO: JX isn't emulated properly at all, and should be moved to a separate driver
 	memory_share *const vram = memshare("vram");
 	if (vram)
+	{
+		m_video->set_16bit(true);
 		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, vram->bytes() - 1), &vram[0]);
-	else if (ramsize > (64 * 1024))
-		vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, ramsize - 1), m_ram->pointer());
+	}
 	else
-		vram_space.install_ram(0, ramsize - 1, 0x010000, m_ram->pointer());
+	{
+		m_video->set_16bit(ramsize > (64 * 1024));
+		if (ramsize > (64 * 1024))
+			vram_space.install_ram(0, std::min<offs_t>((128 * 1024) - 1, ramsize - 1), m_ram->pointer());
+		else
+			vram_space.install_ram(0, ramsize - 1, 0x010000, m_ram->pointer());
+	}
 }
 
 void pcjr_state::machine_reset()
@@ -348,6 +366,15 @@ void pcjr_state::pcjr_ppi_portb_w(uint8_t data)
 	pc_speaker_set_spkrdata(data & 0x02);
 
 	m_cassette->change_state((data & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+
+	// PB5 & PB6 control MC14529B Dual 4-Channel Analog Data Selector:
+	// X0 - TIMER AUDIO
+	// X1 - CASS AUDIO TO MUX
+	// X2 - AUDIO INPUT
+	// X3 - SN76496N AUDIO
+	m_speaker->set_output_gain(0, (data & 0x60) == 0x00 ? 1.0 : 0.0);
+	m_cassette->set_output_gain(0, (data & 0x60) == 0x20 ? 1.0 : 0.0);
+	m_sn76496->set_output_gain(0, (data & 0x60) == 0x60 ? 1.0 : 0.0);
 }
 
 /*
@@ -591,7 +618,7 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x00a0, 0x00a0).rw(FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::write));
+	map(0x00c0, 0x00c0).w(m_sn76496, FUNC(sn76496_device::write));
 	map(0x00f2, 0x00f2).w(FUNC(pcjr_state::pcjr_fdc_dor_w));
 	map(0x00f4, 0x00f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
@@ -668,8 +695,8 @@ void pcjr_state::ibmpcjr(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
-	SN76496(config, "sn76496", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
+	SN76496(config, m_sn76496, XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* printer */
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
@@ -682,7 +709,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, false); // clocked through SED9420C
 
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 

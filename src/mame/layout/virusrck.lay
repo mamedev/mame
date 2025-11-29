@@ -78,8 +78,8 @@ license:CC0-1.0
 		     currently unsupported element rotations with arbitrary angles:
 
 		<rect>
-			<color red="0.6" green="0.6" blue="0.6"/>
-			<bounds x="22" y="2" width="3" height="12"/>
+		    <color red="0.6" green="0.6" blue="0.6"/>
+		    <bounds x="22" y="2" width="3" height="12"/>
 		</rect>
 		-->
 
@@ -378,9 +378,9 @@ license:CC0-1.0
 		<element ref="program_text"><bounds x="890" y="158" width="34" height="9"/></element>
 
 		<!-- NOTE:
-			The exact positioning of buttons is not very precise. Here I use non-zero values for x and y
-			just to get a resonable result (something that looks good, even though it is not precise).
-			Someday someone (myself, perhaps?!) should fine-tune this layout to more closely match the exact coordinates.
+		    The exact positioning of buttons is not very precise. Here I use non-zero values for x and y
+		    just to get a resonable result (something that looks good, even though it is not precise).
+		    Someday someone (myself, perhaps?!) should fine-tune this layout to more closely match the exact coordinates.
 		-->
 		<element ref="outlines"><bounds x="20" y="1" width="1700" height="180"/></element>
 		<element ref="rack_r_text"><bounds x="1163" y="-10" width="61" height="190"/></element>
