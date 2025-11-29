@@ -2389,27 +2389,25 @@ INPUT_PORTS_END
  *
  **********************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
+void model2_state::screen_vblank(int state)
 {
-	int scanline = param;
+	if (!state)
+		return;
 
-	if(scanline == 384)
+	m_framenum = m_screen->frame_number();
+
+	// if 60 Hz mode or frame number is even, trigger geometrizer to start new frame
+	if ((m_videocontrol & 1) == 0 || (m_framenum & 1) == 0)
+		geo_parse();
+
+	const u32 line = 1 << 0;
+	if (m_intena & line)
 	{
-		m_framenum = m_screen->frame_number();
-
-		// if 60 Hz mode or frame number is even, trigger geometrizer to start new frame
-		if ((m_videocontrol & 1) == 0 || (m_framenum & 1) == 0)
-			geo_parse();
-
-		const u32 line = 1 << 0;
-		if (m_intena & line)
-		{
-			m_intreq |= line;
-			irq_update();
-		}
-		if (m_m2comm != nullptr)
-			m_m2comm->check_vint_irq();
+		m_intreq |= line;
+		irq_update();
 	}
+	if (m_m2comm != nullptr)
+		m_m2comm->check_vint_irq();
 }
 
 void model2_state::sound_ready_w(int state)
@@ -2493,6 +2491,7 @@ void model2_state::model2_screen(machine_config &config)
 	// TODO: from System 24, might not be accurate for Model 2
 	m_screen->set_raw(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
 	m_screen->set_screen_update(FUNC(model2_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(model2_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_entries(8192);
 }
@@ -2524,8 +2523,6 @@ void model2o_state::model2o(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2o_state::copro_tgp_prog_map);
@@ -2677,7 +2674,6 @@ void model2a_state::model2a(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2a_state::copro_tgp_prog_map);
@@ -2813,8 +2809,6 @@ void model2b_state::model2b(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
-
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	ADSP21062(config, m_copro_adsp, 32_MHz_XTAL);
 	m_copro_adsp->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
@@ -2968,7 +2962,6 @@ void model2c_state::model2c(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86235(config, m_copro_tgpx4, 20_MHz_XTAL);
 	m_copro_tgpx4->set_addrmap(AS_PROGRAM, &model2c_state::copro_tgpx4_map);
