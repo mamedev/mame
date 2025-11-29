@@ -1,62 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, James Wallace, blueonesarefaster
+
 /* Bellfruit SWP (Skill With Prizes) Video hardware
     aka Cobra 3
 
-*/
-
-/* Radio Times readme #1
----------------------------------------------
-
-Music TR9C1710 (Video RAMDAC)
-
-Part number :   STV8438CV
- Manufacture :  ST Microelectronics
-Specification(s)
- Description :   8-Bit Triple DAC with Analog Switch
- Package :   PQFP44
-
-MC68340 : Integrated Processor with DMA
- The MC68340 is a high-performance 32-bit integrated processor with direct memory access (DMA), combining an enhanced M68000-compatible processor, 32-bit DMA, and other peripheral subsystems on a single integrated circuit. The MC68340 CPU32 delivers 32-bit CISC processor performance from a lower cost 16-bit memory system. The combination of peripherals offered in the MC68340 can be found in a diverse range of microprocessor-based systems. Systems requiring very high-speed block transfers of data can benefit from the MC68340.
-
- Block Diagram
-
-
-MC68340 Features
-CPU32 Core
-Two-Channel DMA Controller
-DUART Compatible with 68681
-Two 16-Bit Timer/Counters
-Four Chip Selects
-System Integration
-32 Address Lines, 16 Data Lines
-Low Power Management
-4.8 MIPS @ 25 MHz
-Available in 16 and 25 MHz
-Available in 3.3 and 5V
-
-
-l5380 -scsi controller
-
-ymz280b - in MAME - sound chip
-
-audio board
-
-75585116 - PALCE 16V8H
-75585118 - PALCE 16V8H
-
-TI introduce the TMS320AV110 MPEG audio decoder based on TI's 16 bits
-
-roms (RadioTimes)
-
-game 95 400 009 type swp left ver. radt 1.1 - ST 27C4001
-game 95 400 010 type swp right ver. radt 1.1 - ST 27C4001
-95 004 056 sound left - ST 27C4001
-95 004 057 sound right - AM 27C040
-
-cd
-
-version 95-100-302
+   TODO: MPEG decoding currently not implemented
+         Checksum fails for all games, looks like a CPU bug
 */
 
 
@@ -138,19 +87,19 @@ uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 
 	switch ( cs )
 	{
-		case 1: //ROM
+		case 1: // ROM
 			return m_cpuregion[offset & 0x7ffff];
-		case 2://RAM
+		case 2:// (NV)RAM
 			return m_mainram[offset & 0x1fff];
 
-		case 3: //I/O 00ac0000-00ac07ff
+		case 3: // I/O
 			{
 				offset &= 0x7ff;
 				offs_t cs_addr_8_11 = (offset * 2) & 0xf00;
 
 				switch(cs_addr_8_11)
 				{
-					case 0x300: //ac0300
+					case 0x300: //YMZ stereo sound accesses
 						if(ACCESSING_BITS_0_7)
 						{
 							return m_ymz->read(offset & 1);
@@ -158,7 +107,7 @@ uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 						break;
 
 					case 0x400:
-						//input reads
+						//input reads, haven't got far enough to trigger any
 						break;
 
 					case 0x500: //SCSI DMA
@@ -177,23 +126,23 @@ uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 							}
 						}
 						break;
-						
+
 					default:
-						logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+						logerror("%s maincpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 						break;
 				}
 			}
 			break;
 
-		case 4: //0x00b10000 SCSI controller
+		case 4: // SCSI controller
 				if(ACCESSING_BITS_8_15)
 				{
-					return(m_scsic->read(offset & 0x0f)<<8);
+					return(m_scsic->read(offset & 0x0f) << 8);
 				}
 				break;
 
 		default:
-				logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
+				logerror("%s maincpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 	}
 
 	return 0x0000;
@@ -206,34 +155,33 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 
 	switch (cs)
 	{
-		case 1://ROM, shouldn't write here?
-				logerror("%08x maincpu write access(1) offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+		case 1:// ROM, shouldn't write here?
+				logerror("%sx maincpu write access(1) offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
 				break;
-			
-		case 2://RAM
+
+		case 2:// (NV)RAM
 				COMBINE_DATA(&m_mainram[offset & 0x1fff]);
 				break;
-			
-		case 3: //00ac0000-00ac07ff I/O
+
+		case 3: // I/O
 			{
 				offset &= 0x7ff;
 				offs_t cs_addr_8_11 = (offset * 2) & 0xf00;
-
 				switch(cs_addr_8_11)
 				{
 					case 0x000:
-						// lamps0_15_w(data);
+						// lamps;
 						break;
 
 					case 0x100:
 						if(ACCESSING_BITS_8_15)
 						{
-							//coin lockout and optional vfd
+							// coin lockout and optional vfd (debug only?)
 						}
 						break;
 
 					case 0x200:
-						//volume, watchdog and other stuff ?
+						// volume, watchdog and other stuff ? That's where it would be elsewhere
 						break;
 
 					case 0x300:
@@ -243,14 +191,14 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 						}
 						break;
 
-					case 0x500://SCSI DMA
+					case 0x500: // SCSI DMA
 						if(ACCESSING_BITS_8_15)
 						{
 							m_scsic->dma_w(data >> 8);
 						}
 						break;
 
-					case 0x700:
+					case 0x700: // RAMDAC for palettes
 						if(ACCESSING_BITS_0_7)
 						{
 							offset &= 7;
@@ -274,21 +222,21 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 						break;
 
 					default:
-						// coin divert, hoppers, note validator
-						logerror("%08x maincpu write access(3) offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
+						// coin divert, hoppers, note validator must be somewhere
+						logerror("%s maincpu write access(3) offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
 						break;
 				}
 			}
 			break;
-			
-		case 4: //0x00b10000 SCSI controller
+
+		case 4: // SCSI controller
 				offset &= 0x0f;
 				if(ACCESSING_BITS_8_15)
 				{
 					m_scsic->write(offset, data >> 8);
 				}
 				break;
-		
+
 		default:
 				logerror("%08x maincpu write access(0) offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
 				break;
@@ -313,7 +261,7 @@ void bfm_cobra3_state::scc66470_map(address_map &map)
 }
 
 static INPUT_PORTS_START( bfm_cobra3 )
-	//TODO: Fix inputs
+	// TODO: Fix inputs
 	PORT_START("STROBE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3)
@@ -372,7 +320,7 @@ static void cobra_scsi_devices(device_slot_interface &device)
 
 void bfm_cobra3_state::dma1_drq(int state)
 {
-	//? Can't see this
+	// Triggers, but seems not to do anything, may be CPU bug related.
 }
 
 void bfm_cobra3_state::scc66470_irq(int state)
@@ -386,19 +334,16 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	{
 		if(cliprect.min_y == cliprect.max_y)
 		{
-			uint32_t *dest;
-			uint8_t *src;
+			uint32_t *dest = &bitmap.pix(cliprect.min_y);
 			uint8_t buffer[768];
-
-			dest = &bitmap.pix(cliprect.min_y);
-
+			uint8_t *src = buffer;
 			m_scc66470->line(cliprect.min_y, buffer, sizeof(buffer));
 
 			src = buffer;
 
 			if(*src == 254)
 			{
-				// Other implementation suggests MPEG border colour here to ease blending
+				// Other implementations suggest leaving transparency / MPEG border colour here to ease blending
 				src += 32;
 			}
 			else
@@ -406,7 +351,7 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 				dest = std::fill_n(dest, 32, m_palette->pen(*src));
 				src += 32;
 			}
-			
+
 			/* mpeg video has significant overscan, 4 lines either side.
 
 			Just crop it out to fit, presume the chip does this IRL */
@@ -415,7 +360,7 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			{
 				if(*src == 254)
 				{
-					*dest++ = 0; //Will allow MPEG to be drawn i.e. transparent
+					*dest++ = 0; // Will allow MPEG to be drawn i.e. transparent
 					src++;
 				}
 				else
@@ -425,7 +370,7 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 				if(*src == 254)
 				{
-					*dest++ = 0; // this should be mpeg video pixel - 0 = transparent
+					*dest++ = 0; // This should be mpeg video pixel i.e. transparent
 					src++;
 				}
 				else
@@ -435,7 +380,7 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			}
 			if(*src == 254)
 			{
-				// finally 32 pixels of mpeg border colour when it's mixed
+				// finally 32 pixels of mpeg border colour when it's mixed in
 			}
 			else
 			{
@@ -449,7 +394,6 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 {
-	/* basic machine hardware */
 	M68340(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_cobra3_state::bfm_cobra3_map);
 
@@ -462,8 +406,8 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	RAMDAC(config, m_ramdac, 0, m_palette);
-	m_ramdac->set_addrmap(0, &bfm_cobra3_state::ramdac_map); // MUSIC Semiconductor TR9C1710 RAMDAC
+	RAMDAC(config, m_ramdac, 0, m_palette); // MUSIC Semiconductor TR9C1710 RAMDAC
+	m_ramdac->set_addrmap(0, &bfm_cobra3_state::ramdac_map);
 	m_ramdac->set_split_read(1);
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -582,8 +526,7 @@ ROM_START( c3_ppays )
 	DISK_IMAGE_READONLY( "95100315", 0, SHA1(fc76d3ab5ff38c2dc4f06399f5399a1ae3c136e9) )
 ROM_END
 
-} // anonymous namespace
-
+}
 
 GAME( 1995, c3_telly,  0, bfm_cobra3, bfm_cobra3, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1995, c3_tellyns,0, bfm_cobra3, bfm_cobra3, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (New Series) (Bellfruit) (Cobra 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
