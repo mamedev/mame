@@ -1956,11 +1956,7 @@ uint32_t wingco_state::screen_update_megaline(screen_device &screen, bitmap_rgb3
 		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
-	if (m_enable_reg & 0x40)  // foreground
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	if (m_enable_reg || 0x2a)  // workaround to enter the settings
-		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
