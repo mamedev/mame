@@ -19,7 +19,7 @@ Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System
  | .           ___________   __________  __________   __________  | System      |   |
  |     RST    |74HC08N   |  |74HC368B1| |74AS138N |  |74HCT21N |  | Modul       |   |
  | .           ___________               __________   __________  | ROM Module  |   |
- | .          |74HC00N   |              |74HC4050N|  |74HC04N  |  | [SCC2592AC] |   |
+ | .          |74HC00N   |              |74HC4050N|  |74HC04N  |  | [SCC2692AC] |   |
  | .           ___________                                        |             |   |
  | .          |74HC32N   |                                XTAL    | [M27C4001 ] |   |
  | .                                                    3.686MHz  |_____________|   |
@@ -49,7 +49,6 @@ Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System
 #include "emu.h"
 
 #include "cpu/nec/v25.h"
-
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"
 #include "sound/okim6376.h"
@@ -103,8 +102,6 @@ INPUT_PORTS_END
 
 void st25_state::st25(machine_config &config)
 {
-	// Basic machine hardware
-
 	V25(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &st25_state::io_map);
@@ -117,8 +114,7 @@ void st25_state::st25(machine_config &config)
 	m_maincpu->p1_out_cb().set([this] (uint8_t data) { logerror("%s: p1 out %02X\n", machine().describe_context(), data); });
 	m_maincpu->p2_out_cb().set([this] (uint8_t data) { logerror("%s: p2 out %02X\n", machine().describe_context(), data); });
 
-
-	M48T02(config, "m48t18", 0); // ST M48T18-150PC1
+	M48T02(config, "nvram", 0); // ST M48T18-150PC1
 
 	SCN2681(config, "uart", 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
 
@@ -200,14 +196,14 @@ ROM_START(bigactione)
 ROM_END
 
 ROM_START(bigkick)
+	ROM_REGION(0x04000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("w27e040_big_kick_st25.ic1", 0x00000, 0x80000, CRC(fa752fed) SHA1(5da6f37ebe0095fc74a1c54df86bb3ca492e92f4))
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("w27e040_big_kick_st25.ic2", 0x00000, 0x80000, CRC(7277e039) SHA1(67e17c675aa68b3e828027c12ea7f51a6ead9549))
-
-	ROM_REGION(0x04000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 ROM_END
 
 ROM_START(blizzard)
@@ -236,6 +232,9 @@ ROM_START(boostersp)
 ROM_END
 
 ROM_START(citytower)
+	ROM_REGION(0x04000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
 	ROM_REGION(0x40000, "nvram", 0)
 	ROM_LOAD("m27c2001dip32_city_tower_0705.ic3", 0x00000, 0x40000, CRC(e4fbff9c) SHA1(f2081d43051e05ddc54879cf4080746eb8fa43f8))
 
@@ -244,9 +243,6 @@ ROM_START(citytower)
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("panther_city_tower.ic2", 0x00000, 0x80000, CRC(454f200b) SHA1(087ca6b34fc7b5d14fc9ab3f32dc46254acb54a9))
-
-	ROM_REGION(0x04000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 ROM_END
 
 ROM_START(colossos)
@@ -261,45 +257,45 @@ ROM_START(colossos)
 ROM_END
 
 ROM_START(galaktica)
+	ROM_REGION(0x04000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("galaktica_124460.ic2_w27e040_12.ic2", 0x00000, 0x80000, CRC(a99c6250) SHA1(a9129eeec99c630b0a3e6355deedb86a1ae5062c))
 
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("galaktica_124461.ic1_w27e040_12.ic1", 0x00000, 0x80000, CRC(0e8acf71) SHA1(184472d62e094a724cd21954459e872f8d1b30c8))
-
-	ROM_REGION(0x04000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 ROM_END
 
 ROM_START(jamaica)
+	ROM_REGION(0x04000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("panther_jamaica_musik_st1.ic1", 0x00000, 0x80000, CRC(7dee50d4) SHA1(1d96ee159b07db84c4f0373f5df4df648ecef786))
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("panther_jamaica.ic2", 0x00000, 0x80000, CRC(a7119368) SHA1(e50174bd7bb2ba00ab9fda3995007d60f0811242))
-
-	ROM_REGION(0x04000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 ROM_END
 
 ROM_START(macaor)
+	ROM_REGION(0x04000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("123623.ic1", 0x00000, 0x80000, CRC(dccc242f) SHA1(9c0df10dc0028286a02dada673fa56bd6f137f67))
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("123742.ic2", 0x00000, 0x80000, CRC(3eeb68c3) SHA1(09f606988608dc89b1714347145b5b01352aa144))
-
-	ROM_REGION(0x04000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 ROM_END
 
 
 ROM_START(majesto)
-	ROM_REGION(0x80000, "oki", 0)
-	ROM_LOAD("majesto_st1_m27c4001_121308_17.09.98_euro.ic1", 0x00000, 0x80000, CRC(59033ced) SHA1(39b0821dc2b347677f2803ba1a2c570231f89102))
-
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
+	ROM_REGION(0x80000, "oki", 0)
+	ROM_LOAD("majesto_st1_m27c4001_121308_17.09.98_euro.ic1", 0x00000, 0x80000, CRC(59033ced) SHA1(39b0821dc2b347677f2803ba1a2c570231f89102))
 
 	ROM_REGION(0x02000, "nvram", 0)
 	ROM_LOAD("majesto_2033_m48t18.ic3", 0x00000, 0x02000, CRC(3e7d6bf6) SHA1(0863371517a4acb6744fa2ed98b01a675c008b9b))
@@ -326,13 +322,16 @@ ROM_START(matrixx)
 ROM_END
 
 ROM_START(multiclassic)
+	ROM_REGION(0x04000, "maskrom", 0)
+	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
+
 	ROM_REGION(0x02000, "nvram", 0)
 	ROM_LOAD("m48t18_100pc1_l.ic3", 0x00000, 0x02000, CRC(5814553f) SHA1(7bcfe719f6305a19c0db3b95ab13c81a773b2a46))
 
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("w27e040_tsop32_123774_02.07.2004.ic1", 0x00000, 0x80000, CRC(80d754c3) SHA1(b30d18a89d1e9d3dc54687d6a355a3a3d0957c5c))
 
-	ROM_REGION(0x80000, "bp", 0)
+	ROM_REGION(0x80000, "soundrom", 0)
 	ROM_LOAD("w27e040_tsop32_123775_02.07.2004_back_panel.icf5", 0x00000, 0x80000, CRC(633d0f1e) SHA1(1ba518c5fb7367bf2a43b079a8f8b8db5c6fc5af))
 
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -340,9 +339,6 @@ ROM_START(multiclassic)
 
 	ROM_REGION(0x20000, "coin", 0)
 	ROM_LOAD("w29ee011__191_043_v5.05_10.05.04__emp_nsm_euro", 0x00000, 0x20000, CRC(079de5e5) SHA1(7f634769a5d9f56d6dae7a66e21b155b21787c36))
-
-	ROM_REGION(0x04000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 ROM_END
 
 ROM_START(purpurr)
