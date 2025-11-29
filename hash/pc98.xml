@@ -12795,6 +12795,7 @@ Fails to boot with "E4" error, access [FDC] chrn=(0, 0, 1, 512)
 Throws "E>" error with chrn=(0, 1, 1, 512) in 2dd mode
 ]]></notes>
 		<info name="alt_title" value="クルーズ チェイサー ブラスティー" />
+		<info name="release" value="198611xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="741376">
@@ -19060,11 +19061,13 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		</part>
 	</software>
 
-	<!-- Can't create the player disk -->
 	<software name="elysion" supported="no">
 		<description>Elysion (2HD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Can't create the player disk
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -19078,6 +19081,9 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		<description>Elysion (2DD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Hangs while booting
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
