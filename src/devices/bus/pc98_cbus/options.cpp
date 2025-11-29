@@ -7,6 +7,7 @@
 #include "amd98.h"
 #include "fdd_2dd.h"
 #include "fdd_2hd.h"
+#include "lha201.h"
 #include "pc9801_02.h"
 #include "pc9801_14.h"
 #include "pc9801_26.h"
@@ -61,10 +62,14 @@ void pc98_cbus_devices(device_slot_interface &device)
 	device.option_add("pc9801_27",  PC9801_27);
 
 	// SCSI
-//	device_option_add("pc9801_55",  PC9801_55);
+	// NEC
+//  device_option_add("pc9801_55",  PC9801_55);
 	device.option_add("pc9801_55u", PC9801_55U);
 	device.option_add("pc9801_55l", PC9801_55L);
-//	device.option_add("pc9801_92",  PC9801_92);
+//  device.option_add("pc9801_92",  PC9801_92);
+	// Logitec
+	device.option_add("lha201", LHA201);
+
 
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);

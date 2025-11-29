@@ -20,18 +20,18 @@ NOTE:
 	<!-- FIXME: Aggres (Riverhill Soft) disk B throws "fail1" (2D interface) -->
 	<!-- FIXME: Cruise Chaser Blassty (Square) both disks throws "fail1" -->
 
-    <software name="crux">
-        <description>Crux</description>
-        <year>1987</year>
+	<software name="crux">
+		<description>Crux</description>
+		<year>1987</year>
 		<publisher>コムパック (Compac)</publisher>
-        <info name="alt_title" value="クラックス" />
-        <info name="release" value="198703xx" />
-        <part name="flop1" interface="floppy_5_25">
-            <dataarea name="flop" size="6144648">
-                <rom name="crux.mfi" size="6144648" crc="e1870c00" sha1="748096b8c781453bf0a8a1a4f28a9deced38aa23" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<info name="alt_title" value="クラックス" />
+		<info name="release" value="198703xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="6144648">
+				<rom name="crux.mfi" size="6144648" crc="e1870c00" sha1="748096b8c781453bf0a8a1a4f28a9deced38aa23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cyclefgt" supported="yes">
 		<description>Cycle Fight</description>
@@ -58,18 +58,18 @@ No cross cut on some line elements behind hills (verify)
 
 	<!-- FIXME: Dennou Suikoden (Hot-B / Gamu) both disks throws "fail1" -->
 
-    <software name="dna">
+	<software name="dna">
 		<description>DNA</description>
 		<year>1987</year>
 		<publisher>グレイ (Gray)</publisher>
 		<info name="alt_title" value="ドナ" />
 		<info name="release" value="198708xx" />
-        <part name="flop1" interface="floppy_5_25">
-            <dataarea name="flop" size="4985494">
-                <rom name="dna.mfi" size="4985494" crc="1e967aba" sha1="722d7b9575536904754f8e35ff82d33c25d79c2d" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="4985494">
+				<rom name="dna.mfi" size="4985494" crc="1e967aba" sha1="722d7b9575536904754f8e35ff82d33c25d79c2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="elysion" supported="no">
 		<description>Elysion (2HD version)</description>
@@ -130,6 +130,7 @@ Fails at PC=0279D, goes on title screen by forcing aw=dw but then crashes with "
 Stuck [PC-9801-26] note on title screen (verify)
 Runs a bit too fast (verify)
 GFX trails on backgrounds [GRCG] or [7220]
+Hangs when accessing first diamond shaped portal
 ]]></notes>
 		<info name="alt_title" value="未来" />
 		<info name="release" value="198611xx" />
@@ -141,24 +142,24 @@ GFX trails on backgrounds [GRCG] or [7220]
 		</part>
 	</software>
 
-    <software name="moonchil" supported="no">
+	<software name="moonchil" supported="no">
 		<description>Moon Child</description>
 		<year>1987</year>
 		<publisher>HOT・B</publisher>
-        <notes><![CDATA[
+		<notes><![CDATA[
 Crashes when starting a new game
 ]]></notes>
-        <info name="alt_title" value="ムーンチャイルド" />
-        <info name="release" value="1987xxxx" />
+		<info name="alt_title" value="ムーンチャイルド" />
+		<info name="release" value="1987xxxx" />
 		<!-- GA夢 -->
 		<info name="developer" value="Gamu" />
 		<!-- TODO: just wants an empty disk unlike pc8801 and mz2500 versions? -->
-        <part name="flop1" interface="floppy_5_25">
-            <dataarea name="flop" size="5080909">
-                <rom name="moon child.mfi" size="5080909" crc="42606fd6" sha1="53f75f30b954bf62bc8a803f7ba0a7380ecf05d9" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5080909">
+				<rom name="moon child.mfi" size="5080909" crc="42606fd6" sha1="53f75f30b954bf62bc8a803f7ba0a7380ecf05d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- FIXME: Soapland Story (Hard) has GFX glitch on title screen -->
 
@@ -180,7 +181,7 @@ Runs too fast on pc9801vm (definitely intended for a 5 MHz machine)
 		</part>
 	</software>
 
-	<!-- FIXME: Ulysses (StarCraft): both disks throws "fail1" -->
+	<!-- FIXME: Ulysses (StarCraft): both disks throws "fail1" (2D interface) -->
 	<!-- FIXME: Val Trad (Riverhill Soft): both disks throws "fail1" -->
 	<!-- FIXME: Youtoden (SystemSoft): I/O Error, chrn=(0, 1, 4, 1024) -->
 

@@ -35,7 +35,7 @@ pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type ty
 	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_scsi_bus(*this, "scsi")
 	, m_wdc(*this, "scsi:7:wdc")
-	, m_space_io_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55_device::internal_map), this))
+//  , m_space_io_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, amap)
 	, m_bios(*this, "bios")
 	, m_dsw1(*this, "DSW1")
 	, m_dsw2(*this, "DSW2")
@@ -45,13 +45,14 @@ pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type ty
 pc9801_55u_device::pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_55_device(mconfig, PC9801_55U, tag, owner, clock)
 {
+	m_space_io_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55u_device::internal_map), this));
 
 }
 
 pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_55_device(mconfig, PC9801_55L, tag, owner, clock)
 {
-
+	m_space_io_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55l_device::internal_map), this));
 }
 
 
@@ -225,7 +226,7 @@ void pc9801_55_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
-		logerror("map ROM at 0x000dc000-0x000dcfff (bank %d)\n", m_rom_bank);
+		// logerror("map ROM at 0x000dc000-0x000dcfff (bank %d)\n", m_rom_bank);
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xdc000,
 			0xdcfff,
@@ -303,7 +304,7 @@ void pc9801_55_device::internal_map(address_map &map)
 			return m_port30;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			logerror("$30 Memory Bank %02x\n", data);
+			// logerror("$30 Memory Bank %02x\n", data);
 			m_wdc->reset_w(!BIT(data, 1));
 
 			if ((data & 0xc0) != (m_port30 & 0xc0))
