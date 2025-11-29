@@ -23860,7 +23860,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198703xx"/>
 		<info name="alt_title" value="ムーンチャイルド"/>
-		<!-- TODO: document user disk creation (copy of disk B?) -->
+		<info name="usage" value="Copy disk B as a .mfi container, select make character and mount it, then start a new game with that in drive 1" />
 		<!--combined image-->
 		<!--rom name="moon child.d88" size="697696" crc="cf86aa5e" sha1="8f541854a18b689841bdbf8a4b23ecdab3cdd32b"/-->
 
