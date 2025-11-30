@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="sd1_flop" description="Ensoniq SD-1 Disk Images">
+<softwarelist name="sd1_flop" description="Ensoniq SD-1 disk images">
 
 	<software name="os3" supported="yes">
 		<description>SD-1 Sequencer OS version 3.0</description>

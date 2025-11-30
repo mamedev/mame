@@ -257,7 +257,7 @@ Black colored OEM CD with no id whatsoever
 
 	<!-- Windows 95/98 -->
 	<software name="acatari2">
-		<description>Aracde's Greatest Hits: The Atari Collection 2</description>
+		<description>Arcade's Greatest Hits: The Atari Collection 2</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="Atari" />
@@ -9784,9 +9784,9 @@ Video editing software for [ZR36067]-based PCI card, can also detect [DC30] and 
 Has an HW tester, DirectDraw fails to enable overlay with [ViRGE] Scenic Highway interface
 ]]></notes>
 		<!-- Serial number: 3920519554 -->
-		<info name="language" value="Deutsch" />
 		<info name="language" value="Dutch" />
 		<info name="language" value="English" />
+		<info name="language" value="German" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pinnacle-studio-dc10-plus" sha1="1530776b913e21774ade2b160960f2fe70bf4c6b"/>
