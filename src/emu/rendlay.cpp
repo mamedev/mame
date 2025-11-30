@@ -3221,6 +3221,7 @@ protected:
 					// get the width of the string
 					s32 width = font->string_width(ourheight / num_shown, 1.0f, m_stopnames[fruit]);
 					float aspect = width > bounds.width() ? (float) bounds.width() / (float) width : 1.0f;
+					width *= aspect;
 
 					float curx = bounds.left() + (bounds.width() - width) / 2.0f;
 
@@ -3362,6 +3363,7 @@ private:
 					// get the width of the string
 					s32 width = font->string_width(dest.height(), 1.0f, m_stopnames[fruit]);
 					float aspect = width > bounds.width() ? (float) bounds.width() / (float) width : 1.0f;
+					width *= aspect;
 
 					float curx = bounds.left();
 
@@ -3703,6 +3705,7 @@ void layout_element::component::draw_text(
 	// get the width of the string
 	s32 width = font.string_width(bounds.height(), 1.0f, str);
 	float aspect = (align == 3 || width > bounds.width()) ? (float) bounds.width() / (float) width : 1.0f;
+	width *= aspect;
 
 	// get alignment
 	float curx;
