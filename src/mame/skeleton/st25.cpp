@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: stonedDiscord
 
 /*
 Skeleton driver for NSM/Löwen ST25 platform of gambling machines
@@ -102,7 +102,6 @@ void st25_state::io_map(address_map &map)
 static INPUT_PORTS_START(st25)
 	PORT_START("IN0")
 INPUT_PORTS_END
-
 
 void st25_state::st25(machine_config &config)
 {
@@ -285,7 +284,6 @@ ROM_START(macaor)
 	ROM_LOAD("123623.ic1", 0x00000, 0x80000, CRC(dccc242f) SHA1(9c0df10dc0028286a02dada673fa56bd6f137f67))
 ROM_END
 
-
 ROM_START(majesto)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
@@ -449,4 +447,3 @@ GAME(2006, bigkick,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Lö
 GAME(2006, galaktica,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Galaktica",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2007, amarillo,     0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Amarillo",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2007, xeno,         0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Xeno",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-
