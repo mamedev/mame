@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="sd132_flop" description="Ensoniq SD-1 32 Voice Disk Images">
+<softwarelist name="sd132_flop" description="Ensoniq SD-1 32 Voice disk images">
 
 	<software name="os400" cloneof="os410" supported="yes">
 		<description>SD-1 Sequencer OS version 4.00</description>
