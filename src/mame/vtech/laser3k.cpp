@@ -93,6 +93,7 @@ public:
 		, m_cassette(*this, "tape")
 		, m_gamepad(*this, "gamepad")
 		, m_kbspecial(*this, "keyb_special")
+		, m_rom(*this, "maincpu")
 		, m_fdc(*this, "fdc%u", 0U)
 		, m_floppy(*this, "floppy%u", 0U)
 		, m_fdc_rom(*this, "fdc")
@@ -114,8 +115,10 @@ private:
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io2_r(offs_t offset);
 
-	void printer_rombank_w(uint8_t data);
-	void display_rombank_w(uint8_t data);
+	uint8_t printer_rom_r(offs_t offset);
+	void printer_rombank_w(offs_t offset, uint8_t data);
+	uint8_t display_rom_r(offs_t offset);
+	void display_rombank_w(offs_t offset, uint8_t data);
 	uint8_t fdc_rom_r(offs_t offset);
 	uint8_t rombank_disable_r();
 	void rombank_disable_w(uint8_t data);
@@ -146,6 +149,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<apple2_gameio_device> m_gamepad;
 	required_ioport m_kbspecial;
+	required_region_ptr<u8> m_rom;
 	required_device_array<diskii_fdc_device, 2> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_region_ptr<u8> m_fdc_rom;
@@ -184,9 +188,9 @@ void laser3k_state::banks_map(address_map &map)
 	map(0x3c000, 0x3c07f).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
 	map(0x3c0d0, 0x3c0df).rw(m_fdc[1], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
 	map(0x3c0e0, 0x3c0ef).rw(m_fdc[0], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
-	map(0x3c100, 0x3c1ff).rom().region("maincpu", 0x4100).w(FUNC(laser3k_state::printer_rombank_w));
+	map(0x3c100, 0x3c1ff).rw(FUNC(laser3k_state::printer_rom_r), FUNC(laser3k_state::printer_rombank_w));
 	map(0x3c1c0, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
-	map(0x3c300, 0x3c3ff).rom().region("maincpu", 0x4300).w(FUNC(laser3k_state::display_rombank_w));
+	map(0x3c300, 0x3c3ff).rw(FUNC(laser3k_state::display_rom_r), FUNC(laser3k_state::display_rombank_w));
 	map(0x3c500, 0x3c6ff).r(FUNC(laser3k_state::fdc_rom_r));
 	map(0x3c800, 0x3cffe).view(m_3c800);
 	m_3c800[0](0x3c800, 0x3cffe).rom().region("maincpu", 0x0800);
@@ -581,12 +585,26 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 	return 0xff;
 }
 
-void laser3k_state::printer_rombank_w(uint8_t data)
+uint8_t laser3k_state::printer_rom_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.select(0);
+	return m_rom[offset + 0x4100];
+}
+
+void laser3k_state::printer_rombank_w(offs_t offset, uint8_t data)
 {
 	m_3c800.select(0);
 }
 
-void laser3k_state::display_rombank_w(uint8_t data)
+uint8_t laser3k_state::display_rom_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.select(1);
+	return m_rom[offset + 0x4300];
+}
+
+void laser3k_state::display_rombank_w(offs_t offset, uint8_t data)
 {
 	m_3c800.select(1);
 }
