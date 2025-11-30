@@ -9,10 +9,10 @@ Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System
   ___________________________________________________________________________________
  |                 __________                             XTAL       SERIAL         |
  | .              |TL7705ACP|           ______________  16.000 MHz                  |
- | .               __________          | NEC V25     |                ___________   |
- | .              |74HCT574 |          | D70322L-8   |                |74HC123N |   |
- | .               __________          |             |                ____________  |
- | .              |74HCT245N|          |             |                |V62C518256|  |
+ | .               __________          | NEC JAPAN   |                ___________   |
+ | .              |74HCT574 |          |D70322L-8-232|                |74HC123N |   |
+ | .               __________          | NSM-GA-1093 |                ____________  |
+ | .              |74HCT245N|          | 9937EK001   |                |V62C518256|  |
  | .                                   |_____________|                              |
  | .           ___________               __________   __________   _____________    |
  | .          |74HC32N   |              |74HC138N |  |74HC04N  |  | Spiel und   |   |
@@ -63,13 +63,19 @@ class st25_state : public driver_device
 public:
 	st25_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_rtc(*this, "nvram"),
+		m_oki(*this, "oki"),
+		m_duart(*this, "duart")
 	{ }
 
 	void st25(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<v25_device> m_maincpu;
+	required_device<m48t02_device> m_rtc;
+	required_device<okim6376_device> m_oki;
+	required_device<scn2681_device> m_duart;
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -106,21 +112,14 @@ void st25_state::st25(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &st25_state::io_map);
 	m_maincpu->set_addrmap(AS_DATA, &st25_state::data_map);
-	m_maincpu->pt_in_cb().set([this] () { logerror("%s: pt in\n", machine().describe_context()); return uint8_t(0); });
-	m_maincpu->p0_in_cb().set([this] () { logerror("%s: p0 in\n", machine().describe_context()); return uint8_t(0); });
-	m_maincpu->p1_in_cb().set([this] () { logerror("%s: p1 in\n", machine().describe_context()); return uint8_t(0); });
-	m_maincpu->p2_in_cb().set([this] () { logerror("%s: p2 in\n", machine().describe_context()); return uint8_t(0); });
-	m_maincpu->p0_out_cb().set([this] (uint8_t data) { logerror("%s: p0 out %02X\n", machine().describe_context(), data); });
-	m_maincpu->p1_out_cb().set([this] (uint8_t data) { logerror("%s: p1 out %02X\n", machine().describe_context(), data); });
-	m_maincpu->p2_out_cb().set([this] (uint8_t data) { logerror("%s: p2 out %02X\n", machine().describe_context(), data); });
 
-	M48T02(config, "nvram", 0); // ST M48T18-150PC1
+	M48T02(config, m_rtc, 0); // ST M48T18-150PC1
 
-	SCN2681(config, "uart", 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
+	SCN2681(config, m_duart, 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6376(config, "oki", 4_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
+	OKIM6376(config, m_oki, 128000).add_route(ALL_OUTPUTS, "mono", 0.5); // adjustable using a pot
 }
 
 ROM_START(alphar)
