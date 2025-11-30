@@ -10,15 +10,16 @@ license:CC0-1.0
 	<!-- Some cartridges contain no ROM, but just bridges between edge connector pins. -->
 
 	<!-- pinout is identical to Storio cartridges -->
-
-
+	<!--
 	Language:
 	********0 = US / Canada / Hong Kong
+	********1 = Unused
 	*******22 = Spain / Mexico / Latin America
 	********3 = UK
 	*******23 = Netherlands
 	********4 = Germany
 	********5 = France / Canada (French)
+	********6 = Unused
 	********7 = Italy
 
 	80-230104(GE) - Cars 2 (InnoTab Max Compatible)
@@ -37,7 +38,7 @@ license:CC0-1.0
 	80-230604(GE) - Dora: Lass Dem Hilfen! (InnoTab Max Compatible)
 	80-230605(FR) - Dora l'Exploratrice a la rescousse (InnoTab Max Compatible)
 	80-230622(SP) - Dora la Exploradora (InnoTab Max Compatible)
-	80-230623(NL) - Dora the Explorer: Laten we Helpen!  (InnoTab Max Compatible)
+	80-230623(NL) - Dora the Explorer: Laten we Helpen! (InnoTab Max Compatible)
 	80-230704(GE) - SpongeBob Schwammkopf
 	80-230805(FR) - Scooby Doo
 	80-231004(GE) - Dino-Zug: Weltreise
@@ -67,7 +68,7 @@ license:CC0-1.0
 	80-232504(GE) - Tut Tut Baby Flitzer (InnoTab Max Compatible)
 	80-232505(FR) - Tut Tut Bolides - Ma Ville Alphabet (InnoTab Max Compatible)
 	80-232523(NL) - Toet Toet Auto's - Het Alphabetstad (InnoTab Max Compatible)
-	80-232600(US) - Learn to Write with Cody and Cora
+	80-232600(US) - Learn to Write with Cody and Cora (InnoTab Max Compatible)
 	80-232604(GE) - Nino & Nina Lernen Schreissen (InnoTab Max Compatible)
 	80-232605(FR) - J'apprends crire avec Nino & Nina (InnoTab Max Compatible)
 	80-232623(NL) - Leer schrijven met Nino & Nina (InnoTab Max Compatible)
@@ -85,6 +86,7 @@ license:CC0-1.0
 	80-233704(GE) - Classic stories
 	80-234004(GE) - Octonauts (InnoTab Max Compatible)
 	80-234005(FR) - Octonauts (InnoTab Max Compatible)
+	-->
 	
 	<software name="mickeychuk" supported="no">
 		<description>Mickey Mouse Clubhouse (UK) (InnoTab Max Compatible)</description>
