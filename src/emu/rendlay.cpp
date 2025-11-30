@@ -3223,7 +3223,7 @@ protected:
 					float aspect = 1.0;
 					if (width > bounds.width())
 					{
-						aspect = (float) bounds.width() / (float) width;
+						aspect = float(bounds.width()) / float(width);
 						width = bounds.width();
 					}
 
@@ -3369,7 +3369,7 @@ private:
 					float aspect = 1.0;
 					if (width > bounds.width())
 					{
-						aspect = (float) bounds.width() / (float) width;
+						aspect = float(bounds.width()) / float(width);
 						width = bounds.width();
 					}
 
@@ -3715,7 +3715,7 @@ void layout_element::component::draw_text(
 	float aspect = 1.0;
 	if (align == 3 || width > bounds.width())
 	{
-		aspect = (float) bounds.width() / (float) width;
+		aspect = float(bounds.width()) / float(width);
 		width = bounds.width();
 	}
 
@@ -3730,7 +3730,7 @@ void layout_element::component::draw_text(
 
 		// right
 		case 2:
-			curx = bounds.right() - width;
+			curx = bounds.left() + bounds.width() - width;
 			break;
 		
 		// stretch
