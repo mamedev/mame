@@ -864,7 +864,7 @@ void esq5505_state::sd1(machine_config &config, int panel_type)
 	vfxsd(config, panel_type);
 
 	// software list
-	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop").set_filter("sd1");
+	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop");
 }
 
 // Like the sd1, but with some clock speeds faster.
@@ -881,7 +881,7 @@ void esq5505_state::sd132(machine_config &config, int panel_type)
 	m_pump->set_clock(clock);
 
 	// software list
-	SOFTWARE_LIST(config.replace(), "sd1_flop").set_original("sd1_flop").set_filter("sd132");
+	SOFTWARE_LIST(config, "sd132_flop").set_original("sd132_flop");
 }
 
 // 32-voice machines with the VFX-SD type config
