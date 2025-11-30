@@ -24,9 +24,8 @@
   http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/LASER/LASER%203000/Manuals/The%20Cat%20Technical%20Reference%20Manual.pdf
 
   TODO:
-    - Finish keyboard
+    - Dump and emulate keyboard
     - RGB graphics mode
-    - FDC C800 page appears to be inside the FDC cartridge, need a dump :(  (can hack to use IWM in the meantime)
     - Centronics printer port (data at 3c090, read ack at 3c1c0, read busy at 3c1c2)
 
 ***************************************************************************/
@@ -37,9 +36,11 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
+#include "machine/applefdintf.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/kb3600.h"
+#include "machine/wozfdc.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
 
@@ -85,13 +86,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_ram(*this, "mainram")
-		, m_bank(*this, "bank%u", 0U)
+		, m_bank(*this, "bank")
 		, m_ay3600(*this, "ay3600")
 		, m_speaker(*this, "speaker")
 		, m_sn(*this, "sn76489")
 		, m_cassette(*this, "tape")
 		, m_gamepad(*this, "gamepad")
 		, m_kbspecial(*this, "keyb_special")
+		, m_fdc(*this, "fdc%u", 0U)
+		, m_floppy(*this, "floppy%u", 0U)
+		, m_fdc_rom(*this, "fdc")
+		, m_3c800(*this, "3c800")
 	{ }
 
 	void laser3k(machine_config &config);
@@ -101,11 +106,19 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io2_r(offs_t offset);
+
+	void printer_rombank_w(uint8_t data);
+	void display_rombank_w(uint8_t data);
+	uint8_t fdc_rom_r(offs_t offset);
+	uint8_t rombank_disable_r();
+	void rombank_disable_w(uint8_t data);
 
 	void laser3k_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -126,13 +139,17 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
-	required_device_array<address_map_bank_device, 4> m_bank;
+	required_device<address_map_bank_device> m_bank;
 	required_device<ay3600_device> m_ay3600;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<sn76489_device> m_sn;
 	required_device<cassette_image_device> m_cassette;
 	required_device<apple2_gameio_device> m_gamepad;
 	required_ioport m_kbspecial;
+	required_device_array<diskii_fdc_device, 2> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppy;
+	required_region_ptr<u8> m_fdc_rom;
+	memory_view m_3c800;
 
 	uint8_t m_bankval[4];
 	int m_flash;
@@ -157,22 +174,26 @@ private:
 
 void laser3k_state::laser3k_map(address_map &map)
 {
-	map(0x0000, 0x3fff).m(m_bank[0], FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0x7fff).m(m_bank[1], FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xbfff).m(m_bank[2], FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xffff).m(m_bank[3], FUNC(address_map_bank_device::amap8));
+	map(0x0000, 0xffff).rw(FUNC(laser3k_state::mem_r), FUNC(laser3k_state::mem_w));
 }
 
 void laser3k_state::banks_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rw(FUNC(laser3k_state::ram_r), FUNC(laser3k_state::ram_w));
 	map(0x38000, 0x3bfff).rom().region("maincpu", 0);
-	map(0x3c000, 0x3c0ff).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
-	map(0x3c100, 0x3c1ff).rom().region("maincpu", 0x4100);
+	map(0x3c000, 0x3c07f).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
+	map(0x3c0d0, 0x3c0df).rw(m_fdc[1], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
+	map(0x3c0e0, 0x3c0ef).rw(m_fdc[0], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
+	map(0x3c100, 0x3c1ff).rom().region("maincpu", 0x4100).w(FUNC(laser3k_state::printer_rombank_w));
 	map(0x3c1c0, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
-	map(0x3c300, 0x3c3ff).rom().region("maincpu", 0x4300);
-//  map(0x3c600, 0x3c6ff).rom().region("fdc", 0);
-	map(0x3c800, 0x3ffff).rom().region("maincpu", 0x4800);
+	map(0x3c300, 0x3c3ff).rom().region("maincpu", 0x4300).w(FUNC(laser3k_state::display_rombank_w));
+	map(0x3c500, 0x3c6ff).r(FUNC(laser3k_state::fdc_rom_r));
+	map(0x3c800, 0x3cffe).view(m_3c800);
+	m_3c800[0](0x3c800, 0x3cffe).rom().region("maincpu", 0x0800);
+	m_3c800[1](0x3c800, 0x3cffe).rom().region("maincpu", 0x4800);
+	m_3c800[2](0x3c800, 0x3cffe).rom().region("fdc", 0x800);
+	map(0x3cfff, 0x3cfff).rw(FUNC(laser3k_state::rombank_disable_r), FUNC(laser3k_state::rombank_disable_w));
+	map(0x3d000, 0x3ffff).rom().region("maincpu", 0x5000);
 }
 
 void laser3k_state::machine_start()
@@ -235,6 +256,9 @@ void laser3k_state::machine_start()
 	m_x_calibration = attotime::from_nsec(10800).as_double();
 	m_y_calibration = attotime::from_nsec(10800).as_double();
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0.0;
+
+	m_fdc[0]->set_floppies(m_floppy[0], m_floppy[1]);
+	m_fdc[1]->set_floppies(m_floppy[2], m_floppy[3]);
 }
 
 void laser3k_state::machine_reset()
@@ -243,10 +267,8 @@ void laser3k_state::machine_reset()
 	m_bankval[1] = 1;
 	m_bankval[2] = 2;
 	m_bankval[3] = 0xf;
-	m_bank[0]->set_bank(m_bankval[0]);
-	m_bank[1]->set_bank(m_bankval[1]);
-	m_bank[2]->set_bank(m_bankval[2]);
-	m_bank[3]->set_bank(m_bankval[3]);
+
+	m_3c800.disable();
 
 	m_flash = 0;
 	m_speaker_state = 0;
@@ -260,6 +282,16 @@ void laser3k_state::machine_reset()
 	m_80col = 0;
 	m_mix = false;
 	m_gfxmode = TEXT;
+}
+
+uint8_t laser3k_state::mem_r(offs_t offset)
+{
+	return m_bank->space().read_byte(uint32_t(m_bankval[offset >> 14]) << 14 | (offset & 0x3fff));
+}
+
+void laser3k_state::mem_w(offs_t offset, uint8_t data)
+{
+	m_bank->space().write_byte(uint32_t(m_bankval[offset >> 14]) << 14 | (offset & 0x3fff), data);
 }
 
 uint8_t laser3k_state::ram_r(offs_t offset)
@@ -507,22 +539,18 @@ void laser3k_state::io_w(offs_t offset, uint8_t data)
 
 		case 0x7c:  // bank 0
 			m_bankval[0] = data & 0xf;
-			m_bank[0]->set_bank(m_bankval[0]);
 			break;
 
 		case 0x7d:  // bank 1
 			m_bankval[1] = data & 0xf;
-			m_bank[1]->set_bank(m_bankval[1]);
 			break;
 
 		case 0x7e:  // bank 2
 			m_bankval[2] = data & 0xf;
-			m_bank[2]->set_bank(m_bankval[2]);
 			break;
 
 		case 0x7f:  // bank 3
 			m_bankval[3] = data & 0xf;
-			m_bank[3]->set_bank(m_bankval[3]);
 			break;
 
 		default:
@@ -551,6 +579,35 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 	}
 
 	return 0xff;
+}
+
+void laser3k_state::printer_rombank_w(uint8_t data)
+{
+	m_3c800.select(0);
+}
+
+void laser3k_state::display_rombank_w(uint8_t data)
+{
+	m_3c800.select(1);
+}
+
+uint8_t laser3k_state::fdc_rom_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.select(2);
+	return m_fdc_rom[offset + 0x500];
+}
+
+uint8_t laser3k_state::rombank_disable_r()
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.disable();
+	return 0; // FIXME: actually return the ROM value
+}
+
+void laser3k_state::rombank_disable_w(uint8_t data)
+{
+	m_3c800.disable();
 }
 
 void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
@@ -1017,7 +1074,7 @@ void laser3k_state::laser3k_palette(palette_device &palette) const
 void laser3k_state::laser3k(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 14_MHz_XTAL / 7); // 1 or 2 MHz depending on soft switch
+	M6502(config, m_maincpu, 14_MHz_XTAL / 14); // 1 or 2 MHz depending on soft switch
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser3k_state::laser3k_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1031,10 +1088,15 @@ void laser3k_state::laser3k(machine_config &config)
 	PALETTE(config, "palette", FUNC(laser3k_state::laser3k_palette), std::size(laser3k_pens));
 
 	/* memory banking */
-	for (auto &bank : m_bank)
-		ADDRESS_MAP_BANK(config, bank).set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	RAM(config, "mainram").set_default_size("192K");
+
+	// ASIC in disk cartridge seems to control up to 4 Apple-style drives
+	DISKII_FDC(config, m_fdc[0], 14_MHz_XTAL / 7);
+	DISKII_FDC(config, m_fdc[1], 14_MHz_XTAL / 7);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, applefdintf_device::floppies_525, "525", applefdintf_device::formats_525).enable_sound(true);
 
 	APPLE2_GAMEIO(config, m_gamepad, apple2_gameio_device::joystick_options, nullptr);
 	m_gamepad->set_sw_pullups(true); // 3K9 pullups to +5V
