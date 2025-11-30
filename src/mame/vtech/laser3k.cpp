@@ -574,7 +574,7 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 			return m_screen->vblank() ? 0x80 : 0x00;
 
 		case 0x05:  // CPU 1/2 MHz status?
-			return m_80col ? 0x00 : 0x80;
+			return m_80col ? 0x80 : 0x00;
 
 		default:
 			if (!machine().side_effects_disabled())
