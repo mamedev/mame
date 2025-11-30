@@ -168,8 +168,11 @@ void laser3k_state::banks_map(address_map &map)
 	map(0x00000, 0x2ffff).rw(FUNC(laser3k_state::ram_r), FUNC(laser3k_state::ram_w));
 	map(0x38000, 0x3bfff).rom().region("maincpu", 0);
 	map(0x3c000, 0x3c0ff).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
-	map(0x3c100, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
-	map(0x3c200, 0x3ffff).rom().region("maincpu", 0x4200);
+	map(0x3c100, 0x3c1ff).rom().region("maincpu", 0x4100);
+	map(0x3c1c0, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
+	map(0x3c300, 0x3c3ff).rom().region("maincpu", 0x4300);
+//  map(0x3c600, 0x3c6ff).rom().region("fdc", 0);
+	map(0x3c800, 0x3ffff).rom().region("maincpu", 0x4800);
 }
 
 void laser3k_state::machine_start()
@@ -257,11 +260,6 @@ void laser3k_state::machine_reset()
 	m_80col = 0;
 	m_mix = false;
 	m_gfxmode = TEXT;
-
-	uint8_t *rom = (uint8_t *)memregion("maincpu")->base();
-
-	// patch out disk controller ID for now so it drops right into BASIC
-	rom[0x4607] = 0;
 }
 
 uint8_t laser3k_state::ram_r(offs_t offset)
@@ -537,17 +535,18 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0xc2:  // h-blank status
+		case 0x02:  // h-blank status
 			return m_screen->hblank() ? 0x80 : 0x00;
 
-		case 0xc3:  // v-blank status
+		case 0x03:  // v-blank status
 			return m_screen->vblank() ? 0x80 : 0x00;
 
-		case 0xc5:  // CPU 1/2 MHz status?
+		case 0x05:  // CPU 1/2 MHz status?
 			return 0x00;
 
 		default:
-			printf("io2_r @ unknown %x\n", offset);
+			if (!machine().side_effects_disabled())
+				logerror("io2_r @ unknown %x\n", offset);
 			break;
 	}
 
@@ -1068,22 +1067,22 @@ void laser3k_state::laser3k(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
-ROM_START(las3000)
+ROM_START(laser3k)
 	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
+	ROM_LOAD("341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
 
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD ( "las3000.rom", 0x0000, 0x8000, CRC(9c7aeb09) SHA1(3302adf41e258cf50210c19736948c8fa65e91de))
+	ROM_LOAD("laser3000_v2.2.rom", 0x0000, 0x8000, CRC(3ecbc06c) SHA1(c5c188484664bec1a1445156d63b7b80842e7219))
 
 	ROM_REGION(0x400, "kbdmcu", 0)
-	ROM_LOAD ( "tmp8048p.u44", 0x000, 0x400, NO_DUMP)
+	ROM_LOAD("tmp8048p.u44", 0x000, 0x400, NO_DUMP)
 
-	ROM_REGION(0x100, "fdc", 0)
-	ROM_LOAD ( "l3kdisk.rom", 0x0000, 0x0100, CRC(2d4b1584) SHA1(989780b77e100598124df7b72663e5a31a3339c0))
+	ROM_REGION(0x1000, "fdc", 0)
+	ROM_LOAD("laser_3000_disk_rom.bin", 0x0000, 0x1000, CRC(89f667fa) SHA1(9e34a208c11772e6bc8915aad090240d20a9ceff))
 ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME      FLAGS
-COMP( 1983, las3000, 0,      0,      laser3k, laser3k, laser3k_state, empty_init, "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )
+COMP( 1983, laser3k, 0,      0,      laser3k, laser3k, laser3k_state, empty_init, "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )
