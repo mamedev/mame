@@ -400,7 +400,7 @@ void laser3k_state::do_io(int offset)
 
 		case 0x4c:  // low resolution (40 column)
 			m_80col = false;
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(1000000);
 			break;
 
 		case 0x4d:  // RGB mode
@@ -410,12 +410,12 @@ void laser3k_state::do_io(int offset)
 		case 0x4e:  // double hi-res
 			m_80col = true;
 			m_gfxmode = DHIRES;
-			m_maincpu->set_unscaled_clock(1021800*2);
+			m_maincpu->set_unscaled_clock(1000000*2);
 			break;
 
 		case 0x4f:  // high resolution (80 column).  Yes, the CPU clock also doubles when the pixel clock does (!)
 			m_80col = true;
-			m_maincpu->set_unscaled_clock(1021800*2);
+			m_maincpu->set_unscaled_clock(1000000*2);
 			break;
 
 		case 0x50:  // graphics mode
@@ -574,7 +574,7 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 			return m_screen->vblank() ? 0x80 : 0x00;
 
 		case 0x05:  // CPU 1/2 MHz status?
-			return 0x00;
+			return m_80col ? 0x00 : 0x80;
 
 		default:
 			if (!machine().side_effects_disabled())
@@ -637,7 +637,7 @@ void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos
 	/* look up the character data */
 	uint8_t const *const chardata = &textgfx_data[(code * 8) % textgfx_datalen];
 
-	if (m_flash && (code >= 0x40) && (code <= 0x7f))
+	if (code < 0x80 && (m_flash || m_80col || code < 0x40))
 	{
 		/* we're flashing; swap */
 		using std::swap;
