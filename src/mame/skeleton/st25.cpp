@@ -5,6 +5,10 @@
 Skeleton driver for NSM/Löwen ST25 platform of gambling machines
 Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System_Modul_25
 
+CPU: NEC V25 (D70322L-8) with customer specific internal ROM NSM-GA-1093
+RAM: Mosel-Vitelic V62C518256LL-70P 32Kx8 SRAM
+
+
   NSM STE25.1 216575A/1012
   ___________________________________________________________________________________
  |                 __________                             XTAL       SERIAL         |
@@ -79,27 +83,21 @@ private:
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 };
 
 
 void st25_state::program_map(address_map &map)
 {
-	//map(0x00000, 0x3ffff).ram();
-	//map(0x40000, 0x7ffff).rom().region("maincpu", 0);
+	map(0x00000, 0x1ffff).ram();
+	map(0x20000, 0x7ffff).rom().region("maincpu", 0x20000);
+	map(0x80000, 0xeffff).ram();
 	map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
 
 void st25_state::io_map(address_map &map)
 {
-	// map(0x8000, 0x8000).w();
+	map(0x3000, 0x3001).nopw(); // neither oki, rtc or duart
 }
-
-void st25_state::data_map(address_map &map)
-{
-	map(0x100, 0x1ff).ram();
-}
-
 
 static INPUT_PORTS_START(st25)
 	PORT_START("IN0")
@@ -111,7 +109,6 @@ void st25_state::st25(machine_config &config)
 	V25(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &st25_state::io_map);
-	m_maincpu->set_addrmap(AS_DATA, &st25_state::data_map);
 
 	M48T02(config, m_rtc, 0); // ST M48T18-150PC1
 
@@ -119,7 +116,7 @@ void st25_state::st25(machine_config &config)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
-	OKIM6376(config, m_oki, 128000).add_route(ALL_OUTPUTS, "mono", 0.5); // adjustable using a pot
+	OKIM6376(config, m_oki, 128000).add_route(ALL_OUTPUTS, "mono", 0.5); // clock adjustable by a glued pot
 }
 
 ROM_START(alphar)
@@ -151,7 +148,7 @@ ROM_START(arenau)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("27c2001.ic2", 0x00000, 0x40000, CRC(2348e6c3) SHA1(7708a2ffc3b5154bd1793fb7332e26125cdc9696))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -173,7 +170,7 @@ ROM_START(ballermann)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("27c2001.ic2", 0x00000, 0x40000, CRC(a20915f1) SHA1(cd7e1339bc635a8e16381858b93fe28f04fa725d))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -209,7 +206,7 @@ ROM_START(blizzard)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("tms27c020dip32_blizzard_pgm_119438_170296.ic2", 0x00000, 0x40000, CRC(7ff91608) SHA1(988335313141ca63d06abab6fd2542b167c5c04a))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -293,7 +290,7 @@ ROM_START(majesto)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("majesto_m27c2001_st2_122559_28.09.02.ic2", 0x00000, 0x40000, CRC(e08a308c) SHA1(7e015508949e32fd86334ae0e95baf11ca5e26b2))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -344,7 +341,7 @@ ROM_START(purpurr)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("pur_pur_royal_2804_w27e020.ic2", 0x00000, 0x40000, CRC(f7058b6a) SHA1(ad307de9dc979e6c21237b893bb186fc75533b60))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -355,29 +352,18 @@ ROM_START(robin)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("m27c2001_panther_robin_1705.ic2", 0x00000, 0x40000, CRC(1e465f8d) SHA1(63cd069c867c54f24af893ec2d6ad36016b7e179))
 
 	ROM_REGION(0x80000, "oki", 0)
 	ROM_LOAD("m27c4001_panther_robin_musik.ic1", 0x00000, 0x80000, CRC(0dcf91a7) SHA1(2e29b55c83bfd649dd92c087eeaa887676755e9f))
 ROM_END
 
-ROM_START(smaragd)
-	ROM_REGION(0x04000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
-
-	ROM_REGION(0x08000, "maincpu", 0)
-	ROM_LOAD("115192_c6.ic2", 0x00000, 0x08000, CRC(6bc0009e) SHA1(a4a10ddd93517cb27be06901232f925f7cbcee52))
-
-	ROM_REGION(0x08000, "oki", 0)
-	ROM_LOAD("115191_c5.ic1", 0x00000, 0x08000, CRC(346b91cb) SHA1(6bb7beaeef890ca7e0e322b5400e4257101c0c88))
-ROM_END
-
 ROM_START(stakeoffe)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("27c020a.ic2", 0x00000, 0x40000, CRC(b1553dc1) SHA1(d04d1e0d7cf553588d6abf2f5c95e0d8a761f8b6))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -402,7 +388,7 @@ ROM_START(tango)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("am27c020_nsm_tango.ic2", 0x00000, 0x40000, CRC(7c0fec14) SHA1(9c2c463c9b39dd1167203c67fb6632d9379a37fe))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -413,7 +399,7 @@ ROM_START(tobago)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("27c2001.ic2", 0x00000, 0x40000, CRC(dc7e529b) SHA1(3bf7b3e0a27c808061c47515513fa6e76d26cd63))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -439,7 +425,6 @@ ROM_END
 
 
 //   YEAR  NAME      PARENT   MACHINE INPUT    CLASS   INIT        ROT   COMPANY         FULLNAME                                                  FLAGS
-GAME(1994, smaragd,      0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Smaragd",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1995, blizzard,     0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Blizzard",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1995, tango,        0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Tango",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1996, tobago,       0,     st25, st25, st25_state, empty_init, ROT0, "Bergmann", "Tobago",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
