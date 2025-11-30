@@ -207,26 +207,23 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 	// get and process messages
 	MSG message;
 
-	// Crude implementation of GetMessage with timeout
-	if (MsgWaitForMultipleObjects(0, nullptr, false, 16, QS_ALLINPUT) == WAIT_OBJECT_0)
+	if (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE))
 	{
-		if (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE)) {
-			switch (message.message)
-			{
-				// check for F10 -- we need to capture that ourselves
-				case WM_SYSKEYDOWN:
-				case WM_SYSKEYUP:
-					if (message.wParam == VK_F4 && message.message == WM_SYSKEYDOWN)
-						SendMessage(GetAncestor(GetFocus(), GA_ROOT), WM_CLOSE, 0, 0);
-					if (message.wParam == VK_F10)
-						SendMessage(GetAncestor(GetFocus(), GA_ROOT), (message.message == WM_SYSKEYDOWN) ? WM_KEYDOWN : WM_KEYUP, message.wParam, message.lParam);
-					break;
+		switch (message.message)
+		{
+			// check for F10 -- we need to capture that ourselves
+			case WM_SYSKEYDOWN:
+			case WM_SYSKEYUP:
+				if (message.wParam == VK_F4 && message.message == WM_SYSKEYDOWN)
+					SendMessage(GetAncestor(GetFocus(), GA_ROOT), WM_CLOSE, 0, 0);
+				if (message.wParam == VK_F10)
+					SendMessage(GetAncestor(GetFocus(), GA_ROOT), (message.message == WM_SYSKEYDOWN) ? WM_KEYDOWN : WM_KEYUP, message.wParam, message.lParam);
+				break;
 
-					// process everything else
-				default:
-					winwindow_dispatch_message(*m_machine, message);
-					break;
-			}
+			// process everything else
+			default:
+				winwindow_dispatch_message(*m_machine, message);
+				break;
 		}
 	}
 
