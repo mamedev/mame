@@ -2579,7 +2579,7 @@ ROM_START( anibonusb2 )
 	ROM_LOAD( "ab17lt_.id", 0x00, 0x20, CRC(cee2a8e9) SHA1(8c5fe465f1397b3d40f616d6a4d842c2bbc767de) )
 ROM_END
 
-ROM_START( anibonusd1 )
+ROM_START( anibonusd1 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "abd17r.bin", 0x00000, 0x40000, CRC(32707445) SHA1(12005139862b209e0f187e27f61f779de81066a1) )
 
@@ -3393,7 +3393,7 @@ ROM_START( fb2genv2 )
 	ROM_LOAD( "fb2g18lt.id", 0x00, 0x20, CRC(8f36bc08) SHA1(53d970cb1a1055c459e64a09f4e495c52aa2ab9f) )
 ROM_END
 
-ROM_START( fb2gencq )
+ROM_START( fb2gencq ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "f2gv18lt.bin", 0x00000, 0x80000, CRC(ea6cb51e) SHA1(d86398feeac529aee12e1955e9f01b6477d6505c) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
@@ -3684,7 +3684,7 @@ ROM_START( fb4c2 )
 	ROM_LOAD( "fb415lt.id", 0x00, 0x20, CRC(f44d3e8c) SHA1(af462959a37c271c840324d74b2619691fadf8bd) )
 ROM_END
 
-ROM_START( fb4d1 )
+ROM_START( fb4d1 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "fb4d15r.bin", 0x00000, 0x40000, CRC(aeed6133) SHA1(8658708fbfd7f662f72a30a3f37baca98e931589) )
 
