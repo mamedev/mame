@@ -6,12 +6,11 @@ license:CC0-1.0
 <softwarelist name="mobigo_cart" description="VTech MobiGo cartridges">
 
 	<!-- This list is ordered by game description -->
-
 	<!-- Dummy carts (just a jumper PCB, without ROM) that enable internal games in the BIOS:
 	    80-250700 - Touch & Learn - Game Pack (US)
 	    80-250704 - MobiGo 2 (GE) -->
 
-	<software name="ben10g" supported="no">
+	<software name="ben10g" supported="no"> <!-- Will be clone of "ben10" once found and dumped. -->
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -72,7 +71,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carstoong" supported="no">
+	<software name="carstoong" supported="no"> <!-- Will be clone of "carstoon" once found and dumped. -->
 		<description>Disney/Pixar Cars Toon - Hooks unglaubliche Geschichten (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -84,7 +83,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="chuggg" supported="no">
+	<software name="chuggg" supported="no"> <!-- Will be clone of "chugg" once found and dumped. -->
 		<description>Chuggington (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -96,7 +95,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="docmcg" supported="no">
+	<software name="docmcg" supported="no"> <!-- Will be clone of "docmc" once found and dumped. -->
 		<description>Doc McStuffins - Spielzeugarztin (Germany)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
@@ -120,7 +119,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dzuggerg" supported="no">
+	<software name="dzuggerg" supported="no"> <!-- Will be clone of "dinotrain" once found and dumped. -->
 		<description>Dino-Zug - Erforsche die Welt (Germany)</description>
 		<year>2014</year>
 		<publisher>VTech</publisher>
@@ -156,7 +155,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dorag" supported="no">
+	<software name="dorag" supported="no"> <!-- Will be clone of "dora" once found and dumped. -->
 		<description>Nickelodeon Dora - Tag des Zwillings (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -168,7 +167,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hkittyg" supported="no">
+	<software name="hkittyg" supported="no"> <!-- Will be clone of "hkitty" once found and dumped. -->
 		<description>Hello Kitty - Hello Kitty feiert Geburtstag! (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -216,8 +215,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mickey" supported="no"> <!-- part #? full title? region? -->
-		<description>Mickey Mouse</description>
+	<software name="mickeych" supported="no">
+		<description>Mickey Mouse Clubhouse (USA)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
@@ -227,7 +226,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mickeyg" cloneof="mickey" supported="no"> <!-- By now, cloneof "mickey" -->
+	<software name="mickeychg" cloneof="mickeych" supported="no">
 		<description>Disney Micky Maus - Wunderhaus (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -239,7 +238,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mickeys" cloneof="mickey" supported="no"> <!-- By now, cloneof "mickey" -->
+	<software name="mickeychs" cloneof="mickeych" supported="no"> <!-- By now, cloneof "mickey" -->
 		<description>Disney La Casa de Mickey Mouse (Spain)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -251,7 +250,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="minnieg" supported="no">
+	<software name="minnieg" supported="no"> <!-- Will be clone of "minnie" once found and dumped. -->
 		<description>Disney Minnie (Germany)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
@@ -287,7 +286,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="planesg" supported="no">
+	<software name="planesg" supported="no"> 
 		<description>Disney Planes (Germany)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
@@ -299,7 +298,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rapunzelg" supported="no">
+	<software name="tangledg" cloneof="tangled" supported="no">
 		<description>Disney Rapunzel - Neu verföhnt (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -347,7 +346,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sofiag" supported="no">
+	<software name="sofiag" supported="no"> <!-- Will be clone of "sofia" once found and dumped. -->
 		<description>Sofia die Erste (Germany)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
@@ -419,8 +418,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tangled" supported="no"> <!-- part #? full title? region? -->
-		<description>Tangled</description>
+	<software name="tangled" supported="no">
+		<description>Tangled (USA)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
@@ -430,7 +429,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="teamumizg" supported="no">
+	<software name="teamumizg" supported="no"> <!-- Will be clone of "teamumiz" once found and dumped. -->
 		<description>Nickelodeon Team Umizoomi - Die große Umiauto Rettung (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -442,9 +441,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- offset 0x12 is '0x01' is this a version number? cartridge was still only marked as 80-252700(US) -->
 	<software name="thomas" supported="no">
-		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 1?)</description>
+		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 1)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-252700(US)"/>
@@ -455,9 +453,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- offset 0x12 is '0x02' is this a version number? cartridge was still only marked as 80-252700(US) -->
 	<software name="thomasa" cloneof="thomas" supported="no">
-		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 2?)</description>
+		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 2)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-252700(US)"/>
@@ -528,7 +525,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="uspidg" supported="no">
+	<software name="uspidg" supported="no"> <!-- Will be clone of "uspid" once found and dumped. -->
 		<description>Marvel Ultimate Spider-Man (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
@@ -556,7 +553,7 @@ license:CC0-1.0
 
 	<!-- these have downloaded games on them, they do however appear to be tied to the machine that downloaded them, on other units they appear as blank -->
 	<software name="user1" supported="no">
-		<description>NAND User Cartridge (unknown data, set 1)</description>
+		<description>NAND User Cartridge (USA)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
@@ -567,7 +564,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="user2" supported="no">
-		<description>NAND User Cartridge (unknown data, set 2)</description>
+		<description>NAND User Cartridge (Europe)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
