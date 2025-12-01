@@ -22,6 +22,10 @@ void isa8_fdc_6300p_device::device_add_mconfig(machine_config &config)
 	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
 	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_irq_w));
 	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_drq_w));
+
+	// According to "Getting Started with you AT&T 6300 Plus", when the
+	// system came in a two-floppy configuration, drive A (lower drive)
+	// was 1.2MB, and drive B was 360K.
 	FLOPPY_CONNECTOR(config, "fdc:0", att6300p_floppies, "525hd", isa8_fdc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", att6300p_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
 }
