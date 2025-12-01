@@ -88,7 +88,6 @@ public:
 	ioport_value daytona_gearbox_r();
 
 	/* Public for access by MCFG */
-	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	u16 crypt_read_callback(u32 addr);
 
 
@@ -176,7 +175,7 @@ protected:
 	void colorxlat_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void eeprom_w(u8 data);
 	u8 in0_r();
-	u32 fifo_control_2a_r();
+	u32 fifo_control_r();
 	u32 videoctl_r();
 	void videoctl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u8 rchase2_drive_board_r();
@@ -220,15 +219,15 @@ protected:
 	void driveio_port_w(u8 data);
 	void push_geo_data(u32 data);
 	void reset_model2_scsp();
-	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//  void screen_vblank_model2(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
 	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
 
-	void model2_3d_frame_start();
+	void render_frame_start();
 	void geo_parse();
-	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void render_polygons( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	void model2_timers(machine_config &config);
@@ -268,10 +267,12 @@ private:
 	u32 m_geoctl = 0;
 	u32 m_geocnt = 0;
 	u32 m_videocontrol = 0;
+	u32 m_framenum = 0;
 
 	bool m_render_unk = false;
 	bool m_render_mode = false;
 	bool m_render_test_mode = false;
+	bool m_render_done = false;
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 	bool m_palette_dirty = false;
 
@@ -307,13 +308,13 @@ private:
 	// raster functions
 	// main data input port
 	void model2_3d_push( raster_state *raster, u32 input );
-	// quad & triangle push paths
-	void model2_3d_process_quad( raster_state *raster, u32 attr );
-	void model2_3d_process_triangle( raster_state *raster, u32 attr );
+	// polygon push path
+	template <unsigned NumVerts>
+	void model2_3d_process_polygon( raster_state *raster, u32 attr );
 
 	// inliners
 	inline void model2_3d_project( triangle *tri );
-	inline u16 float_to_zval( float floatval );
+	inline u16 float_to_zval( float floatval, s32 z_adjust );
 	inline bool check_culling( raster_state *raster, u32 attr, float min_z, float max_z );
 };
 
@@ -398,7 +399,6 @@ public:
 	void vcop(machine_config &config);
 
 protected:
-	u32 fifo_control_2o_r();
 	void daytona_output_w(u8 data);
 	void desert_output_w(u8 data);
 	void vcop_output_w(u8 data);
@@ -795,7 +795,7 @@ struct model2_state::raster_state
 	int16_t         center[4][2] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }; // Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y])
 	u16             center_sel = 0;                 // Selected center
 	u32             reverse = 0;                    // Left/Right Reverse
-	float           z_adjust = 0;                   // ZSort Mode
+	s32             z_adjust = 0;                   // ZSort Mode
 	float           triangle_z = 0;                 // Current Triangle z value
 	u8              master_z_clip = 0;              // Master Z-Clip value
 	u32             cur_command = 0;                // Current command
