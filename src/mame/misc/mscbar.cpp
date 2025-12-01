@@ -19,7 +19,7 @@
   U12 W27C512-45Z - eeprom
   Y1 10.7386 xtal mhz
   
-  At back.
+  At pcb back.
   MUSICBAR VER 201.
 
   Led Board
@@ -39,12 +39,18 @@
   Unpopulated 
   ld32 - led  
   ds14 ds15 2x  7 segment display 2 digit.
-
-  Todo:
-  Need layout.
+ 
+  Unused layout element:
+  digit27. only used to display 10 during k0
+  ay2 output
+  led32 - bit 6 Unused - only used during led test - K1
+  led33 - bit 7 Unused - only used during led test - K1. after start the roulette will start to blink. special bonus led?
+  
+  Todo: 
+  Need Accurate layout.
   Meter In and Out.
-  Verify Hooper hook up.
-  Verify P3 Led output.
+  Verify Hooper hook up and p3 led output.
+
 **************************************************************************/
 
 #include "emu.h"
@@ -115,7 +121,8 @@ static INPUT_PORTS_START( mscbar )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 8")PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Bet 9") PORT_CODE(KEYCODE_L)
 
-    PORT_START("KEYS2")
+
+	PORT_START("KEYS2")
 	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_GAMBLE_TAKE)  PORT_NAME("Credits") PORT_CODE(KEYCODE_Q) 
 	PORT_BIT(0x40, IP_ACTIVE_LOW,  IPT_KEYPAD)  PORT_NAME("Bonus") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_CODE(KEYCODE_T) // ???
@@ -143,15 +150,15 @@ static INPUT_PORTS_START( mscbar )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_C)  //  will cause error 76.
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT) PORT_NAME("Clear Credits?") PORT_CODE(KEYCODE_C)  //  will cause error 76.
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // For Hopper.
 
 	PORT_START("P3")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(8)  // Coin
-    INPUT_PORTS_END
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)  // Coin
+INPUT_PORTS_END
 
 void mscbar_state::ay1_port_a_w(uint8_t data)
-{   
+{  
 	for (uint8_t i = 0; i < 8; i++)
 		m_leds[i] = BIT(~data, i);
 }
@@ -170,23 +177,25 @@ void mscbar_state::ay2_port_a_w(uint8_t data)
 
 void mscbar_state::ay2_port_b_w(uint8_t data)
 {
-    for (uint8_t i = 0; i < 6; i++)
+	for (uint8_t i = 0; i < 6; i++)
     m_leds[i + 24] = BIT(~data, i);
-    m_leds[30] = BIT(~data, 6); // Unused - only used during led test - K1
-	m_leds[31] = BIT(~data, 7); // Unused - only used during led test - K1. after start the roulette will start to blink. special bonus led?
+//  m_leds[32] = BIT(data, 6);
+//	m_leds[33] = BIT(data, 7);
 }
-
 void mscbar_state::p1_port_w(uint8_t data)
 {
- m_hopper->motor_w(BIT(data, 3));
+
+m_hopper->motor_w(BIT(data, 3));
+machine().bookkeeping().coin_counter_w(0, data & 0x80);  
 }
 
 void mscbar_state::p3_port_w(uint8_t data)  // bit 3 and 5 are used.
 {
-	m_leds[33] = BIT(data, 3);
-    m_leds[32] = BIT(data, 5);
+	m_leds[31] = BIT(data, 3);
+    m_leds[30] = BIT(data, 5);
 }
-	
+
+
 void mscbar_state::multiplex_7seg_w(uint8_t data)
 {
 
@@ -218,6 +227,7 @@ void mscbar_state::display_7seg_data_w(uint8_t data)
 
 void mscbar_state::mscbar_adpcm_bank(uint8_t data)
 {
+
 		m_oki->set_rom_bank(data & 0x07);
 }
 
@@ -225,6 +235,7 @@ void mscbar_state::mscbar_program_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region("maincpu", 0);
 	map(0x1000, 0xffff).rom().region("eeprom",  0x1000);
+
 }
 
 void mscbar_state::mscbar_data_map(address_map &map)
@@ -235,6 +246,7 @@ void mscbar_state::mscbar_data_map(address_map &map)
 	map(0xa000, 0xa001).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xb000, 0xb000).w(FUNC(mscbar_state::mscbar_adpcm_bank)); /* adpcm bank */
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* HM6116LP-3: 2kb of Static RAM */
+
 }
 
 void mscbar_state::mscbar(machine_config &config)
@@ -299,5 +311,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                FLAGS
-GAME( 20??, mscbar, 0,       mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",    MACHINE_NOT_WORKING ) // Error 02
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                                  FLAGS
+GAME( 20??, mscbar, 0,       mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",                      MACHINE_NOT_WORKING  ) // Error 02
