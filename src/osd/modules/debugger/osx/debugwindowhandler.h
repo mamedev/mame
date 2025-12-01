@@ -35,6 +35,7 @@ extern NSString *const MAMESaveDebuggerConfigurationNotification;
 - (id)initWithMachine:(running_machine &)m title:(NSString *)t;
 
 - (void)activate;
+- (BOOL)sourceFrameActive;
 
 - (IBAction)debugBreak:(id)sender;
 - (IBAction)debugRun:(id)sender;
@@ -104,5 +105,15 @@ extern NSString *const MAMESaveDebuggerConfigurationNotification;
 
 - (void)saveConfigurationToNode:(util::xml::data_node *)node;
 - (void)restoreConfigurationFromNode:(util::xml::data_node const *)node;
+
+
+@end
+
+
+@protocol MAMEDebugViewDisasemblyContainer <NSObject>
+
+- (void) setDisasemblyView:(BOOL)value;
+- (BOOL) getDisasemblyView;
+- (void) setSourceButton:(int)index;
 
 @end

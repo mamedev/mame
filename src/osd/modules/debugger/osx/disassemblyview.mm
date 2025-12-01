@@ -7,6 +7,8 @@
 //============================================================
 
 #include "emu.h"
+
+#import "debugwindowhandler.h"
 #import "disassemblyview.h"
 
 #include "debug/debugvw.h"
@@ -34,6 +36,22 @@
 	if (action == @selector(showRightColumn:))
 	{
 		[item setState:((downcast<debug_view_disasm *>(view)->right_column() == [item tag]) ? NSOnState : NSOffState)];
+		return YES;
+	}
+	else if (action == @selector(sourceDebugChanged:))
+	{
+		NSWindow *window = [self window];
+		id delegate = [window delegate];
+		BOOL which = [delegate getDisasemblyView];
+		if (which == [item tag])
+		{
+			[item setState:NSControlStateValueOn];
+		}
+		else
+		{
+			[item setState:NSControlStateValueOff];
+		}
+
 		return YES;
 	}
 	else
@@ -103,6 +121,22 @@
 					keyEquivalent:@"n"];
 	[item setTarget:self];
 	[item setTag:DASM_RIGHTCOL_COMMENTS];
+
+	[menu addItem:[NSMenuItem separatorItem]];
+
+	item = [menu addItemWithTitle:@"Show Source"
+						   action:@selector(sourceDebugChanged:)
+					keyEquivalent:@"u"];
+	[item setTarget:self];
+	[item setTag:MENU_SHOW_SOURCE];
+
+	item = [menu addItemWithTitle:@"Show Disassembly"
+						   action:@selector(sourceDebugChanged:)
+					keyEquivalent:@"U"];
+	[item setTarget:self];
+	[item setTag:MENU_SHOW_DISASM];
+
+
 }
 
 
@@ -193,8 +227,16 @@
 }
 
 
-- (offs_t)selectedAddress {
-	return downcast<debug_view_disasm *>(view)->selected_address();
+- (NSNumber *)selectedAddress {
+	std::optional<offs_t> address = downcast<debug_view_disasm *>(view)->selected_address();
+	if (address.has_value())
+	{
+		return [NSNumber numberWithUnsignedInt:address.value()];
+	}
+	else
+	{
+		return nil;
+	}
 }
 
 
@@ -202,6 +244,25 @@
 	downcast<debug_view_disasm *>(view)->set_right_column((disasm_right_column) [sender tag]);
 }
 
+
+- (IBAction)sourceDebugChanged:(id)sender {
+	if ([sender tag] == MENU_SHOW_SOURCE)
+	{
+//      m_codeDock->setWidget(m_srcdbgFrame);
+		NSWindow *window = [self window];
+		id del = [window delegate];
+		[del setDisasemblyView:true];
+		machine->debug_view().update_all(DVT_SOURCE);
+	}
+	else
+	{
+//      m_codeDock->setWidget(m_dasmFrame);
+		NSWindow *window = [self window];
+		id del = [window delegate];
+		[del setDisasemblyView:false];
+		machine->debug_view().update_all(DVT_DISASSEMBLY);
+	}
+}
 
 - (void)insertActionItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
 	NSMenuItem *breakItem = [menu insertItemWithTitle:@"Toggle Breakpoint at Cursor"
@@ -252,6 +313,23 @@
 												 atIndex:index++];
 	[commentsItem setTarget:self];
 	[commentsItem setTag:DASM_RIGHTCOL_COMMENTS];
+
+	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
+
+	NSMenuItem *showSource = [menu insertItemWithTitle:@"Show Source"
+												action:@selector(sourceDebugChanged:)
+										 keyEquivalent:@"u"
+											   atIndex:index++ ];
+
+	[showSource setTarget:self];
+	[showSource setTag:MENU_SHOW_SOURCE];
+
+	NSMenuItem *showDisasembly = [menu insertItemWithTitle:@"Show Disassembly"
+													action:@selector(sourceDebugChanged:)
+											 keyEquivalent:@"U"
+												   atIndex:index++ ];
+	[showDisasembly setTarget:self];
+	[showDisasembly setTag:MENU_SHOW_DISASM];
 
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];

@@ -64,8 +64,9 @@ class debug_view_disasm : public debug_view
 {
 	friend class debug_view_manager;
 
+protected:
 	// construction/destruction
-	debug_view_disasm(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate);
+	debug_view_disasm(running_machine &machine, debug_view_osd_update_func osdupdate, void *osdprivate, bool source_code_debugging = false);
 	virtual ~debug_view_disasm();
 
 public:
@@ -74,7 +75,7 @@ public:
 	disasm_right_column right_column() const { return m_right_column; }
 	u32 backward_steps() const { return m_backwards_steps; }
 	u32 disasm_width() const { return m_dasm_width; }
-	offs_t selected_address();
+	virtual std::optional<offs_t> selected_address();
 
 	// setters
 	void set_expression(const std::string &expression);
@@ -90,6 +91,9 @@ protected:
 	virtual void view_notify(debug_view_notification type) override;
 	virtual void view_char(int chval) override;
 	virtual void view_click(const int button, const debug_view_xy& pos) override;
+
+	// helpers
+	bool update_previous_pc(offs_t pc);
 
 private:
 	// The information of one disassembly line. May become the actual
