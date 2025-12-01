@@ -31,6 +31,7 @@ TODO:
  - denseib,2: fix gfx glitches, missing texts
  - venom    : gfx glitches on second level
  - wldgunsb : remove hack for continue counter (values at 0x781010 and 0x781012 are expected to be initialized on reset/boot)
+ - piratdwb : probably protected. Role of the M68000 currently not investigated.
 
 ***************************************************************************
 
@@ -164,30 +165,31 @@ public:
 		m_shared_ram(*this, "shared_ram%u", 1U)
 	{ }
 
-	void base(machine_config &config);
-	void endless(machine_config &config);
-	void extrainp(machine_config &config);
-	void ffight2b(machine_config &config);
-	void kinstb(machine_config &config);
-	void rushbets(machine_config &config);
-	void sblast2b(machine_config &config);
-	void venom(machine_config &config);
-	void wldgunsb(machine_config &config);
-	void tmntmwb(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
+	void endless(machine_config &config) ATTR_COLD;
+	void extrainp(machine_config &config) ATTR_COLD;
+	void ffight2b(machine_config &config) ATTR_COLD;
+	void kinstb(machine_config &config) ATTR_COLD;
+	void rushbets(machine_config &config) ATTR_COLD;
+	void sblast2b(machine_config &config) ATTR_COLD;
+	void venom(machine_config &config) ATTR_COLD;
+	void wldgunsb(machine_config &config) ATTR_COLD;
+	void tmntmwb(machine_config &config) ATTR_COLD;
 
-	void init_iron();
-	void init_denseib();
-	void init_denseib2();
-	void init_kinstb();
-	void init_sblast2b();
-	void init_ffight2b();
-	void init_ffight3b();
-	void init_endless();
-	void init_legendsb();
-	void init_rushbets();
-	void init_tmntmwb();
-	void init_venom();
-	void init_wldgunsb();
+	void init_iron() ATTR_COLD;
+	void init_denseib() ATTR_COLD;
+	void init_denseib2() ATTR_COLD;
+	void init_kinstb() ATTR_COLD;
+	void init_sblast2b() ATTR_COLD;
+	void init_ffight2b() ATTR_COLD;
+	void init_ffight3b() ATTR_COLD;
+	void init_endless() ATTR_COLD;
+	void init_legendsb() ATTR_COLD;
+	void init_rushbets() ATTR_COLD;
+	void init_tmntmwb() ATTR_COLD;
+	void init_venom() ATTR_COLD;
+	void init_wldgunsb() ATTR_COLD;
+	void init_anheizs() ATTR_COLD;
 
 private:
 	optional_shared_ptr_array<int8_t, 2> m_shared_ram;
@@ -1621,6 +1623,15 @@ void snesb_state::init_wldgunsb()
 	init_snes();
 }
 
+void snesb_state::init_anheizs()
+{
+	// boot vector
+	//dst[0x7ffc] = 0x40;
+	//dst[0x7ffd] = 0x80;
+
+	init_snes();
+}
+
 
 ROM_START( kinstb )
 	ROM_REGION( 0x400000, "user3", 0 )
@@ -1813,7 +1824,17 @@ ROM_START( wldgunsb )
 	ROM_LOAD( "c20.bin", 0x080000, 0x080000, CRC(62ae4acb) SHA1(62aa320bcc7eeedb00c70baa909ac0230256c9a4) )
 ROM_END
 
-} // Anonymous namespace
+ROM_START( piratdwb ) // this PCB has a M68000 in addition to the usual SNES bootleg hardware
+	ROM_REGION( 0x100000, "user3", 0 )
+	ROM_LOAD( "rom2", 0x000000, 0x080000, CRC(026247eb) SHA1(3eabfa06cce1f9227c5b957e7624a6879783133a) )
+	ROM_LOAD( "rom1", 0x080000, 0x080000, CRC(770a23f2) SHA1(ff4f750da7161089b4000a91e7c9b29bd7b73df1) )
+
+	ROM_REGION( 0x40000, "m68000", 0 ) // these contain a tiny program followed by padding / leftover stuff
+	ROM_LOAD16_BYTE( "1", 0x00000, 0x20000, CRC(4ad4d7ab) SHA1(15bf2a47af8c778ba81f8f17430f1ea0fe6cfc63) )
+	ROM_LOAD16_BYTE( "2", 0x00001, 0x20000, CRC(81fb1936) SHA1(ba7168a6f117eb9722180eb6cd78f69fc1db90ec) )
+ROM_END
+
+} // anonymous namespace
 
 
 GAME( 199?, kinstb,       0,        kinstb,       kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -1831,3 +1852,4 @@ GAME( 1996, legendsb,     0,        extrainp,     legendsb, snesb_state, init_le
 GAME( 1997, rushbets,     0,        rushbets,     legendsb, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
+GAME( 199?, piratdwb,     0,        base,         wldgunsb, snesb_state, init_anheizs,   ROT0, "bootleg",  "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
