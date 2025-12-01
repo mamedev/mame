@@ -250,7 +250,7 @@ private:
 	void nmi_enable_w(uint8_t data);
 	void update_nmi();
 
-	void set_protected_mode(bool enabled);
+	void set_protection_enabled(bool enabled);
 
 	required_device<i80286_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -295,8 +295,6 @@ private:
 
 	void update_ir1();
 
-	static void floppy_formats(format_registration &fr);
-
 	void soft_reset();
 	void configure_mapping(int sel);
 
@@ -316,6 +314,7 @@ private:
 	void cltrap_w(offs_t offset, uint8_t data);
 
 	bool m_protected;
+	bool m_realmode;
 	bool m_mapping_sel;
 	bool m_warm_reset;
 
@@ -385,6 +384,7 @@ void att6300p_state::machine_start()
 	save_item(NAME(m_p2_out));
 	save_item(NAME(m_kbdata));
 	save_item(NAME(m_protected));
+	save_item(NAME(m_realmode));
 	save_item(NAME(m_warm_reset));
 	save_item(NAME(m_trapio_reg_idx));
 	save_item(NAME(m_trapio_reg));
@@ -392,7 +392,8 @@ void att6300p_state::machine_start()
 
 void att6300p_state::machine_reset()
 {
-	set_protected_mode(false);
+	set_protection_enabled(false);
+	m_realmode = true;
 	configure_mapping(0);
 
 	ctrlport_a_w(0);
@@ -662,7 +663,12 @@ void att6300p_state::zc02_cb(int state)
 
 void att6300p_state::soft_reset()
 {
-	set_protected_mode(false);
+	if (!m_realmode)
+	{
+		m_realmode = true;
+		configure_mapping(m_mapping_sel);
+		m_mmu->set_a20_enabled(!m_realmode);
+	}
 	m_maincpu->reset();
 }
 
@@ -675,7 +681,7 @@ void att6300p_state::configure_mapping(int sel)
 		0x03, 0x13, 0x0b, 0x1b, 0x07, 0x17, 0x0f, 0x1f,
 	};
 
-	bool rom_upper = (sel & 0x8) == 0 || m_protected;
+	bool rom_upper = !((sel & 0x8) && m_realmode);
 	int rom_region = (sel & 7) + (rom_upper ? 8 : 0);
 
 	uint8_t *rom = m_map_rom->base() + rom_region*32;
@@ -701,13 +707,23 @@ void att6300p_state::configure_mapping(int sel)
 	m_mapping_sel = sel;
 }
 
-void att6300p_state::set_protected_mode(bool enabled)
+void att6300p_state::set_protection_enabled(bool enabled)
 {
 	if (m_protected != enabled)
 	{
+		if (enabled)
+		{
+			// Rising edge of protection enable indicates we are to use
+			// A20-A23 for the PROM-based address mapping.
+			if (m_realmode)
+			{
+				m_realmode = false;
+				configure_mapping(m_mapping_sel);
+				m_mmu->set_a20_enabled(!m_realmode);
+			}
+		}
 		m_protected = enabled;
-		configure_mapping(m_mapping_sel);
-		m_mmu->set_protected_mode_enabled(enabled);
+		m_mmu->set_protection_enabled(enabled);
 	}
 }
 
@@ -743,7 +759,7 @@ void att6300p_state::timeslice_w(offs_t offset, uint8_t data)
 
 void att6300p_state::protecten_w(offs_t offset, uint8_t data)
 {
-	set_protected_mode(data & B_VIRT_PE_PROTECTEN);
+	set_protection_enabled(data & B_VIRT_PE_PROTECTEN);
 
 	m_mmu->set_mem_setup_enabled(data & B_VIRT_PE_MEMSETUP);
 	m_mmu->set_io_setup_enabled(data & B_VIRT_PE_IOSETUP);
