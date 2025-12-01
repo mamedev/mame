@@ -18,121 +18,176 @@ void fsblk_t::set_block_size(u32 block_size)
 	m_block_size = block_size;
 }
 
-const u8 *fsblk_t::block_t::roffs(const char *function, u32 off, u32 size) const
+void fsblk_t::block_t::rcheck(const char *function, u32 off, u32 size) const
 {
 	if(off + size > m_size)
 		throw std::out_of_range(util::string_format("block_t::%s out-of-block read access, offset=%d, size=%d, block size=%d", function, off, size, m_size));
-	return rodata() + off;
 }
 
-u8 *fsblk_t::block_t::woffs(const char *function, u32 off, u32 size)
+void fsblk_t::block_t::wcheck(const char *function, u32 off, u32 size) const
 {
 	if(off + size > m_size)
 		throw std::out_of_range(util::string_format("block_t::%s out-of-block access, offset=%d, size=%d, block size=%d", function, off, size, m_size));
-	return data() + off;
 }
 
 void fsblk_t::block_t::write(u32 offset, const u8 *src, u32 size)
 {
-	memcpy(woffs("write", offset, size), src, size);
+	wcheck("write", offset, size);
+	internal_write(offset, src, size);
 }
 
 void fsblk_t::block_t::fill(u32 offset, u8 data, u32 size)
 {
-	memset(woffs("fill", offset, size), data, size);
+	wcheck("fill", offset, size);
+	internal_fill(offset, data, size);
 }
 
 void fsblk_t::block_t::fill(u8 data)
 {
-	memset(this->data(), data, size());
+	internal_fill(0, data, size());
 }
 
 void fsblk_t::block_t::wstr(u32 offset, std::string_view str)
 {
-	memcpy(woffs("wstr", offset, str.size()), str.data(), str.size());
+	wcheck("wstr", offset, str.size());
+	internal_write(offset, reinterpret_cast<const u8 *>(str.data()), str.size());
 }
 
 void fsblk_t::block_t::w8(u32 offset, u8 data)
 {
-	woffs("w8", offset, 1)[0] = data;
+	wcheck("w8", offset, 1);
+	internal_fill(offset, data, 1);
 }
 
 void fsblk_t::block_t::w16b(u32 offset, u16 data)
 {
-	put_u16be(woffs("w16b", offset, 2), data);
+	wcheck("w16b", offset, 2);
+	u8 p[2];
+	put_u16be(p, data);
+	internal_write(offset, p, 2);
 }
 
 void fsblk_t::block_t::w24b(u32 offset, u32 data)
 {
-	put_u24be(woffs("w24b", offset, 3), data);
+	wcheck("w24b", offset, 3);
+	u8 p[3];
+	put_u24be(p, data);
+	internal_write(offset, p, 3);
 }
 
 void fsblk_t::block_t::w32b(u32 offset, u32 data)
 {
-	put_u32be(woffs("w32b", offset, 4), data);
+	wcheck("w32b", offset, 4);
+	u8 p[4];
+	put_u32be(p, data);
+	internal_write(offset, p, 4);
 }
 
 void fsblk_t::block_t::w16l(u32 offset, u16 data)
 {
-	put_u16le(woffs("w16l", offset, 2), data);
+	wcheck("w16l", offset, 2);
+	u8 p[2];
+	put_u16le(p, data);
+	internal_write(offset, p, 2);
 }
 
 void fsblk_t::block_t::w24l(u32 offset, u32 data)
 {
-	put_u24le(woffs("w24l", offset, 3), data);
+	wcheck("w24l", offset, 3);
+	u8 p[3];
+	put_u24le(p, data);
+	internal_write(offset, p, 3);
 }
 
 void fsblk_t::block_t::w32l(u32 offset, u32 data)
 {
-	put_u32le(woffs("w32l", offset, 4), data);
+	wcheck("w32l", offset, 4);
+	u8 p[4];
+	put_u32le(p, data);
+	internal_write(offset, p, 4);
 }
 
 void fsblk_t::block_t::read(u32 offset, u8 *dst, u32 size) const
 {
-	memcpy(dst, roffs("read", offset, size), size);
+	rcheck("read", offset, size);
+	internal_read(offset, dst, size);
 }
 
-std::string_view fsblk_t::block_t::rstr(u32 offset, u32 size) const
+std::string fsblk_t::block_t::rstr(u32 offset, u32 size) const
 {
-	const u8 *d = roffs("rstr", offset, size);
-	return std::string_view(reinterpret_cast<const char *>(d), size);
+	rcheck("rstr", offset, size);
+	std::string s(size, 0);
+	internal_read(offset, reinterpret_cast<u8 *>(s.data()), size);
+	return s;
 }
 
 u8 fsblk_t::block_t::r8(u32 offset) const
 {
-	return roffs("r8", offset, 1)[0];
+	rcheck("r8", offset, 1);
+	u8 p;
+	internal_read(offset, &p, 1);
+	return p;
 }
 
 u16 fsblk_t::block_t::r16b(u32 offset) const
 {
-	return get_u16be(roffs("r16b", offset, 2));
+	rcheck("r16b", offset, 2);
+	u8 p[2];
+	internal_read(offset, p, 2);
+	return get_u16be(p);
 }
 
 u32 fsblk_t::block_t::r24b(u32 offset) const
 {
-	return get_u24be(roffs("r24b", offset, 3));
+	rcheck("r24b", offset, 3);
+	u8 p[3];
+	internal_read(offset, p, 3);
+	return get_u24be(p);
 }
 
 u32 fsblk_t::block_t::r32b(u32 offset) const
 {
-	return get_u32be(roffs("r32b", offset, 4));
+	rcheck("r32b", offset, 4);
+	u8 p[4];
+	internal_read(offset, p, 4);
+	return get_u32be(p);
 }
 
 u16 fsblk_t::block_t::r16l(u32 offset) const
 {
-	return get_u16le(roffs("r16l", offset, 2));
+	rcheck("r16l", offset, 2);
+	u8 p[2];
+	internal_read(offset, p, 2);
+	return get_u16le(p);
 }
 
 u32 fsblk_t::block_t::r24l(u32 offset) const
 {
-	return get_u24le(roffs("r24l", offset, 3));
+	rcheck("r24l", offset, 3);
+	u8 p[3];
+	internal_read(offset, p, 3);
+	return get_u24le(p);
 }
 
 u32 fsblk_t::block_t::r32l(u32 offset) const
 {
-	return get_u32le(roffs("r32l", offset, 4));
+	rcheck("r32l", offset, 4);
+	u8 p[4];
+	internal_read(offset, p, 4);
+	return get_u32le(p);
 }
 
+bool fsblk_t::block_t::eqmem(u32 offset, const u8 *p, u32 size) const
+{
+	rcheck("eqmem", offset, size);
+	return internal_eqmem(offset, p, size);
+}
+
+bool fsblk_t::block_t::eqstr(u32 offset, std::string_view str) const
+{
+	rcheck("eqstr", offset, str.size());
+	return internal_eqmem(offset, reinterpret_cast<const u8 *>(str.data()), str.size());
+}
 
 
 void filesystem_t::wstr(u8 *p, std::string_view str)
@@ -140,9 +195,9 @@ void filesystem_t::wstr(u8 *p, std::string_view str)
 	memcpy(p, str.data(), str.size());
 }
 
-std::string_view filesystem_t::rstr(const u8 *p, u32 size)
+std::string filesystem_t::rstr(const u8 *p, u32 size)
 {
-	return std::string_view(reinterpret_cast<const char *>(p), size);
+	return std::string(reinterpret_cast<const char *>(p), size);
 }
 
 std::string_view filesystem_t::trim_end_spaces(std::string_view str)
