@@ -152,6 +152,7 @@ Iron PCB (same as Final Fight 2?)
 
 #include "snes.h"
 
+#include "cpu/m68000/m68000.h"
 #include "speaker.h"
 
 
@@ -175,6 +176,7 @@ public:
 	void venom(machine_config &config) ATTR_COLD;
 	void wldgunsb(machine_config &config) ATTR_COLD;
 	void tmntmwb(machine_config &config) ATTR_COLD;
+	void piratdwb(machine_config &config) ATTR_COLD;
 
 	void init_iron() ATTR_COLD;
 	void init_denseib() ATTR_COLD;
@@ -222,6 +224,9 @@ private:
 	void venom_map(address_map &map) ATTR_COLD;
 	void wldgunsb_map(address_map &map) ATTR_COLD;
 	void tmntmwb_map(address_map &map) ATTR_COLD;
+
+	void piratdwb_map(address_map &map) ATTR_COLD;
+	void piratdwb_68k_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -453,6 +458,37 @@ void snesb_state::tmntmwb_map(address_map &map)
 	map(0x7010f1, 0x7010f2).r(FUNC(snesb_state::tmntmwb_7010f1_r));
 
 	map(0x781000, 0x7810ff).ram().share(m_shared_ram[0]);
+}
+
+
+void snesb_state::piratdwb_map(address_map &map)
+{
+	snesb_map(map);
+}
+
+void snesb_state::piratdwb_68k_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	// shared?
+	map(0x04e000, 0x04ffff).ram();
+	map(0x050000, 0x0503ff).ram();
+
+//	map(0x080000, 0x080000).lw8(
+//		NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff?, data); })
+//	);
+
+	// interrupts main CPU on coin triggers
+	map(0x0c0000, 0x0c0000).lw8(
+		NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff4, data); })
+	);
+	map(0x100000, 0x100001).portr("COIN");
+//	map(0x140000, 0x140000).lw8(
+//		NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff?, data); })
+//	);
+//	map(0x180000, 0x180000).lw8(
+//		NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff?, data); })
+//	);
+
 }
 
 static INPUT_PORTS_START( snes_common )
@@ -993,6 +1029,14 @@ static INPUT_PORTS_START( tmntmwb )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( piratdwb )
+	PORT_INCLUDE(snes_common)
+
+	PORT_START("COIN")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+INPUT_PORTS_END
+
+
 void snesb_state::base(machine_config &config)
 {
 	// basic machine hardware
@@ -1107,6 +1151,18 @@ void snesb_state::tmntmwb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::tmntmwb_map);
 }
+
+void snesb_state::piratdwb(machine_config &config)
+{
+	base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_map);
+
+	m68000_device &maincpu(M68000(config, "m68000", 16_MHz_XTAL / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_68k_map);
+//	maincpu.set_cpu_space(AS_PROGRAM);
+	maincpu.set_vblank_int("screen", FUNC(snesb_state::irq1_line_hold)); // unknown irq and source (all points the same)
+}
+
 
 void snesb_state::init_kinstb()
 {
@@ -1852,4 +1908,4 @@ GAME( 1996, legendsb,     0,        extrainp,     legendsb, snesb_state, init_le
 GAME( 1997, rushbets,     0,        rushbets,     legendsb, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
-GAME( 199?, piratdwb,     0,        base,         wldgunsb, snesb_state, init_anheizs,   ROT0, "bootleg",  "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, piratdwb,     0,        piratdwb,     piratdwb, snesb_state, init_anheizs,   ROT0, "bootleg",  "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
