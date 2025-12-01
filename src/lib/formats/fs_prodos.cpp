@@ -9,11 +9,9 @@
 #include "fsblk.h"
 
 #include "corestr.h"
-#include "multibyte.h"
 #include "strformat.h"
 
 #include <map>
-#include <stdexcept>
 
 using namespace fs;
 
@@ -293,7 +291,6 @@ std::error_condition prodos_impl::format(const meta_data &meta)
 	// Mark blocks from first_free_block to blocks-1 (the last one) as free
 	for(u32 i = 0; i != fmap_block_count; i++) {
 		auto fmap = m_blockdev.get(6 + i);
-		u8 *fdata = fmap->data();
 		u32 start = i ? 0 : first_free_block;
 		u32 end = i != fmap_block_count - 1 ? 4095 : (blocks - 1) & 4095;
 		end += 1;
@@ -302,13 +299,13 @@ std::error_condition prodos_impl::format(const meta_data &meta)
 		u32 eb = end >> 3;
 		u32 ei = end & 7;
 		if(sb == eb)
-			fdata[sb] = (0xff >> si) & ~(0xff >> ei);
+			fmap->w8(sb, (0xff >> si) & ~(0xff >> ei));
 		else {
-			fdata[sb] = 0xff >> si;
+			fmap->w8(sb, 0xff >> si);
 			if(eb != 512)
-				fdata[eb] = ~(0xff >> ei);
+				fmap->w8(eb, ~(0xff >> ei));
 			if(eb - sb > 1)
-				memset(fdata+sb, 0xff, eb-sb-1);
+				fmap->fill(sb, 0xff, eb-sb-1);
 		}
 	}
 	return std::error_condition();
@@ -356,7 +353,7 @@ std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_c
 		auto [blk, off, dir] = path_find(path);
 		if(!off || !dir)
 			return std::make_pair(error::not_found, std::vector<dir_entry>());
-		block = blk->r16l(off+0x11);
+		block = blk->r16l(off + 0x11);
 	}
 
 	std::vector<dir_entry> res;
@@ -368,11 +365,11 @@ std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_c
 			// skip inactive entries and subroutine/volume headers
 			if(type != 0 && type < 0xe0) {
 				meta_data meta;
-				meta.set(meta_name::name, blk->rstr(off+1, type & 0xf));
+				meta.set(meta_name::name, blk->rstr(off + 1, type & 0xf));
 				type >>= 4;
 
 				if(type == 5) {
-					auto rootblk = m_blockdev.get(blk->r16l(off+0x11));
+					auto rootblk = m_blockdev.get(blk->r16l(off + 0x11));
 					meta.set(meta_name::length, rootblk->r24l(0x005));
 					meta.set(meta_name::rsrc_length, rootblk->r24l(0x105));
 
@@ -402,7 +399,7 @@ std::tuple<fsblk_t::block_t::ptr, u32> prodos_impl::path_find_step(const std::st
 		auto blk = m_blockdev.get(block);
 		for(u32 off = 4; off < 511; off += 39) {
 			u8 type = blk->r8(off);
-			if(type != 0 && type < 0xe0 && name == blk->rstr(off+1, type & 0xf))
+			if(type != 0 && type < 0xe0 && name.size() == (type & 0xf) && blk->eqstr(off + 1, name))
 				return std::make_tuple(blk, off);
 		}
 		block = blk->r16l(2);
@@ -443,25 +440,20 @@ std::pair<std::error_condition, meta_data> prodos_impl::metadata(const std::vect
 	if(!off)
 		return std::make_pair(error::not_found, meta_data());
 
-	const u8 *entry = blk->rodata() + off;
-
 	meta_data res;
-	if(dir) {
-		u8 type = entry[0];
-		std::string_view name = rstr(entry+1, type & 0xf);
-		res.set(meta_name::name, name);
-	} else {
-		u8 type = entry[0];
-		std::string_view name = rstr(entry+1, type & 0xf);
+	u8 type = blk->r8(off);
+	std::string name = blk->rstr(off + 1, type & 0xf);
+	res.set(meta_name::name, name);
+
+	if(!dir) {
 		type >>= 4;
-		res.set(meta_name::name, name);
 		if(type == 5) {
-			auto rootblk = m_blockdev.get(get_u16le(entry+0x11));
+			auto rootblk = m_blockdev.get(blk->r16l(off + 0x11));
 			res.set(meta_name::length, rootblk->r24l(0x005));
 			res.set(meta_name::rsrc_length, rootblk->r24l(0x105));
 
 		} else if(type >= 1 && type <= 3)
-			res.set(meta_name::length, get_u24le(entry + 0x15));
+			res.set(meta_name::length, blk->r24l(off + 0x15));
 
 		else
 			return std::make_pair(error::unsupported, meta_data());
@@ -527,14 +519,13 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_read(const st
 	if(!off || dir)
 		return std::make_pair(error::not_found, std::vector<u8>());
 
-	const u8 *entry = blk->rodata() + off;
-	u8 type = entry[0] >> 4;
+	u8 type = blk->r8(off) >> 4;
 
 	if(type >= 1 && type <= 3)
-		return any_read(type, get_u16le(entry+0x11), get_u24le(entry + 0x15));
+		return any_read(type, blk->r16l(off + 0x11), blk->r24l(off + 0x15));
 
 	else if(type == 5) {
-		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
+		auto kblk = m_blockdev.get(blk->r16l(off + 0x11));
 		return any_read(kblk->r8(0x000), kblk->r16l(0x001), kblk->r24l(0x005));
 
 	} else
@@ -547,13 +538,12 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_rsrc_read(con
 	if(!off || dir)
 		return std::make_pair(error::not_found, std::vector<u8>());
 
-	const u8 *entry = blk->rodata() + off;
-	u8 type = entry[0] >> 4;
+	u8 type = blk->r8(off) >> 4;
 
 	if(type == 5) {
-		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
+		auto kblk = m_blockdev.get(blk->r16l(off + 0x11));
 		return any_read(kblk->r8(0x100), kblk->r16l(0x101), kblk->r24l(0x105));
 
 	} else
-		return std::make_pair(error::unsupported, std::vector<u8>());
+		return std::make_pair(std::error_condition(), std::vector<u8>());
 }

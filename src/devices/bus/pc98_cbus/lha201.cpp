@@ -6,10 +6,22 @@ Logitec LHA-201/20B SCSI-2
 
 PC-9801-92 derived?
 
+https://98epjunk.shakunage.net/sw/ext_card/ext_card_doc/lha201.txt
+Maximum -chs 13329,15,63 according to link above (for LHA-20B BIOS, TBD for LHA-201)
+
 TODO:
-- currently keeps pinging port 30 reset line;
-- stuck at "Negate ACK" just like base devices;
-- PnP;
+- stuck at "Negate ACK" just like base devices (cfr. issue #14532);
+- Can't IPL boot as standalone (requires a bootable IDE BIOS and moving of ROM window here),
+  uses SC_MODE_SENSE_6 pages 0xc3 and 0xc4, then SC_READ_CAPACITY, finally keeps SC_TEST_UNIT_READY
+  -> SC_REQUEST_SENSE with length = 0x16 trimmed internally with 18 (?).
+  What it reads comes from initial device_reset sense request.
+- Need data throttle between here, wd33c9x and/or NSCSI harddisk, otherwise executing anything will
+  fail;
+- PIO mode (involves port $cc6 and a ready flag in port $37 bit 0)
+- Tends to miss BIOS ROM loading at first boot, need to refactor C-Bus to actually have slots
+  as children (and make remapping phase less arbitrary, can't read required input port at
+  device_start);
+- Remaining remap options;
 
 **************************************************************************************************/
 
@@ -27,7 +39,7 @@ lha201_device::lha201_device(const machine_config &mconfig, const char *tag, dev
 
 ROM_START( lha201 )
 	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
-	ROM_LOAD("lha201-20b.ic3", 0x0000, 0x8000, CRC(a5995180) SHA1(4316fd50ce03d1b8f522327c8caa79edc88ac55a) )
+	ROM_LOAD("lha-201_ver1.33.ic3", 0x0000, 0x8000, CRC(a5995180) SHA1(4316fd50ce03d1b8f522327c8caa79edc88ac55a) )
 ROM_END
 
 const tiny_rom_entry *lha201_device::device_rom_region() const
@@ -45,7 +57,8 @@ void lha201_device::device_add_mconfig(machine_config &config)
 		{
 			wd33c9x_base_device &adapter = downcast<wd33c9x_base_device &>(*device);
 
-			adapter.set_clock(20'000'000);
+			// FIXME: check frequency select in wd core
+			adapter.set_clock(20'000'000 / 4);
 			adapter.irq_cb().set(*this, FUNC(lha201_device::scsi_irq_w));
 			adapter.drq_cb().set(*this, FUNC(lha201_device::scsi_drq_w));
 		}
@@ -111,8 +124,7 @@ static INPUT_PORTS_START( lha201 )
 	PORT_DIPSETTING(   0x01, "0xcd0")
 	PORT_DIPSETTING(   0x02, "0xce0")
 	PORT_DIPSETTING(   0x03, "0xcf0")
-	// TODO: default is bus master
-	PORT_DIPNAME( 0x04, 0x04, "LHA-201: Transfer mode setting") PORT_DIPLOCATION("SCSI_SW3:!3")
+	PORT_DIPNAME( 0x04, 0x00, "LHA-201: Transfer mode setting") PORT_DIPLOCATION("SCSI_SW3:!3")
 	PORT_DIPSETTING(    0x00, "Automatic selection (bus master)" )
 	PORT_DIPSETTING(    0x04, "I/O transfer fixed")
 	// following are all "system use"
@@ -151,11 +163,8 @@ ioport_constructor lha201_device::device_input_ports() const
 void lha201_device::device_start()
 {
 	pc9801_55_device::device_start();
-//	save_item(NAME(m_ar));
-//	save_item(NAME(m_port30));
-//	save_item(NAME(m_rom_bank));
-//	save_item(NAME(m_pkg_id));
-//	save_item(NAME(m_dma_enable));
+	save_item(NAME(m_port34));
+	save_item(NAME(m_port36));
 
 	m_bus->set_dma_channel(0, this, false);
 }
@@ -168,36 +177,62 @@ void lha201_device::device_start()
 void lha201_device::device_reset()
 {
 	pc9801_55_device::device_reset();
+	// TODO: INT5/INT6
+	m_int_line = (m_dsw1->read() & 0x18) >> 3;
+	m_port34 = 0;
+	m_port36 = 0;
 }
 
-//void lha201_device::remap(int space_id, offs_t start, offs_t end)
-//{
-//	if (space_id == AS_PROGRAM)
-//	{
-//		logerror("map ROM at 0x000dc000-0x000dcfff (bank %d)\n", m_rom_bank);
-//		m_bus->space(AS_PROGRAM).install_rom(
-//			0xdc000,
-//			0xdcfff,
-//			m_bios->base() + m_rom_bank * 0x1000
-//		);
-//	}
-//	else if (space_id == AS_IO)
-//	{
-//		m_bus->install_device(0x0000, 0x3fff, *this, &lha201_device::io_map);
-//	}
-//}
-//
-//void lha201_device::io_map(address_map &map)
-//{
-//	// ...
-//}
+void lha201_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		const u32 m_memory_base = 0x000d0000 + ((m_dsw2->read() & 7) * 0x2000);
+		m_bus->space(AS_PROGRAM).install_rom(
+			m_memory_base,
+			m_memory_base + 0xfff,
+			m_bios->base() + m_rom_bank * 0x1000
+		);
+	}
+	else if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x3fff, *this, &lha201_device::io_map);
+	}
+}
+
+void lha201_device::io_map(address_map &map)
+{
+	pc9801_55_device::io_map(map);
+//  0xcc6 direct FIFO read/write in PIO mode
+}
 
 void lha201_device::internal_map(address_map &map)
 {
 	pc9801_55_device::internal_map(map);
-	// 0x36 <unknown>
+
+	// FIFO int guard on NEC, unknown here
+	map(0x34, 0x34).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_port34;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("Port $34 write %02x\n", data);
+			m_port34 = data;
+		})
+	);
+	// unknown
+	map(0x36, 0x36).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_port36;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("Port $36 write %02x\n", data);
+			m_port36 = data;
+		})
+	);
 	map(0x37, 0x37).lr8(
 		NAME([this] (offs_t offset) {
+			// TODO: not all of it, bit 0 at least is for a status ready in PIO mode (FFE?)
 			return m_dsw3->read();
 		})
 	);

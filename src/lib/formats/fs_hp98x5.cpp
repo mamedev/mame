@@ -66,6 +66,7 @@
 
 #include <bitset>
 #include <map>
+#include <stdexcept>
 
 using namespace fs;
 using namespace std::literals;

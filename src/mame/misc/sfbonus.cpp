@@ -2579,7 +2579,7 @@ ROM_START( anibonusb2 )
 	ROM_LOAD( "ab17lt_.id", 0x00, 0x20, CRC(cee2a8e9) SHA1(8c5fe465f1397b3d40f616d6a4d842c2bbc767de) )
 ROM_END
 
-ROM_START( anibonusd1 )
+ROM_START( anibonusd1 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "abd17r.bin", 0x00000, 0x40000, CRC(32707445) SHA1(12005139862b209e0f187e27f61f779de81066a1) )
 
@@ -3078,6 +3078,25 @@ ROM_START( sfruitbd1 )
 	ROM_LOAD( "sfb25r.id", 0x00, 0x20, CRC(06d72594) SHA1(53b8ddd2166e0345d7ab83c8ab5fc05672201b88) )
 ROM_END
 
+ROM_START( sfruitbo3 ) // PCB VCG-1
+	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
+	ROM_LOAD( "rom1.u6", 0x00000, 0x40000, CRC(840c4601) SHA1(70eea9b09eee9c9e7e5cb776840e2a593d4a0fc0) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 ) // Samples
+	ROM_LOAD( "rom2.u18", 0x00000, 0x20000, CRC(3823a36e) SHA1(4136e380b63546b9490033ad26d776f326eb9290) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom3.u25", 0x00000, 0x80000, CRC(b48eb491) SHA1(0369873231ffa3fb78863623209ad1e05222fc8a) )
+	ROM_LOAD16_BYTE( "rom4.u24", 0x00001, 0x80000, CRC(a307119c) SHA1(b45a0e73d4e2d665de634dbf0034b3dcc9152b3d) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rom5.u23", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
+	ROM_LOAD16_BYTE( "rom6.u22", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x1000, "nvram", ROMREGION_ERASE00 ) // default settings
+	ROM_LOAD( "sfb23.id", 0x00, 0x20, CRC(09a724ac) SHA1(4cdc61405e554fd580265af56ef11126f85bef5e) )
+ROM_END
+
 ROM_START( sfruitbd2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "sfbd20lt.bin", 0x00000, 0x40000, CRC(9d0ebc24) SHA1(790050a35f91e683a5e2c2231c6b861a05eba04a) )
@@ -3393,7 +3412,7 @@ ROM_START( fb2genv2 )
 	ROM_LOAD( "fb2g18lt.id", 0x00, 0x20, CRC(8f36bc08) SHA1(53d970cb1a1055c459e64a09f4e495c52aa2ab9f) )
 ROM_END
 
-ROM_START( fb2gencq )
+ROM_START( fb2gencq ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "f2gv18lt.bin", 0x00000, 0x80000, CRC(ea6cb51e) SHA1(d86398feeac529aee12e1955e9f01b6477d6505c) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
@@ -3684,7 +3703,7 @@ ROM_START( fb4c2 )
 	ROM_LOAD( "fb415lt.id", 0x00, 0x20, CRC(f44d3e8c) SHA1(af462959a37c271c840324d74b2619691fadf8bd) )
 ROM_END
 
-ROM_START( fb4d1 )
+ROM_START( fb4d1 ) // PCB VCG-1
 	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
 	ROM_LOAD( "fb4d15r.bin", 0x00000, 0x40000, CRC(aeed6133) SHA1(8658708fbfd7f662f72a30a3f37baca98e931589) )
 
@@ -4351,6 +4370,22 @@ ROM_START( ch2000o10 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x80000, CRC(a113ba92) SHA1(ce6acfe3fe4c478fae4cfbb504baa82d79907fe1) )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, CRC(7f81610d) SHA1(372f33e016df99b45d24d0fe63c3f31f085817c1) )
+ROM_END
+
+ROM_START( ch2000o11 ) // PCB S2000-B
+	ROM_REGION( 0x80000, "maincpu", 0 ) // Z80 code
+	ROM_LOAD( "rom1.u6", 0x00000, 0x40000, CRC(3ad0188e) SHA1(104f6074a43bc06e4cfa9d6b8032b9cc4fd98bcd) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 ) // Samples
+	ROM_LOAD( "rom2.u18", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom3.u25", 0x00000, 0x40000, CRC(a712b521) SHA1(355b3bd892d5fbd360961ca4b5adb20ddf2ba553) )
+	ROM_LOAD16_BYTE( "rom4.u24", 0x00001, 0x40000, CRC(8996d2d5) SHA1(fc3830b8126ef9d15108e0873209168ad0b608c8) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "rom5.u23", 0x00000, 0x40000, CRC(494fd1fa) SHA1(01ca60e35b68da398612fc7c8a7da6f8835eabd5) )
+	ROM_LOAD16_BYTE( "rom6.u22", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
 ROM_END
 
 // Pirate 2001
@@ -6266,6 +6301,7 @@ GAME( 2002, sfruitbd2,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_s
 GAME( 2002, sfruitbv2,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, sfruitbo,    sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, sfruitbo2,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 1.80XT)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, sfruitbo3,   sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbd,        ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.3)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2002, sfruitbh,    sfruitb,  sfbonus, amcoe1_reels3, sfbonus_state, init_sfruitbv2,       ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2EB Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2002, sfruitbbh,   sfruitb,  sfbonus, amcoe2_reels3, sfbonus_state, init_sfruitb,         ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 1)", MACHINE_SUPPORTS_SAVE )
@@ -6336,6 +6372,7 @@ GAME( 2000, ch2000o7,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_c
 GAME( 2000, ch2000o8,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.4 Special, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000o9,    ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 2.3B)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, ch2000o10,   ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version T 2.3C)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, ch2000o11,   ch2000,   sfbonus, amcoe2_reels3, sfbonus_state, init_ch2000,          ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.7)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2001, pir2001,     0,        sfbonus, amcoe1_reels3, sfbonus_state, init_pir2001v2,       ROT0,  "Amcoe", "Pirate 2001 (Version 2.5E Dual)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, pir2001b1,   pir2001,  sfbonus, amcoe2_reels3, sfbonus_state, init_pir2001,         ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 1)", MACHINE_SUPPORTS_SAVE )

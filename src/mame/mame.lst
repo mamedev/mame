@@ -19531,6 +19531,7 @@ bshipg
 comparca
 copspa
 ctstein
+dimension
 einvaderc
 funjacks
 funrlgl
@@ -20958,6 +20959,7 @@ starzan
 tarzan
 tarzan103m
 tarzan106fa
+tarzan201fa
 tarzan202fa
 tarzana
 tarzanb
@@ -29649,6 +29651,8 @@ amspdwya
 
 @source:misc/amstarz80.cpp
 holddraw
+unkamst
+unkamsta
 
 @source:misc/amusco.cpp
 amusco
@@ -32920,6 +32924,7 @@ ch2000d1
 ch2000d2
 ch2000o
 ch2000o10
+ch2000o11
 ch2000o2
 ch2000o3
 ch2000o4
@@ -33094,6 +33099,7 @@ sfruitbdh
 sfruitbh
 sfruitbo
 sfruitbo2
+sfruitbo3
 sfruitboh
 sfruitbv1
 sfruitbv2
@@ -36072,6 +36078,7 @@ ffight3b2
 iron
 legendsb
 kinstb
+piratdwb
 rushbets
 sblast2b
 tmntmwb
@@ -36739,6 +36746,7 @@ mspacmab2
 mspacmab3
 mspacmab4
 mspacmab5
+mspacmab6
 mspacman
 mspacmanbcc
 mspacmanbco

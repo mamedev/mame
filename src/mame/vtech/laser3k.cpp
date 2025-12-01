@@ -26,20 +26,21 @@
   TODO:
     - Dump and emulate keyboard
     - RGB graphics mode
-    - Centronics printer port (data at 3c090, read ack at 3c1c0, read busy at 3c1c2)
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "bus/a2gameio/gameio.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
 #include "machine/applefdintf.h"
 #include "machine/bankdev.h"
-#include "machine/ram.h"
 #include "machine/kb3600.h"
+#include "machine/ram.h"
+#include "machine/output_latch.h"
 #include "machine/wozfdc.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
@@ -92,6 +93,8 @@ public:
 		, m_sn(*this, "sn76489")
 		, m_cassette(*this, "tape")
 		, m_gamepad(*this, "gamepad")
+		, m_printer(*this, "printer")
+		, m_platch(*this, "platch")
 		, m_kbspecial(*this, "keyb_special")
 		, m_rom(*this, "maincpu")
 		, m_fdc(*this, "fdc%u", 0U)
@@ -114,6 +117,10 @@ private:
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io2_r(offs_t offset);
+
+	void prdata_w(uint8_t data);
+	void prack_w(int state);
+	void prbusy_w(int state);
 
 	uint8_t printer_rom_r(offs_t offset);
 	void printer_rombank_w(offs_t offset, uint8_t data);
@@ -145,9 +152,11 @@ private:
 	required_device<address_map_bank_device> m_bank;
 	required_device<ay3600_device> m_ay3600;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<sn76489_device> m_sn;
+	required_device<sn76489a_device> m_sn;
 	required_device<cassette_image_device> m_cassette;
 	required_device<apple2_gameio_device> m_gamepad;
+	required_device<centronics_device> m_printer;
+	required_device<output_latch_device> m_platch;
 	required_ioport m_kbspecial;
 	required_region_ptr<u8> m_rom;
 	required_device_array<diskii_fdc_device, 2> m_fdc;
@@ -170,6 +179,8 @@ private:
 	int m_gfxmode;
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
+	bool m_prack;
+	bool m_prbusy;
 };
 
 /***************************************************************************
@@ -186,14 +197,15 @@ void laser3k_state::banks_map(address_map &map)
 	map(0x00000, 0x2ffff).rw(FUNC(laser3k_state::ram_r), FUNC(laser3k_state::ram_w));
 	map(0x38000, 0x3bfff).rom().region("maincpu", 0);
 	map(0x3c000, 0x3c07f).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
+	map(0x3c090, 0x3c090).w(FUNC(laser3k_state::prdata_w));
 	map(0x3c0d0, 0x3c0df).rw(m_fdc[1], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
 	map(0x3c0e0, 0x3c0ef).rw(m_fdc[0], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
-	map(0x3c100, 0x3c1ff).rw(FUNC(laser3k_state::printer_rom_r), FUNC(laser3k_state::printer_rombank_w));
+	map(0x3c100, 0x3c1bf).rw(FUNC(laser3k_state::printer_rom_r), FUNC(laser3k_state::printer_rombank_w));
 	map(0x3c1c0, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
 	map(0x3c300, 0x3c3ff).rw(FUNC(laser3k_state::display_rom_r), FUNC(laser3k_state::display_rombank_w));
 	map(0x3c500, 0x3c6ff).r(FUNC(laser3k_state::fdc_rom_r));
 	map(0x3c800, 0x3cffe).view(m_3c800);
-	m_3c800[0](0x3c800, 0x3cffe).rom().region("maincpu", 0x0800);
+	m_3c800[0](0x3c800, 0x3cffe).rom().region("maincpu", 0x0000);
 	m_3c800[1](0x3c800, 0x3cffe).rom().region("maincpu", 0x4800);
 	m_3c800[2](0x3c800, 0x3cffe).rom().region("fdc", 0x800);
 	map(0x3cfff, 0x3cfff).rw(FUNC(laser3k_state::rombank_disable_r), FUNC(laser3k_state::rombank_disable_w));
@@ -263,6 +275,9 @@ void laser3k_state::machine_start()
 
 	m_fdc[0]->set_floppies(m_floppy[0], m_floppy[1]);
 	m_fdc[1]->set_floppies(m_floppy[2], m_floppy[3]);
+
+	m_prack = false;
+	m_prbusy = false;
 }
 
 void laser3k_state::machine_reset()
@@ -286,6 +301,8 @@ void laser3k_state::machine_reset()
 	m_80col = 0;
 	m_mix = false;
 	m_gfxmode = TEXT;
+
+	m_printer->write_strobe(1);
 }
 
 uint8_t laser3k_state::mem_r(offs_t offset)
@@ -567,6 +584,12 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 {
 	switch (offset)
 	{
+		case 0x00:
+			return m_prack ? 0x80 : 0x00;
+
+		case 0x01:
+			return m_prbusy ? 0x80 : 0x00;
+
 		case 0x02:  // h-blank status
 			return m_screen->hblank() ? 0x80 : 0x00;
 
@@ -583,6 +606,25 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 	}
 
 	return 0xff;
+}
+
+void laser3k_state::prdata_w(uint8_t data)
+{
+	m_platch->write(data);
+
+	// timing (determined by ASIC) is probably wrong for this
+	m_printer->write_strobe(0);
+	m_printer->write_strobe(1);
+}
+
+void laser3k_state::prack_w(int state)
+{
+	m_prack = state;
+}
+
+void laser3k_state::prbusy_w(int state)
+{
+	m_prbusy = state;
 }
 
 uint8_t laser3k_state::printer_rom_r(offs_t offset)
@@ -1139,12 +1181,18 @@ void laser3k_state::laser3k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	SN76489(config, m_sn, 14_MHz_XTAL / 7).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, m_sn, 14_MHz_XTAL / 7).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple2_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	OUTPUT_LATCH(config, m_platch);
+	CENTRONICS(config, m_printer, centronics_devices, "printer");
+	m_printer->set_output_latch(*m_platch);
+	m_printer->ack_handler().set(FUNC(laser3k_state::prack_w));
+	m_printer->busy_handler().set(FUNC(laser3k_state::prbusy_w));
 }
 
 ROM_START(laser3k)
@@ -1153,6 +1201,7 @@ ROM_START(laser3k)
 
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("laser3000_v2.2.rom", 0x0000, 0x8000, CRC(3ecbc06c) SHA1(c5c188484664bec1a1445156d63b7b80842e7219))
+	ROM_FILL(0x0001, 1, 0x09) // bad bit?
 
 	ROM_REGION(0x400, "kbdmcu", 0)
 	ROM_LOAD("tmp8048p.u44", 0x000, 0x400, NO_DUMP)

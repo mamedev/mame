@@ -412,14 +412,14 @@
 	<element name="text_L_phones">
 		<text string="Phones" align="1" />
 	</element>
-	<element name="text_L_dynamic_component_synthesizer">
-		<text string="DYNAMIC COMPONENT SYNTHESIZER" align="1" />
+	<element name="text_S_dynamic_component_synthesizer">
+		<text string="DYNAMIC COMPONENT SYNTHESIZER" align="3" />
 	</element>
-	<element name="text_ensoniq">
-		<text string="ensoniq" />
+	<element name="text_S_ensoniq">
+		<text string="ensoniq" align="3" />
 	</element>
-	<element name="text_L_vfx">
-		<text string="VFX" align="1" />
+	<element name="text_S_vfx">
+		<text string="VFX" align="3" />
 	</element>
 	<element name="text_L_patch_select">
 		<text string="Patch Select" align="1" />
@@ -2344,13 +2344,13 @@
 		<element ref="text_L_cartridge">
 			<bounds x="720" y="17.7" width="56" height="4.3" />
 		</element>
-		<element ref="text_L_dynamic_component_synthesizer">
-			<bounds x="13" y="7" width="200" height="4.3" />
+		<element ref="text_S_dynamic_component_synthesizer">
+			<bounds x="13" y="7" width="88" height="4.3" />
 		</element>
-		<element ref="text_ensoniq">
-			<bounds x="765" y="92" width="62" height="9" />
+		<element ref="text_S_ensoniq">
+			<bounds x="762" y="92" width="68" height="9" />
 		</element>
-		<element ref="text_L_vfx">
+		<element ref="text_S_vfx">
 			<bounds x="13" y="70.5" width="92" height="43" />
 		</element>
 		<group ref="Sliders">

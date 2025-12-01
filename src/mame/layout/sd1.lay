@@ -468,14 +468,14 @@
 	<element name="text_L_phones">
 		<text string="Phones" align="1" />
 	</element>
-	<element name="text_L_music_production_synthesizer">
-		<text string="MUSIC PRODUCTION SYNTHESIZER" align="1" />
+	<element name="text_S_music_production_synthesizer">
+		<text string="MUSIC PRODUCTION SYNTHESIZER" align="3" />
 	</element>
-	<element name="text_ensoniq">
-		<text string="ensoniq" />
+	<element name="text_S_ensoniq">
+		<text string="ensoniq" align="3" />
 	</element>
-	<element name="text_L_sd_1">
-		<text string="SD-1" align="1" />
+	<element name="text_S_sd_1">
+		<text string="SD-1" align="3" />
 	</element>
 	<element name="text_L_patch_select">
 		<text string="Patch Select" align="1" />
@@ -2523,13 +2523,13 @@
 		<element ref="text_L_cartridge">
 			<bounds x="720" y="17.7" width="56" height="4.3" />
 		</element>
-		<element ref="text_L_music_production_synthesizer">
-			<bounds x="13" y="7" width="200" height="4.3" />
+		<element ref="text_S_music_production_synthesizer">
+			<bounds x="13" y="7" width="88" height="4.3" />
 		</element>
-		<element ref="text_ensoniq">
-			<bounds x="765" y="92" width="62" height="9" />
+		<element ref="text_S_ensoniq">
+			<bounds x="762" y="92" width="68" height="9" />
 		</element>
-		<element ref="text_L_sd_1">
+		<element ref="text_S_sd_1">
 			<bounds x="13" y="77.5" width="67" height="27" />
 		</element>
 		<element name="lights" ref="light_16">

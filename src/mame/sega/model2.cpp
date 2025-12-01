@@ -15,7 +15,6 @@
 
     TODO (per-game issues)
     - doa, doaa: corrupted sound, eventually becomes silent;
-    - dynamcopc: corrupts palette for 2d;
     - hpyagu98: stops with 'Error #1' message during boot.
       Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
@@ -159,6 +158,8 @@ void model2_state::machine_start()
 	save_item(NAME(m_timerrun[1]));
 	save_item(NAME(m_timerrun[2]));
 	save_item(NAME(m_timerrun[3]));
+	save_item(NAME(m_videocontrol));
+	save_item(NAME(m_framenum));
 
 	save_item(NAME(m_geo_write_start_address));
 	save_item(NAME(m_geo_read_start_address));
@@ -324,9 +325,9 @@ void model2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	u16 palcolor = m_palram[offset];
-	u8 r = m_colorxlat[0x0080 / 2 + ((palcolor >> 0) & 0x1f) * 0x100];
-	u8 g = m_colorxlat[0x4080 / 2 + ((palcolor >> 5) & 0x1f) * 0x100];
-	u8 b = m_colorxlat[0x8080 / 2 + ((palcolor >> 10) & 0x1f) * 0x100];
+	u8 r = m_colorxlat[(0x0080 >> 1) + (((palcolor >> 0) & 0x1f) << 8)];
+	u8 g = m_colorxlat[(0x4080 >> 1) + (((palcolor >> 5) & 0x1f) << 8)];
+	u8 b = m_colorxlat[(0x8080 >> 1) + (((palcolor >> 10) & 0x1f) << 8)];
 	r = m_gamma_table[r];
 	g = m_gamma_table[g];
 	b = m_gamma_table[b];
@@ -352,25 +353,9 @@ u16 model2_state::colorxlat_r(offs_t offset)
 	return m_colorxlat[offset];
 }
 
-// Apparently original Model 2 doesn't have fifo control?
-u32 model2o_state::fifo_control_2o_r()
+u32 model2_state::fifo_control_r()
 {
-	return 0xffffffff;
-}
-
-u32 model2_state::fifo_control_2a_r()
-{
-	u32 r = 0;
-
-	if (m_copro_fifo_out->is_empty())
-	{
-		r |= 1;
-	}
-
-	// #### 1 if fifo empty, zerogun needs | 0x04 set
-	// TODO: 0x04 is probably fifo full, zeroguna stalls with a fresh nvram with that enabled?
-	return r;
-//  return r | 0x04;
+	return m_copro_fifo_out->is_empty() ? 1 : 0;
 }
 
 u32 model2_state::videoctl_r()
@@ -378,9 +363,9 @@ u32 model2_state::videoctl_r()
 	u8 framenum;
 
 	if(m_render_mode == false)
-		framenum = (m_screen->frame_number() & 2) << 1;
+		framenum = (m_framenum & 2) << 1;
 	else
-		framenum = (m_screen->frame_number() & 1) << 2;
+		framenum = (m_framenum & 1) << 2;
 
 	return (framenum) | (m_videocontrol & 3);
 }
@@ -500,9 +485,9 @@ u32 model2_tgp_state::copro_sincos_r(offs_t offset)
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
 	if (ang & 0x4000)
-		index = std::min(0x4000 - (int)index, 0x3fff);
+		index = std::min(0x4000 - int(index), 0x3fff);
 	u32 result = m_copro_tgp_tables[index];
-	if(ang & 0x8000)
+	if (ang & 0x8000)
 		result ^= 0x80000000;
 	return result;
 }
@@ -536,7 +521,7 @@ u32 model2_tgp_state::copro_isqrt_r(offs_t offset)
 	u8 bexp = (m_copro_isqrt_base >> 24) & 0x7f;
 	u8 exp = (result >> 23) + (0x3f - bexp);
 	result = (result & 0x807fffff) | (exp << 23);
-	if(!(offset & 1))
+	if (!(offset & 1))
 		result &= 0x7fffffff;
 	return result;
 }
@@ -562,11 +547,11 @@ u32 model2_tgp_state::copro_atan_r()
 
 	u32 result = m_copro_tgp_tables[index | 0x4000];
 
-	if(s0 ^ s1 ^ s2)
+	if (s0 ^ s1 ^ s2)
 		result >>= 16;
-	if(s2)
+	if (s2)
 		result += 0x4000;
-	if((s0 && !s2) || (s1 && s2))
+	if ((s0 && !s2) || (s1 && s2))
 		result += 0x8000;
 
 	return result & 0xffff;
@@ -1075,7 +1060,7 @@ void model2_state::model2_base_mem(address_map &map)
 
 	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram").flags(i960_cpu_device::BURST);
 
-	map(0x00980004, 0x00980007).r(FUNC(model2_state::fifo_control_2a_r));
+	map(0x00980004, 0x00980007).r(FUNC(model2_state::fifo_control_r));
 	map(0x0098000c, 0x0098000f).rw(FUNC(model2_state::videoctl_r), FUNC(model2_state::videoctl_w));
 	map(0x00980030, 0x0098003f).r(FUNC(model2_state::tgpid_r));
 
@@ -1264,7 +1249,6 @@ void model2o_state::model2o_mem(address_map &map)
 
 	map(0x00200000, 0x0021ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000).flags(i960_cpu_device::BURST);
-	map(0x00980004, 0x00980007).r(FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
 	map(0x01c80000, 0x01c80003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
@@ -1807,8 +1791,10 @@ INPUT_PORTS_START( vf2 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-template <unsigned N> ioport_value model2a_airwlkrs_state::start_in_r() {
-	return BIT(m_start_in->read(), N + m_key_matrix * 2);
+template <unsigned N>
+ioport_value model2a_airwlkrs_state::start_in_r()
+{
+	return BIT(m_start_in->read(), (m_key_matrix << 1) | N);
 }
 
 INPUT_PORTS_START( airwlkrs )
@@ -2405,21 +2391,25 @@ INPUT_PORTS_END
  *
  **********************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
+void model2_state::screen_vblank(int state)
 {
-	int scanline = param;
+	if (!state)
+		return;
 
-	if(scanline == 384)
+	m_framenum = m_screen->frame_number();
+
+	// if 60 Hz mode or frame number is even, trigger geometrizer to start new frame
+	if ((m_videocontrol & 1) == 0 || (m_framenum & 1) == 0)
+		geo_parse();
+
+	const u32 line = 1 << 0;
+	if (m_intena & line)
 	{
-		const u32 line = 1 << 0;
-		if (m_intena & line)
-		{
-			m_intreq |= line;
-			irq_update();
-		}
-		if (m_m2comm != nullptr)
-			m_m2comm->check_vint_irq();
+		m_intreq |= line;
+		irq_update();
 	}
+	if (m_m2comm)
+		m_m2comm->check_vint_irq();
 }
 
 void model2_state::sound_ready_w(int state)
@@ -2502,7 +2492,8 @@ void model2_state::model2_screen(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// TODO: from System 24, might not be accurate for Model 2
 	m_screen->set_raw(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
-	m_screen->set_screen_update(FUNC(model2_state::screen_update_model2));
+	m_screen->set_screen_update(FUNC(model2_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(model2_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_entries(8192);
 }
@@ -2534,8 +2525,6 @@ void model2o_state::model2o(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2o_state::copro_tgp_prog_map);
@@ -2687,7 +2676,6 @@ void model2a_state::model2a(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2a_state::copro_tgp_prog_map);
@@ -2727,12 +2715,8 @@ void model2a_airwlkrs_state::airwlkrs(machine_config &config)
 	// P3 / P4 support routes input sides depending on content of port F
 	// this implicitly fallback to regular handling when cabinet is set in two players mode
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.in_pc_callback().set([this] () {
-		return m_player_in[m_key_matrix * 2]->read();
-	});
-	io.in_pd_callback().set([this] () {
-		return m_player_in[m_key_matrix * 2 + 1]->read();
-	});
+	io.in_pc_callback().set([this] () { return m_player_in[m_key_matrix << 1]->read(); });
+	io.in_pd_callback().set([this] () { return m_player_in[(m_key_matrix << 1) | 1]->read(); });
 	io.out_pf_callback().set([this] (u8 data) { m_key_matrix = BIT(data, 7); });
 }
 
@@ -2823,8 +2807,6 @@ void model2b_state::model2b(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
-
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	ADSP21062(config, m_copro_adsp, 32_MHz_XTAL);
 	m_copro_adsp->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
@@ -2978,7 +2960,6 @@ void model2c_state::model2c(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86235(config, m_copro_tgpx4, 20_MHz_XTAL);
 	m_copro_tgpx4->set_addrmap(AS_PROGRAM, &model2c_state::copro_tgpx4_map);
