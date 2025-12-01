@@ -172,7 +172,7 @@ static int is_double_click_start(int argc);
 
 int main(int argc, char *argv[])
 {
-	std::setlocale(LC_ALL, "");
+	std::setlocale(LC_ALL, "en_US.UTF-8");
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
 
 	// use small output buffers on non-TTYs (i.e. pipes)
