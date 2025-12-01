@@ -21,39 +21,44 @@ tmp94c241_serial_device::tmp94c241_serial_device(const machine_config &mconfig, 
 	m_serial_mode(0), /* I/O interface mode and clock source at TO2 trigger */
 	m_baud_rate(0),
 	m_hz(0),
-	m_clock_count(0),
-	m_rx_clock_count(24),
+	m_rx_clock_count(0),
+	m_rx_shift_register(0),
+	m_rx_buffer(0),
+	m_rxd(0),
+	m_rxd_prev(0),
+	m_sioclk_state(0),
+	m_tx_clock_count(0),
 	m_tx_shift_register(0),
-	m_serial_in(0),
-	m_serial_in_prev(0),
-	m_sck_in(0),
-	m_serial_out(0),
-	m_sck_out(0),
-	m_serial_out_cb(*this),
-	m_sck_cb(*this)
+	m_txd(0),
+	m_sclk_out(0),
+	m_txd_cb(*this),
+	m_sclk_in_cb(*this),
+	m_sclk_out_cb(*this)
 {
 }
 
 void tmp94c241_serial_device::device_start()
 {
-	m_tx_timer = timer_alloc(FUNC(tmp94c241_serial_device::tx_timer_callback), this);
+	m_timer = timer_alloc(FUNC(tmp94c241_serial_device::timer_callback), this);
 	m_cpu = dynamic_cast<tmp94c241_device *>(owner());
 
 	save_item(NAME(m_serial_control));
 	save_item(NAME(m_serial_mode));
 	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_hz));
-	save_item(NAME(m_clock_count));
 	save_item(NAME(m_rx_clock_count));
+	save_item(NAME(m_rx_shift_register));
+	save_item(NAME(m_rx_buffer));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_rxd_prev));
+	save_item(NAME(m_sioclk_state));
+	save_item(NAME(m_tx_clock_count));
 	save_item(NAME(m_tx_shift_register));
-	save_item(NAME(m_serial_in));
-	save_item(NAME(m_serial_in_prev));
-	save_item(NAME(m_sck_in));
-	save_item(NAME(m_serial_out));
-	save_item(NAME(m_sck_out));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_sclk_out));
 
-	m_sck_cb(m_sck_out);
-	m_serial_out_cb(m_serial_out);
+	m_sclk_out_cb(m_sclk_out);
+	m_txd_cb(m_txd);
 }
 
 void tmp94c241_serial_device::device_reset()
@@ -69,41 +74,62 @@ void tmp94c241_serial_device::TO2_trigger(int state)
 	if ((m_serial_mode & 3) == 0 && BIT(m_serial_control, 1))
 	{
 		/* Clock source: TO2 output compare trigger */
-		sck(state);
+		sioclk(state);
 	}
 }
 
-void tmp94c241_serial_device::sck(int state)
+void tmp94c241_serial_device::sioclk(int state)
 {
-	if (m_sck_in != state)
-	{
-		m_sck_in = state;
-		// logerror("sck state=%d\n", state);
+	if (m_sioclk_state == state)
+		return;
 
-		update_serial();
+	m_sioclk_state = state;
+	// logerror("sioclk state=%d rxd=%d m_rx_clock_count=%d txd=%d m_tx_clock_count=%d\n", m_sioclk_state, m_rxd, m_rx_clock_count, m_txd, m_tx_clock_count);
+
+	if (m_rx_clock_count){
+		m_rx_clock_count--;
+
+		if (m_rx_clock_count == 0)
+		{
+			m_cpu->m_int_reg[(m_channel == 0) ? INTES0 : INTES1] |= 0x08;
+			m_cpu->m_check_irqs = 1;
+		}
+	}
+
+	if (m_tx_clock_count){
+		logerror("send bit #%d: %d\n", 8-m_tx_clock_count, m_tx_shift_register & 1);
+
+		m_txd_cb(m_tx_shift_register & 1);
+		m_sclk_out_cb(1);
+		m_sclk_out_cb(0);
+		m_tx_shift_register >>= 1;
+		if (--m_tx_clock_count == 0) {
+			logerror("Finished sending byte.\n");
+			// We finished sending the data:
+			m_cpu->m_int_reg[(m_channel == 0) ? INTES0 : INTES1] |= 0x80;
+			m_cpu->m_check_irqs = 1;
+		}
 	}
 }
 
-void tmp94c241_serial_device::serial_in(int state)
+void tmp94c241_serial_device::rxd(int state)
 {
-	if (m_serial_in != state)
+	if (m_rxd != state)
 	{
-		m_serial_in = state;
-
-		update_serial();
+		m_rxd = state;
 	}
 }
 
 uint8_t tmp94c241_serial_device::scNbuf_r()
 {
-	return 0;
+	return m_rx_buffer;
 }
 
 void tmp94c241_serial_device::scNbuf_w(uint8_t data)
 {
 	logerror("buf write: %02X\n", data);
 	m_tx_shift_register = data;
-	m_clock_count = 8;
+	m_tx_clock_count = 8;
 	//if (m_channel == 1) machine().debug_break();
 }
 
@@ -160,33 +186,14 @@ void tmp94c241_serial_device::brNcr_w(uint8_t data)
 	{
 		long int fc = 16'000'000; // TODO: set this from the cpu.
 		m_hz = (fc >> shift_amount) / divisor;
-		m_tx_timer->adjust(attotime::from_hz(m_hz), 0, attotime::from_hz(m_hz));
-		logerror("tx_timer set to %d Hz.\n", m_hz);
+		m_timer->adjust(attotime::from_hz(m_hz), 0, attotime::from_hz(m_hz));
+		logerror("timer set to %d Hz.\n", m_hz);
 	} else {
-		m_tx_timer->reset(attotime::never);
+		m_timer->reset(attotime::never);
 		m_hz = 0;
-		logerror("tx_timer disabled.\n");
+		logerror("timer disabled.\n");
 	}
 	//if (m_channel == 1) machine().debug_break();
-}
-
-void tmp94c241_serial_device::update_serial()
-{
-	//logerror("update_serial sck=%d serial_in=%d m_clock_count=%d\n", m_sck_in, m_serial_in, m_clock_count);
-	if (m_clock_count){
-		logerror("send bit #%d: %d\n", 8-m_clock_count, m_tx_shift_register & 1);
-
-		m_serial_out_cb(m_tx_shift_register & 1);
-		m_sck_cb(1);
-		m_sck_cb(0);
-		m_tx_shift_register >>= 1;
-		if (--m_clock_count == 0) {
-			logerror("Finished sending byte.\n");
-			// We finished sending the data:
-			m_cpu->m_int_reg[(m_channel == 0) ? INTES0 : INTES1] |= 0x80;
-			m_cpu->m_check_irqs = 1;
-		}
-	}
 }
 
 /*
@@ -219,22 +226,13 @@ fc4619: f0 3f 41              ld (0x3f),A
 
 */
 
-TIMER_CALLBACK_MEMBER(tmp94c241_serial_device::tx_timer_callback)
+TIMER_CALLBACK_MEMBER(tmp94c241_serial_device::timer_callback)
 {
-	if (m_rx_clock_count){
-		m_rx_clock_count--;
 
-		if (m_rx_clock_count == 0)
-		{
-			m_cpu->m_int_reg[(m_channel == 0) ? INTES0 : INTES1] |= 0x08;
-			m_cpu->m_check_irqs = 1;
-		}
-	}
-
-	if (m_hz && m_clock_count && (m_cpu->m_port_function[PORT_F] & (1 << (m_channel==0 ? 2: 6))))
+	if (m_hz && m_tx_clock_count && (m_cpu->m_port_function[PORT_F] & (1 << (m_channel==0 ? 2: 6))))
 	{
-		//logerror("m_clock_count=%d and we'll call sck(%d).\n", m_clock_count, m_sck_in ^ 1);
-		sck(m_sck_in ^ 1);
+		//logerror("m_tx_clock_count=%d and we'll call sioclk(%d).\n", m_tx_clock_count, m_sioclk_state ^ 1);
+		sioclk(m_sioclk_state ^ 1);
 	}
 }
 

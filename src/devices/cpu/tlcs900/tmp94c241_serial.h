@@ -22,10 +22,10 @@ public:
 	tmp94c241_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t channel, uint32_t clock = 0);
 
 	void TO2_trigger(int state);
-	void serial_in(int state);
-	auto serial_out() { return m_serial_out_cb.bind(); }
-	void sck(int state);
-	auto sck() { return m_sck_cb.bind(); }
+	void rxd(int state);
+	auto txd() { return m_txd_cb.bind(); }
+	auto sclk_in() { return m_sclk_in_cb.bind(); }
+	auto sclk_out() { return m_sclk_out_cb.bind(); }
 
 	uint8_t brNcr_r();
 	void brNcr_w(uint8_t data);
@@ -40,11 +40,12 @@ protected:
 	// device_t
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	void sioclk(int state);
 
 	void update_serial();
-	TIMER_CALLBACK_MEMBER(tx_timer_callback);
+	TIMER_CALLBACK_MEMBER(timer_callback);
 
-	emu_timer *m_tx_timer;
+	emu_timer *m_timer;
 
 	uint8_t m_channel;
 	uint8_t m_serial_control;
@@ -52,18 +53,21 @@ protected:
 	uint8_t m_baud_rate;
 	uint32_t m_hz;
 
-	uint8_t m_clock_count;
 	uint8_t m_rx_clock_count;
+	uint8_t m_rx_shift_register;
+	uint8_t m_rx_buffer;
+	uint8_t m_rxd;
+	uint8_t m_rxd_prev;
+	uint8_t m_sioclk_state;
+
+	uint8_t m_tx_clock_count;
 	uint8_t m_tx_shift_register;
-	uint8_t m_serial_in;
-	uint8_t m_serial_in_prev;
-	uint8_t m_sck_in;
+	uint8_t m_txd;
+	uint8_t m_sclk_out;
 
-	uint8_t m_serial_out;
-	uint8_t m_sck_out;
-
-	devcb_write_line m_serial_out_cb;
-	devcb_write_line m_sck_cb;
+	devcb_write_line m_txd_cb;
+	devcb_write_line m_sclk_in_cb;
+	devcb_write_line m_sclk_out_cb;
 
 	tmp94c241_device *m_cpu;
 };
