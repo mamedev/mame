@@ -3713,7 +3713,7 @@ void layout_element::component::draw_text(
 	// get the width of the string
 	s32 width = font.string_width(bounds.height(), 1.0f, str);
 	float aspect = 1.0;
-	if (align == 3 || width > bounds.width())
+	if ((align == 3) || (width > bounds.width()))
 	{
 		if (width != 0)
 			aspect = float(bounds.width()) / float(width);
@@ -3866,7 +3866,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
@@ -3891,7 +3891,7 @@ void layout_element::component::draw_segment_diagonal_2(bitmap_argb32 &dest, int
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
@@ -3915,14 +3915,14 @@ void layout_element::component::draw_segment_decimal(bitmap_argb32 &dest, int mi
 {
 	// compute parameters
 	width /= 2;
-	float ooradius2 = 1.0f / (float)(width * width);
+	float ooradius2 = 1.0f / float(width * width);
 
 	// iterate over y
 	for (u32 y = 0; y <= width; y++)
 	{
 		u32 *const d0 = &dest.pix(midy - y);
 		u32 *const d1 = &dest.pix(midy + y);
-		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
+		float xval = width * sqrt(1.0f - float(y * y) * ooradius2);
 		s32 left, right;
 
 		// compute left/right coordinates
@@ -3944,7 +3944,7 @@ void layout_element::component::draw_segment_comma(bitmap_argb32 &dest, int minx
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
