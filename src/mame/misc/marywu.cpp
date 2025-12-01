@@ -3,10 +3,25 @@
 /*************************************************************************
 
   This is a driver for a gambling board with a yet unknown name.
+  Driver by Felipe Sanches.
+
+  marywu:
   The PCB is labeled with: WU- MARY-1A
   And there's a text string in the ROM that says: "Music by: SunKiss Chen"
 
-  Driver by Felipe Sanches
+  mary1s
+  labeled as MARY-1/SUNRISE.
+
+  U8 HM6116P?-??.
+  U7 W78E52B-24.
+  U14 U16 JFC 95101.
+  U23 TOP 8279.
+  U100 unpopulated for ym2413 or um3567.
+
+  unpopulated led marked for rouletted circles instead of square.
+
+  at back pcb
+  st m27c512? - duplicated 32x2 with same rom programs.
 
   TODO:
   * Figure out where exactly all devices are mapped to (the devices are
@@ -20,6 +35,8 @@
 #include "emu.h"
 
 #include "cpu/mcs51/i80c51.h"
+#include "cpu/mcs51/i80c52.h"
+
 #include "machine/nvram.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
@@ -41,6 +58,7 @@ public:
 	{ }
 
 	void marywu(machine_config &config);
+	void mary1s(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -216,13 +234,28 @@ void marywu_state::marywu(machine_config &config)
 	ay2.port_b_write_callback().set(FUNC(marywu_state::ay2_port_b_w));
 }
 
+void marywu_state::mary1s(machine_config &config)
+{
+	marywu(config);
+	i80c52_device &maincpu(I80C52(config.replace(), "maincpu", XTAL(10'738'635))); // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
+	maincpu.port_in_cb<1>().set_ioport("P1");
+	maincpu.set_addrmap(AS_PROGRAM, &marywu_state::program_map);
+	maincpu.set_addrmap(AS_DATA, &marywu_state::data_map);
+}
+
 ROM_START( marywu )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
+ROM_START( mary1s ) // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mary_sunrise.rom", 0x0000, 0x10000, CRC(746463A4) SHA1(065478223a809c75fe0302d1c85f129d94f503b4) )
+ROM_END
+
 } // anonymous namespace
 
 
-//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( ????, marywu, 0,       marywu,   marywu, marywu_state, empty_init, ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT    COMPANY        FULLNAME                                                FLAGS
+GAME( ????, marywu, 0,       marywu,   marywu, marywu_state, empty_init, ROT0,  "<unknown>",  "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen",    MACHINE_NOT_WORKING )
+GAME( ????, mary1s, 0,       mary1s,   marywu, marywu_state, empty_init, ROT0,  "<unknown>",  "unknown Labeled 'MARY-1/SUNRISE' Music by: SunKiss Chen", MACHINE_NOT_WORKING ) // Error 02
