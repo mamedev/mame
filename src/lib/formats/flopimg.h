@@ -548,7 +548,7 @@ public:
 		DSQD   = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
 		DSQD10 = 0x30315144, //!< "DQ10", Double-sided quad-density 10 hard sector
 		DSQD16 = 0x36315144, //!< "DQ16", Double-sided quad-density 16 hard sector (720K in 5.25, means DD+80 tracks)
-		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
+		DSHD   = 0x44485344, //!< "DSHD", Double-sided high-density (1440K in 3.5, 1200K in 5.25)
 		DSED   = 0x44455344  //!< "DSED", Double-sided extra-density (2880K)
 	};
 
