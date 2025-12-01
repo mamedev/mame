@@ -17,9 +17,10 @@ class kn5000_cpanel_device :
 public:
 	kn5000_cpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-//	auto sck() { return m_sck_cb.bind(); }
+	auto sck_out() { return m_sck_out_cb.bind(); }
 	void sck_in(int state);
 	void serial_in(int state);
+	auto serial_out() { return m_serial_out_cb.bind(); }
 
 
 protected:
@@ -31,7 +32,8 @@ protected:
 
 	int8_t m_serial_in;
 
-	devcb_write_line m_sck_cb;
+	devcb_write_line m_sck_out_cb;
+	devcb_write_line m_serial_out_cb;
 
 	int8_t m_sck_in;
 	int8_t m_sck_in_prev;

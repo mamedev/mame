@@ -15,7 +15,8 @@ DEFINE_DEVICE_TYPE(KN5000_CPANEL, kn5000_cpanel_device, "kn5000_cpanel", "KN5000
 
 kn5000_cpanel_device::kn5000_cpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KN5000_CPANEL, tag, owner, clock),
-	m_sck_cb(*this),
+	m_sck_out_cb(*this),
+	m_serial_out_cb(*this),
 	m_sck_in(1),
 	m_sck_out(1),
 	m_clock_count(0),
@@ -34,7 +35,7 @@ void kn5000_cpanel_device::device_start()
 	save_item(NAME(m_tx_shift_register));
 	save_item(NAME(m_rx_shift_register));
 
-	m_sck_cb(m_sck_out);
+	m_sck_out_cb(m_sck_out);
 	sck_in(0);
 	serial_in(0);
 

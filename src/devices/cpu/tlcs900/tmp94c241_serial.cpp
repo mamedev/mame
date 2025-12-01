@@ -21,7 +21,7 @@ tmp94c241_serial_device::tmp94c241_serial_device(const machine_config &mconfig, 
 	m_serial_mode(0), /* I/O interface mode and clock source at TO2 trigger */
 	m_baud_rate(0),
 	m_hz(0),
-	m_rx_clock_count(0),
+	m_rx_clock_count(8),
 	m_rx_shift_register(0),
 	m_rx_buffer(0),
 	m_rxd(0),
@@ -89,8 +89,13 @@ void tmp94c241_serial_device::sioclk(int state)
 	if (m_rx_clock_count){
 		m_rx_clock_count--;
 
+		m_rx_shift_register >>= 1;
+		m_rx_shift_register |= (m_rxd << 7);
+
 		if (m_rx_clock_count == 0)
 		{
+			m_rx_clock_count = 8;
+			m_rx_buffer = m_rx_shift_register;
 			m_cpu->m_int_reg[(m_channel == 0) ? INTES0 : INTES1] |= 0x08;
 			m_cpu->m_check_irqs = 1;
 		}

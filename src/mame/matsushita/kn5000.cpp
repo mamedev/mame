@@ -744,9 +744,10 @@ void kn5000_state::kn5000(machine_config &config)
 	// SCLK1 = CPSCK
 	auto &m_cpanel(KN5000_CPANEL(config, "cpanel"));
 	m_maincpu->m_serial[1].lookup()->txd().set(m_cpanel, FUNC(kn5000_cpanel_device::serial_in));
-//	m_maincpu->m_serial[1].lookup()->rxd().set(m_cpanel, FUNC(kn5000_cpanel_device::serial_out));
 	m_maincpu->m_serial[1].lookup()->sclk_out().set(m_cpanel, FUNC(kn5000_cpanel_device::sck_in));
-//	m_maincpu->m_serial[1].lookup()->sclk_in().set(m_cpanel, FUNC(kn5000_cpanel_device::sck_out));
+	m_cpanel.serial_out().set(m_maincpu->m_serial[1], FUNC(tmp94c241_serial_device::rxd));
+//	m_cpanel.sck_out().set(m_maincpu->m_serial[1], FUNC(tmp94c241_serial_device::sclk_in));
+
 
 	// AN0 = EXP (expression pedal?)
 	// AN1 = AFT
