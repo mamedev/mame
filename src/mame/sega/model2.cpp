@@ -325,9 +325,9 @@ void model2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	u16 palcolor = m_palram[offset];
-	u8 r = m_colorxlat[0x0080 / 2 + ((palcolor >> 0) & 0x1f) * 0x100];
-	u8 g = m_colorxlat[0x4080 / 2 + ((palcolor >> 5) & 0x1f) * 0x100];
-	u8 b = m_colorxlat[0x8080 / 2 + ((palcolor >> 10) & 0x1f) * 0x100];
+	u8 r = m_colorxlat[(0x0080 >> 1) + (((palcolor >> 0) & 0x1f) << 8)];
+	u8 g = m_colorxlat[(0x4080 >> 1) + (((palcolor >> 5) & 0x1f) << 8)];
+	u8 b = m_colorxlat[(0x8080 >> 1) + (((palcolor >> 10) & 0x1f) << 8)];
 	r = m_gamma_table[r];
 	g = m_gamma_table[g];
 	b = m_gamma_table[b];
@@ -485,9 +485,9 @@ u32 model2_tgp_state::copro_sincos_r(offs_t offset)
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
 	if (ang & 0x4000)
-		index = std::min(0x4000 - (int)index, 0x3fff);
+		index = std::min(0x4000 - int(index), 0x3fff);
 	u32 result = m_copro_tgp_tables[index];
-	if(ang & 0x8000)
+	if (ang & 0x8000)
 		result ^= 0x80000000;
 	return result;
 }
@@ -521,7 +521,7 @@ u32 model2_tgp_state::copro_isqrt_r(offs_t offset)
 	u8 bexp = (m_copro_isqrt_base >> 24) & 0x7f;
 	u8 exp = (result >> 23) + (0x3f - bexp);
 	result = (result & 0x807fffff) | (exp << 23);
-	if(!(offset & 1))
+	if (!(offset & 1))
 		result &= 0x7fffffff;
 	return result;
 }
@@ -547,11 +547,11 @@ u32 model2_tgp_state::copro_atan_r()
 
 	u32 result = m_copro_tgp_tables[index | 0x4000];
 
-	if(s0 ^ s1 ^ s2)
+	if (s0 ^ s1 ^ s2)
 		result >>= 16;
-	if(s2)
+	if (s2)
 		result += 0x4000;
-	if((s0 && !s2) || (s1 && s2))
+	if ((s0 && !s2) || (s1 && s2))
 		result += 0x8000;
 
 	return result & 0xffff;
@@ -1791,8 +1791,10 @@ INPUT_PORTS_START( vf2 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-template <unsigned N> ioport_value model2a_airwlkrs_state::start_in_r() {
-	return BIT(m_start_in->read(), N + m_key_matrix * 2);
+template <unsigned N>
+ioport_value model2a_airwlkrs_state::start_in_r()
+{
+	return BIT(m_start_in->read(), (m_key_matrix << 1) | N);
 }
 
 INPUT_PORTS_START( airwlkrs )
@@ -2406,7 +2408,7 @@ void model2_state::screen_vblank(int state)
 		m_intreq |= line;
 		irq_update();
 	}
-	if (m_m2comm != nullptr)
+	if (m_m2comm)
 		m_m2comm->check_vint_irq();
 }
 
@@ -2713,12 +2715,8 @@ void model2a_airwlkrs_state::airwlkrs(machine_config &config)
 	// P3 / P4 support routes input sides depending on content of port F
 	// this implicitly fallback to regular handling when cabinet is set in two players mode
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.in_pc_callback().set([this] () {
-		return m_player_in[m_key_matrix * 2]->read();
-	});
-	io.in_pd_callback().set([this] () {
-		return m_player_in[m_key_matrix * 2 + 1]->read();
-	});
+	io.in_pc_callback().set([this] () { return m_player_in[m_key_matrix << 1]->read(); });
+	io.in_pd_callback().set([this] () { return m_player_in[(m_key_matrix << 1) | 1]->read(); });
 	io.out_pf_callback().set([this] (u8 data) { m_key_matrix = BIT(data, 7); });
 }
 
