@@ -3715,7 +3715,8 @@ void layout_element::component::draw_text(
 	float aspect = 1.0;
 	if (align == 3 || width > bounds.width())
 	{
-		aspect = float(bounds.width()) / float(width);
+		if (width != 0)
+			aspect = float(bounds.width()) / float(width);
 		width = bounds.width();
 	}
 
@@ -3732,8 +3733,8 @@ void layout_element::component::draw_text(
 		case 2:
 			curx = bounds.left() + bounds.width() - width;
 			break;
-		
-		// stretch
+
+		// stretch (aligned both left & right)
 		case 3:
 			curx = bounds.left();
 			break;
