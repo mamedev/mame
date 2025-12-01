@@ -252,6 +252,10 @@ license:CC0-1.0
        x="20"
        y="54" 
     /></element>
+	 <!-- unused. -->
+
+	 <!-- 
+
        <element name="led32"
 	   	   ref="led"><bounds
        width="17.702967"
@@ -266,7 +270,7 @@ license:CC0-1.0
        x="60"
        y="54" 
     /></element>
-
+ -->
  <element name="digit14"
  	   		ref="digit"><bounds 
 
@@ -399,7 +403,7 @@ license:CC0-1.0
     /></element>
 
 <!-- Middle 7seg display module -->
-
+ 
  <element name="digit26"
 	   		ref="digit"><bounds 
       width="9.9822998"
@@ -407,6 +411,10 @@ license:CC0-1.0
        x="12.351883"
        y="116.74464" 
     /></element>
+
+<!-- unused -->
+
+<!-- 
  <element name="digit27"
 	   		ref="digit"><bounds 
        width="9.9822998"
@@ -414,6 +422,6 @@ license:CC0-1.0
        x="0.35392699"
        y="116.74464" 
     /></element>
-
+-->	
 	</view>
 </mamelayout>
