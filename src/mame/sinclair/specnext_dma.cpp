@@ -46,6 +46,9 @@ void specnext_dma_device::write(u8 data)
 {
 	if (num_follow() == 0)
 	{
+		if ((data & 0x83) == 0x82)
+			return; // avoid "Unknown base register" error
+
 		z80dma_device::write(data);
 		if ((data & 0x83) == 0x83) // WR6
 		{
