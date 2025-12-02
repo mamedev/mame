@@ -18,13 +18,13 @@ const tiny_rom_entry *m24_keyboard_device::device_rom_region() const
 
 void m24_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8049(config, m_mcu, XTAL(6'000'000));
+	I8049(config, m_mcu, 6_MHz_XTAL);
 	m_mcu->bus_out_cb().set(FUNC(m24_keyboard_device::bus_w));
 	m_mcu->p1_in_cb().set(FUNC(m24_keyboard_device::p1_r));
 	m_mcu->p1_out_cb().set(FUNC(m24_keyboard_device::p1_w));
 	m_mcu->p2_in_cb().set(FUNC(m24_keyboard_device::p2_r));
-	m_mcu->t0_in_cb().set(FUNC(m24_keyboard_device::t0_r));
-	m_mcu->t1_in_cb().set(FUNC(m24_keyboard_device::t1_r));
+	m_mcu->t0_in_cb().set_constant(0);
+	m_mcu->t1_in_cb().set_constant(0);
 }
 
 INPUT_PORTS_START( m24_keyboard )
@@ -212,12 +212,13 @@ ioport_constructor m24_keyboard_device::device_input_ports() const
 
 m24_keyboard_device::m24_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, M24_KEYBOARD, tag, owner, clock)
+	, m_out_data(*this)
+	, m_mcu(*this, "mcu")
 	, m_rows(*this, "ROW.%u", 0)
 	, m_mousebtn(*this, "MOUSEBTN")
 	, m_mousex(*this, "MOUSEX")
 	, m_mousey(*this, "MOUSEY")
-	, m_out_data(*this)
-	, m_mcu(*this, "mcu")
+	, m_reset_timer(nullptr)
 	, m_mouse_read_count(0)
 	, m_count_mx(0), m_count_my(0)
 	, m_bits_mx(0), m_bits_my(0)
@@ -265,7 +266,7 @@ uint8_t m24_keyboard_device::p1_r()
 
 void m24_keyboard_device::p1_w(uint8_t data)
 {
-	// bit 3 and 4 are leds and bits 6 and 7 are jumpers to ground
+	// bit 3 and 4 are LEDs and bits 6 and 7 are jumpers to ground
 	m_p1 = data & ~0xc0;
 	if(m_p1 & 4)
 		m_p1 |= 2;
@@ -281,7 +282,7 @@ uint8_t m24_keyboard_device::p2_r()
 
 	if (mx != m_last_mx)
 	{
-		int diff = (int)mx - m_last_mx;
+		int diff = int(unsigned(mx)) - m_last_mx;
 
 		// check for wrap
 		if (diff > 0x80)
@@ -296,7 +297,7 @@ uint8_t m24_keyboard_device::p2_r()
 
 	if (my != m_last_my)
 	{
-		int diff = (int)my - m_last_my;
+		int diff = int(unsigned(my)) - m_last_my;
 
 		if (diff > 0x80)
 			diff -= 0x100;
@@ -319,7 +320,9 @@ uint8_t m24_keyboard_device::p2_r()
 			{
 				m_count_mx--;
 				m_bits_mx++;
-			} else {
+			}
+			else
+			{
 				m_count_mx++;
 				m_bits_mx--;
 			}
@@ -332,7 +335,9 @@ uint8_t m24_keyboard_device::p2_r()
 			{
 				m_count_my--;
 				m_bits_my++;
-			} else {
+			}
+			else
+			{
 				m_count_my++;
 				m_bits_my--;
 			}
@@ -354,16 +359,6 @@ uint8_t m24_keyboard_device::p2_r()
 			BIT(m_bits_my + 1, 1) << 3;
 }
 
-int m24_keyboard_device::t0_r()
-{
-	return 0;
-}
-
-int m24_keyboard_device::t1_r()
-{
-	return 0;
-}
-
 void m24_keyboard_device::bus_w(uint8_t data)
 {
 	uint8_t col = m_rows[(data >> 3) & 0xf]->read();
@@ -373,8 +368,10 @@ void m24_keyboard_device::bus_w(uint8_t data)
 void m24_keyboard_device::clock_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, !state);
-	if(!state)
+	if (!state)
+	{
 		m_reset_timer->adjust(attotime::from_msec(50));
+	}
 	else
 	{
 		m_reset_timer->adjust(attotime::never);
