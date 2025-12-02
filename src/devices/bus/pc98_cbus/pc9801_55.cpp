@@ -108,17 +108,25 @@ void pc9801_55_device::dack_w(int line, u8 data)
 	m_wdc->dma_w(data);
 }
 
+// opt-in, works with specific options only
+static void pc98_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_PC98_HD);
+	// TODO: at least a CD-ROM option
+}
+
+
 void pc9801_55_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsi_bus);
 	// TODO: currently returning default_scsi_devices, checkout if true for PC-98
-	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", pc98_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("wdc", WD33C93A).machine_config(
 		[this](device_t *device)
 		{

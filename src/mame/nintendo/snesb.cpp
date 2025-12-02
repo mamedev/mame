@@ -1157,10 +1157,11 @@ void snesb_state::piratdwb(machine_config &config)
 	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_map);
 
-	m68000_device &maincpu(M68000(config, "m68000", 16_MHz_XTAL / 2));
-	maincpu.set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_68k_map);
+	m68000_device &protcpu(M68000(config, "m68000", 16_MHz_XTAL / 2));
+	protcpu.set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_68k_map);
 //	maincpu.set_cpu_space(AS_PROGRAM);
-	maincpu.set_vblank_int("screen", FUNC(snesb_state::irq1_line_hold)); // unknown irq and source (all points the same)
+	// unknown irq and source (all points the same, NMI tied to coin chute?)
+	protcpu.set_vblank_int("screen", FUNC(snesb_state::irq1_line_hold));
 }
 
 

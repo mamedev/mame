@@ -12,7 +12,7 @@
 #pragma once
 
 #include "slot.h"
-#include "bus/nscsi/devices.h"
+#include "bus/nscsi/pc98_hd.h"
 #include "machine/nscsi_bus.h"
 #include "machine/wd33c9x.h"
 
