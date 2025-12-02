@@ -225,7 +225,6 @@ public:
 		m_custom(*this, "CUSTOM.%u", 0),
 		m_opt(*this, "OPT.%u", 0),
 		m_mcu_out(*this, "mcuout%u", 0U),
-		m_mcu_output(*this, "mcuoutput%u", 0U),
 		m_cpuled_out(*this, "cpuled%u", 0U),
 		m_wheel_motor(*this, "wheel_motor")
 	{ }
@@ -439,7 +438,6 @@ protected:
 	optional_ioport_array<2> m_custom;
 	optional_ioport_array<2> m_opt;
 	output_finder<16> m_mcu_out;
-	output_finder<2> m_mcu_output;
 	output_finder<8> m_cpuled_out;
 	output_finder<> m_wheel_motor;
 
