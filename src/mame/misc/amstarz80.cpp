@@ -190,7 +190,7 @@ ROM_START( unkamst ) // AMSTAR ELEC ASSY 1061-3700. Had ROM labels removed / unr
 
 	ROM_REGION( 0x400, "tiles", 0 )
 	ROM_LOAD( "2708.e5", 0x000, 0x400, CRC(8a0a90f5) SHA1(2bb2f27a3617dcf776c9ac9b713eafa3d8017c38) )
-	// empty ROM sockets at d5
+	// empty ROM socket at d5
 
 	// these custom ROMs were dumped via an adapter built on educated guessing of the pinout, so resulting dump isn't confirmed to be 100% correct
 	// they do contain good GFX data
@@ -215,7 +215,7 @@ ROM_START( unkamsta ) // AMSTAR ELEC ASSY 1061-3700. Had ROM labels removed / un
 
 	ROM_REGION( 0x400, "tiles", 0 )
 	ROM_LOAD( "2708.e5", 0x000, 0x400, CRC(8a0a90f5) SHA1(2bb2f27a3617dcf776c9ac9b713eafa3d8017c38) )
-	// empty ROM sockets at d5
+	// empty ROM socket at d5
 
 	// these custom ROMs were dumped via an adapter built on educated guessing of the pinout, so resulting dump isn't confirmed to be 100% correct
 	// they do contain good GFX data
@@ -224,7 +224,7 @@ ROM_START( unkamsta ) // AMSTAR ELEC ASSY 1061-3700. Had ROM labels removed / un
 	ROM_LOAD( "c29114.b5",  0x1000, 0x1000, CRC(78fee34e) SHA1(3cef1c03d91ec5b74272ec63c4962009cf309b52) ) // 1xxxxxxxxxxx = 0x00, different chip code but same contents as the other sets
 
 	ROM_REGION( 0x600, "proms", 0 )
-	ROM_LOAD( "d2",          0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "d2",          0x000, 0x100, CRC(77d1cf3b) SHA1(f2891b9ea0af028c8b4f6aac254e4dfc27531da2) )
 	ROM_LOAD( "f2",          0x100, 0x100, CRC(a33b5045) SHA1(e7eb46c2f75a6a754d023542c4b229f27058a79b) )
 	ROM_LOAD( "g1",          0x200, 0x100, CRC(7238328c) SHA1(8693aa21f0ede154f0fc17abc1c4f392de4b8018) )
 	ROM_LOAD( "001_1602.g2", 0x300, 0x100, CRC(8364f735) SHA1(888376546430a9db223893896014ecc95e40d566) )
