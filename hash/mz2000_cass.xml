@@ -23,7 +23,7 @@ TODO:
 <!-- !Operating Systems -->
 
 	<software name="mz1z001" supported="no">
-		<description>BASIC MZ-1Z001 v1.0c</description>
+		<description>BASIC MZ-1Z001 (v1.0c)</description>
 		<year>1982</year>
 		<publisher>Sharp</publisher>
 		<part name="cass1" interface="mz_cass">
@@ -34,7 +34,7 @@ TODO:
 	</software>
 
 	<software name="mz1z002" supported="no">
-		<description>BASIC MZ-1Z002 v1.0a</description>
+		<description>BASIC MZ-1Z002 (v1.0a)</description>
 		<year>1982</year>
 		<publisher>Sharp</publisher>
 		<part name="cass1" interface="mz_cass">

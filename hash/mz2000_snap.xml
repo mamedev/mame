@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- 
+<!--
 Software list of Sharp MZ-2000 snapshots, created to provide support for software that will run as a snapshot image in MAME but (currently) not in the original media.
 -->
 <softwarelist name="mz2000_snap" description="Sharp MZ-2000 snapshots">
 
-<!-- Operating Systems -->
+<!-- !Operating Systems -->
 
 	<software name="mz1z001" supported="yes">
-		<description>BASIC MZ-1Z001 v1.0c</description>
+		<description>BASIC MZ-1Z001 (v1.0c)</description>
 		<year>1982</year>
 		<publisher>Sharp</publisher>
 		<part name="snap" interface="mz_snap">
@@ -19,7 +19,7 @@ Software list of Sharp MZ-2000 snapshots, created to provide support for softwar
 	</software>
 
 	<software name="mz1z002" supported="yes">
-		<description>BASIC MZ-1Z002 v1.0a</description>
+		<description>BASIC MZ-1Z002 (v1.0a)</description>
 		<year>1982</year>
 		<publisher>Sharp</publisher>
 		<part name="snap" interface="mz_snap">
@@ -29,7 +29,7 @@ Software list of Sharp MZ-2000 snapshots, created to provide support for softwar
 		</part>
 	</software>
 
-<!-- Games -->
+<!-- !Games -->
 
 	<software name="binary" supported="yes">
 		<description>Binary Land</description>
@@ -55,7 +55,7 @@ Software list of Sharp MZ-2000 snapshots, created to provide support for softwar
 
 	<software name="dawnptrl" supported="yes">
 		<description>Dawn Patrol</description>
-		<year>19??</year>
+		<year>1986?</year>
 		<publisher>Silver Ball Software</publisher>
 		<part name="snap" interface="mz_snap">
 			<dataarea name="snap" size="38144">
@@ -88,7 +88,7 @@ Software list of Sharp MZ-2000 snapshots, created to provide support for softwar
 
 	<software name="frntline" supported="yes">
 		<description>Front Line</description>
-		<year>19??</year>
+		<year>1984?</year>
 		<publisher>Carry Soft</publisher>
 		<part name="snap" interface="mz_snap">
 			<dataarea name="snap" size="62464">
@@ -132,7 +132,7 @@ Software list of Sharp MZ-2000 snapshots, created to provide support for softwar
 
 	<software name="plazmaln" supported="yes">
 		<description>Plazma Line</description>
-		<year>19??</year>
+		<year>1984?</year>
 		<publisher>Techno Soft</publisher>
 		<part name="snap" interface="mz_snap">
 			<dataarea name="snap" size="54016">
@@ -144,7 +144,7 @@ Software list of Sharp MZ-2000 snapshots, created to provide support for softwar
 	<software name="undrgrnd" supported="yes">
 		<description>Underground City</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="snap" interface="mz_snap">
 			<dataarea name="snap" size="46592">
 				<rom name="underground-city.bin" size="46592" crc="361de7f3" sha1="328f20ca3845bc42390c60286540ea0435241a90" />
@@ -166,7 +166,7 @@ Software list of Sharp MZ-2000 snapshots, created to provide support for softwar
 	<software name="xetter2k" supported="yes">
 		<description>Xetter</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="snap" interface="mz_snap">
 			<dataarea name="snap" size="61461">
 				<rom name="xetter-2000.bin" size="61461" crc="a9dc0D9d" sha1="798298638335c0dcbc5cd9ed14f3163894a892d1" />
