@@ -1491,6 +1491,7 @@ void lua_engine::initialize()
 				}
 				return nullptr;
 			});
+	machine_type["side_effects_disabled"] = sol::property(&running_machine::side_effects_disabled);
 
 
 	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
