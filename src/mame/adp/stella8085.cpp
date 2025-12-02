@@ -28,6 +28,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8256.h"
 #include "machine/i8279.h"
@@ -73,7 +74,7 @@ private:
 	uint8_t m_kbd_sl = 0x00;
 	bool m_kbd_bd = false;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<i8256_device> m_uart;
 	required_device<i8279_device> m_kdc;
 	required_ioport_array<8> m_tz;
@@ -86,10 +87,12 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
 	void small_program_map(address_map &map) ATTR_COLD;
+	void io_4040_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
 	// I8256 ports
 	uint8_t lw_r(); //P1.0-P1.3
+	uint8_t machine_r();
 	void machine1_w(uint8_t data);
 	void machine2_w(uint8_t data);
 
@@ -102,12 +105,12 @@ private:
 	void output_digit(uint8_t i, uint8_t data);
 
 	void io00(uint8_t data) ATTR_COLD;
-	void io70(uint8_t data) ATTR_COLD;
-	void io71(uint8_t data) ATTR_COLD;
+	uint8_t io70r() ATTR_COLD;
+	void io70w(uint8_t data) ATTR_COLD;
+	uint8_t io71r() ATTR_COLD;
+	void io71w(uint8_t data) ATTR_COLD;
 	void sounddev(uint8_t data) ATTR_COLD;
 	void io73(uint8_t data) ATTR_COLD;
-	uint8_t io9r() ATTR_COLD;
-	void io9w(uint8_t data) ATTR_COLD;
 
 	void makesound(uint8_t tone, uint8_t octave, uint8_t length);
 	int soundfreq(uint8_t channel, uint8_t clockdiv);
@@ -127,7 +130,7 @@ void stella8085_state::machine_start()
 void stella8085_state::program_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom(); // ICE6, ICD6, ICC5
-	map(0x9000, 0x933f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+	map(0x9000, 0x900d).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0xa000, 0xafff).ram(); // ??
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
@@ -143,8 +146,22 @@ void stella8085_state::small_program_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
-	map(0x6000, 0x633f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+	map(0x6000, 0x6fff).ram();
+	//map(0x6000, 0x633f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0x7000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xffff).ram();
+}
+
+void stella8085_state::io_4040_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
+	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w));
+	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w));
+	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
+	map(0x73, 0x73).w(FUNC(stella8085_state::io73));
+	map(0x80, 0x81).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x90, 0x9f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 void stella8085_state::io_map(address_map &map)
@@ -152,12 +169,12 @@ void stella8085_state::io_map(address_map &map)
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
-	map(0x70, 0x70).w(FUNC(stella8085_state::io70));
-	map(0x71, 0x71).w(FUNC(stella8085_state::io71));
+	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w));
+	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x73).w(FUNC(stella8085_state::io73)); // probably extra lamps
+	map(0x73, 0x73).w(FUNC(stella8085_state::io73));
 	// map(0x80, 0x8f) //Y8 ICC5 empty socket
-	map(0x90, 0x9f).rw(FUNC(stella8085_state::io9r),FUNC(stella8085_state::io9w)); //Y9 wired to rtc circuits but somehow memory mapped in hardware
+	//Y9 wired to rtc circuits but somehow memory mapped in hardware
 }
 
 /*********************************************
@@ -178,7 +195,22 @@ uint8_t stella8085_state::lw_r()
 	//P1.6 is always low
 	// LIW5
 
-	return 0xbf;
+	return 0x00;
+}
+
+uint8_t stella8085_state::machine_r()
+{
+	// all pins pulled low through resistor pack
+	// M1A
+	// M1B
+	// M2A
+	// M2B
+	// M3A
+	// M3B
+	// M4A
+	// M4B
+
+	return 0x00;
 }
 
 void stella8085_state::machine1_w(uint8_t data)
@@ -192,7 +224,7 @@ void stella8085_state::machine2_w(uint8_t data)
 }
 
 /*********************************************
-*      I8279 Keyboard-Disply Interface       *
+*      I8279 Keyboard-Display Interface      *
 *                                            *
 *********************************************/
 
@@ -279,7 +311,7 @@ TIMER_CALLBACK_MEMBER(stella8085_state::sound_stop)
 
 void stella8085_state::rst65_w(uint8_t state)
 {
-	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(I8085_RST65_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void stella8085_state::io00(uint8_t data)
@@ -287,17 +319,12 @@ void stella8085_state::io00(uint8_t data)
 	//old boards
 }
 
-uint8_t stella8085_state::io9r()
+uint8_t stella8085_state::io70r()
 {
-	return 0xff; //old boards
+	return 0xff;
 }
 
-void stella8085_state::io9w(uint8_t data)
-{
-	//old boards
-}
-
-void stella8085_state::io70(uint8_t data)
+void stella8085_state::io70w(uint8_t data)
 {
 	const bool AW1 = BIT(data,0);
 	const bool AW2 = BIT(data,1);
@@ -316,15 +343,18 @@ void stella8085_state::io70(uint8_t data)
 	machine().bookkeeping().coin_counter_w(5,SZ); // game counter
 
 	if (D6)
-	{
-		//LOG("Short test\n");
-	}
+		;//LOG("Short test\n");
 
 	if (PA7)
 		LOG("PA7 high\n");
 }
 
-void stella8085_state::io71(uint8_t data)
+uint8_t stella8085_state::io71r()
+{
+	return 0xff;
+}
+
+void stella8085_state::io71w(uint8_t data)
 {
 	const bool RS = BIT(data,0);
 	const bool GONG = BIT(data,1);
@@ -427,6 +457,28 @@ int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 	}
 }
 
+static INPUT_PORTS_START( stella8085_tatatur )
+	PORT_START("TZ6") // TASTATUR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
+
+	PORT_START("TZ7") // TASTATUR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dicemstr )
 	PORT_START("DSW")
 	PORT_DIPNAME(0x01, 0x01, "8085 RST75")
@@ -466,25 +518,7 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_START("TZ5") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TZ6") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
-
-	PORT_START("TZ7") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
+	PORT_INCLUDE(stella8085_tatatur)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( disc )
@@ -542,26 +576,7 @@ static INPUT_PORTS_START( disc )
 	PORT_START("TZ5") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TZ6") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
-
-	PORT_START("TZ7") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
-
+	PORT_INCLUDE(stella8085_tatatur)
 INPUT_PORTS_END
 
 void stella8085_state::dicemstr(machine_config &config)
@@ -588,15 +603,31 @@ void stella8085_state::dicemstr(machine_config &config)
 
 void stella8085_state::doppelpot(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	excellent(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
 
+	MC146818(config, "rtc", 32.768_kHz_XTAL);
+
+}
+
+void stella8085_state::excellent(machine_config &config)
+{
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
+
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
-	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
 	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
 	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
+	m_uart->in_p2_callback().set(FUNC(stella8085_state::machine_r));
+	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
+	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
@@ -607,17 +638,9 @@ void stella8085_state::doppelpot(machine_config &config)
 
 	config.set_default_layout(layout_adpservice);
 
-	MC146818(config, "rtc", 32.768_kHz_XTAL);
-
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 0)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
-}
-
-void stella8085_state::excellent(machine_config &config)
-{
-	doppelpot(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
 }
 
 ROM_START( bahia )
@@ -645,22 +668,22 @@ ROM_END
 
 ROM_START( doppelstart )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "doppel_start_eprom1_2732.bin", 0x0000, 0x1000, CRC(0a90cc49) SHA1(87a2aaa85ecf0525473d02a2121d13c6615b7188) )
-	ROM_LOAD( "doppel_start_eprom2_2732.bin", 0x1000, 0x1000, CRC(720c4262) SHA1(da7f6a399093e4596d84798423201e1445ac38a1) )
-	ROM_LOAD( "doppel_start_eprom3_2732.bin", 0x2000, 0x1000, CRC(1d26e43a) SHA1(389a5398536097c3dc3e084f4635908aad17c62d) )
-	ROM_LOAD( "doppel_start_eprom4_2732.bin", 0x3000, 0x1000, CRC(d0fa1fdd) SHA1(c56df831c0c112762636675a60a76a0f00732ab2) )
-	ROM_LOAD( "doppel_start_eprom5_2732.bin", 0x4000, 0x1000, CRC(40079325) SHA1(9e9f5e3853b3b75c89cd9086814f8a762cc3643b) )
-	ROM_LOAD( "doppel_start_eprom6_2732.bin", 0x7000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
+	ROM_LOAD( "doppel_start_1_2732.bin", 0x0000, 0x1000, CRC(0a90cc49) SHA1(87a2aaa85ecf0525473d02a2121d13c6615b7188) )
+	ROM_LOAD( "doppel_start_2_2732.bin", 0x1000, 0x1000, CRC(720c4262) SHA1(da7f6a399093e4596d84798423201e1445ac38a1) )
+	ROM_LOAD( "doppel_start_3_2732.bin", 0x2000, 0x1000, CRC(1d26e43a) SHA1(389a5398536097c3dc3e084f4635908aad17c62d) )
+	ROM_LOAD( "doppel_start_4_2732.bin", 0x3000, 0x1000, CRC(d0fa1fdd) SHA1(c56df831c0c112762636675a60a76a0f00732ab2) )
+	ROM_LOAD( "doppel_start_5_2732.bin", 0x4000, 0x1000, CRC(40079325) SHA1(9e9f5e3853b3b75c89cd9086814f8a762cc3643b) )
+	ROM_LOAD( "doppel_start_6_2732.bin", 0x7000, 0x1000, CRC(1b988121) SHA1(7886ad67d62db61588640f95efc679bc26220691) )
 ROM_END
 
 ROM_START( disc )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "disc_eprom1_2732.bin", 0x0000, 0x1000, CRC(b9d1f518) SHA1(3a49b248eeb77767e8274a8be523678d7b4aa7d0) )
-	ROM_LOAD( "disc_eprom2_2732.bin", 0x1000, 0x1000, CRC(f55fba7c) SHA1(941f2653cb48836bb46f0903f64c3e9d32e67f46) )
-	ROM_LOAD( "disc_eprom3_2732.bin", 0x2000, 0x1000, CRC(bd05e77a) SHA1(9e2b5ad6de3eb36cb1f588906a2a10e512b79ce8) )
-	ROM_LOAD( "disc_eprom4_2732.bin", 0x3000, 0x1000, CRC(fa8dfac6) SHA1(7e8ba772218f4344070c4fa7e7bc5606b004ddc7) )
-	ROM_LOAD( "disc_eprom5_2732.bin", 0x4000, 0x1000, CRC(d036733c) SHA1(f2912f9090b3737ddd1c0702f30a6817fd36ec2c) )
-	ROM_LOAD( "disc_eprom6_2732.bin", 0x7000, 0x1000, CRC(d94d5f6e) SHA1(a27df116478b776c549c392297ffa4fdbb073514) )
+	ROM_REGION( 0x9000, "maincpu", 0 )
+	ROM_LOAD( "disc_1_2732.bin", 0x0000, 0x1000, CRC(b9d1f518) SHA1(3a49b248eeb77767e8274a8be523678d7b4aa7d0) )
+	ROM_LOAD( "disc_2_2732.bin", 0x1000, 0x1000, CRC(f55fba7c) SHA1(941f2653cb48836bb46f0903f64c3e9d32e67f46) )
+	ROM_LOAD( "disc_3_2732.bin", 0x2000, 0x1000, CRC(bd05e77a) SHA1(9e2b5ad6de3eb36cb1f588906a2a10e512b79ce8) )
+	ROM_LOAD( "disc_4_2732.bin", 0x3000, 0x1000, CRC(fa8dfac6) SHA1(7e8ba772218f4344070c4fa7e7bc5606b004ddc7) )
+	ROM_LOAD( "disc_5_2732.bin", 0x4000, 0x1000, CRC(d036733c) SHA1(f2912f9090b3737ddd1c0702f30a6817fd36ec2c) )
+	ROM_LOAD( "disc_6_2732.bin", 0x7000, 0x1000, CRC(d94d5f6e) SHA1(a27df116478b776c549c392297ffa4fdbb073514) )
 ROM_END
 
 ROM_START( disc2000 )
@@ -679,6 +702,22 @@ ROM_START( disc3000 )
 	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "disc3000.ice6", 0x0000, 0x4000, CRC(6e024e72) SHA1(7198c0cd844d4bc080b2d8654d32d53a04ce8bb4) )
 	ROM_LOAD( "disc3000.icd6", 0x4000, 0x4000, CRC(ad88715a) SHA1(660f4044e8f24ad59767ce025966475f9fd56885) )
+ROM_END
+
+ROM_START( disciiplus )
+	ROM_REGION( 0x9000, "maincpu", 0 )
+	ROM_LOAD( "disc_ii_plus_1-f7m27256f1.ice6", 0x0000, 0x4000, CRC(b2d999f2) SHA1(cb961dfa7d6eec84e742261d6cf66a3e95715101) )
+	ROM_LOAD( "disc_ii_plus_2-f7m27256f1.icd6", 0x4000, 0x4000, CRC(c87dd5ce) SHA1(721293fd9ba19bb58b657d6eabd3cd1c7dd74aac) )
+ROM_END
+
+ROM_START( discolympia )
+	ROM_REGION( 0x9000, "maincpu", 0 )
+	ROM_LOAD( "olympia_pr1", 0x0000, 0x1000, CRC(531deb63) SHA1(6fddfc5791465c3bcdb554f207de391905085df9) )
+	ROM_LOAD( "olympia_pr2", 0x1000, 0x1000, CRC(81e119b2) SHA1(a28eca9394e88b862b15e7bc117b0c4d01d4cf38) )
+	ROM_LOAD( "olympia_pr3", 0x2000, 0x1000, CRC(2e156cef) SHA1(e5f145f3e4b7515b949fa7b570ca312c5dd12311) )
+	ROM_LOAD( "olympia_pr4", 0x3000, 0x1000, CRC(8f51c072) SHA1(f23fd7d683a5d0765469de8910bb24d0db1b42e2) )
+	ROM_LOAD( "olympia_pr5", 0x4000, 0x1000, CRC(f486c0da) SHA1(ebec6f66bffa1057f5fa9b4ab53cedd533036f0a) )
+	ROM_LOAD( "olympia_pr6", 0x7000, 0x1000, CRC(e6830d26) SHA1(dbe7a39f24a1dcee298dae3ec1b2d6249a914262) )
 ROM_END
 
 ROM_START( elitedisc )
@@ -702,10 +741,31 @@ ROM_START( extrablatt )
 	ROM_LOAD( "extrablatt.icd6", 0x8000, 0x8000, CRC(5c0cb9bd) SHA1(673d5f8dec7ccce1c4f39dce6be1e9d1ed699047) )
 ROM_END
 
-ROM_START( glucksstern )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "glucksstern.ice6", 0x00000, 0x20000, CRC(8e969bae) SHA1(bf66d491932b77dab4c6b15ec7fbf470223636ac) )
-	ROM_LOAD( "glucksstern.icd6", 0x20000, 0x20000, CRC(f31b860a) SHA1(7b016bb7d0699cfe7165c0abb2c1bbcb944cdc86) )
+ROM_START( fullhouse )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "merkur_full_house_ic1.ice6", 0x0000, 0x8000, CRC(4f984add) SHA1(5a31c96475fe12c4f19658133d97e6bf0536b776) )
+	ROM_LOAD( "merkur_full_house_ic2.icd6", 0x8000, 0x8000, CRC(c0f393a0) SHA1(fa16db49d44e813e68701eb77284d04903cf3ec7) )
+ROM_END
+
+ROM_START( herzas )
+	ROM_REGION( 0x9000, "maincpu", 0 )
+	ROM_LOAD( "herz_as_nr1.ice6", 0x0000, 0x4000, CRC(dd4dbaac) SHA1(7fb3c8ea495d5bf989c4aa807ecbe5601c451a73) )
+	ROM_LOAD( "herz_as_nr2.icd6", 0x4000, 0x4000, CRC(f2c6a0c4) SHA1(2dad5f79cb5b21905cbefd56b00db1cce1d0b920) )
+	ROM_LOAD( "herz_as_nr3.icc5", 0x8000, 0x1000, CRC(1c8657e8) SHA1(836319901c77037c7f414cf0fddf5ab1bdf90ee5) )
+ROM_END
+
+ROM_START( herzasf8 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
+	ROM_LOAD( "herz_as_f8_1.ice6", 0x0000, 0x4000, CRC(830bada0) SHA1(8c1fc7e8433c986687b68f6de7610a624e9ac707) )
+	ROM_LOAD( "herz_as_f8_2.icd6", 0x4000, 0x4000, CRC(77f88503) SHA1(671a7e819a0361101a30327179132f2661388b72) )
+	ROM_LOAD( "herz_as_f8_3.icc5", 0x8000, 0x1000, CRC(b343bfac) SHA1(3772045fcaeb9a87459e481149f27873fc713ca7) )
+ROM_END
+
+ROM_START( herzasf10 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
+	ROM_LOAD( "herz_as_f10_1.ice6", 0x0000, 0x4000, CRC(e8342e8b) SHA1(e32ad013cdd1480d350ba2e6db18a4489f152301) )
+	ROM_LOAD( "herz_as_f10_2.icd6", 0x4000, 0x4000, CRC(03ba2d03) SHA1(12434a3c862b30e40b7c3187066b25b2b7c4eaa6) )
+	ROM_LOAD( "herz_as_f10_3.icc5", 0x8000, 0x1000, CRC(f67d2492) SHA1(a2daad380376d19cd9ca37f530a23c01b8d3ce5c) )
 ROM_END
 
 ROM_START( juwel )
@@ -732,10 +792,34 @@ ROM_START( macao )
 	ROM_LOAD( "mega_macao_f1_2.icd6", 0x8000, 0x8000, CRC(4df216e6) SHA1(28b3ad213f3af9a472c5e7de1c139399677dd825) )
 ROM_END
 
+ROM_START( mastro )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "merkur_astro_pr1.ice6", 0x0000, 0x8000, CRC(b2d61886) SHA1(12d2aed9315fc311929edeacd23a38bceadb69f8) )
+	ROM_LOAD( "merkur_astro_pr2.icd6", 0x8000, 0x8000, CRC(1e0e42d0) SHA1(46b1eec99331f6656f7cb1542207a79091bce9d9) )
+ROM_END
+
 ROM_START( rasant )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rasant_pr_1.ice6", 0x0000, 0x8000, CRC(6abef716) SHA1(8ef2999f6c72f7fb134bfa4ad72ab7be7d12af27) )
 	ROM_LOAD( "rasant_pr_2.icd6", 0x8000, 0x8000, CRC(c3a95f74) SHA1(87805ca63a93cc9012e7f2ab4d808c48ba93c919) )
+ROM_END
+
+ROM_START( superherzas )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_herz_as_1.ice6", 0x0000, 0x8000, CRC(4212cfaa) SHA1(c428a2a59ae73a92abd08e2b9b2f4feb8ae4dc31) )
+	ROM_LOAD( "super_herz_as_2.icd6", 0x8000, 0x8000, CRC(c5cab1a1) SHA1(d3425c94d898369ad22e969a00697e2f0a1305f9) )
+ROM_END
+
+ROM_START( superjackpot )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_jackpot_i.ice6", 0x0000, 0x4000, CRC(3f14364a) SHA1(4711e2d1aa76a08478177ad7b1f5509b11649f9d) )
+	ROM_LOAD( "super_jackpot_ii.icd6", 0x4000, 0x4000, CRC(984d4ca1) SHA1(1da5533f06fb7a1ab8f221c5a58c1afafdd5f862) )
+ROM_END
+
+ROM_START( supermulti )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_multi_1.ice6", 0x0000, 0x8000, CRC(fcf126ba) SHA1(89dfd10b6529a92b55d2585c0aa3d0c6b1751550) )
+	ROM_LOAD( "super_multi_2.icd6", 0x8000, 0x8000, CRC(0b7a8352) SHA1(ac03b226296085f43634ba96e3e390d3e44c1760) )
 ROM_END
 
 ROM_START( supermultib )
@@ -744,24 +828,54 @@ ROM_START( supermultib )
 	ROM_LOAD( "super_multi_dob_pr2.icd6", 0x8000, 0x8000, CRC(e3f14918) SHA1(8ba7fc80044b5d27005a53ddbf9e928c74c25d48) )
 ROM_END
 
+ROM_START( superpro )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_pro_f2_1.ice6", 0x0000, 0x8000, CRC(3294f651) SHA1(3c2dcecda4cbebf29246bbc7705430e96dcafbae) )
+	ROM_LOAD( "super_pro_f2_2.icd6", 0x8000, 0x8000, CRC(82802b74) SHA1(8e6ebc429d4e1ccfc5ed6a3bb6fb1747a6a7187a) )
+ROM_END
+
+ROM_START( treffasm )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "treff_as_medaille_1.ice6", 0x0000, 0x8000, CRC(053831b7) SHA1(d534a9a37d1556c366af523c397d1d5cf97b2a12) )
+	ROM_LOAD( "treff_as_medaille_2.icd6", 0x8000, 0x8000, CRC(c2576b97) SHA1(d4f3ca7d7565500b66366b04ef6395c20037b380) )
+ROM_END
+
+ROM_START( v4asse )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "venus_4_asse_f1_i.ice6", 0x0000, 0x8000, CRC(29fd7f6a) SHA1(84a8f744e189f0645410c4b7ac36b65f30aa1cc9) )
+	ROM_LOAD( "venus_4_asse_f1_ii.icd6", 0x8000, 0x8000, CRC(314dc36c) SHA1(d076651910c713326fe5f0c617ae6e74b6c15334) )
+ROM_END
+
 } // anonymous namespace
 
-GAMEL( 1982, excellent,   0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1983, bahia,       0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1984, disc,        0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1985, doppelstart, 0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, doppelpot,   0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, elitedisc,   0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1986, rasant,      0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, disc2000,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, disc2001,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, kniffi,      0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, supermultib, 0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, extrablatt,  0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, juwel,       0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1989, disc3000,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1991, macao,       0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Macao",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1992, karoas,      0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1982, excellent,            0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1983, bahia,                0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1984, disc,                 0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1985, doppelstart,          0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, discolympia,          0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Olympia",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1986, doppelpot,            0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, elitedisc,            0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1986, rasant,               0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, superjackpot,         0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Nova",   "Super Jackpot",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, disc2000,             0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, disc2001,             0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, fullhouse,            0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Full House",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzas,       herzasf10, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf8,     herzasf10, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F8)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf10,            0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F10)",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, kniffi,               0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, supermulti, supermultib, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, supermultib,          0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, extrablatt,           0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, juwel,                0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, mastro,               0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Merkur Astro",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, superherzas,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz AS",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1989, disc3000,             0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1990, v4asse,               0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "4 Asse",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, macao,                0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Macao",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, superpro,             0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Pro",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, treffasm,             0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Treff As",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, disciiplus,           0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc II Plus",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, karoas,               0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 // 'STELLA DICE MASTER F2' and 'COPYRIGHT BY ADP LUEBBECKE GERMANY 1993' in ROM
 GAMEL( 1993, dicemstr,    0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1998, glucksstern, 0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
