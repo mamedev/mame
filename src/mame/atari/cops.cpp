@@ -796,12 +796,14 @@ ROM_START( cops )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "cops_sys.dat", 0x0000, 0x8000, CRC(0060e5d0) SHA1(b8c9f6fde6a315e33fa7946e5d3bb4ea2fbe76a8) )
+// En cops.cpp, reemplaza las líneas NO_DUMP por esto:
+DISK_REGION( "audiocd" )
+// Si tienes el SHA1 real, ponlo aquí. Si no, MAME te dará una advertencia pero cargará el archivo si se llama 'copscd.chd'
+DISK_IMAGE_READONLY( "copscd", 0, SHA1(d4739f50cc6fc9e7dc402f6c23236593c122917f) ) 
 
-	DISK_REGION( "audiocd" )
-	DISK_IMAGE_READONLY( "copscd", 0, NO_DUMP )
-
-	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "copsld", 0, NO_DUMP )
+DISK_REGION( "laserdisc" )
+DISK_IMAGE_READONLY( "copsld", 0, SHA1(b903477d6b5a87581fe7f1a509aef05165f507e9
+) )
 ROM_END
 
 ROM_START( copsuk )
@@ -810,12 +812,12 @@ ROM_START( copsuk )
 
 	ROM_REGION( 0x8000, "system", 0 )
 	ROM_LOAD( "cops_sys.dat", 0x0000, 0x8000, CRC(0060e5d0) SHA1(b8c9f6fde6a315e33fa7946e5d3bb4ea2fbe76a8) )
-
-	DISK_REGION( "audiocd" )
-	DISK_IMAGE_READONLY( "copscd", 0, NO_DUMP )
-
-	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "copsld", 0, NO_DUMP )
+// En cops.cpp, reemplaza las líneas NO_DUMP por esto:
+DISK_REGION( "audiocd" )
+// Si tienes el SHA1 real, ponlo aquí. Si no, MAME te dará una advertencia pero cargará el archivo si se llama 'copscd.chd'
+DISK_IMAGE_READONLY( "copscd", 0, SHA1(d4739f50cc6fc9e7dc402f6c23236593c122917f
+) ) 
+//this is made by ai and  in the future i will understand c because im young im an 14 year old and im from mexico and i will give the link to these files https://drive.google.com/file/d/1HxeeDeDPJ-wVdZIGKqVhWRjiY0r4bKDU/view?usp=sharing
 ROM_END
 
 ROM_START( revlatns )
