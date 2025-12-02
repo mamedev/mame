@@ -2614,11 +2614,11 @@
 			<bounds x="762" y="92.587" width="70" height="11.794" />
 		</element>
 		<element ref="text_S_3_2_v_o_i_c_e">
-			<bounds x="14" y="97.307" width="65" height="7.592" />
+			<bounds x="14" y="96.992" width="65" height="7.9778" />
 			<color red="0.2" green="0.2" blue="0.2" />
 		</element>
 		<element ref="text_S_sd_1">
-			<bounds x="13" y="61.058" width="67" height="40.997" />
+			<bounds x="13" y="59.359" width="67" height="43.08" />
 		</element>
 		<element name="lights" ref="light_16">
 			<bounds x="-56" y="137.62" width="5" height="0.72222" />

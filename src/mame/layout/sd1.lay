@@ -2608,7 +2608,7 @@
 			<bounds x="762" y="92.587" width="70" height="11.794" />
 		</element>
 		<element ref="text_S_sd_1">
-			<bounds x="13" y="71.058" width="67" height="40.997" />
+			<bounds x="13" y="69.359" width="67" height="43.08" />
 		</element>
 		<element name="lights" ref="light_16">
 			<bounds x="-56" y="137.62" width="5" height="0.72222" />

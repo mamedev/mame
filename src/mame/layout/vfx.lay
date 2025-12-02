@@ -2396,7 +2396,7 @@
 			<bounds x="762" y="92.587" width="70" height="11.794" />
 		</element>
 		<element ref="text_S_vfx">
-			<bounds x="13" y="59.946" width="92" height="54.62" />
+			<bounds x="13" y="61.559" width="92" height="52.642" />
 		</element>
 		<group ref="Sliders">
 			<bounds x="120" y="15" width="90" height="88.2" />
