@@ -3750,8 +3750,8 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_io_map(&specnext_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
-	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
+	m_maincpu->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
+	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
@@ -3826,7 +3826,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
-	m_copper->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
+	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
 
 	config.device_remove("snapshot");

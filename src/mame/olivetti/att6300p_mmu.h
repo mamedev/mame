@@ -21,7 +21,8 @@ public:
 	auto trapio_callback() { return m_trapio.bind(); }
 
 	// MMU configuration
-	void set_protected_mode_enabled(bool enabled);
+	void set_a20_enabled(bool enabled);
+	void set_protection_enabled(bool enabled);
 	void set_mem_mapping(uint32_t target_addr[32]);
 	void set_mem_setup_enabled(bool enabled);
 	void set_io_setup_enabled(bool enabled);
@@ -53,7 +54,7 @@ private:
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_mem16_space;
 	address_space *m_io;
 
-	bool m_protected_mode;
+	bool m_protection_enabled;
 	uint32_t m_map_table[32];
 	uint32_t m_map_imask, m_map_omask;
 	bool m_mem_wr_fastpath;

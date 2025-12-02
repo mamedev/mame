@@ -766,12 +766,12 @@ void esq5505_state::common(machine_config &config)
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	MC68681(config, m_duart, 5000000);
+	MC68681(config, m_duart, 5'000'000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(500'000, 500'000, 1'000'000, 1'000'000);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -851,7 +851,7 @@ void esq5505_state::vfxsd(machine_config &config, int panel_type)
 	m_pump->add_route(2, "aux", 1.0, 0);
 	m_pump->add_route(3, "aux", 1.0, 1);
 
-	WD1772(config, m_fdc, 8000000);
+	WD1772(config, m_fdc, 8'000'000);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
 
 	// software list
@@ -874,7 +874,7 @@ void esq5505_state::sd132(machine_config &config, int panel_type)
 
 	// Like the SD-1 but with its own panel type
 	sd1(config, panel_type);
-	m_duart->set_clock(4000000);
+	m_duart->set_clock(4'000'000);
 
 	m_maincpu->set_clock(clock);
 	m_otis->set_clock(clock);
@@ -898,12 +898,12 @@ void esq5505_state::common32(machine_config &config)
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
-	MC68681(config, m_duart,  4000000);
+	MC68681(config, m_duart,  4'000'000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(500'000, 500'000, 1'000'000, 1'000'000);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -938,7 +938,7 @@ void esq5505_state::common32(machine_config &config)
 	m_otis->add_route(6, "pump", 1.0, 6);
 	m_otis->add_route(7, "pump", 1.0, 7);
 
-	WD1772(config, m_fdc, 8000000);
+	WD1772(config, m_fdc, 8'000'000);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, "35dd", FLOPPY_35_DD, true, floppy_formats);
 }
 

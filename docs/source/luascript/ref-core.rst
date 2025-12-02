@@ -253,6 +253,8 @@ machine.exit_pending (read-only)
     A Boolean indicating whether the emulation session is scheduled to exit.
 machine.hard_reset_pending (read-only)
     A Boolean indicating whether a hard reset of the emulated system is pending.
+machine.side_effects_disabled (read-only)
+    A Boolean indicating whether side effects are disabled.
 machine.devices (read-only)
     A :ref:`device enumerator <luascript-ref-devenum>` that yields all
     :ref:`devices <luascript-ref-device>` in the emulated system.

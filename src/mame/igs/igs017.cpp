@@ -105,7 +105,8 @@ Notes:
 #include "multibyte.h"
 
 #include "igspoker.lh"
-#include "igsslot.lh"
+#include "starzan.lh"
+#include "tarzan103m.lh"
 
 #define LOG_PROT_STRING     (1U << 1)
 #define LOG_PROT_BITSWAP    (1U << 2)
@@ -2470,12 +2471,12 @@ void igs017_state::starzan_counter_w(u8 data)
 
 void igs017_state::starzan_lamps_sound_w(u8 data)
 {
-	m_lamps[0] = BIT(data, 2); // stop 1
-	m_lamps[1] = BIT(data, 0); // stop 2
-	m_lamps[2] = BIT(data, 4); // stop 3
-	m_lamps[3] = BIT(data, 1); // stop 4
-	m_lamps[4] = BIT(data, 3); // bet/stop
-	m_lamps[5] = BIT(data, 5); // start
+	m_lamps[0] = BIT(data, 0);
+	m_lamps[1] = BIT(data, 1);
+	m_lamps[2] = BIT(data, 2);
+	m_lamps[3] = BIT(data, 3);
+	m_lamps[4] = BIT(data, 4);
+	m_lamps[5] = BIT(data, 5);
 //               BIT(data, 6); // unused?
 	m_oki->set_rom_bank(BIT(data, 7));
 
@@ -4309,36 +4310,36 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( starzan )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "System Limit" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING( 0x01, DEF_STR(Off) )
+	PORT_DIPSETTING( 0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, "System Limit" )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING( 0x02, "Unlimited" )
 	PORT_DIPSETTING( 0x00, "Limited" )
-	PORT_DIPNAME( 0x04, 0x04, "W-Up Game" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Double Up Game" )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Back Color" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Back Color" )          PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING( 0x08, "Black" )
 	PORT_DIPSETTING( 0x00, "Color" )
-	PORT_DIPNAME( 0x10, 0x10, "Stop Status" ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING( 0x10, "Non Stop" )
-	PORT_DIPSETTING( 0x00, "Auto Stop" )
-	PORT_DIPNAME( 0x20, 0x20, "Key" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x10, 0x10, "Auto Stop" )           PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10, DEF_STR(No) )
+	PORT_DIPSETTING( 0x00, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x20, 0x20, "Control Panel Type" )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING( 0x20, "Mode 1" )
-	PORT_DIPSETTING( 0x00, "Mode 2" ) // To Do
-	PORT_DIPNAME( 0x40, 0x40, "Credit Level" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x00, "Mode 2" ) // TODO: add support to internal artwork
+	PORT_DIPNAME( 0x40, 0x40, "Credit Level" )        PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Odds Table" ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING( 0x80, "Show" )
-	PORT_DIPSETTING( 0x00, "No Show" )
+	PORT_DIPNAME( 0x80, 0x80, "Show Odds Table" )     PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING( 0x00, DEF_STR(Off) )
+	PORT_DIPSETTING( 0x80, DEF_STR(On) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Normal Level" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Low ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( High ) )
-	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2") // not used from here on according to test mode, PCB does have 3 8-dip banks
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW2:2") // not used from here on according to test mode, PCB does have 3 8-switch banks
 	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW2:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW2:4")
 	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW2:5")
@@ -4357,41 +4358,47 @@ static INPUT_PORTS_START( starzan )
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW3:8")
 
 	PORT_START("PLAYER1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM        ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1        ) PORT_NAME("Start / HW-Up")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3    ) PORT_NAME("Stop Reel 3 / Low")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All Reels / Bet / 2W-Up")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / HW-Up")                 PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Low")             PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Stop All Reels / Bet / 2W-Up")  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / 2W-Up")                 PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / Low")             PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )     PORT_NAME("Stop Reel 4 / Bet / HW-Up")     PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
 
 	PORT_START("PLAYER2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2    ) PORT_NAME("Stop Reel 2 / High")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP4    ) PORT_NAME("Stop Reel 4 / W-Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1    ) PORT_NAME("Stop Reel 1 / Take")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )     PORT_NAME("Stop Reel 2 / High")            PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )     PORT_NAME("Stop Reel 4 / W-Up")            PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / Take")            PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )  PORT_NAME("Stop All Reels / High")         PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )     PORT_NAME("Stop Reel 1 / W-Up")            PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )     PORT_NAME("Stop Reel 3 / Take")            PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2         ) PORT_IMPULSE(5) // 'coin C'
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5) // 'coin A'
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5) // 'coin C'
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5) // 'coin A'
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW      ) // keep pressed while booting
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK   ) // enters book-keeping menu
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // no effects in key test
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW ) // keep pressed while booting
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) // enters book-keeping menu
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tarzan202fa )
 	PORT_INCLUDE(starzan)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW1:7") // not used from here on according to test mode, PCB does have 3 8-dip banks
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x40, "SW1:7") // not used from here on according to test mode, PCB does have 3 8-switch banks
 	PORT_DIPUNUSED_DIPLOC(0x80, 0x80, "SW1:8")
 
 	PORT_MODIFY("DSW2")
@@ -4402,7 +4409,7 @@ static INPUT_PORTS_START( tarzan103m )
 	PORT_INCLUDE(tarzan202fa)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW1:5") // not used from here on according to test mode, PCB does have 3 8-dip banks
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW1:5") // not used from here on according to test mode, PCB does have 3 8-switch banks
 	PORT_DIPUNUSED_DIPLOC(0x20, 0x20, "SW1:6")
 
 	PORT_MODIFY("PLAYER1")
@@ -6575,14 +6582,14 @@ GAME ( 1999,  tarzan,      tarzanc,  tarzan,     tarzan,      igs017_state, init
 GAME ( 1999,  tarzana,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
 GAME ( 1999,  tarzanb,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                              0 )
 GAME ( 2000,  sdmg2p,      0,        sdmg2p,     sdmg2p,      igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
-GAMEL( 2000?, starzan,     0,        starzan,    starzan,     igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   0, layout_igsslot )
-GAMEL( 2000?, jking103a,   starzan,  starzan,    starzan,     igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                0, layout_igsslot )
-GAMEL( 2000?, jking105us,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V105US)",                                               0, layout_igsslot )
-GAMEL( 1999,  jking200pr,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Jungle King (V200PR)",                                               0, layout_igsslot )
-GAME ( 1999?, tarzan103m,  tarzanc,  starzan,    tarzan103m,  igs017_state, init_starzan,    ROT0, "IGS", "Tarzan (V103M)",                                                     0 )
-GAMEL( 1999?, tarzan106fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V106FA)",                                                    0, layout_igsslot  )
-GAMEL( 1999?, tarzan201fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Tarzan (V201FA)",                                                    0, layout_igsslot  )
-GAMEL( 1999?, tarzan202fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V202FA)",                                                    0, layout_igsslot  )
+GAMEL( 2000?, starzan,     0,        starzan,    starzan,     igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   0, layout_starzan )
+GAMEL( 2000?, jking103a,   starzan,  starzan,    starzan,     igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                0, layout_starzan )
+GAMEL( 2000?, jking105us,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V105US)",                                               0, layout_starzan )
+GAMEL( 1999,  jking200pr,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Jungle King (V200PR)",                                               0, layout_starzan )
+GAMEL( 1999?, tarzan103m,  tarzanc,  starzan,    tarzan103m,  igs017_state, init_starzan,    ROT0, "IGS", "Tarzan (V103M)",                                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_tarzan103m ) // gives an error after double up game
+GAMEL( 1999?, tarzan106fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V106FA)",                                                    0, layout_starzan  )
+GAMEL( 1999?, tarzan201fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Tarzan (V201FA)",                                                    0, layout_starzan  )
+GAMEL( 1999?, tarzan202fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V202FA)",                                                    0, layout_starzan  )
 GAMEL( 2000?, happyskl,    0,        happyskl,   happyskl,    igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                        0, layout_igspoker )
 GAMEL( 2000?, cpoker2,     0,        cpoker2,    cpoker2,     igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                           0, layout_igspoker )
 GAME ( 2000?, spkrform,    spk306us, spkrform,   spkrform,    igs017_state, init_spkrform,   ROT0, "IGS", "Super Poker (V100xD03) / Formosa",                                   MACHINE_UNEMULATED_PROTECTION ) // poker game enabling forced with a patch. Parent spk306us in driver spoker.cpp

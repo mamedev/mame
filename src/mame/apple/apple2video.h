@@ -47,7 +47,7 @@ public:
 	void a80col_w(bool b80Col);
 	void a80store_w(bool b80Store)  { m_80store = b80Store; }
 	void page2_w(bool page2)        { m_page2 = page2; }
-	void altcharset_w(bool altch)   { m_altcharset = altch; }
+	void altcharset_w(bool altch);
 	void monohgr_w(bool mono)       { m_monohgr = mono; }
 
 	// IIgs-specific accessors
@@ -59,10 +59,8 @@ public:
 	const u8 get_newvideo()         { return m_newvideo; }
 	void set_newvideo(u8 newvideo)  { m_newvideo = newvideo; }
 	u8 get_GS_langsel()             { return m_GS_langsel; }
-	u8 get_GS_language()            { return (m_GS_langsel >> 5) & 0x07; }
-	bool is_pal_video_mode()        { return (m_GS_langsel >> 4) & 0x01; }
-	bool get_language_switch()      { return (m_GS_langsel >> 3) & 0x01; }
-	void set_GS_langsel(u8 langsel) { m_GS_langsel = langsel; }
+	bool is_pal_video_mode()        { return BIT(m_GS_langsel, 4); }
+	void set_GS_langsel(u8 langsel);
 	void set_SHR_color(u8 color, u32 rgb) { m_shr_palette[color] = rgb; }
 	void set_GS_border_color(u8 color, u32 rgb) { m_GSborder_colors[color] = rgb; }
 

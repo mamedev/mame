@@ -454,14 +454,15 @@ void apple2_state::utility_strobe_w(u8 data)
 
 u8 apple2_state::switches_r(offs_t offset)
 {
+	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 u8 apple2_state::flags_r(offs_t offset)
 {
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	// Y output of 74LS251 at H14 read as D7
 	switch (offset)

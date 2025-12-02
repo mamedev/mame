@@ -10,7 +10,7 @@ HDDs apparently needs to be with 8 heads and 25 cylinders only
 https://www7b.biglobe.ne.jp/~drachen6jp/98scsi.html
 
 TODO:
-- hangs on wdc core with a Negate ACK command when not initiator;
+- hangs on wdc core with a Negate ACK command when not initiator (cfr. issue #14532);
 - Wants to read "NEC" around PC=dc632, currently reads " SE" (from nscsi/hd.cpp " SEAGATE" inquiry)
 \- Wants specifically -ss 256 in chdman, DOS will throw a "run-time error R6003 otherwise".
 \- Should really require a nscsi/hd.cpp subclass, seems to detect 130 MB hdd from mode sense 6 pages
@@ -84,7 +84,7 @@ const tiny_rom_entry *pc9801_55l_device::device_rom_region() const
 
 void pc9801_55_device::scsi_irq_w(int state)
 {
-	m_bus->int_w(3, BIT(m_port30, 2) && state);
+	m_bus->int_w(m_int_line, BIT(m_port30, 2) && state);
 }
 
 void pc9801_55_device::scsi_drq_w(int state)
@@ -214,6 +214,8 @@ void pc9801_55_device::device_start()
 
 void pc9801_55_device::device_reset()
 {
+	m_int_line = 3;
+
 	m_rom_bank = 0;
 
 	m_pkg_id = 0xfd;
@@ -226,6 +228,7 @@ void pc9801_55_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// incredibly verbose for LHA-201
 		// logerror("map ROM at 0x000dc000-0x000dcfff (bank %d)\n", m_rom_bank);
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xdc000,
@@ -240,7 +243,7 @@ void pc9801_55_device::remap(int space_id, offs_t start, offs_t end)
 }
 
 // required by MS-DOS to actually detect the disk size for format.
-// Mimic wdc33c9x core here
+// Mimic wd33c9x core here
 void pc9801_55_device::increment_addr()
 {
 	if (machine().side_effects_disabled()) return;
@@ -298,14 +301,20 @@ void pc9801_55_device::internal_map(address_map &map)
 	// xx-- ---- ROM bank
 	// ---- x--- MEM1 allow memory access (DMA?)
 	// ---- -x-- IRE1 allow interrupts
-	// ---- --x- WRS1 SCSI bus RST (active low)
+	// ---- --x- WRS1 SCSI bus RST (1 -> 0)
 	map(0x30, 0x30).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_port30;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			// logerror("$30 Memory Bank %02x\n", data);
-			m_wdc->reset_w(!BIT(data, 1));
+			if ((m_port30 & 0x3f) != (data & 0x3f))
+				logerror("$30 Memory Bank %02x\n", data);
+
+			if (BIT(m_port30, 1) && !(BIT(data, 1)))
+			{
+				m_wdc->reset_w(1);
+				m_wdc->reset_w(0);
+			}
 
 			if ((data & 0xc0) != (m_port30 & 0xc0))
 			{

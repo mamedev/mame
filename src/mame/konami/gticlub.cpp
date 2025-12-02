@@ -279,6 +279,7 @@ protected:
 		, m_analog(*this, "AN%u", 0U)
 		, m_ports(*this, "IN%u", 0)
 		, m_pcb_digit(*this, "pcbdigit%u", 0U)
+		, m_wheel_motor(*this, "wheel_motor")
 		, m_cg_view(*this, "cg_view")
 	{ }
 
@@ -301,6 +302,7 @@ protected:
 	optional_ioport_array<4> m_analog;
 	required_ioport_array<4> m_ports;
 	output_finder<2> m_pcb_digit;
+	output_finder<> m_wheel_motor;
 	memory_view m_cg_view;
 
 	bool m_sound_irq_enabled = false;
@@ -436,6 +438,11 @@ void gticlub_base_state::sysreg_w(offs_t offset, uint8_t data)
 			m_pcb_digit[offset] = bitswap<7>(~data,0,1,2,3,4,5,6);
 			break;
 
+		case 2:
+			// GTI club drive commands
+			m_wheel_motor = data;
+			break;
+
 		case 3:
 			m_eeprom->di_write(BIT(data, 0));
 			m_eeprom->clk_write(BIT(data, 1));
@@ -484,6 +491,7 @@ void gticlub_base_state::soundtimer_ack_w(uint16_t data)
 void gticlub_base_state::machine_start()
 {
 	m_pcb_digit.resolve();
+	m_wheel_motor.resolve();
 
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
