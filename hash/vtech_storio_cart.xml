@@ -162,7 +162,8 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	
+	<!-- also known as Mickey Mouse Clubhouse: Mickey Go Seek -->
 	<software name="mickeych" supported="no">
 		<description>Mickey Mouse Clubhouse (USA)</description>
 		<year>2010</year>
@@ -178,6 +179,7 @@ license:CC0-1.0
 	<!-- this cartridge looked identical to the above, but contained a normal flash chip instead of an OTP device
 	     the data structure is very different, and doesn't start with the FAT16 filesystem?
 	     does the system BIOS detect different cartridge types and handle them in different ways? -->
+	<!-- also known as Mickey Mouse Clubhouse: Mickey Go Seek -->
 	<software name="mickeycha" cloneof="mickeych" supported="no">
 		<description>Mickey Mouse Clubhouse (USA, flash chip)</description>
 		<year>2010</year>
