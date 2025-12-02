@@ -28,15 +28,11 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	void update_serial();
-
-	int8_t m_serial_in;
-
 	devcb_write_line m_sck_out_cb;
 	devcb_write_line m_serial_out_cb;
 
+	int8_t m_serial_in;
 	int8_t m_sck_in;
-	int8_t m_sck_in_prev;
 	int8_t m_sck_out;
 	uint8_t m_clock_count;
 	uint8_t m_tx_shift_register;
