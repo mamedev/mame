@@ -5616,19 +5616,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kamikaze">
-		<description>Kamikaze (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-11-11"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="kamikaze (4am crack).dsk" size="143360" crc="85e61598" sha1="82c4fae0308674022aa5bc17632ca047ef3455be" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kchamp">
 		<description>Karate Champ (cleanly cracked)</description>
 		<year>1985</year>
@@ -5685,19 +5672,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="kinder koncepts (4am crack).dsk" size="143360" crc="90b4abcb" sha1="a14426a981dc4ef95b8b89b5ba34304c3b620958" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kingcrib">
-		<description>King Cribbage (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="king cribbage (4am crack).dsk" size="143360" crc="12580b86" sha1="56da09f4644f836dfd44423c1a8ff73752ceb70f" />
 			</dataarea>
 		</part>
 	</software>
@@ -5913,19 +5887,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="lantern of d'gamma (4am crack).dsk" size="143360" crc="21812e21" sha1="9f923f1934ca6c0433cf973a006ac34d10ce9da0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lsrbounc">
-		<description>Laser Bounce (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="laser bounce (4am crack).dsk" size="143360" crc="380ddd9f" sha1="450eecfa3d87e8764827980ee83aa5c40f866c63" />
 			</dataarea>
 		</part>
 	</software>
@@ -7417,32 +7378,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="microadd">
-		<description>Micro Addition (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2016-08-14"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="micro addition (4am crack).dsk" size="143360" crc="10e7aefc" sha1="c9f05bff90fac6c7abcf31a6acc0ee8965248468" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="microdiv">
-		<description>Micro Division (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2016-07-14"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="micro division (4am crack).dsk" size="143360" crc="e6d86580" sha1="dfdaabce438fb5b075ef6c3970ea995b61653f55" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="microhab">
 		<description>Micro Habitats (cleanly cracked)</description>
 		<year>1984</year>
@@ -7469,19 +7404,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="micromul">
-		<description>Micro Multiplication (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2016-08-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="micro multiplication (4am crack).dsk" size="143360" crc="8f87468f" sha1="4728a423315f032f3562702d75a0a9718b1b9796" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="microbe">
 		<description>Microbe (supports Mockingboard) (cleanly cracked)</description>
 		<year>1982</year>
@@ -7504,19 +7426,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="microbe rev. 3 (4am crack).dsk" size="143360" crc="287270b1" sha1="3f9a1950131310c3cbaf5b45c7992ec4748e662f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="micrjrny">
-		<description>Microscopic Journey (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="microscopic journey (4am crack).dsk" size="143360" crc="78479c3f" sha1="02ab3f200a412f472ad8a63d90583b08072039f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -10914,59 +10823,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="satreadc">
-		<description>SAT Score Improvement System: Reading Comprehension (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2015-07-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - reading comprehension (4am crack).dsk" size="143360" crc="9769462e" sha1="8da44b87e307b1ee657ffaa20659b8e8a30436cb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="satvocab">
-		<description>SAT Score Improvement System: Vocabulary (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2015-07-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - vocabulary (4am crack) side a.dsk" size="143360" crc="a15b2691" sha1="15fc150eed3026dd07ed3edf32dac12227b3e83b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - vocabulary (4am crack) side b.dsk" size="143360" crc="73f2e5b1" sha1="093e08fa9679f7ff0de8b4ac0e9bd43c659bee3d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="satgeom">
-		<description>SAT Score Improvement System: Geometry (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2015-07-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - geometry (4am crack) side a.dsk" size="143360" crc="1546dc51" sha1="307be3502073a328af0fe443b38eb6f13625c97d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - geometry (4am crack) side b.dsk" size="143360" crc="cceba950" sha1="849cf06f184eb32940a81426537bc86a3a3916f3" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jrgchaos">
 		<description>The Jar Game and Chaos (cleanly cracked)</description>
 		<year>1982</year>
@@ -11138,26 +10994,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 5 Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the quarter mile 4.1 (4am crack) disk 5 side b.dsk" size="143360" status="nodump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="satquanc">
-		<description>SAT Score Improvement System: Quantitative Comparisons (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2015-09-11"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - quantitative comparisons (4am crack) side a.dsk" size="143360" crc="71885927" sha1="90a4b3002c5416803dc189868986dcf7995af0ce" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - quantitative comparisons (4am crack) side b.dsk" size="143360" crc="c32f2154" sha1="2796b3280aee07aec39c3072aabd4e7ebe459460" />
 			</dataarea>
 		</part>
 	</software>
@@ -11866,19 +11702,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ssisalge">
-		<description>SAT Score Improvement System: Algebra (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2016-07-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="sat score improvement system - algebra (4am crack).dsk" size="143360" crc="0970f773" sha1="adbd341be774bab2abacf46154c7f3e93e0b58f9" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tagtmwrs">
 		<description>Tag Team Wrestling (cleanly cracked)</description>
 		<year>1984</year>
@@ -11936,19 +11759,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="tharolian tunnels (4am crack).dsk" size="143360" crc="da3f2e16" sha1="4979627215128f90ef69ac4bf47f43640115f870" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tetrad">
-		<description>Tetrad (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2016-07-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="tetrad (4am crack).dsk" size="143360" crc="a4be8830" sha1="a63a62afe40f9ebc58c020e5512c44d52ca5c37b" />
 			</dataarea>
 		</part>
 	</software>
@@ -14005,32 +13815,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="finlconf">
-		<description>The Final Conflict (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the final conflict (4am crack).dsk" size="143360" crc="97363845" sha1="f6e7ab72fc88b39699a7588cae032c5c8e6fe458" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="shtlintr">
-		<description>Shuttle Intercept (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="shuttle intercept (4am crack).dsk" size="143360" crc="b90be8e9" sha1="0f6b36a57e76272194f292481dc14e546b6b2116" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wodlwck">
 		<description>Voyages of Discovery: Lewis and Clark (cleanly cracked)</description>
 		<year>1986</year>
@@ -14704,19 +14488,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wargle">
-		<description>Wargle (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2018-04-24"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wargle (4am crack).dsk" size="143360" crc="7ddb00ca" sha1="183a142b5710998c90e797e00988fc7691c21ddc" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="spckadet">
 		<description>Space Kadet (cleanly cracked)</description>
 		<year>1982</year>
@@ -14926,19 +14697,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="tactical armour command (4am crack).dsk" size="143360" crc="a014d3de" sha1="8a444e6b55bd38304538343d17959a8218033478" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="maincali">
-		<description>The Great Maine to Calfornia Race (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2018-09-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the great maine to california race (4am crack).dsk" size="143360" crc="1b4f680a" sha1="5e5714fdefceaeaa5770e999f6b8eb752c63bd39" />
 			</dataarea>
 		</part>
 	</software>
@@ -17428,26 +17186,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="oo-topos (sentient software) (4am crack).dsk" size="143360" crc="b637fa9e" sha1="232865a6f3539df681128076b6333f053604a2d0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sargon3">
-		<description>Sargon III (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2020-10-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A - Program disk"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sargon iii (hayden) (4am crack) side a - program.dsk" size="143360" crc="73ff040a" sha1="2400bc73ee4f7752f07bc871b5d67bddd84bb781"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B - Great games"/>
-			<dataarea name="flop" size="143360">
-				<rom name="sargon iii (hayden) (4am crack) side b - great games.dsk" size="143360" crc="a28d8935" sha1="2a4dca4e13608380d8c13f530dc435558a103cf8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21128,27 +20866,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hlygrail">
-		<description>The Holy Grail (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2021-09-17"/>
-		<!-- "The Holy Grail" is a 1985 adventure game developed by Joe Emerson and Ken Smith, and distributed by Hayden Software. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the holy grail (4am crack) side a.dsk" size="143360" crc="25da1ecc" sha1="40b0ee95721d8540fedc0142046aad10131f72c7"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the holy grail (4am crack) side b.dsk" size="143360" crc="9f63ad15" sha1="77e377fe95af1dc4898e159a8e6ded37d440c275"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="readctar">
 		<description>How to Read in the Content Areas (cleanly cracked)</description>
 		<year>????</year>
@@ -24592,7 +24309,7 @@ license:CC0-1.0
 		<description>Alibi (4am crack)</description>
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
-		<info name="programmer" value="Ian Trackman" />
+		<info name="programmer" value="Ian L. Trackman" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-06-02 -->
@@ -28318,7 +28035,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-03-28 -->
@@ -28335,7 +28052,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
 		<!-- Despite a complete lack of visible version numbers, this disk has significant differences on multiple tracks -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -28353,7 +28070,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 3" />
 		<!-- Despite a complete lack of visible version numbers, this disk has significant differences on multiple tracks -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -30599,7 +30316,7 @@ license:CC0-1.0
 
 	<software name="cottales">
 		<description>Cotton Tales (version 1990) (4am crack)</description>
-		<year>1987</year>
+		<year>1990</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
@@ -30927,8 +30644,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
 		<info name="developer" value="Imaginative Systems Software" />
+		<info name="author" value="Barry Marx" />
 		<info name="programmer" value="Dan Kitchen" />
-		<info name="programmer" value="Barry Marx" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-08-08 -->
@@ -31270,7 +30987,7 @@ license:CC0-1.0
 		<description>Crystal Caverns (revision 0) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
-		<info name="developer" value="Imaginative Systems" />
+		<info name="developer" value="Imaginative Systems Software" />
 		<info name="programmer" value="Daniel Kitchen" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 0" />
@@ -31289,7 +31006,7 @@ license:CC0-1.0
 		<description>Crystal Caverns (revision 1) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
-		<info name="developer" value="Imaginative Systems" />
+		<info name="developer" value="Imaginative Systems Software" />
 		<info name="programmer" value="Daniel Kitchen" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
@@ -32962,7 +32679,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-03-27 -->
 		<!-- educational game -->
@@ -33312,7 +33029,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-03-27 -->
 		<!-- educational game -->
@@ -37395,7 +37112,7 @@ license:CC0-1.0
 		<description>Inca (4am crack)</description>
 		<year>1985</year>
 		<publisher>Hayden Software</publisher>
-		<info name="programmer" value="Joe Emerson" />
+		<info name="author" value="Joe Emerson" />
 		<info name="programmer" value="Ken Smith" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -37709,7 +37426,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1987" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-11-19 -->
@@ -37787,6 +37504,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="j-bird (4am crack).dsk" size="143360" crc="2b911c4f" sha1="bdc62f9d9ac640e6f9567cd7d1bdbc3bfb7fd3ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kamikaze">
+		<description>Kamikaze (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-11-11 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kamikaze (4am crack).dsk" size="143360" crc="85e61598" sha1="82c4fae0308674022aa5bc17632ca047ef3455be" />
 			</dataarea>
 		</part>
 	</software>
@@ -38104,6 +37838,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="kindercomp (4am crack).dsk" size="143360" crc="32a9df32" sha1="99cb35aa9f452d8b7475b5ec3eefd0a3bb302e8f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingcrib">
+		<description>King Cribbage (4am crack)</description>
+		<year>1981</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Randi J. Rost" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-25 -->
+		<!-- card game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="king cribbage (4am crack).dsk" size="143360" crc="12580b86" sha1="56da09f4644f836dfd44423c1a8ff73752ceb70f" />
 			</dataarea>
 		</part>
 	</software>
@@ -38868,6 +38618,23 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="143360">
 				<rom name="language carnival 2 (4am crack).dsk" size="143360" crc="51875615" sha1="ac164a9c49a76fc107bd8c0d526195dc6be2a127" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsrbounc">
+		<description>Laser Bounce (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="Kevin Kalkut" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-28 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="laser bounce (4am crack).dsk" size="143360" crc="380ddd9f" sha1="450eecfa3d87e8764827980ee83aa5c40f866c63" />
 			</dataarea>
 		</part>
 	</software>
@@ -42771,6 +42538,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="micro-lads 7 prepositions ii (4am crack).dsk" size="143360" crc="35a599f2" sha1="056372e56805dabad02d3e193d1f1b54d558d93a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micrjrny">
+		<description>Microscopic Journey (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Dan Sullivan" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-25 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microscopic journey (4am crack).dsk" size="143360" crc="78479c3f" sha1="02ab3f200a412f472ad8a63d90583b08072039f8" />
 			</dataarea>
 		</part>
 	</software>
@@ -48319,7 +48102,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mindplay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-11-11 -->
 		<!-- educational game -->
@@ -49927,7 +49710,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>MindPlay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-08-16 -->
@@ -49944,7 +49727,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>MindPlay</publisher>
 		<info name="developer" value="Methods &amp; Solutions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
 		<!-- This version has significant differences on multiple tracks than any other version. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -50286,6 +50069,107 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ssisalge">
+		<description>SAT Score Improvement System: Algebra (4am crack)</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="developer" value="Arrow Instructional Systems" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-07-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - algebra (4am crack).dsk" size="143360" crc="0970f773" sha1="adbd341be774bab2abacf46154c7f3e93e0b58f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssisgeom">
+		<description>SAT Score Improvement System: Geometry (4am crack)</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="developer" value="Arrow Instructional Systems" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-07-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - geometry (4am crack) side a.dsk" size="143360" crc="1546dc51" sha1="307be3502073a328af0fe443b38eb6f13625c97d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - geometry (4am crack) side b.dsk" size="143360" crc="cceba950" sha1="849cf06f184eb32940a81426537bc86a3a3916f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssisqucom">
+		<description>SAT Score Improvement System: Quantitative Comparisons and Word Problems (4am crack)</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="developer" value="Arrow Instructional Systems" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-09-11 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - quantitative comparisons (4am crack) side a.dsk" size="143360" crc="71885927" sha1="90a4b3002c5416803dc189868986dcf7995af0ce" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - quantitative comparisons (4am crack) side b.dsk" size="143360" crc="c32f2154" sha1="2796b3280aee07aec39c3072aabd4e7ebe459460" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssisrdcom">
+		<description>SAT Score Improvement System: Reading Comprehension (4am crack)</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="developer" value="Arrow Instructional Systems" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-07-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - reading comprehension (4am crack).dsk" size="143360" crc="9769462e" sha1="8da44b87e307b1ee657ffaa20659b8e8a30436cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssisvoc">
+		<description>SAT Score Improvement System: Vocabulary (4am crack)</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="developer" value="Arrow Instructional Systems" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-07-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - vocabulary (4am crack) side a.dsk" size="143360" crc="a15b2691" sha1="15fc150eed3026dd07ed3edf32dac12227b3e83b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sat score improvement system - vocabulary (4am crack) side b.dsk" size="143360" crc="73f2e5b1" sha1="093e08fa9679f7ff0de8b4ac0e9bd43c659bee3d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sspsai85" cloneof="sspsai">
 		<description>Safari Search: Problem Solving and Inference (version 1985) (4am crack)</description>
 		<year>1985</year>
@@ -50376,6 +50260,32 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="sammy lightfoot (4am crack).dsk" size="143360" crc="afbef357" sha1="b0ae2cc0e8279c7bf6f35f3ed88659a9f697f18a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon3">
+		<description>Sargon III (revision 2) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Dan Spracklen" />
+		<info name="programmer" value="Kathe Spracklen" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Title page does not list Hayden Book Company and includes Great Games disk. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-10-17 -->
+		<!-- chess game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sargon iii (hayden) (4am crack) side a - program.dsk" size="143360" crc="73ff040a" sha1="2400bc73ee4f7752f07bc871b5d67bddd84bb781"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Great Games and Chess Problems"/>
+			<dataarea name="flop" size="143360">
+				<rom name="sargon iii (hayden) (4am crack) side b - great games.dsk" size="143360" crc="a28d8935" sha1="2a4dca4e13608380d8c13f530dc435558a103cf8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51336,6 +51246,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="shutterbug's pictures (4am crack).dsk" size="143360" crc="ec7753fa" sha1="f592937967570c31171468b3d923cec693c42e98" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shtlintr">
+		<description>Shuttle Intercept (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-28 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="shuttle intercept (4am crack).dsk" size="143360" crc="b90be8e9" sha1="0f6b36a57e76272194f292481dc14e546b6b2116" />
 			</dataarea>
 		</part>
 	</software>
@@ -52904,6 +52831,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="star search self-running demo (4am crack) side b.dsk" size="143360" crc="fe50796b" sha1="509b98da10af36a1acb1f7c78489c091e5a9e670"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startrad">
+		<description>Star Traders (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Ian Trackman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-19 -->
+		<!-- simulation game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="star traders (4am crack).dsk" size="143360" crc="a741f1b8" sha1="ec41a84eb4c6d44f4a21b38c0e649a671d330a44" />
 			</dataarea>
 		</part>
 	</software>
@@ -55335,6 +55278,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="tetrad">
+		<description>Tetrad (4am crack)</description>
+		<year>1981</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Phillip Hess" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-07-28 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tetrad (4am crack).dsk" size="143360" crc="a4be8830" sha1="a63a62afe40f9ebc58c020e5512c44d52ca5c37b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thatjobl1">
 		<description>That's My Job: Level 1 (version 02.08.88) (4am crack)</description>
 		<year>1988</year>
@@ -56330,6 +56289,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="finlconf">
+		<description>The Final Conflict (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Thomas G. Cleaver" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-28 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the final conflict (4am crack).dsk" size="143360" crc="97363845" sha1="f6e7ab72fc88b39699a7588cae032c5c8e6fe458" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fnlfrntr">
 		<description>The Final Frontier (version 1.0) (Softsmith) (4am and san inc crack)</description>
 		<year>1982</year>
@@ -56617,6 +56592,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="maincali">
+		<description>The Great Maine to California Race (4am crack)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Natalie Jesdale M.S., ED." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-09-21 -->
+		<!-- educational program -->
+		<!-- Missing Side B? -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the great maine to california race (4am crack).dsk" size="143360" crc="1b4f680a" sha1="5e5714fdefceaeaa5770e999f6b8eb752c63bd39" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grunfren">
 		<description>The Gruneberg Linkword Language Course: French (4am crack)</description>
 		<year>1985</year>
@@ -56704,6 +56696,30 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the heist (4am crack).dsk" size="143360" crc="4b3cc3a0" sha1="32a63adfacfc2676924f8b77566d2cdb64f88693" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hlygrail">
+		<description>The Holy Grail (4am crack)</description>
+		<year>1985</year>
+		<publisher>Hayden Software</publisher>
+		<info name="author" value="Joe Emerson" />
+		<info name="programmer" value="Ken Smith" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-09-17 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the holy grail (4am crack) side a.dsk" size="143360" crc="25da1ecc" sha1="40b0ee95721d8540fedc0142046aad10131f72c7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the holy grail (4am crack) side b.dsk" size="143360" crc="9f63ad15" sha1="77e377fe95af1dc4898e159a8e6ded37d440c275"/>
 			</dataarea>
 		</part>
 	</software>
@@ -61066,6 +61082,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wargle">
+		<description>Wargle! (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Eastgate Systems" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-04-24 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wargle (4am crack).dsk" size="143360" crc="7ddb00ca" sha1="183a142b5710998c90e797e00988fc7691c21ddc" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dunzhin">
 		<description>Warrior of RAS Volume One: Dunzhin (4am crack)</description>
 		<year>1982</year>
@@ -61931,8 +61963,8 @@ license:CC0-1.0
 		<description>Wiziprint (version 2.01 20-AUG-83) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Sir-Tech Software</publisher>
-		<info name="programmer" value="Andrew Greenberg" />
-		<info name="programmer" value="Robert Woodhead" />
+		<info name="programmer" value="Andrew C. Greenberg" />
+		<info name="programmer" value="Robert J. Woodhead" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="2.01 20-AUG-83" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -63092,6 +63124,57 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="zoom grafix second edition (4am crack).dsk" size="143360" crc="5db0f70f" sha1="d7496eba65e8321ce02223c9dae66a6f51d8601a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microadd">
+		<description>microAddition (4am crack)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Anthony Cote" />
+		<info name="programmer" value="Andrew E. Taylor" />
+		<info name="programmer" value="Brian Root" />
+		<info name="programmer" value="Kerry Wentworth" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-08-14 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro addition (4am crack).dsk" size="143360" crc="10e7aefc" sha1="c9f05bff90fac6c7abcf31a6acc0ee8965248468" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microdiv">
+		<description>microDivision (4am crack)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Hayden Software" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-07-14 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro division (4am crack).dsk" size="143360" crc="e6d86580" sha1="dfdaabce438fb5b075ef6c3970ea995b61653f55" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="micromul">
+		<description>microMultiplication (4am crack)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Hayden Software" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-08-21 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro multiplication (4am crack).dsk" size="143360" crc="8f87468f" sha1="4728a423315f032f3562702d75a0a9718b1b9796" />
 			</dataarea>
 		</part>
 	</software>
