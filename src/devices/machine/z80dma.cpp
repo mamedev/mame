@@ -850,10 +850,11 @@ void z80dma_device::write(u8 data)
 				logerror("Z80DMA Unknown WR6 command %02x\n", data);
 			}
 		}
-		else if (data == 0x8e) //newtype on Sharp X1, unknown purpose
-			logerror("Z80DMA Unknown base register %02x\n", data);
 		else
-			fatalerror("Z80DMA '%s' Unknown base register %02x\n", tag(), data);
+		{
+			// 0x8e: newtype on Sharp X1, unknown purpose
+			logerror("Z80DMA '%s' Unknown base register %02x\n", tag(), data);
+		}
 		m_cur_follow = 0;
 	}
 	else
