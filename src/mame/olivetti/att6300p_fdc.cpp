@@ -2,8 +2,11 @@
 // copyright-holders: D. Donohoe
 
 #include "emu.h"
-
 #include "att6300p_fdc.h"
+
+#include "imagedev/floppy.h"
+#include "machine/upd765.h"
+
 
 static void att6300p_floppies(device_slot_interface &device)
 {
@@ -19,9 +22,9 @@ isa8_fdc_6300p_device::isa8_fdc_6300p_device(const machine_config &mconfig, cons
 
 void isa8_fdc_6300p_device::device_add_mconfig(machine_config &config)
 {
-	upd765a_device &upd765a(UPD765A(config, m_fdc, 8'000'000, false, false));
-	upd765a.intrq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_irq_w));
-	upd765a.drq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_drq_w));
+	UPD765A(config, m_fdc, 8'000'000, false, false);
+	m_fdc->intrq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(isa8_fdc_6300p_device::fdc_drq_w));
 
 	// According to "Getting Started with you AT&T 6300 Plus", when the
 	// system came in a two-floppy configuration, drive A (lower drive)
@@ -44,6 +47,7 @@ void isa8_fdc_6300p_device::map(address_map &map)
 void isa8_fdc_6300p_device::device_start()
 {
 	set_isa_device();
+
 	m_isa->install_device(0x0065, 0x0065, *this, &isa8_fdc_6300p_device::rc_map);
 	m_isa->install_device(0x03f0, 0x03f7, *this, &isa8_fdc_6300p_device::map);
 	m_isa->set_dma_channel(2, this, true);
@@ -62,8 +66,8 @@ uint8_t isa8_fdc_6300p_device::rc_r()
 
 void isa8_fdc_6300p_device::rc_w(uint8_t data)
 {
-	static const int rates[4] = { 500000, 300000, 250000, 250000 };
-	m_rate = rates[data&3];
+	constexpr int32_t rates[4] = { 500'000, 300'000, 250'000, 250'000 };
+	m_rate = rates[data & 3];
 	m_fdc->set_rate(m_rate);
 }
 

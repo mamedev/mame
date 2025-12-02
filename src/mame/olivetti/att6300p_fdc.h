@@ -5,12 +5,11 @@
 
 #include "bus/isa/fdc.h"
 #include "bus/isa/isa.h"
-#include "imagedev/floppy.h"
-#include "machine/upd765.h"
 
 DECLARE_DEVICE_TYPE(ISA8_FDC_6300P, isa8_fdc_6300p_device)
 
-class isa8_fdc_6300p_device : public isa8_upd765_fdc_device {
+class isa8_fdc_6300p_device : public isa8_upd765_fdc_device
+{
 public:
 	isa8_fdc_6300p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -22,9 +21,9 @@ protected:
 	void map(address_map &map) ATTR_COLD;
 	void rc_map(address_map &map) ATTR_COLD;
 
-    uint8_t rc_r();
-    void rc_w(uint8_t data);
+	uint8_t rc_r();
+	void rc_w(uint8_t data);
 
 private:
-    int m_rate;
+	int32_t m_rate;
 };
