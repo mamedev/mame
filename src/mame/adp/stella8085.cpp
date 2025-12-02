@@ -58,7 +58,7 @@ public:
 		m_tz(*this, "TZ%u", 0U),
 		m_dsw(*this, "DSW"),
 		m_digits(*this, "digit%u", 0U),
-		m_lamps(*this, "lamp%u%u", 0U),
+		m_lamps(*this, "lamp%u%u", 0U, 0U),
 		m_beep(*this, "beeper")
 	{ }
 
@@ -80,7 +80,7 @@ private:
 	required_ioport_array<8> m_tz;
 	required_ioport m_dsw;
 	output_finder<16> m_digits;
-	output_finder<8,8> m_lamps;
+	output_finder<8, 8> m_lamps;
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
@@ -343,9 +343,7 @@ void stella8085_state::io70w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(5,SZ); // game counter
 
 	if (D6)
-	{
-		//LOG("Short test\n");
-	}
+		;//LOG("Short test\n");
 
 	if (PA7)
 		LOG("PA7 high\n");
@@ -459,6 +457,28 @@ int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 	}
 }
 
+static INPUT_PORTS_START( stella8085_tatatur )
+	PORT_START("TZ6") // TASTATUR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
+
+	PORT_START("TZ7") // TASTATUR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dicemstr )
 	PORT_START("DSW")
 	PORT_DIPNAME(0x01, 0x01, "8085 RST75")
@@ -498,25 +518,7 @@ static INPUT_PORTS_START( dicemstr )
 	PORT_START("TZ5") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TZ6") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
-
-	PORT_START("TZ7") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
+	PORT_INCLUDE(stella8085_tatatur)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( disc )
@@ -574,26 +576,7 @@ static INPUT_PORTS_START( disc )
 	PORT_START("TZ5") //MATRIX-EINGAENGE
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("TZ6") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset") // TS7
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dauerlauf")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Spielzähler")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzspeicher")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hardware-Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Auszahlquote")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Foul")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gewinn") // TS0
-
-	PORT_START("TZ7") // TASTATUR
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 1,-")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 1,-")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch Serie")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter Serie")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hoch 0,10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Runter 0,10")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Münzung")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Initialisieren")
-
+	PORT_INCLUDE(stella8085_tatatur)
 INPUT_PORTS_END
 
 void stella8085_state::dicemstr(machine_config &config)
