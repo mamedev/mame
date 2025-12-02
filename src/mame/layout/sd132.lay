@@ -2575,7 +2575,7 @@
 			<bounds x="0" y="121.5" width="845" height="170" />
 		</element>
 		<element ref="drawing_fake_ensoniq">
-			<bounds x="760" y="90" width="72" height="13" />
+			<bounds x="760" y="93.94" width="72" height="10.56" />
 		</element>
 		<element ref="rect_sd1">
 			<bounds x="13" y="97.5" width="67" height="7" />
@@ -2611,7 +2611,7 @@
 			<bounds x="13" y="7" width="88" height="4.4412" />
 		</element>
 		<element ref="text_S_ensoniq">
-			<bounds x="762" y="88.174" width="68" height="14.804" />
+			<bounds x="762" y="92.587" width="70" height="11.794" />
 		</element>
 		<element ref="text_S_3_2_v_o_i_c_e">
 			<bounds x="14" y="97.307" width="65" height="7.592" />
