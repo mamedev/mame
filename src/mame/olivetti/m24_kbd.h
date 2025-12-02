@@ -38,6 +38,11 @@ private:
 	required_device<i8049_device> m_mcu;
 	emu_timer *m_reset_timer;
 
+	uint32_t m_mouse_read_count;
+	int m_count_mx, m_count_my;
+	uint8_t m_bits_mx, m_bits_my;
+	uint8_t m_last_mx, m_last_my;
+
 	void bus_w(uint8_t data);
 	uint8_t p1_r();
 	void p1_w(uint8_t data);

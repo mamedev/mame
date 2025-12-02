@@ -218,6 +218,10 @@ m24_keyboard_device::m24_keyboard_device(const machine_config &mconfig, const ch
 	, m_mousey(*this, "MOUSEY")
 	, m_out_data(*this)
 	, m_mcu(*this, "mcu")
+	, m_mouse_read_count(0)
+	, m_count_mx(0), m_count_my(0)
+	, m_bits_mx(0), m_bits_my(0)
+	, m_last_mx(0), m_last_my(0)
 {
 }
 
@@ -225,11 +229,27 @@ void m24_keyboard_device::device_start()
 {
 	m_out_data(1);
 	m_reset_timer = timer_alloc(FUNC(m24_keyboard_device::reset_mcu), this);
+
+	save_item(NAME(m_p1));
+	save_item(NAME(m_keypress));
+	save_item(NAME(m_kbcdata));
+	save_item(NAME(m_mouse_read_count));
+	save_item(NAME(m_count_mx));
+	save_item(NAME(m_count_my));
+	save_item(NAME(m_bits_mx));
+	save_item(NAME(m_bits_my));
+	save_item(NAME(m_last_mx));
+	save_item(NAME(m_last_my));
 }
 
 void m24_keyboard_device::device_reset()
 {
 	m_kbcdata = true;
+
+	m_count_mx = 0;
+	m_count_my = 0;
+	m_last_mx = 0;
+	m_last_my = 0;
 }
 
 TIMER_CALLBACK_MEMBER(m24_keyboard_device::reset_mcu)
@@ -259,6 +279,68 @@ uint8_t m24_keyboard_device::p2_r()
 	uint8_t mx = m_mousex->read();
 	uint8_t my = m_mousey->read();
 
+	if (mx != m_last_mx)
+	{
+		int diff = (int)mx - m_last_mx;
+
+		// check for wrap
+		if (diff > 0x80)
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
+
+		m_count_mx += diff;
+
+		m_last_mx = mx;
+	}
+
+	if (my != m_last_my)
+	{
+		int diff = (int)my - m_last_my;
+
+		if (diff > 0x80)
+			diff -= 0x100;
+		else if (diff < -0x80)
+			diff += 0x100;
+
+		m_count_my += diff;
+
+		m_last_my = my;
+	}
+
+	// Only update the mouse position signals every 4 reads by the MCU, so
+	// that the signals are not at a higher frequency than the MCU expects.
+	if ((m_mouse_read_count & 3) == 0)
+	{
+		if (m_count_mx)
+		{
+			// Consume max. one unit of accumulated X delta per MCU update
+			if (m_count_mx > 0)
+			{
+				m_count_mx--;
+				m_bits_mx++;
+			} else {
+				m_count_mx++;
+				m_bits_mx--;
+			}
+		}
+
+		if (m_count_my)
+		{
+			// Consume max. one unit of accumulated Y delta per MCU update
+			if (m_count_my > 0)
+			{
+				m_count_my--;
+				m_bits_my++;
+			} else {
+				m_count_my++;
+				m_bits_my--;
+			}
+		}
+	}
+
+	m_mouse_read_count++;
+
 	// Generate appropriate square waves in response to changing mouse
 	// co-ordinates.  The +1 is to put one signal 90 degrees out of phase with
 	// respect to the other, to produce the required "quadrature" encoding,
@@ -266,10 +348,10 @@ uint8_t m24_keyboard_device::p2_r()
 	return
 			(m_keypress << 7) |
 			m_mousebtn->read() |
-			BIT(mx + 1, 1) |
-			BIT(mx, 1) << 1 |
-			BIT(my, 1) << 2 |
-			BIT(my + 1, 1) << 3;
+			BIT(m_bits_mx + 1, 1) |
+			BIT(m_bits_mx, 1) << 1 |
+			BIT(m_bits_my, 1) << 2 |
+			BIT(m_bits_my + 1, 1) << 3;
 }
 
 int m24_keyboard_device::t0_r()
