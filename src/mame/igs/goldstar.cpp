@@ -3405,11 +3405,11 @@ void cmaster_state::bank_set_w(offs_t offset, uint8_t data)
 	{
 		case 0x00 :
 		case 0x07 :
-		case 0x40 : membank("bank1")->set_entry(0); break;
 		case 0x41 :
 		case 0x43 :
 		case 0x44 :
 		case 0x47 : logerror("no bank yet\n"); break;
+		case 0x40 : membank("bank1")->set_entry(0); break;
 		case 0x81 : membank("bank1")->set_entry(1); break;
 		case 0x82 : membank("bank1")->set_entry(0); break;
 		case 0x84 : membank("bank1")->set_entry(1); break;
