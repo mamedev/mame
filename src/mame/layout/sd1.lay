@@ -238,7 +238,7 @@
 			<bounds x="253" y="337" width="42" height="42" />
 		</element>
 		<element name="~input~" ref="underline">
-			<bounds x="43" y="411" width="183" height="25" />
+			<bounds x="43" y="444" width="183" height="25" />
 		</element>
 	</group>
 	<element name="vfd_background">
