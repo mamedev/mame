@@ -332,7 +332,9 @@ Loading error, boots with Z80 clock set at 3.2 MHz (80%)
 		<description>Polar Star II</description>
 		<year>1983</year>
 		<publisher>Hyo-Kin Soft</publisher>
-				<notes><![CDATA[Loads but gameplay won't start]]></notes>
+		<notes><![CDATA[
+Loads but gameplay won't start
+]]></notes>
 		<info name="usage" value="IPL"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="6078700">
