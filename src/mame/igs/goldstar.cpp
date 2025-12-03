@@ -26612,6 +26612,25 @@ ROM_START( eldoraddoa )  // String "DYNA ELD2  V1.4D" in program ROM. The two du
 	ROM_LOAD( "82s129.h5", 0x000, 0x100, CRC(209ccf78) SHA1(9f92875855702c7cc4d429ba5f463b698e0e91d3) )
 ROM_END
 
+ROM_START( eldoraddoab )  // Dyna ELD2 V1.5U (Dyna Grayhound version)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dyna_eld2_v1.5u.h13", 0x00000, 0x10000, CRC(01346eb6) SHA1(726a9e74180592f52aefd45a1665ec8a2d7d76ba) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "9.d9", 0x00000, 0x20000, CRC(ee7b1537) SHA1(e10b2f3c9291d836782148c4ae388c94ee47a964) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "8.d8", 0x00000, 0x20000, CRC(d39c3cf2) SHA1(56a56ae7c931aa3f94643e1fbf33bfc6ac1c1b2b) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129.e12", 0x000, 0x100, CRC(1564bb12) SHA1(641a681866ac5d53d88752a076ad958c94e68a3a) )
+	ROM_LOAD( "82s129.e10", 0x100, 0x100, CRC(db31f7ac) SHA1(9f23d65dc0c43b1700093461d2c5277cc1d42f49) )
+	ROM_LOAD( "82s129.e11", 0x200, 0x100, CRC(49c4df77) SHA1(860fa207c74eab00ea6c7f3fa16aafba84195336) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.h5", 0x000, 0x100, CRC(209ccf78) SHA1(9f92875855702c7cc4d429ba5f463b698e0e91d3) )
+ROM_END
+
 ROM_START( animalhs ) // Animal House. Strings "SUNS PECKER V1.0" and "SUNS CO LTD." on program ROM. Clearly derived from the eldoraddoa set above
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "1_am27512.l2", 0x00000, 0x10000, CRC(258208d7) SHA1(11a75963c535636ff1320a3d3c3b9867a1f169d4) )
@@ -31930,9 +31949,10 @@ GAME(  1993, missbingoc, crazybonb, crazybonb, crazybonb, cmaster_state, init_cr
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
 // Dyna D9101 PCB
-GAMEL( 1991, eldoraddoa, eldoradd, animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna",             "El Dorado (V1.4D)",                           0,                 layout_animalhs )
-GAMEL( 1991, animalhs,   0,        animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 1)",                  0,                 layout_animalhs )
-GAMEL( 1991, animalhsa,  animalhs, animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 2)",                  0,                 layout_animalhs )
+GAMEL( 1991, eldoraddoa,  eldoradd, animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna",             "El Dorado (V1.4D)",                          0,                 layout_animalhs )
+GAMEL( 1991, eldoraddoab, eldoradd, animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna / Grayhound", "El Dorado (V1.5U, Dyna/Grayhound)",          0,                 layout_animalhs )
+GAMEL( 1991, animalhs,    0,        animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 1)",                 0,                 layout_animalhs )
+GAMEL( 1991, animalhsa,   animalhs, animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 2)",                 0,                 layout_animalhs )
 
 // Dyna D9106C PCB
 GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
