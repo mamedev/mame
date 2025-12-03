@@ -14152,7 +14152,7 @@ Occasionally sky background flickers with wrong colors
 		</part>
 	</software>
 
-	<software name="vpoint" supported="no">
+	<software name="vpoint">
 		<description>Viewpoint 2064 (Japan, prototype, master 4/13 version)</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
