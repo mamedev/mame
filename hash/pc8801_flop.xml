@@ -44195,13 +44195,10 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="hoehoem1" supported="no">
+	<software name="hoehoem1" supported="yes">
 		<description>Hoehoe Team 199x Music Disk Vol. 1 - Explosion</description>
 		<year>1992?</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<notes><![CDATA[
-Never completes ADPCM loading on boot, PC=9591 loops on [OPNA] EOS never set
-]]></notes>
+		<publisher>徳間書店 (Tokuma Shoten Publishing)</publisher>
 		<info name="developer" value="Hoehoe Team 199x" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -54698,12 +54695,14 @@ ExtractDisk  [02]"DISK_B          " -> "game music library_02.d88"
 		</part>
 	</software>
 
-	<!-- Tests [Sound Board 2] -->
-	<!-- Reports "ADPCM ???K" size after loading -->
 	<software name="gamemus2" supported="partial">
 		<description>Game Music Collection Vol. 2 - Final Fantasy Original Music + Alpha</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Tests [Sound Board 2]
+Reports "ADPCM ???K" size after loading
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="371744">
 				<rom name="game music collection vol. 2 - final fantasy original music+ (-)(-).d88" size="371744" crc="aa272c52" sha1="b42b9bd96eae5cc95e86debf568032ed0971f6cd"/>
