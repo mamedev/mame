@@ -306,6 +306,8 @@ void wrlshunt_game_state::cs1_w(offs_t offset, uint16_t data)
 
 void wrlshunt_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	m_romwords_mask = (memregion("maincpu")->bytes()/2)-1;
 	save_item(NAME(m_sdram));
 }

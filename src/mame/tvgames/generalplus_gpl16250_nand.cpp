@@ -101,6 +101,8 @@ void generalplus_gpac800_game_state::dma_complete_hacks(int state)
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
+	set_addrmap(0, &generalplus_gpac800_game_state::cs_map_base);
+
 	GPAC800(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
@@ -113,12 +115,10 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
-	m_maincpu->set_cs_space(m_memory, 0);
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 	m_maincpu->dma_complete_callback().set(FUNC(generalplus_gpac800_game_state::dma_complete_hacks));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
-
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -708,6 +708,8 @@ ROM_END
 
 void generalplus_gpac800_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	save_item(NAME(m_sdram));
 }
 
@@ -933,7 +935,7 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of th games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
+CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of the games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
 CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

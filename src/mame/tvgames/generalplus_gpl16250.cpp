@@ -94,16 +94,6 @@ void gcm394_game_state::cs_map_base(address_map& map)
 {
 }
 
-uint16_t gcm394_game_state::read_external_space(offs_t offset)
-{
-	return m_memory->get_program()->read_word(offset);
-}
-
-void gcm394_game_state::write_external_space(offs_t offset, uint16_t data)
-{
-	m_memory->get_program()->write_word(offset, data);
-}
-
 uint16_t gcm394_game_state::porta_r()
 {
 	uint16_t data = m_io[0]->read();
@@ -136,6 +126,8 @@ void gcm394_game_state::porta_w(uint16_t data)
 
 void gcm394_game_state::base(machine_config &config)
 {
+	set_addrmap(0, &gcm394_game_state::cs_map_base);
+
 	GCM394(config, m_maincpu, 96000000, m_screen);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
@@ -148,9 +140,7 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(1); // boot from external ROM / CS mirror
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
-	m_maincpu->set_cs_space(m_memory, 0);
-
-	FULL_MEMORY(config, m_memory).set_map(&gcm394_game_state::cs_map_base);
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -170,6 +160,7 @@ void gcm394_game_state::base_alt_irq(machine_config &config)
 
 void gcm394_game_state::machine_start()
 {
+	space(0).specific(m_memory);
 }
 
 void gcm394_game_state::machine_reset()
@@ -181,11 +172,18 @@ void gcm394_game_state::machine_reset()
 	//m_maincpu->set_paldisplaybank_high_hack(1);
 }
 
+device_memory_interface::space_config_vector gcm394_game_state::memory_space_config() const
+{
+	return space_config_vector{ std::make_pair(0, &m_full_mem_config) };
+}
+
 void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, uint16_t cs3, uint16_t cs4)
 {
+	address_space &external = space(0);
+
 	// wipe existing mappings;
-	m_memory->get_program()->unmap_readwrite(0, (0x8000000*5)-1);
-	m_memory->get_program()->nop_readwrite(0, (0x8000000*5)-1); // stop logging spam if video params are invalid
+	external.unmap_readwrite(0, (0x8000000*5)-1);
+	external.nop_readwrite(0, (0x8000000*5)-1); // stop logging spam if video params are invalid
 
 	int start_address = 0;
 	int end_address;
@@ -195,31 +193,31 @@ void gcm394_game_state::cs_callback(uint16_t cs0, uint16_t cs1, uint16_t cs2, ui
 	size = (((cs0 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs0 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
+	external.install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs0_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs0_w)));
 	start_address += size;
 
 	size = (((cs1 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs1 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
+	external.install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs1_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs1_w)));
 	start_address += size;
 
 	size = (((cs2 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs2 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
+	external.install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs2_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs2_w)));
 	start_address += size;
 
 	size = (((cs3 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs3 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
+	external.install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs3_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs3_w)));
 	start_address += size;
 
 	size = (((cs4 & 0xff00) >> 8) + 1) * 0x10000;
 	end_address = start_address + (size - 1);
 	logerror("installing cs4 handler start_address %08x end_address %08x\n", start_address, end_address);
-	m_memory->get_program()->install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
+	external.install_readwrite_handler( start_address, end_address, read16sm_delegate(*this, FUNC(gcm394_game_state::cs4_r)), write16sm_delegate(*this, FUNC(gcm394_game_state::cs4_w)));
 	//start_address += size;
 }
 
