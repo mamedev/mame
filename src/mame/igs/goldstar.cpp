@@ -26569,6 +26569,24 @@ ROM_START( eldoraddoc )  // String "DYNA ELD3 V1.1J" in program ROM
 	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
 ROM_END
 
+ROM_START( eldoraddod )  // String "DYNA ELD3 V1.1U" in program ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "27c512_v1.1u.c14", 0x00000, 0x10000, CRC(3274d388) SHA1(180c9389fe7ccdee716b28a87effdc3970e057bf) )
+
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD( "tc538009.g15", 0x000000, 0x100000, CRC(fa84c372) SHA1(a71e57e76321b7ebb16933d9bc983b9160995b4a) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "bprom.d8",  0x000, 0x100, CRC(fa274678) SHA1(6712cb1f7ead1a7aa703ec799e7199c33ace857c) )
+	ROM_LOAD( "bprom.d10", 0x100, 0x100, CRC(e58877ea) SHA1(30fa873fc05d91610ef68eef54b78f2c7301a62a) )
+	ROM_LOAD( "bprom.d12", 0x200, 0x100, CRC(781b2842) SHA1(566667d4f81e93b29bb01dbc51bf144c02dff75d) )
+
+	ROM_REGION( 0x400, "plds", 0 )  // available as brute-forced dumps, need to be verified and converted
+	ROM_LOAD( "pal16l8.d13", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8.e11", 0x200, 0x104, NO_DUMP )
+ROM_END
+
+
 /*
   DYNA D9101 PCB with Z0840006VSC CPU and 2 customs
   (scratched), AY38910A/P, 6x 8-dip banks, XTAL 12 MHz.
@@ -31923,6 +31941,7 @@ GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_ini
 GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddob, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V2.0D)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1J)",                           MACHINE_NOT_WORKING ) // different GFX hw?
+GAME(  1991, eldoraddod, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1U)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 
 GAME(  1991, cmast91,    0,        cmast91,  cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAMEL( 1991, cll,        0,        cmast91,  cmast91,  cmaster_state,  init_cll,       ROT0, "Dyna / TAB Austria","Cuty Line Limited (ver.1.30)",                0,    layout_cmv4 ) // needs verifying dips, missing girls
