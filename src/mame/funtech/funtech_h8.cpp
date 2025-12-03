@@ -18,9 +18,8 @@ TDA 1519 sound amplifier
 
 TODO:
 - unknown reads / writes;
-- freezes sometimes;
-- NVRAM;
-- outputs (counters, lamps..);
+- layout;
+- identify exact H8 model. Can't be H83030 as the game uses more internal RAM. H83031 seems enough;
 - does the H8 really run so slow or is there something else in play?
 */
 
@@ -28,6 +27,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/h8/h83032.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 
@@ -62,7 +62,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<h83030_device> m_maincpu;
+	required_device<h83031_device> m_maincpu;
 	required_device<hopper_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -86,7 +86,9 @@ private:
 	template <uint8_t Which> void reel_attrram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hopper_w(uint16_t data);
+	void control_w(uint8_t data);
+	void hopper_counters_w(uint16_t data);
+	void lamps_w(uint16_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -192,25 +194,53 @@ void funtech_h8_state::machine_start()
 	save_item(NAME(m_reel0_full_screen));
 }
 
-void funtech_h8_state::hopper_w(uint16_t data)
+
+void funtech_h8_state::control_w(uint8_t data)
 {
+	m_tilebank = (data & 0x06) >> 1;
+
+	m_reel0_full_screen = BIT(data, 5);
+
+	if (data & 0xd9)
+		logerror("%s control_w unknown bits set: %02x\n", machine().describe_context(), data);
+}
+
+void funtech_h8_state::hopper_counters_w(uint16_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2)); // coin
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3)); // keyin
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 6)); // keyout
+
 	m_hopper->motor_w(BIT(data, 7));
 
-	if (data & 0xff7f)
-		logerror("%s hopper_w unknown bits written: %04x\n", machine().describe_context(), data);
+	if (data & 0xff33)
+		logerror("%s hopper_counters_w unknown bits written: %04x\n", machine().describe_context(), data);
+}
+
+void funtech_h8_state::lamps_w(uint16_t data)
+{
+	// bit 0: bet
+	// bit 1: start / all stop
+	// bit 2: low / stop 2
+	// bit 3: high
+	// bit 4: double up / stop 1
+	// bit 5: take score / stop 3
+
+	if (data & 0xffc0)
+		logerror("%s lamps_w unknown bits written: %04x\n", machine().describe_context(), data);
 }
 
 
 void funtech_h8_state::program_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x47fff).ram(); // NVRAM?
-	map(0x48000, 0x48001).w(FUNC(funtech_h8_state::hopper_w));
+	map(0x40000, 0x47fff).ram().share("nvram");
+	map(0x48000, 0x48001).w(FUNC(funtech_h8_state::hopper_counters_w));
 	map(0x48008, 0x48009).portr("IN0").nopw(); // TODO: continuously, alternatively writes 0xff00 and 0x00ff
 	map(0x4800a, 0x4800b).portr("DSW3_4");
-	// map(0x4800c, 0x4800d).w // writes here sometimes
+	map(0x4800c, 0x4800d).w(FUNC(funtech_h8_state::lamps_w));
 	map(0x4800e, 0x4800e).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	// map(0x48ffe, 0x48fff).r // reads here sometimes
+	// map(0x48ffe, 0x48fff).nopr(); // TODO: reads here sometimes, protection?
 	map(0xa0000, 0xa01ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[0][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<0>));
 	map(0xa0200, 0xa03ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[1][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<1>));
 	map(0xa0400, 0xa05ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[2][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<2>));
@@ -250,15 +280,15 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("P1 Start / All Stop")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score / Stop 3")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up / Stop 1")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Low / Stop 2")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 
 	PORT_START("DSW1" )
@@ -348,11 +378,13 @@ GFXDECODE_END
 
 void funtech_h8_state::funtech_h8(machine_config &config)
 {
-	H83030(config, m_maincpu, 12_MHz_XTAL / 6); // minimal speed for an H8 is 2 MHz and this seems to match available reference, but strange
+	H83031(config, m_maincpu, 12_MHz_XTAL / 6); // minimal speed for an H8 is 2 MHz and this seems to match available reference, but strange
 	m_maincpu->set_addrmap(AS_PROGRAM, &funtech_h8_state::program_map);
 	m_maincpu->read_port7().set_ioport("DSW1");
 	m_maincpu->read_porta().set_ioport("DSW2");
-	m_maincpu->write_portb().set([this] (uint8_t data) { m_reel0_full_screen = BIT(data, 5); m_tilebank = (data & 0x06) >> 1; });
+	m_maincpu->write_portb().set(FUNC(funtech_h8_state::control_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
