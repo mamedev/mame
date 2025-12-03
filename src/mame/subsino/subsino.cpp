@@ -1167,7 +1167,7 @@ void subsino_state::trsocean_map(address_map &map)
 	map(0x0d010, 0x0d010).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0d011, 0x0d011).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0d012, 0x0d012).w("ramdac", FUNC(ramdac_device::mask_w));
-
+	map(0x0d016, 0x0d017).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x0d018, 0x0d018).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x0e000, 0x0e7ff).ram().w(FUNC(subsino_state::colorram_w)).share("colorram");
@@ -3090,7 +3090,7 @@ void subsino_state::trsocean(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::trsocean_map);
 
-	config.device_remove("ymsnd");
+	
 
 	OKIM6295(config, "oki", XTAL(4'433'619) / 4, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // Clock frequency & pin 7 not verified
 }
