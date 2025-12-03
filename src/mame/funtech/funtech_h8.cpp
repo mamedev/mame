@@ -18,8 +18,7 @@ TDA 1519 sound amplifier
 
 TODO:
 - unknown reads / writes;
-- reels alignment in most screens;
-- only accepts coins in test mode;
+- freezes sometimes;
 - NVRAM;
 - outputs (counters, lamps..);
 - does the H8 really run so slow or is there something else in play?
@@ -50,8 +49,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "tileram", 0x800U, ENDIANNESS_BIG),
 		m_attrram(*this, "attrram", 0x800U, ENDIANNESS_BIG),
+		m_reel0_full_scrollram(*this, "reel0_full_scrollram", 0x40U, ENDIANNESS_BIG),
 		m_reel_tileram(*this, "reel_tileram%u", 0U, 0x200U, ENDIANNESS_BIG),
-		m_reel_attrram(*this, "reel_attrram%u", 0U, 0x200U, ENDIANNESS_BIG)
+		m_reel_attrram(*this, "reel_attrram%u", 0U, 0x200U, ENDIANNESS_BIG),
+		m_reel_scrollram(*this, "reel_scrollram%u", 0U, 0x80U, ENDIANNESS_BIG)
 	{ }
 
 	void funtech_h8(machine_config &config) ATTR_COLD;
@@ -67,12 +68,15 @@ private:
 
 	memory_share_creator<uint8_t> m_tileram;
 	memory_share_creator<uint8_t> m_attrram;
+	memory_share_creator<uint8_t> m_reel0_full_scrollram;
 	memory_share_array_creator<uint8_t, 4> m_reel_tileram;
 	memory_share_array_creator<uint8_t, 4> m_reel_attrram;
+	memory_share_array_creator<uint8_t, 4> m_reel_scrollram;
 
 	tilemap_t *m_tilemap = nullptr;
 	tilemap_t *m_reel_tilemap[4] {};
 	uint8_t m_tilebank = 0;
+	uint8_t m_reel0_full_screen = 0;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void tileram_w(offs_t offset, uint8_t data);
@@ -97,10 +101,12 @@ void funtech_h8_state::video_start()
 	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_tilemap->set_transparent_pen(0);
-	m_reel_tilemap[0]->set_transparent_pen(0);
-	m_reel_tilemap[1]->set_transparent_pen(0);
-	m_reel_tilemap[2]->set_transparent_pen(0);
-	m_reel_tilemap[3]->set_transparent_pen(0);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_reel_tilemap[i]->set_transparent_pen(0xff);
+		m_reel_tilemap[i]->set_scroll_cols(32);
+	}
 }
 
 TILE_GET_INFO_MEMBER(funtech_h8_state::get_tile_info)
@@ -150,10 +156,29 @@ uint32_t funtech_h8_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 {
 	bitmap.fill(0, cliprect);
 
-	m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_reel_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	m_reel_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
-	m_reel_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
+	if (!(m_reel0_full_screen))
+	{
+		for (int j = 0; j < 4; j ++)
+			for (int i = 1; i < 0x40; i += 2)
+				m_reel_tilemap[j]->set_scrolly(i / 2, m_reel_scrollram[j][i]);
+
+		const rectangle visible1(0 * 8, 64 * 8 - 1, 2 * 8, 10 * 8 - 1);
+		const rectangle visible2(0 * 8, 64 * 8 - 1, 10 * 8, 18 * 8 - 1);
+		const rectangle visible3(0 * 8, 64 * 8 - 1, 18 * 8, 26 * 8 - 1);
+		const rectangle visible4(0 * 8, 64 * 8 - 1, 26 * 8, 30 * 8 - 1);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[3]->draw(screen, bitmap, visible4, 0, 0);
+	}
+	else
+	{
+		for (int i = 1; i < 0x40; i += 2)
+			m_reel_tilemap[0]->set_scrolly(i / 2, m_reel0_full_scrollram[i]);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	}
 
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -164,6 +189,7 @@ uint32_t funtech_h8_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 void funtech_h8_state::machine_start()
 {
 	save_item(NAME(m_tilebank));
+	save_item(NAME(m_reel0_full_screen));
 }
 
 void funtech_h8_state::hopper_w(uint16_t data)
@@ -195,7 +221,20 @@ void funtech_h8_state::program_map(address_map &map)
 	map(0xa8600, 0xa87ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_attrram[3][offset]; })).w(FUNC(funtech_h8_state::reel_attrram_w<3>));
 	map(0xc0000, 0xc01ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc8000, 0xc81ff).ram().w("palette", FUNC(palette_device::write16_ext)).share("palette_ext");
-	map(0xd8000, 0xd87ff).ram(); // seems unused by this game, only initialized
+	map(0xd8000, 0xd803f).ram(); // ??
+	map(0xd8040, 0xd807f).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[0][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[0][offset] = data; }));
+	map(0xd8080, 0xd80bf).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[1][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[1][offset] = data; }));
+	map(0xd80c0, 0xd80ff).ram(); // ??
+	map(0xd8100, 0xd813f).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[2][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[2][offset] = data; }));
+	map(0xd8140, 0xd817f).ram(); // ??
+	map(0xd8180, 0xd81bf).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[3][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[3][offset] = data; }));
+	map(0xd81c0, 0xd87bf).ram();
+	map(0xd87c0, 0xd87ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel0_full_scrollram[offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel0_full_scrollram[offset] = data; }));
 	map(0xe0000, 0xe07ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_tileram[offset]; })).w(FUNC(funtech_h8_state::tileram_w));
 	map(0xe0800, 0xe083f).ram(); // ??
 	map(0xe8000, 0xe87ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_attrram[offset]; })).w(FUNC(funtech_h8_state::attrram_w));
@@ -313,7 +352,7 @@ void funtech_h8_state::funtech_h8(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &funtech_h8_state::program_map);
 	m_maincpu->read_port7().set_ioport("DSW1");
 	m_maincpu->read_porta().set_ioport("DSW2");
-	m_maincpu->write_portb().set([this] (uint8_t data) { m_tilebank = (data & 0x06) >> 1; }); // TODO: Bit 5 also used.
+	m_maincpu->write_portb().set([this] (uint8_t data) { m_reel0_full_screen = BIT(data, 5); m_tilebank = (data & 0x06) >> 1; });
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
@@ -323,6 +362,7 @@ void funtech_h8_state::funtech_h8(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(funtech_h8_state::screen_update));
 	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, 0);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_goldnegg);
 
