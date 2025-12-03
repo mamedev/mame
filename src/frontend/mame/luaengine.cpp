@@ -1446,6 +1446,7 @@ void lua_engine::initialize()
 					m.popmessage();
 			});
 	machine_type.set_function("logerror", [] (running_machine &m, char const *str) { m.logerror("[luaengine] %s\n", str); });
+	machine_type.set_function("side_effects_disabled", &running_machine::side_effects_disabled);
 	machine_type["time"] = sol::property(&running_machine::time);
 	machine_type["system"] = sol::property(&running_machine::system);
 	machine_type["parameters"] = sol::property(&running_machine::parameters);
@@ -1491,7 +1492,6 @@ void lua_engine::initialize()
 				}
 				return nullptr;
 			});
-	machine_type["side_effects_disabled"] = sol::property(&running_machine::side_effects_disabled);
 
 
 	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
