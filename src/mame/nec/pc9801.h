@@ -141,7 +141,7 @@ public:
 		, m_fdc_2hd(*this, "fdc_2hd")
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
-		, m_cbus_root(*this, "cbus_root")
+		, m_cbus_root(*this, "cbus")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")

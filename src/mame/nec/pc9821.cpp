@@ -909,7 +909,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
-	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_86");
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_state, pc9821)
@@ -1002,8 +1002,8 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 //  m_ram->set_extra_options("6M,8M,14M,15M");
 
 	// pc9801-86 (built-in)
-	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, nullptr);
-	PC98_CBUS_SLOT(config, "board1", 0, "cbus_root", pc98_cbus_devices, "sound_pc9821ce", true);
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 
 	// 3.5 x2
 	config_floppy_35hd(config);
@@ -1030,8 +1030,8 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, nullptr);
-	PC98_CBUS_SLOT(config, "board1", 0, "cbus_root", pc98_cbus_devices, "sound_pc9821cx3", true);
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
@@ -1424,7 +1424,7 @@ ROM_START( pc9821ce )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	ROM_REGION( 0x4000, "board1:sound_pc9821ce:bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821ce:bios", ROMREGION_ERASE00 )
 	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
 
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
@@ -1509,7 +1509,7 @@ ROM_START( pc9821cx3 )
 	// cfr. $afe00 and $ad400 range
 	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 
-	ROM_REGION( 0x4000, "board1:sound_pc9821cx3:bios", 0)
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821cx3:bios", 0)
 	ROM_COPY( "biosrom", 0x54000, 0x00000, 0x04000 )
 
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )

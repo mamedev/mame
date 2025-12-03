@@ -17,9 +17,6 @@ TODO:
 - Need data throttle between here, wd33c9x and/or NSCSI harddisk, otherwise executing anything will
   fail (should be fixed with pc98_hd option?);
 - PIO mode (involves port $cc6 and a ready flag in port $37 bit 0)
-- Tends to miss BIOS ROM loading at first boot, need to refactor C-Bus to actually have slots
-  as children (and make remapping phase less arbitrary, can't read required input port at
-  device_start);
 - Remaining remap options;
 
 **************************************************************************************************/
@@ -186,6 +183,7 @@ void lha201_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// TODO: move base in device_reset
 		const u32 m_memory_base = 0x000d0000 + ((m_dsw2->read() & 7) * 0x2000);
 		m_bus->space(AS_PROGRAM).install_rom(
 			m_memory_base,

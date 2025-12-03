@@ -16,11 +16,13 @@ class lha201_device : public pc9801_55_device
 {
 public:
 	lha201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	//lha201_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	static constexpr feature_type unemulated_features() { return feature::DISK; }
+	static constexpr feature_type imperfect_features() { return feature::DISK; }
+	static constexpr feature_type unemulated_features() { return feature::NONE; }
 
 protected:
+	//lha201_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 //  virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

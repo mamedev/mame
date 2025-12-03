@@ -167,6 +167,7 @@ void pc9801_26_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// TODO: move base in device_reset
 		const u8 rom_setting = ioport("JP6A2")->read() & 7;
 		static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
 		const u32 start_address = rom_addresses[rom_setting & 7];

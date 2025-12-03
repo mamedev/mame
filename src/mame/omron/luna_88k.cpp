@@ -179,7 +179,7 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_spc(*this, "scsi%u:7:spc", 0U)
 		, m_net(*this, "net%u", 0U)
-		, m_cbus_root(*this, "cbus_root")
+		, m_cbus_root(*this, "cbus")
 		, m_eprom(*this, "eprom")
 		, m_fzrom(*this, "fzrom")
 	{
@@ -600,7 +600,7 @@ void luna88k2_state::luna88k2(machine_config &config)
 	PC98_CBUS_ROOT(config, m_cbus_root, 0);
 	// TODO: interrupts
 
-	PC98_CBUS_SLOT(config, "cbus0", 0, m_cbus_root, luna88k2_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:0", 0, m_cbus_root, luna88k2_cbus_devices, nullptr);
 }
 
 u32 luna_88k_state_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)

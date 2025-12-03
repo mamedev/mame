@@ -236,6 +236,7 @@ void pc9801_55_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// TODO: move base to device_reset
 		// incredibly verbose for LHA-201
 		// logerror("map ROM at 0x000dc000-0x000dcfff (bank %d)\n", m_rom_bank);
 		m_bus->space(AS_PROGRAM).install_rom(
