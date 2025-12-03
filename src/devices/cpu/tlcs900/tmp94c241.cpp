@@ -994,6 +994,21 @@ void tmp94c241_device::tlcs900_check_irqs()
 
 		// Clear taken IRQ
 		m_int_reg[tmp94c241_irq_vector_map[irq].reg] &= ~ tmp94c241_irq_vector_map[irq].iff;
+
+		// notify the debugger
+		if (machine().debug_enabled())
+		{
+			int8_t default_priority = vector/4 + 1;
+			if (vector > 0x3c)
+				default_priority--; // skip reserved one
+
+			// For now we can't pass a string with the interrupt name
+			// so, here we'll get a message that says things like "IRQ 20"
+			// and we can look up the TMP94C241 datasheet and find under
+			// "Default priority" on the interrupt table that
+			// "20" means "INTT0: 8-bit timer (Timer 0)"
+			debug()->interrupt_hook(default_priority, m_pc.d);
+		}
 	}
 }
 
