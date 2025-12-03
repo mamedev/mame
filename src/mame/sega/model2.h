@@ -72,7 +72,9 @@ public:
 		m_copro_data(*this, "copro_data"),
 		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
-		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
+		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"}),
+		m_lamps(*this, "lamp%u", 0U),
+		m_wheel_motor(*this, "wheel_motor")		
 	{ }
 
 	/* Public for access by the rendering functions */
@@ -101,6 +103,7 @@ public:
 	void init_sgt24h();
 	void init_srallyc();
 	void init_powsledm();
+	void lamp_output_w(u8 data);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -135,6 +138,8 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_lightgun_ports;
+	output_finder<6> m_lamps;
+	output_finder<> m_wheel_motor;
 
 	u32 m_timervals[4]{};
 	u32 m_timerorig[4]{};
@@ -531,6 +536,7 @@ public:
 	void gunblade(machine_config &config);
 	void dynabb(machine_config &config);
 	void zerogun(machine_config &config);
+	void sgt24h(machine_config& config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

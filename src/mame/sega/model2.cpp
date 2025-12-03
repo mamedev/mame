@@ -143,6 +143,9 @@ void model2_state::machine_start()
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
 
+	m_lamps.resolve();
+	m_wheel_motor.resolve();
+
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intena));
 	save_item(NAME(m_coproctl));
@@ -1172,48 +1175,92 @@ u8 model2_state::lightgun_offscreen_r(offs_t offset)
 //**************************************************************************
 //  OUTPUTS
 //**************************************************************************
-
-void model2o_state::daytona_output_w(u8 data)
-{
-	// 7-------  leader led
-	// -6------  vr4 led
-	// --5-----  vr3 led
-	// ---4----  vr2 led
-	// ----3---  vr1 led
-	// -----2--  start led
+	// Daytona Output
+	// 7-------  leader lamp
+	// -6------  vr4 lamp
+	// --5-----  vr3 lamp
+	// ---4----  vr2 lamp
+	// ----3---  vr1 lamp
+	// -----2--  start lamp
 	// ------1-  coin counter 2
 	// -------0  coin counter 1
 
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-}
-
-void model2o_state::desert_output_w(u8 data)
-{
+	// Desert Output
 	// 7-------  cannon motor
 	// -6------  machine gun motor
-	// --5-----  vr1
-	// ---4----  vr2
-	// ----3---  vr3
-	// -----2--  start
+	// --5-----  vr1 lamp
+	// ---4----  vr2 lamp
+	// ----3---  vr3 lamp
+	// -----2--  start lamp
 	// ------1-  coin counter 2
 	// -------0  coin counter 1
 
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-}
-
-void model2o_state::vcop_output_w(u8 data)
-{
+	// Vcop Output
 	// 7654----  unknown (not used?)
-	// ----32--  start leds (always set together)
+	// ----32--  start lamps (always set together)
 	// ------1-  coin counter 2
 	// -------0  coin counter 1
 
-	machine().bookkeeping().coin_counter_w(1, BIT(~data, 1));
-	machine().bookkeeping().coin_counter_w(0, BIT(~data, 0));
-}
+	// Srallyc Output
+	// 7-------  leader lamp   
+	// -6------  unknown
+	// --5-----  vr lamp
+	// ---4----  unknown
+	// ----3---  unknown
+	// -----2--  start lamp
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
 
+	// STCC Output
+	// 7-------  unknown
+	// -6------  unknown
+	// --5-----  view 2 (zoom out) lamp  
+	// ---4----  view 1 (zoom in) lamp 
+	// ----3---  rev max lamp 
+	// -----2--  start lamp 
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	// Indy500 Output
+	// 7-------  race leader lamp 
+	// -6------  unknown
+	// --5-----  view 2 (zoom out) lamp
+	// ---4----  view 1 (zoom in) lamp 
+	// ----3---  unknown
+	// -----2--  start lamp 
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	// Overrev Output
+	// 7-------  unknown
+	// -6------  unknown
+	// --5-----  view 2 lamp
+	// ---4----  view 1 lamp
+	// ----3---  unknown
+	// -----2--  start lamp
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	// Sgt24h Output
+	// 7-------  unknown
+	// -6------  unknown
+	// --5-----  view 2 lamp
+	// ---4----  view 1 lamp
+	// ----3---  unknown
+	// -----2--  start lamp
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+void model2_state::lamp_output_w(u8 data)
+{
+	// Coin counters
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+
+	// Lamps (bits 2–7)
+	for (int i = 0; i < 6; i++)
+		m_lamps[i] = BIT(data, i + 2);
+}
 
 //**************************************************************************
 //  I/O BOARD
@@ -1527,6 +1574,7 @@ void model2_state::rchase2_drive_board_w(u8 data)
 
 void model2_state::drive_board_w(u8 data)
 {
+	m_wheel_motor = data;
 	m_driveio_comm_data = data;
 	m_drivecpu->set_input_line(0, HOLD_LINE);
 }
@@ -2623,7 +2671,7 @@ void model2o_state::daytona(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STEER");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
-	ioboard.output_callback().set(FUNC(model2o_state::daytona_output_w));
+	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 }
 
 void model2o_maxx_state::daytona_maxx(machine_config &config)
@@ -2648,7 +2696,7 @@ void model2o_state::desert(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STEER");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
-	ioboard.output_callback().set(FUNC(model2o_state::desert_output_w));
+	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 }
 
 void model2o_state::vcop(machine_config &config)
@@ -2662,7 +2710,7 @@ void model2o_state::vcop(machine_config &config)
 	ioboard.in_callback<0>().set_ioport("IN0");
 	ioboard.in_callback<1>().set_ioport("IN1");
 	ioboard.in_callback<2>().set_ioport("IN2");
-	ioboard.output_callback().set(FUNC(model2o_state::vcop_output_w));
+	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 	ioboard.set_lightgun_p1x_tag("P1_X");
 	ioboard.set_lightgun_p1y_tag("P1_Y");
 	ioboard.set_lightgun_p2x_tag("P2_X");
@@ -2748,6 +2796,7 @@ void model2a_state::srallyc(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.out_pe_callback().set(FUNC(model2a_state::drive_board_w));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -2831,6 +2880,7 @@ void model2b_state::model2b(machine_config &config)
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (u8 data) { m_billboard->write(data); });
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2868,6 +2918,8 @@ void model2b_state::indy500(machine_config &config)
 	model2b(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -2878,6 +2930,20 @@ void model2b_state::overrev2b(machine_config &config)
 	model2b(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
+	io.an_port_callback<0>().set_ioport("STEER");
+	io.an_port_callback<1>().set_ioport("ACCEL");
+	io.an_port_callback<2>().set_ioport("BRAKE");
+}
+
+void model2b_state::sgt24h(machine_config& config)
+{
+	model2b(config);
+
+	sega_315_5649_device& io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -2979,6 +3045,7 @@ void model2c_state::model2c(machine_config &config)
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -3001,6 +3068,7 @@ void model2c_state::stcc(machine_config &config)
 	model2c(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -3058,6 +3126,7 @@ void model2c_state::overrev2c(machine_config &config)
 	model2c(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
