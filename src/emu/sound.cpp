@@ -2732,8 +2732,7 @@ void sound_manager::streams_update()
 	}
 
 	for(sound_stream *stream : m_ordered_streams)
-		if(stream->device().type() != SPEAKER)
-			stream->sync(now);
+		stream->sync(now);
 
 	for(osd_input_stream &stream : m_osd_input_streams)
 		stream.m_buffer.sync();
