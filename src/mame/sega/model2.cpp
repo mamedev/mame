@@ -1174,81 +1174,84 @@ u8 model2_state::lightgun_offscreen_r(offs_t offset)
 //**************************************************************************
 //  OUTPUTS
 //**************************************************************************
-	// Daytona Output
-	// 7-------  leader lamp
-	// -6------  vr4 lamp
-	// --5-----  vr3 lamp
-	// ---4----  vr2 lamp
-	// ----3---  vr1 lamp
-	// -----2--  start lamp
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
 
-	// Desert Output
-	// 7-------  cannon motor
-	// -6------  machine gun motor
-	// --5-----  vr1 lamp
-	// ---4----  vr2 lamp
-	// ----3---  vr3 lamp
-	// -----2--  start lamp
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+/*
+	Daytona
+	7-------  leader lamp
+	-6------  vr4 lamp
+	--5-----  vr3 lamp
+	---4----  vr2 lamp
+	----3---  vr1 lamp
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
 
-	// Vcop Output
-	// 7654----  unknown (not used?)
-	// ----32--  start lamps (always set together)
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+	Desert
+	7-------  cannon motor
+	-6------  machine gun motor
+	--5-----  vr1 lamp
+	---4----  vr2 lamp
+	----3---  vr3 lamp
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
 
-	// Srallyc Output
-	// 7-------  leader lamp   
-	// -6------  unknown
-	// --5-----  vr lamp
-	// ---4----  unknown
-	// ----3---  unknown
-	// -----2--  start lamp
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+	Vcop
+	7654----  unknown (not used?)
+	----32--  start lamps (always set together)
+	------1-  coin counter 2
+	-------0  coin counter 1
 
-	// STCC Output
-	// 7-------  unknown
-	// -6------  unknown
-	// --5-----  view 2 (zoom out) lamp  
-	// ---4----  view 1 (zoom in) lamp 
-	// ----3---  rev max lamp 
-	// -----2--  start lamp 
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+	Srallyc
+	7-------  leader lamp   
+	-6------  unknown
+	--5-----  vr lamp
+	---4----  unknown
+	----3---  unknown
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
 
-	// Indy500 Output
-	// 7-------  race leader lamp 
-	// -6------  unknown
-	// --5-----  view 2 (zoom out) lamp
-	// ---4----  view 1 (zoom in) lamp 
-	// ----3---  unknown
-	// -----2--  start lamp 
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+	STCC
+	7-------  unknown
+	-6------  unknown
+	--5-----  view 2 (zoom out) lamp  
+	---4----  view 1 (zoom in) lamp 
+	----3---  rev max lamp 
+	-----2--  start lamp 
+	------1-  coin counter 2
+	-------0  coin counter 1
 
-	// Overrev Output
-	// 7-------  unknown
-	// -6------  unknown
-	// --5-----  view 2 lamp
-	// ---4----  view 1 lamp
-	// ----3---  unknown
-	// -----2--  start lamp
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+	Indy500
+	7-------  race leader lamp 
+	-6------  unknown
+	--5-----  view 2 (zoom out) lamp
+	---4----  view 1 (zoom in) lamp 
+	----3---  unknown
+	-----2--  start lamp 
+	------1-  coin counter 2
+	-------0  coin counter 1
 
-	// Sgt24h Output
-	// 7-------  unknown
-	// -6------  unknown
-	// --5-----  view 2 lamp
-	// ---4----  view 1 lamp
-	// ----3---  unknown
-	// -----2--  start lamp
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+	Overrev
+	7-------  unknown
+	-6------  unknown
+	--5-----  view 2 lamp
+	---4----  view 1 lamp
+	----3---  unknown
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
+
+	Sgt24h
+	7-------  unknown
+	-6------  unknown
+	--5-----  view 2 lamp
+	---4----  view 1 lamp
+	----3---  unknown
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
+*/
 
 void model2_state::lamp_output_w(u8 data)
 {
@@ -1578,6 +1581,7 @@ void model2_state::drive_board_w(u8 data)
 		m_drivecpu->set_input_line(0, HOLD_LINE);
 }
 
+
 //**************************************************************************
 //  INPUT HANDLING
 //**************************************************************************
@@ -1615,12 +1619,11 @@ u8 model2_state::in0_r()
 ioport_value model2_state::daytona_gearbox_r()
 {
 	u8 res = m_gears.read_safe(0);
-	int i;
 	const u8 gearvalue[5] = { 0, 2, 1, 6, 5 };
 
-	for(i=0;i<5;i++)
+	for (int i = 0; i < 5; i++)
 	{
-		if(res & 1<<i)
+		if (BIT(res, i))
 		{
 			m_gearsel = i;
 			return gearvalue[i];
@@ -2694,7 +2697,6 @@ void model2o_state::desert(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STEER");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
-	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 }
 
 void model2o_state::vcop(machine_config &config)
@@ -2821,8 +2823,8 @@ void model2a_state::skytargt(machine_config &config)
 
 u16 model2_state::crypt_read_callback(u32 addr)
 {
-	u16 dat= m_maincpu->space().read_word((0x1d80000+2*addr));
-	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
+	u16 dat= m_maincpu->space().read_word((0x1d80000 + 2*addr));
+	return ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
 }
 
 void model2a_state::model2a_5881(machine_config &config)
@@ -2917,28 +2919,6 @@ void model2b_state::indy500(machine_config &config)
 	model2b(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
-	io.an_port_callback<0>().set_ioport("STEER");
-	io.an_port_callback<1>().set_ioport("ACCEL");
-	io.an_port_callback<2>().set_ioport("BRAKE");
-}
-
-void model2b_state::overrev2b(machine_config &config)
-{
-	model2b(config);
-
-	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
-	io.an_port_callback<0>().set_ioport("STEER");
-	io.an_port_callback<1>().set_ioport("ACCEL");
-	io.an_port_callback<2>().set_ioport("BRAKE");
-}
-
-void model2b_state::sgt24h(machine_config& config)
-{
-	model2b(config);
-
-	sega_315_5649_device& io(*subdevice<sega_315_5649_device>("io"));
 	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
@@ -7645,14 +7625,14 @@ GAME( 1996, lastbrnxu,  lastbrnx, model2b,      vf2,       model2b_state, empty_
 GAME( 1996, lastbrnxj,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,        0,        model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Jan 10 1997
 GAME( 1996, doab,       doa,      model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Dec 4 1996
-GAME( 1996, sgt24h,     0,        overrev2b,    sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sgt24h,     0,        indy500,      sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, powsled,    0,        powsled,      powsled,   model2b_state, empty_init,    ROT0, "Sega",   "Power Sled (Slave, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, powsledr,   powsled,  powsled,      powsled,   model2b_state, empty_init,    ROT0, "Sega",   "Power Sled (Relay, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, powsledm,   powsled,  powsled,      powsled,   model2b_state, init_powsledm, ROT0, "Sega",   "Power Sled (Main, hack of Relay)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, dynabb,     0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, dynabb97,   0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrevb,   overrev,  overrev2b,    overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrevba,  overrev,  overrev2b,    overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrevb,   overrev,  indy500,      overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrevba,  overrev,  indy500,      overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogun,    0,        zerogun,      zerogun,   model2b_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunj,   zerogun,  zerogun,      zerogun,   model2b_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcopb,  dynamcop, model2b_5881, dynamcop,  model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
