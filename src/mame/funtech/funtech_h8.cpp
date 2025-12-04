@@ -161,8 +161,10 @@ uint32_t funtech_h8_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	if (!(m_reel0_full_screen))
 	{
 		for (int j = 0; j < 4; j ++)
+		{
 			for (int i = 1; i < 0x40; i += 2)
 				m_reel_tilemap[j]->set_scrolly(i / 2, m_reel_scrollram[j][i]);
+		}
 
 		const rectangle visible1(0 * 8, 64 * 8 - 1, 2 * 8, 10 * 8 - 1);
 		const rectangle visible2(0 * 8, 64 * 8 - 1, 10 * 8, 18 * 8 - 1);
@@ -280,27 +282,27 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("P1 Start / All Stop")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("P1 Start / Stop All Reels")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score / Stop 3")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up / Stop 1")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Low / Stop 2")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Low")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 
 	PORT_START("DSW1" )
-	PORT_DIPNAME( 0x03, 0x03, "Main Game Rate" )  PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x03, "45" )
-	PORT_DIPSETTING(    0x02, "50" )
-	PORT_DIPSETTING(    0x01, "55" )
-	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPNAME( 0x04, 0x04, "Double Game Rate" )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x03, 0x03, "Main Game Payout Rate" )  PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "45%" )
+	PORT_DIPSETTING(    0x02, "50%" )
+	PORT_DIPSETTING(    0x01, "55%" )
+	PORT_DIPSETTING(    0x00, "60%" )
+	PORT_DIPNAME( 0x04, 0x04, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "80" )
 	PORT_DIPSETTING(    0x04, "90" )
-	PORT_DIPNAME( 0x18, 0x18, "Max Play" )  PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Maximum Bet" )  PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x18, "8" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x08, "64" )
@@ -308,7 +310,7 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6") // no effect shown in test mode
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Min Play for Bonus" )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Minimum Bet for Bonus" )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "8" )
 	PORT_DIPSETTING(    0x00, "32" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8") // no effect shown in test mode
@@ -316,7 +318,7 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2" )
-	PORT_DIPNAME( 0x01, 0x01, "Double Game" )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Double Up Game" )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2") // no effect shown in test mode
@@ -340,7 +342,7 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_DIPSETTING(    0x00, "1 Coin/1000 Credits" )
 
 	PORT_START("DSW3_4" ) // no effect shown in test mode for most
-	PORT_DIPNAME(           0x0003, 0x0003, "Min Play" )  PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPNAME(           0x0003, 0x0003, "Minimum Bet" )  PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(                0x0003, "1" )
 	PORT_DIPSETTING(                0x0002, "8" )
 	PORT_DIPSETTING(                0x0001, "16" )

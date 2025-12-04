@@ -70,7 +70,7 @@ public:
 		, m_io_config(*this, "CONFIG")
 	{ }
 
-	void mz80b(machine_config &config);
+	void mz80b(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(boot_reset_cb);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset_cb);
@@ -177,7 +177,7 @@ public:
 		: mz80b_state(mconfig, type, tag)
 	{ }
 
-	void mz2000(machine_config &config);
+	void mz2000(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -208,7 +208,7 @@ public:
 		: mz2000_state(mconfig, type, tag)
 	{ }
 
-	void mz2200(machine_config &config);
+	void mz2200(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -216,7 +216,7 @@ protected:
 	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
-	virtual void set_palette_bank() override { };
+	virtual void set_palette_bank() override { }
 };
 
 
@@ -474,7 +474,8 @@ void mz2000_state::gvram_bank_w(u8 data)
  * MZ-2000 work RAM handling
  */
 
-template <unsigned N> u8 mz2000_state::work_ram_r(offs_t offset)
+template <unsigned N>
+u8 mz2000_state::work_ram_r(offs_t offset)
 {
 	if (m_vram_overlay_enable)
 	{
@@ -508,7 +509,8 @@ template <unsigned N> u8 mz2000_state::work_ram_r(offs_t offset)
 	return m_work_ram[offset];
 }
 
-template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, u8 data)
+template <unsigned N>
+void mz2000_state::work_ram_w(offs_t offset, u8 data)
 {
 	if (m_vram_overlay_enable)
 	{
@@ -559,7 +561,8 @@ void mz80b_state::mz80b_gvram_w(offs_t offset, u8 data)
 	m_gvram[(offset + m_gvram_bank * 0x2000)] = data;
 }
 
-template <unsigned N> u8 mz80b_state::mz80b_work_ram_r(offs_t offset)
+template <unsigned N>
+u8 mz80b_state::mz80b_work_ram_r(offs_t offset)
 {
 	if (m_vram_overlay_enable)
 	{
@@ -595,7 +598,8 @@ template <unsigned N> u8 mz80b_state::mz80b_work_ram_r(offs_t offset)
 	return m_work_ram[offset];
 }
 
-template <unsigned N> void mz80b_state::mz80b_work_ram_w(offs_t offset, u8 data)
+template <unsigned N>
+void mz80b_state::mz80b_work_ram_w(offs_t offset, u8 data)
 {
 	if (m_vram_overlay_enable)
 	{
@@ -706,7 +710,7 @@ void mz80b_state::mz80b_vram_w(offs_t offset, u8 data)
 
 u8 mz80b_state::fdc_r(offs_t offset)
 {
-	if(m_has_fdc)
+	if (m_has_fdc)
 		return m_fdc->read(offset) ^ 0xff;
 
 	return 0xff;
@@ -714,7 +718,7 @@ u8 mz80b_state::fdc_r(offs_t offset)
 
 void mz80b_state::fdc_w(offs_t offset, u8 data)
 {
-	if(m_has_fdc)
+	if (m_has_fdc)
 		m_fdc->write(offset, data ^ 0xff);
 }
 
@@ -857,7 +861,7 @@ u8 mz80b_state::ppi_portb_r()
 {
 	u8 res = m_io_keys[3]->read() & 0x80;
 
-	if(m_cassette->get_image() != nullptr)
+	if (m_cassette->get_image() != nullptr)
 	{
 		res |= (m_cassette->input() > 0.0038) ? 0x40 : 0x00;
 		res |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x10 : 0x30;
@@ -884,17 +888,17 @@ u8 mz80b_state::ppi_portb_r()
  */
 void mz80b_state::ppi_porta_w(u8 data)
 {
-	if((m_tape_ctrl & 0x80) == 0 && data & 0x80)
+	if ((m_tape_ctrl & 0x80) == 0 && data & 0x80)
 	{
 		//popmessage("Tape APSS control");
 	}
 
-	if((m_tape_ctrl & 0x40) == 0 && data & 0x40)
+	if ((m_tape_ctrl & 0x40) == 0 && data & 0x40)
 	{
 		//popmessage("Tape APLAY control");
 	}
 
-	if((m_tape_ctrl & 0x20) == 0 && data & 0x20)
+	if ((m_tape_ctrl & 0x20) == 0 && data & 0x20)
 	{
 		//popmessage("Tape AREW control");
 	}
@@ -908,24 +912,24 @@ void mz80b_state::ppi_porta_w(u8 data)
 	//if (BIT(data, 4))
 	//  popmessage("Reverse video");
 
-	if((m_tape_ctrl & 0x08) == 0 && data & 0x08) // stop
+	if ((m_tape_ctrl & 0x08) == 0 && data & 0x08) // stop
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 	}
 
-	if((m_tape_ctrl & 0x04) == 0 && data & 0x04) // play
+	if ((m_tape_ctrl & 0x04) == 0 && data & 0x04) // play
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 
-	if((m_tape_ctrl & 0x02) == 0 && data & 0x02)
+	if ((m_tape_ctrl & 0x02) == 0 && data & 0x02)
 	{
 		//popmessage("Tape FF control");
 	}
 
-	if((m_tape_ctrl & 0x01) == 0 && data & 0x01)
+	if ((m_tape_ctrl & 0x01) == 0 && data & 0x01)
 	{
 		//popmessage("Tape Rewind control");
 	}
@@ -946,14 +950,14 @@ void mz80b_state::ppi_portc_w(u8 data)
 {
 	//logerror("C W %02x\n",data);
 
-	if(BIT(m_old_portc, 3) != BIT(data, 3))
+	if (BIT(m_old_portc, 3) != BIT(data, 3))
 	{
 		logerror("PIO PC: IPL reset %s\n", BIT(data, 3) ? "stopped" : "started");
 		// TODO: timing
 		m_ipl_reset_timer->adjust(!BIT(data, 3) ? attotime::from_hz(100) : attotime::never);
 	}
 
-	if(!BIT(m_old_portc, 1) && BIT(data, 1))
+	if (!BIT(m_old_portc, 1) && BIT(data, 1))
 	{
 		logerror("PIO PC: Work RAM reset\n");
 		m_ipl_view.disable();
@@ -989,7 +993,7 @@ void mz80b_state::pio_porta_w(u8 data)
 
 u8 mz80b_state::pio_portb_r()
 {
-	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
+	if (((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
 		int res,i;
 
@@ -1413,6 +1417,7 @@ void mz80b_state::mz80b(machine_config &config)
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(mz80b_state::snapshot_cb));
 	snapshot.set_interface("mz_snap");
+
 	SOFTWARE_LIST(config, "flop_list").set_original("mz80b_flop");
 	SOFTWARE_LIST(config, "cass_list").set_original("mz80b_cass");
 }
