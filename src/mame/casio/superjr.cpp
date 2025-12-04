@@ -49,6 +49,8 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	void install_program_rom() ATTR_COLD;
+
 	void kol_w(u8 data);
 	void koh_w(u8 data);
 	void port_w(u8 data);
@@ -74,9 +76,22 @@ private:
 
 void superjr_state::machine_start()
 {
+	install_program_rom();
+
 	save_item(NAME(m_ko));
 	save_item(NAME(m_port));
 	save_item(NAME(m_opt));
+}
+
+void superjr_state::install_program_rom()
+{
+	// TODO: RAM writes are done at segment 0x84 (address 0x840000),
+	// while program ROMs are loaded at segment 0x80, even if they are larger than 0x40000 bytes.
+	// Confirm if the rest of the program ROM is mapped on other segments besides 0x80..0x83.
+	auto *const rom = memregion("mask_rom");
+	const u32 base_address = 0x800000;
+	const u32 memory_size = std::min(rom->bytes(), u32(0x40000));
+	m_maincpu->space(AS_PROGRAM).install_rom(base_address, base_address + memory_size - 1, rom->base());
 }
 
 void superjr_state::superjr_palette(palette_device &palette) const
@@ -87,12 +102,10 @@ void superjr_state::superjr_palette(palette_device &palette) const
 
 void superjr_state::superjr_mem(address_map &map)
 {
-
 	map(0x000000, 0x017fff).rom();
 //  map(0x040000, 0x04ffff) // Unknown
 	map(0x080000, 0x0807ff).ram();
 	map(0x100000, 0x10017f).ram().share("display_ram");
-	map(0x800000, 0x83ffff).rom().region("mask_rom", 0); // Banked?
 	map(0x840000, 0x847fff).ram();
 }
 
@@ -220,21 +233,21 @@ void superjr_state::superjr(machine_config &config)
 ROM_START(jd5000)
 	CPU_ROM_HC3000
 
-	ROM_REGION(0x100000, "mask_rom", 0)
-	ROM_LOAD("tc531001cf.rom", 0x00000, 0x20000, CRC(43b186a1) SHA1(f5a5ece8179d5e215433553cab781448692fbb60))
+	ROM_REGION(0x020000, "mask_rom", 0)
+	ROM_LOAD("tc531001cf.rom", 0x00000, 0x020000, CRC(43b186a1) SHA1(f5a5ece8179d5e215433553cab781448692fbb60))
 ROM_END
 
 ROM_START(jd320)
 	CPU_ROM_L180
 
-	ROM_REGION(0x100000, "mask_rom", 0)
-	ROM_LOAD("tc531001cf.ic2", 0x00000, 0x080000, CRC(f7f1c35e) SHA1(25ffda8568699082f22a4f82859e99b0396e8e8b))
+	ROM_REGION(0x020000, "mask_rom", 0)
+	ROM_LOAD("tc531001cf.ic2", 0x00000, 0x020000, CRC(f7f1c35e) SHA1(25ffda8568699082f22a4f82859e99b0396e8e8b))
 ROM_END
 
 ROM_START(jd360)
 	CPU_ROM_L180
 
-	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_REGION(0x080000, "mask_rom", 0)
 	ROM_LOAD("d23c4001ebgw-j06.ic2", 0x00000, 0x080000, CRC(9b9a04c3) SHA1(2a72d5d1c3f045f74af8316cde4ac93aee1124a5))
 ROM_END
 
@@ -248,14 +261,14 @@ ROM_END
 ROM_START(jd362)
 	CPU_ROM_L196
 
-	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_REGION(0x080000, "mask_rom", 0)
 	ROM_LOAD("d23c4001ejgw-c10.ic2", 0x00000, 0x080000, CRC(67c59d27) SHA1(93706b2bbe3fdd71505bb1b2c0ac0327ad404d7c))
 ROM_END
 
 ROM_START(jd367)
 	CPU_ROM_L196
 
-	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_REGION(0x080000, "mask_rom", 0)
 	ROM_LOAD("d23c4001ejgw-c42.ic2", 0x00000, 0x080000, CRC(330a8f4f) SHA1(00a822c7e1ce001be45ff2d6a9b15e2bd20e05f0))
 ROM_END
 
