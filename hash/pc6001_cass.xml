@@ -35,7 +35,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 	<software name="amita" supported="partial">
 		<description>Amita</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
         <info name="usage" value="Mode 1, Page 2" />
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="2755">
@@ -47,7 +47,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 	<software name="block" supported="partial">
 		<description>Block</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
         <info name="usage" value="Mode 1, Page 2" />
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="4837">
@@ -85,7 +85,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 	<software name="earthbnd" supported="partial">
 		<description>Earthbound</description>
 		<year>1984</year>
-		<publisher>X'tal Soft</publisher>
+		<publisher>Xtal Soft</publisher>
         <info name="usage" value="Mode 2, Page 2" />
 		<info name="alt_title" value="アースバウンド"/>
 		<part name="cart" interface="pc6001_cass">
@@ -136,7 +136,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 	<software name="power" supported="partial">
 		<description>Power Knight</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
         <info name="usage" value="Mode 1, Page 1" />
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="13612">
@@ -176,6 +176,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>ASCII</publisher>
         <info name="usage" value="Mode 4, Page 3 - PC-6001 requires N60 Extended BASIC cartridge" />
 		<info name="alt_title" value="スペース・エネミー"/>
+		<sharedfeat name="requirement" value="pc6001_cart:n60basic"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="5579">
 				<rom name="space enemy.cas" size="5579" crc="6601f428" sha1="4d922cef648f9efe001f25920bf1874ca5cbde52"/>
@@ -186,7 +187,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 	<software name="suprball" supported="partial">
 		<description>Super Ball</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
         <info name="usage" value="Mode 2, Page 2" />
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="18114">
@@ -214,6 +215,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 		<publisher>Dempa Micomsoft</publisher>
         <info name="usage" value="Mode 4, Page 2 - PC-6001 requires N60 Extended BASIC cartridge" />
 		<info name="alt_title" value="タイニーゼビウス"/>
+		<sharedfeat name="requirement" value="pc6001_cart:n60basic"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="17741">
 				<rom name="tiny xevious.cas" size="17741" crc="5e9e2dbf" sha1="90e2b187f3b042ef1883105a34e83fe69a58e38f"/>

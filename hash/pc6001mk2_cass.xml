@@ -54,7 +54,7 @@ If usage specifies MONITOR:
 	<software name="castleex" supported="partial">
 		<description>Castle Excellent</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>ASCII</publisher>
         <info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="キャッスルエクセレント"/>
 		<part name="cart" interface="pc6001_cass">
@@ -67,7 +67,7 @@ If usage specifies MONITOR:
 	<software name="chackpop" supported="partial">
 		<description>Chack 'n Pop</description>
 		<year>1984</year>
-		<publisher>Hidecom-Carry</publisher>
+		<publisher>Nidecom Carry</publisher>
         <info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
 		<part name="cart" interface="pc6001_cass">
@@ -81,6 +81,7 @@ If usage specifies MONITOR:
 		<description>Chrith Ai no Tabidachi</description>
 		<year>19??</year>
 		<publisher>Comix</publisher>
+		<notes><![CDATA[Comix is a Koei spinoff]]></notes>
         <info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="クリス愛の旅立ち"/>
 		<part name="cart" interface="pc6001_cass">
@@ -207,7 +208,7 @@ If usage specifies MONITOR:
 	</software>
 
 	<software name="plazmaln" supported="partial">
-		<description>Plazma</description>
+		<description>Plazma Line</description>
 		<year>19??</year>
 		<publisher>Techno Soft</publisher>
         <info name="usage" value="Mode 5, Page 3, BASIC" />
@@ -222,7 +223,7 @@ If usage specifies MONITOR:
 	<software name="pbmario" supported="partial">
 		<description>Punchball Mario</description>
 		<year>1983</year>
-		<publisher>Nintendo</publisher>
+		<publisher>Nintendo / Hudson Soft</publisher>
         <info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
 		<part name="cart" interface="pc6001_cass">
