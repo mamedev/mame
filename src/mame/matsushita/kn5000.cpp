@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "bus/technics/kn5000/hdae5000.h"
+#include "bus/midi/midi.h"
 #include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
 #include "machine/gen_latch.h"
@@ -15,6 +16,7 @@
 #include "video/pc_vga.h"
 #include "screen.h"
 #include "kn5000.lh"
+#include "kn5000_cpanel.h"
 
 class mn89304_vga_device : public svga_device
 {
@@ -91,6 +93,7 @@ class kn5000_state : public driver_device
 public:
 	kn5000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cpanel(*this, "cpanel")
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_maincpu_latch(*this, "maincpu_latch")
@@ -112,6 +115,7 @@ public:
 	void kn5000(machine_config &config);
 
 private:
+	required_device<kn5000_cpanel_device> m_cpanel;
 	required_device<tmp94c241_device> m_maincpu;
 	required_device<tmp94c241_device> m_subcpu;
 	required_device<generic_latch_8_device> m_maincpu_latch;
@@ -144,6 +148,7 @@ private:
 void kn5000_state::maincpu_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC9, IC10 (CS3)
+	map(0x008d7c, 0x008d7c).lr8(NAME([this] (offs_t o) { return 0x09; })); // Fool the self-test at address FB7824 of Program ROM v10 ;-) We still need proper HLE of the control panel MCUs.
 	map(0x008e4a, 0x008e54).r(FUNC(kn5000_state::cpanel_right_buttons_r));
 	map(0x008e5a, 0x008e64).r(FUNC(kn5000_state::cpanel_left_buttons_r));
 	map(0x008f38, 0x008f39).w(FUNC(kn5000_state::cpanel_leds_w));
@@ -728,8 +733,21 @@ void kn5000_state::kn5000(machine_config &config)
 
 
 	// RX0/TX0 = MRXD/MTXD
+	auto &mdin(MIDI_PORT(config, "mdin"));
+	midiin_slot(mdin);
+	mdin.rxd_handler().set(m_maincpu->m_serial[0], FUNC(tmp94c241_serial_device::rxd));
+
+	// TODO: MIDI output
+	// midiout_slot(MIDI_PORT(config, "mdout"));
+
 	// RX1/TX1 = CPDATA
-	// SCLK1   = CPSCK
+	// SCLK1 = CPSCK
+	auto &m_cpanel(KN5000_CPANEL(config, "cpanel"));
+	m_maincpu->m_serial[1].lookup()->txd().set(m_cpanel, FUNC(kn5000_cpanel_device::serial_in));
+	m_maincpu->m_serial[1].lookup()->sclk_out().set(m_cpanel, FUNC(kn5000_cpanel_device::sck_in));
+	m_cpanel.serial_out().set(m_maincpu->m_serial[1], FUNC(tmp94c241_serial_device::rxd));
+//	m_cpanel.sck_out().set(m_maincpu->m_serial[1], FUNC(tmp94c241_serial_device::sclk_in));
+
 
 	// AN0 = EXP (expression pedal?)
 	// AN1 = AFT
