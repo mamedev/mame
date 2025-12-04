@@ -72,7 +72,8 @@ public:
 		m_copro_data(*this, "copro_data"),
 		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
-		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
+		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"}),
+		m_lamps(*this, "lamp%u", 0U)		
 	{ }
 
 	/* Public for access by the rendering functions */
@@ -101,6 +102,7 @@ public:
 	void init_sgt24h();
 	void init_srallyc();
 	void init_powsledm();
+	void lamp_output_w(u8 data);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -135,7 +137,8 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_lightgun_ports;
-
+	output_finder<6> m_lamps;
+	
 	u32 m_timervals[4]{};
 	u32 m_timerorig[4]{};
 	int m_timerrun[4]{};
@@ -525,7 +528,6 @@ public:
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
-	void overrev2b(machine_config &config);
 	void powsled(machine_config &config);
 	void rchase2(machine_config &config);
 	void gunblade(machine_config &config);
