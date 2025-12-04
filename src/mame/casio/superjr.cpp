@@ -49,7 +49,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void install_program_rom();
+	void install_program_rom() ATTR_COLD;
 
 	void kol_w(u8 data);
 	void koh_w(u8 data);
@@ -88,9 +88,10 @@ void superjr_state::install_program_rom()
 	// TODO: RAM writes are done at segment 0x84 (address 0x840000),
 	// while program ROMs are loaded at segment 0x80, even if they are larger than 0x40000 bytes.
 	// Confirm if the rest of the program ROM is mapped on other segments besides 0x80..0x83.
+	auto *const rom = memregion("mask_rom");
 	const u32 base_address = 0x800000;
-	const u32 memory_size = std::min(memregion("mask_rom")->bytes(), (u32)0x40000);
-	m_maincpu->space(AS_PROGRAM).install_rom(base_address, base_address + memory_size - 1, memregion("mask_rom")->base());
+	const u32 memory_size = std::min(rom->bytes(), u32(0x40000));
+	m_maincpu->space(AS_PROGRAM).install_rom(base_address, base_address + memory_size - 1, rom->base());
 }
 
 void superjr_state::superjr_palette(palette_device &palette) const
