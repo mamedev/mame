@@ -403,6 +403,7 @@ void mz_state::mz700(machine_config &config)
 	m_cassette->set_interface("mz_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mz700_cass");
+	SOFTWARE_LIST(config, "cass_list_80k").set_compatible("mz80k_cass");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
