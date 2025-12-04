@@ -1264,6 +1264,7 @@ void model2_state::lamp_output_w(u8 data)
 		m_lamps[i] = BIT(data, i + 2);
 }
 
+
 //**************************************************************************
 //  I/O BOARD
 //**************************************************************************
@@ -2697,6 +2698,7 @@ void model2o_state::desert(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STEER");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
+	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 }
 
 void model2o_state::vcop(machine_config &config)
