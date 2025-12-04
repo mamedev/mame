@@ -420,6 +420,10 @@ ROM_START( goldnegg )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "golden_u72_usa.u72", 0x00000, 0x40000, CRC(a636f06b) SHA1(57a4a809ea0f955482f04cc7aedb5bed1c83aca8) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8h-25.u40",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h-25pc4.u19", 0x200, 0x157, NO_DUMP )
 ROM_END
 
 } // anonymous namespace
