@@ -46,6 +46,26 @@
 				]]></data>
 		</image>
 	</element>
+	<element name="media_cartridge">
+		<image state="0" statemask="0x0001">
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="53" height="24" viewBox="0 0 53 24">
+						<rect x="0" y="0" width="53" height="24" rx="0" fill="#303030" stroke="none" />
+					</svg>
+				]]></data>
+		</image>
+		<image state="0x0001" statemask="0x0001">
+			<data>
+				<![CDATA[
+					<svg x="0" y="0" width="53" height="24" viewBox="0 0 53 24">
+						<rect x="0" y="0" width="53" height="24" rx="0" fill="#101010" stroke="none" />
+						<path d="M1.5 14l1 10h48l1 -10 -1 -9h-48z" fill="#444444" stroke="none" />
+						<rect x="10.5" y="14" width="32" height="10" rx="0" fill="#bbbbbb" stroke="none" />
+					</svg>
+				]]></data>
+		</image>
+	</element>
 	<element name="drawing_fake_ensoniq">
 		<image>
 			<bounds x="0" y="0" width="72" height="13" />
@@ -71,7 +91,7 @@
 				]]></data>
 		</image>
 	</element>
-	<element name="drawing_wheel_and_floppy_area">
+	<element name="drawing_wheel_and_floppy_drive_area">
 		<image>
 			<bounds x="0" y="0" width="118" height="161" />
 			<data>
@@ -135,11 +155,6 @@
 	<element name="rect_body_down">
 		<rect>
 			<color red="0.062745" green="0.062745" blue="0.062745" />
-		</rect>
-	</element>
-	<element name="rect_body_up">
-		<rect>
-			<color red="0.18824" green="0.18824" blue="0.18824" />
 		</rect>
 	</element>
 	<element name="rect_body">
@@ -2354,10 +2369,10 @@
 			<bounds x="479" y="102" width="24.5" height="1.2" />
 		</element>
 		<element ref="rect_body_down">
-			<bounds x="720" y="22" width="56" height="27" />
+			<bounds x="720" y="22" width="57" height="28" />
 		</element>
-		<element ref="rect_body_up">
-			<bounds x="721.5" y="23.5" width="53" height="24" />
+		<element name="media" ref="media_cartridge">
+			<bounds x="722" y="24" width="53" height="24" />
 		</element>
 		<element ref="rect_body">
 			<bounds x="0" y="121.5" width="845" height="170" />
@@ -2377,7 +2392,7 @@
 		<element ref="drawing_storage_cutout">
 			<bounds x="-127" y="13" width="118" height="96" />
 		</element>
-		<element ref="drawing_wheel_and_floppy_area">
+		<element ref="drawing_wheel_and_floppy_drive_area">
 			<bounds x="-127" y="129.5" width="118" height="162" />
 		</element>
 		<element ref="ellipse_screwhead">
@@ -2387,7 +2402,7 @@
 			<bounds x="837" y="129.5" width="6" height="6" />
 		</element>
 		<element ref="text_L_cartridge">
-			<bounds x="720" y="16.877" width="56" height="4.4412" />
+			<bounds x="720" y="16.877" width="57" height="4.4412" />
 		</element>
 		<element ref="text_S_dynamic_component_synthesizer">
 			<bounds x="13" y="7" width="88" height="4.4412" />
