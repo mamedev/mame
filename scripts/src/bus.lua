@@ -5569,6 +5569,8 @@ if (BUSES["PC98_CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2dd.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2hd.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2hd.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/lgy98.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/lgy98.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/lha201.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/lha201.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mif201.cpp",

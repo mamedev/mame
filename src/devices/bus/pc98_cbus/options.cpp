@@ -7,6 +7,7 @@
 #include "amd98.h"
 #include "fdd_2dd.h"
 #include "fdd_2hd.h"
+#include "lgy98.h"
 #include "lha201.h"
 #include "pc9801_02.h"
 #include "pc9801_14.h"
@@ -70,6 +71,8 @@ void pc98_cbus_devices(device_slot_interface &device)
 	// Logitec
 	device.option_add("lha201", LHA201);
 
+	// Ethernet
+	device.option_add("lgy98", LGY98);
 
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);

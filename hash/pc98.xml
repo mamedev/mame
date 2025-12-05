@@ -70253,36 +70253,42 @@ Driver disks for [C-Bus] network cards
 ]]></notes>
 		<!-- TODO: likely 3.5" -->
 		<part name="flop1" interface="floppy_5_25">
+			<!-- DOS SETUP -->
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="disk1.hdm" size="1261568" crc="415787c1" sha1="2fe41958ac8e905453bf57c412da1220e40a15f1" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<!-- DOS WORKSTATION -->
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="disk2.hdm" size="1261568" crc="55547c26" sha1="a7a03e09e510d669d8f22bea01f3ea898f341229" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<!-- DOS DRIVERS -->
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="disk3.hdm" size="1261568" crc="dfe8260a" sha1="328ba94b6ab07b54d8d263137c267fbd53828808" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<!-- NETWARE client -->
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="disk4.hdm" size="1261568" crc="840eba05" sha1="b68040f17d677a523df2882634990c74bbbf1f3c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
+			<!-- Windows 3.1 related -->
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="disk5.hdm" size="1261568" crc="c5fd9f25" sha1="bb421c7af54c91d377535876fd11d80362a73c42" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_5_25">
+			<!-- Windows 3.1 related? -->
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="disk6.hdm" size="1261568" crc="6b45307b" sha1="3ad3124069a074dc84e62454908007ffe9517e0f" offset="0" />
