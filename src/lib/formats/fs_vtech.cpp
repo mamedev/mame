@@ -7,6 +7,8 @@
 #include "fsblk.h"
 #include "vt_dsk.h"
 
+#include <algorithm>
+
 using namespace fs;
 
 namespace fs { const vtech_image VTECH; }
@@ -16,6 +18,7 @@ namespace fs { const vtech_image VTECH; }
 //
 // Track 0 sectors 0-14 have the file names.  16 bytes/entry
 //   offset 0  : File type 'T' (basic), 'B' (binary), or some other letter (application-specific)
+//               0x00 = end of directory, 0x01 = deleted file
 //   offset 1  : 0x3a
 //   offset 2-9: File name
 //   offset a  : Track number of first file sector
@@ -152,10 +155,12 @@ std::tuple<fsblk_t::block_t::ptr, u32> vtech_impl::file_find(std::string_view na
 {
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_blockdev.get(sect);
-		for(u32 i = 0; i != 8; i ++) {
+		for(u32 i = 0; i != 8; i++) {
 			u32 off = i*16;
 			u8 type = bdir->r8(off);
-			if(type < 'A' || type > 'Z')
+			if(type == 0x00)
+				return std::make_tuple(fsblk_t::block_t::ptr(), 0xffffffff);
+			if(type == 0x01)
 				continue;
 			if(bdir->r8(off+1) != ':')
 				continue;
@@ -218,10 +223,12 @@ std::pair<std::error_condition, std::vector<dir_entry>> vtech_impl::directory_co
 
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_blockdev.get(sect);
-		for(u32 i = 0; i != 8; i ++) {
+		for(u32 i = 0; i != 8; i++) {
 			u32 off = i*16;
 			u8 type = bdir->r8(off);
-			if(type < 'A' || type > 'Z')
+			if(type == 0x00)
+				return res;
+			if(type == 0x01)
 				continue;
 			if(bdir->r8(off+1) != ':')
 				continue;
@@ -262,10 +269,10 @@ std::error_condition vtech_impl::file_create(const std::vector<std::string> &pat
 	// Find the key for the next unused entry
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_blockdev.get(sect);
-		for(u32 i = 0; i != 16; i ++) {
+		for(u32 i = 0; i != 8; i++) {
 			u32 off = i*16;
 			u8 type = bdir->r8(off);
-			if(type != 'T' && type != 'B') {
+			if(type == 0x00 || type == 0x01) {
 				std::string fname = meta.get_string(meta_name::name, "");
 				fname.resize(8, ' ');
 
@@ -304,9 +311,7 @@ std::pair<std::error_condition, std::vector<u8>> vtech_impl::file_read(const std
 		if(track >= 40 || sector >= 16)
 			break;
 		auto dblk = m_blockdev.get(track*16 + sector);
-		int size = len - pos;
-		if(size > 126)
-			size = 126;
+		int size = std::min(len - pos, 126);
 		dblk->read(0, data.data() + pos, size);
 		pos += size;
 		track = dblk->r8(126);
@@ -348,12 +353,10 @@ std::error_condition vtech_impl::file_write(const std::vector<std::string> &path
 	free_blocks(tofree);
 
 	std::vector<std::pair<u8, u8>> blocks = allocate_blocks(need_ns);
-	for(u32 i=0; i != need_ns; i ++) {
+	for(u32 i=0; i != need_ns; i++) {
 		auto dblk = m_blockdev.get(blocks[i].first * 16 + blocks[i].second);
-		u32 len = new_len - i*126;
-		if(len > 126)
-			len = 126;
-		else if(len < 126)
+		u32 len = std::min<u32>(new_len - i*126, 126);
+		if(len < 126)
 			dblk->fill(0x00);
 		dblk->write(0, data.data() + 126*i, len);
 		if(i < need_ns) {
