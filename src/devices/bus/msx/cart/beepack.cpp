@@ -72,7 +72,7 @@ std::pair<std::error_condition, std::string> msx_cart_beepack_device::call_load(
 
 std::string msx_cart_beepack_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("nomapper");
+	return software_get_default_slot(hook.image_name(), "nomapper");
 }
 
 

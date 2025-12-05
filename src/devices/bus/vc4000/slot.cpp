@@ -238,7 +238,7 @@ std::string vc4000_cart_slot_device::get_default_card_software(get_default_card_
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("std");
+	return software_get_default_slot(hook.image_name(), "std");
 }
 
 /*-------------------------------------------------

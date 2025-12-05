@@ -150,18 +150,18 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
+	strcat(m_localhost, machine().options().comm_localhost());
 	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
+	strcat(m_localhost, machine().options().comm_localport());
 
 	// prepare remotehost "filename"
 	m_remotehost[0] = 0;
 	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
+	strcat(m_remotehost, machine().options().comm_remotehost());
 	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	strcat(m_remotehost, machine().options().comm_remoteport());
 
-	m_framesync = mconfig.options().comm_framesync() ? 0x01 : 0x00;
+	m_framesync = machine().options().comm_framesync() ? 0x01 : 0x00;
 #endif
 }
 

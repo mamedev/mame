@@ -155,7 +155,7 @@ public:
 	bool side_effects_disabled() const { return m_side_effects_disabled != 0; }
 
 	// additional helpers
-	emu_options &options() const { return m_config.options(); }
+	emu_options& options() const;
 	attotime time() const noexcept { return m_scheduler.time(); }
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 	bool allow_logging() const { return !m_logerror_list.empty(); }

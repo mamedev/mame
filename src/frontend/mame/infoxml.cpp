@@ -693,7 +693,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 {
 	using util::xml::normalize_string;
 
-	machine_config config(driver, drivlist.options());
+	machine_config config(driver);
 	device_enumerator iter(config.root_device());
 
 	// allocate input ports and build overall emulation status

@@ -83,7 +83,7 @@ std::string segaai_card_slot_device::get_default_card_software(get_default_card_
 		return std::string(length == 0x40000 ? ROM_256 : ROM_128);
 	}
 
-	return software_get_default_slot(ROM_128);
+	return software_get_default_slot(hook.image_name(), ROM_128);
 }
 
 

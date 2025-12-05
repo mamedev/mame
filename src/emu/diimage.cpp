@@ -1299,11 +1299,10 @@ std::error_condition device_image_interface::load_software_part(std::string_view
 //  software_get_default_slot
 //-------------------------------------------------
 
-std::string device_image_interface::software_get_default_slot(std::string_view default_card_slot) const
+std::string device_image_interface::software_get_default_slot(std::string_view image_name, std::string_view default_card_slot) const
 {
 	std::string result;
 
-	const std::string &image_name(device().mconfig().options().image_option(instance_name()).value());
 	if (!image_name.empty())
 	{
 		result.assign(default_card_slot);

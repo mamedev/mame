@@ -129,7 +129,7 @@ std::string aquarius_cartridge_slot_device::get_default_card_software(get_defaul
 		return std::string(slot_string);
 	}
 	else
-		return software_get_default_slot("rom");
+		return software_get_default_slot(hook.image_name(), "rom");
 }
 
 //-------------------------------------------------

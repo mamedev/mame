@@ -1043,7 +1043,7 @@ std::string gb_cart_slot_device::get_default_card_software(get_default_card_soft
 	}
 
 	// this will return the explicit setting for a software list item
-	return software_get_default_slot(slotoptions::GB_STD);
+	return software_get_default_slot(hook.image_name(), slotoptions::GB_STD);
 }
 
 

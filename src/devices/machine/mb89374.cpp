@@ -109,16 +109,16 @@ mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, 
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
+	strcat(m_localhost, machine().options().comm_localhost());
 	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
+	strcat(m_localhost, machine().options().comm_localport());
 
 	// prepare remotehost "filename"
 	m_remotehost[0] = 0;
 	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
+	strcat(m_remotehost, machine().options().comm_remotehost());
 	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
+	strcat(m_remotehost, machine().options().comm_remoteport());
 }
 
 

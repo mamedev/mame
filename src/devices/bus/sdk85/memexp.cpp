@@ -42,7 +42,7 @@ std::pair<std::error_condition, std::string> sdk85_romexp_device::call_load()
 
 std::string sdk85_romexp_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("i8755");
+	return software_get_default_slot(hook.image_name(), "i8755");
 }
 
 void sdk85_romexp_device::device_start()

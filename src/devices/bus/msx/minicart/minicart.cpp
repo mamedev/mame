@@ -31,5 +31,5 @@ void msx_slot_yamaha_minicart_device::device_start()
 std::string msx_slot_yamaha_minicart_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	using namespace bus::msx::minicart::slotoptions;
-	return software_get_default_slot(NOMAPPER);
+	return software_get_default_slot(hook.image_name(), NOMAPPER);
 }

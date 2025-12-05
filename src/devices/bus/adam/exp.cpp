@@ -107,7 +107,7 @@ std::pair<std::error_condition, std::string> adam_expansion_slot_device::call_lo
 
 std::string adam_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("standard");
+	return software_get_default_slot(hook.image_name(), "standard");
 }
 
 

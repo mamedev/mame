@@ -180,7 +180,7 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 		}
 		return std::string(get_cart_type(&rom[0], length));
 	}
-	return software_get_default_slot(bus::msx::cart::slotoptions::NOMAPPER);
+	return software_get_default_slot(hook.image_name(), bus::msx::cart::slotoptions::NOMAPPER);
 }
 
 

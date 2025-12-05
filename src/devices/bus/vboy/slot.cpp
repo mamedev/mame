@@ -127,7 +127,7 @@ std::string vboy_cart_slot_device::get_default_card_software(get_default_card_so
 	}
 	else
 	{
-		std::string const image_name(mconfig().options().image_option(instance_name()).value());
+		auto image_name = hook.image_name();
 		software_part const *const part(!image_name.empty() ? find_software_item(image_name, true) : nullptr);
 		if (part)
 		{

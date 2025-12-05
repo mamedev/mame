@@ -169,7 +169,7 @@ std::string z88cart_slot_device::get_default_card_software(get_default_card_soft
 			fatalerror("%s: %s:%d %s\n", tag(), err.category().name(), err.value(), err.message());
 	}
 
-	return software_get_default_slot("128krom");
+	return software_get_default_slot(hook.image_name(), "128krom");
 }
 
 

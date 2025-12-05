@@ -193,7 +193,7 @@ std::string astrocade_cart_slot_device::get_default_card_software(get_default_ca
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("rom");
+	return software_get_default_slot(hook.image_name(), "rom");
 }
 
 /*-------------------------------------------------

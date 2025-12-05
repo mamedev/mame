@@ -72,7 +72,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	, m_soft_reset_timer(nullptr)
 	, m_rand_seed(0x9d14abd7)
 	, m_basename(_config.gamedrv().name)
-	, m_sample_rate(_config.options().sample_rate())
+	, m_sample_rate(manager.options().sample_rate())
 	, m_saveload_schedule(saveload_schedule::NONE)
 	, m_saveload_schedule_time(attotime::zero)
 	, m_saveload_searchpath(nullptr)
@@ -1096,6 +1096,16 @@ void running_machine::postload_all_devices()
 {
 	for (device_t &device : device_enumerator(root_device()))
 		device.post_load();
+}
+
+
+//-------------------------------------------------
+//  options - convenience accessor for emu_options
+//-------------------------------------------------
+
+emu_options &running_machine::options() const
+{
+	return manager().options();
 }
 
 

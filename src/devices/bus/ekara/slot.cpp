@@ -195,7 +195,7 @@ std::string ekara_cart_slot_device::get_default_card_software(get_default_card_s
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("plain");
+	return software_get_default_slot(hook.image_name(), "plain");
 }
 
 /*-------------------------------------------------

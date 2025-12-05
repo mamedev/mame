@@ -101,6 +101,7 @@ public:
 	};
 
 	// construction/destruction
+	machine_config(const game_driver& gamedrv);
 	machine_config(const game_driver &gamedrv, emu_options &options);
 	~machine_config();
 
@@ -108,7 +109,6 @@ public:
 	const game_driver &gamedrv() const { return m_gamedrv; }
 	device_t &root_device() const { assert(m_root_device); return *m_root_device; }
 	device_t &current_device() const { assert(m_current_device); return *m_current_device; }
-	emu_options &options() const { return m_options; }
 	device_t *device(const char *tag) const { return root_device().subdevice(tag); }
 	template <class DeviceClass> DeviceClass *device(const char *tag) const { return downcast<DeviceClass *>(device(tag)); }
 	attotime maximum_quantum(attotime const &default_quantum) const;
@@ -227,6 +227,8 @@ public:
 	device_t *device_remove(const char *tag);
 
 private:
+	machine_config(const game_driver &gamedrv, emu_options *options);
+
 	class current_device_stack;
 	typedef std::map<char const *, internal_layout const *, bool (*)(char const *, char const *)> default_layout_map;
 	typedef std::map<char const *, attotime, bool (*)(char const *, char const *)> maximum_quantum_map;
@@ -241,7 +243,6 @@ private:
 
 	// internal state
 	game_driver const &                 m_gamedrv;
-	emu_options &                       m_options;
 	std::unique_ptr<device_t>           m_root_device;
 	default_layout_map                  m_default_layouts;
 	device_t *                          m_current_device;

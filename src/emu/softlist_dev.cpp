@@ -275,10 +275,11 @@ const software_info *software_list_device::find(std::string_view look_for)
 
 
 //-------------------------------------------------
-//  parse - parse our softlist file
+//  parse_if_necessary - parse our softlist file if
+//  it has not been parsed yet
 //-------------------------------------------------
 
-void software_list_device::parse()
+void software_list_device::parse_if_necessary(const emu_options &options)
 {
 	// skip if done
 	if (m_parsed)
@@ -288,7 +289,7 @@ void software_list_device::parse()
 	m_errors.clear();
 
 	// attempt to open the file
-	emu_file file(mconfig().options().hash_path(), OPEN_FLAG_READ);
+	emu_file file(options.hash_path(), OPEN_FLAG_READ);
 	const std::error_condition filerr = file.open(m_list_name + ".xml");
 	m_filename = file.filename();
 	if (!filerr)

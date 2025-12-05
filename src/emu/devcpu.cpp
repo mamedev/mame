@@ -49,7 +49,7 @@ cpu_device::~cpu_device()
 
 bool cpu_device::allow_drc() const
 {
-	return mconfig().options().drc() && !m_force_no_drc;
+	return machine().options().drc() && !m_force_no_drc;
 }
 
 

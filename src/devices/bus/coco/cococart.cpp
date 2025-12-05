@@ -636,7 +636,7 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 	}
 
 	// lookup the default slot
-	return software_get_default_slot(coco_rpk_cardslottypes[pcb_type]);
+	return software_get_default_slot(hook.image_name(), coco_rpk_cardslottypes[pcb_type]);
 }
 
 

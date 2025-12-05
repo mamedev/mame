@@ -810,7 +810,7 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
 		return std::string(slot_string);
 	}
 	else
-		return software_get_default_slot("nrom");
+		return software_get_default_slot(hook.image_name(), "nrom");
 }
 
 

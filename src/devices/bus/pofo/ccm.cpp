@@ -110,7 +110,7 @@ const software_list_loader &portfolio_memory_card_slot_device::get_software_list
 
 std::string portfolio_memory_card_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("rom");
+	return software_get_default_slot(hook.image_name(), "rom");
 }
 
 

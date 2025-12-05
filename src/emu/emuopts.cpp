@@ -811,7 +811,11 @@ std::string emu_options::get_default_card_software(device_slot_interface &slot)
 	}
 
 	// create the hook
-	get_default_card_software_hook hook(image_path, std::move(get_hashfile_extrainfo));
+	get_default_card_software_hook hook(std::move(image_path), std::move(get_hashfile_extrainfo));
+
+	// ensure the software lists are parsed
+	for (software_list_device &swlistdev : software_list_device_enumerator(slot.device().mconfig().root_device()))
+		swlistdev.parse_if_necessary(*this);
 
 	// and invoke the slot's implementation of get_default_card_software()
 	return slot.get_default_card_software(hook);
@@ -932,6 +936,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 			{
 				if (list_name.empty() || (list_name == swlistdev.list_name()))
 				{
+					swlistdev.parse_if_necessary(*this);
 					const software_info *swinfo = swlistdev.find(software_name);
 					if (swinfo != nullptr)
 					{
