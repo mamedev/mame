@@ -139,12 +139,12 @@ Language:
 |        | 80-084326(PT)     | Sininho (84336 on cart)                                                                   |
 |   XX   | 80-084327(SP)     | Campanilla                                                                                |
 +========+===================+===========================================================================================+
-|   XX   | 80-084340(US)     | Up!                                                                                       |
-|        | 80-084342(NL)     | Up!                                                                                       |
+|   XX   | 80-084340(US)     | Up                                                                                        |
+|        | 80-084342(NL)     | Up                                                                                        |
 |        | 80-084344(GE)     | Oben                                                                                      |
 |   XX   | 80-084345(FR)     | Là-Haut                                                                                   |
-|   XX   | 80-084347(SP)     | Up!                                                                                       |
-|        | 80-084347-022(SP) | Up!  (-022 is odd for SP)                                                                 |
+|   XX   | 80-084347(SP)     | Up                                                                                        |
+|        | 80-084347-022(SP) | Up  (-022 is odd for SP)                                                                  |
 +========+===================+===========================================================================================+
 |   XX   | 80-084360(US)     | Handy Manny                                                                               |
 |        | 80-084362(NL)     | Handy Manny                                                                               |
@@ -155,7 +155,8 @@ Language:
 |        | 80-084367(SP)     | Manny Manitas                                                                             |
 +========+===================+===========================================================================================+
 |   XX   | 80-084380(US)     | Winnie the Pooh - The Honey Hunt                                                          |
-|        |          (IT)     | Winnie the Pooh - e la caccia al miele  ???                                               |
+|        |          (IT)     | Winnie the Pooh - e la caccia al miele                                                    |
+|   XX   | 80-084382(NL)     | Winnie the Pooh - De Wonderwereld van Poeh                                                |
 |        | 80-084383(UK)     | Winnie the Pooh - The Honey Hunt                                                          |
 |   XX   | 80-084384(GE)     | Winnie Puuh - Die Honigjagd                                                               |
 |   XX   | 80-084385(FR)     | Winnie L'ourson - La Chasse au miel de Winnie                                             |
@@ -200,18 +201,14 @@ Language:
 |        | 80-084487(SP)     | Tiana y el Sapo - El gran sueño de Tiana                                                  |
 +========+===================+===========================================================================================+
 |   XX   | 80-084500(US)     | Shrek Forever After                                                                       |
-|        | 80-084502(NL)     | Sjrek voor eeuwig en altijd                                                               |
+|        | 80-084502(NL)     | Shrek voor eeuwig en altijd                                                               |
 |        | 80-084503(UK)     | Shrek Forever After                                                                       |
 |   XX   | 80-084504(GE)     | Fuer immer Shrek                                                                          |
 |   XX   | 80-084505(FR)     | Shrek 4 - Il était une fin                                                                |
 |        | 80-084507(SP)     | Shrek Felices para siempre                                                                |
 +========+===================+===========================================================================================+
-|        | 80-084520(US)     | <Unknown>                                                                                 |
-+========+===================+===========================================================================================+
 |   XX   | 80-084540(US)     | Super Why to the Rescue! - The Beach Day Mystery                                          |
 |   **   | 80-084541(US)     | Super Why to the Rescue! - The Beach Day Mystery (pocket version, same ROM as 084540(US)  |
-+========+===================+===========================================================================================+
-|        | 80-084560(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084580(US)     | Cars 2  (motion version)                                                                  |
 |   XX   | 80-084581(US)     | Cars 2  (pocket version)                                                                  |
@@ -220,18 +217,15 @@ Language:
 |   XX   | 80-084585(FR)     | Cars 2                                                                                    |
 |        | 80-084587(SP)     | Cars 2                                                                                    |
 +========+===================+===========================================================================================+
-|        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)               |
 |        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes                                                    |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland                                                       |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland (rev. 2?)                                             |
 |   XX   | 80-084605(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                               |
 +========+===================+===========================================================================================+
-|        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                                         |
 |        | 80-084624(GE)     | Findet Nemo - Nemos Unterwasserabenteuer                                                  |
 |   XX   | 80-084625(FR)     | Le Monde de Nemo - Nemo à la decourverte de l'océan                                       |
 |        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                                             |
 +========+===================+===========================================================================================+
-|        | 80-084640(US)     | <Unknown> (Should be Orange colored SpongeBob)                                            |
 |   XX   | 80-084644(GE)     | SpongeBob Schwammkopf - Der Tag des Schwamms                                              |
 |        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                                            |
 +========+===================+===========================================================================================+
