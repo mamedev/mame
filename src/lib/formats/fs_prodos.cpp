@@ -11,6 +11,7 @@
 #include "corestr.h"
 #include "strformat.h"
 
+#include <algorithm>
 #include <map>
 
 using namespace fs;
@@ -483,7 +484,10 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::any_read(u8 type, 
 		auto iblk = m_blockdev.get(block);
 		for(u32 i=0; i != 256 && dst != end; i++) {
 			u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
-			m_blockdev.get(blk)->read(0, dst, 512);
+			if(blk)
+				m_blockdev.get(blk)->read(0, dst, 512);
+			else
+				std::fill_n(dst, 512, 0);
 			dst += 512;
 		}
 		break;
@@ -496,7 +500,10 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::any_read(u8 type, 
 			auto iblk = m_blockdev.get(mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8));
 			for(u32 i=0; i != 256 && dst != end; i++) {
 				u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
-				m_blockdev.get(blk)->read(0, dst, 512);
+				if(blk)
+					m_blockdev.get(blk)->read(0, dst, 512);
+				else
+					std::fill_n(dst, 512, 0);
 				dst += 512;
 			}
 		}
