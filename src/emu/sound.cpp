@@ -490,7 +490,7 @@ void sound_stream::internal_set_sample_rate(u32 new_rate)
 
 	if(m_started) {
 		if(m_samples_to_update > 0)
-			fatalerror("Error: set_sample_rate called while in steam_update\n");
+			fatalerror("Error: set_sample_rate called while in stream_update\n");
 
 		update();
 		m_output_buffer.resample(m_sample_rate, new_rate, m_sync_time, m_device.machine().time());
