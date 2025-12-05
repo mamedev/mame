@@ -7,13 +7,22 @@
   And there's a text string in the ROM that says: "Music by: SunKiss Chen"
 
   Driver by Felipe Sanches
-
+ 
   TODO:
   * Figure out where exactly all devices are mapped to (the devices are
     2 sound chips, the 2kb SRAM, the 8bit DIP switches,
     31 LEDs, 13 modules of double-digit 7-seg displays and 4 push-buttons).
   * we may also have user inputs from the coin slot and from the
     cabinet buttons, for making bets.
+  * P1 bits are:
+    P1.0 ENABLE (output)
+    P1.1 入表 (output)
+    P1.2 出表 (output)
+    P1.3 SSR (output)
+    P1.4 入表檢查 (input)
+    P1.5 出表檢查 (input)
+    P1.6 HOPPER SW (input)
+    P1.7 洗分 SW (input)
 
 **************************************************************************/
 
@@ -21,6 +30,7 @@
 
 #include "cpu/mcs51/i80c51.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -38,6 +48,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
 		, m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" })
+		, m_hopper(*this, "hopper")
 	{ }
 
 	void marywu(machine_config &config);
@@ -52,6 +63,7 @@ private:
 	void ay1_port_b_w(uint8_t data);
 	void ay2_port_a_w(uint8_t data);
 	void ay2_port_b_w(uint8_t data);
+	void p1_port_w(uint8_t data);
 	uint8_t keyboard_r();
 	void data_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
@@ -61,6 +73,8 @@ private:
 	output_finder<32> m_digits;
 	output_finder<30> m_leds;
 	required_ioport_array<4> m_inputs;
+	required_device<hopper_device> m_hopper;
+
 };
 
 static INPUT_PORTS_START( marywu )
@@ -75,7 +89,7 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I)
 
 	PORT_START("KEYS2")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN1)  PORT_IMPULSE(01) PORT_CODE(KEYCODE_A) // If press or IP_ACTIVE_LOW or press will cause error 30.
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN1)  PORT_IMPULSE(01) PORT_CODE(KEYCODE_A) // If press or IP_ACTIVE_LOW will cause error 30.
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
@@ -102,9 +116,14 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P1.6") PORT_CODE(KEYCODE_C) // If press or IP_ACTIVE_LOW Will cause Error 30 if press
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_KEYPAD) PORT_NAME("P1.7") PORT_CODE(KEYCODE_V) // If press during startup, it will cause error 76.
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Clear credits?") PORT_CODE(KEYCODE_V) // If press during startup, it will cause error 76.
 INPUT_PORTS_END
+
+void marywu_state::p1_port_w(uint8_t data)
+{
+        m_hopper->motor_w(BIT(data, 3));
+}
 
 void marywu_state::ay1_port_a_w(uint8_t data)
 {
@@ -190,6 +209,9 @@ void marywu_state::marywu(machine_config &config)
 	maincpu.set_addrmap(AS_DATA, &marywu_state::data_map);
 	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 	maincpu.port_in_cb<1>().set_ioport("P1");
+	maincpu.port_out_cb<1>().set(FUNC(marywu_state::p1_port_w));
+   
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // Guessed.
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
