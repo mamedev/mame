@@ -1,0 +1,710 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<!-- general grey backdrop -->
+	<element name="greyback">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.4" green="0.4" blue="0.4" />
+		</rect>
+	</element>
+
+    <element name="button_back"><rect><color red="0.35" green="0.35" blue="0.35" /></rect></element>
+
+	<element name="hl" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="0.4" green="0.3" blue="0.3" /></disk>
+		<disk state="0"><color red="1.0" green="0.1" blue="0.1" /></disk>
+	</element>
+
+    <group name="panel_back_11">
+   		<element name="button_0"     ref="button_back"><bounds x="  1" y="1" width="14" height="29"/></element>
+		<element name="button_1"     ref="button_back"><bounds x=" 16" y="1" width="14" height="29"/></element>
+		<element name="button_2"     ref="button_back"><bounds x=" 31" y="1" width="14" height="29"/></element>
+		<element name="button_3"     ref="button_back"><bounds x=" 46" y="1" width="14" height="29"/></element>
+        <element name="button_4"     ref="button_back"><bounds x=" 61" y="1" width="14" height="29"/></element>
+		<element name="button_5"     ref="button_back"><bounds x=" 76" y="1" width="14" height="29"/></element>
+		<element name="button_6"     ref="button_back"><bounds x=" 91" y="1" width="14" height="29"/></element>
+		<element name="button_7"     ref="button_back"><bounds x="106" y="1" width="14" height="29"/></element>
+        <element name="button_8"     ref="button_back"><bounds x="121" y="1" width="14" height="29"/></element>
+		<element name="button_9"     ref="button_back"><bounds x="136" y="1" width="14" height="29"/></element>
+		<element name="button_10"    ref="button_back"><bounds x="151" y="1" width="14" height="29"/></element>
+    </group>
+
+    <element name="text_star"><text string="*"/> </element>
+    <element name="text_A"><text string="A"/> </element>
+    <element name="text_C1"><text string="C1"/> </element>
+    <element name="text_C2"><text string="C2"/> </element>
+    <element name="text_C3"><text string="C3"/> </element>
+    <element name="text_m1"><text string="μ1"/> </element>
+    <element name="text_m2"><text string="μ2"/> </element>
+    <element name="text_m3"><text string="μ3"/> </element>
+    <element name="text_m4"><text string="μ4"/> </element>
+    <element name="text_m5"><text string="μ5"/> </element>
+    <element name="text_m6"><text string="μ6"/> </element>
+
+    <group name="panel_l1">
+   	    <element ref="text_star">                                      <bounds x="  3" y="11" width="10" height="8"/></element>
+   		<element name="star"   ref="hl" inputtag="K6" inputmask="0x02"><bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_1" >                           <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_A">                                         <bounds x=" 18" y="11" width="10" height="8"/></element>
+		<element name="A"      ref="hl" inputtag="K6" inputmask="0x08"><bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_3" >                           <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_C1">                                        <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element name="C1"     ref="hl" inputtag="K6" inputmask="0x01"><bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_0" >                           <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_C2">                                        <bounds x=" 48" y="11" width="10" height="8"/></element>
+        <element name="C2"     ref="hl" inputtag="K6" inputmask="0x10"><bounds x=" 46" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_4" >                           <bounds x=" 48" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_C3">                                        <bounds x=" 63" y="11" width="10" height="8"/></element>
+        <element name="C3"     ref="hl" inputtag="K6" inputmask="0x80"><bounds x=" 61" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_7" >                           <bounds x=" 63" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_m1">                                        <bounds x=" 78" y="11" width="10" height="8"/></element>
+        <element name="m1"     ref="hl" inputtag="K7" inputmask="0x02"><bounds x=" 76" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_1" >                           <bounds x=" 78" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_m2">                                        <bounds x=" 93" y="11" width="10" height="8"/></element>
+        <element name="m2"     ref="hl" inputtag="K7" inputmask="0x20"><bounds x=" 91" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_5" >                           <bounds x=" 93" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_m3">                                        <bounds x="108" y="11" width="10" height="8"/></element>
+        <element name="m3"     ref="hl" inputtag="K7" inputmask="0x04"><bounds x="106" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_2" >                           <bounds x="108" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_m4">                                        <bounds x="123" y="11" width="10" height="8"/></element>
+        <element name="m4"     ref="hl" inputtag="K7" inputmask="0x10"><bounds x="121" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_4" >                           <bounds x="123" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_m5">                                        <bounds x="138" y="11" width="10" height="8"/></element>
+        <element name="m5"     ref="hl" inputtag="K7" inputmask="0x40"><bounds x="136" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_6" >                           <bounds x="138" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_m6">                                        <bounds x="153" y="11" width="10" height="8"/></element>
+        <element name="m6"     ref="hl" inputtag="K8" inputmask="0x10"><bounds x="151" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K8_4" >                           <bounds x="153" y="3" width="3"  height="3" /></element>
+    </group>
+
+    <element name="text_mode"><text string="MODE"/> </element>
+    <element name="text_B"><text string="B"/> </element>
+    <element name="text_C4"><text string="C4"/> </element>
+    <element name="text_C5"><text string="C5"/> </element>
+    <element name="text_C6"><text string="C6"/> </element>
+    <element name="text_m7"><text string="μ7"/> </element>
+    <element name="text_m8"><text string="μ8"/> </element>
+    <element name="text_m9"><text string="μ9"/> </element>
+    <element name="text_m10"><text string="μ10"/> </element>
+    <element name="text_m11"><text string="μ11"/> </element>
+    <element name="text_m12"><text string="μ12"/> </element>
+
+    <group name="panel_l2">
+   	    <element ref="text_mode">                                      <bounds x="  3" y="11" width="10" height="8"/></element>
+   		<element name="mode"   ref="hl" inputtag="K5" inputmask="0x10"><bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K5_4" >                           <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+		<element ref="text_B">                                         <bounds x=" 18" y="11" width="10" height="8"/></element>
+        <element name="B"      ref="hl" inputtag="K5" inputmask="0x40"><bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K5_6" >                           <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+		<element ref="text_C4">                                        <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element name="C4"     ref="hl" inputtag="K6" inputmask="0x20"><bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_5" >                           <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+		<element ref="text_C5">                                        <bounds x=" 48" y="11" width="10" height="8"/></element>
+		<element name="C5"     ref="hl" inputtag="K6" inputmask="0x04"><bounds x=" 46" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_2" >                           <bounds x=" 48" y="3" width="3"  height="3" /></element>
+
+		<element ref="text_C6">                                        <bounds x=" 63" y="11" width="10" height="8"/></element>
+        <element name="C6"     ref="hl" inputtag="K6" inputmask="0x40"><bounds x=" 61" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K6_6" >                           <bounds x=" 63" y="3" width="3"  height="3" /></element>
+
+		<element ref="text_m7">                                        <bounds x=" 78" y="11" width="10" height="8"/></element>
+		<element name="m7"     ref="hl" inputtag="K7" inputmask="0x08"><bounds x=" 76" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_3" >                           <bounds x=" 78" y="3" width="3"  height="3" /></element>
+
+        <element ref="text_m8">                                        <bounds x=" 93" y="11" width="10" height="8"/></element>
+		<element name="m8"     ref="hl" inputtag="K7" inputmask="0x01"><bounds x=" 91" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_0" >                           <bounds x=" 93" y="3" width="3"  height="3" /></element>
+
+        <element ref="text_m9">                                        <bounds x="108" y="11" width="10" height="8"/></element>
+		<element name="m9"     ref="hl" inputtag="K7" inputmask="0x80"><bounds x="106" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K7_7" >                           <bounds x="108" y="3" width="3"  height="3" /></element>
+
+        <element ref="text_m10">                                       <bounds x="123" y="11" width="10" height="8"/></element>
+        <element name="m10"    ref="hl" inputtag="K8" inputmask="0x01"><bounds x="121" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K8_0" >                           <bounds x="123" y="3" width="3"  height="3" /></element>
+
+        <element ref="text_m11">                                       <bounds x="138" y="11" width="10" height="8"/></element>
+		<element name="m11"    ref="hl" inputtag="K8" inputmask="0x04"><bounds x="136" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K8_2" >                           <bounds x="138" y="3" width="3"  height="3" /></element>
+
+		<element ref="text_m12">                                       <bounds x="153" y="11" width="10" height="8"/></element>
+		<element name="m12"    ref="hl" inputtag="K8" inputmask="0x40"><bounds x="151" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K8_6" >                           <bounds x="153" y="3" width="3"  height="3" /></element>
+    </group>
+
+    <group name="panel_back_l">
+   		<element name="button_0"     ref="button_back"><bounds x="  1" y="1" width="14" height="29"/></element>
+		<element name="button_1"     ref="button_back"><bounds x=" 16" y="1" width="14" height="29"/></element>
+		<element name="button_2"     ref="button_back"><bounds x=" 31" y="1" width="14" height="29"/></element>
+		<!-- <element name="button_3"     ref="button_back"><bounds x=" 46" y="1" width="14" height="29"/></element> -->
+        <element name="button_4"     ref="button_back"><bounds x=" 61" y="1" width="29" height="29"/></element>
+		<!-- <element name="button_5"     ref="button_back"><bounds x=" 76" y="1" width="14" height="29"/></element> -->
+		<!-- <element name="button_6"     ref="button_back"><bounds x=" 91" y="1" width="14" height="29"/></element> -->
+		<element name="button_7"     ref="button_back"><bounds x="106" y="1" width="29" height="29"/></element>
+        <!-- <element name="button_8"     ref="button_back"><bounds x="121" y="1" width="14" height="29"/></element> -->
+		<!-- <element name="button_9"     ref="button_back"><bounds x="136" y="1" width="14" height="29"/></element> -->
+		<element name="button_10"    ref="button_back"><bounds x="151" y="1" width="14" height="29"/></element>
+    </group>
+
+    <element name="text_next"><text string="NEXT"/> </element>
+    <element name="text_play"><text string="PLAY"/> </element>
+    <element name="text_erase"><text string="ERASE"/> </element>
+    <element name="text_intro"><text string="INTRO/"/> </element>
+    <element name="text_ending"><text string="ENDING"/> </element>
+    <element name="text_fill1"><text string="FILL 1"/> </element>
+    <element name="text_split"><text string="SPLIT"/> </element>
+
+    <group name="panel_l3">
+  	    <element ref="text_next">                                      <bounds x="  3" y="11" width="10" height="8"/></element>
+    	<element name="next"   ref="hl" inputtag="K5" inputmask="0x02"><bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K5_1" >                           <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+  	    <element ref="text_play">                                      <bounds x=" 18" y="11" width="10" height="8"/></element>
+        <element name="play"   ref="hl" inputtag="K5" inputmask="0x08"><bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K5_3" >                           <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+  	    <element ref="text_erase">                                     <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element name="erase"  ref="hl" inputtag="K5" inputmask="0x80"><bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K5_7" >                           <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+  	    <element ref="text_intro">                                     <bounds x=" 63" y="6" width="14" height="8"/></element>
+  	    <element ref="text_ending">                                    <bounds x=" 63" y="14" width="14" height="8"/></element>
+        <element name="intro"  ref="hl" inputtag="M5" inputmask="0x10"><bounds x=" 61" y="1" width="28" height="29"/></element>
+
+        <!-- matrix -->
+  	    <element ref="text_fill1">                                     <bounds x="108" y="11" width="14" height="8"/></element>
+        <element name="fill1"  ref="hl" inputtag="M5" inputmask="0x04"><bounds x="106" y="1" width="28" height="29"/></element>
+
+  	    <element ref="text_split">                                     <bounds x="153" y="11" width="10" height="8"/></element>
+		<element name="split"  ref="hl" inputtag="K8" inputmask="0x80"><bounds x="151" y="1" width="14" height="29"/></element>
+        <element ref="led"     name="K8_7" >                           <bounds x="153" y="3" width="3"  height="3" /></element>
+    </group>
+
+    <element name="text_read"><text string="READ"/> </element>
+    <element name="text_record"><text string="RECORD"/> </element>
+    <element name="text_store"><text string="STORE"/> </element>
+    <element name="text_start_slash"><text string="START/"/> </element>
+    <element name="text_stop"><text string="STOP"/> </element>
+    <element name="text_fill2"><text string="FILL 2"/> </element>
+    <element name="text_tremolo"><text string="SPLIT"/> </element>
+
+    <group name="panel_l4">
+  	    <element ref="text_read">                                       <bounds x="  3" y="11" width="10" height="8"/></element>
+   		<element name="read"    ref="hl" inputtag="K5" inputmask="0x01"><bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led"      name="K5_0" >                           <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+  	    <element ref="text_record">                                     <bounds x=" 18" y="11" width="10" height="8"/></element>
+		<element name="record"  ref="hl" inputtag="K5" inputmask="0x20"><bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led"      name="K5_5" >                           <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+  	    <element ref="text_store">                                      <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element name="store"   ref="hl" inputtag="K5" inputmask="0x04"><bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led"      name="K5_2" >                           <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+  	    <element ref="text_start_slash">                                <bounds x=" 63" y="6" width="14" height="8"/></element>
+  	    <element ref="text_stop">                                       <bounds x=" 63" y="14" width="14" height="8"/></element>
+        <element name="start"   ref="hl" inputtag="M5" inputmask="0x02"><bounds x=" 61" y="1" width="28" height="29"/></element>
+
+        <element ref="led" name="BEAT" >                                <bounds x="98" y="0" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+  	    <element ref="text_fill2">                                      <bounds x="108" y="11" width="14" height="8"/></element>
+        <element name="fill2"   ref="hl" inputtag="M5" inputmask="0x08"><bounds x="106" y="1" width="28" height="29"/></element>
+
+  	    <element ref="text_tremolo">                                    <bounds x="153" y="11" width="10" height="8"/></element>
+        <element name="tremolo" ref="hl" inputtag="K8" inputmask="0x20"><bounds x="151" y="1" width="14" height="29"/></element>
+        <element ref="led"      name="K8_5" >                           <bounds x="153" y="3" width="3"  height="3" /></element>
+    </group>
+    
+
+    <element name="text_porta"><text string="PORTA"/> </element>
+    <element name="text_mento"><text string="MENTO"/> </element>
+    <element name="text_s1"><text string="S1"/> </element>
+    <element name="text_s2"><text string="S2"/> </element>
+    <element name="text_s3"><text string="S3"/> </element>
+    <element name="text_s4"><text string="S4"/> </element>
+    <element name="text_s5"><text string="S5"/> </element>
+    <element name="text_s6"><text string="S6"/> </element>
+    <element name="text_s7"><text string="S7"/> </element>
+    <element name="text_s8"><text string="S8"/> </element>
+    <element name="text_s9"><text string="S9"/> </element>
+    <element name="text_to"><text string="TO"/> </element>
+    <element name="text_left"><text string="LEFT"/> </element>
+
+    <group name="panel_r1">
+   	    <element ref="text_porta">                         <bounds x="  3" y="6" width="10" height="8"/></element>
+   	    <element ref="text_mento">                         <bounds x="  3" y="14" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="K4" inputmask="0x01"> <bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_0" >                   <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s1">                            <bounds x=" 18" y="11" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="K4" inputmask="0x10"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_4" >                   <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s2">                            <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x04"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_2" >                   <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s3">                            <bounds x=" 48" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x01"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_0" >                   <bounds x=" 48" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s4">                            <bounds x=" 63" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x40"> <bounds x=" 61" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_6" >                   <bounds x=" 63" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s5">                            <bounds x=" 78" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K1" inputmask="0x01"> <bounds x=" 76" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K1_0" >                   <bounds x=" 78" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s6">                            <bounds x=" 93" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K1" inputmask="0x10"> <bounds x=" 91" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K1_4" >                   <bounds x=" 93" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s7">                            <bounds x="108" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K1" inputmask="0x40"> <bounds x="106" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K1_6" >                   <bounds x="108" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s8">                            <bounds x="123" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K0" inputmask="0x02"> <bounds x="121" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K0_1" >                   <bounds x="123" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s9">                            <bounds x="138" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K0" inputmask="0x08"> <bounds x="136" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K0_3" >                   <bounds x="138" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_to">                            <bounds x="153" y=" 6" width="10" height="8"/></element>
+   	    <element ref="text_left">                          <bounds x="153" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K0" inputmask="0x20"> <bounds x="151" y=" 1" width="14" height="29"/></element>
+        <element ref="led" name="K0_5" >                   <bounds x="153" y=" 3" width="3"  height="3" /></element>
+    </group>
+    
+    <element name="text_dyn"><text string="DYN"/> </element>
+    <element name="text_cancel"><text string="CANCEL"/> </element>
+    <element name="text_s10"><text string="S10"/> </element>
+    <element name="text_s11"><text string="S11"/> </element>
+    <element name="text_s12"><text string="S12"/> </element>
+    <element name="text_s13"><text string="S13"/> </element>
+    <element name="text_s14"><text string="S14"/> </element>
+    <element name="text_s15"><text string="S15"/> </element>
+    <element name="text_s16"><text string="S16"/> </element>
+    <element name="text_s17"><text string="S17"/> </element>
+    <element name="text_s18"><text string="S18"/> </element>
+    <element name="text_bass"><text string="BASS"/> </element>
+
+    <group name="panel_r2">
+   	    <element ref="text_dyn">                           <bounds x="  3" y="6" width="10" height="8"/></element>
+   	    <element ref="text_cancel">                        <bounds x="  3" y="14" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="K4" inputmask="0x04"> <bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_2" >                   <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s10">                           <bounds x=" 18" y="11" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="K4" inputmask="0x40"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_6" >                   <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s11">                           <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x01"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_0" >                   <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s12">                           <bounds x=" 48" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x10"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_4" >                   <bounds x=" 48" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s13">                           <bounds x=" 63" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x40"> <bounds x=" 61" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_6" >                   <bounds x=" 63" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s14">                           <bounds x=" 78" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x04"> <bounds x=" 76" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_2" >                   <bounds x=" 78" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s15">                           <bounds x=" 93" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x10"> <bounds x=" 91" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_4" >                   <bounds x=" 93" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s16">                           <bounds x="108" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K1" inputmask="0x04"> <bounds x="106" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K1_2" >                   <bounds x="108" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s17">                           <bounds x="123" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K0" inputmask="0x10"> <bounds x="121" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K0_4" >                   <bounds x="123" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_s18">                           <bounds x="138" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K0" inputmask="0x40"> <bounds x="136" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K0_6" >                   <bounds x="138" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_to">                            <bounds x="153" y=" 6" width="10" height="8"/></element>
+   	    <element ref="text_bass">                          <bounds x="153" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K0" inputmask="0x80"> <bounds x="151" y=" 1" width="14" height="29"/></element>
+        <element ref="led" name="K0_7" >                   <bounds x="153" y=" 3" width="3"  height="3" /></element>
+    </group>
+    
+    
+    <group name="panel_back_r">
+   		<element name="button_0"     ref="button_back"><bounds x="  1" y="1" width="14" height="29"/></element>
+		<element name="button_1"     ref="button_back"><bounds x=" 16" y="1" width="14" height="29"/></element>
+		<element name="button_2"     ref="button_back"><bounds x=" 31" y="1" width="14" height="29"/></element>
+		<element name="button_3"     ref="button_back"><bounds x=" 46" y="1" width="14" height="29"/></element>
+        <element name="button_4"     ref="button_back"><bounds x=" 61" y="1" width="14" height="29"/></element>
+		<element name="button_5"     ref="button_back"><bounds x=" 76" y="1" width="14" height="29"/></element>
+		<element name="button_6"     ref="button_back"><bounds x=" 91" y="1" width="14" height="29"/></element>
+		<element name="button_7"     ref="button_back"><bounds x="106" y="1" width="14" height="29"/></element>
+        <element name="button_8"     ref="button_back"><bounds x="121" y="1" width="14" height="29"/></element>
+		<!-- <element name="button_9"     ref="button_back"><bounds x="136" y="1" width="14" height="29"/></element> -->
+		<element name="button_10"    ref="button_back"><bounds x="151" y="1" width="14" height="29"/></element>
+    </group>
+
+    <element name="text_trk1"><text string="TRK1"/> </element>
+    <!-- <element name="text_rhythm"><text string="RHYTHM"/> </element> -->
+    <element name="text_trk2"><text string="TRK2"/> </element>
+    <!-- <element name="text_bass"><text string="BASS"/> </element> -->
+    <element name="text_trk3"><text string="TRK3"/> </element>
+    <element name="text_plus"><text string="+"/> </element>
+    <element name="text_key"><text string="KEY"/> </element>
+    <element name="text_start"><text string="START"/> </element>
+    <element name="text_score"><text string="SCORE"/> </element>
+    <element name="text_reduct"><text string="REDUCT"/> </element>
+    <element name="text_right"><text string="RIGHT"/> </element>
+    <element name="text_down"><text string="DOWN"/> </element>
+    <element name="text_hash"><text string="#"/> </element>    
+    <element name="text_plus_1/2"><text string="+1/2"/> </element>
+
+    <group name="panel_r3">
+   	    <element ref="text_trk1">                          <bounds x="  3" y="6"  width="10" height="8"/></element>
+   	    <element ref="text_rhythm">                        <bounds x="  3" y="14" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="K4" inputmask="0x08"> <bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_3" >                   <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_trk2">                          <bounds x=" 18" y="6"  width="10" height="8"/></element>
+   	    <element ref="text_bass">                          <bounds x=" 18" y="14" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="K4" inputmask="0x80"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_7" >                   <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_trk3">                          <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x02"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_1" >                   <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+   	    <element ref="text_plus">                          <bounds x=" 48" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M0" inputmask="0x04"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_key">                           <bounds x=" 63" y="6" width="10" height="8"/></element>
+   	    <element ref="text_start">                         <bounds x=" 63" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x80"> <bounds x=" 61" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_7" >                   <bounds x=" 63" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_score">                         <bounds x=" 78" y="6"  width="10" height="8"/></element>
+   	    <element ref="text_reduct">                        <bounds x=" 78" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x02"> <bounds x=" 76" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_1" >                   <bounds x=" 78" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_right">                         <bounds x=" 93" y="6"  width="10" height="8"/></element>
+   	    <element ref="text_down">                          <bounds x=" 93" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x20"> <bounds x=" 91" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_5" >                   <bounds x=" 93" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+   	    <element ref="text_hash">                          <bounds x="108" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M0" inputmask="0x40"> <bounds x="106" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_plus_1/2">                      <bounds x="123" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K1" inputmask="0x08"> <bounds x="121" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K1_3" >                   <bounds x="123" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+   	    <element ref="text_plus">                          <bounds x="153" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M4" inputmask="0x01"> <bounds x="151" y=" 1" width="14" height="29"/></element>
+    </group>
+
+    <element name="text_auto"><text string="AUTO"/> </element>
+    <element name="text_tempo"><text string="TEMPO"/> </element>
+    <element name="text_trk4"><text string="TRK4"/> </element>
+    <element name="text_trk5"><text string="TRK5"/> </element>
+    <element name="text_minus"><text string="-"/> </element>
+    <!-- <element name="text_tempo"><text string="TEMPO"/> </element> -->
+    <element name="text_trk4/5"><text string="TRK4/5"/> </element>
+    <element name="text_k_start"><text string="K START"/> </element>
+    <element name="text_rhythm"><text string="RHYTHM"/> </element>
+    <element name="text_subst"><text string="SUBST"/> </element>
+    <!-- <element name="text_left"><text string="LEFT"/> </element> -->
+    <!-- <element name="text_down"><text string="DOWN"/> </element> -->
+    <element name="text_b"><text string="b"/> </element>    
+    <element name="text_tune"><text string="TUNE"/> </element>    
+    <!-- <element name="text_minus"><text string="-"/> </element> -->
+    <element name="text_volume"><text string="VOLUME"/> </element>    
+
+    <group name="panel_r4">
+   	    <element ref="text_auto">                          <bounds x="  3" y="6"  width="10" height="8"/></element>
+   	    <element ref="text_tempo">                         <bounds x="  3" y="14" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="K4" inputmask="0x02"> <bounds x="  1" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_1" >                   <bounds x="  3" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_trk4">                          <bounds x=" 18" y="11"  width="10" height="8"/></element>
+		<element ref="hl"  inputtag="K4" inputmask="0x20"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K4_5" >                   <bounds x=" 18" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_trk5">                          <bounds x=" 33" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x08"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_3" >                   <bounds x=" 33" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+   	    <element ref="text_minus">                         <bounds x=" 48" y="6" width="10" height="8"/></element>
+   	    <element ref="text_tempo">                         <bounds x="  48" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M0" inputmask="0x08"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_trk4/5">                        <bounds x=" 63" y="6" width="10" height="8"/></element>
+   	    <element ref="text_k_start">                       <bounds x=" 63" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K3" inputmask="0x20"> <bounds x=" 61" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K3_5" >                   <bounds x=" 63" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_rhythm">                        <bounds x=" 78" y="6"  width="10" height="8"/></element>
+   	    <element ref="text_subst">                         <bounds x=" 78" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x08"> <bounds x=" 76" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_3" >                   <bounds x=" 78" y="3" width="3"  height="3" /></element>
+
+   	    <element ref="text_left">                          <bounds x=" 93" y="6"  width="10" height="8"/></element>
+   	    <element ref="text_down">                          <bounds x=" 93" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K2" inputmask="0x80"> <bounds x=" 91" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K2_7" >                   <bounds x=" 93" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+   	    <element ref="text_b">                             <bounds x="108" y="6" width="10" height="8"/></element>
+   	    <element ref="text_tune">                          <bounds x="108" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M0" inputmask="0x80"> <bounds x="106" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_key">                           <bounds x="123" y="11" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="K1" inputmask="0x02"> <bounds x="121" y="1" width="14" height="29"/></element>
+        <element ref="led" name="K1_1" >                   <bounds x="123" y="3" width="3"  height="3" /></element>
+
+        <!-- matrix -->
+   	    <element ref="text_minus">                         <bounds x="153" y="6" width="10" height="8"/></element>
+   	    <element ref="text_volume">                        <bounds x="153" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M4" inputmask="0x02"> <bounds x="151" y=" 1" width="14" height="29"/></element>
+    </group>
+
+    <group name="panel_back_12">
+   		<element name="button_0"     ref="button_back"><bounds x="  1" y="1" width="14" height="29"/></element>
+		<element name="button_1"     ref="button_back"><bounds x=" 16" y="1" width="14" height="29"/></element>
+		<element name="button_2"     ref="button_back"><bounds x=" 31" y="1" width="14" height="29"/></element>
+		<element name="button_3"     ref="button_back"><bounds x=" 46" y="1" width="14" height="29"/></element>
+        <element name="button_4"     ref="button_back"><bounds x=" 61" y="1" width="14" height="29"/></element>
+		<element name="button_5"     ref="button_back"><bounds x=" 76" y="1" width="14" height="29"/></element>
+		<element name="button_6"     ref="button_back"><bounds x=" 91" y="1" width="14" height="29"/></element>
+		<element name="button_7"     ref="button_back"><bounds x="106" y="1" width="14" height="29"/></element>
+        <element name="button_8"     ref="button_back"><bounds x="121" y="1" width="14" height="29"/></element>
+		<element name="button_9"     ref="button_back"><bounds x="136" y="1" width="14" height="29"/></element>
+		<element name="button_10"    ref="button_back"><bounds x="151" y="1" width="14" height="29"/></element>
+		<element name="button_11"    ref="button_back"><bounds x="166" y="1" width="14" height="29"/></element>
+    </group>
+
+    <element name="text_r.h."><text string="R.H."/> </element>
+    <element name="text_port."><text string="PORT."/> </element>
+    <element name="text_vibr."><text string="VIBR."/> </element>
+    <element name="text_bril."><text string="BRIL."/> </element>
+    <element name="text_sust"><text string="SUST"/> </element>
+    <element name="text_p1"><text string="P1"/> </element>
+    <element name="text_p2"><text string="P2"/> </element>
+    <element name="text_p3"><text string="P3"/> </element>
+    <element name="text_p4"><text string="P4"/> </element>
+    <element name="text_p5"><text string="P5"/> </element>
+    <element name="text_p6"><text string="P6"/> </element>
+    <element name="text_p7"><text string="P7"/> </element>
+    <element name="text_p8"><text string="P8"/> </element>
+    <element name="text_p9"><text string="P9"/> </element>
+    <element name="text_p10"><text string="P10"/> </element>
+    <element name="text_p11"><text string="P11"/> </element>
+    <element name="text_p12"><text string="P12"/> </element>
+
+    <group name="panel_m1_0">
+   	    <element ref="text_p1">                            <bounds x="  3" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x="  3" y="14" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="M1" inputmask="0x01"> <bounds x="  1" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p2">                            <bounds x=" 18" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 18" y="14" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="M1" inputmask="0x04"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p3">                            <bounds x=" 33" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 33" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M1" inputmask="0x10"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p4">                            <bounds x=" 48" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 48" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M1" inputmask="0x40"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+    </group>
+    
+    <group name="panel_m1_1">
+  	    <element ref="text_minus">                         <bounds x="  3" y="6" width="10" height="8"/></element>
+ 	    <element ref="text_r.h.">                          <bounds x="  3" y="14" width="10" height="8"/></element>
+ 	    <element ref="text_port.">                         <bounds x="  3" y="20" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="M1" inputmask="0x02"> <bounds x="  1" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 18" y="6" width="10" height="8"/></element>
+   	    <element ref="text_r.h.">                          <bounds x=" 18" y="14" width="10" height="8"/></element>
+   	    <element ref="text_vibr.">                         <bounds x=" 18" y="20" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="M1" inputmask="0x08"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 33" y="6" width="10" height="8"/></element>
+   	    <element ref="text_left">                          <bounds x=" 33" y="14" width="10" height="8"/></element>
+   	    <element ref="text_bril.">                         <bounds x=" 33" y="20" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M1" inputmask="0x20"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 48" y="6" width="10" height="8"/></element>
+   	    <element ref="text_right">                         <bounds x=" 48" y="14" width="10" height="8"/></element>
+   	    <element ref="text_bril.">                         <bounds x=" 48" y="20" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M1" inputmask="0x80"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+    </group>
+
+    <group name="panel_m2_0">
+   	    <element ref="text_p5">                            <bounds x="  3" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x="  3" y="14" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="M2" inputmask="0x01"> <bounds x="  1" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p6">                            <bounds x=" 18" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 18" y="14" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="M2" inputmask="0x04"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p7">                            <bounds x=" 33" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 33" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M2" inputmask="0x10"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p8">                            <bounds x=" 48" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 48" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M2" inputmask="0x40"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+    </group>
+    
+    <group name="panel_m2_1">
+  	    <element ref="text_minus">                         <bounds x="  3" y="6" width="10" height="8"/></element>
+ 	    <element ref="text_rhythm">                        <bounds x="  3" y="14" width="10" height="8"/></element>
+ 	    <element ref="text_trk1">                          <bounds x="  3" y="20" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="M2" inputmask="0x02"> <bounds x="  1" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 18" y="6" width="10" height="8"/></element>
+   	    <element ref="text_bass">                          <bounds x=" 18" y="14" width="10" height="8"/></element>
+   	    <element ref="text_trk2">                         <bounds x=" 18" y="20" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="M2" inputmask="0x08"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 33" y="6" width="10" height="8"/></element>
+   	    <element ref="text_trk3">                          <bounds x=" 33" y="20" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M2" inputmask="0x20"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 48" y="6" width="10" height="8"/></element>
+   	    <element ref="text_trk4">                          <bounds x=" 48" y="20" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M2" inputmask="0x80"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+    </group>
+
+    <group name="panel_m3_0">
+   	    <element ref="text_p9">                            <bounds x="  3" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x="  3" y="14" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="M3" inputmask="0x01"> <bounds x="  1" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p10">                           <bounds x=" 18" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 18" y="14" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="M3" inputmask="0x04"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p11">                           <bounds x=" 33" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 33" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M3" inputmask="0x10"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_p12">                           <bounds x=" 48" y="6" width="10" height="8"/></element>
+   	    <element ref="text_plus">                          <bounds x=" 48" y="14" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M3" inputmask="0x40"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+    </group>
+    
+    <group name="panel_m3_1">
+  	    <element ref="text_minus">                         <bounds x="  3" y="6" width="10" height="8"/></element>
+ 	    <element ref="text_trk5">                          <bounds x="  3" y="20" width="10" height="8"/></element>
+   		<element ref="hl"  inputtag="M3" inputmask="0x02"> <bounds x="  1" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 18" y="6" width="10" height="8"/></element>
+   	    <element ref="text_right">                         <bounds x=" 18" y="14" width="10" height="8"/></element>
+   	    <element ref="text_sust">                          <bounds x=" 18" y="20" width="10" height="8"/></element>
+		<element ref="hl"  inputtag="M3" inputmask="0x08"> <bounds x=" 16" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 33" y="6" width="10" height="8"/></element>
+   	    <element ref="text_left">                          <bounds x=" 33" y="20" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M3" inputmask="0x20"> <bounds x=" 31" y="1" width="14" height="29"/></element>
+
+   	    <element ref="text_minus">                         <bounds x=" 48" y="6" width="10" height="8"/></element>
+   	    <element ref="text_right">                         <bounds x=" 48" y="20" width="10" height="8"/></element>
+        <element ref="hl"  inputtag="M3" inputmask="0x80"> <bounds x=" 46" y="1" width="14" height="29"/></element>
+    </group>
+
+    
+    <view name="Default">
+		<element ref="greyback"><bounds x="0" y="0" width="530" height="144" /></element>
+		<screen tag="screen">
+			<bounds x="180" y="12" width="175" height="62" />
+		</screen>
+        
+        <!-- left panel -->
+		<group ref="panel_back_11"><bounds x="  6" y=" 10" width="160" height="31" /></group>
+		<group ref="panel_l1">     <bounds x="  6" y=" 10" width="160" height="31" /></group>
+
+        <group ref="panel_back_11"><bounds x="  6" y=" 42" width="160" height="31" /></group>
+        <group ref="panel_l2">     <bounds x="  6" y=" 42" width="160" height="31" /></group>
+
+        <group ref="panel_back_l" ><bounds x="  6" y=" 80" width="160" height="31" /></group>
+        <group ref="panel_l3" >    <bounds x="  6" y=" 80" width="160" height="31" /></group>
+
+        <group ref="panel_back_l" ><bounds x="  6" y="112" width="160" height="31" /></group>
+        <group ref="panel_l4" >    <bounds x="  6" y="112" width="160" height="31" /></group>
+
+        <!-- right panel -->
+        <group ref="panel_back_11"><bounds x="368" y=" 10" width="160" height="31" /></group>
+		<group ref="panel_r1">     <bounds x="368" y=" 10" width="160" height="31" /></group>
+        
+		<group ref="panel_back_11"><bounds x="368" y=" 42" width="160" height="31" /></group>
+		<group ref="panel_r2">     <bounds x="368" y=" 42" width="160" height="31" /></group>
+
+        <group ref="panel_back_r" ><bounds x="368" y=" 80" width="160" height="31" /></group>
+        <group ref="panel_r3" >    <bounds x="368" y=" 80" width="160" height="31" /></group>
+
+        <group ref="panel_back_r" ><bounds x="368" y="112" width="160" height="31" /></group>
+        <group ref="panel_r4" >    <bounds x="368" y="112" width="160" height="31" /></group>
+
+        <!-- center panel -->
+        <group ref="panel_back_12"><bounds x="180" y="80" width="175" height="31" /></group>
+		<group ref="panel_back_12"><bounds x="180" y="112" width="175" height="31" /></group>
+
+        <group ref="panel_m1_0"><bounds x="180" y="80" width="58" height="31" /></group>
+        <group ref="panel_m1_1"><bounds x="180" y="112" width="58" height="31" /></group>
+
+        <group ref="panel_m2_0"><bounds x="238" y="80" width="58" height="31" /></group>
+        <group ref="panel_m2_1"><bounds x="238" y="112" width="58" height="31" /></group>
+
+        <group ref="panel_m3_0"><bounds x="296" y="80" width="58" height="31" /></group>
+        <group ref="panel_m3_1"><bounds x="296" y="112" width="58" height="31" /></group>
+
+    </view>
+</mamelayout>

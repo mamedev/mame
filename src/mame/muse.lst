@@ -1,0 +1,15 @@
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+/******************************************************************************
+
+    muse.lst
+
+    List of all enabled drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+******************************************************************************/
+
+
+@source:hohner/ustudio.cpp
+ustudio_proto                   // 12/1986 (c) 1986
+ustudio                         // 12/1986 (c) 1986
