@@ -7435,10 +7435,10 @@ ROM_START( hpyagu98 ) /* Hanguk Pro Yagu 98, Model 2A, ROM board# 834-11342 REV.
 	ROM_LOAD16_WORD_SWAP( "bb-sn-4.37", 0x600000, 0x200000, CRC(8692fbf3) SHA1(d8e854bba7b54fba85e182d761a9fd02fd13646f) )
 
 	ROM_REGION16_LE(0x80, "eeprom", 0) // EEPROM (required to prevent error #0 on boot)
-	ROM_LOAD("hpyagu98_nvram", 0x00, 0x80, CRC(3634c60f) SHA1(1ab7b74fd05b2d21496af9b2a477c0d197847c55)) // same settings as dynabb97 default
+	ROM_LOAD("hpyagu98_nvram", 0x00, 0x80, CRC(3634c60f) SHA1(1ab7b74fd05b2d21496af9b2a477c0d197847c55)) // partly handcrafted, same settings as dynabb97 default
 
 	ROM_REGION(0x4000, "backup1", 0) // Backup RAM (required to prevent error #0 on boot)
-	ROM_LOAD("hpyagu98_backup", 0x0000, 0x4000, CRC(979751d5) SHA1(2f6c6d12b77d7fbd3e44b05f4c21ca479fae782c))
+	ROM_LOAD("hpyagu98_backup", 0x0000, 0x4000, CRC(979751d5) SHA1(2f6c6d12b77d7fbd3e44b05f4c21ca479fae782c)) // partly handcrafted
 
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
