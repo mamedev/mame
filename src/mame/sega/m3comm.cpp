@@ -142,6 +142,14 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 	m_commcpu(*this, M68K_TAG),
 	m_ram(*this, RAM_TAG)
 {
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void m3comm_device::device_start()
+{
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -155,14 +163,7 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 	strcat(m_remotehost, machine().options().comm_remotehost());
 	strcat(m_remotehost, ":");
 	strcat(m_remotehost, machine().options().comm_remoteport());
-}
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void m3comm_device::device_start()
-{
 	m_timer = timer_alloc(FUNC(m3comm_device::trigger_irq5), this);
 	m_timer->adjust(attotime::from_usec(10000));
 }

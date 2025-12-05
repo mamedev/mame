@@ -197,6 +197,14 @@ void m2comm_device::device_add_mconfig(machine_config &config)
 m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M2COMM, tag, owner, clock)
 {
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void m2comm_device::device_start()
+{
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -214,14 +222,6 @@ m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, dev
 	m_framesync = machine().options().comm_framesync() ? 0x01 : 0x00;
 
 	m_frameoffset = 0x1c0; // default
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void m2comm_device::device_start()
-{
 }
 
 //-------------------------------------------------

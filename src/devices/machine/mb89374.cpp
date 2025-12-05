@@ -106,6 +106,15 @@ mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, 
 	m_out_irq_cb(*this),
 	m_out_po_cb(*this)
 {
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//------------------------------------------------
+
+void mb89374_device::device_start()
+{
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
 	strcat(m_localhost, "socket.");
@@ -119,15 +128,7 @@ mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, 
 	strcat(m_remotehost, machine().options().comm_remotehost());
 	strcat(m_remotehost, ":");
 	strcat(m_remotehost, machine().options().comm_remoteport());
-}
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//------------------------------------------------
-
-void mb89374_device::device_start()
-{
 	// set our instruction counter
 	set_icountptr(m_icount);
 

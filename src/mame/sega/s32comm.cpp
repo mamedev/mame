@@ -99,6 +99,14 @@ void s32comm_device::device_add_mconfig(machine_config &config)
 s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S32COMM, tag, owner, clock)
 {
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void s32comm_device::device_start()
+{
 	std::fill(std::begin(m_shared), std::end(m_shared), 0);
 
 	// prepare localhost "filename"
@@ -116,14 +124,6 @@ s32comm_device::s32comm_device(const machine_config &mconfig, const char *tag, d
 	strcat(m_remotehost, machine().options().comm_remoteport());
 
 	m_framesync = machine().options().comm_framesync() ? 0x01 : 0x00;
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void s32comm_device::device_start()
-{
 }
 
 //-------------------------------------------------

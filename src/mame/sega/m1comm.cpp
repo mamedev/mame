@@ -146,6 +146,14 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 	m_dma(*this, "commdma"),
 	m_dlc(*this, "commdlc")
 {
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void m1comm_device::device_start()
+{
 #ifdef M1COMM_SIMULATION
 	// prepare localhost "filename"
 	m_localhost[0] = 0;
@@ -163,14 +171,6 @@ m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, dev
 
 	m_framesync = machine().options().comm_framesync() ? 0x01 : 0x00;
 #endif
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void m1comm_device::device_start()
-{
 }
 
 //-------------------------------------------------

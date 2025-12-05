@@ -31,11 +31,12 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_drcfe(nullptr)
 {
 	m_cpu_type = cpu_type;
-	m_isdrc = allow_drc();
 }
 
 void sh2_device::device_start()
 {
+	m_isdrc = allow_drc();
+
 	sh_common_execution::device_start();
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
