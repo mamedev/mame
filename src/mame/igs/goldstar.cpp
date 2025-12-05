@@ -20386,6 +20386,74 @@ ROM_START( texas99b )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+ROM_START( texas99c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "texas_99_m27c512_cleco.bin", 0x0000, 0x1000, CRC(23a44d71) SHA1(c3692c62b960c4f44eba1ea9576a9cdcfb62bd39) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.bin", 0x00000, 0x8000, CRC(d77d1f8b) SHA1(69761cb9cbb903b8c94ca1b3727f6c686bda1be2) )
+	ROM_LOAD( "rom6.bin", 0x08000, 0x8000, CRC(4b26ed0a) SHA1(24f56835e098f47dd92bca1c3bc13a4afeb8d58c) )
+	ROM_LOAD( "rom5.bin", 0x10000, 0x8000, CRC(b2ee065f) SHA1(a41aaa6515adfac4f6f705b8e1ff4a25cdc91e4e) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.bin", 0x0000, 0x2000, CRC(6b870b29) SHA1(d65f24817d9d45c148cb857439b46e9e75dabfe7) )
+	ROM_LOAD( "rom3.bin", 0x2000, 0x2000, CRC(8a0b205f) SHA1(3afea0464b793526bf23610cac6736a31edc7ec2) )
+	ROM_LOAD( "rom2.bin", 0x4000, 0x2000, CRC(c84dba45) SHA1(ab4ac891a23d6b9a216df046d516e868c77e8a36) )
+	ROM_LOAD( "rom1.bin", 0x6000, 0x2000, CRC(9e337e9c) SHA1(58aacc09d59f04d7686dfec1eb7621969719857f) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_FILL( 0x0000, 0x10000, 0xff )  // U53 (girl bitmaps) not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+ROM_START( texas99d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "texas_99_m27c512_usa_board_long.bin", 0x0000, 0x1000, CRC(5f209e97) SHA1(a9b90db26c172d7c24cbb338d5a76cb0397fb3cd) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.bin", 0x00000, 0x8000, CRC(d77d1f8b) SHA1(69761cb9cbb903b8c94ca1b3727f6c686bda1be2) )
+	ROM_LOAD( "rom6.bin", 0x08000, 0x8000, CRC(4b26ed0a) SHA1(24f56835e098f47dd92bca1c3bc13a4afeb8d58c) )
+	ROM_LOAD( "rom5.bin", 0x10000, 0x8000, CRC(b2ee065f) SHA1(a41aaa6515adfac4f6f705b8e1ff4a25cdc91e4e) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.bin", 0x0000, 0x2000, CRC(6b870b29) SHA1(d65f24817d9d45c148cb857439b46e9e75dabfe7) )
+	ROM_LOAD( "rom3.bin", 0x2000, 0x2000, CRC(8a0b205f) SHA1(3afea0464b793526bf23610cac6736a31edc7ec2) )
+	ROM_LOAD( "rom2.bin", 0x4000, 0x2000, CRC(c84dba45) SHA1(ab4ac891a23d6b9a216df046d516e868c77e8a36) )
+	ROM_LOAD( "rom1.bin", 0x6000, 0x2000, CRC(9e337e9c) SHA1(58aacc09d59f04d7686dfec1eb7621969719857f) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_FILL( 0x0000, 0x10000, 0xff )  // U53 (girl bitmaps) not populated
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
 /*
   A-Plan
   (C) 1993 WeaShing H.K.
@@ -32074,10 +32142,13 @@ GAMEL( 1996, cmast97b,   cmast97,  cmast97,  cmast97a, cmast97_state,  empty_ini
 GAMEL( 1996, cmast97i,   cmast97,  cmast97,  cmast97i, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     0,    layout_cmast97 )
 GAMEL( 1997, jpknight,   0,        jpknight, cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       0,    layout_cmast97 ) // check inputs
 
-GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL1-V9B.00)",                      MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99 
-GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ1-V9B.00)",                      MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99b 
+// Dyna CM99 hardware (dynamic banking)
+GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Dyna",              "Cherry Master '99 (QL-1 V9B.00)",             MACHINE_NOT_WORKING,     layout_cmv4 )
+GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, bootleg)",    MACHINE_NOT_WORKING,     layout_cmv4 )
+GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                     MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99 
+GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",            MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99b 
+GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, cleco)",              MACHINE_NOT_WORKING,     layout_cmv4 )
+GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",       MACHINE_NOT_WORKING,     layout_cmv4 ) 
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
 GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 1)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
 GAME(  1999, top7a,      top7,     cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 2)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
