@@ -94,7 +94,8 @@ public:
 		// add start empty item
 		m_swinfo.emplace_back(*menu.m_system.driver);
 
-		machine_config config(*menu.m_system.driver, menu.machine().options());
+		machine_config config(*menu.m_system.driver);
+		config.add_slot_options(menu.machine().options());
 
 		// see if any media devices require an image to be loaded
 		m_has_empty_start = true;

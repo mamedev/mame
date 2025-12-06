@@ -708,7 +708,8 @@ menu_select_launch::system_flags const &menu_select_launch::get_system_flags(gam
 
 	// aggregate flags
 	emu_options clean_options;
-	machine_config const mconfig(driver, clean_options);
+	machine_config mconfig(driver);
+	mconfig.add_slot_options(clean_options);
 	return m_flags.emplace(&driver, machine_static_info(ui().options(), mconfig)).first->second;
 }
 

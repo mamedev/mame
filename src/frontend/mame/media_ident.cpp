@@ -385,7 +385,8 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 		match_device(m_drivlist.config()->root_device());
 
 	// iterator over registered device types
-	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	machine_config config(GAME_NAME(___empty));
+	config.add_slot_options(m_drivlist.options());
 	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{

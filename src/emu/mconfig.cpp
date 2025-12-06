@@ -39,17 +39,6 @@ private:
 //-------------------------------------------------
 
 machine_config::machine_config(const game_driver &gamedrv)
-	: machine_config(gamedrv, nullptr)
-{
-}
-
-
-machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
-	: machine_config(gamedrv, &options)
-{
-}
-
-machine_config::machine_config(const game_driver &gamedrv, emu_options *options)
 	: m_gamedrv(gamedrv)
 	, m_root_device()
 	, m_default_layouts([] (char const *a, char const *b) { return 0 > std::strcmp(a, b); })
@@ -59,67 +48,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options *options)
 {
 	// add the root device
 	device_add("root", gamedrv.type, 0);
-
-	if (options)
-	{
-		// intialize slot devices - make sure that any required devices have been allocated
-		for (device_slot_interface &slot : slot_interface_enumerator(root_device()))
-		{
-			device_t &owner = slot.device();
-			const char *slot_option_name = owner.tag() + 1;
-
-			// figure out which device goes into this slot
-			bool const has_option = options->has_slot_option(slot_option_name);
-			const char *selval;
-			bool is_default;
-			if (!has_option)
-			{
-				// The only time we should be getting here is when emuopts.cpp is invoking
-				// us to evaluate slot/image options, and the internal state of emuopts.cpp has
-				// not caught up yet
-				selval = slot.default_option();
-				is_default = true;
-			}
-			else
-			{
-				const slot_option &opt = options->slot_option(slot_option_name);
-				selval = opt.value().c_str();
-				is_default = !opt.specified();
-			}
-
-			if (selval && *selval)
-			{
-				// TODO: make this thing more self-contained so it can apply itself - shouldn't need to know all this here
-				device_slot_interface::slot_option const *option = slot.option(selval);
-				if (option && (is_default || option->selectable()))
-				{
-					// create the device
-					token const tok(begin_configuration(owner));
-					device_t *const new_dev = device_add(option->name(), option->devtype(), option->clock());
-					slot.set_card_device(new_dev);
-
-					char const *const default_bios = option->default_bios();
-					if (default_bios)
-						new_dev->set_default_bios_tag(default_bios);
-
-					auto additions = option->machine_config();
-					if (additions)
-						additions(new_dev);
-
-					input_device_default const *const input_device_defaults = option->input_device_defaults();
-					if (input_device_defaults)
-						new_dev->set_input_default(input_device_defaults);
-				}
-				else
-					throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag() + 1);
-			}
-		}
-	}
-
-	// then notify all devices that their configuration is complete
-	for (device_t &device : device_enumerator(root_device()))
-		if (!device.configured())
-			device.config_complete();
 }
 
 
@@ -129,6 +57,88 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options *options)
 
 machine_config::~machine_config()
 {
+}
+
+
+//-------------------------------------------------
+//  add_slot_options - adds slot options to this
+//  configuration as specified by these emu_options
+//-------------------------------------------------
+
+void machine_config::add_slot_options(emu_options &options)
+{
+	// intialize slot devices - make sure that any required devices have been allocated
+	for (device_slot_interface &slot : slot_interface_enumerator(root_device()))
+	{
+		device_t &owner = slot.device();
+		const char *slot_option_name = owner.tag() + 1;
+
+		// figure out which device goes into this slot
+		bool const has_option = options.has_slot_option(slot_option_name);
+		const char *selval;
+		bool is_default;
+		if (!has_option)
+		{
+			// The only time we should be getting here is when emuopts.cpp is invoking
+			// us to evaluate slot/image options, and the internal state of emuopts.cpp has
+			// not caught up yet
+			selval = slot.default_option();
+			is_default = true;
+		}
+		else
+		{
+			const slot_option &opt = options.slot_option(slot_option_name);
+			selval = opt.value().c_str();
+			is_default = !opt.specified();
+		}
+
+		if (selval && *selval)
+		{
+			// TODO: make this thing more self-contained so it can apply itself - shouldn't need to know all this here
+			device_slot_interface::slot_option const *option = slot.option(selval);
+			if (option && (is_default || option->selectable()))
+			{
+				// create the device
+				token const tok(begin_configuration(owner));
+				device_t *const new_dev = device_add(option->name(), option->devtype(), option->clock());
+				slot.set_card_device(new_dev);
+
+				char const *const default_bios = option->default_bios();
+				if (default_bios)
+					new_dev->set_default_bios_tag(default_bios);
+
+				auto additions = option->machine_config();
+				if (additions)
+					additions(new_dev);
+
+				input_device_default const *const input_device_defaults = option->input_device_defaults();
+				if (input_device_defaults)
+					new_dev->set_input_default(input_device_defaults);
+			}
+			else
+				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag() + 1);
+		}
+	}
+
+	// we've added slot options; complete the configuration
+	complete();
+}
+
+
+//-------------------------------------------------
+//  complete - completes the configuration of slot
+//  options
+//
+//  it is only necessary to call this when one is
+//  not adding slot options!
+//-------------------------------------------------
+
+void machine_config::complete()
+{
+	// then notify all devices that their configuration is complete
+	for (device_t &device : device_enumerator(root_device()))
+		if (!device.configured())
+			device.config_complete();
 }
 
 

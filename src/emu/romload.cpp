@@ -103,7 +103,8 @@ auto next_parent_device(device_t const &device, emu_options &options)
 				}
 				else
 				{
-					machine_config config(GAME_NAME(___empty), options);
+					machine_config config(GAME_NAME(___empty));
+					config.add_slot_options(options);
 					machine_config::token const tok(config.begin_configuration(config.root_device()));
 					roms = config.device_add("_tmp", *type, 0)->rom_region_vector();
 					config.device_remove("_tmp");

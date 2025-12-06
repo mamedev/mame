@@ -58,7 +58,8 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 		else
 			parse_one_ini(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI, &error_stream);
 
-		machine_config config(*cursystem, options);
+		machine_config config(*cursystem);
+		config.add_slot_options(options);
 		for (const screen_device &device : screen_device_enumerator(config.root_device()))
 		{
 			// parse "raster.ini" for raster games

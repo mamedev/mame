@@ -560,7 +560,8 @@ bool emu_options::add_and_remove_slot_options()
 	if (m_system)
 	{
 		// create the configuration
-		machine_config config(*m_system, *this);
+		machine_config config(*m_system);
+		config.add_slot_options(*this);
 
 		for (const device_slot_interface &slot : slot_interface_enumerator(config.root_device()))
 		{
@@ -656,7 +657,8 @@ bool emu_options::add_and_remove_image_options()
 	if (m_system)
 	{
 		// create the configuration
-		machine_config config(*m_system, *this);
+		machine_config config(*m_system);
+		config.add_slot_options(*this);
 
 		// iterate through all image devices
 		for (device_image_interface &image : image_interface_enumerator(config.root_device()))
@@ -736,7 +738,8 @@ void emu_options::reevaluate_default_card_software()
 	do
 	{
 		// set up the machine_config
-		machine_config config(*m_system, *this);
+		machine_config config(*m_system);
+		config.add_slot_options(*this);
 		found = false;
 
 		// iterate through all slot devices
@@ -900,7 +903,8 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 			throw options_error_exception("Cannot specify software without specifying system");
 
 		// and set up a configuration
-		machine_config config(*m_system, *this);
+		machine_config config(*m_system);
+		config.add_slot_options(*this);
 		software_list_device_enumerator iter(config.root_device());
 		if (iter.count() == 0)
 			throw emu_fatalerror(EMU_ERR_FATALERROR, "Error: unknown option: %s\n", software_identifier);

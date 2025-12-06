@@ -101,8 +101,7 @@ public:
 	};
 
 	// construction/destruction
-	machine_config(const game_driver& gamedrv);
-	machine_config(const game_driver &gamedrv, emu_options &options);
+	machine_config(const game_driver &gamedrv);
 	~machine_config();
 
 	// getters
@@ -113,6 +112,12 @@ public:
 	template <class DeviceClass> DeviceClass *device(const char *tag) const { return downcast<DeviceClass *>(device(tag)); }
 	attotime maximum_quantum(attotime const &default_quantum) const;
 	device_execute_interface *perfect_quantum_device() const;
+
+	/// \brief Adds slot options to this configuration
+	void add_slot_options(emu_options &options);
+
+	/// \brief Indicates that option configuration is complete
+	void complete();
 
 	/// \brief Apply visitor to internal layouts
 	///

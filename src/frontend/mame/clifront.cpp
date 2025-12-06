@@ -1017,7 +1017,8 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 
 	if (iswild || !matchcount)
 	{
-		machine_config config(GAME_NAME(___empty), m_options);
+		machine_config config(GAME_NAME(___empty));
+		config.add_slot_options(m_options);
 		machine_config::token const tok(config.begin_configuration(config.root_device()));
 		for (device_type type : registered_device_types)
 		{
@@ -1659,7 +1660,8 @@ template <typename T, typename U> void cli_frontend::apply_action(const std::vec
 
 template <typename T> void cli_frontend::apply_device_action(const std::vector<std::string> &args, T &&action)
 {
-	machine_config config(GAME_NAME(___empty), m_options);
+	machine_config config(GAME_NAME(___empty));
+	config.add_slot_options(m_options);
 	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	apply_action(
 			args,

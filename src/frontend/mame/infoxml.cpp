@@ -694,6 +694,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	using util::xml::normalize_string;
 
 	machine_config config(driver);
+	config.complete();
 	device_enumerator iter(config.root_device());
 
 	// allocate input ports and build overall emulation status
@@ -919,7 +920,8 @@ void output_devices(std::ostream &out, emu_options &lookup_options, device_type_
 						auto task_proc = [&active_task_count, &lookup_options, batch = std::move(batch), collect_devices = bool(filter)]
 								{
 									// use a single machine configuration and stream for a batch of devices
-									machine_config config(GAME_NAME(___empty), lookup_options);
+									machine_config config(GAME_NAME(___empty));
+									config.add_slot_options(lookup_options);
 									prepared_info result;
 									std::ostringstream stream;
 									stream.imbue(std::locale::classic());
