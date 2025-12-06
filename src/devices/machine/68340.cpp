@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 /* 68340
  * TODO: - convert all modules to devices
+         - in multiple QUICC systems running slave mode, global chip select disabled, the internal base moves to start at 3ff04
  */
 
 #include "emu.h"
@@ -130,8 +131,15 @@ uint8_t m68340_cpu_device::int_ack(offs_t offset)
 uint16_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint16_t mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x)\n", m_ppc, offset*2,mem_mask);
-	return ((!BIT(offset, 0) ? (m_m68340_base >> 16): m_m68340_base)) & 0xffff;
+		LOGMASKED(LOG_BASE, "%08x m68340_internal_base_r %08x, (%08x) [s%08x] [d%08x]\n", m_ppc, offset*2,mem_mask, m_sfc, m_dfc);
+	if (m_sfc==0x7)
+	{
+		return ((!BIT(offset, 0) ? (m_m68340_base >> 16): m_m68340_base)) & 0xffff;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
