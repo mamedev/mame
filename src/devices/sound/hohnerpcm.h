@@ -4,8 +4,8 @@
 /*    SEGA 8bit PCM                                      */
 /*********************************************************/
 
-#ifndef MAMESOUND_HOHNERPCM_H
-#define MAMESOUND_HOHNERPCM_H
+#ifndef MAME_SOUND_HOHNERPCM_H
+#define MAME_SOUND_HOHNERPCM_H
 
 #pragma once
 
@@ -48,4 +48,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HOHNERPCM, hohnerpcm_device)
 
-#endif // MAMESOUND_HOHNERPCM_H
+#endif // MAME_SOUND_HOHNERPCM_H
