@@ -224,7 +224,7 @@ std::string c64_expansion_slot_device::get_default_card_software(get_default_car
 			return cbm_crt_get_card(*hook.image_file());
 	}
 
-	return software_get_default_slot("standard");
+	return software_get_default_slot(hook.image_name(), "standard");
 }
 
 

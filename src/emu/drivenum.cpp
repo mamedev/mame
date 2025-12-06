@@ -125,7 +125,10 @@ std::shared_ptr<machine_config> const &driver_enumerator::config(std::size_t ind
 	// if we don't have it cached, add it
 	std::shared_ptr<machine_config> &config = m_config[index];
 	if (!config)
-		config = std::make_shared<machine_config>(*s_drivers_sorted[index], options);
+	{
+		config = std::make_shared<machine_config>(*s_drivers_sorted[index]);
+		config->add_slot_options(options);
+	}
 
 	return config;
 }

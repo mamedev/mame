@@ -37,5 +37,5 @@ void msx_slot_yamaha_expansion_device::device_start()
 std::string msx_slot_yamaha_expansion_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	using namespace bus::msx::module;
-	return software_get_default_slot(slotoptions::SFG01);
+	return software_get_default_slot(hook.image_name(), slotoptions::SFG01);
 }

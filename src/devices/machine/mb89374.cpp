@@ -106,19 +106,6 @@ mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, 
 	m_out_irq_cb(*this),
 	m_out_po_cb(*this)
 {
-	// prepare localhost "filename"
-	m_localhost[0] = 0;
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
-
-	// prepare remotehost "filename"
-	m_remotehost[0] = 0;
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
 }
 
 
@@ -128,6 +115,20 @@ mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, 
 
 void mb89374_device::device_start()
 {
+	// prepare localhost "filename"
+	m_localhost[0] = 0;
+	strcat(m_localhost, "socket.");
+	strcat(m_localhost, machine().options().comm_localhost());
+	strcat(m_localhost, ":");
+	strcat(m_localhost, machine().options().comm_localport());
+
+	// prepare remotehost "filename"
+	m_remotehost[0] = 0;
+	strcat(m_remotehost, "socket.");
+	strcat(m_remotehost, machine().options().comm_remotehost());
+	strcat(m_remotehost, ":");
+	strcat(m_remotehost, machine().options().comm_remoteport());
+
 	// set our instruction counter
 	set_icountptr(m_icount);
 

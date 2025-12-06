@@ -1994,7 +1994,8 @@ void validity_checker::validate_one(const game_driver &driver)
 	// wrap in try/catch to catch fatalerrors
 	try
 	{
-		machine_config config(driver, m_blank_options);
+		machine_config config(driver);
+		config.add_slot_options(m_blank_options);
 		validate_driver(config.root_device());
 		validate_roms(config.root_device());
 		validate_inputs(config.root_device());
@@ -2801,7 +2802,8 @@ void validity_checker::validate_device_types()
 	m_verbose_text.clear();
 
 	std::unordered_map<std::string, std::add_pointer_t<device_type> > device_name_map, device_shortname_map;
-	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	machine_config config(GAME_NAME(___empty));
+	config.add_slot_options(m_drivlist.options());
 	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{

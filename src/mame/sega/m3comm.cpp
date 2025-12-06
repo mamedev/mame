@@ -142,19 +142,6 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 	m_commcpu(*this, M68K_TAG),
 	m_ram(*this, RAM_TAG)
 {
-	// prepare localhost "filename"
-	m_localhost[0] = 0;
-	strcat(m_localhost, "socket.");
-	strcat(m_localhost, mconfig.options().comm_localhost());
-	strcat(m_localhost, ":");
-	strcat(m_localhost, mconfig.options().comm_localport());
-
-	// prepare remotehost "filename"
-	m_remotehost[0] = 0;
-	strcat(m_remotehost, "socket.");
-	strcat(m_remotehost, mconfig.options().comm_remotehost());
-	strcat(m_remotehost, ":");
-	strcat(m_remotehost, mconfig.options().comm_remoteport());
 }
 
 //-------------------------------------------------
@@ -163,6 +150,20 @@ m3comm_device::m3comm_device(const machine_config &mconfig, const char *tag, dev
 
 void m3comm_device::device_start()
 {
+	// prepare localhost "filename"
+	m_localhost[0] = 0;
+	strcat(m_localhost, "socket.");
+	strcat(m_localhost, machine().options().comm_localhost());
+	strcat(m_localhost, ":");
+	strcat(m_localhost, machine().options().comm_localport());
+
+	// prepare remotehost "filename"
+	m_remotehost[0] = 0;
+	strcat(m_remotehost, "socket.");
+	strcat(m_remotehost, machine().options().comm_remotehost());
+	strcat(m_remotehost, ":");
+	strcat(m_remotehost, machine().options().comm_remoteport());
+
 	m_timer = timer_alloc(FUNC(m3comm_device::trigger_irq5), this);
 	m_timer->adjust(attotime::from_usec(10000));
 }

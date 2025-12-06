@@ -352,7 +352,10 @@ void simple_menu_select_game::custom_render(uint32_t flags, void *selectedref, f
 			if (driver != m_cached_driver)
 			{
 				emu_options clean_options;
-				machine_static_info const info(ui().options(), machine_config(*driver, clean_options));
+				machine_config config(*driver);
+				config.add_slot_options(clean_options);
+
+				machine_static_info const info(ui().options(), std::move(config));
 				m_cached_driver = driver;
 				m_cached_machine_flags = info.machine_flags();
 				m_cached_emulation_flags = info.emulation_flags();

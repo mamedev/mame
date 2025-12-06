@@ -773,7 +773,7 @@ void cps2_comm_device::start_comm()
 	if (!BIT(m_config->read(), 0))
 		return;
 
-	auto const &opts = mconfig().options();
+	auto const &opts = machine().options();
 	std::error_code err;
 	std::istringstream parsestr;
 	parsestr.imbue(std::locale::classic());

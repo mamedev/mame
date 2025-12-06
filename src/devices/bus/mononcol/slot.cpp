@@ -96,5 +96,5 @@ std::pair<std::error_condition, std::string> mononcol_cartslot_device::call_load
 
 std::string mononcol_cartslot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("rom");
+	return software_get_default_slot(hook.image_name(), "rom");
 }

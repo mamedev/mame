@@ -38,9 +38,8 @@ private:
 //  machine_config - constructor
 //-------------------------------------------------
 
-machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
+machine_config::machine_config(const game_driver &gamedrv)
 	: m_gamedrv(gamedrv)
-	, m_options(options)
 	, m_root_device()
 	, m_default_layouts([] (char const *a, char const *b) { return 0 > std::strcmp(a, b); })
 	, m_current_device(nullptr)
@@ -49,7 +48,25 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 {
 	// add the root device
 	device_add("root", gamedrv.type, 0);
+}
 
+
+//-------------------------------------------------
+//  ~machine_config - destructor
+//-------------------------------------------------
+
+machine_config::~machine_config()
+{
+}
+
+
+//-------------------------------------------------
+//  add_slot_options - adds slot options to this
+//  configuration as specified by these emu_options
+//-------------------------------------------------
+
+void machine_config::add_slot_options(emu_options &options)
+{
 	// intialize slot devices - make sure that any required devices have been allocated
 	for (device_slot_interface &slot : slot_interface_enumerator(root_device()))
 	{
@@ -99,23 +116,29 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 					new_dev->set_input_default(input_device_defaults);
 			}
 			else
-				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
+				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag() + 1);
 		}
 	}
 
-	// then notify all devices that their configuration is complete
-	for (device_t &device : device_enumerator(root_device()))
-		if (!device.configured())
-			device.config_complete();
+	// we've added slot options; complete the configuration
+	complete();
 }
 
 
 //-------------------------------------------------
-//  ~machine_config - destructor
+//  complete - completes the configuration of slot
+//  options
+//
+//  it is only necessary to call this when one is
+//  not adding slot options!
 //-------------------------------------------------
 
-machine_config::~machine_config()
+void machine_config::complete()
 {
+	// then notify all devices that their configuration is complete
+	for (device_t &device : device_enumerator(root_device()))
+		if (!device.configured())
+			device.config_complete();
 }
 
 

@@ -1092,7 +1092,7 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("lorom");
+	return software_get_default_slot(hook.image_name(), "lorom");
 }
 
 

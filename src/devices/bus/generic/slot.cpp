@@ -207,7 +207,7 @@ void generic_slot_device::call_unload()
 
 std::string generic_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot(m_default_card);
+	return software_get_default_slot(hook.image_name(), m_default_card);
 }
 
 

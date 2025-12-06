@@ -565,7 +565,7 @@ std::string a78_cart_slot_device::get_default_card_software(get_default_card_sof
 		return std::string(slot_string);
 	}
 	else
-		return software_get_default_slot("a78_rom");
+		return software_get_default_slot(hook.image_name(), "a78_rom");
 }
 
 

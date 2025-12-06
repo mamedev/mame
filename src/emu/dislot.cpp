@@ -143,8 +143,9 @@ const device_slot_interface::slot_option *device_slot_interface::option(const ch
 }
 
 
-get_default_card_software_hook::get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo)
-	: m_get_hashfile_extrainfo(std::move(get_hashfile_extrainfo))
+get_default_card_software_hook::get_default_card_software_hook(std::string path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo)
+	: m_image_name(std::move(path))
+	, m_get_hashfile_extrainfo(std::move(get_hashfile_extrainfo))
 	, m_called_get_hashfile_extrainfo(false)
 	, m_has_hash_extrainfo(false)
 {
