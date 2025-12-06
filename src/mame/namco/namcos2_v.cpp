@@ -65,6 +65,27 @@ void namcos2_state::create_shadow_table()
 	}
 }
 
+bool namcos2_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+{
+	if (srcpri >= destpri)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			if (src == 0xffe)
+			{
+				dest |= 0x800;
+			}
+			else
+			{
+				dest = colbase + src;
+			}
+			destpri = srcpri;
+			return true;
+		}
+	}
+	return false;
+}
+
 /**************************************************************************/
 
 void namcos2_state::video_start()
@@ -130,7 +151,7 @@ u32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &b
 		{
 			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
 		}
-		m_c45_road->draw(bitmap, clip, pri);
+		m_c45_road->draw(screen, bitmap, clip, pri);
 		m_ns2sprite->draw_sprites(screen, bitmap, clip, pri, m_gfx_ctrl);
 	}
 	return 0;
@@ -163,21 +184,21 @@ u32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &b
 	rectangle clip;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 	apply_clip(clip, cliprect);
 
 	for (int pri = 0; pri < 16; pri++)
 	{
 		if ((pri & 1) == 0)
 		{
-			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
+			m_c123tmap->draw(screen, bitmap, clip, pri / 2, pri, 0);
 		}
-		m_c45_road->draw(bitmap, clip, pri);
+		m_c45_road->draw(screen, bitmap, clip, pri, pri, 0);
 
 		if (m_c169roz)
-			m_c169roz->draw(screen, bitmap, clip, pri);
-
-		m_c355spr->draw(screen, bitmap, clip, pri);
+			m_c169roz->draw(screen, bitmap, clip, pri, pri, 0);
 	}
+	m_c355spr->draw(screen, bitmap, clip);
 	return 0;
 }
 
@@ -192,13 +213,13 @@ u32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bi
 	rectangle clip;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 	apply_clip(clip, cliprect);
 
 	for (int pri = 0; pri < 8; pri++)
-	{
-		m_c123tmap->draw(screen, bitmap, clip, pri);
-		m_c355spr->draw(screen, bitmap, clip, pri);
-	}
+		m_c123tmap->draw(screen, bitmap, clip, pri, pri, 0);
+
+	m_c355spr->draw(screen, bitmap, clip);
 	return 0;
 }
 
