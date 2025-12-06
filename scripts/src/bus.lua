@@ -3232,6 +3232,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/grafex.h",
 		MAME_DIR .. "src/devices/bus/a2bus/grappler.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/grappler.h",
+		MAME_DIR .. "src/devices/bus/a2bus/ibsap2.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/ibsap2.h",
 		MAME_DIR .. "src/devices/bus/a2bus/lancegs.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/lancegs.h",
 		MAME_DIR .. "src/devices/bus/a2bus/laser128.cpp",
