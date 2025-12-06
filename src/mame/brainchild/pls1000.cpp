@@ -5,14 +5,9 @@
 Brainchild PLS-1000 "Personal Learning System"
 
 TODO:
-- keeps looping on INT_TIMER2 events in DragonBall core
-(shouldn't take them? may require a first cart boot that populates the stack?):
-':maincpu' (0062B4): tcmp_w<1>: TCMP2 = 028f
-':maincpu' (0062B8): tstat_r: TSTAT2: 0000
-':maincpu' (0062BE): tctl_w<1>: TCTL2 = 0039
-TCTL_TEN, TCTL_CLKSOURCE_32KHZ4, TCTL_OM, TCTL_IRQEN
-
-- Requires cart dumps to go further;
+- I/O;
+- Stuck on cart loading;
+- Sound (DAC1BIT?)
 
 ===================================================================================================
 
@@ -26,12 +21,15 @@ two knobs at console bottom sides, VR1/VR2
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68328.h"
 #include "video/mc68328lcd.h"
 
 //#include "speaker.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 namespace {
 
@@ -43,6 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_lcdctrl(*this, "lcdctrl")
 		, m_screen(*this, "screen")
+		, m_cart(*this, "cart")
 	{ }
 
 	void pls1000(machine_config &config);
@@ -54,6 +53,7 @@ private:
 	required_device<mc68328_base_device> m_maincpu;
 	required_device<mc68328_lcd_device> m_lcdctrl;
 	required_device<screen_device> m_screen;
+	required_device<generic_slot_device> m_cart;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -69,7 +69,7 @@ void pls1000_state::main_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region("bios", 0);
 	map(0x200000, 0x207fff).ram();
-//	map(0x800000, 0x8.....) cart space (checks 0x5a05 header there)
+	map(0x800000, 0x83ffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 }
 
 static INPUT_PORTS_START( pls1000 )
@@ -92,11 +92,20 @@ void pls1000_state::pls1000(machine_config &config)
 	// TODO: check vertical
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(240, 160);
-	m_screen->set_visarea(0, 240 - 1, 0, 160 - 1);
+	m_screen->set_size(240, 144);
+	m_screen->set_visarea(0, 240 - 1, 0, 144 - 1);
 	m_screen->set_screen_update(FUNC(pls1000_state::screen_update));
 
 	MC68328_LCD(config, m_lcdctrl, 0);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "bin");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_endian(ENDIANNESS_BIG);
+	m_cart->set_interface("pls1000_cart");
+	m_cart->set_must_be_loaded(false);
+
+	SOFTWARE_LIST(config, "cart_list").set_original("pls1000_cart");
+
 
 //	SPEAKER(config, "speaker").front_center();
 //	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
