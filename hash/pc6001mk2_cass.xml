@@ -11,6 +11,9 @@ Mode 3: N60 EXTENDED BASIC (16K)
 Mode 4: N60 EXTENDED BASIC (32K)
 Mode 5: N60m BASIC (64K)
 
+This software list should ONLY be used for Mk II specific software which will require mode 5.
+Any software requiring modes 1-4 should be listed in the pc6001_cass.xml software list.
+
 The Page value should be entered at the 'How Many Pages?' prompt in all versions of BASIC.
 
 Once in BASIC:
@@ -108,7 +111,7 @@ If usage specifies MONITOR:
 		<description>Dig Dug</description>
 		<year>19??</year>
 		<publisher>Namco</publisher>
-        <info name="usage" value="Mode 4, Page 1, BASIC" />
+        <info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="29546">
