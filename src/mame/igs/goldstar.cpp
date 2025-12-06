@@ -20524,6 +20524,7 @@ ROM_END
 
 /*
   Texas '99 (Cleco, Hand Count?)
+  Taiwanese bootleg.
 
   Different bankswitching?
 
@@ -20533,7 +20534,7 @@ ROM_END
   call $0bf6 --> disable the screen
   call $91d0 --> banked to $51d0?
 
-*/  
+*/
 ROM_START( texas99hc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "texas_99_hc.bin", 0x0000, 0x1000, CRC(021df5aa) SHA1(62863fbd95ecca3fa37bcc169184c15e6372ac55) )
