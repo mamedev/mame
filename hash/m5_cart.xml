@@ -310,15 +310,15 @@ and why some of the dumps below have weird size?
 		</part>
 	</software>
 
-	<software name="upupball" supported="no">
+	<software name="upupball" supported="yes">
 		<description>Up Up Balloon</description>
 		<year>1983</year>
 		<publisher>Takara ~ Monkey Punch</publisher>
 		<info name="serial" value="18" />
 		<info name="alt_title" value="アップアップバルーン" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="8320">
-				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8320" crc="68c85890" sha1="0c94d2d55a6a6e66531137e124f2e0a3a176b252" offset="00000" status="baddump" />
+			<dataarea name="rom" size="8192">
+				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8192" crc="1fce24c8" sha1="139ab0c63c82538bc032d2cb9d9eaf858d7c969d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
