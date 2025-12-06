@@ -37,6 +37,8 @@ public:
 	virtual void key_down(uint8_t key, uint8_t velocity);
 	virtual void key_pressure(uint8_t key, uint8_t pressure);
 	virtual void key_up(uint8_t key);
+	virtual void set_cartridge_loaded(bool loaded) { }
+	virtual void set_floppy_loaded(bool loaded) { }
 	virtual void set_floppy_active(bool floppy_active) { }
 
 protected:
@@ -115,6 +117,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(patch_select_change);
 	DECLARE_INPUT_CHANGED_MEMBER(analog_value_change);
 	DECLARE_INPUT_CHANGED_MEMBER(key_change);
+	void set_cartridge_loaded(bool loaded) override;
+	void set_floppy_loaded(bool loaded) override;
 	void set_floppy_active(bool floppy_active) override;
 
 	void set_family_member(int family_member);
@@ -151,14 +155,18 @@ private:
 	required_device<esq2x40_vfx_device> m_vfd;
 
 	output_finder<> m_lights;
+	output_finder<> m_media;
 
 	required_ioport m_buttons_0;
 	required_ioport m_buttons_32;
 	required_ioport m_analog_data_entry;
 	required_ioport m_analog_volume;
 
+	bool m_cartridge_loaded = false;
+	bool m_floppy_loaded = false;
 	bool m_floppy_active = false;
 
+	void update_media();
 	TIMER_CALLBACK_MEMBER(update_blink);
 	void update_lights();
 
