@@ -399,11 +399,9 @@ uint16_t decode_sample_address(uint8_t sample, uint8_t octave, uint8_t phase) {
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void honmeg_device::sound_stream_update(sound_stream& stream,
-                                        std::vector<read_stream_view> const& inputs,
-                                        std::vector<write_stream_view>& outputs)
+void honmeg_device::sound_stream_update(sound_stream& stream)
 {
-    for (int i = 0; i < outputs[0].samples(); i++)
+    for (int i = 0; i < stream.samples(); i++)
     {
         for (int j = 0; j < m_ticks_per_sample; j++)
         {
@@ -461,7 +459,7 @@ void honmeg_device::sound_stream_update(sound_stream& stream,
 
         for (int c = 0; c < 8; c++)
         {
-            outputs[c].put_int(i, std::min(32767, std::max(-32767, static_cast<int>(integrators[c]))), 32768);
+            stream.put_int(c, i, std::min(32767, std::max(-32767, static_cast<int>(integrators[c]))), 32768);
             integrators[c] *= 0.999;
         }
     }

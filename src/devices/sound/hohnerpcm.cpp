@@ -71,11 +71,11 @@ void hohnerpcm_device::rom_bank_pre_change()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void hohnerpcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void hohnerpcm_device::sound_stream_update(sound_stream &stream)
 {
 	/* clear the buffers */
-	outputs[0].fill(0);
-	outputs[1].fill(0);
+	stream.fill(0, 0);
+	stream.fill(1, 0);
 
 	// instruction  function
 	// ------------------------------------------------
@@ -86,12 +86,12 @@ void hohnerpcm_device::sound_stream_update(sound_stream &stream, std::vector<rea
 
     auto next_byte = [&](auto& ch) {
         return read_byte(ch.address++);
-        
+
     };
     auto get_byte = [&](const auto& ch) {
         return read_byte(ch.address);
     };
-    
+
 	/* loop over channels */
 	for (int ch = 0; ch < 6; ch++)
 	{
@@ -103,9 +103,9 @@ void hohnerpcm_device::sound_stream_update(sound_stream &stream, std::vector<rea
         }
 
         auto out = ch < 2 ? 0 : 1;
-        
+
         /* loop over samples on this channel */
-        for (int i = 0; i < outputs[out].samples(); i++)
+        for (int i = 0; i < stream.samples(); i++)
         {
             uint8_t val = next_byte(channel);
 
@@ -141,7 +141,7 @@ void hohnerpcm_device::sound_stream_update(sound_stream &stream, std::vector<rea
                 break;
             }
 
-            outputs[out].add_int(i, (val - 0x80) * channel.volume, 32768);
+            stream.add_int(out, i, (val - 0x80) * channel.volume, 32768);
         }
     }
 }

@@ -487,14 +487,14 @@ void ustudio_state::drvif_changed(ioport_field& field, u32 param, ioport_value o
 // clang-format off
 #define DRVIF_PORT(num, sw1, sw2, sw3, sw4, sw5, sw6, sw7, sw8) \
     PORT_START("K" #num) \
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num) \
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num) \
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num) \
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num) \
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw5) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num) \
-    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw6) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num) \
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw7) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num) \
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw8) PORT_CHANGED_MEMBER(DEVICE_SELF, ustudio_state, drvif_changed, num)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num) \
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num) \
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num) \
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw4) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num) \
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw5) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num) \
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw6) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num) \
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw7) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num) \
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(sw8) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ustudio_state::drvif_changed), num)
 
 #define MATRIX_PORT(num, sw1, sw2, sw3, sw4, sw5, sw6, sw7, sw8)    \
     PORT_START("M" #num) \
@@ -669,7 +669,7 @@ ROM_END
 
 // Both ROMS state V1.1 but the hardware of the first looked more to be a prototype,
 // with cables directly soldered to RCA ouput jacks, not on a PCB.
-SYST(1987, ustudio_proto, 0, 0, ustudio_proto, ustudio, ustudio_state, empty_init, "Hohner", "uStudio30 v1.1 prototype", MACHINE_CLICKABLE_ARTWORK)
+SYST(1987, ustudio_proto, 0, 0, ustudio_proto, ustudio, ustudio_state, empty_init, "Hohner", "uStudio30 v1.1 prototype", MACHINE_SUPPORTS_SAVE)
 // | MACHINE_IMPERFECT_SOUND)
 
-SYST(1987, ustudio, 0, 0, ustudio, ustudio, ustudio_state, empty_init, "Hohner", "uStudio30 v1.1", MACHINE_CLICKABLE_ARTWORK)
+SYST(1987, ustudio, 0, 0, ustudio, ustudio, ustudio_state, empty_init, "Hohner", "uStudio30 v1.1", MACHINE_SUPPORTS_SAVE)
