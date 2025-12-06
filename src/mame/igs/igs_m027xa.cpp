@@ -61,11 +61,13 @@ public:
 	void haunthig(machine_config &config) ATTR_COLD;
 	void tripfev(machine_config &config) ATTR_COLD;
 
+	void init_crzybug2() ATTR_COLD;
 	void init_crzybugs() ATTR_COLD;
 	void init_crzybugsj() ATTR_COLD;
 	void init_hauntedh() ATTR_COLD;
 	void init_jking04() ATTR_COLD;
 	void init_krzykeno() ATTR_COLD;
+	void init_texashld() ATTR_COLD;
 	void init_tripfev() ATTR_COLD;
 	void init_wldfruit() ATTR_COLD;
 
@@ -1032,6 +1034,51 @@ ROM_START( krzykeno ) // IGS PCB-0575-03-HU PCB
 	ROM_LOAD( "krazy_keno_sp_u3.u3", 0x000000, 0x200000, CRC(1af3e67f) SHA1(65d5f466192f476815f02f9d2c2f6bb26a9adde2) )
 ROM_END
 
+ROM_START( crzybug2 ) // IGS PCB-0575-04-HU PCB
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "c3_igs027a.u42", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "crazy-b_ii_v-102us.u34", 0x000000, 0x200000, CRC(d0e45b17) SHA1(cc3213400860c35a7989eb9f8473f24c753d568c) )
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "v6.u17", 0x00000, 0x10000, CRC(0a05a8c9) SHA1(63a86b17709c7991e499ffe45197dfb5db74f272) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "crazy-b_ii_text_u15.u15", 0x00000, 0x80000, CRC(c5b981ec) SHA1(fb7a8b5703aa22173b3f40cc204bcec43e3ca049) )
+	// u14 not populated
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "crazy-b_ii_ext_cg_u12.u12", 0x000000, 0x400000, CRC(d118b80f) SHA1(291661e6286e84004d34ec96ced288d6a6508d6e) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// u13 not populated
+
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
+	ROM_LOAD( "crazy-b_ii_sp_u3.u3", 0x000000, 0x200000, CRC(27f5be5e) SHA1(5838ca3a75ce943877c75b1c17563f3d837871b4) )
+ROM_END
+
+ROM_START( texashld ) // IGS PCB-0447-05-GM
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "m12_igs27a.u37", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
+	ROM_LOAD( "texal-h_v-015us.u23", 0x000000, 0x80000, CRC(ee7a11cd) SHA1(626adb6721a4584eacaea495a9f97a6971b64e3e) ) // MX27C4096
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU) marked J9
+	ROM_LOAD( "gr_v101.u27", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "texas-h_text.u10", 0x00000, 0x80000, CRC(9bd8d4f4) SHA1(bf04b74c797d74ece03c342b01d92ba2d2a33fc1) ) // 27C4096
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "texas-h_cg.u19", 0x000000, 0x400000, CRC(0f92636a) SHA1(cffc47a19cf425aab45115830919a6e871a857fd) ) // 27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
+	// u18 not populated
+
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
+	ROM_LOAD( "texas-h_sp.u15", 0x000000, 0x200000, CRC(dc647ce0) SHA1(1d50199be940811c242b1c6fd2bfc1444121eb96) ) // M27C160
+ROM_END
+
 
 void igs_m027xa_state::pgm_create_dummy_internal_arm_region()
 {
@@ -1105,6 +1152,20 @@ void igs_m027xa_state::init_krzykeno()
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 }
 
+void igs_m027xa_state::init_crzybug2()
+{
+	crzybug2_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
+	//m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
+void igs_m027xa_state::init_texashld()
+{
+	texashld_decrypt(machine());
+	//m_igs017_igs031->sdwx_gfx_decrypt();
+	//m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 // These use the MX10EXAQC (80c51XA from Philips)
@@ -1124,8 +1185,12 @@ GAMEL( 2006, tripfev108us,  tripfev,  tripfev,    tripfev,       igs_m027xa_stat
 GAMEL( 2006, tripfev107us,  tripfev,  tripfev,    tripfev,       igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", 0, layout_tripfev ) // IGS FOR V107US 2006 09 07
 GAMEL( 2006, tripfev105us,  tripfev,  tripfev,    tripfev,       igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING, layout_tripfev )
 
-GAME(  200?, wldfruit,      0,        base,       base,          igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
+GAME(  200?, wldfruit,      0,        base,       base,          igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US, no internal ROM dump
 
 GAMEL( 2003, jking04,       0,        tripfev,    jking04,       igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", 0, layout_jking04 )
 
 GAMEL( 2006, krzykeno,      0,        haunthig,   krzykeno,      igs_m027xa_state, init_krzykeno,  ROT0, "IGS", "Krazy Keno (V105US)", MACHINE_NOT_WORKING, layout_krzykeno ) // touch pad
+
+GAME(  200?, crzybug2,      0,        base,       base,          igs_m027xa_state, init_crzybug2,  ROT0, "IGS", "Crazy Bugs II (V102US)", MACHINE_NOT_WORKING ) // no internal ROM dump
+
+GAME(  200?, texashld,      0,        base,       base,          igs_m027xa_state, init_texashld,  ROT0, "IGS", "Texas Holdem (V015US)", MACHINE_NOT_WORKING ) // no internal ROM dump

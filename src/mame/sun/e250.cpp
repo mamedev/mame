@@ -62,8 +62,22 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
 };
 
+
+void e250_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom();
+}
+
+void e250_state::sub_map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).ram();
+	map(0xfff00000, 0xffffffff).rom().region("subcpu", 0);
+}
 
 static INPUT_PORTS_START(e250)
 INPUT_PORTS_END
@@ -71,10 +85,12 @@ INPUT_PORTS_END
 void e250_state::e250(machine_config &config)
 {
 	SPARCV8(config, m_maincpu, 20'000'000); // Actually a UltraSPARC II 250, 300 or 400 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &e250_state::main_map);
 	//SPARCV8(config, m_maincpu, 20'000'000); // Actually a UltraSPARC II 250, 300 or 400 MHz (optional 2nd CPU)
 
 	// For management console
 	MPC8240(config, m_subcpu, XTAL(66'000'000)); // Actually a Motorola XPC823ZT66B2
+	m_subcpu->set_addrmap(AS_PROGRAM, &e250_state::sub_map);
 
 	SOFTWARE_LIST(config, "sun_sparc").set_original("sun_sparc");
 
@@ -87,16 +103,16 @@ void e250_state::e250(machine_config &config)
 
 
 ROM_START(e250)
-	ROM_REGION(0x400000, "maincpu", 0)
+	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "525-1718-15_a30250_e28f008sa.u2703", 0x000000, 0x100000, CRC(293ac969) SHA1(88fa0c2607bd68bbb209fc8242efeaba60956daa) )
 
-	ROM_REGION(0x400000, "subcpu", 0)
+	ROM_REGION(0x100000, "subcpu", 0)
 	ROM_LOAD( "525-1724-08_a29898_e28f008sa.u4401", 0x000000, 0x100000, CRC(567fcc56) SHA1(c6a26b34f61559ec49119eed258666318d551378) ) // VxWorks for management console
 
-	ROM_REGION(0x021000, "nvram", 0)
+	ROM_REGION(0x002000, "nvram", 0)
 	ROM_LOAD( "525-1726-02_stm48t59y-70p10.u2706",  0x000000, 0x002000, CRC(adc6696f) SHA1(97e4d4709ba739e8adbe5298175d38e826c0321f) )
 
-	ROM_REGION(0x008000, "seeprom", 0)
+	ROM_REGION(0x000100, "seeprom", 0)
 	ROM_LOAD( "24c02n.u4402",                       0x000000, 0x000100, CRC(e98dd85c) SHA1(014e89081945a6c16e1498a2f10604ce64048ae6) ) // Seems to contain passwords
 ROM_END
 

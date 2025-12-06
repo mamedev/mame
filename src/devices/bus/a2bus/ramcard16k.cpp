@@ -56,6 +56,7 @@ void a2bus_ramcard_device::device_start()
 
 void a2bus_ramcard_device::device_reset()
 {
+	// dedicated power-on clear circuit is used in place of /RES
 	m_inh_state = INH_WRITE;
 	m_dxxx_bank = 0;
 	m_prewrite = false;

@@ -36,6 +36,7 @@ void megadrive_seganet_device::device_start()
 			{
 				m_rom->configure_entry(0, &base[0]);
 			});
+	m_ram.resize(0x40'000 / 2);
 }
 
 void megadrive_seganet_device::device_reset()
@@ -49,7 +50,12 @@ void megadrive_seganet_device::cart_map(address_map &map)
 	// NOTE: menu system writes extra couple writes at $40000,
 	// programming mistake?
 	map(0x00'0000, 0x03'ffff).view(m_ram_view);
-	m_ram_view[0](0x00'0000, 0x03'ffff).ram();
+	// TODO: Fatal error: Attempt to register save state entry after state registration is closed!
+//	m_ram_view[0](0x00'0000, 0x03'ffff).ram();
+	m_ram_view[0](0x00'0000, 0x03'ffff).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_ram[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ram[offset]); })
+	);
 }
 
 void megadrive_seganet_device::time_io_map(address_map &map)

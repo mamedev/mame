@@ -31,26 +31,95 @@
 
 static formats_table formats;
 
-static void display_usage(const char *first_argument)
+struct command_info
+{
+	const char *name;
+	const char *params;
+	const char *desc;
+};
+
+static const command_info s_command_usage[] =
+{
+	{
+		"identify", "<inputfile> [<inputfile> ...]",
+		"Identify an image format"
+	},
+	{
+		"flopconvert", "[input_format|auto] output_format <inputfile> <outputfile>",
+		"Convert a floppy image"
+	},
+	{
+		"flopcreate", "output_format filesystem <outputfile>",
+		"Create a preformatted floppy image"
+	},
+	{
+		"flopdir", "input_format filesystem <image>",
+		"List the contents of a floppy image"
+	},
+	{
+		"flophashes", "input_format filesystem <image>",
+		"List hashes for each file on a floppy image"
+	},
+	{
+		"flopread", "input_format filesystem <image> <path> <outputfile>",
+		"Extract a file from a floppy image"
+	},
+	{
+		"flopwrite", "input_format filesystem <image> <inputfile> <path>",
+		"Write a file into a floppy image"
+	},
+	{
+		"flopchmeta", "format filesystem <image> [<path>] [-<name> <value> ...]",
+		"Change metadata for a file, directory or volume on a floppy image"
+	},
+	{
+		"floprename", "input_format filesystem <image> <oldpath> <newpath>",
+		"Rename a file or directory on a floppy image"
+	},
+	{
+		"flopremove", "input_format filesystem <image> <path>",
+		"Remove a file or empty directory from a floppy image"
+	},
+	{
+		"hddir", "filesystem <image>",
+		"List the contents of a hard disk image"
+	},
+	{
+		"hdhashes", "filesystem <image>",
+		"List hashes for each file on a hard disk image"
+	},
+	{
+		"hdread", "filesystem <image> <path> <outputfile>",
+		"Extract a file from a hard disk image"
+	},
+	{
+		"hdwrite", "filesystem <image> <inputfile> <path>",
+		"Write a file into a hard disk image"
+	},
+	{
+		"help", "[subject|.ext|all]",
+		"Display help for supported commands, filesystems and/or formats"
+	},
+	{
+		"version", "",
+		"Display the current version of floptool"
+	}
+};
+
+static void display_usage(FILE *f, const char *first_argument, const char *cmd_name)
 {
 	std::string exe_name(core_filename_extract_base(first_argument));
 
-	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "       %s identify <inputfile> [<inputfile> ...]                                 -- Identify an image format\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopconvert [input_format|auto] output_format <inputfile> <outputfile> -- Convert a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopcreate output_format filesystem <outputfile>                       -- Create a preformatted floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopdir input_format filesystem <image>                                -- List the contents of a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flophashes input_format filesystem <image>                             -- List hashes for each file on a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopwrite input_format filesystem <image> <inputfile> <path>           -- Write a file into a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopchmeta format filesystem <image> [<path>] [-<name> <value> ...]    -- Change metadata for a file, directory or volume on a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s floprename input_format filesystem <image> <oldpath> <newpath>         -- Rename a file or directory on a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s flopremove input_format filesystem <image> <path>                      -- Remove a file or empty directory from a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s hddir filesystem <image>                                               -- List the contents of a hard disk image\n", exe_name.c_str());
-	fprintf(stderr, "       %s hdhashes filesystem <image>                                            -- List hashes for each file on a hard disk image\n", exe_name.c_str());
-	fprintf(stderr, "       %s hdread filesystem <image> <path> <outputfile>                          -- Extract a file from a hard disk image\n", exe_name.c_str());
-	fprintf(stderr, "       %s hdwrite filesystem <image> <inputfile> <path>                          -- Write a file into a hard disk image\n", exe_name.c_str());
-	fprintf(stderr, "       %s version                                                                -- Display the current version of floptool\n", exe_name.c_str());
+	fprintf(f, "Usage: \n");
+	for(const command_info &info : s_command_usage) {
+		if(!cmd_name || !strcmp(info.name, cmd_name))
+			fprintf(f, "       %s %s %-*s -- %s\n", exe_name.c_str(), info.name, int(69 - strlen(info.name)), info.params, info.desc);
+	}
+}
+
+static void display_one_format(const floppy_image_format_t &format, int sk)
+{
+	printf("  %-*s     r%c - %s [%s]\n", sk, format.name(), format.supports_save() ? 'w' : '-', format.description(), format.extensions());
 }
 
 static void display_formats()
@@ -62,6 +131,62 @@ static void display_formats()
 			sk = sz;
 	}
 
+	printf("Supported floppy formats:\n\n");
+	for(const auto &e : formats.floppy_format_info_by_category)
+		if(!e.second.empty()) {
+			printf("%s:\n", e.first.c_str());
+			for(auto *fif : e.second)
+				display_one_format(*fif->m_format, sk);
+		}
+}
+
+static int display_formats_by_extension(const char *ext)
+{
+	int sk = 0;
+	for(const auto &e : formats.floppy_format_info_by_key) {
+		int sz = e.first.size();
+		if(sz > sk)
+			sk = sz;
+	}
+
+	bool found = false;
+	for(const auto &e : formats.floppy_format_info_by_category) {
+		bool foundcat = false;
+		for(auto *fif : e.second) {
+			if(fif->m_format->extension_matches(ext)) {
+				if(!found) {
+					printf("Floppy formats matching %s:\n\n", ext);
+					found = true;
+				}
+				if(!foundcat) {
+					printf("%s:\n", e.first.c_str());
+					foundcat = true;
+				}
+				display_one_format(*fif->m_format, sk);
+			}
+		}
+	}
+
+	if(!found) {
+		fprintf(stderr, "No floppy formats matching \"%s\" found.\n", ext);
+		return 1;
+	}
+
+	return 0;
+}
+
+static void display_format_info(const floppy_format_info &fmtinfo)
+{
+	printf("Format '%s' (%s)\n  Identifying extensions: %s\n  Saving: %s\n",
+			fmtinfo.m_format->name(),
+			fmtinfo.m_format->description(),
+			fmtinfo.m_format->extensions(),
+			fmtinfo.m_format->supports_save() ? "supported" : "not supported");
+}
+
+static void display_filesystems()
+{
+	int sk = 0;
 	for(const auto &e : formats.filesystem_format_by_key) {
 		int sz = e.first.size();
 		if(sz > sk)
@@ -74,21 +199,12 @@ static void display_formats()
 			sk = sz;
 	}
 
-	fprintf(stderr, "Supported floppy formats:\n\n");
-	for(const auto &e : formats.floppy_format_info_by_category)
-		if(!e.second.empty()) {
-			fprintf(stderr, "%s:\n", e.first.c_str());
-			for(auto *fif : e.second)
-				fprintf(stderr, "  %-*s     r%c - %s [%s]\n", sk, fif->m_format->name(), fif->m_format->supports_save() ? 'w' : '-', fif->m_format->description(), fif->m_format->extensions());
-		}
-
-	fprintf(stderr, "\n\n");
-	fprintf(stderr, "Supported filesystems (with floppy formatting names):\n\n");
+	printf("Supported filesystems (with floppy formatting names):\n\n");
 	for(const auto &e : formats.filesystem_format_by_category)
 		if(!e.second.empty()) {
-			fprintf(stderr, "%s:\n", e.first.c_str());
+			printf("%s:\n", e.first.c_str());
 			for(const auto &f : e.second) {
-				fprintf(stderr, "  %-*s %c%c%c %c%c%c - %s\n",
+				printf("  %-*s %c%c%c %c%c%c - %s\n",
 						sk,
 						f->m_manager->name(),
 						f->m_floppy || f->m_floppy_raw ? 'F' : '-',
@@ -99,7 +215,7 @@ static void display_formats()
 						f->m_manager->can_write() ? 'w' : '-',
 						f->m_manager->description());
 				for(auto &f2 : f->m_floppy_create)
-					fprintf(stderr, "    %-*s         - %s\n",
+					printf("    %-*s         - %s\n",
 							sk,
 							f2->m_name,
 							f2->m_description);
@@ -107,13 +223,53 @@ static void display_formats()
 		}
 }
 
-static void display_full_usage(char *argv[])
+static void display_metadata_info(const std::vector<fs::meta_description> &metad)
+{
+	for(const auto &d : metad)
+		printf("    %s [r%s] - %s\n",
+				fs::meta_data::entry_name(d.m_name),
+				d.m_ro ? "" : "w",
+				d.m_tooltip);
+}
+
+static void display_filesystem_info(const filesystem_format &fs)
+{
+	const bool can_format = fs.m_manager->can_format() || fs.m_floppy_raw;
+	printf("%s '%s' (%s)\n  Reading: %s\n  Writing: %s\n  Formatting: %s\n",
+			fs.m_floppy_raw ? "Raw format" : "Filesystem",
+			fs.m_manager->name(),
+			fs.m_manager->description(),
+			fs.m_manager->can_read() ? "supported" : "not supported",
+			fs.m_manager->can_write() ? "supported" : "not supported",
+			can_format ? "supported" : "not supported");
+	if(can_format)
+		for(auto &f2 : fs.m_floppy_create)
+			printf("    '%s' - %s\n", f2->m_name, f2->m_description);
+
+	const auto vmetad = fs.m_manager->volume_meta_description();
+	if(!vmetad.empty()) {
+		printf("  Volume metadata:\n");
+		display_metadata_info(vmetad);
+	}
+
+	const auto fmetad = fs.m_manager->file_meta_description();
+	if(!fmetad.empty()) {
+		printf("  File metadata:\n");
+		display_metadata_info(fmetad);
+	}
+
+	const auto dmetad = fs.m_manager->directory_meta_description();
+	if(!dmetad.empty()) {
+		printf("  Directory metadata:\n");
+		display_metadata_info(dmetad);
+	}
+}
+
+static void display_standard_usage(char *argv[])
 {
 	/* Usage */
-	fprintf(stderr, "floptool - Generic floppy image manipulation tool for use with MAME\n\n");
-	display_usage(argv[0]);
-	fprintf(stderr, "\n");
-	display_formats();
+	printf("floptool - Generic floppy image manipulation tool for use with MAME\n\n");
+	display_usage(stdout, argv[0], nullptr);
 }
 
 static int identify(int argc, char *argv[])
@@ -122,7 +278,7 @@ static int identify(int argc, char *argv[])
 
 	if(argc<3) {
 		fprintf(stderr, "Missing name of file to identify.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -200,7 +356,7 @@ static int flopconvert(int argc, char *argv[])
 {
 	if(argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -271,7 +427,7 @@ static int flopcreate(int argc, char *argv[])
 
 	if(argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -413,7 +569,7 @@ static int flopdir(int argc, char *argv[])
 {
 	if(argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -452,7 +608,7 @@ static int hddir(int argc, char *argv[])
 {
 	if(argc!=4) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -561,7 +717,7 @@ static int flophashes(int argc, char *argv[])
 {
 	if(argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -600,7 +756,7 @@ static int hdhashes(int argc, char *argv[])
 {
 	if(argc!=4) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -653,7 +809,7 @@ static int flopread(int argc, char *argv[])
 {
 	if(argc!=7) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -692,7 +848,7 @@ static int hdread(int argc, char *argv[])
 {
 	if(argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -768,7 +924,7 @@ static int flopwrite(int argc, char *argv[])
 {
 	if(argc!=7) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -815,7 +971,7 @@ static int hdwrite(int argc, char *argv[])
 {
 	if(argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -895,7 +1051,7 @@ static int flopchmeta(int argc, char *argv[])
 
 	if(argc!=5 && argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -938,7 +1094,7 @@ static int floprename(int argc, char *argv[])
 {
 	if(argc!=7) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -989,7 +1145,7 @@ static int flopremove(int argc, char *argv[])
 {
 	if(argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage(argv[0]);
+		display_usage(stderr, argv[0], argv[1]);
 		return 1;
 	}
 
@@ -1035,10 +1191,71 @@ static int flopremove(int argc, char *argv[])
 	return 0;
 }
 
+static int help(int argc, char *argv[])
+{
+	if(argc!=2 && argc!=3) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(stderr, argv[0], argv[1]);
+		return 1;
+	}
+
+	if(argc==2 || !strcmp(argv[2], "commands")) {
+		display_standard_usage(argv);
+		return 0;
+	}
+
+	if(!strcmp(argv[2], "all")) {
+		display_standard_usage(argv);
+		printf("\n");
+		display_formats();
+		printf("\n\n");
+		display_filesystems();
+		return 0;
+	}
+
+	if(argv[2][0] == '.')
+		return display_formats_by_extension(argv[2]);
+
+	if(!strcmp(argv[2], "formats")) {
+		display_formats();
+		return 0;
+	}
+
+	if(!strcmp(argv[2], "filesystems")) {
+		display_filesystems();
+		return 0;
+	}
+
+	if(std::find_if(std::begin(s_command_usage), std::end(s_command_usage), [argv] (const command_info &info) { return !strcmp(info.name, argv[2]); }) != std::end(s_command_usage)) {
+		display_usage(stdout, argv[0], argv[2]);
+		return 0;
+	}
+
+	auto fmtinfo = formats.find_floppy_format_info_by_key(argv[2]);
+	if(fmtinfo) {
+		display_format_info(*fmtinfo);
+		return 0;
+	}
+
+	auto fs = formats.find_filesystem_format_by_key(argv[2]);
+	if(!fs) {
+		auto create_fs = formats.find_floppy_create_info_by_key(argv[2]);
+		if(create_fs)
+			fs = formats.find_filesystem_format_by_key(create_fs->m_manager->name());
+	}
+	if(fs) {
+		display_filesystem_info(*fs);
+		return 0;
+	}
+
+	fprintf(stderr, "No help available for \"%s\".\n", argv[2]);
+	return 1;
+}
+
 static int version(int argc, char *argv[])
 {
 	extern const char build_version[];
-	fprintf(stdout, "%s\n", build_version);
+	printf("%s\n", build_version);
 	return 0;
 }
 
@@ -1047,7 +1264,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	formats.init();
 
 	if(argc == 1) {
-		display_full_usage(argv);
+		display_standard_usage(argv);
 		return 0;
 	}
 
@@ -1080,11 +1297,13 @@ int CLIB_DECL main(int argc, char *argv[])
 			return hdread(argc, argv);
 		else if(!core_stricmp("hdwrite", argv[1]))
 			return hdwrite(argc, argv);
+		else if(!core_stricmp("help", argv[1]))
+			return help(argc, argv);
 		else if (!core_stricmp("version", argv[1]))
 			return version(argc, argv);
 		else {
 			fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
-			display_usage(argv[0]);
+			display_usage(stderr, argv[0], nullptr);
 			return 1;
 		}
 	} catch(const std::exception &err) {

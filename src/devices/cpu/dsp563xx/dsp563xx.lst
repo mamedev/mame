@@ -1,5 +1,9 @@
 ....00                       -
 ....26 abs d                 - d:acc(3)
+	if($d & 0x80000000000000) {
+		$d:w((-$d) & 0xffffffffffffff);
+	}
+
 ....21 adc s,d               - s:xyr(4) d:acc(3)
 ....10 add s,d               - s:nacc(3) d:acc(3)
 	$d:w(do_add56(util::sext($s, 56), $d));
@@ -326,10 +330,10 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$xy:m.write_dword($r + $o, $s:h);
 
 014080 add #i,d              - i:imm6(8) d:acc(3)
-	$d = do_add56(u64($i) << 24, $d);
+	$d:w(do_add56(u64($i) << 24, $d));
 
 0140c0 add #i,d              - d:acc(3) i:eximm()
-	$d = do_add56(util::sext($i << 24, 48), $d);
+	$d:w(do_add56(util::sext(u64($i) << 24, 48), $d));
 
 014086 and #i,d              - i:imm6(8) d:acc(3)
 	u32 r = $d:1 & $i;
@@ -378,7 +382,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 0d1840 bcc r                 - r:ar(8) cc:cc(0) cond
 	if($cc) {
- 		m_npc = m_pc + $r;
+		m_npc = m_pc + $r;
 	}
 
 0b4000 bchg #n,xy:ea         - ea:eam1(8) xy:xyc(6) n:bit5(0)
@@ -1370,14 +1374,27 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 
 000087 stop                  -
 014084 sub #i,d              - i:imm6(8) d:acc(3)
-	$d = do_sub56(u64($i) << 24, $d);
+	$d:w(do_sub56(u64($i) << 24, $d));
 
 0140c4 sub #i,d              - d:acc(3) i:eximm()
-	$d = do_sub56(util::sext($i << 24, 48), $d);
+	$d:w(do_sub56(util::sext(u64($i) << 24, 48), $d));
 
 020000 tcc s1,d1             - cc:cc(12) s1:daos3(4, 3) d1:acc(3)
+	if($cc) {
+		$d1:w($s1);
+	}
+
 030000 tcc s1,d1 s2,d2       - cc:cc(12) s2:ar(8) s1:daos3(4, 3) d1:acc(3) d2:ar(0)
+	if($cc) {
+		$d1:w($s1);
+		$d2:w($s2);
+	}
+
 020800 tcc s2,d2             - cc:cc(12) s2:ar(8) d2:ar(0)
+	if($cc) {
+		$d2:w($s2);
+	}
+
 000006 trap                  -
 000010 trapcc                - cc:cc(0) cond
 0ac0c0 vsl s,i,l:ea          - s:acc(16) ea:eam1(8) i:imm1(4)

@@ -13,6 +13,43 @@ DEFINE_DEVICE_TYPE(P80C552, p80c552_device, "p80c552", "Philips P80C552")
 DEFINE_DEVICE_TYPE(P87C552, p87c552_device, "p87c552", "Philips P87C552")
 DEFINE_DEVICE_TYPE(P80C562, p80c562_device, "p80c562", "Philips P80C562")
 
+void i80c51_device::device_start()
+{
+	mcs51_cpu_device::device_start();
+	m_slave_address = 0;
+	m_slave_mask = 0;
+
+	save_item(NAME(m_slave_address));
+	save_item(NAME(m_slave_mask));
+}
+
+void i80c51_device::sfr_map(address_map &map)
+{
+	mcs51_cpu_device::sfr_map(map);
+	map(0xa9, 0xa9).rw(FUNC(i80c51_device::slave_address_r), FUNC(i80c51_device::slave_address_w));
+	map(0xb9, 0xb9).rw(FUNC(i80c51_device::slave_mask_r), FUNC(i80c51_device::slave_mask_w));
+}
+
+void i80c51_device::slave_address_w(u8 data)
+{
+	m_slave_address = data;
+}
+
+u8 i80c51_device::slave_address_r()
+{
+	return m_slave_address;
+}
+
+void i80c51_device::slave_mask_w(u8 data)
+{
+	m_slave_mask = data;
+}
+
+u8 i80c51_device::slave_mask_r()
+{
+	return m_slave_mask;
+}
+
 bool i80c51_device::manage_idle_on_interrupt(u8 ints)
 {
 	/* any interrupt terminates idle mode */

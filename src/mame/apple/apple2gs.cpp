@@ -656,7 +656,10 @@ u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 	// regardless of the language card config.
 	if (!(m_shadow & SHAD_IOLC))
 	{
-		return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
+		if (m_inh_slot != -1 && (m_slotdevice[m_inh_slot]->inh_type() & INH_READ) == INH_READ)
+			return m_slotdevice[m_inh_slot]->read_inh_rom(offset | 0xFFE0);
+		else
+			return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 	}
 	else    // else vector fetches from bank 0 RAM
 	{
@@ -1521,9 +1524,10 @@ u8 apple2gs_state::c000_r(offs_t offset)
 	}
 
 	slow_cycle();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
-	u8 uKeyboard = keyglu_816_read(GLU_C000);
-	u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
+	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
+	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
+	const u8 uKeyboard = keyglu_816_read(GLU_C000);
+	const u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
 
 	switch (offset)
 	{
@@ -1635,7 +1639,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_diskreg;
 
 		case 0x32: // VGCINTCLEAR
-			return read_floatingbus();
+			return uFloatingBus;
 
 		case 0x33: // CLOCKDATA
 			return m_clkdata;
@@ -1779,7 +1783,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		return uKeyboard;
 	}
 
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 void apple2gs_state::c000_w(offs_t offset, u8 data)
@@ -1927,7 +1931,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x2d:  // SLOTROMSEL
 			m_slotromsel = data;
 			break;
-		case 0x31:  //
+
+		case 0x31:  // DISKREG
 			if (!BIT(data, DISKREG_35SEL))
 			{
 				m_motoroff_time = 30;

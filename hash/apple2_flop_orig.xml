@@ -980,7 +980,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="orbitron">
+	<software name="orbitron" supported="no">
 		<description>Orbitron</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
@@ -1209,8 +1209,8 @@ license:CC0-1.0
 		<description>Raster Blaster</description>
 		<year>1981</year>
 		<publisher>BudgeCo</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, //e or //c." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C" />
 		<!-- Dump released: 2018-10-26 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1291,28 +1291,15 @@ license:CC0-1.0
 		<description>Russki Duck</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility problems caused by the copy protection, it will not run on later models." />
+		<info name="author" value="Eric Knopp" />
+		<info name="author" value="Alan Merrell" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-01-24 -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="366642">
 				<rom name="russki duck.woz" size="366642" crc="966e3da1" sha1="4ab54d8b475d12bc54fa8c58fca4af1c68f059b5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sargon3">
-		<description>Sargon III</description>
-		<year>1983</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Runs on any 48K Apple ][+, //e, //c, or IIgs." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2018-08-17 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233540">
-				<rom name="sargon iii.woz" size="233540" crc="4221ff2a" sha1="1148babdcf183c9bfe40d89cdb5befc5ed53cd6f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1446,7 +1433,7 @@ license:CC0-1.0
 		<description>Space Eggs</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+, or an unenhanced Apple //e. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2018-10-31 -->
 
@@ -1664,7 +1651,8 @@ license:CC0-1.0
 		<description>Trick Shot</description>
 		<year>1981</year>
 		<publisher>IDSI</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. It will not run on later models." />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-08-23 -->
 
@@ -1851,8 +1839,8 @@ license:CC0-1.0
 		<description>Eggs-It</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-02-21 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1881,8 +1869,8 @@ license:CC0-1.0
 		<description>Gamma Goblins</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-02-27 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1978,8 +1966,8 @@ license:CC0-1.0
 		<description>Beer Run</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-10 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1993,8 +1981,8 @@ license:CC0-1.0
 		<description>Phaser Fire</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-11 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2008,8 +1996,8 @@ license:CC0-1.0
 		<description>Bug Attack</description>
 		<year>1981</year>
 		<publisher>Cavalier Computer</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on 65C02-based models." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-12 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2038,8 +2026,8 @@ license:CC0-1.0
 		<description>High Orbit</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced Apple //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-03-14 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2388,7 +2376,7 @@ license:CC0-1.0
 		<description>Neptune</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-04-27 -->
 
@@ -2463,8 +2451,9 @@ license:CC0-1.0
 		<description>Juggler</description>
 		<year>1982</year>
 		<publisher>IDSI</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to compatibility problems created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-05-06 -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -2884,21 +2873,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tetrad">
-		<description>Tetrad</description>
-		<year>1981</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-06-24 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234762">
-				<rom name="tetrad.woz" size="234762" crc="80ede3c9" sha1="ea1ae9b469e4bce84af5b69cf3ceb4ed60cc31b1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="witnsr22">
 		<description>Witness (Release 22 / 840924)</description>
 		<year>1983</year>
@@ -3015,9 +2989,10 @@ license:CC0-1.0
 		<description>Quadrant 6112</description>
 		<year>1982</year>
 		<publisher>Sensible Software</publisher>
-		<info name="usage" value="Requires an Apple ][ or ][+ with 48K. Due to compatibility issues created by the copy protection, it will not run on later models. Even with a compatible ROM file, this game triggers bugs in several emulators, resulting in crashes or spontaneous reboots." />
+		<info name="usage" value="Requires an Apple ][ or ][+ with 48K. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-07-01 -->
+		<!-- This game triggers bugs in several emulators, resulting in crashes or spontaneous reboots. -->
 		<!-- Tested for several minutes in MAME on 2019-07-03 with no obvious crashes. Will leave tagged as working unless reports say otherwise. -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3589,21 +3564,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="235460">
 				<rom name="apple stellar invaders.woz" size="235460" crc="edf89d17" sha1="12ffab9535d9a98b26638b7d8de72de8556efa71" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="reversal">
-		<description>Reversal</description>
-		<year>1980</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 32K Apple ][ or later.  May need a 48K Apple ][+ or later with emulation." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-10-14 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234813">
-				<rom name="reversal.woz" size="234813" crc="ec850ca7" sha1="e6726b394b80467052b698c6c71941dd569082e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -4677,7 +4637,7 @@ license:CC0-1.0
 		<description>Horizon V</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="usage" value="Requires an Apple ][ or Apple ][+. Due to restrictive copy protection, it will not boot on later models." />
+		<info name="usage" value="Requires an Apple ][ or Apple ][+. Due to restrictive copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2020-01-22 -->
 
@@ -8288,22 +8248,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wargle">
-		<description>Wargle!</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-10-30 -->
-		<!-- "Wargle!" is a 1982 action game developed and distributed by Hayden Book Company. It requires a 48K Apple ][+ or later. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234778">
-				<rom name="wargle.woz" size="234778" crc="1206aa31" sha1="c2431e7f2cbda517edb71d4458fa0e85a36338fb" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="stardanc">
 		<description>Star Dance</description>
 		<year>1981</year>
@@ -8325,7 +8269,7 @@ license:CC0-1.0
 		<description>Disk Organizer (version 2.6)</description>
 		<year>1982</year>
 		<publisher>Sensible Software</publisher>
-		<info name="usage" value="Requires an Apple ][, ][+, or unenhanced //e with 48K." />
+		<info name="usage" value="Requires an Apple ][, ][+, or unenhanced //e with 48K. It will not run on 65C02-based models." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2021-11-03 -->
 		<!-- "Disk Organizer" is a 1982 disk utility developed and distributed by Sensible Software. This is version 2.6. It requires an Apple ][, ][+, or unenhanced //e with 48K. -->
@@ -8968,7 +8912,9 @@ license:CC0-1.0
 		<description>Space Adventure: Episode One</description>
 		<year>1981</year>
 		<publisher>Sierra Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+." />
+		<info name="author" value="Alick Dziabczenko" />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it does not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2022-02-19 -->
 		<!-- "Space Adventure: Episode One" is a 1981 action game developed by Alick Dziabczenko and distributed by Sierra Software. It requires a 48K Apple ][ or ][+. Due to aggressive copy protection, it does not run on later models. -->
@@ -10023,22 +9969,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="finlconf">
-		<description>The Final Conflict</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2022-02-21 -->
-		<!-- "The Final Conflict" is a 1982 strategy game developed by Thomas G. Cleaver and distributed by Hayden Book Company. It requires a 48K Apple ][+ or later. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234810">
-				<rom name="the final conflict.woz" size="234810" crc="149270e2" sha1="1e1ba74c733adfd57df96c6f395e9804f03dc69a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="intrigue">
 		<description>Intrigue!</description>
 		<year>1986</year>
@@ -10449,7 +10379,7 @@ license:CC0-1.0
 		<description>Computer Foosball</description>
 		<year>1981</year>
 		<publisher>Sirius Software</publisher>
-		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2022-05-26 -->
 		<!-- "Computer Foosball" is a 1981 sports game developed by Keithen Hayenga and distributed by Sirius Software. It requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models. -->
@@ -13075,7 +13005,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Sensible Software</publisher>
 		<info name="programmer" value="Marv Long" />
-		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later systems." />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2023-07-27 -->
 		<!-- action game -->
@@ -13879,9 +13809,9 @@ license:CC0-1.0
 
 	<software name="alibi">
 		<description>Alibi</description>
-		<year>1981</year>
+		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
-		<info name="programmer" value="Ian Trackman" />
+		<info name="programmer" value="Ian L. Trackman" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-10-14 -->
@@ -14266,7 +14196,8 @@ license:CC0-1.0
 		<description>Amnesia</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Thomas M. Disch" />
+		<info name="author" value="Thomas M. Disch" />
+		<info name="developer" value="Cognetics" />
 		<info name="programmer" value="Kevin Bentley" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -17000,6 +16931,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="catmouse">
+		<description>Cat 'n Mouse</description>
+		<year>1986</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234764">
+				<rom name="cat 'n mouse.woz" size="234764" crc="f319ee15" sha1="b40b5b20cb597bece74a51a3ae2db910a9bb19c7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="catdetg">
 		<description>Categorizing: Detective Games</description>
 		<year>1988</year>
@@ -17358,7 +17305,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="choplftr">
+	<software name="choplftr" supported="no">
 		<description>Choplifter</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
@@ -19074,6 +19021,40 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="cottales87" cloneof="cottales">
+		<description>Cotton Tales (version 1987)</description>
+		<year>1987</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1987" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234764">
+				<rom name="cotton tales v1987.woz" size="234764" crc="41513f6f" sha1="39dbced9f32e3cdbc5414d72e21b74f344d5b7ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cottales90_525" cloneof="cottales">
+		<description>Cotton Tales (version 1990)</description>
+		<year>1990</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1990" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="cotton tales v1990.woz" size="234777" crc="738b5373" sha1="0f24a7698248a79a9c34a5dc969031a35b11b826" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cottales">
 		<description>Cotton Tales (version 1990) (800K 3.5")</description>
 		<year>1990</year>
@@ -19249,9 +19230,9 @@ license:CC0-1.0
 		<description>Crime Stopper</description>
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
+		<info name="author" value="Barry Marx" />
 		<info name="developer" value="Imaginative Systems Software" />
 		<info name="programmer" value="Dan Kitchen" />
-		<info name="programmer" value="Barry Marx" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-09-28 -->
@@ -19535,7 +19516,7 @@ license:CC0-1.0
 		<description>Crystal Caverns</description>
 		<year>1982</year>
 		<publisher>Hayden Book Company</publisher>
-		<info name="developer" value="Imaginative Systems" />
+		<info name="developer" value="Imaginative Systems Software" />
 		<info name="programmer" value="Daniel Kitchen" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
@@ -20617,7 +20598,8 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Micro Lab</publisher>
 		<info name="programmer" value="Bill Basham" />
-		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="protection" value="Protect-O-Disk" />
+		<info name="usage" value="Requires a 48K Apple ][ or Apple ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-10-14 -->
 		<!-- action game -->
@@ -20803,8 +20785,7 @@ license:CC0-1.0
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Doug Carlston" />
 		<info name="programmer" value="Brian Crouch" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+." />
-		<!-- Due to compatibility problems created by the copy protection, it will not run on later models. -->
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-05-01 -->
 		<!-- educational game -->
@@ -21034,6 +21015,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dynoqst">
+		<description>Dyno-Quest</description>
+		<year>1984</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2024-11-24 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234762">
+				<rom name="dyno-quest.woz" size="234762" crc="3463fc9f" sha1="4969ff1f02bb2e29981a24180812f00e9c424339" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eagles">
 		<description>Eagles (version 1.0)</description>
 		<year>1983</year>
@@ -21187,6 +21184,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234798">
 				<rom name="easy as abc (spinnaker).woz" size="234798" crc="5d7d691a" sha1="e004af1ad17cc32c826713a162955778474cc49a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easystr">
+		<description>Easy Street</description>
+		<year>1988</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234691">
+				<rom name="easy street.woz" size="234691" crc="03a594af" sha1="0d14c32f2b3f40d20aa92b71a801a692873dc5f0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21798,6 +21811,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="factblast">
+		<description>Factor Blast</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Joe DeMuth" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="188192">
+				<rom name="factor blast.woz" size="188192" crc="3b6d8d88" sha1="fbe80cbffa03f7143a312fc26aaf6bd36322daa7" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="factfall">
 		<description>Facts and Fallacies (version 02.01.87) (800K 3.5")</description>
 		<year>1984</year>
@@ -22216,6 +22245,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="frctnoid">
+		<description>Fraction-oids (version 1989)</description>
+		<year>1989</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1989" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234765">
+				<rom name="fraction-oids.woz" size="234765" crc="8d7bd380" sha1="af65f15b22f8b54ff0740c9ae0320f0b10673839" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fredpzad">
 		<description>Freddy's Puzzling Adventures (revision D)</description>
 		<year>1984</year>
@@ -22491,7 +22537,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gendrift">
+	<software name="gendrift" supported="no">
 		<description>Genetic Drift</description>
 		<year>1981</year>
 		<publisher>Brøderbund Software</publisher>
@@ -22922,8 +22968,8 @@ license:CC0-1.0
 		<info name="developer" value="StarCraft" />
 		<info name="programmer" value="M. Tomita" />
 		<info name="programmer" value="Shigeya Suzuki" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+.  It will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, //e or IIgs. It will not run on an Apple //c." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2GS" />
 		<!-- Dump released: 2019-02-24 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -23989,7 +24035,8 @@ license:CC0-1.0
 		<publisher>Sierra On-Line</publisher>
 		<info name="alt_title" value="Jawbreaker" />
 		<info name="programmer" value="Chuck Bueche (Chuckles)" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
+		<info name="protection" value="Spiradisc System" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-09-21 -->
 		<!-- action game -->
@@ -24101,7 +24148,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="jumblz35">
+	<software name="jmblezzz87" cloneof="jmblezzz">
+		<description>Jumblezzz (version 1987)</description>
+		<year>1987</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1987" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234761">
+				<rom name="jumblezzz.woz" size="234761" crc="2695cec7" sha1="080d38c1dfd955b1184238c70c2ec05af3af6dcc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jmblezzz">
 		<description>Jumblezzz (version 1990) (800K 3.5")</description>
 		<year>1990</year>
 		<publisher>Mindplay</publisher>
@@ -24184,6 +24248,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234788">
 				<rom name="j-bird.woz" size="234788" crc="98debcd8" sha1="f22a533197f895a950cdb04965a20a09d073ca54" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kamikaze">
+		<description>Kamikaze</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="kamikaze.woz" size="234774" crc="20670bef" sha1="15c487dd292df2a4c85f2566c521e3b08b717387" />
 			</dataarea>
 		</part>
 	</software>
@@ -24347,6 +24428,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234803">
 				<rom name="kinder critters- letters and patterns.woz" size="234803" crc="cc43ebbe" sha1="495ff9e15d607f7db830a5c651a70153303740c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingcrib">
+		<description>King Cribbage</description>
+		<year>1981</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Randi J. Rost" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- card game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="king cribbage.woz" size="234763" crc="71025c9a" sha1="e2eb388bb2c06830ed46d0d24aae655b0473df64" />
 			</dataarea>
 		</part>
 	</software>
@@ -24801,7 +24898,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Scott Schram" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-03-17 -->
 		<!-- action game -->
@@ -24867,6 +24964,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lsrbounc">
+		<description>Laser Bounce</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="Kevin Kalkut" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234781">
+				<rom name="laser bounce.woz" size="234781" crc="03f340f8" sha1="60ab961e6b57b059a1dc4f9f6c4e4b845b1aed75" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="latintut">
 		<description>Latin Tutor</description>
 		<year>1983</year>
@@ -24904,8 +25018,8 @@ license:CC0-1.0
 		<description>Lazer Silk (Gebelli Software)</description>
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
-		<info name="programmer" value="Eric Knoff" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="programmer" value="Eric Knopp" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-03-21 -->
 		<!-- action game -->
@@ -24921,7 +25035,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Softsmith</publisher>
 		<info name="original_publisher" value="Gebelli Software" />
-		<info name="programmer" value="Eric Knoff" />
+		<info name="programmer" value="Eric Knopp" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-11-14 -->
@@ -25411,7 +25525,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Chuck Bueche (Chuckles)" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to conflicts created by the copy protection, it will not run on later models." />
+		<info name="protection" value="Spiradisc System" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2019-02-23 -->
 		<!-- action game -->
@@ -26212,6 +26327,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="241632">
 				<rom name="mastertype v2.1.woz" size="241632" crc="2e3f25b3" sha1="944ee9e263ce5cceee795ede0dd5d8829d26cb15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchup">
+		<description>Match Up!</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Debora Cole-Kupperstein, M.S. Ed." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234790">
+				<rom name="match up.woz" size="234790" crc="1de98eb8" sha1="2b4dc063662364087b1904ecc6271cac90749911" />
 			</dataarea>
 		</part>
 	</software>
@@ -27146,6 +27277,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="micrjrny">
+		<description>Microscopic Journey</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Dan Sullivan" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234770">
+				<rom name="microscopic journey.woz" size="234770" crc="3ce5e65c" sha1="686498ffa16cb3b3e053e8141f681ae417f388ef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtypingii">
+		<description>Microtyping II</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Dr. C. William Engel" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234796">
+				<rom name="microtyping ii.woz" size="234796" crc="e2718e76" sha1="0d29f8f75209352799e9d3bab25019ce63c8c8a1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="microz1">
 		<description>Microzine 1</description>
 		<year>1983</year>
@@ -27167,7 +27330,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bob Neumann" />
 		<info name="programmer" value="Megan Stine" />
 		<info name="programmer" value="H. William Stine" />
-		<info name="usage" value="Requires a 48K Apple ][+ or unenhanced //e. Due to issues unrelated to the copy protection, it does not run on later machines." />
+		<info name="usage" value="Requires a 48K Apple ][+ or unenhanced //e. Due to issues unrelated to the copy protection, it does not run on later machines without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2P,A2E" />
 		<!-- Dump released: 2022-08-02 -->
 		<!-- educational disk-based magazine published by Scholastic between 1983 and 1992. -->
@@ -30372,10 +30535,9 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>COMPUTER:applications</publisher>
 		<info name="developer" value="COMPUTER:applications" />
-		<info name="usage" value="Requires an Apple ][ or Apple ][+ with 48K" />
+		<info name="usage" value="Requires an Apple ][ or Apple ][+ with 48K. Due to copy protection, it does not boot on later models without nonstandard firmware." />
 		<info name="version" value="A1" />
 		<sharedfeat name="compatibility" value="A2,A2P" />
-		<!-- Due to aggressive copy protection, it does not boot on later models. -->
 		<!-- Dump released: 2024-03-17 -->
 		<!-- disk utility program -->
 		<part name="flop1" interface="floppy_5_25">
@@ -31168,7 +31330,8 @@ license:CC0-1.0
 		<description>Pest Patrol</description>
 		<year>1982</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues caused by the copy protection, it will not run on any later models." />
+		<info name="protection" value="Spiradisc System" />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-10-25 -->
 		<!-- action game -->
@@ -31260,6 +31423,23 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="234785">
 				<rom name="pickleface and other stories v04.07.90 disk 3.woz" size="234785" crc="915d591a" sha1="97a56c25fb3c4582217cc37cf65cc5d44326dac6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pictperf">
+		<description>Picture Perfect (version 1989)</description>
+		<year>1989</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1989" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234777">
+				<rom name="picture perfect v1989.woz" size="234777" crc="86815b1e" sha1="505b89960ae901e3980765a0a61efd254fc5efaa" />
 			</dataarea>
 		</part>
 	</software>
@@ -31898,6 +32078,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="qwertyaa">
+		<description>Qwerty's Alphabet Adventure</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="developer" value="Hayden Software" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234756">
+				<rom name="qwerty's alphabet adventure.woz" size="234756" crc="baec9d33" sha1="07a519dc4306cf4349ef6510984ab78968e06d36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raceclck">
+		<description>Race the Clock</description>
+		<year>1984</year>
+		<publisher>Mindplay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234766">
+				<rom name="race the clock.woz" size="234766" crc="47dfdb00" sha1="fa847747df59c893c7d87a507e0796272c67548b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="racter">
 		<description>Racter</description>
 		<year>1985</year>
@@ -32529,7 +32741,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Olaf Lubeck" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility problems caused by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-11-19 -->
 		<!-- action game -->
@@ -32654,6 +32866,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="235508">
 				<rom name="return of heracles.woz" size="235508" crc="50be7d16" sha1="24e16ab619a269e8cb47d0a3557aec1cf9c35d98" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversal">
+		<description>Reversal</description>
+		<year>1980</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Dan Spracklen" />
+		<info name="programmer" value="Kathe Spracklen" />
+		<info name="usage" value="Requires a 32K Apple ][ or later.  May need a 48K Apple ][+ or later with emulation." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-10-14 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="reversal.woz" size="234813" crc="ec850ca7" sha1="e6726b394b80467052b698c6c71941dd569082e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -32850,6 +33079,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296169">
 				<rom name="robin hood and peter pan 800k.woz" size="1296169" crc="fa681449" sha1="4dfe12a419d305baee700410df442b5a02983fde" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robomath">
+		<description>RoboMath</description>
+		<year>1985</year>
+		<publisher>MindPlay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-24 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234760">
+				<rom name="robomath.woz" size="234760" crc="785cce65" sha1="6bd7aef9fbd05b223b49b18fb14343ef76217467" />
 			</dataarea>
 		</part>
 	</software>
@@ -33194,6 +33439,42 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234768">
 				<rom name="saracen.woz" size="234768" crc="487c650f" sha1="949307b3be9f8f533fe9fd89650f76a70ebebbca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon2">
+		<description>Sargon II</description>
+		<year>1979</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Dan Spracklen" />
+		<info name="programmer" value="Kathe Spracklen" />
+		<info name="usage" value="Requires a 24K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-11-12 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174902">
+				<rom name="sargon ii.woz" size="174902" crc="9aa7f20d" sha1="cd53c564732fa5f99704ba8b349b44862bef6d60" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon3">
+		<description>Sargon III (revision 1)</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Dan Spracklen" />
+		<info name="programmer" value="Kathe Spracklen" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<!-- Title page has Hayden Book Company and does not include Great Games disk. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-08-17 -->
+		<!-- chess game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="233540">
+				<rom name="sargon iii.woz" size="233540" crc="4221ff2a" sha1="1148babdcf183c9bfe40d89cdb5befc5ed53cd6f" />
 			</dataarea>
 		</part>
 	</software>
@@ -33745,7 +34026,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="seafox">
+	<software name="seafox" supported="no">
 		<description>Sea Fox</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
@@ -33826,8 +34107,8 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="David Snider" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
-		<sharedfeat name="compatibility" value="A2,A2P" />
+		<info name="usage" value="Requires a 48K Apple ][, ][+, or unenhanced //e. Due to copy protection, it will not run on later models without nonstandard firmware." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2019-02-28 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -34000,6 +34281,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234797">
 				<rom name="shortcuts.woz" size="234797" crc="80fbf42c" sha1="fb47e355e373345d03139b44c1f1f68934cf0c56" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shtlintr">
+		<description>Shuttle Intercept</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="shuttle intercept.woz" size="234775" crc="71b41ee1" sha1="f303b93c84e76397d5931521a7c143003a89369f" />
 			</dataarea>
 		</part>
 	</software>
@@ -34266,7 +34564,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Chris Jochumson" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility problems caused by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2018-10-30 -->
 		<!-- action game -->
@@ -34752,7 +35050,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Tony Suzuki" />
-		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to compatibility issues created by the copy protection, it will not run on later models." />
+		<info name="usage" value="Requires a 48K Apple ][ or ][+. Due to copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P" />
 		<!-- Dump released: 2019-03-25 -->
 		<!-- action game -->
@@ -35458,6 +35756,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234831">
 				<rom name="stoichiometry.woz" size="234831" crc="ebb12c17" sha1="97388f24e0da8a0d02d23f315bb2304f3783897f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="storysket">
+		<description>Story Sketcher (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>MindPlay</publisher>
+		<info name="developer" value="Methods &amp; Solutions" />
+		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K enhanced //e with a compatible drive controller card." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-10-29 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296140">
+				<rom name="story sketcher 800k.woz" size="1296140" crc="33c37884" sha1="83f15ee9a2fa0d3fb3597760776c1126afe2f548" />
 			</dataarea>
 		</part>
 	</software>
@@ -36375,6 +36689,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234796">
 				<rom name="ten clues.woz" size="234796" crc="8b32d377" sha1="a370910a23961dd66844ac3e7b1bb48f3bf9b3fd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrad">
+		<description>Tetrad</description>
+		<year>1981</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Phillip Hess" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-06-24 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234762">
+				<rom name="tetrad.woz" size="234762" crc="80ede3c9" sha1="ea1ae9b469e4bce84af5b69cf3ceb4ed60cc31b1" />
 			</dataarea>
 		</part>
 	</software>
@@ -37498,6 +37828,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="finlconf">
+		<description>The Final Conflict</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Thomas G. Cleaver" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-02-21 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="the final conflict.woz" size="234810" crc="149270e2" sha1="1e1ba74c733adfd57df96c6f395e9804f03dc69a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="1sttksgv">
 		<description>The First Thanksgiving</description>
 		<year>1984</year>
@@ -37696,6 +38042,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234732">
 				<rom name="the graphics magician junior.woz" size="234732" crc="d9f3fe83" sha1="5a29e09bee6c39c08a6291225f118c4370a811a2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maincali">
+		<description>The Great Maine to California Race</description>
+		<year>1983</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Natalie Jesdale M.S., ED." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234811">
+				<rom name="the great maine-to-california race side a.woz" size="234811" crc="b3d6d559" sha1="983bc7863534d2505ae444f7c21c86419f023561" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234811">
+				<rom name="the great maine-to-california race side b.woz" size="234811" crc="e688567b" sha1="a5818ab827b281d1154c596d4e63e42e216282a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -40571,6 +40940,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wargle">
+		<description>Wargle!</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Eastgate Systems" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-10-30 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="wargle.woz" size="234778" crc="1206aa31" sha1="c2431e7f2cbda517edb71d4458fa0e85a36338fb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="warship10">
 		<description>Warship (version 1.0)</description>
 		<year>1986</year>
@@ -41317,12 +41702,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry1v0981" cloneof="wizrdry1">
+	<software name="wizardry1v0981" cloneof="wizardry1">
 		<description>Wizardry: Proving Grounds of the Mad Overlord (version 05-SEP-81)</description>
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
-		<info name="programmer" value="Andrew Greenberg" />
-		<info name="programmer" value="Robert Woodhead" />
+		<info name="programmer" value="Andrew C. Greenberg" />
+		<info name="programmer" value="Robert J. Woodhead" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="05-SEP-81" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
@@ -41344,7 +41729,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry1v1281" cloneof="wizrdry1">
+	<software name="wizardry1v1281" cloneof="wizardry1">
 		<description>Wizardry: Proving Grounds of the Mad Overlord (version 01-DEC-81)</description>
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41371,7 +41756,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry1v20" cloneof="wizrdry1">
+	<software name="wizardry1v20" cloneof="wizardry1">
 		<description>Wizardry: Proving Grounds of the Mad Overlord (version 2.0 01-JAN-82)</description>
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41398,7 +41783,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry1v21" cloneof="wizrdry1">
+	<software name="wizardry1v21" cloneof="wizardry1">
 		<description>Wizardry: Proving Grounds of the Mad Overlord (version 2.1 22-JAN-82)</description>
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41425,7 +41810,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry1">
+	<software name="wizardry1">
 		<description>Wizardry: Proving Grounds of the Mad Overlord (version 6 06-JAN-84)</description>
 		<year>1981</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41451,7 +41836,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry2">
+	<software name="wizardry2">
 		<description>Wizardry II: The Knight of Diamonds (version PV3S2V1/10-MAR-82)</description>
 		<year>1982</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41476,7 +41861,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry3">
+	<software name="wizardry3">
 		<description>Wizardry III: Legacy of Llylgamyn (version 4, 20-Aug-1983 update)</description>
 		<year>1983</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41501,7 +41886,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry4">
+	<software name="wizardry4">
 		<description>Wizardry IV: The Return of Werdna</description>
 		<year>1987</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41550,7 +41935,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizrdry5">
+	<software name="wizardry5">
 		<description>Wizardry V: Heart of the Maelstrom</description>
 		<year>1988</year>
 		<publisher>Sir-Tech Software</publisher>
@@ -41700,8 +42085,8 @@ license:CC0-1.0
 		<description>Wiziprint (version 2.01 20-AUG-83)</description>
 		<year>1982</year>
 		<publisher>Sir-Tech Software</publisher>
-		<info name="programmer" value="Andrew Greenberg" />
-		<info name="programmer" value="Robert Woodhead" />
+		<info name="programmer" value="Andrew C. Greenberg" />
+		<info name="programmer" value="Robert J. Woodhead" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<info name="version" value="2.01 20-AUG-83" />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
@@ -42209,7 +42594,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Gebelli Software</publisher>
 		<info name="programmer" value="Nasir Gebelli" />
-		<info name="usage" value="Runs on a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later systems." />
+		<info name="usage" value="Runs on a 48K Apple ][, ][+, or unenhanced //e. Due to aggressive copy protection, it will not run on later models without nonstandard firmware." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
 		<!-- Dump released: 2023-07-26 -->
 		<!-- action game -->

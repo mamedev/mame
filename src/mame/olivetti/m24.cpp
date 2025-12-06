@@ -23,6 +23,7 @@
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "cpu/tms7000/tms7000.h"
 #include "imagedev/floppy.h"
@@ -134,6 +135,7 @@ private:
 	static void floppy_formats(format_registration &fr);
 
 	static void cfg_m20_format(device_t *device);
+	static void cfg_no_serial_mouse(device_t *device);
 	void kbc_map(address_map &map) ATTR_COLD;
 	void m24_io(address_map &map) ATTR_COLD;
 	void m24_map(address_map &map) ATTR_COLD;
@@ -531,6 +533,12 @@ void m24_state::cfg_m20_format(device_t *device)
 	device->subdevice<floppy_connector>("fdc:1")->set_formats(m24_state::floppy_formats);
 }
 
+void m24_state::cfg_no_serial_mouse(device_t *device)
+{
+	/* Don't attach serial mouse, since there's a proprietary mouse */
+	device->subdevice<rs232_port_device>("serport0")->set_default_option(nullptr);
+}
+
 void m24_state::olivetti(machine_config &config)
 {
 	/* basic machine hardware */
@@ -594,9 +602,9 @@ void m24_state::olivetti(machine_config &config)
 	ISA8_SLOT(config, "mb1", 0, m_isabus, pc_isa8_cards, "cga_m24", true);
 	ISA8_SLOT(config, "mb2", 0, m_isabus, pc_isa8_cards, "fdc_xt", true).set_option_machine_config("fdc_xt", cfg_m20_format);
 	ISA8_SLOT(config, "mb3", 0, m_isabus, pc_isa8_cards, "lpt", true);
-	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "mb4", 0, m_isabus, pc_isa8_cards, "com", true).set_option_machine_config("com", cfg_no_serial_mouse);
 
-	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isabus, pc_isa8_cards, "hdc", false);
 	ISA8_SLOT(config, "isa2", 0, m_isabus, pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa3", 0, m_isabus, pc_isa8_cards, nullptr, false);
 

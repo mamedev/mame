@@ -313,7 +313,7 @@ void pc8801_31_device::sasi_req_w(int state)
 			m_drq_cb(1);
 		}
 		// else if (m_sasi->cd_r())
-		// 	m_irq_cb(1);
+		//  m_irq_cb(1);
 	}
 	else if(m_sasi_req && !state)
 	{

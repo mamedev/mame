@@ -54,7 +54,7 @@ static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
 
 
 // pulse shaping parameters
-// can be enabled with set_limit_pw(true)
+// can be enabled with configure_limit_pw(true)
 // examples:
 //    hat trick - skidding ice sounds too loud if minimum width is too big
 //    snake pit - melody during first level too soft if minimum width is too small
@@ -100,7 +100,7 @@ static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
          0.0 == no resonance
         +2.5 == oscillation
 
-    FILTER_FREQENCY
+    FILTER_FREQUENCY
         -3.0 ... +4.0
         -0.375 V/octave
          0.0 == 1300Hz
@@ -184,7 +184,7 @@ cem3394_device &cem3394_device::configure(double r_vco, double c_vco, double c_v
 	m_hpf_k = 1.0 - exp((-1 / (R_AC * c_ac)) * m_inv_sample_rate);
 
 	LOGMASKED(LOG_CONFIG, "CEM3394 config - vco zero freq: %f, filter zero freq: %f, sample rate: %d\n",
-	          m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
+			  m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
 	return *this;
 }
 
@@ -368,9 +368,13 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 	{
 		// take into account any streaming voltage inputs
 		if (streaming_cv)
+		{
 			for (int i = 1; i < INPUT_COUNT; i++)
+			{
 				if (BIT(input_mask, i))
 					set_voltage_internal(i, stream.get(i, sampindex));
+			}
+		}
 
 		// get the current VCO position and step it forward
 		double vco_position = m_vco_position;
@@ -610,7 +614,7 @@ void cem3394_device::set_voltage_internal(int input, double voltage)
 			break;
 
 		// filter frequency varies from -3.0 to +4.0, at 0.375V/octave
-		case FILTER_FREQENCY:
+		case FILTER_FREQUENCY:
 			m_filter_frequency = m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
 			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_FREQ=%6.3fV -> freq=%f\n", voltage, m_filter_frequency);
 			break;
@@ -712,7 +716,7 @@ double cem3394_device::get_parameter(int input)
 			else
 				return voltage * (1.0 / 2.5);
 
-		case FILTER_FREQENCY:
+		case FILTER_FREQUENCY:
 			return m_filter_zero_freq * pow(2.0, -voltage * (1.0 / 0.375));
 	}
 	return 0.0;

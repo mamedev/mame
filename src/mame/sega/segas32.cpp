@@ -5399,23 +5399,98 @@ ROM_END
     AS-1 - Multi-32
     not protected?
 */
-ROM_START( as1 )
+ROM_START( as1 ) // 'AS-1 CONTROLLER FOR SYSTEM 32 MULTI'
 	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
-	ROM_LOAD32_WORD_x4( "epr15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
-	ROM_LOAD32_WORD_x4( "epr15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
+	ROM_LOAD32_WORD_x4( "epr-15420.ic37", 0x000000, 0x20000, CRC(1f9747b0) SHA1(51d1fbccf6960967d4458ba26fad42ac51978c67) )
+	ROM_LOAD32_WORD_x4( "epr-15421.ic40", 0x000002, 0x20000, CRC(aa96422a) SHA1(21cf327d102f5c7c4a4e41d889d9b4d10c44de35) )
 
 	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
-	ROM_LOAD_x4( "epr15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
+	ROM_LOAD_x4( "epr-15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
 
 	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
-	ROM_LOAD16_BYTE( "epr15422.ic3",  0x000000, 0x080000, CRC(6c61ba6d) SHA1(b41237ced4a2e8741ae0339c333bea4221903690) )
-	ROM_LOAD16_BYTE( "epr15423.ic11", 0x000001, 0x080000, CRC(5178912a) SHA1(b637451c28877ddc93c9920bea356888b4c8eea3) )
+	ROM_LOAD16_BYTE( "epr-15422.ic3",  0x000000, 0x080000, CRC(6c61ba6d) SHA1(b41237ced4a2e8741ae0339c333bea4221903690) )
+	ROM_LOAD16_BYTE( "epr-15423.ic11", 0x000001, 0x080000, CRC(5178912a) SHA1(b637451c28877ddc93c9920bea356888b4c8eea3) )
 
 	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", ROMREGION_ERASEFF ) /* sprites */
 	// empty
 
 	ROM_REGION( 0x400000, "mainpcb:sega", ROMREGION_ERASEFF ) /* Sega PCM sound data */
 	// empty
+ROM_END
+
+// 837-9414-04 sticker
+ROM_START( as1a ) // 'AS-1 CONTROLLER FOR SYSTEM MULTI 32' 'with Michael Jackson Scramble training'
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
+	ROM_LOAD32_WORD_x4( "epr-16631.ic37", 0x000000, 0x20000, CRC(fef1a8ef) SHA1(faf530b909e936f980c1a3030aceba878d3ff191) )
+	ROM_LOAD32_WORD_x4( "epr-16632.ic40", 0x000002, 0x20000, CRC(e41dbf85) SHA1(1009c923a7c64eb419f62e499f5ee05eed525699) )
+
+	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
+
+	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "epr-15422.ic3",  0x000000, 0x080000, CRC(6c61ba6d) SHA1(b41237ced4a2e8741ae0339c333bea4221903690) )
+	ROM_LOAD16_BYTE( "epr-15423.ic11", 0x000001, 0x080000, CRC(5178912a) SHA1(b637451c28877ddc93c9920bea356888b4c8eea3) )
+
+	ROM_REGION32_BE( 0x1000000, "mainpcb:sprites", ROMREGION_ERASEFF ) /* sprites */
+	// empty
+
+	ROM_REGION( 0x400000, "mainpcb:sega", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	// empty
+ROM_END
+
+// 837-9414-01 sticker
+ROM_START( as1b ) // 'AS-1 CONTROLLER FOR SYSTEM MULTI 32' 'with Michael Jackson Scramble training'
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
+	ROM_LOAD32_WORD_x4( "epr-17881.ic37", 0x000000, 0x20000, CRC(4f69cb5b) SHA1(c69404ff3885e28d5f44aaec15348f3cf39b037a) )
+	ROM_LOAD32_WORD_x4( "epr-17882.ic40", 0x000002, 0x20000, CRC(06de75f5) SHA1(a4bae6c60f003c402354d538752ce977bcdcbbd5) )
+	ROM_LOAD32_WORD( "epr-15357.ic36",    0x100000, 0x80000, CRC(5e7a4d40) SHA1(ad5ce4175bf146e32b389d159d885221ffece3f4) )
+	ROM_LOAD32_WORD( "epr-15358.ic39 ",   0x100002, 0x80000, CRC(b262a1ab) SHA1(9457a00b92ad5718baff30c71f73340ade9fbc52) )
+
+	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-15367.ic31", 0x00000, 0x20000, CRC(0220f078) SHA1(9fab79fc91764ecf678bfa4d38d1b4054e258b76) )
+
+	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "epr-15363.ic3",  0x000000, 0x080000, CRC(1586b05c) SHA1(053e665afaace36337dc59356d2b81f492440486) )
+	ROM_LOAD16_BYTE( "epr-15364.ic11", 0x000001, 0x080000, CRC(ec751e99) SHA1(09b09ebff5063c7a95b49704f915955fe0f74b04) )
+
+	ROM_REGION32_BE( 0x400000, "mainpcb:sprites", 0 ) /* sprites */
+	ROM_LOAD64_WORD( "epr-15359.ic14", 0x000000, 0x100000, CRC(39b5f9c6) SHA1(c2df9daed4c52625b3620a2c740d37369d54dbf4) )
+	ROM_LOAD64_WORD( "epr-15360.ic15", 0x000002, 0x100000, CRC(1cb862d6) SHA1(25bc3f4ff57cb0cd13e12c19dac3d4641f40063e) )
+	ROM_LOAD64_WORD( "epr-15361.ic10", 0x000004, 0x100000, CRC(0f45174c) SHA1(61d4c8c89c7a525a6fe4f407890f479ee4479f17) )
+	ROM_LOAD64_WORD( "epr-15362.ic38", 0x000006, 0x100000, CRC(09f713db) SHA1(bf4c824c882f7c85e5b3e1102463e0d1a6abf405) )
+
+	ROM_REGION( 0x400000, "mainpcb:sega", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	ROM_LOAD( "epr-15365.ic1", 0x000000, 0x100000, CRC(56d47661) SHA1(c36426fcbdd3b4315be66f64c088ad3573cf28a3) )
+	ROM_LOAD( "epr-15366.ic2", 0x100000, 0x100000, CRC(9ac14e99) SHA1(ad934860f2da74e0308a1f6dff664c9fac9a0e0b) )
+ROM_END
+
+// 837-9414-02 sticker
+ROM_START( as1c ) // 'AS-1 CONTROLLER FOR SYSTEM MULTI 32' ' with Michael Jackson Scramble training'
+	ROM_REGION( 0x200000, "mainpcb:maincpu", 0 ) /* v60 code */
+	ROM_LOAD32_WORD_x4( "epr-15683.ic37",   0x000000, 0x20000, CRC(323426f0) SHA1(81327c1e846ba06d5869303ea9163ece33d99612) )
+	ROM_LOAD32_WORD_SWAP( "epr-15684.ic40", 0x000002, 0x20000, CRC(fc418a55) SHA1(72dfc859c7186b77ce08cd98259af0cf65e045f0) ) // weirdly, word swapped??
+	ROM_RELOAD(                             0x040002, 0x20000 )
+	ROM_RELOAD(                             0x080002, 0x20000 )
+	ROM_RELOAD(                             0x0c0002, 0x20000 )
+	ROM_LOAD32_WORD( "epr-15685.ic36",      0x100000, 0x80000, CRC(5da82597) SHA1(c516dc2f223f396412ff1a52f11ca81f3534b525) )
+	ROM_LOAD32_WORD( "epr-15686.ic39 ",     0x100002, 0x80000, CRC(f11a50fd) SHA1(fd9ed2a9dec3ebbf5c72cae69e72b5be88fa4b41) )
+
+	ROM_REGION( 0x80000, "mainpcb:soundcpu", 0 ) /* sound CPU */
+	ROM_LOAD_x4( "epr-15695.ic31", 0x00000, 0x20000, CRC(a9760b04) SHA1(7a69d80219c3e5817104d5ca8df08796a63b30a0) )
+
+	ROM_REGION( 0x100000, "mainpcb:gfx1", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "epr-15363.ic3",  0x000000, 0x080000, CRC(1586b05c) SHA1(053e665afaace36337dc59356d2b81f492440486) )
+	ROM_LOAD16_BYTE( "epr-15364.ic11", 0x000001, 0x080000, CRC(ec751e99) SHA1(09b09ebff5063c7a95b49704f915955fe0f74b04) )
+
+	ROM_REGION32_BE( 0x400000, "mainpcb:sprites", 0 ) /* sprites */
+	ROM_LOAD64_WORD( "epr-15689.ic14", 0x000000, 0x100000, CRC(bb8fc39e) SHA1(2ff37ca7745aa1686102f08ea6f2c62a0337a5a3) )
+	ROM_LOAD64_WORD( "epr-15690.ic15", 0x000002, 0x100000, CRC(b26fb774) SHA1(3a576d9dfd8c024309abf90094f4a6aee9e02c03) )
+	ROM_LOAD64_WORD( "epr-15691.ic10", 0x000004, 0x100000, CRC(b3d2732b) SHA1(d8e741205fd1b749b3720f02733d4600e85bbbbe) )
+	ROM_LOAD64_WORD( "epr-15692.ic38", 0x000006, 0x100000, CRC(2c18f008) SHA1(3574cf6202f8158942c71731d8708acd724ae147) )
+
+	ROM_REGION( 0x400000, "mainpcb:sega", ROMREGION_ERASEFF ) /* Sega PCM sound data */
+	ROM_LOAD( "epr-15693.ic1", 0x000000, 0x100000, CRC(1bf02938) SHA1(d702ce631f47467c2e59cc25e940c8a59906cd75) )
+	ROM_LOAD( "epr-15694.ic2", 0x100000, 0x100000, CRC(831c23cd) SHA1(9dcf789eddccc424becf964cb9a47d7a9d833841) )
 ROM_END
 
 /*************************************
@@ -6019,4 +6094,7 @@ GAME( 1992, titlef,    0,        sega_multi32,              titlef,   segas32_ne
 GAME( 1992, titlefu,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (US)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, titlefj,   titlef,   sega_multi32,              titlef,   segas32_new_state, init_titlef,   ROT0, "Sega",   "Title Fight (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, as1,       0,        sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1,       0,        sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1a,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1b,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 3)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation
+GAME( 1993, as1c,      as1,      sega_multi32,              multi32_generic,  segas32_new_state, init_holo, ROT0, "Sega",   "AS-1 Controller (set 4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // needs laserdisc emulation

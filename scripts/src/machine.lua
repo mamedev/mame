@@ -631,6 +631,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/82c100.h,MACHINES["82C100"] = true
+---------------------------------------------------
+
+if (MACHINES["82C100"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/82c100.cpp",
+		MAME_DIR .. "src/devices/machine/82c100.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/82c606.h,MACHINES["82C606"] = true
+---------------------------------------------------
+
+if (MACHINES["82C606"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/82c606.cpp",
+		MAME_DIR .. "src/devices/machine/82c606.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
 ---------------------------------------------------
 
@@ -2954,6 +2978,7 @@ end
 --@src/devices/machine/psion_asic3.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic4.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic5.h,MACHINES["PSION_ASIC"] = true
+--@src/devices/machine/psion_asic7.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic9.h,MACHINES["PSION_ASIC"] = true
 ---------------------------------------------------
 
@@ -2969,6 +2994,8 @@ if (MACHINES["PSION_ASIC"]~=null) then
 		MAME_DIR .. "src/devices/machine/psion_asic4.h",
 		MAME_DIR .. "src/devices/machine/psion_asic5.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic5.h",
+		MAME_DIR .. "src/devices/machine/psion_asic7.cpp",
+		MAME_DIR .. "src/devices/machine/psion_asic7.h",
 		MAME_DIR .. "src/devices/machine/psion_asic9.cpp",
 		MAME_DIR .. "src/devices/machine/psion_asic9.h",
 	}
@@ -3387,17 +3414,6 @@ if (MACHINES["SEGA_MD_IOPORT"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/sega_scu.h,MACHINES["SEGA_SCU"] = true
----------------------------------------------------
-
-if (MACHINES["SEGA_SCU"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/sega_scu.cpp",
-		MAME_DIR .. "src/devices/machine/sega_scu.h",
-	}
-end
 
 ---------------------------------------------------
 --
@@ -3423,17 +3439,6 @@ if (MACHINES["SMC91C9X"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/smpc.h,MACHINES["SMPC"] = true
----------------------------------------------------
-
-if (MACHINES["SMPC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/smpc.cpp",
-		MAME_DIR .. "src/devices/machine/smpc.h",
-	}
-end
 
 ---------------------------------------------------
 --
@@ -3470,6 +3475,8 @@ if (MACHINES["SPG2XX"]~=null) then
 		MAME_DIR .. "src/devices/machine/generalplus_gpl951xx_soc.h",
 		MAME_DIR .. "src/devices/machine/spg_renderer.cpp",
 		MAME_DIR .. "src/devices/machine/spg_renderer.h",
+		MAME_DIR .. "src/devices/machine/gpl_renderer.cpp",
+		MAME_DIR .. "src/devices/machine/gpl_renderer.h",
 	}
 end
 

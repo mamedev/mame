@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+TODO:
+- system bootstrap checks if cart has 0x5a05 as first word, if that check fails it tries for $03
+  on second byte. Compatibility/version flag for an earlier system?
+
+-->
+<softwarelist name="pls1000_cart" description="Brainchild PLS-1000 cartridges">
+
+	<software name="decmath" supported="no">
+		<!-- Compile date 8/16/1995 -->
+		<description>Decimal Math (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation 	-->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_decimals_am27c020.bin" size="0x40000" crc="891a7ad5" sha1="9debe21f55ce1de33b14df33f44764b78dd287bd"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

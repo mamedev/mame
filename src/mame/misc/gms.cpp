@@ -439,6 +439,13 @@ void gms_2layers_state::eeprom_w(uint16_t data)
 			}
 			m_eeprom_command = data;
 		}
+		// additional commands checked by jinpaish
+		else if (data == 0x7a)
+			m_eeprom_data[0] = ~m_eeprom_data[0] | m_eeprom_data[2];
+		else if (data == 0x6a)
+			m_eeprom_data[0] = m_eeprom_data[0] & m_eeprom_data[2];
+		else if (data == 0x00)
+			m_eeprom_command = 0;
 		else
 			logerror("%s: Unknown EEPROM command %02X\n", machine().describe_context(), data);
 	}

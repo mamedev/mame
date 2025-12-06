@@ -174,6 +174,7 @@ void cdislave_hle_device::slave_w_mouse(offs_t offset, uint16_t data)
 	}
 	m_in_index++;
 }
+
 void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_WRITES, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff);
