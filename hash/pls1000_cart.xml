@@ -4,14 +4,15 @@
 license:CC0-1.0
 
 TODO:
-- bootstrap checks at boot if cart has $5a05 on it, if that check fails it tries for $03 on second
-  byte. Compatibility/version flags for an earlier system?
+- system bootstrap checks if cart has 0x5a05 as first word, if that check fails it tries for $03
+  on second byte. Compatibility/version flag for an earlier system?
 
 -->
 <softwarelist name="pls1000_cart" description="Brainchild PLS-1000 cartridges">
 
 	<software name="decmath" supported="no">
-		<description>Decimal Math</description>
+		<!-- Compile date 8/16/1995 -->
+		<description>Decimal Math (v2.83)</description>
 		<year>1995</year>
 		<publisher>Brainchild</publisher>
 		<!-- Published under license from Skills Bank Corporation 	-->
