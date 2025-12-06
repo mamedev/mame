@@ -7,6 +7,7 @@
 #pragma once
 
 #include "slot.h"
+#include "machine/eepromser.h"
 
 class lgy98_device : public device_t
 					, public device_pc98_cbus_slot_interface
@@ -24,6 +25,8 @@ protected:
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+
 	void io_map(address_map &map) ATTR_COLD;
 };
 

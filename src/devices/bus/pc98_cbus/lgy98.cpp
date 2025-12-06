@@ -7,7 +7,7 @@ Melco/Buffalo LGY-98 NIC (NE2000 based)
 TODO:
 - stub, enough for base LGYSETUP.EXE to pass identification and nothing else;
 - Has no dipswitches on board, the port and INT lines are PnP configured thru LGYSETUP + either
-  EEPROM data or something else (perhaps the ROM initialized that?)
+  EEPROM data or something else (perhaps the missing ROM dump initializes that?)
 
 **************************************************************************************************/
 
@@ -19,6 +19,7 @@ DEFINE_DEVICE_TYPE(LGY98, lgy98_device, "lgy98", "Melco LGY-98 NIC interface")
 lgy98_device::lgy98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LGY98, tag, owner, clock)
 	, device_pc98_cbus_slot_interface(mconfig, *this)
+	, m_eeprom(*this, "eeprom")
 {
 }
 
@@ -30,7 +31,8 @@ lgy98_device::lgy98_device(const machine_config &mconfig, const char *tag, devic
 
 void lgy98_device::device_add_mconfig(machine_config &config)
 {
-	// ...
+	// ATMEL829 93C46 PC
+	EEPROM_93C46_16BIT(config, m_eeprom);
 }
 
 void lgy98_device::device_start()
@@ -59,7 +61,16 @@ void lgy98_device::io_map(address_map &map)
 	map(base_io + 0x30a, base_io + 0x30a).lr8(NAME([] () { return 0x00; }));
 	map(base_io + 0x30b, base_io + 0x30b).lr8(NAME([] () { return 0x40; }));
 	map(base_io + 0x30c, base_io + 0x30c).lr8(NAME([] () { return 0x26; }));
-	// TODO: following really looks a 93C46 interface + something else
-	// (bit 5 tested low during ID sequence)
-	map(base_io + 0x30d, base_io + 0x30d).lr8(NAME([] () { return 0x0b; }));
+	map(base_io + 0x30d, base_io + 0x30d).lrw8(
+		NAME([this] () {
+			// TODO: bit 5 required low during ID sequence
+			return 0x0a | (m_eeprom->do_read());
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: other bits
+			m_eeprom->di_write(BIT(data, 1));
+			m_eeprom->cs_write(BIT(data, 2));
+			m_eeprom->clk_write(BIT(data, 3));
+		})
+	);
 }
