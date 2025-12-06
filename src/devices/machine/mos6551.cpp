@@ -730,7 +730,7 @@ void mos6551_device::transmitter_clock(int state)
 				m_tx_bits = 0;
 				m_tx_parity = 0;
 
-				if (m_cts)
+				if (m_cts || m_rts)
 				{
 					m_tx_output = OUTPUT_MARK;
 				}
