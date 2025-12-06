@@ -1,0 +1,265 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+
+Usage details:
+
+Mode refers to the BASIC version the software requires on Mk II machines:
+Mode 1: N60 BASIC (16K)
+Mode 2: N60 BASIC (32K)
+Mode 3: N60 EXTENDED BASIC (16K)
+Mode 4: N60 EXTENDED BASIC (32K)
+Mode 5: N60m BASIC (64K)
+
+This software list should ONLY be used for Mk II specific software which will require mode 5.
+Any software requiring modes 1-4 should be listed in the pc6001_cass.xml software list.
+
+The Page value should be entered at the 'How Many Pages?' prompt in all versions of BASIC.
+
+Once in BASIC:
+If usage specifies BASIC: 
+- Enter CLOAD then press ENTER.
+- Then enter RUN then ENTER once loading completes.
+
+If usage specifies MONITOR: 
+- Enter MON then press ENTER to enter the Monitor.
+- Type R-0 (- is entered automatically) then press ENTER.
+
+-->
+<softwarelist name="pc6001mk2_cass" description="NEC PC-6001 Mk II cassettes">
+
+	<software name="bokosuka" supported="partial">
+		<description>Bokosuka Wars</description>
+		<year>1985</year>
+		<publisher>ASCII</publisher>
+        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="alt_title" value="ボコスカウォーズ"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="22293">
+				<rom name="bokosuka.cas" size="22293" crc="7690032c" sha1="7928741b1133a1cc87ee6d8ccbf9e7a68278a439"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannonbl" supported="partial">
+		<description>Cannon Ball</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+        <info name="usage" value="Mode 5, Page 4, MONITOR" />
+		<info name="alt_title" value="キャノンボール"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="10886">
+				<rom name="cannon ball.p6" size="10886" crc="c7eb0282" sha1="d2393ffa00f52fe4f5ce1dd48e3ec8e17ff9559a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castleex" supported="partial">
+		<description>Castle Excellent</description>
+		<year>19??</year>
+		<publisher>ASCII</publisher>
+        <info name="usage" value="Mode 5, Page 2, BASIC" />
+		<info name="alt_title" value="キャッスルエクセレント"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="32980">
+				<rom name="castle excellent.cas" size="32980" crc="dc356757" sha1="2d33d6d3274370aae8052dee29bac993c369b4e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chackpop" supported="partial">
+		<description>Chack 'n Pop</description>
+		<year>1984</year>
+		<publisher>Nidecom Carry</publisher>
+        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="alt_title" value="ちゃっくんぽっぷ"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="46630">
+				<rom name="chack 'n pop.cas" size="46630" crc="de769cca" sha1="3e35398d960442c98035db530c3226dda06ae12f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chrith" supported="partial">
+		<description>Chrith Ai no Tabidachi</description>
+		<year>19??</year>
+		<publisher>Comix</publisher>
+		<notes><![CDATA[Comix is a Koei spinoff]]></notes>
+        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="alt_title" value="クリス愛の旅立ち"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="26017">
+				<rom name="chrith.cas" size="26017" crc="8e72abd1" sha1="c3e11ec7eb4b89ba6783d4a60336bef3489fcdc2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daidasso" supported="partial">
+		<description>Daidasso</description>
+		<year>19??</year>
+		<publisher>Carry Lab</publisher>
+        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="alt_title" value="大脱走"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="41712">
+				<rom name="daidasso.cas" size="41712" crc="b0d7af71" sha1="d5cf409aae7c6fbc4332736c16e19850b34d97ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdug" supported="partial">
+		<description>Dig Dug</description>
+		<year>19??</year>
+		<publisher>Namco</publisher>
+        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="alt_title" value="ディグダグ"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="29546">
+				<rom name="dig dug.cas" size="29546" crc="162c2d86" sha1="084e4e6e01a58eb7bd782fe8c9e925008b5055bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dsbubble" supported="partial">
+		<description>Dr. Slump Bubble Daisakusen</description>
+		<year>1984</year>
+		<publisher>Enix</publisher>
+        <info name="usage" value="Mode 5, Page 3, MONITOR" />
+		<info name="alt_title" value="スランプ バブル大作戦"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="28455">
+				<rom name="dr slump bubble daisakusen.cas" size="28455" crc="10529edc" sha1="9fadb778ef869a147956e3d8004cc84574e34bd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doordoor" supported="partial">
+		<description>Door Door Mk. II</description>
+		<year>1984</year>
+		<publisher>Enix</publisher>
+        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="alt_title" value="ドアドアmk2"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="71593">
+				<rom name="door door.p6" size="71593" crc="567f4190" sha1="4c82a9e4b939962a1fc703a5611f59b3f18118bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flappy" supported="partial">
+		<description>Flappy</description>
+		<year>1984</year>
+		<publisher>dB-SOFT</publisher>
+        <info name="usage" value="Mode 5, Page 2, BASIC" />
+		<info name="alt_title" value="フラッピー"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="71422">
+				<rom name="flappy.cas" size="71422" crc="acaa6d1a" sha1="ace6bf7ae566fa152adc779d37d7476a15b9ab2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hisya" supported="partial">
+		<description>Hisya</description>
+		<year>19??</year>
+		<publisher>Carry Lab</publisher>
+        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="30124">
+				<rom name="hisya.cas" size="30124" crc="c3d88ac6" sha1="c6a857cf88f1205b4dfff00e063739752992a7fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceblock" supported="partial">
+		<description>Ice Block</description>
+		<year>19??</year>
+		<publisher>dB-SOFT</publisher>
+        <info name="usage" value="Mode 5, Page 2, BASIC" />
+		<info name="alt_title" value="アイス・ブロック"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="28708">
+				<rom name="ice block.cas" size="28708" crc="90b5276e" sha1="422d51cf71113c29e40acf362104602728ed409c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nutsmilk" supported="partial">
+		<description>Nuts &amp; Milk</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+        <info name="usage" value="Mode 5, Page 2, MONITOR" />
+		<info name="alt_title" value="ナッツ&amp;ミルク"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="28846">
+				<rom name="nuts &amp; milk.p6" size="28846" crc="89ab4aa7" sha1="cf8daeab0b07ca04bf178b1df9f8f129e2e41d1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pascom" supported="partial">
+		<description>Pascom Tower</description>
+		<year>1984</year>
+		<publisher>MIA</publisher>
+        <info name="usage" value="Mode 5, Page 4, BASIC" />
+		<info name="alt_title" value="パスコンタワー"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="46657">
+				<rom name="pascom tower.p6" size="46657" crc="22a42558" sha1="6961686d5557cfb9acb66512c8d594599df4c295"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plazmaln" supported="partial">
+		<description>Plazma Line</description>
+		<year>19??</year>
+		<publisher>Techno Soft</publisher>
+        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="alt_title" value="プラズマライン"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="35744">
+				<rom name="plazma line.cas" size="35744" crc="972adbaf" sha1="9bf713f6ee0fcb3c8bc1b652b4983a8407769aef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbmario" supported="partial">
+		<description>Punchball Mario</description>
+		<year>1983</year>
+		<publisher>Nintendo / Hudson Soft</publisher>
+        <info name="usage" value="Mode 5, Page 4, MONITOR" />
+		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="30669">
+				<rom name="punchball mario.cas" size="30669" crc="a57ba645" sha1="a3852b982638da74e708e0d05c9ef61629495096"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thunder" supported="partial">
+		<description>Thunder Force</description>
+		<year>1985</year>
+		<publisher>Techno Soft</publisher>
+        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="alt_title" value="サンダーフォース"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="35487">
+				<rom name="thunder force.cas" size="35487" crc="bfea6bac" sha1="584cae9a14027eda67b9c24af0186f8096e74d38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vegcrash" supported="partial">
+		<description>Vegetable Crash</description>
+		<year>19??</year>
+		<publisher>Hudson Soft</publisher>
+        <info name="usage" value="Mode 5, Page 4, MONITOR" />
+		<info name="alt_title" value="ベジタブルクラッシュ"/>
+		<part name="cart" interface="pc6001_cass">
+			<dataarea name="rom" size="11027">
+				<rom name="vegetable crash.cas" size="11027" crc="7a0569d1" sha1="932d219a2eae516d57575511a0bdb2a96bd8fa6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
