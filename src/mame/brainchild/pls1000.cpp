@@ -1,12 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 Brainchild PLS-1000 "Personal Learning System"
+BIOS (at least) "developed by Logix, Inc"
 
 TODO:
-- I/O;
-- Stuck on cart loading;
+- Trace remaining I/Os;
+- Samples inputs thru the same irq 4 used for RTC cfr. PC=649a
+- How to enter test mode? There are strings in BIOS at 0x9690
 - DAC1BIT usage is assumed;
 
 ===================================================================================================
@@ -43,10 +45,12 @@ public:
 		, m_lcdctrl(*this, "lcdctrl")
 		, m_screen(*this, "screen")
 		, m_cart(*this, "cart")
-		, m_in_portd(*this, "PORTD")
+		, m_in_left(*this, "LEFT")
+		, m_in_right(*this, "RIGHT")
 	{ }
 
 	void pls1000(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(button_check);
 
 protected:
 	void main_map(address_map &map) ATTR_COLD;
@@ -56,10 +60,14 @@ private:
 	required_device<mc68328_lcd_device> m_lcdctrl;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
-	required_ioport m_in_portd;
+	required_ioport m_in_left;
+	required_ioport m_in_right;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <unsigned N> void kbd_select_w(int state);
+	u8 kbd_r();
 
+	u8 m_kbd_select;
 };
 
 u32 pls1000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -75,12 +83,34 @@ void pls1000_state::main_map(address_map &map)
 	map(0x800000, 0x83ffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 }
 
+u8 pls1000_state::kbd_r()
+{
+	switch(m_kbd_select)
+	{
+		case 1:
+			return m_in_left->read();
+		case 2:
+			return m_in_right->read();
+	}
+
+	return m_in_left->read() | m_in_right->read();
+}
+
+template <unsigned N>
+void pls1000_state::kbd_select_w(int state)
+{
+	m_kbd_select &= ~(1 << N);
+	if (state)
+		m_kbd_select |= (1 << N);
+	m_kbd_select &= 3;
+}
+
 // two columns on console sides:
 // A-B-C-D-E then "Explain" in orange text on left side
 // page right-page left-scroll up-scroll down-asterisk (*) then "Menu" in orange text on right side
 
 static INPUT_PORTS_START( pls1000 )
-	PORT_START("PORTD")
+	PORT_START("LEFT")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("C")
@@ -89,7 +119,14 @@ static INPUT_PORTS_START( pls1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Explain")
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	// TODO: right column
+	PORT_START("RIGHT")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Page Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Page Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Scroll Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Scroll Down")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("*")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Menu")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void pls1000_state::pls1000(machine_config &config)
@@ -98,16 +135,20 @@ void pls1000_state::pls1000(machine_config &config)
 	MC68328(config, m_maincpu, 32768*506); // MC68328PV16VA
 	m_maincpu->set_addrmap(AS_PROGRAM, &pls1000_state::main_map);
 
-	m_maincpu->in_port_d<0>().set_ioport(m_in_portd).bit(0);
-	m_maincpu->in_port_d<1>().set_ioport(m_in_portd).bit(1);
-	m_maincpu->in_port_d<2>().set_ioport(m_in_portd).bit(2);
-	m_maincpu->in_port_d<3>().set_ioport(m_in_portd).bit(3);
-	m_maincpu->in_port_d<4>().set_ioport(m_in_portd).bit(4);
-	m_maincpu->in_port_d<5>().set_ioport(m_in_portd).bit(5);
-	m_maincpu->in_port_d<6>().set_ioport(m_in_portd).bit(6);
-	m_maincpu->in_port_d<7>().set_ioport(m_in_portd).bit(7);
+	m_maincpu->in_port_d<0>().set(FUNC(pls1000_state::kbd_r)).bit(0);
+	m_maincpu->in_port_d<1>().set(FUNC(pls1000_state::kbd_r)).bit(1);
+	m_maincpu->in_port_d<2>().set(FUNC(pls1000_state::kbd_r)).bit(2);
+	m_maincpu->in_port_d<3>().set(FUNC(pls1000_state::kbd_r)).bit(3);
+	m_maincpu->in_port_d<4>().set(FUNC(pls1000_state::kbd_r)).bit(4);
+	m_maincpu->in_port_d<5>().set(FUNC(pls1000_state::kbd_r)).bit(5);
+	m_maincpu->in_port_d<6>().set(FUNC(pls1000_state::kbd_r)).bit(6);
+	m_maincpu->in_port_d<7>().set(FUNC(pls1000_state::kbd_r)).bit(7);
 
-	// TODO: other I/O ports (J r/w at startup)
+//	m_maincpu->in_port_f<2> used for something
+	m_maincpu->in_port_f<3>().set_constant(0); // battery low if '1', checked periodically
+
+	m_maincpu->out_port_j<0>().set(FUNC(pls1000_state::kbd_select_w<0>));
+	m_maincpu->out_port_j<1>().set(FUNC(pls1000_state::kbd_select_w<1>));
 
 	m_maincpu->out_flm().set(m_lcdctrl, FUNC(mc68328_lcd_device::flm_w));
 	m_maincpu->out_llp().set(m_lcdctrl, FUNC(mc68328_lcd_device::llp_w));
