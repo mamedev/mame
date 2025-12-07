@@ -38,6 +38,7 @@ protected:
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual u8 read_c800(u16 offset) override;
 	virtual bool take_c800() const override;
+	virtual void reset_from_bus() override;
 
 private:
 	// miscellaneous handlers
@@ -97,6 +98,11 @@ u8 ibsap2_device::read_c800(u16 offset)
 bool ibsap2_device::take_c800() const
 {
 	return true;
+}
+
+void ibsap2_device::reset_from_bus()
+{
+	m_acia->reset();
 }
 
 void ibsap2_device::acia_irq_w(int state)
