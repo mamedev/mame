@@ -12123,9 +12123,10 @@ Differences between clone/parent:
 		<publisher>Apogee Software</publisher>
 		<info name="developer" value="Apogee Software" />
 		<info name="version" value="1.0a" />
+		<!-- baddump: file dates are in 2005, this is unlikely to be unmodified original media -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Crystal Caves [Apogee Software] [1991] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f4360e24" sha1="93a63c8bb0764ba83829b30263ce8870d1902c9f"/>
+				<rom name="Crystal Caves [Apogee Software] [1991] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f4360e24" sha1="93a63c8bb0764ba83829b30263ce8870d1902c9f" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15099,12 +15100,12 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<year>1993</year>
 		<publisher>Capstone</publisher>
 		<info name="developer" value="Capstone Software" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Grandmaster Chess Deluxe [Capstone] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="59997f01" sha1="4287f94d9f939a83e6001c16aaa59b2bc6e917ec"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Grandmaster Chess Deluxe [Capstone] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5fdfbe9e" sha1="ea2e8bee41c5c2449cd5ca57ffc6f539c9ec0216"/>
 			</dataarea>
