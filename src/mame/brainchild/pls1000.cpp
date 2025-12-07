@@ -53,7 +53,7 @@ public:
 	{ }
 
 	void pls1000(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(button_check);
+	//DECLARE_INPUT_CHANGED_MEMBER(button_check);
 
 protected:
 	void main_map(address_map &map) ATTR_COLD;
