@@ -4,11 +4,16 @@
 
 Melco/Buffalo LGY-98 NIC (NE2000 based)
 
+LANMAN.DOS setup described here:
+https://pokug.net/entry/2022/01/22/221536
+
 TODO:
-- Enough to make LGYSETUP.EXE and MELCHK.EXE to pass checks, requires testing to determine
-  if working or not;
-- Has no dipswitches on board, the port and INT lines are PnP configured thru LGYSETUP + either
-  EEPROM data or something else (perhaps the missing ROM dump initializes that?)
+- Has no dipswitches on board, the port and INT lines are PnP configured thru LGYSETUP.
+  Once LANMAN is setup it will try $00d0 base even if EEPROM says otherwise at CONFIG.SYS boot,
+  and even if PROTOCOL.INI is explicitly  $10d0, definitely needs a BIOS.
+  wpset 0xa294,2,w,wpdata==0xd0
+- Wants CR bit 5 high for enough time on DMA transfers at CONFIG.SYS loading
+- Untested beyond this.
 
 **************************************************************************************************/
 
@@ -64,6 +69,17 @@ device_memory_interface::space_config_vector lgy98_device::memory_space_config()
 	return space_config_vector{
 		std::make_pair(0, &m_space_mem_config)
 	};
+}
+
+ROM_START( lgy98 )
+	// either 0x2000 or 0x4000 in size
+	ROM_REGION16_LE( 0x2000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD("bios.bin", 0x0000, 0x2000, NO_DUMP )
+ROM_END
+
+const tiny_rom_entry *lgy98_device::device_rom_region() const
+{
+	return ROM_NAME( lgy98 );
 }
 
 

@@ -25,6 +25,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
