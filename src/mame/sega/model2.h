@@ -147,6 +147,7 @@ protected:
 	u8 m_driveio_comm_data = 0;
 	int m_iop_write_num = 0;
 	u32 m_iop_data = 0;
+	emu_timer *m_irq_delay_timer;
 
 	u32 m_geo_read_start_address = 0;
 	u32 m_geo_write_start_address = 0;
@@ -227,6 +228,7 @@ protected:
 	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
+	TIMER_CALLBACK_MEMBER(check_sound_irq);
 
 	void render_frame_start();
 	void geo_parse();
