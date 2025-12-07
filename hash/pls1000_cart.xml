@@ -10,6 +10,32 @@ TODO:
 -->
 <softwarelist name="pls1000_cart" description="Brainchild PLS-1000 cartridges">
 
+	<software name="algebra" supported="no">
+		<!-- Compile date 8/16/1995 -->
+		<description>Introduction to Algebra (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation 	-->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_algebraintro_m27c2001.bin" size="0x40000" crc="bd8740ab" sha1="501ebde60a26ebd179564492c859b127472d9f5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capital" supported="no">
+		<!-- Compile date 6/7/1995 -->
+		<description>Capitalization (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation 	-->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_capitalization_m27c2001.bin" size="0x40000" crc="f0095080" sha1="c755b373188c5a54ccc87a33993256bda3121e48"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="decmath" supported="no">
 		<!-- Compile date 8/16/1995 -->
 		<description>Decimal Math (v2.83)</description>
@@ -22,4 +48,31 @@ TODO:
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="punctua" supported="no">
+		<!-- Compile date 8/6/1997 -->
+		<description>Punctuation (v2.90)</description>
+		<year>1997</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation 	-->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_punctuation_m27c2001.bin" size="0x40000" crc="3164606d" sha1="7fb0790f05cd40e172135bb0e2fd987e7d6f501e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordknow" supported="no">
+		<!-- Compile date 6/8/1995 -->
+		<description>Word Knowledge (v2.83)</description>
+		<year>1995</year>
+		<publisher>Brainchild</publisher>
+		<!-- Published under license from Skills Bank Corporation 	-->
+		<part name="cart" interface="pls1000_cart">
+			<dataarea name="rom" size="0x40000" width="16" endianness="big">
+				<rom name="cart_wordknowledge_m27c2001.bin" size="0x40000" crc="83afa4fa" sha1="1b84a8520a74570fabaefa8b594ecc48bb0e4a0b"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
