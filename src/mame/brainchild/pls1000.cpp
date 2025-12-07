@@ -5,6 +5,8 @@
 Brainchild PLS-1000 "Personal Learning System"
 BIOS (at least) "developed by Logix, Inc"
 
+NVRAM usage needs to be enabled in Brainchild Setup -> Turn Bookmark ON
+
 TODO:
 - Trace remaining I/Os;
 - Samples inputs thru the same irq 4 used for RTC cfr. PC=649a
@@ -27,6 +29,7 @@ two knobs at console bottom sides, VR1/VR2
 #include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68328.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "video/mc68328lcd.h"
 
@@ -45,8 +48,8 @@ public:
 		, m_lcdctrl(*this, "lcdctrl")
 		, m_screen(*this, "screen")
 		, m_cart(*this, "cart")
-		, m_in_left(*this, "LEFT")
-		, m_in_right(*this, "RIGHT")
+		, m_nvram(*this, "nvram")
+		, m_in_kbd(*this, { "RIGHT", "LEFT" })
 	{ }
 
 	void pls1000(machine_config &config);
@@ -60,8 +63,8 @@ private:
 	required_device<mc68328_lcd_device> m_lcdctrl;
 	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
-	required_ioport m_in_left;
-	required_ioport m_in_right;
+	required_device<nvram_device> m_nvram;
+	required_ioport_array<2> m_in_kbd;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template <unsigned N> void kbd_select_w(int state);
@@ -79,21 +82,25 @@ u32 pls1000_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 void pls1000_state::main_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().region("bios", 0);
-	map(0x200000, 0x207fff).ram();
+	map(0x200000, 0x207fff).ram().share("nvram");
 	map(0x800000, 0x83ffff).r(m_cart, FUNC(generic_slot_device::read16_rom));
 }
 
+// 0 selects both ports
+// 1 selects left
+// 2 selects right
+// any other combination seems unused
 u8 pls1000_state::kbd_r()
 {
-	switch(m_kbd_select)
+	u8 res = 0;
+
+	for (int i = 0; i < 2; i++)
 	{
-		case 1:
-			return m_in_left->read();
-		case 2:
-			return m_in_right->read();
+		if (!BIT(m_kbd_select, i))
+			res |= m_in_kbd[i]->read();
 	}
 
-	return m_in_left->read() | m_in_right->read();
+	return res;
 }
 
 template <unsigned N>
@@ -102,7 +109,6 @@ void pls1000_state::kbd_select_w(int state)
 	m_kbd_select &= ~(1 << N);
 	if (state)
 		m_kbd_select |= (1 << N);
-	m_kbd_select &= 3;
 }
 
 // two columns on console sides:
@@ -144,11 +150,18 @@ void pls1000_state::pls1000(machine_config &config)
 	m_maincpu->in_port_d<6>().set(FUNC(pls1000_state::kbd_r)).bit(6);
 	m_maincpu->in_port_d<7>().set(FUNC(pls1000_state::kbd_r)).bit(7);
 
-//	m_maincpu->in_port_f<2> used for something
+//	m_maincpu->out_port_f<0..1> shut off system if both high, at the end of the auto off time
+//	m_maincpu->out_port_f<2> low when any key is pressed
 	m_maincpu->in_port_f<3>().set_constant(0); // battery low if '1', checked periodically
 
 	m_maincpu->out_port_j<0>().set(FUNC(pls1000_state::kbd_select_w<0>));
 	m_maincpu->out_port_j<1>().set(FUNC(pls1000_state::kbd_select_w<1>));
+	m_maincpu->out_port_j<2>().set(FUNC(pls1000_state::kbd_select_w<2>));
+	m_maincpu->out_port_j<3>().set(FUNC(pls1000_state::kbd_select_w<3>));
+	m_maincpu->out_port_j<4>().set(FUNC(pls1000_state::kbd_select_w<4>));
+	m_maincpu->out_port_j<5>().set(FUNC(pls1000_state::kbd_select_w<5>));
+	m_maincpu->out_port_j<6>().set(FUNC(pls1000_state::kbd_select_w<6>));
+	m_maincpu->out_port_j<7>().set(FUNC(pls1000_state::kbd_select_w<7>));
 
 	m_maincpu->out_flm().set(m_lcdctrl, FUNC(mc68328_lcd_device::flm_w));
 	m_maincpu->out_llp().set(m_lcdctrl, FUNC(mc68328_lcd_device::llp_w));
@@ -171,6 +184,8 @@ void pls1000_state::pls1000(machine_config &config)
 	m_cart->set_endian(ENDIANNESS_BIG);
 	m_cart->set_interface("pls1000_cart");
 	m_cart->set_must_be_loaded(false);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("pls1000_cart");
 
