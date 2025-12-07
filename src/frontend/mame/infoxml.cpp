@@ -1010,7 +1010,7 @@ void output_device_refs(std::ostream &out, device_t &root)
 {
 	for (device_t &device : device_enumerator(root))
 		if (&device != &root)
-			util::stream_format(out, "\t\t<device_ref name=\"%s\"/>\n", util::xml::normalize_string(device.shortname()));
+			util::stream_format(out, "\t\t<device_ref name=\"%s\" tag=\"%s\"/>\n", util::xml::normalize_string(device.shortname()), util::xml::normalize_string(device.tag()));
 }
 
 
