@@ -783,11 +783,11 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a14_state::radica_eu3a14_map);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a14_state::interrupt));
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&elan_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&elan_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	ELAN_EU3A14_SYS(config, m_sys, 0);
-	m_sys->set_cpu("maincpu");
-	m_sys->set_addrbank("bank");
+	m_sys->set_cpu(m_maincpu);
+	m_sys->set_addrbank(m_bank);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_helper);
 
@@ -803,10 +803,10 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);
 
 	ELAN_EU3A14_VID(config, m_vid, 0);
-	m_vid->set_cpu("maincpu");
-	m_vid->set_addrbank("bank");
-	m_vid->set_palette("palette");
-	m_vid->set_screen("screen");
+	m_vid->set_cpu(m_maincpu);
+	m_vid->set_addrbank(m_bank);
+	m_vid->set_palette(m_palette);
+	m_vid->set_screen(m_screen);
 	m_vid->set_entries(512);
 	m_vid->set_tilerambase(0x0200 - 0x200);
 

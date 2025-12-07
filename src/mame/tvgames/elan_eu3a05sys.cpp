@@ -7,13 +7,27 @@
 // DMA size and destination are 16-bit here, they're 24-bit on EU3A14
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device, "elan_eu3a05sys", "Elan EU3A05 System")
+DEFINE_DEVICE_TYPE(ELAN_EU3A13_SYS, elan_eu3a13sys_device, "elan_eu3a13sys", "Elan EU3A13 System")
 
-elan_eu3a05sys_device::elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	elan_eu3a05commonsys_device(mconfig, ELAN_EU3A05_SYS, tag, owner, clock),
+elan_eu3a05sys_device::elan_eu3a05sys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05commonsys_device(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05sys_device::map), this))
 {
 }
+
+elan_eu3a05sys_device::elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05sys_device(mconfig, ELAN_EU3A05_SYS, tag, owner, clock)
+{
+}
+
+elan_eu3a13sys_device::elan_eu3a13sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05sys_device(mconfig, ELAN_EU3A13_SYS, tag, owner, clock)
+{
+	// might be a difference on this hardware type, as rad_ftet (EU3A13) needs it, but rad_sinv (EU3A05) does not
+	m_bank_on_low_bank_writes = true;
+}
+
 
 device_memory_interface::space_config_vector elan_eu3a05sys_device::memory_space_config() const
 {
