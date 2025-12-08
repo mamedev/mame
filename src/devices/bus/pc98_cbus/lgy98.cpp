@@ -36,6 +36,7 @@ lgy98_device::lgy98_device(const machine_config &mconfig, const char *tag, devic
 
 void lgy98_device::device_add_mconfig(machine_config &config)
 {
+	// MX98902A, "8390 with built-in 10BaseT transceiver"
 	DP8390D(config, m_nic, 20'000'000);
 	m_nic->irq_callback().set([this](int state) { m_bus->int_w(0, state); });
 	m_nic->mem_read_callback().set([this] (offs_t offset) { return space(0).read_byte(offset); });
@@ -43,6 +44,8 @@ void lgy98_device::device_add_mconfig(machine_config &config)
 
 	// ATMEL829 93C46 PC
 	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	// unpopulated 2x 27C256 sockets
 }
 
 void lgy98_device::device_start()
@@ -72,7 +75,7 @@ device_memory_interface::space_config_vector lgy98_device::memory_space_config()
 }
 
 ROM_START( lgy98 )
-	// either 0x2000 or 0x4000 in size
+	// either 0x2000 or 0x4000 in size, internal to the Buffalo custom?
 	ROM_REGION16_LE( 0x2000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD("bios.bin", 0x0000, 0x2000, NO_DUMP )
 ROM_END
@@ -95,7 +98,8 @@ void lgy98_device::remap(int space_id, offs_t start, offs_t end)
 void lgy98_device::io_map(address_map &map)
 {
 	// 0*d* ~ 7*d*
-	const u16 base_io = 0x10d0;
+	// TODO: force to $00d0 for now
+	const u16 base_io = 0x00d0;
 
 	map(base_io, base_io + 0xf).rw(m_nic, FUNC(dp8390_device::cs_read), FUNC(dp8390_device::cs_write));
 
