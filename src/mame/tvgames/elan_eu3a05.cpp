@@ -208,21 +208,11 @@ Set 5043 bit 0 low
 
 #include "emu.h"
 
-#include "elan_eu3a05_a.h"
-
-#include "cpu/m6502/m6502.h"
-//#include "cpu/m6502/w65c02.h"
-#include "emupal.h"
-#include "screen.h"
 #include "softlist_dev.h"
-#include "speaker.h"
-#include "machine/bankdev.h"
-#include "elan_eu3a05gpio.h"
-#include "elan_eu3a05sys.h"
-#include "elan_eu3a05vid.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-
+#include "machine/elan_eu3a05_soc.h"
 
 namespace {
 
@@ -231,18 +221,11 @@ class elan_eu3a05_state : public driver_device
 public:
 	elan_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_sys(*this, "sys"),
-		m_gpio(*this, "gpio"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_ram(*this, "ram"),
-		m_sound(*this, "eu3a05sound"),
-		m_vid(*this, "vid"),
-		m_pixram(*this, "pixram"),
-		m_bank(*this, "bank"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
-	{ }
+		m_pixram(*this, "pixram")
+	{
+	}
 
 	void elan_eu3a05(machine_config &config);
 	void elan_eu3a05_pal(machine_config& config);
@@ -252,39 +235,22 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<elan_eu3a05sys_device> m_sys;
-	required_device<elan_eu3a05gpio_device> m_gpio;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<elan_eu3a05_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint8_t> m_pixram;
 
 	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	// for callback
-	uint8_t read_full_space(offs_t offset);
-
 	void elan_eu3a05_bank_map(address_map &map) ATTR_COLD;
-	void elan_eu3a05_map(address_map &map) ATTR_COLD;
 
 	virtual void video_start() override ATTR_COLD;
 
-	required_shared_ptr<uint8_t> m_ram;
-	required_device<elan_eu3a05_sound_device> m_sound;
-	required_device<elan_eu3a05vid_device> m_vid;
-	required_shared_ptr<uint8_t> m_pixram;
-	required_device<address_map_bank_device> m_bank;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
-	void sound_end0(int state) { m_sys->generate_custom_interrupt(2); }
-	void sound_end1(int state) { m_sys->generate_custom_interrupt(3); }
-	void sound_end2(int state) { m_sys->generate_custom_interrupt(4); }
-	void sound_end3(int state) { m_sys->generate_custom_interrupt(5); }
-	void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
-	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 };
 
 class elan_eu3a05_buzztime_state : public elan_eu3a05_state
@@ -301,7 +267,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	//uint8_t random_r() { return machine().rand(); }
 	uint8_t porta_r();
 	void portb_w(uint8_t data);
 
@@ -336,17 +301,16 @@ class elan_eu3a13_state : public elan_eu3a05_state
 public:
 	elan_eu3a13_state(const machine_config &mconfig, device_type type, const char *tag)
 		: elan_eu3a05_state(mconfig, type, tag)
-	{}
+	{
+	}
 
 	void elan_eu3a13(machine_config &config);
 	void elan_eu3a13_pal(machine_config &config);
-	void elan_eu3a13_pvmil8(machine_config &config);
 
 	void init_sudelan();
 	void init_sudelan3();
 
 private:
-	void elan_eu3a13_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -386,12 +350,12 @@ void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
 {
 	elan_eu3a05_state::elan_eu3a05(config);
 
-	m_sys->set_alt_timer();
+	m_maincpu->set_alt_timer();
 
-	m_gpio->read_0_callback().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
-//  m_gpio->read_1_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
-//  m_gpio->read_2_callback().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
-	m_gpio->write_1_callback().set(FUNC(elan_eu3a05_buzztime_state::portb_w)); // control related
+	m_maincpu->read_callback<0>().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
+//  m_maincpu->read_callback<1>().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+//  m_maincpu->read_callback<2>().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
+	m_maincpu->write_callback<1>().set(FUNC(elan_eu3a05_buzztime_state::portb_w)); // control related
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "buzztime_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -411,66 +375,19 @@ void elan_eu3a05_buzztime_state::portb_w(uint8_t data)
 	logerror("%s: portb_w %02x\n", machine().describe_context(), data);
 }
 
-
 void elan_eu3a05_state::video_start()
 {
 }
 
 
-uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	return m_vid->screen_update(screen, bitmap, cliprect);
+	return m_maincpu->screen_update(screen, bitmap, cliprect);
 }
 
-// sound callback
-uint8_t elan_eu3a05_state::read_full_space(offs_t offset)
-{
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	return fullbankspace.read_byte(offset);
-}
 
 // code at 8bc6 in Air Blaster makes unwanted reads, why, bug in code, flow issue?
 //[:maincpu] ':maincpu' (8BC6): unmapped program memory read from 5972 & FF
-
-
-void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
-{
-	// can the addresses move around?
-	map(0x0000, 0x3fff).ram().share("ram");
-	map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
-
-	map(0x5000, 0x501f).m(m_sys, FUNC(elan_eu3a05sys_device::map)); // including DMA controller
-	map(0x5020, 0x503f).m(m_vid, FUNC(elan_eu3a05vid_device::map));
-
-	// 504x GPIO area?
-	map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
-	// 5047
-	map(0x5048, 0x504a).w(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_unk_w));
-
-	// 506x unknown
-	map(0x5060, 0x506d).ram(); // read/written by tetris (ADC?)
-
-	// 508x sound
-	map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
-
-	//map(0x5000, 0x50ff).ram();
-	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
-
-	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
-	// not sure how these work, might be a modified 6502 core instead.
-	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
-	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
-}
-
-// default e000 mapping is the same as eu3a14, other registers seem closer to eua05
-void elan_eu3a13_state::elan_eu3a13_map(address_map& map)
-{
-	elan_eu3a05_map(map);
-	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
-	// not sure how these work, might be a modified 6502 core instead.
-	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
-	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
-}
 
 
 void elan_eu3a05_state::elan_eu3a05_bank_map(address_map &map)
@@ -724,89 +641,12 @@ void elan_eu3a05_state::machine_start()
 
 void elan_eu3a05_state::machine_reset()
 {
-	/* the 6502 core sets the default stack value to 0x01bd
-	   and Tetris does not initialize it to anything else
-
-	   Tetris stores the playfield data at 0x100 - 0x1c7 and
-	   has a clear routine that will erase that range and
-	   trash the stack
-
-	   It seems likely this 6502 sets it to 0x1ff by default
-	   at least.
-
-	   According to
-	   http://mametesters.org/view.php?id=6486
-	   this isn't right for known 6502 types either
-	*/
-	m_maincpu->set_state_int(M6502_S, 0x1ff);
 }
-
-static const gfx_layout helper_4bpp_8_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ STEP8(0,4) },
-	{ 0 },
-	8 * 4
-};
-
-static const gfx_layout helper_8bpp_8_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ STEP8(0,8) },
-	{ 0 },
-	8 * 8
-};
-
-
-// these are fake just to make looking at the texture pages easier
-static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
-static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
-static const gfx_layout texture_helper_8bpp_layout =
-{
-	256, 256,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	256*256*8,
-	texlayout_xoffset_8bpp,
-	texlayout_yoffset_8bpp
-};
-
-static const uint32_t texlayout_xoffset_4bpp[256] = { STEP256(0,4) };
-static const uint32_t texlayout_yoffset_4bpp[256] = { STEP256(0,256*4) };
-static const gfx_layout texture_helper_4bpp_layout =
-{
-	256, 256,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	EXTENDED_XOFFS,
-	EXTENDED_YOFFS,
-	256*256*4,
-	texlayout_xoffset_4bpp,
-	texlayout_yoffset_4bpp
-};
-
-static GFXDECODE_START( gfx_elan_eu3a05_fake )
-	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_8bpp_layout,  0x0, 1  )
-GFXDECODE_END
-
 
 
 INTERRUPT_GEN_MEMBER(elan_eu3a05_state::interrupt)
 {
-	m_sys->generate_custom_interrupt(9);
+	m_maincpu->generate_custom_interrupt(9);
 }
 
 
@@ -829,13 +669,12 @@ INTERRUPT_GEN_MEMBER(elan_eu3a05_state::interrupt)
 void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_eu3a05_map);
+	ELAN_EU3A05_SOC(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
+	m_maincpu->set_addrmap(5, &elan_eu3a05_state::elan_eu3a05_bank_map);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a05_state::interrupt));
-
-	ADDRESS_MAP_BANK(config, m_bank).set_map(&elan_eu3a05_state::elan_eu3a05_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
-
-	PALETTE(config, m_palette).set_entries(256);
+	m_maincpu->read_callback<0>().set_ioport("IN0");
+	m_maincpu->read_callback<1>().set_ioport("IN1");
+	m_maincpu->read_callback<2>().set_ioport("IN2");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -843,89 +682,51 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_screen->set_screen_update(FUNC(elan_eu3a05_state::screen_update));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_elan_eu3a05_fake);
-
-	ELAN_EU3A05_GPIO(config, m_gpio, 0);
-	m_gpio->read_0_callback().set_ioport("IN0");
-	m_gpio->read_1_callback().set_ioport("IN1");
-	m_gpio->read_2_callback().set_ioport("IN2");
-
-	ELAN_EU3A05_SYS(config, m_sys, 0);
-	m_sys->set_cpu(m_maincpu);
-	m_sys->set_addrbank(m_bank);
-
-	ELAN_EU3A05_VID(config, m_vid, 0);
-	m_vid->set_cpu(m_maincpu);
-	m_vid->set_addrbank(m_bank);
-	m_vid->set_palette(m_palette);
-	m_vid->set_entries(256);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	ELAN_EU3A05_SOUND(config, m_sound, 8000);
-	m_sound->space_read_callback().set(FUNC(elan_eu3a05_state::read_full_space));
-	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
-	/* just causes select sound to loop in Tetris for now!
-	m_sound->sound_end_cb<0>().set(FUNC(elan_eu3a05_state::sound_end0));
-	m_sound->sound_end_cb<1>().set(FUNC(elan_eu3a05_state::sound_end1));
-	m_sound->sound_end_cb<2>().set(FUNC(elan_eu3a05_state::sound_end2));
-	m_sound->sound_end_cb<3>().set(FUNC(elan_eu3a05_state::sound_end3));
-	m_sound->sound_end_cb<4>().set(FUNC(elan_eu3a05_state::sound_end4));
-	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a05_state::sound_end5));
-	*/
 }
 
 void elan_eu3a05_state::elan_eu3a05_pal(machine_config& config)
 {
 	elan_eu3a05(config);
 	m_screen->set_refresh_hz(50);
-	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_maincpu->set_is_pal();
 }
 
 
 void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 {
-	elan_eu3a05(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
+	/* basic machine hardware */
+	ELAN_EU3A13_SOC(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
+	m_maincpu->set_addrmap(5, &elan_eu3a13_state::elan_eu3a05_bank_map);
+	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a13_state::interrupt));
+	m_maincpu->read_callback<0>().set_ioport("IN0");
+	m_maincpu->read_callback<1>().set_ioport("IN1");
+	m_maincpu->read_callback<2>().set_ioport("IN2");
+	m_maincpu->set_alt_timer(); // carlecfg needs it, some other eu3a13 games might not
 
-	ELAN_EU3A13_VID(config.replace(), m_vid, 0);
-	m_vid->set_cpu(m_maincpu);
-	m_vid->set_addrbank(m_bank);
-	m_vid->set_palette(m_palette);
-	m_vid->set_entries(256);
-
-	ELAN_EU3A13_SYS(config.replace(), m_sys, 0);
-	m_sys->set_cpu(m_maincpu);
-	m_sys->set_addrbank(m_bank);
-	m_sys->set_alt_timer(); // for Carl Edwards'
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(elan_eu3a13_state::screen_update));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 }
 
 void elan_eu3a13_state::elan_eu3a13_pal(machine_config& config)
 {
 	elan_eu3a13(config);
-	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_maincpu->set_is_pal();
 	m_screen->set_refresh_hz(50);
 }
-
-void elan_eu3a13_state::elan_eu3a13_pvmil8(machine_config& config)
-{
-	elan_eu3a13_pal(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
-	m_sys->set_alt_timer();
-}
-
 
 uint8_t elan_eu3a05_pvwwcas_state::pvwwc_portc_r()
 {
 	int pc = m_maincpu->pc();
 
-	if ((pc!=0xEBAC) && (pc!= 0xEBB5) && (pc != 0xEBA3) && (pc != 0xEBE1))
+	if ((pc!=0xebac) && (pc!= 0xebb5) && (pc != 0xeba3) && (pc != 0xebe1))
 		logerror("%s: pvwwc_portc_r\n", machine().describe_context().c_str());
 
-	if (pc == 0xEBE1)
+	if (pc == 0xebe1)
 		logerror("%s: pvwwc_portc_r reading input bit\n\n", machine().describe_context());
 
 	return m_prevport_c | 0x4;
@@ -955,14 +756,15 @@ void elan_eu3a05_pvwwcas_state::pvwwc_portc_w(uint8_t data)
 	m_prevport_c = data;
 }
 
+
 void elan_eu3a05_pvwwcas_state::pvwwcas(machine_config& config)
 {
 	elan_eu3a05(config);
 	m_screen->set_refresh_hz(50);
-	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_maincpu->set_is_pal();
 
-	m_gpio->read_2_callback().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_r));
-	m_gpio->write_2_callback().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_w));
+	m_maincpu->read_callback<2>().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_r));
+	m_maincpu->write_callback<2>().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_w));
 }
 
 
@@ -1017,6 +819,14 @@ ROM_START( sudoku2p )
 ROM_END
 
 ROM_START( rad_ftet )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "familytetris.u2", 0x00000, 0x100000, CRC(2b65a70d) SHA1(1c9a960ebb4c2c51177b8596c017a04bf816b020) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
+ROM_START( rad_ftetp ) // ROM is the same on a UK unit
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "familytetris.u2", 0x00000, 0x100000, CRC(2b65a70d) SHA1(1c9a960ebb4c2c51177b8596c017a04bf816b020) )
 	ROM_RELOAD(0x100000,0x100000)
@@ -1120,16 +930,16 @@ CONS( 2005, sudelan, 0,         0, elan_eu3a13_pal,  sudoku,   elan_eu3a13_state
 
 CONS( 2005, sudoku2p, 0,        0, elan_eu3a13_pal,  sudoku2p, elan_eu3a13_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
 
-CONS( 2006, rad_ftet, 0,        0, elan_eu3a13,      rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris", MACHINE_NOT_WORKING )
-// rad_ftet shows UK logo if set to PAL
+CONS( 2006, rad_ftet,  0,        0, elan_eu3a13,      rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal,  rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (PAL)", MACHINE_NOT_WORKING )
 
 CONS( 200?, carlecfg, 0,        0, elan_eu3a13,      carlecfg, elan_eu3a13_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
 // however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit
-CONS( 2005, pvmil8,   0,        0, elan_eu3a13_pvmil8,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmil8,   0,        0, elan_eu3a13_pal,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2005, pvmilfin, pvmil8,   0, elan_eu3a13_pvmil8,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmilfin, pvmil8,   0, elan_eu3a13_pal,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
 
 // Below are unknown, probably belong here, but dumps are bad
 

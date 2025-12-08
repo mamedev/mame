@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_TVGAMES_ELAN_EU3A05COMMONVID_H
-#define MAME_TVGAMES_ELAN_EU3A05COMMONVID_H
+#ifndef MAME_MACHINE_ELAN_EU3A05COMMONVID_H
+#define MAME_MACHINE_ELAN_EU3A05COMMONVID_H
 
 #include "emupal.h"
 
@@ -23,8 +23,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-private:
 	required_device<palette_device> m_palette;
+private:
 	std::vector<uint8_t> m_palram;
 	void update_pen(int pen);
 	double hue2rgb(double p, double q, double t);
@@ -32,4 +32,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_COMMONVID, elan_eu3a05commonvid_device)
 
-#endif // MAME_TVGAMES_ELAN_EU3A05COMMONVID_H
+#endif // MAME_MACHINE_ELAN_EU3A05COMMONVID_H

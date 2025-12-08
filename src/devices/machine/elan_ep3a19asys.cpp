@@ -26,7 +26,8 @@ device_memory_interface::space_config_vector elan_ep3a19asys_device::memory_spac
 void elan_ep3a19asys_device::rombank_w(offs_t offset, uint8_t data)
 {
 	m_rombank_lo = data;
-	m_bank->set_bank(m_rombank_lo);
+
+	m_bankchange_cb(m_rombank_lo | (m_rombank_hi << 8));
 }
 
 uint8_t elan_ep3a19asys_device::rombank_r(offs_t offset)
@@ -83,7 +84,7 @@ void elan_ep3a19asys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 	logerror("%s: elan_eu3a05_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;
 
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+	address_space& fullbankspace = m_cpu->space(5);
 	address_space& destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data)
