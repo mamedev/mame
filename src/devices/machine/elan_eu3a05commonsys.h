@@ -5,7 +5,11 @@
 #define MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
 
 #include "cpu/m6502/m6502.h"
-#include "machine/bankdev.h"
+
+enum
+{
+	AS_EXTERNAL = 5,
+};
 
 class elan_eu3a05commonsys_device : public device_t
 {

@@ -6,6 +6,8 @@
 
 #include "emupal.h"
 
+#include "elan_eu3a05commonsys.h"
+
 class elan_eu3a05commonvid_device : public device_t
 {
 public:

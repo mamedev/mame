@@ -15,7 +15,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-
 class elan_eu3a05_soc_device : public m6502_device {
 public:
 	elan_eu3a05_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -59,11 +58,11 @@ protected:
 	void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
 	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 
-	uint8_t read_full_space(offs_t offset) { address_space &extspace = space(5); return extspace.read_byte(offset); }
+	uint8_t read_full_space(offs_t offset) { address_space &extspace = space(AS_EXTERNAL); return extspace.read_byte(offset); }
 	void bank_change(uint16_t bank)	{ m_current_bank = bank; }
-	uint8_t bank_r(offs_t offset) {	return space(5).read_byte((m_current_bank * 0x8000) + offset); }
-	void bank_w(offs_t offset, uint8_t data) { space(5).write_byte((m_current_bank * 0x8000) + offset, data); }
-	uint8_t fixed_r(offs_t offset) { return space(5).read_byte(m_fixed_bank_address + offset); }	
+	uint8_t bank_r(offs_t offset) {	return space(AS_EXTERNAL).read_byte((m_current_bank * 0x8000) + offset); }
+	void bank_w(offs_t offset, uint8_t data) { space(AS_EXTERNAL).write_byte((m_current_bank * 0x8000) + offset, data); }
+	uint8_t fixed_r(offs_t offset) { return space(AS_EXTERNAL).read_byte(m_fixed_bank_address + offset); }	
 
 	uint16_t m_current_bank;
 	uint32_t m_fixed_bank_address;

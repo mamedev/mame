@@ -81,7 +81,7 @@ void elan_eu3a05sys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 	logerror("%s: elan_eu3a05_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;
 
-	address_space &extspace = m_cpu->space(5);
+	address_space &extspace = m_cpu->space(AS_EXTERNAL);
 	address_space &destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data)

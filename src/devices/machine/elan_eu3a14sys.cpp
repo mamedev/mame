@@ -71,7 +71,7 @@ void elan_eu3a14sys_device::dma_trigger_w(uint8_t data)
 
 	//logerror("%s: dma_trigger_w %02x (src %08x dst %08x size %08x)\n", machine().describe_context(), data, dmasrc, dmadst, dmalen);
 
-	address_space &extspace = m_cpu->space(5);
+	address_space &extspace = m_cpu->space(AS_EXTERNAL);
 	address_space &destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data == 0x08)

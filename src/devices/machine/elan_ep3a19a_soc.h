@@ -51,10 +51,10 @@ protected:
 	required_device<palette_device> m_palette;
 
 	uint8_t nmi_vector_r(offs_t offset)	{ return 0xffd4 >> (offset * 8); }
-	uint8_t bank_r(offs_t offset) {	return space(5).read_byte((m_current_bank * 0x8000) + offset); }
-	void bank_w(offs_t offset, uint8_t data) { space(5).write_byte((m_current_bank * 0x8000) + offset, data); }
-	uint8_t fixed_r(offs_t offset) { /* always at 0 for this SoC? */  return space(5).read_byte(offset); }	
-	uint8_t read_full_space(offs_t offset) { address_space &extspace = space(5); return extspace.read_byte(offset); }
+	uint8_t bank_r(offs_t offset) {	return space(AS_EXTERNAL).read_byte((m_current_bank * 0x8000) + offset); }
+	void bank_w(offs_t offset, uint8_t data) { space(AS_EXTERNAL).write_byte((m_current_bank * 0x8000) + offset, data); }
+	uint8_t fixed_r(offs_t offset) { /* always at 0 for this SoC? */  return space(AS_EXTERNAL).read_byte(offset); }	
+	uint8_t read_full_space(offs_t offset) { address_space &extspace = space(AS_EXTERNAL); return extspace.read_byte(offset); }
 
 
 private:

@@ -175,7 +175,7 @@ void elan_eu3a14vid_device::create_bitmaps(screen_device* screen)
 
 uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 {
-	address_space &extspace = m_cpu->space(5);
+	address_space &extspace = m_cpu->space(AS_EXTERNAL);
 	return extspace.read_byte((offset+x) & 0x7fffff);
 }
 
@@ -189,7 +189,7 @@ uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
 	}
 	else
 	{
-		address_space &extspace = m_cpu->space(5);
+		address_space &extspace = m_cpu->space(AS_EXTERNAL);
 		pix =  extspace.read_byte((baseaddr+count) & 0x7fffff);
 	}
 	return pix;
