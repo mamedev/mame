@@ -20237,7 +20237,20 @@ ROM_START( ll3f )
 	ROM_LOAD( "prom3.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+/*
+  Cherry Master '99
 
+  This hardware has a complex and insane bankswitching system.
+  The PCB seems similar to cm89, but with an extension where
+  you can see unpopulated components, a not soldered DB9 (RS232)
+  port, and two 18CV8 PEELS that seems responsible of this insane
+  dynamic ROM banking.
+
+  Now PLDs are dumped and preserved.
+
+  Note that this hardware runs more games than cmaster99 ones.
+
+*/
 ROM_START( cmast99 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// this ROM loading is confirmed via ICE dump at reset
@@ -20281,6 +20294,10 @@ ROM_START( cmast99 )
 	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, CRC(4dbf87ec) SHA1(338d9fabba8928e25ca39fbe717c5e6ce35b7278) )
 	ROM_LOAD( "palce16v8h.f14", 0x400, 0x117, CRC(12a5e577) SHA1(ee5ea1afef775db3a9f848b5cc5384bc10b4e349) )
 	ROM_LOAD( "palce16v8h.g13", 0x600, 0x117, CRC(deee0b94) SHA1(3682affbe803ffa8b436346f159c3818d6714d1a) )
+
+	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
+	ROM_LOAD( "peel18cv8_inside.j15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.l15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 
