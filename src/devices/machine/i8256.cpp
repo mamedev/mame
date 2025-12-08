@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "i8256.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -251,6 +251,14 @@ void i8256_device::device_reset()
 	reset_timer();
 }
 
+uint8_t i8256_device::acknowledge()
+{
+	uint8_t vector = m_current_interrupt_level;
+	m_out_int_cb(CLEAR_LINE); // deassert interrupt
+	m_current_interrupt_level = -1; // no current interrupt
+	return vector;
+}
+
 void i8256_device::reset_timer()
 {
 	int divider = 64; //default is 16kHz from the datasheet, it may later be changed to a slower one
@@ -274,10 +282,6 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 				m_current_interrupt_level = timer_interrupt[i];
 				m_out_int_cb(ASSERT_LINE); // it occurs when the counter changes from 1 to 0.
 			}
-		}
-		else
-		{
-			m_out_int_cb(CLEAR_LINE);
 		}
 	}
 }
@@ -306,7 +310,7 @@ uint8_t i8256_device::read(offs_t offset)
 		case I8256_REG_INTEN:
 			return m_interrupts;
 		case I8256_REG_INTAD:
-			m_out_int_cb(0);
+			m_out_int_cb(CLEAR_LINE);
 			return m_current_interrupt_level*4;
 		case I8256_REG_BUFFER:
 			return m_rx_buffer;
