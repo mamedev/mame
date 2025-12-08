@@ -4,7 +4,13 @@
 // Soundblaster 16 - LLE
 //
 // The mcu does host communication and control of the dma-dac unit
-// TODO: UART is connected to MIDI port, mixer, adc
+/*
+ * TODO:
+ * - UART is connected to MIDI port, mixer, adc
+ * - Needs the equivalent of https://github.com/mamedev/mame/pull/11441 for sideline/jagdead
+ * - Move DSP code out, for bus/pc98_cbus/sb16_ct2720
+ *
+ */
 
 #include "emu.h"
 #include "sb16.h"
@@ -182,8 +188,9 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 		if(m_ctrl16 & 2)
 			control_timer(false);
 	}
-	else
-		m_isa->drq1_w(1);
+	// wolf3d disagrees with drq high here (will be short by 1 sample, cfr. MT09316)
+	//else
+	//	m_isa->drq1_w(1);
 
 	if(data & 0x80)
 	{
@@ -226,8 +233,8 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 		if(m_ctrl8 & 2)
 			control_timer(false);
 	}
-	else
-		m_isa->drq5_w(1);
+	//else
+	//	m_isa->drq5_w(1);
 
 	if(data & 0x80)
 	{
