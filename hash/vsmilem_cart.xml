@@ -91,7 +91,7 @@ Language:
 |        | 80-084182(NL)     | Mickey Mouse Clubhouse                                                                    |
 |        | 80-084183(UK)     | Mickey Mouse Clubhouse                                                                    |
 |   XX   | 80-084184(GE)     | Micky Maus Wunderhaus                                                                     |
-|        | 80-084185(FR)     | La Maison de Mickey (ever released?)                                                      |
+|        | 80-084185(FR)     | <Unknown> (Should be La Maison de Mickey)                                                 |
 |   XX   | 80-084185-005(FR) | La Maison de Mickey                                                                       |
 |        | 80-084186(PT)     | A Casa do Mickey Mouse (84196 on cart)                                                    |
 |   XX   | 80-084187(SP)     | La Casa de Mickey Mouse                                                                   |
@@ -207,25 +207,34 @@ Language:
 |   XX   | 80-084505(FR)     | Shrek 4 - Il était une fin                                                                |
 |        | 80-084507(SP)     | Shrek Felices para siempre                                                                |
 +========+===================+===========================================================================================+
-|   XX   | 80-084540(US)     | Super Why to the Rescue! - The Beach Day Mystery                                          |
-|   **   | 80-084541(US)     | Super Why to the Rescue! - The Beach Day Mystery (pocket version, same ROM as 084540(US)  |
+|        | 80-084520(US)     | <Unknown>                                                                                 |
++========+===================+===========================================================================================+
+|   XX   | 80-084540(US)     | Super Why! - The Beach Day Mystery                  				                         |
+|   **   | 80-084541(US)     | Super Why! - The Beach Day Mystery (pocket version, same ROM as 084540(US)  				 |
++========+===================+===========================================================================================+
+|        | 80-084560(US)     | <Unknown>                                                                                 |
 +========+===================+===========================================================================================+
 |   XX   | 80-084580(US)     | Cars 2  (motion version)                                                                  |
 |   XX   | 80-084581(US)     | Cars 2  (pocket version)                                                                  |
+|        | 80-084582(NL)     | Cars 2                                                                                    |
 |        | 80-084583(UK)     | Cars 2                                                                                    |
 |   XX   | 80-084584(GE)     | Cars 2                                                                                    |
 |   XX   | 80-084585(FR)     | Cars 2                                                                                    |
 |        | 80-084587(SP)     | Cars 2                                                                                    |
 +========+===================+===========================================================================================+
+|        | 80-084600(US)     | <Unknown> (Should be Orange colored Cinderella - Cinderella's Magic Wishes)               |
+|        | 80-084602(NL)     | Cinderella - De Wonderwereld van Assepoester                                              |
 |        | 80-084603(UK)     | Cinderella - Cinderella's Magic Wishes                                                    |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland                                                       |
 |   XX   | 80-084604(GE)     | Cinderella - Lernen im Maerchenland (rev. 2?)                                             |
 |   XX   | 80-084605(FR)     | Cendrillon - Le rêve enchanté de Cendrillon                                               |
 +========+===================+===========================================================================================+
+|        | 80-084620(US)     | <Unknown> (Should be Orange colored Finding Nemo)                                         |
 |        | 80-084624(GE)     | Findet Nemo - Nemos Unterwasserabenteuer                                                  |
 |   XX   | 80-084625(FR)     | Le Monde de Nemo - Nemo à la decourverte de l'océan                                       |
 |        | 80-084627(SP)     | Buscando a Nemo - Los Descubrimientos de Nemo                                             |
 +========+===================+===========================================================================================+
+|        | 80-084640(US)     | <Unknown> (Should be Orange colored SpongeBob)                                            |
 |   XX   | 80-084644(GE)     | SpongeBob Schwammkopf - Der Tag des Schwamms                                              |
 |        | 80-084647(SP)     | Bob Esponja - Un día en la vida de una esponja                                            |
 +========+===================+===========================================================================================+
