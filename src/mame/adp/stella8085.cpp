@@ -256,7 +256,7 @@ uint8_t stella8085_state::kbd_rl_r()
 
 void stella8085_state::disp_w(uint8_t data)
 {
-	if (m_kbd_sl < 8)
+	if (m_kbd_sl < 8) //SL3 is inverted for the display outs
 	{
 		for (int i = 0; i < 8; i++)
 		{
@@ -266,7 +266,10 @@ void stella8085_state::disp_w(uint8_t data)
 	}
 	else
 	{
-		output_digit(m_kbd_sl, data);
+		// service kb A0-A3
+		output_digit(m_kbd_sl, data & 0x0f);
+		// money counter B0-B3
+		output_digit(m_kbd_sl-8, data >> 4);
 	}
 }
 
