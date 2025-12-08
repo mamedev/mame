@@ -10,7 +10,6 @@ elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, cons
 	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A14_VID, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_screen(*this, finder_base::DUMMY_TAG),
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 7, 0, address_map_constructor(FUNC(elan_eu3a14vid_device::map), this))
 {
 }
@@ -157,11 +156,9 @@ uint8_t elan_eu3a14vid_device::read_vram(int offset)
 
 uint32_t elan_eu3a14vid_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *pen = m_palette->pens();
-
 	m_spriterambase = (m_spriteaddr * 0x200) - 0x200;
 
-	bitmap.fill(pen[0], cliprect);
+	bitmap.fill(m_palette->pens()[0], cliprect);
 	m_prioritybitmap.fill(0, cliprect);
 
 	draw_background(screen, bitmap, cliprect);
@@ -170,9 +167,9 @@ uint32_t elan_eu3a14vid_device::screen_update(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-void elan_eu3a14vid_device::video_start()
+void elan_eu3a14vid_device::create_bitmaps(screen_device* screen)
 {
-	m_screen->register_screen_bitmap(m_prioritybitmap);
+	screen->register_screen_bitmap(m_prioritybitmap);
 }
 
 

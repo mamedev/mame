@@ -14,7 +14,6 @@ public:
 	elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	void map(address_map &map) ATTR_COLD;
 
@@ -22,7 +21,7 @@ public:
 
 	void set_tilerambase(int tilerambase) { m_tilerambase = tilerambase; }
 
-	void video_start();
+	void create_bitmaps(screen_device *screen);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
@@ -34,7 +33,6 @@ protected:
 
 private:
 	required_device<m6502_device> m_cpu;
-	required_device<screen_device> m_screen;
 	const address_space_config      m_space_config;
 
 	inline uint8_t read_gfxdata(int offset, int x);

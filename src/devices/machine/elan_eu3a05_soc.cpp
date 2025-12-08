@@ -12,7 +12,7 @@ elan_eu3a05_cpu_device::elan_eu3a05_cpu_device(const machine_config& mconfig, de
 	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24),
 	m_sys(*this, "sys"),
 	m_gpio(*this, "gpio"),
-	m_screen(*this, ":screen"),
+	m_screen(*this, finder_base::DUMMY_TAG),
 	m_sound(*this, "eu3a05sound"),
 	m_vid(*this, "vid"),
 	m_palette(*this, "palette"),

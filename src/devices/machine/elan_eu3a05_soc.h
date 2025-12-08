@@ -20,15 +20,13 @@ class elan_eu3a05_cpu_device : public m6502_device {
 public:
 	elan_eu3a05_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
-	{
-		return m_vid->screen_update(screen, bitmap, cliprect);
-	}
-
+	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect) { return m_vid->screen_update(screen, bitmap, cliprect); }
 	void generate_custom_interrupt(int irq) { m_sys->generate_custom_interrupt(irq); }
 
 	template <int Port> auto write_callback() { return m_write_callback[Port].bind(); }
 	template <int Port> auto read_callback() { return m_read_callback[Port].bind(); }
+
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	void set_is_pal() { m_is_pal = true; }
 	void set_alt_timer() { m_use_alt_timer = true; }
@@ -82,11 +80,8 @@ private:
 	devcb_read8::array<3> m_read_callback;
 	devcb_write8::array<3> m_write_callback;
 
-	template <int Port>
-	void port_w(uint8_t data) { m_write_callback[Port](data); }
-
-	template <int Port>
-	uint8_t port_r() { return m_read_callback[Port](); }
+	template <int Port>	void port_w(uint8_t data) { m_write_callback[Port](data); }
+	template <int Port>	uint8_t port_r() { return m_read_callback[Port](); }
 
 	bool m_is_pal; // configuration (probably a pin)
 	bool m_use_alt_timer; // hack, until timer enables are understood

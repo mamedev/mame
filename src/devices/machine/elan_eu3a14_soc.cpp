@@ -13,10 +13,12 @@ elan_eu3a14_cpu_device::elan_eu3a14_cpu_device(const machine_config& mconfig, de
 	m_sound(*this, "eu3a05sound"),
 	m_vid(*this, "commonvid"),
 	m_palette(*this, "palette"),
-	m_screen(*this, ":screen"),
+	m_screen(*this, finder_base::DUMMY_TAG),
+//	m_screen(*this, ":screen"),
 	m_default_spriteramaddr(0),
 	m_default_tileramaddr(0),
-	m_disable_timer(false)
+	m_disable_timer(false),
+	m_is_pal(false)
 {
 	m_extbus_config.m_addr_width = 24;
 	m_extbus_config.m_logaddr_width = 24;
@@ -41,7 +43,6 @@ void elan_eu3a14_cpu_device::device_add_mconfig(machine_config &config)
 	ELAN_EU3A14_VID(config, m_vid, 0);
 	m_vid->set_cpu(DEVICE_SELF);
 	m_vid->set_palette(m_palette);
-	m_vid->set_screen(m_screen);
 	m_vid->set_entries(512);
 	m_vid->set_tilerambase(0);
 
@@ -87,6 +88,9 @@ void elan_eu3a14_cpu_device::device_reset()
 	// see note in eu3a05, probably applies here too but nothing depends on it
 	set_state_int(M6502_S, 0x1ff);
 
+	if (m_is_pal)
+		m_sys->set_pal();
+
 	// pass per-game kludges to subdevices
 	m_vid->set_default_spriteramaddr(m_default_spriteramaddr);
 	m_vid->set_tilerambase(m_default_tileramaddr);
@@ -98,7 +102,7 @@ void elan_eu3a14_cpu_device::device_start()
 {
 	m6502_device::device_start();
 
-	m_vid->video_start();
+	m_vid->create_bitmaps(m_screen);
 }
 
 void elan_eu3a14_cpu_device::int_map(address_map &map)

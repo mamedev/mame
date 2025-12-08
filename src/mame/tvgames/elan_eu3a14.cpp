@@ -610,7 +610,8 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a14_state::interrupt));
 	m_maincpu->set_default_spriteramaddr(0x14);
 	m_maincpu->set_tilerambase(0x0000);
-
+	m_maincpu->set_screen("screen");
+	
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -657,7 +658,7 @@ void elan_eu3a14_state::radica_eu3a14_altrambase_adc(machine_config &config)
 void elan_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks differ too, what are they on PAL?
 {
 	radica_eu3a14(config);
-	// TODO: m_sys->set_pal(); // TODO: also set PAL clocks
+	m_maincpu->set_is_pal();
 	m_screen->set_refresh_hz(50);
 }
 
