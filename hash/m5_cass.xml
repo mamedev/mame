@@ -404,7 +404,6 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>Takara</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with TAPE"/>
-		<info name="alt_title" value="ゲーム"/>
 		<sharedfeat name="requirement" value="m5_cart:basici"/>	
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="2381">
