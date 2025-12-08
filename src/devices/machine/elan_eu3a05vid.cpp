@@ -145,7 +145,7 @@ uint8_t elan_eu3a05vid_device::read_vram(int offset)
 
 void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
-	address_space& fullbankspace = m_cpu->space(5);
+	address_space& extspace = m_cpu->space(5);
 	const pen_t *pen = m_palette->pens();
 
 	/*
@@ -281,7 +281,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bi
 				else
 					realaddr += ((tex_y + (yy>>1)) & 0xff) * 256;
 
-				uint8_t pix = fullbankspace.read_byte(realaddr);
+				uint8_t pix = extspace.read_byte(realaddr);
 
 				if (pix != m_transpen)
 				{
@@ -365,7 +365,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 
 void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint32_t* row)
 {
-	address_space& fullbankspace = m_cpu->space(5);
+	address_space& extspace = m_cpu->space(5);
 	const pen_t *pen = m_palette->pens();
 	int colour = attr & 0xf0;
 
@@ -400,7 +400,7 @@ void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int at
 		for (int xx = 0; xx < tilexsize; xx += 2)
 		{
 			int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
-			uint8_t pix = fullbankspace.read_byte(realaddr);
+			uint8_t pix = extspace.read_byte(realaddr);
 
 			int drawxpos;
 
@@ -418,7 +418,7 @@ void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int at
 		for (int xx = 0; xx < tilexsize; xx++)
 		{
 			int realaddr = ((tile + i * 32) << 3) + xx;
-			uint8_t pix = fullbankspace.read_byte(realaddr);
+			uint8_t pix = extspace.read_byte(realaddr);
 
 			int drawxpos = xpos + xx;
 			if ((drawxpos >= 0) && (drawxpos < 256))

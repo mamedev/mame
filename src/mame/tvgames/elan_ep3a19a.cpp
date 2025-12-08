@@ -29,7 +29,7 @@ public:
 
 	void init_tvbg();
 
-	required_device<elan_ep3a19a_cpu_device> m_maincpu;
+	required_device<elan_ep3a19a_soc_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 protected:

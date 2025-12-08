@@ -237,7 +237,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<elan_eu3a05_cpu_device> m_maincpu;
+	required_device<elan_eu3a05_soc_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	// screen updates

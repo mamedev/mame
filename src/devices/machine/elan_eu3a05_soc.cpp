@@ -4,10 +4,10 @@
 #include "emu.h"
 #include "elan_eu3a05_soc.h"
 
-DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOC,     elan_eu3a05_cpu_device,     "elan_eu3a05_cpu_device",     "ELAN EU3A05")
-DEFINE_DEVICE_TYPE(ELAN_EU3A13_SOC,     elan_eu3a13_cpu_device,     "elan_eu3a13_cpu_device",     "ELAN EU3A13")
+DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOC,     elan_eu3a05_soc_device,     "elan_eu3a05_soc_device",     "ELAN EU3A05")
+DEFINE_DEVICE_TYPE(ELAN_EU3A13_SOC,     elan_eu3a13_soc_device,     "elan_eu3a13_soc_device",     "ELAN EU3A13")
 
-elan_eu3a05_cpu_device::elan_eu3a05_cpu_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+elan_eu3a05_soc_device::elan_eu3a05_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
 	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24),
 	m_sys(*this, "sys"),
@@ -23,18 +23,18 @@ elan_eu3a05_cpu_device::elan_eu3a05_cpu_device(const machine_config& mconfig, de
 {
 	m_extbus_config.m_addr_width = 24;
 	m_extbus_config.m_logaddr_width = 24;
-	program_config.m_internal_map = address_map_constructor(FUNC(elan_eu3a05_cpu_device::int_map), this);
+	program_config.m_internal_map = address_map_constructor(FUNC(elan_eu3a05_soc_device::int_map), this);
 
 	m_fixed_bank_address = 0x3f8000;
 }
 
-elan_eu3a05_cpu_device::elan_eu3a05_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	elan_eu3a05_cpu_device(mconfig, ELAN_EU3A05_SOC, tag, owner, clock)
+elan_eu3a05_soc_device::elan_eu3a05_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05_soc_device(mconfig, ELAN_EU3A05_SOC, tag, owner, clock)
 {
 }
 
-elan_eu3a13_cpu_device::elan_eu3a13_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	elan_eu3a05_cpu_device(mconfig, ELAN_EU3A13_SOC, tag, owner, clock)
+elan_eu3a13_soc_device::elan_eu3a13_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05_soc_device(mconfig, ELAN_EU3A13_SOC, tag, owner, clock)
 {
 	m_fixed_bank_address = 0;
 }
@@ -103,21 +103,21 @@ static GFXDECODE_START( gfx_elan_eu3a05_fake )
 GFXDECODE_END
 
 
-void elan_eu3a05_cpu_device::device_add_mconfig(machine_config &config)
+void elan_eu3a05_soc_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(256);
 
 	ELAN_EU3A05_GPIO(config, m_gpio, 0);
-	m_gpio->read_callback<0>().set(FUNC(elan_eu3a05_cpu_device::port_r<0>));
-	m_gpio->write_callback<0>().set(FUNC(elan_eu3a05_cpu_device::port_w<0>));
-	m_gpio->read_callback<1>().set(FUNC(elan_eu3a05_cpu_device::port_r<1>));
-	m_gpio->write_callback<1>().set(FUNC(elan_eu3a05_cpu_device::port_w<1>));
-	m_gpio->read_callback<2>().set(FUNC(elan_eu3a05_cpu_device::port_r<2>));
-	m_gpio->write_callback<2>().set(FUNC(elan_eu3a05_cpu_device::port_w<2>));
+	m_gpio->read_callback<0>().set(FUNC(elan_eu3a05_soc_device::port_r<0>));
+	m_gpio->write_callback<0>().set(FUNC(elan_eu3a05_soc_device::port_w<0>));
+	m_gpio->read_callback<1>().set(FUNC(elan_eu3a05_soc_device::port_r<1>));
+	m_gpio->write_callback<1>().set(FUNC(elan_eu3a05_soc_device::port_w<1>));
+	m_gpio->read_callback<2>().set(FUNC(elan_eu3a05_soc_device::port_r<2>));
+	m_gpio->write_callback<2>().set(FUNC(elan_eu3a05_soc_device::port_w<2>));
 
 	ELAN_EU3A05_SYS(config, m_sys, 0);
 	m_sys->set_cpu(DEVICE_SELF);
-	m_sys->bank_change_callback().set(FUNC(elan_eu3a05_cpu_device::bank_change));
+	m_sys->bank_change_callback().set(FUNC(elan_eu3a05_soc_device::bank_change));
 
 	ELAN_EU3A05_VID(config, m_vid, 0);
 	m_vid->set_cpu(DEVICE_SELF);
@@ -128,7 +128,7 @@ void elan_eu3a05_cpu_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ELAN_EU3A05_SOUND(config, m_sound, 8000);
-	m_sound->space_read_callback().set(FUNC(elan_eu3a05_cpu_device::read_full_space));
+	m_sound->space_read_callback().set(FUNC(elan_eu3a05_soc_device::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 	/* just causes select sound to loop in Tetris for now!
 	m_sound->sound_end_cb<0>().set(FUNC(elan_eu3a05_state::sound_end0));
@@ -142,9 +142,9 @@ void elan_eu3a05_cpu_device::device_add_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_elan_eu3a05_fake);
 }
 
-void elan_eu3a13_cpu_device::device_add_mconfig(machine_config &config)
+void elan_eu3a13_soc_device::device_add_mconfig(machine_config &config)
 {
-	elan_eu3a05_cpu_device::device_add_mconfig(config);
+	elan_eu3a05_soc_device::device_add_mconfig(config);
 
 	ELAN_EU3A13_VID(config.replace(), m_vid, 0);
 	m_vid->set_cpu(DEVICE_SELF);
@@ -153,10 +153,10 @@ void elan_eu3a13_cpu_device::device_add_mconfig(machine_config &config)
 
 	ELAN_EU3A13_SYS(config.replace(), m_sys, 0);
 	m_sys->set_cpu(DEVICE_SELF);
-	m_sys->bank_change_callback().set(FUNC(elan_eu3a13_cpu_device::bank_change));
+	m_sys->bank_change_callback().set(FUNC(elan_eu3a13_soc_device::bank_change));
 }
 
-device_memory_interface::space_config_vector elan_eu3a05_cpu_device::memory_space_config() const
+device_memory_interface::space_config_vector elan_eu3a05_soc_device::memory_space_config() const
 {
 	if(has_configured_map(AS_OPCODES))
 		return space_config_vector {
@@ -171,7 +171,7 @@ device_memory_interface::space_config_vector elan_eu3a05_cpu_device::memory_spac
 		};
 }
 
-void elan_eu3a05_cpu_device::device_reset()
+void elan_eu3a05_soc_device::device_reset()
 {
 	m6502_device::device_reset();
 
@@ -198,12 +198,12 @@ void elan_eu3a05_cpu_device::device_reset()
 		m_sys->set_alt_timer();
 }
 
-void elan_eu3a05_cpu_device::device_start()
+void elan_eu3a05_soc_device::device_start()
 {
 	m6502_device::device_start();
 }
 
-void elan_eu3a05_cpu_device::int_map(address_map &map)
+void elan_eu3a05_soc_device::int_map(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
 
@@ -225,9 +225,9 @@ void elan_eu3a05_cpu_device::int_map(address_map &map)
 	map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
 
 	//map(0x5000, 0x50ff).ram();
-	map(0x6000, 0xdfff).rw(FUNC(elan_eu3a05_cpu_device::bank_r), FUNC(elan_eu3a05_cpu_device::bank_w));
+	map(0x6000, 0xdfff).rw(FUNC(elan_eu3a05_soc_device::bank_r), FUNC(elan_eu3a05_soc_device::bank_w));
 
-	map(0xe000, 0xffff).r(FUNC(elan_eu3a05_cpu_device::fixed_r));
+	map(0xe000, 0xffff).r(FUNC(elan_eu3a05_soc_device::fixed_r));
 	// not sure how these work, might be a modified 6502 core instead.
 	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
 	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
