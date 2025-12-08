@@ -21,7 +21,7 @@ license:CC0-1.0
 	<!-- https://www.pouet.net/prod.php?which=102706 -->
 	<software name="amjfmj">
 		<description>Full Metal Jacket</description>
-		<year>198?</year> <!-- Likely 1987 -->
+		<year>1988</year>
 		<publisher>AMJ</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="708115">
@@ -46,7 +46,7 @@ license:CC0-1.0
 	<!-- https://www.pouet.net/prod.php?which=102705 -->
 	<software name="amjinxs">
 		<description>INXS - Need You Tonight</description>
-		<year>198?</year> <!-- Likely 1987 -->
+		<year>1988</year>
 		<publisher>AMJ</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="751458">
@@ -58,7 +58,7 @@ license:CC0-1.0
 	<!-- https://www.pouet.net/prod.php?which=102704 -->
 	<software name="amjmiami">
 		<description>Theme From Miami Vice</description>
-		<year>198?</year> <!-- Likely 1987 -->
+		<year>1988</year>
 		<publisher>AMJ</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="840018">
