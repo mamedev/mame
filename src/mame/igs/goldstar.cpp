@@ -20643,6 +20643,9 @@ ROM_START( texas99e )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x200, "plds", 0 )
+	ROM_LOAD( "peel18cv8_ntx99_db.bin", 0x0000, 0x0155, CRC(1b4b7240) SHA1(371c81be94540c334196974f3868b7102751dcae) )  // from daughterboard
 ROM_END
 
 /*
