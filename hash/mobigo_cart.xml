@@ -564,7 +564,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="user2" supported="no">
-		<description>NAND User Cartridge (Europe)</description>
+		<description>NAND User Cartridge: Hundesuche/DJ VTech (Germany)</description>
 		<year>201?</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
