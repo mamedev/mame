@@ -198,6 +198,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	drq_cb(*this),
 	hdl_cb(*this),
 	idx_cb(*this),
+	ts_cb(*this, ASSERT_LINE),
 	us_cb(*this)
 {
 }
@@ -1613,6 +1614,8 @@ uint8_t upd765_family_device::get_st3(floppy_info &fi)
 
 		if (ts_connected)
 			st3 |= (fi.dev->twosid_r() ? 0x00 : ST3_TS);
+		else
+			st3 |= ts_cb() ? 0x00 : ST3_TS;
 	}
 	return st3;
 }
@@ -3234,11 +3237,30 @@ void tc8566af_device::device_start()
 
 void tc8566af_device::cr1_w(uint8_t data)
 {
-	m_cr1 = data;
-
-	if(m_cr1 & 0x02) {
+	// Enable CR0 - FDC Terminal Count
+	if(BIT(data, 1)) {
 		// Not sure if this inverted or not
-		tc_w((m_cr1 & 0x01) ? true : false);
+		tc_w(BIT(data, 0) ? true : false);
+		m_cr1 &= ~0x03;
+		m_cr1 |= data & 0x03;
+	}
+
+	// Enable CR2 - Standby Mode
+	if(BIT(data, 3)) {
+		m_cr1 &= ~0x0c;
+		m_cr1 |= data & 0x0c;
+	}
+
+	// Enable CR4 - Control 4
+	if(BIT(data, 5)) {
+		m_cr1 &= ~0x30;
+		m_cr1 |= data & 0x30;
+	}
+
+	// Enable CR6 - Control 6
+	if(BIT(data, 7)) {
+		m_cr1 &= ~0xc0;
+		m_cr1 |= data & 0xc0;
 	}
 }
 
@@ -3292,14 +3314,60 @@ void upd72067_device::auxcmd_w(uint8_t data)
 
 void upd72069_device::auxcmd_w(uint8_t data)
 {
+	// 72068 has all but two of the following auxiliary commands
 	switch(data) {
-	case 0x36: // reset
+	case 0x36: // software reset
 		soft_reset();
 		break;
-	case 0x1e: // motor on, probably
+	case 0x0e: case 0x1e: case 0x2e: case 0x3e: // enable motors
+	case 0x4e: case 0x5e: case 0x6e: case 0x7e:
+	case 0x8e: case 0x9e: case 0xae: case 0xbe:
+	case 0xce: case 0xde: case 0xee: case 0xfe:
 		for(unsigned i = 0; i < 4; i++)
 			if(flopi[i].dev)
 				flopi[i].dev->mon_w(!BIT(data, i + 4));
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
+		break;
+	case 0x0b: case 0x1b: case 0x2b: case 0x3b: // control internal mode
+	case 0x4b: case 0x5b: case 0x6b: case 0x7b:
+	case 0x8b: case 0x9b: case 0xab: case 0xbb:
+	case 0xcb: case 0xdb: case 0xeb: case 0xfb:
+		switch(data & 0xc0)
+		{
+		case 0x00: cur_rate = 250000; break;
+		case 0x40: cur_rate = 500000; break;
+		case 0x80: cur_rate = 600000; break;
+		case 0xc0: cur_rate = 300000; break;
+		}
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
+		break;
+	case 0x88: case 0x98: case 0xa8: case 0xb8: // control data transfer rate (72069 exclusive)
+	case 0xc8: case 0xd8: case 0xe8: case 0xf8:
+		switch(data & 0x70)
+		{
+		case 0x00: cur_rate = 250000; break;
+		case 0x10: case 0x40: cur_rate = 500000; break;
+		case 0x20: case 0x70: cur_rate = 600000; break;
+		case 0x30: cur_rate = 300000; break;
+		case 0x50: cur_rate = 1000000; break;
+		case 0x60: cur_rate = 1250000; break;
+		}
+		main_phase = PHASE_RESULT;
+		result[0] = ST0_UNK;
+		result_pos = 1;
+		break;
+	case 0xc3: case 0xd3: case 0xe3: case 0xf3: // precompensation (72069 exclusive)
+	case 0x4f: // select IBM format (select 77 tracks on some other 7206x variants)
+	case 0x5f: // select ECMA/ISO format (select 255 tracks on some other 7206x variants)
+	case 0x35: // set standby
+	case 0x47: // start clock
+	case 0x34: // reset standby
+	case 0x33: // enable external mode
+	case 0x80: // Not a valid auxcmd, but the Akai S3000 sends it and expects an ACK.
 		main_phase = PHASE_RESULT;
 		result[0] = ST0_UNK;
 		result_pos = 1;

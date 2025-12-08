@@ -1330,7 +1330,7 @@ int device_usb_ohci_function_interface::execute_transfer(int endpoint, int pid, 
  * Usb port connector
  */
 
-DEFINE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector, "usb_connector", "Usb Connector Abstraction");
+DEFINE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector, "usb_connector", "USB Connector Abstraction (OHCI)");
 
 ohci_usb_connector::ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_USB_CONNECTOR, tag, owner, clock),

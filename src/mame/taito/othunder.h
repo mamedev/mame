@@ -61,6 +61,7 @@ private:
 	void tc0310fam_w(offs_t offset, u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
+	rgb_t color_xrgb555(u16 data);
 
 	void othunder_map(address_map &map) ATTR_COLD;
 	void z80_sound_map(address_map &map) ATTR_COLD;

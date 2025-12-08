@@ -19825,6 +19825,33 @@ void m68000_musashi_device::x4e7a_movec_l_1()
 			REG_DA()[(word2 >> 12) & 15] = m_vbr;
 			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+						return;
+					case 0xc0c: // MPCR
+						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+						return;
+					case 0xc0d: // EDRAMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+						return;
+					case 0xc0e: // SECMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+						return;
+					case 0xc0f: // MBAR
+						REG_DA()[(word2 >> 12) & 15] = m_mbar;
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -19866,6 +19893,33 @@ void m68000_musashi_device::x4e7a_movec_l_23f()
 			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_ISP() : REG_SP();
 			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+						return;
+					case 0xc0c: // MPCR
+						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+						return;
+					case 0xc0d: // EDRAMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+						return;
+					case 0xc0e: // SECMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+						return;
+					case 0xc0f: // MBAR
+						REG_DA()[(word2 >> 12) & 15] = m_mbar;
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -19931,6 +19985,33 @@ void m68000_musashi_device::x4e7a_movec_l_4()
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_srp_aptr;
 			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+						return;
+					case 0xc0c: // MPCR
+						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+						return;
+					case 0xc0d: // EDRAMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+						return;
+					case 0xc0e: // SECMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+						return;
+					case 0xc0f: // MBAR
+						REG_DA()[(word2 >> 12) & 15] = m_mbar;
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -19983,31 +20064,34 @@ void m68000_musashi_device::x4e7a_movec_l_c()
 		case 0x007:             /* DTT1 */
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr3;
 			break;
-		case 0xc00: // ROMBAR0
-			/* TODO */
-			break;
-		case 0xc01: // ROMBAR1
-			/* TODO */
-			break;
-		case 0xc04: // RAMBAR0
-			/* TODO */
-			break;
-		case 0xc05: // RAMBAR1
-			/* TODO */
-			break;
-		case 0xc0c: // MPCR
-			/* TODO */
-			break;
-		case 0xc0d: // EDRAMBAR
-			/* TODO */
-			break;
-		case 0xc0e: // SECMBAR
-			/* TODO */
-			break;
-		case 0xc0f: // MBAR
-			/* TODO */
-			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+						return;
+					case 0xc0c: // MPCR
+						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+						return;
+					case 0xc0d: // EDRAMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+						return;
+					case 0xc0e: // SECMBAR
+						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+						return;
+					case 0xc0f: // MBAR
+						REG_DA()[(word2 >> 12) & 15] = m_mbar;
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -20037,6 +20121,33 @@ void m68000_musashi_device::x4e7b_movec_l_1()
 			m_vbr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0c: // MPCR
+						m_mpcr = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0d: // EDRAMBAR
+						m_edrambar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0e: // SECMBAR
+						m_secmbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0f: // MBAR
+						m_mbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -20094,6 +20205,33 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 			}
 			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0c: // MPCR
+						m_mpcr = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0d: // EDRAMBAR
+						m_edrambar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0e: // SECMBAR
+						m_secmbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0f: // MBAR
+						m_mbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -20151,6 +20289,33 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 			}
 			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0c: // MPCR
+						m_mpcr = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0d: // EDRAMBAR
+						m_edrambar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0e: // SECMBAR
+						m_secmbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0f: // MBAR
+						m_mbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -20240,6 +20405,33 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 			m_mmu_srp_aptr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0c: // MPCR
+						m_mpcr = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0d: // EDRAMBAR
+						m_edrambar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0e: // SECMBAR
+						m_secmbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0f: // MBAR
+						m_mbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}
@@ -20307,31 +20499,34 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 		case 0x007:         /* DTT1 */
 			m_mmu_acr3 = REG_DA()[(word2 >> 12) & 15];
 			break;
-		case 0xc00: // ROMBAR0
-			/* TODO */
-			break;
-		case 0xc01: // ROMBAR1
-			/* TODO */
-			break;
-		case 0xc04: // RAMBAR0
-			/* TODO */
-			break;
-		case 0xc05: // RAMBAR1
-			/* TODO */
-			break;
-		case 0xc0c: // MPCR
-			/* TODO */
-			break;
-		case 0xc0d: // EDRAMBAR
-			/* TODO */
-			break;
-		case 0xc0e: // SECMBAR
-			/* TODO */
-			break;
-		case 0xc0f: // MBAR
-			/* TODO */
-			break;
 		default:
+			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			{
+				switch(word2 & 0xfff)
+				{
+					case 0xc00: // ROMBAR0
+					case 0xc01:
+						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc04: // RAMBAR0
+					case 0xc05: // RAMBAR1
+						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0c: // MPCR
+						m_mpcr = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0d: // EDRAMBAR
+						m_edrambar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0e: // SECMBAR
+						m_secmbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+					case 0xc0f: // MBAR
+						m_mbar = REG_DA()[(word2 >> 12) & 15];
+						return;
+				}
+			}
+
 			m68ki_exception_illegal();
 			break;
 		}

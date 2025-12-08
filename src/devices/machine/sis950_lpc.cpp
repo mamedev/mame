@@ -132,16 +132,36 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	// TODO: unknown part #
 	AM9517A(config, m_dmac_master, lpc_pit_clock / 3);
 	m_dmac_master->out_hreq_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq0_w));
-//  m_dmac_master->out_eop_callback().set(FUNC(sis950_lpc_device::at_dma8237_out_eop));
+	m_dmac_master->out_eop_callback().set(FUNC(sis950_lpc_device::at_dma8237_out_eop));
 	m_dmac_master->in_memr_callback().set(FUNC(sis950_lpc_device::pc_dma_read_byte));
 	m_dmac_master->out_memw_callback().set(FUNC(sis950_lpc_device::pc_dma_write_byte));
-	// TODO: ior/iow/dack/eop callbacks
+	m_dmac_master->in_ior_callback<0>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_r<0>));
+	m_dmac_master->in_ior_callback<1>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_r<1>));
+	m_dmac_master->in_ior_callback<2>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_r<2>));
+	m_dmac_master->in_ior_callback<3>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_r<3>));
+	m_dmac_master->out_iow_callback<0>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_w<0>));
+	m_dmac_master->out_iow_callback<1>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_w<1>));
+	m_dmac_master->out_iow_callback<2>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_w<2>));
+	m_dmac_master->out_iow_callback<3>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_w<3>));
+	m_dmac_master->out_dack_callback<0>().set(FUNC(sis950_lpc_device::pc_dack0_w));
+	m_dmac_master->out_dack_callback<1>().set(FUNC(sis950_lpc_device::pc_dack1_w));
+	m_dmac_master->out_dack_callback<2>().set(FUNC(sis950_lpc_device::pc_dack2_w));
+	m_dmac_master->out_dack_callback<3>().set(FUNC(sis950_lpc_device::pc_dack3_w));
 
 	AM9517A(config, m_dmac_slave, lpc_pit_clock / 3);
 	m_dmac_slave->out_hreq_callback().set(FUNC(sis950_lpc_device::pc_dma_hrq_changed));
 	m_dmac_slave->in_memr_callback().set(FUNC(sis950_lpc_device::pc_dma_read_word));
 	m_dmac_slave->out_memw_callback().set(FUNC(sis950_lpc_device::pc_dma_write_word));
-	// TODO: ior/iow/dack callbacks
+	m_dmac_slave->in_ior_callback<1>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_r<5>));
+	m_dmac_slave->in_ior_callback<2>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_r<6>));
+	m_dmac_slave->in_ior_callback<3>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_r<7>));
+	m_dmac_slave->out_iow_callback<1>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_w<5>));
+	m_dmac_slave->out_iow_callback<2>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_w<6>));
+	m_dmac_slave->out_iow_callback<3>().set(FUNC(sis950_lpc_device::pc_dma8237_dack_w<7>));
+	m_dmac_slave->out_dack_callback<0>().set(FUNC(sis950_lpc_device::pc_dack4_w));
+	m_dmac_slave->out_dack_callback<1>().set(FUNC(sis950_lpc_device::pc_dack5_w));
+	m_dmac_slave->out_dack_callback<2>().set(FUNC(sis950_lpc_device::pc_dack6_w));
+	m_dmac_slave->out_dack_callback<3>().set(FUNC(sis950_lpc_device::pc_dack7_w));
 
 	// Confirmed 82C59s
 	PIC8259(config, m_pic_master, 0);
@@ -196,8 +216,8 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	ISA16(config, m_isabus, 0);
 	m_isabus->irq3_callback().set(FUNC(sis950_lpc_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(sis950_lpc_device::pc_irq4_w));
-	m_isabus->irq6_callback().set(FUNC(sis950_lpc_device::pc_irq6_w));
 	m_isabus->irq5_callback().set(FUNC(sis950_lpc_device::pc_irq5_w));
+	m_isabus->irq6_callback().set(FUNC(sis950_lpc_device::pc_irq6_w));
 	m_isabus->irq7_callback().set(FUNC(sis950_lpc_device::pc_irq7_w));
 	m_isabus->irq2_callback().set(FUNC(sis950_lpc_device::pc_irq9_w));
 	m_isabus->irq10_callback().set(FUNC(sis950_lpc_device::pc_irq10_w));
@@ -205,6 +225,13 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_isabus->irq12_callback().set(FUNC(sis950_lpc_device::pc_irq12m_w));
 	m_isabus->irq14_callback().set(FUNC(sis950_lpc_device::pc_irq14_w));
 	m_isabus->irq15_callback().set(FUNC(sis950_lpc_device::pc_irq15_w));
+	m_isabus->drq0_callback().set(m_dmac_master, FUNC(am9517a_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_dmac_master, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_dmac_master, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_dmac_master, FUNC(am9517a_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq6_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq7_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq3_w));
 	m_isabus->iochck_callback().set(FUNC(sis950_lpc_device::iochck_w));
 }
 
@@ -788,3 +815,51 @@ void sis950_lpc_device::pc_dma_write_word(offs_t offset, uint8_t data)
 
 	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
 }
+
+template <unsigned Which>
+uint8_t sis950_lpc_device::pc_dma8237_dack_r()
+{
+	return m_isabus->dack_r(Which);
+}
+
+template <unsigned Which>
+void sis950_lpc_device::pc_dma8237_dack_w(uint8_t data)
+{
+	m_isabus->dack_w(Which, data);
+}
+
+void sis950_lpc_device::at_dma8237_out_eop(int state)
+{
+	m_cur_eop = state == ASSERT_LINE;
+	if (m_dma_channel != -1)
+		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void sis950_lpc_device::pc_select_dma_channel(int channel, bool state)
+{
+	m_isabus->dack_line_w(channel, state);
+
+	if (!state)
+	{
+		m_dma_channel = channel;
+		if (m_cur_eop)
+			m_isabus->eop_w(channel, ASSERT_LINE);
+	}
+	else if (m_dma_channel == channel)
+	{
+		m_dma_channel = -1;
+		if (m_cur_eop)
+			m_isabus->eop_w(channel, CLEAR_LINE);
+	}
+}
+
+void sis950_lpc_device::pc_dack0_w(int state) { pc_select_dma_channel(0, state); }
+void sis950_lpc_device::pc_dack1_w(int state) { pc_select_dma_channel(1, state); }
+void sis950_lpc_device::pc_dack2_w(int state) { pc_select_dma_channel(2, state); }
+void sis950_lpc_device::pc_dack3_w(int state) { pc_select_dma_channel(3, state); }
+void sis950_lpc_device::pc_dack4_w(int state) { m_dmac_master->hack_w( state ? 0 : 1); } // it's inverted
+void sis950_lpc_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state); }
+void sis950_lpc_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
+void sis950_lpc_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
+
+

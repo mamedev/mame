@@ -524,6 +524,30 @@ static INPUT_PORTS_START( rad_tetr )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vjstarzd )
+	// star shaped dance pad, with 5 points and a start/select button on each pad
+	// can't easily be mapped to directions, so just using buttons
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Right / Green") // moves right in menu
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Top / Red")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Bottom Right / Pink")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Bottom Left / Yellow")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Left / Blue") // moves left in menu
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) // connected to both start inputs?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // makes a sound, but is not connected?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT ) // connected to both select inputs?
+
+	PORT_START("IN1") // these don't make a sound in menu, but do in game
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Right / Green")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Top / Red")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Bottom Right / Pink")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Bottom Left / Yellow")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Left / Blue")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( airblsjs )
 	PORT_START("IN0")
@@ -809,7 +833,7 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_eu3a05_map);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a05_state::interrupt));
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&elan_eu3a05_state::elan_eu3a05_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&elan_eu3a05_state::elan_eu3a05_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -829,13 +853,13 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_gpio->read_2_callback().set_ioport("IN2");
 
 	ELAN_EU3A05_SYS(config, m_sys, 0);
-	m_sys->set_cpu("maincpu");
-	m_sys->set_addrbank("bank");
+	m_sys->set_cpu(m_maincpu);
+	m_sys->set_addrbank(m_bank);
 
 	ELAN_EU3A05_VID(config, m_vid, 0);
-	m_vid->set_cpu("maincpu");
-	m_vid->set_addrbank("bank");
-	m_vid->set_palette("palette");
+	m_vid->set_cpu(m_maincpu);
+	m_vid->set_addrbank(m_bank);
+	m_vid->set_palette(m_palette);
 	m_vid->set_entries(256);
 
 	/* sound hardware */
@@ -866,8 +890,16 @@ void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 {
 	elan_eu3a05(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
-	m_vid->set_is_sudoku();
-	m_vid->set_use_spritepages();
+
+	ELAN_EU3A13_VID(config.replace(), m_vid, 0);
+	m_vid->set_cpu(m_maincpu);
+	m_vid->set_addrbank(m_bank);
+	m_vid->set_palette(m_palette);
+	m_vid->set_entries(256);
+
+	ELAN_EU3A13_SYS(config.replace(), m_sys, 0);
+	m_sys->set_cpu(m_maincpu);
+	m_sys->set_addrbank(m_bank);
 	m_sys->set_alt_timer(); // for Carl Edwards'
 }
 
@@ -880,12 +912,9 @@ void elan_eu3a13_state::elan_eu3a13_pal(machine_config& config)
 
 void elan_eu3a13_state::elan_eu3a13_pvmil8(machine_config& config)
 {
-	elan_eu3a05(config);
+	elan_eu3a13_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
-	m_vid->set_is_pvmilfin();
 	m_sys->set_alt_timer();
-	m_sys->set_pal(); // TODO: also set PAL clocks
-	m_screen->set_refresh_hz(50);
 }
 
 
@@ -967,6 +996,12 @@ ROM_START( sudelan3 )
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
 
+ROM_START( vjstarzd )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ep1206a.u2", 0x00000, 0x80000, CRC(e5f39fa5) SHA1(5ac45bde6f4323998f2387cb62e1841ebe60e781) )
+	ROM_RELOAD(0x380000,0x80000) // for boot vectors
+ROM_END
+
 ROM_START( sudelan )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "klaussudoku.bin", 0x00000, 0x200000, CRC(afd2b06a) SHA1(21db956fb40b2e3d61fc2bac89000cf7f61fe99e) )
@@ -1026,6 +1061,12 @@ ROM_START( pvwwcas )
 	ROM_RELOAD(0x200000, 0x200000)
 ROM_END
 
+ROM_START( bratzra )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// this does not seem to contain the game code, is it internal, or is this badly dumped somehow (all lines going to glob were used)
+	ROM_LOAD( "bratzrockangels.u1", 0x000000, 0x100000, BAD_DUMP CRC(078fa134) SHA1(e9ad3e2f0f39b2544821b9c8f71be976726aec3b) )
+ROM_END
+
 void elan_eu3a13_state::init_sudelan3()
 {
 	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
@@ -1060,13 +1101,16 @@ CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init
 
 CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
+// it isn't clear if the ELAN is generating the music on this, or if one of the other globs is an audio MCU
+// VJ Starz Dance Mat on box, VJ Starz Dancing Mat on screen
+CONS( 2003, vjstarzd, 0, 0, elan_eu3a05, vjstarzd, elan_eu3a05_state, empty_init, "Kidz Biz / Jakks Pacific", "VJ Starz Dance Mat", MACHINE_NOT_WORKING )
+
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
 
 CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
 
 CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
-
 
 // Below seem to be EU3A13, as that was confirmed for the Family Tetris die.  They're like EU3A05, but with a different memory map
 
@@ -1086,3 +1130,8 @@ CONS( 200?, carlecfg, 0,        0, elan_eu3a13,      carlecfg, elan_eu3a13_state
 CONS( 2005, pvmil8,   0,        0, elan_eu3a13_pvmil8,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
 CONS( 2005, pvmilfin, pvmil8,   0, elan_eu3a13_pvmil8,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
+
+// Below are unknown, probably belong here, but dumps are bad
+
+// CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?
+CONS( 200?, bratzra,  0,        0, elan_eu3a05,    rad_sinv,   elan_eu3a05_state, empty_init, "MGA", "Bratz Rock Angelz", MACHINE_NOT_WORKING )

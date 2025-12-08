@@ -165,7 +165,7 @@ void isbc_218a_device::mcs1_w(offs_t offset, uint8_t data)
 	case 4:
 		m_motor = data & 1;
 		if(!m_fd8)
-			m_floppy0->get_device()->mon_w(!(data & 1));
+			m_floppy0->get_device()->mon_w(!m_motor);
 		break;
 	case 6: m_fdc->tc_w(data & 1); break;
 	}

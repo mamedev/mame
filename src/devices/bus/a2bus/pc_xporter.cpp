@@ -126,6 +126,8 @@ protected:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<v30_device> m_v30;
@@ -328,6 +330,11 @@ void a2bus_pcxporter_device::device_start()
 }
 
 void a2bus_pcxporter_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_pcxporter_device::reset_from_bus()
 {
 	m_v30->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_reset_during_halt = false;

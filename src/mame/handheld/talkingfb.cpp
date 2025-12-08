@@ -29,7 +29,7 @@ TODO:
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/dac.h"
 
 #include "speaker.h"
@@ -62,7 +62,7 @@ private:
 	u8 m_inp_mux = 0;
 
 	void main_map(address_map &map) ATTR_COLD;
-	void main_io(address_map &map) ATTR_COLD;
+	void main_data(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void bank_w(u8 data);
@@ -134,7 +134,7 @@ void talkingfb_state::main_map(address_map &map)
 	map(0x8000, 0xffff).r(FUNC(talkingfb_state::bank_r<0>));
 }
 
-void talkingfb_state::main_io(address_map &map)
+void talkingfb_state::main_data(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
 	map(0x4000, 0x4000).mirror(0x3fff).rw(FUNC(talkingfb_state::input_r), FUNC(talkingfb_state::input_w));
@@ -226,7 +226,7 @@ void talkingfb_state::talkingfb(machine_config &config)
 	// basic machine hardware
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &talkingfb_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &talkingfb_state::main_io);
+	m_maincpu->set_addrmap(AS_DATA, &talkingfb_state::main_data);
 	m_maincpu->port_out_cb<1>().set("dac", FUNC(dac_8bit_r2r_device::write));
 	m_maincpu->port_out_cb<3>().set(FUNC(talkingfb_state::bank_w));
 

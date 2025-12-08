@@ -26,7 +26,7 @@
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/74259.h"
 #include "machine/timekpr.h"
 #include "screen.h"
@@ -58,7 +58,7 @@ private:
 	required_ioport_array<4> m_inputs;
 
 	void prg_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 
 	u8 m_port_select = 0;
 };
@@ -86,7 +86,7 @@ void cromptons_state::prg_map(address_map &map)
 	map(0x0000, 0xffff).rom().region("maincpu", 0);
 }
 
-void cromptons_state::io_map(address_map &map)
+void cromptons_state::data_map(address_map &map)
 {
 	map(0xe000, 0xffff).rw("timekpr", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
 }
@@ -136,7 +136,7 @@ void cromptons_state::cromptons(machine_config &config)
 	/* basic machine hardware */
 	I80C32(config, m_maincpu, 11.0592_MHz_XTAL); // TS80C32X2-MCA
 	m_maincpu->set_addrmap(AS_PROGRAM, &cromptons_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &cromptons_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &cromptons_state::data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(cromptons_state::port_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(cromptons_state::port_w));
 

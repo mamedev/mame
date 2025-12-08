@@ -19,7 +19,8 @@ null_modem_device::null_modem_device(const machine_config &mconfig, const char *
 	m_timer_poll(nullptr),
 	m_rts(0),
 	m_dtr(0),
-	m_xoff(0)
+	m_xoff(0),
+	m_cr(false)
 {
 }
 
@@ -41,6 +42,20 @@ static INPUT_PORTS_START(null_modem)
 	PORT_CONFSETTING(   0x01, "RTS")
 	PORT_CONFSETTING(   0x02, "DTR")
 	PORT_CONFSETTING(   0x04, "XON/XOFF")
+	PORT_CONFNAME(0x18, 0x00, "CR/LF Input Conversion")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x08, "LF to CR")
+	PORT_CONFSETTING(   0x10, "CR/LF to CR")
+	PORT_CONFSETTING(   0x18, "LF to CR/LF")
+	PORT_CONFNAME(0xe0, 0x00, "Delay After CR")
+	PORT_CONFSETTING(   0x00, DEF_STR(None))
+	PORT_CONFSETTING(   0x20, "10 ms")
+	PORT_CONFSETTING(   0x40, "20 ms")
+	PORT_CONFSETTING(   0x60, "40 ms")
+	PORT_CONFSETTING(   0x80, "80 ms")
+	PORT_CONFSETTING(   0xa0, "160 ms")
+	PORT_CONFSETTING(   0xc0, "320 ms")
+	PORT_CONFSETTING(   0xe0, "640 ms")
 INPUT_PORTS_END
 
 ioport_constructor null_modem_device::device_input_ports() const
@@ -76,6 +91,7 @@ void null_modem_device::update_serial(int state)
 	output_cts(0);
 
 	m_xoff = 0;
+	m_cr = false;
 }
 
 void null_modem_device::device_reset()
@@ -84,25 +100,61 @@ void null_modem_device::device_reset()
 	update_queue(0);
 }
 
+void null_modem_device::update_input_buffer()
+{
+	if (m_input_index == m_input_count)
+	{
+		m_input_index = 0;
+		m_input_count = m_stream->input(m_input_buffer, sizeof(m_input_buffer));
+	}
+}
+
 TIMER_CALLBACK_MEMBER(null_modem_device::update_queue)
 {
 	if (is_transmit_register_empty())
 	{
-		if (m_input_index == m_input_count)
+		auto const fc = m_flow->read();
+		if ((fc & (m_rts | m_dtr << 1 | m_xoff << 2)) == 0)
 		{
-			m_input_index = 0;
-			m_input_count = m_stream->input(m_input_buffer, sizeof(m_input_buffer));
-		}
-
-		if (m_input_count != 0)
-		{
-			uint8_t const fc = m_flow->read();
-
-			if (fc == 0 || (fc == 1 && m_rts == 0) || (fc == 2 && m_dtr == 0) || (fc == 4 && m_xoff == 0))
+			if (m_cr && (fc & 0x18) == 0x18)
 			{
-				transmit_register_setup(m_input_buffer[m_input_index++]);
+				transmit_register_setup(0x0a);
 				m_timer_poll->adjust(attotime::never);
+				m_cr = false;
 				return;
+			}
+
+			update_input_buffer();
+
+			if (m_input_count != 0)
+			{
+				if (m_cr && (fc & 0x18) == 0x10)
+				{
+					while (m_input_index != m_input_count && (m_input_buffer[m_input_index] == 0x0a || m_input_buffer[m_input_index] == 0x0d))
+					{
+						// suppress redundant CRs
+						m_cr = m_input_buffer[m_input_index++] == 0x0d;
+						update_input_buffer();
+					}
+				}
+
+				if (m_input_index != m_input_count)
+				{
+					uint8_t data = m_input_buffer[m_input_index++];
+
+					if ((fc & 0x08) && data == 0x0a)
+					{
+						m_cr = data == 0x0a;
+						if (m_cr)
+							data = 0x0d;
+					}
+					else
+						m_cr = data == 0x0d;
+
+					transmit_register_setup(data);
+					m_timer_poll->adjust(attotime::never);
+					return;
+				}
 			}
 		}
 
@@ -118,7 +170,11 @@ void null_modem_device::tra_callback()
 
 void null_modem_device::tra_complete()
 {
-	update_queue(0);
+	auto const fc = m_flow->read();
+	if (m_cr && (fc & 0xe0) != 0)
+		m_timer_poll->adjust(attotime::from_msec(5 << (fc >> 5)));
+	else
+		update_queue(0);
 }
 
 void null_modem_device::rcv_complete()
@@ -127,9 +183,7 @@ void null_modem_device::rcv_complete()
 
 	uint8_t const data = get_received_char();
 	if (m_flow->read() != 4)
-	{
 		m_stream->output(data);
-	}
 	else
 	{
 		switch (data)

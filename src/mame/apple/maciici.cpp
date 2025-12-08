@@ -176,6 +176,9 @@ private:
 			m_fdc->write((offset >> 8) & 0xf, data & 0xff);
 		else
 			m_fdc->write((offset >> 8) & 0xf, data >> 8);
+
+		if (!machine().side_effects_disabled())
+			m_maincpu->adjust_icount(-5);
 	}
 };
 

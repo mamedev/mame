@@ -604,6 +604,12 @@ function toolchain(_buildDir, _subDir)
 end
 
 function strip()
+	if _OPTIONS["PDB_SYMBOLS"]~=nil and _OPTIONS["PDB_SYMBOLS"]~=0 then
+		linkoptions {
+			"-Wl,--pdb=$(subst .exe,.pdb,$(TARGET))",
+		}
+	end
+
 	if _OPTIONS["STRIP_SYMBOLS"]~="1" then
 		return true
 	end

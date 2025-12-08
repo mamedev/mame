@@ -296,9 +296,9 @@ protected:
 
 private:
 	/* video-related */
-	int m_layer_colorbase[4]{};
-	int m_sprite_colorbase = 0;
-	int m_back_colorbase = 0;
+	uint16_t m_layer_colorbase[4]{};
+	uint16_t m_sprite_colorbase = 0;
+	uint16_t m_back_colorbase = 0;
 
 	/* misc */
 	uint8_t m_cur_control2 = 0U;
@@ -326,8 +326,8 @@ private:
 	K053244_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 	void bank4000_map(address_map &map) ATTR_COLD;
-	void le_main(address_map &map) ATTR_COLD;
-	void le_sound(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -356,23 +356,23 @@ K053244_CB_MEMBER(lethal_state::sprite_callback)
 	// priority 0xfe:
 	//     0x30: always in a bad colour, used to do special effects i think
 
-	switch (*color & 0x30)
+	switch (color & 0x30)
 	{
-		case 0x00: *priority = 0x00; break;
-		case 0x10: *priority = 0xf0; break;
-		case 0x20: *priority = 0xfc; break;
-		case 0x30: *priority = 0xfe; break;
+		case 0x00: priority = 0x00; break;
+		case 0x10: priority = 0xf0; break;
+		case 0x20: priority = 0xfc; break;
+		case 0x30: priority = 0xfe; break;
 	}
 
-	*color = *color & 0x0f;
-	*color += m_sprite_colorbase;
+	color = color & 0x0f;
+	color += m_sprite_colorbase;
 
-	*code = (*code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
+	code = (code & 0x3fff); // | spritebanks[(*code >> 12) & 3];
 }
 
 K056832_CB_MEMBER(lethal_state::tile_callback)
 {
-	*color = m_layer_colorbase[layer] + ((*color & 0x3c) << 2);
+	color = m_layer_colorbase[layer] + ((color & 0x3c) << 2);
 }
 
 void lethal_state::palette_control_w(offs_t offset, uint8_t data)
@@ -413,7 +413,7 @@ void lethal_state::palette_w(offs_t offset, uint8_t data)
 uint32_t lethal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// layer offsets are different if horizontally flipped
-	if (m_k056832->read_register(0x0) & 0x10)
+	if (m_k056832->word_r(0x0) & 0x10)
 	{
 		m_k056832->set_layer_offs(0, -4 - 167, 0);
 		m_k056832->set_layer_offs(1, -2 - 167, 0);
@@ -428,7 +428,7 @@ uint32_t lethal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_k056832->set_layer_offs(3, 2, 0);
 	}
 
-	if (m_k056832->read_register(0x0) & 0x20)
+	if (m_k056832->word_r(0x0) & 0x20)
 		m_k053244->set_offsets(0, 1);
 	else
 		m_k053244->set_offsets(0, -1);
@@ -528,7 +528,7 @@ uint8_t lethal_state::gunsaux_r()
 	return res;
 }
 
-void lethal_state::le_main(address_map &map)
+void lethal_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr("bank1");
 	map(0x2000, 0x3fff).ram();             // work RAM
@@ -570,7 +570,7 @@ void lethal_state::bank4000_map(address_map &map)
 	map(0x4000, 0x7fff).mirror(0x8000).ram().w(FUNC(lethal_state::palette_w)).share("palette");
 }
 
-void lethal_state::le_sound(address_map &map)
+void lethal_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
@@ -681,10 +681,10 @@ void lethal_state::lethalen(machine_config &config)
 {
 	// basic machine hardware
 	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // verified on pcb
-	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::le_main);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::main_map);
 
 	Z80(config, m_soundcpu, 24_MHz_XTAL / 4); // verified on pcb
-	m_soundcpu->set_addrmap(AS_PROGRAM, &lethal_state::le_sound);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lethal_state::sound_map);
 
 	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
 

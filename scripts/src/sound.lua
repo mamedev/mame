@@ -508,6 +508,17 @@ if (SOUNDS["K056800"]~=null) then
 	}
 end
 
+---------------------------------------------------
+-- L4003
+--@src/devices/sound/l4003.h,SOUNDS["L4003"] = true
+---------------------------------------------------
+
+if (SOUNDS["L4003"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/l4003.cpp",
+		MAME_DIR .. "src/devices/sound/l4003.h",
+	}
+end
 
 ---------------------------------------------------
 -- L7A1045 L6028 DSP-A
@@ -1102,6 +1113,18 @@ end
 
 
 ---------------------------------------------------
+-- Texas Instruments TMS3631
+--@src/devices/sound/tms3631.h,SOUNDS["TMS3631"] = true
+---------------------------------------------------
+
+if (SOUNDS["TMS3631"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/tms3631.cpp",
+		MAME_DIR .. "src/devices/sound/tms3631.h",
+	}
+end
+
+---------------------------------------------------
 -- Texas Instruments TMS5100-series speech synthesizers
 --@src/devices/sound/tms5110.h,SOUNDS["TMS5110"] = true
 ---------------------------------------------------
@@ -1187,6 +1210,18 @@ if (SOUNDS["VA_VCA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/va_vca.cpp",
 		MAME_DIR .. "src/devices/sound/va_vca.h",
+	}
+end
+
+--------------------------------------------------
+-- Virtual analog voltage-controlled filters (VCFs)
+--@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_VCF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vcf.cpp",
+		MAME_DIR .. "src/devices/sound/va_vcf.h",
 	}
 end
 

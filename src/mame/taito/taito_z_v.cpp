@@ -782,6 +782,16 @@ void spacegun_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_in
                         SCREEN REFRESH
 **************************************************************/
 
+rgb_t taitoz_z80_sound_state::color_xbgr555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+}
+
+rgb_t taitoz_state::color_xrgb555(u16 data)
+{
+	return rgb_t(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+}
+
 void contcirc_state::contcirc_out_w(u8 data)
 {
 	/* bit 0 = reset sub CPU */

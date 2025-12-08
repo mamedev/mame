@@ -10,14 +10,7 @@
     TODO:
     - Needs proper AWE64 emulation defined as a slot option default, with
       fallbacks to AWE32 and SB16;
-
-    - ISA bus needs IRQ and DMA hookups.
-      \- Will otherwise hang indefinitely after booting, waiting for sound card irqs.
-         There's a C:\sb16\diagnose.exe tool if you want to test this.
-
-    - Convert driver to the newest PCI model;
-
-    - Currently fails because it doesn't find the Voodoo card in the PCI model;
+    \- to workaround: attrib -R C:\IMMERSIA\BIN\IMMOS.BAT then edit file to swap sound card
 
     - When switching gfx mode during boot routine it still sets a terminal debug mode (with cut down screen portions)
       instead of normal Voodoo drawing. Culprit may be an I/O port reading or a Voodoo bug;
@@ -69,29 +62,38 @@
 
 #include "emu.h"
 
-#include "pcshare.h"
-
 #include "bus/isa/sblaster.h"
+#include "bus/isa/isa_cards.h"
+#include "bus/pci/pci_slot.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "machine/ds128x.h"
-#include "machine/idectrl.h"
-#include "machine/lpci.h"
-#include "machine/pckeybrd.h"
-#include "video/pc_vga_s3.h"
+#include "machine/fdc37c93x.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_usb.h"
+#include "machine/i82371sb.h"
+#include "machine/i82443bx_host.h"
+#include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/w83977tf.h"
 #include "video/voodoo_2.h"
+#include "video/voodoo_pci.h"
 
 
 namespace {
 
-class savquest_state : public pcat_base_state
+class savquest_state : public driver_device
 {
 public:
 	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-		m_vga(*this, "vga"),
-		m_voodoo(*this, "voodoo")
+		: driver_device(mconfig, type, tag)
+		, m_voodoo2(*this, "pci:0d.0")
 	{
-		std::fill(std::begin(m_mtxc_config_reg), std::end(m_mtxc_config_reg), 0);
 	}
 
 	void savquest(machine_config &config);
@@ -104,369 +106,35 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
-	std::unique_ptr<uint32_t[]> m_bios_e0000_ram;
-	std::unique_ptr<uint32_t[]> m_bios_e4000_ram;
-	std::unique_ptr<uint32_t[]> m_bios_e8000_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ec000_ram;
+	required_device<voodoo_2_pci_device> m_voodoo2;
 
-	std::unique_ptr<uint8_t[]> m_smram;
+	//int m_haspind = 0;
+	//int m_haspstate = 0;
+	//enum hasp_states
+	//{
+	//  HASPSTATE_NONE,
+	//  HASPSTATE_PASSBEG,
+	//  HASPSTATE_PASSEND,
+	//  HASPSTATE_READ
+	//};
+	//int m_hasp_passind = 0;
+	//uint8_t m_hasp_tmppass[0x29]{};
+	//uint8_t m_port379 = 0;
+	//int m_hasp_passmode = 0;
+	//int m_hasp_prodind = 0;
 
-	required_device<s3trio64_vga_device> m_vga;
-	required_device<voodoo_2_device> m_voodoo;
-
-	int m_haspind = 0;
-	int m_haspstate = 0;
-	enum hasp_states
-	{
-		HASPSTATE_NONE,
-		HASPSTATE_PASSBEG,
-		HASPSTATE_PASSEND,
-		HASPSTATE_READ
-	};
-	int m_hasp_passind = 0;
-	uint8_t m_hasp_tmppass[0x29]{};
-	uint8_t m_port379 = 0;
-	int m_hasp_passmode = 0;
-	int m_hasp_prodind = 0;
-
-	uint8_t m_mtxc_config_reg[256]{};
-	uint8_t m_piix4_config_reg[8][256]{};
-	uint32_t m_pci_3dfx_regs[0x40]{};
-
-	void bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_e4000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_e8000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ec000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	uint8_t parallel_port_r(offs_t offset);
-	void parallel_port_w(offs_t offset, uint8_t data);
-
-	void vblank_assert(int state);
-
-	uint8_t smram_r(offs_t offset);
-	void smram_w(offs_t offset, uint8_t data);
+	//uint8_t parallel_port_r(offs_t offset);
+	//void parallel_port_w(offs_t offset, uint8_t data);
 
 	void savquest_io(address_map &map) ATTR_COLD;
 	void savquest_map(address_map &map) ATTR_COLD;
 
-	void intel82439tx_init();
-	void vid_3dfx_init();
-
-	uint8_t mtxc_config_r(int function, int reg);
-	void mtxc_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-	uint8_t piix4_config_r(int function, int reg);
-	void piix4_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-	uint32_t pci_3dfx_r(int function, int reg, uint32_t mem_mask);
-	void pci_3dfx_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	static void winbond_superio_config(device_t *device);
 };
 
-// Intel 82439TX System Controller (MTXC)
 
-uint8_t savquest_state::mtxc_config_r(int function, int reg)
-{
-//  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
-
-	if((reg & 0xfe) == 0)
-		return (reg & 1) ? 0x80 : 0x86; // Vendor ID, Intel
-
-	if((reg & 0xfe) == 2)
-		return (reg & 1) ? 0x70 : 0x00; // Device ID, MTXC
-
-	return m_mtxc_config_reg[reg];
-}
-
-void savquest_state::mtxc_config_w(int function, int reg, uint8_t data)
-{
-//  osd_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-
-	#if 1
-	switch(reg)
-	{
-		case 0x59:      // PAM0
-		{
-			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
-			{
-				membank("bios_f0000")->set_base(m_bios_f0000_ram.get());
-			}
-			else                    // disable RAM access (reads go to BIOS ROM)
-			{
-				membank("bios_f0000")->set_base(memregion("bios")->base() + 0x30000);
-			}
-			break;
-		}
-
-		case 0x5e:      // PAM5
-		{
-			if (data & 0x10)        // enable RAM access to region 0xe4000 - 0xe7fff
-			{
-				membank("bios_e4000")->set_base(m_bios_e4000_ram.get());
-			}
-			else                    // disable RAM access (reads go to BIOS ROM)
-			{
-				membank("bios_e4000")->set_base(memregion("bios")->base() + 0x24000);
-			}
-
-			if (data & 1)       // enable RAM access to region 0xe0000 - 0xe3fff
-			{
-				membank("bios_e0000")->set_base(m_bios_e0000_ram.get());
-			}
-			else                    // disable RAM access (reads go to BIOS ROM)
-			{
-				membank("bios_e0000")->set_base(memregion("bios")->base() + 0x20000);
-			}
-			break;
-		}
-
-		case 0x5f:      // PAM6
-		{
-			if (data & 0x10)        // enable RAM access to region 0xec000 - 0xeffff
-			{
-				membank("bios_ec000")->set_base(m_bios_ec000_ram.get());
-			}
-			else                    // disable RAM access (reads go to BIOS ROM)
-			{
-				membank("bios_ec000")->set_base(memregion("bios")->base() + 0x2c000);
-			}
-
-			if (data & 1)       // enable RAM access to region 0xe8000 - 0xebfff
-			{
-				membank("bios_e8000")->set_base(m_bios_e8000_ram.get());
-			}
-			else                    // disable RAM access (reads go to BIOS ROM)
-			{
-				membank("bios_e8000")->set_base(memregion("bios")->base() + 0x28000);
-			}
-			break;
-		}
-	}
-	#endif
-
-	m_mtxc_config_reg[reg] = data;
-}
-
-void savquest_state::intel82439tx_init()
-{
-	m_mtxc_config_reg[0x60] = 0x02;
-	m_mtxc_config_reg[0x61] = 0x02;
-	m_mtxc_config_reg[0x62] = 0x02;
-	m_mtxc_config_reg[0x63] = 0x02;
-	m_mtxc_config_reg[0x64] = 0x02;
-	m_mtxc_config_reg[0x65] = 0x02;
-	m_smram = std::make_unique<uint8_t[]>(0x20000);
-}
-
-uint32_t savquest_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mtxc_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mtxc_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mtxc_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mtxc_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void savquest_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-// Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-
-uint8_t savquest_state::piix4_config_r(int function, int reg)
-{
-//  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-
-	if((reg & 0xfe) == 0)
-		return (reg & 1) ? 0x80 : 0x86; // Vendor ID, Intel
-
-	if((reg & 0xfe) == 2)
-	{
-		/* TODO: it isn't detected properly (i.e. PCI writes always goes to function == 0) */
-		if(function == 1)
-			return (reg & 1) ? 0x71 : 0x11; // Device ID, 82371AB IDE Controller
-		if(function == 2)
-			return (reg & 1) ? 0x71 : 0x12; // Device ID, 82371AB Serial Bus Controller
-	}
-
-	return m_piix4_config_reg[function][reg];
-}
-
-void savquest_state::piix4_config_w(int function, int reg, uint8_t data)
-{
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-	m_piix4_config_reg[function][reg] = data;
-}
-
-uint32_t savquest_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= piix4_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= piix4_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= piix4_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= piix4_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void savquest_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-void savquest_state::vid_3dfx_init()
-{
-	m_pci_3dfx_regs[0x00 / 4] = 0x0002121a; // 3dfx Multimedia device
-	m_pci_3dfx_regs[0x08 / 4] = 2; // revision ID
-	m_pci_3dfx_regs[0x10 / 4] = 0xff000000;
-	m_pci_3dfx_regs[0x40 / 4] = 0x4000; //INITEN_SECONDARY_REV_ID
-	m_voodoo->set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
-}
-
-uint32_t savquest_state::pci_3dfx_r(int function, int reg, uint32_t mem_mask)
-{
-//osd_printf_warning("PCI read: %x\n", reg);
-	return m_pci_3dfx_regs[reg / 4];
-}
-
-void savquest_state::pci_3dfx_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-osd_printf_warning("PCI write: %x %x\n", reg, data);
-
-	if (reg == 0x10)
-	{
-		data &= 0xff000000;
-	}
-	else if (reg == 0x40)
-	{
-		m_voodoo->set_init_enable(data);
-	}
-	else if (reg == 0x54)
-	{
-		data &= 0xf000ffff; /* bits 16-27 are read-only */
-	}
-
-	m_pci_3dfx_regs[reg / 4] = data;
-}
-
-void savquest_state::bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
-	#if 1
-	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_f0000_ram.get() + offset);
-	}
-	#endif
-}
-
-void savquest_state::bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//if (m_mtxc_config_reg[0x5e] & 2)       // write to RAM if this region is write-enabled
-	#if 1
-	if (m_mtxc_config_reg[0x5e] & 2)        // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_e0000_ram.get() + offset);
-	}
-	#endif
-}
-
-void savquest_state::bios_e4000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//if (m_mtxc_config_reg[0x5e] & 0x20)       // write to RAM if this region is write-enabled
-	#if 1
-	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_e4000_ram.get() + offset);
-	}
-	#endif
-}
-
-void savquest_state::bios_e8000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//if (m_mtxc_config_reg[0x5f] & 2)       // write to RAM if this region is write-enabled
-	#if 1
-	if (m_mtxc_config_reg[0x5f] & 2)        // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_e8000_ram.get() + offset);
-	}
-	#endif
-}
-
-void savquest_state::bios_ec000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//if (m_mtxc_config_reg[0x5f] & 0x20)       // write to RAM if this region is write-enabled
-	#if 1
-	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ec000_ram.get() + offset);
-	}
-	#endif
-}
-
-static const uint8_t m_hasp_cmppass[] = {0xc3, 0xd9, 0xd3, 0xfb, 0x9d, 0x89, 0xb9, 0xa1, 0xb3, 0xc1, 0xf1, 0xcd, 0xdf, 0x9d}; /* 0x9d or 0x9e */
-static const uint8_t m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x53, 0x4e, 0x53, 0x49, 0x53, 0x48, 0x53, 0x4b, 0x53, 0x4a,
-										0x53, 0x43, 0x53, 0x45, 0x52, 0x46, 0x53, 0x43, 0x53, 0x41, 0xac, 0x40, 0x53, 0xbc, 0x53, 0x42,
-										0x53, 0x57, 0x53, 0x5d, 0x52, 0x5e, 0x53, 0x5b, 0x53, 0x59, 0xac, 0x58, 0x53, 0xa4
-										};
+// TODO: move into parallel port device
+#if 0
 
 uint8_t savquest_state::parallel_port_r(offs_t offset)
 {
@@ -743,164 +411,124 @@ void savquest_state::parallel_port_w(offs_t offset, uint8_t data)
 		}
 	}
 }
-
-uint8_t savquest_state::smram_r(offs_t offset)
-{
-	/* TODO: way more complex than this */
-	if(m_mtxc_config_reg[0x72] & 0x40)
-		return m_smram[offset];
-	else
-		return m_vga->mem_r(offset);
-}
-
-void savquest_state::smram_w(offs_t offset, uint8_t data)
-{
-	/* TODO: way more complex than this */
-	if(m_mtxc_config_reg[0x72] & 0x40)
-		m_smram[offset] = data;
-	else
-		m_vga->mem_w(offset,data);
-
-}
+#endif
 
 void savquest_state::savquest_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw(FUNC(savquest_state::smram_r), FUNC(savquest_state::smram_w)); //.rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-	map(0x000f0000, 0x000fffff).bankr("bios_f0000").w(FUNC(savquest_state::bios_f0000_ram_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_e0000").w(FUNC(savquest_state::bios_e0000_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_e4000").w(FUNC(savquest_state::bios_e4000_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(FUNC(savquest_state::bios_e8000_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(FUNC(savquest_state::bios_ec000_ram_w));
-	map(0x00100000, 0x07ffffff).ram(); // 128MB RAM
-	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
-	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
 void savquest_state::savquest_io(address_map &map)
 {
-	pcat32_io_common(map);
-
-	map(0x00e8, 0x00ef).noprw();
-
-	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x0378, 0x037b).rw(FUNC(savquest_state::parallel_port_r), FUNC(savquest_state::parallel_port_w));
-	map(0x03b0, 0x03df).m("vga", FUNC(s3trio64_vga_device::io_map));
-	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
-
-//  map(0x5000, 0x5007) // routes to port $eb
+	map.unmap_value_high();
 }
 
-#define AT_KEYB_HELPER(bit, text, key1) \
-	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME(text) PORT_CODE(key1)
-
 static INPUT_PORTS_START( savquest )
-	PORT_START("pc_keyboard_3")
-	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
 INPUT_PORTS_END
 
 void savquest_state::machine_start()
 {
-	m_bios_f0000_ram = std::make_unique<uint32_t[]>(0x10000/4);
-	m_bios_e0000_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_e4000_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_e8000_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_ec000_ram = std::make_unique<uint32_t[]>(0x4000/4);
-
-	intel82439tx_init();
-	vid_3dfx_init();
-
-	for (int i = 0; i < 8; i++)
-		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 }
 
 void savquest_state::machine_reset()
 {
-	membank("bios_f0000")->set_base(memregion("bios")->base() + 0x30000);
-	membank("bios_e0000")->set_base(memregion("bios")->base() + 0x20000);
-	membank("bios_e4000")->set_base(memregion("bios")->base() + 0x24000);
-	membank("bios_e8000")->set_base(memregion("bios")->base() + 0x28000);
-	membank("bios_ec000")->set_base(memregion("bios")->base() + 0x2c000);
-	m_haspstate = HASPSTATE_NONE;
 }
 
-void savquest_state::vblank_assert(int state)
+static void isa_internal_devices(device_slot_interface &device)
 {
+	device.option_add("w83977tf", W83977TF);
 }
 
-void savquest_isa16_cards(device_slot_interface &device)
+void savquest_state::winbond_superio_config(device_t *device)
 {
-	device.option_add("sb16", ISA16_SOUND_BLASTER_16);
+	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
+//  fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+
+	auto *lpt = device->subdevice<pc_lpt_device>("lpt");
+	auto *centronics = lpt->subdevice<centronics_device>("centronics");
+	centronics->set_default_option("hasp_savquest");
+	centronics->set_fixed(true);
 }
+
 
 void savquest_state::savquest(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 450000000); // actually Pentium II 450
-	m_maincpu->set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
-	m_maincpu->set_addrmap(AS_IO, &savquest_state::savquest_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+	pentium2_device &maincpu(PENTIUM2(config, "maincpu", 66'000'000)); // actually Pentium II @ 450 MHz
+	maincpu.set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
+	maincpu.set_addrmap(AS_IO, &savquest_state::savquest_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
-	pcat_common(config);
-	DS12885(config.replace(), "rtc");
+	PCI_ROOT(config, "pci", 0);
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	I82443BX_BRIDGE(config, "pci:01.0", 0 );
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device( 0, FUNC(savquest_state::intel82439tx_pci_r), FUNC(savquest_state::intel82439tx_pci_w));
-	pcibus.set_device( 7, FUNC(savquest_state::intel82371ab_pci_r), FUNC(savquest_state::intel82371ab_pci_w));
-	pcibus.set_device(13, FUNC(savquest_state::pci_3dfx_r), FUNC(savquest_state::pci_3dfx_w));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
-	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
-	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	/* sound hardware */
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
+	// TODO: awe64 by default
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "sblaster_16", false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
-	isa.set_memspace("maincpu", AS_PROGRAM);
-	isa.set_iospace("maincpu", AS_IO);
-	ISA16_SLOT(config, "isa1", 0, "isa", savquest_isa16_cards, "sb16", false);
+	VOODOO_2_PCI(config, m_voodoo2, 0, "maincpu", "voodoo_screen");
+	m_voodoo2->set_fbmem(4);
+	m_voodoo2->set_tmumem(4, 4); /* this is the 12Mb card */
+	m_voodoo2->set_status_cycles(1000); // optimization to consume extra cycles when polling status
 
-	/* video hardware */
-	// TODO: map to ISA bus, make sure that the Voodoo can override s3 in screen update
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(s3trio64_vga_device::screen_update));
+//  m_voodoo2->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 
-	s3trio64_vga_device &vga(S3_TRIO64_VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	screen_device &screen(SCREEN(config, "voodoo_screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_size(800, 262);
+	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
+	screen.set_screen_update("pci:0d.0", FUNC(voodoo_2_pci_device::screen_update));
 
-	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
-	m_voodoo->set_fbmem(4);
-	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
-	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
-	m_voodoo->set_screen("screen");
-	m_voodoo->set_cpu(m_maincpu);
-	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, nullptr);
+
+	// TODO: trio64
+	PCI_SLOT(config, "pci:1", pci_cards, 9, 0, 1, 2, 3, "virge").set_fixed(true);
+	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
+//  PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, "voodoo2");
 }
 
 ROM_START( savquest )
-	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_REGION32_LE(0x40000, "pci:07.0", 0)
 	ROM_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317) )
 
-	ROM_REGION32_LE( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
-	ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
+//  ROM_REGION32_LE( 0x10000, "video_bios", 0 ) // 1st half is 2.04.14, second half is 2.01.11
+//  ROM_LOAD( "vgabios.bin",   0x000000, 0x010000, CRC(a81423d6) SHA1(a099af621ce7fbaa55a2d9947d9f07e04f1b5fca) )
 
 	ROM_REGION( 0x080, "rtc", 0 )    /* default NVRAM */
 	ROM_LOAD( "savquest_ds12885.bin", 0x0000, 0x080, BAD_DUMP CRC(e9270019) SHA1(4d900ca317d93c915c80a9053528b741746f08a1) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
 ROM_END
 
 } // Anonymous namespace
 
 
-GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

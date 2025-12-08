@@ -152,7 +152,7 @@ Orange       | Orange       | Orange       |
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/msm6242.h"
 #include "machine/mc68681.h"
 #include "sound/ay8910.h"

@@ -78,6 +78,8 @@ protected:
 	virtual void write_cnxx(u8 offset, u8 data) override;
 	virtual u8 read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, u8 data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 	// SPI 4-wire interface
 	void spi_miso_w(int state) { m_in_bit = state; }
@@ -157,6 +159,11 @@ void a2bus_a2sd_device::device_start()
 }
 
 void a2bus_a2sd_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_a2sd_device::reset_from_bus()
 {
 	m_shift_timer->adjust(attotime::never);
 	m_shift_count = 0;

@@ -42,12 +42,12 @@ protected:
 	a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 	required_device<tms9918a_device> m_tms;
 
@@ -67,12 +67,12 @@ protected:
 	a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 	required_device<v9938_device> m_tms;
 
@@ -92,12 +92,12 @@ protected:
 	a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 	required_device<v9958_device> m_tms;
 
@@ -202,24 +202,27 @@ void a2bus_ezcgi_device::device_start()
 {
 }
 
-void a2bus_ezcgi_device::device_reset()
+void a2bus_ezcgi_device::reset_from_bus()
 {
+	m_tms->reset();
 }
 
 void a2bus_ezcgi_9938_device::device_start()
 {
 }
 
-void a2bus_ezcgi_9938_device::device_reset()
+void a2bus_ezcgi_9938_device::reset_from_bus()
 {
+	m_tms->reset();
 }
 
 void a2bus_ezcgi_9958_device::device_start()
 {
 }
 
-void a2bus_ezcgi_9958_device::device_reset()
+void a2bus_ezcgi_9958_device::reset_from_bus()
 {
+	m_tms->reset();
 }
 
 /*

@@ -5,20 +5,33 @@
 */
 #include "emu.h"
 #include "esqpanel.h"
-
 #include "http.h"
+#include "ioport.h"
 #include "main.h"
 
-//**************************************************************************
-// External panel support
-//**************************************************************************
-
+#include <algorithm>
 #include <list>
 #include <mutex>
 #include <set>
 #include <sstream>
 #include <string>
 #include <thread>
+
+
+#define VERBOSE 0
+#include "logmacro.h"
+
+
+#include "esq2by40_vfx.lh"
+#include "sd1.lh"
+#include "sd132.lh"
+#include "vfx.lh"
+#include "vfxsd.lh"
+
+
+//**************************************************************************
+// External panel support
+//**************************************************************************
 
 
 namespace esqpanel {
@@ -129,7 +142,8 @@ namespace esqpanel {
 			m_version("1")
 		{
 			using namespace std::placeholders;
-			if (m_server->is_active()) {
+			if (m_server->is_active())
+			{
 				m_server->add_endpoint("/esqpanel/socket",
 						std::bind(&external_panel_server::on_open, this, _1),
 						std::bind(&external_panel_server::on_message, this, _1, _2, _3),
@@ -141,7 +155,8 @@ namespace esqpanel {
 
 		virtual ~external_panel_server()
 		{
-			if (m_server->is_active()) {
+			if (m_server->is_active())
+			{
 				m_server->remove_endpoint("/esqpanel/socket");
 			}
 		}
@@ -255,7 +270,8 @@ namespace esqpanel {
 		{
 			auto it = m_panels.find(connection);
 
-			if (it == m_panels.end()) {
+			if (it == m_panels.end())
+			{
 				// this connection is not in the list. This really shouldn't happen
 				// and probably means something else is wrong.
 				throw std::invalid_argument("No panel avaliable for connection");
@@ -413,7 +429,7 @@ DEFINE_DEVICE_TYPE(ESQPANEL2X16_SQ1, esqpanel2x16_sq1_device, "esqpanel216_sq1",
 esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
-	m_light_states(0x3f), // maximum number of lights
+	m_light_states(0x40), // maximum number of lights
 	m_write_tx(*this),
 	m_write_analog(*this)
 {
@@ -428,7 +444,8 @@ esqpanel_device::esqpanel_device(const machine_config &mconfig, device_type type
 void esqpanel_device::device_start()
 {
 	m_external_panel_server = new esqpanel::external_panel_server(machine().manager().http());
-	if (machine().manager().http()->is_active()) {
+	if (machine().manager().http()->is_active())
+	{
 		m_external_panel_server->set_keyboard(owner()->shortname());
 		m_external_panel_server->set_index("/esqpanel/FrontPanel.html");
 		m_external_panel_server->add_http_template("/esqpanel/FrontPanel.html", get_front_panel_html_file());
@@ -450,6 +467,8 @@ void esqpanel_device::device_start()
 
 void esqpanel_device::device_reset()
 {
+	device_t::device_reset();
+
 	// panel comms is at 62500 baud (double the MIDI rate), 8N2
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
 	set_rcv_rate(62500);
@@ -457,13 +476,14 @@ void esqpanel_device::device_reset()
 
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
-	m_bCalibSecondByte = false;
-	m_bButtonLightSecondByte = false;
+	m_expect_calibration_second_byte = false;
+	m_expect_light_second_byte = false;
 
 	attotime sample_time(0, ATTOSECONDS_PER_MILLISECOND);
 	attotime initial_delay(0, ATTOSECONDS_PER_MILLISECOND);
 
-	if (m_external_timer) {
+	if (m_external_timer)
+	{
 		m_external_timer->adjust(initial_delay, 0, sample_time);
 		m_external_timer->enable(true);
 	}
@@ -486,22 +506,22 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 	receive_register_extract();
 	uint8_t data = get_received_char();
 
-//  if (data >= 0xe0) printf("Got %02x from motherboard (second %s)\n", data, m_bCalibSecondByte ? "yes" : "no");
+//  if (data >= 0xe0) LOG("Got %02x from motherboard (second %s)\n", data, m_expect_calibration_second_byte ? "yes" : "no");
 
 	send_to_display(data);
 	m_external_panel_server->send_to_all(data);
 
-	if (m_bCalibSecondByte)
+	if (m_expect_calibration_second_byte)
 	{
-//      printf("second byte is %02x\n", data);
+//      LOG("second byte is %02x\n", data);
 		if (data == 0xfd)   // calibration request
 		{
-//          printf("let's send reply!\n");
+//          LOG("let's send reply!\n");
 			xmit_char(0xff);   // this is the correct response for "calibration OK"
 		}
-		m_bCalibSecondByte = false;
+		m_expect_calibration_second_byte = false;
 	}
-	else if (m_bButtonLightSecondByte)
+	else if (m_expect_light_second_byte)
 	{
 		// Lights on the Buttons, on the VFX-SD:
 		// Number   Button
@@ -521,25 +541,22 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 		// d        Sounds
 		// e        0
 		// f        Cart
-		int lightNumber = data & 0x3f;
+		int light_number = data & 0x3f;
 
 		// Light states:
 		// 0 = Off
 		// 2 = On
 		// 3 = Blinking
-		m_light_states[lightNumber] = (data & 0xc0) >> 6;
-
-		// TODO: do something with the button information!
-		// printf("Setting light %d to %s\n", lightNumber, lightState == 3 ? "Blink" : lightState == 2 ? "On" : "Off");
-		m_bButtonLightSecondByte = false;
+		m_light_states[light_number] = (data & 0xc0) >> 6;
+		m_expect_light_second_byte = false;
 	}
 	else if (data == 0xfb)   // request calibration
 	{
-		m_bCalibSecondByte = true;
+		m_expect_calibration_second_byte = true;
 	}
 	else if (data == 0xff)  // button light state command
 	{
-		m_bButtonLightSecondByte = true;
+		m_expect_light_second_byte = true;
 	}
 	else
 	{
@@ -565,7 +582,7 @@ void esqpanel_device::rcv_complete()    // Rx completed receiving byte
 
 void esqpanel_device::tra_complete()    // Tx completed sending byte
 {
-//  printf("panel Tx complete\n");
+//  LOG("panel Tx complete\n");
 	// is there more waiting to send?
 	if (m_xmit_read != m_xmit_write)
 	{
@@ -588,7 +605,7 @@ void esqpanel_device::tra_callback()    // Tx send bit
 
 void esqpanel_device::xmit_char(uint8_t data)
 {
-//  printf("Panel: xmit %02x\n", data);
+//  LOG("Panel: xmit %02x\n", data);
 
 	// if tx is busy it'll pick this up automatically when it completes
 	if (!m_tx_busy)
@@ -607,16 +624,19 @@ void esqpanel_device::xmit_char(uint8_t data)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server) {
+TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server)
+{
 	while (m_external_panel_server->has_commands())
 	{
 		std::string command = m_external_panel_server->get_next_command();
 		int l = command.length();
-		if (l > 0) {
+		if (l > 0)
+		{
 			std::istringstream is(command);
 			char c;
 			is >> c;
-			if (c == 'B') {
+			if (c == 'B')
+			{
 				// button
 				char ud;
 				is >> ud;
@@ -627,7 +647,9 @@ TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server) {
 				// printf("button %d %s : sending char to mainboard: %02x\n", button, down ? "down" : "up", sendme);
 				xmit_char(sendme);
 				xmit_char(0x00);
-			} else if (c == 'A') {
+			}
+			else if (c == 'A')
+			{
 				// analog value from ES5505 OTIS: 10 bits, left-aligned within 16 bits.
 				int channel, value;
 				is >> channel;
@@ -643,6 +665,52 @@ TIMER_CALLBACK_MEMBER(esqpanel_device::check_external_panel_server) {
 void esqpanel_device::set_analog_value(offs_t offset, uint16_t value)
 {
 	m_write_analog(offset, value);
+}
+
+void esqpanel_device::set_button(uint8_t button, bool pressed)
+{
+	// LOG("set_button(%d, %d)\r\n", button, pressed);
+	bool current = m_pressed_buttons.find(button) != m_pressed_buttons.end();
+	if (pressed == current)
+	{
+		// LOG("- button %d already %d, skipping\r\n", button, pressed);
+		return;
+	}
+
+	uint8_t sendme = (pressed ? 0x80 : 0) | (button & 0xff);
+	// LOG("button %d %s : sending char to mainboard: %02x\n", button, pressed ? "down" : "up", sendme);
+	xmit_char(sendme);
+	xmit_char(0x00);
+	if (pressed)
+	{
+		m_pressed_buttons.insert(button);
+	}
+	else
+	{
+		m_pressed_buttons.erase(button);
+	}
+}
+
+void esqpanel_device::key_down(uint8_t key, uint8_t velocity)
+{
+	velocity = std::clamp<uint8_t>(velocity, 1, 127);
+
+	xmit_char(0x80 | (key & 0x3f));
+	xmit_char(velocity);
+}
+
+void esqpanel_device::key_pressure(uint8_t key, uint8_t pressure)
+{
+	pressure = std::min<uint8_t>(pressure, 127);
+
+	xmit_char(0x40 | (key & 0x3f));
+	xmit_char(pressure);
+}
+
+void esqpanel_device::key_up(uint8_t key)
+{
+	xmit_char(key & 0x3f);
+	xmit_char(0x40);
 }
 
 /* panel with 1x22 VFD display used in the EPS-16 and EPS-16 Plus */
@@ -679,14 +747,33 @@ esqpanel2x40_device::esqpanel2x40_device(const machine_config &mconfig, const ch
 
 void esqpanel2x40_vfx_device::device_add_mconfig(machine_config &config)
 {
-	ESQ2X40(config, m_vfd, 60);
+	ESQ2X40_VFX(config, m_vfd, 60);
+
+	if (m_panel_type == VFX)
+		config.set_default_layout(layout_vfx);
+	else if (m_panel_type == VFX_SD)
+		config.set_default_layout(layout_vfxsd);
+	else if (m_panel_type == SD_1)
+		config.set_default_layout(layout_sd1);
+	else if (m_panel_type == SD_1_32)
+		config.set_default_layout(layout_sd132);
+	else // lowest common demonimator as the default: just the VFD.
+		config.set_default_layout(layout_esq2by40_vfx);
 }
 
-esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, int panel_type, uint32_t clock) :
 	esqpanel_device(mconfig, ESQPANEL2X40_VFX, tag, owner, clock),
-	m_vfd(*this, "vfd")
+	m_panel_type(panel_type),
+	m_vfd(*this, "vfd"),
+	m_lights(*this, "lights"),
+	m_buttons_0(*this, "buttons_0"),
+	m_buttons_32(*this, "buttons_32"),
+	m_analog_data_entry(*this, "analog_data_entry"),
+	m_analog_volume(*this, "analog_volume")
 {
 	m_eps_mode = false;
+	// The VFX family have 16 lights on the panel.
+	m_light_states.resize(16);
 }
 
 bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
@@ -694,13 +781,207 @@ bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
 	m_vfd->write_contents(o);
 	for (int i = 0; i < m_light_states.size(); i++)
 	{
-		o.put(char(0xff));
-		o.put((m_light_states[i] << 6) | i);
+		o.put((char)(0xff));
+		o.put((char)(m_light_states[i] << 6) | i);
 	}
 	return true;
 }
 
+void esqpanel2x40_vfx_device::update_lights()
+{
+	// set the lights according to their status and blink phase.
+	int32_t lights = 0;
+	int32_t bit = 1;
+	for (int i = 0; i < 16; i++)
+	{
+		if (m_light_states[i] == 2 || (m_light_states[i] == 3 && ((m_blink_phase & 1) == 0)))
+		{
+			lights |= bit;
+		}
+		bit <<= 1;
+	}
+	// We use the next bit, 16, for the floppy LED
+	if (m_floppy_active)
+		lights |= 1 << 16;
+	m_lights = lights;
+}
 
+TIMER_CALLBACK_MEMBER(esqpanel2x40_vfx_device::update_blink)
+{
+	m_blink_phase = (m_blink_phase + 1) & 3;
+	m_vfd->set_blink_on(m_blink_phase & 2);
+	update_lights();
+}
+
+void esqpanel2x40_vfx_device::device_start()
+{
+	esqpanel_device::device_start();
+
+	m_lights.resolve();
+
+	m_blink_timer = timer_alloc(FUNC(esqpanel2x40_vfx_device::update_blink), this);
+	m_blink_timer->enable(false);
+}
+
+void esqpanel2x40_vfx_device::device_reset()
+{
+	esqpanel_device::device_reset();
+
+	if (m_blink_timer)
+	{
+		attotime sample_time(0, 250 * ATTOSECONDS_PER_MILLISECOND);
+		attotime initial_delay(0, 250 * ATTOSECONDS_PER_MILLISECOND);
+
+		m_blink_timer->adjust(initial_delay, 0, sample_time);
+		m_blink_timer->enable(true);
+	}
+}
+
+static INPUT_PORTS_START(esqpanel2x40_vfx_device)
+	PORT_START("buttons_0")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYPAD);
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), i)
+	}
+
+	PORT_START("buttons_32")
+	for (int i = 0; i < 32; i++)
+	{
+		PORT_BIT((1 << i), IP_ACTIVE_HIGH, IPT_KEYPAD);
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::button_change), 32 + i)
+	}
+
+	PORT_START("patch_select")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::patch_select_change), 1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::patch_select_change), 1)
+
+	PORT_START("analog_pitch_bend")
+	PORT_BIT(0x3ff, 0x200, IPT_PADDLE) PORT_NAME("Pitch Bend") PORT_MINMAX(0, 0x3ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(128)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 0)
+
+	PORT_START("analog_mod_wheel")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Modulation");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 2)
+
+	PORT_START("analog_data_entry")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x200, 0x3ff, "Data Entry");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 3)
+
+	PORT_START("analog_volume")
+	// An adjuster, but with range 0 .. 1023, to match the 10 bit resolution of the OTIS ADC
+	configurer.field_alloc(IPT_ADJUSTER, 0x3ff, 0x3ff, "Volume");
+	configurer.field_set_min_max(0, 0x3ff);
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::analog_value_change), 5)
+
+	for (int i = 0; i < 61; i++)
+	{
+		std::string port_name = util::string_format("key_%d", i);
+		PORT_START(port_name.c_str());
+		PORT_BIT(0x3fff, 0x0, IPT_PADDLE)
+		PORT_GM_NOTE(36 + i)
+
+		// the following must be set ot MAME complains, but we don't use them:
+		// we always pass the values through explicitly, overriding anything else.
+		PORT_SENSITIVITY(1) PORT_KEYDELTA(1) PORT_CENTERDELTA(1)
+
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esqpanel2x40_vfx_device::key_change), i)
+	}
+
+INPUT_PORTS_END
+
+ioport_constructor esqpanel2x40_vfx_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(esqpanel2x40_vfx_device);
+}
+
+// A button is pressed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::button_change)
+{
+	// Update the internal state
+	esqpanel_device::set_button(param, newval != 0);
+}
+
+// A Patch Select button is pressed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::patch_select_change)
+{
+	// Update the internal state from the full value of the port: presented as an analog value!
+	int value = (field.port().read() & 0x03) * 250;
+	set_analog_value(1, value << 6);
+}
+
+// An anlog value was changed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::analog_value_change)
+{
+	int channel = param;
+	int clamped = std::clamp((int)newval, 0, 1023);
+	int value = clamped << 6;
+	set_analog_value(channel, value);
+}
+
+// An key changed on the internal panel
+INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::key_change)
+{
+	uint8_t key = param & 0x3f;
+	uint8_t velocity = newval & 0x7f;
+
+	if (velocity == 0)
+	{
+		uint8_t old_pressure = (oldval >> 7) & 0x7f;
+		if (old_pressure != 0)
+		{
+			// there was pressure before; reset the pressure to zero before the key-up event.
+			key_pressure(key, 0);
+		}
+		key_up(key);
+	}
+	else
+	{
+		uint8_t old_velocity = oldval & 0x7f;
+		uint8_t pressure = (newval >> 7) & 0x7f;
+
+		if (old_velocity == 0)
+		{
+			// this is a key down event. Might also include an ensuing pressure event.
+			key_down(key, velocity);
+		}
+
+		if (pressure != 0)
+		{
+			// if we have pressure, then it is (also) a pressure event.
+			key_pressure(key, pressure);
+		}
+	}
+}
+
+void esqpanel2x40_vfx_device::set_floppy_active(bool floppy_active)
+{
+	m_floppy_active = floppy_active;
+	update_lights();
+}
+
+ioport_value esqpanel2x40_vfx_device::get_adjuster_value(required_ioport &ioport)
+{
+	auto field = ioport->fields().first();
+	ioport_field::user_settings user_settings;
+	field->get_user_settings(user_settings);
+	return user_settings.value;
+}
+
+void esqpanel2x40_vfx_device::set_adjuster_value(required_ioport &ioport, const ioport_value & value)
+{
+	auto field = ioport->fields().first();
+	ioport_field::user_settings user_settings;
+	field->get_user_settings(user_settings);
+	user_settings.value = value;
+	field->set_user_settings(user_settings);
+}
 
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 void esqpanel2x16_sq1_device::device_add_mconfig(machine_config &config)

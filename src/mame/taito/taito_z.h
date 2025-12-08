@@ -69,6 +69,7 @@ protected:
 	void pancontrol_w(offs_t offset, u8 data);
 
 	void bshark_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
+	rgb_t color_xrgb555(u16 data);
 
 	/* memory pointers */
 	required_shared_ptr<u16> m_spriteram;
@@ -127,6 +128,8 @@ protected:
 	u16 dblaxle_steer_input_r(offs_t offset);
 
 	u32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	rgb_t color_xbgr555(u16 data);
 
 	void z80_sound_map(address_map &map) ATTR_COLD;
 

@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    a2ultraterm.c
+    a2ultraterm.cpp
 
     Implementation of the Videx UltraTerm 80/132/160-column card
 
@@ -25,6 +25,11 @@
     C800-CBFF: ROM page 1
     CC00-CFEF: VRAM window or ROM page 2
 
+    TODO:
+        - Videx logo splash on Ultraterm demo disk has stride problems
+        - DIP switches
+        - Ability to /INH $C300 away on the IIe (known not to work on IIgs)
+
 *********************************************************************/
 
 #include "emu.h"
@@ -34,6 +39,14 @@
 
 #include "screen.h"
 
+#define LOG_REGISTERS   (1U << 1)
+#define LOG_VRAM        (1U << 2)
+#define LOG_HIFREQ      (1U << 3)
+
+#define VERBOSE (0)
+
+// #define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
 
 namespace {
 
@@ -46,8 +59,8 @@ namespace {
 #define ULTRATERM_SCREEN_NAME "uterm_screen"
 #define ULTRATERM_MC6845_NAME "mc6845_uterm"
 
-#define CLOCK_LOW   17430000
-#define CLOCK_HIGH  28759500
+#define CLOCK_LOW   17.43_MHz_XTAL
+#define CLOCK_HIGH  28.7595_MHz_XTAL
 
 #define CT1_MEMSEL  (0x80)  // 0 for read RAM at cc00, 1 for read ROM
 #define CT1_VIDSEL  (0x40)  // 0 for Apple video passthrough, 1 for 6845 video
@@ -83,6 +96,8 @@ ROM_START( a2ultraterm )
 	ROM_LOAD( "ult_2a313.jed", 0x000000, 0x000305, CRC(dcd51dea) SHA1(0ad0c5e802e48495da27f7bd26ee3ab1c92d74dd) )
 ROM_END
 
+// MouseText replaces the "lo res graphics" characters in both fonts here so the original demo disk
+// does not look correct with this set.
 ROM_START( a2ultratermenh )
 	ROM_REGION(0x1000, ULTRATERM_ROM_REGION, 0)
 	ROM_LOAD( "frm_b5c9.bin", 0x000000, 0x001000, CRC(b71e05e0) SHA1(092e3eda4644d4f465809864a7f023ac7d1d1542) )
@@ -117,16 +132,17 @@ protected:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 	uint8_t m_ram[256*16];
-	int m_framecnt;
 	uint8_t m_ctrl1, m_ctrl2;
 
 	required_device<mc6845_device> m_crtc;
 	required_region_ptr<uint8_t> m_rom, m_chrrom;
 
 private:
-	void vsync_changed(int state);
+	void write_ctrl1(uint8_t data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	int m_rambank;
@@ -162,12 +178,11 @@ void a2bus_videx160_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(CLOCK_LOW, 882, 0, 720, 370, 0, 350);
 	screen.set_screen_update(ULTRATERM_MC6845_NAME, FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, CLOCK_LOW/9);
+	HD6845S(config, m_crtc, CLOCK_LOW/9);
 	m_crtc->set_screen(ULTRATERM_SCREEN_NAME);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(8);
+	m_crtc->set_char_width(9);
 	m_crtc->set_update_row_callback(FUNC(a2bus_videx160_device::crtc_update_row));
-	m_crtc->out_vsync_callback().set(FUNC(a2bus_videx160_device::vsync_changed));
 }
 
 //-------------------------------------------------
@@ -191,7 +206,7 @@ const tiny_rom_entry *a2bus_ultratermenh_device::device_rom_region() const
 a2bus_videx160_device::a2bus_videx160_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
-	m_framecnt(0), m_ctrl1(0), m_ctrl2(0),
+	m_ctrl1(0), m_ctrl2(0),
 	m_crtc(*this, ULTRATERM_MC6845_NAME),
 	m_rom(*this, ULTRATERM_ROM_REGION),
 	m_chrrom(*this, ULTRATERM_GFX_REGION),
@@ -216,9 +231,9 @@ a2bus_ultratermenh_device::a2bus_ultratermenh_device(const machine_config &mconf
 void a2bus_videx160_device::device_start()
 {
 	memset(m_ram, 0, 256*16);
+	m_rambank = 0;
 
 	save_item(NAME(m_ram));
-	save_item(NAME(m_framecnt));
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_ctrl1));
 	save_item(NAME(m_ctrl2));
@@ -226,8 +241,13 @@ void a2bus_videx160_device::device_start()
 
 void a2bus_videx160_device::device_reset()
 {
-	m_rambank = 0;
-	m_framecnt = 0;
+	write_ctrl1(0);
+}
+
+void a2bus_videx160_device::reset_from_bus()
+{
+	write_ctrl1(0);
+	m_crtc->reset();
 }
 
 
@@ -237,7 +257,7 @@ void a2bus_videx160_device::device_reset()
 
 uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 {
-//    printf("%s Read c0n%x\n", machine().describe_context().c_str(), offset);
+	LOGMASKED(LOG_HIFREQ, "%s Read c0n%x\n", machine().describe_context().c_str(), offset);
 
 	if (!(m_ctrl1 & CT1_VTEMU))
 	{
@@ -266,7 +286,7 @@ uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 
 void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//    printf("%s Write %02x to c0n%x\n", machine().describe_context().c_str(), data, offset);
+	LOGMASKED(LOG_HIFREQ, "%s Write %02x to c0n%x\n", machine().describe_context().c_str(), data, offset);
 
 	switch (offset)
 	{
@@ -279,19 +299,12 @@ void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 			break;
 
 		case 2:
-			m_ctrl1 = data;
-//          printf("%02x to ctrl1\n", data);
-
-			// if disabling Videoterm emulation, change RAM banking
-			if (data & CT1_VTEMU)
-			{
-				m_rambank = (data & CT1_PAGEMASK) * 256;
-			}
+			write_ctrl1(data);
 			break;
 
 		case 3:
 			m_ctrl2 = data;
-//          printf("%02x to ctrl2\n", data);
+			LOGMASKED(LOG_REGISTERS, "%02x to ctrl2\n", data);
 			break;
 	}
 
@@ -301,7 +314,21 @@ void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 	}
 }
 
-/*-------------------------------------------------
+void a2bus_videx160_device::write_ctrl1(uint8_t data)
+{
+	m_ctrl1 = data;
+	LOGMASKED(LOG_REGISTERS, "%02x to ctrl1\n", data);
+
+	m_crtc->set_clock((data & CT1_CLKSEL ? CLOCK_HIGH : CLOCK_LOW) / 9);
+
+	// if disabling Videoterm emulation, change RAM banking
+	if (data & CT1_VTEMU)
+	{
+		m_rambank = (data & CT1_PAGEMASK) * 256;
+	}
+}
+
+/*------------------------------------------------
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
@@ -325,20 +352,20 @@ void a2bus_videx160_device::write_cnxx(uint8_t offset, uint8_t data)
 uint8_t a2bus_videx160_device::read_c800(uint16_t offset)
 {
 	// ROM at c800-cbff
-	// bankswitched RAM at cc00-cdff
+	// bankswitched RAM or ROM at cc00-cdff
 	if (offset < 0x400)
 	{
-//        printf("Read VRAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
 		return m_rom[offset + 0x800];
 	}
 	else
 	{
-		if (m_ctrl1 & CT1_MEMSEL)   // read ROM?
+		if (m_ctrl1 & CT1_MEMSEL)   // read ROM
 		{
 			return m_rom[offset + 0x800];
 		}
 
-		return m_ram[(offset - 0x400) + m_rambank];
+		LOGMASKED(LOG_VRAM, "Read VRAM at %x = %02x\n", offset + m_rambank, m_ram[offset + m_rambank]);
+		return m_ram[(offset & (m_ctrl1 & CT1_VTEMU ? 0x0ff : 0x1ff)) + m_rambank];
 	}
 }
 
@@ -349,21 +376,28 @@ void a2bus_videx160_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (offset >= 0x400)
 	{
-//        printf("%02x to VRAM at %x\n", data, offset-0x400+m_rambank);
-		m_ram[(offset-0x400) + m_rambank] = data;
+		LOGMASKED(LOG_VRAM, "%02x to VRAM at %x\n", data, offset - 0x400 + m_rambank);
+		m_ram[(offset & (m_ctrl1 & CT1_VTEMU ? 0x0ff : 0x1ff)) + m_rambank] = data;
 	}
 }
 
 MC6845_UPDATE_ROW( a2bus_videx160_device::crtc_update_row )
 {
-	uint32_t  *p = &bitmap.pix(y);
-	uint16_t  chr_base = ra;
+	uint32_t *p = &bitmap.pix(y);
+	uint16_t chr_base = ra & 0x0f;
+	uint16_t addr_mask = m_ctrl1 & CT1_VTEMU ? 0xfff : 0x7ff;
 
 	for ( int i = 0; i < x_count; i++ )
 	{
-		uint16_t offset = ( ma + i );
-		uint8_t chr = m_ram[ offset ];
-		uint8_t data = m_chrrom[ chr_base + (chr * 16) ];
+		const uint16_t offset = ( ma + i );
+		uint8_t chr = m_ram[ offset & addr_mask ];
+		uint16_t chr_address = ((chr & 0x7f) << 4) | 0x800;
+		if (m_ctrl2 & CT2_HIDENSITY)
+		{
+			chr_address &= ~0x800;
+		}
+
+		uint8_t data = m_chrrom[ chr_base + chr_address ];
 		uint8_t fg = 2;
 		uint8_t bg = 0;
 		uint8_t tmp;
@@ -419,28 +453,18 @@ MC6845_UPDATE_ROW( a2bus_videx160_device::crtc_update_row )
 
 		if ( i == cursor_x )
 		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
+			data = 0xFF;
 		}
 
-		*p = ultraterm_palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = ultraterm_palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-void a2bus_videx160_device::vsync_changed(int state)
-{
-	if ( state )
-	{
-		m_framecnt++;
+		*p++ = ultraterm_palette[(data & 0x80) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x40) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x20) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x10) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x08) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x04) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x02) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x01) ? fg : bg];
+		*p++ = ultraterm_palette[(data & 0x01) ? fg : bg];
 	}
 }
 

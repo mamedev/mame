@@ -131,7 +131,7 @@ Find lamps/reels after UPD changes.
 #include "awpvid.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/6821pia.h"
 #include "machine/74259.h"
 #include "machine/i8279.h"

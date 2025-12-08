@@ -94,10 +94,9 @@ and why some of the dumps below have weird size?
 		<publisher>Namco</publisher>
 		<info name="serial" value="2" />
 		<info name="alt_title" value="タンクバタリアン" />
-		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="tank battalion (1980)(namco)(jp).bin" size="8192" crc="daa0d610" sha1="5867090fbe2584654dd2c2aaa215e69243f2f599" offset="00000"/>
+				<rom name="tank battalion (1980)(namco)(jp).bin" size="8192" crc="e05b2c70" sha1="c724e0777aa89ee58937bd9ca60e4d82baeabb66" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,10 +172,9 @@ and why some of the dumps below have weird size?
 		<publisher>Konami</publisher>
 		<info name="serial" value="8" />
 		<info name="alt_title" value="ガッタンゴットン" />
-		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="8448">
-				<rom name="guttang gottong (1981)(konami)(jp).bin" size="8448" crc="0f70fa69" sha1="4e4900f42cbc76e4e795ed32ee18b2e27246e90f" offset="00000" status="baddump" />
+			<dataarea name="rom" size="8192">
+				<rom name="guttang gottong (1981)(konami)(jp).bin" size="8192" crc="04f842ea" sha1="e5d328fa2765530849422eb3ae33628d2adf4ca9" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -289,10 +287,9 @@ and why some of the dumps below have weird size?
 		<publisher>Irem</publisher>
 		<info name="serial" value="16" />
 		<info name="alt_title" value="ワンダーホール" />
-		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="8320">
-				<rom name="wonder hole (1982)(irem)(jp).bin" size="8320" crc="aba2cece" sha1="bcb7442c6d320eb166e224c3ac0f50514906ad4c" offset="00000" status="baddump" />
+			<dataarea name="rom" size="8192">
+				<rom name="wonder hole (1982)(irem)(jp).bin" size="8192" crc="4a7613e6" sha1="dd0e732f121b904bc12a6a5a30e3f9fd40d03afd" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -310,15 +307,15 @@ and why some of the dumps below have weird size?
 		</part>
 	</software>
 
-	<software name="upupball" supported="no">
+	<software name="upupball" supported="yes">
 		<description>Up Up Balloon</description>
 		<year>1983</year>
 		<publisher>Takara ~ Monkey Punch</publisher>
 		<info name="serial" value="18" />
 		<info name="alt_title" value="アップアップバルーン" />
 		<part name="cart" interface="m5_cart">
-			<dataarea name="rom" size="8320">
-				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8320" crc="68c85890" sha1="0c94d2d55a6a6e66531137e124f2e0a3a176b252" offset="00000" status="baddump" />
+			<dataarea name="rom" size="8192">
+				<rom name="up up balloon (1983)(takara - monkey punch)(jp).bin" size="8192" crc="1fce24c8" sha1="139ab0c63c82538bc032d2cb9d9eaf858d7c969d" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -533,8 +530,9 @@ and why some of the dumps below have weird size?
 	<software name="baseball">
 		<description>Baseball</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Takara</publisher>
 		<info name="usage" value="Requires 36k RAM" />
+		<info name="alt_title" value="野球 ゲーム" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="10904">
 				<rom name="baseball (19xx)(-).bin" size="10904" crc="46e94dae" sha1="56d11bb9e4e8431ff4f6dfa592b096dd613084c3" offset="00000" status="baddump" />

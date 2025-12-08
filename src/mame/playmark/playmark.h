@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"

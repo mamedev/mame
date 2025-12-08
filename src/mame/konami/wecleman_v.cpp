@@ -903,13 +903,13 @@ void wecleman_state::video_start()
 
 K051316_CB_MEMBER(hotchase_state::hotchase_zoom_callback_1)
 {
-	*code |= (*color & 0x03) << 8;
-	*color = (*color & 0xfc) >> 2;
+	code |= (color & 0x03) << 8;
+	color = (color & 0xfc) >> 2;
 }
 
 K051316_CB_MEMBER(hotchase_state::hotchase_zoom_callback_2)
 {
-	*color = ((*color & 0x3f) << 1) | ((*code & 0x80) >> 7);
+	color = ((color & 0x3f) << 1) | ((code & 0x80) >> 7);
 }
 
 

@@ -2771,6 +2771,15 @@ ROM_START( blazeon )
 
 	ROM_REGION( 0x100000, "view2_0", 0 )   /* Tiles */
 	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
+
+	ROM_REGION( 0xf00, "plds", ROMREGION_ERASE00 ) // all brute-forced
+	ROM_LOAD( "peel18cv8.u37", 0x000, 0x155, CRC(f79332f9) SHA1(64a1f20d034ca9b16907af3ff16f1cb8b3f2372f) )
+	ROM_LOAD( "gal22v10.u38",  0x200, 0x2e5, CRC(115012a0) SHA1(316a1c35215b48cc50d2e61f61b48fd787937eee) )
+	ROM_LOAD( "peel18cv8.u66", 0x500, 0x155, CRC(7e53ea83) SHA1(67a32b1908817a891cacbdee5ed47645e82e4247) )
+	ROM_LOAD( "peel18cv8.u76", 0x700, 0x155, CRC(eb390e91) SHA1(4cae39ad07e3eebec3dab72609dda1d2d9942b45) )
+	ROM_LOAD( "peel18cv8.u77", 0x900, 0x155, CRC(5c0a5843) SHA1(9fb1f2bda8cec113ceaddb7b2fae30f913c33c3d) )
+	ROM_LOAD( "peel18cv8.u78", 0xb00, 0x155, CRC(f2cec7c6) SHA1(024de04e10739d8d4bf91e64bdcd428df9779698) )
+	ROM_LOAD( "peel18cv8.u79", 0xd00, 0x155, CRC(9d7ce11d) SHA1(031a0cd5d73b5bb1feea3fad0db0478db639eda1) )
 ROM_END
 
 ROM_START( blazeonj )

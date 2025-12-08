@@ -46,6 +46,12 @@ uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	std::sort(order.begin(), order.end(), layer_sort(*m_vmixer));
 
+	// zero value pixels from the bottommost layer show color 0 of the specified palette
+	// to do this we draw the tilemap layers in reverse order as opaque
+	for (int i = 11; i >= 0; i--)
+		if (order[i] < 8 && (order[i] & 1) == 0)
+			m_vtile->draw(screen, bitmap, cliprect, order[i], 0, TILEMAP_DRAW_OPAQUE);
+
 	int spri[4]{};
 	int level = 0;
 	for(int i=0; i<12; i++)

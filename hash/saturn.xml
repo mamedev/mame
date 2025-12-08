@@ -4578,11 +4578,13 @@ https://segaretro.org/Delisoba_Deluxe
 		</part>
 	</software>
 
-	<!-- Gals select screen sports unmasked text layer over box, [VDP2] enables window logic OR on NBG2 with only one window enabled -->
 	<software name="gpanicss" supported="no">
 		<description>Gals Panic SS (Japan)</description>
 		<year>1996</year>
 		<publisher>MYCOM</publisher>
+		<notes><![CDATA[
+Gal select screen sports unmasked text layer over box, [VDP2] enables window logic OR on NBG2 with only one window enabled.
+]]></notes>
 		<info name="serial" value="T-29002G"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="ギャルズパニック SS"/>

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Felipe Sanches
 /*******************************************************************
 
 Toshiba TMP95C063 emulation
@@ -8,6 +8,7 @@ Toshiba TMP95C063 emulation
 
 #include "emu.h"
 #include "tmp95c063.h"
+#include "dasm900.h"
 
 DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063")
 
@@ -1400,4 +1401,54 @@ void tmp95c063_device::execute_set_input(int input, int level)
 		break;
 	}
 	m_check_irqs = 1;
+}
+
+static std::pair<u16, char const *> const tmp95c063_syms[] = {
+	{ 0x01, "P1" }, { 0x04, "P1CR" }, { 0x06, "P2" }, { 0x09, "P2FC" },
+	{ 0x0d, "P5" }, { 0x10, "P5CR" }, { 0x11, "P5FC" },
+	{ 0x12, "P6" }, { 0x13, "P7" }, { 0x15, "P6FC" }, { 0x16, "P7CR" }, { 0x17, "P7FC" },
+	{ 0x18, "P8" }, { 0x19, "P9" }, { 0x1a, "P8CR" }, { 0x1b, "P8FC" }, { 0x1c, "P9CR" }, { 0x1d, "P9FC" },
+	{ 0x1e, "PA" }, { 0x1f, "PB" },
+	{ 0x20, "T8RUN" }, { 0x21, "TRDC" }, { 0x22, "TREG0" },
+	{ 0x23, "TREG1" }, { 0x24, "T01MOD" }, { 0x25, "T02FFCR" },
+	{ 0x26, "TREG2" }, { 0x27, "TREG3" }, { 0x28, "T23MOD" },
+	{ 0x29, "TREG4" }, { 0x2a, "TREG5" }, { 0x2b, "T45MOD" },
+	{ 0x2c, "TA46FFCR" }, { 0x2d, "TREG6" }, { 0x2e, "TREG7" },
+	{ 0x2f, "T67MOD" }, { 0x30, "TREG8L" }, { 0x31, "TREG8H" },
+	{ 0x32, "TREG9L" }, { 0x33, "TREG9H" }, { 0x34, "CAP1L" },
+	{ 0x35, "CAP1H" }, { 0x36, "CAP2L" }, { 0x37, "CAP2H" },
+	{ 0x38, "T8MOD" }, { 0x39, "T8FFCR" }, { 0x3a, "T89CR" },
+	{ 0x3b, "T16RUN" },
+	{ 0x40, "TREGAL" }, { 0x41, "TREGAH" }, { 0x42, "TREGBL" }, { 0x43, "TREGBH" },
+	{ 0x44, "CAP3L" }, { 0x45, "CAP3H" }, { 0x46, "CAP4L" }, { 0x47, "CAP4H" },
+	{ 0x48, "T9MOD" }, { 0x49, "T9FFCR" },
+	{ 0x4a, "DAREG0" }, { 0x4b, "DAREG1" },
+	{ 0x4c, "PG0REG" }, { 0x4d, "PG1REG" }, { 0x4e, "PG01CR" }, { 0x4f, "DADRV" },
+	{ 0x50, "SC0BUF" }, { 0x51, "SC0CR" }, { 0x52, "SC0MOD" }, { 0x53, "BR0CR" },
+	{ 0x54, "SC1BUF" }, { 0x55, "SC1CR" }, { 0x56, "SC1MOD" }, { 0x57, "BR1CR" },
+	{ 0x58, "ODE" },
+	{ 0x5a, "DMA0V" }, { 0x5b, "DMA1V" }, { 0x5c, "DMA2V" }, { 0x5d, "DMA3V" },
+	{ 0x5e, "ADMOD1" }, { 0x5f, "ADMOD2" },
+	{ 0x60, "ADREG04L" }, { 0x61, "ADREG04H" }, { 0x62, "ADREG15L" }, { 0x63, "ADREG15H" },
+	{ 0x64, "ADREG26L" }, { 0x65, "ADREG26H" }, { 0x66, "ADREG37L" }, { 0x67, "ADREG37H" },
+	{ 0x6a, "SDMACR0" }, { 0x6b, "SDMACR1" }, { 0x6c, "SDMACR2" }, { 0x6d, "SDMACR3" },
+	{ 0x6e, "WDMOD" }, { 0x6f, "WDCR" },
+	{ 0x70, "INTE_0AD" }, { 0x71, "INTE12" },
+	{ 0x72, "INTE34" }, { 0x73, "INTE56" }, { 0x74, "INT78" },
+	{ 0x75, "INTET01" }, { 0x76, "INTET32" }, { 0x77, "INTET45" },
+	{ 0x78, "INTET67" }, { 0x79, "INTET89" }, { 0x7a, "INTETAB" },
+	{ 0x7b, "INTES0" }, { 0x7c, "INTES1" }, { 0x7d, "INTETC01" },
+	{ 0x7e, "INTETC23" }, { 0x7f, "IIMC" },
+	{ 0x80, "PACR" }, { 0x81, "PAFC" }, { 0x82, "PBCR" }, { 0x83, "PBFC" },
+	{ 0x84, "PC" }, { 0x85, "PD"}, { 0x88, "PDCR" }, { 0x8a, "PE" }, { 0x8c, "PECR" },
+	{ 0x8f, "BEXCS" },
+	{ 0x90, "B0CS" }, { 0x91, "B1CS" }, { 0x92, "B2CS" }, { 0x93, "B3CS" },
+	{ 0x94, "MSAR0" }, { 0x95, "MAMR0" }, { 0x96, "MSAR1" }, { 0x97, "MAMR1" },
+	{ 0x98, "MSAR2" }, { 0x99, "MAMR2" }, { 0x9a, "MSAR3" }, { 0x9b, "MAMR3" },
+	{ 0x9c, "DREFCR1" }, { 0x9d, "DMEMCR1" }, { 0x9e, "DREFCR3" }, { 0x9f, "DMEMCR3" }
+};
+
+std::unique_ptr<util::disasm_interface> tmp95c063_device::create_disassembler()
+{
+	return std::make_unique<tlcs900_disassembler>(tmp95c063_syms);
 }

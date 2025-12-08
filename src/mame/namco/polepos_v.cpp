@@ -144,18 +144,15 @@ void polepos_state::polepos_palette(palette_device &palette)
 
 TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 {
-	uint16_t word = m_view16_memory[tile_index];
-	int code = (word & 0xff) | ((word & 0x4000) >> 6);
-	int color = (word & 0x3f00) >> 8;
-	tileinfo.set(1,
-			code,
-			color,
-			0);
+	uint16_t const word = m_view16_memory[tile_index];
+	int const code = (word & 0xff) | ((word & 0x4000) >> 6);
+	int const color = (word & 0x3f00) >> 8;
+	tileinfo.set(1, code, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 {
-	uint16_t word = m_alpha16_memory[tile_index];
+	uint16_t const word = m_alpha16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
 	int color = (word & 0x3f00) >> 8;
 
@@ -171,10 +168,7 @@ TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
 	/* 128V input to the palette PROM */
 	if (tile_index >= 32*16) color |= 0x40;
 
-	tileinfo.set(0,
-			code,
-			color,
-			0);
+	tileinfo.set(0, code, color, 0);
 	tileinfo.group = color;
 }
 
@@ -309,33 +303,30 @@ void polepos_state::alpha_w(offs_t offset, uint8_t data)
 
 void polepos_state::draw_road(bitmap_ind16 &bitmap)
 {
-	const uint8_t *road_control = memregion("gfx5")->base();
-	const uint8_t *road_bits1 = road_control + 0x2000;
-	const uint8_t *road_bits2 = road_control + 0x4000;
+	uint8_t const *const road_bits1 = &m_road_region[0x2000];
+	uint8_t const *const road_bits2 = &m_road_region[0x4000];
 
 	/* loop over the lower half of the screen */
 	for (int y = 128; y < 256; y++)
 	{
-		int xoffs, yoffs, xscroll, roadpal;
-		uint16_t scanline[256 + 8];
+		uint16_t scanline[256 + 8]{};
 		uint16_t *dest = scanline;
-		pen_t pen_base;
 
 		/* first add the vertical position modifier and the vertical scroll */
-		yoffs = ((m_vertical_position_modifier[y] + m_road16_vscroll) >> 3) & 0x1ff;
+		int const yoffs = ((m_vertical_position_modifier[y] + m_road16_vscroll) >> 3) & 0x1ff;
 
 		/* then use that as a lookup into the road memory */
-		roadpal = m_road16_memory[yoffs] & 15;
+		int const roadpal = m_road16_memory[yoffs] & 15;
 
 		/* this becomes the palette base for the scanline */
-		pen_base = 0x0b00 + (roadpal << 6);
+		pen_t const pen_base = 0x0b00 + (roadpal << 6);
 
 		/* now fetch the horizontal scroll offset for this scanline */
-		xoffs = m_road16_memory[0x380 + (y & 0x7f)] & 0x3ff;
+		int xoffs = m_road16_memory[0x380 + (y & 0x7f)] & 0x3ff;
 
 		/* the road is drawn in 8-pixel chunks, so round downward and adjust the base */
 		/* note that we assume there is at least 8 pixels of slop on the left/right */
-		xscroll = xoffs & 7;
+		int const xscroll = xoffs & 7;
 		xoffs &= ~7;
 
 		/* loop over 8-pixel chunks */
@@ -354,21 +345,21 @@ void polepos_state::draw_road(bitmap_ind16 &bitmap)
 			else
 			{
 				/* the road ROM offset comes from the current scanline and the X offset */
-				int romoffs = ((y & 0x07f) << 6) + ((xoffs & 0x1f8) >> 3);
+				int const romoffs = ((y & 0x07f) << 6) + ((xoffs & 0x1f8) >> 3);
 
 				/* fetch the current data from the road ROMs */
-				int control = road_control[romoffs];
-				int bits1 = road_bits1[romoffs];
-				int bits2 = road_bits2[(romoffs & 0xfff) | ((romoffs & 0x1000) >> 1)];
+				int const control = m_road_region[romoffs];
+				int const bits1 = road_bits1[romoffs];
+				int const bits2 = road_bits2[(romoffs & 0xfff) | ((romoffs & 0x1000) >> 1)];
 
 				/* extract the road value and the carry-in bit */
 				int roadval = control & 0x3f;
-				int carin = control >> 7;
+				int const carin = control >> 7;
 
 				/* draw this 8-pixel chunk */
 				for (int i = 8; i > 0; i--)
 				{
-					int bits = BIT(bits1,i) + (BIT(bits2,i) << 1);
+					int bits = BIT(bits1, i) + (BIT(bits2, i) << 1);
 					if (!carin && bits) bits++;
 					*dest++ = pen_base | (roadval & 0x3f);
 					roadval += bits;
@@ -381,80 +372,78 @@ void polepos_state::draw_road(bitmap_ind16 &bitmap)
 	}
 }
 
-void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
-		uint32_t code,uint32_t color,int flipx,int sx,int sy,
-		int sizex,int sizey)
+void polepos_state::zoom_sprite(bitmap_ind16 &bitmap, bool big,
+		uint32_t code, uint32_t color, bool flipx, int sx, int sy,
+		int sizex, int sizey)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(big ? 3 : 2);
-	const uint8_t *gfxdata = gfx->get_data(code % gfx->elements());
-	uint8_t *scaling_rom = memregion("gfx6")->base();
-	uint32_t transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
-	int coloroffs = gfx->colorbase() + color * gfx->granularity();
+	uint8_t const *const gfxdata = gfx->get_data(code % gfx->elements());
+	uint32_t const transmask = m_palette->transpen_mask(*gfx, color, 0x1f);
+	int const coloroffs = gfx->colorbase() + color * gfx->granularity();
 
-	if (flipx) flipx = big ? 0x1f : 0x0f;
+	int const offsxor = flipx ? (big ? 0x1f : 0x0f) : 0;
 
-	for (int y = 0;y <= sizey;y++)
+	for (int y = 0; y <= sizey; y++)
 	{
-		int yy = (sy + y) & 0x1ff;
+		int const yy = (sy + y) & 0x1ff;
 
 		/* the following should be a reasonable reproduction of how the real hardware works */
 		if (yy >= 0x10 && yy < 0xf0)
 		{
-			int dy = scaling_rom[(y << 6) + sizey] & 0x1f;
+			int dy = m_scalelut_region[(y << 6) + sizey] & 0x1f;
 			int xx = sx & 0x3ff;
 			int siz = 0;
 			int offs = 0;
-			const uint8_t *src;
 
 			if (!big) dy >>= 1;
-			src = gfxdata + dy * gfx->rowbytes();
+			uint8_t const *src = &gfxdata[dy * gfx->rowbytes()];
 
-			for (int x = (big ? 0x40 : 0x20);x > 0;x--)
+			for (int x = (big ? 0x40 : 0x20); x > 0; x--)
 			{
 				if (xx < 0x100)
 				{
-					int pen = src[offs/2 ^ flipx];
+					int const pen = src[offs/2 ^ offsxor];
 
 					if (!((transmask >> pen) & 1))
 						bitmap.pix(yy, xx) = pen + coloroffs;
 				}
 				offs++;
 
-				siz = siz+1+sizex;
+				siz = siz + 1 + sizex;
 				if (siz & 0x40)
 				{
 					siz &= 0x3f;
-					xx = (xx+1) & 0x3ff;
+					xx = (xx + 1) & 0x3ff;
 				}
 			}
 		}
 	}
 }
 
-void polepos_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
+void polepos_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *posmem = &m_sprite16_memory[0x380];
-	uint16_t *sizmem = &m_sprite16_memory[0x780];
+	uint16_t const *posmem = &m_sprite16_memory[0x380];
+	uint16_t const *sizmem = &m_sprite16_memory[0x780];
 
 	for (int i = 0; i < 64; i++, posmem += 2, sizmem += 2)
 	{
-		int sx = (posmem[1] & 0x3ff) - 0x40 + 4;
-		int sy = 512 - (posmem[0] & 0x1ff) + 1; // sprites are buffered and delayed by one scanline
-		int sizex = (sizmem[1] & 0x3f00) >> 8;
-		int sizey = (sizmem[0] & 0x3f00) >> 8;
-		int code = sizmem[0] & 0x7f;
-		int flipx = sizmem[0] & 0x80;
+		int const sx = (posmem[1] & 0x3ff) - 0x40 + 4;
+		int const sy = 512 - (posmem[0] & 0x1ff) + 1; // sprites are buffered and delayed by one scanline
+		int const sizex = (sizmem[1] & 0x3f00) >> 8;
+		int const sizey = (sizmem[0] & 0x3f00) >> 8;
+		int const code = sizmem[0] & 0x7f;
+		bool const flipx = BIT(sizmem[0], 7);
 		int color = sizmem[1] & 0x3f;
 
 		/* 128V input to the palette PROM */
 		if (sy >= 128) color |= 0x40;
 
-		zoom_sprite(bitmap, (sizmem[0] & 0x8000) ? 1 : 0,
+		zoom_sprite(bitmap, BIT(sizmem[0], 15),
 					code,
 					color,
 					flipx,
 					sx, sy,
-					sizex,sizey);
+					sizex, sizey);
 	}
 }
 
@@ -463,9 +452,9 @@ uint32_t polepos_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	rectangle clip = cliprect;
 	clip.max_y = 127;
-	m_bg_tilemap->draw(screen, bitmap, clip, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, clip, 0, 0);
 	draw_road(bitmap);
 	draw_sprites(bitmap,cliprect);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

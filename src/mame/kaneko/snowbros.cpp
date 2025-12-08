@@ -78,7 +78,7 @@ a joystick.  This is not an emulation bug.
 #include "snowbros.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h" // for semicom mcu
+#include "cpu/mcs51/i80c52.h" // for semicom mcu
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"

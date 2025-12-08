@@ -337,8 +337,8 @@ private:
 	uint32_t get_global_register(uint8_t code);
 
 	// words interpreted as pairs of signed half-words (HS)
-	static int get_lhs(uint32_t val) { return int16_t(val & 0xffff); }
-	static int get_rhs(uint32_t val) { return int16_t(val >> 16); }
+	static int get_lhs(uint32_t val) { return int16_t(uint16_t(val & 0xffff)); }
+	static int get_rhs(uint32_t val) { return int16_t(uint16_t(val >> 16)); }
 
 	uint32_t get_emu_code_addr(uint8_t num);
 	int32_t get_instruction_length(uint16_t op);

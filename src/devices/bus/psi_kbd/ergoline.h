@@ -42,7 +42,7 @@ protected:
 	virtual void tx_w(int state) override;
 
 private:
-	void kbd_io(address_map &map) ATTR_COLD;
+	void kbd_data(address_map &map) ATTR_COLD;
 	void kbd_mem(address_map &map) ATTR_COLD;
 };
 

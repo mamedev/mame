@@ -898,7 +898,7 @@ void ksys573_state::gbbchmp_map(address_map &map)
 {
 	konami573_map(map);
 	// The game waits until transmit is ready, but the chip may not actually be present.
-	map(0x1f640000, 0x1f640007).rw(m_duart, FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f640000, 0x1f640007).m(m_duart, FUNC(mb89371_device::map<0>)).umask32(0x00ff00ff);
 }
 
 bool ksys573_state::jvs_is_valid_packet()
@@ -1120,6 +1120,11 @@ void ksys573_state::machine_reset()
 
 	std::fill_n( m_jvs_input_buffer, sizeof( m_jvs_input_buffer ), 0 );
 	std::fill_n( m_jvs_output_buffer, sizeof( m_jvs_output_buffer ), 0 );
+
+	if (m_duart.found())
+	{
+		m_duart->write_cts<0>(CLEAR_LINE);
+	}
 }
 
 // H8 check at startup (JVS related)
@@ -2930,7 +2935,7 @@ void ksys573_state::salarymc(machine_config &config)
 void ksys573_state::gbbchmp(machine_config &config)
 {
 	animechmp(config);
-	MB89371(config, m_duart, 0);
+	MB89371(config, m_duart, 4_MHz_XTAL);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ksys573_state::gbbchmp_map);
 }

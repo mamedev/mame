@@ -182,7 +182,8 @@ license:CC0-1.0
 		<description>Demon Seed</description>
 		<year>1984</year>
 		<publisher>Michtron</publisher>
-		<info name="programmer" value="Phil Mackenzie &amp; Jeff Sorensen" />
+		<info name="programmer" value="Phil Mackenzie " />
+		<info name="programmer" value="Jeff Sorensen" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="29464">

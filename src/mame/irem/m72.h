@@ -12,7 +12,7 @@
 
 #include "m72_a.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/mb8421.h"
 #include "machine/pic8259.h"
 #include "machine/upd4701.h"
@@ -227,7 +227,7 @@ private:
 	void m72_protected_portmap(address_map &map) ATTR_COLD;
 	void m72_airduel_portmap(address_map &map) ATTR_COLD;
 	void i80c31_mem_map(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void sound_protected_portmap(address_map &map) ATTR_COLD;
 	void xmultiplm72_map(address_map &map) ATTR_COLD;
 };

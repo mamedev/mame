@@ -228,6 +228,12 @@ void a2bus_agat840k_hle_device::device_reset()
 	m_mxcs &= ~MXCSR_TR;
 }
 
+void a2bus_agat840k_hle_device::reset_from_bus()
+{
+	m_d14->reset();
+	m_d15->reset();
+}
+
 TIMER_CALLBACK_MEMBER(a2bus_agat840k_hle_device::timer_wait_tick)
 {
 	m_count_read++;

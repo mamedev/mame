@@ -19,6 +19,7 @@
 #include "opti82c861.h"
 #include "oti_spitfire.h"
 #include "pdc20262.h"
+#include "permedia2.h"
 #include "promotion.h"
 #include "riva128.h"
 #include "rivatnt.h"
@@ -166,6 +167,8 @@ void pci_cards(device_slot_interface &device)
 // assume all natively with class code 03
 void agp_cards(device_slot_interface &device)
 {
+	// 3Dlabs
+	device.option_add("permedia2",      PERMEDIA2);
 	// nVidia
 	device.option_add("riva128",        RIVA128);
 	device.option_add("riva128zx",      RIVA128ZX);

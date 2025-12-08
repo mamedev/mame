@@ -461,30 +461,68 @@ INPUT_PORTS_END
  *  ROM definition(s)
  *
  *************************************/
+
+/*
+Boot ROMs:
+
+v1.00 - v1.03 boot as:  Eagle System Boot ROM Version: 1.0x     (x == actual version of boot ROM)
+v1.05 - v2.09 boot as:  Eagle 40 MB System Boot ROM Version: x.0x     (x == actual version of boot ROM)
+
+BBH v1.02 boots as:  Eagle 8MB System Boot ROM Version: 1.02'
+
+
+Eagle 40MB boot ROMs were updated to allow for larger hard drives, as 40 & 80 gig hard drives became cheap enough in bulk and supply to compete with
+    the standard 8 & 10 gig hard drives used before which were becoming harder to source in bulk.
+
+The BBH boot ROM is meant for green boards with only 8megs of RAM, which was the default for Big Buck Hunter & Big Buck Hunter - Shooter's Challenge
+    Later versions of Big Buck Hunter in the series including Big Buck Hunter II - Sportsman's Paradise and Big Buck Hunter Call of the Wild were
+    generally released on the newer red boards with 16megs of RAM. However, the currently supported set of Big Buck Hunter Call of the Wild is a
+    special upgrade version specifically designed to run on 8meg green boards.  The BBH 8meg boot ROM will work with BBH, BBH - Shooter's Challenge and
+    the current 8meg version of Call of the Wild.  Using the BBH boot ROM for Sportsman's Paradise, a standard Call of the Wild (currently undumped) or
+    any Golden Tee Fore set results in the boot process failing with the following message after BOOTING FROM HARD DRIVE:
+
+Loading Game.....
+WARNING: Checksum mismatch in boot file, boot file corrupted
+!.
+WARNING: Checksum mismatch in boot file, boot file corrupted
+!.
+WARNING: Checksum mismatch in boot file, boot file corrupted
+!.
+Disk Load completed
+
+
+NOTE: At some point the boot ROM labels changed from GOLF FORE U15 to simply EAGLE U15, verified for at least v2.04 and higher
+NOTE: Although specifically labeled as 'GOLF FORE U15 V1.0x' the "golf" boot ROMs work for all BBH sets
+NOTE: Golden Tee Fore! games only boot on boards with 16megs of RAM.
+
+*/
+
 #define EAGLE_BIOS \
 	ROM_REGION( 0x100000, PCI_ID_NILE":rom", 0 ) /* MIPS code */ \
-	ROM_SYSTEM_BIOS(  0, "209", "bootrom 2.09" ) \
-	ROMX_LOAD( "eagle209.u15", 0x000000, 0x100000, CRC(e0fc1a16) SHA1(c9524f7ee6b95bd484a3b75bcbe2243cb273f84c), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS(  1, "208", "bootrom 2.08" ) \
-	ROMX_LOAD( "eagle208.u15", 0x000000, 0x100000, CRC(772f2864) SHA1(085063a4e34f29ebe3814823cd2c6323a050da36), ROM_BIOS(1) ) \
-	ROM_SYSTEM_BIOS(  2, "204", "bootrom 2.04" ) \
-	ROMX_LOAD( "eagle204.u15", 0x000000, 0x100000, CRC(f02e5523) SHA1(b979cf72a6992f1ecad9695a08c8d51e315ab537), ROM_BIOS(2) ) \
-	ROM_SYSTEM_BIOS(  3, "201", "bootrom 2.01" ) \
-	ROMX_LOAD( "eagle201.u15", 0x000000, 0x100000, CRC(e180442b) SHA1(4f50821fed5bcd786d989520aa2559d6c416fb1f), ROM_BIOS(3) ) \
-	ROM_SYSTEM_BIOS(  4, "107", "bootrom 1.07" ) \
-	ROMX_LOAD( "eagle107.u15", 0x000000, 0x100000, CRC(97a01fc9) SHA1(a421dbf4d097b2f50cc005d3cd0d63e562e03df8), ROM_BIOS(4) ) \
-	ROM_SYSTEM_BIOS(  5, "106a", "bootrom 1.06a" ) \
-	ROMX_LOAD( "eagle106a.u15", 0x000000, 0x100000, CRC(9c79b7ad) SHA1(ccf1c86e79d65bee30f399e0fa33a7839570d93b), ROM_BIOS(5) ) \
-	ROM_SYSTEM_BIOS(  6, "106", "bootrom 1.06" ) \
-	ROMX_LOAD( "eagle106.u15", 0x000000, 0x100000, CRC(56bc193d) SHA1(e531d208ef27f777d0784414885f390d1be654b9), ROM_BIOS(6) ) \
-	ROM_SYSTEM_BIOS(  7, "105", "bootrom 1.05" ) \
-	ROMX_LOAD( "eagle105.u15", 0x000000, 0x100000, CRC(3870dbe0) SHA1(09be2d86c7259cd81d945c757044b167a76f30db), ROM_BIOS(7) ) \
-	ROM_SYSTEM_BIOS(  8, "103", "bootrom 1.03" ) \
-	ROMX_LOAD( "eagle103.u15", 0x000000, 0x100000, CRC(c35f4cf2) SHA1(45301c18c7f8f78754c8ad60ea4d2da5a7dc55fb), ROM_BIOS(8) ) \
-	ROM_SYSTEM_BIOS(  9, "102", "bootrom 1.02" ) \
-	ROMX_LOAD( "eagle102.u15", 0x000000, 0x100000, CRC(1fd39e73) SHA1(d1ac758f94defc5c55c62594b3999a406dd9ef1f), ROM_BIOS(9) ) \
-	ROM_SYSTEM_BIOS( 10, "101", "bootrom 1.01" ) \
-	ROMX_LOAD( "eagle101.u15", 0x000000, 0x100000, CRC(2600bc2b) SHA1(c4b89e69c51e4a3bb1874407c4d30b6caed4f396), ROM_BIOS(10) ) \
+	ROM_SYSTEM_BIOS(  0, "209", "Eagle 40MB bootrom 2.09" ) \
+	ROMX_LOAD( "eagle_u15_v209.u15", 0x000000, 0x100000, CRC(e0fc1a16) SHA1(c9524f7ee6b95bd484a3b75bcbe2243cb273f84c), ROM_BIOS(0) ) \
+	ROM_SYSTEM_BIOS(  1, "208", "Eagle 40MB bootrom 2.08" ) \
+	ROMX_LOAD( "eagle_u15_v208.u15", 0x000000, 0x100000, CRC(772f2864) SHA1(085063a4e34f29ebe3814823cd2c6323a050da36), ROM_BIOS(1) ) \
+	ROM_SYSTEM_BIOS(  2, "204", "Eagle 40MB bootrom 2.04" ) \
+	ROMX_LOAD( "eagle_u15_v204.u15", 0x000000, 0x100000, CRC(f02e5523) SHA1(b979cf72a6992f1ecad9695a08c8d51e315ab537), ROM_BIOS(2) ) \
+	ROM_SYSTEM_BIOS(  3, "201", "Eagle 40MB bootrom 2.01" ) \
+	ROMX_LOAD( "eagle_u15_v201.u15", 0x000000, 0x100000, CRC(e180442b) SHA1(4f50821fed5bcd786d989520aa2559d6c416fb1f), ROM_BIOS(3) ) \
+	ROM_SYSTEM_BIOS(  4, "107", "Eagle 40MB bootrom 1.07" ) \
+	ROMX_LOAD( "golf_fore_u15_v107.u15", 0x000000, 0x100000, CRC(97a01fc9) SHA1(a421dbf4d097b2f50cc005d3cd0d63e562e03df8), ROM_BIOS(4) ) \
+	ROM_SYSTEM_BIOS(  5, "106a", "Eagle 40MB bootrom 1.06a" ) \
+	ROMX_LOAD( "golf_fore_u15_v106a.u15", 0x000000, 0x100000, CRC(9c79b7ad) SHA1(ccf1c86e79d65bee30f399e0fa33a7839570d93b), ROM_BIOS(5) ) \
+	ROM_SYSTEM_BIOS(  6, "106", "Eagle 40MB bootrom 1.06" ) \
+	ROMX_LOAD( "golf_fore_u15_v106.u15", 0x000000, 0x100000, CRC(56bc193d) SHA1(e531d208ef27f777d0784414885f390d1be654b9), ROM_BIOS(6) ) \
+	ROM_SYSTEM_BIOS(  7, "105", "Eagle 40MB bootrom 1.05" ) \
+	ROMX_LOAD( "golf_fore_u15_v105.u15", 0x000000, 0x100000, CRC(3870dbe0) SHA1(09be2d86c7259cd81d945c757044b167a76f30db), ROM_BIOS(7) ) \
+	ROM_SYSTEM_BIOS(  8, "103", "Eagle bootrom 1.03" ) \
+	ROMX_LOAD( "golf_fore_u15_v103.u15", 0x000000, 0x100000, CRC(c35f4cf2) SHA1(45301c18c7f8f78754c8ad60ea4d2da5a7dc55fb), ROM_BIOS(8) ) \
+	ROM_SYSTEM_BIOS(  9, "102bbh", "BBH 8meg bootrom 1.02" ) \
+	ROMX_LOAD( "bbh_u15_v102.u15", 0x000000, 0x100000, CRC(1fd39e73) SHA1(d1ac758f94defc5c55c62594b3999a406dd9ef1f), ROM_BIOS(9) ) \
+	ROM_SYSTEM_BIOS( 10, "102", "Eagle bootrom 1.02" ) \
+	ROMX_LOAD( "golf_fore_u15_v102.u15", 0x000000, 0x100000, CRC(4c000c5e) SHA1(4fd5ea2a0874759b621c9cd52cee55d282443e5d), ROM_BIOS(10) ) \
+	ROM_SYSTEM_BIOS( 11, "101", "Eagle bootrom 1.01" ) \
+	ROMX_LOAD( "golf_fore_u15_v101.u15", 0x000000, 0x100000, CRC(2600bc2b) SHA1(c4b89e69c51e4a3bb1874407c4d30b6caed4f396), ROM_BIOS(11) ) \
 	ROM_REGION( 0x30000, "fpga", 0 ) \
 	ROM_LOAD( "17s20lpc_sb4.u26", 0x000000, 0x008000, CRC(62c4af8a) SHA1(6eca277b9c66a401990599e98fdca64a9e38cc9a) ) \
 	ROM_LOAD( "17s20lpc_sb5.u26", 0x008000, 0x008000, CRC(c88b9d42) SHA1(b912d0fc50ecdc6a198c626f6e1644e8405fac6e) ) \
@@ -633,7 +671,7 @@ ROM_START( gtfore06 )
 	DISK_IMAGE( "golf_fore_complete_v6.00.01", 0, SHA1(e902b91bd739daee0b95b10e5cf33700dd63a76b) ) /* Build 09:51:13, Jan 20 2006 */
 ROM_END
 
-ROM_START( bbh )
+ROM_START( bbh ) /* Boots on 8meg GREEN board PCBs, can use BBH 8meg boot ROM */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -643,7 +681,7 @@ ROM_START( bbh )
 	DISK_IMAGE("bbh_v1.00.14", 0, SHA1(dd56f758c3e421005e06ac24c21d12f0f29b0f44)) /* Build 10:59:51, Feb 25 2003 */
 ROM_END
 
-ROM_START( bbhsc )
+ROM_START( bbhsc ) /* Boots on 8meg GREEN board PCBs, can use BBH 8meg boot ROM */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -653,7 +691,7 @@ ROM_START( bbhsc )
 	DISK_IMAGE("bbhsc_v1.60.01", 0, SHA1(8554fdd7193ee27c0fe8ca921aa8db9c0378b313)) /* Build 09:50:13, May 29 2002 */
 ROM_END
 
-ROM_START( bbhsca )
+ROM_START( bbhsca ) /* Boots on 8meg GREEN board PCBs, can use BBH 8meg boot ROM */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -673,7 +711,7 @@ ROM_START( bbh2sp )
 	DISK_IMAGE( "bbh2sp_v2.02.11", 0, SHA1(63e41cca534f4774bfba4b4dda9620fe805029b4) ) /* Build 10:52:30, March 26, 2004 */
 ROM_END
 
-ROM_START( bbh2spa )
+ROM_START( bbh2spa ) /* Boots on 16meg RED board PCBs */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -683,7 +721,7 @@ ROM_START( bbh2spa )
 	DISK_IMAGE( "bbh2sp_v2.02.09", 0, SHA1(fac3963b6da35a8c8b00f6826bc10e9c7230b1d6) ) /* Build 18:07:45, Sept 15, 2003 */
 ROM_END
 
-ROM_START( bbh2spb )
+ROM_START( bbh2spb ) /* Boots on 16meg RED board PCBs */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -693,7 +731,7 @@ ROM_START( bbh2spb )
 	DISK_IMAGE( "bbh2sp_v2.02.08", 0, SHA1(13b9b4ea0465f55dd1c7bc6e2f962c3c9b9566bd) ) /* Build 09:09:03, July 23, 2003 */
 ROM_END
 
-ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
+ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs, can use BBH 8meg boot ROM */
 	EAGLE_BIOS
 
 	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
@@ -726,10 +764,10 @@ GAME( 2004, gtfore05a, gtfore05, gtfore05, iteagle,  iteagle_state, empty_init, 
 GAME( 2004, gtfore05b, gtfore05, gtfore05, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.01.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2004, gtfore05c, gtfore05, gtfore05, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 2005, gtfore06,  iteagle,  gtfore06, iteagle,  iteagle_state, empty_init, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, bbh,       iteagle,  bbh,      bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter (v1.00.14)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, bbhsc,     iteagle,  bbhsc,    bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, bbhsca,    bbhsc,    bbhsc,    bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, bbh,       iteagle,  bbh,      bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter (v1.00.14)", MACHINE_SUPPORTS_SAVE ) // BBH 8meg boot ROM compatible
+GAME( 2002, bbhsc,     iteagle,  bbhsc,    bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.60.01)", MACHINE_SUPPORTS_SAVE ) // BBH 8meg boot ROM compatible
+GAME( 2002, bbhsca,    bbhsc,    bbhsc,    bbh,      iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_SUPPORTS_SAVE ) // BBH 8meg boot ROM compatible
 GAME( 2004, bbh2sp,    iteagle,  bbh2sp,   bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, bbh2spa,   bbh2sp,   bbh2sp,   bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.09)", MACHINE_SUPPORTS_SAVE )
 GAME( 2003, bbh2spb,   bbh2sp,   bbh2sp,   bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.08)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, bbhcotw,   iteagle,  bbhcotw,  bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, bbhcotw,   iteagle,  bbhcotw,  bbh2,     iteagle_state, empty_init, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_SUPPORTS_SAVE ) // BBH 8meg boot ROM compatible

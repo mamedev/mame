@@ -65,7 +65,8 @@
 ********************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "speaker.h"
 
 namespace

@@ -17,6 +17,7 @@
 #ifndef MAME_EMU_DEVICE_H
 #define MAME_EMU_DEVICE_H
 
+#include <cassert>
 #include <iterator>
 #include <memory>
 #include <string>
@@ -294,7 +295,8 @@ public:
 	using exposed_type = DeviceClass;
 
 	using device_type_impl_base::device_type_impl_base;
-	using device_type_impl_base::create;
+
+	std::unique_ptr<DeviceClass> create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const;
 
 	template <typename... Params>
 	std::unique_ptr<DeviceClass> create(machine_config &mconfig, char const *tag, device_t *owner, Params &&... args) const
@@ -434,6 +436,7 @@ extern emu::detail::device_registrar const registered_device_types;
 /// \sa DECLARE_DEVICE_TYPE DECLARE_DEVICE_TYPE_NS DEFINE_DEVICE_TYPE
 #define DEFINE_DEVICE_TYPE_PRIVATE(Type, Base, Class, ShortName, FullName) \
 		namespace { \
+			static_assert(std::is_convertible_v<Class &, Base &>, "Device implementation class must be convertible to exposed class."); \
 			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
 		} \
@@ -1575,7 +1578,35 @@ inline device_t *device_t::siblingdevice(std::string_view tag) const
 }
 
 
-// these operators requires device_interface to be a complete type
+// these things require device_t to be a complete type
+template <class DeviceClass>
+inline std::unique_ptr<DeviceClass> emu::detail::device_type_impl<DeviceClass>::create(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) const
+{
+	auto result(device_type_impl_base::create(mconfig, tag, owner, clock));
+	if constexpr (std::is_base_of_v<device_t, DeviceClass>)
+	{
+		return std::unique_ptr<DeviceClass>(downcast<DeviceClass *>(result.release()));
+	}
+	else
+	{
+#if defined(MAME_DEBUG)
+		auto const exposed(dynamic_cast<DeviceClass *>(result.get()));
+		if (result && !exposed)
+			report_bad_device_cast(result.get(), typeid(device_t), typeid(DeviceClass));
+		else
+			result.release();
+#else
+		if (!result)
+			return nullptr;
+		auto const exposed(&dynamic_cast<DeviceClass &>(*result));
+		result.release();
+#endif
+		return std::unique_ptr<DeviceClass>(exposed);
+	}
+}
+
+
+// these things require device_interface to be a complete type
 inline device_t::interface_list::auto_iterator &device_t::interface_list::auto_iterator::operator++()
 {
 	m_current = m_current->interface_next();

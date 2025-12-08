@@ -15,6 +15,8 @@
 #include "machine/ds128x.h"
 #include "machine/am9517a.h"
 
+#include "cpu/dsp563xx/dsp56362.h"
+
 /*
  * Host
  */
@@ -367,11 +369,14 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(audio_update);
 
 private:
+	required_device<dsp56362_device> gpdsp;
 	required_device<device_memory_interface> cpu;
 	// APU contains 3 dsps: voice processor (VP) global processor (GP) encode processor (EP)
 	struct apu_state {
@@ -385,7 +390,7 @@ private:
 		uint32_t epdsp_sgblocks2 = 0;
 		int voice_number = 0;
 		uint32_t voices_heap_blockaddr[1024]{};
-		uint64_t voices_active[4]{}; //one bit for each voice: 1 playing 0 not
+		uint64_t voices_active[4]{}; // one bit for each voice: 1 playing 0 not
 		uint32_t voicedata_address = 0;
 		int voices_frequency[256]{}; // sample rate
 		int voices_position[256]{}; // position in samples * 1000
@@ -396,6 +401,7 @@ private:
 		address_space *space = nullptr;
 	} apust;
 	void apu_mmio(address_map &map) ATTR_COLD;
+	void p_map(address_map &map) ATTR_COLD;
 	uint8_t minimum_grant_r() { return 1; }
 	uint8_t maximum_latency_r() { return 0xc; }
 };

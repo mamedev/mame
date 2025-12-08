@@ -35,6 +35,7 @@ protected:
 
 	void epson_base_io(address_map &map) ATTR_COLD;
 
+	void pc286u_map(address_map &map) ATTR_COLD;
 	void pc286vs_io(address_map &map) ATTR_COLD;
 	void pc286vs_map(address_map &map) ATTR_COLD;
 	void pc386m_io(address_map &map) ATTR_COLD;

@@ -9,22 +9,68 @@ Toshiba TLCS-900/H disassembly
 #include "emu.h"
 #include "dasm900.h"
 
-template <typename T> std::string tlcs900_disassembler::address(T offset, int size) const
+namespace {
+
+enum e_mnemonics
 {
-	auto const symbol = std::lower_bound(
-		m_symbols,
-		m_symbols + m_symbol_count,
-		offset,
-		[] (auto const &sym, u16 addr) { return sym.first < addr; }
-	);
+	M_ADC, M_ADD, M_AND, M_ANDCF, M_BIT, M_BS1B,
+	M_BS1F, M_CALL, M_CALR, M_CCF, M_CHG, M_CP,
+	M_CPD, M_CPDW, M_CPDR, M_CPDRW, M_CPI, M_CPIR,
+	M_CPIRW, M_CPIW, M_CPL, M_DAA, M_DB, M_DEC,
+	M_DECF, M_DECW, M_DIV, M_DIVS, M_DJNZ, M_EI,
+	M_EX, M_EXTS, M_EXTZ, M_HALT, M_INC, M_INCF,
+	M_INCW, M_JP, M_JR, M_JRL, M_LD, M_LDA,
+	M_LDC, M_LDCF, M_LDD, M_LDDR, M_LDDRW, M_LDDW,
+	M_LDF, M_LDI, M_LDIR, M_LDIRW, M_LDIW, M_LDW,
+	M_LDX, M_LINK, M_MAX, M_MDEC1, M_MDEC2, M_MDEC4,
+	M_MINC1, M_MINC2, M_MINC4, M_MIRR, M_MUL, M_MULA,
+	M_MULS, M_NEG, M_NOP, M_NORMAL, M_OR, M_ORCF,
+	M_PAA, M_POP, M_POPW, M_PUSH, M_PUSHW, M_RCF,
+	M_RES, M_RET, M_RETD, M_RETI, M_RL, M_RLC,
+	M_RLCW, M_RLD, M_RLW, M_RR, M_RRC, M_RRCW,
+	M_RRD, M_RRW, M_SBC, M_SCC, M_SCF, M_SET,
+	M_SLA, M_SLAW, M_SLL, M_SLLW, M_SRA, M_SRAW,
+	M_SRL, M_SRLW, M_STCF, M_SUB, M_SWI, M_TSET,
+	M_UNLK, M_XOR, M_XORCF, M_ZCF,
+	M_80, M_88, M_90, M_98, M_A0, M_A8, M_B0, M_B8,
+	M_C0, oC8, M_D0, oD8, M_E0, M_E8, M_F0
+};
 
-	if ((m_symbol_count != (symbol - m_symbols)) && (symbol->first == offset))
-		return symbol->second;
-	else
-		return util::string_format("0x%0*x", size/4, offset);
-}
+enum e_operand
+{
+	O_NONE,
+	O_A,        // current register set register A
+	O_C8,       // current register set byte
+	O_C16,      // current register set word
+	O_C32,      // current register set long word
+	O_MC16,     // current register set mul/div register word
+	O_CC,       // condition
+	O_CR8,      // byte control register
+	O_CR16,     // word control register
+	O_CR32,     // long word control register
+	O_D8,       // byte displacement
+	O_D16,      // word displacement
+	O_F,        // F register
+	O_I3,       // immediate 3 bit (part of last byte)
+	O_I8,       // immediate byte
+	O_I16,      // immediate word
+	O_I24,      // immediate 3 byte address
+	O_I32,      // immediate long word
+	O_M,        // memory location (defined by extension)
+	O_M8,       // (8)
+	O_M16,      // (i16)
+	O_R,        // register
+	O_SR        // status register
+};
 
-const char *const tlcs900_disassembler::s_mnemonic[] =
+struct tlcs900inst
+{
+	e_mnemonics mnemonic;
+	e_operand   operand1;
+	e_operand   operand2;
+};
+
+const char *const s_mnemonic[] =
 {
 	"adc", "add", "and", "andcf", "bit", "bs1b",
 	"bs1f", "call", "calr", "ccf", "chg", "cp",
@@ -49,8 +95,7 @@ const char *const tlcs900_disassembler::s_mnemonic[] =
 	"db", "db", "db", "db", "db", "db", "db"
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_80[256] =
+const tlcs900inst mnemonic_80[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -133,8 +178,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_80[256] =
 	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_88[256] =
+const tlcs900inst mnemonic_88[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -217,8 +261,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_88[256] =
 	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_90[256] =
+const tlcs900inst mnemonic_90[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -301,8 +344,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_90[256] =
 	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_98[256] =
+const tlcs900inst mnemonic_98[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -385,8 +427,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_98[256] =
 	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_a0[256] =
+const tlcs900inst mnemonic_a0[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -469,8 +510,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_a0[256] =
 	{ M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 },
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_b0[256] =
+const tlcs900inst mnemonic_b0[256] =
 {
 	/* 00 - 1F */
 	{ M_LD, O_M, O_I8 }, { M_DB, O_NONE, O_NONE }, { M_LD, O_M, O_I16 }, { M_DB, O_NONE, O_NONE },
@@ -553,8 +593,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_b0[256] =
 	{ M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }, { M_RET, O_CC, O_NONE }
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_b8[256] =
+const tlcs900inst mnemonic_b8[256] =
 {
 	/* 00 - 1F */
 	{ M_LD, O_M, O_I8 }, { M_DB, O_NONE, O_NONE }, { M_LD, O_M, O_I16 }, { M_DB, O_NONE, O_NONE },
@@ -637,8 +676,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_b8[256] =
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_c0[256] =
+const tlcs900inst mnemonic_c0[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -721,9 +759,8 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_c0[256] =
 	{ M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 }, { M_CP, O_M, O_C8 },
 };
 
-
-/* TODO: M_MUL_O_I8, M_MULS_O_I8, M_DIV_O_I8, M_DIVS_O_i8 need to be fixed */
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_c8[256] =
+// TODO: M_MUL_O_I8, M_MULS_O_I8, M_DIV_O_I8, M_DIVS_O_i8 need to be fixed
+const tlcs900inst mnemonic_c8[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LD, O_R, O_I8 },
@@ -806,8 +843,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_c8[256] =
 	{ M_SLA, O_A, O_R }, { M_SRA, O_A, O_R }, { M_SLL, O_A, O_R }, { M_SRL, O_A, O_R }
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_d0[256] =
+const tlcs900inst mnemonic_d0[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -890,8 +926,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_d0[256] =
 	{ M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 }, { M_CP, O_M, O_C16 },
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_d8[256] =
+const tlcs900inst mnemonic_d8[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LD, O_R, O_I16 },
@@ -974,8 +1009,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_d8[256] =
 	{ M_SLA, O_A, O_R }, { M_SRA, O_A, O_R }, { M_SLL, O_A, O_R }, { M_SRL, O_A, O_R }
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_e0[256] =
+const tlcs900inst mnemonic_e0[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE },
@@ -1058,8 +1092,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_e0[256] =
 	{ M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 }, { M_CP, O_M, O_C32 },
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_e8[256] =
+const tlcs900inst mnemonic_e8[256] =
 {
 	/* 00 - 1F */
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_LD, O_R, O_I32 },
@@ -1142,8 +1175,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_e8[256] =
 	{ M_SLA, O_A, O_R }, { M_SRA, O_A, O_R }, { M_SLL, O_A, O_R }, { M_SRL, O_A, O_R }
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_f0[256] =
+const tlcs900inst mnemonic_f0[256] =
 {
 	/* 00 - 1F */
 	{ M_LD, O_M, O_I8 }, { M_DB, O_NONE, O_NONE }, { M_LD, O_M, O_I16 }, { M_DB, O_NONE, O_NONE },
@@ -1226,8 +1258,7 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic_f0[256] =
 	{ M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }, { M_DB, O_NONE, O_NONE }
 };
 
-
-const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic[256] =
+const tlcs900inst mnemonic[256] =
 {
 	/* 00 - 1F */
 	{ M_NOP, O_NONE, O_NONE }, { M_NORMAL, O_NONE, O_NONE }, { M_PUSH, O_SR, O_NONE }, { M_POP, O_SR, O_NONE },
@@ -1311,12 +1342,11 @@ const tlcs900_disassembler::tlcs900inst tlcs900_disassembler::mnemonic[256] =
 };
 
 
-
-const char *const tlcs900_disassembler::s_reg8[8] = { "W", "A", "B", "C", "D", "E", "H", "L" };
-const char *const tlcs900_disassembler::s_reg16[8] = { "WA", "BC", "DE", "HL", "IX", "IY", "IZ", "SP" };
-const char *const tlcs900_disassembler::s_reg32[8] = { "XWA", "XBC", "XDE", "XHL", "XIX", "XIY", "XIZ", "XSP" };
-const char *const tlcs900_disassembler::s_mulreg16[8] = { "??", "WA", "??", "BC", "??", "DE", "??", "HL" };
-const char *const tlcs900_disassembler::s_allreg8[256] =
+const char *const s_reg8[8] = { "W", "A", "B", "C", "D", "E", "H", "L" };
+const char *const s_reg16[8] = { "WA", "BC", "DE", "HL", "IX", "IY", "IZ", "SP" };
+const char *const s_reg32[8] = { "XWA", "XBC", "XDE", "XHL", "XIX", "XIY", "XIZ", "XSP" };
+const char *const s_mulreg16[8] = { "??", "WA", "??", "BC", "??", "DE", "??", "HL" };
+const char *const s_allreg8[256] =
 {
 	"RA0" ,"RW0" ,"QA0" ,"QW0" ,"RC0" ,"RB0" ,"QC0" ,"QB0" ,"RE0" ,"RD0" ,"QE0" ,"QD0" ,"RL0" ,"RH0" ,"QL0" ,"QH0" ,
 	"RA1" ,"RW1" ,"QA1" ,"QW1" ,"RC1" ,"RB1" ,"QC1" ,"QB1" ,"RE1" ,"RD1" ,"QE1" ,"QD1" ,"RL1" ,"RH1" ,"QL1" ,"QH1" ,
@@ -1336,8 +1366,7 @@ const char *const tlcs900_disassembler::s_allreg8[256] =
 	"IXL" ,"IXH" ,"QIXL","QIXH","IYL" ,"IYH" ,"QIYL","QIYH","IZL" ,"IZH" ,"QIZL","QIZH","SPL" ,"SPH" ,"QSPL","QSPH",
 };
 
-
-const char *const tlcs900_disassembler::s_allreg16[256] =
+const char *const s_allreg16[256] =
 {
 	"RWA0","r01W","QWA0","r03W","RBC0","r05W","QBC0","r07W","RDE0","r09W","QDE0","r0BW","RHL0","r0DW","QHL0","r0FW",
 	"RWA1","r11W","QWA1","r13W","RBC1","r15W","QBC1","r17W","RDE1","r19W","QDE1","r1BW","RHL1","r1DW","QHL1","r1FW",
@@ -1357,8 +1386,7 @@ const char *const tlcs900_disassembler::s_allreg16[256] =
 	"IX"  ,"rF1W","QIX" ,"rF3W","IY"  ,"rF5W","QIY" ,"rF7W","IZ"  ,"rF9W","QIZ" ,"rFBW","SP"  ,"rFDW","QSP" ,"rFFW",
 };
 
-
-const char *const tlcs900_disassembler::s_allreg32[256] =
+const char *const s_allreg32[256] =
 {
 	"XWA0","XWA0","XWA0","r03L","XBC0","XBC0","XBC0","r07L","XDE0","XDE0","XDE0","r0BL","XHL0","XHL0","XHL0","r0FL",
 	"XWA1","XWA1","XWA1","r13L","XBC1","XBC1","XBC1","r17L","XDE1","XDE1","XDE1","r1BL","XHL1","XHL1","XHL1","r1FL",
@@ -1378,16 +1406,38 @@ const char *const tlcs900_disassembler::s_allreg32[256] =
 	"XIX" ,"XIX" ,"XIX" ,"rF3L","XIY" ,"XIY" ,"XIY" ,"rF7L","XIZ" ,"XIZ" ,"XIZ" ,"rFBL","XSP" ,"XSP" ,"XSP" ,"rFFL",
 };
 
-
-const char *const tlcs900_disassembler::s_cond[16] =
+const char *const s_cond[16] =
 {
 	"F","LT","LE","ULE","PE/OV","M/MI","Z","C","T","GE","GT","UGT","PO/NOV","P/PL","NZ","NC"
 };
 
+} // anonymous namespace
+
+
+template <typename T>
+std::string tlcs900_disassembler::address(T offset, int size) const
+{
+	auto const symbol = std::lower_bound(
+			m_symbols,
+			m_symbols + m_symbol_count,
+			offset,
+			[] (auto const &sym, u16 addr) { return sym.first < addr; });
+
+	if ((m_symbol_count != (symbol - m_symbols)) && (symbol->first == offset))
+		return symbol->second;
+	else
+		return util::string_format("0x%0*x", size/4, offset);
+}
 
 u32 tlcs900_disassembler::opcode_alignment() const
 {
 	return 1;
+}
+
+tlcs900_disassembler::tlcs900_disassembler()
+	: m_symbols(nullptr)
+	, m_symbol_count(0)
+{
 }
 
 offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)

@@ -20,6 +20,8 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 
 protected:
+	elan_eu3a05sys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -30,6 +32,14 @@ private:
 	uint8_t m_dmaparams[7];
 };
 
+
+class elan_eu3a13sys_device : public elan_eu3a05sys_device
+{
+public:
+	elan_eu3a13sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device)
+DECLARE_DEVICE_TYPE(ELAN_EU3A13_SYS, elan_eu3a13sys_device)
 
 #endif // MAME_TVGAMES_ELAN_EU3A05SYS_H

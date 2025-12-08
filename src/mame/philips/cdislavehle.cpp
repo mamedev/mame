@@ -141,59 +141,47 @@ void cdislave_hle_device::set_mouse_position()
 	m_device_mouse_y = ((m_in_buf[1] & 0x0f) << 6) | (m_in_buf[0] & 0x3f);
 }
 
+void cdislave_hle_device::slave_w_mouse(offs_t offset, uint16_t data)
+{
+	m_in_buf[m_in_index] = data & 0x00ff;
+	bool set_mouse = m_in_buf[0] >= 0xc0;
+	if (set_mouse)
+	{
+		if (m_in_index == 0)
+		{
+			LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff);
+			m_in_count = 3;
+		}
+		else
+		{
+			if (m_in_index == m_in_count - 1)
+			{
+				// Update Mouse Position
+				set_mouse_position();
+				memset(m_in_buf, 0, 17);
+				m_in_index = 0;
+				m_in_count = 0;
+				return;
+			}
+		}
+	}
+	else
+	{
+		LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
+		if (m_in_index == 0){
+			return;
+		}
+	}
+	m_in_index++;
+}
+
 void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 {
 	LOGMASKED(LOG_WRITES, "slave_w: Channel %d: %d = %02x\n", offset, m_in_index, data & 0x00ff);
 	switch (offset)
 	{
 		case 0:
-			if (m_in_index)
-			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
-				if (m_in_index == m_in_count)
-				{
-					switch (m_in_buf[0])
-					{
-						case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
-						case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
-						case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
-						case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
-						case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
-						case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
-						case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
-						case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff: // Update Mouse Position
-							set_mouse_position();
-							memset(m_in_buf, 0, 17);
-							m_in_index = 0;
-							m_in_count = 0;
-							break;
-					}
-				}
-			}
-			else
-			{
-				m_in_buf[m_in_index] = data & 0x00ff;
-				m_in_index++;
-				switch (data & 0x00ff)
-				{
-					case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
-					case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
-					case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
-					case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
-					case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
-					case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
-					case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7:
-					case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
-						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Update Mouse Position (0x%02x)\n", offset, data & 0x00ff);
-						m_in_count = 3;
-						break;
-					default:
-						LOGMASKED(LOG_COMMANDS | LOG_UNKNOWNS, "slave_w: Channel %d: Unknown register: %02x\n", offset, data & 0x00ff);
-						m_in_index = 0;
-						break;
-				}
-			}
+			slave_w_mouse(offset, data);
 			break;
 		case 1:
 			if (m_in_index)

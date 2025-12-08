@@ -27,7 +27,7 @@
 #define LOG_AD      (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL | LOG_IOPORT | LOG_TIMER | LOG_EPROM | LOG_AD)
-//#define LOG_OUTPUT_FUNC printf
+//#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGINT(...)     LOGMASKED(LOG_INT,    __VA_ARGS__)

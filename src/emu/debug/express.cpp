@@ -1341,7 +1341,7 @@ void parsed_expression::parse_string_into_tokens()
 				if (string[1] == '=')
 					string += 2, token.configure_operator(TVL_NOTEQUAL, 7);
 				else
-					string += 2, token.configure_operator(TVL_COMPLEMENT, 2);
+					string += 1, token.configure_operator(TVL_COMPLEMENT, 2);
 				break;
 
 			case '&':

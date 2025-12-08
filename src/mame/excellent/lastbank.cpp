@@ -8,16 +8,13 @@ Uses a TC0091LVC, a variant of the one used on Taito L HW
 
 Undumped games on similar hardware (ES-9402 or ES-9410):
 * Angel Fever
-* Lucky Pierrot / Wonder Circus
 * Miracle Seven
-* Miracle Seven - Heaven's Gate Turbo
 * Royal Choice Poker
 
 TODO:
 - lastbank: sprites should be clip masked during gameplay (verify);
 - fever13: OKI sound volume overdrives a lot;
-- goldstrk, wcircus: sound flags / latches are somewhat different, need correct implementation;
-- goldstrk: correct DIP definitions;
+- goldstrk, lpierrot, wcircus: sound flags / latches are somewhat different, need correct implementation;
 - hookup hopper device;
 
 **************************************************************************************************/
@@ -626,6 +623,38 @@ static INPUT_PORTS_START( mir7hg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mir7hgt )
+	PORT_INCLUDE( mir7hg )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Max Bet" ) PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "30" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Reach Speed" ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Quick" )
+	PORT_DIPNAME( 0x60, 0x60, "Pool Limit" ) PORT_DIPLOCATION("DSW2:6,7")
+	PORT_DIPSETTING(    0x60, "100" )
+	PORT_DIPSETTING(    0x40, "300" )
+	PORT_DIPSETTING(    0x20, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "Coin C" ) PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 9C_1C ) )
+
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet" ) PORT_DIPLOCATION("DSW4:2,3")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x00, "30" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( wcircus )
 	PORT_INCLUDE( fever13 )
 
@@ -730,6 +759,43 @@ static INPUT_PORTS_START( wcircus )
 	PORT_DIPSETTING(    0x00, "Small / Big / W-Up" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lpierrot )
+	PORT_INCLUDE( wcircus )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6") // no effect in test mode
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( goldstrk )
+	PORT_INCLUDE( wcircus )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Max Bet" ) PORT_DIPLOCATION("DSW1:1,2")
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "50" )
+	PORT_DIPSETTING(    0x01, "100" )
+	PORT_DIPSETTING(    0x00, "200" )
+	PORT_DIPNAME( 0x10, 0x10, "Reel Stop Speed" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPNAME( 0x40, 0x40, "Double Up Game" ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Double Up Type" ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, "A" )
+	PORT_DIPSETTING(    0x00, "B" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::scanline_cb)
 {
@@ -791,7 +857,7 @@ void lastbank_state::lastbank(machine_config &config)
 
 	msm6585_device &msm(MSM6585(config, "msm", 640_kHz_XTAL));
 	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
-	msm.set_prescaler_selector(msm6585_device::S40); /* Not verified */
+	msm.set_prescaler_selector(msm6585_device::S40); // Not verified
 	msm.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// A RTC-62421 is present on the Last Bank PCB. However, the code
@@ -880,6 +946,24 @@ ROM_START( mir7hg ) // v1.0.2 Feb 19 1996 15:05:17
 	ROM_LOAD( "5.u60", 0x00000, 0x80000, CRC(13d8c30a) SHA1(1a2dc0c97992e9e1d73c5f3f713db8599d2d2285) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+// ES-9402 PCB
+ROM_START( mir7hgt )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "2.u9", 0x00000, 0x40000, CRC(691c46a7) SHA1(ceca506cf5f49974dc6f78aa7ec3618356641c42) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(895da366) SHA1(4e82e2ee9b6a91453b8dca9f313714ef846dec56) ) // same as mir7hg, 11111xxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "1.u11", 0x00000, 0x80000, CRC(d9b94979) SHA1(d536ecd92fde57b322c040a0ee15c9ef18fe0ebb) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u55", 0x00000, 0x40000, CRC(04114b83) SHA1(d1b4fcb0a2dc81a938c1e63dab5a43c2e628542e) ) // same as mir7hg, 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "5.u60", 0x00000, 0x80000, CRC(13d8c30a) SHA1(1a2dc0c97992e9e1d73c5f3f713db8599d2d2285) ) // same as mir7hg, 11xxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 ROM_START( wcircus )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "6.u9", 0x00000, 0x40000, CRC(6cb29023) SHA1(e1a980f789d4c66ddd80e819d0a94991a5ad1f2b) )
@@ -918,12 +1002,35 @@ ROM_START( goldstrk )
 	ROM_LOAD( "7.gsbgm.u60", 0x00000, 0x80000, CRC(04952e51) SHA1(272283306d9ec951baa85cb8e2d8952da7a98894) )
 ROM_END
 
+// ES-9402 PCB
+ROM_START( lpierrot )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "6.u9", 0x00000, 0x40000, CRC(13565453) SHA1(3b0e9b1435ae6cbcb93874c14d3c9413878188d7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(ec8a0ccc) SHA1(84ffb5c9614764500f41cff8f0d6d5ad9f0d8084) ) // same as wcircus and goldstrk
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "27c802.u11", 0x000000, 0x100000, CRC(fefee118) SHA1(21c81e4a7d5ac86e1ebb452647a1908fd4ee9600) ) // same as wcircus, 1xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "5s.u55", 0x00000, 0x40000, CRC(390911e9) SHA1(10ed6fca1a0d183f47c231503a3077faab0d593e) ) // same as wcircus, 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(d018ed97) SHA1(02eb6559805f81f371d39b9c0660cd6d9d392656) ) // same as wcircus
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8b.u45", 0x000, 0x117, CRC(02e1f2e9) SHA1(25ae98facfed2796bfc1ad33cce73c5074edd135) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1994, lastbank, 0,       lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1995, ukiyobox, fever13, lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, wcircus,  0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, goldstrk, 0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank, 0,       lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, ukiyobox, fever13, lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hgt,  0,       lastbank, mir7hgt,  fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate Turbo (Japan, v2.0.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, wcircus,  0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, lpierrot, 0,       lastbank, lpierrot, wcircus_state,  empty_init, ROT0, "Cobra",            "Lucky Pierrot (Japan, v1.1.0B)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, goldstrk, 0,       lastbank, goldstrk, wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

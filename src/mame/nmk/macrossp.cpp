@@ -1025,8 +1025,8 @@ void macrossp_state::macrossp(machine_config &config)
 	ensoniq.set_addrmap(1, &macrossp_state::es5506_bank1_map);
 	ensoniq.set_channels(1);
 	ensoniq.irq_cb().set(FUNC(macrossp_state::irqhandler));
-	ensoniq.add_route(0, "speaker", 0.1, 0);
-	ensoniq.add_route(1, "speaker", 0.1, 1);
+	ensoniq.add_route(0, "speaker", 1.6, 0);
+	ensoniq.add_route(1, "speaker", 1.6, 1);
 }
 
 void macrossp_state::quizmoon(machine_config &config)

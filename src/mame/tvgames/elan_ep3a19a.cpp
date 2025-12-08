@@ -252,7 +252,7 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_ep3a19a_state::elan_ep3a19a_map);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_ep3a19a_state::interrupt));
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&elan_ep3a19a_state::elan_ep3a19a_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&elan_ep3a19a_state::elan_ep3a19a_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -272,17 +272,14 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 	m_gpio->read_2_callback().set_ioport("IN2");
 
 	ELAN_EP3A19A_SYS(config, m_sys, 0);
-	m_sys->set_cpu("maincpu");
-	m_sys->set_addrbank("bank");
+	m_sys->set_cpu(m_maincpu);
+	m_sys->set_addrbank(m_bank);
 
-	ELAN_EU3A05_VID(config, m_vid, 0);
-	m_vid->set_cpu("maincpu");
-	m_vid->set_addrbank("bank");
-	m_vid->set_palette("palette");
+	ELAN_EP3A19A_VID(config, m_vid, 0);
+	m_vid->set_cpu(m_maincpu);
+	m_vid->set_addrbank(m_bank);
+	m_vid->set_palette(m_palette);
 	m_vid->set_entries(256);
-	m_vid->set_is_pvmilfin();
-	m_vid->set_use_spritepages();
-	m_vid->set_force_basic_scroll();
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

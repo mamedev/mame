@@ -612,7 +612,7 @@ ROM_START( emirage )
 	ROM_LOAD("1996_7012_excalibur_hd6433256a33p.ic1", 0x0000, 0xc000, CRC(41eed8ea) SHA1(8b5370814d2bfc2d5fcb4ee86c30d676517bcd3a) )
 
 	ROM_REGION( 109652, "screen", 0 )
-	ROM_LOAD("regency.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
+	ROM_LOAD("kchal.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
 ROM_END
 
 } // anonymous namespace

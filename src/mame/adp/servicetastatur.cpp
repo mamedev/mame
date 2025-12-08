@@ -40,7 +40,7 @@ ___| XTAL  80C31          +KEYPAD+       |__
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/i2cmem.h"
 #include "video/hd44780.h"
 #include "emupal.h"
@@ -97,7 +97,7 @@ private:
 	uint8_t bus_r(offs_t offset);
 	void bus_w(offs_t offset, uint8_t data);
 
-	void servicet_io(address_map &map) ATTR_COLD;
+	void servicet_data(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
 
 	HD44780_PIXEL_UPDATE(servicet_pixel_update);
@@ -117,7 +117,7 @@ void servicet_state::servicet_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void servicet_state::servicet_io(address_map &map)
+void servicet_state::servicet_data(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(servicet_state::bus_r), FUNC(servicet_state::bus_w));
 }
@@ -283,7 +283,7 @@ void servicet_state::servicet(machine_config &config)
 {
 	I80C31(config, m_maincpu, 11.0592_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &servicet_state::servicet_map);
-	m_maincpu->set_addrmap(AS_IO, &servicet_state::servicet_io);
+	m_maincpu->set_addrmap(AS_DATA, &servicet_state::servicet_data);
 
 	m_maincpu->port_in_cb<1>().set(FUNC(servicet_state::port1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(servicet_state::port1_w));

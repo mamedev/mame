@@ -4050,15 +4050,15 @@ void vgmplay_state::vgmplay(machine_config &config)
 	// TODO m_es5505[0]->set_addrmap(0, &vgmplay_state::es5505_map<0>);
 	// TODO m_es5505[0]->set_addrmap(1, &vgmplay_state::es5505_map<0>);
 	m_es5505[0]->set_channels(1);
-	m_es5505[0]->add_route(0, m_viz, 0.5, 0);
-	m_es5505[0]->add_route(1, m_viz, 0.5, 1);
+	m_es5505[0]->add_route(0, m_viz, 8.0, 0);
+	m_es5505[0]->add_route(1, m_viz, 8.0, 1);
 
 	ES5505(config, m_es5505[1], 0);
 	// TODO m_es5505[1]->set_addrmap(0, &vgmplay_state::es5505_map<1>);
 	// TODO m_es5505[1]->set_addrmap(1, &vgmplay_state::es5505_map<1>);
 	m_es5505[1]->set_channels(1);
-	m_es5505[1]->add_route(0, m_viz, 0.5, 0);
-	m_es5505[1]->add_route(1, m_viz, 0.5, 1);
+	m_es5505[1]->add_route(0, m_viz, 8.0, 0);
+	m_es5505[1]->add_route(1, m_viz, 8.0, 1);
 
 	X1_010(config, m_x1_010[0], 0);
 	m_x1_010[0]->set_addrmap(0, &vgmplay_state::x1_010_map<0>);

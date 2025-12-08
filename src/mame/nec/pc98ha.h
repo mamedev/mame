@@ -13,13 +13,16 @@
 
 #include "pc9801.h"
 
+#include "machine/input_merger.h"
+
 class pc98lt_state : public pc98_base_state
 {
 public:
 	pc98lt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc98_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_fdc(*this, "upd765")
+		, m_fdc(*this, "fdc")
+		, m_fdc_irqs(*this, "fdc_irqs")
 		, m_gvram(*this, "gvram")
 		, m_bram_bank(*this, "bram_bank")
 		, m_dict_bank(*this, "dict_bank")
@@ -37,9 +40,10 @@ protected:
 	required_device<v50_device> m_maincpu;
 
 	virtual void machine_start() override ATTR_COLD;
-//  virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 private:
 	required_device<upd765a_device> m_fdc;
+	required_device<input_merger_device> m_fdc_irqs;
 	required_shared_ptr<uint16_t> m_gvram;
 	std::unique_ptr<uint16_t[]> m_bram_ptr;
 	required_memory_bank m_bram_bank;
@@ -64,6 +68,10 @@ private:
 
 	u8 m_floppy_mode = 0;
 	u8 m_fdc_ctrl = 0;
+	int m_dack;
+	void tc_w(int state);
+	emu_timer *m_vfo_timer;
+	TIMER_CALLBACK_MEMBER(vfo_timer_cb);
 
 	virtual void uart_irq_check() override;
 };

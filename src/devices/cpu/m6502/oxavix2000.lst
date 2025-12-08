@@ -327,8 +327,10 @@ decpb_imp
 	prefetch();
 
 orapa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
+	TMP = read_full_data(m_pa);
+	A |= TMP;
+	set_nz(A);
 	prefetch();
 
 andpa_imp
@@ -339,8 +341,10 @@ andpa_imp
 	prefetch();
 
 eorpa_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
+	TMP = read_full_data(m_pa);
+	A ^= TMP;
+	set_nz(A);
 	prefetch();
 
 adcpa_imp
@@ -366,18 +370,24 @@ sbcpa_imp
 	prefetch();
 
 orapb_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
+	TMP = read_full_data(m_pb);
+	A |= TMP;
+	set_nz(A);
 	prefetch();
 
 andpb_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
+	TMP = read_full_data(m_pb);
+	A &= TMP;
+	set_nz(A);
 	prefetch();
 
 eorpb_imp
-	fatalerror("unhandled opcode %02x%04x: %02x\n", m_codebank, PPC, inst_state);
 	read_pc();
+	TMP = read_full_data(m_pb);
+	A ^= TMP;
+	set_nz(A);
 	prefetch();
 
 adcpb_imp

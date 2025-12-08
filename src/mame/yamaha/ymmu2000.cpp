@@ -113,7 +113,7 @@ protected:
 	required_device<sci4_device> m_sci;
 	required_device<mulcd_device> m_lcd;
 	required_shared_ptr<u32> m_ram;
-	required_device_array<plg1x0_connector, 3> m_ext;
+	optional_device_array<plg1x0_connector, 3> m_ext;
 	required_ioport_array<6> m_ioports;
 
 	u16 m_pe;
@@ -190,9 +190,9 @@ u16 mu500_state::pe_r()
 	if(BIT(m_pe, 4)) {
 		if(BIT(m_pe, 0)) {
 			if(BIT(m_pe, 2))
-				return m_lcd->data_read() << 8;
+				return m_lcd->data_r() << 8;
 			else
-				return m_lcd->control_read() << 8;
+				return m_lcd->control_r() << 8;
 		} else
 			return 0x0000;
 	}
@@ -205,9 +205,9 @@ void mu500_state::pe_w(u16 data)
 	if(BIT(m_pe, 4) && !BIT(data, 4)) {
 		if(!BIT(data, 0)) {
 			if(BIT(data, 2))
-				m_lcd->data_write(data >> 8);
+				m_lcd->data_w(data >> 8);
 			else
-				m_lcd->control_write(data >> 8);
+				m_lcd->control_w(data >> 8);
 		}
 	}
 
@@ -318,7 +318,8 @@ void mu2000_state::map_2000(address_map &map)
 
 void mu500_state::swp30_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rom().region("swp30", 0);
+	map(0x0000000, 0x07fffff).rom().region("swp30", 0);
+	map(0x1000000, 0x1100000).ram().share("samples");
 }
 
 void mu500_state::mu500(machine_config &config)
@@ -367,18 +368,6 @@ void mu500_state::mu500(machine_config &config)
 	midiout_slot(mdout);
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
-	PLG1X0_CONNECTOR(config, m_ext[0], plg1x0_intf, nullptr);
-	m_ext[0]->midi_tx().set(m_sci, FUNC(sci4_device::rx_w<30>));
-	m_sci->write_tx<30>().set(m_ext[0], FUNC(plg1x0_connector::midi_rx));
-
-	PLG1X0_CONNECTOR(config, m_ext[1], plg1x0_intf, nullptr);
-	m_ext[1]->midi_tx().set(m_sci, FUNC(sci4_device::rx_w<31>));
-	m_sci->write_tx<31>().set(m_ext[1], FUNC(plg1x0_connector::midi_rx));
-
-	PLG1X0_CONNECTOR(config, m_ext[2], plg1x0_intf, nullptr);
-	m_ext[2]->midi_tx().set(m_sci, FUNC(sci4_device::rx_w<32>));
-	m_sci->write_tx<32>().set(m_ext[2], FUNC(plg1x0_connector::midi_rx));
-
 	config.set_default_layout(layout_mu128);
 }
 
@@ -389,8 +378,55 @@ void mu1000_state::mu1000(machine_config &config)
 
 	SWP30(config, m_swp30s);
 	m_swp30s->set_addrmap(AS_DATA, &mu1000_state::swp30_map);
-	m_swp30s->add_route(0, "speaker", 1.0, 0);
-	m_swp30s->add_route(1, "speaker", 1.0, 1);
+
+	m_swp30s->add_route( 0+4, m_swp30m, 1.0,  0);
+	m_swp30s->add_route( 1+4, m_swp30m, 1.0,  1);
+	m_swp30s->add_route( 2+4, m_swp30m, 1.0,  2);
+	m_swp30s->add_route( 3+4, m_swp30m, 1.0,  3);
+	m_swp30s->add_route( 4+4, m_swp30m, 1.0,  4);
+	m_swp30s->add_route( 5+4, m_swp30m, 1.0,  5);
+	m_swp30s->add_route( 6+4, m_swp30m, 1.0,  6);
+	m_swp30s->add_route( 7+4, m_swp30m, 1.0,  7);
+	m_swp30s->add_route( 8+4, m_swp30m, 1.0,  8);
+	m_swp30s->add_route( 9+4, m_swp30m, 1.0,  9);
+	m_swp30s->add_route(10+4, m_swp30m, 1.0, 10);
+	m_swp30s->add_route(11+4, m_swp30m, 1.0, 11);
+	m_swp30s->add_route(12+4, m_swp30m, 1.0, 12);
+	m_swp30s->add_route(13+4, m_swp30m, 1.0, 13);
+
+	m_swp30m->add_route( 0+4, m_swp30s, 1.0,  0);
+	m_swp30m->add_route( 1+4, m_swp30s, 1.0,  1);
+	m_swp30m->add_route( 2+4, m_swp30s, 1.0,  2);
+	m_swp30m->add_route( 3+4, m_swp30s, 1.0,  3);
+	m_swp30m->add_route( 4+4, m_swp30s, 1.0,  4);
+	m_swp30m->add_route( 5+4, m_swp30s, 1.0,  5);
+	m_swp30m->add_route( 8+4, m_swp30s, 1.0,  8);
+	m_swp30m->add_route( 9+4, m_swp30s, 1.0,  9);
+
+
+	PLG1X0_CONNECTOR(config, m_ext[0], plg1x0_intf, nullptr);
+	m_ext[0]->midi_tx().set(m_sci, FUNC(sci4_device::rx_w<30>));
+	m_sci->write_tx<30>().set(m_ext[0], FUNC(plg1x0_connector::midi_rx));
+	m_swp30s->add_route(14+4, m_ext[0], 1.0,  0);
+	m_swp30s->add_route(15+4, m_ext[0], 1.0,  1);
+	m_ext[0]->add_route(0, m_swp30s, 1.0, 10);
+	m_ext[0]->add_route(0, m_swp30s, 1.0, 11);
+
+	PLG1X0_CONNECTOR(config, m_ext[1], plg1x0_intf, nullptr);
+	m_ext[1]->midi_tx().set(m_sci, FUNC(sci4_device::rx_w<31>));
+	m_sci->write_tx<31>().set(m_ext[1], FUNC(plg1x0_connector::midi_rx));
+	m_swp30s->add_route(14+4, m_ext[1], 1.0,  0);
+	m_swp30s->add_route(15+4, m_ext[1], 1.0,  1);
+	m_ext[1]->add_route(0, m_swp30s, 1.0, 12);
+	m_ext[1]->add_route(0, m_swp30s, 1.0, 13);
+
+	PLG1X0_CONNECTOR(config, m_ext[2], plg1x0_intf, nullptr);
+	m_ext[2]->midi_tx().set(m_sci, FUNC(sci4_device::rx_w<32>));
+	m_sci->write_tx<32>().set(m_ext[2], FUNC(plg1x0_connector::midi_rx));
+	m_swp30s->add_route(14+4, m_ext[2], 1.0,  0);
+	m_swp30s->add_route(15+4, m_ext[2], 1.0,  1);
+	m_ext[2]->add_route(0, m_swp30s, 1.0, 14);
+	m_ext[2]->add_route(0, m_swp30s, 1.0, 15);
 }
 
 void mu2000_state::mu2000(machine_config &config)
@@ -451,6 +487,6 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2000, mu500,  0,     0, mu500,  mu500, mu500_state,  empty_init, "Yamaha", "MU500",  MACHINE_NOT_WORKING )
-CONS( 1999, mu1000, mu500, 0, mu1000, mu500, mu1000_state, empty_init, "Yamaha", "MU1000", MACHINE_NOT_WORKING )
-CONS( 1999, mu2000, mu500, 0, mu2000, mu500, mu2000_state, empty_init, "Yamaha", "MU2000", MACHINE_NOT_WORKING )
+CONS( 2000, mu500,  0,     0, mu500,  mu500, mu500_state,  empty_init, "Yamaha", "MU500",  MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+CONS( 1999, mu1000, mu500, 0, mu1000, mu500, mu1000_state, empty_init, "Yamaha", "MU1000", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+CONS( 1999, mu2000, mu500, 0, mu2000, mu500, mu2000_state, empty_init, "Yamaha", "MU2000", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

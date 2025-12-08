@@ -94,7 +94,8 @@ bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const st
 			sectors[track][head][sector - 1].size = SECTOR_SIZE >> 8;
 			sectors[track][head][sector - 1].actual_size = SECTOR_SIZE;
 			sectors[track][head][sector - 1].deleted = false;
-			sectors[track][head][sector - 1].bad_crc = false;
+			sectors[track][head][sector - 1].bad_data_crc = false;
+			sectors[track][head][sector - 1].bad_addr_crc = false;
 
 			// read sector data
 			switch (compression)

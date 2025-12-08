@@ -197,6 +197,8 @@ machine:popmessage([msg])
 machine:logerror(msg)
     Writes the message to the machine error log.  This may be displayed in a
     debugger window, written to a file, or written to the standard error output.
+machine:side_effects_disabled()
+    Returns a Boolean indicating whether side effects are disabled.
 
 Properties
 ~~~~~~~~~~

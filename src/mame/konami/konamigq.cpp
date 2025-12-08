@@ -101,7 +101,8 @@ public:
 		m_dasp(*this, "dasp"),
 		m_ncr53cf96(*this, "scsi:7:ncr53cf96"),
 		m_k056800(*this, "k056800"),
-		m_pcmram(*this, "pcmram")
+		m_pcmram(*this, "pcmram"),
+		m_duart(*this, "duart")
 	{
 	}
 
@@ -118,6 +119,7 @@ private:
 	required_device<ncr53cf96_device> m_ncr53cf96;
 	required_device<k056800_device> m_k056800;
 	required_shared_ptr<uint8_t> m_pcmram;
+	required_device<mb89371_device> m_duart;
 
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_intck = 0;
@@ -201,7 +203,8 @@ void konamigq_state::konamigq_map(address_map &map)
 	map(0x1f230004, 0x1f230007).portr("P3_SERVICE");
 	map(0x1f238000, 0x1f238003).portr("DSW");
 	map(0x1f300000, 0x1f5fffff).rw(FUNC(konamigq_state::pcmram_r), FUNC(konamigq_state::pcmram_w)).umask32(0x00ff00ff);
-	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f680000, 0x1f680007).rw(m_duart, FUNC(mb89371_device::read<0>), FUNC(mb89371_device::write<0>)).umask32(0x00ff00ff);
+	map(0x1f680008, 0x1f68000f).rw(m_duart, FUNC(mb89371_device::read<1>), FUNC(mb89371_device::write<1>)).umask32(0x00ff00ff);
 	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
 }
 
@@ -339,6 +342,8 @@ void konamigq_state::machine_reset()
 	m_dma_offset = 0;
 	m_dma_size = 0;
 	m_dma_requested = m_dma_is_write = false;
+
+	m_duart->write_cts<0>(CLEAR_LINE);
 }
 
 void konamigq_state::konamigq(machine_config &config)
@@ -357,7 +362,7 @@ void konamigq_state::konamigq(machine_config &config)
 	m_dasp->set_addrmap(AS_DATA, &konamigq_state::konamigq_dasp_map);
 	m_dasp->set_periodic_int(FUNC(konamigq_state::tms_sync), attotime::from_hz(48000));
 
-	MB89371(config, "mb89371", 0);
+	MB89371(config, m_duart, 4_MHz_XTAL);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(konamigq_def_eeprom, 128);
 

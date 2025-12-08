@@ -60,7 +60,7 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void chesskng(machine_config &config);
+	void chesskng(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -189,12 +189,9 @@ DEVICE_IMAGE_LOAD_MEMBER(chessking_state::cart_load)
 
 uint8_t chessking_state::cartridge_r(offs_t offset)
 {
-	// bank 1 selects main rom
-	if (m_cart_bank == 1)
+	if (m_cart_bank == 1) // bank 1 selects main rom
 		return m_mainrom[offset & 0x3ffff];
-
-	// banks 4-7 go to cartridge
-	else if (m_cart_bank >= 4)
+	else if (m_cart_bank >= 4) // banks 4-7 go to cartridge
 		return m_cart->read_rom(offset | (m_cart_bank & 3) << 19);
 
 	// other banks: maybe cartridge too?

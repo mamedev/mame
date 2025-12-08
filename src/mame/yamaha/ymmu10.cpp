@@ -6,9 +6,9 @@
                    tone module
     Driver by R. Belmont and O. Galibert
 
-    Essentially a screen-less MU10 (SWP00, identical wave rom) with a gate-array based
-    hack to connect the wave rom space to the adcs so that effects can be applied to
-    analog inputs.  Entirely controlled through midi.
+    Essentially a screen-less MU50 (SWP00, identical wave rom) with a gate-array based
+    hack to connect the wave rom space to the adc so that effects can be applied to
+    the analog input.  Entirely controlled through midi.
 
 **************************************************************************************/
 
@@ -17,6 +17,7 @@
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83002.h"
+#include "sound/adc.h"
 #include "sound/swp00.h"
 #include "machine/nvram.h"
 
@@ -26,9 +27,6 @@
 
 namespace {
 
-static INPUT_PORTS_START( mu10 )
-INPUT_PORTS_END
-
 class mu10_state : public driver_device
 {
 public:
@@ -37,6 +35,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_nvram(*this, "ram")
 		, m_swp00(*this, "swp00")
+		, m_adc(*this, "adc")
+		, m_port_ad(*this, "AD")
 		, m_ram(*this, "ram")
 	{ }
 
@@ -46,6 +46,8 @@ private:
 	required_device<h83002_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_device<swp00_device> m_swp00;
+	required_device<adc16_device> m_adc;
+	required_ioport m_port_ad;
 	required_shared_ptr<u16> m_ram;
 
 	u8 cur_p6, cur_pa, cur_pb;
@@ -53,12 +55,15 @@ private:
 	u16 adc_battery_r();
 	u16 adc_midisw_r();
 
+	u8 ad_r(offs_t offset);
+
 	void p6_w(u8 data);
 	void pa_w(u8 data);
 	void pb_w(u8 data);
 	u8 pb_r();
 
 	void mu10_map(address_map &map) ATTR_COLD;
+	void swp00_map(address_map &map) ATTR_COLD;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -80,6 +85,25 @@ void mu10_state::mu10_map(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x400000, 0x4007ff).m(m_swp00, FUNC(swp00_device::map));
 	map(0x600000, 0x607fff).ram().share(m_ram); // 32K work RAM
+}
+
+void mu10_state::swp00_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("swp00", 0);
+	map(0xc00000, 0xffffff).r(FUNC(mu10_state::ad_r));
+}
+
+static INPUT_PORTS_START( mu10 )
+	PORT_START("AD")
+	PORT_CONFNAME(0x08, 0x08, "A/D input connected")
+	PORT_CONFSETTING(   0x08, "No")
+	PORT_CONFSETTING(   0x00, "Yes")
+INPUT_PORTS_END
+
+u8 mu10_state::ad_r(offs_t offset)
+{
+	// Using mirror makes the install horrible slow
+	return offset & 1 ? m_adc->read8h() : m_adc->read8l();
 }
 
 // Battery level
@@ -113,7 +137,7 @@ void mu10_state::pb_w(u8 data)
 u8 mu10_state::pb_r()
 {
 	// bit 3 = a/d plugged in
-	return 8;
+	return m_port_ad->read();
 }
 
 void mu10_state::pa_w(u8 data)
@@ -127,6 +151,9 @@ void mu10_state::mu10(machine_config &config)
 	H83002(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mu10_state::mu10_map);
 	m_maincpu->read_adc<0>().set(FUNC(mu10_state::adc_battery_r));
+	m_maincpu->read_adc<1>().set_constant(0);
+	m_maincpu->read_adc<2>().set_constant(0);
+	m_maincpu->read_adc<3>().set_constant(0);
 	m_maincpu->read_adc<4>().set_constant(0);
 	m_maincpu->read_adc<5>().set_constant(0);
 	m_maincpu->read_adc<6>().set_constant(0);
@@ -139,10 +166,15 @@ void mu10_state::mu10(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	SPEAKER(config, "speaker", 2).front();
+	MICROPHONE(config, "ad", 1).front_center().add_route(0, m_adc, 1.0, 0);
+
+	ADC16(config, m_adc, 44100);
 
 	SWP00(config, m_swp00);
 	m_swp00->add_route(0, "speaker", 1.0, 0);
 	m_swp00->add_route(1, "speaker", 1.0, 1);
+	m_swp00->set_addrmap(0, &mu10_state::swp00_map);
+	m_swp00->require_sync();
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);

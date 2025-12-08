@@ -55,6 +55,17 @@ if (VIDEOS["YM7101"]~=null) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/devices/video/82c425.h,VIDEOS["82C425"] = true
+--------------------------------------------------
+
+if (VIDEOS["82C425"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/82c425.cpp",
+		MAME_DIR .. "src/devices/video/82c425.h",
+	}
+end
 
 --------------------------------------------------
 --

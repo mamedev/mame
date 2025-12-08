@@ -39,6 +39,7 @@ protected:
 	virtual u8 read_inh_rom(u16 offset) override;
 	virtual void write_inh_rom(u16 offset, u8 data) override;
 	virtual bool inh_check(uint16_t offset, bool bIsWrite) override;
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<apple2_gameio_device> m_gameio;

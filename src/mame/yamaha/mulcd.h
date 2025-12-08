@@ -14,17 +14,13 @@
 
 DECLARE_DEVICE_TYPE(MULCD, mulcd_device)
 
-class mulcd_device : public device_t
+class mulcd_device : public hd44780_base_device
 {
 public:
-	mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 270000);
 
 	void set_contrast(u8 contrast);
 	void set_leds(u16 leds);
-	u8 data_read() { return m_lcd->data_r(); }
-	u8 control_read() { return m_lcd->control_r(); }
-	void data_write(u8 data) { m_lcd->data_w(data); }
-	void control_write(u8 data) { m_lcd->control_w(data); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -33,12 +29,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	required_device<hd44780_device> m_lcd;
 	output_finder<64, 8, 5> m_outputs;
 	output_finder<> m_contrast;
 	output_finder<10> m_led_outputs;
 
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 mu_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #endif // MAME_YAMAHA_MULCD_H

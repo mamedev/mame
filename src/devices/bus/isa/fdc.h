@@ -135,8 +135,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void aux_irq_w(int state);
-
 	required_device<bus_mouse_device> m_bus_mouse;
 };
 

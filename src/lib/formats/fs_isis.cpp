@@ -16,6 +16,7 @@
 #include "strformat.h"
 
 #include <bitset>
+#include <stdexcept>
 
 using namespace fs;
 using namespace std::literals;

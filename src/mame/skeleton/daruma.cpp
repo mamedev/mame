@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 //TODO: #include "ds348.lh"
@@ -41,7 +41,7 @@ private:
 	uint8_t dev4_r();
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	void mem_io(address_map &map) ATTR_COLD;
+	void mem_data(address_map &map) ATTR_COLD;
 	void mem_prg(address_map &map) ATTR_COLD;
 };
 
@@ -93,7 +93,7 @@ void daruma_state::mem_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void daruma_state::mem_io(address_map &map)
+void daruma_state::mem_data(address_map &map)
 {
 	map(0x0000, 0x0000).r(FUNC(daruma_state::dev0_r));
 	map(0x1000, 0x1000).w(FUNC(daruma_state::dev1_w));
@@ -126,7 +126,7 @@ void daruma_state::daruma(machine_config &config)
 	/* basic machine hardware */
 	I80C32(config, m_maincpu, 11059200); //verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &daruma_state::mem_prg);
-	m_maincpu->set_addrmap(AS_IO, &daruma_state::mem_io);
+	m_maincpu->set_addrmap(AS_DATA, &daruma_state::mem_data);
 	// TODO: ports
 
 	/* sound hardware */

@@ -21,7 +21,7 @@ TODO: add GAL logic to route the ROMs to the DAC and output that onto a screen
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/saa1043.h"
 
 #include "pm5644.lh"
@@ -50,7 +50,6 @@ protected:
 
 private:
 	void i80c31_data(address_map &map) ATTR_COLD;
-	void i80c31_io(address_map &map) ATTR_COLD;
 	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	u8 i80c31_p1_r();
@@ -74,7 +73,7 @@ void patgen_state::i80c31_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void patgen_state::i80c31_io(address_map &map)
+void patgen_state::i80c31_data(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x8000).r(FUNC(patgen_state::keyboard_r));
@@ -82,11 +81,6 @@ void patgen_state::i80c31_io(address_map &map)
 	map(0x8004, 0x8004).w(FUNC(patgen_state::control_w));
 	map(0x8005, 0x8005).w(FUNC(patgen_state::ch1_w));
 	map(0x8006, 0x8006).w(FUNC(patgen_state::ch23_w));
-}
-
-void patgen_state::i80c31_data(address_map &map)
-{
-	map(0x000, 0x1ff).ram();
 }
 
 u8 patgen_state::i80c31_p1_r()
@@ -210,7 +204,6 @@ void patgen_state::patgen(machine_config &config)
 	I80C31(config, m_maincpu, 16_MHz_XTAL); // Philips PCB80C31BH
 	m_maincpu->set_addrmap(AS_PROGRAM, &patgen_state::i80c31_prg);
 	m_maincpu->set_addrmap(AS_DATA, &patgen_state::i80c31_data);
-	m_maincpu->set_addrmap(AS_IO, &patgen_state::i80c31_io);
 	m_maincpu->port_in_cb<1>().set(FUNC(patgen_state::i80c31_p1_r));
 
 	saa1043_device &saa1043(SAA1043(config, "saa1043", XTAL(5'000'000)));

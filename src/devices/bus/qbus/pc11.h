@@ -59,6 +59,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(read_tick);
 
 private:
+	bool m_installed;
 	int m_rxvec;
 	int m_txvec;
 

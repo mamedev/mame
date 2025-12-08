@@ -1937,7 +1937,7 @@ void segas16b_state::spin_68k_w(uint8_t data)
 	m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(20000));
 }
 
-void segas16b_state::mcu_io_map(address_map &map)
+void segas16b_state::mcu_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -4162,7 +4162,7 @@ void segas16b_state::system16b_i8751(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::i8751_main_cpu_vblank));
 
 	I8751(config, m_mcu, MASTER_CLOCK_8MHz);
-	m_mcu->set_addrmap(AS_IO, &segas16b_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas16b_state::mcu_data_map);
 	m_mcu->port_in_cb<1>().set_ioport("SERVICE");
 	m_mcu->port_out_cb<1>().set(FUNC(segas16b_state::spin_68k_w));
 

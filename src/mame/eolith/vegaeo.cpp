@@ -298,7 +298,7 @@ ROM_END
 void vegaeo_state::init_vegaeo()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000->cpu().space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	init_speedup();

@@ -152,7 +152,7 @@ void kn5000_state::maincpu_mem(address_map &map)
 	map(0x140000, 0x14ffff).r(m_maincpu_latch, FUNC(generic_latch_8_device::read)); // @ IC23
 	map(0x140000, 0x14ffff).w(m_subcpu_latch, FUNC(generic_latch_8_device::write)); // @ IC22
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
-	map(0x1a0000, 0x1bffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
+	map(0x1a0000, 0x1dffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram(); // 1Mbit SRAM @ IC21 (CS0)  Note: I think this is the message "ERROR in back-up SRAM"
 	map(0x300000, 0x3fffff).rom().region("custom_data", 0); // 8MBit FLASH ROM @ IC19 (CS5)
 	map(0x400000, 0x7fffff).rom().region("rhythm_data", 0); // 32MBit ROM @ IC14 (A22=1 and CS5)
@@ -772,6 +772,7 @@ void kn5000_state::kn5000(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, TLCS900_INT4);
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, TLCS900_INT5);
 	m_fdc->hdl_wr_callback().set_inputline(m_maincpu, TLCS900_INT6);
+	// TODO: tc coming from maincpu TC0 signal
 	//m_fdc->??_wr_callback().set_inputline(m_maincpu, TLCS900_INT7);
 	//FIXME:
 	// Interrupt 4: FDCINT
@@ -793,7 +794,10 @@ void kn5000_state::kn5000(machine_config &config)
 
 	mn89304_vga_device &vga(MN89304_VGA(config, "vga", 0));
 	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	// 4 Mbit, M5M44265CJ6S
+	vga.set_vram_size(0x80000);
+	// iochrdy tied to refresh pin and SA19, A21 and A20 to GND
+	// TODO: VGA.A18 signal, banking? From maincpu thru a T7W139F decoder
 
 	config.set_default_layout(layout_kn5000);
 }

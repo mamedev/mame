@@ -686,30 +686,30 @@ TILE_GET_INFO_MEMBER(prmrsocr_state::prmrsocr_get_roz_tile_info)
 
 K052109_CB_MEMBER(tmnt2_base_state::tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 K052109_CB_MEMBER(sunsetbl_state::ssbl_tile_callback)
 {
 	if (layer == 0)
 	{
-		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
+		code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
 	}
 	else
 	{
-		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
+		code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
 		//osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
 	}
 
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 K052109_CB_MEMBER(blswhstl_state::blswhstl_tile_callback)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
-	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8) | (bank << 12) | m_blswhstl_rombank << 14;
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x01) << 8) | ((color & 0x10) << 5) | ((color & 0x0c) << 8) | (bank << 12) | m_blswhstl_rombank << 14;
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 
@@ -722,33 +722,33 @@ K052109_CB_MEMBER(blswhstl_state::blswhstl_tile_callback)
 
 K051960_CB_MEMBER(punkshot_state::punkshot_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*code |= (*color & 0x10) << 9;
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	code |= (color & 0x10) << 9;
+	color = m_sprite_colorbase + (color & 0x0f);
 }
 
 K051960_CB_MEMBER(punkshot_state::thndrx2_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	color = m_sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -760,17 +760,17 @@ K051960_CB_MEMBER(punkshot_state::thndrx2_sprite_callback)
 
 K053244_CB_MEMBER(tmnt2_k053245_base_state::lgtnfght_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 K053244_CB_MEMBER(blswhstl_state::blswhstl_sprite_callback)
@@ -781,33 +781,33 @@ K053244_CB_MEMBER(blswhstl_state::blswhstl_sprite_callback)
 	if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
 #endif
 
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 K053244_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*code |= m_sprite_bank << 14;
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	code |= m_sprite_bank << 14;
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 

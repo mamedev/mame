@@ -361,16 +361,19 @@ Title screen looks incorrect (verify), also has inconsistent blood animation, ra
 		</part>
 	</software>
 
-	<software name="moonchld" supported="no">
-		<description>Moonchild</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="moonchil" supported="no">
+		<description>Moon Child</description>
+		<year>1987?</year>
+		<publisher>HOT・B</publisher>
 		<notes><![CDATA[
 Uses mixed 3+3bpp [TVRAM] support, kludged for now (not a real test case)
-Suspicious window masking on main menu
+Bad window masking on main menu and gameplay
 [FDC] disk error when trying to create an user disk
 Has optional [Modem] and [Data Link] features
 ]]></notes>
+		<info name="alt_title" value="ムーンチャイルド"/>
+		<info name="developer" value="Gamu" />
+		<info name="usage" value="Copy disk as a .mfi container, select make character and mount it, then start a new game with that in drive 2" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">

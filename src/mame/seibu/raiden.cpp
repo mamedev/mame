@@ -93,7 +93,9 @@
 
 #include "emu.h"
 
+#include "sei80bu.h"
 #include "seibu_crtc.h"
+
 #include "seibusound.h"
 
 #include "cpu/nec/nec.h"
@@ -766,7 +768,7 @@ void raiden_state::raidene(machine_config &config)
 	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &raiden_state::raiden_sound_map);
 	subdevice<z80_device>("audiocpu")->set_addrmap(AS_OPCODES, &raiden_state::raiden_sound_decrypted_opcodes_map);
 
-	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
+	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 14.318181_MHz_XTAL / 4));
 	sei80bu.set_addrmap(AS_PROGRAM, &raiden_state::sei80bu_encrypted_full_map);
 }
 

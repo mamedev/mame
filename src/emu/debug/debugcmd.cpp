@@ -3907,7 +3907,7 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 				break;
 
 			case 8:
-				tspace->read_qword_unaligned(address, fill_data[j]);
+				tspace->write_qword_unaligned(address, fill_data[j]);
 				break;
 			}
 			offset += fill_data_size[j];

@@ -73,7 +73,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9928a.h"
@@ -119,7 +119,7 @@ private:
 	void re_mux_port_A_w(uint8_t data);
 	void re_mux_port_B_w(uint8_t data);
 
-	void mem_io(address_map &map) ATTR_COLD;
+	void mem_data(address_map &map) ATTR_COLD;
 	void mem_prg(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -254,7 +254,7 @@ void re900_state::mem_prg(address_map &map)
 	map(0x0000, 0xffff).rom().region("maincpu", 0);
 }
 
-void re900_state::mem_io(address_map &map)
+void re900_state::mem_data(address_map &map)
 {
 	map(0x0000, 0xbfff).rom().region("maincpu", 0);
 	map(0xc000, 0xdfff).ram().share("nvram");
@@ -387,7 +387,7 @@ void re900_state::re900(machine_config &config)
 	/* basic machine hardware */
 	i8051_device &maincpu(I8051(config, m_maincpu, MAIN_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &re900_state::mem_prg);
-	maincpu.set_addrmap(AS_IO, &re900_state::mem_io);
+	maincpu.set_addrmap(AS_DATA, &re900_state::mem_data);
 	maincpu.port_out_cb<0>().set(FUNC(re900_state::cpu_port_0_w));
 
 	/* video hardware */

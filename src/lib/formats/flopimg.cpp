@@ -1910,6 +1910,8 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 		fm_w (track_data, 8, sects[i].sector);
 		fm_w (track_data, 8, sects[i].size);
 		crc = calc_crc_ccitt(track_data, cpos, track_data.size());
+		if(sects[i].bad_addr_crc)
+			crc = 0xffff^crc;
 		fm_w (track_data, 16, crc);
 		for(int j=0; j<gap_2; j++) fm_w(track_data, 8, 0xff);
 
@@ -1923,7 +1925,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 			raw_w(track_data, 16, sects[i].deleted ? 0xf56a : 0xf56f);
 			for(int j=0; j<sects[i].actual_size; j++) fm_w(track_data, 8, sects[i].data[j]);
 			crc = calc_crc_ccitt(track_data, cpos, track_data.size());
-			if(sects[i].bad_crc)
+			if(sects[i].bad_data_crc)
 				crc = 0xffff^crc;
 			fm_w(track_data, 16, crc);
 			if(i != sector_count-1)
@@ -1977,6 +1979,8 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 		mfm_w(track_data, 8, sects[i].sector);
 		mfm_w(track_data, 8, sects[i].size);
 		crc = calc_crc_ccitt(track_data, cpos, track_data.size());
+		if(sects[i].bad_addr_crc)
+			crc = 0xffff^crc;
 		mfm_w(track_data, 16, crc);
 		for(int j=0; j<gap_2; j++) mfm_w(track_data, 8, 0x4e);
 
@@ -1991,7 +1995,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 			mfm_w(track_data, 8, sects[i].deleted ? 0xf8 : 0xfb);
 			for(int j=0; j<sects[i].actual_size; j++) mfm_w(track_data, 8, sects[i].data[j]);
 			crc = calc_crc_ccitt(track_data, cpos, track_data.size());
-			if(sects[i].bad_crc)
+			if(sects[i].bad_data_crc)
 				crc = 0xffff^crc;
 			mfm_w(track_data, 16, crc);
 			if(i != sector_count-1)

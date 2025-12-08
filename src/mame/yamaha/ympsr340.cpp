@@ -53,7 +53,7 @@ private:
 	required_shared_ptr<u16> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<mks3_device> m_mks3;
-	required_device<hd44780_device> m_lcdc;
+	required_device<ks0066_device> m_lcdc;
 	output_finder<80, 8, 5> m_outputs;
 	required_ioport_array<8> m_key;
 

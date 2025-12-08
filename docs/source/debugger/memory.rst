@@ -209,7 +209,10 @@ By default, the data will be interpreted as a series of NUL-terminated
 (ASCIIZ) strings, the dump will have one string per line, and C-style
 escapes sequences will be used for bytes that do not represent printable
 ASCII characters.  The optional **<term>** parameter can be used to
-specify a different string terminator character.
+specify a different string terminator character.  If **<term>** equals
+-0x80, the terminator is not a separate byte but 0x80 added to the last
+character of each string.
+
 
 Back to :ref:`debugger-memory-list`
 

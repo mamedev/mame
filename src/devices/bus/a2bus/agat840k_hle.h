@@ -62,6 +62,7 @@ protected:
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void reset_from_bus() override;
 
 	TIMER_CALLBACK_MEMBER(timer_wait_tick);
 	TIMER_CALLBACK_MEMBER(timer_seek_tick);

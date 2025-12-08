@@ -144,7 +144,7 @@ private:
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
 	uint8_t m_sprite_colorbase = 0;
-	int m_layerpri[3]{};
+	int32_t m_layerpri[3]{};
 
 	// misc
 	uint8_t m_irq_enabled = 0;
@@ -200,14 +200,14 @@ private:
 
 K052109_CB_MEMBER(vendetta_state::vendetta_tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x30) << 6) | ((*color & 0x0c) << 10) | (bank << 14);
-	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	code |= ((color & 0x03) << 8) | ((color & 0x30) << 6) | ((color & 0x0c) << 10) | (bank << 14);
+	color = m_layer_colorbase[layer] + ((color & 0xc0) >> 6);
 }
 
 K052109_CB_MEMBER(vendetta_state::esckids_tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) <<  9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >>  5);
+	code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) <<  9) | (bank << 13);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >>  5);
 }
 
 
@@ -219,17 +219,17 @@ K052109_CB_MEMBER(vendetta_state::esckids_tile_callback)
 
 K053246_CB_MEMBER(vendetta_state::sprite_callback)
 {
-	int pri = (*color & 0x03e0) >> 4; // ???????
+	int pri = (color & 0x03e0) >> 4; // ???????
 	if (pri <= m_layerpri[2])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority_mask = 0xf0;
+		priority_mask = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+		priority_mask = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		priority_mask = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x001f);
+	color = m_sprite_colorbase + (color & 0x001f);
 }
 
 

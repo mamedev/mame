@@ -72,7 +72,8 @@ bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[i].actual_size = mfm ? 256 : 128;
 				sects[i].data = sectdata + 256*j;
 				sects[i].deleted = false;
-				sects[i].bad_crc = false;
+				sects[i].bad_data_crc = false;
+				sects[i].bad_addr_crc = false;
 			}
 
 			if(mfm)

@@ -8,7 +8,6 @@
 
     Undumped games running on the same hardware:
     * Baccara Star (World-One)
-    * Baccarat Special (World-One)
 
     Driver by Angelo Salese.
     Additional work by Roberto Fresca.
@@ -751,6 +750,129 @@ static INPUT_PORTS_START( vparadis2 )
 	PORT_DIPSETTING(      0xe000, "3000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( baccarsp )
+	PORT_INCLUDE( common )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Select Left")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP ) PORT_NAME("Double-Up / Cancel")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE ) PORT_NAME("Take Score / Show Pay Table")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW )  PORT_NAME("Small / Select Right")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW1-2")
+	PORT_DIPNAME( 0x0007, 0x0000, "Main Level" ) PORT_DIPLOCATION("DSW1:!1,!2,!3")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0001, "2" )
+	PORT_DIPSETTING(      0x0002, "3" )
+	PORT_DIPSETTING(      0x0003, "4" )
+	PORT_DIPSETTING(      0x0004, "5" )
+	PORT_DIPSETTING(      0x0005, "6" )
+	PORT_DIPSETTING(      0x0006, "7" )
+	PORT_DIPSETTING(      0x0007, "X" )
+	PORT_DIPNAME( 0x0038, 0x0000, "Double-Up Level" ) PORT_DIPLOCATION("DSW1:!4,!5,!6")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0008, "2" )
+	PORT_DIPSETTING(      0x0010, "3" )
+	PORT_DIPSETTING(      0x0018, "4" )
+	PORT_DIPSETTING(      0x0020, "5" )
+	PORT_DIPSETTING(      0x0028, "6" )
+	PORT_DIPSETTING(      0x0030, "7" )
+	PORT_DIPSETTING(      0x0038, "X" )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:!7") // No effect shown in test mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:!8") // No effect shown in test mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0700, 0x0000, "Key In - Service In - Hopper Out" ) PORT_DIPLOCATION("DSW2:!1,!2,!3")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0200, "10" )
+	PORT_DIPSETTING(      0x0300, "25" )
+	PORT_DIPSETTING(      0x0400, "50" )
+	PORT_DIPSETTING(      0x0500, "100" )
+	PORT_DIPSETTING(      0x0600, "500" )
+	PORT_DIPSETTING(      0x0700, "1000" )
+	PORT_DIPNAME( 0x3800, 0x0000, "Coin-In" ) PORT_DIPLOCATION("DSW2:!4,!5,!6")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0800, "5" )
+	PORT_DIPSETTING(      0x1000, "10" )
+	PORT_DIPSETTING(      0x1800, "20" )
+	PORT_DIPSETTING(      0x2000, "25" )
+	PORT_DIPSETTING(      0x2800, "50" )
+	PORT_DIPSETTING(      0x3000, "100" )
+	PORT_DIPSETTING(      0x3800, "200" )
+	PORT_DIPNAME( 0x4000, 0x0000, "Out Counter" ) PORT_DIPLOCATION("DSW2:!7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, "Hopper" ) PORT_DIPLOCATION("DSW2:!8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+
+	PORT_START("DSW3-4")
+	PORT_DIPNAME( 0x0007, 0x0000, "Coin In Limit" )     PORT_DIPLOCATION("DSW3:!1,!2,!3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0001, "5000" )
+	PORT_DIPSETTING(      0x0002, "10000" )
+	PORT_DIPSETTING(      0x0003, "20000" )
+	PORT_DIPSETTING(      0x0004, "50000" )
+	PORT_DIPSETTING(      0x0005, "100000" )
+	PORT_DIPSETTING(      0x0006, "200000" )
+	PORT_DIPSETTING(      0x0007, "300000" )
+	PORT_DIPNAME( 0x0038, 0x0000, "Credit Limit" )      PORT_DIPLOCATION("DSW3:!4,!5,!6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, "10000" )
+	PORT_DIPSETTING(      0x0010, "20000" )
+	PORT_DIPSETTING(      0x0018, "30000" )
+	PORT_DIPSETTING(      0x0020, "50000" )
+	PORT_DIPSETTING(      0x0028, "100000" )
+	PORT_DIPSETTING(      0x0030, "200000" )
+	PORT_DIPSETTING(      0x0038, "300000" )
+	PORT_DIPNAME( 0x0040, 0x0000, "Credit Over Cut" )  PORT_DIPLOCATION("DSW3:!7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW3:!8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0300, 0x0000, "Bet Max" ) PORT_DIPLOCATION("DSW4:!1,!2")
+	PORT_DIPSETTING(      0x0000, "100" )
+	PORT_DIPSETTING(      0x0100, "200" )
+	PORT_DIPSETTING(      0x0200, "300" )
+	PORT_DIPSETTING(      0x0300, "500" )
+	PORT_DIPNAME( 0x0400, 0x0000, "Commission Pool" ) PORT_DIPLOCATION("DSW4:!3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, "Scoresheet in Tie" ) PORT_DIPLOCATION("DSW4:!4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "Shibori" ) PORT_DIPLOCATION("DSW4:!5") // written Sibori in test mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:!6") // No effect shown in test mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:!7") // No effect shown in test mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW4:!8") // No effect shown in test mode
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static GFXDECODE_START( gfx_umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar, 0, 0x40)
@@ -774,7 +896,7 @@ void umipoker_state::umipoker(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &umipoker_state::audio_map);
 	audiocpu.set_addrmap(AS_IO, &umipoker_state::audio_io_map);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -896,6 +1018,25 @@ ROM_START( vparadis2 )
 	ROM_LOAD( "nvram", 0x0000, 0x4000, CRC(64836e23) SHA1(75a4dd1f69f9c02b8ad560241ccc8765613a7a3e) )
 ROM_END
 
+ROM_START( baccarsp )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bp0.u61", 0x00000, 0x20000, CRC(342be7f4) SHA1(e4946d2f5f02b24f69e22ef136b2278f626c57e7) )
+	ROM_LOAD16_BYTE( "bp1.u60", 0x00001, 0x20000, CRC(8a41a229) SHA1(1df744687933578186fd323b36a66b46b2da6a3b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bz.u8", 0x00000, 0x10000, CRC(4bf07fa8) SHA1(4dfd1ea7e13a99fed1c06d84185ea7ce7b58fbcf) ) // 11xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "bg3.u39", 0x00000, 0x20000, CRC(563085a1) SHA1(5151bc7eb889c6f2a1491112945fbdd8b63f6292) )
+	ROM_LOAD( "bg2.u40", 0x20000, 0x20000, CRC(979144ad) SHA1(f2e1a8d51fc1a5414682c21be18a13b07af5a45e) )
+	ROM_LOAD( "bg1.u41", 0x40000, 0x20000, CRC(9dac87cb) SHA1(4c6ef32efef7e0e02f4563f05505874ed5040f16) )
+	ROM_LOAD( "bg0.u42", 0x60000, 0x20000, CRC(338ca689) SHA1(321235116d6b720deef9dea392883aeb50387dbf) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "bm.u17", 0x00000, 0x40000, CRC(7216b7ae) SHA1(3d8e12e26569b5f7131390766aac46617b08f8b1) )
+	ROM_IGNORE(                  0x40000 ) // 0xxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 } // anonymous namespace
 
 
@@ -906,5 +1047,6 @@ ROM_END
 //     YEAR  NAME       PARENT    MACHINE    INPUT      STATE           INIT        ROT   COMPANY                  FULLNAME                                         FLAGS                   LAYOUT
 GAME(  1997, umipoker,  0,        umipoker,  umipoker,  umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, newer)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
 GAME(  1997, umipokera, umipoker, umipoker,  umipoker,  umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, older)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
+GAME(  1997, baccarsp,  0,        umipoker,  baccarsp,  umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Baccarat Special",                              MACHINE_SUPPORTS_SAVE )
 GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip,  saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",                    MACHINE_SUPPORTS_SAVE,  layout_saiyukip )
 GAME(  2005, vparadis2, 0,        umipoker,  vparadis2, umipoker_state, empty_init, ROT0, "Paradise",              "Victory Paradise II (V9)",                      MACHINE_SUPPORTS_SAVE )

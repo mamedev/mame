@@ -38,7 +38,7 @@ Segment data is sent to each 14seg digit by first writing half of the data to po
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "minicom.lh"
 
 #define LOG_IO_PORTS (1U << 1)

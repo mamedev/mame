@@ -22,6 +22,8 @@ public:
 
 private:
 	virtual void config_map(address_map &map) override ATTR_COLD;
+
+	virtual void internal_io_map(address_map &map) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device)

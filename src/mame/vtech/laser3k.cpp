@@ -24,21 +24,24 @@
   http://mirrors.apple2.org.za/Apple%20II%20Documentation%20Project/Computers/LASER/LASER%203000/Manuals/The%20Cat%20Technical%20Reference%20Manual.pdf
 
   TODO:
-    - Finish keyboard
+    - Dump and emulate keyboard
     - RGB graphics mode
-    - FDC C800 page appears to be inside the FDC cartridge, need a dump :(  (can hack to use IWM in the meantime)
-    - Centronics printer port (data at 3c090, read ack at 3c1c0, read busy at 3c1c2)
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "bus/a2gameio/gameio.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
+#include "machine/applefdintf.h"
 #include "machine/bankdev.h"
-#include "machine/ram.h"
 #include "machine/kb3600.h"
+#include "machine/ram.h"
+#include "machine/output_latch.h"
+#include "machine/wozfdc.h"
 #include "sound/sn76496.h"
 #include "sound/spkrdev.h"
 
@@ -84,13 +87,20 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_ram(*this, "mainram")
-		, m_bank(*this, "bank%u", 0U)
+		, m_bank(*this, "bank")
 		, m_ay3600(*this, "ay3600")
 		, m_speaker(*this, "speaker")
 		, m_sn(*this, "sn76489")
 		, m_cassette(*this, "tape")
 		, m_gamepad(*this, "gamepad")
+		, m_printer(*this, "printer")
+		, m_platch(*this, "platch")
 		, m_kbspecial(*this, "keyb_special")
+		, m_rom(*this, "maincpu")
+		, m_fdc(*this, "fdc%u", 0U)
+		, m_floppy(*this, "floppy%u", 0U)
+		, m_fdc_rom(*this, "fdc")
+		, m_3c800(*this, "3c800")
 	{ }
 
 	void laser3k(machine_config &config);
@@ -100,11 +110,25 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t io2_r(offs_t offset);
+
+	void prdata_w(uint8_t data);
+	void prack_w(int state);
+	void prbusy_w(int state);
+
+	uint8_t printer_rom_r(offs_t offset);
+	void printer_rombank_w(offs_t offset, uint8_t data);
+	uint8_t display_rom_r(offs_t offset);
+	void display_rombank_w(offs_t offset, uint8_t data);
+	uint8_t fdc_rom_r(offs_t offset);
+	uint8_t rombank_disable_r();
+	void rombank_disable_w(uint8_t data);
 
 	void laser3k_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -125,13 +149,20 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
-	required_device_array<address_map_bank_device, 4> m_bank;
+	required_device<address_map_bank_device> m_bank;
 	required_device<ay3600_device> m_ay3600;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<sn76489_device> m_sn;
+	required_device<sn76489a_device> m_sn;
 	required_device<cassette_image_device> m_cassette;
 	required_device<apple2_gameio_device> m_gamepad;
+	required_device<centronics_device> m_printer;
+	required_device<output_latch_device> m_platch;
 	required_ioport m_kbspecial;
+	required_region_ptr<u8> m_rom;
+	required_device_array<diskii_fdc_device, 2> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppy;
+	required_region_ptr<u8> m_fdc_rom;
+	memory_view m_3c800;
 
 	uint8_t m_bankval[4];
 	int m_flash;
@@ -148,6 +179,8 @@ private:
 	int m_gfxmode;
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
 	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
+	bool m_prack;
+	bool m_prbusy;
 };
 
 /***************************************************************************
@@ -156,19 +189,27 @@ private:
 
 void laser3k_state::laser3k_map(address_map &map)
 {
-	map(0x0000, 0x3fff).m(m_bank[0], FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0x7fff).m(m_bank[1], FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0xbfff).m(m_bank[2], FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xffff).m(m_bank[3], FUNC(address_map_bank_device::amap8));
+	map(0x0000, 0xffff).rw(FUNC(laser3k_state::mem_r), FUNC(laser3k_state::mem_w));
 }
 
 void laser3k_state::banks_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rw(FUNC(laser3k_state::ram_r), FUNC(laser3k_state::ram_w));
 	map(0x38000, 0x3bfff).rom().region("maincpu", 0);
-	map(0x3c000, 0x3c0ff).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
-	map(0x3c100, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
-	map(0x3c200, 0x3ffff).rom().region("maincpu", 0x4200);
+	map(0x3c000, 0x3c07f).rw(FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
+	map(0x3c090, 0x3c090).w(FUNC(laser3k_state::prdata_w));
+	map(0x3c0d0, 0x3c0df).rw(m_fdc[1], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
+	map(0x3c0e0, 0x3c0ef).rw(m_fdc[0], FUNC(wozfdc_device::read), FUNC(wozfdc_device::write));
+	map(0x3c100, 0x3c1bf).rw(FUNC(laser3k_state::printer_rom_r), FUNC(laser3k_state::printer_rombank_w));
+	map(0x3c1c0, 0x3c1ff).r(FUNC(laser3k_state::io2_r));
+	map(0x3c300, 0x3c3ff).rw(FUNC(laser3k_state::display_rom_r), FUNC(laser3k_state::display_rombank_w));
+	map(0x3c500, 0x3c6ff).r(FUNC(laser3k_state::fdc_rom_r));
+	map(0x3c800, 0x3cffe).view(m_3c800);
+	m_3c800[0](0x3c800, 0x3cffe).rom().region("maincpu", 0x0000);
+	m_3c800[1](0x3c800, 0x3cffe).rom().region("maincpu", 0x4800);
+	m_3c800[2](0x3c800, 0x3cffe).rom().region("fdc", 0x800);
+	map(0x3cfff, 0x3cfff).rw(FUNC(laser3k_state::rombank_disable_r), FUNC(laser3k_state::rombank_disable_w));
+	map(0x3d000, 0x3ffff).rom().region("maincpu", 0x5000);
 }
 
 void laser3k_state::machine_start()
@@ -231,6 +272,12 @@ void laser3k_state::machine_start()
 	m_x_calibration = attotime::from_nsec(10800).as_double();
 	m_y_calibration = attotime::from_nsec(10800).as_double();
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0.0;
+
+	m_fdc[0]->set_floppies(m_floppy[0], m_floppy[1]);
+	m_fdc[1]->set_floppies(m_floppy[2], m_floppy[3]);
+
+	m_prack = false;
+	m_prbusy = false;
 }
 
 void laser3k_state::machine_reset()
@@ -239,10 +286,8 @@ void laser3k_state::machine_reset()
 	m_bankval[1] = 1;
 	m_bankval[2] = 2;
 	m_bankval[3] = 0xf;
-	m_bank[0]->set_bank(m_bankval[0]);
-	m_bank[1]->set_bank(m_bankval[1]);
-	m_bank[2]->set_bank(m_bankval[2]);
-	m_bank[3]->set_bank(m_bankval[3]);
+
+	m_3c800.disable();
 
 	m_flash = 0;
 	m_speaker_state = 0;
@@ -257,10 +302,17 @@ void laser3k_state::machine_reset()
 	m_mix = false;
 	m_gfxmode = TEXT;
 
-	uint8_t *rom = (uint8_t *)memregion("maincpu")->base();
+	m_printer->write_strobe(1);
+}
 
-	// patch out disk controller ID for now so it drops right into BASIC
-	rom[0x4607] = 0;
+uint8_t laser3k_state::mem_r(offs_t offset)
+{
+	return m_bank->space().read_byte(uint32_t(m_bankval[offset >> 14]) << 14 | (offset & 0x3fff));
+}
+
+void laser3k_state::mem_w(offs_t offset, uint8_t data)
+{
+	m_bank->space().write_byte(uint32_t(m_bankval[offset >> 14]) << 14 | (offset & 0x3fff), data);
 }
 
 uint8_t laser3k_state::ram_r(offs_t offset)
@@ -365,7 +417,7 @@ void laser3k_state::do_io(int offset)
 
 		case 0x4c:  // low resolution (40 column)
 			m_80col = false;
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(1000000);
 			break;
 
 		case 0x4d:  // RGB mode
@@ -375,12 +427,12 @@ void laser3k_state::do_io(int offset)
 		case 0x4e:  // double hi-res
 			m_80col = true;
 			m_gfxmode = DHIRES;
-			m_maincpu->set_unscaled_clock(1021800*2);
+			m_maincpu->set_unscaled_clock(1000000*2);
 			break;
 
 		case 0x4f:  // high resolution (80 column).  Yes, the CPU clock also doubles when the pixel clock does (!)
 			m_80col = true;
-			m_maincpu->set_unscaled_clock(1021800*2);
+			m_maincpu->set_unscaled_clock(1000000*2);
 			break;
 
 		case 0x50:  // graphics mode
@@ -508,22 +560,18 @@ void laser3k_state::io_w(offs_t offset, uint8_t data)
 
 		case 0x7c:  // bank 0
 			m_bankval[0] = data & 0xf;
-			m_bank[0]->set_bank(m_bankval[0]);
 			break;
 
 		case 0x7d:  // bank 1
 			m_bankval[1] = data & 0xf;
-			m_bank[1]->set_bank(m_bankval[1]);
 			break;
 
 		case 0x7e:  // bank 2
 			m_bankval[2] = data & 0xf;
-			m_bank[2]->set_bank(m_bankval[2]);
 			break;
 
 		case 0x7f:  // bank 3
 			m_bankval[3] = data & 0xf;
-			m_bank[3]->set_bank(m_bankval[3]);
 			break;
 
 		default:
@@ -536,21 +584,90 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0xc2:  // h-blank status
+		case 0x00:
+			return m_prack ? 0x80 : 0x00;
+
+		case 0x01:
+			return m_prbusy ? 0x80 : 0x00;
+
+		case 0x02:  // h-blank status
 			return m_screen->hblank() ? 0x80 : 0x00;
 
-		case 0xc3:  // v-blank status
+		case 0x03:  // v-blank status
 			return m_screen->vblank() ? 0x80 : 0x00;
 
-		case 0xc5:  // CPU 1/2 MHz status?
-			return 0x00;
+		case 0x05:  // CPU 1/2 MHz status?
+			return m_80col ? 0x80 : 0x00;
 
 		default:
-			printf("io2_r @ unknown %x\n", offset);
+			if (!machine().side_effects_disabled())
+				logerror("io2_r @ unknown %x\n", offset);
 			break;
 	}
 
 	return 0xff;
+}
+
+void laser3k_state::prdata_w(uint8_t data)
+{
+	m_platch->write(data);
+
+	// timing (determined by ASIC) is probably wrong for this
+	m_printer->write_strobe(0);
+	m_printer->write_strobe(1);
+}
+
+void laser3k_state::prack_w(int state)
+{
+	m_prack = state;
+}
+
+void laser3k_state::prbusy_w(int state)
+{
+	m_prbusy = state;
+}
+
+uint8_t laser3k_state::printer_rom_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.select(0);
+	return m_rom[offset + 0x4100];
+}
+
+void laser3k_state::printer_rombank_w(offs_t offset, uint8_t data)
+{
+	m_3c800.select(0);
+}
+
+uint8_t laser3k_state::display_rom_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.select(1);
+	return m_rom[offset + 0x4300];
+}
+
+void laser3k_state::display_rombank_w(offs_t offset, uint8_t data)
+{
+	m_3c800.select(1);
+}
+
+uint8_t laser3k_state::fdc_rom_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.select(2);
+	return m_fdc_rom[offset + 0x500];
+}
+
+uint8_t laser3k_state::rombank_disable_r()
+{
+	if (!machine().side_effects_disabled())
+		m_3c800.disable();
+	return 0; // FIXME: actually return the ROM value
+}
+
+void laser3k_state::rombank_disable_w(uint8_t data)
+{
+	m_3c800.disable();
 }
 
 void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
@@ -562,7 +679,7 @@ void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos
 	/* look up the character data */
 	uint8_t const *const chardata = &textgfx_data[(code * 8) % textgfx_datalen];
 
-	if (m_flash && (code >= 0x40) && (code <= 0x7f))
+	if (code < 0x80 && (m_flash || m_80col || code < 0x40))
 	{
 		/* we're flashing; swap */
 		using std::swap;
@@ -1017,7 +1134,7 @@ void laser3k_state::laser3k_palette(palette_device &palette) const
 void laser3k_state::laser3k(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 14_MHz_XTAL / 7); // 1 or 2 MHz depending on soft switch
+	M6502(config, m_maincpu, 14_MHz_XTAL / 14); // 1 or 2 MHz depending on soft switch
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser3k_state::laser3k_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1031,13 +1148,20 @@ void laser3k_state::laser3k(machine_config &config)
 	PALETTE(config, "palette", FUNC(laser3k_state::laser3k_palette), std::size(laser3k_pens));
 
 	/* memory banking */
-	for (auto &bank : m_bank)
-		ADDRESS_MAP_BANK(config, bank).set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&laser3k_state::banks_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
 	RAM(config, "mainram").set_default_size("192K");
 
+	// ASIC in disk cartridge seems to control up to 4 Apple-style drives
+	DISKII_FDC(config, m_fdc[0], 14_MHz_XTAL / 7);
+	DISKII_FDC(config, m_fdc[1], 14_MHz_XTAL / 7);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, applefdintf_device::floppies_525, "525", applefdintf_device::formats_525).enable_sound(true);
+
 	APPLE2_GAMEIO(config, m_gamepad, apple2_gameio_device::joystick_options, nullptr);
 	m_gamepad->set_sw_pullups(true); // 3K9 pullups to +5V
+
+	I8048(config, "kbdmcu", 14_MHz_XTAL * 2 / 7).set_disable();
 
 	/* the 8048 isn't dumped, so substitute modified real Apple II h/w */
 	AY3600(config, m_ay3600, 0);
@@ -1057,27 +1181,37 @@ void laser3k_state::laser3k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-	SN76489(config, m_sn, 14_MHz_XTAL / 7).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, m_sn, 14_MHz_XTAL / 7).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->set_interface("apple2_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	OUTPUT_LATCH(config, m_platch);
+	CENTRONICS(config, m_printer, centronics_devices, "printer");
+	m_printer->set_output_latch(*m_platch);
+	m_printer->ack_handler().set(FUNC(laser3k_state::prack_w));
+	m_printer->busy_handler().set(FUNC(laser3k_state::prbusy_w));
 }
 
-ROM_START(las3000)
+ROM_START(laser3k)
 	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD ( "341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
+	ROM_LOAD("341-0036.chr", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
 
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD ( "las3000.rom", 0x0000, 0x8000, CRC(9c7aeb09) SHA1(3302adf41e258cf50210c19736948c8fa65e91de))
+	ROM_LOAD("laser3000_v2.2.rom", 0x0000, 0x8000, CRC(3ecbc06c) SHA1(c5c188484664bec1a1445156d63b7b80842e7219))
+	ROM_FILL(0x0001, 1, 0x09) // bad bit?
 
-	ROM_REGION(0x100, "fdc", 0)
-	ROM_LOAD ( "l3kdisk.rom", 0x0000, 0x0100, CRC(2d4b1584) SHA1(989780b77e100598124df7b72663e5a31a3339c0))
+	ROM_REGION(0x400, "kbdmcu", 0)
+	ROM_LOAD("tmp8048p.u44", 0x000, 0x400, NO_DUMP)
+
+	ROM_REGION(0x1000, "fdc", 0)
+	ROM_LOAD("laser_3000_disk_rom.bin", 0x0000, 0x1000, CRC(89f667fa) SHA1(9e34a208c11772e6bc8915aad090240d20a9ceff))
 ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME      FLAGS
-COMP( 1983, las3000, 0,      0,      laser3k, laser3k, laser3k_state, empty_init, "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )
+COMP( 1983, laser3k, 0,      0,      laser3k, laser3k, laser3k_state, empty_init, "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )

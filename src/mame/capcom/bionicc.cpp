@@ -82,7 +82,7 @@
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "video/bufsprite.h"
@@ -140,7 +140,7 @@ private:
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
-	void mcu_io(address_map &map) ATTR_COLD;
+	void mcu_data(address_map &map) ATTR_COLD;
 
 	void output_w(u8 data);
 
@@ -211,7 +211,7 @@ void bionicc_state::sound_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 }
 
-void bionicc_state::mcu_io(address_map &map)
+void bionicc_state::mcu_data(address_map &map)
 {
 	map.global_mask(0x7ff);
 	map(0x000, 0x7ff).rw(FUNC(bionicc_state::mcu_dma_r), FUNC(bionicc_state::mcu_dma_w));
@@ -644,7 +644,7 @@ void bionicc_state::bionicc(machine_config &config)
 
 	// Protection MCU Intel C8751H-88 @ 6 MHz
 	I8751(config, m_mcu, 24_MHz_XTAL / 4);
-	m_mcu->set_addrmap(AS_IO, &bionicc_state::mcu_io);
+	m_mcu->set_addrmap(AS_DATA, &bionicc_state::mcu_data);
 	m_mcu->port_in_cb<1>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::mcu_p3_w));

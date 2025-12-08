@@ -1295,10 +1295,11 @@ ROM_START( ikari3 )
 	ROM_LOAD( "ik3-6.18e",  0x000000, 0x20000, CRC(59d256a4) SHA1(1e7b33329f761c695bc9a817bbc0c5e13386d073) )
 ROM_END
 
+ // A7007-SUB4M ROM board
 ROM_START( ikari3w ) // Initial boot shows Ikari III The Rescue, then the title changes to the Japanese title - No demo play - proto or test set??
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "ik_2.c10",  0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) // Rotary joystick - hand written label
-	ROM_LOAD16_BYTE( "ik_3.c9",   0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) // Rotary joystick - hand written label
+	ROM_LOAD16_BYTE( "ik_e2.c10", 0x000000, 0x20000, CRC(d0b690d3) SHA1(6c31b27e6b9f1438e8ddbefe41fa8ded22cdb51c) ) // Rotary joystick
+	ROM_LOAD16_BYTE( "ik_e3.c9",  0x000001, 0x20000, CRC(11a9e664) SHA1(bf2d8a5f3f2aeff99a45d26279c88ebf04b7f79b) ) // Rotary joystick
 	ROM_LOAD16_BYTE( "ik3-1.c8",  0x040000, 0x10000, CRC(47e4d256) SHA1(7c6921cf2f1b8c3dae867eb1fc14e3da218cc1e0) )
 	ROM_LOAD16_BYTE( "ik3-4.c12", 0x040001, 0x10000, CRC(a43af6b5) SHA1(1ad3acadbadd21642932028ecd7c282f7fd02856) )
 

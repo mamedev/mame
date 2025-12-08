@@ -61,6 +61,7 @@ class a2bus_grappler_device_base : public device_t, public device_a2bus_card_int
 public:
 	// device_a2bus_card_interface implementation
 	virtual u8 read_c800(u16 offset) override;
+	virtual bool take_c800() const override { return true; }
 
 protected:
 	a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -237,6 +238,7 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 protected:
 	// device_t implementation
@@ -353,6 +355,12 @@ void a2bus_grappler_device::device_start()
 
 void a2bus_grappler_device::device_reset()
 {
+	reset_from_bus();
+}
+
+
+void a2bus_grappler_device::reset_from_bus()
+{
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
 }
 
@@ -441,6 +449,7 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
+	virtual void reset_from_bus() override;
 
 protected:
 	a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
@@ -519,6 +528,12 @@ void a2bus_grapplerplus_device_base::device_start()
 
 
 void a2bus_grapplerplus_device_base::device_reset()
+{
+	m_ack_latch = 1U;
+}
+
+
+void a2bus_grapplerplus_device_base::reset_from_bus()
 {
 	m_ack_latch = 1U;
 }

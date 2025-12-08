@@ -47,6 +47,8 @@ protected:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 	required_device<ncr53c80_device> m_ncr5380;
 	required_device<nscsi_bus_device> m_scsibus;

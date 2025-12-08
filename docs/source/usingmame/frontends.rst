@@ -28,9 +28,9 @@ starting point.
     tightly and effectively replace MAME’s internal user interface.  It has
     many useful features for home computer emulation.  Written in C++, the
     `source code is on GitHub <https://github.com/npwoods/bletchmame>`__.
-`IV/Play <http://www.mameui.info/>`__ (Microsoft Windows)
-    A simple Windows program for launching systems in MAME.  Written in C#, the
-    `source code is on GitHub <https://github.com/Mataniko/IV-Play>`__.
+`IV/Play <https://john-iv.github.io/iv-play/>`__ (Microsoft Windows)
+    IV/Play has a customisable interface designed to be navigated with a
+    keyboard.  It supports software lists and has flexible filtering.
 `Emu Loader <http://emuloader.mameworld.info/>`__ (Microsoft Windows)
     Emu Loader provides a Windows interface for launching systems in multiple
     emulators, including MAME, Supermodel and DEMUL.  Written in Delphi Pascal,

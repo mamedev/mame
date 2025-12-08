@@ -1,6 +1,6 @@
 // This file is part of AsmJit project <https://asmjit.com>
 //
-// See asmjit.h or LICENSE.md for license and copyright information
+// See <asmjit/core.h> or LICENSE.md for license and copyright information
 // SPDX-License-Identifier: Zlib
 
 // C++ code generation helpers.
@@ -9,7 +9,7 @@ const FATAL = commons.FATAL;
 
 // Utilities to convert primitives to C++ code.
 class Utils {
-  static toHex(val, pad) {
+  static toHexRaw(val, pad) {
     if (val < 0)
       val = 0xFFFFFFFF + val + 1;
 
@@ -17,7 +17,11 @@ class Utils {
     if (pad != null && s.length < pad)
       s = "0".repeat(pad - s.length) + s;
 
-    return "0x" + s.toUpperCase();
+    return s.toUpperCase();
+  }
+
+  static toHex(val, pad) {
+    return "0x" + Utils.toHexRaw(val, pad);
   }
 
   static capitalize(s) {

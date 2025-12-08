@@ -417,6 +417,13 @@ ROM_START(dphh8633)
 	ROM_LOAD("25lq032.u2", 0x000000, 0x400000, CRC(45b8609a) SHA1(d03615a68465a1a365ba07db0b352424680d62d0) )
 ROM_END
 
+ROM_START(dphh8661)
+	INTERNAL_ROM_TYPE2
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("p25d32h.u2", 0x000000, 0x400000, CRC(b91c1dfc) SHA1(97557d10174c74d40aba780398cb2de3974b2f24) )
+ROM_END
+
 ROM_START(retro150)
 	INTERNAL_ROM_TYPE2
 
@@ -438,11 +445,46 @@ ROM_START(pg118)
 	ROM_LOAD("25vq32.bin", 0x000000, 0x400000, CRC(e99f1621) SHA1(f907c36a1a884d892331b7de294a8fd58f7bf9d5) )
 ROM_END
 
+ROM_START(ppg118)
+	INTERNAL_ROM_TYPE2
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("25q32.u2", 0x000000, 0x400000, CRC(c96a30b8) SHA1(da2c41e57b852f3a6644a7cbd0d3740e1b0555dc) )
+ROM_END
+
+ROM_START(table108)
+	INTERNAL_ROM_TYPE2
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("mx25q32.bin", 0x000000, 0x400000, CRC(3fcad3d6) SHA1(9e7b1ba2be174c9ef41eaa06f1537dbe14a695e0) )
+ROM_END
+
 ROM_START(toumapet)
 	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
+ROM_END
+
+ROM_START(touma560)
+	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("py25q64ha.bin", 0x000000, 0x800000, CRC(7974bf3c) SHA1(8467f869f86b51a86eb115e1408b30daa8f148e7) )
+ROM_END
+
+ROM_START(touma568)
+	INTERNAL_ROM_TYPE2 // still does't boot with this one, is it different internal ROM again, or just different mappings?
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("p25q64sh.bin", 0x000000, 0x800000, CRC(32f6d834) SHA1(c0dc5b4792a6d86822a666a0f8de7380d1905505) )
+ROM_END
+
+ROM_START(qpet)
+	INTERNAL_ROM_TYPE2 // not checked if it uses this ROM type
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("t25s16.bin", 0x000000, 0x200000, CRC(78a9c285) SHA1(73b0ebe1c88af79fae3357ab3cb4920d685a14f4) )
 ROM_END
 
 
@@ -478,9 +520,16 @@ CONS( 201?, retro150,      0,       0,      bbl380_24mhz,   bbl380, bbl380_state
 CONS( 201?, retro150a,     retro150,0,      bbl380_24mhz,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1) (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // these are for the Japanese market, the ROM is the same between the Pocket Game and Game Computer but the form factor is different.
 CONS( 2019, pg118,         0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
+CONS( 201?, ppg118,        0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "PPG Play Portable Game 118 Games (HH-0046)", MACHINE_NOT_WORKING )
+CONS( 201?, table108,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Table Game Classic 108-in-1 (KTFC-001B)", MACHINE_NOT_WORKING )
 // it is unclear if dphh8633 refers to the case style, rather than the software, as the dphh8630 set was also noted as previously being found in an 8633 unit
 CONS( 201?, dphh8633,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8633", MACHINE_NOT_WORKING )
+CONS( 2016, dphh8661,      0,       0,      bbl380_menuprot,   bbl380_prot, bbl380_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 268-in-1 - Model 8661", MACHINE_NOT_WORKING ) // from PCP? (logo on back of console) 2016 date on PCB
 
 // also has the 0xE4 XOR, also doesn't currently boot, could be yet another internal ROM
-CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
+CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-550)", MACHINE_NOT_WORKING )
+CONS( 2021, touma560,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-560)", MACHINE_NOT_WORKING )
+CONS( 2021, touma568,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet (OK-568)", MACHINE_NOT_WORKING )
 
+
+CONS( 2020, qpet,          0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "M&D", "Q Pet (2nd version)", MACHINE_NOT_WORKING )

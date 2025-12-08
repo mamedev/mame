@@ -233,9 +233,10 @@ void tk2000_state::snd_w(uint8_t data)
 
 uint8_t tk2000_state::switches_r(offs_t offset)
 {
+	const uint8_t uFloatingBus = read_floatingbus(); // video side-effects latch after reading
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 uint8_t tk2000_state::cassette_r()

@@ -431,7 +431,6 @@ test1f diagnostic hacks:
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "machine/nvram.h"
-#include "machine/smpc.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"
@@ -547,8 +546,8 @@ uint32_t sat_console_state::abus_dummy_r(offs_t offset)
 void sat_console_state::saturn_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0).nopw(); // bios
-	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
-	map(0x00180000, 0x0018ffff).rw(FUNC(sat_console_state::saturn_backupram_r), FUNC(sat_console_state::saturn_backupram_w)).share("share1");
+	map(0x00100000, 0x0010007f).mirror(0x2007ff80).m(m_smpc_hle, FUNC(smpc_hle_device::io_map));
+	map(0x00180000, 0x0018ffff).rw(FUNC(sat_console_state::backupram_r), FUNC(sat_console_state::backupram_w)).share("share1");
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
 	map(0x01000000, 0x017fffff).w(FUNC(sat_console_state::saturn_minit_w));
 	map(0x01800000, 0x01ffffff).w(FUNC(sat_console_state::saturn_sinit_w));
@@ -559,16 +558,16 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05000000, 0x057fffff).r(FUNC(sat_console_state::abus_dummy_r));
 	map(0x05800000, 0x0589ffff).rw(m_stvcd, FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
 	/* Sound */
-	map(0x05a00000, 0x05a7ffff).rw(FUNC(sat_console_state::saturn_soundram_r), FUNC(sat_console_state::saturn_soundram_w));
+	map(0x05a00000, 0x05a7ffff).rw(FUNC(sat_console_state::soundram_r), FUNC(sat_console_state::soundram_w));
 	map(0x05b00000, 0x05b00fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	map(0x05c00000, 0x05c7ffff).rw(FUNC(sat_console_state::saturn_vdp1_vram_r), FUNC(sat_console_state::saturn_vdp1_vram_w));
-	map(0x05c80000, 0x05cbffff).rw(FUNC(sat_console_state::saturn_vdp1_framebuffer0_r), FUNC(sat_console_state::saturn_vdp1_framebuffer0_w));
-	map(0x05d00000, 0x05d0001f).rw(FUNC(sat_console_state::saturn_vdp1_regs_r), FUNC(sat_console_state::saturn_vdp1_regs_w));
-	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::saturn_vdp2_vram_r), FUNC(sat_console_state::saturn_vdp2_vram_w));
-	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::saturn_vdp2_cram_r), FUNC(sat_console_state::saturn_vdp2_cram_w));
-	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::saturn_vdp2_regs_r), FUNC(sat_console_state::saturn_vdp2_regs_w));
-	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //rw(FUNC(sat_console_state::saturn_scu_r), FUNC(sat_console_state::saturn_scu_w));
+	map(0x05c00000, 0x05c7ffff).rw(FUNC(sat_console_state::vdp1_vram_r), FUNC(sat_console_state::vdp1_vram_w));
+	map(0x05c80000, 0x05cbffff).rw(FUNC(sat_console_state::vdp1_framebuffer0_r), FUNC(sat_console_state::vdp1_framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(FUNC(sat_console_state::vdp1_regs_r), FUNC(sat_console_state::vdp1_regs_w));
+	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::vdp2_vram_r), FUNC(sat_console_state::vdp2_vram_w));
+	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::vdp2_cram_r), FUNC(sat_console_state::vdp2_cram_w));
+	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::vdp2_regs_r), FUNC(sat_console_state::vdp2_regs_w));
+	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(saturn_scu_device::regs_map));
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x40000000, 0x46ffffff).nopw(); // associative purge page
 	map(0x60000000, 0x600003ff).nopw(); // cache address array
@@ -682,13 +681,13 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
 }
 
-/* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
+// diehardt tests RAM address $25e7ffe bit 2 with Slave during FRT minit irq
+// in-development tool for breaking execution of it?
 uint32_t sat_console_state::saturn_null_ram_r()
 {
 	return 0xffffffff;
@@ -756,7 +755,7 @@ inline uint8_t sat_console_state::saturn_direct_port_read(bool which)
 		case 0x40: res = smpc_th_control_mode(ctrl_read,which); break;
 		case 0x60: res = smpc_direct_mode(ctrl_read,which); break;
 		default:
-			popmessage("SMPC: unemulated control method %02x, contact MAMEdev",cur_mode & 0x60);
+			popmessage("SMPC: unemulated control method %02x",cur_mode & 0x60);
 			break;
 	}
 
@@ -826,7 +825,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
 	m_audiocpu->reset_cb().set(FUNC(sat_console_state::m68k_reset_callback));
 
-	SEGA_SCU(config, m_scu, 0);
+	SATURN_SCU(config, m_scu, 0);
 	m_scu->set_hostcpu(m_maincpu);
 
 //  SH-1
@@ -846,7 +845,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_smpc_hle->system_reset_handler().set(FUNC(saturn_state::system_reset_w));
 	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
 	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
-	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(sega_scu_device::smpc_irq_w));
+	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(saturn_scu_device::smpc_irq_w));
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
@@ -856,20 +855,20 @@ void sat_console_state::saturn(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224);
-	m_screen->set_screen_update(FUNC(sat_console_state::screen_update_stv_vdp2));
+	m_screen->set_screen_update(FUNC(sat_console_state::screen_update_vdp2));
 
 	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
 
-	MCFG_VIDEO_START_OVERRIDE(sat_console_state,stv_vdp2)
+	MCFG_VIDEO_START_OVERRIDE(sat_console_state,vdp2_video_start)
 
 	SPEAKER(config, "speaker", 2).front();
 
 	SCSP(config, m_scsp, 8467200*8/3); // 8.4672 MHz EXTCLK * 8 / 3 = 22.5792 MHz
 	m_scsp->set_addrmap(0, &sat_console_state::scsp_mem);
 	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
-	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
+	m_scsp->main_irq_cb().set(m_scu, FUNC(saturn_scu_device::sound_req_w));
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
@@ -971,7 +970,6 @@ template <bool is_pal> void sat_console_state::init_saturn()
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-//  m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 

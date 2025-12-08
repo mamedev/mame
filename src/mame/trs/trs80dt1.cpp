@@ -33,7 +33,7 @@ the printer data goes to B800 which is a spare address range in the real machine
 **********************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "video/i8275.h"
 #include "machine/7474.h"
 #include "machine/x2212.h"
@@ -358,7 +358,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	/* basic machine hardware */
 	I8051(config, m_maincpu, 7.3728_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trs80dt1_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &trs80dt1_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &trs80dt1_state::io_map);
 	m_maincpu->port_out_cb<1>().set(FUNC(trs80dt1_state::port1_w));
 	m_maincpu->port_in_cb<1>().set(FUNC(trs80dt1_state::port1_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(trs80dt1_state::port3_w));

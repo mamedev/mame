@@ -1785,6 +1785,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/rx01_dsk.h,FORMATS["RX01_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "RX01_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/rx01_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/rx01_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/rx50_dsk.h,FORMATS["RX50_DSK"] = true
 --------------------------------------------------
 
@@ -2236,6 +2248,18 @@ if opt_tool(FORMATS, "WD177X_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/wd177x_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/wd177x_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/wren_dsk.h,FORMATS["WREN_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "WREN_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/wren_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/wren_dsk.h",
 	}
 end
 

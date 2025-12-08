@@ -46,7 +46,6 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override { return false; }
 
 	required_device<sn76489_device> m_sn1;
 	required_device<sn76489_device> m_sn2;

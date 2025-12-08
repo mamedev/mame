@@ -555,8 +555,8 @@ std::vector<u8> coco_os9_impl::read_file_data(const file_header &header) const
 		{
 			auto block = m_blockdev.get(lsn);
 			size_t block_size = std::min(std::min(u32(m_volume_header.sector_size()), block->size()), header.file_size() - u32(data.size()));
-			for (auto i = 0; i < block_size; i++)
-				data.push_back(block->rodata()[i]);
+			data.resize(data.size() + block_size);
+			block->read(0, &*(data.end() - block_size), block_size);
 		}
 	}
 	return data;
@@ -676,7 +676,7 @@ coco_os9_impl::volume_header::volume_header(fsblk_t::block_t::ptr &&block)
 
 std::string coco_os9_impl::volume_header::name() const
 {
-	std::string_view raw_name(m_block->rstr(31, 32));
+	std::string raw_name(m_block->rstr(31, 32));
 	return pick_os9_string(raw_name);
 }
 

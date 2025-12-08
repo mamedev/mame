@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "cl_sh260.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 DEFINE_DEVICE_TYPE(EV346, isa16_ev346_device, "ev346", "Everex EV-346 disk controller")
 DEFINE_DEVICE_TYPE(JC1310, isa16_jc1310_device, "jc1310", "Joincom JC-1310 disk controller")
@@ -57,7 +57,7 @@ void isa16_ev346_device::device_add_mconfig(machine_config &config)
 {
 	i8031_device &mcu(I8031(config, "mcu", 12_MHz_XTAL)); // SCN8031HCCN40
 	mcu.set_addrmap(AS_PROGRAM, &isa16_ev346_device::i8031_map);
-	mcu.set_addrmap(AS_IO, &isa16_ev346_device::ext_map);
+	mcu.set_addrmap(AS_DATA, &isa16_ev346_device::ext_map);
 
 	DP8473(config, m_fdc, 24_MHz_XTAL);
 }
@@ -66,7 +66,7 @@ void isa16_jc1310_device::device_add_mconfig(machine_config &config)
 {
 	i8031_device &mcu(I8031(config, "mcu", 10_MHz_XTAL)); // P8031AH
 	mcu.set_addrmap(AS_PROGRAM, &isa16_jc1310_device::i8031_map);
-	mcu.set_addrmap(AS_IO, &isa16_jc1310_device::ext_map);
+	mcu.set_addrmap(AS_DATA, &isa16_jc1310_device::ext_map);
 
 	WD37C65C(config, m_fdc, 16_MHz_XTAL, 9.6_MHz_XTAL); // WD37C65B-PL
 }

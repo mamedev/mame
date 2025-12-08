@@ -57,12 +57,9 @@ void turrett_device::device_start()
 	m_volume_table[0x4f] = 0;
 
 	// Register state for saving
-	for (int ch = 0; ch < SOUND_CHANNELS; ++ch)
-	{
-		save_item(NAME(m_channels[ch].m_address), ch);
-		save_item(NAME(m_channels[ch].m_volume), ch);
-		save_item(NAME(m_channels[ch].m_playing), ch);
-	}
+	save_item(STRUCT_MEMBER(m_channels, m_address));
+	save_item(STRUCT_MEMBER(m_channels, m_volume));
+	save_item(STRUCT_MEMBER(m_channels, m_playing));
 }
 
 
@@ -95,11 +92,11 @@ void turrett_device::sound_stream_update(sound_stream &stream)
 			rvol = m_volume_table[rvol];
 
 			// Channels 30 and 31 expect interleaved stereo samples
-			uint32_t incr = (ch >= 30) ? 2 : 1;
+			const uint32_t incr = (ch >= 30) ? 2 : 1;
 
 			for (int s = 0; s < stream.samples(); ++s)
 			{
-				int16_t sample = m_cache.read_word(addr << 1);
+				const int16_t sample = m_cache.read_word(addr << 1);
 
 				if ((uint16_t)sample == 0x8000)
 				{
@@ -125,7 +122,7 @@ uint32_t turrett_device::read(offs_t offset)
 {
 	m_stream->update();
 
-	int ch = offset & 0x3f;
+	const int ch = offset & 0x3f;
 
 	return m_channels[ch].m_playing << 31;
 }
@@ -139,7 +136,7 @@ void turrett_device::write(offs_t offset, uint32_t data)
 {
 	m_stream->update();
 
-	int ch = offset & 0x3f;
+	const int ch = offset & 0x3f;
 
 	if (offset < 0x100/4)
 	{

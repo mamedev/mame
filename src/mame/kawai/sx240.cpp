@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
 
@@ -103,7 +103,7 @@ void kawai_sx240_state::sx240(machine_config &config)
 {
 	I8031(config, m_master, 12_MHz_XTAL);
 	m_master->set_addrmap(AS_PROGRAM, &kawai_sx240_state::master_prog);
-	m_master->set_addrmap(AS_IO, &kawai_sx240_state::master_ext);
+	m_master->set_addrmap(AS_DATA, &kawai_sx240_state::master_ext);
 
 	NVRAM(config, "ram0", nvram_device::DEFAULT_ALL_0); // HM6116ALSP-20 (I9) + battery
 	NVRAM(config, "ram1", nvram_device::DEFAULT_ALL_0); // HM6116ALSP-20 (I10) + battery
@@ -112,7 +112,7 @@ void kawai_sx240_state::sx240(machine_config &config)
 
 	I8031(config, m_slave, 12_MHz_XTAL);
 	m_slave->set_addrmap(AS_PROGRAM, &kawai_sx240_state::slave_prog);
-	m_slave->set_addrmap(AS_IO, &kawai_sx240_state::slave_ext);
+	m_slave->set_addrmap(AS_DATA, &kawai_sx240_state::slave_ext);
 
 	PIT8253(config, "pit0"); // MSM82C53-5 (I25)
 	PIT8253(config, "pit1"); // MSM82C53-5 (I26)

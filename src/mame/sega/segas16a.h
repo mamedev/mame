@@ -8,7 +8,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
@@ -106,8 +106,8 @@ private:
 
 	// I8751 MCU read/write handlers
 	void mcu_control_w(uint8_t data);
-	void mcu_io_w(offs_t offset, uint8_t data);
-	uint8_t mcu_io_r(address_space &space, offs_t offset);
+	void mcu_data_w(offs_t offset, uint8_t data);
+	uint8_t mcu_data_r(address_space &space, offs_t offset);
 
 	// I8751-related VBLANK interrupt handlers
 	void i8751_main_cpu_vblank_w(int state);
@@ -116,7 +116,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_no7751_portmap(address_map &map) ATTR_COLD;

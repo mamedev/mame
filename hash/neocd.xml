@@ -1625,4 +1625,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!--
+	<rom name="cbarrel_Neocd.cue" size="531" crc="b63384ae" sha1="252244d8d5429d13ac765d6050f53de87d484ef0"/>
+	<rom name="cbarrel_Neocd.bin" size="756918288" crc="be62cc20" sha1="010cc136afe8912cef700ae787139846a04d35eb"/>
+	-->
+	<software name="cpbarrel">
+		<description>Captain Barrel</description>
+		<year>2024</year>
+		<publisher>Neo Byte Force</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cbarrel_Neocd" sha1="c36ef17f7c00a25ca443f3aac01afffa24539de6"/>
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

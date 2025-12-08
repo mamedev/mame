@@ -1107,7 +1107,7 @@ ROM_START( eprom2 )
 ROM_END
 
 
-ROM_START( klaxp1 )
+ROM_START( klaxp1 ) // internal ROM test date: 15NOV1989 12:54:34
 	ROM_REGION( 0xa0000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "klax_ft1.50a",   0x00000, 0x10000, CRC(87ee72d1) SHA1(39ae6f8406f0768480bcc80d395a14d9c2c65dca) )
 	ROM_LOAD16_BYTE( "klax_ft1.40a",   0x00001, 0x10000, CRC(ba139fdb) SHA1(98a8ac5e0349b934f55d0d9de85abacd3fd0d77d) )
@@ -1130,7 +1130,7 @@ ROM_START( klaxp1 )
 ROM_END
 
 
-ROM_START( klaxp2 )
+ROM_START( klaxp2 ) // internal ROM test date: 15NOV1989 12:54:34
 	ROM_REGION( 0xa0000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "klax_ft2.50a",   0x00000, 0x10000, CRC(7d401937) SHA1(8db0560528a86b9cb01c4598a49694bd44b00dba) )
 	ROM_LOAD16_BYTE( "klax_ft2.40a",   0x00001, 0x10000, CRC(c5ca33a9) SHA1(c2e2948f987ba43f61c043baed06ffea8787be43) )

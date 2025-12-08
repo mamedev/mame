@@ -95,6 +95,11 @@ void a2bus_softcard3_device::device_start()
 
 void a2bus_softcard3_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_softcard3_device::reset_from_bus()
+{
 	m_bEnabled = false;
 	m_reset = false;
 	m_enable_fffx = false;
@@ -218,9 +223,4 @@ void a2bus_softcard3_device::dma_w(offs_t offset, uint8_t data)
 	{
 		slot_dma_write((offset & 0xff) + (m_prom[offset >> 8] << 8), data);
 	}
-}
-
-bool a2bus_softcard3_device::take_c800()
-{
-	return false;
 }

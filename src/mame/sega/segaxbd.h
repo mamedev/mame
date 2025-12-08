@@ -15,7 +15,7 @@
 #include "sega16sp.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 #include "machine/i8251.h"

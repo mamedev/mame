@@ -8,13 +8,13 @@
 #include "tilemap.h"
 
 
-#define K051316_CB_MEMBER(_name)   void _name(int *code, int *color)
+#define K051316_CB_MEMBER(_name)   void _name(int &code, int &color)
 
 
 class k051316_device : public device_t, public device_gfx_interface
 {
 public:
-	using zoom_delegate = device_delegate<void (int *code, int *color)>;
+	using zoom_delegate = device_delegate<void (int &code, int &color)>;
 
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -49,7 +49,7 @@ public:
 	u8 rom_r(offs_t offset);
 	void ctrl_w(offs_t offset, u8 data);
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u32 priority);
-	void wraparound_enable(int status);
+	void wraparound_enable(int state);
 
 	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
 	void mark_tmap_dirty() { m_tmap->mark_all_dirty(); }
@@ -60,16 +60,16 @@ protected:
 
 private:
 	// internal state
-	std::vector<uint8_t> m_ram;
-	uint8_t m_ctrlram[14];
+	std::vector<u8> m_ram;
+	u8 m_ctrlram[14];
 	tilemap_t *m_tmap;
 
-	optional_region_ptr<uint8_t> m_zoom_rom;
+	optional_region_ptr<u8> m_zoom_rom;
 
 	int m_dx, m_dy;
-	int m_wrap;
-	int m_pixels_per_byte;
-	int m_layermask;
+	bool m_wrap;
+	s32 m_pixels_per_byte;
+	s32 m_layermask;
 	zoom_delegate m_k051316_cb;
 	bool m_readout_enabled;
 	bool m_flipx_enabled;

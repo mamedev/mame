@@ -541,7 +541,7 @@ void deniamb_state::oki_rom_bank_w(u8 data)
 
 void deniamc_state::oki_rom_bank_w(u8 data)
 {
-	if ((data & 0xfe) != 0) popmessage("OKI bank was not 0 or 1! contact MAMEDEV!");
+	if ((data & 0xfe) != 0) popmessage("OKI bank %02x", data);
 	m_oki->set_rom_bank(data & 0x01);
 }
 

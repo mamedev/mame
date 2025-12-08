@@ -81,6 +81,8 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
+	virtual void internal_io_map(address_map &map) ATTR_COLD;
+
 private:
 	void at_pit8254_out0_changed(int state);
 	void at_pit8254_out1_changed(int state);
@@ -114,8 +116,6 @@ private:
 	uint8_t pc_dma_read_word(offs_t offset);
 	void pc_dma_write_word(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-
-	void internal_io_map(address_map &map) ATTR_COLD;
 
 	void boot_state_w(uint8_t data);
 	void nop_w(uint8_t data);

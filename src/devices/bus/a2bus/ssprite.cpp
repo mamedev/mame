@@ -51,6 +51,7 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
 
 private:
 	void tms_irq_w(int state);
@@ -104,6 +105,12 @@ void a2bus_ssprite_device::device_start()
 
 void a2bus_ssprite_device::device_reset()
 {
+}
+
+void a2bus_ssprite_device::reset_from_bus()
+{
+	m_tms->reset();
+	m_ay->reset();
 }
 
 /*

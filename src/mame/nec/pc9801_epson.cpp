@@ -2,49 +2,56 @@
 // copyright-holders:Angelo Salese,Carl
 /**************************************************************************************************
 
-    Epson PC98[01] class machine
+Epson PC98[01] class machine
 
-    TODO (PC-286VS):
-    - Verify A20 gate usage, seems to reuse the same hookup as later Epson variants;
+TODO (pc286vs):
+- Verify A20 gate usage, seems to reuse the same hookup as later Epson variants;
+- Not extensively tested beyond not having a working SASI/SCSI option (using IDE as fallback);
 
-    TODO (PC-386M):
-    - Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
-      (which barely contains program code);
-    - "ERR:VR" at POST (GFX VRAM)
-      Sub-routine that throws this is at PC=0xfd9bc. Notice that you can actually skip this
-      with eip=0x1bf in debugger and make the system to actually checkout memory installed.
-      (Shorthand: "bp fd9bc,eip=0x1bf")
-    - POST throws non-fatal "ERR:PA" (page fault, "Protected Address"?) after checking memory
-      installed. Non-fatal as in POST will checkout bootable devices afterward.
+TODO (pc386m):
+- Incomplete shadow IPL banking, we currently never bankswitch to the other ROM bank
+  (which barely contains program code);
+- "ERR:VR" at POST (GFX VRAM)
+  Sub-routine that throws this is at PC=0xfd9bc. Notice that you can actually skip this
+  with eip=0x1bf in debugger and make the system to actually checkout memory installed.
+  (Shorthand: "bp fd9bc,eip=0x1bf")
+- POST throws non-fatal "ERR:PA" (page fault, "Protected Address"?) after checking memory
+  installed. Non-fatal as in POST will checkout bootable devices afterward.
 
-    TODO: (PC-486SE/PC-486MU):
-    - Verify ROM bankswitch;
-      On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
-      is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
-      the same bank.
-    - Remove IDE regression hack at I/O $74e;
-    - Regressed with a ERR:RA (conventional memory!?) when moving driver to
-      stand-alone file;
-    - Eventually errors with a ERR:VR (GFX VRAM);
+TODO: (pc486se/pc486mu):
+- Verify ROM bankswitch;
+  On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
+  is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
+  the same bank.
+- Remove IDE regression hack at I/O $74e;
+- Regressed with a ERR:RA (conventional memory!?) when moving driver to
+  stand-alone file;
+- Eventually errors with a ERR:VR (GFX VRAM);
+- Higher RAM hookups needs verifying, particularly with hole 15M marks;
 
-    Notes:
-    - A detailed list of Epson PC98s can be seen from here:
-      http://www.pc-9800.net/db_epson/index.htm
+Notes:
+- A detailed list of Epson PC98s can be seen from here:
+  http://www.pc-9800.net/db_epson/index.htm
 
-    - Being these knockoffs means that there isn't 100% compatibility with all SWs.
-      Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック)
-      starting with MS-DOS 3.3 onward, which checks the presence of NEC / Microsoft copyright
-      string at E800:0DD8 and refuses to boot if not satisfied.
-      cfr. https://github.com/joncampbell123/dosbox-x/issues/682
-      Epson offcially provided PC "Software Installation Program" (SIP) floppy disks
-      (the "epinstal*" in SW list?) that counteracts with the protection check.
-      There's alternatively a freeware user released "Dispell!" program tool that can be used for
-      the same purpose, which also works for 32-bit DOS/V machines.
+- Being these knockoffs means that there isn't 100% compatibility with all SWs.
+  Additionally NEC introduced the so called "EPSON Protect" / "EPSON check" (エプソンチェック)
+  starting with MS-DOS 3.3 onward, which checks the presence of NEC / Microsoft copyright
+  string at E800:0DD8 and refuses to boot if not satisfied.
+  cfr. https://github.com/joncampbell123/dosbox-x/issues/682
+  Epson offcially provided PC "Software Installation Program" (SIP) floppy disks
+  (the "epinstal*" in SW list?) that counteracts with the protection check.
+  There's alternatively a freeware user released "Dispell!" program tool that can be used for
+  the same purpose, which also works for 32-bit DOS/V machines.
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "pc9801_epson.h"
+
+#include "bus/pc98_54simm/options.h"
+#include "bus/pc98_54simm/slot.h"
+#include "bus/pc98_61simm/options.h"
+#include "bus/pc98_61simm/slot.h"
 
 template <unsigned which> void pc98_epson_state::shadow_ipl_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -130,11 +137,20 @@ void pc98_epson_state::epson_vram_bank_w(offs_t offset, u8 data)
 	logerror("%s: Epson $c06 write %02x\n", machine().describe_context(), data);
 }
 
+void pc98_epson_state::pc286u_map(address_map &map)
+{
+	pc9801vm_map(map);
+	map(0xe8000, 0xfffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+}
+
+
 void pc98_epson_state::pc286vs_map(address_map &map)
 {
 	pc9801ux_map(map);
 	map(0x0e8000, 0x0fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
-	map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+//  map(0x100000, 0xefffff).rw(FUNC(pc98_epson_state::ram_ext_r), FUNC(pc98_epson_state::ram_ext_w));
+	// would hang the machine with following and 15M
+//  map(0xee8000, 0xefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0xfe8000, 0xffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
@@ -166,7 +182,7 @@ void pc98_epson_state::epson_base_io(address_map &map)
 
 void pc98_epson_state::pc286vs_io(address_map &map)
 {
-	pc9801ux_io(map);
+	pc9801vm_io(map);
 	epson_base_io(map);
 }
 
@@ -303,9 +319,9 @@ static INPUT_PORTS_START( pc386m )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
-	PORT_START("ROM_LOAD")
+	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_CONFNAME( 0x04, 0x04, "Load IDE BIOS" )
+	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
@@ -343,6 +359,10 @@ void pc98_epson_state::pc286vs(machine_config &config)
 
 	config_base_epson(config);
 
+	// RAM 640KB ~ 14.6MB
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("640K,4M,8M,14M,15M");
+
 	// TODO: DMA type & clock
 }
 
@@ -350,6 +370,15 @@ void pc98_epson_state::pc286u(machine_config &config)
 {
 	pc9801vm(config);
 	config_base_epson(config);
+	V30(config.replace(), m_maincpu, 10'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc98_epson_state::pc286u_map);
+	m_maincpu->set_addrmap(AS_IO, &pc98_epson_state::pc286vs_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// RAM 640KB ~ 8.6MB
+//  m_ram->set_default_size("640K");
+	// TODO: how?
+//  m_ram->set_extra_options("4M,8M,9M");
 
 	// TODO: DMA type & clock
 }
@@ -365,7 +394,10 @@ void pc98_epson_state::pc386m(machine_config &config)
 
 	config_base_epson(config);
 
-	// RAM: 640KB + 14.6MB max
+	// RAM: 640KB ~ 14.6MB
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("640K,4M,8M,14M,15M");
+
 	// 2 3.5 floppy drives
 	// ...
 }
@@ -381,7 +413,10 @@ void pc98_epson_state::pc486se(machine_config &config)
 
 	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
 
-	// RAM: 1.6 MB (!) + 17.6 max
+	// RAM 1.6 MB ~ 17.6 MB
+//  m_ram->set_default_size("2M");
+//  m_ram->set_extra_options("4M,8M,14M,16M,18M");
+
 	// "dedicated internal memory slot x 1"
 	// "dedicated video board" slot
 }
@@ -397,8 +432,12 @@ void pc98_epson_state::pc486mu(machine_config &config)
 
 	pit_clock_config(config, xtal/8); // unknown, passes "ERR:TM" test
 
+	// RAM: 5.6 MB ~ 61.6 MB
+//  m_ram->set_default_size("6M");
+//  m_ram->set_extra_options("8M,14M,16M,32M,48M,62M");
+
 	// CL-GD5428
-	// RAM: 5.6 + 61.6MB max
+
 	// 2 x 3.5 floppy drives
 }
 
@@ -557,20 +596,20 @@ ROM_END
 // Epson PC98 desktop line
 
 // PC-286 (i286, first model released in Oct 1987)
-COMP( 1989, pc286vs,     0,       0, pc286vs,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286VS", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1989, pc286vs,     0,       0, pc286vs,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286VS", MACHINE_NOT_WORKING )
 
 // PC-286U (same as above except running on V30)
-COMP( 1987, pc286u,     0,        0, pc286u,     pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286U", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // Revised BIOS 1988
+COMP( 1987, pc286u,     0,        0, pc286u,     pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-286U", MACHINE_NOT_WORKING ) // Revised BIOS 1988
 
 // PC-286C "PC Club" (same as PC-286?)
 // ...
 
 // PC-386 (i386)
-COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-386M",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1990, pc386m,     0,        0, pc386m,    pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-386M",  MACHINE_NOT_WORKING )
 
 // PC-486 (i486SX/DX)
-COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486MU", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486SE", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pc486mu,    0,        0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486MU", MACHINE_NOT_WORKING )
+COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_pc9801_kanji, "Epson", "PC-486SE", MACHINE_NOT_WORKING )
 // PRO-486 (first actual version with i486dx? Supports High-reso)
 // PC-486P/Win (same as a PC-486P but with Windows 3.0a + MS-DOS 3.3 HDD pre-installed?)
 

@@ -85,7 +85,7 @@ protected:
 	void pc2000_mem(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<hd44780_device> m_lcdc;
+	optional_device<hd44780_base_device> m_lcdc;
 	required_device<screen_device> m_screen;
 	required_device<beep_device> m_beep;
 	required_device<generic_slot_device> m_cart;

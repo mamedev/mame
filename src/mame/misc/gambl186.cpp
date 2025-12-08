@@ -54,7 +54,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/nvram.h"
 #include "sound/upd7759.h"
 #include "video/pc_vga_cirrus.h"

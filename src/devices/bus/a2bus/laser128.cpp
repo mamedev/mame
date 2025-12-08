@@ -138,7 +138,7 @@ void a2bus_laser128_device::write_c800(uint16_t offset, uint8_t data)
 	}
 }
 
-bool a2bus_laser128_device::take_c800()
+bool a2bus_laser128_device::take_c800() const
 {
 	switch (slotno())
 	{

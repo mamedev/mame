@@ -16,7 +16,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
@@ -70,7 +70,7 @@ protected:
 
 private:
 	void fireball_map(address_map &map) ATTR_COLD;
-	void fireball_io_map(address_map &map) ATTR_COLD;
+	void fireball_data_map(address_map &map) ATTR_COLD;
 
 	void io_00_w(uint8_t data);
 	uint8_t io_00_r();
@@ -296,7 +296,7 @@ void fireball_state::fireball_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 }
 
-void fireball_state::fireball_io_map(address_map &map)
+void fireball_state::fireball_data_map(address_map &map)
 {
 	map(0x00, 0x01).rw(FUNC(fireball_state::io_00_r), FUNC(fireball_state::io_00_w));
 	map(0x02, 0x03).rw(FUNC(fireball_state::io_02_r), FUNC(fireball_state::io_02_w));
@@ -510,7 +510,7 @@ void fireball_state::fireball(machine_config &config)
 	// basic machine hardware
 	I8031(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fireball_state::fireball_map);
-	m_maincpu->set_addrmap(AS_IO, &fireball_state::fireball_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &fireball_state::fireball_data_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(fireball_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(fireball_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(fireball_state::p3_r));

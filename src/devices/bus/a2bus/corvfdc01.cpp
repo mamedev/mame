@@ -139,6 +139,11 @@ void a2bus_corvfdc01_device::device_reset()
 	m_curfloppy = nullptr;
 }
 
+void a2bus_corvfdc01_device::reset_from_bus()
+{
+	m_wdfdc->reset();
+}
+
 /*-------------------------------------------------
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/

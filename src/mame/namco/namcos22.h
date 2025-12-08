@@ -225,7 +225,8 @@ public:
 		m_custom(*this, "CUSTOM.%u", 0),
 		m_opt(*this, "OPT.%u", 0),
 		m_mcu_out(*this, "mcuout%u", 0U),
-		m_cpuled_out(*this, "cpuled%u", 0U)
+		m_cpuled_out(*this, "cpuled%u", 0U),
+		m_wheel_motor(*this, "wheel_motor")
 	{ }
 
 	void cybrcomm(machine_config &config);
@@ -438,6 +439,7 @@ protected:
 	optional_ioport_array<2> m_opt;
 	output_finder<16> m_mcu_out;
 	output_finder<8> m_cpuled_out;
+	output_finder<> m_wheel_motor;
 
 	u8 m_syscontrol[0x20] = { };
 	bool m_dsp_irq_enabled = false;

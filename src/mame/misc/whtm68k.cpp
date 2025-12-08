@@ -5,7 +5,7 @@
 益智象棋 (Yìzhì Xiàngqí)
 
 TODO:
-- Dip-switches (needs sheet);
+- DIP-switches (needs sheet);
 - Lamps;
 - Convert video to use 6845 semantics;
 - is there a way to access key test? There are strings in program ROM and GFX in the gfx2 region.
@@ -38,7 +38,7 @@ K-665 sound chip (Oki M6295 clone)
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -126,7 +126,7 @@ private:
 
 	void main_program_map(address_map &map) ATTR_COLD;
 	void audio_program_map(address_map &map) ATTR_COLD;
-	void audio_io_map(address_map &map) ATTR_COLD;
+	void audio_data_map(address_map &map) ATTR_COLD;
 	template <uint8_t Which> void ramdac_map(address_map &map) ATTR_COLD;
 };
 
@@ -252,7 +252,7 @@ void whtm68k_state::audio_program_map(address_map &map)
 	map(0x8000, 0xffff).bankr(m_audiobank);
 }
 
-void whtm68k_state::audio_io_map(address_map &map)
+void whtm68k_state::audio_data_map(address_map &map)
 {
 	map(0x8000, 0x803f).ram(); // ??
 	map(0xa000, 0xa000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -306,13 +306,14 @@ static INPUT_PORTS_START( yizhix ) // TODO: possibly some missing inputs
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red") // in roulette double up
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Red") // in roulette double up
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Black") // in roulette double up
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black") // in roulette double up
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: these are present on PCB, but do they have any effect?
 	// Settings are done via test mode
+	// turning on both SW1:1 and SW1:2 makes the game boot into the bookkeeping screen
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC(0x0001, 0x0001, "SW1:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x0002, 0x0002, "SW1:2")
@@ -378,7 +379,7 @@ void whtm68k_state::yizhix(machine_config &config)
 
 	i80c32_device &audiocpu(I80C32(config, "audiocpu", 12_MHz_XTAL));
 	audiocpu.set_addrmap(AS_PROGRAM, &whtm68k_state::audio_program_map);
-	audiocpu.set_addrmap(AS_IO, &whtm68k_state::audio_io_map);
+	audiocpu.set_addrmap(AS_DATA, &whtm68k_state::audio_data_map);
 	audiocpu.port_in_cb<0>().set([this] () { LOGPORTS("%s: 80C32 port 0 read\n", machine().describe_context()); return 0; });
 	audiocpu.port_in_cb<1>().set([this] () {
 		// TODO: read all the time

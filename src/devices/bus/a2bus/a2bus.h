@@ -136,14 +136,14 @@ public:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) { device().logerror("a2bus: unhandled write %02x to Cn%02x\n", data, offset); }
 	virtual uint8_t read_c800(uint16_t offset) { return 0; }      // C800 - /IOSTB
 	virtual void write_c800(uint16_t offset, uint8_t data) {device().logerror("a2bus: unhandled write %02x to %04x\n", data, offset + 0xc800); }
-	virtual bool take_c800() { return true; }   // override and return false if your card doesn't take over the c800 space
+	virtual bool take_c800() const { return false; }   // override and return true if your card can take over the /IOSTB space
 	virtual uint8_t read_inh_rom(uint16_t offset) { return 0; }
 	virtual void write_inh_rom(uint16_t offset, uint8_t data) { }
 	virtual uint16_t inh_start() { return INH_START_INVALID; }
 	virtual uint16_t inh_end() { return INH_END_INVALID; }
 	virtual bool inh_check(uint16_t offset, bool bIsWrite) { return false; }
 	virtual int inh_type() { return INH_NONE; }
-	virtual void bus_reset() { }
+	virtual void reset_from_bus() { }
 
 	device_a2bus_card_interface *next() const { return m_next; }
 

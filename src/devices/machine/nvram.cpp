@@ -76,15 +76,6 @@ void nvram_device::nvram_default()
 			memset(m_base, 0xff, m_length);
 			break;
 
-		// random values
-		case DEFAULT_RANDOM:
-			{
-				uint8_t *nvram = reinterpret_cast<uint8_t *>(m_base);
-				for (int index = 0; index < m_length; index++)
-					nvram[index] = machine().rand();
-			}
-			break;
-
 		// custom handler
 		case DEFAULT_CUSTOM:
 			m_custom_handler(*this, m_base, m_length);

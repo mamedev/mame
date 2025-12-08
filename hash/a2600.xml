@@ -259,7 +259,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>3-D Genesis (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
-		<info name="programmer" value="Jerry Lawson, Dan Mcelroy" />
+		<info name="programmer" value="Jerry Lawson" />
+		<info name="programmer" value="Dan Mcelroy" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
@@ -273,7 +274,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>3-D Ghost Attack (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
-		<info name="programmer" value="michael k. glass, jerry lawson" />
+		<info name="programmer" value="Michael K. Glass" />
+		<info name="programmer" value="Jerry Lawson" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f6" />
@@ -287,7 +289,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>3-D Havoc (prototype)</description>
 		<year>1983</year>
 		<publisher>Amiga</publisher>
-		<info name="programmer" value="Frank Ellis, Jerry Lawson" />
+		<info name="programmer" value="Frank Ellis" />
+		<info name="programmer" value="Jerry Lawson" />
 		<info name="serial" value="2110"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a2600_cart">
@@ -552,7 +555,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1983</year>
 		<publisher>Mattel Electronics</publisher>
 		<info name="serial" value="4317" />
-		<info name="programmer" value="Hal Finney, Glenn Hightower" />
+		<info name="programmer" value="Hal Finney" />
+		<info name="programmer" value="Glenn Hightower" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
@@ -566,7 +570,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1989</year>
 		<publisher>Telegames</publisher>
 		<info name="serial" value="4317 A009" />
-		<info name="programmer" value="Hal Finney, Glenn Hightower" />
+		<info name="programmer" value="Hal Finney" />
+		<info name="programmer" value="Glenn Hightower" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<dataarea name="rom" size="4096">
@@ -767,7 +772,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan &amp; Preston Stuart" />
+		<info name="programmer" value="Michael Callahan " />
+		<info name="programmer" value="Preston Stuart" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
@@ -783,7 +789,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan &amp; Preston Stuart" />
+		<info name="programmer" value="Michael Callahan " />
+		<info name="programmer" value="Preston Stuart" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
@@ -799,7 +806,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan &amp; Preston Stuart" />
+		<info name="programmer" value="Michael Callahan " />
+		<info name="programmer" value="Preston Stuart" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
@@ -815,7 +823,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX26103" />
-		<info name="programmer" value="Michael Callahan &amp; Preston Stuart" />
+		<info name="programmer" value="Michael Callahan " />
+		<info name="programmer" value="Preston Stuart" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
@@ -859,7 +868,8 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		<description>AndroMan on the Moon (prototype)</description>
 		<year>1984</year>
 		<publisher>Western Technologies</publisher>
-		<info name="programmer" value="Michael Case, Lenny Carlson" />
+		<info name="programmer" value="Michael Case" />
+		<info name="programmer" value="Lenny Carlson" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="slot" value="a26_f8" />
 			<dataarea name="rom" size="8192">

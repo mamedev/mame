@@ -57,7 +57,7 @@ reset (F3).
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "machine/rescap.h"
@@ -427,7 +427,7 @@ void midi2cv8_state::midi2cv8(machine_config &config)
 {
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midi2cv8_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &midi2cv8_state::external_memory_map);
+	m_maincpu->set_addrmap(AS_DATA, &midi2cv8_state::external_memory_map);
 
 	m_maincpu->port_in_cb<1>().set_ioport("dsw").mask(0x1f);  // P1.0-P1.4
 	m_maincpu->port_in_cb<1>().append(FUNC(midi2cv8_state::is_volts_per_hz_r)).lshift(7).mask(0x80);  // P1.7

@@ -19,6 +19,7 @@ public:
 	pc9821_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801bx_state(mconfig, type, tag)
 		, m_ext_gvram(*this, "ext_gvram")
+		, m_pegc_vram_view(*this, "pegc_vram_view")
 		, m_pegc_mmio_view(*this, "pegc_mmio_view")
 	{
 	}
@@ -37,6 +38,7 @@ protected:
 
 private:
 	required_shared_ptr<uint32_t> m_ext_gvram;
+	memory_view m_pegc_vram_view;
 	memory_view m_pegc_mmio_view;
 
 	uint16_t pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -86,6 +88,7 @@ public:
 
 protected:
 	void pc9821as_map(address_map &map) ATTR_COLD;
+	void pc9821ap2_map(address_map &map) ATTR_COLD;
 	void pc9821as_io(address_map &map) ATTR_COLD;
 
 	virtual void itf_43d_bank_w(offs_t offset, uint8_t data) override;
@@ -93,6 +96,7 @@ protected:
 
 private:
 	DECLARE_MACHINE_START(pc9821ap2);
+	DECLARE_MACHINE_RESET(pc9821ap2);
 
 	// Starting from Af
 	memory_view m_bios_view;
@@ -113,26 +117,32 @@ class pc9821_canbe_state : public pc9821_state
 public:
 	pc9821_canbe_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9821_state(mconfig, type, tag)
+		, m_bios_view(*this, "bios_view")
 	{
 	}
 
-	void pc9821ce2(machine_config &config);
+	void pc9821ce(machine_config &config);
+//  void pc9821ce2(machine_config &config);
 	void pc9821cx3(machine_config &config);
 
 protected:
+	void pc9821ce_map(address_map &map) ATTR_COLD;
+	void pc9821ce_io(address_map &map) ATTR_COLD;
+
 	void pc9821cx3_map(address_map &map) ATTR_COLD;
 	void pc9821cx3_io(address_map &map) ATTR_COLD;
 
+	virtual void itf_43d_bank_w(offs_t offset, uint8_t data) override;
+	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data) override;
+
 private:
-	void remote_addr_w(offs_t offset, u8 data);
-	u8 remote_data_r(offs_t offset);
-	void remote_data_w(offs_t offset, u8 data);
+	memory_view m_bios_view;
 
 	DECLARE_MACHINE_START(pc9821_canbe);
+	DECLARE_MACHINE_RESET(pc9821_canbe);
 
-	struct {
-		u8 index = 0;
-	}m_remote;
+	virtual void hole_15m_control_w(offs_t offset, u8 data) override;
+
 };
 
 // class pc9821_cereb_state : public pc9821_canbe_state
@@ -152,7 +162,8 @@ public:
 	}
 
 	void pc9821xa16(machine_config &config);
-	void pc9821xs(machine_config &config);
+	void pc9821xv13(machine_config &config);
+//  void pc9821xs(machine_config &config);
 };
 
 // Mate R

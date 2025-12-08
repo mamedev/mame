@@ -63,7 +63,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/e132xs/e132xs.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -3128,7 +3128,7 @@ void vamphalf_qdsp_state::init_misncrft()
 	m_flip_bit = 1;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qdsp_cpu->space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
 }
 
@@ -3211,7 +3211,7 @@ void vamphalf_qdsp_state::init_wyvernwg()
 	m_semicom_prot_data[1] = 1;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qdsp_cpu->space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
 
 	save_item(NAME(m_semicom_prot_idx));
@@ -3235,7 +3235,7 @@ void vamphalf_qdsp_state::init_yorijori()
 	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
-	m_qdsp_cpu->space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qdsp_cpu->space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
 }
 

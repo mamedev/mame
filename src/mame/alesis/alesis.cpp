@@ -115,7 +115,7 @@ void alesis_state::hr16_mem(address_map &map)
 	map(0x0000, 0x7fff).mirror(0x8000).rom();
 }
 
-void alesis_state::hr16_io(address_map &map)
+void alesis_state::hr16_data(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0000).r(FUNC(alesis_state::kb_r));
@@ -132,7 +132,7 @@ void alesis_state::sr16_mem(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void alesis_state::sr16_io(address_map &map)
+void alesis_state::sr16_data(address_map &map)
 {
 	//map.unmap_value_high();
 	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
@@ -142,7 +142,7 @@ void alesis_state::sr16_io(address_map &map)
 	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
 }
 
-void alesis_state::mmt8_io(address_map &map)
+void alesis_state::mmt8_data(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).ram().share("nvram");   // 2x32Kx8 SRAM, (battery-backed)
@@ -411,7 +411,7 @@ void alesis_state::hr16(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::hr16_mem);
-	m_maincpu->set_addrmap(AS_IO, &alesis_state::hr16_io);
+	m_maincpu->set_addrmap(AS_DATA, &alesis_state::hr16_data);
 	m_maincpu->port_in_cb<1>().set_ioport("SELECT");
 	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::p3_w));
@@ -446,7 +446,7 @@ void alesis_state::sr16(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::sr16_mem);
-	m_maincpu->set_addrmap(AS_IO, &alesis_state::sr16_io);
+	m_maincpu->set_addrmap(AS_DATA, &alesis_state::sr16_data);
 	m_maincpu->port_in_cb<1>().set_constant(0);
 
 	/* video hardware */
@@ -465,7 +465,7 @@ void alesis_state::mmt8(machine_config &config)
 	hr16(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_IO, &alesis_state::mmt8_io);
+	m_maincpu->set_addrmap(AS_DATA, &alesis_state::mmt8_data);
 	m_maincpu->port_in_cb<1>().set(FUNC(alesis_state::kb_r));
 	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::mmt8_p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::mmt8_p3_w));

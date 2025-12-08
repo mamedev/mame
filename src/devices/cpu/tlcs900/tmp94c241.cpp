@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR,Felipe Sanches
+// copyright-holders:AJR, Felipe Sanches
 /****************************************************************************
 
     Toshiba TMP94C241 microcontroller
@@ -1326,7 +1326,7 @@ void tmp94c241_device::execute_set_input(int input, int level)
 	m_check_irqs = 1;
 }
 
-std::pair<u16, char const *> const tmp94c241_syms[] = {
+static std::pair<u16, char const *> const tmp94c241_syms[] = {
 	/* TLCS-900/H2 type 8 bit I/O: */
 	{ 0x00, "P0" }, { 0x02, "P0CR" }, { 0x03, "P0FC" },
 	{ 0x04, "P1" }, { 0x06, "P1CR" }, { 0x07, "P1FC" },
@@ -1402,5 +1402,5 @@ std::pair<u16, char const *> const tmp94c241_syms[] = {
 
 std::unique_ptr<util::disasm_interface> tmp94c241_device::create_disassembler()
 {
-	return std::make_unique<tmp94c241_disassembler>(tmp94c241_syms);
+	return std::make_unique<tlcs900_disassembler>(tmp94c241_syms);
 }

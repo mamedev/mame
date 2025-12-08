@@ -33,6 +33,8 @@ public:
 	void set_rom_bank(int bank);
 
 protected:
+	typename memory_access<AddrWidth, DataWidth, AddrShift, Endian>::cache m_rom_cache;
+
 	virtual void rom_bank_pre_change() { }
 	virtual void rom_bank_post_change() { }
 	virtual space_config_vector memory_space_config() const override;
@@ -43,7 +45,6 @@ private:
 	optional_memory_region m_rom_region;
 	optional_address_space m_rom_space;
 	address_space_config m_rom_config;
-	typename memory_access<AddrWidth, DataWidth, AddrShift, Endian>::cache m_rom_cache;
 
 	memory_bank_creator m_bank;
 	u32 m_cur_bank, m_bank_count;

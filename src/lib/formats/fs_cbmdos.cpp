@@ -21,7 +21,7 @@ Current limitations:
 #include "fsblk.h"
 
 #include "corestr.h"
-#include "multibyte.h"
+#include "coretmpl.h"
 #include "strformat.h"
 
 #include <array>
@@ -65,8 +65,8 @@ public:
 	public:
 		block_iterator(const impl &fs, u8 first_track, u8 first_sector);
 		bool next();
-		const void *data() const;
-		const std::array<cbmdos_dirent, SECTOR_DIRECTORY_COUNT> &dirent_data() const;
+		void append_data(std::vector<u8> &vec) const;
+		cbmdos_dirent get_dirent(int file_index) const;
 		u8 size() const;
 		u8 track() const { return m_track; }
 		u8 sector() const { return m_sector; }
@@ -305,7 +305,7 @@ impl::impl(fsblk_t &blockdev)
 meta_data impl::volume_metadata()
 {
 	auto bam_block = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	std::string_view disk_name = bam_block->rstr(0x90, 16);
+	std::string disk_name = bam_block->rstr(0x90, 16);
 
 	meta_data results;
 	results.set(meta_name::name, strtrimright_cbm(disk_name));
@@ -359,7 +359,7 @@ std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vect
 	std::vector<u8> result;
 	block_iterator iter(*this, dirent->m_file_first_track, dirent->m_file_first_sector);
 	while (iter.next())
-		result.insert(result.end(), (const u8 *)iter.data(), (const u8 *)iter.data() + iter.size());
+		iter.append_data(result);
 
 	return std::make_pair(std::error_condition(), std::move(result));
 }
@@ -670,13 +670,12 @@ void impl::iterate_directory_entries(const std::function<bool(u8 track, u8 secto
 	block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
 	while (iter.next())
 	{
-		auto entries = iter.dirent_data();
-
 		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++)
 		{
-			if (entries[file_index].m_file_type != 0x00)
+			cbmdos_dirent entry = iter.get_dirent(file_index);
+			if (entry.m_file_type != 0x00)
 			{
-				if (callback(iter.track(), iter.sector(), file_index, entries[file_index]))
+				if (callback(iter.track(), iter.sector(), file_index, entry))
 					return;
 			}
 		}
@@ -688,11 +687,10 @@ void impl::iterate_all_directory_entries(const std::function<bool(u8 track, u8 s
 	block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
 	while (iter.next())
 	{
-		auto entries = iter.dirent_data();
-
 		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++)
 		{
-			if (callback(iter.track(), iter.sector(), file_index, entries[file_index]))
+			cbmdos_dirent entry = iter.get_dirent(file_index);
+			if (callback(iter.track(), iter.sector(), file_index, entry))
 				return;
 		}
 	}
@@ -790,22 +788,26 @@ bool impl::block_iterator::next()
 
 
 //-------------------------------------------------
-//  impl::block_iterator::data
+//  impl::block_iterator::append_data
 //-------------------------------------------------
 
-const void *impl::block_iterator::data() const
+void impl::block_iterator::append_data(std::vector<u8> &vec) const
 {
-	return m_block->rodata() + 2;
+	const u8 size = this->size();
+	vec.resize(vec.size() + size);
+	m_block->read(2, &*(vec.end() - size), size);
 }
 
 
 //-------------------------------------------------
-//  impl::block_iterator::dirent_data
+//  impl::block_iterator::get_dirent
 //-------------------------------------------------
 
-const std::array<impl::cbmdos_dirent, impl::SECTOR_DIRECTORY_COUNT> &impl::block_iterator::dirent_data() const
+impl::cbmdos_dirent impl::block_iterator::get_dirent(int file_index) const
 {
-	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, SECTOR_DIRECTORY_COUNT> *>(m_block->rodata());
+	cbmdos_dirent entry;
+	m_block->read(sizeof(cbmdos_dirent) * file_index, reinterpret_cast<u8 *>(&entry), sizeof(cbmdos_dirent));
+	return entry;
 }
 
 

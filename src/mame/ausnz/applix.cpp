@@ -38,7 +38,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -136,7 +136,7 @@ private:
 	required_shared_ptr<u16> m_base;
 
 	void main_mem(address_map &map) ATTR_COLD;
-	void keytronic_pc3270_io(address_map &map) ATTR_COLD;
+	void keytronic_pc3270_data(address_map &map) ATTR_COLD;
 	void keytronic_pc3270_program(address_map &map) ATTR_COLD;
 	void sub_io(address_map &map) ATTR_COLD;
 	void sub_mem(address_map &map) ATTR_COLD;
@@ -466,7 +466,7 @@ void applix_state::keytronic_pc3270_program(address_map &map)
 	map(0x0000, 0x0fff).rom().region("kbdcpu", 0);
 }
 
-void applix_state::keytronic_pc3270_io(address_map &map)
+void applix_state::keytronic_pc3270_data(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(applix_state::internal_data_read), FUNC(applix_state::internal_data_write));
 }
@@ -852,7 +852,7 @@ void applix_state::applix(machine_config &config)
 
 	i8051_device &kbdcpu(I8051(config, "kbdcpu", 11060250));
 	kbdcpu.set_addrmap(AS_PROGRAM, &applix_state::keytronic_pc3270_program);
-	kbdcpu.set_addrmap(AS_IO, &applix_state::keytronic_pc3270_io);
+	kbdcpu.set_addrmap(AS_DATA, &applix_state::keytronic_pc3270_data);
 	kbdcpu.port_in_cb<1>().set(FUNC(applix_state::p1_read));
 	kbdcpu.port_out_cb<1>().set(FUNC(applix_state::p1_write));
 	kbdcpu.port_in_cb<2>().set(FUNC(applix_state::p2_read));

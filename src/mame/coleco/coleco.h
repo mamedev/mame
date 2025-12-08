@@ -55,7 +55,6 @@ public:
 	TIMER_CALLBACK_MEMBER(paddle_irqreset_callback);
 	TIMER_CALLBACK_MEMBER(paddle_pulse_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_update_callback);
-	void coleco_vdp_interrupt(int state);
 
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);
@@ -73,7 +72,6 @@ protected:
 	required_device<colecovision_cartridge_slot_device> m_cart;
 
 	int m_joy_mode = 0;
-	int m_last_nmi_state = 0;
 
 	// analog controls
 	attotime m_joy_pulse_reload[2]{};

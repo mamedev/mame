@@ -29,6 +29,7 @@ void lc82310_device::device_start()
 	save_item(NAME(m_sample_count));
 	save_item(NAME(m_samples_idx));
 	save_item(NAME(m_frame_channels));
+	save_item(NAME(m_frame_sample_rate));
 	save_item(NAME(m_output_gain));
 
 	save_item(NAME(m_csctl));
@@ -42,6 +43,7 @@ void lc82310_device::device_start()
 	save_item(NAME(m_ctl_out_byte));
 
 	mp3dec->register_save(*this);
+	m_frame_sample_rate = 44100;
 }
 
 void lc82310_device::device_reset()
@@ -234,7 +236,13 @@ void lc82310_device::handle_command(uint8_t cmd, uint8_t param)
 	}
 }
 
-void lc82310_device::fill_buffer()
+TIMER_CALLBACK_MEMBER(lc82310_device::update_sample_rate)
+{
+	stream->set_sample_rate(m_frame_sample_rate);
+	
+}
+
+bool lc82310_device::fill_buffer()
 {
 	int pos = 0, frame_sample_rate = 0;
 	bool decoded_frame = mp3dec->decode_buffer(pos, m_mp3data_count, &samples[0], m_sample_count, frame_sample_rate, m_frame_channels);
@@ -249,13 +257,20 @@ void lc82310_device::fill_buffer()
 			m_mp3data_count--;
 		}
 
-		return;
+		return false;
 	}
 
 	std::copy(mp3data.begin() + pos, mp3data.end(), mp3data.begin());
 	m_mp3data_count -= pos;
 
-	stream->set_sample_rate(frame_sample_rate);
+	// Sample rate changed
+	if(frame_sample_rate != m_frame_sample_rate) {
+		m_frame_sample_rate = frame_sample_rate;
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(lc82310_device::update_sample_rate), this));
+		return true;
+	}
+
+	return false;
 }
 
 void lc82310_device::append_buffer(sound_stream &stream, int &pos, int scount)
@@ -286,8 +301,16 @@ void lc82310_device::sound_stream_update(sound_stream &stream)
 
 	while (pos < csamples)
 	{
-		if (m_sample_count == 0)
-			fill_buffer();
+		if (m_sample_count == 0) {
+			if(fill_buffer()) {
+				while(pos < csamples) {
+					stream.put(0, pos, 0);
+					stream.put(1, pos, 0);
+					pos++;
+				}
+				return;
+			}
+		}
 
 		if (m_sample_count <= 0)
 			return;

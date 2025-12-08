@@ -2,16 +2,20 @@
 // copyright-holders:QUFB
 /***************************************************************************
 
-    Driver for Casio Picky Talk and Casio Plet's
+    Hitachi HD621xx organizers with pen touchpad input.
+    Includes Picky Talk, Plet's, and Opinion models.
 
     TODO:
 
-    - Communication port;
-    - Panel active buttons display;
+    - Communication/infrared port;
     - Review PORT/OPT callbacks copied from CFX9850G;
     - Fix unk_F8 loop when viewing calendar in JD-363/JD-364 models;
     - Fix busy loop @ 20:2981 in Plet's models;
-    - Keyboard input for Plet's models;
+    - Keyboard input for CSF-xxxx/JD-xxx/Plet's models;
+    - Touchpad input for NX-xxxx/RX-xxx models;
+    - Verify palettes. Colors can be changed by changing the contrast;
+    - Panel active buttons display;
+    - Layouts with scanned overlays;
 
     Hardware
     --------
@@ -69,6 +73,9 @@ public:
 	ioport_value pen_y_rescale_r();
 	ioport_value pen_target_r();
 
+	virtual u8 tablet_read(offs_t offset) { return 0; };
+	void tablet_write(offs_t offset, u8 data);
+
 protected:
 	enum pen_target : u8
 	{
@@ -87,6 +94,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_display_ram(*this, "display_ram")
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_io_buttons(*this, "BUTTONS")
 		, m_io_pen_x(*this, "PEN_X")
 		, m_io_pen_y(*this, "PEN_Y")
@@ -106,14 +114,13 @@ protected:
 	void port_w(u8 data);
 	void opt_w(u8 data);
 	u8 ki_r();
+	u8 port_r();
 	u8 in0_r();
 	u8 input_flag_read();
 
 	TIMER_CALLBACK_MEMBER(io_timer_tick);
 	u8 io_pen_x_read();
 	u8 io_pen_y_read();
-	virtual u8 tablet_read(offs_t offset) = 0;
-	void tablet_write(offs_t offset, u8 data);
 
 	void update_crosshair(screen_device &screen);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -128,6 +135,7 @@ protected:
 
 	required_shared_ptr<u8> m_display_ram;
 	required_device<hcd62121_cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 	required_ioport m_io_buttons;
 	required_ioport m_io_pen_x;
@@ -282,6 +290,11 @@ u8 pickytlk_base_state::ki_r()
 	return (m_pen_state == PEN_PRESS) ? 0x80 : 0;
 }
 
+u8 pickytlk_base_state::port_r()
+{
+	return m_port;
+}
+
 u8 pickytlk_base_state::in0_r()
 {
 	// battery level?
@@ -311,20 +324,20 @@ u32 pickytlk_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	u16 offset = 0;
 
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < (m_screen->width() + 1) / 8; i++)
 	{
 		int const x = i * 8;
 
-		for (int j = 0; j < 64; j++)
+		for (int j = 0; j < m_screen->height(); j++)
 		{
-			u16 *const row = &bitmap.pix(63 - j);
+			u16 *const row = &bitmap.pix(m_screen->height() - 1 - j);
 
 			u8 const data1 = m_display_ram[offset];
 			u8 const data2 = m_display_ram[offset + 0x400];
 
 			for (int b = 0; b < 8; b++)
 			{
-				if (x + b < 127)
+				if (x + b < m_screen->width())
 				{
 					row[x + b] = (BIT(data1, b) << 1) | BIT(data2, b);
 				}
@@ -360,18 +373,19 @@ void pickytlk_base_state::pickytlk(machine_config &config)
 	HCD62121(config, m_maincpu, 4300000); /* X1 - 4.3 MHz */
 	m_maincpu->kol_cb().set(FUNC(pickytlk_base_state::kol_w));
 	m_maincpu->koh_cb().set(FUNC(pickytlk_base_state::koh_w));
-	m_maincpu->port_cb().set(FUNC(pickytlk_base_state::port_w));
+	m_maincpu->port_w_cb().set(FUNC(pickytlk_base_state::port_w));
 	m_maincpu->opt_cb().set(FUNC(pickytlk_base_state::opt_w));
 	m_maincpu->ki_cb().set(FUNC(pickytlk_base_state::ki_r));
+	m_maincpu->port_r_cb().set(FUNC(pickytlk_base_state::port_r));
 	m_maincpu->in0_cb().set(FUNC(pickytlk_base_state::in0_r));
 	m_maincpu->input_flag_cb().set(FUNC(pickytlk_base_state::input_flag_read));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_size(127, 64);
-	screen.set_visarea(0, 126, 0, 63);
-	screen.set_screen_update(FUNC(pickytlk_base_state::screen_update));
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(127, 64);
+	m_screen->set_visarea(0, 127 - 1, 0, 64 - 1);
+	m_screen->set_screen_update(FUNC(pickytlk_base_state::screen_update));
+	m_screen->set_palette("palette");
 }
 
 
@@ -382,12 +396,13 @@ public:
 		: pickytlk_base_state(mconfig, type, tag)
 	{ }
 
+	virtual u8 tablet_read(offs_t offset) override;
+	void pickytlk_palette(palette_device &palette) const ATTR_COLD;
+
 	void pickytlk_monocolor(machine_config &config) ATTR_COLD;
 
 private:
-	virtual u8 tablet_read(offs_t offset) override;
 	void pickytlk_mem(address_map &map) ATTR_COLD;
-	void pickytlk_palette(palette_device &palette) const ATTR_COLD;
 };
 
 u8 pickytlk_monocolor_state::tablet_read(offs_t offset)
@@ -438,7 +453,6 @@ void pickytlk_monocolor_state::pickytlk_monocolor(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pickytlk_monocolor_state::pickytlk_mem);
 
-	// TODO: Verify palette. Colors can be changed by changing the contrast.
 	PALETTE(config, "palette", FUNC(pickytlk_monocolor_state::pickytlk_palette), 4);
 
 	config.set_default_layout(layout_pickytlk);
@@ -452,13 +466,14 @@ public:
 		: pickytlk_base_state(mconfig, type, tag)
 	{ }
 
-	void plets(machine_config &config) ATTR_COLD;
+	virtual u8 tablet_read(offs_t offset) override;
+	void pickytlk_palette(palette_device &palette) const ATTR_COLD;
+
 	void pickytlk_multicolor(machine_config &config) ATTR_COLD;
+	void plets(machine_config &config) ATTR_COLD;
 
 private:
-	virtual u8 tablet_read(offs_t offset) override;
 	void pickytlk_mem(address_map &map) ATTR_COLD;
-	void pickytlk_palette(palette_device &palette) const ATTR_COLD;
 };
 
 u8 pickytlk_multicolor_state::tablet_read(offs_t offset)
@@ -503,7 +518,7 @@ u8 pickytlk_multicolor_state::tablet_read(offs_t offset)
 
 void pickytlk_multicolor_state::pickytlk_mem(address_map &map)
 {
-	map(0x000000, 0x007fff).rom();
+	map(0x000000, 0x007fff).rom().mirror(0x18000);
 	map(0x080000, 0x0807ff).ram();
 	map(0x080300, 0x08030f).rw(FUNC(pickytlk_multicolor_state::tablet_read), FUNC(pickytlk_multicolor_state::tablet_write));
 //  map(0x100000, 0x10ffff) // Unknown
@@ -528,7 +543,6 @@ void pickytlk_multicolor_state::plets(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pickytlk_multicolor_state::pickytlk_mem);
 
-	// TODO: Verify palette. Colors can be changed by changing the contrast.
 	PALETTE(config, "palette", FUNC(pickytlk_multicolor_state::pickytlk_palette), 4);
 }
 
@@ -537,6 +551,166 @@ void pickytlk_multicolor_state::pickytlk_multicolor(machine_config &config)
 	plets(config);
 
 	config.set_default_layout(layout_pickytlk);
+}
+
+
+class csf_multicolor_state : public pickytlk_multicolor_state
+{
+public:
+	csf_multicolor_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pickytlk_multicolor_state(mconfig, type, tag)
+	{ }
+
+	void csf_multicolor(machine_config &config) ATTR_COLD;
+
+private:
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void csf_multicolor_mem(address_map &map) ATTR_COLD;
+	u8 csf_multicolor_port_r();
+};
+
+u32 csf_multicolor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	u16 offset = 0x200;
+
+	for (int j = 0; j < m_screen->height(); j++)
+	{
+		for (int i = 0; i < (m_screen->width() + 1) / 8; i++)
+		{
+			int const x = i * 8;
+
+			u16 *const row = &bitmap.pix(m_screen->height() - 1 - j);
+
+			u8 const data1 = m_display_ram[offset];
+			u8 const data2 = m_display_ram[offset + 0x300];
+
+			for (int b = 0; b < 8; b++)
+			{
+				if (x + b < m_screen->width())
+				{
+					row[m_screen->width() - (x + b + 1)] = (BIT(data1, b) << 1) | BIT(data2, b);
+				}
+			}
+
+			offset++;
+		}
+	}
+
+	return 0;
+}
+
+void csf_multicolor_state::csf_multicolor_mem(address_map &map)
+{
+	map(0x000000, 0x007fff).rom().mirror(0x18000);
+	map(0x080000, 0x0807ff).ram();
+//  map(0x100000, 0x10ffff) // Unknown
+//  map(0x110000, 0x11ffff) // LCD I/O
+	map(0x200000, 0x27ffff).rom().region("mask_rom", 0);
+	map(0x400000, 0x4007ff).ram().share("display_ram");
+	map(0x400800, 0x41ffff).ram();
+//  map(0xe10000, 0xe1ffff) // LCD I/O
+}
+
+u8 csf_multicolor_state::csf_multicolor_port_r()
+{
+	// bit 0: Power supply detection. On CSF-4450, PORT0 is connected to a 2SK1133 mosfet, driven by a RH5VL26CA voltage detector.
+	return m_port | 1;
+}
+
+void csf_multicolor_state::csf_multicolor(machine_config &config)
+{
+	pickytlk_base_state::pickytlk(config);
+
+	m_maincpu->port_r_cb().set(FUNC(csf_multicolor_state::csf_multicolor_port_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &csf_multicolor_state::csf_multicolor_mem);
+
+	PALETTE(config, "palette", FUNC(pickytlk_multicolor_state::pickytlk_palette), 4);
+
+	m_screen->set_size(95, 32);
+	m_screen->set_visarea(0, 95 - 1, 0, 32 - 1);
+	m_screen->set_screen_update(FUNC(csf_multicolor_state::screen_update));
+}
+
+
+class opinion_multicolor_state : public pickytlk_multicolor_state
+{
+public:
+	opinion_multicolor_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pickytlk_multicolor_state(mconfig, type, tag)
+	{ }
+
+	void opinion(machine_config &config) ATTR_COLD;
+
+private:
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void opinion_palette(palette_device &palette) const ATTR_COLD;
+	void opinion_mem(address_map &map) ATTR_COLD;
+};
+
+void opinion_multicolor_state::opinion(machine_config &config)
+{
+	pickytlk_base_state::pickytlk(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &opinion_multicolor_state::opinion_mem);
+
+	PALETTE(config, "palette", FUNC(opinion_multicolor_state::opinion_palette), 4);
+
+	m_screen->set_screen_update(FUNC(opinion_multicolor_state::screen_update));
+}
+
+void opinion_multicolor_state::opinion_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, 0xee, 0xee, 0xcc);
+	palette.set_pen_color(1, 0x33, 0xcc, 0x77);
+	palette.set_pen_color(2, 0xee, 0x77, 0x33);
+	palette.set_pen_color(3, 0x11, 0x33, 0x99);
+}
+
+void opinion_multicolor_state::opinion_mem(address_map &map)
+{
+	map(0x000000, 0x007fff).rom().mirror(0x18000);
+	map(0x080000, 0x0807ff).ram();
+	map(0x080300, 0x08030f).rw(FUNC(pickytlk_multicolor_state::tablet_read), FUNC(pickytlk_multicolor_state::tablet_write));
+//  map(0x100000, 0x10ffff) // Unknown
+//  map(0x110000, 0x11ffff) // LCD I/O
+	map(0x200000, 0x27ffff).rom().region("mask_rom", 0);
+	map(0x400000, 0x4007ff).ram().share("display_ram");
+	map(0x400800, 0x41ffff).ram();
+//  map(0xe10000, 0xe1ffff) // LCD I/O
+}
+
+u32 opinion_multicolor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	update_crosshair(screen);
+
+	u16 offset = 0;
+
+	for (int j = 0; j < m_screen->height(); j++)
+	{
+		for (int i = 0; i < (m_screen->width() + 1) / 8; i++)
+		{
+			int const x = i * 8;
+
+			u16 *const row = &bitmap.pix(m_screen->height() - 1 - j);
+
+			u8 const data1 = m_display_ram[offset];
+			u8 const data2 = m_display_ram[offset + 0x400];
+
+			for (int b = 0; b < 8; b++)
+			{
+				if (x + b < m_screen->width())
+				{
+					row[m_screen->width() - (x + b + 1)] = (BIT(data1, b) << 1) | BIT(data2, b);
+				}
+			}
+
+			offset++;
+		}
+	}
+
+	return 0;
 }
 
 
@@ -577,6 +751,20 @@ ROM_START(jd366)
 	ROM_LOAD("d23c8000xgx-c15.lsi5", 0x00000, 0x100000, CRC(d8a84c6a) SHA1(6a64dff0070c0016457c69fc0518df57da9c1b75))
 ROM_END
 
+ROM_START(csf5550)
+	CPU_ROM_MULTICOLOR
+
+	ROM_REGION(0x80000, "mask_rom", 0)
+	ROM_LOAD("d23c4001ejgw-c52.lsi3", 0x00000, 0x80000, CRC(108afd0d) SHA1(b91e8660e90592b7d025d94ffb2a648e53505522))
+ROM_END
+
+ROM_START(rx850)
+	CPU_ROM_MULTICOLOR
+
+	ROM_REGION(0x100000, "mask_rom", 0)
+	ROM_LOAD("d23c8000xgx-c07.lsi5", 0x00000, 0x100000, CRC(64acd87b) SHA1(d967455b20f16d2f9075fed504575596804bec18))
+ROM_END
+
 ROM_START(jd368)
 	CPU_ROM_MULTICOLOR
 
@@ -608,21 +796,32 @@ ROM_END
 } // anonymous namespace
 
 
+// ピッキートーク SUPER 電子手帳
 // Release date 1995-09 from "Casio Game Perfect Catalogue"
 COMP(1995, jd363, 0, 0, pickytlk_monocolor, pickytlk, pickytlk_monocolor_state, empty_init, "Casio", "Picky Talk - Super Denshi Techou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // ROM date 9539K7001
 COMP(1995?, pickydis, 0, 0, pickytlk_monocolor, pickytlk, pickytlk_monocolor_state, empty_init, "Tsukuda Original", "Disney Characters - Tegaki Electronic Note", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// カラーピッキートーク
 // Release date 1995-10 from "Casio Game Perfect Catalogue"
 COMP(1995, jd364, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Color Picky Talk - Super Denshi Techou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// スーパーピッキートーク マイルームファンタジー
 // ROM date 9635K7021
 COMP(1996?, jd366, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - My room fantasy", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ROM date 9620K7005
+COMP(1996?, csf5550, 0, 0, csf_multicolor, pickytlk, csf_multicolor_state, empty_init, "Casio", "Color Digital Diary (CSF-5550)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// https://www.casio-calculator.com/Download/Catalogue/1996-April%20Japan/1996-4%20JPn.pdf
+// Models with identical dumps: RX-355
+COMP(1996?, rx850, 0, 0, opinion, pickytlk, opinion_multicolor_state, empty_init, "Casio", "Opinion (RX-850)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // ROM date 9737K7041
 COMP(1997?, jd368, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - Access Pet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// スーパーピッキートーク グルタンの森
 // Release date 1998-07 from "Casio Game Perfect Catalogue"
 COMP(1998, pickytlk, 0, 0, pickytlk_multicolor, pickytlk, pickytlk_multicolor_state, empty_init, "Casio", "Super Picky Talk - Forest of Gurutan", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

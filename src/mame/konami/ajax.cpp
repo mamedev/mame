@@ -130,8 +130,8 @@ K052109_CB_MEMBER(ajax_state::tile_callback)
 {
 	static const int layer_colorbase[] = { 1024 / 16, 0 / 16, 512 / 16 };
 
-	*code |= ((*color & 0x0f) << 8) | (bank << 12);
-	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+	code |= ((color & 0x0f) << 8) | (bank << 12);
+	color = layer_colorbase[layer] + ((color & 0xf0) >> 4);
 }
 
 
@@ -151,11 +151,11 @@ K051960_CB_MEMBER(ajax_state::sprite_callback)
 	   6 over A    (1 = have priority)
 	   never over F
 	*/
-	*priority = 0;
-	if ( *color & 0x10) *priority |= GFX_PMASK_4; // Z = 4
-	if (~*color & 0x40) *priority |= GFX_PMASK_2; // A = 2
-	if ( *color & 0x20) *priority |= GFX_PMASK_1; // B = 1
-	*color = sprite_colorbase + (*color & 0x0f);
+	priority = 0;
+	if ( color & 0x10) priority |= GFX_PMASK_4; // Z = 4
+	if (~color & 0x40) priority |= GFX_PMASK_2; // A = 2
+	if ( color & 0x20) priority |= GFX_PMASK_1; // B = 1
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -169,8 +169,8 @@ K051316_CB_MEMBER(ajax_state::zoom_callback)
 {
 	enum { zoom_colorbase = 768 / 128 };
 
-	*code |= ((*color & 0x07) << 8);
-	*color = zoom_colorbase + ((*color & 0x08) >> 3);
+	code |= ((color & 0x07) << 8);
+	color = zoom_colorbase + ((color & 0x08) >> 3);
 }
 
 

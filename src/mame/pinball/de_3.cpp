@@ -614,6 +614,18 @@ ROM_START(rab_130)
 	ROM_LOAD("rab.u21", 0x080000, 0x40000, CRC(3de1b375) SHA1(a48bb80483ca03cd7c3bf0b5f2930a6ee9cc448d))
 ROM_END
 
+ROM_START(rab_110be)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("rocky-bull_1.10_belgium-c5.bin", 0x0000, 0x10000, CRC(195bc8e4) SHA1(bfcb8f0881a0638d4502f4df332629c401ee905e))
+	ROM_REGION(0x80000, "decodmd2", 0)
+	ROM_LOAD("rocky-bull_1.03_disp-rom0.bin", 0x00000, 0x80000, CRC(76f50541) SHA1(f79f1ce7f1cb17f295eaca7349676a8777f689ec))
+	ROM_REGION(0x010000, "decobsmt:soundcpu", 0)
+	ROM_LOAD("rab.u7", 0x0000, 0x10000, CRC(b232e630) SHA1(880fffc395d7c24bdea4e7e8000afba7ea71c094))
+	ROM_REGION(0x1000000, "decobsmt:bsmt", 0)
+	ROM_LOAD("rab.u17", 0x000000, 0x80000, CRC(7f2b53b8) SHA1(fd4f4ed1ed343069ffc534fe4b20026fe7403220))
+	ROM_LOAD("rab.u21", 0x080000, 0x40000, CRC(3de1b375) SHA1(a48bb80483ca03cd7c3bf0b5f2930a6ee9cc448d))
+ROM_END
+
 ROM_START(rab_103s)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("rabcpu.103", 0x0000, 0x10000, CRC(d5fe3184) SHA1(dc1ca938f15240d1c15ee5724d29a3538418f8de))
@@ -2029,6 +2041,19 @@ ROM_START(mav_402)
 	ROM_LOAD("mavu21.dat", 0x080000, 0x80000, CRC(be0c6a6f) SHA1(4fee912d9f0d4b196dbfacf06a4202b2fa3037b1))
 ROM_END
 
+ROM_START(mav_404g)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mav_c5_404.bin", 0x0000, 0x10000, CRC(f5a07f88) SHA1(180e5aaa6d46d4c83d1a5a2a58b68a9ba8117391))
+	ROM_REGION16_BE(0x100000, "decodmd3", 0)
+	ROM_LOAD16_BYTE("mav_rom0.bin", 0x000001, 0x80000, CRC(2c3b776d) SHA1(507d2bf5267b93dab740572b3854f05271c65e71))
+	ROM_LOAD16_BYTE("mav_rom3.bin", 0x000000, 0x80000, CRC(e94abe3c) SHA1(61ff20677ef407c7fda68e2bbd808e793b038941))
+	ROM_REGION(0x010000, "decobsmt:soundcpu", 0)
+	ROM_LOAD("mavu7.dat", 0x0000, 0x10000, CRC(427e6ab9) SHA1(6ad9295097f3d498383c91adf4ca667f797f29b1))
+	ROM_REGION(0x1000000, "decobsmt:bsmt", 0)
+	ROM_LOAD("mavu17.dat", 0x000000, 0x80000, CRC(cba377b8) SHA1(b7551b6cb64357cdacf1a96cedfccbabf4bd070a))
+	ROM_LOAD("mavu21.dat", 0x080000, 0x80000, CRC(be0c6a6f) SHA1(4fee912d9f0d4b196dbfacf06a4202b2fa3037b1))
+ROM_END
+
 ROM_START(mav_401)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("mavcpua.404", 0x0000, 0x10000, CRC(9f06bd8d) SHA1(3b931af5455ed9c40f2b6c884427a326bba8f75a))
@@ -2119,6 +2144,7 @@ ROM_END
 
 GAME(1993,  rab_320,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 3.20, display A3.00)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // ROCKY+BULLWINKLE AUGUST 12, 1993 USA CPU 3.20. DISPLAY VERSION- BULLWINKLE A3.00 5/24/1993
 GAME(1993,  rab_130,       rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.30, display A1.30)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // ROCKY+BULLWINKLE APRIL 1, 1993 USA CPU 1.30. DISPLAY VERSION- BULLWINKLE A1.30 4/1/1993
+GAME(1993,  rab_110be,     rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (Belgium 1.10, display I1.03)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // ROCKY+BULLWINKLE APRIL 1, 1993 USA CPU 1.30. DISPLAY VERSION- BULLWINKLE A1.30 4/1/1993
 GAME(1993,  rab_103s,      rab_320,  de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Adventures of Rocky and Bullwinkle and Friends (USA 1.03, display S1.03)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // ROCKY+BULLWINKLE FEBRUARY 3, 1993 USA CPU 1.03. DISPLAY VERSION- BULLWINKLE S1.03 2/2/1993
 GAME(1992,  aar_101,       0,        de_3_dmd2, de3, de_3_state, empty_init, ROT0, "Data East", "Aaron Spelling (1.01)",                                                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // AARON SPELLING V1.01 12/23/92
 GAME(1991,  btmn_106,      0,        de_3_dmd1, de3, de_3_state, empty_init, ROT0, "Data East", "Batman (USA 1.06, display A1.02)",                                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // BATMAN USA 1.06. DISP VER: BATMAN A1.02
@@ -2225,6 +2251,7 @@ GAME(1994,  frankst,       0,        de_3b,     de3, de_3_state, empty_init, ROT
 GAME(1995,  frankstg,      frankst,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein (Germany)",                                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1995,  franksti,      frankst,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Mary Shelley's Frankenstein (Italy)",                                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  mav_402,       0,        de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick, The Movie (4.04, Display Rev. 4.02)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1994,  mav_404g,      mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick, The Movie (Germany 4.04, Display Rev. 4.00)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  mav_401,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick, The Movie (4.02, Display Rev. 4.01)",                                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  mav_400,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Sega",      "Maverick, The Movie (Display Rev. 4.00)",                                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1994,  mav_200,       mav_402,  de_3b,     de3, de_3_state, empty_init, ROT0, "Data East", "Maverick, The Movie (2.00)",                                                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

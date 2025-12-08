@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "bus/wysekbd/wysekbd.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "screen.h"
 
@@ -114,7 +114,7 @@ void wy30p_state::wy30p(machine_config &config)
 {
 	i8031_device &maincpu(I8031(config, "maincpu", 7.3728_MHz_XTAL));
 	maincpu.set_addrmap(AS_PROGRAM, &wy30p_state::prog_map);
-	maincpu.set_addrmap(AS_IO, &wy30p_state::ext_map);
+	maincpu.set_addrmap(AS_DATA, &wy30p_state::ext_map);
 	maincpu.port_in_cb<1>().set(FUNC(wy30p_state::p1_r));
 	maincpu.port_in_cb<3>().set(FUNC(wy30p_state::p3_r));
 	maincpu.port_out_cb<3>().set(m_eeprom, FUNC(eeprom_serial_er5911_device::cs_write)).bit(3);

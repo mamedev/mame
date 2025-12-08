@@ -253,6 +253,9 @@ protected:
 	void tekkencw_map(address_map &map) ATTR_COLD;
 	void tjumpman_map(address_map &map) ATTR_COLD;
 	void uopoko_map(address_map &map) ATTR_COLD;
+
+	void nmk112_oki0_map(address_map &map) ATTR_COLD;
+	void nmk112_oki1_map(address_map &map) ATTR_COLD;
 };
 
 // with sound Z80

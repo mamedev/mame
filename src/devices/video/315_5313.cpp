@@ -2287,7 +2287,7 @@ void sega315_5313_device::vdp_handle_scanline_callback(int scanline)
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					m_irq4_on_timer->adjust(attotime::from_ticks(16, clock() / 4));
+					m_irq4_on_timer->adjust(attotime::from_ticks(32, clock() / 4));
 					//osd_printf_debug("irq4 on scanline %d reload %d\n", get_scanline_counter(), MEGADRIVE_REG0A_HINT_VALUE);
 				}
 				else

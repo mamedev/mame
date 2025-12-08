@@ -2911,6 +2911,9 @@ void taitof2_state::finalb(machine_config &config)
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_offsets(1, 0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
+
+	m_tc0110pcr->set_shift(1);
+	m_tc0110pcr->set_color_callback(FUNC(taitof2_state::color_xbgr555));
 }
 
 void dondokod_state::dondokod(machine_config &config)
@@ -3034,6 +3037,9 @@ void taitof2_state::qtorimon(machine_config &config)
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
+
+	m_tc0110pcr->set_shift(1);
+	m_tc0110pcr->set_color_callback(FUNC(taitof2_state::color_xbgr555));
 }
 
 void taitof2_state::liquidk(machine_config &config)
@@ -3070,6 +3076,9 @@ void taitof2_state::quizhq(machine_config &config)
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_gfxlayout(TC0100SCN_LAYOUT_1BPP);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
+
+	m_tc0110pcr->set_shift(1);
+	m_tc0110pcr->set_color_callback(FUNC(taitof2_state::color_xbgr555));
 }
 
 void taitof2_state::ssi(machine_config &config)
@@ -3145,6 +3154,9 @@ void mjnquest_state::mjnquest(machine_config &config)
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
 	m_tc0100scn[0]->set_tile_callback(FUNC(mjnquest_state::tmap_cb));
+
+	m_tc0110pcr->set_shift(1);
+	m_tc0110pcr->set_color_callback(FUNC(mjnquest_state::color_xbgr555));
 }
 
 void footchmp_state::footchmp(machine_config &config)

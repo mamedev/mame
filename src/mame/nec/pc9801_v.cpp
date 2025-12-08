@@ -396,7 +396,8 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 	{
 		switch((offset & 0xe) + 1)
 		{
-			case 0x09://cg window font read
+			// cg window font read
+			case 0x09:
 			{
 				uint32_t pcg_offset;
 
@@ -576,7 +577,7 @@ uint16_t pc9801vm_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
 	uint16_t res = 0;
 
 	if(!(m_grcg.mode & 0x80) || machine().side_effects_disabled())
-		res = m_video_ram[1][offset];
+		res = m_video_ram[1][(offset & 0xffff) | (m_vram_bank << 16)];
 	else if(m_ex_video_ff[2])
 		res = egc_blit_r(offset, mem_mask);
 	else if(!(m_grcg.mode & 0x40))
@@ -602,7 +603,7 @@ uint16_t pc9801vm_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
 void pc9801vm_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!(m_grcg.mode & 0x80))
-		COMBINE_DATA(&m_video_ram[1][offset]);
+		COMBINE_DATA(&m_video_ram[1][(offset & 0xffff) | (m_vram_bank << 16)]);
 	else if(m_ex_video_ff[2])
 		egc_blit_w(offset, data, mem_mask);
 	else

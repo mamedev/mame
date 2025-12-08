@@ -634,6 +634,9 @@ ROM_START(cueballv)
 
 	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
+
+	ROM_REGION(0x117, "pld", ROMREGION_ERASEFF)
+	ROM_LOAD("gal16v8.u8", 0x000, 0x117, CRC(e12f9d12) SHA1(e3eedf459898d80208c3a0743b80d34b3a765ea1))
 ROM_END
 
 /*-------------------------------------------------------------------

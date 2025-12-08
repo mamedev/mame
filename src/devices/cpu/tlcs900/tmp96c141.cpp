@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR, Felipe Sanches
 /****************************************************************************
 
     Toshiba TMP96C141 microcontroller
@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "tmp96c141.h"
-
+#include "dasm900.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -194,4 +194,42 @@ void tmp96c141_device::tlcs900_handle_timers()
 
 void tmp96c141_device::execute_set_input(int inputnum, int state)
 {
+}
+
+static std::pair<u16, char const *> const tmp96c141_syms[] = {
+	{ 0x00, "P0" }, { 0x01, "P1" }, { 0x02, "P0CR" }, { 0x04, "P1CR" }, { 0x05, "P1FC" },
+	{ 0x06, "P2" }, { 0x07, "P3" }, { 0x08, "P2CR" }, { 0x09, "P2FC" }, { 0x0a, "P3CR" }, { 0x0b, "P3FC" },
+	{ 0x0c, "P4" }, { 0x0d, "P5" }, { 0x0e, "P4CR" }, { 0x10, "P4FC" },
+	{ 0x12, "P6" }, { 0x13, "P7" }, { 0x14, "P6CR" }, { 0x15, "P7CR" }, { 0x16, "P6FC" }, { 0x17, "P7FC" },
+	{ 0x18, "P8" }, { 0x19, "P9" }, { 0x1a, "P8CR" }, { 0x1b, "P9CR" }, { 0x1c, "P8FC" }, { 0x1d, "P9FC" },
+	{ 0x20, "TRUN" },
+	{ 0x22, "TREG0" }, { 0x23, "TREG1" },
+	{ 0x24, "TMOD" }, { 0x25, "TFFCR" },
+	{ 0x26, "TREG2" }, { 0x27, "TREG3" },
+	{ 0x28, "P0MOD" }, { 0x29, "P1MOD" }, { 0x2a, "PFFCR" },
+	{ 0x30, "TREG4L" }, { 0x31, "TREG4H" }, { 0x32, "TREG5L" }, { 0x33, "TREG5H" },
+	{ 0x34, "CAP1L" }, { 0x35, "CAP1H" }, { 0x36, "CAP2L" }, { 0x37, "CAP2H" },
+	{ 0x38, "T4MOD" }, { 0x39, "T4FFCR" }, { 0x3a, "T45CR" },
+	{ 0x40, "TREG6L" }, { 0x41, "TREG6H" }, { 0x42, "TREG7L" }, { 0x43, "TREG7H" },
+	{ 0x44, "CAP3L" }, { 0x45, "CAP3H" }, { 0x46, "CAP4L" }, { 0x47, "CAP4H" },
+	{ 0x48, "T5MOD" }, { 0x49, "T5FFCR" },
+	{ 0x4c, "PG0REG" }, { 0x4d, "PG1REG" }, { 0x4e, "PG01CR" },
+	{ 0x50, "SC0BUF" }, { 0x51, "SC0CR" }, { 0x52, "SC0MOD" }, { 0x53, "BR0CR" },
+	{ 0x54, "SC1BUF" }, { 0x55, "SC1CR" }, { 0x56, "SC1MOD" }, { 0x57, "BR1CR" },
+	{ 0x58, "ODE" },
+	{ 0x5c, "WDMOD" }, { 0x5d, "WDCR" },
+	{ 0x5e, "ADMOD" },
+	{ 0x60, "ADREG0L" }, { 0x61, "ADREG0H" }, { 0x62, "ADREG1L" }, { 0x63, "ADREG1H" },
+	{ 0x64, "ADREG2L" }, { 0x65, "ADREG2H" }, { 0x66, "ADREG3L" }, { 0x67, "ADREG3H" },
+	{ 0x68, "B0CS" }, { 0x69, "B1CS" }, { 0x6a, "B2CS" },
+	{ 0x70, "INTE0AD" }, { 0x71, "INTE45" }, { 0x72, "INTE67" },
+	{ 0x73, "INTET10" }, { 0x74, "INTEPW10" }, { 0x75, "INTET54" },
+	{ 0x76, "INTET76" }, { 0x77, "INTES0" }, { 0x78, "INTES1" },
+	{ 0x7b, "IIMC" },
+	{ 0x7c, "DMA0V" }, { 0x7d, "DMA1V" }, { 0x7e, "DMA2V" }, { 0x7f, "DMA3V"}
+};
+
+std::unique_ptr<util::disasm_interface> tmp96c141_device::create_disassembler()
+{
+	return std::make_unique<tlcs900_disassembler>(tmp96c141_syms);
 }

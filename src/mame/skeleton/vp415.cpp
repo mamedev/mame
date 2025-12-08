@@ -40,7 +40,7 @@
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 
@@ -223,13 +223,13 @@ private:
 	void update_cpu_int();
 
 	void ctrl_program_map(address_map &map) ATTR_COLD;
-	void ctrl_io_map(address_map &map) ATTR_COLD;
+	void ctrl_data_map(address_map &map) ATTR_COLD;
 	void ctrlmcu_program_map(address_map &map) ATTR_COLD;
 	void sd_w(uint8_t data);
 	uint8_t sd_r();
 
 	void drive_program_map(address_map &map) ATTR_COLD;
-	void drive_io_map(address_map &map) ATTR_COLD;
+	void drive_data_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_datacpu;
 	required_device<i8041a_device> m_datamcu;
@@ -558,7 +558,7 @@ void vp415_state::ctrl_program_map(address_map &map)
 	map(0x0000, 0xffff).rom().region(CONTROL_ROM_TAG, 0);
 }
 
-void vp415_state::ctrl_io_map(address_map &map)
+void vp415_state::ctrl_data_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share(CTRLRAM_TAG);
 	map(0xe000, 0xffff).rw(FUNC(vp415_state::ctrl_regs_r), FUNC(vp415_state::ctrl_regs_w)).mask(0x1e00);
@@ -674,7 +674,7 @@ void vp415_state::drive_program_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region(DRIVE_ROM_TAG, 0);
 }
 
-void vp415_state::drive_io_map(address_map &map)
+void vp415_state::drive_data_map(address_map &map)
 {
 	map(0x0000, 0x0003).mirror(0xfbfc).rw(I8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0400, 0x04ff).mirror(0xf800).rw(I8155_TAG, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -738,7 +738,7 @@ void vp415_state::vp415(machine_config &config)
 	m_ctrlcpu->port_out_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_w));
 	m_ctrlcpu->port_in_cb<3>().set(FUNC(vp415_state::ctrl_cpu_port3_r));
 	m_ctrlcpu->set_addrmap(AS_PROGRAM, &vp415_state::ctrl_program_map);
-	m_ctrlcpu->set_addrmap(AS_IO, &vp415_state::ctrl_io_map);
+	m_ctrlcpu->set_addrmap(AS_DATA, &vp415_state::ctrl_data_map);
 
 	I8041A(config, m_ctrlmcu, XTAL(4'000'000)); // Verified on schematic
 	m_ctrlmcu->p1_in_cb().set(FUNC(vp415_state::ctrl_mcu_port1_r));
@@ -752,7 +752,7 @@ void vp415_state::vp415(machine_config &config)
 	m_drivecpu->port_out_cb<1>().set(FUNC(vp415_state::drive_cpu_port1_w));
 	m_drivecpu->port_out_cb<3>().set(FUNC(vp415_state::drive_cpu_port3_w));
 	m_drivecpu->set_addrmap(AS_PROGRAM, &vp415_state::drive_program_map);
-	m_drivecpu->set_addrmap(AS_IO, &vp415_state::drive_io_map);
+	m_drivecpu->set_addrmap(AS_DATA, &vp415_state::drive_data_map);
 
 	i8155_device &i8155(I8155(config, I8155_TAG, 0));
 	i8155.out_pa_callback().set(CHARGEN_TAG, FUNC(mb88303_device::da_w));

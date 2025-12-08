@@ -33,9 +33,9 @@ class sis950_lpc_device : public pci_device
 {
 public:
 	template <typename T, typename U> sis950_lpc_device(
-		const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
-		T &&cpu_tag, U &&flash_tag
-	) : sis950_lpc_device(mconfig, tag, owner, clock)
+			const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+			T &&cpu_tag, U &&flash_tag)
+		: sis950_lpc_device(mconfig, tag, owner, clock)
 	{
 		// Revision 0 -> A0
 		set_ids(0x10390008, 0x00, 0x060100, 0x00);
@@ -169,7 +169,7 @@ private:
 	bool m_at_spkrdata = 0;
 	uint8_t m_channel_check = 0;
 	int m_dma_channel = -1;
-//  bool m_cur_eop = false;
+	bool m_cur_eop = false;
 	uint16_t m_dma_high_byte = 0;
 
 	void cpu_a20_w(int state);
@@ -181,9 +181,20 @@ private:
 	void nmi_control_w(uint8_t data);
 	void at_speaker_set_spkrdata(uint8_t data);
 	void iochck_w(int state);
+
+	template <unsigned Which> uint8_t pc_dma8237_dack_r();
+	template <unsigned Which> void pc_dma8237_dack_w(uint8_t data);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
+	void at_dma8237_out_eop(int state);
 };
 
 DECLARE_DEVICE_TYPE(SIS950_LPC, sis950_lpc_device)
 
-
-#endif
+#endif // MAME_MACHINE_SIS950_LPC_H

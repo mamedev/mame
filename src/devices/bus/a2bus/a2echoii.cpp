@@ -67,7 +67,7 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override;
+	virtual void reset_from_bus() override;
 
 private:
 	//void tms_irq_callback(int state);
@@ -135,6 +135,11 @@ void a2bus_echoii_device::device_start()
 
 void a2bus_echoii_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_echoii_device::reset_from_bus()
+{
 	m_readlatch_flag = true; // /RESET presets this latch
 	m_tms->rsq_w(m_readlatch_flag); // update the rsq pin
 }
@@ -194,11 +199,6 @@ void a2bus_echoii_device::write_c0nx(uint8_t offset, uint8_t data)
 	m_writelatch_flag = false; // /DEVWRITE clears the latch on its falling edge
 	m_tms->wsq_w(m_writelatch_flag);
 	m_tms->data_w(m_writelatch_data);
-}
-
-bool a2bus_echoii_device::take_c800()
-{
-	return false;
 }
 
 } // anonymous namespace

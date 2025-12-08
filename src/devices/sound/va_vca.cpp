@@ -6,64 +6,75 @@
 
 #include <cfloat>
 
-// Default max peak-to-peak voltage for the CV input.
-static constexpr const float DEFAULT_MAX_VPP = 100;
-
-DEFINE_DEVICE_TYPE(VA_VCA, va_vca_device, "va_vca", "Voltage Controlled Amplifier")
-
 va_vca_device::va_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VA_VCA, tag, owner, clock)
+	: va_vca_device(mconfig, VA_VCA, tag, owner, clock)
+{
+}
+
+va_vca_device::va_vca_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_min_cv(-DEFAULT_MAX_VPP)
-	, m_max_cv(DEFAULT_MAX_VPP)
-	, m_cv_scale(1.0F)
 	, m_fixed_gain(1.0F)
 {
 }
 
-va_vca_device &va_vca_device::configure_cem3360_linear_cv()
+void va_vca_device::set_fixed_gain_cv(float gain_cv)
 {
-	// TODO: For now, the CEM3360 is treated as a linear device. But since it
-	// is OTA-based, it likely has a tanh response. This requires more research.
+	if (!m_stream)
+		fatalerror("%s: set_fixed_gain_cv() cannot be called before device_start()\n", tag());
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_GAIN))
+		fatalerror("%s: Cannot set a fixed gain CV when streaming it.\n", tag());
 
-	// Typical linear CV for max gain, as reported on the CEM3360 datasheet.
-	static constexpr const float CEM3360_MAX_GAIN_CV = 1.93F;
-	m_min_cv = 0;
-	m_max_cv = CEM3360_MAX_GAIN_CV;
-	m_cv_scale = 1.0F / CEM3360_MAX_GAIN_CV;
-	return *this;
+	const float gain = cv_to_gain(gain_cv);
+	if (gain == m_fixed_gain)
+		return;
+
+	m_stream->update();
+	m_fixed_gain = gain;
 }
 
-void va_vca_device::set_fixed_cv(float cv)
+float va_vca_device::cv_to_gain(float cv) const
 {
-	m_stream->update();
-	m_fixed_gain = cv_to_gain(cv);
+	return cv;
 }
 
 void va_vca_device::device_start()
 {
-	assert(get_sound_requested_inputs_mask() == 0x01 || get_sound_requested_inputs_mask() == 0x03);
+	if (get_sound_requested_inputs_mask() != 0x01 && get_sound_requested_inputs_mask() != 0x03)
+		fatalerror("%s: Input 0 must be connected, input 1 can optionally be connected. No other inputs allowed.\n", tag());
+
 	m_stream = stream_alloc(get_sound_requested_inputs(), 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 	save_item(NAME(m_fixed_gain));
 }
 
 void va_vca_device::sound_stream_update(sound_stream &stream)
 {
-	if (get_sound_requested_inputs() > 1)
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_GAIN))
 	{
 		for (int i = 0; i < stream.samples(); i++)
-			stream.put(0, i, stream.get(0, i) * cv_to_gain(stream.get(1, i)));
+			stream.put(0, i, stream.get(INPUT_AUDIO, i) * cv_to_gain(stream.get(INPUT_GAIN, i)));
 	}
 	else
 	{
 		for (int i = 0; i < stream.samples(); i++)
-			stream.put(0, i, stream.get(0, i) * m_fixed_gain);
+			stream.put(0, i, stream.get(INPUT_AUDIO, i) * m_fixed_gain);
 	}
 }
 
-float va_vca_device::cv_to_gain(float cv) const
+
+cem3360_vca_device::cem3360_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: va_vca_device(mconfig, CEM3360_VCA, tag, owner, clock)
 {
-	return std::clamp(cv, m_min_cv, m_max_cv) * m_cv_scale;
 }
 
+float cem3360_vca_device::cv_to_gain(float cv) const
+{
+	// Typical linear CV for max gain, as reported on the CEM3360 datasheet.
+	constexpr float CEM3360_MAX_GAIN_CV = 1.93F;
+	return std::clamp(cv, 0.0F, CEM3360_MAX_GAIN_CV) / CEM3360_MAX_GAIN_CV;
+}
+
+
+DEFINE_DEVICE_TYPE(VA_VCA, va_vca_device, "va_vca", "Voltage-controlled amplifier")
+DEFINE_DEVICE_TYPE(CEM3360_VCA, cem3360_vca_device, "cem3360_vca", "CEM3360-based VCA")

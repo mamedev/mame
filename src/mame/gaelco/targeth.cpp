@@ -68,7 +68,7 @@ DS5002FP Box contains:
 
 #include "gaelco_ds5002fp.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/ds5002fp.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/74259.h"
 #include "sound/okim6295.h"

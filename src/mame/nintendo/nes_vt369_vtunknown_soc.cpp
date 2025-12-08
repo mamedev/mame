@@ -292,7 +292,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// the ALU is not VT1682 compatible
 	map(0x4130, 0x4137).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w));
-	map(0x4138, 0x413d).r(FUNC(vt3xx_soc_base_device::alu_r)); // mirror?
+	map(0x4138, 0x413d).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w)); // mirror or 2nd ALU?
 
 	// 4144
 	// 4147

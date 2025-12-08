@@ -44,7 +44,7 @@
 #define PIXEL_OP_REBASE_TRANSPEN(DEST, DESTZ, SOURCE) \
 do \
 { \
-	uint32_t srcdata = (SOURCE); \
+	const u32 srcdata = (SOURCE); \
 	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
 	{ \
 		if (zval < (DESTZ)) \
@@ -63,7 +63,7 @@ while (0)
 #define PIXEL_OP_REBASE_TRANSPEN_REV(DEST, DESTZ, SOURCE) \
 do \
 { \
-	uint32_t srcdata = (SOURCE); \
+	const u32 srcdata = (SOURCE); \
 	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
 	{ \
 		if (zval >= (DESTZ)) \
@@ -112,20 +112,20 @@ do \
 } \
 while (0)
 
-inline void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
-	gfx_element * gfx, uint32_t code, uint32_t color, int flipy, int32_t xpos,
-	int32_t dx, int32_t dy, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int32_t ypos, const u8 *srcdata, int32_t srcx, uint32_t leftovers, int curyy, uint16_t &srcpix)
+inline void hng64_state::drawline(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
+	gfx_element * gfx, u32 code, u32 color, int flipy, s32 xpos,
+	s32 dx, s32 dy, u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard, u8 mosaic, u8 &mosaic_count_x, s32 ypos, const u8 *srcdata, s32 srcx, u32 leftovers, int curyy, u16 &srcpix)
 {
 	auto* destptr = &dest.pix(ypos, 0);
 	auto* destzptr = &destz.pix(ypos, 0);
 
 	const u8* srcptr = srcdata + (flipy ? ((15-curyy) & 0xf) : (curyy & 0xf)) * gfx->rowbytes();
-	int32_t cursrcx = srcx;
+	s32 cursrcx = srcx;
 
 	if (zrev)
 	{
 		// iterate over leftover pixels
-		for (int32_t curx = 0; curx < leftovers; curx++)
+		for (s32 curx = 0; curx < leftovers; curx++)
 		{
 			int xdrawpos = xpos + curx;
 			PIX_CHECKERBOARD;
@@ -136,7 +136,7 @@ inline void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, con
 	else
 	{
 		// iterate over leftover pixels
-		for (int32_t curx = 0; curx < leftovers; curx++)
+		for (s32 curx = 0; curx < leftovers; curx++)
 		{
 			int xdrawpos = xpos + curx;
 			PIX_CHECKERBOARD;
@@ -147,15 +147,15 @@ inline void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, con
 }
 
 inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
-		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int curyy, uint16_t &srcpix)
+		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 xpos, s32 ypos,
+		s32 dx, s32 dy, u32 dstwidth, u32 trans_pen, u32 zval, bool zrev, bool blend, u16 group, bool checkerboard, u8 mosaic, u8 &mosaic_count_x, int curyy, u16 &srcpix)
 {
 	// use pen usage to optimize
 	code %= gfx->elements();
 	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		uint32_t usage = gfx->pen_usage(code);
+		const u32 usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << trans_pen)) == 0)
 			return;
 	}
@@ -178,7 +178,7 @@ inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, 
 	if (dstwidth < 1)
 		return;
 
-	int32_t srcx = 0;
+	s32 srcx = 0;
 	// apply X flipping
 	if (flipx)
 	{
@@ -189,8 +189,8 @@ inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, 
 	// fetch the source data
 	const u8 *srcdata = gfx->get_data(code);
 
-	int32_t destendx = xpos + dstwidth - 1;
-	uint32_t leftovers = (destendx + 1 - xpos);
+	s32 destendx = xpos + dstwidth - 1;
+	u32 leftovers = (destendx + 1 - xpos);
 
 	drawline(dest, destz, cliprect,
 		gfx, code, color, flipy, xpos,
@@ -198,7 +198,7 @@ inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, 
 
 }
 
-inline void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
+inline void hng64_state::get_tile_details(bool chain, u16 spritenum, u8 xtile, u8 ytile, u8 xsize, u8 ysize, bool xflip, bool yflip, u32& tileno, u16& pal, u8 &gfxregion)
 {
 	int offset;
 	if (!xflip)
@@ -256,14 +256,14 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	// global offsets in sprite regs
-	int spriteoffsx = (m_spriteregs[1] >> 0) & 0xffff;
-	int spriteoffsy = (m_spriteregs[1] >> 16) & 0xffff;
+	const int spriteoffsx = (m_spriteregs[1] >> 0) & 0xffff;
+	const int spriteoffsy = (m_spriteregs[1] >> 16) & 0xffff;
 
 	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
 	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
 	// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
 	// Could also be draw order related, check if it inverts the z value?
-	bool zsort = !(m_spriteregs[0] & 0x01000000);
+	const bool zsort = !(m_spriteregs[0] & 0x01000000);
 
 	if (zsort)
 		m_sprite_zbuffer.fill(0x0000, cliprect);
@@ -275,11 +275,10 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 	while (currentsprite < ((0xc000 / 4) / 8))
 	{
-		uint16_t zval = (m_spriteram[(currentsprite * 8) + 2] & 0x07ff0000) >> 16;
+		const u16 zval = (m_spriteram[(currentsprite * 8) + 2] & 0x07ff0000) >> 16;
 
-
-		int16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
-		int16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
+		s16 ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
+		s16 xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
 
 		// should the offsets also be sign extended?
 		xpos += (spriteoffsx);
@@ -289,17 +288,17 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		xpos = util::sext(xpos, 10);
 		ypos = util::sext(ypos, 10);
 
-		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
-		uint16_t group = (m_spriteram[(currentsprite * 8) + 4] & 0x00700000) >> 8;
-		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
-		uint8_t mosaic = (m_spriteram[(currentsprite * 8) + 4] & 0xf0000000) >> 28;
+		const bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
+		const u16 group = (m_spriteram[(currentsprite * 8) + 4] & 0x00700000) >> 8;
+		const bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
+		const u8 mosaic = (m_spriteram[(currentsprite * 8) + 4] & 0xf0000000) >> 28;
 
-		int yflip = (m_spriteram[(currentsprite * 8) + 4] & 0x01000000) >> 24;
-		int xflip = (m_spriteram[(currentsprite * 8) + 4] & 0x02000000) >> 25;
+		const int yflip = (m_spriteram[(currentsprite * 8) + 4] & 0x01000000) >> 24;
+		const int xflip = (m_spriteram[(currentsprite * 8) + 4] & 0x02000000) >> 25;
 
-		int chainy = (m_spriteram[(currentsprite * 8) + 2] & 0x0000000f);
-		int chainx = (m_spriteram[(currentsprite * 8) + 2] & 0x000000f0) >> 4;
-		int chaini = (m_spriteram[(currentsprite * 8) + 2] & 0x00000100);
+		const int chainy = (m_spriteram[(currentsprite * 8) + 2] & 0x0000000f);
+		const int chainx = (m_spriteram[(currentsprite * 8) + 2] & 0x000000f0) >> 4;
+		const int chaini = (m_spriteram[(currentsprite * 8) + 2] & 0x00000100);
 
 		if (!chaini)
 		{
@@ -310,8 +309,8 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			nextsprite = currentsprite + ((chainx + 1) * (chainy + 1));
 		}
 
-		uint32_t zoomy = (m_spriteram[(currentsprite * 8) + 1] & 0xffff0000) >> 16;
-		uint32_t zoomx = (m_spriteram[(currentsprite * 8) + 1] & 0x0000ffff) >> 0;
+		const u32 zoomy = (m_spriteram[(currentsprite * 8) + 1] & 0xffff0000) >> 16;
+		const u32 zoomx = (m_spriteram[(currentsprite * 8) + 1] & 0x0000ffff) >> 0;
 
 		/* Calculate the zoom */
 		int zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
@@ -335,7 +334,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			continue;
 		}
 
-		int32_t dx, dy;
+		s32 dx, dy;
 
 		if (zoom_factor == 0x100)
 		{
@@ -349,8 +348,8 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		}
 
 
-		uint32_t full_srcpix_y = 0;
-		uint32_t full_dstheight = 0;
+		u32 full_srcpix_y = 0;
+		u32 full_dstheight = 0;
 		do
 		{
 			full_srcpix_y += dy;
@@ -359,7 +358,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 		int realline = 0;
 		int mosaic_y_counter = 0;
-		for (int32_t curyy = 0; curyy <= full_dstheight - 1; curyy++)
+		for (s32 curyy = 0; curyy <= full_dstheight - 1; curyy++)
 		{
 			if (!mosaic)
 			{
@@ -380,10 +379,10 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 			if (ypos <= cliprect.bottom() && ypos >= cliprect.top())
 			{
-				uint32_t full_srcpix_y2 = realline * dy;
-				int used_ysource_pos = full_srcpix_y2 >> 16;
-				int ytilebbb = used_ysource_pos / 0x10;
-				int use_tile_line = used_ysource_pos & 0xf;
+				const u32 full_srcpix_y2 = realline * dy;
+				const int used_ysource_pos = full_srcpix_y2 >> 16;
+				const int ytilebbb = used_ysource_pos / 0x10;
+				const int use_tile_line = used_ysource_pos & 0xf;
 				draw_sprite_line(screen, cliprect, use_tile_line, ypos, xpos, chainx, dx, dy, ytilebbb, chaini, currentsprite, chainy, xflip, yflip, zval, zsort, blend, group, checkerboard, mosaic);
 			}
 			ypos++;
@@ -394,16 +393,16 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 }
 
 
-inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t ypos, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic)
+inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle& cliprect, s32 curyy, s16 ypos, s16 xpos, int chainx, s32 dx, s32 dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, u16 zval, bool zsort, bool blend, u16 group, bool checkerboard, u8 mosaic)
 {
-	uint32_t srcpix_x = 0;
-	uint16_t srcpix = 0;
+	u32 srcpix_x = 0;
+	u16 srcpix = 0;
 
-	uint8_t mosaic_count_x = 0;
+	u8 mosaic_count_x = 0;
 
 	for (int xdrw = 0; xdrw <= chainx; xdrw++)
 	{
-		uint32_t dstwidth = 0;
+		u32 dstwidth = 0;
 		do
 		{
 			srcpix_x += dx;
@@ -411,9 +410,9 @@ inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle
 		} while (srcpix_x < 0x100000);
 		srcpix_x &= 0x0fffff;
 
-		uint32_t tileno;
-		uint16_t pal;
-		uint8_t gfxregion;
+		u32 tileno;
+		u16 pal;
+		u8 gfxregion;
 
 		get_tile_details(chaini, currentsprite, xdrw, ytileblock, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
 		zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, xpos, ypos, dx, dy, dstwidth, 0, zval, zsort, blend, group, checkerboard, mosaic, mosaic_count_x, curyy, srcpix);

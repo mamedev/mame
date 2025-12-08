@@ -45,12 +45,6 @@ Known Non-Issues (confirmed on Real Genesis)
 
 void md_base_state::megadriv_z80_bank_w(uint16_t data)
 {
-	// TODO: menghu crashes here
-	// Tries to setup a bank of 0xff0000 from z80 side (PC=1131) after you talk with the cashier twice.
-	// Without a guard over it game will trash 68k memory causing a crash, works on real HW with everdrive
-	// so not coming from a cart copy protection.
-	// Update: it breaks cfodder BGM on character select at least, therefore we current don't guard against it
-	// Apparently reading 68k RAM from z80 is not recommended by Sega, so *writing* isn't possible lacking bus grant?
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 

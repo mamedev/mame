@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 class device_sgi_kbd_port_interface;
 

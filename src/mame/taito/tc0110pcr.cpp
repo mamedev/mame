@@ -15,6 +15,11 @@ The data bus is 16 bits wide.
 #include "emu.h"
 #include "tc0110pcr.h"
 
+#define LOG_UNKNOWN (1 << 1)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device, "tc0110pcr", "Taito TC0110PCR")
 
@@ -22,8 +27,9 @@ tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, TC0110PCR, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, m_ram(nullptr)
-	, m_type(0)
 	, m_addr(0)
+	, m_shift(0)
+	, m_color_cb(*this)
 {
 }
 
@@ -33,10 +39,11 @@ tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *ta
 
 void tc0110pcr_device::device_start()
 {
+	m_color_cb.resolve_safe(rgb_t(0, 0, 0));
+
 	m_ram = make_unique_clear<uint16_t[]>(TC0110PCR_RAM_SIZE);
 
 	save_pointer(NAME(m_ram), TC0110PCR_RAM_SIZE);
-	save_item(NAME(m_type));
 	save_item(NAME(m_addr));
 }
 
@@ -46,7 +53,6 @@ void tc0110pcr_device::device_start()
 
 void tc0110pcr_device::device_reset()
 {
-	m_type = 0;    /* default, xBBBBBGGGGGRRRRR */
 }
 
 //-------------------------------------------------
@@ -64,39 +70,9 @@ void tc0110pcr_device::device_post_load()
 
 void tc0110pcr_device::restore_colors()
 {
-	for (int i = 0; i < (256 * 16); i++)
+	for (int i = 0; i < palette_entries(); i++)
 	{
-		const u16 color = m_ram[i];
-
-		u8 r = 0, g = 0, b = 0;
-		switch (m_type)
-		{
-			case 0x00:
-			{
-				r = pal5bit(color >>  0);
-				g = pal5bit(color >>  5);
-				b = pal5bit(color >> 10);
-				break;
-			}
-
-			case 0x01:
-			{
-				b = pal5bit(color >>  0);
-				g = pal5bit(color >>  5);
-				r = pal5bit(color >> 10);
-				break;
-			}
-
-			case 0x02:
-			{
-				r = pal4bit(color >> 0);
-				g = pal4bit(color >> 4);
-				b = pal4bit(color >> 8);
-				break;
-			}
-		}
-
-		set_pen_color(i, rgb_t(r, g, b));
+		set_pen_color(i, m_color_cb(m_ram[i]));
 	}
 }
 
@@ -109,7 +85,8 @@ u16 tc0110pcr_device::word_r(offs_t offset)
 			return m_ram[m_addr];
 
 		default:
-//logerror("%s: warning - read TC0110PCR address %02x\n",m_maincpu->pc(),offset);
+			if (!machine().side_effects_disabled())
+				LOGMASKED(LOG_UNKNOWN, "%s: warning - read TC0110PCR address %02x\n", machine().describe_context(), offset);
 			return 0xff;
 	}
 }
@@ -119,86 +96,18 @@ void tc0110pcr_device::word_w(offs_t offset, u16 data)
 	switch (offset)
 	{
 		case 0:
-			/* In test mode game writes to odd register number so (data>>1) */
-			m_addr = (data >> 1) & 0xfff;
-			if (data > 0x1fff)
-				logerror ("Write to palette index > 0x1fff\n");
+			m_addr = (data >> m_shift) & 0xfff;
+			if ((data >> m_shift) >= palette_entries())
+				LOGMASKED(LOG_UNKNOWN, "%s: Write to palette index > %x\n", machine().describe_context(), (palette_entries() << m_shift) - 1);
 			break;
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			set_pen_color(m_addr, m_color_cb(data));
 			break;
 
 		default:
-//logerror("%s: warning - write %04x to TC0110PCR address %02x\n",m_maincpu->pc(),data,offset);
-			break;
-	}
-}
-
-void tc0110pcr_device::step1_word_w(offs_t offset, u16 data)
-{
-	switch (offset)
-	{
-		case 0:
-			m_addr = data & 0xfff;
-			if (data > 0xfff)
-				logerror ("Write to palette index > 0xfff\n");
-			break;
-
-		case 1:
-			m_ram[m_addr] = data & 0xffff;
-			set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-			break;
-
-		default:
-//logerror("%s: warning - write %04x to TC0110PCR address %02x\n",m_maincpu->pc(),data,offset);
-			break;
-	}
-}
-
-void tc0110pcr_device::step1_rbswap_word_w(offs_t offset, u16 data)
-{
-	m_type = 1;    /* xRRRRRGGGGGBBBBB */
-
-	switch (offset)
-	{
-		case 0:
-			m_addr = data & 0xfff;
-			if (data > 0xfff)
-				logerror ("Write to palette index > 0xfff\n");
-			break;
-
-		case 1:
-			m_ram[m_addr] = data & 0xffff;
-			set_pen_color(m_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-			break;
-
-		default:
-//logerror("%s: warning - write %04x to TC0110PCR offset %02x\n",m_maincpu->pc(),data,offset);
-			break;
-	}
-}
-
-void tc0110pcr_device::step1_4bpg_word_w(offs_t offset, u16 data)
-{
-	m_type = 2;    /* xxxxBBBBGGGGRRRR */
-
-	switch (offset)
-	{
-		case 0:
-			m_addr = data & 0xfff;
-			if (data > 0xfff)
-				logerror ("Write to palette index > 0xfff\n");
-			break;
-
-		case 1:
-			m_ram[m_addr] = data & 0xffff;
-			set_pen_color(m_addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
-			break;
-
-		default:
-//logerror("%s: warning - write %04x to TC0110PCR address %02x\n",m_maincpu->pc(),data,offset);
+			LOGMASKED(LOG_UNKNOWN, "%s: warning - write %04x to TC0110PCR address %02x\n", machine().describe_context(), data, offset);
 			break;
 	}
 }

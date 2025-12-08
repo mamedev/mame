@@ -31,7 +31,7 @@ Spin to Win runs on the same hardware.
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
 
@@ -220,7 +220,7 @@ void aftrshok_state::aftrshok(machine_config &config)
 	/* basic machine hardware */
 	I8031(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aftrshok_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &aftrshok_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &aftrshok_state::ext_map);
 	m_maincpu->port_out_cb<3>().set(FUNC(aftrshok_state::mcu_p3_w));
 
 	/* sound hardware */

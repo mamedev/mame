@@ -39,6 +39,12 @@ public:
 	void pcs_overflow();
 	void pcs_underflow();
 
+	enum address_spaces
+	{
+		AS_BUSA = AS_OPCODES + 1,
+		AS_BUSB
+	};
+
 	enum
 	{
 		MB86235_PC = 1,
@@ -162,6 +168,7 @@ private:
 	uml::code_handle *m_write_abus;
 
 	address_space_config m_program_config;
+	address_space_config m_external_config;
 	address_space_config m_dataa_config;
 	address_space_config m_datab_config;
 	optional_device<generic_fifo_u32_device> m_fifoin;
@@ -171,10 +178,11 @@ private:
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<mb86235_frontend> m_drcfe;
 
-	memory_access<32, 3, -3, ENDIANNESS_LITTLE>::cache m_pcache;
-	memory_access<32, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::specific m_dataa;
+	memory_access<12, 3, -3, ENDIANNESS_LITTLE>::cache m_pcache;
+	memory_access<12, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<10, 2, -2, ENDIANNESS_LITTLE>::specific m_dataa;
 	memory_access<10, 2, -2, ENDIANNESS_LITTLE>::specific m_datab;
+	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::specific m_external;
 
 	/* internal compiler state */
 	struct compiler_state
@@ -258,8 +266,10 @@ private:
 	inline uint32_t get_transfer_reg(uint8_t which);
 	inline void set_transfer_reg(uint8_t which, uint32_t value);
 	inline uint32_t decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, uint16_t disp, bool isbbus);
-	inline uint32_t read_bus(bool isbbus, uint32_t addr);
-	inline void write_bus(bool isbbus, uint32_t addr, uint32_t data);
+	inline uint32_t read_abus(uint32_t addr);
+	inline uint32_t read_bbus(uint32_t addr);
+	inline void write_abus(uint32_t addr, uint32_t data);
+	inline void write_bbus(uint32_t addr, uint32_t data);
 	inline void increment_pwp();
 	inline void increment_prp();
 	inline void decrement_prp();

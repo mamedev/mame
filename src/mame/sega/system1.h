@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "machine/z80pio.h"
@@ -161,8 +161,8 @@ protected:
 	// misc handlers
 	void adjust_cycles(u8 data);
 	void mcu_control_w(u8 data);
-	u8 mcu_io_r(offs_t offset);
-	void mcu_io_w(offs_t offset, u8 data);
+	u8 mcu_data_r(offs_t offset);
+	void mcu_data_w(offs_t offset, u8 data);
 	u8 nob_mcu_latch_r();
 	void nob_mcu_latch_w(u8 data);
 	void nob_mcu_status_w(u8 data);
@@ -230,7 +230,7 @@ protected:
 	void encrypted_sys1ppi_maps(machine_config &config);
 	void encrypted_sys1pio_maps(machine_config &config);
 	void encrypted_sys2_mc8123_maps(machine_config &config);
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void nobo_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void system1_map(address_map &map) ATTR_COLD;

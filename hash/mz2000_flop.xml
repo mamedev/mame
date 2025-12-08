@@ -137,7 +137,7 @@ license:CC0-1.0
 		<description>Lilas</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
-		<info name="usage" value="Type ADV on CPM prompt" />
+		<info name="usage" value="Type ADV at CPM prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lilascmp.d88" size="348848" crc="ac570829" sha1="15e927727d3498660c1dc3f3ea55409aad4eeef8"/>

@@ -187,7 +187,7 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6fd0, 0x6fd7).rw(FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
 
 	// Sprite Registers
-	map(0x6fd8, 0x6fd8).w(FUNC(xavix_state::spriteregs_w));
+	map(0x6fd8, 0x6fd8).rw(FUNC(xavix_state::spriteregs_r), FUNC(xavix_state::spriteregs_w));
 
 	// Sprite DMA
 	map(0x6fe0, 0x6fe0).rw(FUNC(xavix_state::spritefragment_dma_status_r), FUNC(xavix_state::spritefragment_dma_trg_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
@@ -217,19 +217,19 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x7400, 0x757f).ram();
 
 	// Sound Control
-	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_startstop_r), FUNC(xavix_state::sound_startstop_w)); // r/w tested read/written 8 times in a row
-	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_updateenv_r), FUNC(xavix_state::sound_updateenv_w));
-	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_sta16_r)); // related to 75f0 / 75f1 (read after writing there - rad_mtrk)
-	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w)); // r/w tested
-	map(0x75f7, 0x75f7).w(FUNC(xavix_state::sound_regbase_w));
-	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_75f8_r), FUNC(xavix_state::sound_75f8_w)); // r/w tested
-	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_75f9_r), FUNC(xavix_state::sound_75f9_w));
-	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_timer0_r), FUNC(xavix_state::sound_timer0_w)); // r/w tested
-	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_timer1_r), FUNC(xavix_state::sound_timer1_w)); // r/w tested
-	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_timer2_r), FUNC(xavix_state::sound_timer2_w)); // r/w tested
-	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_timer3_r), FUNC(xavix_state::sound_timer3_w)); // r/w tested
-	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_irqstatus_r), FUNC(xavix_state::sound_irqstatus_w));
-	map(0x75ff, 0x75ff).w(FUNC(xavix_state::sound_75ff_w));
+	map(0x75f0, 0x75f1).rw(FUNC(xavix_state::sound_voice_startstop_r), FUNC(xavix_state::sound_voice_startstop_w));
+	map(0x75f2, 0x75f3).rw(FUNC(xavix_state::sound_voice_updateenv_r), FUNC(xavix_state::sound_voice_updateenv_w));
+	map(0x75f4, 0x75f5).r(FUNC(xavix_state::sound_voice_status_r));
+	map(0x75f6, 0x75f6).rw(FUNC(xavix_state::sound_volume_r), FUNC(xavix_state::sound_volume_w));
+	map(0x75f7, 0x75f7).rw(FUNC(xavix_state::sound_regbase_r), FUNC(xavix_state::sound_regbase_w));
+	map(0x75f8, 0x75f8).rw(FUNC(xavix_state::sound_cyclerate_r), FUNC(xavix_state::sound_cyclerate_w));
+	map(0x75f9, 0x75f9).rw(FUNC(xavix_state::sound_mixer_r), FUNC(xavix_state::sound_mixer_w));
+	map(0x75fa, 0x75fa).rw(FUNC(xavix_state::sound_tp0_r), FUNC(xavix_state::sound_tp0_w));
+	map(0x75fb, 0x75fb).rw(FUNC(xavix_state::sound_tp1_r), FUNC(xavix_state::sound_tp1_w));
+	map(0x75fc, 0x75fc).rw(FUNC(xavix_state::sound_tp2_r), FUNC(xavix_state::sound_tp2_w));
+	map(0x75fd, 0x75fd).rw(FUNC(xavix_state::sound_tp3_r), FUNC(xavix_state::sound_tp3_w));
+	map(0x75fe, 0x75fe).rw(FUNC(xavix_state::sound_irq_status_r), FUNC(xavix_state::sound_irq_status_w));
+	map(0x75ff, 0x75ff).rw(FUNC(xavix_state::sound_dac_control_r), FUNC(xavix_state::sound_dac_control_w));
 
 	// Slot Registers
 	map(0x7810, 0x7810).w(FUNC(xavix_state::slotreg_7810_w)); // startup
@@ -1583,17 +1583,15 @@ void xavix_state::xavix(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(xavix_state::scanline_cb), "screen", 0, 1);
 
-	ADDRESS_MAP_BANK(config, "lowbus").set_map(&xavix_state::xavix_lowbus_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
-
 	XAVIX_ADC(config, m_adc, 0);
-	m_adc->read_0_callback().set(FUNC(xavix_state::adc0_r));
-	m_adc->read_1_callback().set(FUNC(xavix_state::adc1_r));
-	m_adc->read_2_callback().set(FUNC(xavix_state::adc2_r));
-	m_adc->read_3_callback().set(FUNC(xavix_state::adc3_r));
-	m_adc->read_4_callback().set(FUNC(xavix_state::adc4_r));
-	m_adc->read_5_callback().set(FUNC(xavix_state::adc5_r));
-	m_adc->read_6_callback().set(FUNC(xavix_state::adc6_r));
-	m_adc->read_7_callback().set(FUNC(xavix_state::adc7_r));
+	m_adc->read_0_callback().set_ioport("AN0");
+	m_adc->read_1_callback().set_ioport("AN1");
+	m_adc->read_2_callback().set_ioport("AN2");
+	m_adc->read_3_callback().set_ioport("AN3");
+	m_adc->read_4_callback().set_ioport("AN4");
+	m_adc->read_5_callback().set_ioport("AN5");
+	m_adc->read_6_callback().set_ioport("AN6");
+	m_adc->read_7_callback().set_ioport("AN7");
 
 	XAVIX_ANPORT(config, m_anport, 0);
 	m_anport->read_0_callback().set(FUNC(xavix_state::anport0_r));
@@ -1624,6 +1622,7 @@ void xavix_state::xavix(machine_config &config)
 	XAVIX_SOUND(config, m_sound, MAIN_CLOCK);
 	m_sound->read_regs_callback().set(FUNC(xavix_state::sound_regram_read_cb));
 	m_sound->read_samples_callback().set(FUNC(xavix_state::sample_read));
+	m_sound->write_regs_callback().set(FUNC(xavix_state::sound_regram_write_cb));
 	//m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_sound->add_route(0, "speaker", 1.0, 0);
 	m_sound->add_route(1, "speaker", 1.0, 1);
@@ -2064,6 +2063,12 @@ void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
 	m_rgn = memregion("bios")->base();
+}
+
+void xavix_state::init_xavix_slowenv()
+{
+	init_xavix();
+	m_default_audio_tempo_override = 0x40;
 }
 
 /***************************************************************************
@@ -2834,8 +2839,8 @@ CONS( 2002, tomshoot, 0,           0,  xavix_i2c_24c02_2mb,  tomshoot,xavix_i2c_
 // トミカ カーナビドライブ / トミー
 CONS( 2003, tcarnavi,  0,          0,  xavix_4mb_nv,     tcarnavi, xavix_state,          init_xavix,    "Tomy / SSD Company LTD",                       "Tomica Carnavi Drive (Japan)", MACHINE_IMPERFECT_SOUND )
 
-// ちゃんぴよんピンボール
-CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,      init_xavix,    "Tomy / SSD Company LTD",                       "Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// 痛快！娯楽活劇 ちゃんぴよんピンボール
+CONS( 2003, tomcpin,   0,          0,  xavix_i2c_24c08_4mb,  tomcpin,  xavix_i2c_state,  init_xavix,    "Tomy / SSD Company LTD",                       "Tsuukai! Goraku Katsugeki - Champiyon Pinball (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // 日本一周 僕はプラレール運転士
 CONS( 2004, tomplc,    0,          0,  xavix_i2c_24c02_43mhz,tomplc,xavix_i2c_state,     init_xavix,    "Tomy / SSD Company LTD",                       "Nihon Isshuu - Boku wa Plarail Untenshi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -2857,22 +2862,22 @@ CONS( 2001, bistro,    0,          0,  xavix_2mb,        xavix,    xavix_state, 
 /* Music titles: Emulation note:
    Timers might not be 100%, PAL stuff uses different ways to do timing.
 */
-CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
-CONS( 2000, ekaraa,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turning on e-kara" without cart
-CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
-CONS( 2002, ekarag,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
-CONS( 2002, ekaras,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD / newgent",           "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2000, ekara,    0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turn it on" without cart
+CONS( 2000, ekaraa,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD / Hasbro",            "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows "Please insert a cartridge before turning on e-kara" without cart
+CONS( 2000, ekaraj,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
+CONS( 2002, ekarag,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
+CONS( 2002, ekaras,   ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD / newgent",           "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 // the Korean i-singer release from Sonokong has a unique bios and different data resources, meaning carts are not fully compatible between it and e-kara
-CONS( 2000, isinger,  ekara,       0,  xavix_cart_isinger, ekara,    xavix_ekara_state,    init_xavix,    "Sonokong / SSD Company LTD",                   "i-Singer (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2000, isinger,  ekara,       0,  xavix_cart_isinger, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Sonokong / SSD Company LTD",                   "i-Singer (Korea)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
-CONS( 2002, ekaraphs, ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2002, ekaraphs, ekara,       0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // epitch (at least the pichi pichi pitch mermaid starter pack) uses the same internal rom as the Japanese ekara, but has less buttons, so some features aren't available (some games also seem to expect to read it with a different layout eg 'a7' cart, but 'a5' cart doesn't, so must be a way to enable that mode, or bug in code?)
-CONS( 2003, epitch,   0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-pitch (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
+CONS( 2003, epitch,   0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-pitch (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ ) // shows Japanese message without cart
 
 // e-kara mix was another unit that allowed you to connect to a PC, unlike e-kara web it also functions as a regular device
-CONS( 200?, ekaramix, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix,    "Takara / SSD Company LTD",                     "e-kara Mix (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 200?, ekaramix, 0,           0,  xavix_cart_ekara, ekara,    xavix_ekara_state,    init_xavix_slowenv,    "Takara / SSD Company LTD",                     "e-kara Mix (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // ダンスダンスレボリューション　ふぁみマット
 CONS( 2001, ddrfammt, 0,           0,  xavix_cart_ddrfammt,ddrfammt, xavix_cart_state,   init_xavix,    "Takara / Konami / SSD Company LTD",            "Dance Dance Revolution Family Mat (Japan)", MACHINE_IMPERFECT_SOUND/*|MACHINE_IS_BIOS_ROOT*/ )
@@ -2904,7 +2909,7 @@ CONS( 2002, gcslottv, 0,           0,  xavix_cart_gcslottv,  gcslottv,     xavix
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006, ltv_tam,  0,           0,  xavix_i2c_24lc04_tam,  ltv_tam,xavix_i2c_ltv_tam_state,      init_xavix,    "Bandai / SSD Company LTD",                      "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
+CONS( 2008, hikara,   0,           0,  xavix_cart_hikara, hikara,    xavix_hikara_state,    init_xavix_slowenv,    "Takara Tomy / SSD Company LTD",            "Hi-kara (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND /*| MACHINE_IS_BIOS_ROOT*/ )
 
 // 東京フレンドパーク2
 CONS( 2003, epo_tfp2,  0,          0,  xavix_i2c_24c08_4mb,  epo_tfp2, xavix_i2c_state, init_xavix, "Epoch / SSD Company LTD", "Tokyo Friend Park II (Japan)", MACHINE_IMPERFECT_SOUND) // uses in24lc08b

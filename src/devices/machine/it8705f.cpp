@@ -6,7 +6,7 @@ Winbond IT8705F LPC Super I/O
 
 TODO:
 - Move stuff from sis950_lpc;
-- shutms11 fails detecting FDC;
+- shutms11 fails detecting FDC (error 80, no motor activity);
 
 **************************************************************************************************/
 
@@ -29,9 +29,9 @@ it8705f_device::it8705f_device(const machine_config &mconfig, const char *tag, d
 	, device_isa16_card_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
 	, m_space_config("superio_config_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(it8705f_device::config_map), this))
-	, m_pc_fdc(*this, "fdc")
-	, m_pc_com(*this, "uart%d", 0U)
-	, m_pc_lpt(*this, "lpta")
+	, m_fdc(*this, "fdc")
+	, m_com(*this, "uart%d", 0U)
+	, m_lpt(*this, "lpta")
 	, m_logical_view(*this, "logical_view")
 	, m_irq1_callback(*this)
 	, m_irq8_callback(*this)
@@ -60,26 +60,33 @@ void it8705f_device::device_start()
 	m_isa->set_dma_channel(1, this, true);
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
-	remap(AS_IO, 0, 0x400);
-
+	save_pointer(NAME(m_activate), 9);
 }
 
 void it8705f_device::device_reset()
 {
 	m_index = 0;
 	m_lock_sequence_index = 0;
+	std::fill(std::begin(m_activate), std::end(m_activate), false);
 
-	m_pc_fdc_irq_line = 6;
-	m_pc_fdc_drq_line = 2;
-//  m_pc_fdc_mode = ;
-	m_pc_fdc_address = 0x03f0;
+	m_fdc_irq_line = 6;
+	m_fdc_drq_line = 2;
+//  m_fdc_mode = ;
+	m_fdc_address = 0x03f0;
 
-	m_pc_lpt_address = 0x0378;
-	m_pc_lpt_irq_line = 7;
-	m_pc_lpt_drq_line = 4; // disabled
-//  m_pc_lpt_mode = 0x3f;
+	m_lpt_address = 0x0378;
+	m_lpt_irq_line = 7;
+	m_lpt_drq_line = 4; // disabled
+//  m_lpt_mode = 0x3f;
 
-	m_pc_fdc->set_rate(500000);
+	m_fdc_f0 = 0;
+	m_fdc_f1 = 0;
+	m_fdc->set_mode(upd765_family_device::mode_t::AT);
+	m_fdc->set_rate(500000);
+
+	m_last_dma_line = -1;
+
+	remap(AS_IO, 0, 0x400);
 }
 
 device_memory_interface::space_config_vector it8705f_device::memory_space_config() const
@@ -91,6 +98,7 @@ device_memory_interface::space_config_vector it8705f_device::memory_space_config
 
 static void pc_hd_floppies(device_slot_interface &device)
 {
+	device.option_add("35ed", FLOPPY_35_ED);
 	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("35hd", FLOPPY_35_HD);
 	device.option_add("525dd", FLOPPY_525_DD);
@@ -106,26 +114,26 @@ void it8705f_device::floppy_formats(format_registration &fr)
 void it8705f_device::device_add_mconfig(machine_config &config)
 {
 	// 82077 compatible
-	N82077AA(config, m_pc_fdc, XTAL(24'000'000), upd765_family_device::mode_t::AT);
-	m_pc_fdc->intrq_wr_callback().set(FUNC(it8705f_device::irq_floppy_w));
-	m_pc_fdc->drq_wr_callback().set(FUNC(it8705f_device::drq_floppy_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", it8705f_device::floppy_formats);
+	N82077AA(config, m_fdc, XTAL(24'000'000), upd765_family_device::mode_t::AT);
+	m_fdc->intrq_wr_callback().set(FUNC(it8705f_device::irq_floppy_w));
+	m_fdc->drq_wr_callback().set(FUNC(it8705f_device::drq_floppy_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_hd_floppies, "35hd", it8705f_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", pc_hd_floppies, "35hd", it8705f_device::floppy_formats);
 
-	NS16550(config, m_pc_com[0], XTAL(24'000'000) / 13);
-	m_pc_com[0]->out_int_callback().set(FUNC(it8705f_device::irq_serial1_w));
-	m_pc_com[0]->out_tx_callback().set(FUNC(it8705f_device::txd_serial1_w));
-	m_pc_com[0]->out_dtr_callback().set(FUNC(it8705f_device::dtr_serial1_w));
-	m_pc_com[0]->out_rts_callback().set(FUNC(it8705f_device::rts_serial1_w));
+	NS16550(config, m_com[0], XTAL(24'000'000) / 13);
+	m_com[0]->out_int_callback().set(FUNC(it8705f_device::irq_serial1_w));
+	m_com[0]->out_tx_callback().set(FUNC(it8705f_device::txd_serial1_w));
+	m_com[0]->out_dtr_callback().set(FUNC(it8705f_device::dtr_serial1_w));
+	m_com[0]->out_rts_callback().set(FUNC(it8705f_device::rts_serial1_w));
 
-	NS16550(config, m_pc_com[1], XTAL(24'000'000) / 13);
-	m_pc_com[1]->out_int_callback().set(FUNC(it8705f_device::irq_serial2_w));
-	m_pc_com[1]->out_tx_callback().set(FUNC(it8705f_device::txd_serial2_w));
-	m_pc_com[1]->out_dtr_callback().set(FUNC(it8705f_device::dtr_serial2_w));
-	m_pc_com[1]->out_rts_callback().set(FUNC(it8705f_device::rts_serial2_w));
+	NS16550(config, m_com[1], XTAL(24'000'000) / 13);
+	m_com[1]->out_int_callback().set(FUNC(it8705f_device::irq_serial2_w));
+	m_com[1]->out_tx_callback().set(FUNC(it8705f_device::txd_serial2_w));
+	m_com[1]->out_dtr_callback().set(FUNC(it8705f_device::dtr_serial2_w));
+	m_com[1]->out_rts_callback().set(FUNC(it8705f_device::rts_serial2_w));
 
-	PC_LPT(config, m_pc_lpt);
-	m_pc_lpt->irq_handler().set(FUNC(it8705f_device::irq_parallel_w));
+	PC_LPT(config, m_lpt);
+	m_lpt->irq_handler().set(FUNC(it8705f_device::irq_parallel_w));
 
 }
 
@@ -139,22 +147,22 @@ void it8705f_device::remap(int space_id, offs_t start, offs_t end)
 
 		if (m_activate[0])
 		{
-			m_isa->install_device(m_pc_fdc_address, m_pc_fdc_address + 7, *m_pc_fdc, &n82077aa_device::map);
+			m_isa->install_device(m_fdc_address, m_fdc_address + 7, *m_fdc, &n82077aa_device::map);
 		}
 
 		for (int i = 0; i < 2; i++)
 		{
 			if (m_activate[i + 1])
 			{
-				const u16 uart_addr = m_pc_com_address[i];
-				m_isa->install_device(uart_addr, uart_addr + 7, read8sm_delegate(*m_pc_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_pc_com[i], FUNC(ns16450_device::ins8250_w)));
+				const u16 uart_addr = m_com_address[i];
+				m_isa->install_device(uart_addr, uart_addr + 7, read8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_w)));
 			}
 		}
 
 		// can't map below 0x100
-		if (m_activate[3] & 1 && m_pc_lpt_address & 0xf00)
+		if (m_activate[3] & 1 && m_lpt_address & 0xf00)
 		{
-			m_isa->install_device(m_pc_lpt_address, m_pc_lpt_address + 3, read8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::write)));
+			m_isa->install_device(m_lpt_address, m_lpt_address + 3, read8sm_delegate(*m_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_lpt, FUNC(pc_lpt_device::write)));
 		}
 	}
 }
@@ -217,37 +225,58 @@ void it8705f_device::config_map(address_map &map)
 	m_logical_view[0](0x30, 0x30).rw(FUNC(it8705f_device::activate_r<0>), FUNC(it8705f_device::activate_w<0>));
 	m_logical_view[0](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_pc_fdc_address >> (offset * 8)) & 0xff;
+			return (m_fdc_address >> (offset * 8)) & 0xff;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const u8 shift = offset * 8;
-			m_pc_fdc_address &= 0xff << shift;
-			m_pc_fdc_address |= data << (shift ^ 8);
-			m_pc_fdc_address &= ~0xf007;
-			LOG("LDN0 (FDC): remap %04x ([%d] %02x)\n", m_pc_fdc_address, offset, data);
+			m_fdc_address &= 0xff << shift;
+			m_fdc_address |= data << (shift ^ 8);
+			m_fdc_address &= ~0xf007;
+			LOG("LDN0 (FDC): remap %04x ([%d] %02x)\n", m_fdc_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
 		})
 	);
 	m_logical_view[0](0x70, 0x70).lrw8(
 		NAME([this] () {
-			return m_pc_fdc_irq_line;
+			return m_fdc_irq_line;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_pc_fdc_irq_line = data & 0xf;
-			LOG("LDN0 (FDC): irq routed to %02x\n", m_pc_lpt_irq_line);
+			m_fdc_irq_line = data & 0xf;
+			LOG("LDN0 (FDC): irq routed to %02x\n", m_fdc_irq_line);
 		})
 	);
 	m_logical_view[0](0x74, 0x74).lrw8(
 		NAME([this] () {
-			return m_pc_lpt_drq_line;
+			return m_fdc_drq_line;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_pc_fdc_drq_line = data & 0x7;
-			LOG("LDN0 (FDC): drq %s (%02x)\n", BIT(m_pc_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+			m_fdc_drq_line = data & 0x7;
+			LOG("LDN0 (FDC): drq %s (%02x)\n", BIT(m_fdc_drq_line, 2) ? "disabled" : "enabled", data);
+			update_dreq_mapping(m_fdc_drq_line, 0);
 		})
 	);
-	// TODO: m_logical_view[0](0xf0, 0xf1) FDC config
+	m_logical_view[0](0xf0, 0xf0).lrw8(
+		NAME([this] () {
+			LOG("LDN0 (FDC): special config 1 (F0h) read\n");
+			return m_fdc_f0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("LDN0 (FDC): special config 1 (F0h) %02x\n", data);
+			m_fdc_f0 = data;
+		})
+	);
+	m_logical_view[0](0xf1, 0xf1).lrw8(
+		NAME([this] () {
+			LOG("LDN0 (FDC): special config 2 (F1h) read\n");
+			return m_fdc_f1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: sets up bit 7 at POST, undocumented
+			LOG("LDN0 (FDC): special config 2 (F1h) %02x\n", data);
+			m_fdc_f1 = data;
+		})
+	);
 
 	// UART1
 	m_logical_view[1](0x30, 0x30).rw(FUNC(it8705f_device::activate_r<1>), FUNC(it8705f_device::activate_w<1>));
@@ -265,14 +294,14 @@ void it8705f_device::config_map(address_map &map)
 	m_logical_view[3](0x30, 0x30).rw(FUNC(it8705f_device::activate_r<3>), FUNC(it8705f_device::activate_w<3>));
 	m_logical_view[3](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_pc_lpt_address >> (offset * 8)) & 0xff;
+			return (m_lpt_address >> (offset * 8)) & 0xff;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const u8 shift = offset * 8;
-			m_pc_lpt_address &= 0xff << shift;
-			m_pc_lpt_address |= data << (shift ^ 8);
-			m_pc_lpt_address &= ~0xf003;
-			LOG("LDN3 (LPT): remap %04x ([%d] %02x)\n", m_pc_lpt_address, offset, data);
+			m_lpt_address &= 0xff << shift;
+			m_lpt_address |= data << (shift ^ 8);
+			m_lpt_address &= ~0xf003;
+			LOG("LDN3 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
 
 			remap(AS_IO, 0, 0x400);
 		})
@@ -281,20 +310,21 @@ void it8705f_device::config_map(address_map &map)
 	//m_logical_view[3](0x64, 0x65) POST data port base address
 	m_logical_view[3](0x70, 0x70).lrw8(
 		NAME([this] () {
-			return m_pc_lpt_irq_line;
+			return m_lpt_irq_line;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_pc_lpt_irq_line = data & 0xf;
-			LOG("LDN3 (LPT): irq routed to %02x\n", m_pc_lpt_irq_line);
+			m_lpt_irq_line = data & 0xf;
+			LOG("LDN3 (LPT): irq routed to %02x\n", m_lpt_irq_line);
 		})
 	);
 	m_logical_view[3](0x74, 0x74).lrw8(
 		NAME([this] () {
-			return m_pc_lpt_drq_line;
+			return m_lpt_drq_line;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			m_pc_lpt_drq_line = data & 0x7;
-			LOG("LDN3 (LPT): drq %s (%02x)\n", BIT(m_pc_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+			m_lpt_drq_line = data & 0x7;
+			LOG("LDN3 (LPT): drq %s (%02x)\n", BIT(m_lpt_drq_line, 2) ? "disabled" : "enabled", data);
+			update_dreq_mapping(m_lpt_drq_line, 3);
 		})
 	);
 
@@ -417,14 +447,14 @@ void it8705f_device::irq_floppy_w(int state)
 {
 	if (!m_activate[0])
 		return;
-	request_irq(m_pc_fdc_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(m_fdc_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void it8705f_device::drq_floppy_w(int state)
 {
-	if (!m_activate[0])
+	if (!m_activate[0] || BIT(m_fdc_drq_line, 2))
 		return;
-	request_dma(m_pc_fdc_drq_line, state ? ASSERT_LINE : CLEAR_LINE);
+	request_dma(m_fdc_drq_line, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -433,34 +463,34 @@ void it8705f_device::drq_floppy_w(int state)
 
 template <unsigned N> u8 it8705f_device::uart_address_r(offs_t offset)
 {
-	return (m_pc_com_address[N] >> (offset * 8)) & 0xff;
+	return (m_com_address[N] >> (offset * 8)) & 0xff;
 }
 
 template <unsigned N> void it8705f_device::uart_address_w(offs_t offset, u8 data)
 {
 	const u8 shift = offset * 8;
-	m_pc_com_address[N] &= 0xff << shift;
-	m_pc_com_address[N] |= data << (shift ^ 8);
-	m_pc_com_address[N] &= ~0xf007;
-	LOG("LDN%d (COM%d): remap %04x ([%d] %02x)\n", N, N + 1, m_pc_com_address[N], offset, data);
+	m_com_address[N] &= 0xff << shift;
+	m_com_address[N] |= data << (shift ^ 8);
+	m_com_address[N] &= ~0xf007;
+	LOG("LDN%d (COM%d): remap %04x ([%d] %02x)\n", N + 1, N + 1, m_com_address[N], offset, data);
 
 	remap(AS_IO, 0, 0x400);
 }
 
 template <unsigned N> u8 it8705f_device::uart_irq_r(offs_t offset)
 {
-	return m_pc_com_irq_line[N];
+	return m_com_irq_line[N];
 }
 
 template <unsigned N> void it8705f_device::uart_irq_w(offs_t offset, u8 data)
 {
-	m_pc_com_irq_line[N] = data & 0xf;
-	LOG("LDN%d (UART): irq routed to %02x\n", N, m_pc_com_irq_line[N]);
+	m_com_irq_line[N] = data & 0xf;
+	LOG("LDN%d (UART): irq routed to %02x\n", N, m_com_irq_line[N]);
 }
 
 template <unsigned N> u8 it8705f_device::uart_config_r(offs_t offset)
 {
-	return m_pc_com_control[N];
+	return m_com_control[N];
 }
 
 /*
@@ -471,22 +501,22 @@ template <unsigned N> u8 it8705f_device::uart_config_r(offs_t offset)
  */
 template <unsigned N> void it8705f_device::uart_config_w(offs_t offset, u8 data)
 {
-	m_pc_com_control[N] = data;
-	LOG("LDN%d (UART): control %02x\n", N, m_pc_com_control[N]);
+	m_com_control[N] = data;
+	LOG("LDN%d (UART): control %02x\n", N, m_com_control[N]);
 }
 
 void it8705f_device::irq_serial1_w(int state)
 {
 	if (!m_activate[1])
 		return;
-	request_irq(m_pc_com_irq_line[0], state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(m_com_irq_line[0], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void it8705f_device::irq_serial2_w(int state)
 {
 	if (!m_activate[2])
 		return;
-	request_irq(m_pc_com_irq_line[1], state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(m_com_irq_line[1], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void it8705f_device::txd_serial1_w(int state)
@@ -533,52 +563,52 @@ void it8705f_device::rts_serial2_w(int state)
 
 void it8705f_device::rxd1_w(int state)
 {
-	m_pc_com[0]->rx_w(state);
+	m_com[0]->rx_w(state);
 }
 
 void it8705f_device::ndcd1_w(int state)
 {
-	m_pc_com[0]->dcd_w(state);
+	m_com[0]->dcd_w(state);
 }
 
 void it8705f_device::ndsr1_w(int state)
 {
-	m_pc_com[0]->dsr_w(state);
+	m_com[0]->dsr_w(state);
 }
 
 void it8705f_device::nri1_w(int state)
 {
-	m_pc_com[0]->ri_w(state);
+	m_com[0]->ri_w(state);
 }
 
 void it8705f_device::ncts1_w(int state)
 {
-	m_pc_com[0]->cts_w(state);
+	m_com[0]->cts_w(state);
 }
 
 void it8705f_device::rxd2_w(int state)
 {
-	m_pc_com[1]->rx_w(state);
+	m_com[1]->rx_w(state);
 }
 
 void it8705f_device::ndcd2_w(int state)
 {
-	m_pc_com[1]->dcd_w(state);
+	m_com[1]->dcd_w(state);
 }
 
 void it8705f_device::ndsr2_w(int state)
 {
-	m_pc_com[1]->dsr_w(state);
+	m_com[1]->dsr_w(state);
 }
 
 void it8705f_device::nri2_w(int state)
 {
-	m_pc_com[1]->ri_w(state);
+	m_com[1]->ri_w(state);
 }
 
 void it8705f_device::ncts2_w(int state)
 {
-	m_pc_com[1]->cts_w(state);
+	m_com[1]->cts_w(state);
 }
 
 /*
@@ -589,5 +619,69 @@ void it8705f_device::irq_parallel_w(int state)
 {
 	if (m_activate[3] == false)
 		return;
-	request_irq(m_pc_lpt_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(m_lpt_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
 }
+
+
+/*
+ * DMA
+ */
+
+void it8705f_device::update_dreq_mapping(int dreq, int logical)
+{
+	if ((dreq < 0) || (dreq >= 4))
+		return;
+	for (int n = 0; n < 4; n++)
+		if (m_dreq_mapping[n] == logical)
+			m_dreq_mapping[n] = -1;
+	m_dreq_mapping[dreq] = logical;
+}
+
+void it8705f_device::eop_w(int state)
+{
+	// dma transfer finished
+	if (m_last_dma_line < 0)
+		return;
+	switch (m_dreq_mapping[m_last_dma_line])
+	{
+	case 0:
+		m_fdc->tc_w(state == ASSERT_LINE);
+		break;
+	default:
+		break;
+	}
+	//m_last_dma_line = -1;
+}
+
+// TODO: LPT bindings
+uint8_t it8705f_device::dack_r(int line)
+{
+	// transferring data from device to memory using dma
+	// read one byte from device
+	m_last_dma_line = line;
+	switch (m_dreq_mapping[line])
+	{
+	case 0:
+		return m_fdc->dma_r();
+	default:
+		break;
+	}
+	return 0;
+}
+
+void it8705f_device::dack_w(int line, uint8_t data)
+{
+	// transferring data from memory to device using dma
+	// write one byte to device
+	m_last_dma_line = line;
+	switch (m_dreq_mapping[line])
+	{
+	case 0:
+		m_fdc->dma_w(data);
+		break;
+	default:
+		break;
+	}
+}
+
+

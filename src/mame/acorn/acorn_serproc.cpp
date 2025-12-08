@@ -122,7 +122,8 @@ void acorn_serproc_device::write(uint8_t data)
 uint8_t acorn_serproc_device::read()
 {
 	// Reading has the same effect as writing 0xFE (high byte of address 0xFE10)
-	write(0xfe);
+	if (!machine().side_effects_disabled())
+		write(0xfe);
 
 	return 0;
 }

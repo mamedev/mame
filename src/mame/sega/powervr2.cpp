@@ -1273,10 +1273,10 @@ void powervr2_device::spg_control_w(offs_t offset, uint32_t data, uint32_t mem_m
 	update_screen_format();
 
 	if((spg_control & 0xc0) == 0xc0)
-		popmessage("SPG undocumented pixel clock mode 11, contact MAME/MESSdev");
+		popmessage("SPG undocumented pixel clock mode 11");
 
 	if((spg_control & 0xd0) == 0x10)
-		popmessage("SPG enabled VGA mode with interlace, contact MAME/MESSdev");
+		popmessage("SPG enabled VGA mode with interlace");
 }
 
 uint32_t powervr2_device::spg_hblank_r()

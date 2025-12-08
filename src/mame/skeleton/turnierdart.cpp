@@ -51,7 +51,7 @@ PCB silkscreened "Valley Recreation Products - Coyright © 1997".
 ************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 //#include "machine/nvram.h"
 #include "speaker.h"
 

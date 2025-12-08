@@ -94,7 +94,8 @@ bool pc98fdi_format::load(util::random_read &io, uint32_t form_factor, const std
 				sects[i].size        = ssize;
 				sects[i].actual_size = sector_size;
 				sects[i].deleted     = false;
-				sects[i].bad_crc     = false;
+				sects[i].bad_data_crc = false;
+				sects[i].bad_addr_crc = false;
 				sects[i].data        = sect_data + i*sector_size;
 			}
 

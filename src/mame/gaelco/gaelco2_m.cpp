@@ -78,7 +78,7 @@ void gaelco2_state::init_alighunt()
 }
 
 
-void gaelco2_state::init_touchgo()
+void gaelco2_dual_state::init_touchgo()
 {
 	/*
 	For "gfx_temp" we have this memory map:
@@ -186,26 +186,6 @@ void gaelco2_state::wrally2_latch_w(offs_t offset, u16 data)
 	m_mainlatch->write_bit(offset >> 2, BIT(data, 0));
 }
 
-void gaelco2_state::coin1_counter_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-void gaelco2_state::coin2_counter_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-void gaelco2_state::coin3_counter_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(2, state);
-}
-
-void gaelco2_state::coin4_counter_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(3, state);
-}
-
 void gaelco2_state::alighunt_coin_w(u16 data)
 {
 	/* Coin Lockouts */
@@ -237,7 +217,7 @@ void bang_state::bang_clr_gun_int_w(u16 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 {
-	int scanline = param;
+	const int scanline = param;
 
 	if (scanline == 256)
 	{

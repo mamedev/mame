@@ -151,13 +151,13 @@ private:
 	optional_memory_bank m_nvrambank;
 
 	// video-related
-	int        m_layer_colorbase[3]{};
-	int        m_sprite_colorbase = 0;
-	int        m_tmnt_priorityflag = 0;
+	uint16_t   m_layer_colorbase[3]{};
+	uint16_t   m_sprite_colorbase = 0;
+	uint16_t   m_priority = 0;
 
 	// misc
-	int        m_tmnt_soundlatch = 0;
-	int        m_last = 0;
+	uint8_t    m_tmnt_soundlatch = 0;
+	int32_t    m_last = 0;
 	uint8_t    m_irq5_mask = 0;
 	uint16_t   m_cuebrick_nvram[0x400 * 0x20 / 2]{}; // 32k paged in a 1k window
 	int16_t    m_sampledata[0x40000];
@@ -174,12 +174,12 @@ private:
 
 	uint16_t k052109_word_noA12_r(offs_t offset, uint16_t mem_mask = ~0);
 	void k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t tmnt_sres_r();
-	void tmnt_sres_w(uint8_t data);
+	uint8_t sres_r();
+	void sres_w(uint8_t data);
 	void tmnt_decode_sample();
 	void cuebrick_nvbank_w(uint8_t data);
-	void tmnt_0a0000_w(offs_t offset, uint16_t data);
-	void tmnt_priority_w(offs_t offset, uint16_t data);
+	void _0a0000_w(offs_t offset, uint16_t data);
+	void priority_w(offs_t offset, uint16_t data);
 	void tmnt_upd_start_w(uint8_t data);
 	uint8_t tmnt_upd_busy_r();
 
@@ -188,7 +188,7 @@ private:
 	DECLARE_MACHINE_RESET(tmnt);
 	DECLARE_VIDEO_START(tmnt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tmnt_vblank_w(int state);
+	void vblank_w(int state);
 	void volume_callback(uint8_t data);
 	K051960_CB_MEMBER(mia_sprite_callback);
 	K051960_CB_MEMBER(tmnt_sprite_callback);
@@ -227,19 +227,19 @@ void tmnt_state::k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem
 }
 
 
-void tmnt_state::tmnt_vblank_w(int state)
+void tmnt_state::vblank_w(int state)
 {
 	if (state && m_irq5_mask)
 		m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
 
-uint8_t tmnt_state::tmnt_sres_r()
+uint8_t tmnt_state::sres_r()
 {
 	return m_tmnt_soundlatch;
 }
 
-void tmnt_state::tmnt_sres_w(uint8_t data)
+void tmnt_state::sres_w(uint8_t data)
 {
 	/* bit 1 resets the UPD7795C sound chip */
 	m_upd7759->reset_w(BIT(data, 1));
@@ -290,16 +290,16 @@ void tmnt_state::tmnt_decode_sample()
 
 K052109_CB_MEMBER(tmnt_state::mia_tile_callback)
 {
-	*flags = (*color & 0x04) ? TILE_FLIPX : 0;
+	flags = (color & 0x04) ? TILE_FLIPX : 0;
 	if (layer == 0)
 	{
-		*code |= ((*color & 0x01) << 8);
-		*color = m_layer_colorbase[layer] + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
+		code |= ((color & 0x01) << 8);
+		color = m_layer_colorbase[layer] + ((color & 0x80) >> 5) + ((color & 0x10) >> 1);
 	}
 	else
 	{
-		*code |= ((*color & 0x01) << 8) | ((*color & 0x18) << 6) | (bank << 11);
-		*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+		code |= ((color & 0x01) << 8) | ((color & 0x18) << 6) | (bank << 11);
+		color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 	}
 }
 
@@ -307,20 +307,20 @@ K052109_CB_MEMBER(tmnt_state::cuebrick_tile_callback)
 {
 	if ((m_k052109->get_rmrd_line() == CLEAR_LINE) && (layer == 0))
 	{
-		*code |= ((*color & 0x01) << 8);
-		*color = m_layer_colorbase[layer] + ((*color & 0x0e) >> 1);
+		code |= ((color & 0x01) << 8);
+		color = m_layer_colorbase[layer] + ((color & 0x0e) >> 1);
 	}
 	else
 	{
-		*code |= ((*color & 0xf) << 8);
-		*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+		code |= ((color & 0xf) << 8);
+		color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 	}
 }
 
 K052109_CB_MEMBER(tmnt_state::tmnt_tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 
@@ -333,13 +333,13 @@ K052109_CB_MEMBER(tmnt_state::tmnt_tile_callback)
 
 K051960_CB_MEMBER(tmnt_state::mia_sprite_callback)
 {
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	color = m_sprite_colorbase + (color & 0x0f);
 }
 
 K051960_CB_MEMBER(tmnt_state::tmnt_sprite_callback)
 {
-	*code |= (*color & 0x10) << 9;
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	code |= (color & 0x10) << 9;
+	color = m_sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -364,8 +364,8 @@ VIDEO_START_MEMBER(tmnt_state,mia)
 	m_layer_colorbase[2] = 40;
 	m_sprite_colorbase = 16;
 
-	m_tmnt_priorityflag = 0;
-	save_item(NAME(m_tmnt_priorityflag));
+	m_priority = 0;
+	save_item(NAME(m_priority));
 }
 
 VIDEO_START_MEMBER(tmnt_state,tmnt)
@@ -375,8 +375,8 @@ VIDEO_START_MEMBER(tmnt_state,tmnt)
 	m_layer_colorbase[2] = 40;
 	m_sprite_colorbase = 16;
 
-	m_tmnt_priorityflag = 0;
-	save_item(NAME(m_tmnt_priorityflag));
+	m_priority = 0;
+	save_item(NAME(m_priority));
 
 	m_palette->set_shadow_factor(0.75);
 }
@@ -388,7 +388,7 @@ VIDEO_START_MEMBER(tmnt_state,tmnt)
 
 ***************************************************************************/
 
-void tmnt_state::tmnt_0a0000_w(offs_t offset, uint16_t data)
+void tmnt_state::_0a0000_w(offs_t offset, uint16_t data)
 {
 	/* bit 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -411,7 +411,7 @@ void tmnt_state::tmnt_0a0000_w(offs_t offset, uint16_t data)
 	/* other bits unused */
 }
 
-void tmnt_state::tmnt_priority_w(offs_t offset, uint16_t data)
+void tmnt_state::priority_w(offs_t offset, uint16_t data)
 {
 	/* bit 2/3 = priority; other bits unused */
 	/* bit2 = PRI bit3 = PRI2
@@ -431,7 +431,7 @@ void tmnt_state::tmnt_priority_w(offs_t offset, uint16_t data)
 	      are 0) is taken from the *foreground* palette, not the background
 	      one as would be more intuitive.
 	*/
-	m_tmnt_priorityflag = (data & 0x0c) >> 2;
+	m_priority = (data & 0x0c) >> 2;
 }
 
 
@@ -445,9 +445,9 @@ void tmnt_state::tmnt_priority_w(offs_t offset, uint16_t data)
 uint32_t tmnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
-	if ((m_tmnt_priorityflag & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+	if ((m_priority & 1) == 1) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
-	if ((m_tmnt_priorityflag & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
+	if ((m_priority & 1) == 0) m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 
 	return 0;
@@ -465,7 +465,7 @@ void tmnt_state::cuebrick_main_map(address_map &map)
 	map(0x040000, 0x043fff).ram(); /* main RAM */
 	map(0x060000, 0x063fff).ram(); /* main RAM */
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::_0a0000_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0010, 0x0a0011).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -486,7 +486,7 @@ void tmnt_state::mia_main_map(address_map &map)
 	map(0x040000, 0x043fff).ram(); /* main RAM */
 	map(0x060000, 0x063fff).ram(); /* main RAM */
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::_0a0000_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0009, 0x0a0009).w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -494,7 +494,7 @@ void tmnt_state::mia_main_map(address_map &map)
 	map(0x0a0012, 0x0a0013).portr("DSW2");
 	map(0x0a0018, 0x0a0019).portr("DSW3");
 #if 0
-	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
+	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::priority_w));
 #endif
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 //  map(0x10e800, 0x10e801).nopw(); ???
@@ -508,7 +508,7 @@ void tmnt_state::tmnt_main_map(address_map &map)
 	map(0x000000, 0x05ffff).rom();
 	map(0x060000, 0x063fff).ram(); /* main RAM */
 	map(0x080000, 0x080fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::tmnt_0a0000_w));
+	map(0x0a0000, 0x0a0001).portr("COINS").w(FUNC(tmnt_state::_0a0000_w));
 	map(0x0a0002, 0x0a0003).portr("P1");
 	map(0x0a0004, 0x0a0005).portr("P2");
 	map(0x0a0006, 0x0a0007).portr("P3");
@@ -517,7 +517,7 @@ void tmnt_state::tmnt_main_map(address_map &map)
 	map(0x0a0012, 0x0a0013).portr("DSW2");
 	map(0x0a0014, 0x0a0015).portr("P4");
 	map(0x0a0018, 0x0a0019).portr("DSW3");
-	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::tmnt_priority_w));
+	map(0x0c0000, 0x0c0001).w(FUNC(tmnt_state::priority_w));
 	map(0x100000, 0x107fff).rw(FUNC(tmnt_state::k052109_word_noA12_r), FUNC(tmnt_state::k052109_word_noA12_w));
 //  map(0x10e800, 0x10e801).nopw(); ???
 	map(0x140000, 0x140007).rw(m_k051960, FUNC(k051960_device::k051937_r), FUNC(k051960_device::k051937_w));
@@ -539,7 +539,7 @@ void tmnt_state::tmnt_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
+	map(0x9000, 0x9000).rw(FUNC(tmnt_state::sres_r), FUNC(tmnt_state::sres_w)); /* title music & UPD7759C reset */
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -553,7 +553,7 @@ void tmnt_state::tmntucbl_audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).rw(FUNC(tmnt_state::tmnt_sres_r), FUNC(tmnt_state::tmnt_sres_w)); /* title music & UPD7759C reset */
+	map(0x9000, 0x9000).rw(FUNC(tmnt_state::sres_r), FUNC(tmnt_state::sres_w)); /* title music & UPD7759C reset */
 	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	// TODO: MC68705R3P + Oki M5205
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -832,7 +832,7 @@ void tmnt_state::cuebrick(machine_config &config)
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w));
+	screen.screen_vblank().set(FUNC(tmnt_state::vblank_w));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);
@@ -879,7 +879,7 @@ void tmnt_state::mia(machine_config &config)
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w));
+	screen.screen_vblank().set(FUNC(tmnt_state::vblank_w));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);
@@ -941,7 +941,7 @@ void tmnt_state::tmnt(machine_config &config)
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // verified against real hardware
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w)); // NVBLK from 051962
+	screen.screen_vblank().set(FUNC(tmnt_state::vblank_w)); // NVBLK from 051962
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);

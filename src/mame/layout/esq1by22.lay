@@ -12,14 +12,23 @@ license:CC0-1.0
 		</led14segsc>
 	</element>
 
+	<element name="underline" defstate="0">
+		<rect state="0"><color red="0.06" green="0.12" blue="0.10" /></rect>
+		<rect state="1"><color red="0.45" green="1.00" blue="0.95" /></rect>
+	</element>
+
 	<view name="Default Layout">
 
 		<!-- VFDs -->
 		<repeat count="22">
 			<param name="n" start="0" increment="1" />
+			<param name="u" start="22" increment="1" />
 			<param name="x" start="0" increment="19" />
 			<element name="vfd~n~" ref="vfd0">
 				<bounds x="~x~" y="0" width="18" height="23" />
+			</element>
+			<element name="vfd~u~" ref="underline">
+				<bounds x="~x~" y="26" width="14" height="2" />
 			</element>
 		</repeat>
 	</view>

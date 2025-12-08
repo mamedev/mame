@@ -61,7 +61,7 @@
 #include "emu.h"
 
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/clock.h"
 #include "machine/i2cmem.h"
 #include "machine/timer.h"
@@ -165,7 +165,7 @@ private:
 	void ts9347_io_w(offs_t offset, uint8_t data);
 
 	void mem_prg(address_map &map) ATTR_COLD;
-	void mem_io(address_map &map) ATTR_COLD;
+	void mem_data(address_map &map) ATTR_COLD;
 };
 
 void minitel_state::machine_start()
@@ -387,7 +387,7 @@ void minitel_state::mem_prg(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void minitel_state::mem_io(address_map &map)
+void minitel_state::mem_data(address_map &map)
 {
 	map(0x2000, 0x3fff).rw(FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_ctrl_reg_w));
 	/* ts9347 */
@@ -523,7 +523,7 @@ void minitel_state::minitel2(machine_config &config)
 	/* basic machine hardware */
 	I80C32(config, m_maincpu, XTAL(14'318'181)); //verified on pcb
 	m_maincpu->set_addrmap(AS_PROGRAM, &minitel_state::mem_prg);
-	m_maincpu->set_addrmap(AS_IO, &minitel_state::mem_io);
+	m_maincpu->set_addrmap(AS_DATA, &minitel_state::mem_data);
 	m_maincpu->port_in_cb<1>().set(FUNC(minitel_state::port1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(minitel_state::port1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(minitel_state::port3_r));
@@ -577,8 +577,8 @@ ROM_START( minitel2 )
 	ROM_SYSTEM_BIOS(2, "ft_bv9", "Minitel 2 ROM Bv9")
 	ROMX_LOAD( "bv9.1402",           0x0000, 0x8000, CRC(ace5d65e) SHA1(c8d589f8af6bd7d339964fdece937a76db972115), ROM_BIOS(2) )
 
-	ROM_REGION( 0x4000, "ts9347", 0 )
-	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )            // from dcvg5k
+	ROM_REGION( 0x2000, "ts9347", 0 )
+	ROM_LOAD( "ts9347.bin", 0x0000, 0x2000, CRC(acff72e7) SHA1(54c8b6f5b6407f13a933a40b5b7742ca06cdc1a3) )
 ROM_END
 
 } // anonymous namespace
