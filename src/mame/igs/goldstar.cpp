@@ -20620,6 +20620,9 @@ ROM_START( texas99e )
 	ROM_CONTINUE(0x5000, 0x1000)
 	ROM_CONTINUE(0x8000, 0x8000)
 
+	ROM_REGION( 0x1000, "mcu", 0 )  // daughterboard at89c51 internal binary
+	ROM_LOAD( "n99v251.tsk", 0x00000, 0x1000, CRC(3cd90940) SHA1(7ce9eacc12955f64b4177a8e1252c4d2c7a89578) )
+
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rom7.bin", 0x00000, 0x8000, CRC(d77d1f8b) SHA1(69761cb9cbb903b8c94ca1b3727f6c686bda1be2) )
 	ROM_LOAD( "rom6.bin", 0x08000, 0x8000, CRC(4b26ed0a) SHA1(24f56835e098f47dd92bca1c3bc13a4afeb8d58c) )
