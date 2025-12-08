@@ -632,6 +632,7 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_rgb32& b
 uint32_t elan_eu3a05vid_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pens()[0], cliprect);
+
 	screen.priority().fill(0xff, cliprect);
 
 	draw_tilemaps(screen,bitmap,cliprect,0); // 'low priority'

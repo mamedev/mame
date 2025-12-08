@@ -285,6 +285,8 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	void elan_eu3a05_extmap_buzztime(address_map &map);
+
 	uint8_t porta_r();
 	void portb_w(uint8_t data);
 
@@ -371,7 +373,7 @@ void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
 
 	m_maincpu->set_alt_timer();
 
-	m_maincpu->set_addrmap(5, &elan_eu3a05_buzztime_state::elan_eu3a05_extmap_2mb);
+	m_maincpu->set_addrmap(5, &elan_eu3a05_buzztime_state::elan_eu3a05_extmap_buzztime);
 
 	m_maincpu->read_callback<0>().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
 //  m_maincpu->read_callback<1>().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
@@ -413,26 +415,28 @@ uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_rgb32& b
 
 void elan_eu3a05_state::elan_eu3a05_extmap_4mb(address_map &map)
 {
-	map(0x000000, 0xffffff).noprw();
-	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
+	map(0x000000, 0x3fffff).mirror(0xc00000).rom().region("maincpu", 0);
 }
 
 void elan_eu3a05_state::elan_eu3a05_extmap_2mb(address_map &map)
 {
-	map(0x000000, 0xffffff).noprw();
+	map(0x000000, 0x1fffff).mirror(0xe00000).rom().region("maincpu", 0);
+}
+
+void elan_eu3a05_buzztime_state::elan_eu3a05_extmap_buzztime(address_map &map)
+{
 	map(0x000000, 0x1fffff).mirror(0x200000).rom().region("maincpu", 0);
+	map(0x800000, 0x80ffff).ram();
 }
 
 void elan_eu3a05_state::elan_eu3a05_extmap_1mb(address_map &map)
 {
-	map(0x000000, 0xffffff).noprw();
-	map(0x000000, 0x0fffff).mirror(0x300000).rom().region("maincpu", 0);
+	map(0x000000, 0x0fffff).mirror(0xf00000).rom().region("maincpu", 0);
 }
 
 void elan_eu3a05_state::elan_eu3a05_extmap_512kb(address_map &map)
 {
-	map(0x000000, 0xffffff).noprw();
-	map(0x000000, 0x07ffff).mirror(0x380000).rom().region("maincpu", 0);
+	map(0x000000, 0x07ffff).mirror(0xf80000).rom().region("maincpu", 0);
 }
 
 void elan_eu3a05_rad_sinv_state::elan_eu3a05_sinv_map(address_map &map)
@@ -887,7 +891,7 @@ ROM_START( sudelan3 )
 ROM_END
 
 ROM_START( sudelan )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "klaussudoku.bin", 0x00000, 0x100000, CRC(afd2b06a) SHA1(21db956fb40b2e3d61fc2bac89000cf7f61fe99e) )
 	ROM_IGNORE(0x100000) // 2nd half empty, maybe overdumped
 ROM_END
