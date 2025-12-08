@@ -138,6 +138,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timerrun[TNum] = 0;
 }
 
+TIMER_CALLBACK_MEMBER(model2_state::check_sound_irq)
+{
+	const u32 line = 1 << 10;
+	if ((m_uart->status_r() & 0x03) && (m_intena & line))
+	{
+		m_intreq |= line;
+		irq_update();
+	}
+}
+
 void model2_state::machine_start()
 {
 	// initialize custom debugger pool, @see machine/model2.cpp
@@ -165,6 +175,9 @@ void model2_state::machine_start()
 
 	save_item(NAME(m_geo_write_start_address));
 	save_item(NAME(m_geo_read_start_address));
+
+	m_irq_delay_timer = timer_alloc(FUNC(model2_state::check_sound_irq), this);
+	m_irq_delay_timer->adjust(attotime::never);
 }
 
 void model2_tgp_state::machine_start()
@@ -921,12 +934,8 @@ void model2_state::irq_enable_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_intena);
 
-	const u32 line = 1 << 10;
-	if ((m_uart->status_r() & 0x03) && (m_intena & line))
-	{
-		m_intreq |= line;
-		irq_update();
-	}
+	// delay sound IRQ check by 2 cycles; vcop2 needs this
+	m_irq_delay_timer->adjust(attotime::from_nsec(80));
 }
 
 void model2_state::irq_update()
