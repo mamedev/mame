@@ -11449,7 +11449,36 @@ license:CC0-1.0
 	</software>
 
 	<software name="bbb2">
-		<description>Bang Bang Busters 2 (demo)</description>
+		<description>Bang Bang Busters 2 (demo v2.0)</description>
+		<year>2025</year>
+		<publisher>PixelHeart</publisher>
+		<info name="developer" value="Studio Story Bird" />
+		<info name="developer" value="Visco" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="070-p1.bin" offset="0x000000" size="0x100000" crc="b6f02669" sha1="e35e612fbe7aa829d3f2dab9f5975affe31687de" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="070-s1.bin" crc="e53ef3d0" sha1="ef3ade7aadc1b57a20c1830bf1d3444dfc9ce1fb" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="070-m1.bin" crc="4c134828" sha1="110848755185eac24b552e949ce22daf37d7085f" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x800000">
+				<rom name="070-v1.bin" offset="0x000000" size="0x400000" crc="da7cb2b8" sha1="daccb8bb9c445b5b4a2ce70f5fb008685e063421" />
+				<rom name="070-v2.bin" offset="0x400000" size="0x400000" crc="0043d4f2" sha1="22535283d3501feca3459746e4438a677da79432" />
+			</dataarea>
+			<dataarea name="sprites" size="0x1000000">
+				<rom loadflag="load16_byte" name="070-c1.bin" offset="0x000000" size="0x800000" crc="c887be9b" sha1="ed36d80a3dbb1f17c3bf9e8072380a15c8a16857" />
+				<rom loadflag="load16_byte" name="070-c2.bin" offset="0x000001" size="0x800000" crc="13c6dd38" sha1="a6fcc704106f3f64eba60eed9e88325cfda68acd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbb2_dm1" cloneof="bbb2">
+		<description>Bang Bang Busters 2 (demo v1.0)</description>
 		<year>2025</year>
 		<publisher>PixelHeart</publisher>
 		<info name="developer" value="Studio Story Bird" />
