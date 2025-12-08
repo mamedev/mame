@@ -2,9 +2,10 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    ramcard128k.c
+    ramcard128k.cpp
 
-    Implemention of the Saturn Systems 128K extended language card
+    Implemention of the 128K extended language card from Saturn
+    Systems, Inc. (later Titan Technologies, Inc.)
 
 *********************************************************************/
 
