@@ -20581,6 +20581,32 @@ ROM_END
   7b23: bit5, a
   7b25: jr  z, $7b21
 
+  *EDIT*
+  
+  The game is not a bootleg. Runs in cmast99 hardware
+  with a heavily protected daughterboard.
+
+  Daughterboard specs:
+
+  Silkscreened "KOLOM-LK1"
+
+  1x Zilog Z84C0006PEC (Z80 CPU)
+  1x NEC D71055C Parallel Interfase Unit (i8255 PPI compatible)
+  1x ATMEL AT89C51 (MCU with 4KB of internal flash ROM)
+  1x HM6116 SRAM.
+  1x PEEL18CV8P-25
+  1x 8 DIP switches bank.
+  1x 5 DIP switches bank.
+  1x DB9 not soldered port (possible RS232 comm)
+  1x 3-pin connector (P1).
+  2x Red LEDs (maybe for system status).
+  1x 12.000 MHz Xtal.
+
+  Due to the complexity, this daughterboard seems to be meant
+  for different extra functions, as printers, SAS, jackpot
+  servers, or whatever linking system.
+  Needs further investigtion.
+
 */
 ROM_START( texas99e )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -32361,7 +32387,7 @@ GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99
 GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",            MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99b 
 GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, Cleco)",              MACHINE_NOT_WORKING,     layout_cmv4 )
 GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",       MACHINE_NOT_WORKING,     layout_cmv4 ) 
-GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "New Texas '99 (QL-1 V9B.00, Kolom V1)",       MACHINE_NOT_WORKING,     layout_cmv4 ) // different ports?... see the ROM load notes 
+GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",       MACHINE_NOT_WORKING,     layout_cmv4 ) // DB with MCU... see the ROM load notes 
 GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING,     layout_cmv4 ) // different bankswitching? see the ROM load notes
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
 GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 1)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
