@@ -397,6 +397,10 @@ ifeq ($(findstring aarch64,$(UNAME)),aarch64)
 ARCHITECTURE :=
 endif
 
+ifeq ($(findstring riscv64,$(UNAME)),riscv64)
+ARCHITECTURE :=
+endif
+
 # Autodetect BIGENDIAN
 # MacOSX
 ifndef BIGENDIAN
