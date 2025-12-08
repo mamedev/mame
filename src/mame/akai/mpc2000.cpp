@@ -19,6 +19,12 @@
         Panel controller CPU: NEC uPD78C10AGQ @ 12 MHz
         Sound DSP: L7A1045-L6028
 
+    TODO:
+        - FDC motor is never turned off, at least via auxcmd.  Is there some other uPD76x
+          mechanism that might do this?  Floppy sounds are disabled for now because of this.
+        - SCSI and ATA don't work (SCSI has the same issues as MPC3000, likely the same cause)
+        - Boot ROM is an Intel E28F800B5 "boot block flash", and can be live updated.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -82,6 +88,7 @@ public:
 		, m_fdc_drq(0)
 		, m_ata_irq(0)
 		, m_ata_drq(0)
+		, m_wadcsn(0)
 		, m_lcdx{ 0, 0 }
 		, m_lcdy{ 0, 0 }
 		, m_lcdcmd{ 0, 0 }
@@ -126,6 +133,9 @@ private:
 	template <int cs> void lcd_csw(offs_t offset, uint8_t data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	uint8_t wadcsn_r();
+	void wadcn_w(uint8_t data);
+
 	uint8_t subcpu_pa_r();
 	uint8_t subcpu_pb_r();
 	uint8_t subcpu_pc_r();
@@ -149,6 +159,7 @@ private:
 	int m_last_dial, m_count_dial, m_quadrature_phase;
 	int m_fdc_ata, m_fdc_irq, m_fdc_drq, m_ata_irq, m_ata_drq;
 
+	uint8_t m_wadcsn;
 	uint16_t m_lcdx[2];
 	uint8_t m_lcdy[2], m_lcdcmd[2];
 	uint16_t m_vram[256*64];
@@ -170,9 +181,15 @@ void mpc2000_state::machine_reset()
 
 void mpc2000_state::mpc2000_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram(); // RAM is 2x HM5118160 (1M x 16 bit) for a total of 4MiB
-	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
-	map(0x100000, 0x3fffff).ram();
+	map(0x00'0000, 0x07'ffff).ram(); // RAM is 2x HM5118160 (1M x 16 bit) for a total of 4MiB
+	map(0x08'0000, 0x0f'ffff).rom().region("maincpu", 0).mirror(0x70'0000);
+	map(0x10'0000, 0x17'ffff).ram();
+	map(0x20'0000, 0x27'ffff).ram();
+	map(0x30'0000, 0x37'ffff).ram();
+	map(0x40'0000, 0x47'ffff).ram();
+	map(0x50'0000, 0x57'ffff).ram();
+	map(0x60'0000, 0x67'ffff).ram();
+	map(0x70'0000, 0x77'ffff).ram();
 }
 
 /*
@@ -200,6 +217,7 @@ void mpc2000_state::mpc2000_io_map(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(mpc2000_state::lcd_csr), FUNC(mpc2000_state::lcd_csw<0>)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x00a0, 0x00a3).nopw(); // silence effects writes
+	map(0x00c0, 0x00c0).rw(FUNC(mpc2000_state::wadcsn_r), FUNC(mpc2000_state::wadcn_w)).umask16(0x00ff);
 	map(0x00e0, 0x00ff).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 
 	map(0x0100, 0x0103).rw(FUNC(mpc2000_state::lcd_csr), FUNC(mpc2000_state::lcd_csw<1>)).umask16(0x00ff);
@@ -242,8 +260,8 @@ void mpc2000_state::dsp_map(address_map &map)
 
 void mpc2000_state::mpc2000_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(64, 140, 250));
-	palette.set_pen_color(1, rgb_t(230, 240, 250));
+	palette.set_pen_color(0, rgb_t(230, 240, 250));
+	palette.set_pen_color(1, rgb_t(64, 140, 250));
 }
 
 u32 mpc2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -302,6 +320,24 @@ template <int cs> void mpc2000_state::lcd_csw(offs_t offset, uint8_t data)
 template void mpc2000_state::lcd_csw<0>(offs_t offset, uint8_t data);
 template void mpc2000_state::lcd_csw<1>(offs_t offset, uint8_t data);
 
+// WADCSN, handled by Xilinx FPGA at IC220
+// bit 7 = 1 to enable the right channel input
+// bit 6 = 1 to enable the left channel input
+// bit 5 is always clear
+// bit 4 is always set
+// bit 3 = 1 to disable analog input
+// bit 2 = 1 to enable S/PDIF digital input
+// bit 1 is always set
+// bit 0 is always clear
+uint8_t mpc2000_state::wadcsn_r()
+{
+	return m_wadcsn;
+}
+
+void mpc2000_state::wadcn_w(uint8_t data)
+{
+	m_wadcsn = data;
+}
 
 INPUT_CHANGED_MEMBER(mpc2000_state::variation_changed)
 {
