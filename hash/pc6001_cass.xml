@@ -98,7 +98,7 @@ Once in BASIC, enter CLOAD then press ENTER, then RUN then ENTER once loading co
 	<software name="eggy" supported="partial">
 		<description>Eggy</description>
 		<year>1984</year>
-		<publisher>Bothtech</publisher>
+		<publisher>Bothtec</publisher>
         <info name="usage" value="Mode 2, Page 1" />
 		<info name="alt_title" value="エギー"/>
 		<part name="cart" interface="pc6001_cass">
