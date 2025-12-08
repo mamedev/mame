@@ -20,7 +20,7 @@ class elan_eu3a05_soc_device : public m6502_device {
 public:
 	elan_eu3a05_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect) { return m_vid->screen_update(screen, bitmap, cliprect); }
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_vid->screen_update(screen, bitmap, cliprect); }
 	void generate_custom_interrupt(int irq) { m_sys->generate_custom_interrupt(irq); }
 
 	template <int Port> auto write_callback() { return m_write_callback[Port].bind(); }
@@ -32,7 +32,7 @@ public:
 	void set_alt_timer() { m_use_alt_timer = true; }
 
 protected:
-	elan_eu3a05_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	elan_eu3a05_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -59,7 +59,7 @@ protected:
 	void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
 	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 
-	uint8_t read_full_space(offs_t offset) { address_space& extspace = space(5); return extspace.read_byte(offset); }
+	uint8_t read_full_space(offs_t offset) { address_space &extspace = space(5); return extspace.read_byte(offset); }
 	void bank_change(uint16_t bank)	{ m_current_bank = bank; }
 	uint8_t bank_r(offs_t offset) {	return space(5).read_byte((m_current_bank * 0x8000) + offset); }
 	void bank_w(offs_t offset, uint8_t data) { space(5).write_byte((m_current_bank * 0x8000) + offset, data); }

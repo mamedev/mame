@@ -53,7 +53,7 @@ void elan_ep3a19a_state::video_start()
 {
 }
 
-uint32_t elan_ep3a19a_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t elan_ep3a19a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_maincpu->screen_update(screen, bitmap, cliprect);
 }
@@ -159,7 +159,7 @@ ROM_END
 void elan_ep3a19a_state::init_tvbg()
 {
 	// is this swapping internal to the ep3a19a type ELAN, or external; ROM glob had standard TSOP pinout pads that were used for dumping.
-	uint8_t* ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	size_t len = memregion("maincpu")->bytes();
 
 	for (int i = 0; i < len; i++)

@@ -83,14 +83,14 @@ public:
 	void radica_eu3a14p(machine_config &config);
 
 	void radica_eu3a14p_altrambase(machine_config &config);
-	void radica_eu3a14_altrambase(machine_config& config);
+	void radica_eu3a14_altrambase(machine_config &config);
 	void radica_eu3a14_altrambase_adc(machine_config &config);
 
 	void radica_eu3a14_altrambase_bb3(machine_config &config);
 	void radica_eu3a14p_altrambase_bb3(machine_config &config);
 
-	void radica_eu3a14_altspritebase(machine_config& config);
-	void radica_eu3a14_altspritebase_bat(machine_config& config);
+	void radica_eu3a14_altspritebase(machine_config &config);
+	void radica_eu3a14_altspritebase_bat(machine_config &config);
 
 	int tsbuzz_inputs_r();
 
@@ -118,7 +118,7 @@ private:
 
 
 
-uint32_t elan_eu3a14_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t elan_eu3a14_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_maincpu->screen_update(screen, bitmap, cliprect);
 }
@@ -623,14 +623,14 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 }
 
-void elan_eu3a14_state::radica_eu3a14_altspritebase(machine_config& config)
+void elan_eu3a14_state::radica_eu3a14_altspritebase(machine_config &config)
 {
 	radica_eu3a14(config);
 	m_maincpu->set_addrmap(5, &elan_eu3a14_state::external_map_8mb);
 	m_maincpu->set_default_spriteramaddr(0x04); // at 0x800
 }
 
-void elan_eu3a14_state::radica_eu3a14_altspritebase_bat(machine_config& config)
+void elan_eu3a14_state::radica_eu3a14_altspritebase_bat(machine_config &config)
 {
 	radica_eu3a14(config);
 	m_maincpu->set_addrmap(5, &elan_eu3a14_state::external_map_8mb);
@@ -638,13 +638,13 @@ void elan_eu3a14_state::radica_eu3a14_altspritebase_bat(machine_config& config)
 }
 
 
-void elan_eu3a14_state::radica_eu3a14_altrambase(machine_config& config)
+void elan_eu3a14_state::radica_eu3a14_altrambase(machine_config &config)
 {
 	radica_eu3a14(config);
 	m_maincpu->set_tilerambase(0x0800);
 }
 
-void elan_eu3a14_state::radica_eu3a14_altrambase_bb3(machine_config& config)
+void elan_eu3a14_state::radica_eu3a14_altrambase_bb3(machine_config &config)
 {
 	radica_eu3a14_altrambase(config);
 	m_maincpu->disable_timer_irq();
@@ -665,13 +665,13 @@ void elan_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks d
 	m_screen->set_refresh_hz(50);
 }
 
-void elan_eu3a14_state::radica_eu3a14p_altrambase(machine_config& config)
+void elan_eu3a14_state::radica_eu3a14p_altrambase(machine_config &config)
 {
 	radica_eu3a14p(config);
 	m_maincpu->set_tilerambase(0x0800);
 }
 
-void elan_eu3a14_state::radica_eu3a14p_altrambase_bb3(machine_config& config)
+void elan_eu3a14_state::radica_eu3a14p_altrambase_bb3(machine_config &config)
 {
 	radica_eu3a14p_altrambase(config);
 	m_maincpu->disable_timer_irq();

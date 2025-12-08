@@ -144,7 +144,7 @@ void elan_eu3a14vid_device::device_reset()
 
 uint8_t elan_eu3a14vid_device::read_vram(int offset)
 {
-	address_space& cpuspace = m_cpu->space(AS_PROGRAM);
+	address_space &cpuspace = m_cpu->space(AS_PROGRAM);
 	int realoffset = offset + 0x200;
 	if (realoffset < 0x4000)
 	{
@@ -175,7 +175,7 @@ void elan_eu3a14vid_device::create_bitmaps(screen_device* screen)
 
 uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 {
-	address_space& extspace = m_cpu->space(5);
+	address_space &extspace = m_cpu->space(5);
 	return extspace.read_byte((offset+x) & 0x7fffff);
 }
 
@@ -189,13 +189,13 @@ uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
 	}
 	else
 	{
-		address_space& extspace = m_cpu->space(5);
+		address_space &extspace = m_cpu->space(5);
 		pix =  extspace.read_byte((baseaddr+count) & 0x7fffff);
 	}
 	return pix;
 }
 
-void elan_eu3a14vid_device::draw_background_tile(bitmap_rgb32& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
+void elan_eu3a14vid_device::draw_background_tile(bitmap_rgb32 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
 	const pen_t *pen = m_palette->pens();
 
@@ -411,7 +411,7 @@ int elan_eu3a14vid_device::get_xscroll_for_screenypos(int ydraw)
 }
 
 
-void elan_eu3a14vid_device::draw_background_page(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
+void elan_eu3a14vid_device::draw_background_page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
 {
 
 	int palette = ((palettepri & 0xf0) >> 4) | ((palettepri & 0x08) << 1);
@@ -464,7 +464,7 @@ void elan_eu3a14vid_device::draw_background_page(screen_device& screen, bitmap_r
 	}
 }
 
-void elan_eu3a14vid_device::draw_background_ramlayer(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void elan_eu3a14vid_device::draw_background_ramlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// this register use is questionable
 	if (m_ramtilecfg[0] & 0x80)
@@ -655,7 +655,7 @@ void elan_eu3a14vid_device::draw_background(screen_device &screen, bitmap_rgb32 
 
 }
 
-void elan_eu3a14vid_device::draw_sprite_pix(const rectangle& cliprect, uint32_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
+void elan_eu3a14vid_device::draw_sprite_pix(const rectangle &cliprect, uint32_t *dst, uint8_t *pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
 {
 	if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 	{

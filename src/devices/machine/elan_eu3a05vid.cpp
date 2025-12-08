@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "El
 DEFINE_DEVICE_TYPE(ELAN_EU3A13_VID, elan_eu3a13vid_device, "elan_eu3a13vid", "Elan EU3A13 Video")
 DEFINE_DEVICE_TYPE(ELAN_EP3A19A_VID, elan_ep3a19avid_device, "elan_ep3a19avid", "Elan EP3A19A Video")
 
-elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config& mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	elan_eu3a05commonvid_device(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
@@ -112,7 +112,7 @@ void elan_eu3a05vid_device::device_reset()
 
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
 {
-	address_space& cpuspace = m_cpu->space(AS_PROGRAM);
+	address_space &cpuspace = m_cpu->space(AS_PROGRAM);
 	int realoffset = offset+m_spritebase;
 	if (realoffset < 0x4000)
 	{
@@ -125,7 +125,7 @@ uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
 
 uint8_t elan_eu3a05vid_device::read_vram(int offset)
 {
-	address_space& cpuspace = m_cpu->space(AS_PROGRAM);
+	address_space &cpuspace = m_cpu->space(AS_PROGRAM);
 	int realoffset = offset+m_vrambase;
 	if (realoffset < 0x4000)
 	{
@@ -145,7 +145,7 @@ uint8_t elan_eu3a05vid_device::read_vram(int offset)
 
 void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
-	address_space& extspace = m_cpu->space(5);
+	address_space &extspace = m_cpu->space(5);
 	const pen_t *pen = m_palette->pens();
 
 	/*
@@ -328,7 +328,7 @@ int elan_eu3a13vid_device::get_bytes_per_tile_entry()
 }
 
 // a hacky mess for now
-bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2)
+bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int &tile, int &attr, int &unk2)
 {
 	int bytes_per_tile_entry = get_bytes_per_tile_entry();
 
@@ -363,9 +363,9 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 }
 
 
-void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint32_t* row)
+void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint32_t *row)
 {
-	address_space& extspace = m_cpu->space(5);
+	address_space &extspace = m_cpu->space(5);
 	const pen_t *pen = m_palette->pens();
 	int colour = attr & 0xf0;
 
@@ -540,7 +540,7 @@ uint16_t elan_eu3a05vid_device::get_tilemapindex_from_xy(uint16_t x, uint16_t y)
 	return index;
 }
 
-void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int drawpri)
+void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int drawpri)
 {
 	/*
 	    this doesn't handle 8x8 4bpp (not used by anything yet)

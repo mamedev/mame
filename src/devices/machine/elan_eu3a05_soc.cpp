@@ -7,7 +7,7 @@
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOC,     elan_eu3a05_soc_device,     "elan_eu3a05_soc_device",     "ELAN EU3A05")
 DEFINE_DEVICE_TYPE(ELAN_EU3A13_SOC,     elan_eu3a13_soc_device,     "elan_eu3a13_soc_device",     "ELAN EU3A13")
 
-elan_eu3a05_soc_device::elan_eu3a05_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+elan_eu3a05_soc_device::elan_eu3a05_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
 	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24),
 	m_sys(*this, "sys"),

@@ -22,7 +22,7 @@ device_memory_interface::space_config_vector elan_eu3a14sys_device::memory_space
 	};
 }
 
-void elan_eu3a14sys_device::map(address_map& map)
+void elan_eu3a14sys_device::map(address_map &map)
 {
 	elan_eu3a05commonsys_device::map(map); // 00 - 0e
 	map(0x0f, 0x17).rw(FUNC(elan_eu3a14sys_device::dma_param_r), FUNC(elan_eu3a14sys_device::dma_param_w));
@@ -71,8 +71,8 @@ void elan_eu3a14sys_device::dma_trigger_w(uint8_t data)
 
 	//logerror("%s: dma_trigger_w %02x (src %08x dst %08x size %08x)\n", machine().describe_context(), data, dmasrc, dmadst, dmalen);
 
-	address_space& extspace = m_cpu->space(5);
-	address_space& destspace = m_cpu->space(AS_PROGRAM);
+	address_space &extspace = m_cpu->space(5);
+	address_space &destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data == 0x08)
 	{

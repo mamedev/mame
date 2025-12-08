@@ -230,7 +230,7 @@ public:
 	void elan_eu3a05_1mb(machine_config &config);
 	void elan_eu3a05_512kb(machine_config &config);
 
-	void elan_eu3a05_pal_4mb(machine_config& config);
+	void elan_eu3a05_pal_4mb(machine_config &config);
 
 protected:
 	// driver_device overrides
@@ -262,7 +262,7 @@ public:
 		m_pixram(*this, "pixram")
 	{ }
 
-	void elan_rad_sinv(machine_config& config);
+	void elan_rad_sinv(machine_config &config);
 
 private:
 	void elan_eu3a05_sinv_map(address_map &map) ATTR_COLD;
@@ -279,7 +279,7 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void elan_buzztime(machine_config& config);
+	void elan_buzztime(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -304,7 +304,7 @@ public:
 		m_prevport_c(0xff)
 	{ }
 
-	void pvwwcas(machine_config& config);
+	void pvwwcas(machine_config &config);
 
 	void init_pvwwcas();
 
@@ -343,13 +343,13 @@ void elan_eu3a05_buzztime_state::machine_start()
 	if (m_cart && m_cart->exists())
 	{
 		uint8_t *rom = memregion("maincpu")->base();
-		uint8_t* cart = m_cart->get_rom_base();
+		uint8_t *cart = m_cart->get_rom_base();
 		std::copy(&cart[0x000000], &cart[0x200000], &rom[0x000000]);
 	}
 	else
 	{
 		uint8_t *rom = memregion("maincpu")->base();
-		uint8_t* bios = memregion("bios")->base();
+		uint8_t *bios = memregion("bios")->base();
 		std::copy(&bios[0x000000], &bios[0x200000], &rom[0x000000]);
 	}
 }
@@ -403,7 +403,7 @@ void elan_eu3a05_state::video_start()
 }
 
 
-uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+uint32_t elan_eu3a05_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_maincpu->screen_update(screen, bitmap, cliprect);
 }
@@ -753,7 +753,7 @@ void elan_eu3a05_rad_sinv_state::elan_rad_sinv(machine_config &config)
 	m_maincpu->set_addrmap(5, &elan_eu3a05_rad_sinv_state::elan_eu3a05_sinv_map);
 }
 
-void elan_eu3a05_state::elan_eu3a05_pal_4mb(machine_config& config)
+void elan_eu3a05_state::elan_eu3a05_pal_4mb(machine_config &config)
 {
 	elan_eu3a05_4mb(config);
 	m_screen->set_refresh_hz(50);
@@ -761,7 +761,7 @@ void elan_eu3a05_state::elan_eu3a05_pal_4mb(machine_config& config)
 }
 
 
-void elan_eu3a13_state::elan_eu3a13_1mb(machine_config& config)
+void elan_eu3a13_state::elan_eu3a13_1mb(machine_config &config)
 {
 	/* basic machine hardware */
 	ELAN_EU3A13_SOC(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
@@ -781,7 +781,7 @@ void elan_eu3a13_state::elan_eu3a13_1mb(machine_config& config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 }
 
-void elan_eu3a13_state::elan_eu3a13_pal_1mb(machine_config& config)
+void elan_eu3a13_state::elan_eu3a13_pal_1mb(machine_config &config)
 {
 	elan_eu3a13_1mb(config);
 	m_maincpu->set_is_pal();
@@ -832,7 +832,7 @@ void elan_eu3a05_pvwwcas_state::pvwwc_portc_w(uint8_t data)
 }
 
 
-void elan_eu3a05_pvwwcas_state::pvwwcas(machine_config& config)
+void elan_eu3a05_pvwwcas_state::pvwwcas(machine_config &config)
 {
 	elan_eu3a05_4mb(config);
 	m_screen->set_refresh_hz(50);
@@ -932,7 +932,7 @@ ROM_END
 void elan_eu3a13_state::init_sudelan3()
 {
 	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
-	uint8_t* ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x0fcc] = 0xea;
 	ROM[0x0fcd] = 0xea;
 	ROM[0x0fce] = 0xea;
@@ -941,7 +941,7 @@ void elan_eu3a13_state::init_sudelan3()
 void elan_eu3a13_state::init_sudelan()
 {
 	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown?)
-	uint8_t* ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0xd0f] = 0xea;
 	ROM[0xd10] = 0xea;
 	ROM[0xd11] = 0xea;
@@ -950,7 +950,7 @@ void elan_eu3a13_state::init_sudelan()
 void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 {
 	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown? or I/O failure?)
-	uint8_t* ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x1f8d92] = 0xea;
 	ROM[0x1f8d93] = 0xea;
 	ROM[0x1f8d94] = 0xea;

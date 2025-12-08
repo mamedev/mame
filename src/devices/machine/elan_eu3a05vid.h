@@ -52,7 +52,7 @@ private:
 
 	uint16_t get_scroll(int which);
 
-	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
+	bool get_tile_data(int base, int drawpri, int &tile, int &attr, int &unk2);
 	void draw_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int drawpri);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	void draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int tileline, int xpos, uint32_t *row);

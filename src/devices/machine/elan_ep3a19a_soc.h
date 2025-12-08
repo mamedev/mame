@@ -20,13 +20,13 @@ class elan_ep3a19a_soc_device : public m6502_device {
 public:
 	elan_ep3a19a_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect) { return m_vid->screen_update(screen, bitmap, cliprect); }
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_vid->screen_update(screen, bitmap, cliprect); }
 
 	template <int Port> auto write_callback() { return m_write_callback[Port].bind(); }
 	template <int Port> auto read_callback() { return m_read_callback[Port].bind(); }
 
 protected:
-	elan_ep3a19a_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	elan_ep3a19a_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -54,7 +54,7 @@ protected:
 	uint8_t bank_r(offs_t offset) {	return space(5).read_byte((m_current_bank * 0x8000) + offset); }
 	void bank_w(offs_t offset, uint8_t data) { space(5).write_byte((m_current_bank * 0x8000) + offset, data); }
 	uint8_t fixed_r(offs_t offset) { /* always at 0 for this SoC? */  return space(5).read_byte(offset); }	
-	uint8_t read_full_space(offs_t offset) { address_space& extspace = space(5); return extspace.read_byte(offset); }
+	uint8_t read_full_space(offs_t offset) { address_space &extspace = space(5); return extspace.read_byte(offset); }
 
 
 private:

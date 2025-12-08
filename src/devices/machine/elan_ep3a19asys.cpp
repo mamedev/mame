@@ -36,7 +36,7 @@ uint8_t elan_ep3a19asys_device::rombank_r(offs_t offset)
 }
 
 
-void elan_ep3a19asys_device::map(address_map& map)
+void elan_ep3a19asys_device::map(address_map &map)
 {
 //  elan_eu3a05commonsys_device::map(map); // 00 - 0e
 
@@ -84,8 +84,8 @@ void elan_ep3a19asys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 	logerror("%s: elan_eu3a05_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;
 
-	address_space& extspace = m_cpu->space(5);
-	address_space& destspace = m_cpu->space(AS_PROGRAM);
+	address_space &extspace = m_cpu->space(5);
+	address_space &destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data)
 	{
