@@ -7,7 +7,10 @@
 // they can't be fully identified without decapping.
 
 #include "emu.h"
+
 #include "elan_eu3a05vid.h"
+
+#include "elan_eu3a05_soc.h"
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "Elan EU3A05 Video")
 DEFINE_DEVICE_TYPE(ELAN_EU3A13_VID, elan_eu3a13vid_device, "elan_eu3a13vid", "Elan EU3A13 Video")
@@ -145,7 +148,7 @@ uint8_t elan_eu3a05vid_device::read_vram(int offset)
 
 void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
-	address_space &extspace = m_cpu->space(AS_EXTERNAL);
+	address_space &extspace = m_cpu->space(elan_eu3a05_soc_device::AS_EXTERNAL);
 	const pen_t *pen = m_palette->pens();
 
 	/*
@@ -365,7 +368,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int &tile, int 
 
 void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint32_t *row)
 {
-	address_space &extspace = m_cpu->space(AS_EXTERNAL);
+	address_space &extspace = m_cpu->space(elan_eu3a05_soc_device::AS_EXTERNAL);
 	const pen_t *pen = m_palette->pens();
 	int colour = attr & 0xf0;
 

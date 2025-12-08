@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "elan_eu3a14vid.h"
 
+#include "elan_eu3a14_soc.h"
+
 DEFINE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device, "elan_eu3a14vid", "Elan EU3A14 Video")
 
 elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -175,7 +177,7 @@ void elan_eu3a14vid_device::create_bitmaps(screen_device* screen)
 
 uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 {
-	address_space &extspace = m_cpu->space(AS_EXTERNAL);
+	address_space &extspace = m_cpu->space(elan_eu3a14_soc_device::AS_EXTERNAL);
 	return extspace.read_byte((offset+x) & 0x7fffff);
 }
 
@@ -189,7 +191,7 @@ uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
 	}
 	else
 	{
-		address_space &extspace = m_cpu->space(AS_EXTERNAL);
+		address_space &extspace = m_cpu->space(elan_eu3a14_soc_device::AS_EXTERNAL);
 		pix =  extspace.read_byte((baseaddr+count) & 0x7fffff);
 	}
 	return pix;

@@ -10,7 +10,7 @@
 #include "elan_eu3a05vid.h"
 
 #include "cpu/m6502/m6502.h"
-//#include "cpu/m6502/w65c02.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -18,6 +18,11 @@
 class elan_eu3a05_soc_device : public m6502_device {
 public:
 	elan_eu3a05_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	enum
+	{
+		AS_EXTERNAL = 5,
+	};
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return m_vid->screen_update(screen, bitmap, cliprect); }
 	void generate_custom_interrupt(int irq) { m_sys->generate_custom_interrupt(irq); }

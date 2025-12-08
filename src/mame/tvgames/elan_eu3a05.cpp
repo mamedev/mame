@@ -373,7 +373,7 @@ void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
 
 	m_maincpu->set_alt_timer();
 
-	m_maincpu->set_addrmap(5, &elan_eu3a05_buzztime_state::elan_eu3a05_extmap_buzztime);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a05_buzztime_state::elan_eu3a05_extmap_buzztime);
 
 	m_maincpu->read_callback<0>().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
 //  m_maincpu->read_callback<1>().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
@@ -719,7 +719,7 @@ void elan_eu3a05_state::elan_eu3a05_4mb(machine_config &config)
 {
 	/* basic machine hardware */
 	ELAN_EU3A05_SOC(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
-	m_maincpu->set_addrmap(5, &elan_eu3a05_state::elan_eu3a05_extmap_4mb);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a05_state::elan_eu3a05_extmap_4mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a05_state::interrupt));
 	m_maincpu->read_callback<0>().set_ioport("IN0");
 	m_maincpu->read_callback<1>().set_ioport("IN1");
@@ -738,19 +738,19 @@ void elan_eu3a05_state::elan_eu3a05_4mb(machine_config &config)
 void elan_eu3a05_state::elan_eu3a05_512kb(machine_config &config)
 {
 	elan_eu3a05_4mb(config);
-	m_maincpu->set_addrmap(5, &elan_eu3a05_rad_sinv_state::elan_eu3a05_extmap_512kb);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a05_rad_sinv_state::elan_eu3a05_extmap_512kb);
 }
 
 void elan_eu3a05_state::elan_eu3a05_1mb(machine_config &config)
 {
 	elan_eu3a05_4mb(config);
-	m_maincpu->set_addrmap(5, &elan_eu3a05_rad_sinv_state::elan_eu3a05_extmap_1mb);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a05_rad_sinv_state::elan_eu3a05_extmap_1mb);
 }
 
 void elan_eu3a05_rad_sinv_state::elan_rad_sinv(machine_config &config)
 {
 	elan_eu3a05_4mb(config);
-	m_maincpu->set_addrmap(5, &elan_eu3a05_rad_sinv_state::elan_eu3a05_sinv_map);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a05_rad_sinv_state::elan_eu3a05_sinv_map);
 }
 
 void elan_eu3a05_state::elan_eu3a05_pal_4mb(machine_config &config)
@@ -765,7 +765,7 @@ void elan_eu3a13_state::elan_eu3a13_1mb(machine_config &config)
 {
 	/* basic machine hardware */
 	ELAN_EU3A13_SOC(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
-	m_maincpu->set_addrmap(5, &elan_eu3a13_state::elan_eu3a05_extmap_1mb);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a13_state::elan_eu3a05_extmap_1mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a13_state::interrupt));
 	m_maincpu->read_callback<0>().set_ioport("IN0");
 	m_maincpu->read_callback<1>().set_ioport("IN1");
@@ -791,7 +791,7 @@ void elan_eu3a13_state::elan_eu3a13_pal_1mb(machine_config &config)
 void elan_eu3a13_state::elan_eu3a13_pal_2mb(machine_config &config)
 {
 	elan_eu3a13_pal_1mb(config);
-	m_maincpu->set_addrmap(5, &elan_eu3a13_state::elan_eu3a05_extmap_2mb);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a13_state::elan_eu3a05_extmap_2mb);
 }
 
 uint8_t elan_eu3a05_pvwwcas_state::pvwwc_portc_r()
@@ -837,7 +837,7 @@ void elan_eu3a05_pvwwcas_state::pvwwcas(machine_config &config)
 	elan_eu3a05_4mb(config);
 	m_screen->set_refresh_hz(50);
 	m_maincpu->set_is_pal();
-	m_maincpu->set_addrmap(5, &elan_eu3a05_pvwwcas_state::elan_eu3a05_extmap_2mb);
+	m_maincpu->set_addrmap(elan_eu3a05_soc_device::AS_EXTERNAL, &elan_eu3a05_pvwwcas_state::elan_eu3a05_extmap_2mb);
 
 	m_maincpu->read_callback<2>().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_r));
 	m_maincpu->write_callback<2>().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_w));

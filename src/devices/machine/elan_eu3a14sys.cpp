@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "elan_eu3a14sys.h"
 
+#include "elan_eu3a14_soc.h"
+
 // DMA size and destination are 24-bit here, they're 16-bit on EU3A05
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A14_SYS, elan_eu3a14sys_device, "elan_eu3a14sys", "Elan EU3A14 System")
@@ -71,7 +73,7 @@ void elan_eu3a14sys_device::dma_trigger_w(uint8_t data)
 
 	//logerror("%s: dma_trigger_w %02x (src %08x dst %08x size %08x)\n", machine().describe_context(), data, dmasrc, dmadst, dmalen);
 
-	address_space &extspace = m_cpu->space(AS_EXTERNAL);
+	address_space &extspace = m_cpu->space(elan_eu3a14_soc_device::AS_EXTERNAL);
 	address_space &destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data == 0x08)

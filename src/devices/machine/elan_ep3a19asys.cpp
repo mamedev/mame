@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "elan_ep3a19asys.h"
 
+#include "elan_ep3a19a_soc.h"
+
 // like EU3A05 but with the DMA at a lower address where the code bank register would usually be, and a single byte for bank register rather than 2 - any other changes?
 
 DEFINE_DEVICE_TYPE(ELAN_EP3A19A_SYS, elan_ep3a19asys_device, "elan_ep3a19asys", "Elan EP3A19A System")
@@ -84,7 +86,7 @@ void elan_ep3a19asys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 	logerror("%s: elan_eu3a05_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;
 
-	address_space &extspace = m_cpu->space(AS_EXTERNAL);
+	address_space &extspace = m_cpu->space(elan_ep3a19a_soc_device::AS_EXTERNAL);
 	address_space &destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data)

@@ -6,11 +6,6 @@
 
 #include "cpu/m6502/m6502.h"
 
-enum
-{
-	AS_EXTERNAL = 5,
-};
-
 class elan_eu3a05commonsys_device : public device_t
 {
 public:

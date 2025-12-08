@@ -606,7 +606,7 @@ INTERRUPT_GEN_MEMBER(elan_eu3a14_state::interrupt)
 void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 {
 	ELAN_EU3A14_SOC(config, m_maincpu, XTAL(21'477'272)/2); // marked as 21'477'270
-	m_maincpu->set_addrmap(5, &elan_eu3a14_state::external_map_4mb);
+	m_maincpu->set_addrmap(elan_eu3a14_soc_device::AS_EXTERNAL, &elan_eu3a14_state::external_map_4mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a14_state::interrupt));
 	m_maincpu->set_default_spriteramaddr(0x14);
 	m_maincpu->set_tilerambase(0x0000);
@@ -626,14 +626,14 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 void elan_eu3a14_state::radica_eu3a14_altspritebase(machine_config &config)
 {
 	radica_eu3a14(config);
-	m_maincpu->set_addrmap(5, &elan_eu3a14_state::external_map_8mb);
+	m_maincpu->set_addrmap(elan_eu3a14_soc_device::AS_EXTERNAL, &elan_eu3a14_state::external_map_8mb);
 	m_maincpu->set_default_spriteramaddr(0x04); // at 0x800
 }
 
 void elan_eu3a14_state::radica_eu3a14_altspritebase_bat(machine_config &config)
 {
 	radica_eu3a14(config);
-	m_maincpu->set_addrmap(5, &elan_eu3a14_state::external_map_8mb);
+	m_maincpu->set_addrmap(elan_eu3a14_soc_device::AS_EXTERNAL, &elan_eu3a14_state::external_map_8mb);
 	m_maincpu->set_default_spriteramaddr(0x0c); // at 0x1800
 }
 

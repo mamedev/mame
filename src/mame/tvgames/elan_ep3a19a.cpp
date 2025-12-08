@@ -111,7 +111,7 @@ INTERRUPT_GEN_MEMBER(elan_ep3a19a_state::interrupt)
 void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 {
 	ELAN_EP3A19A_SOC(config, m_maincpu, XTAL(21'477'272)/8);
-	m_maincpu->set_addrmap(5, &elan_ep3a19a_state::elan_ep3a19a_extmap_2mb);
+	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_2mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_ep3a19a_state::interrupt));
 	m_maincpu->read_callback<0>().set_ioport("IN0");
 	m_maincpu->read_callback<1>().set_ioport("IN1");
@@ -128,7 +128,7 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 void elan_ep3a19a_state::elan_ep3a19a_1mb(machine_config &config)
 {
 	elan_ep3a19a(config);
-	m_maincpu->set_addrmap(5, &elan_ep3a19a_state::elan_ep3a19a_extmap_1mb);
+	m_maincpu->set_addrmap(elan_ep3a19a_soc_device::AS_EXTERNAL, &elan_ep3a19a_state::elan_ep3a19a_extmap_1mb);
 }
 
 ROM_START( tvbg6a )
