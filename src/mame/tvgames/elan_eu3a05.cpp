@@ -222,36 +222,54 @@ public:
 	elan_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_pixram(*this, "pixram")
+		m_screen(*this, "screen")
 	{
 	}
 
-	void elan_eu3a05(machine_config &config);
-	void elan_eu3a05_pal(machine_config& config);
+	void elan_eu3a05_4mb(machine_config &config);
+	void elan_eu3a05_1mb(machine_config &config);
+	void elan_eu3a05_512kb(machine_config &config);
+
+	void elan_eu3a05_pal_4mb(machine_config& config);
 
 protected:
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-
 	required_device<elan_eu3a05_cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<uint8_t> m_pixram;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	// for callback
-	void elan_eu3a05_bank_map(address_map &map) ATTR_COLD;
+	void elan_eu3a05_extmap_4mb(address_map &map) ATTR_COLD;
+	void elan_eu3a05_extmap_2mb(address_map &map) ATTR_COLD;
+	void elan_eu3a05_extmap_1mb(address_map &map) ATTR_COLD;
+	void elan_eu3a05_extmap_512kb(address_map &map) ATTR_COLD;
 
 	virtual void video_start() override ATTR_COLD;
-
-
 };
+
+
+class elan_eu3a05_rad_sinv_state : public elan_eu3a05_state
+{
+public:
+	elan_eu3a05_rad_sinv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		elan_eu3a05_state(mconfig, type, tag),
+		m_pixram(*this, "pixram")
+	{ }
+
+	void elan_rad_sinv(machine_config& config);
+
+private:
+	void elan_eu3a05_sinv_map(address_map &map) ATTR_COLD;
+
+	required_shared_ptr<uint8_t> m_pixram;
+};
+
 
 class elan_eu3a05_buzztime_state : public elan_eu3a05_state
 {
@@ -304,8 +322,9 @@ public:
 	{
 	}
 
-	void elan_eu3a13(machine_config &config);
-	void elan_eu3a13_pal(machine_config &config);
+	void elan_eu3a13_1mb(machine_config &config);
+	void elan_eu3a13_pal_1mb(machine_config &config);
+	void elan_eu3a13_pal_2mb(machine_config &config);
 
 	void init_sudelan();
 	void init_sudelan3();
@@ -323,13 +342,13 @@ void elan_eu3a05_buzztime_state::machine_start()
 	{
 		uint8_t *rom = memregion("maincpu")->base();
 		uint8_t* cart = m_cart->get_rom_base();
-		std::copy(&cart[0x000000], &cart[0x200000], &rom[0x200000]);
+		std::copy(&cart[0x000000], &cart[0x200000], &rom[0x000000]);
 	}
 	else
 	{
 		uint8_t *rom = memregion("maincpu")->base();
 		uint8_t* bios = memregion("bios")->base();
-		std::copy(&bios[0x000000], &bios[0x200000], &rom[0x200000]);
+		std::copy(&bios[0x000000], &bios[0x200000], &rom[0x000000]);
 	}
 }
 
@@ -348,9 +367,11 @@ DEVICE_IMAGE_LOAD_MEMBER(elan_eu3a05_buzztime_state::cart_load)
 
 void elan_eu3a05_buzztime_state::elan_buzztime(machine_config &config)
 {
-	elan_eu3a05_state::elan_eu3a05(config);
+	elan_eu3a05_state::elan_eu3a05_4mb(config);
 
 	m_maincpu->set_alt_timer();
+
+	m_maincpu->set_addrmap(5, &elan_eu3a05_buzztime_state::elan_eu3a05_extmap_2mb);
 
 	m_maincpu->read_callback<0>().set(FUNC(elan_eu3a05_buzztime_state::porta_r)); // I/O lives in here
 //  m_maincpu->read_callback<1>().set(FUNC(elan_eu3a05_buzztime_state::random_r)); // nothing of note
@@ -390,13 +411,37 @@ uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_rgb32& b
 //[:maincpu] ':maincpu' (8BC6): unmapped program memory read from 5972 & FF
 
 
-void elan_eu3a05_state::elan_eu3a05_bank_map(address_map &map)
+void elan_eu3a05_state::elan_eu3a05_extmap_4mb(address_map &map)
 {
-	map(0x000000, 0xffffff).noprw(); // shut up any logging when video params are invalid
+	map(0x000000, 0xffffff).noprw();
 	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
+}
+
+void elan_eu3a05_state::elan_eu3a05_extmap_2mb(address_map &map)
+{
+	map(0x000000, 0xffffff).noprw();
+	map(0x000000, 0x1fffff).mirror(0x200000).rom().region("maincpu", 0);
+}
+
+void elan_eu3a05_state::elan_eu3a05_extmap_1mb(address_map &map)
+{
+	map(0x000000, 0xffffff).noprw();
+	map(0x000000, 0x0fffff).mirror(0x300000).rom().region("maincpu", 0);
+}
+
+void elan_eu3a05_state::elan_eu3a05_extmap_512kb(address_map &map)
+{
+	map(0x000000, 0xffffff).noprw();
+	map(0x000000, 0x07ffff).mirror(0x380000).rom().region("maincpu", 0);
+}
+
+void elan_eu3a05_rad_sinv_state::elan_eu3a05_sinv_map(address_map &map)
+{
+	elan_eu3a05_extmap_1mb(map);
 	map(0x400000, 0x40ffff).ram(); // ?? only ever cleared maybe a mirror of below?
 	map(0x800000, 0x80ffff).ram().share("pixram"); // Qix writes here and sets the tile base here instead of ROM so it can have a pixel layer
 }
+
 
 static INPUT_PORTS_START( rad_sinv )
 	PORT_START("IN0")
@@ -666,11 +711,11 @@ INTERRUPT_GEN_MEMBER(elan_eu3a05_state::interrupt)
    there don't appear to be any kind of blanking bits being checked.
 */
 
-void elan_eu3a05_state::elan_eu3a05(machine_config &config)
+void elan_eu3a05_state::elan_eu3a05_4mb(machine_config &config)
 {
 	/* basic machine hardware */
 	ELAN_EU3A05_SOC(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
-	m_maincpu->set_addrmap(5, &elan_eu3a05_state::elan_eu3a05_bank_map);
+	m_maincpu->set_addrmap(5, &elan_eu3a05_state::elan_eu3a05_extmap_4mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a05_state::interrupt));
 	m_maincpu->read_callback<0>().set_ioport("IN0");
 	m_maincpu->read_callback<1>().set_ioport("IN1");
@@ -686,19 +731,37 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 
 }
 
-void elan_eu3a05_state::elan_eu3a05_pal(machine_config& config)
+void elan_eu3a05_state::elan_eu3a05_512kb(machine_config &config)
 {
-	elan_eu3a05(config);
+	elan_eu3a05_4mb(config);
+	m_maincpu->set_addrmap(5, &elan_eu3a05_rad_sinv_state::elan_eu3a05_extmap_512kb);
+}
+
+void elan_eu3a05_state::elan_eu3a05_1mb(machine_config &config)
+{
+	elan_eu3a05_4mb(config);
+	m_maincpu->set_addrmap(5, &elan_eu3a05_rad_sinv_state::elan_eu3a05_extmap_1mb);
+}
+
+void elan_eu3a05_rad_sinv_state::elan_rad_sinv(machine_config &config)
+{
+	elan_eu3a05_4mb(config);
+	m_maincpu->set_addrmap(5, &elan_eu3a05_rad_sinv_state::elan_eu3a05_sinv_map);
+}
+
+void elan_eu3a05_state::elan_eu3a05_pal_4mb(machine_config& config)
+{
+	elan_eu3a05_4mb(config);
 	m_screen->set_refresh_hz(50);
 	m_maincpu->set_is_pal();
 }
 
 
-void elan_eu3a13_state::elan_eu3a13(machine_config& config)
+void elan_eu3a13_state::elan_eu3a13_1mb(machine_config& config)
 {
 	/* basic machine hardware */
 	ELAN_EU3A13_SOC(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
-	m_maincpu->set_addrmap(5, &elan_eu3a13_state::elan_eu3a05_bank_map);
+	m_maincpu->set_addrmap(5, &elan_eu3a13_state::elan_eu3a05_extmap_1mb);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a13_state::interrupt));
 	m_maincpu->read_callback<0>().set_ioport("IN0");
 	m_maincpu->read_callback<1>().set_ioport("IN1");
@@ -714,11 +777,17 @@ void elan_eu3a13_state::elan_eu3a13(machine_config& config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 }
 
-void elan_eu3a13_state::elan_eu3a13_pal(machine_config& config)
+void elan_eu3a13_state::elan_eu3a13_pal_1mb(machine_config& config)
 {
-	elan_eu3a13(config);
+	elan_eu3a13_1mb(config);
 	m_maincpu->set_is_pal();
 	m_screen->set_refresh_hz(50);
+}
+
+void elan_eu3a13_state::elan_eu3a13_pal_2mb(machine_config &config)
+{
+	elan_eu3a13_pal_1mb(config);
+	m_maincpu->set_addrmap(5, &elan_eu3a13_state::elan_eu3a05_extmap_2mb);
 }
 
 uint8_t elan_eu3a05_pvwwcas_state::pvwwc_portc_r()
@@ -761,30 +830,30 @@ void elan_eu3a05_pvwwcas_state::pvwwc_portc_w(uint8_t data)
 
 void elan_eu3a05_pvwwcas_state::pvwwcas(machine_config& config)
 {
-	elan_eu3a05(config);
+	elan_eu3a05_4mb(config);
 	m_screen->set_refresh_hz(50);
 	m_maincpu->set_is_pal();
+	m_maincpu->set_addrmap(5, &elan_eu3a05_pvwwcas_state::elan_eu3a05_extmap_2mb);
 
 	m_maincpu->read_callback<2>().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_r));
 	m_maincpu->write_callback<2>().set(FUNC(elan_eu3a05_pvwwcas_state::pvwwc_portc_w));
 }
 
-
-
-ROM_START( rad_tetr )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "tetrisrom.bin", 0x000000, 0x100000, CRC(40538e08) SHA1(1aef9a2c678e39243eab8d910bb7f9f47bae0aee) )
-	ROM_RELOAD(0x100000, 0x100000)
-	ROM_RELOAD(0x200000, 0x100000)
-	ROM_RELOAD(0x300000, 0x100000)
-ROM_END
+// EU3A05 sets
 
 ROM_START( rad_sinv )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "spaceinvadersrom.bin", 0x000000, 0x100000, CRC(5ffb2c8f) SHA1(9bde42ec5c65d9584a802de7d7c8b842ebf8cbd8) )
-	ROM_RELOAD(0x100000, 0x100000)
-	ROM_RELOAD(0x200000, 0x100000)
-	ROM_RELOAD(0x300000, 0x100000)
+ROM_END
+
+ROM_START( rad_tetr )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "tetrisrom.bin", 0x000000, 0x100000, CRC(40538e08) SHA1(1aef9a2c678e39243eab8d910bb7f9f47bae0aee) )
+ROM_END
+
+ROM_START( vjstarzd )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ep1206a.u2", 0x00000, 0x80000, CRC(e5f39fa5) SHA1(5ac45bde6f4323998f2387cb62e1841ebe60e781) )
 ROM_END
 
 ROM_START( airblsjs )
@@ -792,92 +861,69 @@ ROM_START( airblsjs )
 	ROM_LOAD( "airblsjs.bin", 0x000000, 0x400000, BAD_DUMP CRC(d10a6a84) SHA1(fa65f06e7da229006ddaffb245eef2cc4f90a66d) ) // ROM probably ok, but needs verification pass
 ROM_END
 
-ROM_START( sudelan3 )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "sudoku.bin", 0x00000, 0x100000, CRC(c2596173) SHA1(cc74932648b577b735151014e8c04ed778e11704) )
-	ROM_RELOAD(0x100000,0x100000)
-	ROM_RELOAD(0x200000,0x100000)
-	ROM_RELOAD(0x300000,0x100000)
-ROM_END
-
-ROM_START( vjstarzd )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "ep1206a.u2", 0x00000, 0x80000, CRC(e5f39fa5) SHA1(5ac45bde6f4323998f2387cb62e1841ebe60e781) )
-	ROM_RELOAD(0x380000,0x80000) // for boot vectors
-ROM_END
-
-ROM_START( sudelan )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "klaussudoku.bin", 0x00000, 0x200000, CRC(afd2b06a) SHA1(21db956fb40b2e3d61fc2bac89000cf7f61fe99e) )
-	ROM_RELOAD(0x200000,0x200000)
-ROM_END
-
-ROM_START( sudoku2p )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "1596.bin", 0x00000, 0x100000, CRC(fe8ce5bc) SHA1(8fb1463c6d349e07f6483da2b6cce10a4f25fcec) )
-	ROM_RELOAD(0x100000,0x100000)
-	ROM_RELOAD(0x200000,0x100000)
-	ROM_RELOAD(0x300000,0x100000)
-ROM_END
-
-ROM_START( rad_ftet )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "familytetris.u2", 0x00000, 0x100000, CRC(2b65a70d) SHA1(1c9a960ebb4c2c51177b8596c017a04bf816b020) )
-	ROM_RELOAD(0x100000,0x100000)
-	ROM_RELOAD(0x200000,0x100000)
-	ROM_RELOAD(0x300000,0x100000)
-ROM_END
-
-ROM_START( rad_ftetp ) // ROM is the same on a UK unit
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "familytetris.u2", 0x00000, 0x100000, CRC(2b65a70d) SHA1(1c9a960ebb4c2c51177b8596c017a04bf816b020) )
-	ROM_RELOAD(0x100000,0x100000)
-	ROM_RELOAD(0x200000,0x100000)
-	ROM_RELOAD(0x300000,0x100000)
-ROM_END
-
-ROM_START( carlecfg )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "carledwardsracing.bin", 0x00000, 0x100000, CRC(920f633e) SHA1(8460b77b9635a2484edab1111f35bbda74eb68e4) )
-	ROM_RELOAD(0x100000,0x100000)
-	ROM_RELOAD(0x200000,0x100000)
-	ROM_RELOAD(0x300000,0x100000)
-ROM_END
-
-ROM_START( pvmil8 )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "millionare_8bit.bin", 0x000000, 0x200000, CRC(8934a8d6) SHA1(24681e06d02f1567a57b84ec1c6f0a23a5f308ac) )
-	ROM_RELOAD(0x200000,0x200000)
-ROM_END
-
-
-ROM_START( pvmilfin )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "fwwtbam.bin", 0x000000, 0x200000, CRC(2cfef9ab) SHA1(b64f55e36b59790a310ae33154774ac613b5d49f) )
-	ROM_RELOAD(0x200000,0x200000)
-ROM_END
-
-
-
 ROM_START( buzztime )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "buzztimeunit.bin", 0x000000, 0x200000, CRC(8ba3569c) SHA1(3e704338a53daed63da90aba0db4f6adb5bccd21) )
 ROM_END
 
-
 ROM_START( pvwwcas )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "playvisiontaikeecasino.bin", 0x000000, 0x200000, CRC(b5e4a58d) SHA1(0a7809e91023258ecd55386b3e36b1541fb9e7f6) )
-	ROM_RELOAD(0x200000, 0x200000)
 ROM_END
 
 ROM_START( bratzra )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
 	// this does not seem to contain the game code, is it internal, or is this badly dumped somehow (all lines going to glob were used)
 	ROM_LOAD( "bratzrockangels.u1", 0x000000, 0x100000, BAD_DUMP CRC(078fa134) SHA1(e9ad3e2f0f39b2544821b9c8f71be976726aec3b) )
 ROM_END
+
+// EU3A13 sets
+
+ROM_START( sudelan3 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "sudoku.bin", 0x00000, 0x100000, CRC(c2596173) SHA1(cc74932648b577b735151014e8c04ed778e11704) )
+ROM_END
+
+ROM_START( sudelan )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "klaussudoku.bin", 0x00000, 0x100000, CRC(afd2b06a) SHA1(21db956fb40b2e3d61fc2bac89000cf7f61fe99e) )
+	ROM_IGNORE(0x100000) // 2nd half empty, maybe overdumped
+ROM_END
+
+ROM_START( sudoku2p )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "1596.bin", 0x00000, 0x100000, CRC(fe8ce5bc) SHA1(8fb1463c6d349e07f6483da2b6cce10a4f25fcec) )
+ROM_END
+
+ROM_START( rad_ftet )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "familytetris.u2", 0x00000, 0x100000, CRC(2b65a70d) SHA1(1c9a960ebb4c2c51177b8596c017a04bf816b020) )
+ROM_END
+
+ROM_START( rad_ftetp ) // ROM is the same on a UK unit
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "familytetris.u2", 0x00000, 0x100000, CRC(2b65a70d) SHA1(1c9a960ebb4c2c51177b8596c017a04bf816b020) )
+ROM_END
+
+ROM_START( carlecfg )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "carledwardsracing.bin", 0x00000, 0x100000, CRC(920f633e) SHA1(8460b77b9635a2484edab1111f35bbda74eb68e4) )
+ROM_END
+
+ROM_START( pvmil8 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "millionare_8bit.bin", 0x000000, 0x200000, CRC(8934a8d6) SHA1(24681e06d02f1567a57b84ec1c6f0a23a5f308ac) )
+ROM_END
+
+ROM_START( pvmilfin )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "fwwtbam.bin", 0x000000, 0x200000, CRC(2cfef9ab) SHA1(b64f55e36b59790a310ae33154774ac613b5d49f) )
+ROM_END
+
+
+
 
 void elan_eu3a13_state::init_sudelan3()
 {
@@ -901,49 +947,50 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 {
 	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown? or I/O failure?)
 	uint8_t* ROM = memregion("maincpu")->base();
-	ROM[0x3f8d92] = 0xea;
-	ROM[0x3f8d93] = 0xea;
-	ROM[0x3f8d94] = 0xea;
+	ROM[0x1f8d92] = 0xea;
+	ROM[0x1f8d93] = 0xea;
+	ROM[0x1f8d94] = 0xea;
 }
 
 } // anonymous namespace
 
 
-CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_sinv, 0, 0, elan_rad_sinv, rad_sinv, elan_eu3a05_rad_sinv_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
-CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_tetr, 0, 0, elan_eu3a05_1mb, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
 // it isn't clear if the ELAN is generating the music on this, or if one of the other globs is an audio MCU
 // VJ Starz Dance Mat on box, VJ Starz Dancing Mat on screen
-CONS( 2003, vjstarzd, 0, 0, elan_eu3a05, vjstarzd, elan_eu3a05_state, empty_init, "Kidz Biz / Jakks Pacific", "VJ Starz Dance Mat", MACHINE_NOT_WORKING )
+CONS( 2003, vjstarzd, 0, 0, elan_eu3a05_512kb, vjstarzd, elan_eu3a05_state, empty_init, "Kidz Biz / Jakks Pacific", "VJ Starz Dance Mat", MACHINE_NOT_WORKING )
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
-CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
+CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal_4mb, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
 
 CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
 
 CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 
+// unknown, might be EU3A05, but bad dump
+// CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?
+CONS( 200?, bratzra,  0,        0, elan_eu3a05_1mb,    rad_sinv,   elan_eu3a05_state, empty_init, "MGA", "Bratz Rock Angelz", MACHINE_NOT_WORKING )
+
+
 // Below seem to be EU3A13, as that was confirmed for the Family Tetris die.  They're like EU3A05, but with a different memory map
 
-CONS( 2006, sudelan3, 0,        0, elan_eu3a13,      sudoku,   elan_eu3a13_state, init_sudelan3,  "All in 1 Products Ltd / Senario",  "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
+CONS( 2006, sudelan3, 0,        0, elan_eu3a13_1mb,      sudoku,   elan_eu3a13_state, init_sudelan3,  "All in 1 Products Ltd / Senario",  "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
 // Senario also distributed this version in the US without the '3 in 1' text on the box, ROM has not been verified to match
-CONS( 2005, sudelan, 0,         0, elan_eu3a13_pal,  sudoku,   elan_eu3a13_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
+CONS( 2005, sudelan, 0,         0, elan_eu3a13_pal_1mb,  sudoku,   elan_eu3a13_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
 
-CONS( 2005, sudoku2p, 0,        0, elan_eu3a13_pal,  sudoku2p, elan_eu3a13_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
+CONS( 2005, sudoku2p, 0,        0, elan_eu3a13_pal_1mb,  sudoku2p, elan_eu3a13_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
 
-CONS( 2006, rad_ftet,  0,        0, elan_eu3a13,      rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
-CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal,  rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (PAL)", MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftet,  0,        0, elan_eu3a13_1mb,      rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftetp, rad_ftet, 0, elan_eu3a13_pal_1mb,  rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris (PAL)", MACHINE_NOT_WORKING )
 
-CONS( 200?, carlecfg, 0,        0, elan_eu3a13,      carlecfg, elan_eu3a13_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+CONS( 200?, carlecfg, 0,        0, elan_eu3a13_1mb,      carlecfg, elan_eu3a13_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
 // however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit
-CONS( 2005, pvmil8,   0,        0, elan_eu3a13_pal,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmil8,   0,        0, elan_eu3a13_pal_2mb,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2005, pvmilfin, pvmil8,   0, elan_eu3a13_pal,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmilfin, pvmil8,   0, elan_eu3a13_pal_2mb,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
 
-// Below are unknown, probably belong here, but dumps are bad
-
-// CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?
-CONS( 200?, bratzra,  0,        0, elan_eu3a05,    rad_sinv,   elan_eu3a05_state, empty_init, "MGA", "Bratz Rock Angelz", MACHINE_NOT_WORKING )

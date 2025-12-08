@@ -25,6 +25,9 @@ public:
 
 	void generate_custom_interrupt(int irq) { m_sys->generate_custom_interrupt(irq); }
 
+	template <int Port> auto write_callback() { return m_write_callback[Port].bind(); }
+	template <int Port> auto read_callback() { return m_read_callback[Port].bind(); }
+
 	void set_is_pal() { m_is_pal = true; }
 
 	// set per game kludges to pass to subdevices
@@ -46,24 +49,17 @@ protected:
 	address_space_config m_extbus_config;
 	address_space *m_extbus_space;
 
-	void bank_change(uint16_t bank)	{ m_current_bank = bank; }
-
-	// sound callback
-	uint8_t read_full_space(offs_t offset) { address_space& fullbankspace = space(5); return fullbankspace.read_byte(offset); }
-
 	void porta_dir_w(uint8_t data) { m_portdir[0] = data; /* TODO: update state */ }
 	void portb_dir_w(uint8_t data) { m_portdir[1] = data; /* TODO: update state */ }
 	void portc_dir_w(uint8_t data) { m_portdir[2] = data; /* TODO: update state */ }
 
-	void porta_dat_w(uint8_t data) { /* TODO */ }
-	void portb_dat_w(uint8_t data) { /* TODO */ }
-	void portc_dat_w(uint8_t data) { /* TODO */ }
+	uint8_t porta_dat_r() { /* TODO, use direction */ return m_read_callback[0](); }
+	uint8_t portb_dat_r() { /* TODO, use direction */ return m_read_callback[1](); }
+	uint8_t portc_dat_r() { /* TODO, use direction */ return m_read_callback[2](); }
 
-	required_device<elan_eu3a14sys_device> m_sys;
-	required_device<elan_eu3a05_sound_device> m_sound;
-	required_device<elan_eu3a14vid_device> m_vid;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
+	void porta_dat_w(uint8_t data) { /* TODO, use direction */ m_write_callback[0](data); }
+	void portb_dat_w(uint8_t data) { /* TODO, use direction */ m_write_callback[1](data); }
+	void portc_dat_w(uint8_t data) { /* TODO, use direction */ m_write_callback[2](data); }
 
 	void sound_end0(int state) { m_sys->generate_custom_interrupt(2); }
 	void sound_end1(int state) { m_sys->generate_custom_interrupt(3); }
@@ -72,14 +68,25 @@ protected:
 	void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
 	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 
+	void bank_change(uint16_t bank)	{ m_current_bank = bank; }
+	uint8_t read_full_space(offs_t offset) { address_space& fullbankspace = space(5); return fullbankspace.read_byte(offset); }
 	uint8_t bank_r(offs_t offset) { return space(5).read_byte((m_current_bank * 0x8000) + offset); }
 	void bank_w(offs_t offset, uint8_t data) { space(5).write_byte((m_current_bank * 0x8000) + offset, data); }
 	uint8_t fixed_r(offs_t offset) { /* always at 0 for this SoC ? */ return space(5).read_byte(offset); }
+
+	required_device<elan_eu3a14sys_device> m_sys;
+	required_device<elan_eu3a05_sound_device> m_sound;
+	required_device<elan_eu3a14vid_device> m_vid;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	uint16_t m_current_bank;
 	uint8_t m_portdir[3];
 
 private:
+	devcb_read8::array<3> m_read_callback;
+	devcb_write8::array<3> m_write_callback;
+
 	// per game config kludges (until registers are figured out)
 	uint16_t m_default_spriteramaddr;
 	uint16_t m_default_tileramaddr;

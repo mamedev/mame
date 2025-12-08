@@ -14,7 +14,8 @@ elan_eu3a14_cpu_device::elan_eu3a14_cpu_device(const machine_config& mconfig, de
 	m_vid(*this, "commonvid"),
 	m_palette(*this, "palette"),
 	m_screen(*this, finder_base::DUMMY_TAG),
-//	m_screen(*this, ":screen"),
+	m_read_callback(*this, 0xff),
+	m_write_callback(*this),
 	m_default_spriteramaddr(0),
 	m_default_tileramaddr(0),
 	m_disable_timer(false),
@@ -116,11 +117,11 @@ void elan_eu3a14_cpu_device::int_map(address_map &map)
 
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
 	map(0x5040, 0x5040).w(FUNC(elan_eu3a14_cpu_device::porta_dir_w));
-	map(0x5041, 0x5041).portr(":IN0").w(FUNC(elan_eu3a14_cpu_device::porta_dat_w));
+	map(0x5041, 0x5041).rw(FUNC(elan_eu3a14_cpu_device::porta_dat_r), FUNC(elan_eu3a14_cpu_device::porta_dat_w));
 	map(0x5042, 0x5042).w(FUNC(elan_eu3a14_cpu_device::portb_dir_w));
-	map(0x5043, 0x5043).portr(":IN1").w(FUNC(elan_eu3a14_cpu_device::portb_dat_w));
+	map(0x5043, 0x5043).rw(FUNC(elan_eu3a14_cpu_device::portb_dat_r), FUNC(elan_eu3a14_cpu_device::portb_dat_w));
 	map(0x5044, 0x5044).w(FUNC(elan_eu3a14_cpu_device::portc_dir_w));
-	map(0x5045, 0x5045).portr(":IN2").w(FUNC(elan_eu3a14_cpu_device::portc_dat_w));
+	map(0x5045, 0x5045).rw(FUNC(elan_eu3a14_cpu_device::portc_dat_r), FUNC(elan_eu3a14_cpu_device::portc_dat_w));
 
 	map(0x5046, 0x5046).nopw();
 	map(0x5047, 0x5047).nopw();

@@ -45,16 +45,6 @@ protected:
 	address_space_config m_extbus_config;
 	address_space *m_extbus_space;
 
-	// sound callback
-	uint8_t read_full_space(offs_t offset)
-	{
-		address_space& fullbankspace = space(5);
-		return fullbankspace.read_byte(offset);
-	}
-
-	void bank_change(uint16_t bank)	{ m_current_bank = bank; }
-	uint16_t m_current_bank;
-
 	required_device<elan_eu3a05sys_device> m_sys;
 	required_device<elan_eu3a05gpio_device> m_gpio;
 	required_device<screen_device> m_screen;
@@ -69,11 +59,13 @@ protected:
 	void sound_end4(int state) { m_sys->generate_custom_interrupt(6); }
 	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 
-
+	uint8_t read_full_space(offs_t offset) { address_space& fullbankspace = space(5); return fullbankspace.read_byte(offset); }
+	void bank_change(uint16_t bank)	{ m_current_bank = bank; }
 	uint8_t bank_r(offs_t offset) {	return space(5).read_byte((m_current_bank * 0x8000) + offset); }
 	void bank_w(offs_t offset, uint8_t data) { space(5).write_byte((m_current_bank * 0x8000) + offset, data); }
 	uint8_t fixed_r(offs_t offset) { return space(5).read_byte(m_fixed_bank_address + offset); }	
 
+	uint16_t m_current_bank;
 	uint32_t m_fixed_bank_address;
 
 private:
