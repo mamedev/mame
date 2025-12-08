@@ -137,12 +137,12 @@ device_memory_interface::space_config_vector elan_ep3a19a_soc_device::memory_spa
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &program_config),
 			std::make_pair(AS_OPCODES, &sprogram_config),
-			std::make_pair(5, &m_extbus_config),
+			std::make_pair(AS_EXTERNAL, &m_extbus_config),
 		};
 	else
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &program_config),
-			std::make_pair(5, &m_extbus_config),
+			std::make_pair(AS_EXTERNAL, &m_extbus_config),
 		};
 }
 
