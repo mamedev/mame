@@ -40,6 +40,69 @@ elan_eu3a13_cpu_device::elan_eu3a13_cpu_device(const machine_config &mconfig, co
 }
 
 
+static const gfx_layout helper_4bpp_8_layout =
+{
+	8,1,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ STEP8(0,4) },
+	{ 0 },
+	8 * 4
+};
+
+static const gfx_layout helper_8bpp_8_layout =
+{
+	8,1,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,8) },
+	{ 0 },
+	8 * 8
+};
+
+
+// these are fake just to make looking at the texture pages easier
+static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
+static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
+static const gfx_layout texture_helper_8bpp_layout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*8,
+	texlayout_xoffset_8bpp,
+	texlayout_yoffset_8bpp
+};
+
+static const uint32_t texlayout_xoffset_4bpp[256] = { STEP256(0,4) };
+static const uint32_t texlayout_yoffset_4bpp[256] = { STEP256(0,256*4) };
+static const gfx_layout texture_helper_4bpp_layout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*4,
+	texlayout_xoffset_4bpp,
+	texlayout_yoffset_4bpp
+};
+
+static GFXDECODE_START( gfx_elan_eu3a05_fake )
+	// TODO: how do we avoid the direct region reference here? (this is only used for debugging)
+	GFXDECODE_ENTRY( ":maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( ":maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( ":maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( ":maincpu", 0, texture_helper_8bpp_layout,  0x0, 1  )
+GFXDECODE_END
+
+
 void elan_eu3a05_cpu_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(256);
@@ -75,6 +138,8 @@ void elan_eu3a05_cpu_device::device_add_mconfig(machine_config &config)
 	m_sound->sound_end_cb<4>().set(FUNC(elan_eu3a05_state::sound_end4));
 	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a05_state::sound_end5));
 	*/
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_elan_eu3a05_fake);
 }
 
 void elan_eu3a13_cpu_device::device_add_mconfig(machine_config &config)

@@ -31,6 +31,49 @@ elan_eu3a14_cpu_device::elan_eu3a14_cpu_device(const machine_config &mconfig, co
 {
 }
 
+// background
+static const gfx_layout helper16x16x8_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	{ STEP16(0,16*8) },
+	16 * 16 * 8
+};
+
+static const gfx_layout helper16x16x4_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP16(0,4) },
+	{ STEP16(0,16*4) },
+	16 * 16 * 4
+};
+
+static const gfx_layout helper8x8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8 * 8 * 8
+};
+
+static GFXDECODE_START( gfx_helper )
+	// TODO: how do we avoid the direct region reference here? (this is only used for debugging)
+	GFXDECODE_ENTRY( ":maincpu", 0, helper16x16x8_layout,  0x0, 2  )
+	GFXDECODE_ENTRY( ":maincpu", 0, helper16x16x4_layout,  0x0, 32  )
+	GFXDECODE_ENTRY( ":maincpu", 0, helper8x8x8_layout,    0x0, 2  )
+	GFXDECODE_ENTRY( ":maincpu", 0, gfx_8x8x4_packed_msb,  0x0, 32  )
+GFXDECODE_END
+
+
 void elan_eu3a14_cpu_device::device_add_mconfig(machine_config &config)
 {
 	ELAN_EU3A14_SYS(config, m_sys, 0);
@@ -59,6 +102,8 @@ void elan_eu3a14_cpu_device::device_add_mconfig(machine_config &config)
 	m_sound->sound_end_cb<3>().set(FUNC(elan_eu3a14_cpu_device::sound_end3));
 	m_sound->sound_end_cb<4>().set(FUNC(elan_eu3a14_cpu_device::sound_end4));
 	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a14_cpu_device::sound_end5));
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_helper);
 }
 
 device_memory_interface::space_config_vector elan_eu3a14_cpu_device::memory_space_config() const
