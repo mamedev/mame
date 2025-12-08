@@ -620,6 +620,7 @@ void stella8085_state::excellent(machine_config &config)
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
+	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);

@@ -62,6 +62,7 @@ public:
 
 	void write(offs_t offset, u8 data);
 	uint8_t read(offs_t offset);
+	uint8_t acknowledge();
 
 	uint8_t p1_r();
 	void    p1_w(uint8_t data);
