@@ -20296,8 +20296,8 @@ ROM_START( cmast99 )
 	ROM_LOAD( "palce16v8h.g13", 0x600, 0x117, CRC(deee0b94) SHA1(3682affbe803ffa8b436346f159c3818d6714d1a) )
 
 	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
-	ROM_LOAD( "peel18cv8_inside.j15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
-	ROM_LOAD( "peel18cv8_edge.l15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 
@@ -20335,8 +20335,8 @@ ROM_START( cmast99b )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
 	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
-	ROM_LOAD( "peel18cv8_inside.j15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
-	ROM_LOAD( "peel18cv8_edge.l15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 ROM_START( cmast99c )
@@ -20373,8 +20373,8 @@ ROM_START( cmast99c )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
 	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
-	ROM_LOAD( "peel18cv8_inside.j15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
-	ROM_LOAD( "peel18cv8_edge.l15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 ROM_START( cmast99d )
@@ -20411,8 +20411,8 @@ ROM_START( cmast99d )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
 	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
-	ROM_LOAD( "peel18cv8_inside.j15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
-	ROM_LOAD( "peel18cv8_edge.l15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 /*
@@ -20462,8 +20462,8 @@ ROM_START( cmast99hc )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
 	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
-	ROM_LOAD( "peel18cv8_inside.j15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
-	ROM_LOAD( "peel18cv8_edge.l15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 ROM_START( texas99 )
@@ -20498,6 +20498,10 @@ ROM_START( texas99 )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 ROM_START( texas99b )
@@ -20532,6 +20536,10 @@ ROM_START( texas99b )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 ROM_START( texas99c )
@@ -20566,6 +20574,10 @@ ROM_START( texas99c )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 ROM_START( texas99d )
@@ -20600,6 +20612,10 @@ ROM_START( texas99d )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 /*
@@ -20679,6 +20695,10 @@ ROM_START( texas99e )
 
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "peel18cv8_ntx99_db.bin", 0x0000, 0x0155, CRC(1b4b7240) SHA1(371c81be94540c334196974f3868b7102751dcae) )  // from daughterboard
+
+	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 /*
@@ -20726,6 +20746,10 @@ ROM_START( texas99hc )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x400, "plds2", ROMREGION_ERASE00 )  // extended PLDs (bankswitching)
+	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
+	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 /*
