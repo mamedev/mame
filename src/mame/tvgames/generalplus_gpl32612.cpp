@@ -282,6 +282,11 @@ ROM_START( kidizmb )
 	ROM_LOAD( "hy27uf081g2a_withspare.bin", 0x0000, 0x8400000, CRC(b87861c4) SHA1(8b5cc2557b54a37928be818430b91c48db98758f) )
 ROM_END
 
+ROM_START( kidizmtb )
+	ROM_REGION(  0x8400000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "kidizoomtwistdutchfw.bin", 0x0000, 0x10800000, CRC(b87861c4) SHA1(8b5cc2557b54a37928be818430b91c48db98758f) )
+ROM_END
+
 ROM_START( pocketmp )
 	ROM_REGION(  0x8800000, "nand", ROMREGION_ERASE00 )
 	ROM_LOAD( "tc58nvg0s3hta00.u3", 0x0000, 0x8800000, CRC(aabf2deb) SHA1(ee3118377c21b1fb28ff262484c9b587b394bd80) )
@@ -532,6 +537,8 @@ CONS( 201?, zippityuk,       zippity, 0,      zippity, gpl32612, generalplus_zip
 CONS( 2013, kidizmp,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom Connect (Germany, pink camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // seems to be older tech, just glob + ROM, assuming it's a GP32 series based on above and due to having ARM code
 CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+CONS( 2010, kidizmtb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom Twist (Netherlands, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32610
 CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
