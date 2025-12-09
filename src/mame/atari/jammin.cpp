@@ -6,6 +6,7 @@
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -21,6 +22,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_ym2151(*this, "ym2151"),
 		m_bgram(*this, "bgram")
 	{ }
 
@@ -35,6 +37,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<ym2151_device> m_ym2151;
 	required_shared_ptr<uint8_t> m_bgram;
 
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -44,6 +47,9 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
+
+	// just for debugging
+	uint8_t unk_r() { return machine().rand(); }
 };
 
 TILE_GET_INFO_MEMBER(jammin_state::get_bg_tile_info)
@@ -77,15 +83,16 @@ void jammin_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 
-//  map(0x4000, 0x4001).ram(); // maybe sound chip? 
-//	map(0x5000, 0x50ff).ram(); // reads from here, but does't write, why?
+	map(0x4000, 0x4001).ram().rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+
+	map(0x5000, 0x50ff).ram();
 
 	map(0x6000, 0x6bff).ram(); // are sprites in here?
 
 	map(0x7000, 0x73ff).ram();
 	map(0x7400, 0x77ff).ram().w(FUNC(jammin_state::bgram_w)).share(m_bgram);
 	map(0x7800, 0x7bff).ram();
-	map(0x7c00, 0x7fff).ram();
+	map(0x7c00, 0x7fff).r(FUNC(jammin_state::unk_r)); // inputs seem to be in here
 
 	map(0x8000, 0xbfff).rom();
 }
@@ -164,7 +171,11 @@ void jammin_state::jammin(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "speaker", 2).front();
+
+	YM2151(config, m_ym2151, 14'318'181 / 4); // ?? used sys2 clock
+	m_ym2151->add_route(0, "speaker", 0.60, 0);
+	m_ym2151->add_route(1, "speaker", 0.60, 1);
 }
 
 ROM_START( jammin )
