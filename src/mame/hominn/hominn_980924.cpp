@@ -5,8 +5,8 @@
 Hom Inn 980924-1 PCB
 JC-10011A
 
-- square 100-pin chip with no markings
-- rectangular 64-pin chip with no markings
+- MC68000P10
+- square 100-pin chip with almost unreadable marking (only 17-2414-01 and 97/09)
 - square 84-pin chip with no markings
 - 16.000 MHz XTAL
 - 12.000 MHz XTAL
@@ -15,19 +15,36 @@ JC-10011A
 - M5M82C255
 - OKIM6295 or clone (markings unreadable, but ROM content reveals it)
 - bank of 8 switches (with 2 unpopulated spaces for more banks)
+
+
+TODO:
+- seems protected / to expect pre-programmed NVRAM?
+- while failing it currently shows 红心接龙, which is different to what it shows on
+  provided pics. Title selected via switch?
 */
 
 
 #include "emu.h"
 
-#include "cpu/mcs51/i80c52.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_PORTS     (1U << 1)
+
+#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+
+#include "logmacro.h"
+
+#define LOGPORTS(...)     LOGMASKED(LOG_PORTS,     __VA_ARGS__)
 
 
 namespace {
@@ -37,14 +54,29 @@ class hominn_980924_state : public driver_device
 public:
 	hominn_980924_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_charram(*this, "charram")
 	{ }
 
 	void qxjl(machine_config &config) ATTR_COLD;
 
+	void init_qxjl() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<uint16_t> m_charram;
+
+	tilemap_t *m_char_tilemap = nullptr;
+
+	TILE_GET_INFO_MEMBER(get_char_info);
+
+	void charram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -52,9 +84,30 @@ private:
 };
 
 
+void hominn_980924_state::video_start()
+{
+	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hominn_980924_state::get_char_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+}
+
+TILE_GET_INFO_MEMBER(hominn_980924_state::get_char_info)
+{
+	uint16_t const tile = m_charram[tile_index] & 0xfff;
+	uint16_t const color = (m_charram[tile_index] & 0xf000) >> 12;
+
+	tileinfo.set(0, tile, color, 0);
+}
+
+void hominn_980924_state::charram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_charram[offset]);
+	m_char_tilemap->mark_tile_dirty(offset);
+}
+
 uint32_t hominn_980924_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
+
+	m_char_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -62,6 +115,16 @@ uint32_t hominn_980924_state::screen_update(screen_device &screen, bitmap_rgb32 
 
 void hominn_980924_state::program_map(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom();
+	map(0x060000, 0x067fff).ram().share("nvram");
+	map(0x080000, 0x080007).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x084000, 0x084007).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x090001, 0x090001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	// map(0x09c001, 0x09c001); // ??
+	map(0x0a0000, 0x0a0fff).ram();
+	map(0x0c0000, 0x0c0fff).ram().w(FUNC(hominn_980924_state::charram_w)).share(m_charram);
+	// map(0x0e0001, 0x0e0001); // ??
 }
 
 
@@ -124,20 +187,36 @@ GFXDECODE_END
 void hominn_980924_state::qxjl(machine_config &config)
 {
 	// basic machine hardware
-	I80C52(config, m_maincpu, 12_MHz_XTAL); // TODO: unknown CPU, XTAL could also be the 16 MHz one
+	M68000(config, m_maincpu, 12_MHz_XTAL); // TODO: XTAL could also be the 16 MHz one
 	m_maincpu->set_addrmap(AS_PROGRAM, &hominn_980924_state::program_map);
+	//m_maincpu->set_vblank_int("screen", FUNC(hominn_980924_state::irq1_line_hold));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// 82C255 (actual chip on PCB) is equivalent to two 8255s
-	I8255(config, "ppi0");
+	i8255_device &ppi0(I8255(config, "ppi0"));
+	ppi0.in_pa_callback().set([this] () { LOGPORTS("%s: PPI0 port A in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.in_pb_callback().set([this] () { LOGPORTS("%s: PPI0 port B in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.in_pc_callback().set([this] () { LOGPORTS("%s: PPI0 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port A out %02x\n", machine().describe_context(), data); });
+	ppi0.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port B out %02x\n", machine().describe_context(), data); });
+	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
 
-	I8255(config, "ppi1");
+
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.in_pa_callback().set([this] () { LOGPORTS("%s: PPI1 port A in\n", machine().describe_context()); return uint8_t(0); });
+	ppi1.in_pb_callback().set([this] () { LOGPORTS("%s: PPI1 port B in\n", machine().describe_context()); return uint8_t(0); });
+	ppi1.in_pc_callback().set([this] () { LOGPORTS("%s: PPI1 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi1.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port A out %02x\n", machine().describe_context(), data); });
+	ppi1.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port B out %02x\n", machine().describe_context(), data); });
+	ppi1.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port C out %02x\n", machine().describe_context(), data); });
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify everything once emulation works
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_visarea(0*8, 64*8-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(hominn_980924_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx);
@@ -153,8 +232,9 @@ void hominn_980924_state::qxjl(machine_config &config)
 
 // 千禧接龙 (Qiānxǐ Jiēlóng)
 ROM_START( qxjl )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-	// internal to one of the 3 unidentified chips?
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1.u17", 0x00000, 0x20000, CRC(50c0d1fb) SHA1(4d535c8e3032e651ed0d9b10206530fa5ddebf85) )
+	ROM_LOAD16_BYTE( "2.u16", 0x00001, 0x20000, CRC(36eb936c) SHA1(348f842928177ab72ee62d93a9fb74e9d0cf5fb1) )
 
 	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "3.uz10", 0x00000, 0x20000, CRC(35cbe0cd) SHA1(f2c11d6e12097e281df6a6bd2ce35c15ef482377) )
@@ -162,16 +242,86 @@ ROM_START( qxjl )
 	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "5.ub9", 0x00000, 0x40000, CRC(f12e5c72) SHA1(e4d791bb623a10ee5041f8b52ba82b3e5bb7f5b7) )
 
-	ROM_REGION( 0x50000, "unsorted", 0 )
-	ROM_LOAD( "1.u17", 0x00000, 0x20000, CRC(50c0d1fb) SHA1(4d535c8e3032e651ed0d9b10206530fa5ddebf85) )
-	ROM_LOAD( "2.u16", 0x20000, 0x20000, CRC(36eb936c) SHA1(348f842928177ab72ee62d93a9fb74e9d0cf5fb1) )
-	ROM_LOAD( "4.ub4", 0x40000, 0x10000, CRC(7b44beed) SHA1(9cbdb5dc388665ded2c46d29e19ebcde194e7bc1) )
+	ROM_REGION( 0x10000, "unsorted", 0 ) // is this some kind of data ROM?
+	ROM_LOAD( "4.ub4", 0x00000, 0x10000, CRC(7b44beed) SHA1(9cbdb5dc388665ded2c46d29e19ebcde194e7bc1) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "6.u31", 0x00000, 0x80000, CRC(fad9be9f) SHA1(d58a51b09560edffebe52ec22080a29767273ed3) )
+
+	ROM_REGION( 0x8000, "nvram", ROMREGION_ERASE00 )
+	// ROM_FILL( 0x20b0, 0x02, 0x50 )
+	// ROM_FILL( 0x20b2, 0x02, 0x0a )
 ROM_END
+
+
+void hominn_980924_state::init_qxjl()
+{
+	// TODO: reduce this monstrosity
+
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x40000);
+
+	memcpy(&buffer[0], rom, 0x40000);
+
+	for (int i = 0; i < 0x40000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 8, 3, 15, 14, 13, 12, 10, 11, 9, 2, 7, 16, 5, 4, 17, 6, 1, 0)];
+
+	for (int i = 0; i < 0x40000; i += 0x100)
+	{
+		std::swap_ranges(&rom[i + 0x10], &rom[i + 0x14], &rom[i + 0x40]);
+		std::swap_ranges(&rom[i + 0x18], &rom[i + 0x1c], &rom[i + 0x48]);
+		std::swap_ranges(&rom[i + 0x30], &rom[i + 0x34], &rom[i + 0x60]);
+		std::swap_ranges(&rom[i + 0x38], &rom[i + 0x3c], &rom[i + 0x68]);
+		std::swap_ranges(&rom[i + 0x44], &rom[i + 0x48], &rom[i + 0x84]);
+		std::swap_ranges(&rom[i + 0x4c], &rom[i + 0x50], &rom[i + 0x8c]);
+		std::swap_ranges(&rom[i + 0x54], &rom[i + 0x58], &rom[i + 0x94]);
+		std::swap_ranges(&rom[i + 0x5c], &rom[i + 0x60], &rom[i + 0x9c]);
+		std::swap_ranges(&rom[i + 0x64], &rom[i + 0x68], &rom[i + 0xa4]);
+		std::swap_ranges(&rom[i + 0x6c], &rom[i + 0x70], &rom[i + 0xac]);
+		std::swap_ranges(&rom[i + 0x74], &rom[i + 0x78], &rom[i + 0xb4]);
+		std::swap_ranges(&rom[i + 0x7c], &rom[i + 0x80], &rom[i + 0xbc]);
+	}
+
+	for (int i = 0; i < 0x40000; i += 0x200)
+	{
+		std::swap_ranges(&rom[i + 0x80], &rom[i + 0x100], &rom[i + 0x100]);
+	}
+
+	for (int i = 0; i < 0x40000; i += 0x400)
+	{
+		std::swap_ranges(&rom[i + 0x100], &rom[i + 0x200], &rom[i + 0x200]);
+	}
+
+	for (int i = 0; i < 0x40000; i += 0x1000)
+	{
+		std::swap_ranges(&rom[i + 0x200], &rom[i + 0x300], &rom[i + 0x800]);
+		std::swap_ranges(&rom[i + 0x300], &rom[i + 0x400], &rom[i + 0x900]);
+		std::swap_ranges(&rom[i + 0x600], &rom[i + 0x700], &rom[i + 0xc00]);
+		std::swap_ranges(&rom[i + 0x700], &rom[i + 0x800], &rom[i + 0xd00]);
+	}
+
+	for (int i = 0; i < 0x40000; i += 0x20000)
+	{
+		std::swap_ranges(&rom[i + 0x0800], &rom[i + 0x1000], &rom[i + 0x10000]);
+		std::swap_ranges(&rom[i + 0x1800], &rom[i + 0x2000], &rom[i + 0x11000]);
+		std::swap_ranges(&rom[i + 0x2800], &rom[i + 0x3000], &rom[i + 0x12000]);
+		std::swap_ranges(&rom[i + 0x3800], &rom[i + 0x4000], &rom[i + 0x13000]);
+		std::swap_ranges(&rom[i + 0x4800], &rom[i + 0x5000], &rom[i + 0x14000]);
+		std::swap_ranges(&rom[i + 0x5800], &rom[i + 0x6000], &rom[i + 0x15000]);
+		std::swap_ranges(&rom[i + 0x6800], &rom[i + 0x7000], &rom[i + 0x16000]);
+		std::swap_ranges(&rom[i + 0x7800], &rom[i + 0x8000], &rom[i + 0x17000]);
+		std::swap_ranges(&rom[i + 0x8800], &rom[i + 0x9000], &rom[i + 0x18000]);
+		std::swap_ranges(&rom[i + 0x9800], &rom[i + 0xa000], &rom[i + 0x19000]);
+		std::swap_ranges(&rom[i + 0xa800], &rom[i + 0xb000], &rom[i + 0x1a000]);
+		std::swap_ranges(&rom[i + 0xb800], &rom[i + 0xc000], &rom[i + 0x1b000]);
+		std::swap_ranges(&rom[i + 0xc800], &rom[i + 0xd000], &rom[i + 0x1c000]);
+		std::swap_ranges(&rom[i + 0xd800], &rom[i + 0xe000], &rom[i + 0x1d000]);
+		std::swap_ranges(&rom[i + 0xe800], &rom[i + 0xf000], &rom[i + 0x1e000]);
+		std::swap_ranges(&rom[i + 0xf800], &rom[i + 0x10000], &rom[i + 0x1f000]);
+	}
+}
 
 } // anonymous namespace
 
 
-GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, empty_init, ROT0, "Hom Inn", "Qianxi Jielong", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, init_qxjl, ROT0, "Hom Inn", "Qianxi Jielong", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
