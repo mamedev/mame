@@ -234,7 +234,7 @@ void jammin_state::jammin(machine_config &config)
 ROM_START( jammin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	// rebuilt from sources
-	ROM_LOAD( "jammin_v2.bin", 0x00000, 0xb853, CRC(449ce727) SHA1(83a96284072cd5fc3aae5ad327fc95ad90346954) )
+	ROM_LOAD( "jammin.bin", 0x00000, 0xb853, CRC(449ce727) SHA1(83a96284072cd5fc3aae5ad327fc95ad90346954) )
 
 	ROM_REGION( 0x1000, "tiles", 0 ) // backgrounds?
 	ROM_LOAD( "jambak.pl0", 0x0000, 0x0800, CRC(af808d29) SHA1(cad060ee4e529f9a2ffa9675682b9e17bed4dffe) )
@@ -249,15 +249,19 @@ ROM_START( jammin )
 	ROM_REGION( 0x4000, "unknown_data", 0 ) // not tile based? (what is this?)
 	ROM_LOAD( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
 
-	ROM_REGION( 0x300, "proms", 0 )
+	ROM_REGION( 0x100, "proms_col_n", 0 ) // lookup?
 	ROM_LOAD( "col2n.bin", 0x000, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
-	ROM_LOAD( "col2f.bin", 0x100, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
-	ROM_LOAD( "col2e.bin", 0x200, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
 
-	ROM_REGION( 0x300, "proms2", 0 )
+	ROM_REGION( 0x200, "proms_col_ef", 0 ) // colours?
+	ROM_LOAD( "col2f.bin", 0x000, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
+	ROM_LOAD( "col2e.bin", 0x100, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
+
+	ROM_REGION( 0x100, "proms_mac_n", 0 ) // lookup?
 	ROM_LOAD( "mac2n.bin", 0x000, 0x0100, CRC(e8198448) SHA1(20fc8da7858daa56be758148e5e80f5de30533f9) )
-	ROM_LOAD( "mac2f.bin", 0x100, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) )
-	ROM_LOAD( "mac2e.bin", 0x200, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
+
+	ROM_REGION( 0x200, "proms_mac_ef", 0 ) // colours?
+	ROM_LOAD( "mac2f.bin", 0x000, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) )
+	ROM_LOAD( "mac2e.bin", 0x100, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
 ROM_END
 
 } // anonymous namespace
