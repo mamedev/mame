@@ -47,9 +47,6 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
-
-	// just for debugging
-	uint8_t unk_r() { return machine().rand(); }
 };
 
 TILE_GET_INFO_MEMBER(jammin_state::get_bg_tile_info)
@@ -92,12 +89,54 @@ void jammin_state::prg_map(address_map &map)
 	map(0x7000, 0x73ff).ram();
 	map(0x7400, 0x77ff).ram().w(FUNC(jammin_state::bgram_w)).share(m_bgram);
 	map(0x7800, 0x7bff).ram();
-	map(0x7c00, 0x7fff).r(FUNC(jammin_state::unk_r)); // inputs seem to be in here
+	map(0x7c00, 0x7c00).portr("IN0"); // player inputs
+	map(0x7c80, 0x7c80).portr("IN1"); // player inputs
+	map(0x7d07, 0x7d07).portr("IN2"); // Coin is in here
+	map(0x7d80, 0x7d80).portr("IN3"); // unknown
 
 	map(0x8000, 0xbfff).rom();
 }
 
 static INPUT_PORTS_START( jammin )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )  // acts as a drum, also start 2
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // acts as a drum
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // acts as a drum
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) // acts as a drum
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) // acts as a drum, advances selection in menu
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) // acts as a drum
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) // acts as a drum
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) // acts as a drum
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )  // acts as a drum, also start 1
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
