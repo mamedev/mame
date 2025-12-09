@@ -1,8 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Jaume López
 
-#define VERBOSE 1
-
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8251.h"
@@ -68,7 +66,7 @@ namespace
 			required_device<i8255_device> m_ppi_diag;
 			required_device<i8255_device> m_ppi_settings;
 			required_device<i8257_device> m_dmac;
-			required_device<ibm4178629_device> m_crtc;
+			required_device<i8275_device> m_crtc;
 			required_device<pit8253_device> m_pit;
 			required_device<pic8259_device> m_pic;
 			required_device<i8251_device> m_usart;
@@ -243,6 +241,11 @@ namespace
 		if (BIT(attrcode, RVV))
 			gfx ^= 0xff;
 
+		rgb_t color = rgb_t::green();
+		if (BIT(attrcode, HLGT))
+			color = rgb_t::white();
+
+
 		//if (BIT(attrcode, GPA0) || BIT(attrcode, GPA1)) printf("GPA0: %u GPA1: %u\n", BIT(attrcode, GPA0), BIT(attrcode, GPA1));
 		if (BIT(attrcode, GPA0) && BIT(attrcode, GPA1) && !lpen_ct)
 		{
@@ -264,18 +267,10 @@ namespace
 		//LOG("x=%x y=%x attrcode=%x\n",x,y,attrcode);
 
 		// Highlight not used
-		// bitmap.pix(y, x++) = (BIT(gfx, 7)? rgb_t::green() : rgb_t::black());
-		// bitmap.pix(y, x++) = (BIT(gfx, 6)? rgb_t::green() : rgb_t::black());
-		// bitmap.pix(y, x++) = (BIT(gfx, 5)? rgb_t::green() : rgb_t::black());
-		// bitmap.pix(y, x++) = (BIT(gfx, 4)? rgb_t::green() : rgb_t::black());
-		// bitmap.pix(y, x++) = (BIT(gfx, 3)? rgb_t::green() : rgb_t::black());
-		// bitmap.pix(y, x++) = (BIT(gfx, 2)? rgb_t::green() : rgb_t::black());
-		// bitmap.pix(y, x++) = (BIT(gfx, 1)? rgb_t::green() : rgb_t::black());
-		// bitmap.pix(y, x++) = (BIT(gfx, 0)? rgb_t::green() : rgb_t::black());
 
 		for(int pixel=7; pixel >= 0; pixel--)
 		{
-			bitmap.pix(y, x++) = (BIT(gfx, pixel)? rgb_t::green() : rgb_t::black());
+			bitmap.pix(y, x++) = (BIT(gfx, pixel)? color : rgb_t::black());
 		}
 	}
 
@@ -502,7 +497,7 @@ namespace
 		m_screen->set_raw(18'432'000, 800, 0, 640, 324, 0, 300);
 		m_screen->set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 
-		IBM4178629(config, m_crtc, (18'432'000 / 8));
+		I8275(config, m_crtc, (18'432'000 / 8));
 		m_crtc->set_character_width(8);
 		m_crtc->set_screen(m_screen);
 		m_crtc->set_display_callback(FUNC(system23_state::display_pixels));
@@ -660,7 +655,7 @@ namespace
 		ROMX_LOAD("18_22cb6de4_8519417.bin", 0x20000, 0x2000, CRC(22cb6de4) SHA1(ae050de1dd20afc25fe97012f6b088be0ae47878), ROM_BIOS(0))
 		ROMX_LOAD("19_2e665945_4481711.bin", 0x22000, 0x2000, CRC(2e665945) SHA1(4ae61c13786b44b28a02055c104ef63355a629b9), ROM_BIOS(0))
 
-		//ROS 1.01 (1980)
+		//ROS 1.01 (1982)
 		ROMX_LOAD("02_765abd93_8493746.bin", 0x00000, 0x2000, CRC(765abd93) SHA1(1ec489f1d2f72bf7e9ddc5ef642a8336b3ff67e3), ROM_BIOS(1))
 		ROMX_LOAD("09_07843020_8493747.bin", 0x02000, 0x2000, CRC(07843020) SHA1(828ca0199af1246f6caf58bcb785f791c3a7e34e), ROM_BIOS(1))
 		ROMX_LOAD("0a_b9569153_8493748.bin", 0x04000, 0x2000, CRC(b9569153) SHA1(92ccf91766557bc565ad36fc131396aff28b8999), ROM_BIOS(1))

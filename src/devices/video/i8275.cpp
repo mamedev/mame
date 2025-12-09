@@ -61,7 +61,6 @@ const int i8275_device::character_attribute[3][16] =
 // device type definitions
 DEFINE_DEVICE_TYPE(I8275, i8275_device, "i8275", "Intel 8275 CRTC")
 DEFINE_DEVICE_TYPE(I8276, i8276_device, "i8276", "Intel 8276 CRTC")
-DEFINE_DEVICE_TYPE(IBM4178629, ibm4178629_device, "ibm4178629", "IBM 418629 CRTC")
 
 
 //**************************************************************************
@@ -103,7 +102,6 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_char_blink(0),
 	m_stored_attr(0),
 	m_field_attr(0),
-	m_ibmCRTC(false),
 	m_init(false)
 {
 	memset(m_param, 0x00, sizeof(m_param));
@@ -117,12 +115,6 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 i8276_device::i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i8275_device(mconfig, I8276, tag, owner, clock)
 {
-}
-
-ibm4178629_device::ibm4178629_device(const machine_config &mconfig, const char * tag, device_t *owner, uint32_t clock) :
-	i8275_device(mconfig, IBM4178629, tag, owner, clock)
-{
-	this->m_ibmCRTC = true;
 }
 
 
@@ -187,7 +179,6 @@ void i8275_device::device_start()
 	save_item(NAME(m_char_blink));
 	save_item(NAME(m_stored_attr));
 	save_item(NAME(m_field_attr));
-	save_item(NAME(m_ibmCRTC));
 	save_item(NAME(m_init));
 }
 
@@ -316,8 +307,8 @@ TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
 	{
 		for (i8275_device *crtc = this; crtc != nullptr; crtc = crtc->m_next_crtc)
 		{
-			// If either the IC is initialized or it is an IBM CRTC the interrupt is set if the EI flag is set
-			if ((crtc->m_status & ST_IE) && !(crtc->m_status & ST_IR) && (crtc->m_init || crtc->m_ibmCRTC))
+			// The interrupt is set if the EI flag is set
+			if ((crtc->m_status & ST_IE))
 			{
 				LOG("I8275 IRQ Set\n");
 				crtc->m_status |= ST_IR;

@@ -16537,6 +16537,9 @@ hotpinbl                        // (c) 1995 Comad & New Japan System
 lvgirl94                        // (c) 1994 Comad
 zerozone                        // (c) 1993 Comad
 
+@source:comelta/cr124.cpp
+cr124							// COMELTA CR-124 CPU card
+
 @source:commodore/c64.cpp
 c64                             //
 c64_jp                          // Commodore 64 (Japan)
@@ -20070,7 +20073,7 @@ rtpc025                         // IBM RT PC Model 025
 rtpca25                         // IBM RT PC Model A25
 
 @source:ibm/system23.cpp		// IBM System/23 Datamaster
-system23
+system23						//
 
 @source:ibm/thinkpad600.cpp
 thinkpad600                     // IBM Thinkpad 600
