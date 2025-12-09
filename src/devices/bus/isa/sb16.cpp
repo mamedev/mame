@@ -693,10 +693,14 @@ uint8_t sb16_lle_device::dsp_rbuf_status_r(offs_t offset)
 		}
 		return 0xff;
 	}
+	// reading here clears both irqs
+	// sideline boot init with mode = 0x65 (16-bit) then just uses mode = 0x64 (8-bit) in-game.
 	if(!machine().side_effects_disabled())
 	{
 		m_irq8 = false;
+		m_irq16 = false;
 		m_irqs->in_w<0>(CLEAR_LINE);
+		m_irqs->in_w<1>(CLEAR_LINE);
 	}
 	return m_data_out << 7;
 }
