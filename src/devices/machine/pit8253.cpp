@@ -34,7 +34,6 @@
 #define LOG_2 (1U << 2)
 
 //#define VERBOSE (LOG_1 | LOG_2)
-#define VERBOSE LOG_1
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
