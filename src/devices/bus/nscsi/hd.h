@@ -20,9 +20,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	// experiment for slowing target device
-	virtual attotime scsi_data_byte_period() override { return attotime::from_nsec(770); }
-
+	// experiment for slowing target device (based on 1.2Mbps)
+	virtual attotime scsi_data_byte_period() override { return attotime::from_nsec(820); }
+	virtual attotime scsi_data_command_delay() override { return attotime::from_nsec(20000); }
 
 	virtual void scsi_command() override;
 	virtual uint8_t scsi_get_data(int id, int pos) override;
