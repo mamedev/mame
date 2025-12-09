@@ -253,11 +253,16 @@ void i8256_device::device_reset()
 
 uint8_t i8256_device::acknowledge()
 {
-	// c7 = rst 0, ff = rst 7
-	const uint8_t vector = 0xc7 | (m_current_interrupt_level << 3);
+	// 8085 mode c7 = rst 0, ff = rst 7
+	const uint8_t rstvector = 0xc7 | (m_current_interrupt_level << 3);
+	// 8086 mode, TODO: only on second INTA
+	const uint8_t ivector = 0x40 | m_current_interrupt_level;
 	m_out_int_cb(CLEAR_LINE); // deassert interrupt
 	m_current_interrupt_level = -1; // no current interrupt
-	return vector;
+	if (BIT(m_command1,I8256_CMD1_8086))
+		return ivector;
+	else
+		return rstvector;
 }
 
 void i8256_device::reset_timer()
