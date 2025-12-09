@@ -5219,7 +5219,9 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
 		<notes><![CDATA[
-Has [SB16] issues in both HLE and LLE cores
+Throws EMS warning at startup (FreeDOS only?)
+Has [SB16] issues in both HLE and LLE cores (workaround with voicebuffer = 1 in DOTT.CD\DOTT.INI)
+Untested demos
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

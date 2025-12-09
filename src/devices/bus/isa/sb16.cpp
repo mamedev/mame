@@ -163,13 +163,13 @@ uint8_t sb16_lle_device::ctrl8_r()
 void sb16_lle_device::ctrl8_w(uint8_t data)
 {
 	/* port 0x08
-	 * bit0 - ?
+	 * bit0 - DMA resume? (resuming from pause in tentacle)
 	 * bit1 - stop transfer
 	 * bit2 - load counter
 	 * bit3 -
 	 * bit4 -
 	 * bit5 -
-	 * bit6 - ? (wolf3d)
+	 * bit6 - DMA pause? (wolf3d, entering pause in tentacle)
 	 * bit7 - toggle for 8bit irq
 	*/
 	if(data & 4)
@@ -190,7 +190,20 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 	}
 	// wolf3d disagrees with drq high here (will be short by 1 sample, cfr. MT09316)
 	//else
-	//	m_isa->drq1_w(1);
+	//  m_isa->drq1_w(1);
+
+//  if (data & 0x40)
+//  {
+//      printf("DMA pause? %02x\n", data);
+//      //m_isa->drq1_w(0);
+//      control_timer(false);
+//  }
+//  else if (data & 1)
+//  {
+//      printf("DMA resume? %02x\n", data);
+//      //m_isa->drq1_w(1);
+//      control_timer(true);
+//  }
 
 	if(data & 0x80)
 	{
@@ -234,7 +247,7 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 			control_timer(false);
 	}
 	//else
-	//	m_isa->drq5_w(1);
+	//  m_isa->drq5_w(1);
 
 	if(data & 0x80)
 	{
@@ -351,12 +364,22 @@ uint8_t sb16_lle_device::adc_data_ready_r()
 
 uint8_t sb16_lle_device::dma8_cnt_lo_r()
 {
-	return m_dma8_cnt & 0xff;
+	u8 res = m_dma8_cnt;
+	if (!(BIT(m_mode, 6)))
+		res <<= 1;
+	res --;
+
+	return res & 0xff;
 }
 
 uint8_t sb16_lle_device::dma8_cnt_hi_r()
 {
-	return m_dma8_cnt >> 8;
+	u8 res = m_dma8_cnt;
+	if (!(BIT(m_mode, 6)))
+		res <<= 1;
+	res --;
+
+	return res >> 8;
 }
 
 void sb16_lle_device::dma8_len_lo_w(uint8_t data)
@@ -428,7 +451,7 @@ void sb16_lle_device::host_io(address_map &map)
 	map(0x0a, 0x0b).r(FUNC(sb16_lle_device::host_data_r));
 	map(0x0c, 0x0d).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
 	map(0x0e, 0x0f).r(FUNC(sb16_lle_device::dsp_rbuf_status_r));
-//	map(0x10, 0x13) CD-ROM interface
+//  map(0x10, 0x13) CD-ROM interface
 }
 
 const tiny_rom_entry *sb16_lle_device::device_rom_region() const
@@ -531,6 +554,7 @@ uint8_t sb16_lle_device::dack_r(int line)
 
 void sb16_lle_device::dack_w(int line, uint8_t data)
 {
+//  printf("dack_w %02x -> [%02x] FIFO (%02x ~ %02x) ctrl %02x cnt %04x mode %02x\n", m_ctrl8, data, m_dac_fifo_head, m_dac_fifo_tail, m_dac_fifo_ctrl, m_dma8_cnt, m_mode);
 	if(m_ctrl8 & 2)
 		return;
 
@@ -608,6 +632,8 @@ uint16_t sb16_lle_device::dack16_r(int line)
 
 void sb16_lle_device::dack16_w(int line, uint16_t data)
 {
+//  printf("dack16_w %02x -> [%02x] FIFO (%02x ~ %02x) ctrl %02x cnt %04x mode %02x\n", m_ctrl16, data, m_dac_fifo_head, m_dac_fifo_tail, m_dac_fifo_ctrl, m_dma16_cnt, m_mode);
+
 	if(m_ctrl16 & 2)
 		return;
 
@@ -786,6 +812,8 @@ void sb16_lle_device::device_reset()
 TIMER_CALLBACK_MEMBER(sb16_lle_device::timer_tick)
 {
 	uint16_t dacl = 0, dacr = 0, adcl = 0, adcr = 0;
+	//printf("mode %02x ctrl8 %02x ctrl16 %02x\n", m_mode, m_ctrl8, m_ctrl16);
+
 	if(m_mode & 2)
 	{
 		// it might be possible to run the adc though dma simultaneously but the rom doesn't appear to permit it
