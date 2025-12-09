@@ -88,10 +88,10 @@ void okim6588_device::device_reset()
 //  internal handlers
 //-------------------------------------------------
 
-void okim6588_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void okim6588_device::sound_stream_update(sound_stream &stream)
 {
 	// simply fill the buffer with the current sample
-	outputs[0].fill(m_adpcm.output() / 2048.0);
+	stream.fill(0, m_adpcm.output() / 2048.0);
 }
 
 TIMER_CALLBACK_MEMBER(okim6588_device::clock_adpcm)

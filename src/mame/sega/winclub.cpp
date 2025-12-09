@@ -69,7 +69,7 @@ uint32_t winclub_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void winclub_state::prg_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).rom().mirror(0xe0000000).region("pcmcia", 0);
+	map(0x00000000, 0x007fffff).rom().region("pcmcia", 0);
 }
 
 static INPUT_PORTS_START( winclub ) // no dips on PCB
@@ -88,7 +88,7 @@ INPUT_PORTS_END
 void winclub_state::winclub(machine_config &config)
 {
 	// basic machine hardware
-	sh4_device &maincpu(SH4LE(config, "maincpu", 14'318'000)); // TODO: SH-4 based custom, unknown type and clock
+	sh4_device &maincpu(SH4(config, "maincpu", 14'318'000)); // TODO: SH-4 based custom, unknown type and clock
 	maincpu.set_addrmap(AS_PROGRAM, &winclub_state::prg_map);
 	// maincpu.set_vblank_int("screen", FUNC(winclub_state::irq2_line_hold));
 
@@ -101,12 +101,11 @@ void winclub_state::winclub(machine_config &config)
 	screen.set_screen_update(FUNC(winclub_state::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz770_device &ymz770(YMZ770(config, "ymz", 16'384'000)); // internal clock?
-	ymz770.add_route(0, "lspeaker", 1.0);
-	ymz770.add_route(1, "rspeaker", 1.0);
+	ymz770.add_route(0, "speaker", 1.0, 0);
+	ymz770.add_route(1, "speaker", 1.0, 1);
 }
 
 

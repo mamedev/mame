@@ -155,22 +155,6 @@ if (SOUNDS["TIA"]~=null) then
 	}
 end
 
-
-
----------------------------------------------------
--- Amiga audio hardware
---@src/devices/machine/8364_paula.h,SOUNDS["PAULA_8364"] = true
----------------------------------------------------
-
-if (SOUNDS["PAULA_8364"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/8364_paula.cpp",
-		MAME_DIR .. "src/devices/machine/8364_paula.h",
-	}
-end
-
-
-
 ---------------------------------------------------
 -- Bally Astrocade sound system
 --@src/devices/sound/astrocde.h,SOUNDS["ASTROCADE"] = true
@@ -524,6 +508,17 @@ if (SOUNDS["K056800"]~=null) then
 	}
 end
 
+---------------------------------------------------
+-- L4003
+--@src/devices/sound/l4003.h,SOUNDS["L4003"] = true
+---------------------------------------------------
+
+if (SOUNDS["L4003"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/l4003.cpp",
+		MAME_DIR .. "src/devices/sound/l4003.h",
+	}
+end
 
 ---------------------------------------------------
 -- L7A1045 L6028 DSP-A
@@ -1118,6 +1113,18 @@ end
 
 
 ---------------------------------------------------
+-- Texas Instruments TMS3631
+--@src/devices/sound/tms3631.h,SOUNDS["TMS3631"] = true
+---------------------------------------------------
+
+if (SOUNDS["TMS3631"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/tms3631.cpp",
+		MAME_DIR .. "src/devices/sound/tms3631.h",
+	}
+end
+
+---------------------------------------------------
 -- Texas Instruments TMS5100-series speech synthesizers
 --@src/devices/sound/tms5110.h,SOUNDS["TMS5110"] = true
 ---------------------------------------------------
@@ -1139,8 +1146,6 @@ if (SOUNDS["TMS5220"]~=null) then
 		MAME_DIR .. "src/devices/sound/tms5220.cpp",
 		MAME_DIR .. "src/devices/sound/tms5220.h",
 		MAME_DIR .. "src/devices/sound/tms5110r.hxx",
-		MAME_DIR .. "src/devices/machine/spchrom.cpp",
-		MAME_DIR .. "src/devices/machine/spchrom.h",
 	}
 end
 
@@ -1184,6 +1189,41 @@ if (SOUNDS["UPD7752"]~=null) then
 	}
 end
 
+--------------------------------------------------
+-- Virtual analog envelope generators (EGs)
+--@src/devices/sound/va_eg.h,SOUNDS["VA_EG"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_EG"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_eg.cpp",
+		MAME_DIR .. "src/devices/sound/va_eg.h",
+	}
+end
+
+--------------------------------------------------
+-- Virtual analog voltage-controlled amplifiers (VCAs)
+--@src/devices/sound/va_vca.h,SOUNDS["VA_VCA"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_VCA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vca.cpp",
+		MAME_DIR .. "src/devices/sound/va_vca.h",
+	}
+end
+
+--------------------------------------------------
+-- Virtual analog voltage-controlled filters (VCFs)
+--@src/devices/sound/va_vcf.h,SOUNDS["VA_VCF"] = true
+--------------------------------------------------
+
+if (SOUNDS["VA_VCF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/va_vcf.cpp",
+		MAME_DIR .. "src/devices/sound/va_vcf.h",
+	}
+end
 
 ---------------------------------------------------
 -- VLM5030 speech synthesizer
@@ -1222,20 +1262,6 @@ if (SOUNDS["VRENDER0"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/vrender0.cpp",
 		MAME_DIR .. "src/devices/sound/vrender0.h",
-	}
-end
-
-
-
----------------------------------------------------
--- WAVE file (used for cassette)
---@src/devices/sound/wave.h,SOUNDS["WAVE"] = true
----------------------------------------------------
-
-if (SOUNDS["WAVE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/wave.cpp",
-		MAME_DIR .. "src/devices/sound/wave.h",
 	}
 end
 
@@ -1425,18 +1451,6 @@ if (SOUNDS["AD1848"]~=null) then
 end
 
 ---------------------------------------------------
--- UPD1771
---@src/devices/sound/upd1771.h,SOUNDS["UPD1771"] = true
----------------------------------------------------
-
-if (SOUNDS["UPD1771"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/upd1771.cpp",
-		MAME_DIR .. "src/devices/sound/upd1771.h",
-	}
-end
-
----------------------------------------------------
 -- GB_SOUND
 --@src/devices/sound/gb.h,SOUNDS["GB_SOUND"] = true
 ---------------------------------------------------
@@ -1528,6 +1542,18 @@ if (SOUNDS["LC82310"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/lc82310.cpp",
 		MAME_DIR .. "src/devices/sound/lc82310.h",
+	}
+end
+
+---------------------------------------------------
+-- NEC uPD931
+--@src/devices/sound/upd931.h,SOUNDS["UPD931"] = true
+---------------------------------------------------
+
+if (SOUNDS["UPD931"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/upd931.cpp",
+		MAME_DIR .. "src/devices/sound/upd931.h",
 	}
 end
 
@@ -1780,5 +1806,53 @@ if (SOUNDS["UPD65043GFU01"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/upd65043gfu01.cpp",
 		MAME_DIR .. "src/devices/sound/upd65043gfu01.h",
+	}
+end
+
+---------------------------------------------------
+-- Casio GT155
+--@src/devices/sound/gt155.h,SOUNDS["GT155"] = true
+---------------------------------------------------
+
+if (SOUNDS["GT155"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/gt155.cpp",
+		MAME_DIR .. "src/devices/sound/gt155.h",
+	}
+end
+
+---------------------------------------------------
+-- Nintendo MMC5 Sound
+--@src/devices/sound/mmc5.h,SOUNDS["MMC5"] = true
+---------------------------------------------------
+
+if (SOUNDS["MMC5"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mmc5.cpp",
+		MAME_DIR .. "src/devices/sound/mmc5.h",
+	}
+end
+
+---------------------------------------------------
+-- ADCs
+--@src/devices/sound/adc.h,SOUNDS["ADC"] = true
+---------------------------------------------------
+
+if (SOUNDS["ADC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/adc.cpp",
+		MAME_DIR .. "src/devices/sound/adc.h",
+	}
+end
+
+---------------------------------------------------
+-- Casio FZ-series PCM
+--@src/devices/sound/fz_pcm.h,SOUNDS["FZ_PCM"] = true
+---------------------------------------------------
+
+if (SOUNDS["FZ_PCM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/fz_pcm.cpp",
+		MAME_DIR .. "src/devices/sound/fz_pcm.h",
 	}
 end

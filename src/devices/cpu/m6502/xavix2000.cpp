@@ -38,6 +38,7 @@ DEFINE_DEVICE_TYPE(XAVIX2002, xavix2002_device, "xavix2002", "XaviX (SSD 2002) (
 xavix2000_device::xavix2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	xavix_device(mconfig, type, tag, owner, clock)
 {
+	m_use_private_stack_for_extra_callf_byte = false;
 }
 
 xavix2000_device::xavix2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

@@ -29,6 +29,7 @@ class m6809_base_device : public cpu_device
 public:
 	auto interrupt_vector_read() { return m_vector_read_func.bind(); }
 	auto sync_acknowledge_write() { return m_syncack_write_func.bind(); }
+
 protected:
 	// construction/destruction
 	m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, int divider);

@@ -596,6 +596,13 @@ static INPUT_PORTS_START( sasuke )
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_HIGH, "SW1:!4" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sasukea )
+	PORT_INCLUDE(sasuke)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW1:!7" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( vanguard )
 	PORT_INCLUDE(snk6502_generic_joy8way)
 
@@ -772,18 +779,18 @@ static const gfx_layout charlayout_memory =
 
 
 static GFXDECODE_START( gfx_sasuke )
-	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, swapcharlayout,      0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_satansat )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_vanguard )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
 
 
@@ -795,7 +802,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
 {
-	if(m_irq_mask)
+	if (m_irq_mask)
 		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
@@ -833,7 +840,6 @@ void snk6502_state::sasuke(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
 	// video hardware
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz((MASTER_CLOCK / 16) / (45 * 32 * 8));
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -968,6 +974,32 @@ ROM_START( sasuke )
 	ROM_LOAD( "sc11",         0x0000, 0x0800, CRC(24a0e121) SHA1(e3cde355309de6678026d595955297258f069946) )
 ROM_END
 
+ROM_START( sasukea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc1",          0x4000, 0x0800, CRC(34cbbe03) SHA1(3d643e11370e61dde0c42c7761a856c5cf53d621) )
+	ROM_LOAD( "sc2",          0x4800, 0x0800, CRC(38cc14f0) SHA1(d60df67f2a32c131e8957e225b79618d6262463d) )
+	ROM_LOAD( "sc3",          0x5000, 0x0800, CRC(c7a0c668) SHA1(f16cda4f1caaba3582e2fbef4f4f4992bb93aed7) )
+	ROM_LOAD( "sc4",          0x5800, 0x0800, CRC(23edafcf) SHA1(bda3bcb506f6e23f422aafd7ca9b95bfb4d1d8e1) )
+	ROM_LOAD( "sc5",          0x6000, 0x0800, CRC(ca410e4f) SHA1(0d09422d01b4359853c173a4cb18c9b5fbc7fe7c) )
+	// dump repaired using bytes 0x6a00 to 0x6a13 from parent set & filling 0x6e00 to 0x6e11 with 0xff
+	ROM_LOAD( "sc6",          0x6800, 0x0800, BAD_DUMP CRC(d97e98fa) SHA1(c3dd6175d5c31b88f36c7151d78b037fd8611eee) )
+	ROM_LOAD( "sc7",          0x7000, 0x0800, CRC(04d0f104) SHA1(73ed501f70d2a9e8994f8392f617450eafef39b3) )
+	ROM_LOAD( "sc8",          0x7800, 0x0800, CRC(1893a1d3) SHA1(1651e5ee023de7823d41dca9dcecc03302270a1a) )
+	ROM_RELOAD(               0xf800, 0x0800 ) /* for the reset/interrupt vectors */
+	ROM_LOAD( "sc9",          0x8000, 0x0800, CRC(681dc3c5) SHA1(4bd0943b2fe4b016b251fba36d05cffb9f0f92b2) )
+	ROM_LOAD( "sc10",         0x8800, 0x0800, CRC(19df6b9a) SHA1(95e904251c39dcef227a4c125fc573e958ee78b7) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "mcs_c",        0x0000, 0x0800, CRC(aff9743d) SHA1(a968a193ca551d92f79e09d1761dd2ccebc76eee) )
+	ROM_LOAD( "mcs_d",        0x0800, 0x0800, CRC(9c805120) SHA1(74b83daa3ce3c9f7d96ad872b9134edd6f1bcb8a) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sasuke.clr",   0x0000, 0x0020, CRC(b70f34c1) SHA1(890cfbb25e14112713ba7900b9cd56554a8bc1ec) )
+
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound data for Vanguard-style audio section */
+	ROM_LOAD( "sc11",         0x0000, 0x0800, CRC(24a0e121) SHA1(e3cde355309de6678026d595955297258f069946) )
+ROM_END
+
 ROM_START( satansat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ss1",          0x4000, 0x0800, CRC(549dd13a) SHA1(06b55d0b1da84bef30857faa398aabfd04365eb6) )
@@ -1048,9 +1080,6 @@ ROM_START( zarzon )
 	ROM_LOAD( "zarz133.53",   0x0000, 0x0800, CRC(b253cf78) SHA1(56a73b22ed2866222c407a3e9b51b8e0c92cf2aa) )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
-
-
-
 
 ROM_START( satansatind )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1499,7 +1528,7 @@ ROM_START( nibblera ) /* revision 9 - alternate? */
 	ROM_LOAD( "2732.ic07", 0x4000, 0x1000, CRC(7f9d715c) SHA1(59fbdbb55dceaa86235911589395fa5243e44afe) )
 	ROM_LOAD( "2732.ic08", 0x5000, 0x1000, CRC(e46eb1c9) SHA1(b70a14085985096eb6650f3d06343a20d75e61b5) )
 	ROM_LOAD( "2732.ic09", 0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) )
-	ROM_LOAD( "2732.ic10", 0x7000, 0x1000, BAD_DUMP CRC(746e94cd) SHA1(284696722857900760d35f1f8ef53290deddac20) )  // FIXED BITS (xxx1xxxx)
+	ROM_LOAD( "2732.ic10", 0x7000, 0x1000, CRC(746e94cd) SHA1(284696722857900760d35f1f8ef53290deddac20) )
 	ROM_LOAD( "2732.ic14", 0x8000, 0x1000, CRC(48ec4af0) SHA1(9b4b80c288d5ade998c0bbcfc3868c9dcd438707) )
 	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
 	ROM_LOAD( "2732.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )
@@ -1579,7 +1608,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, sasukea,     sasuke,   sasuke,   sasukea,  snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

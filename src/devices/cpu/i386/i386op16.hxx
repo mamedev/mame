@@ -2944,7 +2944,7 @@ void i386_device::i386_groupF7_16()        // Opcode 0xf7
 							m_CF = 1;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -2965,7 +2965,7 @@ void i386_device::i386_groupF7_16()        // Opcode 0xf7
 				if( src ) {
 					remainder = quotient % (int32_t)(int16_t)src;
 					result = quotient / (int32_t)(int16_t)src;
-					if( result > 0xffff ) {
+					if( result > 0x7fff || result < -0x8000 ) {
 						/* TODO: Divide error */
 					} else {
 						REG16(DX) = (uint16_t)remainder;
@@ -2976,7 +2976,7 @@ void i386_device::i386_groupF7_16()        // Opcode 0xf7
 							m_CF = 1;
 					}
 				} else {
-					i386_trap(0, 0, 0);
+					i386_trap(0, 0);
 				}
 			}
 			break;
@@ -3150,7 +3150,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 		case 1:         /* STR */
@@ -3167,7 +3167,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 		case 2:         /* LLDT */
@@ -3193,7 +3193,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 
@@ -3225,7 +3225,7 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 			}
 			break;
 
@@ -3260,19 +3260,23 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 						{  // check if conforming, these are always readable, regardless of privilege
 							if(!(seg.flags & 0x04))
 							{
-								// if not conforming, then we must check privilege levels (TODO: current privilege level check)
-								if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+								// if not conforming, then we must check privilege levels
+								if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
 									result = 0;
 							}
 						}
 					}
+					else
+					{
+						if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
+							result = 0;
+					}
 				}
-				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
 				SetZF(result);
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 				LOGMASKED(LOG_PM_EVENTS, "i386: VERR: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3308,14 +3312,13 @@ void i386_device::i386_group0F00_16()          // Opcode 0x0f 00
 							result = 0;
 					}
 				}
-				// check that the descriptor privilege is greater or equal to the selector's privilege level and the current privilege (TODO)
-				if(((seg.flags >> 5) & 0x03) < (address & 0x03))
+				if(((seg.flags >> 5) & 0x03) < std::max(m_CPL, (uint8_t)(address & 0x03)))
 					result = 0;
 				SetZF(result);
 			}
 			else
 			{
-				i386_trap(6, 0, 0);
+				i386_trap(6, 0);
 				LOGMASKED(LOG_PM_EVENTS, "i386: VERW: Exception - Running in real mode or virtual 8086 mode.\n");
 			}
 			break;
@@ -3612,7 +3615,7 @@ void i386_device::i386_lar_r16_rm16()  // Opcode 0x0f 0x02
 	else
 	{
 		// illegal opcode
-		i386_trap(6,0, 0);
+		i386_trap(6,0);
 		LOGMASKED(LOG_PM_EVENTS, "i386: LAR: Exception - running in real mode or virtual 8086 mode.\n");
 	}
 }
@@ -3677,7 +3680,7 @@ void i386_device::i386_lsl_r16_rm16()  // Opcode 0x0f 0x03
 		}
 	}
 	else
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 }
 
 void i386_device::i386_bound_r16_m16_m16() // Opcode 0x62
@@ -3702,7 +3705,7 @@ void i386_device::i386_bound_r16_m16_m16() // Opcode 0x62
 	if ((val < low) || (val > high))
 	{
 		CYCLES(CYCLES_BOUND_OUT_RANGE);
-		i386_trap(5, 0, 0);
+		i386_trap(5, 0);
 	}
 	else
 	{
@@ -3751,18 +3754,21 @@ bool i386_device::i386_load_far_pointer16(int s)
 {
 	uint8_t modrm = FETCH();
 	uint16_t selector;
+	bool fault = false;
 
 	if( modrm >= 0xc0 ) {
 		//LOGMASKED(LOG_PM_EVENTS, "i386: load_far_pointer16 NYI\n"); // don't log, NT will use this a lot
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 		return false;
 	} else {
 		uint32_t ea = GetEA(modrm,0);
-		STORE_REG16(modrm, READ16(ea + 0));
+		uint16_t val = READ16(ea + 0);
 		selector = READ16(ea + 2);
-		i386_sreg_load(selector,s,nullptr);
+		i386_sreg_load(selector,s,&fault);
+		if(!fault)
+			STORE_REG16(modrm, val);
 	}
-	return true;
+	return !fault;
 }
 
 void i386_device::i386_lds16()             // Opcode 0xc5

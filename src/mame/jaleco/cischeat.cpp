@@ -2116,8 +2116,7 @@ void cischeat_state::bigrun(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x3600/2);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 	GENERIC_LATCH_16(config, m_soundlatch2);
@@ -2125,16 +2124,16 @@ void cischeat_state::bigrun(machine_config &config)
 	// TODO: all sound frequencies unverified (assume same as Mega System 1)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 7000000/2));
 	ymsnd.irq_handler().set(FUNC(cischeat_state::sound_irq));
-	ymsnd.add_route(0, "lspeaker", 0.50);
-	ymsnd.add_route(1, "rspeaker", 0.50);
+	ymsnd.add_route(0, "speaker", 0.50, 0);
+	ymsnd.add_route(1, "speaker", 0.50, 1);
 
 	OKIM6295(config, m_oki1, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_oki1->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_oki1->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	OKIM6295(config, m_oki2, 4000000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }
 
 void cischeat_state::bigrun_d65006(machine_config &config)
@@ -2295,16 +2294,15 @@ void cischeat_state::scudhamm(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_oki1->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_oki1->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 
 	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 
@@ -2399,18 +2397,17 @@ void captflag_state::captflag(machine_config &config)
 	config.set_default_layout(layout_captflag);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki1, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki1->set_addrmap(0, &captflag_state::oki1_map);
-	m_oki1->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_oki1->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_oki1->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_oki1->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 
 	OKIM6295(config, m_oki2, 4000000/2, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki2->set_addrmap(0, &captflag_state::oki2_map);
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 

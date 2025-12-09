@@ -212,8 +212,7 @@ void ivl_karaoke_state::ivl_karaoke_base(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(ivl_karaoke_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void easy_karaoke_cartslot_state::easy_karaoke(machine_config &config)

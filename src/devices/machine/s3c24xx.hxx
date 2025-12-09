@@ -422,7 +422,7 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_dma_read_bits(int count)
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tpal()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t color = s3c24xx_get_color_tpal();
 	for (int y = m_lcd.vpos_min; y <= m_lcd.vpos_max; y++)
 	{
@@ -436,7 +436,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tpal()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -467,7 +467,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_01()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_02()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -490,7 +490,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_02()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_04()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -513,7 +513,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_04()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_08()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -536,7 +536,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_08()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_p()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 16; i++)
 	{
@@ -554,7 +554,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_p()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_u() // not tested
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -577,7 +577,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_stn_12_u() // not tested
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_01()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -600,7 +600,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_01()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_02()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -623,7 +623,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_02()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_04()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -646,7 +646,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_04()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_08()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -669,7 +669,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_08()
 
 void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 {
-	bitmap_rgb32 &bitmap = *m_lcd.bitmap[0];
+	bitmap_rgb32 &bitmap = m_lcd.bitmap[0];
 	uint32_t *scanline = &bitmap.pix(m_lcd.vpos, m_lcd.hpos);
 	for (int i = 0; i < 4; i++)
 	{
@@ -733,8 +733,8 @@ TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
 
 void S3C24_CLASS_NAME::s3c24xx_video_start()
 {
-	m_lcd.bitmap[0] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
-	m_lcd.bitmap[1] = std::make_unique<bitmap_rgb32>(m_screen->width(), m_screen->height());
+	m_lcd.bitmap[0].allocate(m_screen->width(), m_screen->height());
+	m_lcd.bitmap[1].allocate(m_screen->width(), m_screen->height());
 
 	m_cpu->space(AS_PROGRAM).cache(m_cache);
 }
@@ -770,12 +770,12 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_video_update(screen_device &screen, bitmap_rg
 	{
 		if (m_lcd.framerate >= 1195)
 		{
-			bitmap_blend( bitmap, *m_lcd.bitmap[0], *m_lcd.bitmap[1]);
-			copybitmap( *m_lcd.bitmap[1], *m_lcd.bitmap[0], 0, 0, 0, 0, cliprect);
+			bitmap_blend(bitmap, m_lcd.bitmap[0], m_lcd.bitmap[1]);
+			copybitmap(m_lcd.bitmap[1], m_lcd.bitmap[0], 0, 0, 0, 0, cliprect);
 		}
 		else
 		{
-			copybitmap( bitmap, *m_lcd.bitmap[0], 0, 0, 0, 0, cliprect);
+			copybitmap(bitmap, m_lcd.bitmap[0], 0, 0, 0, 0, cliprect);
 		}
 		s3c24xx_lcd_dma_init();
 	}

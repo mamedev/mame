@@ -2,8 +2,6 @@
 // copyright-holders:Nicola Salmoria, Dan Boris
 /***************************************************************************
 
-  snk6502.c
-
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/
@@ -168,12 +166,6 @@ VIDEO_START_MEMBER(snk6502_state,snk6502)
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
-	machine().save().register_postload(save_prepost_delegate(FUNC(snk6502_state::postload), this));
-}
-
-void snk6502_state::postload()
-{
-	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
 VIDEO_START_MEMBER(snk6502_state,pballoon)
@@ -290,5 +282,4 @@ VIDEO_START_MEMBER(snk6502_state,satansat)
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(0)->set_source(m_charram);
-	machine().save().register_postload(save_prepost_delegate(FUNC(snk6502_state::postload), this));
 }

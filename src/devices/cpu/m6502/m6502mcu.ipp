@@ -55,7 +55,7 @@ void m6502_mcu_device_base<Base>::execute_run()
 			if(this->inst_state < 0xff00) {
 				this->PPC = this->NPC;
 				this->inst_state = this->IR | this->inst_state_base;
-				if(this->machine().debug_flags & DEBUG_FLAG_ENABLED)
+				if(this->debugger_enabled())
 					this->debugger_instruction_hook(this->NPC);
 			}
 			this->do_exec_full();

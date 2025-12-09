@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="circle">
+		<disk />
+	</element>
+
+	<view name="Touch-Enabled" showpointers="yes">
+		<bounds x="0" y="0" width="4.5" height="4" />
+
+		<screen id="screen" index="0">
+			<bounds left="0" top="0" right="3" bottom="4" />
+		</screen>
+
+		<element ref="circle" inputtag="IN0" inputmask="0x08">
+			<color red="1" green="0.796" blue="0.573" />
+			<bounds x="3.1" y="0.15" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN0" inputmask="0x10">
+			<color red="0.780" green="0.396" blue="0" />
+			<bounds x="3.1" y="0.85" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN0" inputmask="0x20">
+			<color red="0" green="1" blue="0" />
+			<bounds x="3.1" y="1.55" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN0" inputmask="0x40">
+			<color red="0.635" green="0.765" blue="1" />
+			<bounds x="3.1" y="2.25" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN0" inputmask="0x80">
+			<color red="1" green="0.427" blue="1" />
+			<bounds x="3.1" y="2.95" width="0.6" height="0.6" />
+		</element>
+
+		<element ref="circle" inputtag="IN1" inputmask="0x08">
+			<color red="1" green="0" blue="0" />
+			<bounds x="3.8" y="0.45" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN1" inputmask="0x10">
+			<color red="0.188" green="0.349" blue="0.984" />
+			<bounds x="3.8" y="1.15" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN1" inputmask="0x20">
+			<color red="0" green="0.588" blue="0" />
+			<bounds x="3.8" y="1.85" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN1" inputmask="0x40">
+			<color red="1" green="1" blue="0" />
+			<bounds x="3.8" y="2.55" width="0.6" height="0.6" />
+		</element>
+		<element ref="circle" inputtag="IN1" inputmask="0x80">
+			<color red="1" green="1" blue="1" />
+			<bounds x="3.8" y="3.25" width="0.6" height="0.6" />
+		</element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function ()
+				-- get the touchscreen I/O port fields - X/Y swapped for rotated screen
+				-- TODO: needs inverted Y values for screen area
+				local tsdev = file.device:subdevice('microtouch')
+				local btn_field = tsdev:ioport('TOUCH'):field(0x01)
+				local x_field = tsdev:ioport('TOUCH_Y'):field(0x3fff)
+				local y_field = tsdev:ioport('TOUCH_X'):field(0x3fff)
+
+				local set_field_value = btn_field.set_value
+				local clear_field_value = btn_field.clear_value
+				local x_min = x_field.minvalue
+				local x_max = x_field.maxvalue
+				local y_min = y_field.minvalue
+				local y_max = y_field.maxvalue
+
+				-- for mapping coordinates
+				local view = file.views['Touch-Enabled']
+				local scr_item = view.items['screen']
+				local floor = math.floor
+				local l, r, t, b
+				local x_scale, y_scale
+
+				-- pointer state
+				local ptr_id = nil
+				local inside = false
+
+				local function release_touch()
+					clear_field_value(btn_field)
+					clear_field_value(x_field)
+					clear_field_value(y_field)
+				end
+
+				local function recomputed()
+					local bounds = scr_item.bounds
+					l = bounds.x0
+					r = bounds.x1
+					t = bounds.y0
+					b = bounds.y1
+					x_scale = (x_max - x_min + 1) / bounds.width
+					y_scale = (y_max - y_min + 1) / bounds.height
+				end
+
+				local function check_pointer(x, y)
+					if (x >= l) and (x < r) and (y >= t) and (y < b) then
+						inside = true
+						local ix = x_min + floor(0.0001 + ((x - l) * x_scale))
+						if ix < x_min then
+							ix = x_min
+						elseif ix > x_max then
+							ix = x_max
+						end
+						local iy = y_min + floor(0.0001 + ((y - t) * y_scale))
+						if iy < y_min then
+							iy = y_min
+						elseif iy > y_max then
+							iy = y_max
+						end
+						set_field_value(btn_field, 1)
+						set_field_value(x_field, ix)
+						set_field_value(y_field, iy)
+					elseif inside then
+						inside = false
+						release_touch()
+					end
+				end
+
+				local function forget_pointer()
+					if inside then
+						release_touch()
+					end
+					ptr_id = nil
+					inside = false
+				end
+
+				local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+					if ptr_id == id then
+						if (btn & 0x01) == 0 then
+							forget_pointer()
+						else
+							check_pointer(x, y)
+						end
+					elseif (not ptr_id) and ((dn & 0x01) ~= 0) then
+						ptr_id = id
+						check_pointer(x, y)
+					end
+				end
+
+				local function pointer_lost(type, id, dev, x, y, up, cnt)
+					if ptr_id == id then
+						forget_pointer()
+					end
+				end
+
+				-- attach callbacks to view
+				view:set_recomputed_callback(recomputed)
+				view:set_pointer_updated_callback(pointer_updated)
+				view:set_pointer_left_callback(pointer_lost)
+				view:set_pointer_aborted_callback(pointer_lost)
+				view:set_forget_pointers_callback(forget_pointer)
+			end)
+	]]></script>
+</mamelayout>

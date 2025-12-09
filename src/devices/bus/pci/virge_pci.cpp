@@ -7,6 +7,11 @@
 
 #include "screen.h"
 
+DEFINE_DEVICE_TYPE(VIRGE_PCI, virge_pci_device, "virge_pci", "S3 86C325 ViRGE")
+DEFINE_DEVICE_TYPE(VIRGEVX_PCI, virgevx_pci_device, "virgevx_pci", "S3 86C988 ViRGE/VX")
+DEFINE_DEVICE_TYPE(VIRGEDX_PCI, virgedx_pci_device, "virgedx_pci", "S3 86C375 ViRGE/DX")
+//VIRGEGX_PCI, /DX with SGRAM/SDRAM support
+
 virge_pci_device::virge_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: virge_pci_device(mconfig, VIRGE_PCI, tag, owner, clock)
 {
@@ -17,6 +22,11 @@ virge_pci_device::virge_pci_device(const machine_config &mconfig, device_type ty
 	m_vga(*this, "vga"),
 	m_bios(*this, "bios"),
 	m_screen(*this, finder_base::DUMMY_TAG)
+{
+}
+
+virgevx_pci_device::virgevx_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: virge_pci_device(mconfig, VIRGEVX_PCI, tag, owner, clock)
 {
 }
 
@@ -54,7 +64,7 @@ void virge_pci_device::mmio_map(address_map& map)
 
 	//map(0xff00, 0xff5f) LPB Local Peripheral Bus control
 	//map(0xff1c, 0xff1f) LPB GIP/GOP General Input/Output Port (for OEM implementations)
-	//map(0xff20, 0xff23) Serial Port Register (DDC/I2C, pins 205-206, aliased at I/O ports $e2 or $e8)
+	map(0xff20, 0xff23).rw(m_vga, FUNC(s3virge_vga_device::serial_port_r), FUNC(s3virge_vga_device::serial_port_w));
 	//map(0xff24, 0xff27) LPB Video Input Window Size
 	//map(0xff28, 0xff2b) LPB Video Data Offsets
 	//map(0xff2c, 0xff2f) LPB Horizontal Decimation Control Register
@@ -173,6 +183,27 @@ void virge_pci_device::device_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));
 }
 
+void virgevx_pci_device::device_start()
+{
+	set_ids(0x5333883d, 0x00, 0x030000, 0x000000);
+	pci_card_device::device_start();
+
+	add_rom(m_bios->base(),0x8000);
+	expansion_rom_base = 0xc0000;
+
+	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virgevx_pci_device::lfb_map));
+	set_map_address(0, 0x70000000);
+
+	command = 0x0000;
+	// DAC SNP / BME / MEM / I/O
+	command_mask = 0x27;
+	// medium DEVSELB
+	status = 0x0200;
+
+	remap_cb();
+	machine().save().register_postload(save_prepost_delegate(FUNC(virgevx_pci_device::postload), this));
+}
+
 void virgedx_pci_device::device_start()
 {
 	set_ids(0x53338a01, 0x00, 0x030000, 0x000000);
@@ -183,6 +214,12 @@ void virgedx_pci_device::device_start()
 
 	add_map(64 * 1024 * 1024, M_MEM | M_DISABLED, FUNC(virge_pci_device::lfb_map));
 	set_map_address(0, 0x70000000);
+
+	command = 0x0000;
+	// DAC SNP / BME / MEM / I/O
+	command_mask = 0x27;
+	// medium DEVSELB
+	status = 0x0200;
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgedx_pci_device::postload), this));
@@ -207,7 +244,16 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 	}
 
 	if (BIT(command, 0))
+	{
 		io_space->install_device(0x03b0, 0x03df, *this, &virge_pci_device::legacy_io_map);
+
+		// Available at MMFF20 only if true
+		if (m_vga->read_pd26_strapping() == false)
+		{
+			const u16 port_offset = m_vga->read_pd25_strapping() ? 0xe2 : 0xe8;
+			io_space->install_readwrite_handler(port_offset, port_offset, read8sm_delegate(m_vga, FUNC(s3virge_vga_device::serial_port_r)), write8sm_delegate(m_vga, FUNC(s3virge_vga_device::serial_port_w)));
+		}
+	}
 }
 
 void virge_pci_device::device_add_mconfig(machine_config &config)
@@ -220,6 +266,19 @@ void virge_pci_device::device_add_mconfig(machine_config &config)
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
 	m_vga->linear_config_changed().set(FUNC(virge_pci_device::linear_config_changed_w));
+}
+
+void virgevx_pci_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
+	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
+
+	S3VIRGEVX(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	// 2MB, 4MB and 8MB, EDO RAM
+	m_vga->set_vram_size(0x400000);
+	m_vga->linear_config_changed().set(FUNC(virgevx_pci_device::linear_config_changed_w));
 }
 
 void virgedx_pci_device::device_add_mconfig(machine_config &config)
@@ -247,6 +306,27 @@ ROM_START( virge_pci )
 	ROM_IGNORE( 0x8000 )
 ROM_END
 
+const tiny_rom_entry *virge_pci_device::device_rom_region() const
+{
+	return ROM_NAME( virge_pci );
+}
+
+ROM_START( virgevx_pci )
+	ROM_REGION(0x8000,"bios", 0)
+	ROM_DEFAULT_BIOS("dms3d3k")
+
+	// Vlask dump
+	// v2.xx BIOSes known to exist
+	ROM_SYSTEM_BIOS( 0, "dms3d3k", "Diamond Stealth 3D 3000 HQ v1.00" )
+	ROMX_LOAD("diamondstealth3000.vbi", 0x0000, 0x8000, CRC(c2423896) SHA1(fdab43f15da1d66bca286583f9da86873f3e22de), ROM_BIOS(0) )
+ROM_END
+
+const tiny_rom_entry *virgevx_pci_device::device_rom_region() const
+{
+	return ROM_NAME( virgevx_pci );
+}
+
+
 ROM_START( virgedx_pci )
 	ROM_REGION(0x8000,"bios", 0)
 	ROM_DEFAULT_BIOS("virgedx")
@@ -256,18 +336,12 @@ ROM_START( virgedx_pci )
 
 	ROM_SYSTEM_BIOS( 1, "dms3d2kp", "Diamond Stealth 3D 2000 Pro v3.04" )
 	ROMX_LOAD("virgedxdiamond.bin", 0x00000, 0x8000, CRC(58b0dcda) SHA1(b13ae6b04db6fc05a76d924ddf2efe150b823029), ROM_BIOS(1) )
-ROM_END
 
-const tiny_rom_entry *virge_pci_device::device_rom_region() const
-{
-	return ROM_NAME( virge_pci );
-}
+	ROM_SYSTEM_BIOS( 2, "s600dx", "Leadtek WinFast 3D S600DX V1.01.03" )
+	ROMX_LOAD("winfast_3d_s600dx.bin", 0x00000, 0x8000, CRC(d68db9f4) SHA1(9a7f58fab7811342a00bbc76837b4f9015913ddb), ROM_BIOS(2) )
+ROM_END
 
 const tiny_rom_entry *virgedx_pci_device::device_rom_region() const
 {
 	return ROM_NAME( virgedx_pci );
 }
-
-DEFINE_DEVICE_TYPE(VIRGE_PCI, virge_pci_device, "virge_pci", "S3 86C325 ViRGE")
-DEFINE_DEVICE_TYPE(VIRGEDX_PCI, virgedx_pci_device, "virgedx_pci", "S3 86C375 ViRGE/DX")
-//VIRGEGX_PCI, /DX with SGRAM/SDRAM support

@@ -16,25 +16,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define ATARIRLE_PRIORITY_SHIFT     12
-#define ATARIRLE_BANK_SHIFT         15
-#define ATARIRLE_PRIORITY_MASK      ((0xffff << ATARIRLE_PRIORITY_SHIFT) & 0xffff)
-#define ATARIRLE_DATA_MASK          (ATARIRLE_PRIORITY_MASK ^ 0xffff)
-
-#define ATARIRLE_CONTROL_MOGO       1
-#define ATARIRLE_CONTROL_ERASE      2
-#define ATARIRLE_CONTROL_FRAME      4
-
-#define ATARIRLE_COMMAND_NOP        0
-#define ATARIRLE_COMMAND_DRAW       1
-#define ATARIRLE_COMMAND_CHECKSUM   2
-
-
-
-//**************************************************************************
 //  TYPES & STRUCTURES
 //**************************************************************************
 
@@ -69,6 +50,20 @@ class atari_rle_objects_device : public device_t,
 									public atari_rle_objects_config
 {
 public:
+	// constants
+	static inline constexpr int PRIORITY_SHIFT     = 12;
+	//static inline constexpr int BANK_SHIFT         = 15;
+	static inline constexpr uint16_t PRIORITY_MASK = ((0xffff << PRIORITY_SHIFT) & 0xffff);
+	static inline constexpr uint16_t DATA_MASK     = (PRIORITY_MASK ^ 0xffff);
+
+	static inline constexpr int CONTROL_MOGO       = 1;
+	static inline constexpr int CONTROL_ERASE      = 2;
+	static inline constexpr int CONTROL_FRAME      = 4;
+
+	static inline constexpr int COMMAND_NOP        = 0;
+	static inline constexpr int COMMAND_DRAW       = 1;
+	static inline constexpr int COMMAND_CHECKSUM   = 2;
+
 	// construction/destruction
 	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, const atari_rle_objects_config &config)
 		: atari_rle_objects_device(mconfig, tag, owner, clock)
@@ -89,10 +84,10 @@ public:
 	void vblank_callback(screen_device &screen, bool state);
 
 	// getters
-	bitmap_ind16 &vram(int idx) { return m_vram[idx][(m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2]; }
+	bitmap_ind16 &vram(int idx) { return m_vram[idx][(m_control_bits & CONTROL_FRAME) >> 2]; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -138,6 +133,9 @@ private:
 	void draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, u32 palette, int sx, int sy, int scalex, int scaley);
 	void hilite_object(bitmap_ind16 &bitmap, int hilite);
 
+	required_region_ptr<u16> m_rombase;    // pointer to the base of the GFX ROM
+	memory_array     m_ram;
+
 	// derived state
 	int             m_bitmapwidth = 0;        // width of the full playfield bitmap
 	int             m_bitmapheight = 0;       // height of the full playfield bitmap
@@ -157,19 +155,17 @@ private:
 	sprite_parameter    m_vrammask;           // mask for the VRAM target
 
 	// ROM information
-	required_region_ptr<u16> m_rombase;    // pointer to the base of the GFX ROM
 	int                 m_objectcount = 0;        // number of objects in the ROM
 	std::vector<object_info> m_info;               // list of info records
 
 	// rendering state
 	bitmap_ind16     m_vram[2][2];         // pointers to VRAM bitmaps and backbuffers
-	int              m_partial_scanline = 0;   // partial update scanline
+	s32              m_partial_scanline = 0;   // partial update scanline
 
 	// control state
 	u8               m_control_bits = 0;       // current control bits
 	u8               m_command = 0;            // current command
 	u16              m_checksums[256];     // checksums for each 0x40000 bytes
-	memory_array     m_ram;
 
 	// tables
 	u8               m_rle_bpp[8];

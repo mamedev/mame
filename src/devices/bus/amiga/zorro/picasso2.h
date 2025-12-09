@@ -29,13 +29,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// device_memory_interface
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_zorro2_card_interface overrides
 	virtual void cfgin_w(int state) override;
+	virtual void busrst_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;
@@ -58,6 +58,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_PICASSO2P, bus::amiga::zorro, picasso2p_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_PICASSO2P, bus::amiga::zorro, picasso2p_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_PICASSO2_H

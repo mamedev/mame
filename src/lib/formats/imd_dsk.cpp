@@ -621,7 +621,8 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[i].data = nullptr;
 			} else {
 				sects[i].deleted = stype == 3 || stype == 4 || stype == 7 || stype == 8;
-				sects[i].bad_crc = stype == 5 || stype == 6 || stype == 7 || stype == 8;
+				sects[i].bad_data_crc = stype == 5 || stype == 6 || stype == 7 || stype == 8;
+				sects[i].bad_addr_crc = false;
 
 				if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
 					sects[i].data = new uint8_t [actual_size];
@@ -647,11 +648,6 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 
 	return true;
-}
-
-bool imd_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const imd_format FLOPPY_IMD_FORMAT;

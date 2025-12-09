@@ -53,7 +53,7 @@ private:
 
 	void program_map(address_map &map) ATTR_COLD;
 
-	required_device<sh3_device> m_maincpu;
+	required_device<sh7708s_device> m_maincpu;
 };
 
 uint32_t m119_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -99,7 +99,7 @@ INPUT_PORTS_END
 void m119_state::m119(machine_config &config)
 {
 	// basic machine hardware
-	SH3LE(config, m_maincpu, 60'000'000); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
+	SH7708S(config, m_maincpu, 60'000'000); // HD6417708S, according to the datasheet operation frequency is 60 MHz.
 	m_maincpu->set_addrmap(AS_PROGRAM, &m119_state::program_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(m119_state::irq2_line_hold));
 
@@ -114,12 +114,11 @@ void m119_state::m119(machine_config &config)
 	// TODO: UPD94244-210 VDP
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16'934'400)); // internal?
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 

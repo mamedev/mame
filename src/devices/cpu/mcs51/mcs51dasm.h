@@ -2,25 +2,9 @@
 // copyright-holders:Steve Ellenoff
 /*****************************************************************************
  *
- *   i8051dasm.c
- *   Portable MCS-51 Family Emulator
+ * Portable MCS-51 Family Disassembler
+ * Copyright Steve Ellenoff
  *
- *   Chips in the family:
- *   8051 Product Line (8031,8051,8751)
- *   8052 Product Line (8032,8052,8752)
- *   8054 Product Line (8054)
- *   8058 Product Line (8058)
- *
- *   Copyright Steve Ellenoff, all rights reserved.
- *
- *  This work is based on:
- *  #1) 'Intel(tm) MC51 Microcontroller Family Users Manual' and
- *  #2) 8051 simulator by Travis Marlatte
- *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
- *
- *****************************************************************************
- * Symbol Memory Name Tables borrowed from:
- * D52 8052 Disassembler - Copyright Jeffery L. Post
  *****************************************************************************/
 
 #ifndef MAME_CPU_MCS51_MCS51DASM_H

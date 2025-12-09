@@ -15,6 +15,7 @@
 #include "osdcomm.h"
 
 #include <array>
+#include <string_view>
 
 
 namespace osd {
@@ -22,6 +23,7 @@ namespace osd {
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
 
 // base for virtual network interface handler
 
@@ -33,13 +35,34 @@ public:
 	virtual void recv_cb(u8 *buf, int len) = 0;
 
 	std::array<u8, 6> const &get_mac() noexcept { return m_mac; }
-	bool get_promisc() noexcept { return m_promisc; }
 
 protected:
 	~network_handler() = default;
 
-	bool m_promisc;
 	std::array<u8, 6> m_mac;
+};
+
+
+// interface to network device
+
+class network_device
+{
+public:
+	virtual ~network_device() = default;
+
+	virtual void start() = 0;
+	virtual void stop() = 0;
+	virtual void poll() = 0;
+	virtual int send(const void *buf, int len) = 0;
+};
+
+
+// description of an available network device
+
+struct network_device_info
+{
+	int id;
+	std::string_view description;
 };
 
 } // namespace osd

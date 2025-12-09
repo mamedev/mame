@@ -79,22 +79,18 @@ void gomoku_sound_device::device_start()
 //  sound_stream_update - handle a stream update in mono
 //-------------------------------------------------
 
-void gomoku_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void gomoku_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
 	sound_channel *voice;
 	short *mix;
 	int ch;
 
 	// if no sound, we're done
 	if (m_sound_enable == 0)
-	{
-		buffer.fill(0);
 		return;
-	}
 
 	// zap the contents of the mixer buffer
-	std::fill_n(&m_mixer_buffer[0], buffer.samples(), 0);
+	std::fill_n(&m_mixer_buffer[0], stream.samples(), 0);
 
 	// loop over each voice and add its contribution
 	for (ch = 0, voice = std::begin(m_channel_list); voice < std::end(m_channel_list); ch++, voice++)
@@ -116,7 +112,7 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 			mix = &m_mixer_buffer[0];
 
 			// add our contribution
-			for (int i = 0; i < buffer.samples(); i++)
+			for (int i = 0; i < stream.samples(); i++)
 			{
 				c += f;
 
@@ -157,8 +153,8 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 
 	// mix it down
 	mix = &m_mixer_buffer[0];
-	for (int i = 0; i < buffer.samples(); i++)
-		buffer.put_int(i, *mix++, 128 * MAX_VOICES);
+	for (int i = 0; i < stream.samples(); i++)
+		stream.put_int(0, i, *mix++, 128 * MAX_VOICES);
 }
 
 

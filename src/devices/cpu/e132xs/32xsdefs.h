@@ -9,18 +9,31 @@
     COMPILE-TIME DEFINITIONS
 ***************************************************************************/
 
-#define PC_REGISTER          0
-#define SR_REGISTER          1
-#define SP_REGISTER         18
-#define UB_REGISTER         19
-#define BCR_REGISTER        20
-#define TPR_REGISTER        21
-#define TCR_REGISTER        22
-#define TR_REGISTER         23
-#define WCR_REGISTER        24
-#define ISR_REGISTER        25
-#define FCR_REGISTER        26
-#define MCR_REGISTER        27
+// compilation boundaries -- how far back/forward does the analysis extend?
+enum : u32
+{
+	COMPILE_BACKWARDS_BYTES     = 128,
+	COMPILE_FORWARDS_BYTES      = 512,
+	COMPILE_MAX_INSTRUCTIONS    = (COMPILE_BACKWARDS_BYTES / 2) + (COMPILE_FORWARDS_BYTES / 2),
+	COMPILE_MAX_SEQUENCE        = 64
+};
+
+enum
+{
+	PC_REGISTER                 =  0,
+	SR_REGISTER                 =  1,
+	FER_REGISTER                =  2,
+	SP_REGISTER                 = 18,
+	UB_REGISTER                 = 19,
+	BCR_REGISTER                = 20,
+	TPR_REGISTER                = 21,
+	TCR_REGISTER                = 22,
+	TR_REGISTER                 = 23,
+	WCR_REGISTER                = 24,
+	ISR_REGISTER                = 25,
+	FCR_REGISTER                = 26,
+	MCR_REGISTER                = 27
+};
 
 #define X_CODE(val)      ((val & 0x7000) >> 12)
 #define E_BIT(val)       ((val & 0x8000) >> 15)
@@ -59,34 +72,41 @@
 #define EMSUBD          0x11e
 #define EHCFFTSD        0x296
 
-/* IRQ numbers */
-#define IRQ_INT1        0
-#define IRQ_INT2        1
-#define IRQ_INT3        2
-#define IRQ_INT4        3
-#define IRQ_IO1         4
-#define IRQ_IO2         5
-#define IRQ_IO3         6
+// IRQ numbers
+enum
+{
+	IRQ_INT1                    = 0,
+	IRQ_INT2                    = 1,
+	IRQ_INT3                    = 2,
+	IRQ_INT4                    = 3,
+	IRQ_IO1                     = 4,
+	IRQ_IO2                     = 5,
+	IRQ_IO3                     = 6
+};
 
-/* Trap numbers */
-#define TRAPNO_IO2                  48
-#define TRAPNO_IO1                  49
-#define TRAPNO_INT4                 50
-#define TRAPNO_INT3                 51
-#define TRAPNO_INT2                 52
-#define TRAPNO_INT1                 53
-#define TRAPNO_IO3                  54
-#define TRAPNO_TIMER                55
-#define TRAPNO_RESERVED1            56
-#define TRAPNO_TRACE_EXCEPTION      57
-#define TRAPNO_PARITY_ERROR         58
-#define TRAPNO_EXTENDED_OVERFLOW    59
-#define TRAPNO_RANGE_ERROR          60
-#define TRAPNO_PRIVILEGE_ERROR      TRAPNO_RANGE_ERROR
-#define TRAPNO_FRAME_ERROR          TRAPNO_RANGE_ERROR
-#define TRAPNO_RESERVED2            61
-#define TRAPNO_RESET                62  // reserved if not mapped @ MEM3
-#define TRAPNO_ERROR_ENTRY          63  // for instruction code of all ones
+// Trap numbers
+enum
+{
+	TRAPNO_IO2                  = 48,
+	TRAPNO_IO1                  = 49,
+	TRAPNO_INT4                 = 50,
+	TRAPNO_INT3                 = 51,
+	TRAPNO_INT2                 = 52,
+	TRAPNO_INT1                 = 53,
+	TRAPNO_IO3                  = 54,
+	TRAPNO_TIMER                = 55,
+	TRAPNO_RESERVED1            = 56,
+	TRAPNO_TRACE_EXCEPTION      = 57,
+	TRAPNO_PARITY_ERROR         = 58,
+	TRAPNO_EXTENDED_OVERFLOW    = 59,
+	TRAPNO_RANGE_ERROR          = 60,
+	TRAPNO_POINTER_ERROR        = TRAPNO_RANGE_ERROR,
+	TRAPNO_PRIVILEGE_ERROR      = TRAPNO_RANGE_ERROR,
+	TRAPNO_FRAME_ERROR          = TRAPNO_RANGE_ERROR,
+	TRAPNO_RESERVED2            = 61,
+	TRAPNO_RESET                = 62,  // reserved if not mapped @ MEM3
+	TRAPNO_ERROR_ENTRY          = 63   // for instruction code of all ones
+};
 
 /* Trap codes */
 #define TRAPLE      4
@@ -110,30 +130,21 @@
 #define E132XS_ENTRY_MEM3   7
 
 /* Memory access */
-/* read byte */
-#define READ_B(addr)            m_program->read_byte((addr))
-/* read half-word */
-#define READ_HW(addr)           m_program->read_word((addr) & ~1)
-/* read word */
-#define READ_W(addr)            m_program->read_dword((addr) & ~3)
+#define READ_B(addr)            m_read_byte(addr)
+#define READ_HW(addr)           m_read_halfword(addr)
+#define READ_W(addr)            m_read_word(addr)
 
-/* write byte */
-#define WRITE_B(addr, data)     m_program->write_byte(addr, data)
-/* write half-word */
-#define WRITE_HW(addr, data)    m_program->write_word((addr) & ~1, data)
-/* write word */
-#define WRITE_W(addr, data)     m_program->write_dword((addr) & ~3, data)
+#define WRITE_B(addr, data)     m_write_byte(addr, data)
+#define WRITE_HW(addr, data)    m_write_halfword(addr, data)
+#define WRITE_W(addr, data)     m_write_word(addr, data)
 
 
 /* I/O access */
-/* read word */
-#define IO_READ_W(addr)         m_io->read_dword(((addr) >> 11) & 0x7ffc)
-/* write word */
-#define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
+#define IO_READ_W(addr)         m_read_io(addr)
+#define IO_WRITE_W(addr, data)  m_write_io(addr, data)
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
-#define MISSIONCRAFT_FLAGS 1
 
 /* Registers */
 
@@ -157,25 +168,31 @@
 #define MCR             m_core->global_regs[27] //Memory Control Register
 // 28 - 31  Reserved
 
-#define C_MASK                  0x00000001
-#define Z_MASK                  0x00000002
-#define N_MASK                  0x00000004
-#define V_MASK                  0x00000008
-#define M_MASK                  0x00000010
-#define H_MASK                  0x00000020
-#define I_MASK                  0x00000080
-#define L_MASK                  0x00008000
-#define T_MASK                  0x00010000
-#define P_MASK                  0x00020000
-#define S_MASK                  0x00040000
-#define ILC_MASK                0x00180000
+constexpr uint32_t  C_MASK                  = 0x00000001;
+constexpr uint32_t  Z_MASK                  = 0x00000002;
+constexpr uint32_t  N_MASK                  = 0x00000004;
+constexpr uint32_t  V_MASK                  = 0x00000008;
+constexpr uint32_t  M_MASK                  = 0x00000010;
+constexpr uint32_t  H_MASK                  = 0x00000020;
+constexpr uint32_t  I_MASK                  = 0x00000080;
+constexpr uint32_t  L_MASK                  = 0x00008000;
+constexpr uint32_t  T_MASK                  = 0x00010000;
+constexpr uint32_t  P_MASK                  = 0x00020000;
+constexpr uint32_t  S_MASK                  = 0x00040000;
+constexpr uint32_t  ILC_MASK                = 0x00180000;
+constexpr uint32_t  FL_MASK                 = 0x01e00000;
+constexpr uint32_t  FP_MASK                 = 0xfe000000;
 
-#define C_SHIFT                 0
-#define Z_SHIFT                 1
-#define N_SHIFT                 2
-#define V_SHIFT                 3
-#define S_SHIFT                 18
-#define ILC_SHIFT               19
+constexpr int       C_SHIFT                 = 0;
+constexpr int       Z_SHIFT                 = 1;
+constexpr int       N_SHIFT                 = 2;
+constexpr int       V_SHIFT                 = 3;
+constexpr int       L_SHIFT                 = 15;
+constexpr int       T_SHIFT                 = 16;
+constexpr int       S_SHIFT                 = 18;
+constexpr int       ILC_SHIFT               = 19;
+constexpr int       FL_SHIFT                = 21;
+constexpr int       FP_SHIFT                = 25;
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY

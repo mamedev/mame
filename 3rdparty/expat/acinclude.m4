@@ -8,5 +8,7 @@ m4_include(conftools/ax-append-flag.m4)
 m4_include(conftools/ax-append-compile-flags.m4)
 m4_include(conftools/ax-append-link-flags.m4)
 m4_include(conftools/expatcfg-compiler-supports-visibility.m4)
+m4_include(conftools/ax-cxx-compile-stdcxx.m4)
+m4_include(conftools/ax-cxx-compile-stdcxx-11.m4)
 
 ### end of file

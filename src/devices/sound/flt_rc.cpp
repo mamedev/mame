@@ -55,34 +55,32 @@ void filter_rc_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void filter_rc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void filter_rc_device::sound_stream_update(sound_stream &stream)
 {
-	auto &src = inputs[0];
-	auto &dst = outputs[0];
-	stream_buffer::sample_t memory = m_memory;
+	sound_stream::sample_t memory = m_memory;
 
-	if (m_last_sample_rate != m_stream->sample_rate())
+	if (m_last_sample_rate != stream.sample_rate())
 	{
 		recalc();
-		m_last_sample_rate = m_stream->sample_rate();
+		m_last_sample_rate = stream.sample_rate();
 	}
 
 	switch (m_type)
 	{
 		case LOWPASS_3R:
 		case LOWPASS:
-			for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
+			for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 			{
-				memory += (src.get(sampindex) - memory) * m_k;
-				dst.put(sampindex, memory);
+				memory += (stream.get(0, sampindex) - memory) * m_k;
+				stream.put(0, sampindex, memory);
 			}
 			break;
 		case HIGHPASS:
 		case AC:
-			for (int sampindex = 0; sampindex < dst.samples(); sampindex++)
+			for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 			{
-				dst.put(sampindex, src.get(sampindex) - memory);
-				memory += (src.get(sampindex) - memory) * m_k;
+				stream.put(0, sampindex, stream.get(0, sampindex) - memory);
+				memory += (stream.get(0, sampindex) - memory) * m_k;
 			}
 			break;
 	}

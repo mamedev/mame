@@ -246,8 +246,8 @@ uint32_t nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_in
 
 	case 1:
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 3, 0);
-		draw_sprites(bitmap, cliprect, 3);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 3, 0);
+		draw_sprites(bitmap, cliprect, 3);
 		draw_sprites(bitmap, cliprect, 2);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 2, 0);
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);

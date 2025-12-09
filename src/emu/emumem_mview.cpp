@@ -241,7 +241,7 @@ public:
 			offs_t nstart, nend, nmask, nmirror;
 			u64 nunitmask;
 			int ncswidth;
-			check_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+			check_range_optimize_all("install_read_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
 				auto hand_r = new handler_entry_read_delegate<Width, AddrShift, READ>(m_view.m_space, flags, handler_r);
@@ -277,7 +277,7 @@ public:
 			offs_t nstart, nend, nmask, nmirror;
 			u64 nunitmask;
 			int ncswidth;
-			check_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
+			check_range_optimize_all("install_write_handler", 8 << AccessWidth, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, cswidth, nstart, nend, nmask, nmirror, nunitmask, ncswidth);
 
 			if constexpr (Width == AccessWidth) {
 				auto hand_w = new handler_entry_write_delegate<Width, AddrShift, WRITE>(m_view.m_space, flags, handler_w);
@@ -556,60 +556,60 @@ void memory_view::initialize_from_address_map(offs_t addrstart, offs_t addrend, 
 }
 
 namespace {
-	template<int Width, int AddrShift> void h_make_1(int HighBits, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
+	template<int Width, int AddrShift> void h_make_1(int HighBits, address_space &space, memory_view &view, offs_t addrstart, offs_t addrend, handler_entry *&r, handler_entry *&w) {
 		switch(HighBits) {
-		case  0: r = new handler_entry_read_dispatch<std::max(0, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(0, Width), Width, AddrShift>(&space, view); break;
-		case  1: r = new handler_entry_read_dispatch<std::max(1, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(1, Width), Width, AddrShift>(&space, view); break;
-		case  2: r = new handler_entry_read_dispatch<std::max(2, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(2, Width), Width, AddrShift>(&space, view); break;
-		case  3: r = new handler_entry_read_dispatch<std::max(3, Width), Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<std::max(3, Width), Width, AddrShift>(&space, view); break;
-		case  4: r = new handler_entry_read_dispatch< 4, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 4, Width, AddrShift>(&space, view); break;
-		case  5: r = new handler_entry_read_dispatch< 5, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 5, Width, AddrShift>(&space, view); break;
-		case  6: r = new handler_entry_read_dispatch< 6, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 6, Width, AddrShift>(&space, view); break;
-		case  7: r = new handler_entry_read_dispatch< 7, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 7, Width, AddrShift>(&space, view); break;
-		case  8: r = new handler_entry_read_dispatch< 8, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 8, Width, AddrShift>(&space, view); break;
-		case  9: r = new handler_entry_read_dispatch< 9, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch< 9, Width, AddrShift>(&space, view); break;
-		case 10: r = new handler_entry_read_dispatch<10, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<10, Width, AddrShift>(&space, view); break;
-		case 11: r = new handler_entry_read_dispatch<11, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<11, Width, AddrShift>(&space, view); break;
-		case 12: r = new handler_entry_read_dispatch<12, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<12, Width, AddrShift>(&space, view); break;
-		case 13: r = new handler_entry_read_dispatch<13, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<13, Width, AddrShift>(&space, view); break;
-		case 14: r = new handler_entry_read_dispatch<14, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<14, Width, AddrShift>(&space, view); break;
-		case 15: r = new handler_entry_read_dispatch<15, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<15, Width, AddrShift>(&space, view); break;
-		case 16: r = new handler_entry_read_dispatch<16, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<16, Width, AddrShift>(&space, view); break;
-		case 17: r = new handler_entry_read_dispatch<17, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<17, Width, AddrShift>(&space, view); break;
-		case 18: r = new handler_entry_read_dispatch<18, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<18, Width, AddrShift>(&space, view); break;
-		case 19: r = new handler_entry_read_dispatch<19, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<19, Width, AddrShift>(&space, view); break;
-		case 20: r = new handler_entry_read_dispatch<20, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<20, Width, AddrShift>(&space, view); break;
-		case 21: r = new handler_entry_read_dispatch<21, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<21, Width, AddrShift>(&space, view); break;
-		case 22: r = new handler_entry_read_dispatch<22, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<22, Width, AddrShift>(&space, view); break;
-		case 23: r = new handler_entry_read_dispatch<23, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<23, Width, AddrShift>(&space, view); break;
-		case 24: r = new handler_entry_read_dispatch<24, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<24, Width, AddrShift>(&space, view); break;
-		case 25: r = new handler_entry_read_dispatch<25, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<25, Width, AddrShift>(&space, view); break;
-		case 26: r = new handler_entry_read_dispatch<26, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<26, Width, AddrShift>(&space, view); break;
-		case 27: r = new handler_entry_read_dispatch<27, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<27, Width, AddrShift>(&space, view); break;
-		case 28: r = new handler_entry_read_dispatch<28, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<28, Width, AddrShift>(&space, view); break;
-		case 29: r = new handler_entry_read_dispatch<29, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<29, Width, AddrShift>(&space, view); break;
-		case 30: r = new handler_entry_read_dispatch<30, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<30, Width, AddrShift>(&space, view); break;
-		case 31: r = new handler_entry_read_dispatch<31, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<31, Width, AddrShift>(&space, view); break;
-		case 32: r = new handler_entry_read_dispatch<32, Width, AddrShift>(&space, view); w = new handler_entry_write_dispatch<32, Width, AddrShift>(&space, view); break;
+		case  0: r = new handler_entry_read_dispatch<std::max(0, Width), Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<std::max(0, Width), Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  1: r = new handler_entry_read_dispatch<std::max(1, Width), Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<std::max(1, Width), Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  2: r = new handler_entry_read_dispatch<std::max(2, Width), Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<std::max(2, Width), Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  3: r = new handler_entry_read_dispatch<std::max(3, Width), Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<std::max(3, Width), Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  4: r = new handler_entry_read_dispatch< 4, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch< 4, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  5: r = new handler_entry_read_dispatch< 5, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch< 5, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  6: r = new handler_entry_read_dispatch< 6, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch< 6, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  7: r = new handler_entry_read_dispatch< 7, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch< 7, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  8: r = new handler_entry_read_dispatch< 8, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch< 8, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case  9: r = new handler_entry_read_dispatch< 9, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch< 9, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 10: r = new handler_entry_read_dispatch<10, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<10, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 11: r = new handler_entry_read_dispatch<11, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<11, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 12: r = new handler_entry_read_dispatch<12, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<12, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 13: r = new handler_entry_read_dispatch<13, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<13, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 14: r = new handler_entry_read_dispatch<14, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<14, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 15: r = new handler_entry_read_dispatch<15, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<15, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 16: r = new handler_entry_read_dispatch<16, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<16, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 17: r = new handler_entry_read_dispatch<17, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<17, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 18: r = new handler_entry_read_dispatch<18, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<18, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 19: r = new handler_entry_read_dispatch<19, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<19, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 20: r = new handler_entry_read_dispatch<20, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<20, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 21: r = new handler_entry_read_dispatch<21, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<21, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 22: r = new handler_entry_read_dispatch<22, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<22, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 23: r = new handler_entry_read_dispatch<23, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<23, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 24: r = new handler_entry_read_dispatch<24, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<24, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 25: r = new handler_entry_read_dispatch<25, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<25, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 26: r = new handler_entry_read_dispatch<26, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<26, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 27: r = new handler_entry_read_dispatch<27, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<27, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 28: r = new handler_entry_read_dispatch<28, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<28, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 29: r = new handler_entry_read_dispatch<29, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<29, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 30: r = new handler_entry_read_dispatch<30, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<30, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 31: r = new handler_entry_read_dispatch<31, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<31, Width, AddrShift>(&space, view, addrstart, addrend); break;
+		case 32: r = new handler_entry_read_dispatch<32, Width, AddrShift>(&space, view, addrstart, addrend); w = new handler_entry_write_dispatch<32, Width, AddrShift>(&space, view, addrstart, addrend); break;
 		default: abort();
 		}
 	}
 
-	void h_make(int HighBits, int Width, int AddrShift, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
+	void h_make(int HighBits, int Width, int AddrShift, address_space &space, memory_view &view, offs_t addrstart, offs_t addrend, handler_entry *&r, handler_entry *&w) {
 		switch (Width | (AddrShift + 4)) {
-		case  8|(4+1): h_make_1<0,  1>(HighBits, space, view, r, w); break;
-		case  8|(4-0): h_make_1<0,  0>(HighBits, space, view, r, w); break;
-		case 16|(4+3): h_make_1<1,  3>(HighBits, space, view, r, w); break;
-		case 16|(4-0): h_make_1<1,  0>(HighBits, space, view, r, w); break;
-		case 16|(4-1): h_make_1<1, -1>(HighBits, space, view, r, w); break;
-		case 32|(4+3): h_make_1<2,  3>(HighBits, space, view, r, w); break;
-		case 32|(4-0): h_make_1<2,  0>(HighBits, space, view, r, w); break;
-		case 32|(4-1): h_make_1<2, -1>(HighBits, space, view, r, w); break;
-		case 32|(4-2): h_make_1<2, -2>(HighBits, space, view, r, w); break;
-		case 64|(4-0): h_make_1<3,  0>(HighBits, space, view, r, w); break;
-		case 64|(4-1): h_make_1<3, -1>(HighBits, space, view, r, w); break;
-		case 64|(4-2): h_make_1<3, -2>(HighBits, space, view, r, w); break;
-		case 64|(4-3): h_make_1<3, -3>(HighBits, space, view, r, w); break;
+		case  8|(4+1): h_make_1<0,  1>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case  8|(4-0): h_make_1<0,  0>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 16|(4+3): h_make_1<1,  3>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 16|(4-0): h_make_1<1,  0>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 16|(4-1): h_make_1<1, -1>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 32|(4+3): h_make_1<2,  3>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 32|(4-0): h_make_1<2,  0>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 32|(4-1): h_make_1<2, -1>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 32|(4-2): h_make_1<2, -2>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 64|(4-0): h_make_1<3,  0>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 64|(4-1): h_make_1<3, -1>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 64|(4-2): h_make_1<3, -2>(HighBits, space, view, addrstart, addrend, r, w); break;
+		case 64|(4-3): h_make_1<3, -3>(HighBits, space, view, addrstart, addrend, r, w); break;
 		default: abort();
 		}
 	}
@@ -623,7 +623,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 
 		if (m_config) {
 			if (m_addrstart != addrstart || m_addrend != addrend)
-				fatalerror("A memory_view must be installed at its configuration address.");
+				fatalerror("A memory_view must be installed at its configuration address. (start %08x != %08x) (end %08x != %08x)", m_addrstart, addrstart, m_addrend, addrend);
 		} else {
 			m_config = &space.space_config();
 			m_addrstart = addrstart;
@@ -635,7 +635,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		offs_t span = addrstart ^ addrend;
 		u32 awidth = 32 - count_leading_zeros_32(span);
 
-		h_make(awidth, m_config->data_width(), m_config->addr_shift(), space, *this, m_handler_read, m_handler_write);
+		h_make(awidth, m_config->data_width(), m_config->addr_shift(), space, *this, addrstart, addrend, m_handler_read, m_handler_write);
 		m_handler_read->ref();
 		m_handler_write->ref();
 	}
@@ -884,7 +884,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_read_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_read_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -906,7 +906,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_read_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_read_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -928,7 +928,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_read_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_read_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -952,7 +952,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_write_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_write_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -974,7 +974,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_write_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_write_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -996,7 +996,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_write_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_write_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -1019,7 +1019,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_readwrite_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_readwrite_before_time", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -1043,7 +1043,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_readwrite_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_readwrite_before_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);
@@ -1067,7 +1067,7 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 			m_addrchars, addrmirror, ws.name());
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_mirror("install_readwrite_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
+	check_range_optimize_mirror("install_readwrite_after_delay", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	r()->select_u(m_id);
 	w()->select_u(m_id);

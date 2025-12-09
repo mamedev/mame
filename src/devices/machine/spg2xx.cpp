@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(SPG28X,     spg28x_device,     "spg28x", "SPG280-series Syste
 
 spg2xx_device::spg2xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t sprite_limit, address_map_constructor internal) :
 	unsp_device(mconfig, type, tag, owner, clock, internal),
-	device_mixer_interface(mconfig, *this, 2),
+	device_mixer_interface(mconfig, *this),
 	m_spg_audio(*this, "spgaudio"),
 	m_spg_io(*this, "spgio"),
 	m_spg_sysdma(*this, "spgsysdma"),
@@ -193,8 +193,8 @@ void spg24x_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->channel_irq_callback().set(FUNC(spg24x_device::audiochirq_w));
 	m_spg_audio->space_read_callback().set(FUNC(spg24x_device::space_r));
 
-	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_spg_audio->add_route(0, *this, 1.0, 0);
+	m_spg_audio->add_route(1, *this, 1.0, 1);
 
 	SPG24X_IO(config, m_spg_io, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 

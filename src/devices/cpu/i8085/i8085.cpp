@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Juergen Buchmueller, hap
+// copyright-holders:Juergen Buchmueller, Roberto Fresca, Grull Osgo
 // thanks-to:Marcel De Kogel
 /*****************************************************************************
  *
  *   Portable I8085A emulator V1.3
  *
- *   Copyright Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller
  *   Partially based on information out of Z80Em by Marcel De Kogel
  *
  *   TODO:
@@ -104,6 +104,11 @@
  * - on 8080, don't push the unsupported flags(X5, X3, V) to stack
  * - it passes on 8080/8085 CPU Exerciser (ref: http://www.idb.me.uk/sunhillow/8080.html
  *   tests only 8080 opcodes, link is dead so go via archive.org)
+ *
+ * April 2025, Roberto Fresca
+ * - Reworked the DSUB (Double Subtraction) undocumented instruction.
+ * - Reworked the RDEL (Rotate D and E Left with Carry) undocumented instruction.
+ *   (ref: https://robertofresca.com/files/New_8085_instruction.pdf)
  *
  *****************************************************************************/
 
@@ -269,26 +274,18 @@ void i8085a_cpu_device::init_tables()
 {
 	for (int i = 0; i < 256; i++)
 	{
-		/* cycles */
+		// cycles
 		lut_cycles[i] = is_8085() ? lut_cycles_8085[i] : lut_cycles_8080[i];
 
-		/* flags */
+		// flags
 		u8 zs = 0;
-		if (i==0) zs |= ZF;
-		if (i&128) zs |= SF;
+		if (i == 0) zs |= ZF;
+		if (i & 0x80) zs |= SF;
 
-		u8 p = 0;
-		if (i&1) ++p;
-		if (i&2) ++p;
-		if (i&4) ++p;
-		if (i&8) ++p;
-		if (i&16) ++p;
-		if (i&32) ++p;
-		if (i&64) ++p;
-		if (i&128) ++p;
+		u8 p = (population_count_32(i) & 1) ? 0 : PF;
 
 		lut_zs[i] = zs;
-		lut_zsp[i] = zs | ((p&1) ? 0 : PF);
+		lut_zsp[i] = zs | p;
 	}
 }
 
@@ -307,15 +304,15 @@ void i8085a_cpu_device::device_start()
 	m_after_ei = 0;
 	m_nmi_state = 0;
 	m_irq_state[3] = m_irq_state[2] = m_irq_state[1] = m_irq_state[0] = 0;
-	m_trap_pending = 0;
+	m_trap_pending = false;
 	m_trap_im_copy = 0;
-	m_sod_state = true; // SOD will go low at reset
+	m_sod_state = 1; // SOD will go low at reset
 	m_in_acknowledge = false;
-	m_ietemp = false;
+	m_ietemp = 0;
 
 	init_tables();
 
-	/* set up the state table */
+	// set up the state table
 	state_add(I8085_PC,     "PC",     m_PC.w.l);
 	state_add(STATE_GENPC,  "GENPC",  m_PC.w.l).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PC.w.l).noshow();
@@ -350,7 +347,7 @@ void i8085a_cpu_device::device_start()
 	space(has_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM).cache(m_copcodes);
 	space(AS_IO).specific(m_io);
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_PC.w.l));
 	save_item(NAME(m_SP.w.l));
 	save_item(NAME(m_AF.w.l));
@@ -382,7 +379,7 @@ void i8085a_cpu_device::device_reset()
 	m_halt = 0;
 	m_im &= ~IM_I75;
 	m_im |= IM_M55 | IM_M65 | IM_M75;
-	m_after_ei = false;
+	m_after_ei = 0;
 	m_trap_pending = false;
 	m_trap_im_copy = 0;
 	set_inte(0);
@@ -430,11 +427,11 @@ void i8085a_cpu_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case I8085_SID:
-			m_ietemp = ((m_im & IM_SID) != 0) && m_in_sid_func() != 0;
+			m_ietemp = ((m_im & IM_SID) && m_in_sid_func()) ? 1 : 0;
 			break;
 
 		case I8085_INTE:
-			m_ietemp = ((m_im & IM_IE) != 0);
+			m_ietemp = (m_im & IM_IE) ? 1 : 0;
 			break;
 
 		default:
@@ -488,7 +485,7 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 {
 	int newstate = (state != CLEAR_LINE);
 
-	/* TRAP is level and edge-triggered NMI */
+	// TRAP is level and edge-triggered NMI
 	if (irqline == I8085_TRAP_LINE)
 	{
 		if (!m_nmi_state && newstate)
@@ -498,7 +495,7 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 		m_nmi_state = newstate;
 	}
 
-	/* RST7.5 is edge-triggered */
+	// RST7.5 is edge-triggered
 	else if (irqline == I8085_RST75_LINE)
 	{
 		if (!m_irq_state[I8085_RST75_LINE] && newstate)
@@ -506,105 +503,105 @@ void i8085a_cpu_device::execute_set_input(int irqline, int state)
 		m_irq_state[I8085_RST75_LINE] = newstate;
 	}
 
-	/* remaining sources are level triggered */
+	// remaining sources are level triggered
 	else if (irqline < std::size(m_irq_state))
 		m_irq_state[irqline] = state;
 }
 
 void i8085a_cpu_device::break_halt_for_interrupt()
 {
-	/* de-halt if necessary */
+	// de-halt if necessary
 	if (m_halt)
 	{
 		m_PC.w.l++;
 		m_halt = 0;
-		set_status(0x26); /* int ack while halt */
+		set_status(0x26); // int ack while halt
 	}
 	else
-		set_status(0x23); /* int ack */
+		set_status(0x23); // int ack
 
 	m_in_acknowledge = true;
 }
 
 void i8085a_cpu_device::check_for_interrupts()
 {
-	/* TRAP is the highest priority */
+	// TRAP is the highest priority
 	if (m_trap_pending)
 	{
-		/* the first RIM after a TRAP reflects the original IE state; remember it here,
-		   setting the high bit to indicate it is valid */
+		// the first RIM after a TRAP reflects the original IE state; remember it here,
+		// setting the high bit to indicate it is valid
 		m_trap_im_copy = m_im | 0x80;
 
-		/* reset the pending state */
+		// reset the pending state
 		m_trap_pending = false;
 
-		/* break out of HALT state and call the IRQ ack callback */
+		// break out of HALT state and call the IRQ ack callback
 		break_halt_for_interrupt();
 		standard_irq_callback(I8085_TRAP_LINE, m_PC.w.l);
 
-		/* push the PC and jump to $0024 */
+		// push the PC and jump to $0024
 		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_TRAP;
 		m_icount -= 11;
 	}
 
-	/* followed by RST7.5 */
+	// followed by RST7.5
 	else if ((m_im & IM_I75) && !(m_im & IM_M75) && (m_im & IM_IE))
 	{
-		/* reset the pending state (which is CPU-visible via the RIM instruction) */
+		// reset the pending state (which is CPU-visible via the RIM instruction)
 		m_im &= ~IM_I75;
 
-		/* break out of HALT state and call the IRQ ack callback */
+		// break out of HALT state and call the IRQ ack callback
 		break_halt_for_interrupt();
 		standard_irq_callback(I8085_RST75_LINE, m_PC.w.l);
 
-		/* push the PC and jump to $003C */
+		// push the PC and jump to $003C
 		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_RST75;
 		m_icount -= 11;
 	}
 
-	/* followed by RST6.5 */
+	// followed by RST6.5
 	else if (m_irq_state[I8085_RST65_LINE] && !(m_im & IM_M65) && (m_im & IM_IE))
 	{
-		/* break out of HALT state and call the IRQ ack callback */
+		// break out of HALT state and call the IRQ ack callback
 		break_halt_for_interrupt();
 		standard_irq_callback(I8085_RST65_LINE, m_PC.w.l);
 
-		/* push the PC and jump to $0034 */
+		// push the PC and jump to $0034
 		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_RST65;
 		m_icount -= 11;
 	}
 
-	/* followed by RST5.5 */
+	// followed by RST5.5
 	else if (m_irq_state[I8085_RST55_LINE] && !(m_im & IM_M55) && (m_im & IM_IE))
 	{
-		/* break out of HALT state and call the IRQ ack callback */
+		// break out of HALT state and call the IRQ ack callback
 		break_halt_for_interrupt();
 		standard_irq_callback(I8085_RST55_LINE, m_PC.w.l);
 
-		/* push the PC and jump to $002C */
+		// push the PC and jump to $002C
 		op_push(m_PC);
 		set_inte(0);
 		m_PC.w.l = ADDR_RST55;
 		m_icount -= 11;
 	}
 
-	/* followed by classic INTR */
+	// followed by classic INTR
 	else if (m_irq_state[I8085_INTR_LINE] && (m_im & IM_IE))
 	{
-		/* break out of HALT state and call the IRQ ack callback */
+		// break out of HALT state and call the IRQ ack callback
 		if (!m_in_inta_func.isunset())
 			standard_irq_callback(I8085_INTR_LINE, m_PC.w.l);
 		break_halt_for_interrupt();
 
 		u8 vector = read_inta();
 
-		/* use the resulting vector as an opcode to execute */
+		// use the resulting vector as an opcode to execute
 		set_inte(0);
 		LOG("i8085 take int $%02x\n", vector);
 		execute_one(vector);
@@ -646,7 +643,7 @@ void i8085a_cpu_device::set_inte(int state)
 
 void i8085a_cpu_device::set_status(u8 status)
 {
-	if (status != m_status)
+	if (!m_out_status_func.isunset() && status != m_status)
 		m_out_status_func(status);
 
 	m_status = status;
@@ -657,12 +654,12 @@ u8 i8085a_cpu_device::get_rim_value()
 	u8 result = m_im;
 	int sid = m_in_sid_func();
 
-	/* copy live RST5.5 and RST6.5 states */
+	// copy live RST5.5 and RST6.5 states
 	result &= ~(IM_I65 | IM_I55);
 	if (m_irq_state[I8085_RST65_LINE]) result |= IM_I65;
 	if (m_irq_state[I8085_RST55_LINE]) result |= IM_I55;
 
-	/* fetch the SID bit if we have a callback */
+	// fetch the SID bit if we have a callback
 	result = (result & ~IM_SID) | (sid ? IM_SID : 0);
 
 	return result;
@@ -870,21 +867,21 @@ void i8085a_cpu_device::op_rst(u8 v)
 
 void i8085a_cpu_device::execute_run()
 {
-	/* check for TRAPs before diving in (can't do others because of after_ei) */
+	// check for TRAPs before diving in (can't do others because of after_ei)
 	if (m_trap_pending || m_after_ei == 0)
 		check_for_interrupts();
 
 	do
 	{
-		/* the instruction after an EI does not take an interrupt, so
-		   we cannot check immediately; handle post-EI behavior here */
+		// the instruction after an EI does not take an interrupt, so
+		// we cannot check immediately; handle post-EI behavior here
 		if (m_after_ei != 0 && --m_after_ei == 0)
 			check_for_interrupts();
 
 		m_in_acknowledge = false;
 		debugger_instruction_hook(m_PC.d);
 
-		/* here we go... */
+		// here we go...
 		execute_one(read_op());
 
 	} while (m_icount > 0);
@@ -928,16 +925,31 @@ void i8085a_cpu_device::execute_one(int opcode)
 			m_AF.b.l = (m_AF.b.l & 0xfe) | (m_AF.b.h & CF);
 			break;
 
-		case 0x08: // 8085: undocumented DSUB, otherwise undocumented NOP
+		case 0x08: // 8085: undocumented DSUB (Double Subtraction, HL - BC)
 			if (is_8085())
 			{
-				int q = m_HL.b.l - m_BC.b.l;
-				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.l ^ q ^ m_BC.b.l) & HF) | (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ q) & SF) >> 5);
-				m_HL.b.l = q;
-				q = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
-				m_AF.b.l = lut_zs[q & 0xff] | ((q >> 8) & CF) | VF | ((m_HL.b.h ^ q ^ m_BC.b.h) & HF) | (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ q) & SF) >> 5);
-				if (m_HL.b.l != 0)
-					m_AF.b.l &= ~ZF;
+				// Low byte subtraction: L = L - C
+				int q_low = m_HL.b.l - m_BC.b.l;
+				u8 res_low = q_low & 0xff;
+				// Calculate flags for low byte
+				m_AF.b.l = lut_zs[res_low]
+					| ((q_low >> 8) & CF) // Carry
+					| ((m_HL.b.l ^ res_low ^ m_BC.b.l) & HF) // Half Carry
+					| (((m_BC.b.l ^ m_HL.b.l) & (m_HL.b.l ^ res_low) & SF)) >> 5; // Overflow
+				m_HL.b.l = res_low;
+
+				// High byte subtraction: H = H - B - carry_from_low
+				int q_high = m_HL.b.h - m_BC.b.h - (m_AF.b.l & CF);
+				u8 res_high = q_high & 0xff;
+				// Calculate flags for high byte
+				m_AF.b.l = lut_zs[res_high]
+					| ((q_high >> 8) & CF) // Carry
+					| ((m_HL.b.h ^ res_high ^ m_BC.b.h) & HF) // Half Carry
+					| (((m_BC.b.h ^ m_HL.b.h) & (m_HL.b.h ^ res_high) & SF)) >> 5; // Overflow
+				m_HL.b.h = res_high;
+
+				// Set Zero flag based on 16-bit result
+				m_AF.b.l = (m_AF.b.l & ~ZF) | (((m_HL.b.l | m_HL.b.h) == 0) ? ZF : 0);
 			}
 			break;
 		case 0x09: // DAD B
@@ -1010,11 +1022,12 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		}
 
-		case 0x18: // 8085: undocumented RDEL, otherwise undocumented NOP
+		case 0x18: // 8085: undocumented RDEL (Rotate D and E Left through Carry), otherwise undocumented NOP
 			if (is_8085())
 			{
-				m_AF.b.l = (m_AF.b.l & ~(CF | VF)) | (m_DE.b.h >> 7);
-				m_DE.w.l = (m_DE.w.l << 1) | (m_DE.w.l >> 15);
+				int c = m_AF.b.l & CF;                                // save old carry state
+				m_AF.b.l = (m_AF.b.l & ~(CF | VF)) | (m_DE.b.h >> 7); // set new carry state
+				m_DE.w.l = (m_DE.w.l << 1) | c;                       // rotate with carry
 				if ((((m_DE.w.l >> 15) ^ m_AF.b.l) & CF) != 0)
 					m_AF.b.l |= VF;
 			}

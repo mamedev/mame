@@ -164,9 +164,9 @@ static INPUT_PORTS_START( clpoker )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) ) // $E014
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x04, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )
 	PORT_DIPNAME( 0x30, 0x30, "Key In/Out" ) // $E015
 	PORT_DIPSETTING(    0x30, "50 Credits" )
 	PORT_DIPSETTING(    0x20, "100 Credits" )

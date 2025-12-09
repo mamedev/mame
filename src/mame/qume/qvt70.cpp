@@ -35,10 +35,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/z80sio.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+
 #include "emupal.h"
 #include "screen.h"
 

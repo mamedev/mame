@@ -43,49 +43,78 @@ public:
 	acorn_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 
+private:
 	// configuration
 	required_device<acorn_bus_device> m_bus;
+	device_acorn_bus_interface *m_card;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(ACORN_BUS_SLOT, acorn_bus_slot_device)
 
 
-
 // ======================> acorn_bus_device
-class acorn_bus_device : public device_t
+
+class acorn_bus_device : public device_t, public device_memory_interface
 {
 public:
 	// construction/destruction
-	acorn_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	acorn_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	~acorn_bus_device() { m_device_list.detach_all(); }
 
-	// inline configuration
-	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
+	void add_card(device_acorn_bus_interface &card);
+
+	// callbacks
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
+	auto cb1_handler() { return m_cb1_handler.bind(); }
+	auto cb2_handler() { return m_cb2_handler.bind(); }
 
 	address_space &memspace() const { return *m_space; }
 
-	void irq_w(int state);
-	void nmi_w(int state);
+	void set_blk0(uint8_t blk0) { m_blk0 = blk0 & 0x0f; }
+	uint8_t blk0() { return m_blk0; }
 
-	void add_slot(acorn_bus_slot_device &slot);
+	void irq_w(int state) { m_out_irq_cb(state); }
+	void nmi_w(int state) { m_out_nmi_cb(state); }
+
+	// from slot
+	void cb1_w(int state) { m_cb1_handler(state); }
+	void cb2_w(int state) { m_cb2_handler(state); }
+
+	// from host
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t pb_r();
+	void pb_w(uint8_t data);
+	void write_cb1(int state);
+	void write_cb2(int state);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override;
+
+private:
 	// internal state
-	required_address_space m_space;
+	address_space_config m_space_config;
+
+	address_space *m_space;
 
 	devcb_write_line m_out_irq_cb;
 	devcb_write_line m_out_nmi_cb;
+	devcb_write_line m_cb1_handler;
+	devcb_write_line m_cb2_handler;
 
-	std::forward_list<acorn_bus_slot_device *> m_slot_list;
+	uint8_t m_blk0 = 0x00;
+
+	simple_list<device_acorn_bus_interface> m_device_list;
 };
 
 
@@ -94,29 +123,36 @@ DECLARE_DEVICE_TYPE(ACORN_BUS, acorn_bus_device)
 
 // ======================> device_acorn_bus_interface
 
-// class representing interface-specific live acorn bus card
 class device_acorn_bus_interface : public device_interface
 {
-public:
 	friend class acorn_bus_device;
+	template <class ElementType> friend class simple_list;
 
-	// construction/destruction
-	virtual ~device_acorn_bus_interface();
+public:
+	device_acorn_bus_interface *next() const { return m_next; }
 
-	// inline configuration
-	void set_acorn_bus(acorn_bus_device &bus) { assert(!device().started()); m_bus = &bus; }
+	virtual uint8_t pb_r() { return 0xff; }
+	virtual void pb_w(uint8_t data) { }
+	virtual void write_cb1(int state) { }
+	virtual void write_cb2(int state) { }
 
 protected:
 	device_acorn_bus_interface(const machine_config &mconfig, device_t &device);
 
 	virtual void interface_pre_start() override;
 
-	acorn_bus_device  *m_bus;
+	acorn_bus_device *m_bus;
+	acorn_bus_slot_device *const m_slot;
+
+private:
+	device_acorn_bus_interface *m_next;
 };
 
 
 void acorn_bus_devices(device_slot_interface &device);
 void atom_bus_devices(device_slot_interface &device);
+void atom_pl8_devices(device_slot_interface &device);
+void eurocube_bus_devices(device_slot_interface &device);
 void cms_bus_devices(device_slot_interface &device);
 
 

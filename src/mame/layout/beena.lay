@@ -3,6 +3,8 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
+	<element name="card" />
+
 	<element name="pencursor">
 		<image state="1">
 			<data><![CDATA[
@@ -51,77 +53,140 @@ license:CC0-1.0
 		</element>
 	</view>
 
+	<view name="Storyware and Card View">
+		<screen index="0">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+
+		<element id="leftpage" ref="leftpage">
+			<bounds x="0" y="3.1" width="2" height="2.8" />
+		</element>
+		<element id="rightpage" ref="rightpage">
+			<bounds x="2" y="3.1" width="2" height="2.8" />
+		</element>
+
+		<element id="pencursor" ref="pencursor">
+			<!-- will be positioned by script -->
+			<bounds x="0" y="3.1" width="0.2" height="0.2" />
+			<color alpha="0.7" />
+		</element>
+
+		<element ref="card">
+			<bounds x="0" y="6" width="4" height="2.65" />
+		</element>
+	</view>
+
 	<script><![CDATA[
+		local function init_storyware(view)
+			-- get memory regions for page scans
+			local pages = { }
+			for i = 1, 12 do
+				local page = file.device:memregion(string.format('cartslot:page%u', i))
+				if page ~= nil then
+					pages[i] = page
+				else
+					break
+				end
+			end
+
+			-- left/right page items are needed on-the-fly
+			local leftpage = file.views[view].items['leftpage']
+			local rightpage = file.views[view].items['rightpage']
+
+			-- recompute target pen cursor size and area when necessary
+			local curxoffs, curyoffs, curxscale, curyscale, curwidth, curheight
+			file.views[view]:set_recomputed_callback(
+					function ()
+						local lbounds = leftpage.bounds
+						local rbounds = rightpage.bounds
+						curwidth = lbounds.width / 10
+						curheight = lbounds.height / 14
+						curxoffs = lbounds.x0 - (curwidth * 0.5)
+						curyoffs = lbounds.y0 - (curheight * 0.5)
+						curxscale = (rbounds.x1 - lbounds.x0) / 255
+						curyscale = lbounds.height / 255
+					end)
+
+			-- make page display respond to page selection input
+			local pagectrl = file.device:ioport('PAGE')
+			local function get_page() return pagectrl:read() end
+			leftpage:set_element_state_callback(get_page)
+			rightpage:set_element_state_callback(get_page)
+
+			-- render even pages on the left, odd pages on the right
+			local function draw_page(n, dest)
+				local page = pages[n]
+				if page ~= nil then
+					-- TODO: reduce temporary memory usage when I/O classes are exposed to Lua
+					local data = page:read(0, page.size)
+					local image = emu.bitmap_argb32.load(data)
+					image:resample(dest)
+				end
+			end
+			file.elements['leftpage']:set_draw_callback(
+					function (state, bitmap)
+						draw_page(state * 2, bitmap)
+					end)
+			file.elements['rightpage']:set_draw_callback(
+					function (state, bitmap)
+						draw_page((state * 2) + 1, bitmap)
+					end)
+
+			-- animate the position of the pen cursor
+			local penctrl = file.device:ioport('PEN_LEFT')
+			local penx = file.device:ioport('PENX')
+			local peny = file.device:ioport('PENY')
+			file.views[view].items['pencursor']:set_element_state_callback(
+					function ()
+						return (penctrl:read() & 2) >> 1
+					end)
+			file.views[view].items['pencursor']:set_bounds_callback(
+					function ()
+						local x = curxoffs + (penx:read() * curxscale)
+						local y = curyoffs + (peny:read() * curyscale)
+						return emu.render_bounds(x, y, x + curwidth, y + curheight)
+					end)
+		end
+
+		local sub -- keep this here to avoid it being garbage collected prematurely
+
+		local function init_card()
+			-- get card slot device and card display element
+			local card_device = emu.image_enumerator(file.device)['card']
+			local card_element = file.elements['card']
+
+			-- invalidate the card display on media change
+			local card_data = card_device.device:memregion('card')
+			sub = card_device:add_media_change_notifier(
+					function (event)
+						card_data = card_device.device:memregion('card')
+						card_element:invalidate()
+					end)
+
+			-- draw the card image
+			card_element:set_draw_callback(
+					function (state, bitmap)
+						if card_data ~= nil then
+							-- TODO: reduce temporary memory usage when I/O classes are exposed to Lua
+							local data = card_data:read(0, card_data.size)
+							local image = emu.bitmap_argb32.load(data)
+							image:resample(bitmap)
+						end
+					end)
+		end
+
 		file:set_resolve_tags_callback(
 				function ()
-					-- get memory regions for page scans
-					local pages = { }
-					for i = 1, 12 do
-						local page = file.device:memregion(string.format('cartslot:page%u', i))
-						if page ~= nil then
-							pages[i] = page
-						else
-							break
-						end
+					local barcode_device = emu.device_enumerator(file.device, 3)[':card:rd']
+					if barcode_device == nil then
+						barcode_device = emu.device_enumerator(file.device, 3)[':card:rd2061']
 					end
-
-					-- left/right page items are needed on-the-fly
-					local leftpage = file.views['Default View'].items['leftpage']
-					local rightpage = file.views['Default View'].items['rightpage']
-
-					-- recompute target pen cursor size and area when necessary
-					local curxoffs, curyoffs, curxscale, curyscale, curwidth, curheight
-					file.views['Default View']:set_recomputed_callback(
-							function ()
-								local lbounds = leftpage.bounds
-								local rbounds = rightpage.bounds
-								curwidth = lbounds.width / 10
-								curheight = lbounds.height / 14
-								curxoffs = lbounds.x0 - (curwidth * 0.5)
-								curyoffs = lbounds.y0 - (curheight * 0.5)
-								curxscale = (rbounds.x1 - lbounds.x0) / 255
-								curyscale = lbounds.height / 255
-							end)
-
-					-- make page display respond to page selection input
-					local pagectrl = file.device:ioport('PAGE')
-					local function get_page() return pagectrl:read() end
-					leftpage:set_element_state_callback(get_page)
-					rightpage:set_element_state_callback(get_page)
-
-					-- render even pages on the left, odd pages on the right
-					local function draw_page(n, dest)
-						local page = pages[n]
-						if page ~= nil then
-							-- TODO: reduce temporary memory usage when I/O classes are exposed to Lua
-							local data = page:read(0, page.size)
-							local image = emu.bitmap_argb32.load(data)
-							image:resample(dest)
-						end
+					if barcode_device == nil then
+						init_storyware('Default View')
+					else
+						init_storyware('Storyware and Card View')
+						init_card()
 					end
-					file.elements['leftpage']:set_draw_callback(
-							function (state, bitmap)
-								draw_page(state * 2, bitmap)
-							end)
-					file.elements['rightpage']:set_draw_callback(
-							function (state, bitmap)
-								draw_page((state * 2) + 1, bitmap)
-							end)
-
-					-- animate the position of the pen cursor
-					local penctrl = file.device:ioport('PEN_LEFT')
-					local penx = file.device:ioport('PENX')
-					local peny = file.device:ioport('PENY')
-					file.views['Default View'].items['pencursor']:set_element_state_callback(
-							function ()
-								return (penctrl:read() & 2) >> 1
-							end)
-					file.views['Default View'].items['pencursor']:set_bounds_callback(
-							function ()
-								local x = curxoffs + (penx:read() * curxscale)
-								local y = curyoffs + (peny:read() * curyscale)
-								return emu.render_bounds(x, y, x + curwidth, y + curheight)
-							end)
 				end)
 	]]></script>
 </mamelayout>

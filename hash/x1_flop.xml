@@ -124,12 +124,12 @@ Cannot select other options in main menu, including user disk creation [KBD]
 		</part>
 	</software>
 
-	<software name="alpha" supported="no">
+	<software name="alpha" supported="yes">
 		<description>Alpha</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<notes><![CDATA[
-Corrupt space ship GFX on first gameplay screen, [z80dma] or [FDC]
+Extensive use of [z80dma]
 ]]></notes>
 
 		<info name="usage" value="x1turbo only" />
@@ -1035,23 +1035,6 @@ IPL loading resolves to a red and corrupt screen, baddump?
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="gra_kai.d88" size="348848" crc="008bada3" sha1="b19eee31909e555e8f96900bcf49469e1891cd37"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gruppe" supported="no">
-		<description>Gruppe</description>
-		<year>1985</year>
-		<publisher>SPS</publisher>
-		<notes><![CDATA[
-Shows a random bitmap graphic then returns "program load error", wants [FDC] write protection enabled (regression)
-]]></notes>
-
-		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="ぐるっぺ"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="gruppe.d88" size="348848" crc="a50dfd33" sha1="551749d2ec4deb3919f2111d234450fd4f90d54a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3394,19 +3377,6 @@ Expects [KBD] name entry presses with shift held
 		</part>
 	</software>
 
-	<software name="victnine">
-		<description>Victorious Nine</description>
-		<year>1985</year>
-		<publisher>ニデコム (Nidecom)</publisher>
-		<info name="release" value="198509xx"/>
-		<info name="alt_title" value="ビクトリアスナイン"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="350560">
-				<rom name="victorious nine.d88" size="350560" crc="2fc94dfd" sha1="e29f55bed953e0304d88b8eed9448f31eb888298"/>
-			</dataarea>
-		</part>
-	</software>
-
 <!-- There exists an alt checksum for the first disk (due to differences only in the d88 header, but exact same data)
     <rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f"/>
 -->
@@ -3806,6 +3776,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 		<description>The Curse of Mars</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="the curse of mars.2d" size="327680" crc="2d7eceae" sha1="e50d56313904d5c246abddac3293a0dd51aeca36"/>
@@ -3817,6 +3788,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 		<description>The Curse of Mars (alt)</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="developer" value="M.N.M. Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="mars.2d" size="327680" crc="7a879e8c" sha1="476ede9ca7a83d57eaf6e14d06cfb7592f75988c"/>

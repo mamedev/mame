@@ -11,6 +11,15 @@
 #include "qix.h"
 
 
+#define LOG_MCU (1 << 1)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGMCU(...) LOGMASKED(LOG_MCU, __VA_ARGS__)
+
+
 /*************************************
  *
  *  Machine initialization
@@ -47,9 +56,9 @@ void zookeep_state::machine_start()
 		qix_state::machine_start();
 
 	// configure the banking
-	m_vidbank->configure_entry(0, memregion("videocpu")->base() + 0xa000);
-	m_vidbank->configure_entry(1, memregion("videocpu")->base() + 0x10000);
-	m_vidbank->set_entry(0);
+	m_videobank->configure_entry(0, memregion("videocpu")->base() + 0xa000);
+	m_videobank->configure_entry(1, memregion("videocpu")->base() + 0x10000);
+	m_videobank->set_entry(0);
 }
 
 /*************************************
@@ -58,9 +67,9 @@ void zookeep_state::machine_start()
  *
  *************************************/
 
-void qix_state::qix_vsync_changed(int state)
+void qix_state::vsync_changed(int state)
 {
-	m_sndpia0->cb1_w(state);
+	m_sndpia[0]->cb1_w(state);
 }
 
 
@@ -73,9 +82,9 @@ void qix_state::qix_vsync_changed(int state)
 
 void zookeep_state::bankswitch_w(uint8_t data)
 {
-	m_vidbank->set_entry(BIT(data, 2));
+	m_videobank->set_entry(BIT(data, 2));
 	// not necessary, but technically correct
-	qix_palettebank_w(data);
+	palettebank_w(data);
 }
 
 
@@ -86,19 +95,19 @@ void zookeep_state::bankswitch_w(uint8_t data)
  *
  *************************************/
 
-void qix_state::qix_data_firq_w(uint8_t data)
+void qix_state::data_firq_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
-void qix_state::qix_data_firq_ack_w(uint8_t data)
+void qix_state::data_firq_ack_w(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-uint8_t qix_state::qix_data_firq_r(address_space &space)
+uint8_t qix_state::data_firq_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -106,7 +115,7 @@ uint8_t qix_state::qix_data_firq_r(address_space &space)
 }
 
 
-uint8_t qix_state::qix_data_firq_ack_r(address_space &space)
+uint8_t qix_state::data_firq_ack_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
@@ -121,19 +130,19 @@ uint8_t qix_state::qix_data_firq_ack_r(address_space &space)
  *
  *************************************/
 
-void qix_state::qix_video_firq_w(uint8_t data)
+void qix_state::video_firq_w(uint8_t data)
 {
 	m_videocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
-void qix_state::qix_video_firq_ack_w(uint8_t data)
+void qix_state::video_firq_ack_w(uint8_t data)
 {
 	m_videocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-uint8_t qix_state::qix_video_firq_r(address_space &space)
+uint8_t qix_state::video_firq_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_videocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -141,7 +150,7 @@ uint8_t qix_state::qix_video_firq_r(address_space &space)
 }
 
 
-uint8_t qix_state::qix_video_firq_ack_r(address_space &space)
+uint8_t qix_state::video_firq_ack_r(address_space &space)
 {
 	if (!machine().side_effects_disabled())
 		m_videocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
@@ -158,16 +167,17 @@ uint8_t qix_state::qix_video_firq_ack_r(address_space &space)
 
 uint8_t qixmcu_state::coin_r()
 {
-	logerror("qixmcu_state, coin_r = %02X\n", m_68705_porta_out);
+	if (!machine().side_effects_disabled())
+		LOGMCU("qixmcu_state, coin_r = %02X\n", m_68705_porta_out);
 	return m_68705_porta_out;
 }
 
 
 void qixmcu_state::coin_w(uint8_t data)
 {
-	logerror("qixmcu_state, coin_w = %02X\n", data);
+	LOGMCU("qixmcu_state, coin_w = %02X\n", data);
 	// this is a callback called by pia6821_device::write(), so I don't need to synchronize
-	// the CPUs - they have already been synchronized by qix_pia_w()
+	// the CPUs - they have already been synchronized by pia_w()
 	m_mcu->pa_w(data);
 }
 
@@ -187,9 +197,9 @@ void qixmcu_state::coinctrl_w(uint8_t data)
 	}
 
 	// this is a callback called by pia6821_device::write(), so I don't need to synchronize
-	// the CPUs - they have already been synchronized by qix_pia_w()
+	// the CPUs - they have already been synchronized by pia_w()
 	m_coinctrl = data;
-	logerror("qixmcu_state, coinctrl_w = %02X\n", data);
+	LOGMCU("qixmcu_state, coinctrl_w = %02X\n", data);
 }
 
 
@@ -221,7 +231,7 @@ uint8_t qixmcu_state::mcu_portc_r()
 
 void qixmcu_state::mcu_porta_w(uint8_t data)
 {
-	logerror("68705:portA_w = %02X\n", data);
+	LOGMCU("68705:portA_w = %02X\n", data);
 	m_68705_porta_out = data;
 }
 
@@ -229,8 +239,8 @@ void qixmcu_state::mcu_porta_w(uint8_t data)
 void qixmcu_state::mcu_portb_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= mem_mask;
-	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
-	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 6));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
 
@@ -243,11 +253,11 @@ void qixmcu_state::mcu_portb_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 
 TIMER_CALLBACK_MEMBER(qix_state::pia_w_callback)
 {
-	m_pia0->write(param >> 8, param & 0xff);
+	m_pia[0]->write(param >> 8, param & 0xff);
 }
 
 
-void qix_state::qix_pia_w(offs_t offset, uint8_t data)
+void qix_state::pia_w(offs_t offset, uint8_t data)
 {
 	// make all the CPUs synchronize, and only AFTER that write the command to the PIA
 	// otherwise the 68705 will miss commands
@@ -262,60 +272,14 @@ void qix_state::qix_pia_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void qix_state::qix_coinctl_w(uint8_t data)
+void qix_state::coinctr_w(uint8_t data)
 {
-	machine().bookkeeping().coin_lockout_w(0, (~data >> 2) & 1);
-	machine().bookkeeping().coin_counter_w(0, (data >> 1) & 1);
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1));
 }
 
-void slither_state::slither_coinctl_w(uint8_t data)
+void slither_state::slither_coinctr_w(uint8_t data)
 {
-	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
-	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 1);
-}
-
-
-
-/*************************************
- *
- *  Slither SN76489 I/O
- *
- *************************************/
-
-void slither_state::sn76489_0_ctrl_w(int state)
-{
-	// write to the sound chip
-	if (!state && m_sn76489_ctrl[0])
-		m_sn[0]->write(m_pia1->b_output());
-
-	m_sn76489_ctrl[0] = bool(state);
-}
-
-
-void slither_state::sn76489_1_ctrl_w(int state)
-{
-	// write to the sound chip
-	if (!state && m_sn76489_ctrl[1])
-		m_sn[1]->write(m_pia2->b_output());
-
-	m_sn76489_ctrl[1] = bool(state);
-}
-
-
-
-/*************************************
- *
- *  Slither trackball I/O
- *
- *************************************/
-
-uint8_t slither_state::trak_lr_r()
-{
-	return m_trak[m_flip ? 3 : 1]->read();
-}
-
-
-uint8_t slither_state::trak_ud_r()
-{
-	return m_trak[m_flip ? 2 : 0]->read();
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 6));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 }

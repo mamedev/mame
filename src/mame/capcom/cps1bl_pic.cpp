@@ -472,8 +472,7 @@ void dinopic_state::dinopic(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dinopic_state::dinopic_map);
-	m_maincpu->set_vblank_int("screen", FUNC(dinopic_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &dinopic_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dinopic_state::irq2_line_hold));
 
 	PIC16C57(config, m_pic, 30_MHz_XTAL / 8);
 	m_pic->write_a().set_membank(m_okibank).mask(0x0f);
@@ -495,6 +494,7 @@ void dinopic_state::dinopic(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(dinopic_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(dinopic_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(dinopic_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -515,8 +515,7 @@ void cps1bl_pic_state::punipic(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::punipic_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::irq2_line_hold));
 
 	PIC16C57(config, m_pic, 30_MHz_XTAL / 8);
 	m_pic->write_a().set_membank(m_okibank).mask(0x0f);
@@ -537,6 +536,7 @@ void cps1bl_pic_state::punipic(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(cps1bl_pic_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(cps1bl_pic_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(cps1bl_pic_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -557,8 +557,7 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::slampic_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::irq2_line_hold));
 
 	PIC16C57(config, m_pic, 12000000);
 	m_pic->set_disable(); // no valid dump
@@ -575,6 +574,7 @@ void cps1bl_pic_state::slampic(machine_config &config)
 	m_screen->set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1 );
 	m_screen->set_screen_update(FUNC(cps1bl_pic_state::screen_update_fcrash));
 	m_screen->screen_vblank().set(FUNC(cps1bl_pic_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(cps1bl_pic_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -592,8 +592,7 @@ void slampic2_state::slampic2(machine_config &config)
 {
 	M68000(config, m_maincpu, 10000000);  // measured
 	m_maincpu->set_addrmap(AS_PROGRAM, &slampic2_state::slampic2_map);
-	m_maincpu->set_vblank_int("screen", FUNC(slampic2_state::cps1_interrupt));
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &slampic2_state::cpu_space_map);
+	m_maincpu->set_vblank_int("screen", FUNC(slampic2_state::irq2_line_hold));
 
 	PIC16C57(config, m_pic, 4000000); // measured
 	m_pic->set_disable();
@@ -604,6 +603,7 @@ void slampic2_state::slampic2(machine_config &config)
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(slampic2_state::screen_update_fcrash));
 	//m_screen->screen_vblank().set(FUNC(slampic2_state::screen_vblank_cps1));
+	//m_screen->screen_vblank().append(FUNC(slampic2_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -843,7 +843,6 @@ void cps1bl_pic_state::init_dinopic()
 {
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
-	init_cps1();
 }
 
 void cps1bl_pic_state::init_punipic()
@@ -876,8 +875,6 @@ void slampic2_state::init_slampic2()
 
 	m_bootleg_work_ram = std::make_unique<uint16_t[]>(0x20000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf00000, 0xf3ffff, m_bootleg_work_ram.get());
-
-	init_cps1();
 }
 
 void wofpic_state::init_wofpic()
@@ -885,7 +882,6 @@ void wofpic_state::init_wofpic()
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x990000, 0x990001, write16smo_delegate(*this, FUNC(wofpic_state::wofpic_spr_base_w)));
-	init_cps1();
 }
 
 

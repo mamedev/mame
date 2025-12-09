@@ -10,23 +10,27 @@
   FsFF7000: Bit 2 is VBL IRQ enable/ack
   FsFF7001: Bit 0 is VBL status
 
+  All of Lapis' cards for Macs have the same architecture:
+    A Xilinx FPGA that the declaration ROM reprograms for each color depth
+    A TLC34075 or TLC34076 RAMDAC
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "pds30_procolor816.h"
+
+#include "video/tlc34076.h"
+
 #include "screen.h"
 
 #include <algorithm>
 
+static constexpr u32 VRAM_SIZE  =   0x200000;
 
-#define PROCOLOR816_SCREEN_NAME "cb264_screen"
-#define PROCOLOR816_ROM_REGION  "cb264_rom"
-
-#define VRAM_SIZE   (0x200000)  // 2 megs?
-
+namespace {
 
 ROM_START( procolor816 )
-	ROM_REGION(0x8000, PROCOLOR816_ROM_REGION, 0)
+	ROM_REGION(0x8000, "declrom", 0)
 	ROM_LOAD( "procolor_ver60590.bin", 0x000000, 0x008000, CRC(ebef6168) SHA1(e41ecc7d12fc13bc74f9223ca02920e8a7eb072b) )
 ROM_END
 
@@ -34,94 +38,110 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PDS030_PROCOLOR816, nubus_procolor816_device, "pd3_pc16", "Lapis ProColor Server 8*16")
+class nubus_procolor816_device : public device_t,
+								 public device_video_interface,
+								 public device_nubus_card_interface
+{
+public:
+	// construction/destruction
+	nubus_procolor816_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
+	nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void card_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(vbl_tick);
+
+	bool m_has_15bpp;
+
+private:
+	u8 regs_r(offs_t offset);
+	void regs_w(offs_t offset, u8 data);
+	u32 vram_r(offs_t offset, u32 mem_mask = ~0);
+	void vram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	required_device<screen_device> m_screen;
+	required_device<tlc34076_device> m_dac;
+
+	std::unique_ptr<u32[]> m_vram;
+	u8 m_video_enable, m_vbl_disable;
+	emu_timer *m_timer;
+};
+
+void nubus_procolor816_device::card_map(address_map &map)
+{
+	map(0x00'0000, 0x1f'ffff).rw(FUNC(nubus_procolor816_device::vram_r), FUNC(nubus_procolor816_device::vram_w));
+	map(0xfd'6000, 0xfd'603f).rw(m_dac, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask32(0x00ff0000);
+	map(0xfd'7000, 0xfd'7fff).rw(FUNC(nubus_procolor816_device::regs_r), FUNC(nubus_procolor816_device::regs_w));
+	map(0xff'6000, 0xff'601f).rw(m_dac, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask32(0x00ff00ff);
+	map(0xff'7000, 0xff'7fff).rw(FUNC(nubus_procolor816_device::regs_r), FUNC(nubus_procolor816_device::regs_w));
+}
 
 void nubus_procolor816_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, PROCOLOR816_SCREEN_NAME, SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(nubus_procolor816_device::screen_update));
-	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	screen.set_size(1024, 768);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-}
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(nubus_procolor816_device::screen_update));
+	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
+	TLC34076(config, m_dac, tlc34076_device::TLC34076_8_BIT);   // actually a TLC34075, but I can't find a difference
+}
 
 const tiny_rom_entry *nubus_procolor816_device::device_rom_region() const
 {
 	return ROM_NAME( procolor816 );
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  nubus_procolor816_device - constructor
-//-------------------------------------------------
-
-nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_procolor816_device(mconfig, PDS030_PROCOLOR816, tag, owner, clock)
 {
 }
 
-nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	device_nubus_card_interface(mconfig, *this),
-	m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	m_has_15bpp(true),
+	m_screen(*this, "screen"),
+	m_dac(*this, "tlc34076"),
+	m_video_enable(0),
+	m_vbl_disable(0),
+	m_timer(nullptr)
 {
-	set_screen(*this, PROCOLOR816_SCREEN_NAME);
+	set_screen(*this, "screen");
 }
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void nubus_procolor816_device::device_start()
 {
-	uint32_t slotspace;
+	m_vram = make_unique_clear<u32[]>(VRAM_SIZE / sizeof(u32));
 
-	install_declaration_rom(PROCOLOR816_ROM_REGION);
-
-	slotspace = get_slotspace();
-
-//  printf("[procolor816 %p] slotspace = %x\n", this, slotspace);
-
-	m_vram.resize(VRAM_SIZE / sizeof(uint32_t));
-
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32s_delegate(*this, FUNC(nubus_procolor816_device::vram_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::vram_w)));
-	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32s_delegate(*this, FUNC(nubus_procolor816_device::vram_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::vram_w)));
-	nubus().install_device(slotspace+0xf00000, slotspace+0xff7fff, read32s_delegate(*this, FUNC(nubus_procolor816_device::procolor816_r)), write32s_delegate(*this, FUNC(nubus_procolor816_device::procolor816_w)));
+	install_declaration_rom("declrom");
+	nubus().install_map(*this, &nubus_procolor816_device::card_map);
 
 	m_timer = timer_alloc(FUNC(nubus_procolor816_device::vbl_tick), this);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
-}
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
+	save_item(NAME(m_video_enable));
+	save_item(NAME(m_vbl_disable));
+	save_pointer(NAME(m_vram), VRAM_SIZE / sizeof(u32));
+}
 
 void nubus_procolor816_device::device_reset()
 {
-	m_count = 0;
-	m_clutoffs = 0;
 	m_vbl_disable = 1;
-	m_mode = 3;
-	std::fill(m_vram.begin(), m_vram.end(), 0);
-	memset(m_palette, 0, sizeof(m_palette));
-
-	m_palette[0] = rgb_t(255, 255, 255);
-	m_palette[0x80] = rgb_t(0, 0, 0);
+	m_video_enable = 0;
+	std::fill_n(&m_vram[0], VRAM_SIZE / sizeof(u32), 0);
 }
-
 
 TIMER_CALLBACK_MEMBER(nubus_procolor816_device::vbl_tick)
 {
@@ -133,204 +153,213 @@ TIMER_CALLBACK_MEMBER(nubus_procolor816_device::vbl_tick)
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
-/***************************************************************************
-
-  CB264 section
-
-***************************************************************************/
-
-uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 nubus_procolor816_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const vram8 = util::big_endian_cast<uint8_t const>(&m_vram[0]) + 4;
-
-	switch (m_mode)
+	if (!m_video_enable)
 	{
-		case 0: // 1 bpp?
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
+	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]) + 4;
+	pen_t const *const pens = m_dac->pens();
+	const auto clock_select = m_dac->read(0xa); // get the TLC34076 output clock select
+	const auto pixel_mask = m_dac->read(2); // get the TLC34076 pixel mask
+
+	switch (pixel_mask)
+	{
+		case 0x1: // 1 bpp - SCLK = DOTCLK/32
 			for (int y = 0; y < 480; y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y);
+				u32 *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/8; x++)
 				{
-					uint8_t const pixels = vram8[(y * 640/8) + x];
+					u8 const pixels = vram8[(y * 640/8) + x];
 
-					*scanline++ = m_palette[(pixels&0x80)];
-					*scanline++ = m_palette[((pixels<<1)&0x80)];
-					*scanline++ = m_palette[((pixels<<2)&0x80)];
-					*scanline++ = m_palette[((pixels<<3)&0x80)];
-					*scanline++ = m_palette[((pixels<<4)&0x80)];
-					*scanline++ = m_palette[((pixels<<5)&0x80)];
-					*scanline++ = m_palette[((pixels<<6)&0x80)];
-					*scanline++ = m_palette[((pixels<<7)&0x80)];
+					*scanline++ = pens[(pixels>>7)&1];
+					*scanline++ = pens[(pixels>>6)&1];
+					*scanline++ = pens[(pixels>>5)&1];
+					*scanline++ = pens[(pixels>>4)&1];
+					*scanline++ = pens[(pixels>>3)&1];
+					*scanline++ = pens[(pixels>>2)&1];
+					*scanline++ = pens[(pixels>>1)&1];
+					*scanline++ = pens[pixels&1];
 				}
 			}
 			break;
 
-		case 1: // 2 bpp
+		case 0x3: // 2 bpp - SCLK = DOTCLK/16
 			for (int y = 0; y < 480; y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y);
+				u32 *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/4; x++)
 				{
-					uint8_t const pixels = vram8[(y * 640/4) + x];
+					u8 const pixels = vram8[(y * 640/4) + x];
 
-					*scanline++ = m_palette[(pixels&0xc0)];
-					*scanline++ = m_palette[((pixels<<2)&0xc0)];
-					*scanline++ = m_palette[((pixels<<4)&0xc0)];
-					*scanline++ = m_palette[((pixels<<6)&0xc0)];
+					*scanline++ = pens[(pixels>>6)&3];
+					*scanline++ = pens[(pixels>>4)&3];
+					*scanline++ = pens[(pixels>>2)&3];
+					*scanline++ = pens[pixels & 0x3];
 				}
 			}
 			break;
 
-		case 2: // 4 bpp
+		case 0xf: // 4 bpp - SCLK = DOTCLK/8
 			for (int y = 0; y < 480; y++)
 			{
-				uint32_t *scanline = &bitmap.pix(y);
+				u32 *scanline = &bitmap.pix(y);
 				for (int x = 0; x < 640/2; x++)
 				{
-					uint8_t const pixels = vram8[(y * 640/2) + x];
+					u8 const pixels = bitswap(vram8[(y * 640 / 2) + x], 4, 5, 6, 7, 0, 1, 2, 3);
 
-					*scanline++ = m_palette[(pixels&0xf0)];
-					*scanline++ = m_palette[((pixels&0x0f)<<4)];
+					*scanline++ = pens[(pixels>>4)&0xf];
+					*scanline++ = pens[pixels&0xf];
 				}
 			}
 			break;
 
-		case 3: // 8 bpp
-			for (int y = 0; y < 480; y++)
+		case 0xff: // 8 bpp - SCLK = DOTCLK/4
+			if ((clock_select == 0x19) && (m_has_15bpp))
 			{
-				uint32_t *scanline = &bitmap.pix(y);
-				for (int x = 0; x < 640; x++)
-				{
-					uint8_t const pixels = vram8[(y * 640) + x];
-					*scanline++ = m_palette[pixels];
-				}
-			}
-			break;
-
-		case 4: // 15 bpp
-			{
-				auto const vram16 = util::big_endian_cast<uint16_t const>(&m_vram[0]);
+				auto const vram16 = util::big_endian_cast<u16 const>(&m_vram[0]);
 
 				for (int y = 0; y < 480; y++)
 				{
-					uint32_t *scanline = &bitmap.pix(y);
+					u32 *scanline = &bitmap.pix(y);
 					for (int x = 0; x < 640; x++)
 					{
-						uint16_t const pixels = vram16[(y * 640) + x];
-						*scanline++ = rgb_t(pal5bit((pixels>>10) & 0x1f), pal5bit((pixels>>5) & 0x1f), pal5bit(pixels & 0x1f));
+						u16 const pixels = vram16[(y * 640) + x];
+						*scanline++ = rgb_t(pal5bit((pixels >> 10) & 0x1f), pal5bit((pixels >> 5) & 0x1f), pal5bit(pixels & 0x1f));
+					}
+				}
+			}
+			else
+			{
+				for (int y = 0; y < 480; y++)
+				{
+					u32 *scanline = &bitmap.pix(y);
+					for (int x = 0; x < 640; x++)
+					{
+						u8 const pixels = bitswap(vram8[(y * 640) + x], 0, 1, 2, 3, 4, 5, 6, 7);
+						*scanline++ = pens[pixels];
 					}
 				}
 			}
 			break;
 
 		default:
-			fatalerror("procolor816: unknown video mode %d\n", m_mode);
+			fatalerror("procolor816: unknown video mode %x\n", clock_select);
 	}
+
 	return 0;
 }
 
-void nubus_procolor816_device::procolor816_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_procolor816_device::regs_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-		case 0x3d805:           // mode
-			if (mem_mask == 0xff)
+		case 0:   // bit 3 = screen enable, bit 2 = VBL control
+		case 3:   // ProColor 8 mirrors this here
+			m_video_enable = BIT(data, 3);
+
+			if (BIT(data, 2))
 			{
-				switch (data & 0xff)
-				{
-					case 0x13:
-						m_mode = 0;
-						break;
-
-					case 0x17:
-						m_mode = 1;
-						break;
-
-					case 0x1b:
-						m_mode = 2;
-						break;
-
-					case 0x1e:
-						m_mode = 3;
-						break;
-
-					case 0x0a:
-						m_mode = 4;
-						break;
-				}
+				m_vbl_disable = 0;
+				lower_slot_irq();
+			}
+			else
+			{
+				m_vbl_disable = 1;
 			}
 			break;
 
-		case 0x3d800:
-			if (mem_mask == 0x00ff0000)
-			{
-		//          printf("%s %08x to DAC control\n", machine().describe_context().c_str(), data);
-					m_clutoffs = bitswap<8>((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
-			}
-			else if (mem_mask == 0x000000ff)
-			{
-					m_colors[m_count++] = (data & 0xff);
-
-					if (m_count == 3)
-					{
-//                        printf("%s RAMDAC: color %02x = %02x %02x %02x\n", machine().describe_context().c_str(), m_clutoffs, m_colors[0], m_colors[1], m_colors[2]);
-						m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
-						m_clutoffs++;
-						if (m_clutoffs > 255)
-						{
-							m_clutoffs = 0;
-						}
-						m_count = 0;
-					}
-			}
-			break;
-
-	case 0x3dc00:   // VBL control
-			if (mem_mask == 0xff000000)
-			{
-				if (data & 0x04000000)
-				{
-					m_vbl_disable = 0;
-					lower_slot_irq();
-				}
-				else
-				{
-					m_vbl_disable = 1;
-				}
-			}
+		case 0x800: // Xilinx XC3030 FPGA bitstream write
 			break;
 
 		default:
-//            printf("%s procolor816_w: %08x @ %x, mask %08x\n", machine().describe_context().c_str(), data, offset, mem_mask);
+			logerror("%s procolor816_w: %08x @ %x\n", machine().describe_context().c_str(), data, offset);
 			break;
 	}
 }
 
-uint32_t nubus_procolor816_device::procolor816_r(offs_t offset, uint32_t mem_mask)
+u8 nubus_procolor816_device::regs_r(offs_t offset)
 {
-	if (offset == 0x3dc00)
+	switch (offset)
 	{
-		m_toggle ^= 0xffffffff;
-		return m_toggle;
-	}
-	else if (offset == 0x3d807)
-	{
-		return 0;
-	}
-	else
-	{
-//      printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device<cpu_device>("maincpu")->pc());
-	}
+		case 0x1:
+			return m_screen->vblank() ? 1 : 0;
 
+		default:
+			logerror("%s procolor816_r: unknown @ %x\n", machine().describe_context().c_str(), offset);
+			break;
+	}
 	return 0;
 }
 
-void nubus_procolor816_device::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_procolor816_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-uint32_t nubus_procolor816_device::vram_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_procolor816_device::vram_r(offs_t offset, u32 mem_mask)
 {
 	return m_vram[offset];
 }
+
+class pds30_procolor8_device : public nubus_procolor816_device
+{
+public:
+	// construction/destruction
+	pds30_procolor8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+ROM_START( procolor8_pds )
+	ROM_REGION(0x8000, "declrom", 0)
+	ROM_LOAD( "procolorserver8.bin", 0x000000, 0x008000, CRC(8701ba41) SHA1(ef2d7ad3309a0df16ec392a82110118830d276b5) )
+ROM_END
+
+const tiny_rom_entry *pds30_procolor8_device::device_rom_region() const
+{
+	return ROM_NAME(procolor8_pds);
+}
+
+pds30_procolor8_device::pds30_procolor8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	nubus_procolor816_device(mconfig, PDS030_PROCOLOR8, tag, owner, clock)
+{
+	m_has_15bpp = false;
+}
+
+class nubus_procolor8_device : public nubus_procolor816_device
+{
+public:
+	// construction/destruction
+	nubus_procolor8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+ROM_START( procolor8_nb )
+	ROM_REGION(0x8000, "declrom", 0)
+	ROM_LOAD( "lapisprocolorserver.bin", 0x000000, 0x008000, CRC(cd2a726b) SHA1(bd4ceb4b229c9ce3e8f5386d5132ff26de6067e1) )
+ROM_END
+
+const tiny_rom_entry *nubus_procolor8_device::device_rom_region() const
+{
+	return ROM_NAME(procolor8_nb);
+}
+
+nubus_procolor8_device::nubus_procolor8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	nubus_procolor816_device(mconfig, NUBUS_PROCOLOR8, tag, owner, clock)
+{
+	m_has_15bpp = false;
+}
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(PDS030_PROCOLOR816, device_nubus_card_interface, nubus_procolor816_device, "pd3_pc16", "Lapis ProColor Server 8*16")
+DEFINE_DEVICE_TYPE_PRIVATE(PDS030_PROCOLOR8, device_nubus_card_interface, pds30_procolor8_device, "pd3_pcs8", "Lapis ProColor Server 8 (PDS)")
+DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_PROCOLOR8, device_nubus_card_interface, nubus_procolor8_device, "nb_pcs8", "Lapis ProColor Server 8")

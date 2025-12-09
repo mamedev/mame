@@ -465,16 +465,15 @@ void amspdwy_state::amspdwy(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YM2151(config, m_ym2151, 3000000);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 0);
-	m_ym2151->add_route(0, "lspeaker", 1.0);
-	m_ym2151->add_route(1, "rspeaker", 1.0);
+	m_ym2151->add_route(0, "speaker", 1.0, 0);
+	m_ym2151->add_route(1, "speaker", 1.0, 1);
 }
 
 

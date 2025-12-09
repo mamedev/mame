@@ -470,9 +470,11 @@ Black screen after Thalion logo, attempts to r/w [FPU] $fffa40
 		<year>1989</year>
 		<publisher>Lucasfilm</publisher>
 		<notes><![CDATA[
-Fussy on [disk swap], will return to TOS when trying to begin a flight
+TODO: untested after copy protection
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1085,17 +1087,17 @@ Keeps returning to TOS on loading
 		</part>
 	</software>
 
-	<software name="camelot" supported="no">
+	<software name="camelot" supported="partial">
 		<!-- SPS (CAPS) release 3152 -->
 		<description>Conquests of Camelot (Europe, v1.019)</description>
 		<year>1990</year>
 		<publisher>Sierra</publisher>
 		<notes><![CDATA[
-Starting a game will fail on [disk swap], doesn't recognize disk 2
-Has [MIDI] options
+Has [MIDI] options (untested)
 ]]></notes>
 		<info name="alt_title" value="Conquests of Camelot - The Search for the Grail" />
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -2140,15 +2142,13 @@ Unresponsive [mouse] on TOS (random)
 		</part>
 	</software>
 
-	<software name="gravity" supported="no">
+	<software name="gravity">
 		<!-- SPS (CAPS) release 3330 -->
 		<description>Gravity (Europe)</description>
 		<year>1990</year>
 		<publisher>Image Works</publisher>
-		<notes><![CDATA[
-Fails on [disk swap] after title screen
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -3332,9 +3332,11 @@ Pauses itself when pressing fire on joystick during gameplay (?)
 		<year>1990</year>
 		<publisher>Lucasfilm</publisher>
 		<notes><![CDATA[
-Doesn't recognize [disk swap] when prompted to
+TODO: untested after copy protection
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection (fruits)" />
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -4054,15 +4056,14 @@ During gameplay player loses a life with no chance of actual game.
 		</part>
 	</software>
 
-	<software name="robocop" supported="no">
+	<software name="robocop">
 		<!-- SPS (CAPS) release 3166 -->
 		<description>RoboCop (Europe)</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-Fails [disk swap] when prompted to after title screen
-]]></notes>
+		<info name="usage" value="Requires joystick in port 0" />
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -4180,15 +4181,13 @@ White screen. Track 1 appears to be malformed, causing CRC errors on reads; 6800
 		</part>
 	</software>
 
-	<software name="shadgate" supported="no">
+	<software name="shadgate">
 		<!-- SPS (CAPS) release 3315 -->
 		<description>Shadowgate (Europe)</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
-		<notes><![CDATA[
-Fails [disk swap]
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -5043,15 +5042,13 @@ First two copy protection codes are always W/16 - A/5 (verify)
 		</part>
 	</software>
 
-	<software name="trauma" supported="no">
+	<software name="trauma">
 		<!-- SPS (CAPS) release 3348 -->
 		<description>Trauma (Europe)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
-		<notes><![CDATA[
-Fails [disk swap] after title screen
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -5209,9 +5206,11 @@ White screen, [68k] stalls on bootstrap with invalid opcode PC=13eba
 		<year>1990</year>
 		<publisher>Impressions</publisher>
 		<notes><![CDATA[
-Fails [disk swap] when launching univers3.prg
+TODO: untested after copy protection
 ]]></notes>
+		<info name="usage" value="Sports manual copy protection" />
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk" />
@@ -5350,15 +5349,13 @@ Unsupported optional 3d glasses
 		</part>
 	</software>
 
-	<software name="warmidle" supported="no">
+	<software name="warmidle">
 		<!-- SPS (CAPS) release 3385 -->
 		<description>War in Middle Earth (Europe)</description>
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
-		<notes><![CDATA[
-Fails to recognize [disk swap] after title screen
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />

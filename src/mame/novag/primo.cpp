@@ -12,29 +12,36 @@ TODO:
 - if/when MAME supports an exit callback, hook up power-off switch to that
 - Novag Super System peripherals don't work on nsnova due to serial clock drift,
   baud rate differs a bit between host and client, m6801 serial emulation issue
-- unmapped reads from 0x3c/0x3d (primo/supremo) or 0x33/0x34 (nsnova)
+- unmapped reads from 0x33/0x34 (nsnova) or 0x3c/0x3d (others)
 - supremo unmapped writes to 0x2000/0x6000, always 0?
 - is the 1st version of supremo(black plastic) the same ROM?
 - is "Aquamarine / Super Nova" the same ROM as nsnova and just a redesign?
 
 BTANB:
-- primo has the same bug as nvip, where if the user presses Go right after
-  entering a move during the opening, the CPU opponent will answer by playing
-  a move with white
+- nprimo/beluga has the same bug as nvip, where if the user presses Go right
+  after entering a move during the opening, the CPU opponent will answer by
+  playing a move with white
 
 ================================================================================
 
-Novag Primo (model 871)
------------------------
+Novag Primo family
+------------------
 
 Hardware notes:
+
+Primo (model 871):
 - PCB label: 100059/100060
 - Hitachi HD6301Y0P (mode 2) @ 8MHz
 - 2KB RAM(M5M5118P)
 - LCD with 4 7segs and custom segments, no LCD chip
 - buzzer, 16 LEDs, 8*8 chessboard buttons
 
-The LCD is the same as the one in VIP / Super VIP.
+Beluga (model 903):
+- PCB label: 100116
+- CPU runs at 16MHz, rest is same as Primo
+
+The LCD is the same as the one in VIP / Super VIP. Beluga is an updated version
+of the program in Primo, just in a different housing (more similar to nsnova).
 
 ================================================================================
 
@@ -83,6 +90,7 @@ the Super VIP combined with the Novag Super System Touch Sensory board.
 #include "speaker.h"
 
 // internal artwork
+#include "novag_beluga.lh"
 #include "novag_primo.lh"
 #include "novag_snova.lh"
 #include "novag_supremo.lh"
@@ -106,6 +114,7 @@ public:
 	{ }
 
 	void primo(machine_config &config);
+	void beluga(machine_config &config);
 	void supremo(machine_config &config);
 	void snova(machine_config &config);
 
@@ -216,13 +225,13 @@ u8 primo_state::p2_r()
 		if (BIT(m_select, i + 6))
 			data |= BIT(m_inputs[i]->read(), m_inp_mux);
 
-	// P23 (nprimo, supremo): power switch
-	if (!m_power)
-		data |= 8;
-
 	// P23 (nsnova): serial rx
 	if (m_rs232)
 		data |= m_rs232->rxd_r() << 3;
+
+	// P23 (others): power switch
+	if (!m_power)
+		data |= 8;
 
 	return data ^ 1;
 }
@@ -330,28 +339,47 @@ static INPUT_PORTS_START( supremo )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( snova )
+static INPUT_PORTS_START( beluga )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Trace Back / Next Best")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("Trace Forward / Auto Play")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("Set Level / Pawn")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Info / Knight")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Easy / Bishop")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Solve Mate / Rook")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Sound / Queen")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Referee / King")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Go")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Restore")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Hint")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Clear Board / Clear")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Color")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Set Up / Verify")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Random")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
+
+	PORT_START("POWER") // needs to be triggered for nvram to work
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(primo_state::primo_power_off), 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( snova )
+	PORT_INCLUDE( beluga )
+
+	PORT_MODIFY("IN.0")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("Info / Echo / Knight")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("Easy / Moves / Bishop")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Solve Mate / Language / Rook")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Sound / Game / Queen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Referee / Board / King")
 
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Go")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("Restore")
+	PORT_MODIFY("IN.1")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Hint / Human")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Clear Board / Clear")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Color / Video")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Set Up / Verify")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Random / Auto Clock")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 
-	PORT_START("POWER") // needs to be triggered for nvram to work
+	PORT_MODIFY("POWER") // needs to be triggered for nvram to work
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(primo_state::snova_power_off), 0)
 INPUT_PORTS_END
 
@@ -396,6 +424,20 @@ void primo_state::primo(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+void primo_state::beluga(machine_config &config)
+{
+	primo(config);
+
+	// basic machine hardware
+	m_maincpu->set_clock(16_MHz_XTAL);
+	m_maincpu->in_p2_cb().set(FUNC(primo_state::p2_r)).mask(0xef);
+
+	// P24 is tied to P52 (freq sel via P50-P53)
+	m_maincpu->in_p2_cb().append([this]() { return m_select << 2; }).mask(0x10);
+
+	config.set_default_layout(layout_novag_beluga);
 }
 
 void primo_state::supremo(machine_config &config)
@@ -445,6 +487,15 @@ ROM_START( nprimo )
 ROM_END
 
 
+ROM_START( beluga )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD("novag_903_31y0rm59p.u1", 0x0000, 0x4000, CRC(16fc6bfc) SHA1(5ab4c7e92eb7b6b449c388f50293dfd01aa87c24) )
+
+	ROM_REGION( 36256, "screen", 0 )
+	ROM_LOAD("nvip.svg", 0, 36256, CRC(3373e0d5) SHA1(25bfbf0405017388c30f4529106baccb4723bc6b) )
+ROM_END
+
+
 ROM_START( supremo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("sp_a10.u5", 0x8000, 0x8000, CRC(1db63786) SHA1(4f24452ed8955b31ba88f68cc95c357660930aa4) )
@@ -480,6 +531,8 @@ ROM_END
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
 SYST( 1987, nprimo,  0,      0,      primo,   primo,   primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Primo (Novag)", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1990, beluga,  0,      0,      beluga,  beluga,  primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Beluga", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1988, supremo, 0,      0,      supremo, supremo, primo_state, empty_init, "Novag Industries / Intelligent Heuristic Programming", "Supremo", MACHINE_SUPPORTS_SAVE )
 

@@ -598,6 +598,7 @@ void rom_load_manager::verify_length_and_hash(emu_file *file, std::string_view n
 	{
 		m_errorstring.append(string_format("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength));
 		m_warnings++;
+		m_presentbad++;
 	}
 
 	if (hashes.flag(util::hash_collection::FLAG_NO_DUMP))
@@ -619,6 +620,7 @@ void rom_load_manager::verify_length_and_hash(emu_file *file, std::string_view n
 			m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", name));
 			dump_wrong_and_correct_checksums(hashes, all_acthashes);
 			m_warnings++;
+			m_presentbad++;
 		}
 		else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 		{
@@ -1210,6 +1212,7 @@ void rom_load_manager::process_disk_entries(
 				m_errorstring.append(string_format("%s WRONG CHECKSUMS:\n", filename));
 				dump_wrong_and_correct_checksums(hashes, acthashes);
 				m_warnings++;
+				m_presentbad++;
 			}
 			else if (hashes.flag(util::hash_collection::FLAG_BAD_DUMP))
 			{
@@ -1557,6 +1560,7 @@ void rom_load_manager::process_region_list()
 rom_load_manager::rom_load_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_warnings(0)
+	, m_presentbad(0)
 	, m_knownbad(0)
 	, m_errors(0)
 	, m_romsloaded(0)

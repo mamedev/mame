@@ -774,7 +774,7 @@ void x1_state::fdc_w(offs_t offset, uint8_t data)
 			{
 				floppy->ss_w(BIT(data, 4));
 				if(BIT(m_fdc_ctrl, 7) && !BIT(data, 7))
-					m_motor_timer->adjust(attotime::from_seconds(1.2));
+					m_motor_timer->adjust(attotime::from_msec(1200));
 				else if(BIT(data, 7))
 					floppy->mon_w(0);
 			}
@@ -2233,30 +2233,30 @@ void x1_state::x1(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", x1_floppies, "525dd", x1_state::floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
-
+	// TODO: convert to CZ- expansion unit, verify compatibility with x68k if any.
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "x1_cart", "bin,rom");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// TODO: fix thru schematics (formation of resistors tied to ABC outputs)
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	ay.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	ay.add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	ay.add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 	m_cassette->set_interface("x1_cass");
-
-	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
 
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(x1_state::sub_keyboard_cb), attotime::from_hz(250));
 	TIMER(config, "cmt_wind_timer").configure_periodic(FUNC(x1_state::cmt_seek_cb), attotime::from_hz(16));
+
+	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("x1_flop");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("x1");
 }
 
 void x1turbo_state::x1turbo(machine_config &config)
@@ -2289,8 +2289,8 @@ void x1turbo_state::x1turbo(machine_config &config)
 	m_ctc_ym->zc_callback<0>().set(m_ctc_ym, FUNC(z80ctc_device::trg3));
 
 	YM2151(config, m_ym, MAIN_CLOCK/8);
-	m_ym->add_route(0, "lspeaker", 0.50);
-	m_ym->add_route(1, "rspeaker", 0.50);
+	m_ym->add_route(0, "speaker", 0.50, 0);
+	m_ym->add_route(1, "speaker", 0.50, 1);
 }
 
 /*************************************

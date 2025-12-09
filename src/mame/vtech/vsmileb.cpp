@@ -142,8 +142,8 @@ void vsmileb_state::vsmileb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsmileb_state::mem_map);
 	m_maincpu->set_force_no_drc(true);
 	m_maincpu->chip_select().set(FUNC(vsmileb_state::chip_sel_w));
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5);
 	m_maincpu->porta_in().set(FUNC(vsmileb_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(vsmileb_state::portb_r));
 

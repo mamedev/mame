@@ -101,8 +101,8 @@ void lastmisn_state::lastmisn_control_w(u8 data)
 	*/
 	m_mainbank->set_entry(data & 0x0f);
 
-	m_scroll[0] = (data >> 5) & 1;
-	m_scroll[2] = (data >> 6) & 1;
+	m_scroll[0] = BIT(data, 5);
+	m_scroll[2] = BIT(data, 6);
 
 	if (data & 0x80)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -112,11 +112,11 @@ void lastmisn_state::lastmisn_control_w(u8 data)
 
 void lastmisn_state::shackled_control_w(u8 data)
 {
-	// Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs
+	// Bottom 4 bits - bank switch, Bits 5 & 6 - Scroll MSBs
 	m_mainbank->set_entry(data & 0x0f);
 
-	m_scroll[0] = (data >> 5) & 1;
-	m_scroll[2] = (data >> 6) & 1;
+	m_scroll[0] = BIT(data, 5);
+	m_scroll[2] = BIT(data, 6);
 }
 
 void lastmisn_state::lastmisn_scrollx_w(u8 data)
@@ -140,9 +140,9 @@ void ghostb_state::gondo_scroll_w(offs_t offset, u8 data)
 		m_scroll[3] = data; // Y LSB
 		break;
 	case 0x10:
-		m_scroll[0] = (data >> 0) & 1; // Bit 0: X MSB
-		m_scroll[2] = (data >> 1) & 1; // Bit 1: Y MSB
-		// Bit 2 is also used in Gondo & Garyoret
+		m_scroll[0] = BIT(data, 0); // Bit 0: X MSB
+		m_scroll[2] = BIT(data, 1); // Bit 1: Y MSB
+		buffer_spriteram_w(BIT(data, 2));
 		break;
 	}
 }
@@ -281,9 +281,6 @@ VIDEO_START_MEMBER(ghostb_state,ghostb)
 	m_fix_tilemap->set_transparent_pen(0);
 
 	m_game_uses_priority = 0;
-
-	m_nmi_enable = false;
-	save_item(NAME(m_nmi_enable));
 }
 
 
@@ -292,7 +289,7 @@ VIDEO_START_MEMBER(ghostb_state,ghostb)
 // we mimic the priority scheme in dec0.cpp, this was originally a bit different, so this could be wrong
 void oscar_state::oscar_tile_cb(tile_data &tileinfo, u32 &tile, u32 &colour, u32 &flags)
 {
-	tileinfo.group = BIT(colour, 3) ? 1 : 0;
+	tileinfo.group = BIT(colour, 3);
 	colour &= 7;
 }
 

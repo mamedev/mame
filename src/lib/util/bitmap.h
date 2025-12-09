@@ -75,14 +75,14 @@ public:
 		return *this;
 	}
 
-	rectangle operator&(const rectangle &b)
+	rectangle operator&(const rectangle &b) const
 	{
 		rectangle a(*this);
 		a &= b;
 		return a;
 	}
 
-	rectangle operator|(const rectangle &b)
+	rectangle operator|(const rectangle &b) const
 	{
 		rectangle a(*this);
 		a |= b;

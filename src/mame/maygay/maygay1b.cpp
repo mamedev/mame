@@ -743,21 +743,20 @@ void maygay1b_state::maygay_m1(machine_config &config)
 	mainlatch.q_out_cb<6>().set(FUNC(maygay1b_state::srsel_w));     // Srsel
 
 	S16LF01(config, m_vfd);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	YM2149(config, m_ay, M1_MASTER_CLOCK);
 	m_ay->port_a_write_callback().set(FUNC(maygay1b_state::m1_meter_w));
 	m_ay->port_b_write_callback().set(FUNC(maygay1b_state::m1_lockout_w));
-	m_ay->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_ay->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", M1_MASTER_CLOCK/4));
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6376(config, m_msm6376, 102400); //? Seems to work well with samples, but unconfirmed
-	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_msm6376->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	TIMER(config, "nmitimer").configure_periodic(FUNC(maygay1b_state::maygay1b_nmitimer_callback), attotime::from_hz(75)); // freq?
 
@@ -807,8 +806,8 @@ void maygay1b_state::maygay_m1_nec(machine_config &config)
 	config.device_remove("msm6376");
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void maygay1b_state::m1ab_no_oki_w(uint8_t data)

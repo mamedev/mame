@@ -87,7 +87,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				slot.set_card_device(new_dev);
 
 				char const *const default_bios = option->default_bios();
-				if (default_bios != nullptr)
+				if (default_bios)
 					new_dev->set_default_bios_tag(default_bios);
 
 				auto additions = option->machine_config();

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="ibmpcjx" description="IBM PC JX floppy disk images">
+
+	<software name="eiyuden" supported="partial">
+		<description>Eiyuu Densetsu Saga</description>
+		<year>1984</year>
+		<publisher>Micro Cabin</publisher>
+		<notes><![CDATA[
+Takes an inordinately long time to boot
+]]></notes>
+		<info name="alt_title" value="英雄伝説サーガ" />
+		<info name="developer" value="Arrow Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "760480">
+				<rom name="eiyuden.d88" size="760480" crc="4e77143e" sha1="3999abc9b829af6537cc29d6049ac3492f9774b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jelda2" supported="no">
+		<description>Jelda II</description>
+		<year>1984</year>
+		<publisher>Carry Lab</publisher>
+		<info name="alt_title" value="ジェルダ2" />
+		<info name="developer" value="Zero Soft" />
+		<info name="serial" value="GA-034" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "589038">
+				<rom name="jelda2.mfm" size="589038" crc="027ed23e" sha1="6a1c4c3a2ee872edbd4d0df70e2985532d9a6141"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polstar3">
+		<description>Polar Star III</description>
+		<year>1984</year>
+		<publisher>Carry Lab</publisher>
+		<info name="developer" value="Zero Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "209024">
+				<rom name="polstar3.d88" size="209024" crc="d48aaf5a" sha1="eceae781a294cc38e69b2a7060148184ebe6b125"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shiroden" supported="no">
+		<description>Shiro Densetsu</description>
+		<year>1984</year>
+		<publisher>Xtal Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "755776">
+				<rom name="shiroden.d88" size="755776" crc="c572b618" sha1="615eeac448ec533f25e23cbbb5edccc8188297f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

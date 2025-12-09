@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    atarimo.c
+    atarimo.cpp
 
     Common motion object management functions for Atari raster games.
 
@@ -308,19 +308,19 @@ void atari_motion_objects_device::device_start()
 		m_slipram = m_slipramshare;
 
 	// allocate and initialize the code lookup
-	int codesize = round_to_powerof2(m_codemask.mask());
+	int const codesize = round_to_powerof2(m_codemask.mask());
 	m_codelookup.resize(codesize);
 	for (int i = 0; i < codesize; i++)
 		m_codelookup[i] = i;
 
 	// allocate and initialize the color lookup
-	int colorsize = round_to_powerof2(m_colormask.mask());
+	int const colorsize = round_to_powerof2(m_colormask.mask());
 	m_colorlookup.resize(colorsize);
 	for (int i = 0; i < colorsize; i++)
 		m_colorlookup[i] = i;
 
 	// allocate and the gfx lookup
-	int gfxsize = codesize / 256;
+	int const gfxsize = codesize / 256;
 	m_gfxlookup.resize(gfxsize);
 	for (int i = 0; i < gfxsize; i++)
 		m_gfxlookup[i] = m_gfxindex;
@@ -373,7 +373,7 @@ TIMER_CALLBACK_MEMBER(atari_motion_objects_device::force_update)
 
 void atari_motion_objects_device::build_active_list(int link)
 {
-	uint16_t *bankbase = &spriteram()[m_bank << (m_entrybits + 2)];
+	uint16_t const *bankbase = &spriteram()[m_bank << (m_entrybits + 2)];
 	uint16_t *current = &m_activelist[0];
 
 	// visit all the motion objects and copy their data into the display list
@@ -384,7 +384,7 @@ void atari_motion_objects_device::build_active_list(int link)
 		uint16_t *modata = current;
 		if (!m_split)
 		{
-			uint16_t *srcdata = &bankbase[link * 4];
+			uint16_t const *srcdata = &bankbase[link * 4];
 			*current++ = srcdata[0];
 			*current++ = srcdata[1];
 			*current++ = srcdata[2];
@@ -392,7 +392,7 @@ void atari_motion_objects_device::build_active_list(int link)
 		}
 		else
 		{
-			uint16_t *srcdata = &bankbase[link];
+			uint16_t const *srcdata = &bankbase[link];
 			*current++ = srcdata[uint32_t(0 << m_entrybits)];
 			*current++ = srcdata[uint32_t(1 << m_entrybits)];
 			*current++ = srcdata[uint32_t(2 << m_entrybits)];
@@ -421,28 +421,22 @@ void atari_motion_objects_device::build_active_list(int link)
 void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint16_t *entry)
 {
 	// select the gfx element and save off key information
-	int rawcode = m_codemask.extract(entry);
+	int const rawcode = m_codemask.extract(entry);
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfxlookup[rawcode >> 8]);
-	int save_granularity = gfx->granularity();
-	int save_colorbase = gfx->colorbase();
-	int save_colors = gfx->colors();
-	gfx->set_granularity(1);
-	gfx->set_colorbase(0);
-	gfx->set_colors(65536);
 
 	// extract data from the various words
 	int code = m_codelookup[rawcode];
 	int color = m_colorlookup[m_colormask.extract(entry)];
 	int xpos = m_xposmask.extract(entry) + m_xoffset;
 	int ypos = -m_yposmask.extract(entry);
-	int hflip = m_hflipmask.extract(entry);
-	int vflip = m_vflipmask.extract(entry);
-	int width = m_widthmask.extract(entry) + 1;
-	int height = m_heightmask.extract(entry) + 1;
-	int priority = m_prioritymask.extract(entry);
+	int const hflip = m_hflipmask.extract(entry);
+	int const vflip = m_vflipmask.extract(entry);
+	int const width = m_widthmask.extract(entry) + 1;
+	int const height = m_heightmask.extract(entry) + 1;
+	int const priority = m_prioritymask.extract(entry);
 
 	// compute the effective color, merging in priority
-	color = (color * save_granularity) | (priority << PRIORITY_SHIFT);
+	color = (color * gfx->granularity()) | (priority << PRIORITY_SHIFT);
 	color += m_palettebase;
 
 	// add in the scroll positions if we're not in absolute coordinates
@@ -520,7 +514,7 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 						continue;
 
 					// draw the sprite
-					gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
+					gfx->transpen_raw(bitmap, cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
 					mark_dirty(sx, sx + m_tilewidth - 1, sy, sy + m_tileheight - 1);
 				}
 			}
@@ -549,17 +543,12 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 						continue;
 
 					// draw the sprite
-					gfx->transpen_raw(bitmap,cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
+					gfx->transpen_raw(bitmap, cliprect, code, color, hflip, vflip, sx, sy, m_transpen);
 					mark_dirty(sx, sx + m_tilewidth - 1, sy, sy + m_tileheight - 1);
 				}
 			}
 		}
 	}
-
-	// restore original gfx information
-	gfx->set_granularity(save_granularity);
-	gfx->set_colorbase(save_colorbase);
-	gfx->set_colors(save_colors);
 }
 
 
@@ -573,9 +562,9 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 //-------------------------------------------------
 
 atari_motion_objects_device::sprite_parameter::sprite_parameter()
-	: m_word(0),
-	m_shift(0),
-	m_mask(0)
+	: m_word(0)
+	, m_shift(0)
+	, m_mask(0)
 {
 }
 

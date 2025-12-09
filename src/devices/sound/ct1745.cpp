@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(CT1745, ct1745_mixer_device, "ct1745", "Creative Labs CT1745 
 ct1745_mixer_device::ct1745_mixer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CT1745, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_irq_status_cb(*this, 0)
 	, m_fm(*this, finder_base::DUMMY_TAG)
 	, m_ldac(*this, finder_base::DUMMY_TAG)

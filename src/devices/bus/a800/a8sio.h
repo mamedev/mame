@@ -69,6 +69,7 @@ public:
 	void command_w(int state);     // pin 7
 	void motor_w(int state);       // pin 8
 	void proceed_w(int state);     // pin 9
+	void ready_w(int state);       // pin 10
 	void audio_in_w(uint8_t data); // pin 11
 	void interrupt_w(int state);   // pin 13
 

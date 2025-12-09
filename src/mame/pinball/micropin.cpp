@@ -556,8 +556,17 @@ ROM_START(pentacupt)
 	ROM_LOAD("microt_4.bin", 0x1800, 0x0800, CRC(6f691929) SHA1(a18352312706e0f0af14a33fac31c3f5f7156ba8))
 ROM_END
 
+ROM_START(pentacups)
+	ROM_REGION(0x10000, "v2cpu", 0)
+	ROM_LOAD("micros_1.bin", 0x0000, 0x0800, CRC(c563c419) SHA1(b4e6711125c8222f4b299e23ee12edfe1c92b52f))
+	ROM_LOAD("micros_2.bin", 0x0800, 0x0800, CRC(46ffd9bf) SHA1(4feae6e8fe6929481d89b00d743fca02e40fb7b8))
+	ROM_LOAD("microt_3.bin", 0x1000, 0x0800, CRC(cefb0966) SHA1(836491745417fc0d5f88c01a9c69a5c322d194be)) // same as for rev. T
+	ROM_LOAD("micros_4.bin", 0x1800, 0x0800, CRC(c7fcb6d8) SHA1(2f6f7aa5705e938a9fedfa4e357e720a1f743a26))
+ROM_END
+
 } // anonymous namespace
 
 GAME(1978,  pentacup,  0,         pent6800,  pent6800, pent6800_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  pentacup2, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1980,  pentacupt, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. T)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1980,  pentacups, pentacup,  pent8085,  pent8085, pent8085_state, empty_init, ROT0, "Micropin", "Pentacup (rev. S)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -10,6 +10,7 @@ Known games on this hardware:
  | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
  | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
  | YES    | Miss Bamby        | Automatics Pasqual |                    |
+ | YES    | 3 Mini            | Arfyc              | 6MHz xtal, battery |
  | YES    | Mini Azar D       | Arfyc              |                    |
  | YES    | Golden Winner     | Reben              |                    |
  | YES    | Golden Fruits     | Video Game         | 4 dipsw, battery   |
@@ -182,6 +183,14 @@ ROM_END
 // **** Clones *****
 // *****************
 
+ROM_START( 3mini )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "arfyc_b.49_1680-13.bin", 0x0000, 0x4000, CRC(78ed696f) SHA1(31f319bbe41aac6423b14752e8c0bcba5c8d262a) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "n82s23n.bin", 0x00, 0x20, NO_DUMP )
+ROM_END
+
 // 4 dipswitches, battery on PCB, exact clone of Mini Super Fruits PCB
 ROM_START( goldfrts )
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -339,6 +348,13 @@ ROM_END
   |                                  ULN2003A  ULN2003A                  |
   |                ____                               ____               |
   |_______________|    |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|    |______________|
+
+ The same exact ROM contents, but with a different arrangement, were found on a straight clone (also same layout) of the
+ Mini Super Fruits PCB (blue PCB with no markings, Toshiba TMP8085AP, 6.144 MHz xtal, AMD P8212, NEC D8155C, GI AY-3-8910,
+ battery, etc.). The ROMs were labeled as "LP" (Lucky Player?) and had the following hashes:
+   lp_c-100a.bin [0x1000] CRC(437ce010) SHA1(14f8448a854204b604e5c90e218832f916985397) SUM(06e4)
+   lp_c-100b.bin [0x1000] CRC(11cdc2e5) SHA1(4b5d87f7b85c9c948714f7b82a06b48ca9cb440b) SUM(035b)
+   lp_c-100c.bin [0x1000] CRC(b7c55fc2) SHA1(2dfcc35821971c27178522afe9db1d18e12b3a42) SUM(e769)
 */
 ROM_START( multy )
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -367,6 +383,7 @@ GAME( 1981,  luckyplr,  0, missbamby,  missbamby, missbamby_state, empty_init, R
 GAME( 1981,  minisupf,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
 // Clones
+GAME( 1987,  3mini,     0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "3 Mini",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 198?,  goldfrts,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1983,  gwinner,   0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1989?, miniazard, 0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini Azar D",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

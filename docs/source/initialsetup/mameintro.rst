@@ -68,14 +68,23 @@ MAME is written in C++, and has been ported to numerous platforms. Over time, as
 computer hardware has evolved, the MAME code has evolved as well to take
 advantage of the greater processing power and hardware capabilities offered.
 
-The official MAME binaries are compiled and designed to run on a standard
-Windows-based system. The minimum requirements are:
+The official MAME binary packages are compiled and designed to run on standard
+Windows-based systems. The minimum requirements are:
 
-* Intel Core 2-series CPU or equivalent, at least 2.0 GHz
-* 64-bit OS (Windows 7 or later on Windows, macOS 10.9 or later on Mac)
+* An x86-64 CPU implementing the x86-64v2 feature set (16-byte compare/exchange,
+  ``lahf``/``sahf`` instructions in long mode, population count instruction and
+  SSE 4.2), or
+* An Arm CPU implementing the ARMv8.2-A feature set
+* A 64-bit edition of Windows 7 or later for x86-64 or Windows 10 or later for
+  Arm
 * 4 GB RAM
-* DirectX 9.0c for Windows
-* A Direct3D, or OpenGL capable graphics card
+* DirectX 9.0c for Windows
+* A Direct3D or OpenGL capable GPU with support for non-power-of-two texture
+  sizes
+
+In general, any x86-64 CPU from 2015 onwards or the vast majority of 64-bit Arm
+CPUs from 2018 onwards should be suitable. It is possible to compile MAME
+yourself with support for older CPUs at the cost of some performance.
 
 Of course, the minimum requirements are just that: minimal. You may not get
 optimal performance from such a system, but MAME should run. Modern versions of

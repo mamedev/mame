@@ -1066,7 +1066,7 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 
 void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 {
-	SH4LE(config, m_maincpu, CPU_CLOCK);
+	SH7091(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 1);

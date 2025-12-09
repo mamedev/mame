@@ -764,7 +764,7 @@ static INPUT_PORTS_START( gsword )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_10C ) )
 	// FIXME: these three DIP switches are physically present, but may not be connected to anything - turning them on seems to cause problems
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )          PORT_DIPLOCATION("A:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )

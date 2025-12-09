@@ -674,7 +674,7 @@ static INPUT_PORTS_START( tokio_base )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x00, "99 (Cheat)") // 6 in original version
+	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW B:7" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Language ) )     PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
@@ -717,6 +717,17 @@ static INPUT_PORTS_START( tokio )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", FUNC(taito68705_mcu_device::host_semaphore_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", FUNC(taito68705_mcu_device::mcu_semaphore_r))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tokiob )
+	PORT_INCLUDE( tokio_base )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW B:5,6")
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x00, "99 (Cheat)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bublboblp )
@@ -848,7 +859,7 @@ void bublbobl_state::tokio(machine_config &config)
 
 	TAITO68705_MCU(config, "bmcu", MAIN_XTAL/8); // 3 Mhz
 
-	config.set_perfect_quantum(m_maincpu); // is this necessary?
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -943,7 +954,7 @@ void bublbobl_state::bublbobl_nomcu(machine_config &config)
 	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::sound_map); // IRQs are triggered by the YM2203
 
-	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000)); // a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -2125,13 +2136,13 @@ void bublbobl_state::init_dland()
 GAME( 1986, tokio,      0,        tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (newer)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tokioo,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito Corporation",                           "Tokio / Scramble Formation (older)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tokiou,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokiob,    tokio_base, bublbobl_state, init_common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokiob,    tokiob,     bublbobl_state, init_common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl,   0,        bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl1,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublboblr,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
 GAME( 1986, bublboblr1, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, boblbobl,   bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",                MACHINE_SUPPORTS_SAVE )

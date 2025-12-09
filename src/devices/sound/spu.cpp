@@ -2769,20 +2769,17 @@ void spu_device::update_timing()
 //
 //
 
-void spu_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void spu_device::sound_stream_update(sound_stream &stream)
 {
 	int16_t temp[44100], *src;
 
-	auto &outL = outputs[0];
-	auto &outR = outputs[1];
-
-	generate(temp, outputs[0].samples()*4);  // second parameter is bytes, * 2 (size of int16_t) * 2 (stereo)
+	generate(temp, stream.samples()*4);  // second parameter is bytes, * 2 (size of int16_t) * 2 (stereo)
 
 	src = &temp[0];
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		outL.put_int(i, *src++, 32768);
-		outR.put_int(i, *src++, 32768);
+		stream.put_int(0, i, *src++, 32768);
+		stream.put_int(1, i, *src++, 32768);
 	}
 }
 

@@ -79,7 +79,7 @@ void sega_837_14438_device::sh4_map(address_map &map)
 
 void sega_837_14438_device::device_add_mconfig(machine_config &config)
 {
-	SH4LE(config, m_maincpu, CPU_CLOCK);
+	SH4(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 1);

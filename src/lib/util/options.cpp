@@ -667,7 +667,7 @@ void core_options::add_entry(const options_entry &opt, bool override_existing)
 		std::string::size_type lparen = namestr.find_first_of('(', 0);
 		if (lparen != std::string::npos)
 		{
-			std::string::size_type dash = namestr.find_first_of('-', lparen + 1);
+			std::string::size_type dash = namestr.find_first_of('-', lparen + 2);
 			if (dash != std::string::npos)
 			{
 				std::string::size_type rparen = namestr.find_first_of(')', dash + 1);

@@ -77,10 +77,10 @@ gaelco_gae1_device::gaelco_gae1_device(const machine_config &mconfig, device_typ
             Writes length bytes to the sound buffer
   ============================================================================*/
 
-void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void gaelco_gae1_device::sound_stream_update(sound_stream &stream)
 {
 	/* fill all data needed */
-	for (int j = 0; j < outputs[0].samples(); j++)
+	for (int j = 0; j < stream.samples(); j++)
 	{
 		int output_l = 0, output_r = 0;
 
@@ -178,8 +178,8 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<r
 #endif
 
 		/* now that we have computed all channels, save current data to the output buffer */
-		outputs[0].put_int(j, output_l, 32768);
-		outputs[1].put_int(j, output_r, 32768);
+		stream.put_int(0, j, output_l, 32768);
+		stream.put_int(1, j, output_r, 32768);
 	}
 
 //  if (wavraw)

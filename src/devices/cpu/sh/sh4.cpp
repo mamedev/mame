@@ -34,10 +34,17 @@
 #include "cpu/drcumlsh.h"
 
 
-DEFINE_DEVICE_TYPE(SH3LE, sh3_device,   "sh3le", "Hitachi SH-3 (little)")
-DEFINE_DEVICE_TYPE(SH3BE, sh3be_device, "sh3be", "Hitachi SH-3 (big)")
-DEFINE_DEVICE_TYPE(SH4LE, sh4_device,   "sh4le", "Hitachi SH-4 (little)")
-DEFINE_DEVICE_TYPE(SH4BE, sh4be_device, "sh4be", "Hitachi SH-4 (big)")
+DEFINE_DEVICE_TYPE(SH3, sh3_device,   "sh3", "Hitachi SH-3 (Unidentified)")
+DEFINE_DEVICE_TYPE(SH7708S, sh7708s_device, "sh7708s", "Hitachi SH7708S")
+DEFINE_DEVICE_TYPE(SH7709, sh7709_device, "sh7709", "Hitachi SH7709")
+DEFINE_DEVICE_TYPE(SH7709S, sh7709s_device, "sh7709s", "Hitachi SH7709S")
+DEFINE_DEVICE_TYPE(SH4, sh4_device,   "sh4", "Hitachi SH-4 (Unidentified)")
+DEFINE_DEVICE_TYPE(SH7091, sh7091_device, "sh7091", "Hitachi SH7091")
+DEFINE_DEVICE_TYPE(SH7750, sh7750_device, "sh7750", "Hitachi SH7750")
+DEFINE_DEVICE_TYPE(SH7750R, sh7750r_device, "sh7750r", "Hitachi SH7750R")
+DEFINE_DEVICE_TYPE(SH7750S, sh7750s_device, "sh7750s", "Hitachi SH7750S")
+DEFINE_DEVICE_TYPE(SH7751, sh7751_device, "sh7751", "Hitachi SH7751")
+DEFINE_DEVICE_TYPE(SH7751R, sh7751r_device, "sh7751r", "Hitachi SH7751R")
 
 
 #if 0
@@ -47,6 +54,8 @@ void sh4_base_device::sh4_internal_map(address_map &map)
 	map(0x1C000000, 0x1C000FFF).ram().mirror(0x03FFD000);
 	map(0x1C002000, 0x1C002FFF).ram().mirror(0x03FFD000);
 	map(0xE0000000, 0xE000003F).ram().mirror(0x03FFFFC0);
+
+	sh4_register_map(map);
 }
 #endif
 
@@ -61,15 +70,819 @@ void sh4_base_device::sh4_internal_map(address_map &map)
 	map(0xF7000000, 0xF77FFFFF).rw(FUNC(sh4_base_device::sh4_utlb_data_array1_r), FUNC(sh4_base_device::sh4_utlb_data_array1_w));
 	map(0xF7800000, 0xF7FFFFFF).rw(FUNC(sh4_base_device::sh4_utlb_data_array2_r), FUNC(sh4_base_device::sh4_utlb_data_array2_w));
 
-	map(0xFE000000, 0xFFFFFFFF).rw(FUNC(sh4_base_device::sh4_internal_r), FUNC(sh4_base_device::sh4_internal_w)).umask32(0xffffffff);
+	sh4_register_map(map);
+}
+
+void sh4_device::sh4_register_map(address_map &map)
+{
+	map(0xff000030, 0xff000033).lr32([] { return PVR_SH7751; }, "pvr_r");
+
+	ccn_map(map);
+	ubc_map(map);
+	bsc_map(map);
+	dmac_map(map);
+	cpg_7750r_map(map);
+	rtc_map(map);
+	intc_7750r_map(map);
+	tmu_7750r_map(map);
+	sci_map(map);
+	scif_map(map);
+	hudi_7750r_map(map);
+	pci_7751_map(map);
+}
+
+void sh7091_device::sh4_register_map(address_map& map)
+{
+	map(0xff000030, 0xff000033).lr32([] { return PVR_SH7091; }, "pvr_r");
+
+	ccn_map(map);
+	ubc_map(map);
+	bsc_map(map);
+	dmac_map(map);
+	cpg_map(map);
+	rtc_map(map);
+	intc_map(map);
+	tmu_map(map);
+	sci_map(map);
+	scif_map(map);
+	hudi_map(map);
+}
+
+void sh7750_device::sh4_register_map(address_map& map)
+{
+	map(0xff000030, 0xff000033).lr32([] { return PVR_SH7750; }, "pvr_r");
+
+	ccn_map(map);
+	ubc_map(map);
+	bsc_map(map);
+	dmac_map(map);
+	cpg_map(map);
+	rtc_map(map);
+	intc_map(map);
+	tmu_map(map);
+	sci_map(map);
+	scif_map(map);
+	hudi_map(map);
+}
+
+void sh7750s_device::sh4_register_map(address_map& map)
+{
+	map(0xff000030, 0xff000033).lr32([] { return PVR_SH7750S; }, "pvr_r");
+
+	ccn_map(map);
+	ubc_map(map);
+	bsc_map(map);
+	dmac_map(map);
+	cpg_map(map);
+	rtc_map(map);
+	intc_7750s_map(map);
+	tmu_map(map);
+	sci_map(map);
+	scif_map(map);
+	hudi_map(map);
+}
+
+void sh7750r_device::sh4_register_map(address_map& map)
+{
+	map(0xff000030, 0xff000033).lr32([] { return PVR_SH7750R; }, "pvr_r");
+	map(0xff000044, 0xff000047).lr32([] { return PRR_SH7750R; }, "prr_r");
+
+	ccn_map(map);
+	ubc_map(map);
+	bsc_7750r_map(map);
+	dmac_7750r_map(map);
+	cpg_7750r_map(map);
+	rtc_7750r_map(map);
+	intc_7750r_map(map);
+	tmu_7750r_map(map);
+	sci_map(map);
+	scif_map(map);
+	hudi_7750r_map(map);
+}
+
+void sh7751_device::sh4_register_map(address_map& map)
+{
+	map(0xff000030, 0xff000033).lr32([] { return PVR_SH7751; }, "pvr_r");
+
+	ccn_map(map);
+	ubc_map(map);
+	bsc_map(map);
+	dmac_map(map);
+	cpg_7750r_map(map);
+	rtc_map(map);
+	intc_7750r_map(map);
+	tmu_7750r_map(map);
+	sci_map(map);
+	scif_map(map);
+	hudi_7750r_map(map);
+	pci_7751_map(map);
+}
+
+void sh7751r_device::sh4_register_map(address_map& map)
+{
+	map(0xff000030, 0xff000033).lr32([] { return PVR_SH7751R; }, "pvr_r");
+	map(0xff000044, 0xff000047).lr32([] { return PRR_SH7751R; }, "prr_r");
+
+	ccn_map(map);
+	ubc_map(map);
+	bsc_7750r_map(map);
+	dmac_7750r_map(map);
+	cpg_7750r_map(map);
+	rtc_7750r_map(map);
+	intc_7750r_map(map);
+	tmu_7750r_map(map);
+	sci_map(map);
+	scif_map(map);
+	hudi_7750r_map(map);
+	pci_7751_map(map);
+}
+
+void sh4_base_device::ccn_map(address_map &map)
+{
+	map(0xff000000, 0xff000003).rw(FUNC(sh4_base_device::pteh_r), FUNC(sh4_base_device::pteh_w));
+	map(0xff000004, 0xff000007).rw(FUNC(sh4_base_device::ptel_r), FUNC(sh4_base_device::ptel_w));
+	map(0xff000008, 0xff00000b).rw(FUNC(sh4_base_device::ttb_r), FUNC(sh4_base_device::ttb_w));
+	map(0xff00000c, 0xff00000f).rw(FUNC(sh4_base_device::tea_r), FUNC(sh4_base_device::tea_w));
+	map(0xff000010, 0xff000013).rw(FUNC(sh4_base_device::mmucr_r), FUNC(sh4_base_device::mmucr_w));
+	map(0xff000014, 0xff000014).rw(FUNC(sh4_base_device::basra_r), FUNC(sh4_base_device::basra_w));
+	map(0xff000018, 0xff000018).rw(FUNC(sh4_base_device::basrb_r), FUNC(sh4_base_device::basrb_w));
+	map(0xff00001c, 0xff00001f).rw(FUNC(sh4_base_device::ccr_r), FUNC(sh4_base_device::ccr_w));
+	map(0xff000020, 0xff000023).rw(FUNC(sh4_base_device::tra_r), FUNC(sh4_base_device::tra_w));
+	map(0xff000024, 0xff000027).rw(FUNC(sh4_base_device::expevt_r), FUNC(sh4_base_device::expevt_w));
+	map(0xff000028, 0xff00002b).rw(FUNC(sh4_base_device::intevt_r), FUNC(sh4_base_device::intevt_w));
+	map(0xff000034, 0xff000037).rw(FUNC(sh4_base_device::ptea_r), FUNC(sh4_base_device::ptea_w));
+	map(0xff000038, 0xff00003b).rw(FUNC(sh4_base_device::qacr0_r), FUNC(sh4_base_device::qacr0_w));
+	map(0xff00003c, 0xff00003f).rw(FUNC(sh4_base_device::qacr1_r), FUNC(sh4_base_device::qacr1_w));
+}
+
+void sh4_base_device::ubc_map(address_map &map)
+{
+	map(0xff200000, 0xff200003).rw(FUNC(sh4_base_device::bara_r), FUNC(sh4_base_device::bara_w));
+	map(0xff200004, 0xff200004).rw(FUNC(sh4_base_device::bamra_r), FUNC(sh4_base_device::bamra_w));
+	map(0xff200008, 0xff200009).rw(FUNC(sh4_base_device::bbra_r), FUNC(sh4_base_device::bbra_w));
+	map(0xff20000c, 0xff20000f).rw(FUNC(sh4_base_device::barb_r), FUNC(sh4_base_device::barb_w));
+	map(0xff200010, 0xff200010).rw(FUNC(sh4_base_device::bamrb_r), FUNC(sh4_base_device::bamrb_w));
+	map(0xff200014, 0xff200015).rw(FUNC(sh4_base_device::bbrb_r), FUNC(sh4_base_device::bbrb_w));
+	map(0xff200018, 0xff20001b).rw(FUNC(sh4_base_device::bdrb_r), FUNC(sh4_base_device::bdrb_w));
+	map(0xff20001c, 0xff20001f).rw(FUNC(sh4_base_device::bdmrb_r), FUNC(sh4_base_device::bdmrb_w));
+	map(0xff200020, 0xff200021).rw(FUNC(sh4_base_device::brcr_r), FUNC(sh4_base_device::brcr_w));
+}
+
+void sh4_base_device::bsc_map(address_map& map)
+{
+	map(0xff800000, 0xff800003).rw(FUNC(sh4_base_device::bcr1_r), FUNC(sh4_base_device::bcr1_w));
+	map(0xff800004, 0xff800005).rw(FUNC(sh4_base_device::bcr2_r), FUNC(sh4_base_device::bcr2_w));
+	map(0xff800008, 0xff80000b).rw(FUNC(sh4_base_device::wcr1_r), FUNC(sh4_base_device::wcr1_w));
+	map(0xff80000c, 0xff80000f).rw(FUNC(sh4_base_device::wcr2_r), FUNC(sh4_base_device::wcr2_w));
+	map(0xff800010, 0xff800013).rw(FUNC(sh4_base_device::wcr3_r), FUNC(sh4_base_device::wcr3_w));
+	map(0xff800014, 0xff800017).rw(FUNC(sh4_base_device::mcr_r), FUNC(sh4_base_device::mcr_w));
+	map(0xff800018, 0xff800019).rw(FUNC(sh4_base_device::pcr_r), FUNC(sh4_base_device::pcr_w));
+	map(0xff80001c, 0xff80001d).rw(FUNC(sh4_base_device::rtcsr_r), FUNC(sh4_base_device::rtcsr_w));
+	map(0xff800020, 0xff800021).rw(FUNC(sh4_base_device::rtcnt_r), FUNC(sh4_base_device::rtcnt_w));
+	map(0xff800024, 0xff800025).rw(FUNC(sh4_base_device::rtcor_r), FUNC(sh4_base_device::rtcor_w));
+	map(0xff800028, 0xff800029).rw(FUNC(sh4_base_device::rfcr_r), FUNC(sh4_base_device::rfcr_w));
+	map(0xff80002c, 0xff80002f).rw(FUNC(sh4_base_device::pctra_r), FUNC(sh4_base_device::pctra_w));
+	map(0xff800030, 0xff800031).rw(FUNC(sh4_base_device::pdtra_r), FUNC(sh4_base_device::pdtra_w));
+	map(0xff800040, 0xff800043).rw(FUNC(sh4_base_device::pctrb_r), FUNC(sh4_base_device::pctrb_w));
+	map(0xff800044, 0xff800045).rw(FUNC(sh4_base_device::pdtrb_r), FUNC(sh4_base_device::pdtrb_w));
+	map(0xff800048, 0xff800049).rw(FUNC(sh4_base_device::gpioic_r), FUNC(sh4_base_device::gpioic_w));
+	map(0xff900000, 0xff90ffff).w(FUNC(sh4_base_device::sdmr2_w));
+	map(0xff940000, 0xff94ffff).w(FUNC(sh4_base_device::sdmr3_w));
+}
+
+void sh4_base_device::bsc_7750r_map(address_map& map)
+{
+	bsc_map(map);
+
+	map(0xff800050, 0xff800051).rw(FUNC(sh4_base_device::bcr3_r), FUNC(sh4_base_device::bcr3_w));
+	map(0xfe0a00f0, 0xfe0a00f3).rw(FUNC(sh4_base_device::bcr4_r), FUNC(sh4_base_device::bcr4_w));
+}
+
+void sh4_base_device::dmac_map(address_map& map)
+{
+	map(0xffa00000, 0xffa00003).rw(FUNC(sh4_base_device::sar0_r), FUNC(sh4_base_device::sar0_w));
+	map(0xffa00004, 0xffa00007).rw(FUNC(sh4_base_device::dar0_r), FUNC(sh4_base_device::dar0_w));
+	map(0xffa00008, 0xffa0000b).rw(FUNC(sh4_base_device::dmatcr0_r), FUNC(sh4_base_device::dmatcr0_w));
+	map(0xffa0000c, 0xffa0000f).rw(FUNC(sh4_base_device::chcr0_r), FUNC(sh4_base_device::chcr0_w));
+	map(0xffa00010, 0xffa00013).rw(FUNC(sh4_base_device::sar1_r), FUNC(sh4_base_device::sar1_w));
+	map(0xffa00014, 0xffa00017).rw(FUNC(sh4_base_device::dar1_r), FUNC(sh4_base_device::dar1_w));
+	map(0xffa00018, 0xffa0001b).rw(FUNC(sh4_base_device::dmatcr1_r), FUNC(sh4_base_device::dmatcr1_w));
+	map(0xffa0001c, 0xffa0001f).rw(FUNC(sh4_base_device::chcr1_r), FUNC(sh4_base_device::chcr1_w));
+	map(0xffa00020, 0xffa00023).rw(FUNC(sh4_base_device::sar2_r), FUNC(sh4_base_device::sar2_w));
+	map(0xffa00024, 0xffa00027).rw(FUNC(sh4_base_device::dar2_r), FUNC(sh4_base_device::dar2_w));
+	map(0xffa00028, 0xffa0002b).rw(FUNC(sh4_base_device::dmatcr2_r), FUNC(sh4_base_device::dmatcr2_w));
+	map(0xffa0002c, 0xffa0002f).rw(FUNC(sh4_base_device::chcr2_r), FUNC(sh4_base_device::chcr2_w));
+	map(0xffa00030, 0xffa00033).rw(FUNC(sh4_base_device::sar3_r), FUNC(sh4_base_device::sar3_w));
+	map(0xffa00034, 0xffa00037).rw(FUNC(sh4_base_device::dar3_r), FUNC(sh4_base_device::dar3_w));
+	map(0xffa00038, 0xffa0003b).rw(FUNC(sh4_base_device::dmatcr3_r), FUNC(sh4_base_device::dmatcr3_w));
+	map(0xffa0003c, 0xffa0003f).rw(FUNC(sh4_base_device::chcr3_r), FUNC(sh4_base_device::chcr3_w));
+	map(0xffa00040, 0xffa00043).rw(FUNC(sh4_base_device::dmaor_r), FUNC(sh4_base_device::dmaor_w));
+}
+
+void sh4_base_device::dmac_7750r_map(address_map& map)
+{
+	dmac_map(map);
+
+	map(0xffa00050, 0xffa00053).rw(FUNC(sh4_base_device::sar4_r), FUNC(sh4_base_device::sar4_w));
+	map(0xffa00054, 0xffa00057).rw(FUNC(sh4_base_device::dar4_r), FUNC(sh4_base_device::dar4_w));
+	map(0xffa00058, 0xffa0005b).rw(FUNC(sh4_base_device::dmatcr4_r), FUNC(sh4_base_device::dmatcr4_w));
+	map(0xffa0005c, 0xffa0005f).rw(FUNC(sh4_base_device::chcr4_r), FUNC(sh4_base_device::chcr4_w));
+	map(0xffa00060, 0xffa00063).rw(FUNC(sh4_base_device::sar5_r), FUNC(sh4_base_device::sar5_w));
+	map(0xffa00064, 0xffa00067).rw(FUNC(sh4_base_device::dar5_r), FUNC(sh4_base_device::dar5_w));
+	map(0xffa00068, 0xffa0006b).rw(FUNC(sh4_base_device::dmatcr5_r), FUNC(sh4_base_device::dmatcr5_w));
+	map(0xffa0006c, 0xffa0006f).rw(FUNC(sh4_base_device::chcr5_r), FUNC(sh4_base_device::chcr5_w));
+	map(0xffa00070, 0xffa00073).rw(FUNC(sh4_base_device::sar6_r), FUNC(sh4_base_device::sar6_w));
+	map(0xffa00074, 0xffa00077).rw(FUNC(sh4_base_device::dar6_r), FUNC(sh4_base_device::dar6_w));
+	map(0xffa00078, 0xffa0007b).rw(FUNC(sh4_base_device::dmatcr6_r), FUNC(sh4_base_device::dmatcr6_w));
+	map(0xffa0007c, 0xffa0007f).rw(FUNC(sh4_base_device::chcr6_r), FUNC(sh4_base_device::chcr6_w));
+	map(0xffa00080, 0xffa00083).rw(FUNC(sh4_base_device::sar7_r), FUNC(sh4_base_device::sar7_w));
+	map(0xffa00084, 0xffa00087).rw(FUNC(sh4_base_device::dar7_r), FUNC(sh4_base_device::dar7_w));
+	map(0xffa00088, 0xffa0008b).rw(FUNC(sh4_base_device::dmatcr7_r), FUNC(sh4_base_device::dmatcr7_w));
+	map(0xffa0008c, 0xffa0008f).rw(FUNC(sh4_base_device::chcr7_r), FUNC(sh4_base_device::chcr7_w));
+}
+
+void sh4_base_device::cpg_map(address_map& map)
+{
+	map(0xffc00000, 0xffc00001).rw(FUNC(sh4_base_device::frqcr_r), FUNC(sh4_base_device::frqcr_w));
+	map(0xffc00004, 0xffc00004).rw(FUNC(sh4_base_device::stbcr_r), FUNC(sh4_base_device::stbcr_w));
+	map(0xffc00008, 0xffc00008).r(FUNC(sh4_base_device::wtcnt_r));
+	map(0xffc00008, 0xffc00009).w(FUNC(sh4_base_device::wtcnt_w));
+	map(0xffc0000c, 0xffc0000c).r(FUNC(sh4_base_device::wtcsr_r));
+	map(0xffc0000c, 0xffc0000d).w(FUNC(sh4_base_device::wtcsr_w));
+	map(0xffc00010, 0xffc00010).rw(FUNC(sh4_base_device::stbcr2_r), FUNC(sh4_base_device::stbcr2_w));
+}
+
+void sh4_base_device::cpg_7750r_map(address_map& map)
+{
+	cpg_map(map);
+
+	map(0xfe0a0000, 0xfe0a0003).rw(FUNC(sh4_base_device::clkstp00_r), FUNC(sh4_base_device::clkstp00_w));
+	map(0xfe0a0008, 0xfe0a000b).w(FUNC(sh4_base_device::clkstpclr_w));
+}
+
+void sh4_base_device::rtc_map(address_map& map)
+{
+	map(0xffc80000, 0xffc80000).r(FUNC(sh4_base_device::r64cnt_r));
+	map(0xffc80004, 0xffc80004).rw(FUNC(sh4_base_device::rseccnt_r), FUNC(sh4_base_device::rseccnt_w));
+	map(0xffc80008, 0xffc80008).rw(FUNC(sh4_base_device::rmincnt_r), FUNC(sh4_base_device::rmincnt_w));
+	map(0xffc8000c, 0xffc8000c).rw(FUNC(sh4_base_device::rhrcnt_r), FUNC(sh4_base_device::rhrcnt_w));
+	map(0xffc80010, 0xffc80010).rw(FUNC(sh4_base_device::rwkcnt_r), FUNC(sh4_base_device::rwkcnt_w));
+	map(0xffc80014, 0xffc80014).rw(FUNC(sh4_base_device::rdaycnt_r), FUNC(sh4_base_device::rdaycnt_w));
+	map(0xffc80018, 0xffc80018).rw(FUNC(sh4_base_device::rmoncnt_r), FUNC(sh4_base_device::rmoncnt_w));
+	map(0xffc8001c, 0xffc8001d).rw(FUNC(sh4_base_device::ryrcnt_r), FUNC(sh4_base_device::ryrcnt_w));
+	map(0xffc80020, 0xffc80020).rw(FUNC(sh4_base_device::rsecar_r), FUNC(sh4_base_device::rsecar_w));
+	map(0xffc80024, 0xffc80024).rw(FUNC(sh4_base_device::rminar_r), FUNC(sh4_base_device::rminar_w));
+	map(0xffc80028, 0xffc80028).rw(FUNC(sh4_base_device::rhrar_r), FUNC(sh4_base_device::rhrar_w));
+	map(0xffc8002c, 0xffc8002c).rw(FUNC(sh4_base_device::rwkar_r), FUNC(sh4_base_device::rwkar_w));
+	map(0xffc80030, 0xffc80030).rw(FUNC(sh4_base_device::rdayar_r), FUNC(sh4_base_device::rdayar_w));
+	map(0xffc80034, 0xffc80034).rw(FUNC(sh4_base_device::rmonar_r), FUNC(sh4_base_device::rmonar_w));
+	map(0xffc80038, 0xffc80038).rw(FUNC(sh4_base_device::rcr1_r), FUNC(sh4_base_device::rcr1_w));
+	map(0xffc8003c, 0xffc8003c).rw(FUNC(sh4_base_device::rcr2_r), FUNC(sh4_base_device::rcr2_w));
+}
+
+void sh4_base_device::rtc_7750r_map(address_map& map)
+{
+	rtc_map(map);
+
+	map(0xffc80050, 0xffc80050).rw(FUNC(sh4_base_device::rcr3_r), FUNC(sh4_base_device::rcr3_w));
+	map(0xffc80054, 0xffc80055).rw(FUNC(sh4_base_device::ryrar_r), FUNC(sh4_base_device::ryrar_w));
+}
+
+void sh4_base_device::intc_map(address_map& map)
+{
+	map(0xffd00000, 0xffd00001).rw(FUNC(sh4_base_device::icr_r), FUNC(sh4_base_device::icr_w));
+	map(0xffd00004, 0xffd00005).rw(FUNC(sh4_base_device::ipra_r), FUNC(sh4_base_device::ipra_w));
+	map(0xffd00008, 0xffd00009).rw(FUNC(sh4_base_device::iprb_r), FUNC(sh4_base_device::iprb_w));
+	map(0xffd0000c, 0xffd0000d).rw(FUNC(sh4_base_device::iprc_r), FUNC(sh4_base_device::iprc_w));
+}
+
+void sh4_base_device::intc_7750s_map(address_map& map)
+{
+	intc_map(map);
+
+	map(0xffd00010, 0xffd00011).rw(FUNC(sh4_base_device::iprd_r), FUNC(sh4_base_device::iprd_w));
+}
+
+void sh4_base_device::intc_7750r_map(address_map& map)
+{
+	intc_7750s_map(map);
+
+	map(0xfe080000, 0xfe080003).rw(FUNC(sh4_base_device::intpri00_r), FUNC(sh4_base_device::intpri00_w));
+	map(0xfe080020, 0xfe080023).rw(FUNC(sh4_base_device::intreq00_r), FUNC(sh4_base_device::intreq00_w));
+	map(0xfe080040, 0xfe080043).rw(FUNC(sh4_base_device::intmsk00_r), FUNC(sh4_base_device::intmskclr_w));
+	map(0xfe080060, 0xfe080063).w(FUNC(sh4_base_device::intmsk00_w));
+}
+
+void sh4_base_device::tmu_map(address_map& map)
+{
+	map(0xffd80000, 0xffd80000).rw(FUNC(sh4_base_device::tocr_r), FUNC(sh4_base_device::tocr_w));
+	map(0xffd80004, 0xffd80004).rw(FUNC(sh4_base_device::tstr_r), FUNC(sh4_base_device::tstr_w));
+	map(0xffd80008, 0xffd8000b).rw(FUNC(sh4_base_device::tcor0_r), FUNC(sh4_base_device::tcor0_w));
+	map(0xffd8000c, 0xffd8000f).rw(FUNC(sh4_base_device::tcnt0_r), FUNC(sh4_base_device::tcnt0_w));
+	map(0xffd80010, 0xffd80011).rw(FUNC(sh4_base_device::tcr0_r), FUNC(sh4_base_device::tcr0_w));
+	map(0xffd80014, 0xffd80017).rw(FUNC(sh4_base_device::tcor1_r), FUNC(sh4_base_device::tcor1_w));
+	map(0xffd80018, 0xffd8001b).rw(FUNC(sh4_base_device::tcnt1_r), FUNC(sh4_base_device::tcnt1_w));
+	map(0xffd8001c, 0xffd8001d).rw(FUNC(sh4_base_device::tcr1_r), FUNC(sh4_base_device::tcr1_w));
+	map(0xffd80020, 0xffd80023).rw(FUNC(sh4_base_device::tcor2_r), FUNC(sh4_base_device::tcor2_w));
+	map(0xffd80024, 0xffd80027).rw(FUNC(sh4_base_device::tcnt2_r), FUNC(sh4_base_device::tcnt2_w));
+	map(0xffd80028, 0xffd80029).rw(FUNC(sh4_base_device::tcr2_r), FUNC(sh4_base_device::tcr2_w));
+	map(0xffd8002c, 0xffd8002f).rw(FUNC(sh4_base_device::tcpr2_r), FUNC(sh4_base_device::tcpr2_w));
+}
+
+void sh4_base_device::tmu_7750r_map(address_map& map)
+{
+	tmu_map(map);
+
+	map(0xfe100004, 0xfe100004).rw(FUNC(sh4_base_device::tstr2_r), FUNC(sh4_base_device::tstr2_w));
+	map(0xfe100008, 0xfe10000b).rw(FUNC(sh4_base_device::tcor3_r), FUNC(sh4_base_device::tcor3_w));
+	map(0xfe10000c, 0xfe10000f).rw(FUNC(sh4_base_device::tcnt3_r), FUNC(sh4_base_device::tcnt3_w));
+	map(0xfe100010, 0xfe100011).rw(FUNC(sh4_base_device::tcr3_r), FUNC(sh4_base_device::tcr3_w));
+	map(0xfe100014, 0xfe100017).rw(FUNC(sh4_base_device::tcor4_r), FUNC(sh4_base_device::tcor4_w));
+	map(0xfe100018, 0xfe10001b).rw(FUNC(sh4_base_device::tcnt4_r), FUNC(sh4_base_device::tcnt4_w));
+	map(0xfe10001c, 0xfe10001d).rw(FUNC(sh4_base_device::tcr4_r), FUNC(sh4_base_device::tcr4_w));
+}
+
+void sh4_base_device::sci_map(address_map& map)
+{
+	map(0xffe00000, 0xffe00000).rw(FUNC(sh4_base_device::scsmr1_r), FUNC(sh4_base_device::scsmr1_w));
+	map(0xffe00004, 0xffe00004).rw(FUNC(sh4_base_device::scbrr1_r), FUNC(sh4_base_device::scbrr1_w));
+	map(0xffe00008, 0xffe00008).rw(FUNC(sh4_base_device::scscr1_r), FUNC(sh4_base_device::scscr1_w));
+	map(0xffe0000c, 0xffe0000c).rw(FUNC(sh4_base_device::sctdr1_r), FUNC(sh4_base_device::sctdr1_w));
+	map(0xffe00010, 0xffe00010).rw(FUNC(sh4_base_device::scssr1_r), FUNC(sh4_base_device::scssr1_w));
+	map(0xffe00014, 0xffe00014).r(FUNC(sh4_base_device::scrdr1_r));
+	map(0xffe00018, 0xffe00018).rw(FUNC(sh4_base_device::scscmr1_r), FUNC(sh4_base_device::scscmr1_w));
+	map(0xffe0001c, 0xffe0001c).rw(FUNC(sh4_base_device::scsptr1_r), FUNC(sh4_base_device::scsptr1_w));
+}
+
+void sh4_base_device::scif_map(address_map& map)
+{
+	map(0xffe80000, 0xffe80001).rw(FUNC(sh4_base_device::scsmr2_r), FUNC(sh4_base_device::scsmr2_w));
+	map(0xffe80004, 0xffe80004).rw(FUNC(sh4_base_device::scbrr2_r), FUNC(sh4_base_device::scbrr2_w));
+	map(0xffe80008, 0xffe80009).rw(FUNC(sh4_base_device::scscr2_r), FUNC(sh4_base_device::scscr2_w));
+	map(0xffe8000c, 0xffe8000c).rw(FUNC(sh4_base_device::scftdr2_r), FUNC(sh4_base_device::scftdr2_w));
+	map(0xffe80010, 0xffe80011).rw(FUNC(sh4_base_device::scfsr2_r), FUNC(sh4_base_device::scfsr2_w));
+	map(0xffe80014, 0xffe80014).r(FUNC(sh4_base_device::scfrdr2_r));
+	map(0xffe80018, 0xffe80019).rw(FUNC(sh4_base_device::scfcr2_r), FUNC(sh4_base_device::scfcr2_w));
+	map(0xffe8001c, 0xffe8001d).r(FUNC(sh4_base_device::scfdr2_r));
+	map(0xffe80020, 0xffe80021).rw(FUNC(sh4_base_device::scsptr2_r), FUNC(sh4_base_device::scsptr2_w));
+	map(0xffe80024, 0xffe80025).rw(FUNC(sh4_base_device::sclsr2_r), FUNC(sh4_base_device::sclsr2_w));
+}
+
+void sh4_base_device::hudi_map(address_map &map)
+{
+	map(0xfff00000, 0xfff00001).rw(FUNC(sh4_base_device::sdir_r), FUNC(sh4_base_device::sdir_w));
+	map(0xfff00008, 0xfff0000b).rw(FUNC(sh4_base_device::sddr_r), FUNC(sh4_base_device::sddr_w));
+}
+
+void sh4_base_device::hudi_7750r_map(address_map& map)
+{
+	hudi_map(map);
+
+	map(0xfff00014, 0xfff00015).rw(FUNC(sh4_base_device::sdint_r), FUNC(sh4_base_device::sdint_w));
+}
+
+void sh4_base_device::pci_7751_map(address_map& map)
+{
+	// PCI
+	//  0xfd000000, 0xfdffffff PCIMEM
+
+	// PCIC
+	map(0xfe200000, 0xfe200003).r(FUNC(sh4_base_device::pciconf0_r));
+	map(0xfe200004, 0xfe200007).rw(FUNC(sh4_base_device::pciconf1_r), FUNC(sh4_base_device::pciconf1_w));
+	map(0xfe200008, 0xfe20000b).rw(FUNC(sh4_base_device::pciconf2_r), FUNC(sh4_base_device::pciconf2_w));
+	map(0xfe20000c, 0xfe20000f).rw(FUNC(sh4_base_device::pciconf3_r), FUNC(sh4_base_device::pciconf3_w));
+	map(0xfe200010, 0xfe200013).rw(FUNC(sh4_base_device::pciconf4_r), FUNC(sh4_base_device::pciconf4_w));
+	map(0xfe200014, 0xfe200017).rw(FUNC(sh4_base_device::pciconf5_r), FUNC(sh4_base_device::pciconf5_w));
+	map(0xfe200018, 0xfe20001b).rw(FUNC(sh4_base_device::pciconf6_r), FUNC(sh4_base_device::pciconf6_w));
+	map(0xfe20001c, 0xfe20001f).r(FUNC(sh4_base_device::pciconf7_r));
+	map(0xfe200020, 0xfe200023).r(FUNC(sh4_base_device::pciconf8_r));
+	map(0xfe200024, 0xfe200027).r(FUNC(sh4_base_device::pciconf9_r));
+	map(0xfe200028, 0xfe20002b).r(FUNC(sh4_base_device::pciconf10_r));
+	map(0xfe20002c, 0xfe20002f).rw(FUNC(sh4_base_device::pciconf11_r), FUNC(sh4_base_device::pciconf11_w));
+	map(0xfe200030, 0xfe200033).r(FUNC(sh4_base_device::pciconf12_r));
+	map(0xfe200034, 0xfe200037).r(FUNC(sh4_base_device::pciconf13_r));
+	map(0xfe200038, 0xfe20003b).r(FUNC(sh4_base_device::pciconf14_r));
+	map(0xfe20003c, 0xfe20003f).rw(FUNC(sh4_base_device::pciconf15_r), FUNC(sh4_base_device::pciconf15_w));
+	map(0xfe200040, 0xfe200043).rw(FUNC(sh4_base_device::pciconf16_r), FUNC(sh4_base_device::pciconf16_w));
+	map(0xfe200044, 0xfe200047).rw(FUNC(sh4_base_device::pciconf17_r), FUNC(sh4_base_device::pciconf17_w));
+	map(0xfe200100, 0xfe200103).rw(FUNC(sh4_base_device::pcicr_r), FUNC(sh4_base_device::pcicr_w));
+	map(0xfe200104, 0xfe200107).rw(FUNC(sh4_base_device::pcilsr0_r), FUNC(sh4_base_device::pcilsr0_w));
+	map(0xfe200108, 0xfe20010b).rw(FUNC(sh4_base_device::pcilsr1_r), FUNC(sh4_base_device::pcilsr1_w));
+	map(0xfe20010c, 0xfe20010f).rw(FUNC(sh4_base_device::pcilar0_r), FUNC(sh4_base_device::pcilar0_w));
+	map(0xfe200110, 0xfe200113).rw(FUNC(sh4_base_device::pcilar1_r), FUNC(sh4_base_device::pcilar1_w));
+	map(0xfe200114, 0xfe200117).rw(FUNC(sh4_base_device::pciint_r), FUNC(sh4_base_device::pciint_w));
+	map(0xfe200118, 0xfe20011b).rw(FUNC(sh4_base_device::pciintm_r), FUNC(sh4_base_device::pciintm_w));
+	map(0xfe20011c, 0xfe20011f).rw(FUNC(sh4_base_device::pcialr_r), FUNC(sh4_base_device::pcialr_w));
+	map(0xfe200120, 0xfe200123).rw(FUNC(sh4_base_device::pciclr_r), FUNC(sh4_base_device::pciclr_w));
+	map(0xfe200130, 0xfe200133).rw(FUNC(sh4_base_device::pciaint_r), FUNC(sh4_base_device::pciaint_w));
+	map(0xfe200134, 0xfe200137).rw(FUNC(sh4_base_device::pciaintm_r), FUNC(sh4_base_device::pciaintm_w));
+	map(0xfe200138, 0xfe20013b).rw(FUNC(sh4_base_device::pcibllr_r), FUNC(sh4_base_device::pcibllr_w));
+	map(0xfe200140, 0xfe200143).rw(FUNC(sh4_base_device::pcidmabt_r), FUNC(sh4_base_device::pcidmabt_w));
+	map(0xfe200180, 0xfe200183).rw(FUNC(sh4_base_device::pcidpa0_r), FUNC(sh4_base_device::pcidpa0_w));
+	map(0xfe200184, 0xfe200187).rw(FUNC(sh4_base_device::pcidla0_r), FUNC(sh4_base_device::pcidla0_w));
+	map(0xfe200188, 0xfe20018b).rw(FUNC(sh4_base_device::pcidtc0_r), FUNC(sh4_base_device::pcidtc0_w));
+	map(0xfe20018c, 0xfe20018f).rw(FUNC(sh4_base_device::pcidcr0_r), FUNC(sh4_base_device::pcidcr0_w));
+	map(0xfe200190, 0xfe200193).rw(FUNC(sh4_base_device::pcidpa1_r), FUNC(sh4_base_device::pcidpa1_w));
+	map(0xfe200194, 0xfe200197).rw(FUNC(sh4_base_device::pcidla1_r), FUNC(sh4_base_device::pcidla1_w));
+	map(0xfe200198, 0xfe20019b).rw(FUNC(sh4_base_device::pcidtc1_r), FUNC(sh4_base_device::pcidtc1_w));
+	map(0xfe20019c, 0xfe20019f).rw(FUNC(sh4_base_device::pcidcr1_r), FUNC(sh4_base_device::pcidcr1_w));
+	map(0xfe2001a0, 0xfe2001a3).rw(FUNC(sh4_base_device::pcidpa2_r), FUNC(sh4_base_device::pcidpa2_w));
+	map(0xfe2001a4, 0xfe2001a7).rw(FUNC(sh4_base_device::pcidla2_r), FUNC(sh4_base_device::pcidla2_w));
+	map(0xfe2001a8, 0xfe2001ab).rw(FUNC(sh4_base_device::pcidtc2_r), FUNC(sh4_base_device::pcidtc2_w));
+	map(0xfe2001ac, 0xfe2001af).rw(FUNC(sh4_base_device::pcidcr2_r), FUNC(sh4_base_device::pcidcr2_w));
+	map(0xfe2001b0, 0xfe2001b3).rw(FUNC(sh4_base_device::pcidpa3_r), FUNC(sh4_base_device::pcidpa3_w));
+	map(0xfe2001b4, 0xfe2001b7).rw(FUNC(sh4_base_device::pcidla3_r), FUNC(sh4_base_device::pcidla3_w));
+	map(0xfe2001b8, 0xfe2001bb).rw(FUNC(sh4_base_device::pcidtc3_r), FUNC(sh4_base_device::pcidtc3_w));
+	map(0xfe2001bc, 0xfe2001bf).rw(FUNC(sh4_base_device::pcidcr3_r), FUNC(sh4_base_device::pcidcr3_w));
+	map(0xfe2001c0, 0xfe2001c3).rw(FUNC(sh4_base_device::pcipar_r), FUNC(sh4_base_device::pcipar_w));
+	map(0xfe2001c4, 0xfe2001c7).rw(FUNC(sh4_base_device::pcimbr_r), FUNC(sh4_base_device::pcimbr_w));
+	map(0xfe2001c8, 0xfe2001cb).rw(FUNC(sh4_base_device::pciiobr_r), FUNC(sh4_base_device::pciiobr_w));
+	map(0xfe2001cc, 0xfe2001cf).rw(FUNC(sh4_base_device::pcipint_r), FUNC(sh4_base_device::pcipint_w));
+	map(0xfe2001d0, 0xfe2001d3).rw(FUNC(sh4_base_device::pcipintm_r), FUNC(sh4_base_device::pcipintm_w));
+	map(0xfe2001d4, 0xfe2001d7).rw(FUNC(sh4_base_device::pciclkr_r), FUNC(sh4_base_device::pciclkr_w));
+	map(0xfe2001e0, 0xfe2001e3).rw(FUNC(sh4_base_device::pcibcr1_r), FUNC(sh4_base_device::pcibcr1_w));
+	map(0xfe2001e4, 0xfe2001e7).rw(FUNC(sh4_base_device::pcibcr2_r), FUNC(sh4_base_device::pcibcr2_w));
+	map(0xfe2001f8, 0xfe2001fb).rw(FUNC(sh4_base_device::pcibcr3_r), FUNC(sh4_base_device::pcibcr3_w));
+	map(0xfe2001e8, 0xfe2001eb).rw(FUNC(sh4_base_device::pciwcr1_r), FUNC(sh4_base_device::pciwcr1_w));
+	map(0xfe2001ec, 0xfe2001ef).rw(FUNC(sh4_base_device::pciwcr2_r), FUNC(sh4_base_device::pciwcr2_w));
+	map(0xfe2001f0, 0xfe2001f3).rw(FUNC(sh4_base_device::pciwcr3_r), FUNC(sh4_base_device::pciwcr3_w));
+	map(0xfe2001f4, 0xfe2001f7).rw(FUNC(sh4_base_device::pcimcr_r), FUNC(sh4_base_device::pcimcr_w));
+	map(0xfe200200, 0xfe200203).rw(FUNC(sh4_base_device::pcipctr_r), FUNC(sh4_base_device::pcipctr_w));
+	map(0xfe200204, 0xfe200207).rw(FUNC(sh4_base_device::pcipdtr_r), FUNC(sh4_base_device::pcipdtr_w));
+	map(0xfe200220, 0xfe200223).rw(FUNC(sh4_base_device::pcipdr_r), FUNC(sh4_base_device::pcipdr_w));
+
+	// PCIIO
+	//  0xfe240000, 0xfe27ffff
 }
 
 void sh3_base_device::sh3_internal_map(address_map &map)
 {
-	map(SH3_LOWER_REGBASE, SH3_LOWER_REGEND).rw(FUNC(sh3_base_device::sh3_internal_r), FUNC(sh3_base_device::sh3_internal_w));
-	map(SH3_UPPER_REGBASE, SH3_UPPER_REGEND).rw(FUNC(sh3_base_device::sh3_internal_high_r), FUNC(sh3_base_device::sh3_internal_high_w));
+	sh3_register_map(map);
 }
 
+void sh3_device::sh3_register_map(address_map& map)
+{
+	ccn_7709s_map(map);
+	ubc_7709s_map(map);
+	cpg_7709_map(map);
+	bsc_7709s_map(map);
+	rtc_map(map);
+	intc_7709_map(map);
+	dmac_7709_map(map);
+	tmu_map(map);
+	sci_7709_map(map);
+	cmt_7709_map(map);
+	ad_7709_map(map);
+	da_7709_map(map);
+	port_7709_map(map);
+	irda_7709_map(map);
+	scif_7709_map(map);
+	udi_7709s_map(map);
+}
+
+void sh7708s_device::sh3_register_map(address_map& map)
+{
+	ccn_map(map);
+	ubc_map(map);
+	cpg_map(map);
+	bsc_7708_map(map);
+	rtc_map(map);
+	intc_map(map);
+	tmu_map(map);
+	sci_7708_map(map);
+}
+
+void sh7709_device::sh3_register_map(address_map& map)
+{
+	ccn_map(map);
+	ubc_map(map);
+	cpg_7709_map(map);
+	bsc_7709_map(map);
+	rtc_map(map);
+	intc_7709_map(map);
+	dmac_7709_map(map);
+	tmu_map(map);
+	sci_7709_map(map);
+	cmt_7709_map(map);
+	ad_7709_map(map);
+	da_7709_map(map);
+	port_7709_map(map);
+	irda_7709_map(map);
+	scif_7709_map(map);
+}
+
+void sh7709s_device::sh3_register_map(address_map& map)
+{
+	ccn_7709s_map(map);
+	ubc_7709s_map(map);
+	cpg_7709_map(map);
+	bsc_7709s_map(map);
+	rtc_map(map);
+	intc_7709_map(map);
+	dmac_7709_map(map);
+	tmu_map(map);
+	sci_7709_map(map);
+	cmt_7709_map(map);
+	ad_7709_map(map);
+	da_7709_map(map);
+	port_7709_map(map);
+	irda_7709_map(map);
+	scif_7709_map(map);
+	udi_7709s_map(map);
+}
+
+void sh3_base_device::ccn_map(address_map& map)
+{
+	map(0xfffffff0, 0xfffffff3).rw(FUNC(sh3_base_device::pteh_r), FUNC(sh3_base_device::pteh_w));
+	map(0xfffffff4, 0xfffffff7).rw(FUNC(sh3_base_device::ptel_r), FUNC(sh3_base_device::ptel_w));
+	map(0xfffffff8, 0xfffffffb).rw(FUNC(sh3_base_device::ttb_r), FUNC(sh3_base_device::ttb_w));
+	map(0xfffffffc, 0xffffffff).rw(FUNC(sh3_base_device::tea_r), FUNC(sh3_base_device::tea_w));
+	map(0xffffffe0, 0xffffffe3).rw(FUNC(sh3_base_device::mmucr_r), FUNC(sh3_base_device::mmucr_w));
+	map(0xffffffe4, 0xffffffe4).rw(FUNC(sh3_base_device::basra_r), FUNC(sh3_base_device::basra_w));
+	map(0xffffffe8, 0xffffffe8).rw(FUNC(sh3_base_device::basrb_r), FUNC(sh3_base_device::basrb_w));
+	map(0xffffffec, 0xffffffef).rw(FUNC(sh3_base_device::ccr_r), FUNC(sh3_base_device::ccr_w));
+	map(0xffffffd0, 0xffffffd3).rw(FUNC(sh3_base_device::tra_r), FUNC(sh3_base_device::tra_w));
+	map(0xffffffd4, 0xffffffd7).rw(FUNC(sh3_base_device::expevt_r), FUNC(sh3_base_device::expevt_w));
+	map(0xffffffd8, 0xffffffdb).rw(FUNC(sh3_base_device::intevt_r), FUNC(sh3_base_device::intevt_w));
+}
+
+void sh3_base_device::ccn_7709s_map(address_map& map)
+{
+	ccn_map(map);
+
+	map(0x400000b0, 0x400000b3).rw(FUNC(sh3_base_device::ccr2_r), FUNC(sh3_base_device::ccr2_w));
+}
+
+void sh3_base_device::ubc_map(address_map& map)
+{
+	map(0xffffffb0, 0xffffffb3).rw(FUNC(sh3_base_device::bara_r), FUNC(sh3_base_device::bara_w));
+	map(0xffffffb4, 0xffffffb4).rw(FUNC(sh3_base_device::bamra_r), FUNC(sh3_base_device::bamra_w));
+	map(0xffffffb8, 0xffffffb9).rw(FUNC(sh3_base_device::bbra_r), FUNC(sh3_base_device::bbra_w));
+	map(0xffffffa0, 0xffffffa3).rw(FUNC(sh3_base_device::barb_r), FUNC(sh3_base_device::barb_w));
+	map(0xffffffa4, 0xffffffa4).rw(FUNC(sh3_base_device::bamrb_r), FUNC(sh3_base_device::bamrb_w));
+	map(0xffffffa8, 0xffffffa9).rw(FUNC(sh3_base_device::bbrb_r), FUNC(sh3_base_device::bbrb_w));
+	map(0xffffff90, 0xffffff93).rw(FUNC(sh3_base_device::bdrb_r), FUNC(sh3_base_device::bdrb_w));
+	map(0xffffff94, 0xffffff97).rw(FUNC(sh3_base_device::bdmrb_r), FUNC(sh3_base_device::bdmrb_w));
+	map(0xffffff98, 0xffffff99).rw(FUNC(sh3_base_device::brcr_r), FUNC(sh3_base_device::brcr_w));
+}
+
+void sh3_base_device::ubc_7709s_map(address_map& map)
+{
+	ubc_map(map);
+
+	map(0xffffff9c, 0xffffff9d).rw(FUNC(sh3_base_device::betr_r), FUNC(sh3_base_device::betr_w));
+	map(0xffffffac, 0xffffffaf).rw(FUNC(sh3_base_device::brsr_r), FUNC(sh3_base_device::brsr_w));
+	map(0xffffffbc, 0xffffffbf).rw(FUNC(sh3_base_device::brdr_r), FUNC(sh3_base_device::brdr_w));
+}
+
+void sh3_base_device::cpg_map(address_map& map)
+{
+	map(0xffffff80, 0xffffff81).rw(FUNC(sh3_base_device::frqcr_r), FUNC(sh3_base_device::frqcr_w));
+	map(0xffffff82, 0xffffff83).rw(FUNC(sh3_base_device::stbcr_r), FUNC(sh3_base_device::stbcr_w));
+	map(0xffffff84, 0xffffff84).r(FUNC(sh3_base_device::wtcnt_r));
+	map(0xffffff84, 0xffffff85).w(FUNC(sh3_base_device::wtcnt_w));
+	map(0xffffff86, 0xffffff86).r(FUNC(sh3_base_device::wtcsr_r));
+	map(0xffffff86, 0xffffff87).w(FUNC(sh3_base_device::wtcsr_w));
+}
+
+void sh3_base_device::cpg_7709_map(address_map& map)
+{
+	cpg_map(map);
+
+	map(0xffffff88, 0xffffff88).rw(FUNC(sh3_base_device::stbcr2_r), FUNC(sh3_base_device::stbcr2_w));
+}
+
+void sh3_base_device::bsc_map(address_map& map)
+{
+	map(0xffffff60, 0xffffff61).rw(FUNC(sh3_base_device::bcr1_r), FUNC(sh3_base_device::bcr1_w));
+	map(0xffffff62, 0xffffff63).rw(FUNC(sh3_base_device::bcr2_r), FUNC(sh3_base_device::bcr2_w));
+	map(0xffffff64, 0xffffff65).rw(FUNC(sh3_base_device::wcr1_r), FUNC(sh3_base_device::wcr1_w));
+	map(0xffffff66, 0xffffff67).rw(FUNC(sh3_base_device::wcr2_r), FUNC(sh3_base_device::wcr2_w));
+	map(0xffffff68, 0xffffff69).rw(FUNC(sh3_base_device::mcr_r), FUNC(sh3_base_device::mcr_w));
+	map(0xffffff6c, 0xffffff6d).rw(FUNC(sh3_base_device::pcr_r), FUNC(sh3_base_device::pcr_w));
+	map(0xffffff6e, 0xffffff6f).rw(FUNC(sh3_base_device::rtcsr_r), FUNC(sh3_base_device::rtcsr_w));
+	map(0xffffff70, 0xffffff71).rw(FUNC(sh3_base_device::rtcnt_r), FUNC(sh3_base_device::rtcnt_w));
+	map(0xffffff72, 0xffffff73).rw(FUNC(sh3_base_device::rtcor_r), FUNC(sh3_base_device::rtcor_w));
+	map(0xffffff74, 0xffffff75).rw(FUNC(sh3_base_device::rfcr_r), FUNC(sh3_base_device::rfcr_w));
+	map(0xfffd0000, 0xffffeffe).rw(FUNC(sh3_base_device::sdmr_r), FUNC(sh3_base_device::sdmr_w));
+}
+
+void sh3_base_device::bsc_7708_map(address_map& map)
+{
+	bsc_map(map);
+
+	map(0xffffff6a, 0xffffff6b).rw(FUNC(sh3_base_device::dcr_r), FUNC(sh3_base_device::dcr_w));
+	map(0xffffff76, 0xffffff77).rw(FUNC(sh3_base_device::pctr_r), FUNC(sh3_base_device::pctr_w));
+	map(0xffffff78, 0xffffff79).rw(FUNC(sh3_base_device::pdtr_r), FUNC(sh3_base_device::pdtr_w));
+}
+
+void sh3_base_device::bsc_7709_map(address_map& map)
+{
+	bsc_map(map);
+
+	map(0xffffff6a, 0xffffff6b).rw(FUNC(sh3_base_device::dcr_r), FUNC(sh3_base_device::dcr_w));
+	map(0xffffff7e, 0xffffff7f).rw(FUNC(sh3_base_device::bcr3_r), FUNC(sh3_base_device::bcr3_w));
+}
+
+void sh3_base_device::bsc_7709s_map(address_map& map)
+{
+	bsc_map(map);
+
+	map(0xffffff50, 0xffffff51).rw(FUNC(sh3_base_device::mcscr0_r), FUNC(sh3_base_device::mcscr0_w));
+	map(0xffffff52, 0xffffff53).rw(FUNC(sh3_base_device::mcscr1_r), FUNC(sh3_base_device::mcscr1_w));
+	map(0xffffff54, 0xffffff55).rw(FUNC(sh3_base_device::mcscr2_r), FUNC(sh3_base_device::mcscr2_w));
+	map(0xffffff56, 0xffffff57).rw(FUNC(sh3_base_device::mcscr3_r), FUNC(sh3_base_device::mcscr3_w));
+	map(0xffffff58, 0xffffff59).rw(FUNC(sh3_base_device::mcscr4_r), FUNC(sh3_base_device::mcscr4_w));
+	map(0xffffff5a, 0xffffff5b).rw(FUNC(sh3_base_device::mcscr5_r), FUNC(sh3_base_device::mcscr5_w));
+	map(0xffffff5c, 0xffffff5d).rw(FUNC(sh3_base_device::mcscr6_r), FUNC(sh3_base_device::mcscr6_w));
+	map(0xffffff5e, 0xffffff5f).rw(FUNC(sh3_base_device::mcscr7_r), FUNC(sh3_base_device::mcscr7_w));
+}
+
+void sh3_base_device::rtc_map(address_map& map)
+{
+	map(0xfffffec0, 0xfffffec0).r(FUNC(sh3_base_device::r64cnt_r));
+	map(0xfffffec2, 0xfffffec2).rw(FUNC(sh3_base_device::rseccnt_r), FUNC(sh3_base_device::rseccnt_w));
+	map(0xfffffec4, 0xfffffec4).rw(FUNC(sh3_base_device::rmincnt_r), FUNC(sh3_base_device::rmincnt_w));
+	map(0xfffffec6, 0xfffffec6).rw(FUNC(sh3_base_device::rhrcnt_r), FUNC(sh3_base_device::rhrcnt_w));
+	map(0xfffffec8, 0xfffffec8).rw(FUNC(sh3_base_device::rwkcnt_r), FUNC(sh3_base_device::rwkcnt_w));
+	map(0xfffffeca, 0xfffffeca).rw(FUNC(sh3_base_device::rdaycnt_r), FUNC(sh3_base_device::rdaycnt_w));
+	map(0xfffffecc, 0xfffffecc).rw(FUNC(sh3_base_device::rmoncnt_r), FUNC(sh3_base_device::rmoncnt_w));
+	map(0xfffffece, 0xfffffece).rw(FUNC(sh3_base_device::ryrcnt_r), FUNC(sh3_base_device::ryrcnt_w));
+	map(0xfffffec0, 0xfffffec0).rw(FUNC(sh3_base_device::rsecar_r), FUNC(sh3_base_device::rsecar_w));
+	map(0xfffffed2, 0xfffffed2).rw(FUNC(sh3_base_device::rminar_r), FUNC(sh3_base_device::rminar_w));
+	map(0xfffffed4, 0xfffffed4).rw(FUNC(sh3_base_device::rhrar_r), FUNC(sh3_base_device::rhrar_w));
+	map(0xfffffed6, 0xfffffed6).rw(FUNC(sh3_base_device::rwkar_r), FUNC(sh3_base_device::rwkar_w));
+	map(0xfffffed8, 0xfffffed8).rw(FUNC(sh3_base_device::rdayar_r), FUNC(sh3_base_device::rdayar_w));
+	map(0xfffffeda, 0xfffffeda).rw(FUNC(sh3_base_device::rmonar_r), FUNC(sh3_base_device::rmonar_w));
+	map(0xfffffedc, 0xfffffedc).rw(FUNC(sh3_base_device::rcr1_r), FUNC(sh3_base_device::rcr1_w));
+	map(0xfffffede, 0xfffffede).rw(FUNC(sh3_base_device::rcr2_r), FUNC(sh3_base_device::rcr2_w));
+}
+
+void sh3_base_device::intc_map(address_map& map)
+{
+	map(0xfffffee0, 0xfffffee1).rw(FUNC(sh3_base_device::icr0_r), FUNC(sh3_base_device::icr0_w));
+	map(0xfffffee2, 0xfffffee3).rw(FUNC(sh3_base_device::ipra_r), FUNC(sh3_base_device::ipra_w));
+	map(0xfffffee4, 0xfffffee5).rw(FUNC(sh3_base_device::iprb_r), FUNC(sh3_base_device::iprb_w));
+}
+
+void sh3_base_device::intc_7709_map(address_map& map)
+{
+	intc_map(map);
+
+	map(0x04000000, 0x04000003).rw(FUNC(sh3_base_device::intevt2_r), FUNC(sh3_base_device::intevt2_w));
+	map(0x04000004, 0x04000004).rw(FUNC(sh3_base_device::irr0_r), FUNC(sh3_base_device::irr0_w));
+	map(0x04000006, 0x04000006).rw(FUNC(sh3_base_device::irr1_r), FUNC(sh3_base_device::irr1_w));
+	map(0x04000008, 0x04000008).rw(FUNC(sh3_base_device::irr2_r), FUNC(sh3_base_device::irr2_w));
+	map(0x04000010, 0x04000011).rw(FUNC(sh3_base_device::icr1_r), FUNC(sh3_base_device::icr1_w));
+	map(0x04000012, 0x04000013).rw(FUNC(sh3_base_device::icr2_r), FUNC(sh3_base_device::icr2_w));
+	map(0x04000014, 0x04000015).rw(FUNC(sh3_base_device::pinter_r), FUNC(sh3_base_device::pinter_w));
+	map(0x04000016, 0x04000017).rw(FUNC(sh3_base_device::iprc_r), FUNC(sh3_base_device::iprc_w));
+	map(0x04000018, 0x04000019).rw(FUNC(sh3_base_device::iprd_r), FUNC(sh3_base_device::iprd_w));
+	map(0x0400001a, 0x0400001b).rw(FUNC(sh3_base_device::ipre_r), FUNC(sh3_base_device::ipre_w));
+}
+
+void sh3_base_device::dmac_7709_map(address_map& map)
+{
+	map(0x04000020, 0x04000023).rw(FUNC(sh3_base_device::sar0_r), FUNC(sh3_base_device::sar0_w));
+	map(0x04000024, 0x04000027).rw(FUNC(sh3_base_device::dar0_r), FUNC(sh3_base_device::dar0_w));
+	map(0x04000028, 0x0400002b).rw(FUNC(sh3_base_device::dmatcr0_r), FUNC(sh3_base_device::dmatcr0_w));
+	map(0x0400002c, 0x0400002f).rw(FUNC(sh3_base_device::chcr0_r), FUNC(sh3_base_device::chcr0_w));
+	map(0x04000030, 0x04000033).rw(FUNC(sh3_base_device::sar1_r), FUNC(sh3_base_device::sar1_w));
+	map(0x04000034, 0x04000037).rw(FUNC(sh3_base_device::dar1_r), FUNC(sh3_base_device::dar1_w));
+	map(0x04000038, 0x0400003b).rw(FUNC(sh3_base_device::dmatcr1_r), FUNC(sh3_base_device::dmatcr1_w));
+	map(0x0400003c, 0x0400003f).rw(FUNC(sh3_base_device::chcr1_r), FUNC(sh3_base_device::chcr1_w));
+	map(0x04000040, 0x04000043).rw(FUNC(sh3_base_device::sar2_r), FUNC(sh3_base_device::sar2_w));
+	map(0x04000044, 0x04000047).rw(FUNC(sh3_base_device::dar2_r), FUNC(sh3_base_device::dar2_w));
+	map(0x04000048, 0x0400004b).rw(FUNC(sh3_base_device::dmatcr2_r), FUNC(sh3_base_device::dmatcr2_w));
+	map(0x0400004c, 0x0400004f).rw(FUNC(sh3_base_device::chcr2_r), FUNC(sh3_base_device::chcr2_w));
+	map(0x04000050, 0x04000053).rw(FUNC(sh3_base_device::sar3_r), FUNC(sh3_base_device::sar3_w));
+	map(0x04000054, 0x04000057).rw(FUNC(sh3_base_device::dar3_r), FUNC(sh3_base_device::dar3_w));
+	map(0x04000058, 0x0400005b).rw(FUNC(sh3_base_device::dmatcr3_r), FUNC(sh3_base_device::dmatcr3_w));
+	map(0x0400005c, 0x0400005f).rw(FUNC(sh3_base_device::chcr3_r), FUNC(sh3_base_device::chcr3_w));
+	map(0x04000060, 0x04000061).lrw16(
+		[this](offs_t offset, uint16_t mem_mask) { return dmaor_r(offset, mem_mask); }, "sh3_base_device::dmaor_r",
+		[this](offs_t offset, uint16_t data, uint16_t mem_mask) { dmaor_w(offset, data, mem_mask); }, "sh3_base_device::dmaor_w");
+}
+
+void sh3_base_device::tmu_map(address_map& map)
+{
+	map(0xfffffe90, 0xfffffe90).rw(FUNC(sh3_base_device::tocr_r), FUNC(sh3_base_device::tocr_w));
+	map(0xfffffe92, 0xfffffe92).rw(FUNC(sh3_base_device::tstr_r), FUNC(sh3_base_device::tstr_w));
+	map(0xfffffe94, 0xfffffe97).rw(FUNC(sh3_base_device::tcor0_r), FUNC(sh3_base_device::tcor0_w));
+	map(0xfffffe98, 0xfffffe9b).rw(FUNC(sh3_base_device::tcnt0_r), FUNC(sh3_base_device::tcnt0_w));
+	map(0xfffffe9c, 0xfffffe9d).rw(FUNC(sh3_base_device::tcr0_r), FUNC(sh3_base_device::tcr0_w));
+	map(0xfffffea0, 0xfffffea3).rw(FUNC(sh3_base_device::tcor1_r), FUNC(sh3_base_device::tcor1_w));
+	map(0xfffffea4, 0xfffffea7).rw(FUNC(sh3_base_device::tcnt1_r), FUNC(sh3_base_device::tcnt1_w));
+	map(0xfffffea8, 0xfffffea9).rw(FUNC(sh3_base_device::tcr1_r), FUNC(sh3_base_device::tcr1_w));
+	map(0xfffffeac, 0xfffffeaf).rw(FUNC(sh3_base_device::tcor2_r), FUNC(sh3_base_device::tcor2_w));
+	map(0xfffffeb0, 0xfffffeb3).rw(FUNC(sh3_base_device::tcnt2_r), FUNC(sh3_base_device::tcnt2_w));
+	map(0xfffffeb4, 0xfffffeb5).rw(FUNC(sh3_base_device::tcr2_r), FUNC(sh3_base_device::tcr2_w));
+	map(0xfffffeb8, 0xfffffebb).rw(FUNC(sh3_base_device::tcpr2_r), FUNC(sh3_base_device::tcpr2_w));
+}
+
+void sh3_base_device::sci_7708_map(address_map& map)
+{
+	sci_7709_map(map);
+
+	map(0xffffff7c, 0xffffff7c).rw(FUNC(sh3_base_device::scsptr_r), FUNC(sh3_base_device::scsptr_w));
+}
+
+void sh3_base_device::sci_7709_map(address_map& map)
+{
+	map(0xfffffe80, 0xfffffe80).rw(FUNC(sh3_base_device::scsmr_r), FUNC(sh3_base_device::scsmr_w));
+	map(0xfffffe82, 0xfffffe82).rw(FUNC(sh3_base_device::scbrr_r), FUNC(sh3_base_device::scbrr_w));
+	map(0xfffffe84, 0xfffffe84).rw(FUNC(sh3_base_device::scscr_r), FUNC(sh3_base_device::scscr_w));
+	map(0xfffffe86, 0xfffffe86).rw(FUNC(sh3_base_device::sctdr_r), FUNC(sh3_base_device::sctdr_w));
+	map(0xfffffe88, 0xfffffe88).rw(FUNC(sh3_base_device::scssr_r), FUNC(sh3_base_device::scssr_w));
+	map(0xfffffe8a, 0xfffffe8a).r(FUNC(sh3_base_device::scrdr_r));
+	map(0xfffffe8c, 0xfffffe8c).rw(FUNC(sh3_base_device::scscmr_r), FUNC(sh3_base_device::scscmr_w));
+}
+
+void sh3_base_device::cmt_7709_map(address_map& map)
+{
+	map(0x04000070, 0x04000071).rw(FUNC(sh3_base_device::cmstr_r), FUNC(sh3_base_device::cmstr_w));
+	map(0x04000072, 0x04000073).rw(FUNC(sh3_base_device::cmscr_r), FUNC(sh3_base_device::cmscr_w));
+	map(0x04000074, 0x04000075).rw(FUNC(sh3_base_device::cmcnt_r), FUNC(sh3_base_device::cmcnt_w));
+	map(0x04000076, 0x04000077).rw(FUNC(sh3_base_device::cmcor_r), FUNC(sh3_base_device::cmcor_w));
+}
+
+void sh3_base_device::ad_7709_map(address_map& map)
+{
+	map(0x04000080, 0x04000080).rw(FUNC(sh3_base_device::addrah_r), FUNC(sh3_base_device::addrah_w));
+	map(0x04000082, 0x04000082).rw(FUNC(sh3_base_device::addral_r), FUNC(sh3_base_device::addral_w));
+	map(0x04000084, 0x04000084).rw(FUNC(sh3_base_device::addrbh_r), FUNC(sh3_base_device::addrbh_w));
+	map(0x04000086, 0x04000086).rw(FUNC(sh3_base_device::addrbl_r), FUNC(sh3_base_device::addrbl_w));
+	map(0x04000088, 0x04000088).rw(FUNC(sh3_base_device::addrch_r), FUNC(sh3_base_device::addrch_w));
+	map(0x0400008a, 0x0400008a).rw(FUNC(sh3_base_device::addrcl_r), FUNC(sh3_base_device::addrcl_w));
+	map(0x0400008c, 0x0400008c).rw(FUNC(sh3_base_device::addrdh_r), FUNC(sh3_base_device::addrdh_w));
+	map(0x0400008e, 0x0400008e).rw(FUNC(sh3_base_device::addrdl_r), FUNC(sh3_base_device::addrdl_w));
+	map(0x04000090, 0x04000090).rw(FUNC(sh3_base_device::adcsr_r), FUNC(sh3_base_device::adcsr_w));
+	map(0x04000092, 0x04000092).rw(FUNC(sh3_base_device::adcr_r), FUNC(sh3_base_device::adcr_w));
+}
+
+void sh3_base_device::da_7709_map(address_map& map)
+{
+	map(0x040000a0, 0x040000a0).rw(FUNC(sh3_base_device::dadr0_r), FUNC(sh3_base_device::dadr0_w));
+	map(0x040000a2, 0x040000a2).rw(FUNC(sh3_base_device::dadr1_r), FUNC(sh3_base_device::dadr1_w));
+	map(0x040000a4, 0x040000a4).rw(FUNC(sh3_base_device::dadcr_r), FUNC(sh3_base_device::dadcr_w));
+}
+
+void sh3_base_device::port_7709_map(address_map& map)
+{
+	map(0x04000100, 0x04000101).rw(FUNC(sh3_base_device::pacr_r), FUNC(sh3_base_device::pacr_w));
+	map(0x04000102, 0x04000103).rw(FUNC(sh3_base_device::pbcr_r), FUNC(sh3_base_device::pbcr_w));
+	map(0x04000104, 0x04000105).rw(FUNC(sh3_base_device::pccr_r), FUNC(sh3_base_device::pccr_w));
+	map(0x04000106, 0x04000107).rw(FUNC(sh3_base_device::pdcr_r), FUNC(sh3_base_device::pdcr_w));
+	map(0x04000108, 0x04000109).rw(FUNC(sh3_base_device::pecr_r), FUNC(sh3_base_device::pecr_w));
+	map(0x0400010a, 0x0400010b).rw(FUNC(sh3_base_device::pfcr_r), FUNC(sh3_base_device::pfcr_w));
+	map(0x0400010c, 0x0400010d).rw(FUNC(sh3_base_device::pgcr_r), FUNC(sh3_base_device::pgcr_w));
+	map(0x0400010e, 0x0400010f).rw(FUNC(sh3_base_device::phcr_r), FUNC(sh3_base_device::phcr_w));
+	map(0x04000110, 0x04000111).rw(FUNC(sh3_base_device::pjcr_r), FUNC(sh3_base_device::pjcr_w));
+	map(0x04000112, 0x04000113).rw(FUNC(sh3_base_device::pkcr_r), FUNC(sh3_base_device::pkcr_w));
+	map(0x04000114, 0x04000115).rw(FUNC(sh3_base_device::plcr_r), FUNC(sh3_base_device::plcr_w));
+	map(0x04000116, 0x04000117).rw(FUNC(sh3_base_device::scpcr_r), FUNC(sh3_base_device::scpcr_w));
+	map(0x04000120, 0x04000120).rw(FUNC(sh3_base_device::padr_r), FUNC(sh3_base_device::padr_w));
+	map(0x04000122, 0x04000122).rw(FUNC(sh3_base_device::pbdr_r), FUNC(sh3_base_device::pbdr_w));
+	map(0x04000124, 0x04000124).rw(FUNC(sh3_base_device::pcdr_r), FUNC(sh3_base_device::pcdr_w));
+	map(0x04000126, 0x04000126).rw(FUNC(sh3_base_device::pddr_r), FUNC(sh3_base_device::pddr_w));
+	map(0x04000128, 0x04000128).rw(FUNC(sh3_base_device::pedr_r), FUNC(sh3_base_device::pedr_w));
+	map(0x0400012a, 0x0400012a).rw(FUNC(sh3_base_device::pfdr_r), FUNC(sh3_base_device::pfdr_w));
+	map(0x0400012c, 0x0400012c).rw(FUNC(sh3_base_device::pgdr_r), FUNC(sh3_base_device::pgdr_w));
+	map(0x0400012e, 0x0400012e).rw(FUNC(sh3_base_device::phdr_r), FUNC(sh3_base_device::phdr_w));
+	map(0x04000130, 0x04000130).rw(FUNC(sh3_base_device::pjdr_r), FUNC(sh3_base_device::pjdr_w));
+	map(0x04000132, 0x04000132).rw(FUNC(sh3_base_device::pkdr_r), FUNC(sh3_base_device::pkdr_w));
+	map(0x04000134, 0x04000134).rw(FUNC(sh3_base_device::pldr_r), FUNC(sh3_base_device::pldr_w));
+	map(0x04000136, 0x04000136).rw(FUNC(sh3_base_device::scpdr_r), FUNC(sh3_base_device::scpdr_w));
+}
+
+void sh3_base_device::irda_7709_map(address_map& map)
+{
+	map(0x04000140, 0x04000140).rw(FUNC(sh3_base_device::scsmr1_r), FUNC(sh3_base_device::scsmr1_w));
+	map(0x04000142, 0x04000142).rw(FUNC(sh3_base_device::scbrr1_r), FUNC(sh3_base_device::scbrr1_w));
+	map(0x04000144, 0x04000144).rw(FUNC(sh3_base_device::scscr1_r), FUNC(sh3_base_device::scscr1_w));
+	map(0x04000146, 0x04000146).rw(FUNC(sh3_base_device::scftdr1_r), FUNC(sh3_base_device::scftdr1_w));
+	map(0x04000148, 0x04000149).rw(FUNC(sh3_base_device::scssr1_r), FUNC(sh3_base_device::scssr1_w));
+	map(0x0400014a, 0x0400014a).rw(FUNC(sh3_base_device::scfrdr1_r), FUNC(sh3_base_device::scfrdr1_w));
+	map(0x0400014c, 0x0400014c).rw(FUNC(sh3_base_device::scfcr1_r), FUNC(sh3_base_device::scfcr1_w));
+	map(0x0400014e, 0x0400014f).rw(FUNC(sh3_base_device::scfdr1_r), FUNC(sh3_base_device::scfdr1_w));
+}
+
+void sh3_base_device::scif_7709_map(address_map& map)
+{
+	map(0x04000150, 0x04000150).rw(FUNC(sh3_base_device::scsmr2_r), FUNC(sh3_base_device::scsmr2_w));
+	map(0x04000152, 0x04000152).rw(FUNC(sh3_base_device::scbrr2_r), FUNC(sh3_base_device::scbrr2_w));
+	map(0x04000154, 0x04000154).rw(FUNC(sh3_base_device::scscr2_r), FUNC(sh3_base_device::scscr2_w));
+	map(0x04000156, 0x04000156).rw(FUNC(sh3_base_device::scftdr2_r), FUNC(sh3_base_device::scftdr2_w));
+	map(0x04000158, 0x04000159).rw(FUNC(sh3_base_device::scssr2_r), FUNC(sh3_base_device::scssr2_w));
+	map(0x0400015a, 0x0400015a).rw(FUNC(sh3_base_device::scfrdr2_r), FUNC(sh3_base_device::scfrdr2_w));
+	map(0x0400015c, 0x0400015c).rw(FUNC(sh3_base_device::scfcr2_r), FUNC(sh3_base_device::scfcr2_w));
+	map(0x0400015e, 0x0400015f).rw(FUNC(sh3_base_device::scfdr2_r), FUNC(sh3_base_device::scfdr2_w));
+}
+
+void sh3_base_device::udi_7709s_map(address_map& map)
+{
+	map(0x4000200, 0x4000201).rw(FUNC(sh3_base_device::sdir_r), FUNC(sh3_base_device::sdir_w));
+}
 
 sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
 	: sh_common_execution(mconfig, type, tag, owner, clock, endianness, internal)
@@ -90,6 +903,32 @@ device_memory_interface::space_config_vector sh34_base_device::memory_space_conf
 	};
 }
 
+bool sh34_base_device::memory_translate(int spacenum, int intention, offs_t& address, address_space*& target_space)
+{
+	target_space = &space(spacenum);
+
+	if (address >= 0xe0000000)
+		return true;
+
+	if (address >= 0x80000000) // P1/P2/P3 region
+	{
+		address &= SH34_AM;
+		return true;
+	}
+	else // P0 region
+	{
+		if (!m_sh4_mmu_enabled)
+		{
+			address &= SH34_AM;
+			return true;
+		}
+		else
+		{
+			address = get_remap(address & SH34_AM);
+			return true;
+		}
+	}
+}
 
 sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, address_map_constructor(FUNC(sh3_base_device::sh3_internal_map), this))
@@ -107,29 +946,63 @@ sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type
 }
 
 
-sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh3_base_device(mconfig, SH3LE, tag, owner, clock, ENDIANNESS_LITTLE)
+sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh3_base_device(mconfig, SH3, tag, owner, clock, endianness)
+{
+}
+
+sh7708s_device::sh7708s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh3_base_device(mconfig, SH7708S, tag, owner, clock, endianness)
+{
+}
+
+sh7709_device::sh7709_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh3_base_device(mconfig, SH7709, tag, owner, clock, endianness)
+{
+}
+
+sh7709s_device::sh7709s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh3_base_device(mconfig, SH7709S, tag, owner, clock, endianness)
 {
 }
 
 
-sh3be_device::sh3be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh3_base_device(mconfig, SH3BE, tag, owner, clock, ENDIANNESS_BIG)
+sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh4_base_device(mconfig, SH4, tag, owner, clock, endianness)
 {
 }
 
-
-sh4_device::sh4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh4_base_device(mconfig, SH4LE, tag, owner, clock, ENDIANNESS_LITTLE)
+sh7091_device::sh7091_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh4_base_device(mconfig, SH7091, tag, owner, clock, endianness)
 {
 }
 
-
-sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sh4_base_device(mconfig, SH4BE, tag, owner, clock, ENDIANNESS_BIG)
+sh7750_device::sh7750_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh4_base_device(mconfig, SH7750, tag, owner, clock, endianness)
 {
 }
 
+sh7750s_device::sh7750s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh4_base_device(mconfig, SH7750S, tag, owner, clock, endianness)
+{
+}
+
+sh7750r_device::sh7750r_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh4_base_device(mconfig, SH7750R, tag, owner, clock, endianness)
+{
+}
+
+sh7751_device::sh7751_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh4_base_device(mconfig, SH7751, tag, owner, clock, endianness)
+{
+	m_pciconf0 = 0x35051054;
+}
+
+sh7751r_device::sh7751r_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
+	: sh4_base_device(mconfig, SH7751R, tag, owner, clock, endianness)
+{
+	m_pciconf0 = 0x350e1054;
+}
 
 std::unique_ptr<util::disasm_interface> sh34_base_device::create_disassembler()
 {
@@ -149,28 +1022,28 @@ void sh34_base_device::LDTLB(const uint16_t opcode)
 
 void sh4_base_device::LDTLB(const uint16_t opcode)
 {
-	int replace = (m_m[MMUCR] & 0x0000fc00) >> 10;
+	int replace = (m_mmucr & 0x0000fc00) >> 10;
 
 	logerror("using LDTLB to replace UTLB entry %02x\n", replace);
 
 	// these come from PTEH
-	m_utlb[replace].VPN = (m_m[PTEH] & 0xfffffc00) >> 10;
-	//  m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
-	//  m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
-	m_utlb[replace].ASID = (m_m[PTEH] & 0x000000ff) >> 0;
+	m_utlb[replace].VPN = (m_pteh & 0xfffffc00) >> 10;
+	//  m_utlb[replace].D =    (m_pteh & 0x00000200) >> 9; // from PTEL
+	//  m_utlb[replace].V =    (m_pteh & 0x00000100) >> 8; // from PTEL
+	m_utlb[replace].ASID = (m_pteh & 0x000000ff) >> 0;
 	// these come from PTEL
-	m_utlb[replace].PPN = (m_m[PTEL] & 0x1ffffc00) >> 10;
-	m_utlb[replace].V = (m_m[PTEL] & 0x00000100) >> 8;
-	m_utlb[replace].PSZ = (m_m[PTEL] & 0x00000080) >> 6;
-	m_utlb[replace].PSZ |= (m_m[PTEL] & 0x00000010) >> 4;
-	m_utlb[replace].PPR = (m_m[PTEL] & 0x00000060) >> 5;
-	m_utlb[replace].C = (m_m[PTEL] & 0x00000008) >> 3;
-	m_utlb[replace].D = (m_m[PTEL] & 0x00000004) >> 2;
-	m_utlb[replace].SH = (m_m[PTEL] & 0x00000002) >> 1;
-	m_utlb[replace].WT = (m_m[PTEL] & 0x00000001) >> 0;
+	m_utlb[replace].PPN = (m_ptel & 0x1ffffc00) >> 10;
+	m_utlb[replace].V = (m_ptel & 0x00000100) >> 8;
+	m_utlb[replace].PSZ = (m_ptel & 0x00000080) >> 6;
+	m_utlb[replace].PSZ |= (m_ptel & 0x00000010) >> 4;
+	m_utlb[replace].PPR = (m_ptel & 0x00000060) >> 5;
+	m_utlb[replace].C = (m_ptel & 0x00000008) >> 3;
+	m_utlb[replace].D = (m_ptel & 0x00000004) >> 2;
+	m_utlb[replace].SH = (m_ptel & 0x00000002) >> 1;
+	m_utlb[replace].WT = (m_ptel & 0x00000001) >> 0;
 	// these come from PTEA
-	m_utlb[replace].TC = (m_m[PTEA] & 0x00000008) >> 3;
-	m_utlb[replace].SA = (m_m[PTEA] & 0x00000007) >> 0;
+	m_utlb[replace].TC = (m_ptea & 0x00000008) >> 3;
+	m_utlb[replace].SA = (m_ptea & 0x00000007) >> 0;
 }
 
 #if 0
@@ -452,7 +1325,7 @@ inline void sh34_base_device::LDCSR(const uint16_t opcode)
 	// important to store the value now so that it doesn't get affected by the bank change
 	uint32_t reg = m_sh2_state->r[REG_N];
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 
 	if ((m_sh2_state->r[REG_N] & sRB) != (m_sh2_state->sr & sRB))
@@ -468,7 +1341,7 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 	uint32_t old = m_sh2_state->sr;
 	m_sh2_state->ea = m_sh2_state->r[REG_N];
 	m_sh2_state->sr = read_long(m_sh2_state->ea) & SH34_FLAGS;
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((old & sRB) >> 29);
 	if ((old & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_sh2_state->sr & sRB ? 1 : 0);
@@ -482,7 +1355,7 @@ inline void sh34_base_device::RTE()
 {
 	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->m_spc;
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 	if ((m_sh2_state->m_ssr & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_sh2_state->m_ssr & sRB ? 1 : 0);
@@ -499,11 +1372,11 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
-		m_m[TRA] = imm << 2;
+		m_tra = imm << 2;
 	}
 	else /* SH3 */
 	{
-		m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
+		m_tra = imm << 2;
 	}
 
 	m_sh2_state->m_ssr = m_sh2_state->sr;
@@ -512,7 +1385,7 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 	m_sh2_state->m_sgr = m_sh2_state->r[15];
 
 	m_sh2_state->sr |= MD;
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 	if (!(m_sh2_state->sr & sRB))
 		sh4_change_register_bank(1);
@@ -522,11 +1395,11 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 
 	if (m_cpu_type == CPU_TYPE_SH4)
 	{
-		m_m[EXPEVT] = 0x00000160;
+		m_expevt = 0x00000160;
 	}
 	else /* SH3 */
 	{
-		m_sh3internal_upper[SH3_EXPEVT_ADDR] = 0x00000160;
+		m_expevt = 0x00000160;
 	}
 
 	m_sh2_state->pc = m_sh2_state->vbr + 0x00000100;
@@ -813,7 +1686,7 @@ inline void sh34_base_device::PREFM(const uint16_t opcode)
 			{
 				if (m_cpu_type == CPU_TYPE_SH4)
 				{
-					dest |= (m_m[QACR0] & 0x1C) << 24;
+					dest |= (m_qacr0 & 0x1C) << 24;
 				}
 				else
 				{
@@ -824,7 +1697,7 @@ inline void sh34_base_device::PREFM(const uint16_t opcode)
 			{
 				if (m_cpu_type == CPU_TYPE_SH4)
 				{
-					dest |= (m_m[QACR1] & 0x1C) << 24;
+					dest |= (m_qacr1 & 0x1C) << 24;
 				}
 				else
 				{
@@ -1614,41 +2487,67 @@ void sh34_base_device::device_reset()
 	m_sh2_state->m_test_irq = 0;
 	memset(m_exception_priority, 0, sizeof(m_exception_priority));
 	memset(m_exception_requesting, 0, sizeof(m_exception_requesting));
-	memset(m_m, 0, sizeof(m_m));
-	memset(m_sh3internal_upper, 0, sizeof(m_sh3internal_upper));
-	memset(m_sh3internal_lower, 0, sizeof(m_sh3internal_lower));
 	memset(m_irq_line_state, 0, sizeof(m_irq_line_state));
-	m_SH4_TSTR = 0;
-	m_SH4_TCNT0 = 0;
-	m_SH4_TCNT1 = 0;
-	m_SH4_TCNT2 = 0;
-	m_SH4_TCR0 = 0;
-	m_SH4_TCR1 = 0;
-	m_SH4_TCR2 = 0;
-	m_SH4_TCOR0 = 0;
-	m_SH4_TCOR1 = 0;
-	m_SH4_TCOR2 = 0;
-	m_SH4_TOCR = 0;
-	m_SH4_TCPR2 = 0;
-	m_SH4_IPRA = 0;
-	m_SH4_IPRC = 0;
-	m_SH4_SAR0 = 0;
-	m_SH4_SAR1 = 0;
-	m_SH4_SAR2 = 0;
-	m_SH4_SAR3 = 0;
-	m_SH4_DAR0 = 0;
-	m_SH4_DAR1 = 0;
-	m_SH4_DAR2 = 0;
-	m_SH4_DAR3 = 0;
-	m_SH4_CHCR0 = 0;
-	m_SH4_CHCR1 = 0;
-	m_SH4_CHCR2 = 0;
-	m_SH4_CHCR3 = 0;
-	m_SH4_DMATCR0 = 0;
-	m_SH4_DMATCR1 = 0;
-	m_SH4_DMATCR2 = 0;
-	m_SH4_DMATCR3 = 0;
-	m_SH4_DMAOR = 0;
+
+	// CCN
+	m_pteh = 0;
+	m_ptel = 0;
+	m_ttb = 0;
+	m_mmucr = 0;
+	m_ccr = 0;
+	m_tra = 0;
+	m_expevt = 0;
+	m_intevt = 0;
+
+	// CCN 7709S
+	m_ccr2 = 0;
+
+	// CCN 7091
+	m_ptea = 0;
+	m_qacr0 = 0;
+	m_qacr1 = 0;
+
+	// TMU
+	m_tocr = 0;
+	m_tstr = 0;
+	m_tcor0 = 0xffffffff;
+	m_tcnt0 = 0xffffffff;
+	m_tcr0 = 0;
+	m_tcor1 = 0xffffffff;
+	m_tcnt1 = 0xffffffff;
+	m_tcr1 = 0;
+	m_tcor2 = 0xffffffff;
+	m_tcnt2 = 0xffffffff;
+	m_tcr2 = 0;
+	m_tcpr2 = 0;
+
+	// INTC
+	m_icr = 0;
+	m_ipra = 0;
+	m_iprc = 0;
+
+	// INTC 7709
+	m_intevt2 = 0;
+
+	// DMAC
+	m_sar0 = 0;
+	m_sar1 = 0;
+	m_sar2 = 0;
+	m_sar3 = 0;
+	m_dar0 = 0;
+	m_dar1 = 0;
+	m_dar2 = 0;
+	m_dar3 = 0;
+	m_chcr0 = 0;
+	m_chcr1 = 0;
+	m_chcr2 = 0;
+	m_chcr3 = 0;
+	m_dmatcr0 = 0;
+	m_dmatcr1 = 0;
+	m_dmatcr2 = 0;
+	m_dmatcr3 = 0;
+	m_dmaor = 0;
+
 	m_nmi_line_state = 0;
 	m_sh2_state->m_frt_input = 0;
 	m_internal_irq_vector = 0;
@@ -1662,11 +2561,6 @@ void sh34_base_device::device_reset()
 		if (m_dma_timer[i])
 			m_dma_timer[i]->adjust(attotime::never, i);
 	}
-	if (m_refresh_timer)
-		m_refresh_timer->adjust(attotime::never);
-	m_refresh_timer_base = 0;
-	if (m_rtc_timer)
-		m_rtc_timer->adjust(attotime::never);
 	memset(m_dma_timer_active, 0, sizeof(m_dma_timer_active));
 	memset(m_dma_source, 0, sizeof(m_dma_source));
 	memset(m_dma_destination, 0, sizeof(m_dma_destination));
@@ -1682,10 +2576,8 @@ void sh34_base_device::device_reset()
 
 	sh4_default_exception_priorities();
 
-	m_rtc_timer->adjust(attotime::from_hz(128));
-
 	m_sh2_state->pc = 0xa0000000;
-	m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
+	m_sh2_state->m_ppc = m_sh2_state->pc;
 	m_sh2_state->r[15] = read_long(4);
 	m_sh2_state->sr = 0x700000f0;
 	m_sh2_state->m_fpscr = 0x00040001;
@@ -1710,25 +2602,158 @@ void sh3_base_device::device_reset()
 {
 	sh34_base_device::device_reset();
 
-	m_SH4_TCOR0 = 0xffffffff;
-	m_SH4_TCNT0 = 0xffffffff;
-	m_SH4_TCOR1 = 0xffffffff;
-	m_SH4_TCNT1 = 0xffffffff;
-	m_SH4_TCOR2 = 0xffffffff;
-	m_SH4_TCNT2 = 0xffffffff;
+	// INTC
+	m_icr0 &= 0x8000;
+	m_iprb = 0;
+
+	// INTC 7709
+	m_irr0 = 0;
+	m_irr1 = 0;
+	m_irr2 = 0;
+	m_icr1 = 0;
+	m_icr2 = 0;
+	m_pinter = 0;
+	m_iprd = 0;
+	m_ipre = 0;
+
+	// SCI
+	m_scsmr = 0;
+	m_scbrr = 0xff;
+	m_scscr = 0;
+	m_sctdr = 0xff;
+	m_scssr = 0x84;
+	m_scrdr = 0;
+	m_scscmr = 0;
+
+	// SCI 7709
+	m_scsptr = 0;
+
+	// CMT 7709
+	m_cmstr = 0;
+	m_cmscr = 0;
+	m_cmcnt = 0;
+	m_cmcor = 0xffff;
+
+	// AD 7709
+	m_addrah = 0;
+	m_addral = 0;
+	m_addrbh = 0;
+	m_addrbl = 0;
+	m_addrch = 0;
+	m_addrcl = 0;
+	m_addrdh = 0;
+	m_addrdl = 0;
+	m_adcsr = 0;
+	m_adcr = 0x07;
+
+	// DA 7709
+	m_dadr0 = 0;
+	m_dadr1 = 0;
+	m_dadcr = 0x1f;
+
+	// PORT 7709
+	m_pacr = 0;
+	m_pbcr = 0;
+	m_pccr = 0xaaaa;
+	m_pdcr = 0xaa8a;
+	m_pecr = 0xaaaa; // asemd0=0x2aa8
+	m_pfcr = 0xaaaa; // asemd0=0x00aa
+	m_pgcr = 0xaaaa; // asemd0=0xa200
+	m_phcr = 0xaaaa; // asemd0=0x8aaa
+	m_pjcr = 0;
+	m_pkcr = 0;
+	m_plcr = 0;
+	m_scpcr = 0xa888;
+	m_padr = 0;
+	m_pbdr = 0;
+	m_pcdr = 0;
+	m_pddr = 0;
+	m_pedr = 0;
+	m_pfdr = 0;
+	m_pgdr = 0;
+	m_phdr = 0;
+	m_pjdr = 0;
+	m_pkdr = 0;
+	m_pldr = 0;
+	m_scpdr = 0;
+
+	// IRDA 7709
+	m_scsmr1 = 0;
+	m_scbrr1 = 0xff;
+	m_scscr1 = 0;
+	m_scftdr1 = 0;
+	m_scssr1 = 0x60;
+	m_scfrdr1 = 0;
+	m_scfcr1 = 0;
+	m_scfdr1 = 0;
+
+	// SCIF 7709
+	m_scsmr2 = 0;
+	m_scbrr2 = 0xff;
+	m_scscr2 = 0;
+	m_scftdr2 = 0;
+	m_scssr2 = 0x60;
+	m_scfrdr2 = 0;
+	m_scfcr2 = 0;
+	m_scfdr2 = 0;
+
+	// UDI 7709S
+	m_sdir = 0xffff;
 }
 
 void sh4_base_device::device_reset()
 {
 	sh34_base_device::device_reset();
 
-	m_m[RCR2] = 0x09;
-	m_SH4_TCOR0 = 0xffffffff;
-	m_SH4_TCNT0 = 0xffffffff;
-	m_SH4_TCOR1 = 0xffffffff;
-	m_SH4_TCNT1 = 0xffffffff;
-	m_SH4_TCOR2 = 0xffffffff;
-	m_SH4_TCNT2 = 0xffffffff;
+	m_rtc_timer->adjust(attotime::from_hz(128));
+	m_refresh_timer->adjust(attotime::never);
+	m_refresh_timer_base = 0;
+
+	// DMAC 7750R
+	m_sar4 = 0;
+	m_dar4 = 0;
+	m_sar5 = 0;
+	m_dar5 = 0;
+	m_sar6 = 0;
+	m_dar6 = 0;
+	m_sar7 = 0;
+	m_dar7 = 0;
+	m_chcr4 = 0;
+	m_chcr5 = 0;
+	m_chcr6 = 0;
+	m_chcr7 = 0;
+	m_dmatcr4 = 0;
+	m_dmatcr5 = 0;
+	m_dmatcr6 = 0;
+	m_dmatcr7 = 0;
+
+	// INTC
+	m_iprb = 0;
+
+	// INTC 7750S
+	m_iprd = 0xda74;
+
+	// SCI
+	m_scsmr1 = 0;
+	m_scbrr1 = 0xff;
+	m_scscr1 = 0;
+	m_sctdr1 = 0xff;
+	m_scssr1 = 0x84;
+	m_scrdr1 = 0x00;
+	m_scscmr1 = 0x00;
+	m_scsptr1 = 0;
+
+	// SCIF
+	m_scsmr2 = 0;
+	m_scbrr2 = 0xff;
+	m_scscr2 = 0;
+	m_scftdr2 = 0;
+	m_scfsr2 = 0x60;
+	m_scfrdr2 = 0;
+	m_scfcr2 = 0;
+	m_scfdr2 = 0;
+	m_scsptr2 = 0;
+	m_sclsr2 = 0;
 }
 
 inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
@@ -1967,8 +2992,8 @@ void sh34_base_device::execute_run()
 
 	do
 	{
-		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
-		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
+		m_sh2_state->m_ppc = m_sh2_state->pc;
+		debugger_instruction_hook(m_sh2_state->pc);
 
 		uint16_t opcode;
 
@@ -1994,91 +3019,264 @@ void sh34_base_device::execute_run()
 	} while (m_sh2_state->icount > 0);
 }
 
-void sh3be_device::execute_run()
+void sh3_base_device::device_start()
 {
-	if (m_isdrc)
-	{
-		execute_run_drc();
-		return;
-	}
+	sh34_base_device::device_start();
 
-	if (m_sh2_state->m_cpu_off)
-	{
-		debugger_wait_hook();
-		m_sh2_state->icount = 0;
-		return;
-	}
+	// UBC
+	m_bara = 0;
+	m_bamra = 0;
+	m_bbra = 0;
+	m_barb = 0;
+	m_bamrb = 0;
+	m_bbrb = 0;
+	m_bdrb = 0;
+	m_bdmrb = 0;
+	m_brcr = 0;
 
-	do
-	{
-		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
-		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
+	// UBC 7709S
+	m_betr = 0;
+	m_brsr = 0;
+	m_brdr = 0;
 
-		const uint16_t opcode = m_pr16(m_sh2_state->pc & SH34_AM);
+	// CPG
+	m_frqcr = 0x0102;
+	m_wtcnt = 0;
+	m_wtcsr = 0;
+	m_stbcr = 0;
 
-		if (m_sh2_state->m_delay)
-		{
-			m_sh2_state->pc = m_sh2_state->m_delay;
-			m_sh2_state->m_delay = 0;
-		}
-		else
-			m_sh2_state->pc += 2;
+	// CPG 7709
+	m_stbcr2 = 0;
 
-		execute_one(opcode);
+	// BSC
+	m_bcr1 = 0;
+	m_bcr2 = 0x3ff0;
+	m_wcr1 = 0x3ff3;
+	m_wcr2 = 0xffff;
+	m_mcr = 0;
+	m_pcr = 0;
+	m_rtcsr = 0;
+	m_rtcnt = 0;
+	m_rtcor = 0;
+	m_rfcr = 0;
 
-		if (m_sh2_state->m_test_irq && !m_sh2_state->m_delay)
-		{
-			sh4_check_pending_irq("mame_sh4_execute");
-		}
+	// BSC 7708
+	m_dcr = 0;
+	m_pctr = 0;
+	m_pdtr = 0;
 
-		m_sh2_state->icount--;
-	} while (m_sh2_state->icount > 0);
-}
+	// BSC 7709
+	m_bcr3 = 0;
 
-void sh4be_device::execute_run()
-{
-	if (m_isdrc)
-	{
-		execute_run_drc();
-		return;
-	}
+	// BSC 7709S
+	m_mcscr0 = 0;
+	m_mcscr1 = 0;
+	m_mcscr2 = 0;
+	m_mcscr3 = 0;
+	m_mcscr4 = 0;
+	m_mcscr5 = 0;
+	m_mcscr6 = 0;
+	m_mcscr7 = 0;
 
-	if (m_sh2_state->m_cpu_off)
-	{
-		debugger_wait_hook();
-		m_sh2_state->icount = 0;
-		return;
-	}
+	// RTC
+	m_r64cnt = 0;
+	m_rseccnt = 0;
+	m_rmincnt = 0;
+	m_rhrcnt = 0;
+	m_rwkcnt = 0;
+	m_rmoncnt = 0;
+	m_rdaycnt = 0;
+	m_ryrcnt = 0;
+	m_rsecar = 0;
+	m_rminar = 0;
+	m_rhrar = 0;
+	m_rwkar = 0;
+	m_rdayar = 0;
+	m_rmonar = 0;
+	m_rcr1 = 0;
+	m_rcr2 = 0x09;
 
-	do
-	{
-		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
-		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
+	// INTC
+	m_icr0 = 0;
 
-		const uint16_t opcode = m_pr16(m_sh2_state->pc & SH34_AM);
+	// UBC
+	save_item(NAME(m_bara));
+	save_item(NAME(m_bamra));
+	save_item(NAME(m_bbra));
+	save_item(NAME(m_barb));
+	save_item(NAME(m_bamrb));
+	save_item(NAME(m_bbrb));
+	save_item(NAME(m_bdrb));
+	save_item(NAME(m_bdmrb));
+	save_item(NAME(m_brcr));
 
-		if (m_sh2_state->m_delay)
-		{
-			m_sh2_state->pc = m_sh2_state->m_delay;
-			m_sh2_state->m_delay = 0;
-		}
-		else
-			m_sh2_state->pc += 2;
+	// UBC 7709S
+	save_item(NAME(m_betr));
+	save_item(NAME(m_brsr));
+	save_item(NAME(m_brdr));
 
-		execute_one(opcode);
+	// CPG
+	save_item(NAME(m_frqcr));
+	save_item(NAME(m_stbcr));
+	save_item(NAME(m_wtcnt));
+	save_item(NAME(m_wtcsr));
 
-		if (m_sh2_state->m_test_irq && !m_sh2_state->m_delay)
-		{
-			sh4_check_pending_irq("mame_sh4_execute");
-		}
+	// CPG 7709
+	save_item(NAME(m_stbcr2));
 
-		m_sh2_state->icount--;
-	} while (m_sh2_state->icount > 0);
+	// BSC
+	save_item(NAME(m_bcr1));
+	save_item(NAME(m_bcr2));
+	save_item(NAME(m_wcr1));
+	save_item(NAME(m_wcr2));
+	save_item(NAME(m_mcr));
+	save_item(NAME(m_pcr));
+	save_item(NAME(m_rtcsr));
+	save_item(NAME(m_rtcnt));
+	save_item(NAME(m_rtcor));
+	save_item(NAME(m_rfcr));
+
+	// BSC 7708
+	save_item(NAME(m_dcr));
+	save_item(NAME(m_pctr));
+	save_item(NAME(m_pdtr));
+
+	// BSC 7709
+	save_item(NAME(m_bcr3));
+
+	// BSC 7709S
+	save_item(NAME(m_mcscr0));
+	save_item(NAME(m_mcscr1));
+	save_item(NAME(m_mcscr2));
+	save_item(NAME(m_mcscr3));
+	save_item(NAME(m_mcscr4));
+	save_item(NAME(m_mcscr5));
+	save_item(NAME(m_mcscr6));
+	save_item(NAME(m_mcscr7));
+
+	// RTC
+	save_item(NAME(m_r64cnt));
+	save_item(NAME(m_rseccnt));
+	save_item(NAME(m_rmincnt));
+	save_item(NAME(m_rhrcnt));
+	save_item(NAME(m_rwkcnt));
+	save_item(NAME(m_rmoncnt));
+	save_item(NAME(m_rdaycnt));
+	save_item(NAME(m_ryrcnt));
+	save_item(NAME(m_rsecar));
+	save_item(NAME(m_rminar));
+	save_item(NAME(m_rhrar));
+	save_item(NAME(m_rwkar));
+	save_item(NAME(m_rdayar));
+	save_item(NAME(m_rmonar));
+	save_item(NAME(m_rcr1));
+	save_item(NAME(m_rcr2));
+
+	// INTC
+	save_item(NAME(m_icr0));
+	save_item(NAME(m_iprb));
+
+	// INTC 7709
+	save_item(NAME(m_irr0));
+	save_item(NAME(m_irr1));
+	save_item(NAME(m_irr2));
+	save_item(NAME(m_icr1));
+	save_item(NAME(m_icr2));
+	save_item(NAME(m_pinter));
+	save_item(NAME(m_iprd));
+	save_item(NAME(m_ipre));
+
+	// SCI
+	save_item(NAME(m_scsmr));
+	save_item(NAME(m_scbrr));
+	save_item(NAME(m_scscr));
+	save_item(NAME(m_sctdr));
+	save_item(NAME(m_scssr));
+	save_item(NAME(m_scrdr));
+	save_item(NAME(m_scscmr));
+
+	// SCI 7709
+	save_item(NAME(m_scsptr));
+
+	// CMT 7709
+	save_item(NAME(m_cmstr));
+	save_item(NAME(m_cmscr));
+	save_item(NAME(m_cmcnt));
+	save_item(NAME(m_cmcor));
+
+	// AD 7709
+	save_item(NAME(m_addrah));
+	save_item(NAME(m_addral));
+	save_item(NAME(m_addrbh));
+	save_item(NAME(m_addrbl));
+	save_item(NAME(m_addrch));
+	save_item(NAME(m_addrcl));
+	save_item(NAME(m_addrdh));
+	save_item(NAME(m_addrdl));
+	save_item(NAME(m_adcsr));
+	save_item(NAME(m_adcr));
+
+	// DA 7709
+	save_item(NAME(m_dadr0));
+	save_item(NAME(m_dadr1));
+	save_item(NAME(m_dadcr));
+
+	// PORT 7709
+	save_item(NAME(m_pacr));
+	save_item(NAME(m_pbcr));
+	save_item(NAME(m_pccr));
+	save_item(NAME(m_pdcr));
+	save_item(NAME(m_pecr));
+	save_item(NAME(m_pfcr));
+	save_item(NAME(m_pgcr));
+	save_item(NAME(m_phcr));
+	save_item(NAME(m_pjcr));
+	save_item(NAME(m_pkcr));
+	save_item(NAME(m_plcr));
+	save_item(NAME(m_scpcr));
+	save_item(NAME(m_padr));
+	save_item(NAME(m_pbdr));
+	save_item(NAME(m_pcdr));
+	save_item(NAME(m_pddr));
+	save_item(NAME(m_pedr));
+	save_item(NAME(m_pfdr));
+	save_item(NAME(m_pgdr));
+	save_item(NAME(m_phdr));
+	save_item(NAME(m_pjdr));
+	save_item(NAME(m_pkdr));
+	save_item(NAME(m_pldr));
+	save_item(NAME(m_scpdr));
+
+	// IRDA 7709
+	save_item(NAME(m_scsmr1));
+	save_item(NAME(m_scbrr1));
+	save_item(NAME(m_scscr1));
+	save_item(NAME(m_scftdr1));
+	save_item(NAME(m_scssr1));
+	save_item(NAME(m_scfrdr1));
+	save_item(NAME(m_scfcr1));
+	save_item(NAME(m_scfdr1));
+
+	// SCIF 7709
+	save_item(NAME(m_scsmr2));
+	save_item(NAME(m_scbrr2));
+	save_item(NAME(m_scscr2));
+	save_item(NAME(m_scftdr2));
+	save_item(NAME(m_scssr2));
+	save_item(NAME(m_scfrdr2));
+	save_item(NAME(m_scfcr2));
+	save_item(NAME(m_scfdr2));
+
+	// UDI 7709S
+	save_item(NAME(m_sdir));
 }
 
 void sh4_base_device::device_start()
 {
 	sh34_base_device::device_start();
+
+	m_rtc_timer = timer_alloc(FUNC(sh4_base_device::sh4_rtc_timer_callback), this);
+	m_refresh_timer = timer_alloc(FUNC(sh4_base_device::sh4_refresh_timer_callback), this);
 
 	int i;
 	for (i = 0;i < 64;i++)
@@ -2097,6 +3295,156 @@ void sh4_base_device::device_start()
 		m_utlb[i].TC = 0;
 	}
 
+	// UBC
+	m_bara = 0;
+	m_bamra = 0;
+	m_bbra = 0;
+	m_barb = 0;
+	m_bamrb = 0;
+	m_bbrb = 0;
+	m_bdrb = 0;
+	m_bdmrb = 0;
+	m_brcr = 0;
+
+	// BSC
+	m_bcr1 = 0;
+	m_bcr2 = 0;
+	m_wcr1 = 0;
+	m_wcr2 = 0;
+	m_wcr3 = 0;
+	m_mcr = 0;
+	m_pcr = 0;
+	m_rtcsr = 0;
+	m_rtcnt = 0;
+	m_rtcor = 0;
+	m_rfcr = 0;
+	m_pctra = 0;
+	m_pdtra = 0;
+	m_pctrb = 0;
+	m_pdtrb = 0;
+	m_gpioic = 0;
+
+	// BSC 7750R
+	m_bcr3 = 0;
+	m_bcr4 = 0;
+
+	// CPG
+	m_frqcr = 0;
+	m_stbcr = 0;
+	m_wtcnt = 0;
+	m_wtcsr = 0;
+	m_stbcr2 = 0;
+
+	// RTC
+	m_r64cnt = 0;
+	m_rseccnt = 0;
+	m_rmincnt = 0;
+	m_rhrcnt = 0;
+	m_rwkcnt = 0;
+	m_rmoncnt = 0;
+	m_rdaycnt = 0;
+	m_ryrcnt = 0;
+	m_rsecar = 0;
+	m_rminar = 0;
+	m_rhrar = 0;
+	m_rwkar = 0;
+	m_rdayar = 0;
+	m_rmonar = 0;
+	m_rcr1 = 0;
+	m_rcr2 = 0x09;
+
+	// RTC 7750R
+	m_rcr3 = 0;
+	m_ryrar = 0;
+
+	// INTC 7750R
+	m_intpri00 = 0;
+	m_intreq00 = 0;
+	m_intmsk00 = 0x000003ff;
+
+	// CPG 7750R
+	m_clkstp00 = 0;
+
+	// TMU 7750R
+	m_tstr2 = 0;
+	m_tcor3 = 0xffffffff;
+	m_tcnt3 = 0xffffffff;
+	m_tcr3 = 0;
+	m_tcor4 = 0xffffffff;
+	m_tcnt4 = 0xffffffff;
+	m_tcr4 = 0;
+
+	// PCI 7751
+	m_pciconf1 = 0x02900080;
+	m_pciconf2 = 0;
+	m_pciconf3 = 0;
+	m_pciconf4 = 1;
+	m_pciconf5 = 0;
+	m_pciconf6 = 0;
+	m_pciconf7 = 0;
+	m_pciconf8 = 0;
+	m_pciconf9 = 0;
+	m_pciconf10 = 0;
+	m_pciconf11 = 0;
+	m_pciconf12 = 0;
+	m_pciconf13 = 0x00000040;
+	m_pciconf14 = 0;
+	m_pciconf15 = 0x00000100;
+	m_pciconf16 = 0x00010001;
+	m_pciconf17 = 0;
+	m_pcicr = 0;
+	m_pcilsr0 = 0;
+	m_pcilsr1 = 0;
+	m_pcilar0 = 0;
+	m_pcilar1 = 0;
+	m_pciint = 0;
+	m_pciintm = 0;
+	m_pcialr = 0;
+	m_pciclr = 0;
+	m_pciaint = 0;
+	m_pciaintm = 0;
+	m_pcibllr = 0;
+	m_pcidmabt = 0;
+	m_pcidpa0 = 0;
+	m_pcidla0 = 0;
+	m_pcidtc0 = 0;
+	m_pcidcr0 = 0;
+	m_pcidpa1 = 0;
+	m_pcidla1 = 0;
+	m_pcidtc1 = 0;
+	m_pcidcr1 = 0;
+	m_pcidpa2 = 0;
+	m_pcidla2 = 0;
+	m_pcidtc2 = 0;
+	m_pcidcr2 = 0;
+	m_pcidpa3 = 0;
+	m_pcidla3 = 0;
+	m_pcidtc3 = 0;
+	m_pcidcr3 = 0;
+	m_pcipar = 0;
+	m_pcimbr = 0;
+	m_pciiobr = 0;
+	m_pcipint = 0;
+	m_pcipintm = 0;
+	m_pciclkr = 0;
+	m_pcibcr1 = 0;
+	m_pcibcr2 = 0x00003ffc;
+	m_pcibcr3 = 1;
+	m_pciwcr1 = 0x77777777;
+	m_pciwcr2 = 0xfffeefff;
+	m_pciwcr3 = 0x07777777;
+	m_pcimcr = 0;
+	m_pcipctr = 0;
+	m_pcipdtr = 0;
+	m_pcipdr = 0;
+
+	// H-UDI
+	m_sdir = 0xffff;
+	m_sddr = 0;
+	m_sdint = 0;
+
+	save_item(NAME(m_refresh_timer_base));
+
 	for (i = 0;i < 64;i++)
 	{
 		save_item(NAME(m_utlb[i].ASID), i);
@@ -2112,6 +3460,201 @@ void sh4_base_device::device_start()
 		save_item(NAME(m_utlb[i].SA), i);
 		save_item(NAME(m_utlb[i].TC), i);
 	}
+
+	// UBC
+	save_item(NAME(m_bara));
+	save_item(NAME(m_bamra));
+	save_item(NAME(m_bbra));
+	save_item(NAME(m_barb));
+	save_item(NAME(m_bamrb));
+	save_item(NAME(m_bbrb));
+	save_item(NAME(m_bdrb));
+	save_item(NAME(m_bdmrb));
+	save_item(NAME(m_brcr));
+
+	// BSC
+	save_item(NAME(m_bcr1));
+	save_item(NAME(m_bcr2));
+	save_item(NAME(m_wcr1));
+	save_item(NAME(m_wcr2));
+	save_item(NAME(m_wcr3));
+	save_item(NAME(m_mcr));
+	save_item(NAME(m_pcr));
+	save_item(NAME(m_rtcsr));
+	save_item(NAME(m_rtcnt));
+	save_item(NAME(m_rtcor));
+	save_item(NAME(m_rfcr));
+	save_item(NAME(m_pctra));
+	save_item(NAME(m_pdtra));
+	save_item(NAME(m_pctrb));
+	save_item(NAME(m_pdtrb));
+	save_item(NAME(m_gpioic));
+
+	// BSC 7750R
+	save_item(NAME(m_bcr3));
+	save_item(NAME(m_bcr4));
+
+	// DMAC 7750R
+	save_item(NAME(m_sar4));
+	save_item(NAME(m_dar4));
+	save_item(NAME(m_dmatcr4));
+	save_item(NAME(m_chcr4));
+	save_item(NAME(m_sar5));
+	save_item(NAME(m_dar5));
+	save_item(NAME(m_dmatcr5));
+	save_item(NAME(m_chcr5));
+	save_item(NAME(m_sar6));
+	save_item(NAME(m_dar6));
+	save_item(NAME(m_dmatcr6));
+	save_item(NAME(m_chcr6));
+	save_item(NAME(m_sar7));
+	save_item(NAME(m_dar7));
+	save_item(NAME(m_dmatcr7));
+	save_item(NAME(m_chcr7));
+
+	// CPG
+	save_item(NAME(m_frqcr));
+	save_item(NAME(m_stbcr));
+	save_item(NAME(m_wtcnt));
+	save_item(NAME(m_wtcsr));
+	save_item(NAME(m_stbcr2));
+
+	// CPG 7750R
+	save_item(NAME(m_clkstp00));
+
+	// RTC
+	save_item(NAME(m_r64cnt));
+	save_item(NAME(m_rseccnt));
+	save_item(NAME(m_rmincnt));
+	save_item(NAME(m_rhrcnt));
+	save_item(NAME(m_rwkcnt));
+	save_item(NAME(m_rmoncnt));
+	save_item(NAME(m_rdaycnt));
+	save_item(NAME(m_ryrcnt));
+	save_item(NAME(m_rsecar));
+	save_item(NAME(m_rminar));
+	save_item(NAME(m_rhrar));
+	save_item(NAME(m_rwkar));
+	save_item(NAME(m_rdayar));
+	save_item(NAME(m_rmonar));
+	save_item(NAME(m_rcr1));
+	save_item(NAME(m_rcr2));
+
+	// INTC
+	save_item(NAME(m_iprb));
+
+	// INTC 7750S
+	save_item(NAME(m_iprd));
+
+	// INTC 7750R
+	save_item(NAME(m_intpri00));
+	save_item(NAME(m_intreq00));
+	save_item(NAME(m_intmsk00));
+
+	// TMU 7750R
+	save_item(NAME(m_tstr2));
+	save_item(NAME(m_tcor3));
+	save_item(NAME(m_tcnt3));
+	save_item(NAME(m_tcr3));
+	save_item(NAME(m_tcor4));
+	save_item(NAME(m_tcnt4));
+	save_item(NAME(m_tcr4));
+
+	// RTC 7750R
+	save_item(NAME(m_rcr3));
+	save_item(NAME(m_ryrar));
+
+	// SCI
+	save_item(NAME(m_scsmr1));
+	save_item(NAME(m_scbrr1));
+	save_item(NAME(m_scscr1));
+	save_item(NAME(m_sctdr1));
+	save_item(NAME(m_scssr1));
+	save_item(NAME(m_scrdr1));
+	save_item(NAME(m_scscmr1));
+	save_item(NAME(m_scsptr1));
+
+	// SCIF
+	save_item(NAME(m_scsmr2));
+	save_item(NAME(m_scbrr2));
+	save_item(NAME(m_scscr2));
+	save_item(NAME(m_scftdr2));
+	save_item(NAME(m_scfsr2));
+	save_item(NAME(m_scfrdr2));
+	save_item(NAME(m_scfcr2));
+	save_item(NAME(m_scfdr2));
+	save_item(NAME(m_scsptr2));
+	save_item(NAME(m_sclsr2));
+
+	// H-UDI
+	save_item(NAME(m_sdir));
+	save_item(NAME(m_sddr));
+	save_item(NAME(m_sdint));
+
+	// PCI 7751
+	save_item(NAME(m_pciconf0));
+	save_item(NAME(m_pciconf1));
+	save_item(NAME(m_pciconf2));
+	save_item(NAME(m_pciconf3));
+	save_item(NAME(m_pciconf4));
+	save_item(NAME(m_pciconf5));
+	save_item(NAME(m_pciconf6));
+	save_item(NAME(m_pciconf7));
+	save_item(NAME(m_pciconf8));
+	save_item(NAME(m_pciconf9));
+	save_item(NAME(m_pciconf10));
+	save_item(NAME(m_pciconf11));
+	save_item(NAME(m_pciconf12));
+	save_item(NAME(m_pciconf13));
+	save_item(NAME(m_pciconf14));
+	save_item(NAME(m_pciconf15));
+	save_item(NAME(m_pciconf16));
+	save_item(NAME(m_pciconf17));
+	save_item(NAME(m_pcicr));
+	save_item(NAME(m_pcilsr0));
+	save_item(NAME(m_pcilsr1));
+	save_item(NAME(m_pcilar0));
+	save_item(NAME(m_pcilar1));
+	save_item(NAME(m_pciint));
+	save_item(NAME(m_pciintm));
+	save_item(NAME(m_pcialr));
+	save_item(NAME(m_pciclr));
+	save_item(NAME(m_pciaint));
+	save_item(NAME(m_pciaintm));
+	save_item(NAME(m_pcibllr));
+	save_item(NAME(m_pcidmabt));
+	save_item(NAME(m_pcidpa0));
+	save_item(NAME(m_pcidla0));
+	save_item(NAME(m_pcidtc0));
+	save_item(NAME(m_pcidcr0));
+	save_item(NAME(m_pcidpa1));
+	save_item(NAME(m_pcidla1));
+	save_item(NAME(m_pcidtc1));
+	save_item(NAME(m_pcidcr1));
+	save_item(NAME(m_pcidpa2));
+	save_item(NAME(m_pcidla2));
+	save_item(NAME(m_pcidtc2));
+	save_item(NAME(m_pcidcr2));
+	save_item(NAME(m_pcidpa3));
+	save_item(NAME(m_pcidla3));
+	save_item(NAME(m_pcidtc3));
+	save_item(NAME(m_pcidcr3));
+	save_item(NAME(m_pcipar));
+	save_item(NAME(m_pcimbr));
+	save_item(NAME(m_pciiobr));
+	save_item(NAME(m_pcipint));
+	save_item(NAME(m_pcipintm));
+	save_item(NAME(m_pciclkr));
+	save_item(NAME(m_pcibcr1));
+	save_item(NAME(m_pcibcr2));
+	save_item(NAME(m_pcibcr3));
+	save_item(NAME(m_pciwcr1));
+	save_item(NAME(m_pciwcr2));
+	save_item(NAME(m_pciwcr3));
+	save_item(NAME(m_pcimcr));
+	save_item(NAME(m_pcipctr));
+	save_item(NAME(m_pcipdtr));
+	save_item(NAME(m_pcipdr));
 }
 
 
@@ -2133,13 +3676,6 @@ void sh34_base_device::device_start()
 		m_dma_timer[i] = timer_alloc(FUNC(sh34_base_device::sh4_dmac_callback), this);
 		m_dma_timer[i]->adjust(attotime::never, i);
 	}
-
-	m_refresh_timer = timer_alloc(FUNC(sh34_base_device::sh4_refresh_timer_callback), this);
-	m_refresh_timer->adjust(attotime::never);
-	m_refresh_timer_base = 0;
-
-	m_rtc_timer = timer_alloc(FUNC(sh34_base_device::sh4_rtc_timer_callback), this);
-	m_rtc_timer->adjust(attotime::never);
 
 	sh4_parse_configuration();
 
@@ -2202,41 +3738,80 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_exception_priority));
 	save_item(NAME(m_exception_requesting));
 	save_item(NAME(m_irq_line_state));
-	save_item(NAME(m_m));
-	save_item(NAME(m_SH4_TSTR));
-	save_item(NAME(m_SH4_TCNT0));
-	save_item(NAME(m_SH4_TCNT1));
-	save_item(NAME(m_SH4_TCNT2));
-	save_item(NAME(m_SH4_TCR0));
-	save_item(NAME(m_SH4_TCR1));
-	save_item(NAME(m_SH4_TCR2));
-	save_item(NAME(m_SH4_TCOR0));
-	save_item(NAME(m_SH4_TCOR1));
-	save_item(NAME(m_SH4_TCOR2));
-	save_item(NAME(m_SH4_TOCR));
-	save_item(NAME(m_SH4_TCPR2));
-	save_item(NAME(m_SH4_IPRA));
-	save_item(NAME(m_SH4_IPRC));
-	save_item(NAME(m_SH4_DAR0));
-	save_item(NAME(m_SH4_DAR1));
-	save_item(NAME(m_SH4_DAR2));
-	save_item(NAME(m_SH4_DAR3));
-	save_item(NAME(m_SH4_CHCR0));
-	save_item(NAME(m_SH4_CHCR1));
-	save_item(NAME(m_SH4_CHCR2));
-	save_item(NAME(m_SH4_CHCR3));
-	save_item(NAME(m_SH4_DMATCR0));
-	save_item(NAME(m_SH4_DMATCR1));
-	save_item(NAME(m_SH4_DMATCR2));
-	save_item(NAME(m_SH4_DMATCR3));
-	save_item(NAME(m_SH4_DMAOR));
+
+	// CCN
+	m_tea = 0;
+	m_basra = 0;
+	m_basrb = 0;
+
+	// CCN
+	save_item(NAME(m_pteh));
+	save_item(NAME(m_ptel));
+	save_item(NAME(m_ttb));
+	save_item(NAME(m_tea));
+	save_item(NAME(m_mmucr));
+	save_item(NAME(m_basra));
+	save_item(NAME(m_basrb));
+	save_item(NAME(m_ccr));
+	save_item(NAME(m_tra));
+	save_item(NAME(m_expevt));
+	save_item(NAME(m_intevt));
+
+	// CCN 7709S
+	save_item(NAME(m_ccr2));
+
+	// CCN 7091
+	save_item(NAME(m_ptea));
+	save_item(NAME(m_qacr0));
+	save_item(NAME(m_qacr1));
+
+	// TMU
+	save_item(NAME(m_tocr));
+	save_item(NAME(m_tstr));
+	save_item(NAME(m_tcor0));
+	save_item(NAME(m_tcnt0));
+	save_item(NAME(m_tcr0));
+	save_item(NAME(m_tcor1));
+	save_item(NAME(m_tcnt1));
+	save_item(NAME(m_tcr1));
+	save_item(NAME(m_tcor2));
+	save_item(NAME(m_tcnt2));
+	save_item(NAME(m_tcr2));
+	save_item(NAME(m_tcpr2));
+
+	// INTC
+	save_item(NAME(m_icr));
+	save_item(NAME(m_ipra));
+	save_item(NAME(m_iprc));
+
+	// INTC 7709
+	save_item(NAME(m_intevt2));
+
+	// DMAC
+	save_item(NAME(m_sar0));
+	save_item(NAME(m_sar1));
+	save_item(NAME(m_sar2));
+	save_item(NAME(m_sar3));
+	save_item(NAME(m_dar0));
+	save_item(NAME(m_dar1));
+	save_item(NAME(m_dar2));
+	save_item(NAME(m_dar3));
+	save_item(NAME(m_chcr0));
+	save_item(NAME(m_chcr1));
+	save_item(NAME(m_chcr2));
+	save_item(NAME(m_chcr3));
+	save_item(NAME(m_dmatcr0));
+	save_item(NAME(m_dmatcr1));
+	save_item(NAME(m_dmatcr2));
+	save_item(NAME(m_dmatcr3));
+	save_item(NAME(m_dmaor));
+
 	save_item(NAME(m_nmi_line_state));
 
 	save_item(NAME(m_sh2_state->m_frt_input));
 	save_item(NAME(m_irln));
 	save_item(NAME(m_internal_irq_level));
 	save_item(NAME(m_internal_irq_vector));
-	save_item(NAME(m_refresh_timer_base));
 	save_item(NAME(m_dma_timer_active));
 	save_item(NAME(m_dma_source));
 	save_item(NAME(m_dma_destination));
@@ -2254,8 +3829,6 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_ioport4_pullup));
 	save_item(NAME(m_ioport4_direction));
 	save_item(NAME(m_sh4_mmu_enabled));
-	save_item(NAME(m_sh3internal_upper));
-	save_item(NAME(m_sh3internal_lower));
 
 	// Debugger state
 
@@ -2491,7 +4064,7 @@ void sh34_base_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 	case STATE_GENPC:
-		m_debugger_temp = (m_sh2_state->pc & SH34_AM);
+		m_debugger_temp = m_sh2_state->pc;
 		break;
 	}
 }
@@ -2657,43 +4230,23 @@ void sh34_base_device::sh4_set_ftcsr_callback(sh4_ftcsr_callback callback)
 }
 */
 
-const opcode_desc* sh4be_device::get_desclist(offs_t pc)
+
+const opcode_desc* sh4_base_device::get_desclist(offs_t pc)
 {
 	return m_drcfe->describe_code(pc);
 }
 
-void sh4be_device::init_drc_frontend()
-{
-	m_drcfe = std::make_unique<sh4be_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
-}
-
-
-const opcode_desc* sh4_device::get_desclist(offs_t pc)
-{
-	return m_drcfe->describe_code(pc);
-}
-
-void sh4_device::init_drc_frontend()
+void sh4_base_device::init_drc_frontend()
 {
 	m_drcfe = std::make_unique<sh4_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 }
 
-const opcode_desc* sh3be_device::get_desclist(offs_t pc)
+const opcode_desc* sh3_base_device::get_desclist(offs_t pc)
 {
 	return m_drcfe->describe_code(pc);
 }
 
-void sh3be_device::init_drc_frontend()
-{
-	m_drcfe = std::make_unique<sh4be_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
-}
-
-const opcode_desc* sh3_device::get_desclist(offs_t pc)
-{
-	return m_drcfe->describe_code(pc);
-}
-
-void sh3_device::init_drc_frontend()
+void sh3_base_device::init_drc_frontend()
 {
 	m_drcfe = std::make_unique<sh4_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 }
@@ -2814,7 +4367,7 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 
 	UML_LABEL(block, label++);              // label:
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		for (auto & elem : m_fastram)
 		{

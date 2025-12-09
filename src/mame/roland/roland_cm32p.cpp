@@ -631,13 +631,12 @@ void cm32p_state::cm32p(machine_config &config)
 	maincpu.serial_tx_cb().set(FUNC(cm32p_state::midi_w));
 	maincpu.in_p0_cb().set(FUNC(cm32p_state::port0_r));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MB87419_MB87420(config, pcm, 32.768_MHz_XTAL);
 	pcm->int_callback().set_inputline(cpu, i8x9x_device::EXTINT_LINE);
-	pcm->add_route(0, "lspeaker", 1.0);
-	pcm->add_route(1, "rspeaker", 1.0);
+	pcm->add_route(0, "speaker", 1.0, 0);
+	pcm->add_route(1, "speaker", 1.0, 1);
 
 	RAM(config, some_ram).set_default_size("8K");
 

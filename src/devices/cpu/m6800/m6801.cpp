@@ -2217,12 +2217,12 @@ u8 m6801_cpu_device::icrh_r()
 	{
 		m_tcsr &= ~TCSR_ICF;
 	}
-	return (m_input_capture >> 0) & 0xff;
+	return (m_input_capture >> 8) & 0xff;
 }
 
 u8 m6801_cpu_device::icrl_r()
 {
-	return (m_input_capture >> 8) & 0xff;
+	return (m_input_capture >> 0) & 0xff;
 }
 
 

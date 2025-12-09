@@ -108,10 +108,10 @@ void hotstuff_state::hotstuff(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x200);
 
-	scc8530_device &scc1(SCC8530N(config, "scc1", 4915200));
+	scc8530_device &scc1(SCC8530(config, "scc1", 4915200));
 	scc1.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	scc8530_device &scc2(SCC8530N(config, "scc2", 4915200));
+	scc8530_device &scc2(SCC8530(config, "scc2", 4915200));
 	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 
 	mc146818_device &rtc(MC146818(config, "rtc", XTAL(32'768)));

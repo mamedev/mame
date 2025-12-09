@@ -595,13 +595,12 @@ void sttechno_state::shambros(machine_config &config)
 	FUJITSU_29F160TE_16BIT(config, m_flash[1]);
 	FUJITSU_29F160TE_16BIT(config, m_video_flash);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	STT_SA1(config, m_sound, XTAL(42'954'545) / 3);
 	m_sound->set_addrmap(0, &sttechno_state::sound_map);
-	m_sound->add_route(0, "lspeaker", 1.0);
-	m_sound->add_route(1, "rspeaker", 1.0);
+	m_sound->add_route(0, "speaker", 1.0, 0);
+	m_sound->add_route(1, "speaker", 1.0, 1);
 	TIMER(config, "irq6_timer").configure_periodic(FUNC(sttechno_state::irq6_timer), attotime::from_hz(XTAL(42'954'545) / 3 / 448 / 128)); // probably some interrupt?
 
 	RS232_PORT(config, m_rs232, sttechno_debug_serial_devices, nullptr);

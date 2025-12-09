@@ -33,7 +33,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	enum : uint8_t
@@ -62,8 +62,9 @@ private:
 
 	void handle_command(uint8_t cmd, uint8_t param);
 
-	void fill_buffer();
-	void append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount);
+	bool fill_buffer();
+	void append_buffer(sound_stream &stream, int &pos, int scount);
+	TIMER_CALLBACK_MEMBER(update_sample_rate);
 
 	sound_stream *stream;
 	std::unique_ptr<mp3_audio> mp3dec;
@@ -74,6 +75,7 @@ private:
 	uint32_t m_mp3data_count;
 	int32_t m_sample_count, m_samples_idx;
 	int32_t m_frame_channels;
+	uint32_t m_frame_sample_rate;
 	float m_output_gain[2];
 
 	uint8_t m_csctl;

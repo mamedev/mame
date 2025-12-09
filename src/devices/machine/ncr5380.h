@@ -179,8 +179,15 @@ public:
 	cxd1180_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 };
 
+class dp8490_device : public ncr5380_device
+{
+public:
+	dp8490_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+};
+
 DECLARE_DEVICE_TYPE(NCR5380, ncr5380_device)
 DECLARE_DEVICE_TYPE(NCR53C80, ncr53c80_device)
 DECLARE_DEVICE_TYPE(CXD1180, cxd1180_device)
+DECLARE_DEVICE_TYPE(DP8490, dp8490_device)
 
 #endif // MAME_MACHINE_NCR5380_H

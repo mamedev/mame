@@ -40,11 +40,10 @@ void wavesynth_state::machine_start()
 void wavesynth_state::wavesynth(machine_config &config)
 {
 	WAVEBLASTER_CONNECTOR(config, m_waveblaster, waveblaster_intf, "omniwave");
-	m_waveblaster->add_route(0, "lspeaker", 1.0);
-	m_waveblaster->add_route(1, "rspeaker", 1.0);
+	m_waveblaster->add_route(0, "speaker", 1.0, 0);
+	m_waveblaster->add_route(1, "speaker", 1.0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);

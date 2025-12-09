@@ -1494,11 +1494,11 @@ void z8_device::execute_run()
 		}
 		else
 		{
-			/* fetch opcode */
+			// fetch opcode
 			uint8_t opcode = fetch_opcode();
 			int cycles = Z8601_OPCODE_MAP[opcode].execution_cycles;
 
-			/* execute instruction */
+			// execute instruction
 			(this->*(Z8601_OPCODE_MAP[opcode].function))(opcode, &cycles);
 
 			m_icount -= cycles;
@@ -1558,13 +1558,15 @@ void z8_device::state_string_export(const device_state_entry &entry, std::string
 {
 	switch (entry.index())
 	{
-		case STATE_GENFLAGS: str = string_format("%c%c%c%c%c%c",
-										m_flags & Z8_FLAGS_C ? 'C' : '.',
-										m_flags & Z8_FLAGS_Z ? 'Z' : '.',
-										m_flags & Z8_FLAGS_S ? 'S' : '.',
-										m_flags & Z8_FLAGS_V ? 'V' : '.',
-										m_flags & Z8_FLAGS_D ? 'D' : '.',
-										m_flags & Z8_FLAGS_H ? 'H' : '.');   break;
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c%c%c%c",
+					m_flags & Z8_FLAGS_C ? 'C' : '.',
+					m_flags & Z8_FLAGS_Z ? 'Z' : '.',
+					m_flags & Z8_FLAGS_S ? 'S' : '.',
+					m_flags & Z8_FLAGS_V ? 'V' : '.',
+					m_flags & Z8_FLAGS_D ? 'D' : '.',
+					m_flags & Z8_FLAGS_H ? 'H' : '.');
+			break;
 	}
 }
 

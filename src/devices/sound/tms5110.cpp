@@ -1192,22 +1192,21 @@ int tms5110_device::romclk_hack_r()
 
 ******************************************************************************/
 
-void tms5110_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tms5110_device::sound_stream_update(sound_stream &stream)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
-	auto &buffer = outputs[0];
 
 	/* loop while we still have samples to generate */
-	for (int sampindex = 0; sampindex < buffer.samples(); )
+	for (int sampindex = 0; sampindex < stream.samples(); )
 	{
-		int length = buffer.samples() - sampindex;
+		int length = stream.samples() - sampindex;
 		if (length > MAX_SAMPLE_CHUNK)
 			length = MAX_SAMPLE_CHUNK;
 
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
 		for (int index = 0; index < length; index++)
-			buffer.put_int(sampindex++, sample_data[index], 32768);
+			stream.put_int(0, sampindex++, sample_data[index], 32768);
 	}
 }
 

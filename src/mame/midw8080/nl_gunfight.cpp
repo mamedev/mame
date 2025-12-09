@@ -810,7 +810,7 @@ NETLIST_START(gunfight)
 	ALIAS(IN_RH, I_RIGHT_HIT.Q)
 
 #if USE_FRONTIERS
-	// These frontiers keep the mostly independant halves of the circuit
+	// These frontiers keep the mostly independent halves of the circuit
 	// (left channel and right channel) from affecting each other and the
 	// noise generator, which speeds up processing substantially while
 	// making no audible change in the output. These seem to be the only

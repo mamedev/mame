@@ -741,7 +741,7 @@ void berzerk_state::berzerk_io_map(address_map &map)
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) ) \
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) ) \
-	PORT_DIPSETTING(    0x07, "1 Coin/10 Credits" ) \
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_10C ) ) \
 	PORT_DIPSETTING(    0x08, "1 Coin/14 Credits" )
 
 

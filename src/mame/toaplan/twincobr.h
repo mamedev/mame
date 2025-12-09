@@ -23,9 +23,6 @@ class twincobr_state : public driver_device
 public:
 	twincobr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_sharedram(*this, "sharedram"),
-		m_spriteram8(*this, "spriteram8"),
-		m_spriteram16(*this, "spriteram16"),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
 		m_spritegen(*this, "scu"),
@@ -33,7 +30,10 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_mainlatch(*this, "mainlatch"),
-		m_coinlatch(*this, "coinlatch")
+		m_coinlatch(*this, "coinlatch"),
+		m_sharedram(*this, "sharedram"),
+		m_spriteram8(*this, "spriteram8"),
+		m_spriteram16(*this, "spriteram16")
 	{ }
 
 	void twincobr(machine_config &config);
@@ -42,11 +42,19 @@ public:
 	void fshark(machine_config &config);
 	void fnshark(machine_config &config);
 
-	void init_twincobr();
-
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<tms32010_device> m_dsp;
+	required_device<toaplan_scu_device> m_spritegen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_mainlatch;
+	required_device<ls259_device> m_coinlatch;
 
 	optional_shared_ptr<u8> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
@@ -54,12 +62,6 @@ protected:
 
 	u32 m_fg_rom_bank = 0;
 	u32 m_bg_ram_bank = 0;
-	int m_intenable = 0;
-	int m_dsp_bio = 0;
-	int m_fsharkbt_8741 = 0;
-	int m_dsp_execute = 0;
-	u32 m_dsp_addr_w = 0;
-	u32 m_main_ram_seg = 0;
 	std::unique_ptr<u16[]> m_bgvideoram16;
 	std::unique_ptr<u16[]> m_fgvideoram16;
 	std::unique_ptr<u16[]> m_txvideoram16;
@@ -75,10 +77,17 @@ protected:
 	s32 m_txoffs = 0;
 	s32 m_fgoffs = 0;
 	s32 m_bgoffs = 0;
-	s32 m_display_on = 0;
+	bool m_display_on = false;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
+
+	bool m_intenable = false;
+	s32 m_dsp_bio = 0;
+	s32 m_fsharkbt_8741 = 0;
+	bool m_dsp_execute = false;
+	u32 m_dsp_addr_w = 0;
+	u32 m_main_ram_seg = 0;
 
 	void twincobr_dsp_addrsel_w(u16 data);
 	u16 twincobr_dsp_r();
@@ -134,15 +143,6 @@ protected:
 	void bg_ram_bank_w(int state);
 	void fg_rom_bank_w(int state);
 	void log_vram();
-	void driver_savestate();
-	required_device<cpu_device> m_maincpu;
-	required_device<tms32010_device> m_dsp;
-	required_device<toaplan_scu_device> m_spritegen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<ls259_device> m_mainlatch;
-	required_device<ls259_device> m_coinlatch;
 
 	void dsp_io_map(address_map &map) ATTR_COLD;
 	void dsp_program_map(address_map &map) ATTR_COLD;

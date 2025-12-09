@@ -240,9 +240,9 @@ protected:
 	}
 
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update(sound_stream &stream) override
 	{
-		update_internal(outputs);
+		update_internal(stream);
 	}
 
 	// update streams
@@ -253,15 +253,15 @@ protected:
 	}
 
 	// internal update helper
-	void update_internal(std::vector<write_stream_view> &outputs, int output_shift = 0)
+	void update_internal(sound_stream &stream, int output_shift = 0)
 	{
 		// local buffer to hold samples
 		constexpr int MAX_SAMPLES = 256;
 		typename ChipClass::output_data output[MAX_SAMPLES];
 
 		// parameters
-		int const outcount = std::min(outputs.size(), std::size(output[0].data));
-		int const numsamples = outputs[0].samples();
+		int const outcount = std::min(stream.output_count(), u32(std::size(output[0].data)));
+		int const numsamples = stream.samples();
 
 		// generate the FM/ADPCM stream
 		for (int sampindex = 0; sampindex < numsamples; sampindex += MAX_SAMPLES)
@@ -272,7 +272,7 @@ protected:
 			{
 				int eff_outnum = (outnum + output_shift) % OUTPUTS;
 				for (int index = 0; index < cursamples; index++)
-					outputs[eff_outnum].put_int(sampindex + index, output[index].data[outnum], 32768);
+					stream.put_int(eff_outnum, sampindex + index, output[index].data[outnum], 32768);
 			}
 		}
 	}
@@ -302,17 +302,12 @@ public:
 
 protected:
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
+	virtual void sound_stream_update(sound_stream &stream) override
 	{
 		// ymfm outputs FM first, then SSG, while MAME traditionally
 		// wants SSG streams first; to do this, we rotate the outputs
 		// by the number of SSG output channels
-		parent::update_internal(outputs, ChipClass::SSG_OUTPUTS);
-
-		// for the single-output case, also apply boost the gain to better match
-		// previous version, which summed instead of averaged the outputs
-		if (ChipClass::SSG_OUTPUTS == 1)
-			outputs[0].apply_gain(3.0);
+		parent::update_internal(stream, ChipClass::SSG_OUTPUTS);
 	}
 };
 

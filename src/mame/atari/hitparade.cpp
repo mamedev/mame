@@ -7,8 +7,8 @@ Atari Europe Hit Parade series jukeboxes
 
 Atari Europe is unrelated to the modern Atari Europe, or Infogrames.
 It was a French jukebox company that was partially owned by Atari for a while
-in the mid-1970s. It gets a bit confusing, for more information, Google for
-Socodimex, Electro-Kicker, Europe Electronique.
+in the mid-1970s. It gets a bit confusing, for more information, search online
+for Socodimex, Electro-Kicker, Europe Electronique.
 
 There are probably more jukeboxes on similar hardware.
 

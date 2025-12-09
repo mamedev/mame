@@ -71,7 +71,7 @@
 
 void tms3203x_device::illegal(uint32_t op)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		logerror("Illegal op @ %06X: %08X (tbl=%03X)\n", m_pc - 1, op, op >> 21);
 		machine().debug_break();
@@ -1409,16 +1409,32 @@ uint32_t tms3203x_device::modillegal_def(uint32_t op, uint8_t ar, uint32_t *&def
 
 #define ABSF(dreg, sreg)                                                \
 {                                                                       \
-	int32_t man = FREGMAN(sreg);                                          \
+	int32_t const man = FREGMAN(sreg);                                  \
+	int8_t const fexp = FREGEXP(sreg);                                  \
 	CLR_NZVUF();                                                        \
-	m_r[dreg] = m_r[sreg];                              \
-	if (man < 0)                                                        \
-	{                                                                   \
-		m_r[dreg].set_mantissa(~man);                           \
-		if (man == (int32_t)0x80000000 && FREGEXP(sreg) == 127)           \
-			IREG(TMR_ST) |= VFLAG | LVFLAG;                             \
+	m_r[dreg] = m_r[sreg];                                              \
+	if (fexp == -128)                                                   \
+	{   /* if sreg was misformed, it should come out 80:00000000 */     \
+		m_r[dreg].set_mantissa(0);                                      \
 	}                                                                   \
-	OR_NZF(m_r[dreg]);                                          \
+	else if (man < 0)                                                   \
+	{                                                                   \
+		if (man != int32_t(0x80000000))                                 \
+		{ /* normal case */                                             \
+			m_r[dreg].set_mantissa(-man); /* aka (~man)+1 */            \
+		}                                                               \
+		else if (fexp == 127)                                           \
+		{ /* total overflow result: 7F:7FFFFFFFF */                     \
+			IREG(TMR_ST) |= VFLAG | LVFLAG;                             \
+			m_r[dreg].set_mantissa(0x7fffffff);                         \
+		}                                                               \
+		else                                                            \
+		{ /* man overflow -80000000 to +80000000 : increment exp */     \
+			m_r[dreg].set_exponent(fexp + 1);                           \
+			m_r[dreg].set_mantissa(0);                                  \
+		}                                                               \
+	}                                                                   \
+	OR_NZF(m_r[dreg]);                                                  \
 }
 
 void tms3203x_device::absf_reg(uint32_t op)
@@ -5492,7 +5508,7 @@ inline void tms3203x_device::execute_delayed(uint32_t newpc)
 {
 	m_delayed = true;
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		execute_one();
 		execute_one();

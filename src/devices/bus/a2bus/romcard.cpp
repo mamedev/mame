@@ -5,10 +5,18 @@
     romcard.cpp
 
     Implemention of the Apple II ROM card.  This is like a language
-    card, but with 12K instead of 16K, and ROM instead of RAM.
+    card, but with 12K instead of 16K, and ROM instead of RAM.  While
+    software normally expects to find it in slot 0, it may also be
+    installed in any other expansion bus slot.
 
     Apple at various points called it both "ROM Card" and
-    "Firmware Card",
+    "Firmware Card".
+
+    Some later revisions of DOS 3.3 remove support for the Applesoft
+    BASIC firmware card in slot 0 of an original Apple II, though
+    they will load Applesoft onto a language card if one is present
+    there.  Compatible revisions print "APPLE II PLUS OR ROMCARD"
+    when successfully booted on any non-Integer BASIC system.
 
 *********************************************************************/
 
@@ -27,7 +35,7 @@ public:
 	a2bus_romcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void bus_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
@@ -38,6 +46,7 @@ public:
 	virtual uint16_t inh_start() override { return 0xd000; }
 	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
+	virtual void reset_from_bus() override;
 
 protected:
 	u8 *m_rom;
@@ -107,7 +116,11 @@ ROM_END
 ROM_START( romcardint )
 	/* Integer ROM card: Integer BASIC, the old Monitor, and Programmer's Aid #1 */
 	ROM_REGION(0x3000, "romcard", 0)
-	ROM_LOAD ( "341-0016-00.d0", 0x0000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed))
+	ROM_SYSTEM_BIOS(0, "aid1", "Programmer's Aid #1")
+	ROMX_LOAD( "341-0016-00.d0", 0x0000, 0x0800, CRC(4234e88a) SHA1(c9a81d704dc2f0c3416c20f9c4ab71fedda937ed), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "watson", "The Inspector and Watson (Omega MicroWare)")
+	ROMX_LOAD( "watson.d0", 0x0000, 0x0800, CRC(c9ecbfc3) SHA1(c15390d86bfcad9c03230b3900cdace396d80bf2), ROM_BIOS(1))
+	ROMX_LOAD( "inspector.d8", 0x0800, 0x0800, CRC(20d59f4f) SHA1(2d8fdec2d1a28d54ebc218b54a16f0cae33943d6), ROM_BIOS(1))
 	ROM_LOAD ( "341-0001-00.e0", 0x1000, 0x0800, CRC(c0a4ad3b) SHA1(bf32195efcb34b694c893c2d342321ec3a24b98f))
 	ROM_LOAD ( "341-0002-00.e8", 0x1800, 0x0800, CRC(a99c2cf6) SHA1(9767d92d04fc65c626223f25564cca31f5248980))
 	ROM_LOAD ( "341-0003-00.f0", 0x2000, 0x0800, CRC(62230d38) SHA1(f268022da555e4c809ca1ae9e5d2f00b388ff61c))
@@ -116,7 +129,7 @@ ROM_END
 
 static INPUT_PORTS_START( romcard )
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x01, 0x00, "Enable at boot")
+	PORT_CONFNAME(0x01, 0x00, "Enable at reset")
 	PORT_CONFSETTING(0x00, DEF_STR(No))
 	PORT_CONFSETTING(0x01, DEF_STR(Yes))
 INPUT_PORTS_END
@@ -186,7 +199,12 @@ void a2bus_romcardint_device::device_start()
 	a2bus_romcard_device::device_start();
 }
 
-void a2bus_romcard_device::bus_reset()
+void a2bus_romcard_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_romcard_device::reset_from_bus()
 {
 	if ((m_config->read() == 1) && (m_rom != nullptr))
 	{
@@ -204,7 +222,7 @@ void a2bus_romcard_device::do_io(int offset)
 	int old_inh_state = m_inh_state;
 
 	// any even access enables ROM reading
-	if (((offset & 1) == 1) && (m_rom != nullptr))
+	if (((offset & 1) == 0) && (m_rom != nullptr))
 	{
 		m_inh_state |= INH_READ;
 	}

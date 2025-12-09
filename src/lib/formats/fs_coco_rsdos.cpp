@@ -34,8 +34,6 @@ public:
 	coco_rsdos_impl(fsblk_t &blockdev);
 	virtual ~coco_rsdos_impl() = default;
 
-	static constexpr int SECTOR_DIRECTORY_ENTRY_COUNT = 8;
-
 	struct rsdos_dirent
 	{
 		char    m_filename[11];
@@ -46,15 +44,6 @@ public:
 		u8      m_last_sector_bytes_lsb;
 	};
 
-	struct rsdos_dirent_sector
-	{
-		struct
-		{
-			rsdos_dirent    m_dirent;
-			u8              m_unused[16];
-		} m_entries[SECTOR_DIRECTORY_ENTRY_COUNT];
-	};
-
 	class granule_iterator
 	{
 	public:
@@ -62,23 +51,24 @@ public:
 		bool next(u8 &granule, u16 &byte_count);
 
 	private:
-		fsblk_t::block_t    m_granule_map;
-		std::optional<u8>   m_current_granule;
-		u8                  m_maximum_granules;
-		u16                 m_last_sector_bytes;
-		std::bitset<256>    m_visited_granules;
+		fsblk_t::block_t::ptr   m_granule_map;
+		std::optional<u8>       m_current_granule;
+		u8                      m_maximum_granules;
+		u16                     m_last_sector_bytes;
+		std::bitset<256>        m_visited_granules;
 	};
 
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual err_t format(const meta_data &meta) override;
-	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
-	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::error_condition format(const meta_data &meta) override;
+	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
 	static bool validate_filename(std::string_view name);
 
 private:
+	static constexpr int SECTOR_DIRECTORY_ENTRY_COUNT = 8;
 	static constexpr u8 TRACK_GRANULE_COUNT = 2;
 	static constexpr u8 GRANULE_SECTOR_COUNT = 9;
 	static constexpr u8 TRACK_SECTOR_COUNT = TRACK_GRANULE_COUNT * GRANULE_SECTOR_COUNT;
@@ -96,16 +86,17 @@ private:
 	static constexpr u8 FILE_TYPE_TEXT_EDITOR = 0x03;
 	static constexpr u8 FILE_LAST_GRANULE_INDICATOR = 0xc0;
 
-	fsblk_t::block_t read_sector(int track, int sector) const;
-	fsblk_t::block_t read_granule_sector(u8 granule, u8 sector) const;
+	fsblk_t::block_t::ptr read_sector(int track, int sector) const;
+	fsblk_t::block_t::ptr read_granule_sector(u8 granule, u8 sector) const;
 	u8 maximum_granules() const;
+	static rsdos_dirent get_dirent(const fsblk_t::block_t &dir_block, int file_index);
 	std::optional<rsdos_dirent> dirent_from_path(const std::vector<std::string> &path);
 	template <typename T>
 	void iterate_directory_entries(T &&callback);
 	meta_data get_metadata_from_dirent(const rsdos_dirent &dirent);
 	static std::string get_filename_from_dirent(const rsdos_dirent &dirent);
-	std::pair<err_t, std::string> build_direntry_filename(const std::string &filename);
-	std::pair<err_t, u8> claim_granule();
+	std::pair<std::error_condition, std::string> build_direntry_filename(const std::string &filename);
+	std::pair<std::error_condition, u8> claim_granule();
 	void write_granule_map(u8 granule, u8 map_data);
 	u8 read_granule_map(u8 granule) const;
 	bool is_ascii(const std::vector<u8> &data) const;
@@ -239,14 +230,14 @@ coco_rsdos_impl::coco_rsdos_impl(fsblk_t &blockdev)
 //  coco_rsdos_impl::metadata
 //-------------------------------------------------
 
-std::pair<err_t, meta_data> coco_rsdos_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> coco_rsdos_impl::metadata(const std::vector<std::string> &path)
 {
 	// attempt to find the file
 	const std::optional<rsdos_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, get_metadata_from_dirent(*dirent));
+	return std::make_pair(std::error_condition(), get_metadata_from_dirent(*dirent));
 }
 
 
@@ -254,7 +245,7 @@ std::pair<err_t, meta_data> coco_rsdos_impl::metadata(const std::vector<std::str
 //  coco_rsdos_impl::directory_contents
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<dir_entry>> coco_rsdos_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> coco_rsdos_impl::directory_contents(const std::vector<std::string> &path)
 {
 	std::vector<dir_entry> results;
 	auto const callback = [this, &results](u8 s, u8 i, const rsdos_dirent &dirent)
@@ -263,7 +254,7 @@ std::pair<err_t, std::vector<dir_entry>> coco_rsdos_impl::directory_contents(con
 		return false;
 	};
 	iterate_directory_entries(callback);
-	return std::make_pair(ERR_OK, std::move(results));
+	return std::make_pair(std::error_condition(), std::move(results));
 }
 
 
@@ -271,12 +262,12 @@ std::pair<err_t, std::vector<dir_entry>> coco_rsdos_impl::directory_contents(con
 //  coco_rsdos_impl::file_read
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<u8>> coco_rsdos_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> coco_rsdos_impl::file_read(const std::vector<std::string> &path)
 {
 	// attempt to find the file
 	const std::optional<rsdos_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
 	std::vector<u8> result;
 	u8 granule;
@@ -297,11 +288,10 @@ std::pair<err_t, std::vector<u8>> coco_rsdos_impl::file_read(const std::vector<s
 		{
 			// read this sector
 			auto block = read_sector(track, sector);
-			const u8 *data = block.rodata();
 			u16 data_length = std::min(byte_count, u16(SECTOR_SIZE));
 
 			// and append it to the results
-			memcpy(result.data() + current_size, data, data_length);
+			block->read(0, result.data() + current_size, data_length);
 
 			// and advance
 			current_size += data_length;
@@ -309,7 +299,7 @@ std::pair<err_t, std::vector<u8>> coco_rsdos_impl::file_read(const std::vector<s
 			sector++;
 		}
 	}
-	return std::make_pair(ERR_OK, std::move(result));
+	return std::make_pair(std::error_condition(), std::move(result));
 }
 
 
@@ -317,23 +307,23 @@ std::pair<err_t, std::vector<u8>> coco_rsdos_impl::file_read(const std::vector<s
 //  coco_rsdos_impl::format
 //-------------------------------------------------
 
-err_t coco_rsdos_impl::format(const meta_data &meta)
+std::error_condition coco_rsdos_impl::format(const meta_data &meta)
 {
 	// formatting RS-DOS is easy - just fill everything with 0xFF
-	m_blockdev.fill(0xFF);
-	return ERR_OK;
+	m_blockdev.fill_all(0xFF);
+	return std::error_condition();
 }
 
 
-std::pair<err_t, std::string> coco_rsdos_impl::build_direntry_filename(const std::string &filename)
+std::pair<std::error_condition, std::string> coco_rsdos_impl::build_direntry_filename(const std::string &filename)
 {
 	// The manual does not say anything about valid characters for a file name.
 	const std::regex filename_regex("([^.]{0,8})(\\.([^.]{0,3}))?");
 	std::smatch smatch;
 	if (!std::regex_match(filename, smatch, filename_regex))
-		return std::make_pair(ERR_INVALID, std::string());
+		return std::make_pair(error::invalid_name, std::string());
 	if (smatch.size() != 4)
-		return std::make_pair(ERR_INVALID, std::string());
+		return std::make_pair(error::invalid_name, std::string());
 
 	std::string fname;
 	fname.resize(FNAME_LENGTH, ' ');
@@ -344,18 +334,18 @@ std::pair<err_t, std::string> coco_rsdos_impl::build_direntry_filename(const std
 	for (int j = 0; j < 3 && j < smatch.str(3).size(); j++)
 		fname[8 + j] = smatch.str(3)[j];
 
-	return std::make_pair(ERR_OK, std::move(fname));
+	return std::make_pair(std::error_condition(), std::move(fname));
 }
 
 
-err_t coco_rsdos_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition coco_rsdos_impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
 	if (!path.empty())
-		return ERR_UNSUPPORTED;
+		return error::unsupported;
 
 	const std::string filename = meta.get_string(meta_name::name, "");
 	auto [err, fname] = build_direntry_filename(filename);
-	if (err != ERR_OK)
+	if (err)
 		return err;
 
 	bool found_entry = false;
@@ -367,35 +357,35 @@ err_t coco_rsdos_impl::file_create(const std::vector<std::string> &path, const m
 
 		for (file_index = 0; !found_entry && file_index < SECTOR_DIRECTORY_ENTRY_COUNT; file_index++)
 		{
-			const u8 first_byte = dir_block.r8(file_index * DIRECTORY_ENTRY_SIZE);
+			const u8 first_byte = dir_block->r8(file_index * DIRECTORY_ENTRY_SIZE);
 			// 0xff marks the end of the directory, 0x00 marks a deleted file
 			found_entry = (first_byte == 0xff || first_byte == 0x00);
 			if (found_entry)
 			{
 				for (int i = 0; i < DIRECTORY_ENTRY_SIZE; i++)
-					dir_block.w8(file_index * DIRECTORY_ENTRY_SIZE + i, 0);
+					dir_block->w8(file_index * DIRECTORY_ENTRY_SIZE + i, 0);
 
 				auto [cerr, granule] = claim_granule();
-				if (cerr != ERR_OK)
+				if (cerr != std::error_condition())
 					return cerr;
 
-				dir_block.wstr(file_index * DIRECTORY_ENTRY_SIZE + 0, fname);
-				dir_block.w8(file_index * DIRECTORY_ENTRY_SIZE + OFFSET_FIRST_GRANULE, granule);
+				dir_block->wstr(file_index * DIRECTORY_ENTRY_SIZE + 0, fname);
+				dir_block->w8(file_index * DIRECTORY_ENTRY_SIZE + OFFSET_FIRST_GRANULE, granule);
 				// The file type, ASCII flag, and number of bytes in last sector of file will be set during writing.
 			}
 		}
 	}
 	if (!found_entry)
-		return ERR_NO_SPACE;
+		return error::no_space;
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
-err_t coco_rsdos_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition coco_rsdos_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	if (path.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 	const std::string &target = path[0];
 
 	std::optional<rsdos_dirent> result;
@@ -415,7 +405,7 @@ err_t coco_rsdos_impl::file_write(const std::vector<std::string> &path, const st
 	iterate_directory_entries(callback);
 
 	if (!result)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	const size_t data_length = data.size();
 	const u8 max_granule = maximum_granules();
@@ -429,7 +419,7 @@ err_t coco_rsdos_impl::file_write(const std::vector<std::string> &path, const st
 	{
 		auto data_block = read_granule_sector(granule, granule_sector);
 		bytes_in_last_sector = (data_length - offset) > SECTOR_SIZE ? SECTOR_SIZE : data_length - offset;
-		memcpy(data_block.data(), data.data() + offset, bytes_in_last_sector);
+		data_block->write(0, data.data() + offset, bytes_in_last_sector);
 		offset += SECTOR_SIZE;
 		write_granule_map(granule, FILE_LAST_GRANULE_INDICATOR + granule_sector);
 		if (offset < data_length)
@@ -446,7 +436,7 @@ err_t coco_rsdos_impl::file_write(const std::vector<std::string> &path, const st
 				else
 				{
 					auto [err, next_granule] = claim_granule();
-					if (err != ERR_OK)
+					if (err)
 						return err;
 					write_granule_map(granule, next_granule);
 					granule = next_granule;
@@ -466,11 +456,11 @@ err_t coco_rsdos_impl::file_write(const std::vector<std::string> &path, const st
 
 	// Update directory entry
 	auto dir_block = read_sector(DIRECTORY_TRACK, dir_sector);
-	dir_block.w8(dir_file_index * DIRECTORY_ENTRY_SIZE + OFFSET_FILE_TYPE, determine_file_type(data));
-	dir_block.w8(dir_file_index * DIRECTORY_ENTRY_SIZE + OFFSET_ASCII_FLAG, is_ascii(data) ? 0xff : 0x00);
-	dir_block.w16b(dir_file_index * DIRECTORY_ENTRY_SIZE + OFFSET_LAST_SECTOR_BYTES, bytes_in_last_sector);
+	dir_block->w8(dir_file_index * DIRECTORY_ENTRY_SIZE + OFFSET_FILE_TYPE, determine_file_type(data));
+	dir_block->w8(dir_file_index * DIRECTORY_ENTRY_SIZE + OFFSET_ASCII_FLAG, is_ascii(data) ? 0xff : 0x00);
+	dir_block->w16b(dir_file_index * DIRECTORY_ENTRY_SIZE + OFFSET_LAST_SECTOR_BYTES, bytes_in_last_sector);
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
@@ -510,41 +500,41 @@ u8 coco_rsdos_impl::determine_file_type(const std::vector<u8> &data) const
 }
 
 
-std::pair<err_t, u8> coco_rsdos_impl::claim_granule()
+std::pair<std::error_condition, u8> coco_rsdos_impl::claim_granule()
 {
 	// Granules are likely not assigned in this order on hardware.
 	auto granule_block = read_sector(DIRECTORY_TRACK, 2);
 	for (int g = 0; g < maximum_granules(); g++)
 	{
-		if (granule_block.r8(g) == 0xff)
+		if (granule_block->r8(g) == 0xff)
 		{
-			granule_block.w8(g, FILE_LAST_GRANULE_INDICATOR);
-			return std::make_pair(ERR_OK, g);
+			granule_block->w8(g, FILE_LAST_GRANULE_INDICATOR);
+			return std::make_pair(std::error_condition(), g);
 		}
 	}
-	return std::make_pair(ERR_NO_SPACE, 0);
+	return std::make_pair(error::no_space, 0);
 }
 
 
 void coco_rsdos_impl::write_granule_map(u8 granule, u8 map_data)
 {
 	auto granule_block = read_sector(DIRECTORY_TRACK, 2);
-	granule_block.w8(granule, map_data);
+	granule_block->w8(granule, map_data);
 }
 
 
 u8 coco_rsdos_impl::read_granule_map(u8 granule) const
 {
 	auto granule_block = read_sector(DIRECTORY_TRACK, 2);
-	return granule_block.r8(granule);
+	return granule_block->r8(granule);
 }
 
 
 //-------------------------------------------------
-//  fsblk_t::block_t coco_rsdos_impl::read_sector
+//  coco_rsdos_impl::read_sector
 //-------------------------------------------------
 
-fsblk_t::block_t coco_rsdos_impl::read_sector(int track, int sector) const
+fsblk_t::block_t::ptr coco_rsdos_impl::read_sector(int track, int sector) const
 {
 	// the CoCo RS-DOS world thinks in terms of tracks/sectors, but we have a block device
 	// abstraction
@@ -552,7 +542,7 @@ fsblk_t::block_t coco_rsdos_impl::read_sector(int track, int sector) const
 }
 
 
-fsblk_t::block_t coco_rsdos_impl::read_granule_sector(u8 granule, u8 sector) const
+fsblk_t::block_t::ptr coco_rsdos_impl::read_granule_sector(u8 granule, u8 sector) const
 {
 	// Track 17 does not hold granules
 	if (granule < (DIRECTORY_TRACK * TRACK_GRANULE_COUNT))
@@ -598,6 +588,18 @@ std::optional<coco_rsdos_impl::rsdos_dirent> coco_rsdos_impl::dirent_from_path(c
 
 
 //-------------------------------------------------
+//  coco_rsdos_impl::get_dirent
+//-------------------------------------------------
+
+coco_rsdos_impl::rsdos_dirent coco_rsdos_impl::get_dirent(const fsblk_t::block_t &dir_block, int file_index)
+{
+	rsdos_dirent result;
+	dir_block.read(file_index * DIRECTORY_ENTRY_SIZE, reinterpret_cast<u8 *>(&result), sizeof(rsdos_dirent));
+	return result;
+}
+
+
+//-------------------------------------------------
 //  coco_rsdos_impl::iterate_directory_entries
 //-------------------------------------------------
 
@@ -609,21 +611,21 @@ void coco_rsdos_impl::iterate_directory_entries(T &&callback)
 	{
 		// read this directory sector
 		auto dir_block = read_sector(DIRECTORY_TRACK, dir_sector);
-		const rsdos_dirent_sector &sector = *reinterpret_cast<const rsdos_dirent_sector *>(dir_block.rodata());
 
 		// and loop through all entries
 		for (int file_index = 0; file_index < 8; file_index++)
 		{
 			// 0xFF marks the end of the directory
-			if (sector.m_entries[file_index].m_dirent.m_filename[0] == '\xFF')
+			rsdos_dirent entry = get_dirent(*dir_block, file_index);
+			if (entry.m_filename[0] == '\xFF')
 			{
 				done = true;
 			}
 			else
 			{
 				// 0x00 marks a deleted file
-				if (sector.m_entries[file_index].m_dirent.m_filename[0] != '\0')
-					done = callback(dir_sector, 0, sector.m_entries[file_index].m_dirent);
+				if (entry.m_filename[0] != '\0')
+					done = callback(dir_sector, 0, entry);
 			}
 
 			if (done)
@@ -709,14 +711,14 @@ bool coco_rsdos_impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 	if (m_current_granule)
 	{
 		std::optional<u8> next_granule;
-		const u8 *granule_map_data = m_granule_map.rodata();
-		if (granule_map_data[*m_current_granule] < m_maximum_granules)
+		const u8 cur_granule = m_granule_map->r8(*m_current_granule);
+		if (cur_granule < m_maximum_granules)
 		{
 			// this entry points to the next granule
 			success = true;
 			granule = *m_current_granule;
 			byte_count = GRANULE_SECTOR_COUNT * SECTOR_SIZE;
-			next_granule = granule_map_data[*m_current_granule];
+			next_granule = cur_granule;
 
 			// check for cycles, which should only happen if the disk is corrupt (or not in RS-DOS format)
 			if (m_visited_granules[*next_granule])
@@ -724,12 +726,12 @@ bool coco_rsdos_impl::granule_iterator::next(u8 &granule, u16 &byte_count)
 			else
 				m_visited_granules.set(*next_granule);
 		}
-		else if (granule_map_data[*m_current_granule] >= FILE_LAST_GRANULE_INDICATOR && granule_map_data[*m_current_granule] <= FILE_LAST_GRANULE_INDICATOR + GRANULE_SECTOR_COUNT)
+		else if (cur_granule >= FILE_LAST_GRANULE_INDICATOR && cur_granule <= FILE_LAST_GRANULE_INDICATOR + GRANULE_SECTOR_COUNT)
 		{
 			// this is the last granule in the file
 			success = true;
 			granule = *m_current_granule;
-			u16 sector_count = std::max(granule_map_data[*m_current_granule], u8(0xC1)) - 0xC1;
+			u16 sector_count = std::max(cur_granule, u8(0xC1)) - 0xC1;
 			byte_count = sector_count * SECTOR_SIZE + m_last_sector_bytes;
 			next_granule = std::nullopt;
 		}

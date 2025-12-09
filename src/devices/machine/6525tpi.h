@@ -78,10 +78,6 @@ public:
 	void pb6_w(int state) { port_line_w(m_in_b, 6, state); }
 	void pb7_w(int state) { port_line_w(m_in_b, 7, state); }
 
-	uint8_t get_ddr_a();
-	uint8_t get_ddr_b();
-	uint8_t get_ddr_c();
-
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

@@ -47,8 +47,8 @@ void omniwave_device::midi_rx(int state)
 void omniwave_device::device_add_mconfig(machine_config &config)
 {
 	KS0164(config, m_ks0164, 16.9344_MHz_XTAL);
-	m_ks0164->add_route(0, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_ks0164->add_route(1, DEVICE_SELF_OWNER, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_ks0164->add_route(0, DEVICE_SELF_OWNER, 1.0, 0);
+	m_ks0164->add_route(1, DEVICE_SELF_OWNER, 1.0, 1);
 	m_ks0164->midi_tx().set([this] (int state) { m_connector->do_midi_tx(state); });
 }
 

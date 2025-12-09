@@ -4,9 +4,6 @@
     Dobbertin Smartwatch
 
     Created: 23/2/2015
-
-    TODO: setting the time (requires the DS1315 core to be able to do this,
-          at the moment it just reads the current time)
 */
 
 #include "emu.h"
@@ -21,8 +18,7 @@ DEFINE_DEVICE_TYPE(CPC_SMARTWATCH, cpc_smartwatch_device, "cpc_smartwatch", "Dob
 
 void cpc_smartwatch_device::device_add_mconfig(machine_config &config)
 {
-	DS1315(config, m_rtc, 0);
-	// no pass-through (?)
+	DS1216E(config, m_rtc);
 }
 
 
@@ -63,26 +59,17 @@ void cpc_smartwatch_device::device_start()
 void cpc_smartwatch_device::device_reset()
 {
 	address_space &space = m_slot->cpu().space(AS_PROGRAM);
-	space.install_read_handler(0xc000,0xc001, read8sm_delegate(*this, FUNC(cpc_smartwatch_device::rtc_w)));
-	space.install_read_handler(0xc004,0xc004, read8smo_delegate(*this, FUNC(cpc_smartwatch_device::rtc_r)));
+	// FIXME: should cover the whole ROM address decode range
+	space.install_read_handler(0xc000,0xc004, read8sm_delegate(*this, FUNC(cpc_smartwatch_device::rtc_r)));
 	m_bank = membank(":bank7");
 }
 
-uint8_t cpc_smartwatch_device::rtc_w(offs_t offset)
+uint8_t cpc_smartwatch_device::rtc_r(offs_t offset)
 {
 	uint8_t* bank = (uint8_t*)m_bank->base();
-	if (!machine().side_effects_disabled())
-	{
-		if(offset & 1)
-			m_rtc->read_1();
-		else
-			m_rtc->read_0();
-	}
-	return bank[offset & 1];
-}
-
-uint8_t cpc_smartwatch_device::rtc_r()
-{
-	uint8_t* bank = (uint8_t*)m_bank->base();
-	return (bank[4] & 0xfe) | (m_rtc->read_data() & 0x01);
+	if (m_rtc->ceo_r())
+		return m_rtc->read(offset);
+	else
+		m_rtc->read(offset);
+	return bank[offset];
 }

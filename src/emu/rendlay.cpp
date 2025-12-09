@@ -2501,7 +2501,6 @@ public:
 	led7seg_component(environment &env, util::xml::data_node const &compnode)
 		: component(env, compnode)
 	{
-		m_invert = env.get_attribute_int(compnode, "invert", 0);
 	}
 
 protected:
@@ -2510,8 +2509,8 @@ protected:
 
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		rgb_t const onpen = rgb_t(m_invert ? 0x20 : 0xff, 0xff, 0xff, 0xff);
-		rgb_t const offpen = rgb_t(m_invert ? 0xff : 0x20, 0xff, 0xff, 0xff);
+		rgb_t const onpen = rgb_t(0xff, 0xff, 0xff, 0xff);
+		rgb_t const offpen = rgb_t(0x20, 0xff, 0xff, 0xff);
 
 		// sizes for computation
 		int const bmwidth = 250;
@@ -2553,8 +2552,6 @@ protected:
 		// resample to the target size
 		render_resample_argb_bitmap_hq(dest, tempbitmap, color(state));
 	}
-private:
-	int m_invert = 0;
 };
 
 
@@ -3222,15 +3219,12 @@ protected:
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 					// get the width of the string
-					float aspect = 1.0f;
-					s32 width;
-
-					while (1)
+					s32 width = font->string_width(ourheight / num_shown, 1.0f, m_stopnames[fruit]);
+					float aspect = 1.0;
+					if (width > bounds.width())
 					{
-						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit]);
-						if (width < bounds.width())
-							break;
-						aspect *= 0.95f;
+						aspect = float(bounds.width()) / float(width);
+						width = bounds.width();
 					}
 
 					float curx = bounds.left() + (bounds.width() - width) / 2.0f;
@@ -3371,14 +3365,12 @@ private:
 				else // render text (fallback)
 				{
 					// get the width of the string
-					float aspect = 1.0f;
-					s32 width;
-					while (1)
+					s32 width = font->string_width(dest.height(), 1.0f, m_stopnames[fruit]);
+					float aspect = 1.0;
+					if (width > bounds.width())
 					{
-						width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
-						if (width < bounds.width())
-							break;
-						aspect *= 0.95f;
+						aspect = float(bounds.width()) / float(width);
+						width = bounds.width();
 					}
 
 					float curx = bounds.left();
@@ -3719,15 +3711,13 @@ void layout_element::component::draw_text(
 		const render_color &color)
 {
 	// get the width of the string
-	float aspect = 1.0f;
-	s32 width;
-
-	while (1)
+	s32 width = font.string_width(bounds.height(), 1.0f, str);
+	float aspect = 1.0;
+	if ((align == 3) || (width > bounds.width()))
 	{
-		width = font.string_width(bounds.height(), aspect, str);
-		if (width < bounds.width())
-			break;
-		aspect *= 0.95f;
+		if (width != 0)
+			aspect = float(bounds.width()) / float(width);
+		width = bounds.width();
 	}
 
 	// get alignment
@@ -3741,7 +3731,12 @@ void layout_element::component::draw_text(
 
 		// right
 		case 2:
-			curx = bounds.right() - width;
+			curx = bounds.left() + bounds.width() - width;
+			break;
+
+		// stretch (aligned both left & right)
+		case 3:
+			curx = bounds.left();
 			break;
 
 		// default to center
@@ -3871,7 +3866,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
@@ -3896,7 +3891,7 @@ void layout_element::component::draw_segment_diagonal_2(bitmap_argb32 &dest, int
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
@@ -3920,14 +3915,14 @@ void layout_element::component::draw_segment_decimal(bitmap_argb32 &dest, int mi
 {
 	// compute parameters
 	width /= 2;
-	float ooradius2 = 1.0f / (float)(width * width);
+	float ooradius2 = 1.0f / float(width * width);
 
 	// iterate over y
 	for (u32 y = 0; y <= width; y++)
 	{
 		u32 *const d0 = &dest.pix(midy - y);
 		u32 *const d1 = &dest.pix(midy + y);
-		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
+		float xval = width * sqrt(1.0f - float(y * y) * ooradius2);
 		s32 left, right;
 
 		// compute left/right coordinates
@@ -3949,7 +3944,7 @@ void layout_element::component::draw_segment_comma(bitmap_argb32 &dest, int minx
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
@@ -4062,7 +4057,7 @@ layout_view::layout_view(
 	}
 	if (!layers.marquees.empty())
 	{
-		m_vistoggles.emplace_back("Backdrops", mask);
+		m_vistoggles.emplace_back("Marquees", mask);
 		for (item &marquee : layers.marquees)
 			marquee.m_visibility_mask = mask;
 		m_defvismask |= mask;
@@ -4272,7 +4267,7 @@ void layout_view::recompute(u32 visibility_mask, bool zoom_to_screen)
 	// sort edges of interactive items
 	LOGMASKED(LOG_INTERACTIVE_ITEMS, "Recalculated view '%s' with %u interactive items\n",
 			name(), m_interactive_items.size());
-	//std::reverse(m_interactive_items.begin(), m_interactive_items.end()); TODO: flip hit test order to match visual order
+	std::reverse(m_interactive_items.begin(), m_interactive_items.end());
 	m_interactive_edges_x.reserve(m_interactive_items.size() * 2);
 	m_interactive_edges_y.reserve(m_interactive_items.size() * 2);
 	for (unsigned i = 0; m_interactive_items.size() > i; ++i)
@@ -5360,26 +5355,9 @@ layout_file::layout_file(
 		if (version != LAYOUT_VERSION)
 			throw layout_syntax_error(util::string_format("unsupported version %d", version));
 
-		// parse all the parameters, elements and groups
+		// parse all the parameters, elements, groups and views
 		group_map groupmap;
 		add_elements(env, *mamelayoutnode, groupmap, false, true);
-
-		// parse all the views
-		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
-		{
-			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
-			// e.g. intlc44 and intlc440 have a terminal on the TTY port by default and have a view with the front panel with the terminal screen
-			// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
-			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
-			try
-			{
-				m_viewlist.emplace_back(env, *viewnode, m_elemmap, groupmap);
-			}
-			catch (layout_reference_error const &err)
-			{
-				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*viewnode, "name"), err.what());
-			}
-		}
 
 		// load the content of the first script node
 		if (!m_viewlist.empty())
@@ -5475,7 +5453,22 @@ void layout_file::add_elements(
 				local.increment_parameters();
 			}
 		}
-		else if (repeat || (strcmp(childnode->get_name(), "view") && strcmp(childnode->get_name(), "script")))
+		else if (!repeat && !strcmp(childnode->get_name(), "view"))
+		{
+			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
+			// e.g. intlc44 and intlc440 have a terminal on the TTY port by default and have a view with the front panel with the terminal screen
+			// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
+			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
+			try
+			{
+				m_viewlist.emplace_back(env, *childnode, m_elemmap, groupmap);
+			}
+			catch (layout_reference_error const &err)
+			{
+				osd_printf_warning("Error instantiating layout view %s: %s\n", env.get_attribute_string(*childnode, "name"), err.what());
+			}
+		}
+		else if (repeat || strcmp(childnode->get_name(), "script"))
 		{
 			throw layout_syntax_error(util::string_format("unknown layout item %s", childnode->get_name()));
 		}

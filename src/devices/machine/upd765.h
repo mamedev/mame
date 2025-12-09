@@ -11,8 +11,8 @@ class floppy_image_device;
 
 /*
  * ready = true if the ready line is physically connected to the floppy drive
- * select = true if the fdc controls the floppy drive selection
- * mode = mode_t::AT, mode_t::PS2 or mode_t::M30 for the fdcs that have reset-time selection
+ * select = true if the FDC controls the floppy drive selection
+ * mode = mode_t::AT, mode_t::PS2 or mode_t::M30 for the FDC's that have reset-time selection
  */
 
 class upd765_family_device : public device_t {
@@ -24,6 +24,7 @@ public:
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
 	auto us_wr_callback() { return us_cb.bind(); }
 	auto idx_wr_callback() { return idx_cb.bind(); }
+	auto ts_rd_callback() { return ts_cb.bind(); }
 
 	virtual void map(address_map &map) = 0;
 
@@ -51,10 +52,11 @@ public:
 	void tc_line_w(int state) { tc_w(state == ASSERT_LINE); }
 	void reset_w(int state);
 
-	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
+	void set_rate(int rate); // rate in bps, to be used when the FDC is externally frequency-controlled
 
 	void set_ready_line_connected(bool ready);
 	void set_select_lines_connected(bool select);
+	void set_ts_line_connected(bool ts);
 	void set_floppy(floppy_image_device *image);
 	virtual void soft_reset();
 
@@ -228,7 +230,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected, select_multiplexed, has_dor;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed, ts_connected, has_dor;
 
 	bool external_ready;
 
@@ -239,6 +241,7 @@ protected:
 
 	live_info cur_live, checkpoint_live;
 	devcb_write_line intrq_cb, drq_cb, hdl_cb, idx_cb;
+	devcb_read_line ts_cb;
 	devcb_write8 us_cb;
 	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
@@ -582,6 +585,8 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 
 	void cr1_w(uint8_t data);
+	int c4_r() { return BIT(m_cr1, 4); }
+	int c6_r() { return BIT(m_cr1, 6); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

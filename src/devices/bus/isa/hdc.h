@@ -30,10 +30,10 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
 
-	int dack_r();
-	int dack_rs();
-	void dack_w(int data);
-	void dack_ws(int data);
+	uint8_t dack_r();
+	uint8_t dack_rs();
+	void dack_w(uint8_t data);
+	void dack_ws(uint8_t data);
 
 	void data_w(uint8_t data);
 	void reset_w(uint8_t data);
@@ -179,6 +179,7 @@ public:
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD { return nullptr; }
 
 	required_device<ec1841_device> m_hdc;
 };

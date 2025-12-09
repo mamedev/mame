@@ -173,11 +173,11 @@ void shanghai_state::kothello_sound_map(address_map &map)
 	map(0x4008, 0x4009).rw("seibu_sound", FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
 	map(0x4010, 0x4011).r("seibu_sound", FUNC(seibu_sound_device::soundlatch_r));
 	map(0x4012, 0x4012).r("seibu_sound", FUNC(seibu_sound_device::main_data_pending_r));
-	map(0x4013, 0x4013).portr("COIN");
+	map(0x4013, 0x4013).r("seibu_sound", FUNC(seibu_sound_device::coin_r));
 	map(0x4018, 0x4019).w("seibu_sound", FUNC(seibu_sound_device::main_data_w));
 	map(0x401a, 0x401a).w("adpcm", FUNC(seibu_adpcm_device::ctl_w));
 	map(0x401b, 0x401b).w("seibu_sound", FUNC(seibu_sound_device::coin_w));
-	map(0x8000, 0xffff).bankr("seibu_bank1");
+	map(0x8000, 0xffff).bankr("seibu_bank");
 }
 
 static INPUT_PORTS_START( kothello )
@@ -510,9 +510,10 @@ void shanghai_state::kothello(machine_config &config)
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.coin_io_callback().set_ioport("COIN");
 	seibu_sound.int_callback().set_inputline("audiocpu", 0);
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym2203_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 
@@ -589,6 +590,11 @@ ROM_START( shanghaij )
 	ROM_LOAD16_BYTE( "shg-27a.ic27", 0xc0000, 0x10000, CRC(41af0945) SHA1(dfc4638a17f716ccc8e59f275571d6dc1093a745) )
 	ROM_LOAD16_BYTE( "shg-37b.ic37", 0xe0001, 0x10000, CRC(3f192da0) SHA1(e70d5da5d702e9bf9ac6b77df62bcf51894aadcf) ) // 0xD58C == 0x00
 	ROM_LOAD16_BYTE( "shg-36b.ic36", 0xe0000, 0x10000, CRC(a1d6af96) SHA1(01c4c22bf03b3d260fffcbc6dfc5f2dd2bcba14a) )
+
+	// these come from a bootleg board (GD-8062) with identical ROM content. To be verified if they are the same for an original board, too
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "ampal16l8apc.ic57",    0x000, 0x104, CRC(5b680d26) SHA1(fdb9572f6e471598df82de7cda0e693e31be55a5) )
+	ROM_LOAD( "tibpal16l8-25cn.ic26", 0x200, 0x104, NO_DUMP ) // protected
 ROM_END
 
 ROM_START( shangha2 )

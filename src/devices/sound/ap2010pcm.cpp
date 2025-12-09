@@ -59,16 +59,13 @@ void ap2010pcm_device::device_start()
 	save_item(NAME(m_fifo_fast_tail));
 }
 
-void ap2010pcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ap2010pcm_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-	buffer.fill(0);
-
 	int16_t sample = 0;
 	uint16_t sample_empty_count = 0;
 	uint16_t fifo_size = m_fifo_size;
 	uint16_t fifo_fast_size = m_fifo_fast_size;
-	for (size_t i = 0; i < buffer.samples(); i++) {
+	for (size_t i = 0; i < stream.samples(); i++) {
 		if (m_fifo_fast_size) {
 			sample = fifo_fast_pop();
 		} else if (m_fifo_size) {
@@ -78,10 +75,10 @@ void ap2010pcm_device::sound_stream_update(sound_stream &stream, std::vector<rea
 			sample_empty_count++;
 		}
 
-		buffer.put_int(i, sample * m_volume, 32768);
+		stream.put_int(0, i, sample * m_volume, 32768);
 	}
 	if (fifo_size && sample_empty_count) {
-		LOG("pcm 0s = %d (had %d + fast %d, needed %d)\n", sample_empty_count, fifo_size, fifo_fast_size, buffer.samples());
+		LOG("pcm 0s = %d (had %d + fast %d, needed %d)\n", sample_empty_count, fifo_size, fifo_fast_size, stream.samples());
 	}
 }
 

@@ -81,8 +81,8 @@ void sonora_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->irq_callback().set(FUNC(sonora_device::via2_irq));
 
 	ASC(config, m_asc, C15M, asc_device::asc_type::SONORA);
-	m_asc->add_route(0, tag(), 1.0);
-	m_asc->add_route(1, tag(), 1.0);
+	m_asc->add_route(0, tag(), 1.0, 0);
+	m_asc->add_route(1, tag(), 1.0, 1);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
 
 	SWIM2(config, m_fdc, C15M);
@@ -126,7 +126,7 @@ void sonora_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
 
-	m_stream = stream_alloc(8, 2, m_asc->clock(), STREAM_SYNCHRONOUS);
+	m_stream = stream_alloc(8, 2, 22257, STREAM_SYNCHRONOUS);
 
 	m_6015_timer = timer_alloc(FUNC(sonora_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -174,13 +174,10 @@ void sonora_device::device_reset()
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 }
 
-void sonora_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sonora_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < inputs[0].samples(); i++)
-	{
-		outputs[0].put(i, inputs[0].get(i));
-		outputs[1].put(i, inputs[1].get(i));
-	}
+	stream.copy(0, 0);
+	stream.copy(1, 1);
 }
 
 u32 sonora_device::rom_switch_r(offs_t offset)
@@ -386,6 +383,9 @@ void sonora_device::swim_w(offs_t offset, u16 data, u16 mem_mask)
 		m_fdc->write((offset >> 8) & 0xf, data & 0xff);
 	else
 		m_fdc->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 void sonora_device::phases_w(uint8_t phases)

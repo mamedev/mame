@@ -652,17 +652,16 @@ void fuuki32_state::fuuki32(machine_config &config)
 	m_fuukitmap->set_yoffs(0x3f6, 0x2c7);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
 	ymf.irq_handler().set_inputline("soundcpu", 0);
-	ymf.add_route(0, "lspeaker", 0.50);
-	ymf.add_route(1, "rspeaker", 0.50);
-	ymf.add_route(2, "lspeaker", 0.40);
-	ymf.add_route(3, "rspeaker", 0.40);
-	ymf.add_route(4, "lspeaker", 0.50);
-	ymf.add_route(5, "rspeaker", 0.50);
+	ymf.add_route(0, "speaker", 0.50, 0);
+	ymf.add_route(1, "speaker", 0.50, 1);
+	ymf.add_route(2, "speaker", 0.40, 0);
+	ymf.add_route(3, "speaker", 0.40, 1);
+	ymf.add_route(4, "speaker", 0.50, 0);
+	ymf.add_route(5, "speaker", 0.50, 1);
 }
 
 //-------------------------------------------------

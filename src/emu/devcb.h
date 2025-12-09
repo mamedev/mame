@@ -756,6 +756,12 @@ private:
 		auto set_constant(Result val) { return set([val] () { return val; }); }
 		auto append_constant(Result val) { return append([val] () { return val; }); }
 
+		void remove()
+		{
+			set_used();
+			m_target.m_creators.clear();
+		}
+
 	private:
 		void set_used() { assert(!m_used); m_used = true; }
 
@@ -2150,6 +2156,12 @@ private:
 			set_used();
 			m_target.m_creators.clear();
 			m_target.m_creators.emplace_back(std::make_unique<nop_creator>());
+		}
+
+		void remove()
+		{
+			set_used();
+			m_target.m_creators.clear();
 		}
 
 	private:

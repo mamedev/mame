@@ -342,7 +342,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<description>Meteoroids (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
-		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
+		<info name="developer" value="Steve Hales" />
+		<info name="developer" value="Stephen Harland Landrum" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
@@ -565,7 +566,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<publisher>Arcadia Corporation</publisher>
 		<notes>Also contains preview versions of Communist Mutants from Space and Fireball.</notes>
 		<info name="serial" value="AR-4102"/>
-		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
+		<info name="developer" value="Steve Hales" />
+		<info name="developer" value="Stephen Harland Landrum" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cassa" interface="a2600_cass">
 			<dataarea name="cass" size="12398976">
@@ -586,7 +588,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<publisher>Starpath Corporation</publisher>
 		<notes>Also contains preview versions of Fireball, Dragonstomper, Communist Mutants from Space, Escape from the Mindmaster.</notes>
 		<info name="serial" value="AR-4102"/>
-		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
+		<info name="developer" value="Steve Hales" />
+		<info name="developer" value="Stephen Harland Landrum" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cassa" interface="a2600_cass">
 			<dataarea name="cass" size="21008842">
@@ -605,7 +608,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<description>Suicide Mission (prototype)</description>
 		<year>1982</year>
 		<publisher>Arcadia Corporation</publisher>
-		<info name="developer" value="Steve Hales &amp; Stephen Harland Landrum"/>
+		<info name="developer" value="Steve Hales" />
+		<info name="developer" value="Stephen Harland Landrum" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
@@ -619,7 +623,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4401"/>
-		<info name="developer" value="Steve Mundry &amp; Scott Nelson"/>
+		<info name="developer" value="Steve Mundry" />
+		<info name="developer" value="Scott Nelson" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
@@ -643,7 +648,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4401"/>
-		<info name="developer" value="Steve Mundry &amp; Scott Nelson"/>
+		<info name="developer" value="Steve Mundry" />
+		<info name="developer" value="Scott Nelson" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
@@ -690,7 +696,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4201"/>
-		<info name="developer" value="Stephen Harland Landrum &amp; Jon Leupp"/>
+		<info name="developer" value="Stephen Harland Landrum" />
+		<info name="developer" value="Jon Leupp" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
@@ -704,7 +711,8 @@ meant to be used when there were problems loading the contents from Side A.
 		<year>1983</year>
 		<publisher>Starpath Corporation</publisher>
 		<info name="serial" value="AR-4201"/>
-		<info name="developer" value="Stephen Harland Landrum &amp; Jon Leupp"/>
+		<info name="developer" value="Stephen Harland Landrum" />
+		<info name="developer" value="Jon Leupp" />
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">

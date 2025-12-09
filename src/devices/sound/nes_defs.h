@@ -40,8 +40,8 @@ struct apu_t
 		}
 
 		u8 regs[4];
-		int vbl_length = 0;
-		int freq = 0;
+		s32 vbl_length = 0;
+		s32 freq = 0;
 		float phaseacc = 0.0;
 		float env_phase = 0.0;
 		float sweep_phase = 0.0;
@@ -61,10 +61,10 @@ struct apu_t
 		}
 
 		u8 regs[4]; /* regs[1] unused */
-		int linear_length = 0;
+		s32 linear_length = 0;
 		bool linear_reload = false;
-		int vbl_length = 0;
-		int write_latency = 0;
+		s32 vbl_length = 0;
+		s32 write_latency = 0;
 		float phaseacc = 0.0;
 		u8 adder = 0;
 		bool counter_started = false;
@@ -83,7 +83,7 @@ struct apu_t
 
 		u8 regs[4]; /* regs[1] unused */
 		u16 lfsr = 1;
-		int vbl_length = 0;
+		s32 vbl_length = 0;
 		float phaseacc = 0.0;
 		float env_phase = 0.0;
 		u8 env_vol = 0;
@@ -103,7 +103,7 @@ struct apu_t
 		u8 regs[4];
 		u32 address = 0;
 		u32 length = 0;
-		int bits_left = 0;
+		s32 bits_left = 0;
 		float phaseacc = 0.0;
 		u8 cur_byte = 0;
 		bool enabled = false;
@@ -145,6 +145,66 @@ struct apu_t
 	bool frame_irq_enabled = false;
 	bool frame_irq_occurred = false;
 };
+
+
+struct mmc5_sound_t
+{
+	/* CHANNEL TYPE DEFINITIONS */
+
+	/* Square Wave */
+	struct square_t
+	{
+		square_t()
+		{
+			for (auto & elem : regs)
+				elem = 0;
+		}
+
+		u8 regs[4];
+		s32 vbl_length = 0;
+		s32 freq = 0;
+		float phaseacc = 0.0;
+		float env_phase = 0.0;
+		u8 adder = 0;
+		u8 env_vol = 0;
+		bool enabled = false;
+		u8 output = 0;
+	};
+
+	/* DPCM Wave */
+	struct pcm_t
+	{
+		pcm_t()
+		{
+			for (auto & elem : regs)
+				elem = 0;
+		}
+
+		u8 regs[2];
+		bool irq_enabled = false;
+		bool irq_line = false;
+		u8 output = 0;
+	};
+
+
+	/* REGISTER DEFINITIONS */
+	static constexpr unsigned WRA0    = 0x00;
+	static constexpr unsigned WRA1    = 0x01;
+	static constexpr unsigned WRA2    = 0x02;
+	static constexpr unsigned WRA3    = 0x03;
+	static constexpr unsigned WRB0    = 0x04;
+	static constexpr unsigned WRB1    = 0x05;
+	static constexpr unsigned WRB2    = 0x06;
+	static constexpr unsigned WRB3    = 0x07;
+	static constexpr unsigned WRE0    = 0x10;
+	static constexpr unsigned WRE1    = 0x11;
+	static constexpr unsigned SMASK   = 0x15;
+
+	/* Sound channels */
+	square_t   squ[2];
+	pcm_t      pcm;
+};
+
 
 /* CONSTANTS */
 

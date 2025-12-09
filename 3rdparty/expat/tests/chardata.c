@@ -6,8 +6,13 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
-   Copyright (c) 2000-2017 Expat development team
+   Copyright (c) 2002-2004 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
+   Copyright (c) 2003      Greg Stein <gstein@users.sourceforge.net>
+   Copyright (c) 2016      Gilles Espinasse <g.esp@free.fr>
+   Copyright (c) 2016-2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017      Joe Orton <jorton@redhat.com>
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2022      Sean McBride <sean@rogue-research.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -30,9 +35,11 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifdef HAVE_EXPAT_CONFIG_H
-#  include <expat_config.h>
+#if defined(NDEBUG)
+#  undef NDEBUG /* because test suite relies on assert(...) at the moment */
 #endif
+
+#include "expat_config.h"
 #include "minicheck.h"
 
 #include <assert.h>
@@ -78,15 +85,16 @@ CharData_AppendXMLChars(CharData *storage, const XML_Char *s, int len) {
 
 int
 CharData_CheckXMLChars(CharData *storage, const XML_Char *expected) {
-  char buffer[1024];
   int len = xmlstrlen(expected);
   int count;
 
   assert(storage != NULL);
   count = (storage->count < 0) ? 0 : storage->count;
   if (len != count) {
-    sprintf(buffer, "wrong number of data characters: got %d, expected %d",
-            count, len);
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer),
+             "wrong number of data characters: got %d, expected %d", count,
+             len);
     fail(buffer);
     return 0;
   }

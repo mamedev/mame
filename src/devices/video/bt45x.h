@@ -44,12 +44,6 @@ public:
 
 	virtual void map(address_map &map) ATTR_COLD;
 
-protected:
-	bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
-
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
 	u8 address_r();
 	void address_w(u8 data);
 	virtual u8 palette_r(address_space &space) = 0;
@@ -58,6 +52,12 @@ protected:
 	void register_w(u8 data);
 	virtual u8 overlay_r(address_space &space) = 0;
 	virtual void overlay_w(u8 data) = 0;
+
+protected:
+	bt45x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// helpers
 	virtual void increment_address(const bool side_effects = false);
@@ -79,6 +79,12 @@ protected:
 
 class bt45x_rgb_device_base : public bt45x_device_base, public device_palette_interface
 {
+public:
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
+
 protected:
 	bt45x_rgb_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
 
@@ -86,17 +92,17 @@ protected:
 
 	virtual u32 palette_entries() const noexcept override { return m_palette_colors + m_overlay_colors; }
 
-	virtual u8 palette_r(address_space &space) override;
-	virtual void palette_w(u8 data) override;
-	virtual u8 overlay_r(address_space &space) override;
-	virtual void overlay_w(u8 data) override;
-
 	std::unique_ptr<std::array<u8, 3>[]> m_color_ram;
 };
 
 class bt45x_mono_device_base : public bt45x_device_base
 {
 public:
+	virtual u8 palette_r(address_space &space) override;
+	virtual void palette_w(u8 data) override;
+	virtual u8 overlay_r(address_space &space) override;
+	virtual void overlay_w(u8 data) override;
+
 	// helper instead of device_palette_interface
 	u8 lookup(u8 pixel, u8 overlay = 0) const
 	{
@@ -110,11 +116,6 @@ protected:
 	bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
 
 	virtual void device_start() override ATTR_COLD;
-
-	virtual u8 palette_r(address_space &space) override;
-	virtual void palette_w(u8 data) override;
-	virtual u8 overlay_r(address_space &space) override;
-	virtual void overlay_w(u8 data) override;
 
 	std::unique_ptr<u8[]> m_color_ram;
 };
@@ -161,12 +162,12 @@ class bt457_device : public bt45x_mono_device_base
 public:
 	bt457_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-protected:
 	virtual u8 palette_r(address_space &space) override;
 	virtual void palette_w(u8 data) override;
 	virtual u8 overlay_r(address_space &space) override;
 	virtual void overlay_w(u8 data) override;
 
+protected:
 	virtual void increment_address(const bool side_effects = false) override;
 };
 

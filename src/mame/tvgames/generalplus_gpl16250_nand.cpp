@@ -26,8 +26,6 @@
     map(0x200000, 0x3fffff) continued view into external spaces, but this area is banked with m_membankswitch_7810 (valid bank values 0x00-0x3f)
 */
 
-
-
 #include "emu.h"
 #include "generalplus_gpl16250.h"
 #include "generalplus_gpl16250_nand.h"
@@ -70,9 +68,41 @@ uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
 
 	return 0x00;
 }
+void generalplus_gpac800_game_state::dma_complete_hacks(int state)
+{
+	// HACKS to get into service mode for debugging (needed for testing as many of these require input sequences on the not yet emulated custom controls)
+
+	// note, these patch the code copied to SRAM so the 'PROGRAM ROM' check fails (it passes otherwise)
+
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	//if (mem.read_word(0x4368c) == 0x4846)
+	//  mem.write_word(0x4368c, 0x4840);    // cars 2 force service mode
+
+	//if (mem.read_word(0x34410) == 0x4846)
+	//  mem.write_word(0x34410, 0x4840);    // golden tee force service mode
+
+	// what is it waiting for when we need these? (needed on some service mode screens)
+	//if (mem.read_word(0x3f368) == 0x4840)
+	//  mem.write_word(0x3f368, 0x4841);    // cars 2 IRQ? wait hack
+
+	//if (mem.read_word(0x4d8d4) == 0x4840)
+	//  mem.write_word(0x4d8d4, 0x4841);    // golden tee IRQ? wait hack
+
+	//if (mem.read_word(0x3510f) == 0x4845)
+	//  mem.write_word(0x3510f, 0x4840);    // camp rock force service mode
+
+	if (mem.read_word(0x4abe7) == 0x4840)
+		mem.write_word(0x4abe7, 0x4841);    // camp rock IRQ? wait hack
+
+	//if (mem.read_word(0x37244) == 0x4845)
+	//  mem.write_word(0x37244, 0x4840);    // hannah montana guitar force service mode
+}
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 {
+	set_addrmap(0, &generalplus_gpac800_game_state::cs_map_base);
+
 	GPAC800(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpac800_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpac800_game_state::portb_r));
@@ -81,14 +111,14 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpac800_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpac800_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
+	m_maincpu->dma_complete_callback().set(FUNC(generalplus_gpac800_game_state::dma_complete_hacks));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
-
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -97,8 +127,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(generalplus_gpac800_vbaby_game_state::cart_load)
@@ -679,6 +708,8 @@ ROM_END
 
 void generalplus_gpac800_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	save_item(NAME(m_sdram));
 }
 
@@ -725,8 +756,6 @@ void generalplus_gpac800_game_state::machine_reset()
 	mem.write_word(0x007822, 0x00c7);
 	mem.write_word(0x007823, 0x0047);
 	mem.write_word(0x007824, 0x0047);
-
-	m_maincpu->set_cs_space(m_memory->get_program());
 
 	if (m_nandregion)
 	{
@@ -833,7 +862,6 @@ void generalplus_gpac800_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
@@ -907,7 +935,7 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
-CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of th games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
+CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of the games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check
 CONS(200?, beambox,    0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_beambox,       "Hasbro",                                   "Playskool Heroes Transformers Rescue Bots Beam Box (Spain)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS(200?, mgtfit,     0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "MGT",                                      "Fitness Konsole (NC1470)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // probably has other names in English too? menus don't appear to be in German
 CONS(200?, vbaby,      0, 0, generalplus_gpac800_vbaby, jak_car2, generalplus_gpac800_vbaby_game_state, nand_vbaby,         "VTech",                                    "V.Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

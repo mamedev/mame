@@ -16,7 +16,7 @@ class huc6202_device : public device_t
 {
 public:
 	// construction/destruction
-	huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto next_pixel_0_callback() { return m_next_pixel_0_cb.bind(); }
 	auto time_til_next_event_0_callback() { return m_time_til_next_event_0_cb.bind(); }
@@ -73,16 +73,16 @@ private:
 	devcb_write8                m_write_1_cb;
 
 	struct {
-		uint8_t   prio_type;
-		uint8_t   dev0_enabled;
-		uint8_t   dev1_enabled;
+		u8   prio_type;
+		bool dev0_enabled;
+		bool dev1_enabled;
 	} m_prio[4];
-	uint16_t  m_window1;
-	uint16_t  m_window2;
-	int     m_io_device;
-	int     m_map_index;
-	int     m_map_dirty;
-	uint8_t   m_prio_map[512];
+	u16  m_window1;
+	u16  m_window2;
+	bool m_io_device;
+	u32  m_map_index;
+	bool m_map_dirty;
+	u8   m_prio_map[512];
 
 };
 

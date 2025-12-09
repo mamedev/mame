@@ -13,13 +13,13 @@
 
 
 // helpers
-inline uint32_t get_prg(uint8_t *CPU, uint32_t addr)
+inline uint32_t get_prg(uint8_t const *CPU, uint32_t addr)
 {
-	return ((CPU[addr * 4] << 24) | (CPU[addr * 4 + 1] << 16) | (CPU[addr * 4 + 2] << 8) | 0x00);
+	return (CPU[addr * 4] << 24) | (CPU[addr * 4 + 1] << 16) | (CPU[addr * 4 + 2] << 8) | 0x00;
 }
-inline uint16_t get_data(uint8_t *CPU, uint32_t addr)
+inline uint16_t get_data(uint8_t const *CPU, uint32_t addr)
 {
-	return ((CPU[addr * 2] << 8) | CPU[addr * 2 + 1]);
+	return (CPU[addr * 2] << 8) | CPU[addr * 2 + 1];
 }
 
 //-------------------------------------------------
@@ -141,15 +141,19 @@ void sns_rom20_necdsp_device::device_add_mconfig(machine_config &config)
 
 uint8_t sns_rom20_necdsp_device::chip_read(offs_t offset)
 {
-	offset &= 0x7fff;
-	return m_upd7725->snesdsp_read(offset < 0x4000);
+	if (BIT(offset, 14))
+		return m_upd7725->status_r();
+	else
+		return m_upd7725->data_r();
 }
 
 
 void sns_rom20_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
-	offset &= 0x7fff;
-	m_upd7725->snesdsp_write(offset < 0x4000, data);
+	if (BIT(~offset, 14))
+		m_upd7725->data_w(data);
+	else
+		logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 }
 
 
@@ -199,15 +203,19 @@ void sns_rom21_necdsp_device::device_add_mconfig(machine_config &config)
 
 uint8_t sns_rom21_necdsp_device::chip_read(offs_t offset)
 {
-	offset &= 0x1fff;
-	return m_upd7725->snesdsp_read(offset < 0x1000);
+	if (BIT(offset, 12))
+		return m_upd7725->status_r();
+	else
+		return m_upd7725->data_r();
 }
 
 
 void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 {
-	offset &= 0x1fff;
-	m_upd7725->snesdsp_write(offset < 0x1000, data);
+	if (BIT(~offset, 12))
+		m_upd7725->data_w(data);
+	else
+		logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 }
 
 
@@ -220,13 +228,18 @@ void sns_rom21_necdsp_device::chip_write(offs_t offset, uint8_t data)
 uint8_t sns_rom_setadsp_device::chip_read(offs_t offset)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
-		m_upd96050->snesdsp_read((offset & 0x01) ? false : true);
+	{
+		if (BIT(offset, 0))
+			return m_upd96050->status_r();
+		else
+			return m_upd96050->data_r();
+	}
 
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
-		uint16_t address = offset & 0xffff;
-		uint16_t temp = m_upd96050->dataram_r(address/2);
-		if (offset & 1)
+		uint16_t const address = offset & 0xffff;
+		uint16_t const temp = m_upd96050->dataram_r(address >> 1);
+		if (BIT(offset, 0))
 			return temp >> 8;
 		else
 			return temp & 0xff;
@@ -240,27 +253,18 @@ void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 	{
-		m_upd96050->snesdsp_write((offset & 0x01) ? false : true, data);
+		if (BIT(~offset, 0))
+			m_upd96050->data_w(data);
+		else
+			logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 		return;
 	}
 
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
-		uint16_t address = offset & 0xffff;
-		uint16_t temp = m_upd96050->dataram_r(address/2);
-
-		if (offset & 1)
-		{
-			temp &= 0xff;
-			temp |= data << 8;
-		}
-		else
-		{
-			temp &= 0xff00;
-			temp |= data;
-		}
-
-		m_upd96050->dataram_w(address/2, temp);
+		uint16_t const address = (offset & 0xffff) >> 1;
+		uint8_t const shift = BIT(offset, 0) << 3;
+		m_upd96050->dataram_w(address, (uint16_t(data) << 8) | data, uint16_t(0xff) << shift);
 		return;
 	}
 }

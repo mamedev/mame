@@ -763,6 +763,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 
 	<software name="cloderunt" cloneof="cloderun">
 		<description>Xun Bao Er Dai (Taiwan)</description>
+		<!-- This version has the English title screen after the Chinese title -->
 		<year>1985?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="R-057"/>
@@ -770,6 +771,20 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="championship lode runner (tw).bin" size="32768" crc="ec95ebcb" sha1="321e2c97645dd9af3e52c66b5db06304250d1bf2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cloderunta" cloneof="cloderun">
+		<description>Xun Bao Er Dai (Taiwan, alt)</description>
+		<!-- This version has a Chinese title screen -->
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<info name="serial" value="R-057"/>
+		<info name="alt_title" value="尋寶二代 ~ Xún bǎo èr dài"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="championship lode runner [chinese logo] (tw).sg" size="32768" crc="66b3b792" sha1="2d62eb45ec00a2ffd2577eadda7137139d9c816d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2439,6 +2454,19 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="space armor [v1].bin" size="16384" crc="d5fdb4a3" sha1="3c3b59321321061642f8cf609ae3e2cab56eb83b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacearmt" cloneof="spacearm">
+		<description>Space Armor (Taiwan, v20, alt)</description>
+		<year>1984</year>
+		<publisher>Aaronix</publisher>
+		<info name="serial" value="W-016"/>
+		<info name="alt_title" value="帝國大反擊"/>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="space armor [v2.0] [v1] (tw).sg" size="16384" crc="9b661d04" sha1="ca4eeac02151ce7cd78f3662306db9c3394f58f1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

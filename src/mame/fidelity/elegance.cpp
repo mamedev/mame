@@ -17,6 +17,7 @@ Hardware notes (6085):
 
 This is on the SC12B board, with enough modifications to support more leds and
 magnetic chess board sensors. See sc12.cpp for a more technical description.
+Like SC12, the printer expects a baud rate of 600, and 7 data bits.
 
 The first RAM chip is low-power, and battery-backed with a capacitor. This is
 also mentioned in the manual. Maybe it does not apply to older PCBs.
@@ -35,6 +36,7 @@ TODO:
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
@@ -58,6 +60,7 @@ class elegance_state : public fidel_clockdiv_state
 public:
 	elegance_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidel_clockdiv_state(mconfig, type, tag),
+		m_rs232(*this, "rs232"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -75,6 +78,7 @@ protected:
 
 private:
 	// devices/pointers
+	required_device<rs232_port_device> m_rs232;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
@@ -132,7 +136,10 @@ void elegance_state::control_w(u8 data)
 	// 74245 Q9: speaker out
 	m_dac->write(BIT(sel, 9));
 
-	// d4,d5: printer?
+	// d4: set when reading printer busy flag from 0xa000
+	// d5: printer port data
+	m_rs232->write_txd(BIT(~data, 5));
+
 	// d6,d7: N/C?
 }
 
@@ -234,6 +241,8 @@ void elegance_state::feleg(machine_config &config)
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

@@ -51,42 +51,39 @@ Notes:
 
 namespace {
 
-#define MASTER_CLOCK     XTAL(12'000'000)
-#define SOUND_CLOCK      XTAL(45'000'000)
-
 
 class mwarr_state : public driver_device
 {
 public:
 	mwarr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_mwarr_ram(*this, "mwarr_ram"),
-		m_okibank(*this, "okibank"),
 		m_maincpu(*this, "maincpu"),
 		m_video(*this, "edevices_vid"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_work_ram(*this, "work_ram"),
+		m_okibank(*this, "okibank")
 	{ }
 
 	void mwarr(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<edevices_device> m_video;
+	required_device<palette_device> m_palette;
+
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_mwarr_ram;
+	required_shared_ptr<uint16_t> m_work_ram;
 
 	required_memory_bank m_okibank;
 
-	void mwarr_brightness_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void brightness_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void oki1_bank_w(uint16_t data);
+	void oki2_bank_w(uint16_t data);
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	uint32_t screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<edevices_device> m_video;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	void mwarr_map(address_map &map) ATTR_COLD;
 	void oki2_map(address_map &map) ATTR_COLD;
 };
@@ -97,7 +94,7 @@ private:
  *
  *************************************/
 
-void mwarr_state::oki1_bank_w(uint16_t data)
+void mwarr_state::oki2_bank_w(uint16_t data)
 {
 	m_okibank->set_entry(data & 3);
 }
@@ -122,12 +119,12 @@ void mwarr_state::mwarr_map(address_map &map)
 	map(0x104000, 0x104fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x108000, 0x1087ff).ram().share("spriteram");
 	map(0x108800, 0x108fff).ram();
-	map(0x110000, 0x11ffff).ram().share("mwarr_ram");
+	map(0x110000, 0x11ffff).ram().share(m_work_ram);
 	map(0x110000, 0x110001).portr("P1_P2");
 	map(0x110002, 0x110003).portr("SYSTEM");
 	map(0x110004, 0x110005).portr("DSW");
-	map(0x110010, 0x110011).w(FUNC(mwarr_state::oki1_bank_w));
-	map(0x110014, 0x110015).w(FUNC(mwarr_state::mwarr_brightness_w));
+	map(0x110010, 0x110011).w(FUNC(mwarr_state::oki2_bank_w));
+	map(0x110014, 0x110015).w(FUNC(mwarr_state::brightness_w));
 	map(0x110016, 0x110017).w(m_video, FUNC(edevices_device::sprites_commands_w));
 	map(0x180001, 0x180001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x190001, 0x190001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -138,7 +135,7 @@ void mwarr_state::oki2_map(address_map &map)
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
 	map(0x00000, 0x1ffff).rom().region("oki2", 0);
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 /*************************************
@@ -227,46 +224,23 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout mwarr_tile8_layout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ 0,1,2,3 },
-	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 12, 8, RGN_FRAC(1,2)+12, RGN_FRAC(1,2)+8 },
-	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16 },
-	8*16
-};
-
-static const gfx_layout mwarr_tile16_layout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ 0,1,2,3 },
-	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 12, 8, RGN_FRAC(1,2)+12, RGN_FRAC(1,2)+8,
-		256+4, 256+0, 256+RGN_FRAC(1,2)+4, 256+RGN_FRAC(1,2)+0, 256+12, 256+8, 256+RGN_FRAC(1,2)+12, 256+RGN_FRAC(1,2)+8 },
-	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
-	32*16
-};
-
 static const gfx_layout mwarr_6bpp_sprites =
 {
 	16,16,
 	RGN_FRAC(1,6),
 	6,
 	{ RGN_FRAC(5,6), RGN_FRAC(4,6), RGN_FRAC(3,6), RGN_FRAC(2,6), RGN_FRAC(1,6), RGN_FRAC(0,6) },
-	{ 135,134,133,132,131,130,129,128,7,6,5,4,3,2,1,0 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	{ STEP8(16*8+7, -1), STEP8(7, -1) },
+	{ STEP16(0, 8) },
 	32*8
 };
 
 static GFXDECODE_START( gfx_mwarr )
-	GFXDECODE_ENTRY( "gfx1", 0, mwarr_6bpp_sprites,  1024, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, mwarr_tile8_layout,  384,  8 )
-	GFXDECODE_ENTRY( "gfx3", 0, mwarr_tile16_layout,  256,  8 )
-	GFXDECODE_ENTRY( "gfx4", 0, mwarr_tile16_layout,  128,  8 )
-	GFXDECODE_ENTRY( "gfx5", 0, mwarr_tile16_layout,    0,  8 )
+	GFXDECODE_ENTRY( "sprites",      0, mwarr_6bpp_sprites,                 1024, 16 )
+	GFXDECODE_ENTRY( "txtiles",      0, gfx_8x8x4_packed_lsb,                384,  8 )
+	GFXDECODE_ENTRY( "midhightiles", 0, gfx_8x8x4_col_2x2_group_packed_lsb,  256,  8 )
+	GFXDECODE_ENTRY( "midlowtiles",  0, gfx_8x8x4_col_2x2_group_packed_lsb,  128,  8 )
+	GFXDECODE_ENTRY( "bgtiles",      0, gfx_8x8x4_col_2x2_group_packed_lsb,    0,  8 )
 GFXDECODE_END
 
 /*************************************
@@ -275,16 +249,11 @@ GFXDECODE_END
  *
  *************************************/
 
-uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void mwarr_state::brightness_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	return m_video->draw(screen, bitmap, cliprect);
-}
+	COMBINE_DATA(&m_work_ram[0x14 / 2]);
 
-void mwarr_state::mwarr_brightness_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
-
-	double brightness = (double)(data & 0xff);
+	double const brightness = (double)(data & 0xff);
 	for (int i = 0; i < 0x800; i++)
 	{
 		m_palette->set_pen_contrast(i, brightness/255);
@@ -309,7 +278,7 @@ void mwarr_state::machine_reset()
 void mwarr_state::mwarr(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, MASTER_CLOCK);
+	M68000(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mwarr_state::mwarr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mwarr_state::irq4_line_hold));
 
@@ -319,13 +288,12 @@ void mwarr_state::mwarr(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8+1, 48*8-1-8-1, 0, 30*8-1);
-	screen.set_screen_update(FUNC(mwarr_state::screen_update_mwarr));
+	screen.set_screen_update(m_video, FUNC(edevices_device::draw));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mwarr);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	EDEVICES_VID(config, m_video, 0);
+	EDEVICES_VID(config, m_video, 0, m_palette, gfx_mwarr);
 	m_video->set_bg_videoram_tag("bg_videoram");
 	m_video->set_mlow_videoram_tag("mlow_videoram");
 	m_video->set_mhigh_videoram_tag("mhigh_videoram");
@@ -335,16 +303,14 @@ void mwarr_state::mwarr(machine_config &config)
 	m_video->set_mhigh_scrollram_tag("mhigh_scrollram");
 	m_video->set_vidattrram_tag("vidattrram");
 	m_video->set_spriteram_tag("spriteram");
-	m_video->set_gfxdecode_tag("gfxdecode");
-	m_video->set_palette_tag("palette");
 	m_video->set_spritexoffset(9);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki1", SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+	OKIM6295(config, "oki1", XTAL(45'000'000)/48, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	okim6295_device &oki2(OKIM6295(config, "oki2", SOUND_CLOCK/48 , okim6295_device::PIN7_HIGH));
+	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(45'000'000)/48, okim6295_device::PIN7_HIGH));
 	oki2.add_route(ALL_OUTPUTS, "mono", 1.0);
 	oki2.set_addrmap(0, &mwarr_state::oki2_map);
 }
@@ -362,7 +328,7 @@ ROM_START( mwarr )
 	ROM_LOAD16_BYTE( "prg_ev", 0x00000, 0x80000, CRC(d1d5e0a6) SHA1(f47955459d41c904b96de000b32cae156ee3bcba) ) // date 24/1
 	ROM_LOAD16_BYTE( "prg_od", 0x00001, 0x80000, CRC(e5217d91) SHA1(6a5d282e8e5b98628f98530e3c47b9b398e9334e) ) // date 24/1
 
-	ROM_REGION( 0x900000, "gfx1", 0 )
+	ROM_REGION( 0x900000, "sprites", 0 )
 	ROM_LOAD( "obm-0",  0x000000, 0x80000, CRC(b4707ba1) SHA1(35330a31e9837e5f848a21fa6f589412b35a04a0) ) // 7/11
 	ROM_LOAD( "obm-6",  0x080000, 0x80000, CRC(f9675acc) SHA1(06e0c0c0928ace331ebd08cfeeaa2c8b5603457f) ) // 7/11
 	ROM_LOAD( "obm-12", 0x100000, 0x80000, CRC(6239c4dd) SHA1(128040e9517151faf15c75dc1f2d79c5a66b9e1c) ) // 22/11
@@ -383,21 +349,21 @@ ROM_START( mwarr )
 	ROM_LOAD( "obm-11", 0x800000, 0x80000, CRC(7bf1e4da) SHA1(4aeef3b7c23303580a851dc793e9671a2a0f421f) ) // 7/11
 	ROM_LOAD( "obm-17", 0x880000, 0x80000, CRC(47bd56e8) SHA1(e10569e89083165a7efe29f84167a1c15171ccaf) ) // 22/11
 
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "sf4-0",  0x000000, 0x80000, CRC(25938b2d) SHA1(6336e41eee58cab9a524b9bca08965786cc133d3) ) // 7/11
-	ROM_LOAD( "sf4-1",  0x080000, 0x80000, CRC(2269ce5c) SHA1(4c6169acf17bba94dc5684f5db60d5bcf73ad068) ) // 7/11
+	ROM_REGION( 0x100000, "txtiles", 0 )
+	ROM_LOAD16_BYTE( "sf4-0",  0x000000, 0x80000, CRC(25938b2d) SHA1(6336e41eee58cab9a524b9bca08965786cc133d3) ) // 7/11
+	ROM_LOAD16_BYTE( "sf4-1",  0x000001, 0x80000, CRC(2269ce5c) SHA1(4c6169acf17bba94dc5684f5db60d5bcf73ad068) ) // 7/11
 
-	ROM_REGION( 0x100000, "gfx3", 0 )
-	ROM_LOAD( "sf3-0",  0x000000, 0x80000, CRC(86cd162c) SHA1(95d5f300e3671ebe29b2331325f4d80b96988619) ) // 7/11
-	ROM_LOAD( "sf3-1",  0x080000, 0x80000, CRC(2e755e54) SHA1(74b1e099358a07848f7c22c71fbe2661e1ebb417) ) // 7/11
+	ROM_REGION( 0x100000, "midhightiles", 0 )
+	ROM_LOAD16_BYTE( "sf3-0",  0x000000, 0x80000, CRC(86cd162c) SHA1(95d5f300e3671ebe29b2331325f4d80b96988619) ) // 7/11
+	ROM_LOAD16_BYTE( "sf3-1",  0x000001, 0x80000, CRC(2e755e54) SHA1(74b1e099358a07848f7c22c71fbe2661e1ebb417) ) // 7/11
 
-	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "sf2-0",  0x000000, 0x80000, CRC(622a1816) SHA1(b7b88a90ff69e8f2e291e1f9299708ec97ef9b77) ) // 7/11
-	ROM_LOAD( "sf2-1",  0x080000, 0x80000, CRC(545f89e9) SHA1(e7d52dc2da3770d7310698af47da9ff7ec32388c) ) // 7/11
+	ROM_REGION( 0x100000, "midlowtiles", 0 )
+	ROM_LOAD16_BYTE( "sf2-0",  0x000000, 0x80000, CRC(622a1816) SHA1(b7b88a90ff69e8f2e291e1f9299708ec97ef9b77) ) // 7/11
+	ROM_LOAD16_BYTE( "sf2-1",  0x000001, 0x80000, CRC(545f89e9) SHA1(e7d52dc2da3770d7310698af47da9ff7ec32388c) ) // 7/11
 
-	ROM_REGION( 0x100000, "gfx5", 0 )
-	ROM_LOAD( "dw-0",   0x000000, 0x80000, CRC(b9b18d00) SHA1(4f38502c75eae88916bc58bfd5d255bac59d0813) ) // 22/11
-	ROM_LOAD( "dw-1",   0x080000, 0x80000, CRC(7aea0b12) SHA1(07cbcd6ddcd9ead068b0f5763829e8474b699085) ) // 22/11
+	ROM_REGION( 0x100000, "bgtiles", 0 )
+	ROM_LOAD16_BYTE( "dw-0",   0x000000, 0x80000, CRC(b9b18d00) SHA1(4f38502c75eae88916bc58bfd5d255bac59d0813) ) // 22/11
+	ROM_LOAD16_BYTE( "dw-1",   0x000001, 0x80000, CRC(7aea0b12) SHA1(07cbcd6ddcd9ead068b0f5763829e8474b699085) ) // 22/11
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Samples */
 	ROM_LOAD( "oki0",   0x000000, 0x40000, CRC(005811ce) SHA1(9149bc8e9cc16ce3db4e22f8cb7ea8a57a66980e) ) // no date

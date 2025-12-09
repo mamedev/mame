@@ -28,17 +28,17 @@
 
 DEFINE_DEVICE_TYPE(ORCA_OVG_40C, orca_ovg_40c_device, "orca_ovg_40c", "Orca OVG 40c video PCB")
 
-orca_ovg_40c_device::orca_ovg_40c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ORCA_OVG_40C, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, nullptr, "palette"),
-		device_video_interface(mconfig, *this),
-		m_videoram(*this, "videoram"),
-		m_videoram_2(*this,"videoram_2"),
-		m_attributeram(*this, "attributeram"),
-		m_spriteram(*this, "spriteram"),
-		m_bulletsram(*this, "bulletsram"),
-		m_percuss_hardware(false),
-		m_flip_screen(false)
+orca_ovg_40c_device::orca_ovg_40c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ORCA_OVG_40C, tag, owner, clock),
+	device_gfx_interface(mconfig, *this, nullptr, "palette"),
+	device_video_interface(mconfig, *this),
+	m_videoram(*this, "videoram"),
+	m_videoram_2(*this,"videoram_2"),
+	m_attributeram(*this, "attributeram"),
+	m_spriteram(*this, "spriteram"),
+	m_bulletsram(*this, "bulletsram"),
+	m_percuss_hardware(false),
+	m_flip_screen(false)
 {
 }
 

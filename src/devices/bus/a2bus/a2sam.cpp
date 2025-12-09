@@ -42,7 +42,6 @@ protected:
 
 	// overrides of standard a2bus slot functions
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override { m_dac->write(data); }
-	virtual bool take_c800() override { return false; }
 
 	required_device<dac_byte_interface> m_dac;
 };

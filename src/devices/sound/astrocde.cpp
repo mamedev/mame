@@ -115,9 +115,8 @@ void astrocade_io_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void astrocade_io_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void astrocade_io_device::sound_stream_update(sound_stream &stream)
 {
-	auto &dest = outputs[0];
 	uint16_t noise_state;
 	uint8_t master_count;
 	uint8_t noise_clock;
@@ -129,14 +128,14 @@ void astrocade_io_device::sound_stream_update(sound_stream &stream, std::vector<
 
 	/* loop over samples */
 	int samples_this_time;
-	constexpr stream_buffer::sample_t sample_scale = 1.0f / 60.0f;
-	for (int sampindex = 0; sampindex < dest.samples(); sampindex += samples_this_time)
+	constexpr sound_stream::sample_t sample_scale = 1.0f / 60.0f;
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex += samples_this_time)
 	{
 		s32 cursample = 0;
 
 		/* compute the number of cycles until the next master oscillator reset */
 		/* or until the next noise boundary */
-		samples_this_time = std::min<int>(dest.samples() - sampindex, 256 - master_count);
+		samples_this_time = std::min<int>(stream.samples() - sampindex, 256 - master_count);
 		samples_this_time = std::min(samples_this_time, 64 - noise_clock);
 
 		/* sum the output of the tone generators */
@@ -152,7 +151,7 @@ void astrocade_io_device::sound_stream_update(sound_stream &stream, std::vector<
 			cursample += m_reg[7] >> 4;
 
 		/* scale to max and output */
-		dest.fill(stream_buffer::sample_t(cursample) * sample_scale, sampindex, samples_this_time);
+		stream.fill(0, sound_stream::sample_t(cursample) * sample_scale, sampindex, samples_this_time);
 
 		/* clock the noise; a 2-bit counter clocks a 4-bit counter which clocks the LFSR */
 		noise_clock += samples_this_time;

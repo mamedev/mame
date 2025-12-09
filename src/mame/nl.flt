@@ -9,7 +9,6 @@ exidy/carpolo.cpp
 exidy/starfire.cpp
 irem/m62.cpp
 jpm/jpmsru.cpp
-midway/sspeedr.cpp
 misc/cocoloco.cpp
 modelracing/dribling.cpp
 nintendo/mario.cpp
@@ -23,6 +22,7 @@ sega/zaxxon.cpp
 skeleton/hazeltin.cpp
 skeleton/palestra.cpp
 skeleton/testpat.cpp
+taito/sspeedr.cpp
 universal/cheekyms.cpp
 vtech/gamemachine.cpp
 zaccaria/zaccaria.cpp

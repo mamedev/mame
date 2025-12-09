@@ -330,6 +330,7 @@ protected:
 	} m_Mod_RM;
 
 	uint8_t m_timing[200];
+	uint8_t m_ea_timing[200];
 	bool m_halt;
 
 	bool m_lock;
@@ -372,6 +373,7 @@ protected:
 	address_space_config m_extra_config;
 	address_space_config m_io_config;
 	static const uint8_t m_i8086_timing[200];
+	static const uint8_t m_i8086_ea_timing[200];
 	devcb_write_line m_out_if_func;
 	devcb_write32 m_esc_opcode_handler;
 	devcb_write32 m_esc_data_handler;

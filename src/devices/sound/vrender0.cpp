@@ -205,9 +205,9 @@ device_memory_interface::space_config_vector vr0sound_device::memory_space_confi
 //  for our sound stream
 //-------------------------------------------------
 
-void vr0sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void vr0sound_device::sound_stream_update(sound_stream &stream)
 {
-	VR0_RenderAudio(outputs[0], outputs[1]);
+	VR0_RenderAudio(stream);
 }
 
 u16 vr0sound_device::channel_r(offs_t offset)
@@ -493,7 +493,7 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void vr0sound_device::VR0_RenderAudio(write_stream_view &l, write_stream_view &r)
+void vr0sound_device::VR0_RenderAudio(sound_stream &stream)
 {
 	int div;
 	if (m_ChnClkNum)
@@ -501,7 +501,7 @@ void vr0sound_device::VR0_RenderAudio(write_stream_view &l, write_stream_view &r
 	else
 		div = 1 << 16;
 
-	for (int s = 0; s < l.samples(); s++)
+	for (int s = 0; s < stream.samples(); s++)
 	{
 		s32 lsample = 0, rsample = 0;
 		for (int i = 0; i <= m_MaxChn; i++)
@@ -583,7 +583,7 @@ void vr0sound_device::VR0_RenderAudio(write_stream_view &l, write_stream_view &r
 			lsample += (sample * channel->LChnVol) >> 8;
 			rsample += (sample * channel->RChnVol) >> 8;
 		}
-		l.put_int_clamp(s, lsample, 32768);
-		r.put_int_clamp(s, rsample, 32768);
+		stream.put_int_clamp(0, s, lsample, 32768);
+		stream.put_int_clamp(1, s, rsample, 32768);
 	}
 }

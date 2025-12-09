@@ -383,7 +383,7 @@ void socrates_state::init_socrates()
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 0;
 }
 
@@ -392,7 +392,7 @@ void socrates_state::init_iqunlimz()
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen... is this even right for the iqunlimz? */
 	for (int i = 0; i < 0x20000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	//m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	//m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 1;
 }
 
@@ -401,7 +401,7 @@ void socrates_state::init_vpainter()
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
-	m_maincpu->set_clock_scale(0.45f); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
 	m_kbmcu_type = 2;
 }
 

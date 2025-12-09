@@ -85,16 +85,16 @@ void atari_rle_objects_device::control_write(u8 data)
 //logerror("atarirle_control_w(%d)\n", bits);
 
 	// do nothing if nothing changed
-	int oldbits = m_control_bits;
+	int const oldbits = m_control_bits;
 	if (oldbits == data)
 		return;
 
 	// force a partial update first
-	int scanline = screen().vpos();
+	int const scanline = screen().vpos();
 	screen().update_partial(scanline);
 
 	// if the erase flag was set, erase the front map
-	if ((oldbits & ATARIRLE_CONTROL_ERASE) != 0)
+	if ((oldbits & CONTROL_ERASE) != 0)
 	{
 		// compute the top and bottom of the rect
 		rectangle cliprect(m_cliprect);
@@ -102,23 +102,23 @@ void atari_rle_objects_device::control_write(u8 data)
 				(std::max)(cliprect.top(), m_partial_scanline + 1),
 				(std::min)(cliprect.bottom(), scanline));
 
-		//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (oldbits & ATARIRLE_CONTROL_FRAME) >> 2);
+		//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (oldbits & CONTROL_FRAME) >> 2);
 
 		// erase the bitmap
-		m_vram[0][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2].fill(0, cliprect);
+		m_vram[0][(oldbits & CONTROL_FRAME) >> 2].fill(0, cliprect);
 		if (m_vrammask.mask() != 0)
-			m_vram[1][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2].fill(0, cliprect);
+			m_vram[1][(oldbits & CONTROL_FRAME) >> 2].fill(0, cliprect);
 	}
 
 	// update the bits
 	m_control_bits = data;
 
 	// if mogo is set, do a render on the rising edge
-	if ((oldbits & ATARIRLE_CONTROL_MOGO) == 0 && (data & ATARIRLE_CONTROL_MOGO) != 0)
+	if ((oldbits & CONTROL_MOGO) == 0 && (data & CONTROL_MOGO) != 0)
 	{
-		if (m_command == ATARIRLE_COMMAND_DRAW)
+		if (m_command == COMMAND_DRAW)
 			sort_and_render();
-		else if (m_command == ATARIRLE_COMMAND_CHECKSUM)
+		else if (m_command == COMMAND_CHECKSUM)
 			compute_checksum();
 	}
 
@@ -147,18 +147,18 @@ void atari_rle_objects_device::vblank_callback(screen_device &screen, bool state
 	// on the rising edge, if the erase flag is set, erase to the end of the screen
 	if (state)
 	{
-		if (m_control_bits & ATARIRLE_CONTROL_ERASE)
+		if (m_control_bits & CONTROL_ERASE)
 		{
 			// compute top only; bottom is equal to visible_area
 			rectangle cliprect = m_cliprect;
 			cliprect.sety((std::max)(cliprect.top(), m_partial_scanline + 1), cliprect.bottom());
 
-			//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
+			//logerror("  partial erase %d-%d (frame %d)\n", cliprect.top(), cliprect.bottom(), (m_control_bits & CONTROL_FRAME) >> 2);
 
 			// erase the bitmap
-			m_vram[0][(m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2].fill(0, cliprect);
+			m_vram[0][(m_control_bits & CONTROL_FRAME) >> 2].fill(0, cliprect);
 			if (m_vrammask.mask() != 0)
-				m_vram[1][(m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2].fill(0, cliprect);
+				m_vram[1][(m_control_bits & CONTROL_FRAME) >> 2].fill(0, cliprect);
 		}
 
 		// reset the partial scanline to -1 so we can detect full updates
@@ -331,8 +331,8 @@ int atari_rle_objects_device::count_objects()
 	int lowest_address = m_rombase.length();
 	for (int objoffset = 0; objoffset < lowest_address; objoffset += 4)
 	{
-		int offset = ((m_rombase[objoffset + 2] & 0xff) << 16) | m_rombase[objoffset + 3];
-//logerror("count_objects: objoffset=%d offset=%08X\n", objoffset, offset);
+		int const offset = ((m_rombase[objoffset + 2] & 0xff) << 16) | m_rombase[objoffset + 3];
+		//logerror("count_objects: objoffset=%d offset=%08X\n", objoffset, offset);
 		if (offset > objoffset && offset < lowest_address)
 			lowest_address = offset;
 	}
@@ -358,12 +358,12 @@ void atari_rle_objects_device::prescan_rle(int which)
 	info.yoffs = (s16)base[1];
 
 	// determine the depth and table
-	int flags = base[2];
+	int const flags = base[2];
 	info.bpp = m_rle_bpp[(flags >> 8) & 7];
 	const u16 *table = info.table = m_rle_table[(flags >> 8) & 7];
 
 	// determine the starting offset
-	int offset = ((base[2] & 0xff) << 16) | base[3];
+	int const offset = ((base[2] & 0xff) << 16) | base[3];
 	info.data = base = (u16 *)&m_rombase[offset];
 
 	// make sure it's valid
@@ -397,7 +397,7 @@ void atari_rle_objects_device::prescan_rle(int which)
 		// track the width
 		while (entry_count-- && base < end)
 		{
-			int word = *base++;
+			int const word = *base++;
 			int count/*, value*/;
 
 			// decode the low byte first
@@ -461,32 +461,32 @@ void atari_rle_objects_device::sort_and_render()
 	sort_entry_t sort_entry[256];
 	for (int objnum = 0; objnum < 256; objnum++)
 	{
-		int order = m_ordermask.extract(m_ram, objnum * 8);
+		int const order = m_ordermask.extract(m_ram, objnum * 8);
 		sort_entry[objnum].entry = objnum * 8;
 		sort_entry[objnum].next = list_head[order];
 		list_head[order] = &sort_entry[objnum];
 	}
 
 	// now loop back and process
-	int bitmap_index = (~m_control_bits & ATARIRLE_CONTROL_FRAME) >> 2;
+	int const bitmap_index = (~m_control_bits & CONTROL_FRAME) >> 2;
 	int count = 0;
 	int hilite = -1;
 	for (int order = 1; order < 256; order++)
 		for (sort_entry_t *current = list_head[order]; current != nullptr; current = current->next)
 		{
 			// extract scale and code
-			int scale = m_scalemask.extract(m_ram, current->entry);
-			int code = m_codemask.extract(m_ram, current->entry);
+			int const scale = m_scalemask.extract(m_ram, current->entry);
+			int const code = m_codemask.extract(m_ram, current->entry);
 
 			// make sure they are in range
 			if (scale > 0 && code < m_objectcount)
 			{
-				int hflip = m_hflipmask.extract(m_ram, current->entry);
+				int const hflip = m_hflipmask.extract(m_ram, current->entry);
 				int color = m_colormask.extract(m_ram, current->entry);
-				int priority = m_prioritymask.extract(m_ram, current->entry);
+				int const priority = m_prioritymask.extract(m_ram, current->entry);
 				int x = m_xposmask.extract(m_ram, current->entry);
 				int y = m_yposmask.extract(m_ram, current->entry);
-				int which = m_vrammask.extract(m_ram, current->entry);
+				int const which = m_vrammask.extract(m_ram, current->entry);
 
 				if (count++ == atarirle_hilite_index)
 					hilite = current->entry;
@@ -498,7 +498,7 @@ void atari_rle_objects_device::sort_and_render()
 				x += m_cliprect.left();
 
 				// merge priority and color
-				color = (color << 4) | (priority << ATARIRLE_PRIORITY_SHIFT);
+				color = (color << 4) | (priority << PRIORITY_SHIFT);
 
 				// render to one or both bitmaps
 				bitmap_ind16 &bitmap = m_vram[which][bitmap_index];
@@ -525,7 +525,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 
 	//
 	int scaled_xoffs = (xscale * info.xoffs) >> 12;
-	int scaled_yoffs = (yscale * info.yoffs) >> 12;
+	int const scaled_yoffs = (yscale * info.yoffs) >> 12;
 
 	// we're hflipped, account for it
 	if (hflip)
@@ -542,7 +542,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 	y -= scaled_yoffs;
 
 	// draw it with appropriate flipping
-	u32 palettebase = m_palettebase + color;
+	u32 const palettebase = m_palettebase + color;
 	if (!hflip)
 		draw_rle_zoom(bitmap, clip, info, palettebase, x, y, xscale << 4, yscale << 4);
 	else
@@ -565,8 +565,8 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 	if (scaled_height == 0) scaled_height = 1;
 
 	// compute the remaining parameters
-	int dx = (info.width << 16) / scaled_width;
-	int dy = (info.height << 16) / scaled_height;
+	int const dx = (info.width << 16) / scaled_width;
+	int const dy = (info.height << 16) / scaled_height;
 	int ex = sx + scaled_width - 1;
 	int ey = sy + scaled_height - 1;
 	int sourcey = dy / 2;
@@ -615,7 +615,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 
 		// grab our starting parameters from this row
 		const u16 *base = row_start;
-		int entry_count = *base++;
+		int const entry_count = *base++;
 
 		// non-clipped case
 		if (!xclipped)
@@ -624,7 +624,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 			for (int entry = 0; entry < entry_count; entry++)
 			{
 				// decode the low byte first
-				int word = *base++;
+				int const word = *base++;
 				int count = table[word & 0xff];
 				int value = count & 0xff;
 				rle_end += (count & 0xff00) << 8;
@@ -672,7 +672,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 			for (int entry = 0; entry < entry_count && dest <= end; entry++)
 			{
 				// decode the low byte first
-				int word = *base++;
+				int const word = *base++;
 				int count = table[word & 0xff];
 				int value = count & 0xff;
 				rle_end += (count & 0xff00) << 8;
@@ -744,8 +744,8 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 	if (scaled_height == 0) scaled_height = 1;
 
 	// compute the remaining parameters
-	int dx = (info.width << 16) / scaled_width;
-	int dy = (info.height << 16) / scaled_height;
+	int const dx = (info.width << 16) / scaled_width;
+	int const dy = (info.height << 16) / scaled_height;
 	int ex = sx + scaled_width - 1;
 	int ey = sy + scaled_height - 1;
 	int sourcey = dy / 2;
@@ -794,7 +794,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 
 		// grab our starting parameters from this row
 		const u16 *base = row_start;
-		int entry_count = *base++;
+		int const entry_count = *base++;
 
 		// non-clipped case
 		if (!xclipped)
@@ -803,7 +803,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 			for (int entry = 0; entry < entry_count; entry++)
 			{
 				// decode the low byte first
-				int word = *base++;
+				int const word = *base++;
 				int count = table[word & 0xff];
 				int value = count & 0xff;
 				rle_end += (count & 0xff00) << 8;
@@ -851,7 +851,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 			for (int entry = 0; entry < entry_count && dest >= start; entry++)
 			{
 				// decode the low byte first
-				int word = *base++;
+				int const word = *base++;
 				int count = table[word & 0xff];
 				int value = count & 0xff;
 				rle_end += (count & 0xff00) << 8;
@@ -915,15 +915,15 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 {
 	// extract scale and code
-	int scale = m_scalemask.extract(m_ram, hilite);
-	int code = m_codemask.extract(m_ram, hilite);
+	int const scale = m_scalemask.extract(m_ram, hilite);
+	int const code = m_codemask.extract(m_ram, hilite);
 
 	// make sure they are in range
 	if (scale > 0 && code < m_objectcount)
 	{
-		int hflip = m_hflipmask.extract(m_ram, hilite);
+		int const hflip = m_hflipmask.extract(m_ram, hilite);
 		int color = m_colormask.extract(m_ram, hilite);
-		int priority = m_prioritymask.extract(m_ram, hilite);
+		int const priority = m_prioritymask.extract(m_ram, hilite);
 		int x = m_xposmask.extract(m_ram, hilite);
 		int y = m_yposmask.extract(m_ram, hilite);
 
@@ -934,11 +934,11 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 		x += m_cliprect.left();
 
 		// merge priority and color
-		color = (color << 4) | (priority << ATARIRLE_PRIORITY_SHIFT);
+		color = (color << 4) | (priority << PRIORITY_SHIFT);
 
 		const object_info &info = m_info[code];
 		int scaled_xoffs = (scale * info.xoffs) >> 12;
-		int scaled_yoffs = (scale * info.yoffs) >> 12;
+		int const scaled_yoffs = (scale * info.yoffs) >> 12;
 
 		// we're hflipped, account for it
 		if (hflip)
@@ -1016,9 +1016,9 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 //-------------------------------------------------
 
 atari_rle_objects_device::sprite_parameter::sprite_parameter()
-	: m_word(0),
-		m_shift(0),
-		m_mask(0)
+	: m_word(0)
+	, m_shift(0)
+	, m_mask(0)
 {
 }
 

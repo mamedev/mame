@@ -19,21 +19,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - interrupts
-        - vector
-        - status affects vector
-        - IE/IP/IUS
-        - acknowledge
-        - daisy chain
-    - port I/O
-    - counters/timers
-
-*/
-
 #include "emu.h"
 #include "z8536.h"
 
@@ -200,16 +185,29 @@ u8 cio_base_device::read_register(offs_t offset)
 
 	switch (offset)
 	{
+	case PORT_C_DATA_PATH_POLARITY:
+	case PORT_C_DATA_DIRECTION:
+	case PORT_C_SPECIAL_IO_CONTROL:
+		data = 0xf0 | (m_register[offset] & 0x0f);
+		break;
+
 	case PORT_A_DATA:
-		data = m_read_pa(0);
+		// TODO: take data path polarity into account
+		data = m_output[PORT_A];
+		if (m_register[PORT_A_DATA_DIRECTION] != 0)
+			data = (data & ~m_register[PORT_A_DATA_DIRECTION]) | (m_read_pa() & m_register[PORT_A_DATA_DIRECTION]);
 		break;
 
 	case PORT_B_DATA:
-		data = m_read_pb(0);
+		// TODO: take data path polarity into account
+		data = m_output[PORT_B];
+		if (m_register[PORT_B_DATA_DIRECTION] != 0)
+			data = (data & ~m_register[PORT_B_DATA_DIRECTION]) | (m_read_pb() & m_register[PORT_B_DATA_DIRECTION]);
 		break;
 
 	case PORT_C_DATA:
-		data = 0xf0 | (m_read_pc(0) & 0x0f);
+		// TODO: take data path polarity into account
+		data = 0xf0 | (m_read_pc() & 0x0f);
 		break;
 
 	case COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE:
@@ -263,6 +261,8 @@ u8 cio_base_device::read_register(offs_t offset)
 		break;
 	}
 
+	LOG("%s %s CIO Read Register %02x: %02x\n", machine().time().as_string(), machine().describe_context(), offset, data);
+
 	return data;
 }
 
@@ -283,6 +283,8 @@ u8 cio_base_device::read_register(offs_t offset, u8 mask)
 
 void cio_base_device::write_register(offs_t offset, u8 data)
 {
+	LOG("%s CIO Write Register %02x: %02x\n", machine().time().as_string(), offset, data);
+
 	switch (offset)
 	{
 	case MASTER_INTERRUPT_CONTROL:
@@ -321,6 +323,22 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 			// clear RCC bit if counter disabled
 			if (!counter_enabled(counter)) m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + counter] &= ~CTCS_RCC;
 		}
+
+		if (!(m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_CT1E)) {
+			// clear count in progress bit
+			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS] &= ~CTCS_CIP;
+		}
+
+		if (!(m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_CT2E)) {
+			// clear count in progress bit
+			m_register[COUNTER_TIMER_2_COMMAND_AND_STATUS] &= ~CTCS_CIP;
+		}
+
+		if (!(m_register[MASTER_CONFIGURATION_CONTROL] & MCCR_PCE_CT3E)) {
+			// clear count in progress bit
+			m_register[COUNTER_TIMER_3_COMMAND_AND_STATUS] &= ~CTCS_CIP;
+		}
+
 		break;
 
 	case PORT_A_INTERRUPT_VECTOR:
@@ -340,17 +358,17 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 
 	case PORT_C_DATA_PATH_POLARITY:
 		LOG("%s CIO Port C Data Path Polarity: %02x\n", machine().describe_context(), data);
-		m_register[offset] = data;
+		m_register[offset] = data & 0x0f;
 		break;
 
 	case PORT_C_DATA_DIRECTION:
 		LOG("%s CIO Port C Data Direction: %02x\n", machine().describe_context(), data);
-		m_register[offset] = data;
+		m_register[offset] = data & 0x0f;
 		break;
 
 	case PORT_C_SPECIAL_IO_CONTROL:
 		LOG("%s CIO Port C Special I/O Control: %02x\n", machine().describe_context(), data);
-		m_register[offset] = data;
+		m_register[offset] = data & 0x0f;
 		break;
 
 	case PORT_A_COMMAND_AND_STATUS:
@@ -390,13 +408,13 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 
 		switch (data >> 5)
 		{
-		case IC_CLEAR_IP_IUS:   m_register[offset] &= ~(CTCS_IP | CTCS_IUS);LOG("%s CIO Counter/Timer %u Clear IP/IUS\n", machine().describe_context(), counter + 1);   break;
-		case IC_SET_IUS:        m_register[offset] |= CTCS_IUS;             LOG("%s CIO Counter/Timer %u Set IUS\n", machine().describe_context(), counter + 1);        break;
-		case IC_CLEAR_IUS:      m_register[offset] &= ~CTCS_IUS;            LOG("%s CIO Counter/Timer %u Clear IUS\n", machine().describe_context(), counter + 1);      break;
-		case IC_SET_IP:         m_register[offset] |= CTCS_IP;              LOG("%s CIO Counter/Timer %u Set IP\n", machine().describe_context(), counter + 1);         break;
-		case IC_CLEAR_IP:       m_register[offset] &= ~CTCS_IP;             LOG("%s CIO Counter/Timer %u Clear IP\n", machine().describe_context(), counter + 1);       break;
-		case IC_SET_IE:         m_register[offset] |= CTCS_IE;              LOG("%s CIO Counter/Timer %u Set IE\n", machine().describe_context(), counter + 1);         break;
-		case IC_CLEAR_IE:       m_register[offset] &= ~CTCS_IE;             LOG("%s CIO Counter/Timer %u Clear IE\n", machine().describe_context(), counter + 1);       break;
+		case IC_CLEAR_IP_IUS:   m_register[offset] &= ~(CTCS_IP | CTCS_ERR | CTCS_IUS); LOG("%s CIO Counter/Timer %u Clear IP/IUS\n", machine().describe_context(), counter + 1);   break;
+		case IC_SET_IUS:        m_register[offset] |= CTCS_IUS;                         LOG("%s CIO Counter/Timer %u Set IUS\n", machine().describe_context(), counter + 1);        break;
+		case IC_CLEAR_IUS:      m_register[offset] &= ~CTCS_IUS;                        LOG("%s CIO Counter/Timer %u Clear IUS\n", machine().describe_context(), counter + 1);      break;
+		case IC_SET_IP:         m_register[offset] |= CTCS_IP;                          LOG("%s CIO Counter/Timer %u Set IP\n", machine().describe_context(), counter + 1);         break;
+		case IC_CLEAR_IP:       m_register[offset] &= ~(CTCS_IP | CTCS_ERR);            LOG("%s CIO Counter/Timer %u Clear IP\n", machine().describe_context(), counter + 1);       break;
+		case IC_SET_IE:         m_register[offset] |= CTCS_IE;                          LOG("%s CIO Counter/Timer %u Set IE\n", machine().describe_context(), counter + 1);         break;
+		case IC_CLEAR_IE:       m_register[offset] &= ~CTCS_IE;                         LOG("%s CIO Counter/Timer %u Clear IE\n", machine().describe_context(), counter + 1);       break;
 		}
 
 		// gate command bit
@@ -422,11 +440,15 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 		break;
 
 	case PORT_A_DATA:
-		m_write_pa((offs_t)0, data);
+		// TODO: take data path polarity into account
+		m_output[PORT_A] = data;
+		m_write_pa(data);
 		break;
 
 	case PORT_B_DATA:
-		m_write_pb((offs_t)0, data);
+		// TODO: take data path polarity into account
+		m_output[PORT_B] = data;
+		m_write_pb(data);
 		break;
 
 	case PORT_C_DATA:
@@ -435,7 +457,8 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 
 		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
 
-		m_write_pc((offs_t)0, m_output[PORT_C]);
+		// TODO: take data path polarity into account
+		m_write_pc(m_output[PORT_C]);
 		}
 		break;
 
@@ -649,16 +672,20 @@ void cio_base_device::count(int id)
 	// count down
 	m_counter[id]--;
 
+	LOG("%s CIO Counter/Timer %u Count %04x\n", machine().time().as_string(), id + 1, m_counter[id]);
+
 	if (m_counter[id] == 0)
 	{
 		if (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_IP)
 		{
+			LOG("%s CIO Counter/Timer %u Error\n", machine().time().as_string(), id + 1);
+
 			// set interrupt error bit
 			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] |= CTCS_ERR;
 		}
 		else
 		{
-			LOG("%s CIO Counter/Timer %u Interrupt Pending\n", machine().describe_context(), id + 1);
+			LOG("%s CIO Counter/Timer %u Interrupt Pending\n", machine().time().as_string(), id + 1);
 
 			// set interrupt pending bit
 			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] |= CTCS_IP;
@@ -671,7 +698,7 @@ void cio_base_device::count(int id)
 		}
 		else
 		{
-			LOG("%s CIO Counter/Timer %u Terminal Count\n", machine().describe_context(), id + 1);
+			LOG("%s CIO Counter/Timer %u Terminal Count\n", machine().time().as_string(), id + 1);
 
 			// clear count in progress bit
 			m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] &= ~CTCS_CIP;
@@ -688,6 +715,9 @@ void cio_base_device::count(int id)
 
 void cio_base_device::trigger(int id)
 {
+	// ignore trigger if counter/timer is not enabled
+	if (!counter_enabled(id)) return;
+
 	// ignore triggers during countdown if retrigger is disabled
 	if (!(m_register[COUNTER_TIMER_1_MODE_SPECIFICATION + id] & CTMS_REB) && (m_register[COUNTER_TIMER_1_COMMAND_AND_STATUS + id] & CTCS_CIP)) return;
 
@@ -862,6 +892,9 @@ void cio_base_device::device_reset()
 	m_register[PORT_A_COMMAND_AND_STATUS] = PCS_ORE;
 	m_register[PORT_B_COMMAND_AND_STATUS] = PCS_ORE;
 	m_register[CURRENT_VECTOR] = 0xff;
+	m_register[PORT_A_DATA_DIRECTION] = 0xff;
+	m_register[PORT_B_DATA_DIRECTION] = 0xff;
+	m_register[PORT_C_DATA_DIRECTION] = 0x0f;
 
 	check_interrupt();
 }

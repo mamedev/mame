@@ -356,19 +356,19 @@ void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref
 
 	// calculate optimal width
 	float const maxwidth(1.0f - (lr_border() * 2.0f));
+	float const separation(0.5F * line_height() * x_aspect());
 	m_single_width = (line_height() * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * x_aspect());
-	float width(0.0f);
 	unsigned maxswitches(0U);
+	float maxnamewidth(0.0f);
 	for (switch_group_descriptor const &group : switch_groups())
 	{
 		if (group.mask)
 		{
 			maxswitches = (std::max)(group.switch_count(), maxswitches);
-			float const namewidth(get_string_width(group.name));
-			float const switchwidth(m_single_width * maxswitches);
-			width = (std::min)((std::max)(namewidth + switchwidth + (line_height() * x_aspect()), width), maxwidth);
+			maxnamewidth = (std::max)(get_string_width(group.name), maxnamewidth);
 		}
 	}
+	float const width((std::min)(maxnamewidth + (m_single_width * maxswitches) + separation, maxwidth));
 
 	// draw extra menu area
 	float const boxwidth((std::max)(width + (lr_border() * 2.0f), origx2 - origx1));
@@ -378,7 +378,7 @@ void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref
 	// calculate centred layout
 	float const nameleft((1.0f - width) * 0.5f);
 	float const switchleft(nameleft + width - (m_single_width * maxswitches));
-	float const namewidth(width - (m_single_width * maxswitches) - (line_height() * x_aspect()));
+	float const namewidth(width - (m_single_width * maxswitches) - separation);
 
 	// iterate over switch groups
 	ioport_field *const field((uintptr_t(selectedref) != 1U) ? reinterpret_cast<ioport_field *>(selectedref) : nullptr);

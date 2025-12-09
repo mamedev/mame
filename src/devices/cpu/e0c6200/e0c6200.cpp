@@ -4,17 +4,17 @@
 
   Seiko Epson E0C6200 CPU core and E0C62 MCU family
 
-  References:
-  - 1998 MF297-06a E0C6200/E0C6200A Core CPU Manual
-  - 1998 MF1049-01a E0C6S46 Technical Manual
+References:
+- 1998 MF297-06a E0C6200/E0C6200A Core CPU Manual
+- 1998 MF1049-01a E0C6S46 Technical Manual
 
-  E0C6200 is a CPU core used as the basis of many chips, it is not standalone.
-  Seiko Epson often changed prefixes of their device names. Depending on when,
-  the E0C6200 is known as SMC6200, E0C6200, S1C6200.
+E0C6200 is a CPU core used as the basis of many chips, it is not standalone.
+Seiko Epson often changed prefixes of their device names. Depending on when,
+the E0C6200 is known as SMC6200, E0C6200, S1C6200.
 
-  TODO:
-  - RLC is part of the r,q opcodes and requires that r == q, what happens otherwise?
-  - documentation is conflicting on whether or not the zero flag is set on RLC/RRC
+TODO:
+- RLC is part of the r,q opcodes and requires that r == q, what happens otherwise?
+- documentation is conflicting on whether or not the zero flag is set on RLC/RRC
 
 */
 
@@ -839,7 +839,7 @@ void e0c6200_cpu_device::execute_one()
 
 		// illegal opcode
 		default:
-			logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
+			op_illegal();
 			break;
 
 			} // 0xff0

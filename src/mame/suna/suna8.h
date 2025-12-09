@@ -64,10 +64,11 @@ public:
 	void init_brickzn();
 	void init_brickzn11();
 	void init_hardhead();
-	void init_suna8();
+	void init_rranger();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void sound_start() override ATTR_COLD;
 
 private:
 	enum GFXBANK_TYPE_T
@@ -145,7 +146,6 @@ private:
 	void rranger_play_samples_w(uint8_t data);
 	void samples_number_w(uint8_t data);
 	void play_sample(int index);
-	SAMPLES_START_CB_MEMBER(sh_start);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int which);
 	void draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end, int ypos, bool write_mask);

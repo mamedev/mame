@@ -7,6 +7,9 @@ authors:Sandro Ronco, hap
 
 <!-- define elements -->
 
+	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
+	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
+
 	<element name="blackb"><rect><color red="0.00" green="0.00" blue="0.00" /></rect></element>
 	<element name="blackd"><disk><color red="0.00" green="0.00" blue="0.00" /></disk></element>
 	<element name="black2b"><rect><color red="0.12" green="0.11" blue="0.10" /></rect></element>
@@ -177,9 +180,6 @@ authors:Sandro Ronco, hap
 
 
 <!-- sb board -->
-
-	<element name="cblack"><rect><color red="0.56" green="0.33" blue="0.12" /></rect></element>
-	<element name="cwhite"><rect><color red="0.84" green="0.75" blue="0.50" /></rect></element>
 
 	<element name="hlbb" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>

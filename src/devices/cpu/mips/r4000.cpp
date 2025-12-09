@@ -1110,7 +1110,7 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 
 	if (exception == EXCEPTION_INT)
 	{
-		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (debugger_enabled())
 		{
 			// notify the debugger of the first pending hardware interrupt
 			u32 const iphw = CAUSE & SR & CAUSE_IPHW;

@@ -264,6 +264,15 @@ void coco3_state::coco3(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	INPUT_MERGER_ANY_HIGH(config, m_firqs).output_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
+	// memory and video hardware
+	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, m_cococart, MAINCPU_TAG);
+	m_gime->set_screen("screen");
+	m_gime->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
+	m_gime->fsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::cb1_w));
+	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
+	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
+	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
+
 	PIA6821(config, m_pia_0);
 	m_pia_0->writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	m_pia_0->writepb_handler().set(FUNC(coco_state::pia0_pb_w));
@@ -299,15 +308,6 @@ void coco3_state::coco3(machine_config &config)
 
 	COCO_VHD(config, m_vhd_0, 0, m_maincpu);
 	COCO_VHD(config, m_vhd_1, 0, m_maincpu);
-
-	// video hardware
-	GIME_NTSC(config, m_gime, XTAL(28'636'363), MAINCPU_TAG, RAM_TAG, m_cococart, MAINCPU_TAG);
-	m_gime->set_screen("screen");
-	m_gime->hsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::ca1_w));
-	m_gime->fsync_wr_callback().set(m_pia_0, FUNC(pia6821_device::cb1_w));
-	m_gime->irq_wr_callback().set(m_irqs, FUNC(input_merger_device::in_w<2>));
-	m_gime->firq_wr_callback().set(m_firqs, FUNC(input_merger_device::in_w<2>));
-	m_gime->floating_bus_rd_callback().set(FUNC(coco3_state::floating_bus_r));
 
 	// monitor
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

@@ -34,7 +34,7 @@
  Safari (??/1977) (clone of Gremlin's Safari?)                                      UNKNOWN
  Soccer (11/1973)                                                                   UNKNOWN
  Soccer Deluxe (??/1977)                                                            UNKNOWN
- Speed Race (11/1974)                                                               UNKNOWN
+ Speed Race (11/1974)                                                               YES
  Speed Race CL-5 (10/1978)                                                          UNKNOWN
  Speed Race Deluxe (08/1975)                                                        UNKNOWN
  Speed Race Twin (04/1976)                                                          UNKNOWN
@@ -142,10 +142,10 @@ void taitottl_state::video_start()
 
 void taitottl_state::taitottl(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_taitottl);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
@@ -300,6 +300,33 @@ ROM_START( missilex )
 	ROM_LOAD( "ms01.8d",      0x0000, 0x0020, CRC(e89e76c3) SHA1(1149b5d1f93baa8aecd54a618083cc13b63a894d) )
 ROM_END
 
+// Taito PCB labeled "SG070011B SGN00005B". 14.314 MHz xtal, 1 bank of 4 dip switches.
+ROM_START( speedrac )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x800, "roms", ROMREGION_ERASE00 )
+	ROM_LOAD( "sd01_6331.k3",    0x000, 0x020, CRC(a2b1ea60) SHA1(04d6bc161aa273981b64985f5a4eacf7eab2f6d0) )
+	ROM_LOAD( "sd02_6331.k4",    0x000, 0x020, CRC(4884ce39) SHA1(09262de3b421c41762643ef084e009b2a410e656) )
+	ROM_LOAD( "sd03_6301.j3",    0x000, 0x100, CRC(1c0d7450) SHA1(c487eeeb9a2a781a10f4eb8fe50bd5080f66ba3d) )
+	ROM_LOAD( "sd04_6301.j13",   0x000, 0x100, CRC(013c8aea) SHA1(e2eea2fc553976a7e75cf2dcd234315808a05800) )
+	ROM_LOAD( "sd05_6301.d12",   0x000, 0x100, CRC(d10920ee) SHA1(39bcff62a028373193875f873a76a42b9105a647) )
+	ROM_LOAD( "sd06_mb7054.a13", 0x000, 0x400, CRC(d5e958f5) SHA1(caf1fee287890466ec6ac6399c66b91c50981026) )
+	ROM_LOAD( "sd07_mb7054.a14", 0x000, 0x400, CRC(13869ce6) SHA1(4d14ee7afcf64f57b6a692fe9a734c71bacf178f) )
+	ROM_LOAD( "sd08_6331.k2",    0x000, 0x020, CRC(d60273e9) SHA1(40ea85a5e632da6a9798890f66d4d8c542e7c728) )
+	ROM_LOAD( "sd09_6331.k1",    0x000, 0x020, CRC(6e4fa64e) SHA1(04368bcdb2e91a17cd7815ee98ad846bb9732d9b) )
+	ROM_LOAD( "sd10_6331.g9",    0x000, 0x020, CRC(402e0c59) SHA1(a8e43fe7c2f194ae49977e8ef753049f6b378937) )
+	ROM_LOAD( "sg01_74s474.l11", 0x000, 0x200, CRC(92dbb511) SHA1(dcb8baac3017163d23c3a28099764e0d2f62ea93) )
+	ROM_LOAD( "sg02_74s474.l10", 0x000, 0x200, CRC(ce0739c5) SHA1(bbc10ae1d985557008adc0dae5495fb46c4fb67f) )
+	ROM_LOAD( "sg03_74s474.j14", 0x000, 0x200, CRC(a4558531) SHA1(c9c58a6ed4fb8142ee1166e4407dff7434472fc8) )
+	ROM_LOAD( "sg04_6331.b12",   0x000, 0x020, CRC(8bb91e84) SHA1(6faa1282652d3d9df8442aa6b35956b4a4f3bc5f) )
+	ROM_LOAD( "sg05_6331.d13",   0x000, 0x020, CRC(444998ed) SHA1(320fba0720d6eecf22deaf58c5eae94fc2a0734f) )
+	ROM_LOAD( "sg06_6331.b13",   0x000, 0x020, CRC(d2958150) SHA1(8f8f52e9e2934375dd44038539018997fb5c7e53) )
+	ROM_LOAD( "sg07_mb7052.c4",  0x000, 0x100, CRC(2e055f6c) SHA1(b3c24bb6037cd6a76621094c51d668cfa412cb3a) )
+	ROM_LOAD( "sg08_mb7052.a7",  0x000, 0x100, CRC(075345f5) SHA1(8e9991fc6f68f7200e56acc7043b5aaf8e5c13b1) )
+	ROM_LOAD( "sg09_6331.b14",   0x000, 0x020, CRC(b66bb274) SHA1(a7c464d8fd6c4dffa0a62c7b58bf5402a8a98d46) )
+	ROM_LOAD( "sg10_2716.a7",    0x000, 0x800, CRC(83b738c3) SHA1(705b3190e65eaa4617d2d6c9eeec742dfacb3e8c) )
+ROM_END
+
 ROM_START( ttblock )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
@@ -444,6 +471,7 @@ ROM_END
 GAME( 1977, fisco400, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1977, gunman,   0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1977, missilex, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1974, speedrac, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Speed Race (Taito)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1977, ttblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1978, ttsracec, 0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1979, zzblock,  0, taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

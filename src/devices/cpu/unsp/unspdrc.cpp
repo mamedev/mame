@@ -610,7 +610,7 @@ void unsp_device::generate_sequence_instruction(drcuml_block &block, compiler_st
 	UML_MAPVAR(block, MAPVAR_PC, desc->pc);
 
 	/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		//save_fast_iregs(block);
 		UML_DEBUG(block, desc->pc);

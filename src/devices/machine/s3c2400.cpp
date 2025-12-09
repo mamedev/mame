@@ -180,7 +180,7 @@ s3c2400_device::s3c2400_device(const machine_config &mconfig, const char *tag, d
 	memset(&m_irq, 0, sizeof(m_irq));
 	memset(m_dma, 0, sizeof(m_dma));
 	memset(&m_clkpow, 0, sizeof(m_clkpow));
-	memset(&m_lcd, 0, sizeof(m_lcd));
+	m_lcd.clear();
 	memset(&m_lcdpal, 0, sizeof(m_lcdpal));
 	memset(m_uart, 0, sizeof(m_uart));
 	memset(&m_pwm, 0, sizeof(m_pwm));

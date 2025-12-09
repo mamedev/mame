@@ -1,4 +1,4 @@
-/* midiwin32.h -- system-specific definitions */
+/* pmwinmm.h -- system-specific definitions for windows multimedia API */
 
 void pm_winmm_init( void );
 void pm_winmm_term( void );

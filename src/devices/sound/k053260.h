@@ -31,8 +31,9 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
-	auto sh1_cb() { return m_sh1_cb.bind(); }
-	auto sh2_cb() { return m_sh2_cb.bind(); }
+	auto sh1_cb()  { return m_sh1_cb.bind();  }
+	auto sh2_cb()  { return m_sh2_cb.bind();  }
+	auto tim2_cb() { return m_tim2_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -41,7 +42,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
@@ -55,16 +56,19 @@ private:
 	// Sample hold lines callbacks (often used for interrupts)
 	devcb_write_line m_sh1_cb;
 	devcb_write_line m_sh2_cb;
+	devcb_write_line m_tim2_cb; // tim2 output (2ms period)
+	void tim2_count();
 
 	// configuration
-	sound_stream *  m_stream;
-	emu_timer   *m_timer;
+	sound_stream *m_stream;
+	emu_timer    *m_timer;
 
 	// live state
 	u8           m_portdata[4];
 	u8           m_keyon;
 	u8           m_mode;
-	int          m_timer_state;
+	u32          m_timer_state;
+	u32          m_tim2_count;
 
 	// per voice state
 	class KDSC_Voice

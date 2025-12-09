@@ -269,14 +269,11 @@ TIMER_CALLBACK_MEMBER(vboysnd_device::delayed_stream_update)
 //  our sound stream
 //-------------------------------------------------
 
-void vboysnd_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void vboysnd_device::sound_stream_update(sound_stream &stream)
 {
 	int len, i, j, channel;
 
-	auto &outL = outputs[0];
-	auto &outR = outputs[1];
-
-	len = outL.samples();
+	len = stream.samples();
 
 //  if (mgetb(m_aram+SST0P) & 0x1)  // Sound Stop Reg
 //      goto end;
@@ -384,8 +381,8 @@ void vboysnd_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		note_left = (note_left << 5) | ((note_left >> 6) & 0x1f);
 		note_right = (note_right << 5) | ((note_right >> 6) & 0x1f);
 
-		outL.put_int_clamp(j, note_left, 32768);
-		outR.put_int_clamp(j, note_right, 32768);
+		stream.put_int_clamp(0, j, note_left, 32768);
+		stream.put_int_clamp(1, j, note_right, 32768);
 	}
 }
 

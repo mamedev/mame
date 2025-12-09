@@ -87,7 +87,7 @@ CHANGE LOG
 #define min(a, b) ((a) <= (b) ? (a) : (b))
 #endif
 
-int get_number(char *prompt);
+int get_number(const char *prompt);
 
 PtTimestamp previous_callback_time = 0;
 
@@ -116,7 +116,7 @@ void pt_callback(PtTimestamp timestamp, void *userData)
     /* send a note on/off if user requested it */
     if (test_out && (iteration % output_period == 0)) {
         PmEvent buffer[1];
-        buffer[0].timestamp = Pt_Time(NULL);
+        buffer[0].timestamp = Pt_Time();
         if (note_on) {
             /* note off */
             buffer[0].message = Pm_Message(0x90, 60, 0);
@@ -157,7 +157,6 @@ void pt_callback(PtTimestamp timestamp, void *userData)
 
 int main()
 {
-    char line[STRING_MAX];
     int i;
     int len;
     int choice;
@@ -231,17 +230,17 @@ int main()
         }
     }
 
-    printf("%s%s", "Latency measurements will start in 5 seconds. ",
-                   "Type return to stop: ");
+    printf("Latency measurements will start in 5 seconds. "
+           "Type return to stop: ");
     Pt_Start(period, &pt_callback, 0);
-    fgets(line, STRING_MAX, stdin);
+    while (getchar() != '\n') ;
     stop = Pt_Time();
     Pt_Stop();
 
     /* courteously turn off the last note, if necessary */
     if (note_on) {
        PmEvent buffer[1];
-       buffer[0].timestamp = Pt_Time(NULL);
+       buffer[0].timestamp = Pt_Time();
        buffer[0].message = Pm_Message(0x90, 60, 0);
        Pm_Write(out, buffer, 1);
     }
@@ -260,7 +259,7 @@ int main()
     printf("\nNote that due to rounding, actual latency can be 1ms higher\n");
     printf("than the numbers reported here.\n");
     printf("Type return to exit...");
-    fgets(line, STRING_MAX, stdin);
+    while (getchar() != '\n') ;
 
 	if(choice == 2)
 		Pm_Close(in);
@@ -276,15 +275,13 @@ int main()
 
 
 /* read a number from console */
-int get_number(char *prompt)
-{
-    char line[STRING_MAX];
+int get_number(const char *prompt)
+{ 
     int n = 0, i;
-    printf(prompt);
+    fputs(prompt, stdout);
     while (n != 1) {
         n = scanf("%d", &i);
-        fgets(line, STRING_MAX, stdin);
-
+        while (getchar() != '\n') ;
     }
     return i;
 }

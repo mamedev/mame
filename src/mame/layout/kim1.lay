@@ -4,6 +4,8 @@ license:CC0-1.0
 -->
 <mamelayout version="2">
 
+	<element name="nothing"><rect><color alpha="0" /></rect></element>
+
 	<element name="digit" defstate="0">
 		<led7seg>
 			<color red="1.0" green="0.1" blue="0.15" />
@@ -402,34 +404,33 @@ license:CC0-1.0
 		</element>
 	</group>
 
-	<view name="Keypad and LEDs">
-		<bounds left="0" top="0" right="134" bottom="234" />
-
+	<view name="Main Unit">
 		<group ref="leds">
 			<bounds x="10" y="10" width="114" height="25" />
 		</group>
 
-		<group ref="keypad">
-			<bounds x="10" y="50" width="114" height="174" />
-		</group>
+		<collection name="Keypad">
+			<element ref="nothing">
+				<bounds left="0" top="0" right="134" bottom="234" />
+			</element>
+			<group ref="keypad">
+				<bounds x="10" y="50" width="114" height="174" />
+			</group>
+		</collection>
 	</view>
 
-	<view name="LEDs">
-		<group ref="leds">
-			<bounds x="0" y="0" width="114" height="25" />
-		</group>
-	</view>
-
-	<view name="Keypad, LEDs and Screen">
+	<view name="Main Unit + Screen">
 		<bounds left="0" top="0" right="446" bottom="234" />
 
 		<group ref="leds">
 			<bounds x="10" y="10" width="114" height="25" />
 		</group>
 
-		<group ref="keypad">
-			<bounds x="10" y="50" width="114" height="174" />
-		</group>
+		<collection name="Keypad">
+			<group ref="keypad">
+				<bounds x="10" y="50" width="114" height="174" />
+			</group>
+		</collection>
 
 		<screen index="0">
 			<bounds x="134" y="0" width="312" height="234" />

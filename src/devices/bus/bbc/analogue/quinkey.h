@@ -35,7 +35,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual uint8_t ch_r(int channel) override;
+	virtual uint16_t ch_r(offs_t channel) override;
 
 private:
 	required_device_array<bbc_quinkey_slot_device, 4> m_quinkey;

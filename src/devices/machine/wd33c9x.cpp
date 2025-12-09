@@ -538,10 +538,15 @@ void wd33c9x_base_device::indir_w(offs_t offset, uint8_t data)
 
 uint8_t wd33c9x_base_device::indir_addr_r()
 {
-	// Trick to push the interrupt flag after the fifo is empty to help cps3
+	// HACK: push the interrupt flag after the fifo is empty to help cps3
 	return m_regs[AUXILIARY_STATUS] & 0x01 ? m_regs[AUXILIARY_STATUS] & 0x7f : m_regs[AUXILIARY_STATUS];
 }
 
+// PC-9801-55 definitely doesn't want the hack
+uint8_t wd33c9x_base_device::status_r()
+{
+	return m_regs[AUXILIARY_STATUS];
+}
 
 //-------------------------------------------------
 //  indir_addr_w
@@ -570,7 +575,9 @@ uint8_t wd33c9x_base_device::indir_reg_r()
 			// in advanced mode; the processor must retrieve
 			// the Identify message from the target by reading the
 			// Data Register.
-			fatalerror("%s: The host should never access the data register without DBR set.\n", shortname());
+			if (!machine().side_effects_disabled())
+				fatalerror("%s: The host should never access the data register without DBR set.\n", shortname());
+			return 0;
 		}
 		bool was_full = data_fifo_full();
 		ret = data_fifo_pop();
@@ -763,10 +770,14 @@ void wd33c9x_base_device::start_command()
 
 	case COMMAND_CC_NEGATE_ACK:
 		LOGMASKED(LOG_COMMANDS, "Negate ACK Command\n");
-		// FIXME - This is causing problems, so ignore for now.
-		//if (m_mode != MODE_I) {
-		//  fatalerror("NEGATE_ACK command only valid in the Initiator state.");
-		//}
+		if (m_mode != MODE_I) {
+			// PC-98 controllers explicitly want to clear FIFO and send an irq, cfr. #14532
+			data_fifo_reset();
+
+			irq_fifo_push(SCSI_STATUS_DISCONNECT);
+
+			update_irq();
+		}
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		return;
 
@@ -805,6 +816,38 @@ void wd33c9x_base_device::start_command()
 		set_command_length(cc);
 		load_transfer_count();
 		step(false);
+		break;
+
+	case COMMAND_CC_TRANSLATE_ADDRESS:
+		LOGMASKED(LOG_COMMANDS, "Translate Address Command\n");
+		{
+			uint8_t total_sectors = m_regs[CDB_1];
+			uint8_t total_heads = m_regs[CDB_2];
+			uint16_t total_cylinders = m_regs[CDB_3] << 8 | m_regs[CDB_4];
+			uint32_t lba = (m_regs[CDB_5] << 24) | (m_regs[CDB_6] << 16) | (m_regs[CDB_7] << 8) | (m_regs[CDB_8] << 0);
+
+			LOGMASKED(LOG_COMMANDS, "total_sectors=%02x, total_heads=%02x, total_cylinders=%04x, lba=%08x\n", total_sectors, total_heads, total_cylinders, lba);
+
+			uint16_t cylinder = lba / (total_sectors * total_heads);
+			uint8_t head = (lba - (cylinder * total_sectors * total_heads)) / total_sectors;
+			uint8_t sector = (lba - (cylinder * total_sectors * total_heads)) % total_sectors;
+
+			LOGMASKED(LOG_COMMANDS, "-> cylinder=%04x, head=%02x, sector=%02x\n", cylinder, head, sector);
+
+			m_regs[CDB_9] = sector;
+			m_regs[CDB_10] = head;
+			m_regs[CDB_11] = cylinder >> 8;
+			m_regs[CDB_12] = cylinder >> 0;
+
+			m_regs[AUXILIARY_STATUS] &= ~(AUXILIARY_STATUS_CIP | AUXILIARY_STATUS_BSY);
+
+			if (cylinder >= total_cylinders)
+				irq_fifo_push(SCSI_STATUS_LOGICAL_ADDRESS_TOO_LARGE);
+			else
+				irq_fifo_push(SCSI_STATUS_TRANSLATE_SUCCESS);
+
+			update_irq();
+		}
 		break;
 
 	case COMMAND_CC_TRANSFER_INFO:

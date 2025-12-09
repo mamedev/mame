@@ -829,7 +829,7 @@ OP_HANDLER( jmp_ix )
 /* $6f CLR indexed -0100 */
 OP_HANDLER( clr_ix )
 {
-	INDEXED; WM(EAD,0);
+	INDEXED; RM(EAD); WM(EAD,0);
 	CLR_NZVC; SEZ;
 }
 
@@ -981,7 +981,7 @@ OP_HANDLER( jmp_ex )
 /* $7f CLR extended -0100 */
 OP_HANDLER( clr_ex )
 {
-	EXTENDED; WM(EAD,0);
+	EXTENDED; RM(EAD); WM(EAD,0);
 	CLR_NZVC; SEZ;
 }
 

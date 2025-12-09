@@ -186,12 +186,12 @@ TIMER_CALLBACK_MEMBER(bsmt2000_device::deferred_data_write)
 //  for our sound stream
 //-------------------------------------------------
 
-void bsmt2000_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void bsmt2000_device::sound_stream_update(sound_stream &stream)
 {
 	// just fill with current left/right values
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
-	outputs[0].fill(stream_buffer::sample_t(m_left_data) * sample_scale);
-	outputs[1].fill(stream_buffer::sample_t(m_right_data) * sample_scale);
+	constexpr sound_stream::sample_t sample_scale = 1.0 / 32768.0;
+	stream.fill(0, sound_stream::sample_t(m_left_data) * sample_scale);
+	stream.fill(1, sound_stream::sample_t(m_right_data) * sample_scale);
 }
 
 

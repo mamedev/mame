@@ -26,7 +26,6 @@ public:
 	uint8_t irq_vector_r(offs_t offset);
 
 	void set_alt_timer() { m_whichtimer = 1; }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -49,6 +48,7 @@ protected:
 
 	bool m_is_pal; // this is usually a jumper connected to the chip that the software can read (clocks also differ on PAL units)
 	bool m_allow_timer_irq;
+	bool m_bank_on_low_bank_writes;
 private:
 	uint8_t intmask_r(offs_t offset);
 	void intmask_w(offs_t offset, uint8_t data);

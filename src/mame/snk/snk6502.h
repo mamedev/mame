@@ -90,7 +90,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(sasuke_update_counter);
 
 	void sasuke_start_counter();
-	void postload();
 
 	void sasuke_map(address_map &map) ATTR_COLD;
 	void satansat_map(address_map &map) ATTR_COLD;

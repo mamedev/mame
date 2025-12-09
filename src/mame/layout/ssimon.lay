@@ -11,8 +11,8 @@ authors:hap
 	<element name="static_black2"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
 	<element name="static_grey"><rect><color red="0.6" green="0.6" blue="0.6" /></rect></element>
 
-	<element name="nothing" defstate="0">
-		<text string=" "><color red="0" green="0" blue="0" /></text>
+	<element name="nothing">
+		<rect><color alpha="0" /></rect>
 	</element>
 
 	<element name="text_tie"><text string="TIE"><color red="0.0" green="0.0" blue="0.0" /></text></element>
@@ -174,10 +174,10 @@ authors:hap
 		<element ref="text_s3"><bounds x="-3.9" y="32.15" width="3.5" height="0.9" /></element>
 
 		<element ref="static_black2"><bounds x="-6.5" y="29.125" width="0.5" height="4.5" /></element>
-		<element ref="nothing" clickthrough="no"><bounds x="-7.25" y="29.125" width="2" height="4.5" /></element>
 		<element ref="switch0" inputtag="IN.6" inputmask="0x03" inputraw="yes"><bounds x="-7" y="29.625" width="1.5" height="1" /></element>
 		<element ref="switch1" inputtag="IN.6" inputmask="0x03" inputraw="yes"><bounds x="-7" y="30.875" width="1.5" height="1" /></element>
 		<element ref="switch2" inputtag="IN.6" inputmask="0x03" inputraw="yes"><bounds x="-7" y="32.125" width="1.5" height="1" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="-7.25" y="29.125" width="2" height="4.5" /></element>
 
 		<element ref="static_black"><bounds x="-6.25" y="30.00" width="2" height="0.25" /></element>
 		<element ref="static_black"><bounds x="-6.25" y="31.25" width="2" height="0.25" /></element>
@@ -207,20 +207,20 @@ authors:hap
 		<element ref="text_4"><bounds x="50.25" y="34.65" width="1" height="0.9" /></element>
 
 		<element ref="static_black2"><bounds x="53" y="16.875" width="0.5" height="7" /></element>
-		<element ref="nothing" clickthrough="no"><bounds x="52.25" y="16.875" width="2" height="7" /></element>
 		<element ref="switch0" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="17.375" width="1.5" height="1" /></element>
 		<element ref="switch8" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="18.625" width="1.5" height="1" /></element>
 		<element ref="switch4" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="19.875" width="1.5" height="1" /></element>
 		<element ref="switch2" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="21.125" width="1.5" height="1" /></element>
 		<element ref="switch1" inputtag="IN.0" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="22.375" width="1.5" height="1" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="52.25" y="16.875" width="2" height="7" /></element>
 
 		<element ref="static_black2"><bounds x="53" y="29.125" width="0.5" height="7" /></element>
-		<element ref="nothing" clickthrough="no"><bounds x="52.25" y="29.125" width="2" height="7" /></element>
 		<element ref="switch0" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="29.625" width="1.5" height="1" /></element>
 		<element ref="switch2" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="30.875" width="1.5" height="1" /></element>
 		<element ref="switch4" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="32.125" width="1.5" height="1" /></element>
 		<element ref="switch8" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="33.375" width="1.5" height="1" /></element>
 		<element ref="switch1" inputtag="IN.4" inputmask="0x0f" inputraw="yes"><bounds x="52.5" y="34.625" width="1.5" height="1" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="52.25" y="29.125" width="2" height="7" /></element>
 
 		<element ref="static_black"><bounds x="51.25" y="17.75" width="2" height="0.25" /></element>
 		<element ref="static_black"><bounds x="51.25" y="19.00" width="2" height="0.25" /></element>

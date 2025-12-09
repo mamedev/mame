@@ -1251,7 +1251,7 @@ int device_usb_ohci_function_interface::execute_transfer(int endpoint, int pid, 
 	else if (pid == InPid) {
 		if (endpoints[endpoint].type == ControlEndpoint) { //if (endpoint == 0) {
 			// if no data has been transferred (except for the setup stage)
-			// and the lenght of this IN transaction is 0
+			// and the length of this IN transaction is 0
 			// assume this is the status stage
 			if ((endpoints[endpoint].remain == 0) && (size == 0)) {
 				if ((endpoint == 0) && (settingaddress == true))
@@ -1330,7 +1330,7 @@ int device_usb_ohci_function_interface::execute_transfer(int endpoint, int pid, 
  * Usb port connector
  */
 
-DEFINE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector, "usb_connector", "Usb Connector Abstraction");
+DEFINE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector, "usb_connector", "USB Connector Abstraction (OHCI)");
 
 ohci_usb_connector::ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, OHCI_USB_CONNECTOR, tag, owner, clock),

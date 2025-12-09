@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="gaelco_ds5002fp_rom" description="Gaelco DS5002FP Programmer ROMs">
+
+	<software name="aligator" supported="no">
+		<description>Alligator Hunt</description>
+		<year>1994</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="aligator_47dF_22-nov_27c1024.bin" size="0x20000" crc="ec47f05e" sha1="782eb1398a60d54e5bcbe76e22000f6adc710bfe" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maniacsq" supported="no">
+		<description>Maniac Square</description>
+		<year>1996</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="maniac_825c_22-5-96_27c1024.bin" size="0x20000" crc="89db7181" sha1="fcdc8077c4247ca24d19c7f61fcb9e1bc93e36fd" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="targeth" supported="no">
+		<description>Target Hits</description>
+		<year>1994</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="escopeta_2088_27c1024.bin" size="0x20000" crc="ac13d038" sha1="eb0fd071e92154c1002e9955b72bcde4cafbfb51" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glass" supported="no">
+		<description>Glass</description>
+		<year>1993</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="glass_9970_27c1024.bin" size="0x20000" crc="6cdf4f11" sha1="f6ca3421497468b925af0f5124c798e1555aa990" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thoop2" supported="no">
+		<description>TH Strikes Back</description>
+		<year>1994</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="thunder_h_6886_4-5-94_27c1024.bin" size="0x20000" crc="1074c715" sha1="3c9504ed9321f45cd0f3f9d943702d555a4d3a38" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="touchgo" supported="no">
+		<description>Touch and Go</description>
+		<year>1995</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="voley_27c1024.bin" size="0x20000" crc="9fbbee8c" sha1="89ad2014efe10555a045c56cffd20004d572cc4e" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrally2" supported="no">
+		<description>World Rally 2</description>
+		<year>1995</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="wr2_usa_cafe_31-7_27c1024.bin" size="0x20000" crc="7a1725ec" sha1="58157ebe3a27c8505843a6157243ef5acd14b670" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrally2a" supported="no">
+		<description>World Rally 2 (older)</description>
+		<year>1995</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="wr2_b2d2_29-06_27c1024.bin" size="0x20000" crc="a5f30e85" sha1="d9a744c7cfd7e67e9bb84a0d21bfcc7f90aaa1f4" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldart" supported="no">
+		<description>Goldart</description>
+		<year>1994</year>
+		<publisher>Gaelco</publisher>
+		<part name="cart" interface="gaelcods_rom">
+			<dataarea name="rom" width="16" endianness="big" size="0x20000">
+				<rom name="diana_27c1024.bin" size="0x20000" crc="20c4d1d9" sha1="067be3b3efa0f37dfb7b06d3a83452a1619933e2" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

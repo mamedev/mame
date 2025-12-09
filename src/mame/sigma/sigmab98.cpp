@@ -52,26 +52,26 @@ is "Treasure Fall" (despite the cart label is "Treasure Hall").
 
 Dumped games:
 
+1999 Dokidoki Kingyo Sukui        https://youtu.be/Z0tOjG_tteU
+1999 Shatekids                    https://youtu.be/aWzYlvm6uIs
 2000 Animal Catch                 https://youtu.be/U4L5EwWbxqw
 2000 Itazura Monkey               https://youtu.be/GHxiqUQRpV8
 2000 Pye-nage Taikai              https://youtu.be/oL2OIbrv-KI
 2000 Taihou de Doboon             https://youtu.be/loPP3jt0Ob0
 2001 Hae Hae Ka Ka Ka             https://youtu.be/37IxYCg0tic
+2001 Kotekitai Slot               https://youtu.be/IohrnGIma4A
 2002 Gun Kids
 2003 Go Go Cowboy (EN, prize)     https://youtu.be/rymtzmSXjuA
 2003 Wantouchable                 https://youtu.be/aRcTCdZZLRo
 
 Games with the same cabinet, or in the Treasure Fall series, which might be on the same hardware:
 
-1999 Shatekids                    https://youtu.be/aWzYlvm6uIs
 1999 Otakara Locomo               https://youtu.be/J0NwMWO3SdY
-1999 Dokidoki Kingyosukui         https://youtu.be/Z0tOjG_tteU
 2000 Otoshicha Ottotto            https://youtu.be/AybhPHTFvMo
 2001 Mushitori Meijin
 2001 Morino Dodgeball Senshuken   https://youtu.be/k98KIRjTYbY
 2001 Waiwai Wanage                https://youtu.be/4GmwPTk_Er4
 2001 Zarigani Tsuri               https://youtu.be/NppRdebkUaQ
-2001 Kotekitai Slot               https://youtu.be/IohrnGIma4A
 2002 Shateki Yokochou             https://youtu.be/LPZLWP1x5o8
 2002 Ipponzuri Slot
 2002 Karateman                    https://youtu.be/EIrVHEAv3Sc
@@ -1464,12 +1464,11 @@ void sigmab98_state::sigmab98(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_buffered_spriteram);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));    // clock @X2?
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 void sigmab98_state::dodghero(machine_config &config)
@@ -1545,11 +1544,10 @@ void lufykzku_state::lufykzku(machine_config &config)
 	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // same as sammymdl?
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
-	oki.add_route(0, "lspeaker", 0.80);
-	oki.add_route(1, "rspeaker", 0.80);
+	oki.add_route(0, "speaker", 0.80, 0);
+	oki.add_route(1, "speaker", 0.80, 1);
 }
 
 void lufykzku_state::rockman(machine_config& config)
@@ -1616,12 +1614,11 @@ void sammymdl_state::sammymdl(machine_config &config)
 	//BUFFERED_SPRITERAM8(config, m_buffered_spriteram); // not on sammymdl?
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
-	oki.add_route(0, "lspeaker", 0.80);
-	oki.add_route(1, "rspeaker", 0.80);
+	oki.add_route(0, "speaker", 0.80, 0);
+	oki.add_route(1, "speaker", 0.80, 1);
 }
 
 void sammymdl_state::animalc(machine_config &config)
@@ -2099,9 +2096,11 @@ ROM_END
 #define SAMMYMDL_BIOS                                                                                                           \
 	ROM_REGION( 0x80000, "mainbios", 0 )                                                                                        \
 	ROM_SYSTEM_BIOS( 0, "v5", "IPL Ver. 5.0" ) /* (c)2003 */                                                                    \
-	ROMX_LOAD( "vm1211l01.u2",  0x000000, 0x080000, CRC(c3c74dc5) SHA1(07352e6dba7514214e778ba39e1ca773e4698858), ROM_BIOS(0) ) \
+	ROMX_LOAD( "vm1211l01.u2",   0x000000, 0x080000, CRC(c3c74dc5) SHA1(07352e6dba7514214e778ba39e1ca773e4698858), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "v4", "IPL Ver. 4.0" ) /* (c)2000, ROM patches not correct for this BIOS */                             \
-	ROMX_LOAD( "mt201l04.u012", 0x000000, 0x080000, CRC(c8c6d25f) SHA1(5be39fa72b65f2e455ccc146dbab58d24ab46505), ROM_BIOS(1) )
+	ROMX_LOAD( "mt201l04.u012",  0x000000, 0x080000, CRC(c8c6d25f) SHA1(5be39fa72b65f2e455ccc146dbab58d24ab46505), ROM_BIOS(1) ) \
+	ROM_SYSTEM_BIOS( 2, "v1", "IPL Ver. 1.0" ) /* (c)1999, ROM patches not correct for this BIOS */                             \
+	ROMX_LOAD( "vm1201l01.u012", 0x000000, 0x080000, CRC(21b2ccbd) SHA1(c3ceea196e5c1c6a9e03cf3a22e9f25f0099a38e), ROM_BIOS(2) )
 
 ROM_START( sammymdl )
 	SAMMYMDL_BIOS
@@ -2161,6 +2160,19 @@ ROM_START( wantouch ) // ワンタッチャブル
 
 	ROM_REGION( 0x200000, "sprites", 0 )
 	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(cd8d4478) SHA1(224e8e0e9a49f10515e0ebf9a5e97d8adc7eed13) )
+ROM_END
+
+ROM_START( kotekita ) // こてき隊（たい）スロット
+	SAMMYMDL_BIOS
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "vx2302l01.u021", 0x00000, 0x200000, CRC(37faa4a9) SHA1(619135d74052fb2272ce78976c2aa59a65244f12) )
+
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "vx2301l01.u016", 0x00000, 0x200000, CRC(e471c1ef) SHA1(4ddf3261d8736888ebbdbd0d755aad75987b3b3d) )
 ROM_END
 
 void sammymdl_state::init_animalc()
@@ -2346,6 +2358,32 @@ void sammymdl_state::init_haekaka()
 	rom[0x005ac] = 0xc3;
 }
 
+ROM_START( kingyosu )
+	SAMMYMDL_BIOS
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "vx1302l02.u021", 0x00000, 0x200000, CRC(45e43e3c) SHA1(71ada38c1f65738ca75ca75d2272f310ba43c72c) )
+
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "vx1301l01.u016", 0x00000, 0x200000, CRC(25dfbf4c) SHA1(8f9552cf54bdf7490055ebdb23fa758f5cddafb5) )
+ROM_END
+
+ROM_START( shatekds )
+	SAMMYMDL_BIOS
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "29f016a.u015", 0x00000, 0x200000, CRC(7c779286) SHA1(db688ac2cad14c642e6da770212217a466e1bb64) )
+
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_COPY( "oki", 0x1c0000, 0x00000, 0x40000 )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610tc.u016", 0x00000, 0x200000, CRC(6e7d2c7d) SHA1(747d54eee26631966a91fd26b8b4beb32b67ddb7) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -2368,12 +2406,15 @@ GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashher
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
 GAME( 2002, mnrockman,0,        rockman,  lufykzku, lufykzku_state, init_rockman,  ROT0, "Banpresto / Capcom / Shogakukan / ShoPro / TV Tokyo", "Medal Network: Rockman EXE", 0 )
 // Sammy Medal Games:
-GAME( 2000, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System BIOS",         MACHINE_IS_BIOS_ROOT )
+GAME( 1999, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System BIOS",         MACHINE_IS_BIOS_ROOT )
+GAME( 1999, kingyosu, sammymdl, itazuram, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Dokidoki Kingyo Sukui",                0 )
+GAME( 1999, shatekds, sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Shatekids",                            0 )
 GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
 GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sammymdl_state, init_itazuram, ROT0, "Sammy",             "Itazura Monkey",                       0 )
 GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
 GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
 GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
+GAME( 2001, kotekita, sammymdl, haekaka,  sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Kotekitai Slot",                       0 )
 GAME( 2002, gunkids,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Hayauchi Gun Kids",                    0 )
 GAME( 2003, wantouch, sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Wantouchable",                         0 )
 GAME( 2003, gocowboy, 0,        gocowboy, gocowboy, sammymdl_state, empty_init,    ROT0, "Sammy",             "Go Go Cowboy (English, prize)",        0 )

@@ -469,7 +469,7 @@ template <unsigned Which> void arm_iomd_device::irqmsk_w(u32 data)
 // master clock control
 inline void arm7500fe_iomd_device::refresh_host_cpu_clocks()
 {
-	m_host_cpu->set_unscaled_clock(this->clock() >> (m_cpuclk_divider == false));
+	m_host_cpu->set_unscaled_clock(this->clock() >> (m_cpuclk_divider ? 0 : 1));
 }
 
 u32 arm7500fe_iomd_device::clkctl_r()

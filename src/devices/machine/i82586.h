@@ -205,7 +205,6 @@ protected:
 	static u64 address_hash(u8 *buf, int length);
 	int fetch_bytes(u8 *buf, u32 src, int length);
 	int store_bytes(u32 dst, u8 *buf, int length);
-	void dump_bytes(u8 *buf, int length);
 
 	// device_* members
 	const address_space_config m_space_config;

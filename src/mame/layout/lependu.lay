@@ -50,7 +50,7 @@ license:CC0-1.0
 	</element>
 
 	<element name="BUTTONBASE" defstate="0">
-		<rect state="1"><color red="0.85" green="0.85" blue="0.85" /></rect>
+		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /></rect>
 		<rect state="0"><color red="0.19" green="0.19" blue="0.19" /></rect>
 	</element>
 

@@ -20,10 +20,14 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void do_write() override;
+	virtual void do_read() override;
+
+	virtual TIMER_CALLBACK_MEMBER(clock_w) override;
 
 private:
 	bool m_dma_mode; // 0 = zxn dma, 1 = z80 dma
+	u8 m_r2_portB_preescaler_s;
+	u64 m_dma_timer_0;
 };
 
 DECLARE_DEVICE_TYPE(SPECNEXT_DMA, specnext_dma_device)

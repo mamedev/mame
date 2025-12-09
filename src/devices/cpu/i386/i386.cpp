@@ -1543,7 +1543,7 @@ void i386_device::i386_check_irq_line()
 	if ( (m_irq_state) && m_IF )
 	{
 		m_cycles -= 2;
-		i386_trap(standard_irq_callback(0, m_pc), 1, 0);
+		i386_trap(standard_irq_callback(0, m_pc), 1);
 	}
 }
 
@@ -1592,7 +1592,7 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 	for (uint32_t i = 1; i < 16; i++)
 		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
-	i386_trap(6, 0, 0);
+	i386_trap(6, 0);
 }
 
 
@@ -2724,7 +2724,7 @@ void i386_device::execute_set_input(int irqline, int state)
 			return;
 		}
 		if ( state )
-			i386_trap(2, 1, 0);
+			i386_trap(2, 1);
 	}
 	else
 	{
@@ -2810,7 +2810,7 @@ void i386_device::execute_run()
 					{
 						// The processor never automatically clears bits in DR6. It only sets them.
 						m_dr[6] |= 1 << i;
-						i386_trap(1,0,0);
+						i386_trap(1,0);
 						break;
 					}
 				}
@@ -2850,7 +2850,7 @@ void i386_device::execute_run()
 				m_prev_eip = m_eip;
 				m_ext = 1;
 				m_dr[6] |= (1 << 14); //Set BS bit of DR6.
-				i386_trap(1,0,0);
+				i386_trap(1,0);
 			}
 			if(m_lock && (m_opcode != 0xf0))
 				m_lock = false;

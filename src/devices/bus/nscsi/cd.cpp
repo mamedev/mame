@@ -277,6 +277,8 @@ void nscsi_cdrom_device::update_directory()
 
 		while ((ourEntry = directory->read()) != nullptr)
 		{
+			// FIXME: use-after-free
+			// the directory entry's name is not valid after a subsequent call to read()
 			m_directory.push_back(*ourEntry);
 
 			// API version 0 has a hard cap of 100 files

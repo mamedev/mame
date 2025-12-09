@@ -30,7 +30,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// device_zorro2_card_interface overrides
 	virtual void cfgin_w(int state) override;
@@ -68,6 +67,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_TOCCATA, bus::amiga::zorro, toccata_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_TOCCATA, bus::amiga::zorro, toccata_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_TOCCATA_H

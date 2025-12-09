@@ -66,6 +66,15 @@ void suna8_state::machine_start()
 ***************************************************************************/
 
 /***************************************************************************
+                                Rough Ranger
+***************************************************************************/
+
+void suna8_state::init_rranger()
+{
+	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+}
+
+/***************************************************************************
                                 Hard Head
 ***************************************************************************/
 
@@ -1904,7 +1913,6 @@ GFXDECODE_END
 
 // 1 x 24 MHz crystal
 
-
 void suna8_state::hardhead(machine_config &config)
 {
 	// basic machine hardware
@@ -1946,7 +1954,6 @@ void suna8_state::hardhead(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
@@ -1956,7 +1963,6 @@ void suna8_state::hardhead(machine_config &config)
 ***************************************************************************/
 
 // 1 x 24 MHz crystal
-
 // 2203 + 8910
 void suna8_state::rranger(machine_config &config)
 {
@@ -1999,7 +2005,6 @@ void suna8_state::rranger(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
@@ -2007,8 +2012,6 @@ void suna8_state::rranger(machine_config &config)
 /***************************************************************************
                                 Brick Zone
 ***************************************************************************/
-
-// 1 x 24 MHz crystal
 
 MACHINE_RESET_MEMBER(suna8_state,brickzn)
 {
@@ -2020,6 +2023,7 @@ MACHINE_RESET_MEMBER(suna8_state,brickzn)
 		m_decrypted_opcodes_high->set_entry(0);
 }
 
+// 1 x 24 MHz crystal
 void suna8_state::brickzn11(machine_config &config)
 {
 	// basic machine hardware
@@ -2079,8 +2083,6 @@ void suna8_state::brickzn(machine_config &config)
                                 Hard Head 2
 ***************************************************************************/
 
-// 1 x 24 MHz crystal
-
 TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 {
 	int scanline = param;
@@ -2096,6 +2098,7 @@ MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 	hardhea2_prot_rambank_w<0>(0);
 }
 
+// 1 x 24 MHz crystal
 void suna8_state::hardhea2(machine_config &config)
 {
 	brickzn(config);
@@ -2164,7 +2167,6 @@ void suna8_state::starfigh(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
@@ -2213,7 +2215,6 @@ void suna8_state::sparkman(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
 	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
@@ -3110,18 +3111,13 @@ ROM_END
 
 ***************************************************************************/
 
-void suna8_state::init_suna8()
-{
-	m_mainbank->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
-}
-
-GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA",                       "Super Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, rrangerb,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "bootleg",                    "Rough Ranger (v2.0, bootleg)",       MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangero,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA",                       "Super Ranger (older)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA (NOVA license)",        "Super Ranger (older, NOVA license)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, init_suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",      MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, init_rranger,   ROT0,  "SunA",                       "Super Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, init_rranger,   ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)",                MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, rrangerb,  sranger,  rranger,  rranger,  suna8_state, init_rranger,   ROT0,  "bootleg",                    "Rough Ranger (v2.0, bootleg)",       MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangero,  sranger,  rranger,  rranger,  suna8_state, init_rranger,   ROT0,  "SunA",                       "Super Ranger (older)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, init_rranger,   ROT0,  "SunA (NOVA license)",        "Super Ranger (older, NOVA license)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, init_rranger,   ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, init_rranger,   ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",      MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, init_hardhead,  ROT0,  "SunA",                       "Hard Head",                     0 )
 GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",    0 )

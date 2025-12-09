@@ -356,7 +356,8 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[sector].sector      = sector_base + sector;
 				sects[sector].size        = ssize;
 				sects[sector].deleted     = false;
-				sects[sector].bad_crc     = false;
+				sects[sector].bad_data_crc = false;
+				sects[sector].bad_addr_crc = false;
 				sects[sector].actual_size = sector_size;
 				sects[sector].data        = &imagebuf[pos];
 				pos += sector_size;
@@ -366,16 +367,6 @@ bool cqm_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		}
 
 	return true;
-}
-
-bool cqm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
-{
-	return false;
-}
-
-bool cqm_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const cqm_format FLOPPY_CQM_FORMAT;

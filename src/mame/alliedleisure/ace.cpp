@@ -68,16 +68,17 @@ public:
 
 	void ace(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	void ace_objpos_w(offs_t offset, uint8_t data);
 	void ace_characterram_w(offs_t offset, uint8_t data);
 	void ace_scoreram_w(offs_t offset, uint8_t data);
 	uint8_t unk_r();
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void ace_postload();
 	void main_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -301,24 +302,15 @@ static const gfx_layout scorelayout =
 
 static GFXDECODE_START( gfx_ace )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 2 )
-	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout0, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout1, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( nullptr, 0x8000, charlayout2, 0, 2 ) /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( nullptr, 0x8000, scorelayout, 0, 2 ) /* the game dynamically modifies this */
+	GFXDECODE_RAM( nullptr, 0x8000, charlayout0, 0, 2 )
+	GFXDECODE_RAM( nullptr, 0x8000, charlayout1, 0, 2 )
+	GFXDECODE_RAM( nullptr, 0x8000, charlayout2, 0, 2 )
+	GFXDECODE_RAM( nullptr, 0x8000, scorelayout, 0, 2 )
 GFXDECODE_END
-
-void aceal_state::ace_postload()
-{
-	m_gfxdecode->gfx(1)->mark_dirty(0);
-	m_gfxdecode->gfx(2)->mark_dirty(0);
-	m_gfxdecode->gfx(3)->mark_dirty(0);
-	m_gfxdecode->gfx(4)->mark_dirty(0);
-}
 
 void aceal_state::machine_start()
 {
 	save_item(NAME(m_objpos));
-	machine().save().register_postload(save_prepost_delegate(FUNC(aceal_state::ace_postload), this));
 }
 
 void aceal_state::machine_reset()

@@ -10,12 +10,12 @@
         * Give us a Break [8 sets]
         * Criss Cross (Sweden) [non-working - need disk image]
         * Ten Up [2 sets]
+        * Treasure Trail [non-working - need disk image]
 
     Looking for:
         * Numbers Game
         * Pac Quiz
         * Suit Pursuit
-        * Treasure Trail?
 
     Known issues:
         * Coin data has to go through the datalogger to be counted
@@ -559,6 +559,14 @@ ROM_START( tenup )
 	ROM_LOAD16_BYTE( "tu-14.bin", 0x10001, 0x8000, CRC(fd8a0c3c) SHA1(f87289ce6f0d2bc9b7d3a0b6deff38ba3aadf391) )
 ROM_END
 
+ROM_START( ttrail )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ic49.bin", 0x00000, 0x8000, CRC(01395ff1) SHA1(69e0f0d9893c2b4edf7f2c4547bf7674ddeb10ef) )
+	ROM_LOAD16_BYTE( "ic48.bin", 0x00001, 0x8000, CRC(8dfd2165) SHA1(a239258b2b9e9773f97937506e04680422c6c396) )
+	ROM_LOAD16_BYTE( "ic57.bin", 0x10000, 0x8000, CRC(82775064) SHA1(17437022f76bd8faebdbcc94be8ace482a145382) )
+	ROM_LOAD16_BYTE( "ic56.bin", 0x10001, 0x8000, CRC(70264d8a) SHA1(107b9eb72fd587deb1ba9821645f3ab86e6040c8) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -570,3 +578,4 @@ ROM_END
 GAME( 1986, guab,     0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Give us a Break",      0 )
 GAME( 1986, crisscrs, 0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Criss Cross (Sweden)", MACHINE_NOT_WORKING )
 GAME( 1988, tenup,    0,      guab,    tenup, guab_state, empty_init, ROT0,     "JPM",   "Ten Up",               0 )
+GAME( 198?, ttrail,   0,      guab,    guab,  guab_state, empty_init, ROT0,     "JPM",   "Treasure Trail (JPM)", MACHINE_NOT_WORKING )

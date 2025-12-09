@@ -410,7 +410,7 @@ static const gfx_layout kanjilayout =
 
 static GFXDECODE_START( gfx_b16 )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanjilayout, 0, 1 )
-	GFXDECODE_ENTRY( nullptr, 0x0000, charlayout, 0, 1 )
+	GFXDECODE_RAM( nullptr, 0x0000, charlayout, 0, 1 )
 GFXDECODE_END
 
 uint8_t b16_state::memory_read_byte(offs_t offset)

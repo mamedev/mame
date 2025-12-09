@@ -7,7 +7,21 @@ license:CC0-1.0
 <softwarelist name="sc3000_cart" description="Sega SC-3000 cartridges">
 
 	<software name="basic3">
-		<description>BASIC Level III (Jpn)</description>
+		<description>BASIC Level III (Japan, version 1.1)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="level3" />
+			<dataarea name="rom" size="32768">
+				<rom name="basic sk iii (japan).sg" size="32768" crc="55f47493" sha1="737a06b3ada62942514a2facfea3fb1b0ca9c346" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic3v10" cloneof="basic3">
+		<description>BASIC Level III (Japan, version 1.0)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -20,6 +34,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- Two variants of this cart exist: A "Level A" cart that only contains 16k of RAM, and a "Level B" with 32k.
+	     Both of these have the same program data, the only difference is the amount of RAM. -->
 	<software name="basic3e" cloneof="basic3">
 		<description>BASIC Level III (Export)</description>
 		<year>1985</year>
@@ -35,7 +51,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="basic2" cloneof="basic3">
-		<description>BASIC Level 2 (Jpn)</description>
+		<description>BASIC Level 2 (Japan)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -51,7 +67,7 @@ license:CC0-1.0
 	<!-- SC-3000 Educational carts -->
 
 	<software name="music">
-		<description>Sega Music Editor (Euro?)</description>
+		<description>Sega Music Editor (Europe?)</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -65,7 +81,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="musicj" cloneof="music">
-		<description>Music (Jpn)</description>
+		<description>Music (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-101"/>
@@ -81,7 +97,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueit1n">
-		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 1-Nen (Jpn)</description>
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 1-Nen (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-103"/>
@@ -94,7 +110,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueis1n">
-		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Jpn)</description>
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-104"/>
@@ -107,7 +123,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueis1na" cloneof="chueis1n">
-		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Jpn, Alt)</description>
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 1-Nen (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-104"/>
@@ -120,7 +136,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueib1n">
-		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 1-Nen (Jpn)</description>
+		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 1-Nen (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-105"/>
@@ -133,7 +149,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan4j">
-		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Jpn)</description>
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-106"/>
@@ -146,7 +162,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan4ja" cloneof="tansan4j">
-		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Jpn, Alt)</description>
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Jou (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-106"/>
@@ -159,7 +175,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kagaku">
-		<description>Kagaku ~ Gensokigou Master (Jpn)</description>
+		<description>Kagaku ~ Gensokigou Master (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-107"/>
@@ -172,7 +188,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nihonshi">
-		<description>Nihonshi Nenpyou (Jpn)</description>
+		<description>Nihonshi Nenpyou (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-108"/>
@@ -185,7 +201,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sekaishi">
-		<description>Sekaishi Nenpyou ~ Monbushou Shidouyouryou Junkyo (Jpn)</description>
+		<description>Sekaishi Nenpyou ~ Monbushou Shidouyouryou Junkyo (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-109"/>
@@ -198,7 +214,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueit2n">
-		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Jpn)</description>
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-110"/>
@@ -211,7 +227,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueit2na" cloneof="chueit2n">
-		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Jpn, Alt)</description>
+		<description>Chuugaku Hisshuu Eitango ~ Chuugaku 2-Nen (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-110"/>
@@ -224,7 +240,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueis2n">
-		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Jpn)</description>
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-111"/>
@@ -237,7 +253,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueis2na" cloneof="chueis2n">
-		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Jpn, Alt)</description>
+		<description>Chuugaku Hisshuu Eisakubun ~ Chuugaku 2-Nen (Japan, alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-111"/>
@@ -250,7 +266,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="chueib2n">
-		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 2-Nen (Jpn)</description>
+		<description>Chuugaku Hisshuu Eibunpou ~ Chuugaku 2-Nen (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-112"/>
@@ -263,7 +279,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan4g">
-		<description>Tanoshii Sansu ~ Shougaku 4-Nen Ge (Jpn)</description>
+		<description>Tanoshii Sansu ~ Shougaku 4-Nen Ge (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-113"/>
@@ -276,7 +292,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan5g">
-		<description>Tanoshii Sansu ~ Shougaku 5-Nen Ge (Jpn)</description>
+		<description>Tanoshii Sansu ~ Shougaku 5-Nen Ge (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-114"/>
@@ -289,7 +305,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan6g">
-		<description>Tanoshii Sansu ~ Shougaku 6-Nen Ge (Jpn)</description>
+		<description>Tanoshii Sansu ~ Shougaku 6-Nen Ge (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-115"/>
@@ -302,7 +318,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan5j">
-		<description>Tanoshii Sansuu ~ Shougaku 5-Nen Jou (Jpn)</description>
+		<description>Tanoshii Sansuu ~ Shougaku 5-Nen Jou (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-116"/>
@@ -315,7 +331,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tansan6j">
-		<description>Tanoshii Sansuu ~ Shougaku 6-Nen Jou (Jpn)</description>
+		<description>Tanoshii Sansuu ~ Shougaku 6-Nen Jou (Japan)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="E-117"/>

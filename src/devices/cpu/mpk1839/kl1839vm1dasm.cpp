@@ -12,6 +12,7 @@ static const std::string r_name(u8 id)
 	std::ostringstream ss;
 	switch (id)
 	{
+	case 0x0f: ss << "PC"; break;
 	case 0x14: ss << "AK0"; break;
 	case 0x15: ss << "AK1"; break;
 	case 0x16: ss << "AK2"; break;
@@ -98,7 +99,7 @@ static const void ma(std::ostream &stream, u32 op)
 	const bool py = BIT(op, 2);
 	const bool px = BIT(op, 1);
 
-	m_base(stream, op, 'A', kop1, r_name(x), k_name(am), r_name(x));
+	m_base(stream, op, 'A', kop1, px ? "RX" : r_name(x), py ? "RY" : k_name(am), px ? "RX" : r_name(x));
 
 	if (kob)
 	{
@@ -128,7 +129,7 @@ static const void ma(std::ostream &stream, u32 op)
 			case 0b001: stream << "4D "; break;
 			case 0b010: stream << "ZD "; break;
 			case 0b011: stream << "4Z "; break;
-			case 0b100: stream << "?R(17)==ACC "; break;
+			case 0b100: stream << "WDAK "; break;
 			case 0b101: stream << "4K "; break;
 			case 0b110: break; // reserved
 			case 0b111: stream << "BRD "; break;
@@ -136,8 +137,8 @@ static const void ma(std::ostream &stream, u32 op)
 		}
 	}
 
-	if (px | po | py)
-		stream << "?:" << (px ? "PX " : "") << (po ? "PO " : "") << (py ? "PY " : "");
+	if (po)
+		stream << "?:" << (po ? "RO" : "");
 }
 
 static const void mb(std::ostream &stream, u32 op)
@@ -150,11 +151,11 @@ static const void mb(std::ostream &stream, u32 op)
 	const u8 no = BIT(op, 10, 2);
 	const u8 fo = BIT(op, 8, 2);
 	const u8 kob = BIT(op, 5, 3);
-	const bool pz = BIT(op, 3);
+	const bool po = BIT(op, 3);
 	const bool py = BIT(op, 2);
 	const bool px = BIT(op, 1);
 
-	m_base(stream, op, 'B', kop2 << 1, r_name(x), r_name(y), r_name(x));
+	m_base(stream, op, 'B', kop2 << 1, px ? "RX" : r_name(x), py ? "RY" : r_name(y), px ? "RX" : r_name(x));
 
 	if (kob)
 	{
@@ -192,7 +193,7 @@ static const void mb(std::ostream &stream, u32 op)
 			case 0b001: stream << "4D "; break;
 			case 0b010: stream << "ZD "; break;
 			case 0b011: stream << "4Z "; break;
-			case 0b100: stream << "?R(17)==ACC "; break;
+			case 0b100: stream << "WDAK "; break;
 			case 0b101: stream << "4K "; break;
 			case 0b110: break; // reserved
 			case 0b111: stream << "BRD "; break;
@@ -200,8 +201,8 @@ static const void mb(std::ostream &stream, u32 op)
 		}
 	}
 
-	if (px | pz | py)
-		stream << "?:" << (px ? "PX " : "") << (pz ? "PZ " : "") << (py ? "PY " : "");
+	if (po)
+		stream << "?:" << (po ? "RO" : "");
 }
 
 static const void mc(std::ostream &stream, u32 op)
@@ -214,10 +215,7 @@ static const void mc(std::ostream &stream, u32 op)
 	const bool py = BIT(op, 2);
 	const bool px = BIT(op, 1);
 
-	m_base(stream, op, 'C', kop2 << 1, r_name(x), kop2 ? r_name(y) : r_name(x), r_name(z));
-
-	if (px | pz | py)
-		stream << "?:" << (px ? "PX " : "") << (pz ? "PZ " : "") << (py ? "PY " : "");
+	m_base(stream, op, 'C', kop2 << 1, px ? "RX" : r_name(x), kop2 ? (py ? "RY" : r_name(y)) : (px ? "RX" : r_name(x)), pz ? "RZ" : r_name(z));
 }
 
 static const u32 mk(std::ostream &stream, u32 op)
@@ -228,11 +226,12 @@ static const u32 mk(std::ostream &stream, u32 op)
 		if (BIT(~op, 16)) // madr == 0
 		{
 			const u16 addr = BIT(op, 2, 14);
-			util::stream_format(stream, "BP%s   :                        ;A=%04X", ret ? " " : "B" ,addr);
+			util::stream_format(stream, "BP%s   :                        ;A=(%04X)", ret ? " " : "B" , addr);
 		}
 		else
 		{
-			stream << "??MK-2";
+			u16 addr_hi = BIT(op, 8, 8) << 6;
+			util::stream_format(stream, "BPV%s  :                        ;A=(%04X+%s)", ret ? " " : "D" , addr_hi, r_name(0x18));
 		}
 	}
 	else if ((op & 0xfe000000) == 0xe2000000)
@@ -435,6 +434,11 @@ offs_t kl1839vm1_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 			srf(stream, op);
 		else
 			stream << "<invalid>";
+	}
+
+	if (op & 1)
+	{
+		stream << "S";
 	}
 
 	return 1 | SUPPORTED | step;

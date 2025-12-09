@@ -602,7 +602,7 @@ uint32_t ghosteo_state::bballoon_speedup_r(offs_t offset, uint32_t mem_mask)
 void ghosteo_state::machine_start()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000->cpu().space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	m_security_count = 0;
@@ -647,8 +647,7 @@ void ghosteo_state::ghosteo(machine_config &config)
 	I2C_24C16(config, "i2cmem", 0); // M24CL16-S
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(m_qs1000, FUNC(qs1000_device::set_irq));
@@ -660,8 +659,8 @@ void ghosteo_state::ghosteo(machine_config &config)
 	m_qs1000->p1_out().set(FUNC(ghosteo_state::qs1000_p1_w));
 	m_qs1000->p2_out().set(FUNC(ghosteo_state::qs1000_p2_w));
 	m_qs1000->p3_out().set(FUNC(ghosteo_state::qs1000_p3_w));
-	m_qs1000->add_route(0, "lspeaker", 1.0);
-	m_qs1000->add_route(1, "rspeaker", 1.0);
+	m_qs1000->add_route(0, "speaker", 1.0, 0);
+	m_qs1000->add_route(1, "speaker", 1.0, 1);
 }
 
 void ghosteo_state::bballoon(machine_config &config)

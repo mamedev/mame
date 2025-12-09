@@ -533,7 +533,7 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 			const u16 sprpix = sprbase[x];
 
 			// using the sprite, background, and foreground pixels, look up the color behavior
-			const u8 lookup_index =  (((sprpix & 0xf) == 0) << 0) |
+			const u8 lookup_index = (((sprpix & 0xf) == 0) << 0) |
 					(((fgpix & 7) == 0) << 1) |
 					(((fgpix >> 9) & 3) << 2) |
 					(((bgpix & 7) == 0) << 4) |

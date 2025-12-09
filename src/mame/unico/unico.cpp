@@ -933,16 +933,15 @@ void burglarx_state::burglarx(machine_config &config)
 	PALETTE(config, m_palette).set_format(4, &burglarx_state::unico_R6G6B6X, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181) / 4)); // 3.579545 MHz
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	OKIM6295(config, m_oki, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 
@@ -977,17 +976,16 @@ void zeropnt_state::zeropnt(machine_config &config)
 	PALETTE(config, m_palette).set_format(4, &zeropnt_state::unico_R6G6B6X, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181) / 4)); // 3.579545 MHz
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	OKIM6295(config, m_oki, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 verified
 	m_oki->set_addrmap(0, &zeropnt_state::oki_map);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 
@@ -1024,19 +1022,18 @@ void zeropnt2_state::zeropnt2(machine_config &config)
 	PALETTE(config, m_palette).set_format(4, &zeropnt2_state::unico_R6G6B6X, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70); // 3.579545 MHz
+	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "speaker", 0.70, 0).add_route(1, "speaker", 0.70, 1); // 3.579545 MHz
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki1.set_addrmap(0, &zeropnt2_state::oki_map);
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(14'318'181)/4, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.20);
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.20, 0);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.20, 1);
 }
 
 

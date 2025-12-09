@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -80,8 +80,6 @@ protected:
 	TILE_GET_INFO_MEMBER(get_sslam_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_sslam_bg_tile_info);
-	DECLARE_VIDEO_START(sslam);
-	DECLARE_VIDEO_START(powerbls);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(music_playback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

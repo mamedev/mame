@@ -1307,7 +1307,7 @@ void alto2_cpu_device::update_tclk(int tclk)
 void alto2_cpu_device::init_ether(int task)
 {
 	// intialize all ethernet variables
-	memset(&m_eth, 0, sizeof(m_eth));
+	m_eth = decltype(m_eth)();
 	save_item(NAME(m_eth.fifo));
 	save_item(NAME(m_eth.fifo_rd));
 	save_item(NAME(m_eth.fifo_wr));

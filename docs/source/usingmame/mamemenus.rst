@@ -110,6 +110,13 @@ Network Devices
     Shows the Network Devices menu, where you can set up emulated network
     adapters that support bridging to a host network.  This item is not shown if
     there are no network adaptors that support bridging in the running system.
+Audio Mixer
+    Shows the :ref:`Audio Mixer <menus-audiomixer>` menu, where you configure
+    how MAME routes sound from the emulated system to host system sound outputs,
+    and from host system sound inputs to the emulated system.
+Audio Effects
+    Shows the :ref:`Audio Effects <menus-audioeffects>` menu, where you can
+    configure audio effects applied to emulated sound output.
 Slider Controls
     Shows the Slider Controls menu, where you can adjust various settings,
     including video adjustments and individual sound channel levels.
@@ -285,3 +292,187 @@ graphical form below the menu.  Digital control states are either zero
 ID** to copy the device’s ID to the clipboard.  This is useful for setting up
 :ref:`stable controller IDs <devicemap>` in :ref:`controller configuration files
 <ctrlrcfg>`.
+
+
+.. _menus-audiomixer:
+
+Audio Mixer menu
+----------------
+
+The Audio Mixer menu allows you to configure how MAME routes sound from emulated
+speakers to system sound outputs, and from system sound inputs to emulated
+microphones.  There are two kinds of routes: *full routes*, and *channel
+routes*:
+
+* A full output route sends sound from all channels of an emulated sound output
+  device to a host sound output.  MAME automatically decides how to assign
+  emulated channels (typically speakers) to output channels, based on speaker
+  position information.
+* Similarly, a full input route sends sound from a host sound input to all
+  channels of an emulated sound input device.  MAME automatically decides how
+  to assign input channels to emulated channels (typically microphones), based
+  on microphone position information.
+* A channel route sends sound from a single emulated sound output channel to a
+  single host sound output channel, or from a single host sound input channel to
+  a single emulated sound input channel.
+
+Only one full route is allowed for each combination of an emulated sound output
+or input device and host sound output or input.  Only one channel route is
+allowed between an individual emulated channel and an individual host sound
+channel.
+
+Routes are grouped by emulated device.  For each device, full routes are listed
+before channel routes.  For each route, you can select the system sound output
+or input and adjust the volume from -96 dB (quietest) to +12 dB (loudest).  For
+channel routes, you can also select the individual emulated channel and host
+channel.  Select **Remove this route** to remove a route.
+
+Select **Add new full route** to add a new full route to that group.  If
+possible, it will be added and the menu highlight will move to the newly added
+route.  If routes between the highlighted device and every host output/input
+already exist, no route will be added.
+
+Select **Add new channel route** to add a new channel route to that group.  If
+possible, it will be added and the menu highlight will move to the newly added
+route.  If routes between all channels for the highlighted device and every
+host output/input channel already exist, no route will be added.
+
+Some sound modules allow channel assignments and volumes to be controlled using
+an external mixer interface (for example the PipeWire module for Linux has this
+capability).  In these cases, MAME does its best to follow the changes you make
+in the external mixer interface and save changes in its configuration.
+
+The audio routes are saved in the system configuration file.
+
+
+.. _menus-audioeffects:
+
+Audio Effects menu
+------------------
+
+The Audio Effects menu allows you to configure audio effects that are applied
+to emulated sound output before it’s routed to host sound outputs.  An
+independent effect chain is applied for each emulated sound output device.
+
+The effect chain itself is not configurable.  It always consists of these four
+effects, in this order:
+
+* Filters
+* Compressor
+* Reverb
+* Equalizer
+
+When editing parameters for an output device’s effect chain, inherited default
+parameter values are showing dimmed, while parameter values set for that chain
+are shown in the normal text colour.  Press the UI Clear key (Del/Delete/Forward
+Delete on the keyboard by default) to reset a parameter to use the inherited
+default value.
+
+Edit the **Default** chain to set default parameter value that can be inherited
+by output device chains.  When editing the **Default** chain, you can restore
+the built-in default value for a parameter by pressing the UI Clear key
+(Del/Delete/Forward Delete on the keyboard by default).
+
+By default, the high-pass filter is enabled, with minimal cutoff frequency for
+DC offset removal.  All other effects are bypassed (technically, the equalizer
+effect is active too, but all bands are set to 0 dB so it's still turned off).
+
+The Audio Effects menu also allows you to configure the algorithm used for audio
+sample rate conversion.  The default **LoFi** algorithm has modest CPU
+requirements.  The recommended **HQ** algorithm provides higher quality sample
+rate conversion at the expense of requiring substantially higher CPU
+performance.
+
+The **HQ** algorithm has additional parameters.  Increasing the **HQ latency**
+can improve quality.  If it's increased too much and multiple sound chips are
+used, the latencies will stack up and you will end up with too much lag at the
+end.  When decreasing the latency below 1 ms, the resampler will lose its
+potential (in fact, it will sound similar to MAME's lower quality resampler from
+before version 0.278).  Increasing the **HQ filter max size** or **HQ filter max
+phases** can improve quality at the expense of higher CPU performance
+requirements.
+
+
+Filter effect
+~~~~~~~~~~~~~
+
+This effect implements a second-order high-pass filter and a second-order
+low-pass filter.  The high-pass filter allows DC offsets to be removed.  The
+low-pass filter can simulate the poor high-frequency response typical of many
+arcade cabinets and television sets.
+
+The Q factor controls how sharp the transition from the stop band to the
+passband is.  Higher factors provide a sharper transition.  Values over 0.71
+cause the filter to amplify frequencies close to the cutoff frequency, which
+may be surprising or undesirable.
+
+
+Compressor effect
+~~~~~~~~~~~~~~~~~
+
+This effect provides dynamic range compression (it is based on a
+reimplementation of Alain Paul’s Versatile Compressor).  Dynamic range
+compression reduces the difference in volume between the softest and loudest
+sounds.  It’s useful in a variety of situations, for example it can help make
+quiet sounds more audible over background noise.
+
+The parameters are:
+
+Threshold
+    The level at which the amplification fully stops.
+Ratio
+    The maximum amplification.
+Attack
+    The reaction time to loud sounds to reduce the amplification.
+Release
+    The reaction time to allow the amplification to go back up.
+Input gain
+    The amplification level at the input.
+Output gain
+    The amplification level at the output.
+Convexity
+    The shape of the relationship between distance to the threshold and ratio
+    value.  Higher values give a steeper shape.
+Channel link
+    At 100%, all channels of an output device are amplified identically, while
+    at 0% they are fully independent.  Intermediate values give intermediate
+    behaviour.
+Feedback
+    Allows some of the output to be fed back to the input.
+Inertia
+    Higher values make the ratio change more slowly.
+Inertia decay
+    Tweaks the impact of the Inertia.
+Ceiling
+    The maximum level allowed just before the output amplification.  Causes
+    soft clipping at that level.
+
+By setting **Attack** to 0 ms, **Release** to Infinite, and **Ratio** to
+Infinity:1, the compressor will turn into a brickwall limiter (leave the
+advanced settings to default).  If you increase **Input gain** on top of that,
+with a **Threshold** of eg. -3 dB, it will act like a dynamic normalizer.
+
+
+Reverb effect
+~~~~~~~~~~~~~
+
+Not documented yet.
+
+
+Equalizer effect
+~~~~~~~~~~~~~~~~
+
+A five-band parametric equalizer, allowing to amplify or attenuate specific
+frequency bands.
+
+The three middle filters are bandpass/bandreject filters, meaning they amplify
+or attenuate frequencies around the configured centre frequency.  The first
+and last filters can also be configured as bandpass/bandreject filter by setting
+the mode to **Peak**.  Setting the mode to **Shelf** causes the filter to
+amplify or attenuate all frequencies below (for the first filter) or above (for
+the last filter) the configured cutoff frequency.
+
+The Q factor controls the sharpness of the peak or trough in frequency response
+for bandpass/bandreject filters (the Q factor is not adjustable for **Shelf**
+mode).  Higher Q factors give a sharper shape, affecting a narrower range of
+frequencies.

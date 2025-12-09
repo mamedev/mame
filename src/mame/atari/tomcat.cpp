@@ -376,17 +376,16 @@ void tomcat_state::tomcat(machine_config &config)
 	avg.set_vector("vector");
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	POKEY(config, "pokey1", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "lspeaker", 0.20);
+	SPEAKER(config, "speaker", 2).front();
+	POKEY(config, "pokey1", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "speaker", 0.20, 0);
 
-	POKEY(config, "pokey2", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+	POKEY(config, "pokey2", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "speaker", 0.20, 1);
 
 	TMS5220(config, m_tms, 325000);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
-	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "speaker", 0.60, 0).add_route(1, "speaker", 0.60, 1);
 }
 
 ROM_START( tomcat )

@@ -25,15 +25,6 @@
 
 
 /*
-** LUA_IGMARK is a mark to ignore all before it when building the
-** luaopen_ function name.
-*/
-#if !defined (LUA_IGMARK)
-#define LUA_IGMARK		"-"
-#endif
-
-
-/*
 ** LUA_CSUBSEP is the character that replaces dots in submodule names
 ** when searching for a C loader.
 ** LUA_LSUBSEP is the character that replaces dots in submodule names
@@ -708,8 +699,13 @@ static const luaL_Reg ll_funcs[] = {
 
 
 static void createsearcherstable (lua_State *L) {
-  static const lua_CFunction searchers[] =
-    {searcher_preload, searcher_Lua, searcher_C, searcher_Croot, NULL};
+  static const lua_CFunction searchers[] = {
+    searcher_preload,
+    searcher_Lua,
+    searcher_C,
+    searcher_Croot,
+    NULL
+  };
   int i;
   /* create 'searchers' table */
   lua_createtable(L, sizeof(searchers)/sizeof(searchers[0]) - 1, 0);

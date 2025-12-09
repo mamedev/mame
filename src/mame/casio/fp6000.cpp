@@ -16,6 +16,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -24,6 +25,7 @@
 #include "bus/centronics/ctronics.h"
 #include "fp6000_kbd.h"
 #include "imagedev/cassette.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -38,8 +40,8 @@ namespace {
 class fp6000_state : public driver_device
 {
 public:
-	fp6000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fp6000_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pic(*this, "pic"),
 		m_pit(*this, "pit"),

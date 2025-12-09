@@ -969,7 +969,7 @@ uint8_t isa8_ega_device::read(offs_t offset)
 {
 	uint8_t data = 0xFF;
 
-	if ( !machine().side_effects_disabled() && !( m_graphics_controller.data[5] & 0x10 ) )
+	if ( !machine().side_effects_disabled() )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];
@@ -981,8 +981,23 @@ uint8_t isa8_ega_device::read(offs_t offset)
 	if ( m_graphics_controller.data[5] & 0x08 )
 	{
 		// Read mode #1
-		popmessage("ega: Read mode 1 not supported yet!");
-		printf("EGA: Read mode 1 not supported yet!\n");
+		data = 0;
+		for ( int i = 0; i < 8; i++ )
+		{
+			int bit = 1;
+			for ( int p = 0; p < 4; p++ )
+			{
+				if ( BIT(m_graphics_controller.data[7], p) )
+				{
+					if ( BIT(m_graphics_controller.data[2], p) != BIT(m_plane[p][offset & 0xffff], i) )
+					{
+						bit = 0;
+						break;
+					}
+				}
+			}
+			data |= bit << i;
+		}
 	}
 	else
 	{
@@ -1036,7 +1051,6 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 {
 	uint8_t d[4];
 	uint8_t alu[4];
-	uint8_t target_mask = m_graphics_controller.data[8];
 
 	alu[0] =alu[1] = alu[2] = alu[3] = 0;
 
@@ -1079,7 +1093,6 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		alu[1] = m_read_latch[1];
 		alu[2] = m_read_latch[2];
 		alu[3] = m_read_latch[3];
-		target_mask = 0xff;
 		break;
 
 	case 2:     // Write mode 2
@@ -1112,25 +1125,25 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		{
 			// Plane 0
 			// Bit selection
-			m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+			m_plane[0][offset] = alu[0];
 		}
 		if ( m_sequencer.data[2] & 0x02 )
 		{
 			// Plane 1
 			// Bit selection
-			m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+			m_plane[1][offset] = alu[1];
 		}
 		if ( m_sequencer.data[2] & 0x04 )
 		{
 			// Plane 2
 			// Bit selection
-			m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+			m_plane[2][offset] = alu[2];
 		}
 		if ( m_sequencer.data[2] & 0x08 )
 		{
 			// Plane 3
 			// Bit selection
-			m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+			m_plane[3][offset] = alu[3];
 		}
 	}
 	else
@@ -1145,13 +1158,13 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 			{
 				// Plane 1
 				// Bit selection
-				m_plane[1][offset] = ( m_plane[1][offset] & ~ target_mask ) | ( alu[1] & target_mask );
+				m_plane[1][offset] = alu[1];
 			}
 			if ( ( m_sequencer.data[2] & 0x08 ) && ! ( m_sequencer.data[4] & 0x01 ) )
 			{
 				// Plane 3
 				// Bit selection
-				m_plane[3][offset] = ( m_plane[3][offset] & ~ target_mask ) | ( alu[3] & target_mask );
+				m_plane[3][offset] = alu[3];
 			}
 		}
 		else
@@ -1162,13 +1175,13 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 			{
 				// Plane 0
 				// Bit selection
-				m_plane[0][offset] = ( m_plane[0][offset] & ~ target_mask ) | ( alu[0] & target_mask );
+				m_plane[0][offset] = alu[0];
 			}
 			if ( ( m_sequencer.data[2] & 0x04 ) && ! ( m_sequencer.data[4] & 0x01 ) )
 			{
 				// Plane 2
 				// Bit selection
-				m_plane[2][offset] = ( m_plane[2][offset] & ~ target_mask ) | ( alu[2] & target_mask );
+				m_plane[2][offset] = alu[2];
 			}
 		}
 	}

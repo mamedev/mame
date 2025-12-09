@@ -82,10 +82,10 @@ void exidy440_sound_device::device_add_mconfig(machine_config &config)
 	MC6809(config, m_audiocpu, EXIDY440_AUDIO_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &exidy440_sound_device::exidy440_audio_map);
 
-//  MC3418(config, "cvsd1", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-//  MC3418(config, "cvsd2", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-//  MC3417(config, "cvsd3", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-//  MC3417(config, "cvsd4", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+//  MC3418(config, "cvsd1", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  MC3418(config, "cvsd2", EXIDY440_MC3418_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  MC3417(config, "cvsd3", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
+//  MC3417(config, "cvsd4", EXIDY440_MC3417_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 //-------------------------------------------------
@@ -205,15 +205,15 @@ void exidy440_sound_device::add_and_scale_samples(int ch, int32_t *dest, int sam
  *
  *************************************/
 
-void exidy440_sound_device::mix_to_16(write_stream_view &dest_left, write_stream_view &dest_right)
+void exidy440_sound_device::mix_to_16(sound_stream &stream)
 {
 	int32_t *mixer_left = &m_mixer_buffer_left[0];
 	int32_t *mixer_right = &m_mixer_buffer_right[0];
 
-	for (int i = 0; i < dest_left.samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		dest_left.put_int_clamp(i, *mixer_left++, 32768);
-		dest_right.put_int_clamp(i, *mixer_right++, 32768);
+		stream.put_int_clamp(0, i, *mixer_left++, 32768);
+		stream.put_int_clamp(1, i, *mixer_right++, 32768);
 	}
 }
 
@@ -789,17 +789,17 @@ void exidy440_sound_device::sound_banks_w(offs_t offset, uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void exidy440_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void exidy440_sound_device::sound_stream_update(sound_stream &stream)
 {
 	/* reset the mixer buffers */
-	std::fill_n(&m_mixer_buffer_left[0], outputs[0].samples(), 0);
-	std::fill_n(&m_mixer_buffer_right[0], outputs[0].samples(), 0);
+	std::fill_n(&m_mixer_buffer_left[0], stream.samples(), 0);
+	std::fill_n(&m_mixer_buffer_right[0], stream.samples(), 0);
 
 	/* loop over channels */
 	for (int ch = 0; ch < 4; ch++)
 	{
 		sound_channel_data *channel = &m_sound_channel[ch];
-		int length, volume, left = outputs[0].samples();
+		int length, volume, left = stream.samples();
 		int effective_offset;
 
 		/* if we're not active, bail */
@@ -837,5 +837,5 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 	}
 
 	/* all done, time to mix it */
-	mix_to_16(outputs[0], outputs[1]);
+	mix_to_16(stream);
 }

@@ -97,12 +97,11 @@ void psr400_state::psr500(machine_config &config)
 
 	HD6305V0(config, m_mpscpu, 8_MHz_XTAL).set_disable(); // HD63B05V0D73P (mislabeled HD63B50 on schematic)
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	multipcm_device &gew8(MULTIPCM(config, "gew8", 9.4_MHz_XTAL)); // YMW-258-F
-	gew8.add_route(1, "lspeaker", 1.0);
-	gew8.add_route(0, "rspeaker", 1.0);
+	gew8.add_route(1, "speaker", 1.0, 0);
+	gew8.add_route(0, "speaker", 1.0, 1);
 
 	//YM3413(config, "ldsp"); // PSR-500 only (has its own 256K-bit PSRAM)
 }
