@@ -195,7 +195,7 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 	if(data & 0x80)
 	{
 		m_irq8 = true;
-		m_isa->irq5_w(ASSERT_LINE);
+		m_irqs->in_w<0>(ASSERT_LINE);
 	}
 	m_ctrl8 = data;
 }
@@ -239,7 +239,7 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 	if(data & 0x80)
 	{
 		m_irq16 = true;
-		m_isa->irq5_w(ASSERT_LINE);
+		m_irqs->in_w<1>(ASSERT_LINE);
 	}
 	m_ctrl16 = data;
 }
@@ -421,11 +421,12 @@ void sb16_lle_device::sb16_data(address_map &map)
 
 void sb16_lle_device::host_io(address_map &map)
 {
-	map(0x4, 0x5).rw(m_mixer, FUNC(ct1745_mixer_device::read), FUNC(ct1745_mixer_device::write));
-	map(0x6, 0x7).w(FUNC(sb16_lle_device::dsp_reset_w));
-	map(0xa, 0xb).r(FUNC(sb16_lle_device::host_data_r));
-	map(0xc, 0xd).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
-	map(0xe, 0xf).r(FUNC(sb16_lle_device::dsp_rbuf_status_r));
+	map(0x04, 0x05).rw(m_mixer, FUNC(ct1745_mixer_device::read), FUNC(ct1745_mixer_device::write));
+	map(0x06, 0x07).w(FUNC(sb16_lle_device::dsp_reset_w));
+	map(0x0a, 0x0b).r(FUNC(sb16_lle_device::host_data_r));
+	map(0x0c, 0x0d).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
+	map(0x0e, 0x0f).r(FUNC(sb16_lle_device::dsp_rbuf_status_r));
+//	map(0x10, 0x13) CD-ROM interface
 }
 
 const tiny_rom_entry *sb16_lle_device::device_rom_region() const
@@ -454,6 +455,9 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 	m_mixer->irq_status_cb().set([this] () {
 		return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
 	});
+
+	// TODO: PnP line
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) {m_isa->irq5_w(state ? ASSERT_LINE : CLEAR_LINE); });
 
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 0); // unknown DAC
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 1); // unknown DAC
@@ -657,14 +661,14 @@ uint8_t sb16_lle_device::dsp_rbuf_status_r(offs_t offset)
 		if(!machine().side_effects_disabled())
 		{
 			m_irq16 = false;
-			m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
+			m_irqs->in_w<1>(CLEAR_LINE);
 		}
 		return 0xff;
 	}
 	if(!machine().side_effects_disabled())
 	{
 		m_irq8 = false;
-		m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
+		m_irqs->in_w<0>(CLEAR_LINE);
 	}
 	return m_data_out << 7;
 }
@@ -674,16 +678,21 @@ uint8_t sb16_lle_device::mpu401_r(offs_t offset)
 {
 	uint8_t res;
 
-	m_irq_midi = false;
-	m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		m_irq_midi = false;
+		m_irqs->in_w<2>(CLEAR_LINE);
+	}
 	if(offset == 0) // data
 	{
 		res = m_mpu_byte;
-		m_mpu_byte = 0xff;
+		if (!machine().side_effects_disabled())
+			m_mpu_byte = 0xff;
 	}
 	else // status
 	{
-		res = ((m_mpu_byte != 0xff)?0:0x80) | 0x3f; // bit 7 queue empty (DSR), bit 6 DRR (Data Receive Ready?)
+		// bit 7 queue empty (DSR), bit 6 DRR (Data Receive Ready?)
+		res = ((m_mpu_byte != 0xff) ? 0 : 0x80) | 0x3f;
 	}
 
 	return res;
@@ -702,8 +711,8 @@ void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 		switch(data)
 		{
 			case 0xff: // reset
-				m_isa->irq5_w(ASSERT_LINE);
 				m_irq_midi = true;
+				m_irqs->in_w<2>(ASSERT_LINE);
 				m_mpu_byte = 0xfe;
 				break;
 		}
@@ -717,6 +726,7 @@ sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag,
 	m_mixer(*this, "mixer"),
 	m_ldac(*this, "ldac"),
 	m_rdac(*this, "rdac"),
+	m_irqs(*this, "irqs"),
 	m_joy(*this, "pc_joy"),
 	m_cpu(*this, "sb16_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_freq(0), m_mode(0), m_dac_fifo_ctrl(0), m_adc_fifo_ctrl(0), m_ctrl8(0), m_ctrl16(0), m_mpu_byte(0),
 	m_dma8_len(0), m_dma16_len(0), m_dma8_cnt(0), m_dma16_cnt(0), m_adc_fifo_head(0), m_adc_fifo_tail(0), m_dac_fifo_head(0), m_dac_fifo_tail(0), m_adc_r(false), m_dac_r(false), m_adc_h(false),
@@ -767,6 +777,9 @@ void sb16_lle_device::device_reset()
 	m_dac_r = m_adc_r = false;
 	m_dac_h = m_adc_h = false;
 	m_irq8 = m_irq16 = m_irq_midi = false;
+	m_irqs->in_w<0>(0);
+	m_irqs->in_w<1>(0);
+	m_irqs->in_w<2>(0);
 	m_dma8_done = m_dma16_done = false;
 }
 
