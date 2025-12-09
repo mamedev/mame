@@ -84,15 +84,29 @@ void jammin_state::prg_map(address_map &map)
 
 	map(0x5000, 0x50ff).ram();
 
-	map(0x6000, 0x6bff).ram(); // are sprites in here?
+	map(0x6000, 0x6bff).ram();
 
-	map(0x7000, 0x73ff).ram();
+	map(0x7000, 0x73ff).ram(); // sprites?
 	map(0x7400, 0x77ff).ram().w(FUNC(jammin_state::bgram_w)).share(m_bgram);
-	map(0x7800, 0x7bff).ram();
+
+	map(0x7800, 0x7800).nopw(); // DMACTL
+	map(0x7801, 0x7801).nopw();
+	map(0x7802, 0x7802).nopw();
+	map(0x7803, 0x7803).nopw();
+
+	map(0x7808, 0x7808).nopw();
+
 	map(0x7c00, 0x7c00).portr("IN0"); // player inputs
 	map(0x7c80, 0x7c80).portr("IN1"); // player inputs
 	map(0x7d07, 0x7d07).portr("IN2"); // Coin is in here
 	map(0x7d80, 0x7d80).portr("IN3"); // unknown
+
+	map(0x7d82, 0x7d82).nopw(); // VFLIP
+	map(0x7d83, 0x7d83).nopw(); // MOCNTL
+	map(0x7d84, 0x7d84).nopw(); // NMILAT
+	map(0x7d85, 0x7d85).nopw(); // DMAGO
+	map(0x7d86, 0x7d86).nopw(); // PAL1
+	map(0x7d87, 0x7d87).nopw(); // PAL2
 
 	map(0x8000, 0xbfff).rom();
 }
