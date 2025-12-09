@@ -176,22 +176,22 @@ static const gfx_layout tile_layout2 =
 	16*8
 };
 
-// does't seem to be tile gfx?
+
 static const gfx_layout tile_layout3 =
 {
-	8,8,
+	16,16,
 	RGN_FRAC(1,1),
-	2,
-	{ 0,1 },
-	{ 0,2,4,6,8,10,12,14 },
-	{ 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16 },
-	8*16
+	4,
+	{ 0,1,2,3 },
+	{ 52,48,60,56, 36,32,44,40, 20,16,28,24, 4,0,12,8 },
+	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+	16*64
 };
 
 static GFXDECODE_START( gfx_jammin )
 	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 0, 1 )
 	GFXDECODE_ENTRY( "tiles2", 0, tile_layout2, 0, 1 )
-	GFXDECODE_ENTRY( "unknown_data", 0, tile_layout3, 0, 1 )
+	GFXDECODE_ENTRY( "tiles3", 0, tile_layout3, 0, 1 )
 GFXDECODE_END
 
 void jammin_state::machine_start()
@@ -246,7 +246,7 @@ ROM_START( jammin )
 	ROM_LOAD( "jammin.7e", 0x1000, 0x0800, CRC(9563c301) SHA1(3947af64f3becf36afaacdb8c962bfccc236525d) )
 	ROM_LOAD( "jammin.7f", 0x1800, 0x0800, CRC(26c7f3b8) SHA1(a0a13ce692bcf40104099a4d9bb2c36aca885350) )
 
-	ROM_REGION( 0x4000, "unknown_data", 0 ) // not tile based? (what is this?)
+	ROM_REGION( 0x4000, "tiles3", 0 ) // more sprites?
 	ROM_LOAD( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
 
 	ROM_REGION( 0x100, "proms_col_n", 0 ) // lookup?
