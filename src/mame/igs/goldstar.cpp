@@ -20906,6 +20906,12 @@ ROM_START( top7 )
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "gal16v8d.f10",   0x000, 0x117, CRC(6655473e) SHA1(f7bdd98a5ec5d3fc53332c12ea81c03af02d561a) )
+	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, CRC(4dbf87ec) SHA1(338d9fabba8928e25ca39fbe717c5e6ce35b7278) )
+	ROM_LOAD( "palce16v8h.f14", 0x400, 0x117, CRC(12a5e577) SHA1(ee5ea1afef775db3a9f848b5cc5384bc10b4e349) )
+	ROM_LOAD( "palce16v8h.g13", 0x600, 0x117, CRC(deee0b94) SHA1(3682affbe803ffa8b436346f159c3818d6714d1a) )
+
 	ROM_REGION( 0x400, "plds2", 0 )  // extended PLDs (bankswitching)
 	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
 	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
@@ -20945,12 +20951,22 @@ ROM_START( top7a )
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "gal16v8d.f10",   0x000, 0x117, CRC(6655473e) SHA1(f7bdd98a5ec5d3fc53332c12ea81c03af02d561a) )
+	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, CRC(4dbf87ec) SHA1(338d9fabba8928e25ca39fbe717c5e6ce35b7278) )
+	ROM_LOAD( "palce16v8h.f14", 0x400, 0x117, CRC(12a5e577) SHA1(ee5ea1afef775db3a9f848b5cc5384bc10b4e349) )
+	ROM_LOAD( "palce16v8h.g13", 0x600, 0x117, CRC(deee0b94) SHA1(3682affbe803ffa8b436346f159c3818d6714d1a) )
+
 	ROM_REGION( 0x400, "plds2", 0 )  // extended PLDs (bankswitching)
 	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
 	ROM_LOAD( "peel18cv8_edge.j15",    0x200, 0x155, CRC(b0395c06) SHA1(12b79dffda76c75abe30f36c74b53a87a42de735) )
 ROM_END
 
 /*
+  WAR 3
+  CHERRY BEST
+  1996
+
   WANG QL-0B V1.00 in NVRAM,
   SANGHO in GFX ROMs
 
@@ -20983,6 +20999,12 @@ ROM_START( war3cb )
 	ROM_REGION( 0x200, "proms", 0 )  // not yet dumped
 	ROM_LOAD( "prom1",   0x000, 0x100, BAD_DUMP CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "prom2",   0x100, 0x100, BAD_DUMP CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "gal16v8d.f10",   0x000, 0x117, CRC(6655473e) SHA1(f7bdd98a5ec5d3fc53332c12ea81c03af02d561a) )
+	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, CRC(4dbf87ec) SHA1(338d9fabba8928e25ca39fbe717c5e6ce35b7278) )
+	ROM_LOAD( "palce16v8h.f14", 0x400, 0x117, CRC(12a5e577) SHA1(ee5ea1afef775db3a9f848b5cc5384bc10b4e349) )
+	ROM_LOAD( "palce16v8h.g13", 0x600, 0x117, CRC(deee0b94) SHA1(3682affbe803ffa8b436346f159c3818d6714d1a) )
 
 	ROM_REGION( 0x400, "plds2", 0 )  // extended PLDs (bankswitching)
 	ROM_LOAD( "peel18cv8_inside.i15",  0x000, 0x155, CRC(77eaa6fb) SHA1(33c1e00bef82b526d21e628077a8eaf96b9c1d3a) )
