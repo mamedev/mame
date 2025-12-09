@@ -5213,6 +5213,21 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		</part>
 	</software>
 
+	<software name="tentacle" supported="no">
+		<!-- origin: redump.org -->
+		<description>Maniac Mansion: Day of the Tentacle (Europe)</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<notes><![CDATA[
+Has [SB16] issues in both HLE and LLE cores
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="maniac_mansion_-_day_of_the_tentacle_(europe)" sha1="1376bed342aad4d5319c08707808f8b061ef9c4d"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="masterlvls">
 		<description>Master Levels for Doom II</description>
 		<year>1995</year>
