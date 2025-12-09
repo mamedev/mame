@@ -167,13 +167,13 @@ static const gfx_layout tile_layout =
 
 static const gfx_layout tile_layout2 =
 {
-	8,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
-	16*8
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 8 },
+	{ 0,1,2,3,4,5,6,7, 16,17,18,19,20,21,22,23 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
+	16*32
 };
 
 
@@ -183,7 +183,7 @@ static const gfx_layout tile_layout3 =
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
-	{ 52,48,60,56, 36,32,44,40, 20,16,28,24, 4,0,12,8 },
+	{ 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60 },
 	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
 	16*64
 };
@@ -240,14 +240,16 @@ ROM_START( jammin )
 	ROM_LOAD( "jambak.pl0", 0x0000, 0x0800, CRC(af808d29) SHA1(cad060ee4e529f9a2ffa9675682b9e17bed4dffe) )
 	ROM_LOAD( "jambak.pl1", 0x0800, 0x0800, CRC(43eaccef) SHA1(37e032b60c0bbaea81b55b4d137cb2d9d047e521) )
 
-	ROM_REGION( 0x2000, "tiles2", 0 ) // sprites?
-	ROM_LOAD( "jammin.7c", 0x0000, 0x0800, CRC(82361b24) SHA1(ed070586296c329cb88e3dfc4741d591ec59fb8d) )
-	ROM_LOAD( "jammin.7d", 0x0800, 0x0800, CRC(0f02eb55) SHA1(b97ee07dbd71bdc698ac775a721f220afd6bb7cc) )
-	ROM_LOAD( "jammin.7e", 0x1000, 0x0800, CRC(9563c301) SHA1(3947af64f3becf36afaacdb8c962bfccc236525d) )
-	ROM_LOAD( "jammin.7f", 0x1800, 0x0800, CRC(26c7f3b8) SHA1(a0a13ce692bcf40104099a4d9bb2c36aca885350) )
+	// do these sprite regions need combining into 6bpp gfx?
+	// the layouts are very different
+	ROM_REGION( 0x2000, "tiles2", 0 ) // 2bpp of sprite data
+	ROM_LOAD32_BYTE( "jammin.7c", 0x0000, 0x0800, CRC(82361b24) SHA1(ed070586296c329cb88e3dfc4741d591ec59fb8d) )
+	ROM_LOAD32_BYTE( "jammin.7e", 0x0001, 0x0800, CRC(9563c301) SHA1(3947af64f3becf36afaacdb8c962bfccc236525d) )
+	ROM_LOAD32_BYTE( "jammin.7d", 0x0002, 0x0800, CRC(0f02eb55) SHA1(b97ee07dbd71bdc698ac775a721f220afd6bb7cc) )
+	ROM_LOAD32_BYTE( "jammin.7f", 0x0003, 0x0800, CRC(26c7f3b8) SHA1(a0a13ce692bcf40104099a4d9bb2c36aca885350) )
 
-	ROM_REGION( 0x4000, "tiles3", 0 ) // more sprites?
-	ROM_LOAD( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
+	ROM_REGION( 0x4000, "tiles3", 0 ) // 4bpp of sprite data
+	ROM_LOAD16_WORD_SWAP( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
 
 	ROM_REGION( 0x100, "proms_col_n", 0 ) // lookup?
 	ROM_LOAD( "col2n.bin", 0x000, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
