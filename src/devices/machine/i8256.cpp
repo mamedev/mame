@@ -253,7 +253,8 @@ void i8256_device::device_reset()
 
 uint8_t i8256_device::acknowledge()
 {
-	uint8_t vector = m_current_interrupt_level;
+	// c7 = rst 0, ff = rst 7
+	const uint8_t vector = 0xc7 | (m_current_interrupt_level << 3);
 	m_out_int_cb(CLEAR_LINE); // deassert interrupt
 	m_current_interrupt_level = -1; // no current interrupt
 	return vector;
