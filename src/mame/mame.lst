@@ -2157,6 +2157,9 @@ maxf_ng
 maxforce
 vcircle
 
+@source:atari/jammin.cpp
+jammin
+
 @source:atari/jedi.cpp
 jedi
 
