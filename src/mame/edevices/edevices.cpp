@@ -23,6 +23,7 @@ DEFINE_DEVICE_TYPE(EDEVICES_SFORCE_VID, edevices_sforce_device, "edevices_sforce
 
 edevices_device::edevices_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_gfx_interface(mconfig, *this),
 	m_bg_videoram(*this, finder_base::DUMMY_TAG),
 	m_mlow_videoram(*this, finder_base::DUMMY_TAG),
 	m_mhigh_videoram(*this, finder_base::DUMMY_TAG),
@@ -32,8 +33,6 @@ edevices_device::edevices_device(const machine_config &mconfig, device_type type
 	m_mhigh_scrollram(*this, finder_base::DUMMY_TAG),
 	m_vidattrram(*this, finder_base::DUMMY_TAG),
 	m_spriteram(*this, finder_base::DUMMY_TAG),
-	m_gfxdecode(*this, finder_base::DUMMY_TAG),
-	m_palette(*this, finder_base::DUMMY_TAG),
 	m_spritexoffs(0) // might come from the clock, twinbrat has different video timings and resolution
 {
 }
@@ -52,10 +51,10 @@ edevices_sforce_device::edevices_sforce_device(const machine_config &mconfig, co
 
 void edevices_device::device_start()
 {
-	m_bg_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_bg_tile_info)),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_mlow_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_mlow_tile_info)),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_mhigh_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_mhigh_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_tx_tile_info)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_bg_tilemap    = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_bg_tile_info)),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_mlow_tilemap  = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_mlow_tile_info)),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_mhigh_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_mhigh_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
+	m_tx_tilemap    = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(edevices_device::get_tx_tile_info)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	m_mlow_tilemap->set_transparent_pen(0);
 	m_mhigh_tilemap->set_transparent_pen(0);
@@ -135,32 +134,32 @@ void edevices_device::sprites_commands_w(uint16_t data)
 
 TILE_GET_INFO_MEMBER(edevices_device::get_bg_tile_info)
 {
-	int tileno = m_bg_videoram[tile_index] & 0x1fff;
-	int colour = (m_bg_videoram[tile_index] & 0xe000) >> 13;
+	int const tileno = m_bg_videoram[tile_index] & 0x1fff;
+	int const colour = (m_bg_videoram[tile_index] & 0xe000) >> 13;
 
 	tileinfo.set(4, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(edevices_device::get_mlow_tile_info)
 {
-	int tileno = m_mlow_videoram[tile_index] & 0x1fff;
-	int colour = (m_mlow_videoram[tile_index] & 0xe000) >> 13;
+	int const tileno = m_mlow_videoram[tile_index] & 0x1fff;
+	int const colour = (m_mlow_videoram[tile_index] & 0xe000) >> 13;
 
 	tileinfo.set(3, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(edevices_device::get_mhigh_tile_info)
 {
-	int tileno = m_mhigh_videoram[tile_index] & 0x1fff;
-	int colour = (m_mhigh_videoram[tile_index] & 0xe000) >> 13;
+	int const tileno = m_mhigh_videoram[tile_index] & 0x1fff;
+	int const colour = (m_mhigh_videoram[tile_index] & 0xe000) >> 13;
 
 	tileinfo.set(2, tileno, colour, 0);
 }
 
 TILE_GET_INFO_MEMBER(edevices_device::get_tx_tile_info)
 {
-	int tileno = m_tx_videoram[tile_index] & 0x1fff;
-	int colour = (m_tx_videoram[tile_index] & 0xe000) >> 13;
+	int const tileno = m_tx_videoram[tile_index] & 0x1fff;
+	int const colour = (m_tx_videoram[tile_index] & 0xe000) >> 13;
 
 	tileinfo.set(1, tileno, colour, 0);
 }
@@ -194,28 +193,26 @@ void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	const uint16_t *source = m_sprites_buffer + 0x400 - 4;
 	const uint16_t *finish = m_sprites_buffer;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int x, y, color, flipx, dy, pri, pri_mask, i;
 
 	while (source >= finish)
 	{
 		/* draw sprite */
-		if (source[0] & 0x0800)
+		if (BIT(source[0], 11))
 		{
-			y = 0x1ff - (source[0] & 0x01ff);
-			x = (source[3] & 0x3ff) - m_spritexoffs;
+			int const y = 0x1ff - (source[0] & 0x01ff);
+			int const x = (source[3] & 0x3ff) - m_spritexoffs;
 
-			color = source[1] & 0x000f;
-			flipx = source[1] & 0x0200;
+			int const color = source[1] & 0x000f;
+			bool const flipx = BIT(source[1], 9);
 
-			dy = (source[0] & 0xf000) >> 12;
+			int const dy = (source[0] & 0xf000) >> 12;
 
-			pri = get_priority(source);
-			pri_mask = ~((1 << (pri + 1)) - 1);     // Above the first "pri" levels
+			int const pri = get_priority(source);
+			uint32_t const pri_mask = ~((1 << (pri + 1)) - 1);     // Above the first "pri" levels
 
-			for (i = 0; i <= dy; i++)
+			for (int i = 0; i <= dy; i++)
 			{
-				gfx->prio_transpen(bitmap,
+				gfx(0)->prio_transpen(bitmap,
 					cliprect,
 					source[2] + i,
 					color,
@@ -224,7 +221,7 @@ void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 					screen.priority(), pri_mask, 0);
 
 				/* wrap around x */
-				gfx->prio_transpen(bitmap,
+				gfx(0)->prio_transpen(bitmap,
 					cliprect,
 					source[2] + i,
 					color,
@@ -233,7 +230,7 @@ void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 					screen.priority(), pri_mask, 0);
 
 				/* wrap around y */
-				gfx->prio_transpen(bitmap,
+				gfx(0)->prio_transpen(bitmap,
 					cliprect,
 					source[2] + i,
 					color,
@@ -242,7 +239,7 @@ void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 					screen.priority(), pri_mask, 0);
 
 				/* wrap around x & y */
-				gfx->prio_transpen(bitmap,
+				gfx(0)->prio_transpen(bitmap,
 					cliprect,
 					source[2] + i,
 					color,
@@ -270,42 +267,40 @@ void edevices_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 
 uint32_t edevices_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	/* xscrolls - Steel Force clearly shows that each layer needs -1 scroll compared to the previous, do enable flags change this?  */
 	if (BIT(m_vidattrram[6], 0))
 	{
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[i] + 18);
 	}
 	else
 	{
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 			m_bg_tilemap->set_scrollx(i, m_bg_scrollram[0] + 18);
 	}
 
 	if (BIT(m_vidattrram[6], 2))
 	{
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[i] + 17);
 	}
 	else
 	{
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 			m_mlow_tilemap->set_scrollx(i, m_mlow_scrollram[0] + 17);
 	}
 
 	if (BIT(m_vidattrram[6], 4))
 	{
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[i] + 16);
 	}
 	else
 	{
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 			m_mhigh_tilemap->set_scrollx(i, m_mhigh_scrollram[0] + 16);
 	}
 

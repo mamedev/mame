@@ -1,23 +1,21 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese
-/*************************************************************************************
+/**************************************************************************************************
 
-    SMC-777 (c) 1983 Sony
+SMC-777 (c) 1983 Sony
 
-    driver by Angelo Salese
+TODO:
+- Implement SMC-70 specific features;
+- Implement GFX modes other than 160x100x4
+- ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
+  We currently use an hackish implementation until the MAME/MESS framework can
+  support that ...
+- keyboard input is very sluggish, convert to device_matrix_interface;
+- cursor stuck in Bird Crash;
+- add mc6845 features;
+- interlace (cfr. cpm22 in setup mode);
 
-    TODO:
-    - Implement SMC-70 specific features;
-    - Implement GFX modes other than 160x100x4
-    - ROM/RAM bankswitch, it apparently happens after one instruction prefetching.
-      We currently use an hackish implementation until the MAME/MESS framework can
-      support that ...
-    - keyboard input is very sluggish;
-    - cursor stuck in Bird Crash;
-    - add mc6845 features;
-    - many other missing features;
-
-**************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -108,12 +106,12 @@ private:
 	void ramdac_w(offs_t offset, uint8_t data);
 	uint8_t gcw_r();
 	void gcw_w(uint8_t data);
-	uint8_t smc777_mem_r(offs_t offset);
-	void smc777_mem_w(offs_t offset, uint8_t data);
+	uint8_t main_map_r(offs_t offset);
+	void main_map_w(offs_t offset, uint8_t data);
 	uint8_t vsync_irq_status_r();
 	void vsync_irq_enable_w(uint8_t data);
-	void smc777_palette(palette_device &palette) const;
-	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette_init(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vsync_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
@@ -126,8 +124,8 @@ private:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	void smc777_io(address_map &map) ATTR_COLD;
-	void smc777_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -173,7 +171,7 @@ void smc777_state::video_start()
 {
 }
 
-uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t smc777_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t count;
 
@@ -489,7 +487,7 @@ void smc777_state::fdc1_select_w(uint8_t data)
 		floppy->mon_w(0);
 
 	if(data & 0xf0)
-		printf("floppy access %02x\n", data);
+		logerror("floppy access %02x\n", data);
 }
 
 void smc777_state::fdc_intrq_w(int state)
@@ -522,7 +520,7 @@ uint8_t smc777_state::key_r(offs_t offset)
 		default:
 		{
 			//if(offset == 1)
-			//  printf("Unknown keyboard command %02x read-back\n",m_keyb_cmd);
+			//  logerror("Unknown keyboard command %02x read-back\n",m_keyb_cmd);
 
 			return (offset == 0) ? 0x00 : (machine().rand() & 0x5);
 		}
@@ -532,7 +530,7 @@ uint8_t smc777_state::key_r(offs_t offset)
 	//return 0x00;
 }
 
-/* TODO: the packet commands strikes me as something I've already seen before, don't remember where however ... */
+// TODO: pinpoint interface type
 void smc777_state::key_w(offs_t offset, uint8_t data)
 {
 	if(offset == 1) //keyboard command
@@ -546,7 +544,7 @@ void smc777_state::key_w(offs_t offset, uint8_t data)
 void smc777_state::border_col_w(uint8_t data)
 {
 	if(data & 0xf0)
-		printf("Special border color enabled %02x\n",data);
+		logerror("Special border color enabled %02x\n",data);
 
 	m_backdrop_pen = data & 0xf;
 }
@@ -563,7 +561,7 @@ uint8_t smc777_state::io_status_1c_r()
 	 * ID      ---- -x-- 0=SMC-777 1=SMC-70
 	 * MD      ---- --xx [SMC-70] boot mode (00=DISK; 10=ROM; 11=EXT)
 	 */
-	printf("System R\n");
+	logerror("System R\n");
 
 	return 0;
 }
@@ -643,7 +641,7 @@ void smc777_state::color_mode_w(uint8_t data)
 	switch(data & 0x07)
 	{
 		case 0x06: m_pal_mode = (data & 0x10) ^ 0x10; break;
-		default: printf("Color FF %02x\n",data); break;
+		default: logerror("Color FF %02x\n",data); break;
 	}
 }
 
@@ -653,14 +651,14 @@ void smc777_state::ramdac_w(offs_t offset, uint8_t data)
 	pal_index = (offset & 0xf00) >> 8;
 
 	if(data & 0x0f)
-		printf("RAMdac used with data bits 0-3 set (%02x)\n",data);
+		logerror("RAMdac used with data bits 0-3 set (%02x)\n",data);
 
 	switch((offset & 0x3000) >> 12)
 	{
 		case 0: m_pal.r = (data & 0xf0) >> 4; m_palette->set_pen_color(pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
 		case 1: m_pal.g = (data & 0xf0) >> 4; m_palette->set_pen_color(pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
 		case 2: m_pal.b = (data & 0xf0) >> 4; m_palette->set_pen_color(pal_index, pal4bit(m_pal.r), pal4bit(m_pal.g), pal4bit(m_pal.b)); break;
-		case 3: printf("RAMdac used with gradient index = 3! pal_index = %02x data = %02x\n",pal_index,data); break;
+		case 3: logerror("RAMdac used with gradient index = 3! pal_index = %02x data = %02x\n",pal_index,data); break;
 	}
 }
 
@@ -669,29 +667,27 @@ uint8_t smc777_state::gcw_r()
 	return m_display_reg;
 }
 
-/* x */
+/*
+ * x--- ---- text mode (0 = 80x25 1 = 40x25)
+ * -x-- ---- text page (in 40x25 mode)
+ * --x- ---- color mode (1=for 2bpp mode, blue is replaced with white)
+ * ---x ---- [SMC-70] interlace
+ * ---- xxyy gfx mode (model dependant)
+ * [SMC-70]
+ * ---- 11-- 640x400x1 bpp
+ * ---- 10-- 640x200x2 bpp
+ * ---- 01-- 320x200x4 bpp
+ * ---- 00yy 160x100x4 bpp, bits 0-1 selects page
+ * [SMC-777]
+ * ---- 1--- 640x200x2 bpp
+ * ---- 0--- 320x200x4 bpp
+ */
 void smc777_state::gcw_w(uint8_t data)
 {
-	/*
-	 * x--- ---- text mode (0 = 80x25 1 = 40x25)
-	 * -x-- ---- text page (in 40x25 mode)
-	 * --x- ---- color mode (1=for 2bpp mode, blue is replaced with white)
-	 * ---x ---- [SMC-70] interlace
-	 * ---- xxyy gfx mode (model dependant)
-	 * [SMC-70]
-	 * ---- 11-- 640x400x1 bpp
-	 * ---- 10-- 640x200x2 bpp
-	 * ---- 01-- 320x200x4 bpp
-	 * ---- 00yy 160x100x4 bpp, bits 0-1 selects page
-	 * [SMC-777]
-	 * ---- 1--- 640x200x2 bpp
-	 * ---- 0--- 320x200x4 bpp
-	 */
-
 	m_display_reg = data;
 }
 
-uint8_t smc777_state::smc777_mem_r(offs_t offset)
+uint8_t smc777_state::main_map_r(offs_t offset)
 {
 	uint8_t z80_r;
 
@@ -713,7 +709,7 @@ uint8_t smc777_state::smc777_mem_r(offs_t offset)
 	return m_work_ram[offset];
 }
 
-void smc777_state::smc777_mem_w(offs_t offset, uint8_t data)
+void smc777_state::main_map_w(offs_t offset, uint8_t data)
 {
 	m_work_ram[offset] = data;
 }
@@ -739,13 +735,13 @@ void smc777_state::vsync_irq_enable_w(uint8_t data)
 	// TODO: clear idf on 1->0 irq mask transition?
 }
 
-void smc777_state::smc777_mem(address_map &map)
+void smc777_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(smc777_state::smc777_mem_r), FUNC(smc777_state::smc777_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(smc777_state::main_map_r), FUNC(smc777_state::main_map_w));
 }
 
-void smc777_state::smc777_io(address_map &map)
+void smc777_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x07).select(0xff00).rw(FUNC(smc777_state::vram_r), FUNC(smc777_state::vram_w));
@@ -790,7 +786,7 @@ void smc777_state::smc777_io(address_map &map)
 	map(0x80, 0xff).select(0xff00).rw(FUNC(smc777_state::fbuf_r), FUNC(smc777_state::fbuf_w));
 }
 
-/* Input ports */
+
 static INPUT_PORTS_START( smc777 )
 	PORT_START("key0") //0x00-0x07
 	PORT_BIT (0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
@@ -1102,9 +1098,9 @@ void smc777_state::machine_reset()
 }
 
 
-/* set-up SMC-70 mode colors */
-void smc777_state::smc777_palette(palette_device &palette) const
+void smc777_state::palette_init(palette_device &palette) const
 {
+	// set-up SMC-70 mode colors
 	for(int i = 0x10; i < 0x18; i++)
 	{
 		uint8_t const r = BIT(i, 2);
@@ -1137,10 +1133,9 @@ void smc777_state::smc777(machine_config &config)
 {
 	constexpr XTAL MASTER_CLOCK = 32.2238_MHz_XTAL;
 
-	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_CLOCK / 8); // nominally 4.028 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::smc777_mem);
-	m_maincpu->set_addrmap(AS_IO, &smc777_state::smc777_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &smc777_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &smc777_state::io_map);
 
 	I8041A(config, "mcu", 6_MHz_XTAL).set_disable();
 
@@ -1154,16 +1149,19 @@ void smc777_state::smc777(machine_config &config)
 	m_ioctrl->q_out_cb<6>().set(FUNC(smc777_state::printer_strb_w));
 	m_ioctrl->q_out_cb<7>().set(FUNC(smc777_state::cas_out_w));
 
-	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: retrieve defaults from 6845
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(0x400, 400);
 	m_screen->set_visarea(0, 660-1, 0, 220-1); //normal 640 x 200 + 20 pixels for border color
-	m_screen->set_screen_update(FUNC(smc777_state::screen_update_smc777));
+	m_screen->set_screen_update(FUNC(smc777_state::screen_update));
 	m_screen->set_palette(m_palette);
+	// TODO: 6845 CCLK width is likely supposed to handle this (currently draws 1023x261)
+	m_screen->set_default_position(1.500, 0.000, 1.125, 0.000);
 
-	PALETTE(config, m_palette, FUNC(smc777_state::smc777_palette), 0x20); // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
+	// 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
+	PALETTE(config, m_palette, FUNC(smc777_state::palette_init), 0x20);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
@@ -1173,7 +1171,6 @@ void smc777_state::smc777(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->out_vsync_callback().set(FUNC(smc777_state::vsync_w));
 
-	// floppy controller
 	MB8876(config, m_fdc, MASTER_CLOCK / 32); // divider not confirmed
 	m_fdc->intrq_wr_callback().set(FUNC(smc777_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
@@ -1185,7 +1182,6 @@ void smc777_state::smc777(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));
 
-	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	SN76489A(config, "sn1", MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider
@@ -1196,7 +1192,6 @@ void smc777_state::smc777(machine_config &config)
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(smc777_state::keyboard_callback), attotime::from_hz(240/32));
 }
 
-/* ROM definition */
 ROM_START( smc777 )
 	/* shadow ROM */
 	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
@@ -1212,7 +1207,4 @@ ROM_END
 } // anonymous namespace
 
 
-/* Driver */
-
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   STATE         INIT        COMPANY  FULLNAME   FLAGS
 COMP( 1983, smc777, 0,      0,      smc777,  smc777, smc777_state, empty_init, "Sony",  "SMC-777", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

@@ -19,12 +19,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO_A2065, bus::amiga::zorro::a2065_device, "zorro_a2065", "CBM A2065 Ethernet Card")
+DEFINE_DEVICE_TYPE(AMIGA_A2065, bus::amiga::zorro::a2065_device, "amiga_a2065", "Commodore A2065 Ethernet Card")
 
 namespace bus::amiga::zorro {
 
 a2065_device::a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_A2065, tag, owner, clock),
+	device_t(mconfig, AMIGA_A2065, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_lance(*this, "lance")
 {
@@ -87,7 +87,7 @@ void a2065_device::lance_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void a2065_device::lance_irq_w(int state)
 {
 	// default is irq 2, can be changed via jumper
-	m_slot->int2_w(!state);
+	m_zorro->int2_w(!state);
 }
 
 
@@ -101,32 +101,32 @@ void a2065_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing a2065\n");
 
 	// stop responding to default autoconfig
-	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// install autoconfig handler to new location
-	m_slot->space().install_readwrite_handler(address, address + 0x7f,
+	m_zorro->space().install_readwrite_handler(address, address + 0x7f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 
 	// install access to lance registers
-	m_slot->space().install_read_handler(address + 0x4000, address + 0x4003,
-			read16m_delegate(*m_lance, FUNC(am7990_device::regs_r)), 0xffffffff);
-	m_slot->space().install_write_handler(address + 0x4000, address + 0x4003,
-			write16sm_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffffffff);
+	m_zorro->space().install_read_handler(address + 0x4000, address + 0x4003,
+			read16m_delegate(*m_lance, FUNC(am7990_device::regs_r)), 0xffff);
+	m_zorro->space().install_write_handler(address + 0x4000, address + 0x4003,
+			write16sm_delegate(*m_lance, FUNC(am7990_device::regs_w)), 0xffff);
 
 	// install access to onboard ram (32k)
-	m_slot->space().install_read_handler(address + 0x8000, address + 0x8000 + 0x7fff,
-			read16sm_delegate(*this, FUNC(a2065_device::host_ram_r)), 0xffffffff);
-	m_slot->space().install_write_handler(address + 0x8000, address + 0x8000 + 0x7fff,
-			write16s_delegate(*this, FUNC(a2065_device::host_ram_w)), 0xffffffff);
+	m_zorro->space().install_read_handler(address + 0x8000, address + 0x8000 + 0x7fff,
+			read16sm_delegate(*this, FUNC(a2065_device::host_ram_r)), 0xffff);
+	m_zorro->space().install_write_handler(address + 0x8000, address + 0x8000 + 0x7fff,
+			write16s_delegate(*this, FUNC(a2065_device::host_ram_w)), 0xffff);
 
 	// we're done
-	m_slot->cfgout_w(0);
+	m_zorro->cfgout_w(0);
 }
 
 void a2065_device::cfgin_w(int state)
 {
-	LOG("%s: configin_w (%d)\n", shortname(), state);
+	LOG("%s: cfgin_w (%d)\n", shortname(), state);
 
 	if (state == 0)
 	{
@@ -145,9 +145,9 @@ void a2065_device::cfgin_w(int state)
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 

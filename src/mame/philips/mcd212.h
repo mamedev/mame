@@ -51,7 +51,7 @@ public:
 
 	void map(address_map &map) ATTR_COLD;
 
-	template <int Channel> int ram_dtack_cycle_count();
+	template <int Path> int ram_dtack_cycle_count();
 	int rom_dtack_cycle_count();
 
 protected:
@@ -88,10 +88,11 @@ protected:
 	{
 		CURCNT_COLOR         = 0x00000f,    // Cursor color
 		CURCNT_CUW           = 0x008000,    // Cursor width
-		CURCNT_COF           = 0x070000,    // Cursor off time
 		CURCNT_COF_SHIFT     = 16,
-		CURCNT_CON           = 0x280000,    // Cursor on time
+		CURCNT_COF           = 0b111 << CURCNT_COF_SHIFT,    // Cursor off time
 		CURCNT_CON_SHIFT     = 19,
+		CURCNT_CON           = 0b111 << CURCNT_CON_SHIFT,    // Cursor on time
+		CURCNT_BLKC_SHIFT    = 22,
 		CURCNT_BLKC          = 0x400000,    // Blink type
 		CURCNT_EN            = 0x800000,    // Cursor enable
 
@@ -100,42 +101,45 @@ protected:
 		ICM_MODE2            = 0x000f00,    // Plane 2
 		ICM_MODE2_SHIFT      = 8,
 		ICM_EV               = 0x040000,    // External video
-		ICM_NR               = 0x080000,    // Number of region flags
-		ICM_NR_BIT           = 19,
+		ICM_EV_BIT           = 18,
+		ICM_NM               = 0x080000,    // Number of Matte flags
+		ICM_NM_BIT           = 19,
 		ICM_CS               = 0x400000,    // CLUT select
+		ICM_CS_BIT           = 22,
 
 		TCR_TA               = 0x00000f,    // Plane A
 		TCR_TB               = 0x000f00,    // Plane B
 		TCR_TB_SHIFT         = 8,
-		TCR_COND_1           = 0x0,         // Transparent if: Always (Plane Disabled)
-		TCR_COND_KEY_1       = 0x1,         // Transparent if: Color Key = True
-		TCR_COND_XLU_1       = 0x2,         // Transparent if: Transparency Bit = 1
-		TCR_COND_RF0_1       = 0x3,         // Transparent if: Region Flag 0 = True
-		TCR_COND_RF1_1       = 0x4,         // Transparent if: Region Flag 1 = True
-		TCR_COND_RF0KEY_1    = 0x5,         // Transparent if: Region Flag 0 = True || Color Key = True
-		TCR_COND_RF1KEY_1    = 0x6,         // Transparent if: Region Flag 1 = True || Color Key = True
+		TCR_ALWAYS           = 0x0,         // Transparent if: Always (Plane Disabled)
+		TCR_KEY              = 0x1,         // Transparent if: Color Key = True
+		TCR_RGB              = 0x2,         // Transparent if: Transparency Bit = 1 (RGB Only)
+		TCR_MF0              = 0x3,         // Transparent if: Matte Flag 0 = True
+		TCR_MF1              = 0x4,         // Transparent if: Matte Flag 1 = True
+		TCR_MF0_KEY1         = 0x5,         // Transparent if: Matte Flag 0 = True || Color Key = True
+		TCR_MF1_KEY1         = 0x6,         // Transparent if: Matte Flag 1 = True || Color Key = True
 		TCR_COND_UNUSED0     = 0x7,         // Unused
-		TCR_COND_0           = 0x8,         // Transparent if: Never (No Transparent Area)
-		TCR_COND_KEY_0       = 0x9,         // Transparent if: Color Key = False
-		TCR_COND_XLU_0       = 0xa,         // Transparent if: Transparency Bit = 0
-		TCR_COND_RF0_0       = 0xb,         // Transparent if: Region Flag 0 = False
-		TCR_COND_RF1_0       = 0xc,         // Transparent if: Region Flag 1 = False
-		TCR_COND_RF0KEY_0    = 0xd,         // Transparent if: Region Flag 0 = False && Color Key = False
-		TCR_COND_RF1KEY_0    = 0xe,         // Transparent if: Region Flag 1 = False && Color Key = False
+		TCR_NEVER            = 0x8,         // Transparent if: Never (No Transparent Area)
+		TCR_NOT_KEY          = 0x9,         // Transparent if: Color Key = False
+		TCR_NOT_RGB          = 0xa,         // Transparent if: Transparency Bit = 0 (RGB Only)
+		TCR_NOT_MF0          = 0xb,         // Transparent if: Matte Flag 0 = False
+		TCR_NOT_MF1          = 0xc,         // Transparent if: Matte Flag 1 = False
+		TCR_NOT_MF0_KEY      = 0xd,         // Transparent if: Matte Flag 0 = False || Color Key = False
+		TCR_NOT_MF1_KEY      = 0xe,         // Transparent if: Matte Flag 1 = False || Color Key = False
 		TCR_COND_UNUSED1     = 0xf,         // Unused
 		TCR_DISABLE_MX       = 0x800000,    // Mix disable
 
 		POR_AB               = 0,           // Plane A in front of Plane B
 		POR_BA               = 1,           // Plane B in front of Plane A
 
-		RC_X                 = 0x0003ff,    // X position
-		RC_WF                = 0x00fc00,    // Weight position
-		RC_WF_SHIFT          = 10,
-		RC_RF_BIT            = 16,          // Region flag bit
-		RC_OP                = 0xf00000,    // Operation
-		RC_OP_SHIFT          = 20,
+		MC_X                 = 0x0003ff,    // X position
+		MC_WF                = 0x00fc00,    // Weight position
+		MC_WF_SHIFT          = 10,
+		MC_MF_BIT            = 16,          // Matte flag bit
+		MC_OP                = 0xf00000,    // Operation
+		MC_OP_SHIFT          = 20,
 
 		CSR1R_PA             = 0x20,        // Parity
+		CSR1R_PA_BIT         = 5,
 		CSR1R_DA             = 0x80,        // Display Active
 
 		CSR1W_BE             = 0x0001,      // Bus Error
@@ -171,7 +175,7 @@ protected:
 
 		ICM_OFF              = 0x0,
 		ICM_CLUT8            = 0x1,
-		ICM_RGB555           = 0x2,
+		ICM_RGB555           = 0x1,
 		ICM_CLUT7            = 0x3,
 		ICM_CLUT77           = 0x4,
 		ICM_DYUV             = 0x5,
@@ -196,15 +200,13 @@ protected:
 	uint32_t m_cursor_position = 0;
 	uint32_t m_cursor_control = 0;
 	uint32_t m_cursor_pattern[16]{};
-	uint32_t m_region_control[8]{};
+	uint32_t m_matte_control[8]{};
 	uint32_t m_backdrop_color = 0;
 	uint32_t m_mosaic_hold[2]{};
 	uint8_t m_weight_factor[2][768]{};
 
 	// DYUV color limit arrays.
-	uint32_t m_dyuv_limit_r_lut[3 * 0xff];
-	uint32_t m_dyuv_limit_g_lut[3 * 0xff];
-	uint32_t m_dyuv_limit_b_lut[3 * 0xff];
+	uint32_t m_dyuv_limit_lut[0x300];
 
 	// DYUV delta-Y decoding array
 	uint8_t m_delta_y_lut[0x100];
@@ -230,41 +232,47 @@ protected:
 	required_shared_ptr<uint16_t> m_planea;
 	required_shared_ptr<uint16_t> m_planeb;
 
+	uint32_t m_interlace_field[312][768];
+
 	// internal state
-	bool m_region_flag[2][768]{};
+	bool m_matte_flag[2][768]{};
 	int m_ica_height = 0;
 	int m_total_height = 0;
 	emu_timer *m_ica_timer = nullptr;
 	emu_timer *m_dca_timer = nullptr;
 
+	// Cursor State
+	uint16_t m_blink_time; // Counter that tracks how long since the last m_blink_active last changed.
+	bool m_blink_active = false;
+
 	static const uint32_t s_4bpp_color[16];
 
-	uint8_t get_weight_factor(const uint32_t region_idx);
-	uint8_t get_region_op(const uint32_t region_idx);
-	void update_region_arrays();
+	uint8_t get_weight_factor(const uint32_t Matte_idx);
+	uint8_t get_matte_op(const uint32_t Matte_idx);
+	void update_matte_arrays();
 
 	int get_screen_width();
 	int get_border_width();
-	template <int Channel> int get_plane_width();
+	uint32_t get_backdrop_plane();
 
-	template <int Channel> void set_vsr(uint32_t value);
-	template <int Channel> uint32_t get_vsr();
+	template <int Path> void set_vsr(uint32_t value);
+	template <int Path> uint32_t get_vsr();
 
-	template <int Channel> void set_dcp(uint32_t value);
-	template <int Channel> uint32_t get_dcp();
+	template <int Path> void set_dcp(uint32_t value);
+	template <int Path> uint32_t get_dcp();
 
-	template <int Channel> void set_display_parameters(uint8_t value);
+	template <int Path> void set_display_parameters(uint8_t value);
 
-	template <int Channel> void process_ica();
-	template <int Channel> void process_dca();
+	template <int Path> void process_ica();
+	template <int Path> void process_dca();
 
-	template <int Channel> uint8_t get_transparency_control();
-	template <int Channel> uint8_t get_icm();
-	template <int Channel> bool get_mosaic_enable();
-	template <int Channel> uint8_t get_mosaic_factor();
-	template <int Channel> void process_vsr(uint32_t *pixels, bool *transparent);
+	template <int Path> uint8_t get_transparency_control();
+	template <int Path> uint8_t get_icm();
+	template <int Path> bool get_mosaic_enable();
+	template <int Path> uint8_t get_mosaic_factor();
+	template <int Path> void process_vsr(uint32_t *pixels, bool *transparent);
 
-	template <int Channel> void set_register(uint8_t reg, uint32_t value);
+	template <int Path> void set_register(uint8_t reg, uint32_t value);
 
 	template <bool MosaicA, bool MosaicB, bool OrderAB> void mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out);
 

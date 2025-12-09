@@ -8,13 +8,13 @@
 #include "tilemap.h"
 
 
-#define K051316_CB_MEMBER(_name)   void _name(int *code, int *color)
+#define K051316_CB_MEMBER(_name)   void _name(int &code, int &color)
 
 
 class k051316_device : public device_t, public device_gfx_interface
 {
 public:
-	using zoom_delegate = device_delegate<void (int *code, int *color)>;
+	using zoom_delegate = device_delegate<void (int &code, int &color)>;
 
 	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -26,19 +26,8 @@ public:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo8);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
 
-	// configuration
-	template <typename... T> void set_zoom_callback(T &&... args) { m_k051316_cb.set(std::forward<T>(args)...); }
-	void set_wrap(int wrap) { m_wrap = wrap; }
-	void set_bpp(int bpp);
-	void set_layermask(int mask) { m_layermask = mask; }
-	void set_offsets(int x_offset, int y_offset)
-	{
-		m_dx = x_offset;
-		m_dy = y_offset;
-	}
-
 	/*
-	The callback is passed:
+	The zoom callback is passed:
 	- code (range 00-FF, contents of the first tilemap RAM byte)
 	- color (range 00-FF, contents of the first tilemap RAM byte). Note that bit 6
 	  seems to be hardcoded as flip X.
@@ -48,12 +37,19 @@ public:
 	  structure (e.g. TILE_FLIPX)
 	*/
 
+	template <typename... T> void set_zoom_callback(T &&... args) { m_k051316_cb.set(std::forward<T>(args)...); }
+	void set_wrap(int wrap) { m_wrap = wrap; }
+	void set_bpp(int bpp);
+	void set_layermask(int mask) { m_layermask = mask; }
+	void set_offsets(int dx, int dy) { m_dx = dx; m_dy = dy; }
+
+	// public interface
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 	u8 rom_r(offs_t offset);
 	void ctrl_w(offs_t offset, u8 data);
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, u32 priority);
-	void wraparound_enable(int status);
+	void wraparound_enable(int state);
 
 	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
 	void mark_tmap_dirty() { m_tmap->mark_all_dirty(); }
@@ -64,16 +60,16 @@ protected:
 
 private:
 	// internal state
-	std::vector<uint8_t> m_ram;
-	uint8_t m_ctrlram[14];
+	std::vector<u8> m_ram;
+	u8 m_ctrlram[14];
 	tilemap_t *m_tmap;
 
-	optional_region_ptr<uint8_t> m_zoom_rom;
+	optional_region_ptr<u8> m_zoom_rom;
 
 	int m_dx, m_dy;
-	int m_wrap;
-	int m_pixels_per_byte;
-	int m_layermask;
+	bool m_wrap;
+	s32 m_pixels_per_byte;
+	s32 m_layermask;
 	zoom_delegate m_k051316_cb;
 	bool m_readout_enabled;
 	bool m_flipx_enabled;

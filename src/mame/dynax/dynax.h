@@ -41,16 +41,17 @@ public:
 	{
 	}
 
-	void mjfriday(machine_config &config);
-	void gekisha(machine_config &config);
-	void majrjhdx(machine_config &config);
-	void tenkai(machine_config &config);
-	void ougonhai(machine_config &config);
-	void ougonhaib1(machine_config &config);
-	void mjreach(machine_config &config);
-	void mjreachp2(machine_config &config);
-	void mjdialq2(machine_config &config);
-	void sprtmtch(machine_config &config);
+	void mjfriday(machine_config &config) ATTR_COLD;
+	void gekisha(machine_config &config) ATTR_COLD;
+	void majrjhdx(machine_config &config) ATTR_COLD;
+	void tenkai(machine_config &config) ATTR_COLD;
+	void ougonhai(machine_config &config) ATTR_COLD;
+	void ougonhaib1(machine_config &config) ATTR_COLD;
+	void mjreach(machine_config &config) ATTR_COLD;
+	void mjreachp2(machine_config &config) ATTR_COLD;
+	void mjdialq2(machine_config &config) ATTR_COLD;
+	void sprtmtch(machine_config &config) ATTR_COLD;
+	void qyjdzjp(machine_config &config) ATTR_COLD;
 
 	void blitter_ack_w(int state);
 	void sprtmtch_blitter_irq_w(int state);
@@ -67,8 +68,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<ls259_device> m_mainlatch;
-	optional_device<dynax_blitter_rev2_device> m_blitter;
+	required_device<ls259_device> m_mainlatch;
+	required_device<dynax_blitter_rev2_device> m_blitter;
 	optional_device<hopper_device> m_hopper;
 	optional_device<address_map_bank_device> m_bankdev;
 	optional_device<rst_pos_buffer_device> m_mainirq;
@@ -93,19 +94,27 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	// Nothing below here is used by ddenlovr.cpp
-	// TODO: further decouple dynax.cpp and ddenlovr.cpp
 	void coincounter_0_w(int state);
 	void coincounter_1_w(int state);
 	uint8_t ret_ff();
 	template <unsigned N> uint8_t hanamai_keyboard_r();
+	uint8_t hjingi_keyboard_0_r();
+	uint8_t mjelctrn_keyboard_1_r();
+	uint8_t mjelctrn_dsw_r();
 	void hanamai_keyboard_w(uint8_t data);
 	void dynax_rombank_w(uint8_t data);
+	void hnoridur_rombank_w(uint8_t data);
 	void dynax_blit_palette23_w(uint8_t data);
 	void blit_palbank_w(int state);
 	void dynax_blit_backpen_w(uint8_t data);
 	void dynax_blit_palette01_w(uint8_t data);
 	void dynax_layer_enable_w(uint8_t data);
+	void hanamai_priority_w(uint8_t data);
+	void yarunara_blit_romregion_w(uint8_t data);
+	void hnoridur_palbank_w(uint8_t data);
+	void nanajign_palette_lo_w(offs_t offset, uint8_t data);
+	void nanajign_palette_hi_w(offs_t offset, uint8_t data);
+	void nanajign_palette_update(offs_t offset);
 
 	uint32_t screen_update_hanamai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hnoridur(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -120,6 +129,8 @@ protected:
 	void dynax_common_reset();
 
 	void sprtmtch_mem_map(address_map &map) ATTR_COLD;
+	void nanajign_mem_map(address_map &map) ATTR_COLD;
+	void mjelctrn_banked_map(address_map &map) ATTR_COLD;
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
 	std::unique_ptr<uint8_t[]>  m_pixmap[8][2]{};
@@ -221,6 +232,8 @@ private:
 
 	void mjreachp2_map(address_map &map) ATTR_COLD;
 
+	void qyjdzjp_io_map(address_map &map) ATTR_COLD;
+
 	// misc
 	int m_rombank = 0;
 	uint8_t m_tenkai_p5_val = 0U;
@@ -271,27 +284,17 @@ private:
 	// misc
 	int m_toggle = 0;
 
-	void hnoridur_rombank_w(uint8_t data);
-	void hnoridur_palbank_w(uint8_t data);
 	void hnoridur_palette_lo_w(offs_t offset, uint8_t data);
 	void hnoridur_palette_hi_w(offs_t offset, uint8_t data);
 	void hnoridur_palette_update(offs_t offset);
-	void nanajign_palette_lo_w(offs_t offset, uint8_t data);
-	void nanajign_palette_hi_w(offs_t offset, uint8_t data);
-	void nanajign_palette_update(offs_t offset);
 	void hjingi_lockout_w(int state);
-	uint8_t hjingi_keyboard_0_r();
 	uint8_t hjingi_keyboard_1_r();
 	void yarunara_input_w(offs_t offset, uint8_t data);
 	uint8_t yarunara_input_r(offs_t offset);
 	void yarunara_rombank_w(uint8_t data);
-	void yarunara_blit_romregion_w(uint8_t data);
-	uint8_t mjelctrn_keyboard_1_r();
-	uint8_t mjelctrn_dsw_r();
 	void mjembase_blit_dest_w(uint8_t data);
 	void mjembase_blit_palette23_w(uint8_t data);
 	void hanamai_blit_pixel_w(offs_t offset, uint8_t data);
-	void hanamai_priority_w(uint8_t data);
 	void mjembase_priority_w(uint8_t data);
 
 	void adpcm_int(int state);
@@ -304,13 +307,9 @@ private:
 	DECLARE_VIDEO_START(neruton);
 
 	void hnoridur_mem_map(address_map &map) ATTR_COLD;
-	void mcnpshnt_mem_map(address_map &map) ATTR_COLD;
-	void nanajign_mem_map(address_map &map) ATTR_COLD;
-	void yarunara_mem_map(address_map &map) ATTR_COLD;
 	void quiztvqq_mem_map(address_map &map) ATTR_COLD;
 
 	void hnoridur_banked_map(address_map &map) ATTR_COLD;
-	void mjelctrn_banked_map(address_map &map) ATTR_COLD;
 	void nanajign_banked_map(address_map &map) ATTR_COLD;
 	void yarunara_banked_map(address_map &map) ATTR_COLD;
 	void mjangels_banked_map(address_map &map) ATTR_COLD;
@@ -460,54 +459,5 @@ private:
 
 
 INPUT_PORTS_EXTERN(dynax_mahjong_keys);
-INPUT_PORTS_EXTERN(dynax_hanafuda_keys_bet);
-
-#define MAHJONG_PAYOUT_RATE(shift, loc) \
-		PORT_DIPNAME( 0x0f << shift, 0x07 << shift, "Payout Rate" ) PORT_DIPLOCATION(loc) \
-		PORT_DIPSETTING(             0x00 << shift, "50%" ) \
-		PORT_DIPSETTING(             0x01 << shift, "53%" ) \
-		PORT_DIPSETTING(             0x02 << shift, "56%" ) \
-		PORT_DIPSETTING(             0x03 << shift, "59%" ) \
-		PORT_DIPSETTING(             0x04 << shift, "62%" ) \
-		PORT_DIPSETTING(             0x05 << shift, "65%" ) \
-		PORT_DIPSETTING(             0x06 << shift, "68%" ) \
-		PORT_DIPSETTING(             0x07 << shift, "71%" ) \
-		PORT_DIPSETTING(             0x08 << shift, "75%" ) \
-		PORT_DIPSETTING(             0x09 << shift, "78%" ) \
-		PORT_DIPSETTING(             0x0a << shift, "81%" ) \
-		PORT_DIPSETTING(             0x0b << shift, "84%" ) \
-		PORT_DIPSETTING(             0x0c << shift, "87%" ) \
-		PORT_DIPSETTING(             0x0d << shift, "90%" ) \
-		PORT_DIPSETTING(             0x0e << shift, "93%" ) \
-		PORT_DIPSETTING(             0x0f << shift, "96%" )
-
-#define MAHJONG_COINAGE(shift, loc) \
-		PORT_DIPNAME( 0x03 << shift, 0x03 << shift, DEF_STR(Coinage) ) PORT_DIPLOCATION(loc) /* ＣＯＩＮ　ＲＡＴＥ   */ \
-		PORT_DIPSETTING(             0x03 << shift, DEF_STR(1C_1C) )                         /* １コイン　　１プレイ */ \
-		PORT_DIPSETTING(             0x02 << shift, DEF_STR(1C_2C) )                         /* １コイン　　２プレイ */ \
-		PORT_DIPSETTING(             0x01 << shift, DEF_STR(1C_5C) )                         /* １コイン　　５プレイ */ \
-		PORT_DIPSETTING(             0x00 << shift, "1 Coin/10 Credits" )                    /* １コイン　１０プレイ */
-
-#define MAHJONG_NOTE_CREDITS(shift, loc, ct, cs) \
-		PORT_DIPNAME( 0x01 << shift, 0x00 << shift, "Credits Per Note" ) PORT_DIPLOCATION(loc)                 /* ＮＯＴＥ　ＲＡＴＥ */ \
-		PORT_DIPSETTING(             0x01 << shift, "5" )   PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x03 << cs) /* ＣＯＩＮ×５        */ \
-		PORT_DIPSETTING(             0x01 << shift, "10" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x02 << cs) \
-		PORT_DIPSETTING(             0x01 << shift, "25" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x01 << cs) \
-		PORT_DIPSETTING(             0x01 << shift, "50" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x00 << cs) \
-		PORT_DIPSETTING(             0x00 << shift, "10" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x03 << cs) /* ＣＯＩＮ×１０      */ \
-		PORT_DIPSETTING(             0x00 << shift, "20" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x02 << cs) \
-		PORT_DIPSETTING(             0x00 << shift, "50" )  PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x01 << cs) \
-		PORT_DIPSETTING(             0x00 << shift, "100" ) PORT_CONDITION(ct, 0x03 << cs, EQUALS, 0x00 << cs)
-
-#define MAHJONG_YAKUMAN_BONUS(shift, loc) \
-		PORT_DIPNAME( 0x07 << shift, 0x04 << shift, "Yakuman Bonus Cycle" ) PORT_DIPLOCATION(loc) /* 役満ボーナスの設定周期 */ \
-		PORT_DIPSETTING(             0x07 << shift, "None" )                                      /* 無し                   */ \
-		PORT_DIPSETTING(             0x06 << shift, "First time only" )                           /* 初回のみ               */ \
-		PORT_DIPSETTING(             0x05 << shift, "Every 300 coins" )                           /* ３００コイン毎         */ \
-		PORT_DIPSETTING(             0x04 << shift, "Every 500 coins" )                           /* ５００コイン毎         */ \
-		PORT_DIPSETTING(             0x03 << shift, "Every 700 coins" )                           /* ７００コイン毎         */ \
-		PORT_DIPSETTING(             0x02 << shift, "Every 1000 coins" )                          /* １０００コイン毎       */ \
-	/*  PORT_DIPSETTING(             0x01 << shift, "Every 1000 coins" )*/ \
-	/*  PORT_DIPSETTING(             0x00 << shift, "Every 1000 coins" )*/
 
 #endif // MAME_DYNAX_DYNAX_H

@@ -38,7 +38,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	void update_clock();
@@ -56,7 +56,7 @@ private:
 	uint8_t m_sample_bit;
 	int16_t m_sample;
 
-	stream_buffer::sample_t m_sample_ch1, m_sample_ch2;
+	sound_stream::sample_t m_sample_ch1, m_sample_ch2;
 	double m_att;
 };
 

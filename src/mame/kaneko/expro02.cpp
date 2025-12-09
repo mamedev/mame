@@ -1833,6 +1833,22 @@ ROM_START( galhustl ) // An original PCB has been seen with genuine AFEGA labels
 	ROM_LOAD( "galhstl5.u5", 0x00000, 0x80000, CRC(44a18f15) SHA1(1217cf7fbbb442358b15016099efeface5dcbd22) ) // Also found as AFEGA 5
 ROM_END
 
+ROM_START( galhustla )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "afega_3.uc17", 0x00000, 0x80000, CRC(b811c791) SHA1(02977dc3dfe9ed692c57ccf3d8a995274e92503d) )
+	ROM_LOAD16_BYTE( "afega_4.ud17", 0x00001, 0x80000, CRC(b9aeb643) SHA1(61aa44b008ec7d5422b18310ca97bead9c5d23ab) )
+
+	ROM_REGION16_BE( 0x100000, "maincpudata", ROMREGION_ERASEFF ) // 68000 data
+
+	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
+	ROM_LOAD( "afega_1.ub6", 0x00000, 0x80000, CRC(1aac243c) SHA1(829fc3c1a97a4c125238ac7d314c93666c5c1d02) )
+	ROM_LOAD( "afega_2.uc6", 0x80000, 0x80000, CRC(2168e54a) SHA1(87534334b16d3ddc3daefcb1b8086aff44157ccf) )
+
+	ROM_REGION( 0x100000, "kan_spr", 0 )
+	ROM_LOAD( "afega_5.u5", 0x00000, 0x80000, CRC(8bbffcd3) SHA1(64f809efcc36d6b884cda561545f9f2e49171438) )
+ROM_END
+
 ROM_START( pgalvip ) // this set has extra data roms for the gfx
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "afega_15.ue17", 0x00000, 0x20000, CRC(050060ca) SHA1(1e2a1d6aaf5038269d192baf3520f4af7a299325) )
@@ -2044,7 +2060,8 @@ GAME( 2002, missw02d,  missw02,  fantsia2, missw96,   expro02_state, empty_init,
 
 GAME( 1996, pgalvip,   0,        galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
 GAME( 1997, pgalvipa,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, galhustl,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International",        "Gals Hustler",              MACHINE_SUPPORTS_SAVE ) // hack of the above?
+GAME( 1997, galhustl,  pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International",        "Gals Hustler (set 1)",      MACHINE_SUPPORTS_SAVE ) // hack of the above?
+GAME( 1997, galhustla, pgalvip,  galhustl, galhustl,  expro02_state, empty_init,   ROT0,  "ACE International",        "Gals Hustler (set 2)",      MACHINE_SUPPORTS_SAVE )
 
 GAME( 1995, zipzap,    0,        zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap (Explicit)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
 GAME( 1995, zipzapa,   zipzap,   zipzap,   zipzap,    expro02_state, empty_init,   ROT90, "Barko Corp",               "Zip & Zap (Less Explicit)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "B" nudity level

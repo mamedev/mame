@@ -53,6 +53,19 @@ void handler_entry::dump_map(std::vector<memory_entry> &map) const
 	fatalerror("dump_map called on non-dispatching class\n");
 }
 
+bool handler_entry::is_handler_in_map(std::vector<memory_entry> &map, offs_t begin, offs_t end, handler_entry *handler) const
+{
+	auto it = std::find_if(map.begin(), map.end(), [handler,begin,end](const memory_entry& e) {
+		return (e.entry == handler) && (e.start == begin) && (e.end == end);
+	} );
+
+	if(it == map.end()) {
+		return false;
+	}
+
+	return true;
+}
+
 void handler_entry::select_a(int slot)
 {
 	fatalerror("select_a called on non-view\n");
@@ -600,11 +613,29 @@ void address_space_installer::check_optimize_all(const char *function, int width
 				}
 		}
 
-		// 4. Ajusting the mirror
+		// 4. Adjusting the mirror
 		nmirror &= ~default_lowbits_mask;
 
 		// 5. Recompute changing_bits, it matters for the next optimization.  No need to round up through
 		changing_bits = nstart ^ nend;
+	}
+
+	if(nmask <= default_lowbits_mask && (nend - nstart) != default_lowbits_mask) {
+		// If the access size is lower than the bus width and the
+		// internal range limited, adjust to one full bus width and
+		// adjust the unitmask.  This can have a very positive
+		// interaction with the following block
+		assert(width < m_config.data_width());
+
+		u64 extra_mask;
+		if(m_config.endianness() == ENDIANNESS_BIG)
+			extra_mask = make_bitmask<u64>(m_config.data_width() - 8*(nstart & default_lowbits_mask)) ^ make_bitmask<u64>(m_config.data_width() - 8*(1+(nend & default_lowbits_mask)));
+		else
+			extra_mask = make_bitmask<u64>(8*(nstart & default_lowbits_mask)) ^ make_bitmask<u64>(8*(1+(nend & default_lowbits_mask)));
+		nstart &= ~default_lowbits_mask;
+		nend   |=  default_lowbits_mask;
+		nunitmask &= extra_mask;
+		changing_bits = default_lowbits_mask;
 	}
 
 	if(nmirror && !(nstart & changing_bits) && !((~nend) & changing_bits)) {

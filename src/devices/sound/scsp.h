@@ -37,6 +37,7 @@ public:
 	// MIDI I/O access (used for comms on Model 2/3)
 	void midi_in(u8 data);
 	u16 midi_out_r();
+	void midi_out_w(u8 data);
 
 protected:
 	// device-level overrides
@@ -47,7 +48,7 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	enum SCSP_STATE { SCSP_ATTACK, SCSP_DECAY1, SCSP_DECAY2, SCSP_RELEASE };
@@ -118,6 +119,7 @@ private:
 	u32 m_IrqTimBC;
 	u32 m_IrqMidi;
 
+	u8 m_MidiOutStack[32];
 	u8 m_MidiOutW, m_MidiOutR;
 	u8 m_MidiStack[32];
 	u8 m_MidiW, m_MidiR;
@@ -182,7 +184,7 @@ private:
 	void w16(u32 addr, u16 val);
 	u16 r16(u32 addr);
 	inline s32 UpdateSlot(SCSP_SLOT *slot);
-	void DoMasterSamples(std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs);
+	void DoMasterSamples(sound_stream &stream);
 
 	//LFO
 	void LFO_Init();

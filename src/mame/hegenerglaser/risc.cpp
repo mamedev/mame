@@ -178,14 +178,21 @@ void risc_state::mrisc(machine_config &config)
 ROM_START( mrisc )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1c74f, concatenate those sections and make a .bin file,
-	// then it will work on ChessMachine software. It identifies as R E B E L ver. HG-021 03-04-92
-	ROM_LOAD("meph-risci-v1-2.bin", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5) )
+	// then it will work on ChessMachine software. It identifies as R E B E L version HG-021, 03-04-92
+	ROM_LOAD("meph-risci-v1-2", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5) )
+ROM_END
+
+ROM_START( mrisca )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1c6db, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L version HG-020, 14-03-92
+	ROM_LOAD("risc_1mb_rebel", 0x00000, 0x20000, CRC(f00b43ab) SHA1(8e9f3c99331b104af2008db1f0538ebaa97bc1e9) )
 ROM_END
 
 ROM_START( mrisc2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1cb7f, concatenate those sections and make a .bin file,
-	// then it will work on ChessMachine software. It identifies as R E B E L ver. 2.31 22-07-93, world champion Madrid 1992
+	// then it will work on ChessMachine software. It identifies as R E B E L version 2.31, 22-07-93, world champion Madrid 1992
 	ROM_LOAD("risc_2.31", 0x00000, 0x20000, CRC(9ecf9cd3) SHA1(7bfc628183037a172242c9589f15aca218d8fb12) )
 ROM_END
 
@@ -198,5 +205,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE )
-SYST( 1994, mrisc2,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE )
+SYST( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB (v1.2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, mrisca,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB (v1.0)", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1994, mrisc2,  0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II", MACHINE_SUPPORTS_SAVE )

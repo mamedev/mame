@@ -52,6 +52,8 @@ typedef union Value {
   lua_CFunction f; /* light C functions */
   lua_Integer i;   /* integer numbers */
   lua_Number n;    /* float numbers */
+  /* not used, but may avoid warnings for uninitialized value */
+  lu_byte ub;
 } Value;
 
 
@@ -154,6 +156,17 @@ typedef union StackValue {
 
 /* index to stack elements */
 typedef StackValue *StkId;
+
+
+/*
+** When reallocating the stack, change all pointers to the stack into
+** proper offsets.
+*/
+typedef union {
+  StkId p;  /* actual pointer */
+  ptrdiff_t offset;  /* used while the stack is being reallocated */
+} StkIdRel;
+
 
 /* convert a 'StackValue' to a 'TValue' */
 #define s2v(o)	(&(o)->val)
@@ -373,7 +386,7 @@ typedef struct GCObject {
 typedef struct TString {
   CommonHeader;
   lu_byte extra;  /* reserved words for short strings; "has hash" for longs */
-  lu_byte shrlen;  /* length for short strings */
+  lu_byte shrlen;  /* length for short strings, 0xFF for long strings */
   unsigned int hash;
   union {
     size_t lnglen;  /* length for long strings */
@@ -385,19 +398,17 @@ typedef struct TString {
 
 
 /*
-** Get the actual string (array of bytes) from a 'TString'.
+** Get the actual string (array of bytes) from a 'TString'. (Generic
+** version and specialized versions for long and short strings.)
 */
-#define getstr(ts)  ((ts)->contents)
+#define getstr(ts)	((ts)->contents)
+#define getlngstr(ts)	check_exp((ts)->shrlen == 0xFF, (ts)->contents)
+#define getshrstr(ts)	check_exp((ts)->shrlen != 0xFF, (ts)->contents)
 
-
-/* get the actual string (array of bytes) from a Lua value */
-#define svalue(o)       getstr(tsvalue(o))
 
 /* get string length from 'TString *s' */
-#define tsslen(s)	((s)->tt == LUA_VSHRSTR ? (s)->shrlen : (s)->u.lnglen)
-
-/* get string length from 'TValue *o' */
-#define vslen(o)	tsslen(tsvalue(o))
+#define tsslen(s)  \
+	((s)->shrlen != 0xFF ? (s)->shrlen : (s)->u.lnglen)
 
 /* }================================================================== */
 
@@ -615,8 +626,10 @@ typedef struct Proto {
 */
 typedef struct UpVal {
   CommonHeader;
-  lu_byte tbc;  /* true if it represents a to-be-closed variable */
-  TValue *v;  /* points to stack or to its own value */
+  union {
+    TValue *p;  /* points to stack or to its own value */
+    ptrdiff_t offset;  /* used while the stack is being reallocated */
+  } v;
   union {
     struct {  /* (when open) */
       struct UpVal *next;  /* linked list */

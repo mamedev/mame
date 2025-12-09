@@ -24,10 +24,16 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	static constexpr unsigned TIMER_RATE = 256; // arbitrary
+
+	TIMER_CALLBACK_MEMBER(scan_timer);
+
 	optional_ioport_array<38> m_keys;
 	optional_ioport m_velocity;
 
 	devcb_write_line m_irq_cb;
+
+	emu_timer *m_timer;
 
 	u8 m_cmd, m_row, m_key_data;
 	u8 m_key_state;

@@ -1,18 +1,21 @@
 /* midithru.c -- example program implementing background thru processing */
 
-/* suppose you want low-latency midi-thru processing, but your application
-   wants to take advantage of the input buffer and timestamped data so that
-   it does not have to operate with very low latency.
+/* suppose you want low-latency midi-thru processing, but your
+   application wants to take advantage of the input buffer and
+   timestamped data so that it does not have to operate with very low
+   latency.
 
-   This program illustrates how to use a timer callback from PortTime to 
-   implement a low-latency process that handles midi thru, including correctly
-   merging midi data from the application with midi data from the input port.
+   This program illustrates how to use a timer callback from PortTime
+   to implement a low-latency process that handles midi thru,
+   including correctly merging midi data from the application with
+   midi data from the input port.
 
-   The main application, which runs in the main program thread, will use an
-   interface similar to that of PortMidi, but since PortMidi does not allow
-   concurrent threads to share access to a stream, the application will
-   call private methods that transfer MIDI messages to and from the timer 
-   thread. All PortMidi API calls are made from the timer thread.
+   The main application, which runs in the main program thread, will
+   use an interface similar to that of PortMidi, but since PortMidi
+   does not allow concurrent threads to share access to a stream, the
+   application will call private methods that transfer MIDI messages
+   to and from the timer thread using lock-free queues. All PortMidi
+   API calls are made from the timer thread.
  */
 
 /* DESIGN
@@ -78,11 +81,14 @@ global variable current_timestamp.
 
 #define MIDI_SYSEX 0xf0
 #define MIDI_EOX 0xf7
+#define STRING_MAX 80 /* used for console input */
 
-/* active is set true when midi processing should start */
+/* active is set true when midi processing should start, must be
+ * volatile to force thread to check for updates by other thread */
 int active = FALSE;
-/* process_midi_exit_flag is set when the timer thread shuts down */
-int process_midi_exit_flag;
+/* process_midi_exit_flag is set when the timer thread shuts down;
+ * must be volatile so it is re-read in the while loop that waits on it */
+volatile int process_midi_exit_flag;
 
 PmStream *midi_in;
 PmStream *midi_out;
@@ -92,10 +98,41 @@ PmStream *midi_out;
 #define OUT_QUEUE_SIZE 1024
 PmQueue *in_queue;
 PmQueue *out_queue;
-PmTimestamp current_timestamp = 0;
+/* this is volatile because it is set in the process_midi callback and
+ * the main thread reads it to sense elapsed time. Without volatile, the
+ * optimizer can put it in a register and not see the updates.
+ */
+volatile PmTimestamp current_timestamp = 0;
 int thru_sysex_in_progress = FALSE;
 int app_sysex_in_progress = FALSE;
 PmTimestamp last_timestamp = 0;
+
+
+static void prompt_and_exit(void)
+{
+    printf("type ENTER...");
+    while (getchar() != '\n') ;
+    /* this will clean up open ports: */
+    exit(-1);
+}
+
+
+static PmError checkerror(PmError err)
+{
+    if (err == pmHostError) {
+        /* it seems pointless to allocate memory and copy the string,
+         * so I will do the work of Pm_GetHostErrorText directly
+         */
+        char errmsg[80];
+        Pm_GetHostErrorText(errmsg, 80);
+        printf("PortMidi found host error...\n  %s\n", errmsg);
+        prompt_and_exit();
+    } else if (err < 0) {
+        printf("PortMidi call failed...\n  %s\n", Pm_GetErrorText(err));
+        prompt_and_exit();
+    }
+    return err;
+}
 
 
 /* time proc parameter for Pm_MidiOpen */
@@ -117,8 +154,6 @@ void process_midi(PtTimestamp timestamp, void *userData)
     PmEvent buffer; /* just one message at a time */
 
     current_timestamp++; /* update every millisecond */
-    /* if (current_timestamp % 1000 == 0) 
-        printf("time %d\n", current_timestamp); */
 
     /* do nothing until initialization completes */
     if (!active) {
@@ -222,14 +257,13 @@ void process_midi(PtTimestamp timestamp, void *userData)
 void exit_with_message(char *msg)
 {
 #define STRING_MAX 80
-    char line[STRING_MAX];
     printf("%s\nType ENTER...", msg);
-    fgets(line, STRING_MAX, stdin);
+    while (getchar() != '\n') ;
     exit(1);
 }
 
 
-void initialize()
+void initialize(int input, int output, int virtual)
 /* set up midi processing thread and open midi streams */
 {
     /* note that it is safe to call PortMidi from the main thread for
@@ -246,7 +280,6 @@ void initialize()
      */
 
     const PmDeviceInfo *info;
-    int id;
 
     /* make the message queues */
     in_queue = Pm_QueueCreate(IN_QUEUE_SIZE, sizeof(PmEvent));
@@ -260,36 +293,63 @@ void initialize()
     
     Pm_Initialize();
 
-    id = Pm_GetDefaultOutputDeviceID();
-    info = Pm_GetDeviceInfo(id);
-    if (info == NULL) {
-        printf("Could not open default output device (%d).", id);
-        exit_with_message("");
+    if (output < 0) {
+        if (!virtual) {
+            output = Pm_GetDefaultOutputDeviceID();
+        }
     }
-    printf("Opening output device %s %s\n", info->interf, info->name);
+    if (output >= 0) {
+        info = Pm_GetDeviceInfo(output);
+        if (info == NULL) {
+            printf("Could not open default output device (%d).", output);
+            exit_with_message("");
+        }
 
-    /* use zero latency because we want output to be immediate */
-    Pm_OpenOutput(&midi_out, 
-                  id, 
-                  NULL /* driver info */,
-                  OUT_QUEUE_SIZE,
-                  &midithru_time_proc,
-                  NULL /* time info */,
-                  0 /* Latency */);
+        printf("Opening output device %s %s\n", info->interf, info->name);
 
-    id = Pm_GetDefaultInputDeviceID();
-    info = Pm_GetDeviceInfo(id);
-    if (info == NULL) {
-        printf("Could not open default input device (%d).", id);
-        exit_with_message("");
+        /* use zero latency because we want output to be immediate */
+        Pm_OpenOutput(&midi_out,
+                      output,
+                      NULL /* driver info */,
+                      OUT_QUEUE_SIZE,
+                      &midithru_time_proc,
+                      NULL /* time info */,
+                      0 /* Latency */);
+    } else { /* send to virtual port */
+        int id;
+        printf("Opening virtual output device \"midithru\"\n");
+        id = Pm_CreateVirtualOutput("midithru", NULL, NULL);
+        if (id < 0) checkerror(id);  /* error reporting */
+        checkerror(Pm_OpenOutput(&midi_out, id, NULL, OUT_QUEUE_SIZE,
+                                 &midithru_time_proc, NULL, 0));
     }
-    printf("Opening input device %s %s\n", info->interf, info->name);
-    Pm_OpenInput(&midi_in, 
-                 id, 
-                 NULL /* driver info */,
-                 0 /* use default input size */,
-                 &midithru_time_proc,
-                 NULL /* time info */);
+    if (input < 0) {
+        if (!virtual) {
+            input = Pm_GetDefaultInputDeviceID();
+        }
+    }
+    if (input >= 0) {
+        info = Pm_GetDeviceInfo(input);
+        if (info == NULL) {
+            printf("Could not open default input device (%d).", input);
+            exit_with_message("");
+        }
+        
+        printf("Opening input device %s %s\n", info->interf, info->name);
+        Pm_OpenInput(&midi_in,
+                     input,
+                     NULL /* driver info */,
+                     0 /* use default input size */,
+                     &midithru_time_proc,
+                     NULL /* time info */);
+    } else { /* receive from virtual port */
+        int id;
+        printf("Opening virtual input device \"midithru\"\n");
+        id = Pm_CreateVirtualInput("midithru", NULL, NULL);
+        if (id < 0) checkerror(id);  /* error reporting */
+        checkerror(Pm_OpenInput(&midi_in, id, NULL, 0,
+                                &midithru_time_proc, NULL));
+    }
     /* Note: if you set a filter here, then this will filter what goes
        to the MIDI THRU port. You may not want to do this.
      */
@@ -330,15 +390,42 @@ int main(int argc, char *argv[])
 {
     PmTimestamp last_time = 0;
     PmEvent buffer;
+    int i;
+    int input = -1, output = -1;
+    int virtual = FALSE;
+    int delay_enable = TRUE;
 
-    /* determine what type of test to run */
+    printf("Usage: midithru [-i input] [-o output] [-v] [-n]\n"
+           "where input and output are portmidi device numbers\n"
+           "if -v and input and/or output are not specified,\n"
+           "then virtual ports are created and used instead.\n"
+           "-n turns off the default MIDI delay effect.\n");
+    for (i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-i") == 0) {
+            i++;
+            input = atoi(argv[i]);
+            printf("Input device number: %d\n", input);
+        } else if (strcmp(argv[i], "-o") == 0) {
+            i++;
+            output = atoi(argv[i]);
+            printf("Output device number: %d\n", output);
+        } else if (strcmp(argv[i], "-v") == 0) {
+            virtual = TRUE;
+        } else if (strcmp(argv[i], "-n") == 0) {
+            delay_enable = FALSE;
+            printf("delay_effect is disabled\n");
+        } else {
+            return -1;
+        }
+    }
     printf("begin PortMidi midithru program...\n");
 
-    initialize(); /* set up and start midi processing */
+    initialize(input, output, virtual); /* set up and start midi processing */
 	
-    printf("%s\n%s\n",
-           "This program will run for 60 seconds, or until you play middle C,",
-           "echoing all input with a 2 second delay.");
+    printf("This program will run for 60 seconds, "
+           "or until you play B below middle C,\n"
+           "All input is sent immediately, implementing software MIDI THRU.\n"
+           "Also, all input is echoed with a 2 second delay.\n");
 
     while (current_timestamp < 60000) {
         /* just to make the point that this is not a low-latency process,
@@ -350,11 +437,13 @@ int main(int argc, char *argv[])
         while (Pm_Dequeue(in_queue, &buffer) == 1) {
             /* printf("timestamp %d\n", buffer.timestamp); */
             /* printf("message %x\n", buffer.message); */
-            buffer.timestamp = buffer.timestamp + 2000; /* delay */
-            Pm_Enqueue(out_queue, &buffer);
-            /* play middle C to break out of loop */
+            if (delay_enable) {
+                buffer.timestamp = buffer.timestamp + 2000; /* delay */
+                Pm_Enqueue(out_queue, &buffer);
+            }
+            /* play B3 to break out of loop */
             if (Pm_MessageStatus(buffer.message) == 0x90 &&
-                Pm_MessageData1(buffer.message) == 60) {
+                Pm_MessageData1(buffer.message) == 59) {
                 goto quit_now;
             }
         }

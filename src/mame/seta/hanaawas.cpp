@@ -25,12 +25,18 @@
       NC    |U|17|    NC
     1P "1"  |V|18|  1P "2"
 
+
+TODO:
+- hanaawasa reads inputs differently. Not implemented yet.
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "cpu/mcs48/mcs48.h"
+#include "machine/i8255.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -53,7 +59,8 @@ public:
 		m_player(*this, "P%u", 1U)
 	{ }
 
-	void hanaawas(machine_config &config);
+	void hanaawas(machine_config &config) ATTR_COLD;
+	void hanaawasa(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -67,27 +74,30 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_ioport m_coins, m_start;
+	optional_ioport m_coins, m_start;
 	required_ioport_array<2> m_player;
 
-	tilemap_t    *m_bg_tilemap;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	uint8_t    m_mux;
-	uint8_t    m_coin_settings;
-	uint8_t    m_coin_impulse;
+	uint8_t m_mux = 0;
+	uint8_t m_coin_settings = 0;
+	uint8_t m_coin_impulse = 0;
 
 	uint8_t input_port_0_r();
 	void inputs_mux_w(uint8_t data);
+	uint8_t hanaawasa_matrix_r();
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void key_matrix_status_w(uint8_t data);
 	void irq_ack_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void portb_w(uint8_t data);
 	void prg_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void base_io_map(address_map &map) ATTR_COLD;
+	void hanaawas_io_map(address_map &map) ATTR_COLD;
+	void hanaawasa_io_map(address_map &map) ATTR_COLD;
 };
 
 uint8_t hanaawas_state::input_port_0_r()
@@ -152,6 +162,25 @@ void hanaawas_state::key_matrix_status_w(uint8_t data)
 {
 	if ((data & 0xf0) == 0x40) //coinage setting command
 		m_coin_settings = data & 0xf;
+}
+
+uint8_t hanaawas_state::hanaawasa_matrix_r()
+{
+	uint8_t ret = 0xff;
+
+	if (!BIT(m_mux, 3))
+		ret &= (~m_player[0]->read() & 0x01f) << 3 | 0x07;
+
+	if (!BIT(m_mux, 2))
+		ret &= (~m_player[0]->read() & 0x3e0) >> 2 | 0x07;
+
+	if (!BIT(m_mux, 0))
+		ret &= (~m_player[1]->read() & 0x01f) << 3 | 0x07;
+
+	if (!BIT(m_mux, 6))
+		ret &= (~m_player[1]->read() & 0x3e0) >> 2 | 0x07;
+
+	return ret;
 }
 
 /***************************************************************************
@@ -260,21 +289,28 @@ void hanaawas_state::prg_map(address_map &map)
 }
 
 
-void hanaawas_state::io_map(address_map &map)
+void hanaawas_state::base_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(FUNC(hanaawas_state::input_port_0_r), FUNC(hanaawas_state::inputs_mux_w));
-	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); // r bit 1: status ready, presumably of the input mux device / w = configure device?
 	map(0x10, 0x10).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x10, 0x11).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xc0, 0xc0).nopw(); // watchdog
 }
 
-static INPUT_PORTS_START( hanaawas )
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+void hanaawas_state::hanaawas_io_map(address_map &map)
+{
+	base_io_map(map);
+	map(0x00, 0x00).rw(FUNC(hanaawas_state::input_port_0_r), FUNC(hanaawas_state::inputs_mux_w));
+	map(0x01, 0x01).nopr().w(FUNC(hanaawas_state::key_matrix_status_w)); // r bit 1: status ready, presumably of the input mux device / w = configure device?
+}
 
+void hanaawas_state::hanaawasa_io_map(address_map &map)
+{
+	base_io_map(map);
+	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+static INPUT_PORTS_START( common )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -324,10 +360,31 @@ static INPUT_PORTS_START( hanaawas )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_HANAFUDA_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hanaawas )
+	PORT_INCLUDE( common )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
 	PORT_START("START")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_START2 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hanaawasa )
+	PORT_INCLUDE( common )
+
+	PORT_START("START")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown system input")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -368,11 +425,12 @@ void hanaawas_state::machine_reset()
 void hanaawas_state::hanaawas(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18432000 / 6); // 3.072 MHz ???
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz ???
 	m_maincpu->set_addrmap(AS_PROGRAM, &hanaawas_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::io_map);
+	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawas_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hanaawas_state::irq0_line_assert));
 
+	I8741A(config, "iomcu", 18.432_MHz_XTAL / 6).set_disable(); // type only faintly discerned on one PCB photo; divider not verified
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -389,10 +447,24 @@ void hanaawas_state::hanaawas(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 18432000 / 12));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18.432_MHz_XTAL / 12));
 	aysnd.port_a_read_callback().set_ioport("DSW");
 	aysnd.port_b_write_callback().set(FUNC(hanaawas_state::portb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void hanaawas_state::hanaawasa(machine_config &config)
+{
+	hanaawas(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanaawas_state::hanaawasa_io_map);
+
+	config.device_remove("iomcu");
+
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set_ioport("START");
+	ppi.in_pb_callback().set(FUNC(hanaawas_state::hanaawasa_matrix_r));
+	ppi.out_pc_callback().set(FUNC(hanaawas_state::inputs_mux_w));
 }
 
 
@@ -402,12 +474,15 @@ void hanaawas_state::hanaawas(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( hanaawas )
+ROM_START( hanaawas ) // PC0-017-11 PCB?
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1.1e",       0x0000, 0x2000, CRC(618dc1e3) SHA1(31817f256512352db0d27322998d9dcf95a993cf) )
 	ROM_LOAD( "2.3e",       0x2000, 0x1000, CRC(5091b67f) SHA1(5a66740b8829b9b4d3aea274f9ff36e0b9e8c151) )
 	ROM_LOAD( "3.4e",       0x4000, 0x1000, CRC(dcb65067) SHA1(37964ff4016bd927b9f13b4358b831bb667f993b) )
 	ROM_LOAD( "4.6e",       0x6000, 0x1000, CRC(24bee0dc) SHA1(a4237ad3611c923b563923462e79b0b3f66cc721) )
+
+	ROM_REGION( 0x0400, "iomcu", 0 )
+	ROM_LOAD( "az-001.3j",  0x0000, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0x4000, "tiles", 0 )
 	ROM_LOAD( "5.9a",       0x0000, 0x1000, CRC(304ae219) SHA1(c1eac4973a6aec9fd8e848c206870667a8bb0922) )
@@ -421,7 +496,28 @@ ROM_START( hanaawas )
 	ROM_LOAD( "6g.bpr",     0x0120, 0x0100, CRC(4d94fed5) SHA1(3ea8e6fb95d5677991dc90fe7435f91e5320bb16) )  // I don't know what this is
 ROM_END
 
-} // Anonymous namespace
+ROM_START( hanaawasa ) // PC0-017-41 PCB
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "za51.1e", 0x0000, 0x2000, CRC(9f7d97cb) SHA1(d9172105acb268056ec53774c869cde91534aeb5) )
+	ROM_LOAD( "za12.3e", 0x2000, 0x1000, CRC(b29222f6) SHA1(7cafdd66cfd9cc6c0e9284095ef77859f2dadb12) )
+	ROM_LOAD( "za13.4e", 0x4000, 0x1000, CRC(8ba0ee3c) SHA1(dd5e9a1285ad19800d32ff029bb2ae4ea5ff8a57) )
+	ROM_LOAD( "za34.6e", 0x6000, 0x1000, CRC(7dd06d73) SHA1(2172c5e31afec023c585cc7e3a01fce20a0fa01c) )
+
+	ROM_REGION( 0x4000, "tiles", 0 )
+	ROM_LOAD( "za05.9a",  0x0000, 0x1000, CRC(304ae219) SHA1(c1eac4973a6aec9fd8e848c206870667a8bb0922) )
+	ROM_LOAD( "za06.10a", 0x1000, 0x1000, CRC(765a4e5f) SHA1(b2f148c60cffb75d1a841be8b924a874bff22ce4) )
+	ROM_LOAD( "za07.12a", 0x2000, 0x1000, CRC(4bffdd52) SHA1(c077506da0af589cdf366b3f1f1be9faa469771c) )
+	ROM_LOAD( "za38.13a", 0x3000, 0x1000, CRC(7dfd9deb) SHA1(bcddaf74be8d2d845a6f08fb9ad2a84d57712a53) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "z2.13j", 0x0000, 0x0020, CRC(99300d85) SHA1(dd383db1f3c8c6d784121d32f20ffed3d83e2278) )  // color PROM, N82S123
+	ROM_LOAD( "z1.2a",  0x0020, 0x0100, BAD_DUMP CRC(e26f21a2) SHA1(d0df06f833e0f97872d9d2ffeb7feef94aaaa02a) )  // lookup table, not dumped for this set but expected to match
+	ROM_LOAD( "6g.bpr", 0x0120, 0x0100, BAD_DUMP CRC(4d94fed5) SHA1(3ea8e6fb95d5677991dc90fe7435f91e5320bb16) )  // not dumped for this set
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawas,  0,        hanaawas,  hanaawas,  hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hanaawasa, hanaawas, hanaawasa, hanaawasa, hanaawas_state, empty_init, ROT0, "Seta Kikaku", "Hana Awase (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+

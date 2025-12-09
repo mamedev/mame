@@ -389,22 +389,22 @@ u16 gp9001vdp_device::vdpcount_r()
 
 	int vpos = screen().vpos();
 
-	u16 video_status = 0xff00;    // Set signals inactive
+	u16 video_status = 0xff00; // Set signals inactive
 
 	vpos = (vpos + 15) % 262;
 
-	if (hsync_r())
+	if (!hsync_r())
 		video_status &= ~0x8000;
-	if (vsync_r())
+	if (!vsync_r())
 		video_status &= ~0x4000;
-	if (fblank_r())
+	if (!fblank_r())
 		video_status &= ~0x0100;
 	if (vpos < 256)
 		video_status |= (vpos & 0xff);
 	else
 		video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,m_screen->vblank());
+	//logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,m_screen->vblank());
 
 	return video_status;
 }

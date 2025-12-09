@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /*******************************************************************************
 
-    Input port macros used by games in the galpanic.c driver
+    Input port macros used in the galpanic.cpp and expro02.cpp drivers
 
 *******************************************************************************/
 #ifndef MAME_KANEKO_GALPNIPT_H
@@ -19,7 +19,7 @@
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(PL)\
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(PL)\
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(PL)\
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(PL) PORT_OPTIONAL\
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(PL) /* not used in gameplay */\
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -69,7 +69,7 @@
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-/**************************** Coinage & Dip Switches ****************************/
+/**************************** Coinage & DIP Switches ****************************/
 
 #define COINAGE_WORLD\
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")\

@@ -24,7 +24,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override { div_refresh(); }
+	virtual void machine_reset() override ATTR_COLD { div_refresh(); }
 	virtual void device_post_load() override { div_refresh(); }
 
 	// devices/pointers

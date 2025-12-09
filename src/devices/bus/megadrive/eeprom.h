@@ -89,13 +89,13 @@ protected:
 	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
-// ======================> md_eeprom_nflqb_device (same read/write as nbajamte, but different I2C type)
+// ======================> md_eeprom_nflqb96_device (same read/write as nbajamte, but different I2C type)
 
-class md_eeprom_nflqb_device : public md_std_eeprom_device
+class md_eeprom_nflqb96_device : public md_std_eeprom_device
 {
 public:
 	// construction/destruction
-	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	md_eeprom_nflqb96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -159,7 +159,7 @@ DECLARE_DEVICE_TYPE(MD_STD_EEPROM,      md_std_eeprom_device)
 DECLARE_DEVICE_TYPE(MD_EEPROM_NBAJAM,   md_eeprom_nbajam_device)
 DECLARE_DEVICE_TYPE(MD_EEPROM_NBAJAMTE, md_eeprom_nbajamte_device)
 DECLARE_DEVICE_TYPE(MD_EEPROM_CSLAM,    md_eeprom_cslam_device)
-DECLARE_DEVICE_TYPE(MD_EEPROM_NFLQB,    md_eeprom_nflqb_device)
+DECLARE_DEVICE_TYPE(MD_EEPROM_NFLQB96,  md_eeprom_nflqb96_device)
 DECLARE_DEVICE_TYPE(MD_EEPROM_NHLPA,    md_eeprom_nhlpa_device)
 DECLARE_DEVICE_TYPE(MD_EEPROM_BLARA,    md_eeprom_blara_device)
 DECLARE_DEVICE_TYPE(MD_EEPROM_MODE1,    md_eeprom_mode1_device)

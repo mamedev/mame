@@ -12,27 +12,31 @@
 #include "mega256.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_MEGA256, bbc_mega256_device, "bbc_mega256", "Solidisk Mega 256 cartridge")
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_mega256_device - constructor
-//-------------------------------------------------
-
-bbc_mega256_device::bbc_mega256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_MEGA256, tag, owner, clock)
-	, device_bbc_cart_interface(mconfig, *this)
-	, m_page(0)
+class bbc_mega256_device : public device_t, public device_bbc_cart_interface
 {
-}
+public:
+	bbc_mega256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_MEGA256, tag, owner, clock)
+		, device_bbc_cart_interface(mconfig, *this)
+		, m_page(0)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// bbc_cart_interface overrides
+	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2) override;
+	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2) override;
+
+private:
+	uint8_t m_page;
+};
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -52,6 +56,7 @@ void bbc_mega256_device::device_reset()
 {
 	m_page = 0x00;
 }
+
 
 //-------------------------------------------------
 //  read - cartridge data read
@@ -95,3 +100,8 @@ void bbc_mega256_device::write(offs_t offset, uint8_t data, int infc, int infd, 
 		}
 	}
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_MEGA256, device_bbc_cart_interface, bbc_mega256_device, "bbc_mega256", "Solidisk Mega 256 cartridge")

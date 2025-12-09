@@ -21,6 +21,7 @@
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83003.h"
 #include "machine/nvram.h"
+#include "sound/adc.h"
 #include "sound/swp00.h"
 
 #include "mulcd.h"
@@ -70,6 +71,8 @@ public:
 		, m_ioport_o1(*this, "O1")
 		, m_ioport_o2(*this, "O2")
 		, m_ram(*this, "ram")
+		, m_ad(*this, "ad")
+		, m_adc(*this, "adc%u", 0U)
 	{ }
 
 	void mu50(machine_config &config);
@@ -89,6 +92,8 @@ private:
 	required_ioport m_ioport_o1;
 	required_ioport m_ioport_o2;
 	required_shared_ptr<u16> m_ram;
+	required_device<microphone_device> m_ad;
+	required_device_array<adc10_device, 2> m_adc;
 
 	u8 cur_p6, cur_p9, cur_pa, cur_pb, cur_pc;
 
@@ -135,13 +140,19 @@ void mu50_state::mu50_map(address_map &map)
 // Analog input right (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_ar_r()
 {
-	return 0x3ff;
+	s16 v = m_adc[0]->read();
+	if(v < 0)
+		v = -v;
+	return 0x3ff - v;
 }
 
 // Analog input left (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_al_r()
 {
-	return 0x3ff;
+	s16 v = m_adc[1]->read();
+	if(v < 0)
+		v = -v;
+	return 0x3ff - v;
 }
 
 // Put the host switch to pure midi
@@ -166,9 +177,9 @@ void mu50_state::p6_w(u8 data)
 	if((cur_p6 & P6_LCD_ENABLE) && !(data & P6_LCD_ENABLE)) {
 		if(!(cur_p6 & P6_LCD_RW)) {
 			if(cur_p6 & P6_LCD_RS)
-				m_lcd->data_write(cur_pa);
+				m_lcd->data_w(cur_pa);
 			else
-				m_lcd->control_write(cur_pa);
+				m_lcd->control_w(cur_pa);
 		}
 	}
 
@@ -216,13 +227,12 @@ void mu50_state::pc_w(u8 data)
 u8 mu50_state::pa_r()
 {
 	if((cur_p6 & P6_LCD_ENABLE)) {
-		if(cur_p6 & P6_LCD_RW)
-			{
-				if(cur_p6 & P6_LCD_RS)
-					return m_lcd->data_read();
-				else
-					return m_lcd->control_read();
-			} else
+		if(cur_p6 & P6_LCD_RW) {
+			if(cur_p6 & P6_LCD_RS)
+				return m_lcd->data_r();
+			else
+				return m_lcd->control_r();
+		} else
 			return 0x00;
 	}
 	return cur_pa;
@@ -269,12 +279,20 @@ void mu50_state::mu50(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	MICROPHONE(config, m_ad, 2).front();
+	m_ad->add_route(0, "speakers", 1.0, 0);
+	m_ad->add_route(1, "speakers", 1.0, 1);
+	m_ad->add_route(0, "adc0", 1.0);
+	m_ad->add_route(1, "adc1", 1.0);
+
+	ADC10(config, m_adc[0]);
+	ADC10(config, m_adc[1]);
+
+	SPEAKER(config, "speakers", 2).front();
 
 	SWP00(config, m_swp00);
-	m_swp00->add_route(0, "lspeaker", 1.0);
-	m_swp00->add_route(1, "rspeaker", 1.0);
+	m_swp00->add_route(0, "speakers", 1.0, 0);
+	m_swp00->add_route(1, "speakers", 1.0, 1);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -296,6 +314,8 @@ ROM_START( mu50 )
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "xr174c0.ic7", 0x000000, 0x080000, CRC(902520a4) SHA1(9ca892920598f9fdf08544dac4c0e54e7d46ee3c) )
 	ROM_SYSTEM_BIOS( 1, "bios1", "? (v1.04, May 22, 1995)" )
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "yamaha_mu50.bin", 0x000000, 0x080000, CRC(507168ad) SHA1(58c41f10d292cac35ef0e8f93029fbc4685df586) )
+	ROM_SYSTEM_BIOS( 2, "bios2", "xq332e0 (v1.02, Apr 20, 1995)" )
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "xq332e0.bin", 0x000000, 0x080000, CRC(6fe5bdf5) SHA1(74bb630f8cc575e059cc52cd43b3310e09f26a49) )
 
 	ROM_REGION( 0x400000, "swp00", 0 )
 	// Identical to the db50xg roms

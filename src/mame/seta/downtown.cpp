@@ -15,7 +15,7 @@ Custom :    X1-001A, X1-002A (SDIP64)   Sprites
             X1-004           (SDIP52)   Inputs
             X1-005 or X1-009 (DIP48)    NVRAM/simple protection
             X1-006           (SDIP64)   Palette
-            X1-010           (QFP80)    Sound: 16 Bit PCM
+            X1-010           (QFP80)    Sound: 8 Bit PCM
             X1-011           (QFP80)    Graphics mixing
             X1-012           (QFP100)   Tilemaps
             X1-014                      Sprites?
@@ -44,6 +44,7 @@ Notes:
 TODO:
 - metafox test grid not aligned when screen flipped
 - tndrcade: lots of flickering sprites
+- Verify screen raw parameters
 
 ********************************************************************************
 
@@ -350,8 +351,8 @@ protected:
 	u16 ipl1_ack_r();
 	void ipl1_ack_w(u16 data = 0);
 
-	void seta_coin_lockout_w(u8 data);
-	X1_001_SPRITE_GFXBANK_CB_MEMBER(setac_gfxbank_callback);
+	void coin_lockout_w(u8 data);
+	X1_001_SPRITE_GFXBANK_CB_MEMBER(gfxbank_callback);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u8 sharedram_68000_r(offs_t offset);
@@ -432,7 +433,7 @@ protected:
 	DECLARE_MACHINE_RESET(calibr50);
 	u16 twineagl_tile_offset(u16 code);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(seta_sub_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(sub_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(calibr50_interrupt);
 
 	void calibr50_map(address_map &map) ATTR_COLD;
@@ -517,7 +518,7 @@ u16 usclssic_state::tile_offset(u16 code)
 	return m_tiles_offset + code;
 }
 
-X1_001_SPRITE_GFXBANK_CB_MEMBER(tndrcade_state::setac_gfxbank_callback)
+X1_001_SPRITE_GFXBANK_CB_MEMBER(tndrcade_state::gfxbank_callback)
 {
 	const int bank = (color & 0x06) >> 1;
 	code = (code & 0x3fff) + (bank * 0x4000);
@@ -668,7 +669,7 @@ void tndrcade_state::sub_ctrl_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0/2:   // bit 0: reset sub cpu?
-			if (!(m_sub_ctrl_data & 1) && (data & 1))
+			if (BIT(~m_sub_ctrl_data, 0) && BIT(data, 0))
 				m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			m_sub_ctrl_data = data;
 			break;
@@ -700,7 +701,7 @@ u8 tndrcade_state::dsw2_r()
 }
 
 
-void tndrcade_state::seta_coin_lockout_w(u8 data)
+void tndrcade_state::coin_lockout_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
@@ -888,7 +889,7 @@ void usclssic_state::lockout_w(u8 data)
 		m_tiles->mark_all_dirty();
 	m_tiles_offset = tiles_offset;
 
-	seta_coin_lockout_w(data);
+	coin_lockout_w(data);
 }
 
 
@@ -930,7 +931,7 @@ void tndrcade_state::sub_bankswitch_w(u8 data)
 void tndrcade_state::sub_bankswitch_lockout_w(u8 data)
 {
 	sub_bankswitch_w(data);
-	seta_coin_lockout_w(data);
+	coin_lockout_w(data);
 
 	// 65C02 code doesn't seem to do anything to explicitly acknowledge IRQ; implicitly acknowledging it here seems most likely
 	m_subcpu->set_input_line(W65C02_IRQ_LINE, CLEAR_LINE);
@@ -1764,7 +1765,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::seta_sub_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(downtown_state::sub_interrupt)
 {
 	int scanline = param;
 
@@ -1802,7 +1803,7 @@ void tndrcade_state::tndrcade(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(tndrcade_state::tndrcade_sub_interrupt), "screen", 0, 1);
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(tndrcade_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(tndrcade_state::gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // correct (start grid, wall at beginning of game)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -1851,10 +1852,10 @@ void downtown_state::twineagl(machine_config &config)
 
 	W65C02(config, m_subcpu, 16_MHz_XTAL / 8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::twineagl_sub_map);
-	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::sub_interrupt), "screen", 0, 1);
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // unknown
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -1902,10 +1903,10 @@ void downtown_state::downtown(machine_config &config)
 
 	W65C02(config, m_subcpu, 16_MHz_XTAL / 8); // verified on pcb
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::downtown_sub_map);
-	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::sub_interrupt), "screen", 0, 1);
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 1); // sprites correct (test grid), tilemap unknown but at least -1 non-flipped to fix glitches later in the game
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -1996,7 +1997,7 @@ void usclssic_state::usclssic(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(usclssic_state,calibr50)
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(usclssic_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(usclssic_state::gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(2, 1); // correct (test grid and bg)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -2062,7 +2063,7 @@ void downtown_state::calibr50(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(downtown_state,calibr50)
 
 	X1_001(config, m_spritegen, 16_MHz_XTAL, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(2, -1); // correct (test grid and roof in animation at beginning of game)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -2112,10 +2113,10 @@ void downtown_state::metafox(machine_config &config)
 
 	W65C02(config, m_subcpu, 16000000/8); // 2 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &downtown_state::metafox_sub_map);
-	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::seta_sub_interrupt), "screen", 0, 1);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(downtown_state::sub_interrupt), "screen", 0, 1);
 
 	X1_001(config, m_spritegen, 16000000, m_palette, gfx_sprites);
-	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::setac_gfxbank_callback));
+	m_spritegen->set_gfxbank_callback(FUNC(downtown_state::gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // sprites unknown, tilemap correct (test grid)
 	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
@@ -2123,7 +2124,7 @@ void downtown_state::metafox(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(59.1845); // for close to real hardware music tempo
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);

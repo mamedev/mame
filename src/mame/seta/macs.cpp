@@ -58,10 +58,12 @@ KISEKAE -- info
 */
 
 #include "emu.h"
+
 #include "st0016.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+
 #include "speaker.h"
 
 
@@ -72,47 +74,50 @@ class macs_state : public driver_device
 public:
 	macs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_cart_bank(0)
 		, m_ram2(*this, "ram2")
 		, m_maincpu(*this,"maincpu")
 		, m_cart1(*this, "slot_a")
 		, m_cart2(*this, "slot_b")
-		, m_rombank(*this, "rombank%u", 1)
+		, m_in_io(*this, "IN%u", 0U)
+		, m_sys_io(*this, "SYS%u", 0U)
+		, m_dsw_io(*this, "DSW%u", 0U)
+		, m_rombank(*this, "rombank")
 		, m_rambank(*this, "rambank%u", 1)
 	{ }
 
-	void macs(machine_config &config);
+	void macs(machine_config &config) ATTR_COLD;
 
-	void init_macs();
-	void init_kisekaeh();
-	void init_kisekaem();
-	void init_macs2();
+	void init_macs() ATTR_COLD;
+	void init_kisekaeh() ATTR_COLD;
+	void init_kisekaem() ATTR_COLD;
+	void init_macs2() ATTR_COLD;
 
 protected:
-	void machine_reset() override ATTR_COLD;
-	void machine_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	uint8_t m_mux_data = 0;
-	uint8_t m_rev = 0;
-	uint8_t m_cart_bank;
 	std::unique_ptr<uint8_t[]> m_ram1;
 	required_shared_ptr<uint8_t> m_ram2;
-	void rambank_w(uint8_t data);
-	uint8_t macs_input_r(offs_t offset);
-	void macs_rom_bank_w(uint8_t data);
-	void macs_output_w(offs_t offset, uint8_t data);
-	uint8_t dma_offset();
-
-	uint32_t screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	optional_device<st0016_cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart1;
 	optional_device<generic_slot_device> m_cart2;
+	optional_ioport_array<5> m_in_io;
+	optional_ioport_array<2> m_sys_io;
+	optional_ioport_array<5> m_dsw_io;
 
-	required_memory_bank_array<2> m_rombank;
+	required_memory_bank m_rombank;
 	required_memory_bank_array<2> m_rambank;
 
+	uint8_t m_mux_data = 0;
+	uint8_t m_rev = 0;
+
+	void rambank_w(uint8_t data);
+	uint8_t input_r(offs_t offset);
+	void output_w(offs_t offset, uint8_t data);
+
+	void macs_extrom_mem(address_map &map) ATTR_COLD;
 	void macs_io(address_map &map) ATTR_COLD;
 	void macs_mem(address_map &map) ATTR_COLD;
 };
@@ -121,17 +126,15 @@ private:
 
 void macs_state::macs_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).bankr("rombank1");
-	map(0x8000, 0xbfff).bankr("rombank2");
-	//map(0xc000, 0xcfff).rw(FUNC(macs_state::st0016_sprite_ram_r), FUNC(macs_state::st0016_sprite_ram_w));
-	//map(0xd000, 0xdfff).rw(FUNC(macs_state::st0016_sprite2_ram_r), FUNC(macs_state::st0016_sprite2_ram_w));
 	map(0xe000, 0xe7ff).ram(); /* work ram ? */
-	map(0xe800, 0xe87f).ram().share("ram2");
-	//map(0xe900, 0xe9ff) // sound - internal
-	//map(0xea00, 0xebff).rw(FUNC(macs_state::st0016_palette_ram_r), FUNC(macs_state::st0016_palette_ram_w));
-	//map(0xec00, 0xec1f).rw(FUNC(macs_state::st0016_character_ram_r), FUNC(macs_state::st0016_character_ram_w));
-	map(0xf000, 0xf7ff).bankrw("rambank1"); /* common /backup ram ?*/
-	map(0xf800, 0xffff).bankrw("rambank2"); /* common /backup ram ?*/
+	map(0xe800, 0xe87f).ram().share(m_ram2);
+	map(0xf000, 0xf7ff).bankrw(m_rambank[0]); /* common /backup ram ?*/
+	map(0xf800, 0xffff).bankrw(m_rambank[1]); /* common /backup ram ?*/
+}
+
+void macs_state::macs_extrom_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr(m_rombank);
 }
 
 void macs_state::rambank_w(uint8_t data)
@@ -139,91 +142,81 @@ void macs_state::rambank_w(uint8_t data)
 	m_rambank[0]->set_entry(2 + (data & 1));
 }
 
-uint8_t macs_state::macs_input_r(offs_t offset)
+uint8_t macs_state::input_r(offs_t offset)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0:
+	case 0:
 		{
 			/*It's bit-wise*/
-			switch(m_mux_data&0x0f)
+			switch (m_mux_data & 0x0f)
 			{
-				case 0x00: return ioport("IN0")->read();
-				case 0x01: return ioport("IN1")->read();
-				case 0x02: return ioport("IN2")->read();
-				case 0x04: return ioport("IN3")->read();
-				case 0x08: return ioport("IN4")->read();
+				case 0x00: return m_in_io[0]->read();
+				case 0x01: return m_in_io[1]->read();
+				case 0x02: return m_in_io[2]->read();
+				case 0x04: return m_in_io[3]->read();
+				case 0x08: return m_in_io[4]->read();
 				default:
-				logerror("Unmapped mahjong panel mux data %02x\n",m_mux_data);
-				return 0xff;
+					if (!machine().side_effects_disabled())
+						logerror("Unmapped mahjong panel mux data %02x\n", m_mux_data);
+					return 0xff;
 			}
 		}
-		case 1: return ioport("SYS0")->read();
-		case 2: return ioport("DSW0")->read();
-		case 3: return ioport("DSW1")->read();
-		case 4: return ioport("DSW2")->read();
-		case 5: return ioport("DSW3")->read();
-		case 6: return ioport("DSW4")->read();
-		case 7: return ioport("SYS1")->read();
-		default:    popmessage("Unmapped I/O read at PC = %06x offset = %02x",m_maincpu->pc(),offset+0xc0);
+	case 1: return m_sys_io[0]->read();
+	case 2: return m_dsw_io[0]->read();
+	case 3: return m_dsw_io[1]->read();
+	case 4: return m_dsw_io[2]->read();
+	case 5: return m_dsw_io[3]->read();
+	case 6: return m_dsw_io[4]->read();
+	case 7: return m_sys_io[1]->read();
+	default:
+		if (!machine().side_effects_disabled())
+			popmessage("Unmapped I/O read at PC = %04x offset = %02x", m_maincpu->pc(), offset + 0xc0);
+		break;
 	}
 
 	return 0xff;
 }
 
 
-void macs_state::macs_rom_bank_w(uint8_t data)
+void macs_state::output_w(offs_t offset, uint8_t data)
 {
-	m_rombank[1]->set_entry(m_cart_bank * 0x100 + data);
-}
-
-void macs_state::macs_output_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
+	switch (offset)
 	{
-		case 0:
+	case 0:
 		/*
 		--x- ---- sets RAM bank?
 		---- -x-- Cassette B slot
 		---- --x- Cassette A slot
 		*/
 
-		if(m_rev == 1)
+		if (m_rev == 1)
 		{
 			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST
 			    screens indicates that there's just one RAM bank, but then MACS2 games
 			    locks up. */
 			m_rambank[0]->set_entry(BIT(data, 5));
 
-			m_cart_bank = (data & 0xc) >> 2;
-			m_rombank[0]->set_entry(m_cart_bank * 0x100);
+			m_rombank->set_entry((data >> 2) & 0x03);
 		}
 
 		m_rambank[1]->set_entry(BIT(data, 5));
 		break;
-		case 2: m_mux_data = data; break;
 
+	case 2:
+		m_mux_data = data;
+		break;
 	}
 }
 
 void macs_state::macs_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//map(0x00, 0xbf).rw(FUNC(macs_state::st0016_vregs_r), FUNC(macs_state::st0016_vregs_w)); /* video/crt regs ? */
-	map(0xc0, 0xc7).rw(FUNC(macs_state::macs_input_r), FUNC(macs_state::macs_output_w));
+	map(0xc0, 0xc7).rw(FUNC(macs_state::input_r), FUNC(macs_state::output_w));
 	map(0xe0, 0xe0).nopw(); /* renju = $40, neratte = 0 */
-	map(0xe1, 0xe1).w(FUNC(macs_state::macs_rom_bank_w));
-	//map(0xe2, 0xe2).w(FUNC(macs_state::st0016_sprite_bank_w));
-	//map(0xe3, 0xe4).w(FUNC(macs_state::st0016_character_bank_w));
-	//map(0xe5, 0xe5).w(FUNC(macs_state::st0016_palette_bank_w));
 	map(0xe6, 0xe6).w(FUNC(macs_state::rambank_w)); /* banking ? ram bank ? shared rambank ? */
 	map(0xe7, 0xe7).nopw(); /* watchdog */
-	//map(0xf0, 0xf0).rw(FUNC(macs_state::st0016_dma_r));
 }
-
-//static GFXDECODE_START( macs )
-//  GFXDECODE_ENTRY( nullptr, 0, charlayout,      0, 16*4  )
-//GFXDECODE_END
 
 static INPUT_PORTS_START( macs_base )
 	PORT_START("DSW0")
@@ -494,25 +487,14 @@ static INPUT_PORTS_START( macs_h )
 INPUT_PORTS_END
 
 
-uint32_t macs_state::screen_update_macs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_maincpu->update(screen,bitmap,cliprect);
-}
-
-
-uint8_t macs_state::dma_offset()
-{
-	return m_cart_bank;
-}
-
 
 void macs_state::macs(machine_config &config)
 {
 	/* basic machine hardware */
-	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
-	m_maincpu->set_memory_map(&macs_state::macs_mem);
-	m_maincpu->set_io_map(&macs_state::macs_io);
-	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset));
+	ST0016_CPU(config, m_maincpu, 42.954545_MHz_XTAL / 6); // divider not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &macs_state::macs_mem);
+	m_maincpu->set_addrmap(AS_IO, &macs_state::macs_io);
+	m_maincpu->set_addrmap(st0016_cpu_device::AS_EXTROM, &macs_state::macs_extrom_mem);
 	m_maincpu->set_screen("screen");
 
 	/* video hardware */
@@ -521,7 +503,7 @@ void macs_state::macs(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128*8, 128*8);
 	screen.set_visarea(0*8, 128*8-1, 0*8, 128*8-1);
-	screen.set_screen_update(FUNC(macs_state::screen_update_macs));
+	screen.set_screen_update(m_maincpu, FUNC(st0016_cpu_device::screen_update));
 	screen.set_palette("maincpu:palette");
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE); // FIXME: HOLD_LINE is bad juju
 
@@ -532,22 +514,23 @@ void macs_state::macs(machine_config &config)
 	slot_b.set_default_option("rom");
 	slot_b.set_user_loadable(false);
 
-	// TODO: Mono?
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	// confirmed mono
+	SPEAKER(config, "speaker").front_center();
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0);
 }
 
 
 #define MACS_BIOS \
-	ROM_REGION( 0x1000000, "bios", 0 ) \
-	ROM_LOAD16_BYTE( "macsos_l.u43", 0x00000, 0x80000, CRC(0b5aed5e) SHA1(042e705017ee34656e2c6af45825bb2dd3447747) ) \
-	ROM_LOAD16_BYTE( "macsos_h.u44", 0x00001, 0x80000, CRC(538b68e4) SHA1(a0534147791e94e726f49451d0e95671ae0a87d5) )
+	ROM_REGION( 0x400000, "bios", 0 ) \
+	ROM_LOAD16_BYTE( "am_macs_os_low.u43", 0x00000, 0x80000, CRC(0b5aed5e) SHA1(042e705017ee34656e2c6af45825bb2dd3447747) ) \
+	ROM_LOAD16_BYTE( "am_macs_os_hi.u44",  0x00001, 0x80000, CRC(538b68e4) SHA1(a0534147791e94e726f49451d0e95671ae0a87d5) ) \
+\
+	ROM_REGION( 0x157, "pld", 0 ) \
+	ROM_LOAD( "sx011-01.bin", 0x000, 0x157, CRC(669096c1) SHA1(36f55a2e4865bdf0506746a4df51bfb1944f905e) ) // GAL20V8B
 
 #define MACS2_BIOS \
-	ROM_REGION( 0x1000000, "bios", 0 ) \
+	ROM_REGION( 0x400000, "bios", 0 ) \
 	ROM_LOAD16_BYTE( "macs2os_l.bin", 0x00000, 0x80000, NO_DUMP ) \
 	ROM_LOAD16_BYTE( "macs2os_h.bin", 0x00001, 0x80000, NO_DUMP )
 
@@ -579,6 +562,10 @@ ROM_START( kisekaem )
 	ROM_LOAD16_BYTE( "am-mj.u7", 0x000001, 0x100000, CRC(4b645354) SHA1(1dbf9141c3724e5dff2cd8066117fb1b94671a80) )
 	ROM_LOAD16_BYTE( "am-mj.u6", 0x200000, 0x100000, CRC(23b3aa24) SHA1(bfabdb16f9b1b60230bb636a944ab46fdfda49d7) )
 	ROM_LOAD16_BYTE( "am-mj.u5", 0x200001, 0x100000, CRC(b4d53e29) SHA1(d7683fdd5531bf1aa0ef1e4e6f517b31e2d5829e) )
+
+	ROM_REGION( 0x117, "slot_a:pld", 0 )
+	ROM_LOAD( "sx011-02.bin", 0x000, 0x117, CRC(ac8040b4) SHA1(1dc1cd93eaed13fb5b8cba024d93fdb9193a47c0) ) // GAL16V8B
+
 	ROM_REGION( 0x400000, "slot_b:rom", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
@@ -672,15 +659,8 @@ static const uint8_t ramdata[160]=
 
 void macs_state::machine_start()
 {
-	m_rombank[0]->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
-	m_rombank[0]->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
-	m_rombank[0]->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
-	m_rombank[0]->set_entry(0);
-
-	m_rombank[1]->configure_entries(0  , 256, memregion("maincpu")->base(), 0x4000);
-	m_rombank[1]->configure_entries(256, 256, m_cart1->get_rom_base(), 0x4000);
-	m_rombank[1]->configure_entries(512, 256, m_cart2->get_rom_base(), 0x4000);
-	m_rombank[1]->set_entry(0);
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x400000);
+	m_rombank->set_entry(0);
 
 	m_rambank[0]->configure_entries(0, 4, m_ram1.get(), 0x800);
 	m_rambank[0]->set_entry(2);
@@ -763,28 +743,28 @@ void macs_state::machine_reset()
 
 void macs_state::init_macs()
 {
-	m_ram1=std::make_unique<uint8_t[]>(0x20000);
+	m_ram1 = std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
 void macs_state::init_macs2()
 {
-	m_ram1=std::make_unique<uint8_t[]>(0x20000);
+	m_ram1 = std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
 void macs_state::init_kisekaeh()
 {
-	m_ram1=std::make_unique<uint8_t[]>(0x20000);
+	m_ram1 = std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
 void macs_state::init_kisekaem()
 {
-	m_ram1=std::make_unique<uint8_t[]>(0x20000);
+	m_ram1 = std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_game_flag((10 | 0x180));
 	m_rev = 1;
 }

@@ -495,8 +495,8 @@ void gpworld_state::gpworld(machine_config &config)
 
 	PIONEER_LDV1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(512, 256, FUNC(gpworld_state::screen_update));
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
@@ -505,8 +505,7 @@ void gpworld_state::gpworld(machine_config &config)
 	PALETTE(config, m_palette).set_entries(1024);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

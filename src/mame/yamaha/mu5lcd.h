@@ -32,7 +32,7 @@ protected:
 private:
 	required_device<lc7985_device> m_lcd;
 	output_finder<2, 8, 8, 5> m_outputs;
-	void render_w(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 #endif // MAME_YAMAHA_MU5LCD_H

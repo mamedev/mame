@@ -15,6 +15,7 @@
 #include "divtlb.h"
 
 #include "i386dasm.h"
+#include <algorithm>
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
@@ -513,7 +514,7 @@ protected:
 	void i386_check_sreg_validity(int reg);
 	int i386_limit_check(int seg, uint32_t offset, int size = 1);
 	void i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault);
-	void i386_trap(int irq, int irq_gate, int trap_level);
+	void i386_trap(int irq, int irq_gate);
 	void i386_trap_with_error(int irq, int irq_gate, int trap_level, uint32_t error);
 	void i286_task_switch(uint16_t selector, uint8_t nested);
 	void i386_task_switch(uint16_t selector, uint8_t nested);
@@ -1035,7 +1036,7 @@ protected:
 	void i386_bound_r32_m32_m32();
 	void i386_retf32();
 	void i386_retf_i32();
-	void i386_load_far_pointer32(int s);
+	bool i386_load_far_pointer32(int s);
 	void i386_lds32();
 	void i386_lss32();
 	void i386_les32();

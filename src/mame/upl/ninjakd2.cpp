@@ -172,13 +172,8 @@ TODO:
 #define NE555_FREQUENCY 16300   // measured on PCB
 //#define NE555_FREQUENCY   (1.0f / (0.693 * (560 + 2*51) * 0.1e-6))    // theoretical: this gives 21.8kHz which is too high
 
-SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
+void ninjakd2_state::ninjakd2_init_samples()
 {
-	if (m_pcm_region == nullptr)
-	{
-		return;
-	}
-
 	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
 	m_sampledata = std::make_unique<int16_t[]>(length);
@@ -192,12 +187,6 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 
 void ninjakd2_state::ninjakd2_pcm_play_w(uint8_t data)
 {
-	// only Ninja Kid II uses this
-	if (m_pcm_region == nullptr)
-	{
-		return;
-	}
-
 	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
 	const int start = data << 8;
@@ -500,22 +489,18 @@ void omegaf_state::omegaf_main_cpu(address_map &map)
 }
 
 
-void ninjakd2_state::ninjakd2_sound_cpu(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).rom();
-	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).w(FUNC(ninjakd2_state::ninjakd2_pcm_play_w));
-}
-
 void ninjakd2_state::ninjakid_nopcm_sound_cpu(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).noprw();
+}
+
+void ninjakd2_state::ninjakd2_sound_cpu(address_map &map)
+{
+	ninjakid_nopcm_sound_cpu(map);
+	map(0xf000, 0xf000).w(FUNC(ninjakd2_state::ninjakd2_pcm_play_w));
 }
 
 void ninjakd2_state::decrypted_opcodes_map(address_map &map)
@@ -977,7 +962,6 @@ void ninjakd2_state::ninjakd2_core(machine_config &config)
 
 	SAMPLES(config, m_pcm);
 	m_pcm->set_channels(1);
-	m_pcm->set_samples_start_callback(FUNC(ninjakd2_state::ninjakd2_init_samples));
 	m_pcm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
@@ -1026,11 +1010,10 @@ void robokid_state::robokid(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &robokid_state::robokid_main_cpu);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &robokid_state::ninjakid_nopcm_sound_cpu);
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_robokid);
-	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400);  // RAM is this large, but still only 0x300 colors used
+	m_palette->set_format(palette_device::RRRRGGGGBBBBRGBx, 0x400); // RAM is this large, but still only 0x300 colors used
 	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(robokid_state,robokid)
@@ -1527,54 +1510,92 @@ ROM_END
 
 ROM_START( omegaf )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "1.5",          0x00000, 0x08000, CRC(57a7fd96) SHA1(65ca290b48f8579fcce00db5b3b3f8694667a136) )
-	ROM_IGNORE(                        0x18000 )
-	ROM_RELOAD(               0x10000, 0x20000 )                                                                // banked at 8000-bfff
-	ROM_LOAD( "6.4l",         0x30000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
+	ROM_LOAD( "1.5.3l", 0x00000, 0x08000, CRC(57a7fd96) SHA1(65ca290b48f8579fcce00db5b3b3f8694667a136) )
+	ROM_IGNORE(                  0x18000 )
+	ROM_RELOAD(         0x10000, 0x20000 )                                                                // banked at 8000-bfff
+	ROM_LOAD( "6.4l",   0x30000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "7.7m",         0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
+	ROM_LOAD( "7.7m",  0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
 
-	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
-	ROM_LOAD( "4.18h",        0x00000, 0x08000, CRC(9e2d8152) SHA1(4b50557d171d1b03a870db5891ae67d70858ad37) )
+	ROM_REGION( 0x08000, "chars", 0 ) // fg tiles
+	ROM_LOAD( "4.18h", 0x00000, 0x08000, CRC(9e2d8152) SHA1(4b50557d171d1b03a870db5891ae67d70858ad37) )
 
-	ROM_REGION( 0x20000, "sprites", 0 )    // sprite tiles
-	ROM_LOAD( "8.23m",        0x00000, 0x20000, CRC(0bd2a5d1) SHA1(ef84f1a5554e891fc38d17314e3952ea5c9d2731) )
+	ROM_REGION( 0x20000, "sprites", 0 ) // sprite tiles
+	ROM_LOAD( "8.23m", 0x00000, 0x20000, CRC(0bd2a5d1) SHA1(ef84f1a5554e891fc38d17314e3952ea5c9d2731) )
 
-	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
-	ROM_LOAD( "2back1.27b",   0x00000, 0x80000, CRC(21f8a32e) SHA1(26582e06e7381e09443fa99f24ca9edd0b4a2937) )
+	ROM_REGION( 0x80000, "tiles1", 0 ) // bg0 tiles
+	ROM_LOAD( "2back1.27b", 0x00000, 0x80000, CRC(21f8a32e) SHA1(26582e06e7381e09443fa99f24ca9edd0b4a2937) )
 
-	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
-	ROM_LOAD( "1back2.15b",   0x00000, 0x80000, CRC(6210ddcc) SHA1(89c091eeafcc92750d0ea303fcde8a8dc3eeba89) )
+	ROM_REGION( 0x80000, "tiles2", 0 ) // bg1 tiles
+	ROM_LOAD( "1back2.15b", 0x00000, 0x80000, CRC(6210ddcc) SHA1(89c091eeafcc92750d0ea303fcde8a8dc3eeba89) )
 
-	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
-	ROM_LOAD( "3back3.5f",    0x00000, 0x80000, CRC(c31cae56) SHA1(4cc2d0d70990ca04b0e3abd15e5afe183e98e4ab) )
+	ROM_REGION( 0x80000, "tiles3", 0 ) // bg2 tiles
+	ROM_LOAD( "3back3.5f",  0x00000, 0x80000, CRC(c31cae56) SHA1(4cc2d0d70990ca04b0e3abd15e5afe183e98e4ab) )
+
+	ROM_REGION( 0x0500, "proms", 0 ) // currently unused
+	ROM_LOAD( "10.20l", 0x0000, 0x0100, CRC(89e0763f) SHA1(c0b27acb2cb773aa0b9e72a1b234c3c68f686251) ) // BPROM type 82S129
+	ROM_LOAD( "11.27n", 0x0100, 0x0400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) ) // BPROM type 82S137
+ROM_END
+
+ROM_START( omegafa )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "5_1.3l", 0x00000, 0x08000, CRC(f53acd66) SHA1(574d5cbfaf0f0f74802aebc21d2caabc40e05afc) )
+	ROM_IGNORE(                  0x18000 )
+	ROM_RELOAD(         0x10000, 0x20000 )                                                                // banked at 8000-bfff
+	ROM_LOAD( "6.4l",   0x30000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "7.7m",  0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
+
+	ROM_REGION( 0x08000, "chars", 0 ) // fg tiles
+	ROM_LOAD( "4.18h", 0x00000, 0x08000, CRC(9e2d8152) SHA1(4b50557d171d1b03a870db5891ae67d70858ad37) )
+
+	ROM_REGION( 0x20000, "sprites", 0 ) // sprite tiles
+	ROM_LOAD( "8.23m", 0x00000, 0x20000, CRC(0bd2a5d1) SHA1(ef84f1a5554e891fc38d17314e3952ea5c9d2731) )
+
+	ROM_REGION( 0x80000, "tiles1", 0 ) // bg0 tiles
+	ROM_LOAD( "2back1.27b", 0x00000, 0x80000, CRC(21f8a32e) SHA1(26582e06e7381e09443fa99f24ca9edd0b4a2937) )
+
+	ROM_REGION( 0x80000, "tiles2", 0 ) // bg1 tiles
+	ROM_LOAD( "1back2.15b", 0x00000, 0x80000, CRC(6210ddcc) SHA1(89c091eeafcc92750d0ea303fcde8a8dc3eeba89) )
+
+	ROM_REGION( 0x80000, "tiles3", 0 ) // bg2 tiles
+	ROM_LOAD( "3back3.5f",  0x00000, 0x80000, CRC(c31cae56) SHA1(4cc2d0d70990ca04b0e3abd15e5afe183e98e4ab) )
+
+	ROM_REGION( 0x0500, "proms", 0 ) // currently unused
+	ROM_LOAD( "10.20l", 0x0000, 0x0100, CRC(89e0763f) SHA1(c0b27acb2cb773aa0b9e72a1b234c3c68f686251) ) // BPROM type 82S129
+	ROM_LOAD( "11.27n", 0x0100, 0x0400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) ) // BPROM type 82S137
 ROM_END
 
 ROM_START( omegafs )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "5.3l",         0x00000, 0x08000, CRC(503a3e63) SHA1(73420aecb653cd4fd3b6afe67d6f5726f01411dd) )
-	ROM_IGNORE(                        0x18000 )
-	ROM_RELOAD(               0x10000, 0x20000 )                                                                // banked at 8000-bfff
-	ROM_LOAD( "6.4l",         0x30000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
+	ROM_LOAD( "5.3l",  0x00000, 0x08000, CRC(503a3e63) SHA1(73420aecb653cd4fd3b6afe67d6f5726f01411dd) )
+	ROM_IGNORE(                 0x18000 )
+	ROM_RELOAD(        0x10000, 0x20000 )                                                                // banked at 8000-bfff
+	ROM_LOAD( "6.4l",  0x30000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "7.7m",         0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
+	ROM_LOAD( "7.7m",  0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
 
-	ROM_REGION( 0x08000, "chars", 0 )    // fg tiles
-	ROM_LOAD( "4.18h",        0x00000, 0x08000, CRC(9e2d8152) SHA1(4b50557d171d1b03a870db5891ae67d70858ad37) )
+	ROM_REGION( 0x08000, "chars", 0 ) // fg tiles
+	ROM_LOAD( "4.18h", 0x00000, 0x08000, CRC(9e2d8152) SHA1(4b50557d171d1b03a870db5891ae67d70858ad37) )
 
-	ROM_REGION( 0x20000, "sprites", 0 )    // sprite tiles
-	ROM_LOAD( "8.23m",        0x00000, 0x20000, CRC(0bd2a5d1) SHA1(ef84f1a5554e891fc38d17314e3952ea5c9d2731) )
+	ROM_REGION( 0x20000, "sprites", 0 ) // sprite tiles
+	ROM_LOAD( "8.23m", 0x00000, 0x20000, CRC(0bd2a5d1) SHA1(ef84f1a5554e891fc38d17314e3952ea5c9d2731) )
 
-	ROM_REGION( 0x80000, "tiles1", 0 )    // bg0 tiles
-	ROM_LOAD( "2back1.27b",   0x00000, 0x80000, CRC(21f8a32e) SHA1(26582e06e7381e09443fa99f24ca9edd0b4a2937) )
+	ROM_REGION( 0x80000, "tiles1", 0 ) // bg0 tiles
+	ROM_LOAD( "2back1.27b", 0x00000, 0x80000, CRC(21f8a32e) SHA1(26582e06e7381e09443fa99f24ca9edd0b4a2937) )
 
-	ROM_REGION( 0x80000, "tiles2", 0 )    // bg1 tiles
-	ROM_LOAD( "1back2.15b",   0x00000, 0x80000, CRC(6210ddcc) SHA1(89c091eeafcc92750d0ea303fcde8a8dc3eeba89) )
+	ROM_REGION( 0x80000, "tiles2", 0 ) // bg1 tiles
+	ROM_LOAD( "1back2.15b", 0x00000, 0x80000, CRC(6210ddcc) SHA1(89c091eeafcc92750d0ea303fcde8a8dc3eeba89) )
 
-	ROM_REGION( 0x80000, "tiles3", 0 )    // bg2 tiles
-	ROM_LOAD( "3back3.5f",    0x00000, 0x80000, CRC(c31cae56) SHA1(4cc2d0d70990ca04b0e3abd15e5afe183e98e4ab) )
+	ROM_REGION( 0x80000, "tiles3", 0 ) // bg2 tiles
+	ROM_LOAD( "3back3.5f",  0x00000, 0x80000, CRC(c31cae56) SHA1(4cc2d0d70990ca04b0e3abd15e5afe183e98e4ab) )
+
+	ROM_REGION( 0x0500, "proms", 0 ) // currently unused
+	ROM_LOAD( "10.20l", 0x0000, 0x0100, CRC(89e0763f) SHA1(c0b27acb2cb773aa0b9e72a1b234c3c68f686251) ) // BPROM type 82S129
+	ROM_LOAD( "11.27n", 0x0100, 0x0400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) ) // BPROM type 82S137
 ROM_END
 
 
@@ -1624,6 +1645,7 @@ void ninjakd2_state::init_ninjakd2()
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_decrypted_opcodes, 0x8000);
 
 	gfx_unscramble();
+	ninjakd2_init_samples();
 }
 
 void ninjakd2_state::init_bootleg()
@@ -1631,6 +1653,7 @@ void ninjakd2_state::init_bootleg()
 	memcpy(m_decrypted_opcodes, memregion("soundcpu")->base() + 0x10000, 0x8000);
 
 	gfx_unscramble();
+	ninjakd2_init_samples();
 }
 
 void mnight_state::init_mnight()
@@ -1703,5 +1726,6 @@ GAME( 1988, robokidj,  robokid,  robokid,   robokidj, robokid_state,  init_robok
 GAME( 1988, robokidj2, robokid,  robokid,   robokidj, robokid_state,  init_robokidj, ROT0,   "UPL",                             "Atomic Robo-kid (Japan, Type-2, set 2)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1988, robokidj3, robokid,  robokid,   robokidj, robokid_state,  empty_init,    ROT0,   "UPL",                             "Atomic Robo-kid (Japan)",                                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1989, omegaf,    0,        omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL",                             "Omega Fighter",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegaf,    0,        omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL",                             "Omega Fighter (set 1)",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, omegafa,   omegaf,   omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL",                             "Omega Fighter (set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1989, omegafs,   omegaf,   omegaf,    omegaf,   omegaf_state,   empty_init,    ROT270, "UPL",                             "Omega Fighter Special",                                    MACHINE_SUPPORTS_SAVE )

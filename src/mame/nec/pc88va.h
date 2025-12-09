@@ -11,15 +11,18 @@
 
 #pragma once
 
-//#include "pc80s31k.h"
 #include "pc88va_sgp.h"
 
+//#include "bus/nec_fdd/pc80s31k.h"
+#include "bus/pc98_cbus/slot.h"
 #include "bus/msx/ctrl/ctrl.h"
+
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
+#include "machine/input_merger.h"
 #include "machine/pic8259.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
@@ -46,18 +49,19 @@ public:
 		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
 		, m_rtc(*this, "rtc")
-		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
+		, m_cbus_root(*this, "cbus")
+		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
+		, m_mouse_port(*this, "mouseport")
 		, m_opna(*this, "opna")
-		, m_lspeaker(*this, "lspeaker")
-		, m_rspeaker(*this, "rspeaker")
+		, m_speaker(*this, "speaker")
 		, m_palram(*this, "palram")
 		, m_sysbank(*this, "sysbank")
 		, m_workram(*this, "workram")
 		, m_tvram(*this, "tvram")
-		, m_gvram(*this, "gvram")
 		, m_fb_regs(*this, "fb_regs")
-		, m_kanji_rom(*this, "kanji")
 		, m_sgp(*this, "sgp")
+		, m_gmsp_view(*this, "gmsp_view")
+		, m_kanji_rom(*this, "kanji")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{ }
@@ -95,7 +99,11 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 	void palette_init(palette_device &palette) const;
+
+protected:
+	void pc88va_cbus(machine_config &config);
 
 private:
 
@@ -107,19 +115,20 @@ private:
 //  required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 	required_device<upd4990a_device> m_rtc;
+	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<ym2608_device> m_opna;
-	required_device<speaker_device> m_lspeaker;
-	required_device<speaker_device> m_rspeaker;
+	required_device<speaker_device> m_speaker;
 	required_shared_ptr<uint16_t> m_palram;
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_workram;
 	required_shared_ptr<uint16_t> m_tvram;
-	required_shared_ptr<uint16_t> m_gvram;
+	std::unique_ptr<uint8_t[]> m_gvram;
 	required_shared_ptr<uint16_t> m_fb_regs;
-	required_region_ptr<u16> m_kanji_rom;
 	required_device<pc88va_sgp_device> m_sgp;
-	std::unique_ptr<uint8_t[]> m_kanjiram;
+	memory_view m_gmsp_view;
+	required_region_ptr<u16> m_kanji_rom;
+	std::unique_ptr<uint8_t[]> m_kanji_ram;
 
 	uint16_t m_bank_reg = 0;
 	uint8_t m_timer3_io_reg = 0;
@@ -135,17 +144,16 @@ private:
 	uint8_t m_fdc_ctrl_2 = 0;
 	bool m_xtmask = false;
 	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
+	TIMER_CALLBACK_MEMBER(fdc_timer);
+	template <unsigned N> TIMER_CALLBACK_MEMBER(fdc_motor_start);
 	void tc_w(int state);
 
 	void fdc_irq(int state);
 	static void floppy_formats(format_registration &fr);
-	void pc88va_fdc_update_ready(floppy_image_device *, int);
+	void fdc_update_ready(floppy_image_device *, int);
 	uint8_t fake_subfdc_r();
-	uint8_t pc88va_fdc_r(offs_t offset);
-	void pc88va_fdc_w(offs_t offset, uint8_t data);
+	uint8_t fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, uint8_t data);
 
 	uint16_t bios_bank_r();
 	void bios_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -155,8 +163,6 @@ private:
 	void backupram_wp_0_w(uint16_t data);
 	uint8_t kanji_ram_r(offs_t offset);
 	void kanji_ram_w(offs_t offset, uint8_t data);
-
-	uint8_t hdd_status_r();
 
 	uint16_t sysop_r();
 	void timer3_ctrl_reg_w(uint8_t data);
@@ -175,19 +181,54 @@ private:
 	void r232_ctrl_portc_w(uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
 
-	uint16_t m_video_pri_reg[2]{};
+	uint16_t m_video_pri_reg[2];
 
-	u16 m_screen_ctrl_reg = 0;
-	bool m_dm = false;
-	bool m_ymmd = false;
-	u16 m_gfx_ctrl_reg = 0;
+	u16 m_screen_ctrl_reg;
+	bool m_gden0;
+	bool m_dm;
+	bool m_ymmd;
+	u8 m_vw;
+	u16 m_gfx_ctrl_reg;
 
-	u16 m_color_mode = 0;
-	u8 m_pltm, m_pltp = 0;
+	u16 m_color_mode;
+	u8 m_pltm, m_pltp;
 
-	u16 m_text_transpen = 0;
-	bool m_td = false;
+	u16 m_text_transpen;
+	bool m_td;
 	bitmap_rgb32 m_graphic_bitmap[2];
+
+	struct {
+		bool aacc;
+		u8 gmap;
+		u8 xrpm, xwpm;
+		//bool rbusy;
+		bool cmpen;
+		u8 wss;
+		u8 pmod;
+		u8 rop[4];
+
+		u8 cmpr[4];
+		u8 patr[4][2];
+		u8 prrp, prwp;
+	} m_multiplane;
+
+	struct {
+		//bool rbusy;
+		u8 wss;
+		u8 patr[2];
+		u8 rop[2];
+	} m_singleplane;
+
+	struct {
+		u16 top, bottom;
+		u16 left, right;
+	} m_picture_mask;
+
+	u8 rop_execute(u8 plane_rop, u8 src, u8 dst, u8 pat);
+	u8 gvram_singleplane_r(offs_t offset);
+	void gvram_singleplane_w(offs_t offset, u8 data);
+	u8 gvram_multiplane_r(offs_t offset);
+	void gvram_multiplane_w(offs_t offset, u8 data);
 
 	u16 screen_ctrl_r();
 	void screen_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -198,6 +239,7 @@ private:
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_control_1_w(u8 data);
+	void picture_mask_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u8 m_kanji_cg_line = 0;
 	u8 m_kanji_cg_jis[2]{};
@@ -214,12 +256,12 @@ private:
 	void draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 which);
 
 	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base);
-	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
-	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height);
-	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height);
+	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u16 fb_width, u16 fb_height);
+	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u16 fb_width, u16 fb_height);
 
-	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
-	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
 
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -231,6 +273,7 @@ private:
 	uint8_t m_buf_size = 0;
 	uint8_t m_buf_index = 0;
 	uint8_t m_buf_ram[16]{};
+	u8 m_crtc_regs[15]{};
 	u16 m_vrtc_irq_line = 432;
 
 	uint8_t idp_status_r();
@@ -249,6 +292,8 @@ private:
 	void execute_sprsw_cmd();
 	void execute_spwr_cmd(u8 data);
 
+	void recompute_parameters();
+
 	void main_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void sysbank_map(address_map &map) ATTR_COLD;
@@ -256,11 +301,13 @@ private:
 
 	void sgp_map(address_map &map) ATTR_COLD;
 
+	int m_dack;
+
+// TODO: stuff backported from PC88/PC98 as QoL that should really be common
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-// TODO: stuff backported from PC8801 as QoL that should really be common
 private:
 	uint8_t misc_ctrl_r();
 	void misc_ctrl_w(uint8_t data);

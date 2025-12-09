@@ -177,7 +177,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void device_post_load() override { m_gfxdecode->gfx(1)->mark_all_dirty(); }
 
 private:
 	// max stars is more than it needs to be, to allow experimenting with the star generator

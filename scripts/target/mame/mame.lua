@@ -52,6 +52,7 @@ function linkProjects_mame_mame(_target, _subtarget)
 			end
 		end
 	end
+	table.sort(projects)
 	table.insert(projects, "shared") -- must stay at the end
 	links(projects)
 end
@@ -105,6 +106,7 @@ function createProjects_mame_mame(_target, _subtarget)
 
 		if 0 < #sources then
 			createMAMEProjects(_target, _subtarget, name)
+			table.sort(sources)
 			files(sources)
 		end
 	end

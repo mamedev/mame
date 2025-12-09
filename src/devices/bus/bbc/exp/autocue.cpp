@@ -15,16 +15,42 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "autocue.h"
 
+#include "machine/nvram.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_AUTOCUE, bbc_autocue_device, "bbc_autocue", "Autocue RAM Disc");
+namespace {
+
+class bbc_autocue_device : public device_t, public device_bbc_exp_interface
+{
+public:
+	bbc_autocue_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_AUTOCUE, tag, owner, clock)
+		, device_bbc_exp_interface(mconfig, *this)
+		, m_nvram(*this, "nvram")
+		, m_ram_page(0)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void fred_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t jim_r(offs_t offset) override;
+	virtual void jim_w(offs_t offset, uint8_t data) override;
+
+private:
+	required_device<nvram_device> m_nvram;
+	std::unique_ptr<uint8_t[]> m_ram;
+
+	uint16_t m_ram_page;
+};
 
 
 //-------------------------------------------------
@@ -36,21 +62,6 @@ void bbc_autocue_device::device_add_mconfig(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_autocue_device - constructor
-//-------------------------------------------------
-
-bbc_autocue_device::bbc_autocue_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_AUTOCUE, tag, owner, clock)
-	, device_bbc_exp_interface(mconfig, *this)
-	, m_nvram(*this, "nvram")
-	, m_ram_page(0)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -58,11 +69,11 @@ bbc_autocue_device::bbc_autocue_device(const machine_config &mconfig, const char
 
 void bbc_autocue_device::device_start()
 {
-	/* ram disk - board with 8 x HM62256LFP-12 - 256K expandable to 512K */
+	// ram disk - board with 8 x HM62256LFP-12 - 256K expandable to 512K
 	m_ram = make_unique_clear<uint8_t[]>(0x40000);
 	m_nvram->set_base(m_ram.get(), 0x40000);
 
-	/* register for save states */
+	// register for save states
 	save_item(NAME(m_ram_page));
 	save_pointer(NAME(m_ram), 0x40000);
 }
@@ -100,3 +111,8 @@ void bbc_autocue_device::jim_w(offs_t offset, uint8_t data)
 		m_ram[(m_ram_page << 8) | offset] = data;
 	}
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_AUTOCUE, device_bbc_exp_interface, bbc_autocue_device, "bbc_autocue", "Autocue RAM Disc");

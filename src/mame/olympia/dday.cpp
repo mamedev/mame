@@ -728,5 +728,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1982, dday,  0,    dday, dday,  dday_state, empty_init, ROT0, "Olympia",                   "D-Day",           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dday,  0,    dday, dday,  dday_state, empty_init, ROT0, "Olympia",                   "D-Day (Olympia)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, ddayc, dday, dday, ddayc, dday_state, empty_init, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

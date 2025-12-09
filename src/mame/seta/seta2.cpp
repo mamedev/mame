@@ -88,13 +88,15 @@ funcube series:
 - Hacked to run, as they use a ColdFire CPU.
 - Pay-out key causes "unknown error" after coin count reaches 0.
 
+blnctry:
+- hook up sub CPU, inputs, sound
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "seta2.h"
 
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
@@ -465,13 +467,20 @@ void seta2_state::reelquak_map(address_map &map)
                                 Namco Stars
 ***************************************************************************/
 
-// To be done:
+// TODO: very incomplete
 void seta2_state::namcostr_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                              // ROM
-	map(0x200000, 0x20ffff).ram();                                              // RAM
-	map(0xc00000, 0xc3ffff).ram().share(m_spriteram);                           // Sprites
-	map(0xc60000, 0xc6003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs); // Video Registers
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x21ffff).ram();                                                              // RAM
+	map(0x300000, 0x3003ff).ram().share("nvram");
+	map(0x400000, 0x400001).portr("DSW");
+	map(0x400002, 0x400003).portr("SYSTEM");
+	map(0x400006, 0x400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).nopw();
+	map(0x500001, 0x500001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
+	map(0x500003, 0x500003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
+	map(0x800000, 0x83ffff).ram().share(m_spriteram);                                           // Sprites
+	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
+	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                 // Video Registers
 }
 
 
@@ -781,9 +790,9 @@ void funcube_touchscreen_device::tra_callback()
 
 // Main CPU
 
-uint32_t funcube_state::debug_r()
+uint16_t funcube_state::debug_r()
 {
-	uint32_t ret = m_in_debug->read();
+	uint16_t ret = m_in_debug->read();
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
 	if (!(m_screen->frame_number() % 3))
@@ -797,20 +806,17 @@ void funcube_state::funcube_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00400000, 0x00400003).r(FUNC(funcube_state::debug_r));
-	map(0x00400004, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
+	map(0x00400002, 0x00400003).r(FUNC(funcube_state::debug_r));
+	map(0x00400006, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).nopw();
 
 	map(0x00500001, 0x00500001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x00500003, 0x00500003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 
 	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w));
-	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
+	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x00860000, 0x0086003f).rw(FUNC(funcube_state::vregs_r), FUNC(funcube_state::vregs_w));
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
-
-	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
-	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
 void funcube_state::funcube2_map(address_map &map)
@@ -818,7 +824,7 @@ void funcube_state::funcube2_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00500000, 0x00500003).r(FUNC(funcube_state::debug_r));
+	map(0x00500002, 0x00500003).r(FUNC(funcube_state::debug_r));
 	map(0x00500004, 0x00500007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
 	map(0x00600001, 0x00600001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
@@ -830,7 +836,7 @@ void funcube_state::funcube2_map(address_map &map)
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
 
-	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
+//  map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
@@ -1679,12 +1685,12 @@ static INPUT_PORTS_START( reelquak )
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:7,8")   // bit 7 tested according to game style
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_10C ) )
 
 	PORT_START("DSW2")  // $400302.w
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")  // used
@@ -2198,6 +2204,43 @@ static INPUT_PORTS_START( funcube )
 	PORT_DIPSETTING( 0x00800000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( blnctry )
+	PORT_START("DSW")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW)
+	PORT_DIPNAME( 0x02, 0x02, "DSW" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test Button")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Button")
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
 
@@ -2428,17 +2471,6 @@ void seta2_state::telpacfl(machine_config &config)
                                Funcube series
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(funcube_state::funcube_interrupt)
-{
-	int scanline = param;
-
-	if (scanline == 368)
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-	if (scanline == 0)
-		m_maincpu->set_input_line(2, HOLD_LINE);
-}
-
 void funcube_state::machine_start()
 {
 	seta2_state::machine_start();
@@ -2457,11 +2489,12 @@ void funcube_state::machine_reset()
 	m_funcube_leds = 0;
 }
 
+// original on EVA board, no Coldfire
 void funcube_state::funcube(machine_config &config)
 {
-	MCF5206E(config, m_maincpu, XTAL(25'447'000));
+	// TODO: check exact type and clock
+	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(funcube_state::funcube_interrupt), "screen", 0, 1);
 
 	H83007(config, m_sub, FUNCUBE_SUB_CPU_CLOCK);
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
@@ -2470,8 +2503,6 @@ void funcube_state::funcube(machine_config &config)
 	m_sub->read_porta().set(FUNC(funcube_state::outputs_r));
 	m_sub->write_porta().set(FUNC(funcube_state::outputs_w));
 	m_sub->write_portb().set(FUNC(funcube_state::leds_w));
-
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
@@ -2487,45 +2518,53 @@ void funcube_state::funcube(machine_config &config)
 	m_screen->set_visarea(0x0+1, 0x140-1+1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(funcube_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "lspeaker", 0.80);
-	m_oki->add_route(1, "rspeaker", 0.80);
+	m_oki->add_route(0, "speaker", 0.80, 0);
+	m_oki->add_route(1, "speaker", 0.80, 1);
 }
 
 
 void funcube_state::funcube2(machine_config &config)
 {
 	funcube(config);
+	MCF5206E(config.replace(), m_maincpu, XTAL(25'447'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
+	downcast<mcf5206e_device &>(*m_maincpu).gpio_r_cb().set_ioport("BATTERY");
 
 	m_sub->read_port4().set([]() -> u8 { return 0; }); // unused
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
+	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 1);
 }
 
 
 void seta2_state::namcostr(machine_config &config)
 {
-	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);   // !! TMP68301 !!
+	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seta2_state::namcostr_map);
 	// does this have a ticket dispenser?
+
+	WATCHDOG_TIMER(config, "watchdog");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(0x200, 0x200);
-	m_screen->set_visarea(0x40, 0x1c0-1, 0x00, 0xf0-1);
+	m_screen->set_visarea(0x01, 0x140, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(seta2_state::screen_vblank));
 	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
@@ -2535,12 +2574,11 @@ void seta2_state::namcostr(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x8000+0xf0);    // extra 0xf0 because we might draw 256-color object with 16-color granularity
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "lspeaker", 0.80);
-	m_oki->add_route(1, "rspeaker", 0.80);
+	m_oki->add_route(0, "speaker", 0.80, 0);
+	m_oki->add_route(1, "speaker", 0.80, 1);
 }
 
 
@@ -2669,6 +2707,8 @@ U42, U43 & U47 are mask ROMs read as 27C322
 
 The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
+"15.5846kHz hsync, vsync between 60-61Hz (can't split the csync)"
+
 ***************************************************************************/
 
 ROM_START( funcube2 )
@@ -2745,9 +2785,11 @@ ROM_END
 
 void funcube_state::init_funcube()
 {
-	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
+//  uint16_t *main_cpu = (uint16_t *) memregion("maincpu")->base();
+//
+//  main_cpu[0x064/2] = 0x0000;
+//  main_cpu[0x066/2] = 0x042a; // PIC protection?
 
-	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
 }
 
 void funcube_state::init_funcube2()
@@ -3325,6 +3367,21 @@ void seta2_state::init_namcostr()
 		cpurom[addr / 2] &= 0xfbff;
 }
 
+ROM_START( blnctry ) // same exact PCB as Namco Stars + M144 EMI-DRIVE daughter board with H8/3007 and a MAX232 chip
+	ROM_REGION( 0x80000, "maincpu", 0 ) // TMP68301 Code
+	ROM_LOAD( "blt1mpro.u08", 0x00000, 0x80000, CRC(1d8752d7) SHA1(76f61a2841224653e9f1a2363938d0449c08027b) )
+
+	ROM_REGION( 0x10000, "sub", 0 )     // H8/3007 Code
+	ROM_LOAD( "blt1spr-0.ic3", 0x00000, 0x10000, CRC(cec19b16) SHA1(bc8a95942c6990030cfc11c7ce9f649a7e9b226f) ) // 111xxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x800000, "sprites", 0 )
+	ROM_LOAD32_WORD( "blt1cg0.u39", 0x000000, 0x400000, CRC(d24e223e) SHA1(0c49bb4d3219036029a43fd3a08cd409d93b316f) )
+	ROM_LOAD32_WORD( "blt1cg1.u38", 0x000002, 0x400000, CRC(cd594a58) SHA1(ede40089183b15a1439777170763a21648ef0e2e) )
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "blt1snd0.u40", 0x000000, 0x400000, CRC(3ab59b18) SHA1(149c4fe0c248f79bc00af8ef4946ca4edc93ba86) )
+ROM_END
+
 /***************************************************************************
 
                             Puzzle De Bowling (Japan)
@@ -3739,6 +3796,24 @@ ROM_START( endrichsa )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
 	ROM_LOAD16_BYTE( "kfp_u02_c12.u2", 0x00000, 0x80000, CRC(462341d2) SHA1(a88215d74469513f4239853f62d4dbbffe2aa83a) )
 	ROM_LOAD16_BYTE( "kfp_u03_c12.u3", 0x00001, 0x80000, CRC(2baee8d1) SHA1(f86920382c54a259adb1dee253859561746d215a) )
+
+	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
+	ROM_LOAD64_WORD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
+	ROM_LOAD64_WORD( "kfc-u15-c00.u15", 0x000002, 0x200000, CRC(98e4c36c) SHA1(651be122b78f225d38878ae90776f66989440590) )
+	ROM_LOAD64_WORD( "kfc-u18-c00.u18", 0x000004, 0x200000, CRC(561ac136) SHA1(96da493157405a5d3d72b8cc3004abd3fa3eadfa) )
+	ROM_LOAD64_WORD( "kfc-u17-c00.u17", 0x000006, 0x200000, CRC(34660029) SHA1(cf09b97422497d739f71e6ff8b9974fca0329928) )
+
+	ROM_REGION( 0x200000, "x1snd", 0 )  // Samples
+	ROM_LOAD( "kfs-u32-c00.u32", 0x000000, 0x200000, CRC(e9ffbecf) SHA1(3cc9ab3f4be1a305235603a68ca1e15797fb27cb) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8_kf-001.u38", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( endrichsb )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // TMP68301 Code
+	ROM_LOAD16_BYTE( "kfp_u02_c11.u2", 0x00000, 0x80000, CRC(12613215) SHA1(b39526b13fdf6ce7d7ece664356a075f61fea368) )
+	ROM_LOAD16_BYTE( "kfp_u03_c11.u3", 0x00001, 0x80000, CRC(e32152eb) SHA1(2dbe413fc1fb84a88b3033ad567b743ca70e0d74) )
 
 	ROM_REGION( 0x800000, "sprites", 0 )    // Sprites
 	ROM_LOAD64_WORD( "kfc-u16-c00.u16", 0x000000, 0x200000, CRC(cbfe5e0f) SHA1(6c7c8088c43231997ac47ce05cf43c78c1fdad47) )
@@ -4415,6 +4490,7 @@ GAME( 1997, reelquak,  0,        reelquak, reelquak, seta2_state,    empty_init,
 
 GAME( 1999, endrichs,  0,        reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.21)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, endrichsa, endrichs, reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.20)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, endrichsb, endrichs, reelquak, endrichs, seta2_state,    empty_init,    ROT0,   "E.N.Tiger",             "Endless Riches (Ver 1.10)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1997, staraudi,  0,        staraudi, staraudi, staraudi_state, empty_init,    ROT0,   "Namco",                 "Star Audition",                                       MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // needs flipscreen hooking up properly with new code to function at all
 
@@ -4424,7 +4500,9 @@ GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",                     MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
 GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",                   MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
 
-GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                         MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 1999, blnctry,   0,        namcostr, blnctry,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Balance Try (Japan, ver 1.00)",                       MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING ) // sets 1999/02/01 in NVRAM
+
+GAME( 2000, namcostr,  0,        namcostr, blnctry,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                         MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 
 GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )

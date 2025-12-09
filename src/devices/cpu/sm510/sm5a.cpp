@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Igor
+// copyright-holders:hap
+// thanks-to:Igor
 /*
 
   Sharp SM5A MCU core implementation
@@ -17,7 +18,6 @@
 // MCU types
 DEFINE_DEVICE_TYPE(SM5A, sm5a_device, "sm5a", "Sharp SM5A") // 1.8K ROM, 5x13x4 RAM, shift registers for LCD
 DEFINE_DEVICE_TYPE(SM5L, sm5l_device, "sm5l", "Sharp SM5L") // low-power version of SM5A
-DEFINE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device, "kb1013vk1_2", "KB1013VK1-2") // Soviet-era clone of SM5A
 
 
 // internal memory maps
@@ -49,10 +49,6 @@ sm5a_device::sm5a_device(const machine_config &mconfig, const char *tag, device_
 
 sm5l_device::sm5l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	sm5a_device(mconfig, SM5L, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(sm5l_device::program_1_8k), this), 7, address_map_constructor(FUNC(sm5l_device::data_5x13x4), this))
-{ }
-
-kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	sm5a_device(mconfig, KB1013VK12, tag, owner, clock, 1, 9, 11, address_map_constructor(FUNC(kb1013vk12_device::program_1_8k), this), 7, address_map_constructor(FUNC(kb1013vk12_device::data_5x13x4), this))
 { }
 
 

@@ -22,6 +22,7 @@
 #include "a2dx1.h"
 #include "a2echoii.h"
 #include "a2hsscsi.h"
+#include "a2ieee488.h"
 #include "a2iwm.h"
 #include "a2mcms.h"
 #include "a2memexp.h"
@@ -52,6 +53,7 @@
 #include "ezcgi.h"
 #include "grafex.h"
 #include "grappler.h"
+#include "ibsap2.h"
 #include "lancegs.h"
 #include "laser128.h"
 #include "mouse.h"
@@ -101,7 +103,6 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("videoterm", A2BUS_VIDEOTERM);           // Videx VideoTerm
 	device.option_add("ssc", A2BUS_SSC);                       // Apple Super Serial Card
 	device.option_add("ssi", APRICORN_SSI);                    // Apricorn Super Serial Imager
-	device.option_add("swyft", A2BUS_SWYFT);                   // IAI SwyftCard
 	device.option_add("themill", A2BUS_THEMILL);               // Stellation Two The Mill (6809 card)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II
@@ -155,6 +156,11 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("excel9", A2BUS_EXCEL9);                 // Excel-9 (6809 coprocessor)
 	device.option_add("vistaa800", A2BUS_VISTAA800);           // Vista A800 8" Disk Controller Card
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
+	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
+	device.option_add("romcard", A2BUS_ROMCARDUSER);           // Apple II ROM Card that loads a custom ROM image
+	device.option_add("romcardfp", A2BUS_ROMCARDFP);           // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
+	device.option_add("romcardint", A2BUS_ROMCARDINT);         // Apple II ROM Card with Autostart Monitor + Integer BASIC
+	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
 }
 
 void apple2e_cards(device_slot_interface &device)
@@ -237,6 +243,11 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
 	device.option_add("vistaa800", A2BUS_VISTAA800);           // Vista A800 8" Disk Controller Card
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
+	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
+	device.option_add("romcard", A2BUS_ROMCARDUSER);           // Apple II ROM Card that loads a custom ROM image
+	device.option_add("romcardfp", A2BUS_ROMCARDFP);           // Apple II ROM Card with Autostart Monitor + Applesoft BASIC
+	device.option_add("romcardint", A2BUS_ROMCARDINT);         // Apple II ROM Card with Autostart Monitor + Integer BASIC
+	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -253,7 +264,6 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("videoterm", A2BUS_VIDEOTERM);           // Videx VideoTerm
 	device.option_add("ssc", A2BUS_SSC);                       // Apple Super Serial Card
 	device.option_add("ssi", APRICORN_SSI);                    // Apricorn Super Serial Imager
-	device.option_add("swyft", A2BUS_SWYFT);                   // IAI SwyftCard
 	device.option_add("themill", A2BUS_THEMILL);               // Stellation Two The Mill (6809 card)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II
@@ -297,7 +307,6 @@ void apple2gs_cards(device_slot_interface &device)
 //  device.option_add("pcxport", A2BUS_PCXPORTER);             // Applied Engineering PC Transporter
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
-//  device.option_add("hostram", A2BUS_HOSTRAM);               // Slot 7 RAM for GS Plus host protocol
 //  device.option_add("ramfast", A2BUS_RAMFAST);               // C.V. Technologies RAMFast SCSI card
 	device.option_add("cmsscsi", A2BUS_CMSSCSI);               // CMS Apple II SCSI Card
 	device.option_add("uthernet", A2BUS_UTHERNET);             // A2RetroSystems Uthernet card
@@ -313,6 +322,8 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);     // ProDOS ROM Drive
 	device.option_add("superdrive", A2BUS_SUPERDRIVE);         // Apple II 3.5" Disk Controller
 	device.option_add("wicotrackball", A2BUS_WICOTRACKBALL);   // Wico Trackball
+	device.option_add("ieee488", A2BUS_IEEE488);               // Apple II IEEE-488 Interface Card
+	device.option_add("ap2", A2BUS_IBSAP2);                    // IBS Computertechnik AP 2 Serial Interface
 }
 
 void apple3_cards(device_slot_interface &device)

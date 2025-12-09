@@ -6,7 +6,7 @@
 
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "sound/ct1745.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
@@ -82,7 +82,7 @@ private:
 	uint8_t dsp_wbuf_status_r(offs_t offset);
 	uint8_t dsp_rbuf_status_r(offs_t offset);
 
-	void sb16_io(address_map &map) ATTR_COLD;
+	void sb16_data(address_map &map) ATTR_COLD;
 	void host_io(address_map &map) ATTR_COLD;
 
 	void control_timer(bool start);

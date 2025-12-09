@@ -679,7 +679,7 @@ void segas18_state::pcm_map(address_map &map)
  *
  *************************************/
 
-void segas18_state::mcu_io_map(address_map &map)
+void segas18_state::mcu_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff); // port 2 not used for high order address byte
@@ -1393,8 +1393,8 @@ void segas18_state::system18(machine_config &config)
 	SEGA315_5313(config, m_vdp, 15000000, m_maincpu); // ??? Frequency is a complete guess
 	m_vdp->set_is_pal(false);
 	m_vdp->snd_irq().set(FUNC(segas18_state::vdp_sndirqline_callback_s18));
-	m_vdp->lv6_irq().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
-	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
+	m_vdp->vint_cb().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
+	m_vdp->hint_cb().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_pal_write_base(0x1000);
 	m_vdp->set_ext_palette(m_palette);
@@ -1512,7 +1512,7 @@ void segas18_state::system18_i8751(machine_config &config)
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas18_state::mcu_data_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }
 
@@ -1526,7 +1526,7 @@ void segas18_state::system18_fd1094_i8751(machine_config &config)
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas18_state::mcu_data_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }
 

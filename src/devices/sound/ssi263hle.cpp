@@ -41,7 +41,7 @@ static const u8 PHONEMES_TO_SC01[0x40] =
 
 ssi263hle_device::ssi263hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SSI263HLE, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 1)
+	, device_mixer_interface(mconfig, *this)
 	, m_votrax(*this, "votrax")
 	, m_ar_cb(*this)
 	, m_phoneme_timer(nullptr)
@@ -116,7 +116,7 @@ void ssi263hle_device::device_add_mconfig(machine_config &config)
 {
 	VOTRAX_SC01(config, m_votrax, DERIVED_CLOCK(1, 1));
 	m_votrax->ar_callback().set(FUNC(ssi263hle_device::votrax_request));
-	m_votrax->add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_votrax->add_route(ALL_OUTPUTS, *this, 1.0, 0);
 }
 
 TIMER_CALLBACK_MEMBER(ssi263hle_device::phoneme_tick)

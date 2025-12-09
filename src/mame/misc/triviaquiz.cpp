@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Dirk Best, Ivan Vangelista
+// copyright-holders:Dirk Best
 /*
     Trivia Quiz by Intermatic Manufacturing Ltd.
     1985

@@ -98,10 +98,6 @@ protected:
 	};
 	std::tuple<struct cache::line &, bool> cache_lookup(u32 address, bool invalidate, bool icache = false);
 
-	// debug helpers
-	std::string debug_string(u32 string_pointer, unsigned const limit = 0);
-	std::string debug_string_array(u32 array_pointer);
-
 	// address spaces
 	address_space_config const m_program_config_be;
 	address_space_config const m_program_config_le;

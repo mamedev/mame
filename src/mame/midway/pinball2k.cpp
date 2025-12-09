@@ -653,8 +653,7 @@ void pinball2k_state::mediagx(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

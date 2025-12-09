@@ -450,8 +450,7 @@ void suprslam_state::suprslam(machine_config &config)
 	m_k053936->set_wrap(1);
 	m_k053936->set_offsets(-45, -21);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -459,10 +458,10 @@ void suprslam_state::suprslam(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 32_MHz_XTAL / 4)); // not verified
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 /*** ROM LOADING *************************************************************/

@@ -301,7 +301,7 @@ void pensebem2017_state::pensebem2017(machine_config &config)
 }
 
 ROM_START( pbem2017 )
-	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("sept2017")
 
 	/* September 2017 release */

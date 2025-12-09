@@ -420,11 +420,10 @@ void n64_console_state::n64(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	N64PERIPH(config, m_rcp_periphs, 0);
 

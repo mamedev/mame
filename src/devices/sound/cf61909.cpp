@@ -132,9 +132,9 @@ void cf61909_device::write(offs_t offset, u8 data)
 }
 
 /**************************************************************************/
-void cf61909_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void cf61909_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		s32 sample = 0;
 
@@ -156,6 +156,6 @@ void cf61909_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		}
 
 		// Jaminator patent shows 10-bit sampling, assume that's actually true
-		outputs[0].put_int_clamp(i, sample >> 9, 1 << 9);
+		stream.put_int_clamp(0, i, sample >> 9, 1 << 9);
 	}
 }

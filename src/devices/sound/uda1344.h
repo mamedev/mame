@@ -30,7 +30,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	void ingest_samples(int16_t left, int16_t right);
 
@@ -79,10 +79,10 @@ protected:
 	};
 
 	sound_stream *m_stream;
-	std::vector<stream_buffer::sample_t> m_buffer[2];
+	std::vector<sound_stream::sample_t> m_buffer[2];
 	uint32_t m_bufin[2];
 	uint32_t m_bufout[2];
-	stream_buffer::sample_t m_volume;
+	sound_stream::sample_t m_volume;
 	double m_frequency;
 
 	uint8_t m_data_transfer_mode;

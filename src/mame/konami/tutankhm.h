@@ -29,37 +29,30 @@ class tutankhm_state : public driver_device
 public:
 	tutankhm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_scroll(*this, "scroll"),
-		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
 		m_timeplt_audio(*this, "timeplt_audio"),
-		m_stars_config(*this, "STARS")
+		m_stars_config(*this, "STARS"),
+		m_videoram(*this, "videoram"),
+		m_scroll(*this, "scroll"),
+		m_mainbank(*this, "mainbank")
 	{
 	}
 
 	void tutankhm(machine_config &config);
 
 protected:
-	void irq_enable_w(int state);
-	void tutankhm_bankselect_w(uint8_t data);
-	void coin_counter_1_w(int state);
-	void coin_counter_2_w(int state);
-	void sound_on_w(uint8_t data);
-	void flip_screen_x_w(int state);
-	void flip_screen_y_w(int state);
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	uint32_t screen_update_tutankhm_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tutankhm_scramble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vblank_irq(int state);
-	void main_map(address_map &map) ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	void galaxian_palette(palette_device &palette);
-	static rgb_t raw_to_rgb_func(u32 raw);
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	optional_device<timeplt_audio_device> m_timeplt_audio;
+	optional_ioport m_stars_config;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -75,15 +68,28 @@ protected:
 	uint8_t    m_irq_toggle = 0;
 	uint8_t    m_irq_enable = 0;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	optional_device<timeplt_audio_device> m_timeplt_audio;
-	optional_ioport m_stars_config;
+	uint8_t m_star_mode = 0;
+	rgb_t m_star_color[64];
+	std::unique_ptr<uint8_t[]> m_stars;
+	uint8_t m_stars_enabled = 0;
+	uint8_t m_stars_blink_state = 0;
+
+	void irq_enable_w(int state);
+	void bankselect_w(uint8_t data);
+	void coin_counter_1_w(int state);
+	void coin_counter_2_w(int state);
+	void sound_on_w(uint8_t data);
+	void flip_screen_x_w(int state);
+	void flip_screen_y_w(int state);
+	uint32_t screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_scramble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vblank_irq(int state);
+	void galaxian_palette(palette_device &palette);
+	static rgb_t raw_to_rgb_func(u32 raw);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
-	void galaxian_stars_enable_w(uint8_t data);
+	void stars_enable_w(uint8_t data);
 	void stars_init();
 	void stars_init_scramble();
 	void stars_init_bootleg();
@@ -91,11 +97,7 @@ protected:
 	void scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
 	void scramble_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint8_t m_star_mode = 0;
-	rgb_t m_star_color[64];
-	std::unique_ptr<uint8_t[]> m_stars;
-	uint8_t m_stars_enabled = 0;
-	uint8_t m_stars_blink_state = 0;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_KONAMI_TUTANKHM_H

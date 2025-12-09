@@ -379,7 +379,7 @@ public:
 	// setters
 	void set_device_class(input_device_class devclass) noexcept
 	{
-		assert(devclass >= 0 && devclass <= 0xf);
+		assert(0 == (std::underlying_type_t<input_device_class>(devclass) & ~0xf));
 		m_internal = (m_internal & ~(0xf << 28)) | ((devclass & 0xf) << 28);
 	}
 	void set_device_index(int devindex) noexcept
@@ -389,17 +389,17 @@ public:
 	}
 	void set_item_class(input_item_class itemclass) noexcept
 	{
-		assert(itemclass >= 0 && itemclass <= 0xf);
+		assert(0 == (std::underlying_type_t<input_item_class>(itemclass) & ~0xf));
 		m_internal = (m_internal & ~(0xf << 16)) | ((itemclass & 0xf) << 16);
 	}
 	void set_item_modifier(input_item_modifier modifier) noexcept
 	{
-		assert(modifier >= 0 && modifier <= 0xf);
+		assert(0 == (std::underlying_type_t<input_item_modifier>(modifier) & ~0xf));
 		m_internal = (m_internal & ~(0xf << 12)) | ((modifier & 0xf) << 12);
 	}
 	void set_item_id(input_item_id itemid) noexcept
 	{
-		assert(itemid >= 0 && itemid <= 0xfff);
+		assert(0 == (std::underlying_type_t<input_item_id>(itemid) & ~0xfff));
 		m_internal = (m_internal & ~0xfff) | (itemid & 0xfff);
 	}
 

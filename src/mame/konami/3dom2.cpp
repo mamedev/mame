@@ -1920,11 +1920,6 @@ TIMER_CALLBACK_MEMBER(m2_cde_device::next_dma)
 	const uint32_t ch = (uint32_t)param;
 	dma_channel &dma_ch = m_dma[ch];
 
-	// TODO: HACK!
-#if 1
-	m_cpu1->set_cache_dirty();
-#endif
-
 	if (dma_ch.m_ccnt != 0)
 		throw emu_fatalerror("m2_cde_device::next_dma: DMA count non-zero during next DMA");
 

@@ -20,6 +20,8 @@ public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
 	qsound_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 60'000'000);
 
+	static auto parent_rom_device_type(); // QSOUND
+
 	void qsound_w(offs_t offset, uint8_t data);
 	uint8_t qsound_r();
 
@@ -30,7 +32,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface implementation
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface implementation
 	virtual void rom_bank_pre_change() override;
@@ -152,7 +154,7 @@ private:
 
 	uint16_t *m_register_map[256];
 
-	inline uint16_t read_dsp_rom(uint16_t addr) { return m_dsp_rom[addr&0xfff]; }
+	inline uint16_t read_dsp_rom(uint16_t addr) { return m_dsp_rom[addr & 0xfff]; }
 
 	void write_data(uint8_t addr, uint16_t data);
 	uint16_t read_data(uint8_t addr);

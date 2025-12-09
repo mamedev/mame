@@ -92,6 +92,10 @@ public:
 	void jr200(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
@@ -110,8 +114,6 @@ private:
 	void jr200_border_col_w(uint8_t data);
 	uint8_t mn1271_io_r(offs_t offset);
 	void mn1271_io_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 

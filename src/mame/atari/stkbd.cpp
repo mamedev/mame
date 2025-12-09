@@ -141,14 +141,14 @@ uint8_t st_kbd_device::port2_r()
 	//  2       JOY 1-6 / mouse button 2
 	//  3       serial from cpu
 
-	uint8_t data;
+	uint8_t data = 0xf1;
 
 	if ((m_config->read() & 0x01) == 0)
-		data = m_mouseb->read();
+		data |= m_mouseb->read();
 	else
-		data = m_joy[0]->read();
+		data |= m_joy[1]->read();
 
-	return (data & 0x06) | (m_tx << 3);
+	return (data & 0xf7) | (m_tx << 3);
 }
 
 void st_kbd_device::port2_w(uint8_t data)
@@ -346,7 +346,6 @@ static INPUT_PORTS_START(stkbd)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
@@ -357,8 +356,8 @@ static INPUT_PORTS_START(stkbd)
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("MOUSEB")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)
 INPUT_PORTS_END
 
 ioport_constructor st_kbd_device::device_input_ports() const

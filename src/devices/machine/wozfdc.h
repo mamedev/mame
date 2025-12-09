@@ -49,7 +49,7 @@ protected:
 	void a3_update_drive_sel();
 
 	void lss_start();
-	void lss_sync();
+	void lss_sync(uint64_t extra_cycles = 0);
 
 	enum {
 		MODE_IDLE, MODE_ACTIVE, MODE_DELAY

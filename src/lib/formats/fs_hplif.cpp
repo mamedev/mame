@@ -59,32 +59,32 @@ public:
 	public:
 		block_iterator(const impl &fs, u32 first_sector, u32 sector_count);
 		bool next();
-		const void *data() const;
-		const std::array<hplif_dirent, 8> &dirent_data() const;
+		void append_data(std::vector<u8> &vec) const;
+		hplif_dirent get_dirent(int file_index) const;
 		u8 size() const;
 
 	private:
-		const impl &        m_fs;
-		fsblk_t::block_t    m_block;
-		u8                  m_sector;
-		u32                 m_sector_count;
+		const impl &            m_fs;
+		fsblk_t::block_t::ptr   m_block;
+		u8                      m_sector;
+		u32                     m_sector_count;
 	};
 
 	impl(fsblk_t &blockdev);
 	virtual ~impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 
 private:
-	fsblk_t::block_t read_sector(u32 starting_sector) const;
+	fsblk_t::block_t::ptr read_sector(u32 starting_sector) const;
 	std::optional<hplif_dirent> dirent_from_path(const std::vector<std::string> &path) const;
 	void iterate_directory_entries(const std::function<bool(const hplif_dirent &dirent)> &callback) const;
-	util::arbitrary_datetime decode_datetime(const hplif_time *time) const;
-	meta_data metadata_from_dirent(const hplif_dirent &dirent) const;
-	err_t format(const meta_data &meta) override;
+	static util::arbitrary_datetime decode_datetime(const hplif_time &time);
+	static meta_data metadata_from_dirent(const hplif_dirent &dirent);
+	std::error_condition format(const meta_data &meta) override;
 };
 
 // methods
@@ -252,11 +252,14 @@ impl::impl(fsblk_t &blockdev)
 meta_data impl::volume_metadata()
 {
 	auto block = read_sector(0);
-	std::string_view disk_name = std::string_view((const char *) block.rodata() + 2, 6);
+	std::string disk_name = block->rstr(2, 6);
+
+	hplif_time time;
+	block->read(36, reinterpret_cast<u8 *>(&time), sizeof(hplif_time));
 
 	meta_data results;
 	results.set(meta_name::name, strtrimright_hplif(disk_name));
-	results.set(meta_name::creation_date, decode_datetime(reinterpret_cast<const hplif_time *>(block.rodata() + 36)));
+	results.set(meta_name::creation_date, decode_datetime(time));
 	return results;
 }
 
@@ -265,13 +268,13 @@ meta_data impl::volume_metadata()
 //  impl::metadata
 //-------------------------------------------------
 
-std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> impl::metadata(const std::vector<std::string> &path)
 {
 	std::optional<hplif_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, metadata_from_dirent(*dirent));
+	return std::make_pair(std::error_condition(), metadata_from_dirent(*dirent));
 }
 
 
@@ -279,16 +282,16 @@ std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
 //  impl::directory_contents
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
 {
 	std::vector<dir_entry> results;
-	auto callback = [this, &results](const hplif_dirent &ent)
+	auto callback = [&results](const hplif_dirent &ent)
 	{
 		results.emplace_back(dir_entry_type::file, metadata_from_dirent(ent));
 		return false;
 	};
 	iterate_directory_entries(callback);
-	return std::make_pair(ERR_OK, std::move(results));
+	return std::make_pair(std::error_condition(), std::move(results));
 }
 
 
@@ -296,12 +299,12 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 //  impl::file_read
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
 {
 	// find the file
 	std::optional<hplif_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
 	// and get the data
 	u32 sector_count = big_endianize_int32(dirent->m_sector_count);
@@ -314,9 +317,9 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 	result.reserve(sector_count * 256 + 32);
 	block_iterator iter(*this, big_endianize_int32(dirent->m_starting_sector), sector_count);
 	while (iter.next())
-		result.insert(result.end(), (const u8 *)iter.data(), (const u8 *)iter.data() + 256);
+		iter.append_data(result);
 
-	return std::make_pair(ERR_OK, std::move(result));
+	return std::make_pair(std::error_condition(), std::move(result));
 }
 
 
@@ -324,7 +327,7 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 //  impl::read_sector
 //-------------------------------------------------
 
-fsblk_t::block_t impl::read_sector(u32 sector) const
+fsblk_t::block_t::ptr impl::read_sector(u32 sector) const
 {
 	return m_blockdev.get(sector);
 }
@@ -359,18 +362,20 @@ std::optional<impl::hplif_dirent> impl::dirent_from_path(const std::vector<std::
 
 void impl::iterate_directory_entries(const std::function<bool(const hplif_dirent &dirent)> &callback) const
 {
-	fsblk_t::block_t block = m_blockdev.get(0);
-	block_iterator iter(*this, block.r32b(8), block.r32b(16));
+	fsblk_t::block_t::ptr block = m_blockdev.get(0);
+	block_iterator iter(*this, block->r32b(8), block->r32b(16));
 
-	if (block.r16b(0) != 0x8000)
+	if (block->r16b(0) != 0x8000)
 	{
 		return;
 	}
 
 	while (iter.next())
 	{
-		for (const hplif_dirent &ent : iter.dirent_data())
+		for (int file_index = 0; file_index < 8; file_index++)
 		{
+			hplif_dirent ent = iter.get_dirent(file_index);
+
 			if (ent.m_file_type == 0xffff)
 			{
 				return;
@@ -389,17 +394,17 @@ void impl::iterate_directory_entries(const std::function<bool(const hplif_dirent
 //  impl::decode_datetime
 //-------------------------------------------------
 
-util::arbitrary_datetime impl::decode_datetime(const hplif_time *time) const
+util::arbitrary_datetime impl::decode_datetime(const hplif_time &time)
 {
 	util::arbitrary_datetime result;
 	memset(&result, 0, sizeof(result));
 
-	result.year         = bcd_2_dec(time->year) + 1900;
-	result.month        = bcd_2_dec(time->month);
-	result.day_of_month = bcd_2_dec(time->day);
-	result.hour         = bcd_2_dec(time->hour);
-	result.minute       = bcd_2_dec(time->minute);
-	result.second       = bcd_2_dec(time->second);
+	result.year         = bcd_2_dec(time.year) + 1900;
+	result.month        = bcd_2_dec(time.month);
+	result.day_of_month = bcd_2_dec(time.day);
+	result.hour         = bcd_2_dec(time.hour);
+	result.minute       = bcd_2_dec(time.minute);
+	result.second       = bcd_2_dec(time.second);
 	return result;
 }
 
@@ -407,7 +412,7 @@ util::arbitrary_datetime impl::decode_datetime(const hplif_time *time) const
 //  impl::metadata_from_dirent
 //-------------------------------------------------
 
-meta_data impl::metadata_from_dirent(const hplif_dirent &dirent) const
+meta_data impl::metadata_from_dirent(const hplif_dirent &dirent)
 {
 	std::string file_type = util::string_format("0x%04X", big_endianize_int16(dirent.m_file_type));
 
@@ -416,7 +421,7 @@ meta_data impl::metadata_from_dirent(const hplif_dirent &dirent) const
 	result.set(meta_name::name, strtrimright_hplif(dirent.m_file_name));
 	result.set(meta_name::file_type, std::move(file_type));
 	result.set(meta_name::length, big_endianize_int32(dirent.m_sector_count) * 256);
-	result.set(meta_name::modification_date, decode_datetime(&dirent.m_time));
+	result.set(meta_name::modification_date, decode_datetime(dirent.m_time));
 	return result;
 }
 
@@ -456,44 +461,48 @@ bool impl::block_iterator::next()
 
 
 //-------------------------------------------------
-//  impl::block_iterator::data
+//  impl::block_iterator::append_data
 //-------------------------------------------------
 
-const void *impl::block_iterator::data() const
+void impl::block_iterator::append_data(std::vector<u8> &vec) const
 {
-	return m_block.rodata();
+	vec.resize(vec.size() + 256);
+	m_block->read(0, &*(vec.end() - 256), 256);
 }
+
 
 //-------------------------------------------------
 //  impl::format
 //-------------------------------------------------
 
-err_t impl::format(const meta_data &meta)
+std::error_condition impl::format(const meta_data &meta)
 {
 	std::string volume_name = meta.get_string(meta_name::name, "B9826 ");
-	fsblk_t::block_t block = m_blockdev.get(0);
+	fsblk_t::block_t::ptr block = m_blockdev.get(0);
 
 	if (volume_name.size() < 6)
 		volume_name.insert(volume_name.end(), 6 - volume_name.size(), ' ');
 	if (volume_name.size() > 6)
 		volume_name.resize(6);
 
-	block.w16b(0, 0x8000);  // LIF magic
-	block.wstr(2, volume_name);
-	block.w32b(8, 2);       // directory start
-	block.w16b(12, 0x1000); // LIF identifier
-	block.w32b(16, 14);     // directory size
-	block.w16b(20, 1);      // LIF version
-	return ERR_OK;
+	block->w16b(0, 0x8000);  // LIF magic
+	block->wstr(2, volume_name);
+	block->w32b(8, 2);       // directory start
+	block->w16b(12, 0x1000); // LIF identifier
+	block->w32b(16, 14);     // directory size
+	block->w16b(20, 1);      // LIF version
+	return std::error_condition();
 }
 
 //-------------------------------------------------
-//  impl::block_iterator::dirent_data
+//  impl::block_iterator::get_dirent
 //-------------------------------------------------
 
-const std::array<impl::hplif_dirent, 8> &impl::block_iterator::dirent_data() const
+impl::hplif_dirent impl::block_iterator::get_dirent(int file_index) const
 {
-	return *reinterpret_cast<const std::array<impl::hplif_dirent, 8> *>(m_block.rodata());
+	impl::hplif_dirent ent;
+	m_block->read(file_index * 32, reinterpret_cast<u8 *>(&ent), 32);
+	return ent;
 }
 
 } // anonymous namespace

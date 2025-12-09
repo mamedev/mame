@@ -187,19 +187,18 @@ void speaker_sound_device::device_post_load()
 //-------------------------------------------------
 
 // This can be triggered by the core (based on emulated time) or via level_w().
-void speaker_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void speaker_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
 	double volume = m_levels[m_level];
 	double filtered_volume;
 	attotime sampled_time = attotime::zero;
 
-	if (buffer.samples() > 0)
+	if (stream.samples() > 0)
 	{
 		/* Prepare to update time state */
 		sampled_time = attotime(0, m_channel_sample_period);
-		if (buffer.samples() > 1)
-			sampled_time *= buffer.samples();
+		if (stream.samples() > 1)
+			sampled_time *= stream.samples();
 
 		/* Note: since the stream is in the process of being updated,
 		 * stream->sample_time() will return the time before the update! (MAME 0.130)
@@ -207,19 +206,19 @@ void speaker_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		 */
 	}
 
-	for (int sampindex = 0; sampindex < buffer.samples(); )
+	for (int sampindex = 0; sampindex < stream.samples(); )
 	{
 		/* Note that first intermediate sample may be composed... */
 		filtered_volume = update_interm_samples_get_filtered_volume(volume);
 
 		/* Composite volume is now quantized to the stream resolution */
-		buffer.put(sampindex++, filtered_volume);
+		stream.put(0, sampindex++, filtered_volume);
 
 		/* Any additional samples will be homogeneous, however may need filtering across samples: */
-		while (sampindex < buffer.samples())
+		while (sampindex < stream.samples())
 		{
 			filtered_volume = update_interm_samples_get_filtered_volume(volume);
-			buffer.put(sampindex++, filtered_volume);
+			stream.put(0, sampindex++, filtered_volume);
 		}
 
 		/* Update the time state */
@@ -269,7 +268,7 @@ void speaker_sound_device::level_w(int new_level)
 	/* This is redundant because time update has to be done within sound_stream_update() anyway,
 	 * however this ensures synchronization between the speaker and stream timing:
 	 */
-	m_channel_last_sample_time = m_channel->sample_time();
+	m_channel_last_sample_time = m_channel->end_time();
 
 	/* sample_time() may be ahead of us */
 	if (m_channel_last_sample_time > time)

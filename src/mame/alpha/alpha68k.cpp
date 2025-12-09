@@ -2182,4 +2182,3 @@ GAME( 1989, gangwarsb, gangwars, gangwars,     gangwars,  gangwars_state, init_g
 
 GAME( 1989, sbasebal,  0,        alpha68k_V,   sbasebal,  alpha68k_V_state, init_sbasebal,  ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
 GAME( 1989, sbasebalj, sbasebal, alpha68k_V,   sbasebalj, alpha68k_V_state, init_sbasebalj, ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
-

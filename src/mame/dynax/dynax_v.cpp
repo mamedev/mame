@@ -201,7 +201,7 @@ void jantouki_state::blit2_palbank_w(int state)
 	LOG("PB'=%d ", state);
 }
 
-void dynax_adpcm_state::hnoridur_palbank_w(uint8_t data)
+void dynax_state::hnoridur_palbank_w(uint8_t data)
 {
 	m_palbank = data & 0x0f;
 	m_blit_palbank = data; // ???
@@ -832,7 +832,7 @@ void dynax_state::mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 	}
 }
 
-void dynax_adpcm_state::hanamai_priority_w(uint8_t data)
+void dynax_state::hanamai_priority_w(uint8_t data)
 {
 	m_hanamai_priority = data;
 }

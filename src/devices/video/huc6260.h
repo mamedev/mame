@@ -23,7 +23,6 @@ public:
 	static constexpr unsigned WPF = 1365;   // width of a line in frame including blanking areas
 	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
 
-
 	// construction/destruction
 	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -71,13 +70,13 @@ private:
 	uint16_t  m_palette[512];
 	uint16_t  m_address;
 	uint16_t  m_greyscales;       /* Should the HuC6260 output grey or color graphics */
-	uint8_t   m_blur;             /* Should the edges of graphics be blurred/Select screen height 0=262, 1=263 */
+	bool      m_blur;             /* Should the edges of graphics be blurred/Select screen height 0=262, 1=263 */
 	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
 	uint16_t  m_pixel_data;
 	uint8_t   m_pixel_clock;
 
 	emu_timer   *m_timer;
-	std::unique_ptr<bitmap_ind16>   m_bmp;
+	bitmap_ind16 m_bmp;
 };
 
 

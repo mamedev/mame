@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  nubus_image.c - synthetic NuBus card to allow reading/writing "raw"
+  nubus_image.cpp - synthetic NuBus card to allow reading/writing "raw"
   HFS images, including floppy images (DD and HD) and vMac/Basilisk HDD
   volumes up to 256 MB in size.
 
@@ -22,23 +22,81 @@
 #include "nubus_image.h"
 
 #include "osdcore.h"
+#include "osdfile.h"
 
 #include <algorithm>
 
+constexpr auto MAMEIMG_DISK_SECTOR_SIZE = 512;
 
-#define IMAGE_ROM_REGION    "image_rom"
-#define IMAGE_DISK0_TAG     "nb_disk"
+class nubus_image_device : public device_t,
+							public device_nubus_card_interface
+{
+public:
+	class mameimg_disk_image_device;
 
-#define MESSIMG_DISK_SECTOR_SIZE (512)
+	// construction/destruction
+	nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+protected:
+	enum
+	{
+		kFileCmdGetDir = 1,
+		kFileCmdSetDir,
+		kFileCmdGetFirstListing,
+		kFileCmdGetNextListing,
+		kFileCmdGetFile,
+		kFileCmdPutFile
+	};
 
-// nubus_image_device::messimg_disk_image_device
+	struct nbfilectx
+	{
+		u32 curcmd;
+		char filename[128];
+		std::string curdir;
+		osd::directory::ptr dirp;
+		osd_file::ptr fd;
+		u64 filelen;
+		u32 bytecount;
+	};
 
-class nubus_image_device::messimg_disk_image_device : public device_t, public device_image_interface
+	nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void card_map(address_map &map);
+	void card_super_map(address_map &map);
+
+	u32 image_status_r();
+	void image_status_w(u32 data);
+	u32 image_r();
+	void image_w(u32 data);
+	u32 image_super_r(offs_t offset, u32 mem_mask = ~0);
+	void image_super_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 file_cmd_r();
+	void file_cmd_w(u32 data);
+	u32 file_data_r();
+	void file_data_w(u32 data);
+	u32 file_len_r();
+	void file_len_w(u32 data);
+	u32 file_name_r(offs_t offset);
+	void file_name_w(offs_t offset, u32 data);
+
+	mameimg_disk_image_device *m_image;
+	nbfilectx filectx;
+};
+
+// nubus_image_device::mameimg_disk_image_device
+
+class nubus_image_device::mameimg_disk_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mameimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// device_image_interface implementation
 	virtual bool is_readable()  const noexcept override { return true; }
@@ -55,41 +113,33 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 public:
-	uint32_t m_size;
-	std::unique_ptr<uint8_t[]> m_data;
+	u32 m_size;
+	std::unique_ptr<u8[]> m_data;
 	bool m_ejected;
 };
 
+DEFINE_DEVICE_TYPE(MAMEIMG_DISK, nubus_image_device::mameimg_disk_image_device, "messimg_disk_image", "Mac image")
 
-// device type definition
-DEFINE_DEVICE_TYPE(MESSIMG_DISK, nubus_image_device::messimg_disk_image_device, "messimg_disk_image", "Mac image")
-
-nubus_image_device::messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MESSIMG_DISK, tag, owner, clock),
+nubus_image_device::mameimg_disk_image_device::mameimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, MAMEIMG_DISK, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	m_size(0), m_data(nullptr), m_ejected(false)
 {
 }
 
-
-/*-------------------------------------------------
-    device start callback
--------------------------------------------------*/
-
-void nubus_image_device::messimg_disk_image_device::device_start()
+void nubus_image_device::mameimg_disk_image_device::device_start()
 {
 	m_data = nullptr;
 
 	if (exists() && !fseek(0, SEEK_END))
 	{
-		m_size = uint32_t(ftell());
+		m_size = u32(ftell());
 	}
 }
 
-std::pair<std::error_condition, std::string> nubus_image_device::messimg_disk_image_device::call_load()
+std::pair<std::error_condition, std::string> nubus_image_device::mameimg_disk_image_device::call_load()
 {
 	m_size = length();
 	if (m_size > (256*1024*1024))
@@ -98,7 +148,7 @@ std::pair<std::error_condition, std::string> nubus_image_device::messimg_disk_im
 		return std::make_pair(image_error::INVALIDLENGTH, "Image file is too large (must be no more than 256MB)");
 	}
 
-	m_data.reset(new (std::nothrow) uint8_t [m_size]);
+	m_data.reset(new (std::nothrow) u8 [m_size]);
 	if (!m_data)
 		return std::make_pair(std::errc::not_enough_memory, "Error allocating memory for volume image");
 
@@ -109,7 +159,7 @@ std::pair<std::error_condition, std::string> nubus_image_device::messimg_disk_im
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-void nubus_image_device::messimg_disk_image_device::call_unload()
+void nubus_image_device::mameimg_disk_image_device::call_unload()
 {
 	// TODO: track dirty sectors and only write those
 	fseek(0, SEEK_SET);
@@ -118,33 +168,14 @@ void nubus_image_device::messimg_disk_image_device::call_unload()
 	//free(m_data);
 }
 
-/*-------------------------------------------------
-    device reset callback
--------------------------------------------------*/
-
-void nubus_image_device::messimg_disk_image_device::device_reset()
-{
-}
-
 ROM_START( image )
-	ROM_REGION(0x2000, IMAGE_ROM_REGION, 0)
+	ROM_REGION(0x2000, "declrom", 0)
 	ROM_LOAD( "nb_fake.bin",  0x000000, 0x002000, CRC(9264bac5) SHA1(540c2ce3c90382b2da6e1e21182cdf8fc3f0c930) )
 ROM_END
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(NUBUS_IMAGE, nubus_image_device, "nb_image", "NuBus Disk Image Pseudo-Card")
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
 void nubus_image_device::device_add_mconfig(machine_config &config)
 {
-	MESSIMG_DISK(config, IMAGE_DISK0_TAG, 0);
+	MAMEIMG_DISK(config, "nb_disk", 0);
 }
 
 //-------------------------------------------------
@@ -156,71 +187,52 @@ const tiny_rom_entry *nubus_image_device::device_rom_region() const
 	return ROM_NAME( image );
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  nubus_image_device - constructor
-//-------------------------------------------------
-
-nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_image_device(mconfig, NUBUS_IMAGE, tag, owner, clock)
 {
 }
 
-nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_image(nullptr)
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+void nubus_image_device::card_map(address_map &map)
+{
+	map(0x0000, 0x0003).rw(FUNC(nubus_image_device::image_r), FUNC(nubus_image_device::image_w));
+	map(0x0004, 0x0007).rw(FUNC(nubus_image_device::image_status_r), FUNC(nubus_image_device::image_status_w));
+	map(0x0008, 0x000b).rw(FUNC(nubus_image_device::file_cmd_r), FUNC(nubus_image_device::file_cmd_w));
+	map(0x000c, 0x000f).rw(FUNC(nubus_image_device::file_data_r), FUNC(nubus_image_device::file_data_w));
+	map(0x0010, 0x0013).rw(FUNC(nubus_image_device::file_len_r), FUNC(nubus_image_device::file_len_w));
+	map(0x0014, 0x009b).rw(FUNC(nubus_image_device::file_name_r), FUNC(nubus_image_device::file_name_w));
+}
+
+void nubus_image_device::card_super_map(address_map &map)
+{
+	map(0x0000'0000, 0x0fff'ffff).rw(FUNC(nubus_image_device::image_super_r), FUNC(nubus_image_device::image_super_w));
+}
 
 void nubus_image_device::device_start()
 {
-	uint32_t slotspace;
-	uint32_t superslotspace;
+	install_declaration_rom("declrom");
+	nubus().install_map(*this, &nubus_image_device::card_map);
+	nubus().install_super_map(*this, &nubus_image_device::card_super_map);
 
-	install_declaration_rom(IMAGE_ROM_REGION);
-
-	slotspace = get_slotspace();
-	superslotspace = get_super_slotspace();
-
-//  printf("[image %p] slotspace = %x, super = %x\n", this, slotspace, superslotspace);
-
-	nubus().install_device(slotspace, slotspace+3, read32smo_delegate(*this, FUNC(nubus_image_device::image_r)), write32smo_delegate(*this, FUNC(nubus_image_device::image_w)));
-	nubus().install_device(slotspace+4, slotspace+7, read32smo_delegate(*this, FUNC(nubus_image_device::image_status_r)), write32smo_delegate(*this, FUNC(nubus_image_device::image_status_w)));
-	nubus().install_device(slotspace+8, slotspace+11, read32smo_delegate(*this, FUNC(nubus_image_device::file_cmd_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_cmd_w)));
-	nubus().install_device(slotspace+12, slotspace+15, read32smo_delegate(*this, FUNC(nubus_image_device::file_data_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_data_w)));
-	nubus().install_device(slotspace+16, slotspace+19, read32smo_delegate(*this, FUNC(nubus_image_device::file_len_r)), write32smo_delegate(*this, FUNC(nubus_image_device::file_len_w)));
-	nubus().install_device(slotspace+20, slotspace+147, read32sm_delegate(*this, FUNC(nubus_image_device::file_name_r)), write32sm_delegate(*this, FUNC(nubus_image_device::file_name_w)));
-	nubus().install_device(superslotspace, superslotspace+((256*1024*1024)-1), read32s_delegate(*this, FUNC(nubus_image_device::image_super_r)), write32s_delegate(*this, FUNC(nubus_image_device::image_super_w)));
-
-	m_image = subdevice<messimg_disk_image_device>(IMAGE_DISK0_TAG);
+	m_image = subdevice<mameimg_disk_image_device>("nb_disk");
 
 	filectx.curdir = ".";
 	filectx.dirp.reset();
 	filectx.fd.reset();
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void nubus_image_device::device_reset()
-{
-}
-
-void nubus_image_device::image_status_w(uint32_t data)
+void nubus_image_device::image_status_w(u32 data)
 {
 	m_image->m_ejected = true;
 }
 
-uint32_t nubus_image_device::image_status_r()
+u32 nubus_image_device::image_status_r()
 {
 	if(m_image->m_ejected) {
 		return 0;
@@ -232,33 +244,32 @@ uint32_t nubus_image_device::image_status_r()
 	return 0;
 }
 
-void nubus_image_device::image_w(uint32_t data)
+void nubus_image_device::image_w(u32 data)
 {
 }
 
-uint32_t nubus_image_device::image_r()
+u32 nubus_image_device::image_r()
 {
 	return m_image->m_size;
 }
 
-void nubus_image_device::image_super_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_image_device::image_super_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	uint32_t *image = (uint32_t*)m_image->m_data.get();
+	u32 *image = (u32*)m_image->m_data.get();
 	data = swapendian_int32(data);
 	mem_mask = swapendian_int32(mem_mask);
 
 	COMBINE_DATA(&image[offset]);
 }
 
-uint32_t nubus_image_device::image_super_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_image_device::image_super_r(offs_t offset, u32 mem_mask)
 {
-	uint32_t *image = (uint32_t*)m_image->m_data.get();
+	u32 *image = (u32*)m_image->m_data.get();
 	return swapendian_int32(image[offset]);
 }
 
-void nubus_image_device::file_cmd_w(uint32_t data)
+void nubus_image_device::file_cmd_w(u32 data)
 {
-//  data = swapendian_int32(data);
 	filectx.curcmd = data;
 	switch (data) {
 	case kFileCmdGetDir:
@@ -304,7 +315,7 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 			std::string fullpath(filectx.curdir);
 			fullpath += PATH_SEPARATOR;
 			fullpath.append(std::begin(filectx.filename), std::find(std::begin(filectx.filename), std::end(filectx.filename), '\0'));
-			uint64_t filesize; // unused, but it's an output from the open call
+			u64 filesize; // unused, but it's an output from the open call
 			std::error_condition const filerr = osd_file::open(fullpath, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, filectx.fd, filesize);
 			if (filerr)
 				osd_printf_error("%s: Error opening %s (%s:%d %s)\n", tag(), fullpath, filerr.category().name(), filerr.value(), filerr.message());
@@ -314,15 +325,15 @@ void nubus_image_device::file_cmd_w(uint32_t data)
 	}
 }
 
-uint32_t nubus_image_device::file_cmd_r()
+u32 nubus_image_device::file_cmd_r()
 {
 	return 0;
 }
 
-void nubus_image_device::file_data_w(uint32_t data)
+void nubus_image_device::file_data_w(u32 data)
 {
-	std::uint32_t count = 4;
-	std::uint32_t actualcount = 0;
+	u32 count = 4;
+	u32 actualcount = 0;
 
 	data = swapendian_int32(data);
 	if(filectx.fd) {
@@ -337,11 +348,11 @@ void nubus_image_device::file_data_w(uint32_t data)
 	}
 }
 
-uint32_t nubus_image_device::file_data_r()
+u32 nubus_image_device::file_data_r()
 {
 	if(filectx.fd) {
-		std::uint32_t ret;
-		std::uint32_t actual = 0;
+		u32 ret;
+		u32 actual = 0;
 		filectx.fd->read(&ret, filectx.bytecount, sizeof(ret), actual);
 		filectx.bytecount += actual;
 		if(actual < sizeof(ret)) {
@@ -352,23 +363,25 @@ uint32_t nubus_image_device::file_data_r()
 	return 0;
 }
 
-void nubus_image_device::file_len_w(uint32_t data)
+void nubus_image_device::file_len_w(u32 data)
 {
 	data = swapendian_int32(data);
 	filectx.filelen = big_endianize_int32(data);
 }
 
-uint32_t nubus_image_device::file_len_r()
+u32 nubus_image_device::file_len_r()
 {
 	return filectx.filelen;
 }
 
-void nubus_image_device::file_name_w(offs_t offset, uint32_t data)
+void nubus_image_device::file_name_w(offs_t offset, u32 data)
 {
-	reinterpret_cast<uint32_t *>(filectx.filename)[offset] = big_endianize_int32(data);
+	reinterpret_cast<u32 *>(filectx.filename)[offset] = big_endianize_int32(data);
 }
 
-uint32_t nubus_image_device::file_name_r(offs_t offset)
+u32 nubus_image_device::file_name_r(offs_t offset)
 {
-	return big_endianize_int32(reinterpret_cast<uint32_t const *>(filectx.filename)[offset]);
+	return big_endianize_int32(reinterpret_cast<u32 const *>(filectx.filename)[offset]);
 }
+
+DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_IMAGE, device_nubus_card_interface, nubus_image_device, "nb_image", "NuBus Disk Image Pseudo-Card")

@@ -2,7 +2,11 @@
 // copyright-holders:Stefan Jokisch
 /***************************************************************************
 
-    Atari Cannonball (prototype) driver
+Atari Cannonball (prototype) driver
+
+TODO:
+- half of the graphics are missing due to undumped ROM
+- often hits illegal opcode 0x02, harmless leftover from devkit?
 
 ***************************************************************************/
 
@@ -251,7 +255,6 @@ void cball_state::cball(machine_config &config)
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(12'096'000) / 16); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cball_state::cpu_map);
-
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

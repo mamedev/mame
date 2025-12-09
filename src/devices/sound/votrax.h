@@ -36,7 +36,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	TIMER_CALLBACK_MEMBER(phone_tick);
 
@@ -178,7 +178,7 @@ private:
 	void chip_update();                             // Global update called at 20KHz (main/36)
 	void filters_commit(bool force);                // Commit the currently computed interpolation values to the filters
 	void phone_commit();                            // Commit the current phone id
-	stream_buffer::sample_t analog_calc();                  // Compute one more sample
+	sound_stream::sample_t analog_calc();                  // Compute one more sample
 };
 
 class votrax_sc01a_device : public votrax_sc01_device

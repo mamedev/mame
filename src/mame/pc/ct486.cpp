@@ -172,7 +172,7 @@ void ct486_state::ct486(machine_config &config)
 	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
 	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdc_smc", true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
@@ -192,6 +192,7 @@ void ct486_state::ct486(machine_config &config)
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void ct486_state::ast6000(machine_config &config)

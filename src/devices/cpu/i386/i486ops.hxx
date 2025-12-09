@@ -8,7 +8,7 @@ void i386_device::i486_cpuid()             // Opcode 0x0F A2
 	{
 		// this 486 doesn't support the CPUID instruction
 		LOGMASKED(LOG_MSR, "CPUID not supported at %08x!\n", m_eip);
-		i386_trap(6, 0, 0);
+		i386_trap(6, 0);
 	}
 	else
 	{
@@ -538,7 +538,7 @@ void i386_device::i486_wait()
 {
 	if ((m_cr[0] & (CR0_TS | CR0_MP)) == (CR0_TS | CR0_MP))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	x87_mf_fault();

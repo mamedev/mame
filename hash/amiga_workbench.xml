@@ -3,33 +3,70 @@
 
 <!--
 
-license:CC0-1.0
+license: CC0-1.0
 
-List of known part numbers
+Workbench is the operating system of the Amiga. The last version produced
+by Commodore is 3.1 (this version was also re-released by Escom). Versions
+3.5 and 3.9 were produced by Haage & Partner and the name changed to
+AmigaOS. Hyperion Entertainment then took over development and released
+Version 4.0 and 4.1. In addition, they are releasing updates for the classic
+3.1 release of Workbench running on all Amigas. The latest update was
+released in April 2023 and is numbered 3.2.2.1.
+
+Below is an incomplete list of Commodore part numbers:
 
 315746-02  Extras 1.3 (De) (difference to 317790-01?)
-315747-02  Workbench 1.3 Rev. 34.20 (De) (difference to 317791-01?)
+315747-02  Workbench 1.3 Rev. 34.20 (De) (difference to 317791-01?) [crc 33891c41]
+316160-01  (Electronic Arts disk)
 316167-01  Extras 1.1
 316391-01  Workbench 1.2
-317235-01  Workbench 2.0 A3000
-317235-02  Extras 2.0 A3000
+317234-01  Extras 1.4/2.0 A3000 (International)
+317235-01  Extras 1.4 A3000 (US)
+317235-02  Extras 2.0 A3000 (US)
 317235-04  Extras 2.03 A3000
+317236-01  Extras 1.4/2.0 A3000 (De)
+317240-01  Workbench 1.4/2.0 A3000 (International)
+317241-01  Workbench 1.4/2.0 A3000 (UK)
+317242-01  Workbench 1.4/2.0 A3000 (Fr)
+317243-01  Workbench 1.4/2.0 A3000 (It)
+317244-01  Workbench 1.4/2.0 A3000 (De)
+317245-01  Workbench 1.4/2.0 A3000 (Sp)
+317246-01  Workbench 1.4/2.0 A3000 (Dk)
+317247-01  Workbench 1.4/2.0 A3000 (No)
+317248-01  Workbench 1.4/2.0 A3000 (Se)
+317249-01  Workbench 1.4/2.0 A3000 (Be)
+317451-01  ABasiC (part of release 1.0)
+317481-01  Workbench 1.0
+317481-02  Workbench 1.1
+317481-03  Workbench 1.2 A1000
+317483-01  Kickstart 1.0
+317483-02  Kickstart 1.1
+317483-03  Kickstart 1.2
+317488-01  Amiga BASIC 1.1 A1000
+317488-02  Amiga BASIC 1.2 A500
+317489-01  Kaleidoscope
+317608-01  Workbench 1.2 A500
 317608-03  Workbench 1.2 Rev. 33.56 A500
 317610-03  Workbench 1.2 Rev. 33.56 A500 (De)
 317612-01  Workbench 1.2 Rev. 33.56 A500 (Fr/Be)
 317613-01  Workbench 1.2 Rev. 33.56 A500 (It)
 317615-01  Workbench 1.2 Rev. 33.56 A500 (Se/Fi)
+317617-01  Workbench 1.2 Rev. 33.56 A500 (Dk)
+317617-02  Workbench 1.2 A500 (Dk) Okt. 87
+317619-01  A500 (probably Workbench 1.2 Rev. 33.56 A500 (No))
 317621-01  Workbench 1.2 Rev. 33.56 A500 (Ch)
-317746-01  Workbench 1.3 Rev. 34.20 (US)
-317746-03  Workbench 1.3.2 Rev. 34.28 (US)
-317746-04  Workbench 1.3.3 Rev. 34.34 (US)
-317748-01  Extras 1.3
-317748-02  Extras 1.3.3
-317787-01  Workbench 1.3 Rev. 34.20 (International)
-317787-03  Workbench 1.3.2 Rev. 34.28 (International)
-317787-04  Workbench 1.3.3 Rev. 34.34 (International)
-317788-01  Extras 1.3
-317788-02  Extras 1.3
+317746-01  Workbench 1.3 Rev. 34.20 (Enhancer Software)
+317746-03  Workbench 1.3.2 Rev. 34.28 (Enhancer Software)
+317746-04  Workbench 1.3.3 Rev. 34.34 (Enhancer Software)
+317747-01  Kickstart 1.3 (Enhancer Software)
+317748-01  Extras 1.3 (Enhancer Software)
+317748-02  Extras 1.3.3 (Enhancer Software)
+317759-01  PC Bridgeboards Disk
+317787-01  Workbench 1.3 Rev. 34.20 (US)
+317787-03  Workbench 1.3.2 Rev. 34.28 (US)
+317787-04  Workbench 1.3.3 Rev. 34.34 (US)
+317788-01  Extras 1.3 (International)
+317788-02  Extras 1.3.3 (International)
 317789-01  Workbench 1.3 Rev. 34.20 (UK)
 317789-03  Workbench 1.3.2 Rev. 34.28 (UK)
 317789-04  Workbench 1.3.3 Rev. 34.34 (UK)
@@ -56,33 +93,53 @@ List of known part numbers
 317797-01  Workbench 1.3 Rev. 34.20 (It)
 317797-03  Workbench 1.3.2 Rev. 34.28 (It)
 317797-04  Workbench 1.3.3 Rev. 34.34 (It)
+317798-01  Workbench 1.3 Rev. 34.20 (Dk)
+317798-03  Workbench 1.3.2 Rev. 34.28 (Dk)
+317798-04  Workbench 1.3.3 Rev. 34.34 (Dk)
+317894-01  Amiga 500A Tutorial
 317954-01  Extras 2.0 A3000
-317954-02  Workbench 2.0 A3000
-317954-03  Workbench 2.0 A3000 (De)
+317954-01  Workbench 1.4 A3000 (US)
+317954-02  Workbench 2.0 A3000 (International)
+317954-03  Workbench 2.0 A3000 (US)
 317954-04  Workbench 2.03 A3000
+327244-01  Kickstart 1.0
+327244-02  Kickstart 1.1 PAL
 327245-01  Workbench 1.0
 327245-02  Workbench 1.1 Rev. 32.34 A1000 PAL
 327246-01  Extras 1.0
-335603-02  Install 2.0 A3000
+335603-02  Install 2.01 A3000
 335603-03  Install 2.0 A3000
 335603-04  Install 2.03 A3000
+367245-05  Kickstart 2.03 A3000
+367245-06  Kickstart 2.04 A3000
 367270-01  Workbench 1.3.2 Rev. 34.28 A3000 (International)
+367270-02  Workbench 1.3 A3000
 367272-01  Extras 1.3 A3000
 367617-01  Extras 1.3.3
 367618-01  Extras 1.3.3 Rev. 34.34 (International)
-367813-01  Workbench 2.04 Rev. 37.67
+367813-01  Workbench 2.04 Rev. 37.67 (US/International)
 367813-03  Workbench 2.05 Rev. 37.71
+367814-01  Workbench 2.04 Rev. 37.67 (Ca/Fr)
+367815-01  Workbench 2.04 Rev. 37.67 (UK)
+367816-01  Workbench 2.04 Rev. 37.67 (De)
+367817-01  Workbench 2.04 Rev. 37.67 (Fr/Be)
+367818-01  Workbench 2.04 Rev. 37.67 (It)
+367819-01  Workbench 2.04 Rev. 37.67 (Sp)
+367820-01  Workbench 2.04 Rev. 37.67 (Sw)
+367821-01  Workbench 2.04 Rev. 37.67 (No)
+367822-01  Workbench 2.04 Rev. 37.67 (Se/Fi)
+367823-01  Workbench 2.04 Rev. 37.67 (Dk)
 367824-01  Extras 2.04
-367824-04  Extras 2.05
+367824-04  Extras 2.05 Rev. 37.71
 367825-01  Fonts 2.04
-367825-03  Fonts 2.05
+367825-03  Fonts 2.05 Rev. 37.71
 367826-01  Install 2.04 A3000
 367826-02  Install 2.04
-367826-03  Install 2.05
-367943-01  Install 2.05
-367959-01  Workbench 2.05
-367960-01  Extras 2.05
-367968-01  Fonts 2.05
+367826-03  Install 2.05 SCSI Install
+367943-01  Install 2.05 A600HD Rev. 37.71
+367959-01  Workbench 2.05 Rev. 37.72
+367960-01  Extras 2.05 Rev. 37.72
+367968-01  Fonts 2.05 Rev. 37.72
 370126-02  Install 3.0
 370127-02  Workbench 3.0
 370128-01  Extras 3.0
@@ -100,6 +157,7 @@ List of known part numbers
 370169-01  Fonts 2.1
 370170-01  Locale 2.1
 370172-01  Locale 2.1 International
+370173-03  A3000T-040 68040 Support Library (was this distributed with certain 2.1 releases?)
 370191-01  Fonts 3.0
 370192-01  Fonts 3.0
 370299-97  Install 3.1 A4000T
@@ -111,12 +169,15 @@ List of known part numbers
 370301-97  Extras 3.1 A4000T
 370301-98  Extras 3.1
 370301-99  Fonts 3.1
+380663-01  Kickstart 1.2
 380706-05  Extras 1.2
-380706-09  Extras 1.2
+380706-09  Extras 1.2 27.04.87
 380706-10  Extras 1.2 (De)
+380706-11  Extras 1.2 (Dk)
 380724-07  Workbench 1.2 Rev. 33.53 A2000
 380724-09  Workbench 1.2 Rev. 33.56 A2000
 380724-10  Workbench 1.2 Rev. 33.56 A2000 (De)
+380921-05  The Very First
 380927-01  Workbench 1.2 Rev. 33.56 A500 (UK)
 
 -->
@@ -129,13 +190,22 @@ List of known part numbers
 		<description>Workbench 1.0</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- or 317483-01? -->
+			<feature name="part_id" value="Kickstart 1.0" />
+			<dataarea name="flop" size="901120">
+				<rom name="327244-01_kickstart.adf" size="901120" crc="fc1c4ce8" sha1="e2f7fd40b5f626f1719628e720bc4440cca7c961" />
+			</dataarea>
+		</part>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- or 317481-01? -->
 			<feature name="part_id" value="Workbench 1.0" />
 			<dataarea name="flop" size="901120">
 				<rom name="327245-01_workbench.adf" size="901120" crc="d6ef5192" sha1="c7ea69ed5e85ec599165ab201619646c9b5729ba" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- or 317451-01? should contain ABasiC and Tutor -->
 			<feature name="part_id" value="Extras 1.0" />
 			<dataarea name="flop" size="901120">
 				<rom name="327246-01_extras.adf" size="901120" status="nodump" />
@@ -147,55 +217,128 @@ List of known part numbers
 
 	<software name="wb11">
 		<description>Workbench 1.1</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="317481-02_workbench.adf" size="901120" crc="a629bd97" sha1="d8cc4e0a66d284aab499ff81c9527048bb47ff91" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- listed with this crc at the workbench project -->
+			<feature name="part_id" value="Kickstart 1.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="317483-02_kickstart.adf" size="901120" crc="73789bf8" sha1="68b667395be3a50be86fb6ad78155e1741255822" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- or 316167-01? crc could be 4c1791d8 -->
+			<feature name="part_id" value="Extras 1.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="317488-01_extras.adf" size="901120" crc="9c9fb14c" sha1="45a2506556ce3b13404194b26d04f451984c689a" />
+			</dataarea>
+		</part>
+		<!-- 317489-01 Kaleidoscope? -->
+	</software>
+
+	<software name="wb11pal">
+		<description>Workbench 1.1 (PAL)</description>
+		<year>1986</year>
+		<publisher>Commodore</publisher>
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Kickstart 1.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="327244-02_kickstart.adf" size="901120" crc="70d0030a" sha1="0d79e2444421e5b66b5f295a5d3685d286208128" />
+			</dataarea>
+		</part>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
 			<feature name="part_id" value="Workbench 1.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="327245-02_workbench.adf" size="901120" crc="a629bd97" sha1="d8cc4e0a66d284aab499ff81c9527048bb47ff91" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found, crc should be 4c1791d8 -->
 			<feature name="part_id" value="Extras 1.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="316167-01_extras.adf" size="901120" crc="9c9fb14c" sha1="45a2506556ce3b13404194b26d04f451984c689a" />
 			</dataarea>
 		</part>
+		<!-- Kaleidoscope? -->
 	</software>
 
 	<!-- Version 1.2 -->
 
+	<!-- A1000 version? -->
+	<software name="wb12_de">
+		<description>Workbench 1.2 Rev. 33.43 (De)</description>
+		<year>1986</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.2 (De)" />
+			<dataarea name="flop" size="901120">
+				<rom name="unkpn_workbench.adf" size="901120" crc="ee85e669" sha1="726f091c5ed60b7e9faaca375ca2ee63fb451666" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<feature name="part_id" value="Extras 1.2 (De)" />
+			<dataarea name="flop" size="901120">
+				<rom name="unkpn_extras.adf" size="901120" crc="6f9c810c" sha1="39075ee4504012d21db67cb46b1426807b802c18" />
+			</dataarea>
+		</part>
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- pn unverified, might also be 380663-01 -->
+			<feature name="part_id" value="Kickstart 1.2" />
+			<dataarea name="flop" size="901120">
+				<rom name="317483-03_kickstart.adf" size="901120" crc="9d68d211" sha1="44682d10a7f62896b46180491d60db4ee8c30529" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Enhancer Software? -->
 	<software name="wb12">
 		<description>Workbench 1.2 Rev. 33.56 A500/A2000</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.2 Rev. 33.56 A500/A2000" />
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.2 A500/A2000" />
 			<dataarea name="flop" size="901120">
-				<!-- Part number unverified -->
+				<!-- pn unverified -->
 				<rom name="316391-01_workbench.adf" size="901120" crc="bfbf5df9" sha1="7ede18dcd66de3b1e1f87a5869c21294823da214" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.2" />
 			<dataarea name="flop" size="901120">
-				<!-- Part number unverified -->
+				<!-- or 317488-02? might belong to an earlier rev? dated 1986-11-04 -->
 				<rom name="380706-05_extras.adf" size="901120" crc="7763563b" sha1="51ca15f3ebb4360aabad32014174c411a00b0ecb" />
+			</dataarea>
+		</part>
+		<part name="kickstart" interface="floppy_3_5">
+			<feature name="part_id" value="Kickstart 1.2" />
+			<dataarea name="flop" size="901120">
+				<!-- listed with this crc at the workbench project (might also be 380663-01) -->
+				<rom name="317483-03_kickstart.adf" size="901120" crc="9d68d211" sha1="44682d10a7f62896b46180491d60db4ee8c30529" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="wb12_a500">
-		<description>Workbench 1.2 Rev. 33.56 A500</description>
+		<description>Workbench 1.2 Rev. 33.56 A500 (US)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.2 Rev. 33.56 A500" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.2 A500 (US)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317608-03_workbench.adf" size="901120" crc="94318e6a" sha1="bf8f1542aa525847e22bd3e913247848eb540da0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.2" />
 			<dataarea name="flop" size="901120">
 				<rom name="380706-09_extras.adf" size="901120" crc="46383329" sha1="40356f28c980b9b2ae778cc9d06f7a462a10d46e" />
@@ -207,13 +350,15 @@ List of known part numbers
 		<description>Workbench 1.2 Rev. 33.56 A500 (UK)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.2 Rev. 33.56 A500 (UK)" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.2 A500 (UK)" />
 			<dataarea name="flop" size="901120">
-				<rom name="380927-01_workbench.adf" size="901120" status="nodump"/>
+				<rom name="380927-01_workbench.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.2" />
 			<dataarea name="flop" size="901120">
 				<rom name="380706-09_extras.adf" size="901120" crc="46383329" sha1="40356f28c980b9b2ae778cc9d06f7a462a10d46e" />
@@ -225,13 +370,15 @@ List of known part numbers
 		<description>Workbench 1.2 Rev. 33.56 A500 (De)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.2 Rev. 33.56 A500 (De)" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.2 A500 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317610-03_workbench.adf" size="901120" status="nodump"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.2 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="380706-10_extras.adf" size="901120" crc="af130813" sha1="f7a38640155cfd4d369769349f02aa7686973bcf" />
@@ -239,22 +386,27 @@ List of known part numbers
 		</part>
 	</software>
 
-	<!-- 317612-01 Workbench 1.2 Rev. 33.56 A500 (Fr/Be) -->
+	<!-- 317612-01 Workbench 1.2 Rev. 33.56 A500 (Fr/Be) [label found] -->
 	<!-- 317613-01 Workbench 1.2 Rev. 33.56 A500 (It) -->
-	<!-- 317615-01 Workbench 1.2 Rev. 33.56 A500 (Se/Fi) -->
-	<!-- 317621-01 Workbench 1.2 Rev. 33.56 A500 (Ch) -->
+	<!-- 317615-01 Workbench 1.2 Rev. 33.56 A500 (Se/Fi) [label found] -->
+	<!-- 317617-01 Workbench 1.2 Rev. 33.56 A500 (Dk) [label found] -->
+	<!-- 317617-02 Workbench 1.2 A500 (Dk) Okt. 87 -->
+	<!-- 317619-01 A500 (probably No) -->
+	<!-- 317621-01 Workbench 1.2 Rev. 33.56 A500 (Ch) [label found] -->
 
 	<software name="wb12_a2000">
 		<description>Workbench 1.2 Rev. 33.56 A2000</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.2 Rev. 33.56 A2000" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.2 A2000" />
 			<dataarea name="flop" size="901120">
-				<rom name="380724-09_workbench.adf" size="901120" status="nodump"/>
+				<rom name="380724-09_workbench.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.2" />
 			<dataarea name="flop" size="901120">
 				<rom name="380706-09_extras.adf" size="901120" crc="46383329" sha1="40356f28c980b9b2ae778cc9d06f7a462a10d46e" />
@@ -266,13 +418,14 @@ List of known part numbers
 		<description>Workbench 1.2 Rev. 33.56 A2000 (De)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.2 Rev. 33.56 A2000 (De)" />
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.2 A2000 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="380724-10_workbench.adf" size="901120" crc="4ac89111" sha1="73f8dea3b56bb337a22d5c5f8b447df4f10a4fb0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.2 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="380706-10_extras.adf" size="901120" crc="af130813" sha1="f7a38640155cfd4d369769349f02aa7686973bcf" />
@@ -285,13 +438,13 @@ List of known part numbers
 		<description>Workbench 1.2 Rev. 33.61 A500/A2000</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.2 Rev. 33.61 A500/A2000" />
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.2 A500/A2000" />
 			<dataarea name="flop" size="901120">
 				<rom name="unkpn_workbench_12r3361.adf" size="901120" crc="f1674acf" sha1="6c5a7d91ea638cd001d3c52fac55bafb0a3ae890" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.2" />
 			<dataarea name="flop" size="901120">
 				<rom name="unkpn_extras_12.adf" size="901120" crc="08f6785b" sha1="2edfbec0a82f8f5d133526365544a2e78f916c7b" />
@@ -301,20 +454,46 @@ List of known part numbers
 
 	<!-- Version 1.3 -->
 
-	<!-- 317746-01 Workbench 1.3 (US) -->
-
 	<software name="wb13">
-		<description>Workbench 1.3 Rev. 34.20</description>
+		<description>Workbench 1.3 Rev. 34.20 (Enhancer Software)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3 Rev. 34.20" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found, crc probably 99f1d1fb -->
+			<feature name="part_id" value="Workbench 1.3" />
 			<dataarea name="flop" size="901120">
-				<rom name="317787-01_workbench.adf" size="901120" status="nodump"/>
+				<rom name="317746-01_workbench.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Kickstart 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="317747-01_kickstart.adf" size="901120" crc="5fd0ef3b" sha1="a80b001b98a997969bf709cecd07f8578f861148" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project as unverified -->
+			<feature name="part_id" value="Extras 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="317748-01_extras.adf" size="901120" crc="404a5f8d" sha1="80017dde2269a90ae559c8dee5ef40432bc8720a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wb13_us">
+		<description>Workbench 1.3 Rev. 34.20 (US)</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3 (US)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317787-01_workbench.adf" size="901120" crc="7d315949" sha1="d33f072138bd1ef462a50a6217147f6626f6bd31" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
@@ -326,14 +505,15 @@ List of known part numbers
 		<description>Workbench 1.3 Rev. 34.20 (UK)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3 Rev. 34.20 (UK)" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3 (UK)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317789-01_workbench.adf" size="901120" crc="30bef4c6" sha1="44bace7520746691969d08f28dd68ef5ab2f15fb" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
@@ -345,14 +525,16 @@ List of known part numbers
 		<description>Workbench 1.3 Rev. 34.20 (De)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3 Rev. 34.20 (De)" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- label with pn 315747-02 found, listed at the workbench project with crc 33891c41 -->
+			<feature name="part_id" value="Workbench 1.3 (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317791-01_workbench.adf" size="901120" status="nodump"/>
+				<rom name="317791-01_workbench.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Verified dump -->
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<!-- original label with pn 315746-02 found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317790-01_extras.adf" size="901120" crc="bc1f2c03" sha1="62dab0a803fe01bcd05d7cf20447e46af09669ff" />
@@ -360,30 +542,73 @@ List of known part numbers
 		</part>
 	</software>
 
-	<!-- 317792-01 Workbench 1.3 (Fr/Be) -->
-	<!-- 317793-01 Workbench 1.3 (No) -->
+	<!-- 317792-01 Workbench 1.3 (Fr/Be) [label found] -->
+
+	<software name="wb13_no" cloneof="wb13">
+		<description>Workbench 1.3 Rev. 34.21 (No)</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.3 (No)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317793-01_workbench.adf" size="901120" crc="8f107dd6" sha1="f9b05508d3ee04ac84d44f5c41d67ff4e842e6d7" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- is this something official? contains norway specific printer drivers -->
+			<feature name="part_id" value="Extras 1.3 (No)" />
+			<dataarea name="flop" size="901120">
+				<rom name="unkpn_extras.adf" size="901120" crc="7b27b35a" sha1="0b95704fb0ec8d3bd6390d1934789c741a348417" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- 317794-01 Workbench 1.3 (Es) -->
 	<!-- 317795-01 Workbench 1.3 (Ch) -->
-	<!-- 317796-01 Workbench 1.3 (Se/Fi) -->
-	<!-- 317797-01 Workbench 1.3 (It) -->
+	<!-- 317796-01 Workbench 1.3 (Se/Fi) [label found] -->
+	<!-- 317797-01 Workbench 1.3 (It) [label found] -->
+
+	<software name="wb13_dk" cloneof="wb13">
+		<description>Workbench 1.3 Rev. 34.20 (Dk)</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3 (Dk)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317798-01_workbench.adf" size="901120" crc="6b3bc3b2" sha1="d48769a027c3a156bcc11f9a04fadb5301407552" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Version 1.3.1 -->
+
+	<!-- Very limited release only. Label found which claims "VER. 1.3.1 REV 34.25" (included with an Enhancer set) -->
 
 	<!-- Version 1.3.2 -->
 
-	<!-- 317746-03 Workbench 1.3.2 (US) -->
+	<!-- 317746-03 Workbench 1.3.2 (Enhancer Software) -->
 
 	<software name="wb132">
-		<description>Workbench 1.3.2</description>
+		<description>Workbench 1.3.2 Rev. 34.28 (US)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3.2" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3.2 (US)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317787-03_workbench.adf" size="901120" status="nodump"/>
+				<rom name="317787-03_workbench.adf" size="901120" crc="a80cfe5c" sha1="45bb76bb3ee393b36ce8b38edea609e2a346b3a5" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
-			<!-- Possibly this should be 317788-02? -->
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
@@ -395,16 +620,15 @@ List of known part numbers
 		<description>Workbench 1.3.2 Rev. 34.28 (UK)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<!-- Probably good dump -->
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found, crc should be c5692f06 -->
 			<feature name="part_id" value="Workbench 1.3.2 (UK)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317789-03_workbench.adf" size="901120" crc="c5692f06" status="nodump"/>
+				<rom name="317789-03_workbench.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
-			<!-- Possibly this should be 317788-02? -->
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
@@ -413,17 +637,19 @@ List of known part numbers
 	</software>
 
 	<software name="wb132_de" cloneof="wb132">
-		<description>Workbench 1.3.2 (De)</description>
+		<description>Workbench 1.3.2 Rev. 34.28 (De)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Workbench 1.3.2 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317791-03_workbench.adf" size="901120" crc="e0a29775" sha1="3e2a5e064d8efb4feb64b85b7b26bfaa4f07aa0a" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Verified dump -->
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<!-- original label with pn 315746-02 found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317790-01_extras.adf" size="901120" crc="bc1f2c03" sha1="62dab0a803fe01bcd05d7cf20447e46af09669ff" />
@@ -431,23 +657,21 @@ List of known part numbers
 		</part>
 	</software>
 
-	<!-- 317792-03 Workbench 1.3.2 (Fr/Be) -->
+	<!-- 317792-03 Workbench 1.3.2 (Fr/Be) [label found] -->
 	<!-- 317793-03 Workbench 1.3.2 (No) -->
-	<!-- 317794-03 Workbench 1.3.2 (Es) -->
-	<!-- 317795-03 Workbench 1.3.2 (Ch) -->
-	<!-- 317796-03 Workbench 1.3.2 (Se/Fi) -->
 
-	<software name="wb132_it" cloneof="wb132">
-		<description>Workbench 1.3.2 (It)</description>
+	<software name="wb132_es" cloneof="wb132">
+		<description>Workbench 1.3.2 Rev. 34.28 (Es)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3.2 (It)" />
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.3.2 (Es)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317797-03_workbench.adf" size="901120" status="nodump"/>
+				<rom name="317794-03_workbench.adf" size="901120" crc="e84cd11c" sha1="c5127904ecf864e1a8be770405a02f583ef11ccc" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
@@ -455,38 +679,93 @@ List of known part numbers
 		</part>
 	</software>
 
-	<!-- Version 1.3.3 -->
+	<!-- 317795-03 Workbench 1.3.2 (Ch) -->
+	<!-- 317796-03 Workbench 1.3.2 (Se/Fi) -->
 
-	<software name="wb133_us" cloneof="wb133">
-		<description>Workbench 1.3.3 (US)</description>
+	<software name="wb132_it" cloneof="wb132">
+		<description>Workbench 1.3.2 Rev. 34.28 (It)</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3.2 (It)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317797-03_workbench.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="317788-01_extras.adf" size="901120" crc="2f9cea9f" sha1="7fe6b33427eb860fad67540146480d62349e27ca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 317798-03 Workbench 1.3.2 (Dk) [label found] -->
+
+	<software name="wb132_a3000" cloneof="wb132">
+		<description>Workbench 1.3.2 Rev. 34.28 A3000 (US)</description>
 		<year>1990</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3.3 (US)" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found, crc should be 32ba99d1 -->
+			<feature name="part_id" value="Workbench 1.3.2 A3000 (US)" />
+			<dataarea name="flop" size="901120">
+				<rom name="367270-01_workbench.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Extras 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="367272-01_extras.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Version 1.3.3 -->
+
+	<software name="wb133">
+		<description>Workbench 1.3.3 Rev. 34.34 (Enhancer Software)</description>
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317746-04_workbench.adf" size="901120" crc="bf299bca" sha1="8bac53a89cd1fe5a7762de9bd61a1592f10af2df" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Extras 1.3 (US)" />
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Kickstart 1.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="317747-01_kickstart.adf" size="901120" crc="5fd0ef3b" sha1="a80b001b98a997969bf709cecd07f8578f861148" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Extras 1.3.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="317748-02_extras.adf" size="901120" crc="256a4b82" sha1="465a65aa89fe4b016fee968ef75ab08de9bdfbc6" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wb133">
-		<description>Workbench 1.3.3</description>
-		<year>1988</year>
+	<software name="wb133_us" cloneof="wb133">
+		<description>Workbench 1.3.3 Rev. 34.34 (US)</description>
+		<year>1990</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3.3" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3.3 (US)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317787-04_workbench.adf" size="901120" status="nodump"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="367618-01_extras.adf" size="901120" crc="e8eb34c4" sha1="98b2d23004aa4f70e6e07fae92e36b303ab8e471" />
@@ -495,18 +774,18 @@ List of known part numbers
 	</software>
 
 	<software name="wb133_uk" cloneof="wb133">
-		<description>Workbench 1.3.3 (UK)</description>
-		<year>1988</year>
+		<description>Workbench 1.3.3 Rev. 34.34 (UK)</description>
+		<year>1990</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<!-- Modified -->
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
 			<feature name="part_id" value="Workbench 1.3.3 (UK)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317789-04_workbench.adf" size="901120" crc="f0ac4901" sha1="598a61b0d41fd16f8af5166067337ceda350c2b5" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 1.3.3" />
 			<dataarea name="flop" size="901120">
 				<rom name="367618-01_extras.adf" size="901120" crc="e8eb34c4" sha1="98b2d23004aa4f70e6e07fae92e36b303ab8e471" />
@@ -515,25 +794,171 @@ List of known part numbers
 	</software>
 
 	<software name="wb133_de" cloneof="wb133">
-		<description>Workbench 1.3.3 (De)</description>
+		<description>Workbench 1.3.3 Rev. 34.34 (De)</description>
 		<year>1990</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
 			<feature name="part_id" value="Workbench 1.3.3 (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317791-04_workbench.adf" size="901120" status="nodump" />
+				<rom name="317791-04_workbench.adf" size="901120" crc="aa7f9b30" sha1="a8d8e140c15b0ed9bfb6ab286dfae7ad5103d4e7" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found -->
 			<feature name="part_id" value="Extras 1.3.3 (De)" />
 			<dataarea name="flop" size="901120">
-				<rom name="317790-02_extras.adf" size="901120" status="nodump" />
+				<rom name="317790-02_extras.adf" size="901120" crc="78c9d37d" sha1="a31c2505e20fc9c5d0537a7a6bb723ae8740dc49" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- 317796-04 Workbench 1.3.3 (Se/Fi) -->
+	<software name="wb133_fr" cloneof="wb133">
+		<description>Workbench 1.3.3 Rev. 34.34 (Fr/Be)</description>
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project as unverified -->
+			<feature name="part_id" value="Workbench 1.3.3 (Fr/Be)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317792-04_workbench.adf" size="901120" crc="3df8a000" sha1="b9a8097bd1f65145927ab4100ab157ba0deb5598" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras 1.3.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="367618-01_extras.adf" size="901120" crc="e8eb34c4" sha1="98b2d23004aa4f70e6e07fae92e36b303ab8e471" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 317793-04 Workbench 1.3.3 (No) -->
+	<!-- 317794-04 Workbench 1.3.3 (Es) -->
+	<!-- 317795-04 Workbench 1.3.3 (Ch) -->
+	<!-- 317796-04 Workbench 1.3.3 (Se/Fi) [label found] -->
 	<!-- 317797-04 Workbench 1.3.3 (It) -->
+
+	<software name="wb133_dk" cloneof="wb133">
+		<description>Workbench 1.3.3 Rev. 34.34 (Dk)</description>
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench 1.3.3 (Dk)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317798-04_workbench.adf" size="901120" crc="6395ec1f" sha1="8d8314faa3b5fbc472c11d5fc669358522c1d00b" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras 1.3.3" />
+			<dataarea name="flop" size="901120">
+				<rom name="367618-01_extras.adf" size="901120" crc="e8eb34c4" sha1="98b2d23004aa4f70e6e07fae92e36b303ab8e471" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Version 2.0 -->
+
+	<software name="wb20">
+		<description>Workbench 2.0 Rev. 36.68 A3000</description>
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 2.0" />
+			<dataarea name="flop" size="901120">
+				<rom name="317235-01_workbench.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<feature name="part_id" value="Extras 2.0" />
+			<dataarea name="flop" size="901120">
+				<rom name="317235-02_extras.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="kickstart" interface="floppy_3_5">
+			<feature name="part_id" value="Kickstart 2.0" />
+			<dataarea name="flop" size="901120">
+				<rom name="367245-02_kickstart.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<!-- Install disk? -->
+	</software>
+
+	<!-- Version 2.01 -->
+
+	<software name="wb201">
+		<description>Workbench 2.01 Rev. 36.69 A3000</description>
+		<year>1990</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- crc should be 3e62fbc0 -->
+			<feature name="part_id" value="Workbench 2.01" />
+			<dataarea name="flop" size="901120">
+				<rom name="317954-02_workbench.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<feature name="part_id" value="Extras 2.01" />
+			<dataarea name="flop" size="901120">
+				<rom name="317954-01_extras.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="install" interface="floppy_3_5">
+			<feature name="part_id" value="Install 2.01" />
+			<dataarea name="flop" size="901120">
+				<rom name="335603-02_install.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="kickstart" interface="floppy_3_5">
+			<feature name="part_id" value="Kickstart 2.01" />
+			<dataarea name="flop" size="901120">
+				<rom name="367245-03_kickstart.adf" size="901120" crc="79c58ce8" sha1="8e738fb5a9d293c8321cf5055c06f368d43a6e2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Version 2.02 -->
+
+	<!-- Probably the 335603-03 Install Disk? -->
+	<!-- 317235-02 Extras here? crc should be 47112b69 -->
+
+	<!-- Version 2.03 -->
+
+	<software name="wb203">
+		<description>Workbench 2.03 Rev. 36.102 A3000</description>
+		<year>1991</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- crc should be 6a12963e -->
+			<feature name="part_id" value="Workbench 2.03" />
+			<dataarea name="flop" size="901120">
+				<rom name="317954-04_workbench.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- crc should be bfe0d8cf -->
+			<feature name="part_id" value="Extras 2.03" />
+			<dataarea name="flop" size="901120">
+				<rom name="317235-04_extras.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="install" interface="floppy_3_5">
+			<!-- bad? crc should be c18842d3 -->
+			<feature name="part_id" value="Install Disk 2.03" />
+			<dataarea name="flop" size="901120">
+				<rom name="335603-04_install.adf" size="901120" crc="9a3cc466" sha1="b12a225890a3957bb01dcbfba44c046c19e19c8f" />
+			</dataarea>
+		</part>
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- crc should be 4bf14fc0 -->
+			<feature name="part_id" value="Kickstart 2.03" />
+			<dataarea name="flop" size="901120">
+				<rom name="367245-05_kickstart.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- Version 2.04 -->
 
@@ -541,31 +966,72 @@ List of known part numbers
 		<description>Workbench 2.04 Rev. 37.67</description>
 		<year>1991</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<!-- Probably good dump -->
+		<part name="workbench" interface="floppy_3_5">
+			<!-- listed with this crc at the workbench project -->
 			<feature name="part_id" value="Workbench 2.04" />
 			<dataarea name="flop" size="901120">
 				<rom name="367813-01_workbench.adf" size="901120" crc="57714d34" sha1="8d5c0310a86f14fb3e6a1da001ceb50b9a592c51" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
-			<feature name="part_id" value="Extras 2.04" />
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras Version 2.04" />
 			<dataarea name="flop" size="901120">
 				<rom name="367824-01_extras.adf" size="901120" crc="a019b6b9" sha1="dc6a940c3474a1d90856541c179f4105eadadbbf" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<!-- Probably good dump -->
+		<part name="fonts" interface="floppy_3_5">
+			<!-- listed with this crc at the workbench project -->
 			<feature name="part_id" value="Fonts 2.04" />
 			<dataarea name="flop" size="901120">
 				<rom name="367825-01_fonts.adf" size="901120" crc="2f88c0f6" sha1="22827246c3147c9f9585d029a0f1ebe5fade584e" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
+		<part name="install" interface="floppy_3_5">
+			<!-- listed with this crc at the workbench project -->
 			<feature name="part_id" value="Install 2.04" />
 			<dataarea name="flop" size="901120">
 				<rom name="367826-02_install.adf" size="901120" crc="74f4f26b" sha1="4a6f66823dc9320eb807106b2e98eaba3800c197" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wb204_a3000" cloneof="wb204">
+		<description>Workbench 2.04 Rev. 37.67 A3000</description>
+		<year>1991</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- listed with this crc at the workbench project -->
+			<feature name="part_id" value="Workbench 2.04" />
+			<dataarea name="flop" size="901120">
+				<rom name="367813-01_workbench.adf" size="901120" crc="57714d34" sha1="8d5c0310a86f14fb3e6a1da001ceb50b9a592c51" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras Version 2.04" />
+			<dataarea name="flop" size="901120">
+				<rom name="367824-01_extras.adf" size="901120" crc="a019b6b9" sha1="dc6a940c3474a1d90856541c179f4105eadadbbf" />
+			</dataarea>
+		</part>
+		<part name="fonts" interface="floppy_3_5">
+			<!-- listed with this crc at the workbench project -->
+			<feature name="part_id" value="Fonts 2.04" />
+			<dataarea name="flop" size="901120">
+				<rom name="367825-01_fonts.adf" size="901120" crc="2f88c0f6" sha1="22827246c3147c9f9585d029a0f1ebe5fade584e" />
+			</dataarea>
+		</part>
+		<part name="install" interface="floppy_3_5">
+			<feature name="part_id" value="Install 2.04" />
+			<dataarea name="flop" size="901120">
+				<rom name="367826-01_install.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="kickstart" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="A3000 Kickstart Version 2.04" />
+			<dataarea name="flop" size="901120">
+				<rom name="367245-06_kickstart.adf" size="901120" crc="87ad0c5b" sha1="922ec2776766a6568f3e2de37101c497067948e4" />
 			</dataarea>
 		</part>
 	</software>
@@ -576,72 +1042,182 @@ List of known part numbers
 		<description>Workbench 2.05 Rev. 37.71</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 2.05" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Workbench Version 2.05" />
 			<dataarea name="flop" size="901120">
 				<rom name="367813-03_workbench.adf" size="901120" crc="be1cc8b9" sha1="4d5c1830e04d1302fdad1eb85638104ab94fb353" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Extras 2.05" />
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras Version 2.05" />
 			<dataarea name="flop" size="901120">
 				<rom name="367824-04_extras.adf" size="901120" crc="86daec05" sha1="96bcab8d0d5f05d5fac879436bcc85514d912acc"/>
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Fonts 2.05" />
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Fonts Version 2.05" />
 			<dataarea name="flop" size="901120">
 				<rom name="367825-03_fonts.adf" size="901120" crc="7401aba4" sha1="21124a9695f90b926184ee00ac575217a6373c3d" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="A600HD Install 2.05" />
+		<part name="install" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="A600HD Install Disk Version 2.05" />
 			<dataarea name="flop" size="901120">
 				<rom name="367943-01_install.adf" size="901120" crc="bbdc194c" sha1="66cf349d250f8da83fae3509d8a49bbf7602677f" />
+			</dataarea>
+		</part>
+		<!-- install disk with crc c285c0aa listed at the workbench project as verified -->
+		<!-- only difference is a slightly newer filesystem creation date, is it offical? -->
+	</software>
+
+	<software name="wb205_a3000" cloneof="wb205">
+		<description>Workbench 2.05 Rev. 37.71 A3000</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Workbench Version 2.05" />
+			<dataarea name="flop" size="901120">
+				<rom name="367813-03_workbench.adf" size="901120" crc="be1cc8b9" sha1="4d5c1830e04d1302fdad1eb85638104ab94fb353" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras Version 2.05" />
+			<dataarea name="flop" size="901120">
+				<rom name="367824-04_extras.adf" size="901120" crc="86daec05" sha1="96bcab8d0d5f05d5fac879436bcc85514d912acc"/>
+			</dataarea>
+		</part>
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Fonts Version 2.05" />
+			<dataarea name="flop" size="901120">
+				<rom name="367825-03_fonts.adf" size="901120" crc="7401aba4" sha1="21124a9695f90b926184ee00ac575217a6373c3d" />
+			</dataarea>
+		</part>
+		<part name="install" interface="floppy_3_5">
+			<!-- original label found but unverified, contains a3000 specific files -->
+			<feature name="part_id" value="SCSI Install Disk Version 2.05" />
+			<dataarea name="flop" size="901120">
+				<rom name="367826-03_install.adf" size="901120" crc="27789c2f" sha1="ea7de9081bc485665be72746ace21355c87c1ab1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Only delivered with A600 non-HD models? -->
+	<software name="wb205_3772">
+		<description>Workbench 2.05 Rev. 37.72</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found -->
+			<feature name="part_id" value="Workbench Version 2.05" />
+			<dataarea name="flop" size="901120">
+				<rom name="367959-01_workbench.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found, crc should be 2ec25826 -->
+			<feature name="part_id" value="Extras Version 2.05" />
+			<dataarea name="flop" size="901120">
+				<rom name="367960-01_extras.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found, crc should be 0f4d1bbd -->
+			<feature name="part_id" value="Fonts Version 2.05" />
+			<dataarea name="flop" size="901120">
+				<rom name="367968-01_fonts.adf" size="901120" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- Version 2.1 -->
 
+	<!-- 370152-01 Workbench 2.1 Rev. 38.31 En/No/Se [label found] -->
+
+	<software name="wb21_3835" cloneof="wb21">
+		<description>Workbench 2.1 Rev. 38.35</description>
+		<year>1992</year>
+		<publisher>Commodore</publisher>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- crc should be 811cb955 -->
+			<feature name="part_id" value="Workbench 2.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370155-01_workbench.adf" size="901120" crc="78e1c97d" sha1="e6b571309593f248e3acddcdb42cd31f7cad9423" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- crc should be 4a26e812 -->
+			<feature name="part_id" value="Extras 2.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370159-01_extras.adf" size="901120" crc="2eb06588" sha1="8e3a292f96e4f5c0f5b67180670630d91122d560" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found, crc should be d93c40a1 -->
+			<feature name="part_id" value="Fonts 2.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370160-01_fonts.adf" size="901120" crc="c4e1857d" sha1="037eb15fd2473f2d93879d7a00220aea312d9f63" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="install" interface="floppy_3_5">
+			<!-- crc should be 09a0cd0b -->
+			<feature name="part_id" value="Install 2.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370166-01_install.adf" size="901120" crc="9388e8a6" sha1="030485bff4e157246e4104ec5ad34a705e1f1fd9" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="locale" interface="floppy_3_5">
+			<!-- original label found, crc should be 5eae8e5d -->
+			<feature name="part_id" value="Locale 2.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="370172-01_locale.adf" size="901120" crc="e8d1afb0" sha1="826f71d85110bd6eb63fa7d57ebdf3df8ffe0a44" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 370167-01 Workbench 2.1 Rev. 38.35 -->
+
 	<software name="wb21">
 		<description>Workbench 2.1 Rev. 38.36</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Install 2.1" />
+		<part name="install" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Install Disk Version 2.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="370166-02_install.adf" size="901120" crc="78288c6e" sha1="d92d1218ee28e1057ce776d4c0f4ee12426d53d9" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Workbench 2.1" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Workbench Version 2.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="370167-02_workbench.adf" size="901120" crc="47bc4f1c" sha1="57e630711fc98a57b6a3ee5b126e302f76d4989a" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Extras 2.1" />
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras Version 2.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="370168-01_extras.adf" size="901120" crc="0b64e83d" sha1="34b765f7bbe3dc0370cc448b8eacdca540238ad6" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Fonts 2.1" />
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Fonts Version 2.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="370169-01_fonts.adf" size="901120" crc="38dd8f2c" sha1="4444b0acd8c39d918ef29b79443522d76b2ff485" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Locale 2.1" />
+		<part name="locale" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Locale Version 2.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="370170-01_locale.adf" size="901120" crc="0d6f6b6b" sha1="20a330dbb002edd543e1eac527ea87e54dc496a3" />
 			</dataarea>
@@ -650,148 +1226,208 @@ List of known part numbers
 
 	<!-- Version 3.0 -->
 
+	<!-- Disks with "incomplete" PN. Really different? -->
+	<!-- 370126 Install 3.0 -->
+	<!-- 370127 Workbench 3.0 [label found] -->
+	<!-- 370128 Extras 3.0 [label found] -->
+	<!-- 370129 Locale 3.0 [label found] -->
+	<!-- 370191 Fonts 3.0 [label found] -->
+	<!-- 370150 Storage 3.0 [label found] -->
+
 	<software name="wb30">
 		<description>Workbench 3.0 Rev. 39.29</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Install 3.0" />
+		<part name="install" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Install Disk Version 3.0" />
 			<dataarea name="flop" size="901120">
 				<rom name="370126-02_install.adf" size="901120" crc="6fa2d2b4" sha1="ba24b4172339b9198e4f724a6804d0c6eb5e394b" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Probably good dump -->
-			<feature name="part_id" value="Workbench 3.0" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Workbench Version 3.0" />
 			<dataarea name="flop" size="901120">
 				<rom name="370127-02_workbench.adf" size="901120" crc="a4d9752d" sha1="e663c92a9c88fa38d02bbb299bea8ce70c56b417" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<!-- Probably good dump -->
-			<feature name="part_id" value="Extras 3.0" />
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Extras Version 3.0" />
 			<dataarea name="flop" size="901120">
 				<rom name="370128-01_extras.adf" size="901120" crc="95da642d" sha1="74304711678ebd3287f816ae250b47bd4d8f5195" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<!-- Probably good dump -->
-			<feature name="part_id" value="Locale 3.0" />
+		<part name="locale" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Locale Version 3.0" />
 			<dataarea name="flop" size="901120">
 				<rom name="370129-01_locale.adf" size="901120" crc="67835fe5" sha1="00d0670a9060ab7805dc2fa7e2e856b33a828043" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<!-- Probably good dump -->
-			<feature name="part_id" value="Storage 3.0" />
+		<part name="storage" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Storage Version 3.0" />
 			<dataarea name="flop" size="901120">
 				<rom name="370150-01_storage.adf" size="901120" crc="0c8c24d5" sha1="93cab7cd05471e8fde63cb1d512b048cd593aebc" />
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<!-- This might be 370130-01 (intellifonts on disk) -->
-			<feature name="part_id" value="Fonts 3.0" />
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Fonts Version 3.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="fonts30a.adf" size="901120" crc="6a8188bb" sha1="ce0e9e7f03f26918333e120b2740407684d0b619" />
+				<rom name="370130-01_fonts.adf" size="901120" crc="6a8188bb" sha1="ce0e9e7f03f26918333e120b2740407684d0b619" />
 			</dataarea>
 		</part>
-		<part name="flop7" interface="floppy_3_5">
-			<!-- This might be 370192-01 (intellifonts deleted, not recoverable) -->
-			<feature name="part_id" value="Fonts 3.0 (without intellifonts)" />
-			<dataarea name="flop" size="901120">
-				<rom name="fonts30.adf" size="901120" crc="d7364bb4" sha1="4531651fe34a7f0a2dc1a1523ed4c2507670f5a6" />
-			</dataarea>
-		</part>
+		<!-- 370191-01 Fonts 3.0 [crc should be 242ff841] -->
+		<!-- 370192-01 Fonts 3.0 -->
 	</software>
 
 	<!-- Version 3.1 -->
 
+	<!-- Missing: There is also a release on HD disks -->
+
 	<software name="wb31">
 		<description>Workbench 3.1 Rev. 40.42</description>
-		<year>1995</year>
-		<publisher>ESCOM</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Install 3.1" />
+		<year>1994</year>
+		<publisher>Commodore</publisher>
+		<part name="install" interface="floppy_3_5">
+			<!-- original label found, crc should be 5a039e90 -->
+			<feature name="part_id" value="Install Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370299-98_install.adf" size="901120" crc="27b3c15a" sha1="96d1fa31a61a29f4c1fe7d4659e0e32a3fa6b5f8" />
+				<rom name="370299-98_install.adf" size="901120" crc="2bd9d105" sha1="27c8d7042da3a8c7a21742129970bd7e56b7e828" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Workbench 3.1" />
+		<part name="storage" interface="floppy_3_5">
+			<!-- original label found, crc should be 4bd38ef4 -->
+			<feature name="part_id" value="Storage Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370300-98_workbench.adf" size="901120" crc="576b08f9" sha1="486ea9520e60051c20ec01329d5a0fe3bb10b4fc" />
+				<rom name="370299-99_storage.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Locale 3.1" />
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Workbench Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370300-99_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
+				<rom name="370300-98_workbench.adf" size="901120" crc="d233484c" sha1="ca5b96eaac70558273d3158f476a4e39ca8c7f75" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Extras 3.1" />
+		<part name="locale" interface="floppy_3_5">
+			<!-- original label found, crc should be e0e5de81 -->
+			<feature name="part_id" value="Locale Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370301-98_extras.adf" size="901120" crc="786a7c59" sha1="0a887f5e1f3b2f2af5b5d4c689cc00ea83414137" />
+				<rom name="370300-99_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Fonts 3.1" />
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found, crc should be 32f55078 -->
+			<feature name="part_id" value="Extras Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370301-99_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
+				<rom name="370301-98_extras.adf" size="901120" crc="786a7c59" sha1="0a887f5e1f3b2f2af5b5d4c689cc00ea83414137" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<!-- Verified dump -->
-			<feature name="part_id" value="Storage 3.1" />
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found, crc should be 63470de4 -->
+			<feature name="part_id" value="Fonts Version 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370299-99_storage.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" />
+				<rom name="370301-99_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="wb31_a4k" cloneof="wb31">
-		<description>Workbench 3.1 Rev. 40.42 (A4000T)</description>
+	<!-- ESCOM releases below -->
+	<!-- Some disk labels show the same PN as the Commodore release, however the content seems different -->
+
+	<software name="wb31_escom" cloneof="wb31">
+		<description>Workbench 3.1 Rev. 40.42 (ESCOM)</description>
 		<year>1995</year>
 		<publisher>ESCOM</publisher>
-		<part name="flop1" interface="floppy_3_5">
+		<part name="install" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Install 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370299-97_install.adf" size="901120" status="nodump" />
+				<rom name="escom_install.adf" size="901120" crc="27b3c15a" sha1="96d1fa31a61a29f4c1fe7d4659e0e32a3fa6b5f8" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="workbench" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Workbench 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370300-97_workbench.adf" size="901120" status="nodump" />
+				<rom name="escom_workbench.adf" size="901120" crc="576b08f9" sha1="486ea9520e60051c20ec01329d5a0fe3bb10b4fc" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<!-- Verified dump -->
+		<part name="locale" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Locale 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370300-99_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
+				<rom name="escom_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_3_5">
+		<part name="extras" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Extras 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370301-97_extras.adf" size="901120" status="nodump" />
+				<rom name="escom_extras.adf" size="901120" crc="786a7c59" sha1="0a887f5e1f3b2f2af5b5d4c689cc00ea83414137" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<!-- Verified dump -->
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Fonts 3.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="370301-99_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
+				<rom name="escom_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<!-- Verified dump -->
+		<part name="storage" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Storage 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="escom_storage.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wb31_a4000t" cloneof="wb31">
+		<description>Workbench 3.1 Rev. 40.42 A4000T (ESCOM)</description>
+		<year>1995</year>
+		<publisher>ESCOM</publisher>
+		<part name="install" interface="floppy_3_5">
+			<!-- pn 370299-97? original label found -->
+			<feature name="part_id" value="Install 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="escom_install_a4000t.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="workbench" interface="floppy_3_5">
+			<!-- pn 370300-97? original label found, crc should be 92847a4c -->
+			<feature name="part_id" value="Workbench 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="escom_workbench_a4000t.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="locale" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Locale 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="escom_locale.adf" size="901120" crc="92f2770a" sha1="f4f360ef6b5cf560fe7d7999829aa2b9d536898e" />
+			</dataarea>
+		</part>
+		<part name="extras" interface="floppy_3_5">
+			<!-- pn 370301-97? original label found, crc should be 4f4f2e7d -->
+			<feature name="part_id" value="Extras 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="escom_extras_a4000t.adf" size="901120" status="nodump" />
+			</dataarea>
+		</part>
+		<part name="fonts" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
+			<feature name="part_id" value="Fonts 3.1" />
+			<dataarea name="flop" size="901120">
+				<rom name="escom_fonts.adf" size="901120" crc="a152083d" sha1="69f5e5b5ccb626b5aebf29e9ad2e7bd8864cc3c7" />
+			</dataarea>
+		</part>
+		<part name="storage" interface="floppy_3_5">
+			<!-- original label found and listed with this crc at the workbench project -->
 			<feature name="part_id" value="Storage 3.1" />
 			<dataarea name="flop" size="901120">
 				<rom name="370299-99_storage.adf" size="901120" crc="b16ae967" sha1="5cfccf6d596fbafd75336a2f086c920e25b3fe50" />

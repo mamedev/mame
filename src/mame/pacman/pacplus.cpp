@@ -23,7 +23,6 @@ uint8_t pacman_state::pacplus_decrypt(int addr, uint8_t e)
 	uint32_t method = 0;
 	const uint8_t *tbl;
 
-
 	/* pick method from bits 0 2 5 7 9 of the address */
 	method = picktable[
 		(addr & 0x001) |
@@ -43,14 +42,10 @@ uint8_t pacman_state::pacplus_decrypt(int addr, uint8_t e)
 
 void pacman_state::pacplus_decode()
 {
-	int i;
-	uint8_t *RAM;
-
 	/* CPU ROMs */
-
-	RAM = memregion("maincpu")->base();
-	for (i = 0; i < 0x4000; i++)
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x4000; i++)
 	{
-		RAM[i] = pacplus_decrypt(i,RAM[i]);
+		ROM[i] = pacplus_decrypt(i, ROM[i]);
 	}
 }

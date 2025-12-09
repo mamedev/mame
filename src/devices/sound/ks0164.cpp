@@ -6,6 +6,12 @@
 #include "emu.h"
 #include "ks0164.h"
 
+#define LOG_KEYON  (1U << 1)
+#define LOG_SERIAL (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_KEYON | LOG_SERIAL)
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(KS0164, ks0164_device, "ks0164", "Samsung KS0164 Wavetable Synthesizer")
 
@@ -153,7 +159,7 @@ TIMER_CALLBACK_MEMBER(ks0164_device::irq_timer_tick)
 
 void ks0164_device::tra_complete()
 {
-	logerror("transmit done\n");
+	LOGMASKED(LOG_SERIAL, "transmit done\n");
 }
 
 void ks0164_device::rcv_complete()
@@ -163,7 +169,7 @@ void ks0164_device::rcv_complete()
 	m_midi_in_active = true;
 	m_cpu->set_input_line(6, ASSERT_LINE);
 
-	logerror("recieved %02x\n", m_midi_in);
+	LOGMASKED(LOG_SERIAL, "recieved %02x\n", m_midi_in);
 }
 
 void ks0164_device::tra_callback()
@@ -180,7 +186,7 @@ u8 ks0164_device::midi_r()
 
 void ks0164_device::midi_w(u8 data)
 {
-	logerror("want to transmit %02x\n", data);
+	LOG("want to transmit %02x\n", data);
 }
 
 u8 ks0164_device::midi_status_r()
@@ -191,7 +197,7 @@ u8 ks0164_device::midi_status_r()
 
 void ks0164_device::midi_status_w(u8 data)
 {
-	logerror("midi status_w %02x\n", data);
+	LOG("midi status_w %02x\n", data);
 }
 
 
@@ -336,9 +342,9 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 	u16 old = m_sregs[m_voice_select & 0x1f][offset];
 	COMBINE_DATA(&m_sregs[m_voice_select & 0x1f][offset]);
 	if(0 && m_sregs[m_voice_select & 0x1f][offset] != old && offset == 0)
-		logerror("voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
+		LOGMASKED(LOG_KEYON, "voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
 	if(offset == 0 && (data & 1) && !(old & 1))
-		logerror("keyon %02x mode=%04x (%s %c %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
+		LOGMASKED(LOG_KEYON, "keyon %02x mode=%04x (%s %c %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
 				 m_voice_select,
 
 				 m_sregs[m_voice_select & 0x1f][0x00],
@@ -419,7 +425,7 @@ u8 ks0164_device::irqen_77_r()
 void ks0164_device::irqen_77_w(u8 data)
 {
 	m_irqen_77 = data;
-	logerror("irqen_77 = %02x (%04x)\n", m_irqen_77, m_cpu->pc());
+	LOG("irqen_77 = %02x (%04x)\n", m_irqen_77, m_cpu->pc());
 }
 
 u8 ks0164_device::unk60_r()
@@ -430,7 +436,7 @@ u8 ks0164_device::unk60_r()
 void ks0164_device::unk60_w(u8 data)
 {
 	m_unk60 = data;
-	logerror("unk60 = %02x (%04x)\n", m_unk60, m_cpu->pc());
+	LOG("unk60 = %02x (%04x)\n", m_unk60, m_cpu->pc());
 }
 
 u8 ks0164_device::voice_select_r()
@@ -468,9 +474,9 @@ void ks0164_device::cpu_map(address_map &map)
 	map(0xe000, 0xffff).ram();
 }
 
-void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ks0164_device::sound_stream_update(sound_stream &stream)
 {
-	for(int sample = 0; sample != outputs[0].samples(); sample++) {
+	for(int sample = 0; sample != stream.samples(); sample++) {
 		s32 suml = 0, sumr = 0;
 		for(int voice = 0; voice < 0x20; voice++) {
 			u16 *regs = m_sregs[voice];
@@ -490,7 +496,7 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					break;
 
 				default:
-					logerror("Sample mode %04x\n", regs[0] & 0x8400);
+					LOG("Sample mode %04x\n", regs[0] & 0x8400);
 					samp0 = samp1 = 0;
 					break;
 				}
@@ -531,7 +537,7 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				}
 			}
 		}
-		outputs[0].put_int(sample, suml, 32768 * 32);
-		outputs[1].put_int(sample, sumr, 32768 * 32);
+		stream.put_int(0, sample, suml, 32768 * 32);
+		stream.put_int(1, sample, sumr, 32768 * 32);
 	}
 }

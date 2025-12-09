@@ -46,9 +46,9 @@ menu_control_device_preset::~menu_control_device_preset()
 void menu_control_device_preset::populate()
 {
 	auto presets = m_image.preset_images_list();
-	for(int i = 0; i != int(presets.size()); i++)
+	for(uintptr_t i = 0; i != uintptr_t(presets.size()); i++)
 		item_append(presets[i], 0, reinterpret_cast<void *>(i));
-	set_selection(reinterpret_cast<void *>(m_image.current_preset_image_id()));
+	set_selection(reinterpret_cast<void *>(uintptr_t(m_image.current_preset_image_id())));
 }
 
 

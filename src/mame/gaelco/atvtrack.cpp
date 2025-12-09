@@ -143,8 +143,8 @@ protected:
 	int m_nandcommand[4]{}, m_nandoffset[4]{}, m_nandaddressstep = 0, m_nandaddress[4]{};
 	u32 m_area1_data[4]{};
 
-	required_device<sh4_device> m_maincpu;
-	required_device<sh4_device> m_subcpu;
+	required_device<sh7750s_device> m_maincpu;
+	required_device<sh7750s_device> m_subcpu;
 
 	u16 gpu_irq_pending = 0;
 	u16 gpu_irq_mask = 0;
@@ -576,7 +576,7 @@ INPUT_PORTS_END
 void atvtrack_state::atvtrack(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, ATV_CPU_CLOCK);
+	SH7750S(config, m_maincpu, ATV_CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 1);
 	m_maincpu->set_md(2, 0);
@@ -591,7 +591,7 @@ void atvtrack_state::atvtrack(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &atvtrack_state::atvtrack_main_port);
 	m_maincpu->set_force_no_drc(true);
 
-	SH4LE(config, m_subcpu, ATV_CPU_CLOCK);
+	SH7750S(config, m_subcpu, ATV_CPU_CLOCK);
 	m_subcpu->set_md(0, 1);
 	m_subcpu->set_md(1, 1);
 	m_subcpu->set_md(2, 0);

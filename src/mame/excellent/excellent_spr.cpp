@@ -19,15 +19,33 @@
 #include "excellent_spr.h"
 #include "screen.h"
 
+#include <algorithm>
+
+
+// 16x16x4
+static gfx_layout layout_16x16x4 =
+{
+	16,16,  // 16*16 sprites
+	RGN_FRAC(1,1),
+	4,  // 4 bits per pixel
+//  { 16, 48, 0, 32 },
+	{ 48, 16, 32, 0 },
+	{ STEP16(0,1) },
+	{ STEP16(0,16*4) },
+	16*16*4   // every sprite takes 128 consecutive bytes
+};
+
+GFXDECODE_MEMBER(excellent_spr_device::gfxinfo)
+	GFXDECODE_DEVICE(DEVICE_SELF, 0, layout_16x16x4, 0, 16)
+GFXDECODE_END
 
 DEFINE_DEVICE_TYPE(EXCELLENT_SPRITE, excellent_spr_device, "excellent_spr", "Excellent 8-bit Sprite")
 
 excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXCELLENT_SPRITE, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, nullptr)
+	, device_gfx_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_colpri_cb(*this)
-	, m_gfx_region(*this, DEVICE_SELF)
 	, m_colbase(0)
 {
 }
@@ -35,26 +53,15 @@ excellent_spr_device::excellent_spr_device(const machine_config &mconfig, const 
 
 void excellent_spr_device::device_start()
 {
-	/* 16x16x4 */
-	gfx_layout layout_16x16x4 =
-	{
-		16,16,  /* 16*16 sprites */
-		0,
-		4,  /* 4 bits per pixel */
-//  { 16, 48, 0, 32 },
-		{ 48, 16, 32, 0 },
-		{ STEP16(0,1) },
-		{ STEP16(0,16*4) },
-		16*16*4   /* every sprite takes 128 consecutive bytes */
-	};
-	layout_16x16x4.total = m_gfx_region->bytes() / ((16*16*4) / 8);
+	decode_gfx(gfxinfo);
+	gfx(0)->set_colorbase(m_colbase);
 
 	m_colpri_cb.resolve();
 	m_ram = make_unique_clear<u8[]>(0x1000);
+	m_ram_buffered = make_unique_clear<u8[]>(0x1000);
 
 	save_pointer(NAME(m_ram), 0x1000);
-
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout_16x16x4, m_gfx_region->base(), 0, 0x10, m_colbase));
+	save_pointer(NAME(m_ram_buffered), 0x1000);
 }
 
 
@@ -72,29 +79,35 @@ void excellent_spr_device::device_reset()
 {
 }
 
+void excellent_spr_device::vblank(int state)
+{
+	if (state)
+		std::copy_n(&m_ram[0], 0x1000, &m_ram_buffered[0]);
+}
 
 /****************************************************************
                      SPRITE DRAW ROUTINE
                      (8-bit)
 
-    Word |     Bit(s)      | Use
-    -----+-----------------+-----------------
-      0  | xxxxxxxx| X lo
-      1  | xxxxxxxx| X hi
-      2  | xxxxxxxx| Y lo
-      3  | xxxxxxxx| Y hi
-      4  | x.......| Disable
-      4  | ...x....| Flip Y
-      4  | ....x...| 1 = Y chain, 0 = X chain
-      4  | .....xxx| Chain size
-      5  | ??xxxxxx| Tile (low)
-      6  | xxxxxxxx| Tile (high)
-      7  | ....xxxx| Color Bank
+    Word |  Bit(s)  | Use
+    -----+----------+---------------------------
+      0  | xxxxxxxx | X lo
+      1  | xxxxxxxx | X hi
+      2  | xxxxxxxx | Y lo
+      3  | xxxxxxxx | Y hi
+      4  | x....... | Disable
+      4  | ..x..... | Flip X (aquarium)
+      4  | ...x.... | Flip Y
+      4  | ....x... | 1 = Y chain, 0 = X chain
+      4  | .....xxx | Chain size
+      5  | ??xxxxxx | Tile (low)
+      6  | xxxxxxxx | Tile (high)
+      7  | ....xxxx | Color Bank
 
 ****************************************************************/
 
 
-void excellent_spr_device::aquarium_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
+void excellent_spr_device::aquarium_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const bool priority = !m_colpri_cb.isnull();
 
@@ -104,33 +117,34 @@ void excellent_spr_device::aquarium_draw_sprites(screen_device &screen, bitmap_i
 
 	for (int offs = start; offs != end; offs += inc)
 	{
-		u32 code = ((m_ram[offs + 5]) & 0xff) + (((m_ram[offs + 6]) & 0xff) << 8);
-		code &= 0x3fff;
-
-		if (!(m_ram[offs + 4] & 0x80))  /* active sprite ? */
+		if (BIT(~m_ram_buffered[offs + 4], 7))  /* active sprite ? */
 		{
-			int x = ((m_ram[offs + 0]) & 0xff) + (((m_ram[offs + 1]) & 0xff) << 8);
-			int y = ((m_ram[offs + 2]) & 0xff) + (((m_ram[offs + 3]) & 0xff) << 8);
+			u32 code = ((m_ram_buffered[offs + 5]) & 0xff) + (((m_ram_buffered[offs + 6]) & 0xff) << 8);
+			code &= 0x3fff;
+
+			int x = ((m_ram_buffered[offs + 0]) & 0xff) + (((m_ram_buffered[offs + 1]) & 0xff) << 8);
+			int y = ((m_ram_buffered[offs + 2]) & 0xff) + (((m_ram_buffered[offs + 3]) & 0xff) << 8);
 
 			/* Treat coords as signed */
 			if (x & 0x8000)  x -= 0x10000;
 			if (y & 0x8000)  y -= 0x10000;
 
 			u32 pri_mask = 0;
-			u32 colour = ((m_ram[offs + 7]) & 0x0f);
-			const u8 chain = (m_ram[offs + 4]) & 0x07;
-			const bool flipy = (m_ram[offs + 4]) & 0x10;
-			const bool flipx = (m_ram[offs + 4]) & 0x20;
+			u32 colour = ((m_ram_buffered[offs + 7]) & 0x0f);
+			const u8 chain = (m_ram_buffered[offs + 4]) & 0x07;
+			const bool chaindir = BIT(m_ram_buffered[offs + 4], 3);
+			const bool flipy = BIT(m_ram_buffered[offs + 4], 4);
+			const bool flipx = BIT(m_ram_buffered[offs + 4], 5);
 			if (priority)
 				m_colpri_cb(colour, pri_mask);
 
 			int curx = x;
 			int cury = y;
 
-			if (((m_ram[offs + 4]) & 0x08) && flipy)
+			if (chaindir && flipy)
 				cury += (chain * 16);
 
-			if (!(((m_ram[offs + 4]) & 0x08)) && flipx)
+			if ((!chaindir) && flipx)
 				curx += (chain * 16);
 
 			for (int chain_pos = chain; chain_pos >= 0; chain_pos--)
@@ -158,19 +172,21 @@ void excellent_spr_device::aquarium_draw_sprites(screen_device &screen, bitmap_i
 							code,
 							colour,
 							flipx, flipy,
-							curx,cury,0);
+							curx,cury,
+							0);
 
 					/* wrap around y */
 					gfx(0)->transpen(bitmap,cliprect,
 							code,
 							colour,
 							flipx, flipy,
-							curx,cury + 256,0);
+							curx,cury + 256,
+							0);
 				}
 
 				code++;
 
-				if ((m_ram[offs + 4]) & 0x08)   /* Y chain */
+				if (chaindir)   /* Y chain */
 				{
 					if (flipy)
 						cury -= 16;
@@ -189,7 +205,7 @@ void excellent_spr_device::aquarium_draw_sprites(screen_device &screen, bitmap_i
 	}
 }
 
-void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
+void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const bool priority = !m_colpri_cb.isnull();
 
@@ -199,22 +215,23 @@ void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_i
 
 	for (int offs = start; offs != end; offs += inc)
 	{
-		u32 code = ((m_ram[offs + 5]) & 0xff) + (((m_ram[offs + 6]) & 0xff) << 8);
-		code &= 0x3fff;
-
-		if (!(m_ram[offs + 4] & 0x80))   /* active sprite ? */
+		if (BIT(~m_ram_buffered[offs + 4], 7))  /* active sprite ? */
 		{
-			int x = ((m_ram[offs + 0]) & 0xff) + (((m_ram[offs + 1]) & 0xff) << 8);
-			int y = ((m_ram[offs + 2]) & 0xff) + (((m_ram[offs + 3]) & 0xff) << 8);
+			u32 code = ((m_ram_buffered[offs + 5]) & 0xff) + (((m_ram_buffered[offs + 6]) & 0xff) << 8);
+			code &= 0x3fff;
+
+			int x = ((m_ram_buffered[offs + 0]) & 0xff) + (((m_ram_buffered[offs + 1]) & 0xff) << 8);
+			int y = ((m_ram_buffered[offs + 2]) & 0xff) + (((m_ram_buffered[offs + 3]) & 0xff) << 8);
 
 			/* Treat coords as signed */
 			if (x & 0x8000)  x -= 0x10000;
 			if (y & 0x8000)  y -= 0x10000;
 
 			u32 pri_mask = 0;
-			u32 colour = ((m_ram[offs + 7]) & 0x0f);
-			const u8 chain = (m_ram[offs + 4]) & 0x07;
-			const bool flipy = (m_ram[offs + 4]) & 0x10;
+			u32 colour = ((m_ram_buffered[offs + 7]) & 0x0f);
+			const u8 chain = (m_ram_buffered[offs + 4]) & 0x07;
+			const bool chaindir = BIT(m_ram_buffered[offs + 4], 3);
+			const bool flipy = BIT(m_ram_buffered[offs + 4], 4);
 			const bool flipx = 0;
 			if (priority)
 				m_colpri_cb(colour, pri_mask);
@@ -222,7 +239,7 @@ void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_i
 			int curx = x;
 			int cury = y;
 
-			if (((m_ram[offs + 4]) & 0x08) && flipy)
+			if (chaindir && flipy)
 				cury += (chain * 16);
 
 			for (int chain_pos = chain; chain_pos >= 0; chain_pos--)
@@ -248,10 +265,12 @@ void excellent_spr_device::gcpinbal_draw_sprites(screen_device &screen, bitmap_i
 
 				code++;
 
-				if ((m_ram[offs + 4]) & 0x08)   /* Y chain */
+				if (chaindir)   /* Y chain */
 				{
-					if (flipy)  cury -= 16;
-					else cury += 16;
+					if (flipy)
+						cury -= 16;
+					else
+						cury += 16;
 				}
 				else    /* X chain */
 				{

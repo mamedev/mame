@@ -135,6 +135,9 @@ class midvunit_state : public midvunit_base_state
 public:
 	void midvunit(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(gear_button);
+	DECLARE_INPUT_CHANGED_MEMBER(shift_button);
+
 protected:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midvunit_base_state(mconfig, type, tag)
@@ -145,6 +148,7 @@ protected:
 		, m_in0(*this, "IN0")
 		, m_in1(*this, "IN1")
 		, m_dsw(*this, "DSW")
+		, m_conf(*this, "CONF")
 	{ }
 
 	virtual void machine_start() override ATTR_COLD;
@@ -175,10 +179,11 @@ protected:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_dsw;
+	required_ioport m_conf;
 
 	uint8_t m_adc_shift = 0;
 	uint16_t m_last_port0 = 0;
-	uint8_t m_shifter_state = 0;
+	uint16_t m_shifter_state = 0;
 	uint8_t m_galil_input_index = 0;
 	uint8_t m_galil_input_length = 0;
 	const char *m_galil_input = nullptr;

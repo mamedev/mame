@@ -44,6 +44,10 @@ public:
 		, m_mainlatch(*this, "mainlatch")
 		, m_ymsnd(*this, "ymsnd")
 		, m_mob(*this, "mob")
+		, m_soundbank(*this, "soundbank")
+		, m_io_audio(*this, "AUDIO")
+		, m_io_pedals(*this, "PEDALS")
+		, m_io_fe4000(*this, "FE4000")
 	{ }
 
 	void badlands(machine_config &config);
@@ -69,6 +73,11 @@ private:
 	optional_device<generic_latch_8_device> m_mainlatch;
 	optional_device<ym2151_device> m_ymsnd;
 	optional_device<atari_motion_objects_device> m_mob;
+	optional_memory_bank m_soundbank;
+
+	required_ioport m_io_audio;
+	required_ioport m_io_pedals;
+	required_ioport m_io_fe4000;
 
 	uint16_t sound_busy_r();
 	void sound_reset_w(uint16_t data);

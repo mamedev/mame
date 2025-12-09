@@ -203,8 +203,8 @@
  * DISCRETE_INPUT_NOT(NODE)
  * DISCRETE_INPUTX_NOT(NODE,GAIN,OFFSET,INIT)
  * DISCRETE_INPUT_PULSE(NODE,INIT)
- * DISCRETE_INPUT_STREAM(NODE, NUM)
- * DISCRETE_INPUTX_STREAM(NODE,NUM, GAIN,OFFSET)
+ * DISCRETE_INPUT_STREAM(NODE,NUM)
+ * DISCRETE_INPUTX_STREAM(NODE,NUM,GAIN,OFFSET)
  *
  * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MIN,MAX,DIR,INIT0,CLKTYPE)
  * DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)
@@ -442,8 +442,8 @@
  *
  *  Declaration syntax
  *
- *     DISCRETE_INPUT_STREAM (name of node, stream number, )
- *     DISCRETE_INPUTX_STREAM(name of node, stream nubmer, gain, offset)
+ *     DISCRETE_INPUT_STREAM (name of node, stream number)
+ *     DISCRETE_INPUTX_STREAM(name of node, stream number, gain, offset)
  *
  * Note: The discrete system is floating point based.  So when routing a stream
  *       set it's gain to 100% and then use DISCRETE_INPUTX_STREAM to adjust
@@ -4164,7 +4164,7 @@ class discrete_sound_output_interface
 public:
 	virtual ~discrete_sound_output_interface() { }
 
-	virtual void set_output_ptr(write_stream_view &view) = 0;
+	virtual void set_output_ptr(sound_stream &stream, int output) = 0;
 };
 
 //**************************************************************************
@@ -4305,7 +4305,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	typedef std::vector<discrete_dss_input_stream_node *> istream_node_list_t;

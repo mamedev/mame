@@ -24,7 +24,7 @@ namespace ui {
 //-------------------------------------------------
 
 widgets_manager::widgets_manager(running_machine &machine)
-	: m_hilight_bitmap(std::make_unique<bitmap_argb32>(256, 1))
+	: m_hilight_bitmap(std::make_unique<bitmap_argb32>(512, 1))
 	, m_hilight_texture(nullptr, machine.render())
 	, m_hilight_main_bitmap(std::make_unique<bitmap_argb32>(1, 128))
 	, m_hilight_main_texture(nullptr, machine.render())
@@ -33,9 +33,9 @@ widgets_manager::widgets_manager(running_machine &machine)
 	render_manager &render(machine.render());
 
 	// create a texture for hilighting items
-	for (unsigned x = 0; x < 256; ++x)
+	for (unsigned x = 0; x < 512; ++x)
 	{
-		unsigned const alpha((x < 25) ? (0xff * x / 25) : (x >(256 - 25)) ? (0xff * (255 - x) / 25) : 0xff);
+		unsigned const alpha((x < 50) ? ((x + 1) * 5) : (x > (511 - 50)) ? ((512 - x) * 5) : 0xff);
 		m_hilight_bitmap->pix(0, x) = rgb_t(alpha, 0xff, 0xff, 0xff);
 	}
 	m_hilight_texture.reset(render.texture_alloc());

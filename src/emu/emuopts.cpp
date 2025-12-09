@@ -92,7 +92,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SECONDS_TO_RUN ";str",                      "0",         core_options::option_type::INTEGER,    "number of emulated seconds to run before automatically exiting" },
 	{ OPTION_THROTTLE,                                   "1",         core_options::option_type::BOOLEAN,    "throttle emulation to keep system running in sync with real time" },
 	{ OPTION_SLEEP,                                      "1",         core_options::option_type::BOOLEAN,    "enable sleeping, which gives time back to other applications when idle" },
-	{ OPTION_SPEED "(0.01-100)",                         "1.0",       core_options::option_type::FLOAT,      "controls the speed of gameplay, relative to realtime; smaller numbers are slower" },
+	{ OPTION_SPEED "(0.1-100)",                          "1.0",       core_options::option_type::FLOAT,      "controls the speed of gameplay, relative to realtime; smaller numbers are slower" },
 	{ OPTION_REFRESHSPEED ";rs",                         "0",         core_options::option_type::BOOLEAN,    "automatically adjust emulation speed to keep the emulated refresh rate slower than the host screen" },
 	{ OPTION_LOWLATENCY ";lolat",                        "0",         core_options::option_type::BOOLEAN,    "draws new frame before throttling to reduce input latency" },
 
@@ -101,7 +101,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_KEEPASPECT ";ka",                           "1",         core_options::option_type::BOOLEAN,    "maintain aspect ratio when scaling to fill output screen/window" },
 	{ OPTION_UNEVENSTRETCH ";ues",                       "1",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill output screen/window horizontally or vertically" },
 	{ OPTION_UNEVENSTRETCHX ";uesx",                     "0",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill output screen/window horizontally"},
-	{ OPTION_UNEVENSTRETCHY ";uesy",                     "0",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill otuput screen/window vertially"},
+	{ OPTION_UNEVENSTRETCHY ";uesy",                     "0",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill output screen/window vertically"},
 	{ OPTION_AUTOSTRETCHXY ";asxy",                      "0",         core_options::option_type::BOOLEAN,    "automatically apply -unevenstretchx/y based on source native orientation"},
 	{ OPTION_INTOVERSCAN ";ios",                         "0",         core_options::option_type::BOOLEAN,    "allow overscan on integer scaled targets"},
 	{ OPTION_INTSCALEX ";sx",                            "0",         core_options::option_type::INTEGER,    "set horizontal integer scale factor"},
@@ -143,9 +143,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE SOUND OPTIONS" },
 	{ OPTION_SAMPLERATE ";sr(1000-1000000)",             "48000",     core_options::option_type::INTEGER,    "set sound output sample rate" },
 	{ OPTION_SAMPLES,                                    "1",         core_options::option_type::BOOLEAN,    "enable the use of external samples if available" },
-	{ OPTION_VOLUME ";vol",                              "0",         core_options::option_type::INTEGER,    "sound volume in decibels (-32 min, 0 max)" },
-	{ OPTION_COMPRESSOR,                                 "1",         core_options::option_type::BOOLEAN,    "enable compressor for sound" },
-	{ OPTION_SPEAKER_REPORT "(0-4)",                     "0",         core_options::option_type::INTEGER,    "print report of speaker ouput maxima (0=none, or 1-4 for more detail)" },
+	{ OPTION_VOLUME ";vol(-96-12)",                      "0",         core_options::option_type::INTEGER,    "sound volume in decibels" },
 
 	// input options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE INPUT OPTIONS" },

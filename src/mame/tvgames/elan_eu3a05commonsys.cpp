@@ -175,6 +175,7 @@ elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &m
 	m_bank(*this, finder_base::DUMMY_TAG),
 	m_is_pal(false),
 	m_allow_timer_irq(true),
+	m_bank_on_low_bank_writes(false),
 	m_whichtimer(0)
 {
 }
@@ -323,7 +324,9 @@ uint8_t elan_eu3a05commonsys_device::nmi_vector_r(offs_t offset)
 		if(machine().side_effects_disabled())
 			return 0x00;
 
-		fatalerror("NMI without custom vector!");
+		logerror("NMI without custom vector!");
+
+		return 0x00;
 	}
 }
 
@@ -351,7 +354,6 @@ void elan_eu3a05commonsys_device::elan_eu3a05_rombank_w(offs_t offset, uint8_t d
 {
 	if (offset == 0x00)
 	{
-		// written with the banking?
 		//logerror("%s: elan_eu3a05_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
 		m_rombank_hi = data;
 
@@ -361,7 +363,16 @@ void elan_eu3a05commonsys_device::elan_eu3a05_rombank_w(offs_t offset, uint8_t d
 	{
 		//logerror("%s: elan_eu3a05_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
 		m_rombank_lo = data;
+
+		if (m_bank_on_low_bank_writes)
+		{
+			// rad_ftet writes only the low and expects bank to change
+			// however qix in rad_sinv disagrees.  could this be an
+			// eu3a05 / eu3a13 difference?
+			m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
+		}
 	}
+
 }
 
 uint8_t elan_eu3a05commonsys_device::elan_eu3a05_rombank_r(offs_t offset)

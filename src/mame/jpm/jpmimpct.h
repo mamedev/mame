@@ -15,16 +15,14 @@
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
 #include "machine/meters.h"
-#include "machine/roc10937.h"
 #include "machine/steppers.h"
 #include "machine/timer.h"
 #include "sound/upd7759.h"
 #include "video/bt47x.h"
+#include "video/roc10937.h"
 
 #include "diserial.h"
 #include "emupal.h"
-
-
 
 
 class jpmtouch_device : public device_t,
@@ -121,6 +119,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_set_ip5);
 
 	virtual void update_irqs();
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -149,8 +148,6 @@ private:
 	void lamps_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void digits_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void lampstrobe_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-
 
 	void duart_irq_handler(int state);
 	void impact_non_video_map(address_map &map) ATTR_COLD;

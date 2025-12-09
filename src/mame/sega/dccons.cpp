@@ -183,10 +183,6 @@ void dc_cons_state::dc_map(address_map &map)
 
 //  map(0x14000000, 0x17ffffff) G2 Ext Device #3
 
-	map(0x8c000000, 0x8cffffff).ram().share("dc_ram");  // another RAM mirror
-
-	map(0xa0000000, 0xa01fffff).rom().region("maincpu", 0);
-
 	map(0xf4000000, 0xf4003fff).noprw(); // SH-4 operand cache address array
 }
 
@@ -374,14 +370,14 @@ void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
 	cdda->audio_end_cb().set(*device, FUNC(gdrom_device::cdda_end_mark_cb));
-	cdda->add_route(0, "^^aica", 1.0);
-	cdda->add_route(1, "^^aica", 1.0);
+	cdda->add_route(0, "^^aica", 1.0, 0);
+	cdda->add_route(1, "^^aica", 1.0, 1);
 }
 
 void dc_cons_state::dc_base(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, CPU_CLOCK);
+	SH7091(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 1);
@@ -419,15 +415,14 @@ void dc_cons_state::dc_base(machine_config &config)
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
 	m_aica->set_addrmap(0, &dc_cons_state::aica_map);
-	m_aica->add_route(0, "lspeaker", 0.4);
-	m_aica->add_route(1, "rspeaker", 0.4);
+	m_aica->add_route(0, "speaker", 0.4, 0);
+	m_aica->add_route(1, "speaker", 0.4, 1);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 
@@ -453,7 +448,9 @@ void dc_cons_state::dc(machine_config &config)
 	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
 	dcctrl3.set_port_tags("P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5");
 
-	SOFTWARE_LIST(config, "cd_list").set_original("dc");
+	SOFTWARE_LIST(config, "gdrom_list").set_original("dc");
+	// TODO: hookup Mil-CD/multisession CD-ROMs SW list (later DC models don't support this)
+	// TODO: hookup Video CD SW list (thru DreamMovie VCD/MP3 player disc + remote dongle)
 }
 
 void dc_cons_state::dc_fish(machine_config &config)

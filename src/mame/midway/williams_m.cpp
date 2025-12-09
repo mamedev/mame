@@ -24,7 +24,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::va11_callback)
 	if (scanline == 256)
 		return;
 
-	/* the IRQ signal comes into CB1, and is set to VA11 */
+	// the IRQ signal comes into CB1, and is set to VA11
 	m_pia[1]->cb1_w(BIT(scanline, 5));
 }
 
@@ -88,7 +88,7 @@ void williams2_state::machine_start()
 {
 	williams_state::machine_start();
 
-	/* configure memory banks */
+	// configure memory banks
 	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
@@ -97,7 +97,7 @@ void williams2_state::machine_reset()
 {
 	williams_state::machine_reset();
 
-	/* make sure our banking is reset */
+	// make sure our banking is reset
 	bank_select_w(0);
 }
 
@@ -111,29 +111,29 @@ void williams2_state::machine_reset()
 
 void williams_state::vram_select_w(u8 data)
 {
-	/* VRAM/ROM banking from bit 0 */
+	// VRAM/ROM banking from bit 0
 	if (BIT(data, 0))
 		m_rom_view.select(0);
 	else
 		m_rom_view.disable();
 
-	/* cocktail flip from bit 1 */
+	// cocktail flip from bit 1
 	m_cocktail = BIT(data, 1);
 }
 
 
 void williams2_state::bank_select_w(u8 data)
 {
-	/* the low two bits control the paging */
+	// the low two bits control the paging
 	switch (data & 0x03)
 	{
-		/* page 0 is video ram */
+		// page 0 is video ram
 		case 0:
 			m_rom_view.disable();
 			m_palette_view.disable();
 			break;
 
-		/* pages 1 and 2 are ROM */
+		// pages 1 and 2 are ROM
 		case 1:
 		case 2:
 			m_mainbank->set_entry((data & 6) >> 1);
@@ -141,7 +141,7 @@ void williams2_state::bank_select_w(u8 data)
 			m_palette_view.disable();
 			break;
 
-		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
+		// page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected
 		case 3:
 			m_mainbank->set_entry((data & 4) >> 1);
 			m_rom_view.select(0);
@@ -246,7 +246,7 @@ void williams_state::cmos_4bit_w(offs_t offset, u8 data)
 
 void williams_state::watchdog_reset_w(u8 data)
 {
-	/* yes, the data bits are checked for this specific value */
+	// yes, the data bits are checked for this specific value
 	if (data == 0x39)
 		m_watchdog->watchdog_reset();
 }
@@ -254,7 +254,7 @@ void williams_state::watchdog_reset_w(u8 data)
 
 void williams2_state::watchdog_reset_w(u8 data)
 {
-	/* yes, the data bits are checked for this specific value */
+	// yes, the data bits are checked for this specific value
 	if ((data & 0x3f) == 0x14)
 		m_watchdog->watchdog_reset();
 }
@@ -353,11 +353,11 @@ void defender_state::bank_select_w(u8 data)
 
 u8 mayday_state::protection_r(offs_t offset)
 {
-	/* Mayday does some kind of protection check that is not currently understood  */
-	/* However, the results of that protection check are stored at $a190 and $a191 */
-	/* These are compared against $a193 and $a194, respectively. Thus, to prevent  */
-	/* the protection from resetting the machine, we just return $a193 for $a190,  */
-	/* and $a194 for $a191. */
+	// Mayday does some kind of protection check that is not currently understood
+	// However, the results of that protection check are stored at $a190 and $a191
+	// These are compared against $a193 and $a194, respectively. Thus, to prevent
+	// the protection from resetting the machine, we just return $a193 for $a190,
+	// and $a194 for $a191.
 	return m_videoram[0xa193 + offset];
 }
 
@@ -406,6 +406,12 @@ void blaster_state::machine_reset()
 	williams_state::machine_reset();
 
 	m_mainbank->set_entry(0);
+}
+
+
+void blaster_state::video_control_w(u8 data)
+{
+	m_video_control = data;
 }
 
 
@@ -495,20 +501,16 @@ void tshoot_state::machine_start()
 
 void tshoot_state::maxvol_w(int state)
 {
-	/* something to do with the sound volume */
+	// something to do with the sound volume
 	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
 }
 
 
 void tshoot_state::lamp_w(u8 data)
 {
-	/* set the grenade lamp */
 	m_grenade_lamp   = BIT(~data, 2);
-	/* set the gun lamp */
 	m_gun_lamp       = BIT(~data, 3);
-	/* gun coil */
 	m_p1_gun_recoil  = BIT(data, 4);
-	/* feather coil */
 	m_feather_blower = BIT(data, 5);
 }
 

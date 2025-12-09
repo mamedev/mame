@@ -3,13 +3,18 @@
 
 /***************************************************************************
 
- Espial hardware games
+Espial hardware games
+
+2 XTALS (12.0MHz and 18.432MHz), both CPUs are 3.0MHz and the AY is 1.5MHz.
+18.432MHz XTAL is probably for the pixel clock.
 
 Espial: The Orca logo is displayed, but looks to be "blacked out" via the
         color PROMs by having 0x1c & 0x1d set to black.
 
 TODO:
 - merge with orca/zodiack.cpp
+- where do the sound NMIs come from exactly?
+
 
 Stephh's notes (based on the games Z80 code and some tests) :
 
@@ -43,7 +48,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
@@ -67,9 +71,11 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch%u", 0),
+		m_aysnd(*this, "aysnd")
 	{ }
 
 	void espial(machine_config &config);
@@ -88,22 +94,29 @@ protected:
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_flipscreen = 0U;
+	uint8_t m_flipscreen = 0;
 
 	// sound-related
-	uint8_t m_main_nmi_enabled = 0U;
-	uint8_t m_sound_nmi_enabled = 0U;
+	uint8_t m_main_nmi_enabled = 0;
+	uint8_t m_sound_nmi_enabled = 0;
+	uint8_t m_sound_nmi_freq = 0;
+	emu_timer *m_sound_nmi_timer;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device<ay8910_device> m_aysnd;
 
 	void master_interrupt_mask_w(uint8_t data);
-	void master_soundlatch_w(uint8_t data);
 	void sound_nmi_mask_w(uint8_t data);
+	void porta_w(offs_t offset, uint8_t data, uint8_t mem_mask);
+	TIMER_CALLBACK_MEMBER(sound_nmi_gen);
+	void vblank(int state);
+
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void attributeram_w(offs_t offset, uint8_t data);
@@ -112,9 +125,8 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_nmi_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -123,7 +135,9 @@ protected:
 class netwars_state : public espial_state
 {
 public:
-	using espial_state::espial_state;
+	netwars_state(const machine_config &mconfig, device_type type, const char *tag) :
+		espial_state(mconfig, type, tag)
+	{ }
 
 	void netwars(machine_config &config);
 
@@ -135,7 +149,35 @@ private:
 };
 
 
-/***************************************************************************
+
+/*************************************
+ *
+ *  Machine initialization
+ *
+ *************************************/
+
+void espial_state::machine_start()
+{
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_main_nmi_enabled));
+	save_item(NAME(m_sound_nmi_enabled));
+	save_item(NAME(m_sound_nmi_freq));
+
+	m_sound_nmi_timer = timer_alloc(FUNC(espial_state::sound_nmi_gen), this);
+}
+
+void espial_state::machine_reset()
+{
+	m_main_nmi_enabled = false;
+	m_sound_nmi_enabled = false;
+
+	// HACK: prevent NMI immediately after soft reset
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+
+
+/*************************************
 
   Convert the color PROMs into a more useable format.
 
@@ -153,7 +195,7 @@ private:
         -- 470 ohm resistor  -- RED
   bit 0 -- 1  kohm resistor  -- RED
 
-***************************************************************************/
+*************************************/
 
 void espial_state::palette(palette_device &palette) const
 {
@@ -168,11 +210,13 @@ void espial_state::palette(palette_device &palette) const
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
 		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i + palette.entries()], 0);
 		bit2 = BIT(color_prom[i + palette.entries()], 1);
 		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		// blue component
 		bit0 = 0;
 		bit1 = BIT(color_prom[i + palette.entries()], 2);
@@ -181,23 +225,6 @@ void espial_state::palette(palette_device &palette) const
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
-}
-
-
-
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
-
-TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
-{
-	uint8_t const code = m_videoram[tile_index];
-	uint8_t const col = m_colorram[tile_index];
-	uint8_t const attr = m_attributeram[tile_index];
-
-	tileinfo.set(0, code | ((attr & 0x03) << 8), col & 0x3f, TILE_FLIPYX(attr >> 2));
 }
 
 
@@ -212,60 +239,24 @@ void espial_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(espial_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
-
-	save_item(NAME(m_flipscreen));
 }
 
 void netwars_state::video_start()
 {
 	// Net Wars has a tile map that's twice as big as Espial's
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(netwars_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
-
 	m_bg_tilemap->set_scroll_cols(32);
-
-	save_item(NAME(m_flipscreen));
 }
 
-
-/*************************************
- *
- *  Memory handlers
- *
- *************************************/
-
-void espial_state::videoram_w(offs_t offset, uint8_t data)
+TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 {
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
+	uint8_t const code = m_videoram[tile_index];
+	uint8_t const col = m_colorram[tile_index];
+	uint8_t const attr = m_attributeram[tile_index];
+
+	tileinfo.set(0, code | ((attr & 0x03) << 8), col & 0x3f, TILE_FLIPYX(attr >> 2));
 }
 
-
-void espial_state::colorram_w(offs_t offset, uint8_t data)
-{
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-
-void espial_state::attributeram_w(offs_t offset, uint8_t data)
-{
-	m_attributeram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-
-void espial_state::scrollram_w(offs_t offset, uint8_t data)
-{
-	m_scrollram[offset] = data;
-	m_bg_tilemap->set_scrolly(offset, data);
-}
-
-
-void espial_state::flipscreen_w(uint8_t data)
-{
-	m_flipscreen = data;
-	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-}
 
 
 /*************************************
@@ -333,7 +324,6 @@ void espial_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-
 uint32_t espial_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -342,19 +332,65 @@ uint32_t espial_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-void espial_state::machine_reset()
-{
-	m_flipscreen = 0;
 
-	m_main_nmi_enabled = false;
-	m_sound_nmi_enabled = false;
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+void espial_state::vblank(int state)
+{
+	// vblank irq
+	if (state && m_main_nmi_enabled)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	// timer irq, checks soundlatch port then updates some sound related work RAM buffers
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-void espial_state::machine_start()
+
+TIMER_CALLBACK_MEMBER(espial_state::sound_nmi_gen)
 {
-	save_item(NAME(m_sound_nmi_enabled));
+	if (m_sound_nmi_enabled)
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
+
+void espial_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void espial_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void espial_state::attributeram_w(offs_t offset, uint8_t data)
+{
+	m_attributeram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+void espial_state::scrollram_w(offs_t offset, uint8_t data)
+{
+	m_scrollram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
+}
+
+
+void espial_state::flipscreen_w(uint8_t data)
+{
+	m_flipscreen = data;
+	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+}
 
 void espial_state::master_interrupt_mask_w(uint8_t data)
 {
@@ -367,31 +403,46 @@ void espial_state::sound_nmi_mask_w(uint8_t data)
 	m_sound_nmi_enabled = data & 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(espial_state::scanline)
+void espial_state::porta_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	int const scanline = param;
+	if (mem_mask && data != m_sound_nmi_freq)
+	{
+		// sound NMI frequency
+		m_sound_nmi_freq = data;
+		attotime period;
 
-	if (scanline == 240 && m_main_nmi_enabled) // vblank-out irq
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		// netwars writes 0xf8 and expects 32 NMIs per frame
+		// espial writes 0xfe and expects 4 NMIs per frame
+		switch (data)
+		{
+			case 0:
+				period = attotime::never;
+				break;
 
-	if (scanline == 16) // timer irq, checks soundlatch port then updates some sound related work RAM buffers
-		m_maincpu->set_input_line(0, HOLD_LINE);
+			case 0xfe:
+				period = m_screen->frame_period() / 4;
+				break;
+
+			case 0xf8:
+				period = m_screen->frame_period() / 32;
+				break;
+
+			default:
+				logerror("%s: unknown sound NMI frequency %02X", machine().describe_context(), data);
+				return;
+		}
+
+		m_sound_nmi_timer->adjust(period, 0, period);
+	}
 }
 
 
-INTERRUPT_GEN_MEMBER(espial_state::sound_nmi_gen)
-{
-	if (m_sound_nmi_enabled)
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
 
-
-void espial_state::master_soundlatch_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 void espial_state::main_map(address_map &map)
 {
@@ -401,7 +452,7 @@ void espial_state::main_map(address_map &map)
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN1");
 	map(0x6084, 0x6084).portr("IN2");
-	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(FUNC(espial_state::master_soundlatch_w));
+	map(0x6090, 0x6090).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x7100, 0x7100).w(FUNC(espial_state::master_interrupt_mask_w));
 	map(0x7200, 0x7200).w(FUNC(espial_state::flipscreen_w));
@@ -427,7 +478,7 @@ void netwars_state::main_map(address_map &map)
 	map(0x6082, 0x6082).portr("DSW1");
 	map(0x6083, 0x6083).portr("IN1");
 	map(0x6084, 0x6084).portr("IN2");
-	map(0x6090, 0x6090).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(FUNC(netwars_state::master_soundlatch_w));
+	map(0x6090, 0x6090).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x7000, 0x7000).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x7100, 0x7100).w(FUNC(netwars_state::master_interrupt_mask_w));
 	map(0x7200, 0x7200).w(FUNC(netwars_state::flipscreen_w));
@@ -446,15 +497,22 @@ void espial_state::sound_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x4000, 0x4000).w(FUNC(espial_state::sound_nmi_mask_w));
-	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x6000, 0x6000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 }
 
 void espial_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x00, 0x01).w(m_aysnd, FUNC(ay8910_device::address_data_w));
 }
 
+
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 // verified from Z80 code
 static INPUT_PORTS_START( espial )
@@ -580,6 +638,13 @@ static INPUT_PORTS_START( netwars )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  GFX layouts
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -610,29 +675,35 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine configs
+ *
+ *************************************/
 
 void espial_state::espial(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 3'072'000);   // 3.072 MHz
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &espial_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(espial_state::scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 3'072'000);  // 2 MHz??????
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &espial_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &espial_state::sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(espial_state::sound_nmi_gen), attotime::from_hz(4 * 60));
+
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(espial_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(espial_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(espial_state::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_espial);
 	PALETTE(config, m_palette, FUNC(espial_state::palette), 256);
@@ -640,10 +711,14 @@ void espial_state::espial(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, "soundlatch2");
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	AY8910(config, "aysnd", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
+
+	AY8910(config, m_aysnd, 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_aysnd->port_a_write_callback().set(FUNC(espial_state::porta_w));
+	m_aysnd->port_b_write_callback().set_nop(); // spams 0x00
 }
 
 void netwars_state::netwars(machine_config &config)
@@ -652,18 +727,15 @@ void netwars_state::netwars(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &netwars_state::main_map);
-
-	// video hardware
-	subdevice<screen_device>("screen")->set_size(32*8, 64*8);
 }
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( espial )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -785,6 +857,13 @@ ROM_END
 
 } // anonymous namespace
 
+
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
 GAME( 1983, espial,  0,      espial,  espial,  espial_state,  empty_init, ROT0,  "Orca / Thunderbolt",             "Espial (Europe)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1983, espialj, espial, espial,  espial,  espial_state,  empty_init, ROT0,  "Orca / Thunderbolt",             "Espial (Japan)",                 MACHINE_SUPPORTS_SAVE )

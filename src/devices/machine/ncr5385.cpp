@@ -111,7 +111,6 @@ enum aux_status_mask : u8
 
 enum cmd_mask : u8
 {
-	CMD_INT = 0x08, // interrupting
 	CMD_SBX = 0x40, // single byte transfer
 	CMD_DMA = 0x80, // DMA mode
 };

@@ -271,8 +271,8 @@ void dragrace_state::main_map(address_map &map)
 	map(0x0928, 0x092f).w("latch_a5", FUNC(addressable_latch_device::clear));
 	map(0x0930, 0x0937).w("latch_h5", FUNC(addressable_latch_device::clear));
 	map(0x0938, 0x093f).w("latch_e5", FUNC(addressable_latch_device::clear));
-	map(0x0a00, 0x0aff).writeonly().share(m_playfield_ram);
-	map(0x0b00, 0x0bff).writeonly().share(m_position_ram);
+	map(0x0a00, 0x0aff).nopr().writeonly().share(m_playfield_ram);
+	map(0x0b00, 0x0bff).nopr().writeonly().share(m_position_ram);
 	map(0x0c00, 0x0c00).r(FUNC(dragrace_state::steering_r));
 	map(0x0d00, 0x0d00).r(FUNC(dragrace_state::scanline_r));
 	map(0x0e00, 0x0eff).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
@@ -451,12 +451,11 @@ void dragrace_state::dragrace(machine_config &config)
 	PALETTE(config, "palette", FUNC(dragrace_state::palette), 16);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, dragrace_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 
 	f9334_device &latch_f5(F9334(config, "latch_f5")); // F5
 	latch_f5.parallel_out_cb().set(FUNC(dragrace_state::speed1_w)).mask(0x1f); // set 3SPEED1-7SPEED1

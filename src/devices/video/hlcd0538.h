@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*
 
-  Hughes HLCD 0538(A)/0539(A) LCD Driver
+  Hughes HLCD 0538(A)/0539(A)/0607(A) LCD Driver
 
 */
 
@@ -36,7 +36,8 @@
       C 14 19 |           | 22 C 11
       C 13 20 |___________| 21 C 12
 
-    HLCD 0539 has 8 more C pins(1-8) in place of R pins.
+    HLCD 0539 has 8 more C pins in place of R pins, pins 40-7 are C1-C34
+    HLCD 0607 has 4 more C pins in place of R5-R7, pins 36-7 are C1-C30
 */
 
 
@@ -46,8 +47,8 @@ public:
 	hlcd0538_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
-	auto write_cols() { return m_write_cols.bind(); }              // C/R pins (0538: d0-d7 for rows)
-	auto write_interrupt() { return m_write_interrupt.bind(); }    // INTERRUPT pin
+	auto write_cols() { return m_write_cols.bind(); }           // C/R pins (0538: d0-d7 for rows, 0607: d0-d3 for rows)
+	auto write_interrupt() { return m_write_interrupt.bind(); } // INTERRUPT pin
 
 	void clk_w(int state);
 	void lcd_w(int state);
@@ -81,8 +82,16 @@ public:
 };
 
 
+class hlcd0607_device : public hlcd0538_device
+{
+public:
+	hlcd0607_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+
 
 DECLARE_DEVICE_TYPE(HLCD0538, hlcd0538_device)
 DECLARE_DEVICE_TYPE(HLCD0539, hlcd0539_device)
+DECLARE_DEVICE_TYPE(HLCD0607, hlcd0607_device)
 
 #endif // MAME_VIDEO_HLCD0538_H

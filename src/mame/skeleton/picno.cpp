@@ -70,10 +70,9 @@ void picno_state::picno(machine_config &config)
 	HD6435328(config, m_maincpu, 20'000'000); // TODO: clock is a guess, divided by 2 in the cpu
 	m_maincpu->set_addrmap(AS_PROGRAM, &picno_state::mem_map);
 
-	//SPEAKER(config, "lspeaker").front_left(); // no speaker in the unit, but there's a couple of sockets on the back
-	//SPEAKER(config, "rspeaker").front_right();
-	//sound.add_route(0, "lspeaker", 1.0);
-	//sound.add_route(1, "rspeaker", 1.0);
+	//SPEAKER(config, "speaker", 2).front(); // no speaker in the unit, but there's a couple of sockets on the back
+	//sound.add_route(0, "speaker", 1.0, 0);
+	//sound.add_route(1, "speaker", 1.0, 1);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "picno_cart");
 

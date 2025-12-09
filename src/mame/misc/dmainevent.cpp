@@ -2,7 +2,7 @@
 // copyright-holders:
 /***************************************************************************
 
-    Skeleton driver for "Main Event" (electromechanical machine from Destron).
+    Skeleton driver for "Main Event" (electromechanical boxing machine from Destron).
  _______________________________________________________________________________
 |      ________________                                                        |
 |     |_DSWx8_|_DSWx8_|     ___________      Xtal     ___________________      |
@@ -75,4 +75,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME        PARENT MACHINE     INPUT       CLASS             INIT        ROT   COMPANY    FULLNAME                 FLAGS
-GAME(1983, dmainevent, 0,     dmainevent, dmainevent, dmainevent_state, empty_init, ROT0, "Destron", "Main Event (Destron)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1983, dmainevent, 0,     dmainevent, dmainevent, dmainevent_state, empty_init, ROT0, "Destron", "The Main Event (Destron)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

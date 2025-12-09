@@ -51,7 +51,7 @@ DECLARE_DEVICE_TYPE(STEELTAL1_BOARD,              steeltal1_board_device_state)
 DECLARE_DEVICE_TYPE(STEELTALP_BOARD,              steeltalp_board_device_state)
 DECLARE_DEVICE_TYPE(STRTDRIV_BOARD,               strtdriv_board_device_state)
 DECLARE_DEVICE_TYPE(HDRIVAIR_BOARD,               hdrivair_board_device_state)
-DECLARE_DEVICE_TYPE(HDRIVAIRP_BOARD,              hdrivairp_board_device_state)
+DECLARE_DEVICE_TYPE(HDRIVAIR0_BOARD,              hdrivair0_board_device_state)
 DECLARE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD,         harddriv_sound_board_device)
 
 
@@ -83,7 +83,7 @@ public:
 	void init_racedrivc1(void);
 
 	void init_hdrivair(void);
-	void init_hdrivairp(void);
+	void init_hdrivair0(void);
 
 	void init_steeltal(void);
 	void init_steeltal1(void);
@@ -501,7 +501,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 };
 
-class harddriv_sound_board_device :  public device_t
+class harddriv_sound_board_device : public device_t
 {
 public:
 	// construction/destruction
@@ -558,18 +558,18 @@ private:
 	required_shared_ptr<uint16_t> m_sounddsp_ram;
 	required_region_ptr<uint8_t>  m_sound_rom;
 
-	uint8_t                   m_soundflag = 0;
-	uint8_t                   m_mainflag = 0;
-	uint16_t                  m_sounddata = 0;
-	uint16_t                  m_maindata = 0;
+	uint8_t                 m_soundflag = 0;
+	uint8_t                 m_mainflag = 0;
+	uint16_t                m_sounddata = 0;
+	uint16_t                m_maindata = 0;
 
-	uint8_t                   m_cramen = 0;
-	uint8_t                   m_irq68k = 0;
+	uint8_t                 m_cramen = 0;
+	uint8_t                 m_irq68k = 0;
 
 	offs_t                  m_sound_rom_offs = 0;
 
-	uint16_t                  m_comram[0x400/2]{};
-	uint64_t                  m_last_bio_cycles = 0;
+	uint16_t                m_comram[0x400/2]{};
+	uint64_t                m_last_bio_cycles = 0;
 
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
@@ -580,7 +580,7 @@ private:
 
 /* Hard Drivin' */
 
-class harddriv_board_device_state :  public harddriv_state
+class harddriv_board_device_state : public harddriv_state
 {
 public:
 	harddriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -594,7 +594,7 @@ protected:
 
 /* Hard Drivin' Compact */
 
-class harddrivc_board_device_state :  public harddriv_state
+class harddrivc_board_device_state : public harddriv_state
 {
 public:
 	harddrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -608,7 +608,7 @@ protected:
 
 /* Race Drivin' */
 
-class racedriv_board_device_state :  public harddriv_state
+class racedriv_board_device_state : public harddriv_state
 {
 public:
 	racedriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -621,7 +621,7 @@ protected:
 //  virtual void device_reset();
 };
 
-class racedrivb1_board_device_state :  public racedriv_board_device_state
+class racedrivb1_board_device_state : public racedriv_board_device_state
 {
 public:
 	racedrivb1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -633,7 +633,7 @@ protected:
 
 /* Race Drivin' Compact */
 
-class racedrivc_board_device_state :  public harddriv_state
+class racedrivc_board_device_state : public harddriv_state
 {
 public:
 	racedrivc_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -646,7 +646,7 @@ protected:
 //  virtual void device_reset();
 };
 
-class racedrivc1_board_device_state :  public racedrivc_board_device_state
+class racedrivc1_board_device_state : public racedrivc_board_device_state
 {
 public:
 	racedrivc1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -655,7 +655,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
-class racedrivc_panorama_side_board_device_state :  public racedrivc_board_device_state
+class racedrivc_panorama_side_board_device_state : public racedrivc_board_device_state
 {
 public:
 	racedrivc_panorama_side_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -668,7 +668,7 @@ protected:
 
 /* Stun Runner */
 
-class stunrun_board_device_state :  public harddriv_state
+class stunrun_board_device_state : public harddriv_state
 {
 public:
 	stunrun_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -682,7 +682,7 @@ protected:
 
 /* Steel Talons */
 
-class steeltal_board_device_state :  public harddriv_state
+class steeltal_board_device_state : public harddriv_state
 {
 public:
 	steeltal_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -695,7 +695,7 @@ protected:
 //  virtual void device_reset();
 };
 
-class steeltal1_board_device_state :  public steeltal_board_device_state
+class steeltal1_board_device_state : public steeltal_board_device_state
 {
 public:
 	steeltal1_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -704,7 +704,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
-class steeltalp_board_device_state :  public steeltal_board_device_state
+class steeltalp_board_device_state : public steeltal_board_device_state
 {
 public:
 	steeltalp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -716,7 +716,7 @@ protected:
 
 /* Street Drivin' */
 
-class strtdriv_board_device_state :  public harddriv_state
+class strtdriv_board_device_state : public harddriv_state
 {
 public:
 	strtdriv_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -730,7 +730,7 @@ protected:
 
 /* Hard Drivin' Airbourne */
 
-class hdrivair_board_device_state :  public harddriv_state
+class hdrivair_board_device_state : public harddriv_state
 {
 public:
 	hdrivair_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -743,10 +743,11 @@ protected:
 //  virtual void device_reset();
 };
 
-class hdrivairp_board_device_state :  public hdrivair_board_device_state
+class hdrivair0_board_device_state : public hdrivair_board_device_state
 {
 public:
-	hdrivairp_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hdrivair0_board_device_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 };

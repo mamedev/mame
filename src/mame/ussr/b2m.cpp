@@ -10,9 +10,10 @@ To get numbers, you have to hold down Shift.
 
 B2M:
 - Hit enter while the square block is showing - it will attempt to boot
-  a disk. But, it is loaded corruptly, and it runs into the weeds.
+  a disk.
 - Or, just wait and a menu appears with choices S,L,W,R,G. It's all in
-  Russian, and choosing any of them produces an error.
+  Russian, and choosing any of them produces an error. (Doesn't work
+  currently?)
 
 B2MROM:
 - At start you are in an empty ramdisk called A:
@@ -56,6 +57,7 @@ void b2m_state::b2m_io(address_map &map)
 	map(0x14, 0x15).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x18, 0x19).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x1c, 0x1f).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x1c, 0x1c).r(FUNC(b2m_state::fdc_status_hack_r));
 }
 
 void b2m_state::b2m_rom_io(address_map &map)
@@ -256,8 +258,8 @@ void b2m_state::b2m(machine_config &config)
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->drq_wr_callback().set(FUNC(b2m_state::fdc_drq));
 
-	FLOPPY_CONNECTOR(config, "fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fd1", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fd[0], b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fd[1], b2m_floppies, "525qd", b2m_state::b2m_floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("b2m");
 
 	/* internal ram */

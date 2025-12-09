@@ -5,20 +5,28 @@
  *
  */
 
-#include "modules/osdmodule.h"
 #include "monitor_module.h"
 
+#include "modules/osdmodule.h"
+
 #if defined(OSD_WINDOWS)
+
+// local headers
+#include "monitor_common.h"
+
+// OSD headers
+#include "osdcore.h"
+#include "strconv.h"
+#include "window.h"
+#include "windows/video.h"
 
 // standard windows headers
 #include <windows.h>
 #undef interface
 
-#include "osdcore.h"
-#include "strconv.h"
-#include "windows/video.h"
-#include "window.h"
-#include "monitor_common.h"
+namespace osd {
+
+namespace {
 
 class win32_monitor_module;
 
@@ -28,10 +36,10 @@ private:
 	MONITORINFOEX    m_info;
 
 public:
-	win32_monitor_info(monitor_module& module, const HMONITOR handle, const char* monitor_device, float aspect)
-		: osd_monitor_info(module, std::uintptr_t(handle), monitor_device, aspect)
+	win32_monitor_info(monitor_module& module, const HMONITOR handle, std::string &&monitor_device, float aspect)
+		: osd_monitor_info(module, std::uintptr_t(handle), std::move(monitor_device), aspect)
 	{
-		win32_monitor_info::refresh();
+		refresh();
 	}
 
 	void refresh() override
@@ -93,11 +101,9 @@ protected:
 		EnumDisplayMonitors(nullptr, nullptr, monitor_enum_callback, reinterpret_cast<std::intptr_t>(this));
 
 		// if we're verbose, print the list of monitors
+		for (const auto &monitor : list())
 		{
-			for (const auto &monitor : list())
-			{
-				osd_printf_verbose("Video: Monitor %u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
-			}
+			osd_printf_verbose("Video: Monitor %u = \"%s\" %s\n", monitor->oshandle(), monitor->devicename(), monitor->is_primary() ? "(primary)" : "");
 		}
 
 		return 0;
@@ -106,7 +112,7 @@ protected:
 private:
 	static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data)
 	{
-		auto* self = reinterpret_cast<win32_monitor_module*>(data);
+		auto *const self = reinterpret_cast<win32_monitor_module *>(data);
 		MONITORINFOEX info;
 		BOOL result;
 
@@ -116,14 +122,14 @@ private:
 		assert(result);
 		(void)result; // to silence gcc 4.6
 
-					  // guess the aspect ratio assuming square pixels
-		float aspect = static_cast<float>(info.rcMonitor.right - info.rcMonitor.left) / static_cast<float>(info.rcMonitor.bottom - info.rcMonitor.top);
+		// guess the aspect ratio assuming square pixels
+		float aspect = float(info.rcMonitor.right - info.rcMonitor.left) / float(info.rcMonitor.bottom - info.rcMonitor.top);
 
 		// allocate a new monitor info
 		auto temp = osd::text::from_tstring(info.szDevice);
 
 		// copy in the data
-		auto monitor = std::make_shared<win32_monitor_info>(*self, handle, temp.c_str(), aspect);
+		auto monitor = std::make_shared<win32_monitor_info>(*self, handle, std::move(temp), aspect);
 
 		// hook us into the list
 		self->add_monitor(monitor);
@@ -133,8 +139,14 @@ private:
 	}
 };
 
+} // anonymous namespace
+
+} // namespace osd
+
 #else
-MODULE_NOT_SUPPORTED(win32_monitor_module, OSD_MONITOR_PROVIDER, "win32")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(win32_monitor_module, OSD_MONITOR_PROVIDER, "win32") } }
+
 #endif
 
-MODULE_DEFINITION(MONITOR_WIN32, win32_monitor_module)
+MODULE_DEFINITION(MONITOR_WIN32, osd::win32_monitor_module)

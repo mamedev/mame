@@ -22,7 +22,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 private:
 	void snd_clock();
 	static const uint8_t s_volumeLUT[];

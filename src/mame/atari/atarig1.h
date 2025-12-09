@@ -27,8 +27,8 @@ public:
 		m_alpha_tilemap(*this, "alpha"),
 		m_rle(*this, "rle"),
 		m_adc(*this, "adc"),
-		m_in1(*this, "IN1"),
-		m_mo_command(*this, "mo_command")
+		m_mo_command(*this, "mo_command"),
+		m_in1(*this, "IN1")
 	{ }
 
 	void atarig1(machine_config &config);
@@ -57,11 +57,12 @@ private:
 	required_device<atari_rle_objects_device> m_rle;
 
 	optional_device<adc0808_device> m_adc;
+
+	required_shared_ptr<uint16_t> m_mo_command;
+
 	optional_ioport m_in1;
 
 	bool            m_is_pitfight = false;
-
-	required_shared_ptr<uint16_t> m_mo_command;
 
 	bool            m_bslapstic_primed = false;
 
@@ -80,7 +81,7 @@ private:
 	void update_bank(int bank);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	uint32_t screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map) ATTR_COLD;
 	void pitfight_map(address_map &map) ATTR_COLD;
 	void hydra_map(address_map &map) ATTR_COLD;

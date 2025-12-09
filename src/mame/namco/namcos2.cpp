@@ -568,7 +568,7 @@ C102 - Controls CPU access to ROZ Memory Area.
 #define M68B09_CPU_CLOCK    (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 68B09 sound CPU */
 #define C65_CPU_CLOCK       (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
 #define C68_CPU_CLOCK       (MAIN_OSC_CLOCK / 6)        /* 8.192MHz clock for 37450 I/O CPU */
-#define YM2151_SOUND_CLOCK  XTAL(3'579'545)            /* 3.579545MHz FM clock */
+#define YM2151_SOUND_CLOCK  XTAL(3'579'545)             /* 3.579545MHz FM clock */
 #define C140_SOUND_CLOCK    (MAIN_OSC_CLOCK / 384 / 6)  /* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
 
 
@@ -1121,11 +1121,11 @@ static INPUT_PORTS_START( finallap )
 	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")       /* Steering Wheel */        /* sensitivity, delta, min, max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 	PORT_START("AN6")       /* Brake Pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 	PORT_START("AN7")       /* Accelerator Pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_DIPNAME( 0x01, 0x01, "PortH 0x01")
@@ -1184,11 +1184,11 @@ static INPUT_PORTS_START( finalap3 )
 	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")       /* Steering Wheel */        /* sensitivity, delta, min, max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 	PORT_START("AN6")       /* Brake Pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 	PORT_START("AN7")       /* Accelerator Pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_DIPNAME( 0x01, 0x01, "PortH 0x01")
@@ -1271,11 +1271,11 @@ static INPUT_PORTS_START( fourtrax )
 	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 6 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")       /* Steering Wheel 7 */      /* sensitivity, delta, min, max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(75) PORT_KEYDELTA(50)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(50)
 	PORT_START("AN6")       /* Brake Pedal 8 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 	PORT_START("AN7")       /* Accelerator Pedal 9 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_DIPNAME( 0x01, 0x01, "PortH 0x01")
@@ -1363,11 +1363,11 @@ static INPUT_PORTS_START( suzuka )
 	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5") /* Steering Wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(100)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(100)
 	PORT_START("AN6")       /* Brake pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 	PORT_START("AN7")       /* Accelerator pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1434,11 +1434,11 @@ static INPUT_PORTS_START( luckywld )
 	PORT_START("AN4")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
 	PORT_START("AN5")       /* Steering Wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE(INPUT_CODE_INVALID) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE(INPUT_CODE_INVALID) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 	PORT_START("AN6")       /* Brake pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 	PORT_START("AN7")       /* Accelerator pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1497,7 +1497,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dirtfox )
 	PORT_START("MCUB")      /* 63B05Z0 - PORT B */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Gear Shift Down")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Gear Shift Up")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Shift Up")
 
 	NAMCOS2_MCU_PORT_C_DEFAULT
 
@@ -1512,11 +1512,11 @@ static INPUT_PORTS_START( dirtfox )
 	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")       /* Steering Wheel */
-	PORT_BIT( 0xff,  0x80, IPT_PADDLE ) PORT_SENSITIVITY(70) PORT_KEYDELTA(50)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(70) PORT_KEYDELTA(50)
 	PORT_START("AN6")       /* Brake pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_NAME("Brake")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x40) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Brake")
 	PORT_START("AN7")       /* Accelerator pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Accelerator")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Accelerator")
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1713,8 +1713,7 @@ void namcos2_state::configure_common_standard(machine_config &config)
 	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
 	m_screen->set_palette(m_c116);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
 	m_c140->set_addrmap(0, &namcos2_state::c140_default_am);
@@ -1736,13 +1735,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 			m_c68->ext_interrupt(ASSERT_LINE);
 	}
 
-	if(scanline == 240)
+	if (scanline == 240)
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
 	}
 
-	if(scanline == cur_posirq)
+	if (scanline == cur_posirq)
 	{
 		m_master_intc->pos_irq_trigger();
 		m_slave_intc->pos_irq_trigger();
@@ -1820,10 +1819,10 @@ void namcos2_state::base_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_namcos2_roz_standard(config);
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 
@@ -1844,8 +1843,8 @@ void namcos2_state::base2(machine_config &config)
 	base(config);
 
 	m_c140->reset_routes();
-	m_c140->add_route(0, "lspeaker", 1.0);
-	m_c140->add_route(1, "rspeaker", 1.0);
+	m_c140->add_route(0, "speaker", 1.0, 0);
+	m_c140->add_route(1, "speaker", 1.0, 1);
 }
 
 void namcos2_state::assaultp(machine_config &config)
@@ -1860,10 +1859,10 @@ void namcos2_state::base3(machine_config &config)
 	base(config);
 
 	m_c140->reset_routes();
-	m_c140->add_route(0, "lspeaker", 0.45);
-	m_c140->add_route(1, "rspeaker", 0.45);
+	m_c140->add_route(0, "speaker", 0.45, 0);
+	m_c140->add_route(1, "speaker", 0.45, 1);
 
-	YM2151(config.replace(), "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); /* 3.579545MHz */
+	YM2151(config.replace(), "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1); /* 3.579545MHz */
 }
 
 
@@ -1887,10 +1886,10 @@ void namcos2_state::finallap_noio(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::base_fl(machine_config &config)
@@ -1954,10 +1953,10 @@ void namcos2_state::sgunner(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::sgunner2(machine_config &config)
@@ -1983,10 +1982,10 @@ void namcos2_state::sgunner2(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::suzuka8h(machine_config &config)
@@ -2016,10 +2015,10 @@ void namcos2_state::suzuka8h(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
 
-	m_c140->add_route(0, "lspeaker", 0.75);
-	m_c140->add_route(1, "rspeaker", 0.75);
+	m_c140->add_route(0, "speaker", 0.75, 0);
+	m_c140->add_route(1, "speaker", 0.75, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
 void namcos2_state::luckywld(machine_config &config)
@@ -2061,10 +2060,10 @@ void namcos2_state::metlhawk(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
 
-	m_c140->add_route(0, "lspeaker", 1.0);
-	m_c140->add_route(1, "rspeaker", 1.0);
+	m_c140->add_route(0, "speaker", 1.0, 0);
+	m_c140->add_route(1, "speaker", 1.0, 1);
 
-	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "lspeaker", 0.80).add_route(1, "rspeaker", 0.80); /* 3.579545MHz */
+	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 //  ymsnd.irq_handler().set_inputline("audiocpu", 1);
 }
 

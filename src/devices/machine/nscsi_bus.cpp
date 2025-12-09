@@ -17,6 +17,8 @@
 #define VERBOSE (LOG_UNSUPPORTED)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
+
+
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NSCSI_BUS,       nscsi_bus_device, "nscsi_bus",       "SCSI Bus (new)")
@@ -80,16 +82,16 @@ void nscsi_bus_device::regen_ctrl(int refid)
 					data);
 		for(int i=0; i<devcnt; i++)
 			if(dev[i].ctrl) {
-				LOGMASKED(LOG_CONTROL, "%d=%s%s%s%s%s%s%s%s%s\n", i,
+				LOGMASKED(LOG_CONTROL, "dev%d=%s%s%s%s%s%s%s%s%s\n", i,
 							dev[i].ctrl & nscsi_device::S_RST ? "R" : "",
 							dev[i].ctrl & nscsi_device::S_ATN ? "A" : "",
 							dev[i].ctrl & nscsi_device::S_ACK ? "K" : "",
 							dev[i].ctrl & nscsi_device::S_REQ ? "Q" : "",
-							dev[i].ctrl & nscsi_device::S_MSG ? "M" : "",
-							dev[i].ctrl & nscsi_device::S_INP ? "I" : "",
-							dev[i].ctrl & nscsi_device::S_CTL ? "C" : "",
 							dev[i].ctrl & nscsi_device::S_SEL ? "S" : "",
-							dev[i].ctrl & nscsi_device::S_BSY ? "B" : "");
+							dev[i].ctrl & nscsi_device::S_BSY ? "B" : "",
+							dev[i].ctrl & nscsi_device::S_MSG ? "M" : "",
+							dev[i].ctrl & nscsi_device::S_CTL ? "C" : "",
+							dev[i].ctrl & nscsi_device::S_INP ? "I" : "");
 			}
 	}
 
@@ -902,7 +904,7 @@ attotime nscsi_full_device::scsi_cable_skew_delay()
 // Data release delay (400ns)
 attotime nscsi_full_device::scsi_data_release_delay()
 {
-	return attotime::from_nsec(40);
+	return attotime::from_nsec(400);
 }
 
 // Deskew delay (45ns)

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="bbc_vsm" description="Acorn BBC Micro Speech PHROMs">
+
+	<software name="cm62024">
+		<description>CM62064 (Kenneth Kendall)</description>
+		<year>1982</year>
+		<publisher>Acorn Computers</publisher>
+		<part name="rom" interface="bbc_vsm">
+			<feature name="bank" value="15" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62024.bin" size="0x4000" crc="98e1bf9e" sha1="b369809275cb67dfd8a749265e91adb2d2558ae6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vm61002">
+		<description>VM61002 (Industrial)</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="rom" interface="bbc_vsm">
+			<feature name="bank" value="0" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="vm61002.bin" size="0x4000" crc="bf4b3b64" sha1="66876702d1d95eecc034d20f25047f893a27cde5" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

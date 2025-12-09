@@ -12,16 +12,43 @@
 #include "fdc.h"
 
 #include "formats/acorn_dsk.h"
+#include "imagedev/floppy.h"
+#include "machine/wd_fdc.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(CMS_FDC, cms_fdc_device, "cms_fdc", "CMS Floppy Disc Controller Board")
+class cms_fdc_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	cms_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, CMS_FDC, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_fdc(*this, "wd1770")
+		, m_floppy(*this, "wd1770:%u", 0)
+	{
+	}
+
+	static void floppy_formats(format_registration &fr);
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	required_device<wd_fdc_device_base> m_fdc;
+	required_device_array<floppy_connector, 3> m_floppy;
+
+	uint8_t wd1770_state_r();
+	void wd1770_control_w(uint8_t data);
+};
+
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( cms_fdc )
+//  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
 void cms_fdc_device::floppy_formats(format_registration &fr)
@@ -49,23 +76,6 @@ void cms_fdc_device::device_add_mconfig(machine_config &config)
 }
 
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cms_fdc_device - constructor
-//-------------------------------------------------
-
-cms_fdc_device::cms_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CMS_FDC, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_fdc(*this, "wd1770")
-	, m_floppy(*this, "wd1770:%u", 0)
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -74,8 +84,8 @@ void cms_fdc_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xfc50, 0xfc5f, read8smo_delegate(*this, FUNC(cms_fdc_device::wd1770_state_r)), write8smo_delegate(*this, FUNC(cms_fdc_device::wd1770_control_w)));
-	space.install_readwrite_handler(0xfc40, 0xfc4f, read8sm_delegate(*m_fdc, FUNC(wd1770_device::read)), write8sm_delegate(*m_fdc, FUNC(wd1770_device::write)));
+	space.install_readwrite_handler(0xfc50, 0xfc5f, emu::rw_delegate(*this, FUNC(cms_fdc_device::wd1770_state_r)), emu::rw_delegate(*this, FUNC(cms_fdc_device::wd1770_control_w)));
+	space.install_readwrite_handler(0xfc40, 0xfc4f, emu::rw_delegate(*m_fdc, FUNC(wd1770_device::read)), emu::rw_delegate(*m_fdc, FUNC(wd1770_device::write)));
 }
 
 
@@ -110,3 +120,8 @@ void cms_fdc_device::wd1770_control_w(uint8_t data)
 	// bit 7: density ??
 	m_fdc->dden_w(BIT(data, 7));
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(CMS_FDC, device_acorn_bus_interface, cms_fdc_device, "cms_fdc", "CMS Floppy Disc Controller Board")

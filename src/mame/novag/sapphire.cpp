@@ -25,7 +25,7 @@ Sapphire II:
 - LCD has more segments, the rest is the same as Sapphire
 
 Sapphire II MCU and EPROM are the same as Diamond II. MCU pin P62 determines
-which hardware it runs on, see diamond2.cpp for Diamond II.
+which hardware it runs on, see diamond.cpp for Diamond II.
 
 TODO:
 - Novag Super System peripherals don't work due to serial clock drift, baud rate

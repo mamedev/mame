@@ -573,8 +573,9 @@ void dcon_state::dcon(machine_config &config)
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->set_rombank_tag("seibu_bank");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
@@ -622,8 +623,9 @@ void dcon_state::sdgndmps(machine_config &config) // PCB number is PB91008
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->set_rombank_tag("seibu_bank");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 }

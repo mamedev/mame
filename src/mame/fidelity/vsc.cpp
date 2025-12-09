@@ -145,10 +145,13 @@ chess computers also have support for it. Two models were released:
 FP: Challenger Printer - thermal printer, MCU=D8048C243
 IFP: Impact Printer - also compatible with C64 apparently.
 
+The printer expects a baud rate of 600, 7 data bits, 1 stop bit, and no parity.
+
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/clock.h"
@@ -173,6 +176,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
+		m_rs232(*this, "rs232"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_speech(*this, "speech"),
@@ -191,6 +195,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
+	required_device<rs232_port_device> m_rs232;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
@@ -293,7 +298,7 @@ u8 vsc_state::pio_porta_r()
 
 u8 vsc_state::pio_portb_r()
 {
-	// d4: S14001A busy pin
+	// d4: S14001A busy pin / printer busy
 	return (m_speech->busy_r()) ? 0 : 0x10;
 }
 
@@ -302,6 +307,9 @@ void vsc_state::pio_portb_w(u8 data)
 	// d0,d1: keypad input mux
 	// d5: enable language jumpers
 	m_kp_mux = data;
+
+	// d3: printer port data
+	m_rs232->write_txd(BIT(~data, 3));
 
 	// d7: speech ROM A12
 	m_speech->set_rom_bank(BIT(data, 7));
@@ -406,6 +414,8 @@ void vsc_state::vsc(machine_config &config)
 	m_z80pio->in_pa_callback().set(FUNC(vsc_state::pio_porta_r));
 	m_z80pio->in_pb_callback().set(FUNC(vsc_state::pio_portb_r));
 	m_z80pio->out_pb_callback().set(FUNC(vsc_state::pio_portb_w));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

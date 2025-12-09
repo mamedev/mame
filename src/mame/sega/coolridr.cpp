@@ -2982,11 +2982,6 @@ void coolridr_state::scsp_map(address_map &map)
 }
 
 
-static GFXDECODE_START( gfx_coolridr )
-//  GFXDECODE_ENTRY( nullptr, 0, tiles16x16_layout, 0, 0x100 )
-GFXDECODE_END
-
-
 static INPUT_PORTS_START( coolridr )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_NAME("P1 Coin")
@@ -3253,7 +3248,7 @@ void coolridr_state::coolridr(machine_config &config)
 	io.an_port_callback<5>().set_ioport("AN5");
 	io.an_port_callback<6>().set_ioport("AN6");
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57); // measured at 57.0426Hz
@@ -3273,21 +3268,20 @@ void coolridr_state::coolridr(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	scsp_device &scsp1(SCSP(config, "scsp1", XTAL(22'579'000))); // 22.579 MHz
 	scsp1.set_addrmap(0, &coolridr_state::scsp_map<0>);
 	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
 	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
-	scsp1.add_route(0, "lspeaker", 1.0);
-	scsp1.add_route(1, "rspeaker", 1.0);
+	scsp1.add_route(0, "speaker", 1.0, 0);
+	scsp1.add_route(1, "speaker", 1.0, 1);
 
 	scsp_device &scsp2(SCSP(config, "scsp2", XTAL(22'579'000))); // 22.579 MHz
 	scsp2.set_addrmap(0, &coolridr_state::scsp_map<1>);
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
-	scsp2.add_route(0, "lspeaker", 1.0);
-	scsp2.add_route(1, "rspeaker", 1.0);
+	scsp2.add_route(0, "speaker", 1.0, 0);
+	scsp2.add_route(1, "speaker", 1.0, 1);
 }
 
 void coolridr_state::aquastge(machine_config &config)

@@ -109,8 +109,8 @@ void mm5837_stream_device::device_start()
 //  sound_stream_update - fill the sound buffer
 //-------------------------------------------------
 
-void mm5837_stream_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mm5837_stream_device::sound_stream_update(sound_stream &stream)
 {
-	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
-		outputs[0].put(sampindex, m_source.clock() ? 1.0 : 0.0);
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+		stream.put(0, sampindex, m_source.clock() ? 1.0 : 0.0);
 }

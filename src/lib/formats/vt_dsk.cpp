@@ -224,7 +224,7 @@ const char *vtech_dsk_format::description() const noexcept
 
 const char *vtech_dsk_format::extensions() const noexcept
 {
-	return "dsk";
+	return "dsk,dvz";
 }
 
 int vtech_bin_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const

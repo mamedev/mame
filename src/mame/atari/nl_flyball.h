@@ -1,5 +1,5 @@
 // license:CC0-1.0
-// copyright-holders:Ivan Vangelista, Ryan Holtz
+// copyright-holders:Ryan Holtz
 #ifndef MAME_ATARI_NL_FLYBALL_H
 #define MAME_ATARI_NL_FLYBALL_H
 

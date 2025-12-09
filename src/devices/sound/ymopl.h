@@ -109,7 +109,7 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// ADPCM read/write callbacks

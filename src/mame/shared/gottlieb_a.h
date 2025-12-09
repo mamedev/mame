@@ -69,9 +69,6 @@ protected:
 	// devices
 	required_device<m6503_device> m_cpu;
 	required_device<mos6530_device> m_r6530;
-
-private:
-	u8 m_dummy; // needed for save-state support
 };
 
 
@@ -127,9 +124,6 @@ protected:
 	// devices
 	required_device<mc1408_device> m_dac;
 	required_device<mos6532_device> m_riot;
-
-private:
-	u8 m_dummy; // needed for save-state support
 };
 
 
@@ -259,6 +253,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	// internal communications

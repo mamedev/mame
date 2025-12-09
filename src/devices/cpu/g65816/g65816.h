@@ -15,7 +15,6 @@
 G65C816 CPU Emulator V0.92
 
 Copyright Karl Stenerud
-All rights reserved.
 
 */
 /* ======================================================================== */
@@ -28,10 +27,9 @@ All rights reserved.
 /* =============================== DEFINES ================================ */
 /* ======================================================================== */
 
-/* Interrupt lines - used with g65816_set_irq_line() */
+/* Interrupt lines - used with g65816_set_line() */
 enum
 {
-	G65816_LINE_NONE, // FIXME: there is no such pin
 	G65816_LINE_IRQ,
 	G65816_LINE_NMI,
 	G65816_LINE_ABORT,
@@ -39,10 +37,6 @@ enum
 	G65816_LINE_RDY,
 	G65816_LINE_RESET
 };
-
-#define G65816_INT_NONE G65816_LINE_NONE
-#define G65816_INT_IRQ G65816_LINE_IRQ
-#define G65816_INT_NMI G65816_LINE_NMI
 
 
 class g65816_device : public cpu_device, public g65816_disassembler::config

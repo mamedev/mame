@@ -64,7 +64,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void device_post_load() override;
 
 	TIMER_CALLBACK_MEMBER(set_scanline_interrupt);
 	void scanline_interrupt(int scanline);

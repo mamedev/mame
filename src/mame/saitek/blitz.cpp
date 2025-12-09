@@ -73,7 +73,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD { m_power = true; }
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices/pointers
@@ -92,12 +92,12 @@ private:
 	u8 m_lcd_com = 0;
 	bool m_power = false;
 
+	u8 m_port1 = 0xff;
 	u8 m_port3 = 0xff;
 	u8 m_port6 = 0xff;
 
 	attotime m_board_init_time;
 
-	void init_board(u8 data);
 	bool board_active() { return machine().time() > m_board_init_time; }
 
 	// I/O handlers
@@ -133,15 +133,18 @@ void blitz_state::machine_start()
 	save_item(NAME(m_lcd_segs));
 	save_item(NAME(m_lcd_com));
 	save_item(NAME(m_power));
+	save_item(NAME(m_port1));
 	save_item(NAME(m_port3));
 	save_item(NAME(m_port6));
 	save_item(NAME(m_board_init_time));
 }
 
-void blitz_state::init_board(u8 data)
+void blitz_state::machine_reset()
 {
+	m_power = true;
+
 	// briefly deactivate board after a cold boot to give it time to calibrate
-	if (~data & 1)
+	if (m_port1 & 0x40)
 		m_board_init_time = machine().time() + attotime::from_msec(1750);
 }
 
@@ -207,7 +210,8 @@ void blitz_state::p1_w(u8 data)
 	// P10-P15: board sensor strength (higher is more sensitive)
 	m_sensor_strength = bitswap<6>(data,0,1,2,3,4,5);
 
-	// P16: ext power (no need to emulate it)
+	// P16: ext power
+	m_port1 = data;
 }
 
 void blitz_state::p2_w(u8 data)
@@ -317,7 +321,6 @@ void blitz_state::blitz(machine_config &config)
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
-	m_board->init_cb().append(FUNC(blitz_state::init_board));
 	m_board->set_delay(attotime::from_msec(150));
 	m_board->set_nvram_enable(true);
 

@@ -819,10 +819,9 @@ void wheelfir_state::wheelfir(machine_config &config)
 	GENERIC_LATCH_16(config, "soundlatch");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // unknown DAC
+	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 }
 
 

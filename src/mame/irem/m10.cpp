@@ -1162,19 +1162,18 @@ ROM_END
 
 ROM_START( ipminvad1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b1g",  0x1000, 0x0400, CRC(069102e2) SHA1(90affe384a688b0d42154633e80b708371117fc2) )
-	ROM_LOAD( "b2f",  0x1400, 0x0400, CRC(a6aa5879) SHA1(959ab207110785c03e57ca69c0e62356dd974085) )
-	ROM_LOAD( "b3f",  0x1800, 0x0400, CRC(0c09feb9) SHA1(0db43f480162f8e3fb8b61fcceb2884d19ff115b) )
-	ROM_LOAD( "b4f",  0x1c00, 0x0400, CRC(a4d32207) SHA1(ea9a01d09d82b8c27701601f03989735558d975c) )
-	ROM_RELOAD(       0xfc00, 0x0400 ) // for the reset and interrupt vectors
-	ROM_LOAD( "b5f",  0x2000, 0x0400, CRC(192361c7) SHA1(b13e80429a9183ce78c4df52a32070416d4ec988) )
-	ROM_LOAD( "b6f",  0x2400, 0x0400, NO_DUMP )
-	ROM_FILL(         0x2400, 0x0400, 0x60)
-	ROM_LOAD( "b7f",  0x2800, 0x0400, CRC(0f5115ab) SHA1(3bdd3fc1cfe6bfacb5820ee12c15f2909d2f58d1) )
+	ROM_LOAD( "b1g.h10", 0x1000, 0x0400, CRC(069102e2) SHA1(90affe384a688b0d42154633e80b708371117fc2) )
+	ROM_LOAD( "b2e.g10", 0x1400, 0x0400, CRC(a6aa5879) SHA1(959ab207110785c03e57ca69c0e62356dd974085) )
+	ROM_LOAD( "b3f.j10", 0x1800, 0x0400, CRC(0c09feb9) SHA1(0db43f480162f8e3fb8b61fcceb2884d19ff115b) )
+	ROM_LOAD( "b4e.e10", 0x1c00, 0x0400, CRC(a4d32207) SHA1(ea9a01d09d82b8c27701601f03989735558d975c) )
+	ROM_RELOAD(          0xfc00, 0x0400 ) // for the reset and interrupt vectors
+	ROM_LOAD( "b5f.e8",  0x2000, 0x0400, CRC(192361c7) SHA1(b13e80429a9183ce78c4df52a32070416d4ec988) )
+	ROM_LOAD( "b6f.g8",  0x2400, 0x0400, CRC(18334e59) SHA1(edd51525b9d33bb0b4e329b00180572ea02cab67) )
+	ROM_LOAD( "b7e.h8",  0x2800, 0x0400, CRC(0f5115ab) SHA1(3bdd3fc1cfe6bfacb5820ee12c15f2909d2f58d1) )
 
 	ROM_REGION( 0x0800, "tiles", 0 )
-	ROM_LOAD( "b9",  0x0000, 0x0400, CRC(f6cfa53c) SHA1(ec1076982edee95efb24a1bb08e733bcccacb922) )
-	ROM_LOAD( "b10", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
+	ROM_LOAD( "b9.g3",  0x0000, 0x0400, CRC(f6cfa53c) SHA1(ec1076982edee95efb24a1bb08e733bcccacb922) )
+	ROM_LOAD( "b10.h3", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
 ROM_END
 
 ROM_START( andromed )
@@ -1252,7 +1251,7 @@ ROM_END
 
 //    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT        ROT     COMPANY FULLNAME                         FLAGS
 GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, andromed,  0,        m11,    andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
 GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

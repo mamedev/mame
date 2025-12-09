@@ -205,7 +205,7 @@ void rf5c400_device::device_clock_changed()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void rf5c400_device::sound_stream_update(sound_stream &stream)
 {
 	int i, ch;
 	uint64_t start, end, loop;
@@ -214,18 +214,9 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	uint8_t env_phase;
 	double env_level, env_step, env_rstep;
 
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-	outputs[2].fill(0);
-	outputs[3].fill(0);
-
 	for (ch=0; ch < 32; ch++)
 	{
 		rf5c400_channel *channel = &m_channels[ch];
-		auto &buf0 = outputs[0];
-		auto &buf1 = outputs[1];
-		auto &buf2 = outputs[2];
-		auto &buf3 = outputs[3];
 
 		start = ((uint32_t)(channel->startH & 0xFF00) << 8) | channel->startL;
 		end = ((uint32_t)(channel->endHloopH & 0xFF) << 16) | channel->endL;
@@ -249,7 +240,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			continue;
 		}
 
-		for (i=0; i < buf0.samples(); i++)
+		for (i=0; i < stream.samples(); i++)
 		{
 			int16_t tmp;
 			int32_t sample;
@@ -319,10 +310,10 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 			sample *= volume_table[vol];
 			sample = (sample >> 9) * env_level;
-			buf0.add_int(i, sample * pan_table[lvol], 32768);
-			buf1.add_int(i, sample * pan_table[rvol], 32768);
-			buf2.add_int(i, sample * pan_table[effect_lvol], 32768);
-			buf3.add_int(i, sample * pan_table[effect_rvol], 32768);
+			stream.add_int(0, i, sample * pan_table[lvol], 32768);
+			stream.add_int(1, i, sample * pan_table[rvol], 32768);
+			stream.add_int(2, i, sample * pan_table[effect_lvol], 32768);
+			stream.add_int(3, i, sample * pan_table[effect_rvol], 32768);
 
 			pos += channel->step;
 			if ((pos>>16) > end)

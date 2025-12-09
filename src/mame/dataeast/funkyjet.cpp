@@ -405,8 +405,8 @@ void funkyjet_state::funkyjet(machine_config &config)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000)/4); // Custom chip 45, Audio section crystal is 32.220 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &funkyjet_state::sound_map);
-	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
+	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -441,17 +441,16 @@ void funkyjet_state::funkyjet(machine_config &config)
 	DECO_SPRITE(config, m_sprgen, 0, "palette", gfx_funkyjet_spr);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'220'000)/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); // IRQ2
-	ymsnd.add_route(0, "lspeaker", 0.45);
-	ymsnd.add_route(1, "rspeaker", 0.45);
+	ymsnd.add_route(0, "speaker", 0.45, 0);
+	ymsnd.add_route(1, "speaker", 0.45, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'000'000)/28, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 /******************************************************************************/

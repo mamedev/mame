@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/m6805/m68hc05e1.h"
+#include "machine/macseconds.h"
 
 /// \brief Base class for Apple Cuda devices.
 ///
@@ -13,7 +14,7 @@
 /// on-board RAM and ROM plus several GPIO pins.  Cuda handles
 /// simple power management, the Apple Desktop Bus, I2C, real-time
 /// clock, and parameter RAM.
-class cuda_device :  public device_t, public device_nvram_interface
+class cuda_device :  public device_t, public device_nvram_interface, public macseconds_interface
 {
 public:
 	// construction/destruction
@@ -30,13 +31,15 @@ public:
 	void set_byteack(u8 val) { m_byteack = val; }
 	u8 get_via_data() { return m_via_data; }
 	void set_via_data(u8 dat) { m_via_data = dat; }
-	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE) ? true : false; }
+	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE); }
+	void set_adb_power(int linestate) { m_adb_power = (linestate == ASSERT_LINE); }
 	void set_iic_sda(u8 data) { m_iic_sda = (data & 1); }
 	int get_adb_dtime() { return m_adb_dtime; }
 
 	int rom_offset;
 
 	auto reset_callback() { return write_reset.bind(); }
+	auto nmi_callback() { return write_nmi.bind(); }
 	auto linechange_callback() { return write_linechange.bind(); }
 	auto via_clock_callback() { return write_via_clock.bind(); }
 	auto via_data_callback() { return write_via_data.bind(); }
@@ -44,7 +47,7 @@ public:
 	auto iic_sda_callback() { return write_iic_sda.bind(); }
 	auto dfac_latch_callback() { return write_dfac_latch.bind(); }
 
-	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
+	devcb_write_line write_reset, write_nmi, write_linechange, write_via_clock, write_via_data;
 	devcb_write_line write_iic_scl, write_iic_sda, write_dfac_latch;
 
 protected:
@@ -70,7 +73,8 @@ private:
 	u64 m_last_adb_time;
 	bool m_cuda_controls_power;
 	bool m_adb_in;
-	s32 m_reset_line;
+	bool m_adb_power;
+	s32 m_reset_line, m_nmi_line;
 	s32 m_adb_dtime;
 	u8 m_disk_pram[0x100]{};
 	bool m_pram_loaded;

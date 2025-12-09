@@ -21,7 +21,7 @@
 
 namespace {
 
-void ctrc_reg_w(uint16_t &param, uint32_t offset, uint32_t data) noexcept
+void ctrc_reg_w(u16 &param, u32 offset, u32 data) noexcept
 {
 	param &= 0xff << (BIT(offset, 1) ? 0 : 8);
 	param |= (~data & 0xff) << (BIT(offset, 1) ? 8 : 0);
@@ -57,7 +57,7 @@ void supermac_spec_crtc::reset() noexcept
 }
 
 
-void supermac_spec_crtc::write(device_t &device, offs_t offset, uint32_t data)
+void supermac_spec_crtc::write(device_t &device, offs_t offset, u32 data)
 {
 	switch (offset)
 	{
@@ -145,7 +145,7 @@ void supermac_spec_shift_reg::reset() noexcept
 }
 
 
-void supermac_spec_shift_reg::write_control(device_t &device, uint32_t data)
+void supermac_spec_shift_reg::write_control(device_t &device, u32 data)
 {
 	// Sequence is:
 	// * 1 -> control
@@ -158,7 +158,7 @@ void supermac_spec_shift_reg::write_control(device_t &device, uint32_t data)
 }
 
 
-void supermac_spec_shift_reg::write_data(device_t &device, uint32_t data)
+void supermac_spec_shift_reg::write_data(device_t &device, u32 data)
 {
 	m_shift_data = (m_shift_data >> 1) | (BIT(~data, 0) << 15);
 	++m_shift_count;

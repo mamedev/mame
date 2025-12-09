@@ -45,9 +45,13 @@ public:
 
 	void _88games(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	// video-related
-	bool          m_k88games_priority = false;
+	bool          m_priority = false;
 	bool          m_videobank = false;
 	bool          m_zoomreadroms = false;
 	uint8_t       m_speech_chip = 0;
@@ -67,14 +71,12 @@ private:
 	memory_view m_k051316_view;
 	memory_view m_palette_view;
 
-	void k88games_5f84_w(uint8_t data);
+	void _5f84_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void speech_control_w(uint8_t data);
 	void speech_msg_w(uint8_t data);
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
@@ -96,8 +98,8 @@ K052109_CB_MEMBER(_88games_state::tile_callback)
 {
 	static const int layer_colorbase[] = { 1024 / 16, 0 / 16, 256 / 16 };
 
-	*code |= ((*color & 0x0f) << 8) | (bank << 12);
-	*color = layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+	code |= ((color & 0x0f) << 8) | (bank << 12);
+	color = layer_colorbase[layer] + ((color & 0xf0) >> 4);
 }
 
 
@@ -111,8 +113,8 @@ K051960_CB_MEMBER(_88games_state::sprite_callback)
 {
 	enum { sprite_colorbase = 512 / 16 };
 
-	*priority = (*color & 0x20) >> 5;   // ???
-	*color = sprite_colorbase + (*color & 0x0f);
+	priority = (color & 0x20) >> 5;   // ???
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -126,8 +128,8 @@ K051316_CB_MEMBER(_88games_state::zoom_callback)
 {
 	enum { zoom_colorbase = 768 / 16 };
 
-	*code |= ((*color & 0x07) << 8);
-	*color = zoom_colorbase + ((*color & 0x38) >> 3) + ((*color & 0x80) >> 4);
+	code |= ((color & 0x07) << 8);
+	color = zoom_colorbase + ((color & 0x38) >> 3) + ((color & 0x80) >> 4);
 }
 
 /***************************************************************************
@@ -138,9 +140,7 @@ K051316_CB_MEMBER(_88games_state::zoom_callback)
 
 uint32_t _88games_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
-	if (m_k88games_priority)
+	if (m_priority)
 	{
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);   // tile 0
 		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 1, 1);
@@ -169,7 +169,7 @@ uint32_t _88games_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-void _88games_state::k88games_5f84_w(uint8_t data)
+void _88games_state::_5f84_w(uint8_t data)
 {
 	// bits 0/1 coin counters
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
@@ -180,14 +180,11 @@ void _88games_state::k88games_5f84_w(uint8_t data)
 	m_zoomreadroms = BIT(data, 2);
 	if (!m_videobank)
 		m_k051316_view.select(m_zoomreadroms ? 1 : 0);
-
-	if (data & 0xf8)
-		popmessage("5f84 = %02x", data);
 }
 
 void _88games_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -249,7 +246,7 @@ void _88games_state::main_map(address_map &map)
 	m_k051316_view[0](0x3800, 0x3fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write));
 	m_k051316_view[1](0x3800, 0x3fff).rw(m_k051316, FUNC(k051316_device::rom_r), FUNC(k051316_device::write));
 	map(0x4000, 0x7fff).rw(FUNC(_88games_state::k052109_051960_r), FUNC(_88games_state::k052109_051960_w));
-	map(0x5f84, 0x5f84).w(FUNC(_88games_state::k88games_5f84_w));
+	map(0x5f84, 0x5f84).w(FUNC(_88games_state::_5f84_w));
 	map(0x5f88, 0x5f88).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x5f8c, 0x5f8c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x5f90, 0x5f90).w(FUNC(_88games_state::sh_irqtrigger_w));
@@ -373,6 +370,15 @@ static INPUT_PORTS_START( 88games )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( konami88 )
+	PORT_INCLUDE(88games)
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x80, 0x80, "Rounds Per Game" )      PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "4" )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -405,7 +411,7 @@ void _88games_state::banking_callback(uint8_t data)
 	// bit 6 is unknown, 1 most of the time
 
 	// bit 7 controls layer priority
-	m_k88games_priority = BIT(data, 7);
+	m_priority = BIT(data, 7);
 }
 
 void _88games_state::machine_start()
@@ -417,7 +423,7 @@ void _88games_state::machine_start()
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_zoomreadroms));
 	save_item(NAME(m_speech_chip));
-	save_item(NAME(m_k88games_priority));
+	save_item(NAME(m_priority));
 }
 
 void _88games_state::machine_reset()
@@ -427,17 +433,17 @@ void _88games_state::machine_reset()
 	m_k051316_view.select(0);
 	m_palette_view.disable();
 	m_speech_chip = 0;
-	m_k88games_priority = false;
+	m_priority = false;
 }
 
 void _88games_state::_88games(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 12000000); // ?
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &_88games_state::main_map);
 	m_maincpu->line().set(FUNC(_88games_state::banking_callback));
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_88games_state::sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -446,27 +452,24 @@ void _88games_state::_88games(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(_88games_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback));
 
-	K051316(config, m_k051316, 0);
+	K051316(config, m_k051316, 24_MHz_XTAL / 2);
 	m_k051316->set_palette("palette");
 	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback));
 
@@ -475,10 +478,11 @@ void _88games_state::_88games(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "mono", 0.75).add_route(1, "mono", 0.75);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.75);
 
 	UPD7759(config, m_upd7759[0]).add_route(ALL_OUTPUTS, "mono", 0.30);
-
 	UPD7759(config, m_upd7759[1]).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
@@ -661,6 +665,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, 88games,  0,       _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, konami88, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hypsptsp, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 88games,  0,       _88games, 88games,  _88games_state, empty_init, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, _88games, konami88, _88games_state, empty_init, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, _88games, konami88, _88games_state, empty_init, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )

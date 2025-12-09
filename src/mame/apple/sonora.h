@@ -6,11 +6,10 @@
 
 #pragma once
 
-#include "pseudovia.h"
-
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
 #include "machine/mv_sonora.h"
+#include "machine/pseudovia.h"
 #include "machine/swim2.h"
 #include "sound/asc.h"
 #include "speaker.h"
@@ -55,7 +54,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2;

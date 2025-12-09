@@ -120,7 +120,6 @@ private:
 	void sub_io_map(address_map &map) ATTR_COLD;
 	void sub_mem_map(address_map &map) ATTR_COLD;
 
-	bool m_busak = false;
 	u8 m_keydown = 0U;
 	u8 m_porta = 0U;
 	u8 m_portb = 0U;
@@ -130,7 +129,7 @@ private:
 	u8 m_framecnt = 0U;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<z80_device> m_subcpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<dp8350_device> m_crtc;
@@ -317,7 +316,7 @@ u8 sbrain_state::ppi_pb_r()
 	u8 capslock = BIT(m_modifiers->read(), 0) << 4; // bit 4, capslock
 	u8 p10d0 = BIT(m_port10, 0) << 5; // bit 5
 	u8 ri = m_mainport->ri_r() << 6;
-	u8 busak = m_busak ? 128 : 0; // bit 7
+	u8 busak = m_subcpu->busack_r() ? 0 : 128; // bit 7 (negative true)
 	return busak | ri | p10d0 | capslock | vertsync | m_keydown;
 }
 
@@ -352,8 +351,7 @@ void sbrain_state::ppi_pc_w(u8 data)
 	m_fdc->mr_w(!BIT(data, 3));
 	if (BIT(data, 3))
 		disk_select_w(0);
-	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE); // ignored in z80.cpp
-	m_busak = BIT(data, 5);
+	m_subcpu->set_input_line(Z80_INPUT_LINE_BUSRQ, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void sbrain_state::external_txc_w(int state)
@@ -590,7 +588,6 @@ void sbrain_state::machine_start()
 
 	m_usart[0]->write_cts(0);
 
-	save_item(NAME(m_busak));
 	save_item(NAME(m_keydown));
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
@@ -717,6 +714,7 @@ void sbrain_state::sbrain(machine_config &config)
 	m_ppi->out_pb_callback().set(FUNC(sbrain_state::ppi_pb_w));
 	m_ppi->in_pc_callback().set(FUNC(sbrain_state::ppi_pc_r));
 	m_ppi->out_pc_callback().set(FUNC(sbrain_state::ppi_pc_w));
+	m_ppi->tri_pc_callback().set_constant(0x7f);
 
 	I8251(config, m_usart[0], 16_MHz_XTAL / 8);
 	m_usart[0]->txd_handler().set("auxport", FUNC(rs232_port_device::write_txd));

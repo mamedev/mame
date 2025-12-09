@@ -201,16 +201,15 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	m_c355spr->set_color_base(0x1000);
 	m_c355spr->set_external_prifill(true);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	C140(config, m_c140, 49.152_MHz_XTAL / 2304);
 	m_c140->set_addrmap(0, &namco_de_pcbstack_device::c140_map);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
-	m_c140->add_route(0, "lspeaker", 0.50);
-	m_c140->add_route(1, "rspeaker", 0.50);
+	m_c140->add_route(0, "speaker", 0.50, 0);
+	m_c140->add_route(1, "speaker", 0.50, 1);
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 0.30, 0).add_route(1, "speaker", 0.30, 1);
 }
 
 
@@ -540,7 +539,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_DIPNAME( 0x10, 0x10, "DSW5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPNAME( 0x20, 0x20, "PCM ROM")
 	PORT_DIPSETTING(    0x20, "2M" )
 	PORT_DIPSETTING(    0x00, "4M" )
 	PORT_DIPNAME( 0x40, 0x40, "DSW7")
@@ -645,7 +644,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_DIPNAME( 0x10, 0x10, "DSW5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPNAME( 0x20, 0x20, "PCM ROM")
 	PORT_DIPSETTING(    0x20, "2M" )
 	PORT_DIPSETTING(    0x00, "4M" )
 	PORT_DIPNAME( 0x40, 0x40, "DSW7")
@@ -823,7 +822,6 @@ ROM_START( driveyes )
 	ROM_LOAD16_BYTE( "de1-pt1-l.8e",  0x40001, 0x20000, CRC(a05ee081) SHA1(1be4c61ad716abb809856e04d4bb450943706a55) )
 	ROM_LOAD16_BYTE( "de1-pt2-u.5n",  0x80000, 0x20000, CRC(10e83d81) SHA1(446fedc3b1e258a39fb9467e5327c9f9a9f1ac3f) )
 	ROM_LOAD16_BYTE( "de1-pt2-l.7n",  0x80001, 0x20000, CRC(3339a976) SHA1(c9eb9c04f7b3f2a85e5ab64ffb2fe4fcfb6c494b) )
-
 
 	ROM_REGION( 0x2000, "pcb_2:nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(fa6623e9) SHA1(8c313f136724eb6c829261b223a2ac1fc08d00c2) )

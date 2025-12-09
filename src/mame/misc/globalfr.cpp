@@ -11,12 +11,15 @@
   Missing sound roms? (or is sound data in the program roms?)
   NOTE: VFD is guessed as Samsung 16 segment, like other Global products
   need to know more
+
 *******************************************************************************/
 
 
 #include "emu.h"
+
 #include "cpu/m37710/m37710.h"
-#include "machine/roc10937.h"
+#include "video/roc10937.h"
+
 #include "globalfr.lh"
 
 /******************************************************************************/

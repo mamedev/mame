@@ -167,10 +167,13 @@ void m5074x_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case M5074X_INT1_LINE:
-		// FIXME: edge-triggered
-		if (state == ASSERT_LINE)
+		if ((state == ASSERT_LINE) && !(m_intctrl & IRQ_INTREQ))
 		{
 			m_intctrl |= IRQ_INTREQ;
+		}
+		else if ((state == CLEAR_LINE) && (m_intctrl & IRQ_INTREQ))
+		{
+			m_intctrl &= ~IRQ_INTREQ;
 		}
 		break;
 	}
@@ -600,18 +603,24 @@ void m50753_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case M50753_INT1_LINE:
-		// FIXME: edge-triggered
-		if (state == ASSERT_LINE)
+		if ((state == ASSERT_LINE) && !(m_intctrl & IRQ_50753_INT1REQ))
 		{
 			m_intctrl |= IRQ_50753_INT1REQ;
+		}
+		else if ((state == CLEAR_LINE) && (m_intctrl & IRQ_50753_INT1REQ))
+		{
+			m_intctrl &= ~IRQ_50753_INT1REQ;
 		}
 		break;
 
 	case M50753_INT2_LINE:
-		// FIXME: edge-triggered
-		if (state == ASSERT_LINE)
+		if ((state == ASSERT_LINE) && !(m_intctrl & IRQ_50753_INT2REQ))
 		{
 			m_intctrl |= IRQ_50753_INT2REQ;
+		}
+		else if ((state == CLEAR_LINE) && (m_intctrl & IRQ_50753_INT2REQ))
+		{
+			m_intctrl &= ~IRQ_50753_INT2REQ;
 		}
 		break;
 	}

@@ -153,7 +153,8 @@ INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
   handheld game overall. Hardware design (even the MCU) and programming
   was done at Rockwell.
 
-  A European version was released as "Ski Slalom", except it's upside-down.
+  A European version was released as "Ski Slalom" (model 8290), except it's
+  upside-down.
 
 *******************************************************************************/
 
@@ -734,7 +735,7 @@ ROM_END
 /*******************************************************************************
 
   Rockwell 8R "Automatic Percent", Rockwell 18R "Memory"
-  * B5000 MCU (label B5000CC, die label B5000)
+  * B5000 MCU (label B5000CB/CC, die label B5000)
   * 8-digit 7seg LED display
 
   This MCU was used in Rockwell 8R, 18R, and 9TR. It was also sold by

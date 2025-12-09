@@ -373,15 +373,15 @@ void namcos2_state::namcos2_68k_key_w(offs_t offset, u16 data)
 {
 	if (m_gametype == NAMCOS2_MARVEL_LAND && offset == 5)
 	{
-		if (data == 0x615E) m_sendval = true;
+		if (data == 0x615e) m_sendval = true;
 	}
 	if (m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 4)
 	{
-		if (data == 0x13EC) m_sendval = true;
+		if (data == 0x13ec) m_sendval = true;
 	}
 	if (m_gametype == NAMCOS2_ROLLING_THUNDER_2 && offset == 7)
 	{
-		if (data == 0x13EC) m_sendval = true;
+		if (data == 0x13ec) m_sendval = true;
 	}
 	if (m_gametype == NAMCOS2_MARVEL_LAND && offset == 6)
 	{

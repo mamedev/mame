@@ -6,7 +6,7 @@
 
     OSD module management
 
-*******************************************************************c********/
+***************************************************************************/
 #ifndef MAME_OSD_MODULES_OSDMODULE_H
 #define MAME_OSD_MODULES_OSDMODULE_H
 

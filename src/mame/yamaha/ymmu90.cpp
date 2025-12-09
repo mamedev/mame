@@ -153,9 +153,9 @@ u8 mu90_state::pb_r()
 	if(m_lcd && (cur_pa & 0x20)) {
 		if(cur_pa & 0x40) {
 			if(cur_pa & 0x02)
-				res &= m_lcd->data_read();
+				res &= m_lcd->data_r();
 			else
-				res &= m_lcd->control_read();
+				res &= m_lcd->control_r();
 		}
 	}
 
@@ -181,9 +181,9 @@ void mu90_state::pa_w(u8 data)
 	if(m_lcd && (cur_pa & 0x20) && !(data & 0x20)) {
 		if(!(cur_pa & 0x40)) {
 			if(cur_pa & 0x02)
-				m_lcd->data_write(cur_pb);
+				m_lcd->data_w(cur_pb);
 			else
-				m_lcd->control_write(cur_pb);
+				m_lcd->control_w(cur_pb);
 		}
 	}
 
@@ -213,13 +213,12 @@ void mu90_state::mu90b(machine_config &config)
 	m_maincpu->read_portb().set(FUNC(mu90_state::pb_r));
 	m_maincpu->write_portb().set(FUNC(mu90_state::pb_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(AS_DATA, &mu90_state::swp30_map);
-	m_swp30->add_route(0, "lspeaker", 1.0);
-	m_swp30->add_route(1, "rspeaker", 1.0);
+	m_swp30->add_route(0, "speaker", 1.0, 0);
+	m_swp30->add_route(1, "speaker", 1.0, 1);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);
@@ -269,5 +268,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1996, mu90,     0, 0, mu90,  mu90, mu90_state, empty_init, "Yamaha", "MU90",  MACHINE_NOT_WORKING )
-SYST( 2005, mu90b, mu90, 0, mu90b, mu90, mu90_state, empty_init, "Yamaha", "MU90B", MACHINE_NOT_WORKING )
+SYST( 1996, mu90,     0, 0, mu90,  mu90, mu90_state, empty_init, "Yamaha", "MU90",  MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )
+SYST( 2005, mu90b, mu90, 0, mu90b, mu90, mu90_state, empty_init, "Yamaha", "MU90B", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING )

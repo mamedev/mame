@@ -21,7 +21,7 @@ enum
 /* interrupt sources */
 enum INTSOURCES
 {
-	BRK = 0,
+	BRK     = 0,
 	INT_IRQ = 1,
 	NMI_IRQ = 2
 };
@@ -40,11 +40,11 @@ enum BREGS {
 	BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6)
 };
 
-#define Sreg(x)         m_sregs[x]
-#define Wreg(x)         m_regs.w[x]
-#define Breg(x)         m_regs.b[x]
+#define Sreg(x) m_sregs[x]
+#define Wreg(x) m_regs.w[x]
+#define Breg(x) m_regs.b[x]
 
-#define PC()       ((Sreg(PS)<<4)+m_ip)
+#define PC()    ((Sreg(PS)<<4)+m_ip)
 
 #define CF      (m_CarryVal!=0)
 #define SF      (m_SignVal<0)
@@ -55,10 +55,10 @@ enum BREGS {
 
 /************************************************************************/
 
-#define read_mem_byte(a)            m_program->read_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
-#define read_mem_word(a)            m_program->read_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
-#define write_mem_byte(a,d)         m_program->write_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
-#define write_mem_word(a,d)         m_program->write_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
+#define read_mem_byte(a)        m_program->read_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
+#define read_mem_word(a)        m_program->read_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a))
+#define write_mem_byte(a,d)     m_program->write_byte(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
+#define write_mem_word(a,d)     m_program->write_word_unaligned(m_chip_type == V33_TYPE ? v33_translate(a) : (a), (d))
 
 #define read_port_byte(a)       io_read_byte(a)
 #define read_port_word(a)       io_read_word(a)
@@ -102,16 +102,15 @@ enum BREGS {
     CLKM - cycle count for reg/mem instructions
     CLKR - cycle count for reg/mem instructions with different counts for odd/even addresses
 
-
     Prefetch & buswait time is not emulated.
     Extra cycles for PUSH'ing or POP'ing registers to odd addresses is not emulated.
 */
 
-#define CLK(all) m_icount-=all
-#define CLKS(v20,v30,v33) { const uint32_t ccount=(v20<<16)|(v30<<8)|v33; m_icount-=(ccount>>m_chip_type)&0x7f; }
-#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; m_icount-=(addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f); }
-#define CLKM(v20,v30,v33,v20m,v30m,v33m) { const uint32_t ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; m_icount-=( ModRM >=0xc0 )?((ccount>>m_chip_type)&0x7f):((mcount>>m_chip_type)&0x7f); }
-#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) m_icount-=vall; else m_icount-=(addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f); }
+#define CLK(all) do { int cc = all; m_cur_cycles+=cc; m_icount-=cc; } while(0)
+#define CLKS(v20,v30,v33) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33; CLK((ccount>>m_chip_type)&0x7f); } while(0)
+#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
+#define CLKM(v20,v30,v33,v20m,v30m,v33m) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; CLK(( ModRM >=0xc0 )?((ccount>>m_chip_type)&0x7f):((mcount>>m_chip_type)&0x7f)); } while(0)
+#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) CLK(vall); else CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
 
 /************************************************************************/
 #define CompressFlags() (WORD)(int(CF) | 0x02 | (int(PF) << 2) | (int(AF) << 4) | (int(ZF) << 6) \

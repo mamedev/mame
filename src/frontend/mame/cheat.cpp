@@ -683,7 +683,7 @@ void cheat_script::script_entry::output_argument::save(util::core_file &cheatfil
 
 cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, std::string const &filename, util::xml::data_node const &cheatnode)
 	: m_manager(manager)
-	, m_symbols(manager.machine(), &globaltable)
+	, m_symbols(manager.machine(), symbol_table::BUILTIN_GLOBALS, &globaltable)
 	, m_state(SCRIPT_STATE_OFF)
 	, m_numtemp(DEFAULT_TEMP_VARIABLES)
 	, m_argindex(0)
@@ -1065,7 +1065,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 	, m_numlines(0)
 	, m_lastline(0)
 	, m_disabled(true)
-	, m_symtable(machine)
+	, m_symtable(machine, symbol_table::BUILTIN_GLOBALS)
 {
 	// if the cheat engine is disabled, we're done
 	if (!machine.options().cheat())

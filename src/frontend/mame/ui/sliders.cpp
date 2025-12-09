@@ -75,7 +75,7 @@ bool menu_sliders::handle(event const *ev)
 			// decrease value
 			case IPT_UI_LEFT:
 				if (alt_pressed && shift_pressed)
-					increment = -1;
+					increment = (slider->incval > 100) ? -(slider->incval / 100) : -1;
 				else if (alt_pressed)
 					increment = -(curvalue - slider->minval);
 				else if (shift_pressed)
@@ -89,7 +89,7 @@ bool menu_sliders::handle(event const *ev)
 			// increase value
 			case IPT_UI_RIGHT:
 				if (alt_pressed && shift_pressed)
-					increment = 1;
+					increment = (slider->incval > 100) ? (slider->incval / 100) : 1;
 				else if (alt_pressed)
 					increment = slider->maxval - curvalue;
 				else if (shift_pressed)
@@ -210,6 +210,7 @@ void menu_sliders::populate()
 	}
 
 	item_append(menu_item_type::SEPARATOR);
+	bool separator = true;
 
 	// add OSD options
 	std::vector<menu_item> osd_sliders = machine().osd().get_slider_list();
@@ -230,7 +231,12 @@ void menu_sliders::populate()
 		{
 			item_append(item);
 		}
+
+		separator = item.type() == menu_item_type::SEPARATOR;
 	}
+
+	if (!separator)
+		item_append(menu_item_type::SEPARATOR);
 
 	// reselect last slider used in menuless mode
 	if (m_menuless_mode)

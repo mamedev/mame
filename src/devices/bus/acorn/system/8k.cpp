@@ -14,16 +14,45 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "8k.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(ACORN_8K, acorn_8k_device, "acorn_8k", "Acorn 8K Static Memory Board")
+namespace {
+
+class acorn_8k_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	acorn_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, ACORN_8K, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_rom(*this, "rom%u", 0)
+		, m_ram(*this, "ram", 0x2000, ENDIANNESS_LITTLE)
+		, m_links(*this, "LINKS")
+	{
+	}
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	required_device_array<generic_slot_device, 2> m_rom;
+	memory_share_creator<uint8_t> m_ram;
+	required_ioport m_links;
+
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom0) { return load_rom(image, m_rom[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1) { return load_rom(image, m_rom[1]); }
+};
 
 
 //-------------------------------------------------
@@ -70,25 +99,8 @@ ioport_constructor acorn_8k_device::device_input_ports() const
 void acorn_8k_device::device_add_mconfig(machine_config &config)
 {
 	/* rom sockets */
-	GENERIC_SOCKET(config, "rom0", generic_plain_slot, "acrnsys_rom", "bin,rom").set_device_load(FUNC(acorn_8k_device::rom0_load)); // IC17
-	GENERIC_SOCKET(config, "rom1", generic_plain_slot, "acrnsys_rom", "bin,rom").set_device_load(FUNC(acorn_8k_device::rom1_load)); // IC18
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  acorn_8k_device - constructor
-//-------------------------------------------------
-
-acorn_8k_device::acorn_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACORN_8K, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_rom(*this, "rom%u", 0)
-	, m_links(*this, "LINKS")
-{
+	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "acrnsys_rom", "bin,rom").set_device_load(FUNC(acorn_8k_device::rom0)); // IC17
+	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "acrnsys_rom", "bin,rom").set_device_load(FUNC(acorn_8k_device::rom1)); // IC18
 }
 
 
@@ -98,7 +110,6 @@ acorn_8k_device::acorn_8k_device(const machine_config &mconfig, const char *tag,
 
 void acorn_8k_device::device_start()
 {
-	save_item(NAME(m_ram));
 }
 
 //-------------------------------------------------
@@ -154,3 +165,8 @@ std::pair<std::error_condition, std::string> acorn_8k_device::load_rom(device_im
 
 	return std::make_pair(std::error_condition(), std::string());
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ACORN_8K, device_acorn_bus_interface, acorn_8k_device, "acorn_8k", "Acorn 8K Static Memory Board")

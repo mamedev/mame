@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Vas Crabb
+copyright-holders: Roberto Fresca
 
 Cherry Master control panel
 May or may not match arrangement/colour of real control panel
@@ -10,52 +10,18 @@ May or may not match arrangement/colour of real control panel
 
 	<!-- define button-lamps -->
 
-	<element name="stop1" defstate="0">
+	<element name="bet" defstate="0">
 		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="0.0" blue="1.0" />
 		</rect>
 		<rect state="0">
-			<color red="0.5" green="0.0" blue="0.0" />
+			<color red="0.5" green="0.0" blue="0.5" />
 		</rect>
-		<text string="DOUBLE">
+		<text string="BET">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="STOP 1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
-	</element>
-
-	<element name="stop2" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.5" green="0.0" blue="0.0" />
-		</rect>
-		<text string="SMALL/INFO">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="STOP 2">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
-	</element>
-
-	<element name="stop3" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.5" green="0.0" blue="0.0" />
-		</rect>
-		<text string="BIG">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="STOP 3">
+		<text string="STOP ALL">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -74,6 +40,57 @@ May or may not match arrangement/colour of real control panel
 		</text>
 	</element>
 
+	<element name="stop1" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BIG">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="STOP 1">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stop2" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="STOP 2">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stop3" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.5" green="0.0" blue="0.0" />
+		</rect>
+		<text string="SMALL/INFO">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="STOP 3">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
 	<element name="start" defstate="0">
 		<rect state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
@@ -84,23 +101,6 @@ May or may not match arrangement/colour of real control panel
 		<text string="START">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.3" width="1" height="0.4" />
-		</text>
-	</element>
-
-	<element name="bet" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="1.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.5" green="0.0" blue="0.5" />
-		</rect>
-		<text string="BET">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="STOP ALL">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
@@ -223,26 +223,26 @@ May or may not match arrangement/colour of real control panel
 		</element>
 
 
-		<element name="lamp1" ref="stop_b" inputtag="IN0" inputmask="0x08">
+		<element name="lamp0" ref="stop_b" inputtag="IN0" inputmask="0x04">
 			<bounds x="1.4" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp1" ref="stop1" inputtag="IN0" inputmask="0x08">
+		<element name="lamp0" ref="stop1" inputtag="IN0" inputmask="0x04">
 			<bounds x="1.42" y="3.10" width="0.46" height="0.20" />
 		</element>
 
 
-		<element name="lamp4" ref="stop_b" inputtag="IN0" inputmask="0x40">
+		<element name="lamp1" ref="stop_b" inputtag="IN0" inputmask="0x08">
 			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp4" ref="stop2" inputtag="IN0" inputmask="0x40">
+		<element name="lamp1" ref="stop2" inputtag="IN0" inputmask="0x08">
 			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
 		</element>
 
 
-		<element name="lamp0" ref="stop_b" inputtag="IN0" inputmask="0x04">
+		<element name="lamp4" ref="stop_b" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.7" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element name="lamp0" ref="stop3" inputtag="IN0" inputmask="0x04">
+		<element name="lamp4" ref="stop3" inputtag="IN0" inputmask="0x40">
 			<bounds x="2.72" y="3.10" width="0.46" height="0.20" />
 		</element>
 

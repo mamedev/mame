@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="wren_flop" description="Wren Executive diskettes">
+
+	<software name="wrenexec">
+		<description>Wren Executive System</description>
+		<year>1984</year>
+		<publisher>Wren Computers</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Operating System"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Operating_System.img" size="204800" crc="26ce43ab" sha1="ae938464e9d9d790916212c603f2146b8310b3c7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Executive Desktop"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Executive_Desktop.img" size="204800" crc="219a5b6e" sha1="f9f8431da185357971a3223b8f2f2403ba414623"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Data.img" size="204800" crc="798e0b49" sha1="c1d1955b71946bf015c0672a304739ce0e733d4d"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Communications &amp; Programming"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Comms_and_Programming.img" size="204800" crc="a938af45" sha1="91d1a5c00467b425e5d532f45aa6c8b2f60b8da0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Perfect Writer Installation"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Perfect_Writer_Installation.img" size="204800" crc="c0a7bd46" sha1="772504fca380415a72d793d62aceb2f9c0f32bcb"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Perfect Writer"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Perfect_Writer.img" size="204800" crc="1ad3a9a3" sha1="e03d77d2277add0a8bfa99fdf5b18f917d573128"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Perfect Calc"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Perfect_Calc.img" size="204800" crc="02ff44ea" sha1="6c5a73bda8d2185c8051b0985cb3b03ce2eab75e"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Perfect Filer"/>
+			<dataarea name="flop" size="204800">
+				<rom name="Perfect_Filer.img" size="204800" crc="0999e924" sha1="955cf94099eef5e35886ba02e212f88353dea7a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

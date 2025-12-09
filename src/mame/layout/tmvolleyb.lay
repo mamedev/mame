@@ -178,9 +178,9 @@ authors:hap
 		<element ref="text_serve"><bounds xc="271.5" yc="104" width="7" height="30" /><orientation rotate="270" /></element>
 		<element ref="but1" inputtag="IN.2" inputmask="0x08"><bounds xc="281" yc="104" width="6" height="23" /></element>
 
-		<element ref="nothing" clickthrough="no"><bounds xc="150" y="232.5" width="230" height="4.5" /></element>
 		<element ref="switch1" inputtag="IN.7" inputmask="0x01" inputraw="yes"><bounds xc="109" y="232.5" width="30" height="4.5" /></element>
 		<element ref="switch2" inputtag="IN.6" inputmask="0x08" inputraw="yes"><bounds xc="193" y="232.5" width="30" height="4.5" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="150" y="232.5" width="230" height="4.5" /></element>
 
 		<element ref="black2d" inputtag="IN.7" inputmask="0x01" inputraw="yes"><bounds xc="100" y="226" width="6" height="6" /></element>
 		<element ref="black2d" inputtag="IN.6" inputmask="0x08" inputraw="yes"><bounds xc="200" y="226" width="6" height="6" /></element>

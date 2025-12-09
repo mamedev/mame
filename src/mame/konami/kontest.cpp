@@ -267,12 +267,11 @@ void kontest_state::kontest(machine_config &config)
 	PALETTE(config, m_palette, FUNC(kontest_state::kontest_palette), 32);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	SN76489A(config, "sn1", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	SN76489A(config, "sn1", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
-	SN76489A(config, "sn2", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	SN76489A(config, "sn2", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 }
 
 

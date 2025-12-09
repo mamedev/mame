@@ -4510,7 +4510,7 @@ void sparc_base_device::run_loop()
 
 void sparc_base_device::execute_run()
 {
-	bool debug = machine().debug_flags & DEBUG_FLAG_ENABLED;
+	const bool debug = debugger_enabled();
 
 	if (m_bp_reset_in)
 	{

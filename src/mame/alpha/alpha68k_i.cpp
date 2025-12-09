@@ -283,9 +283,9 @@ static INPUT_PORTS_START( paddlema )
 
 	PORT_START("IN4") // DSW1
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_HIGH, "SW2:8" )
-	PORT_DIPUNUSED_DIPLOC( 0x02, 0x01, "SW2:7" )             // Listed as "Unused"
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x01, "SW2:6" )             // Listed as "Unused"
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x01, "SW2:5" )             // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:7" )             // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:6" )             // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:5" )             // Listed as "Unused"
 	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )                  PORT_DIPLOCATION("SW2:4,3")
 	PORT_DIPSETTING(    0x20, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x00, "Demo Sounds On" )

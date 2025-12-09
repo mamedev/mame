@@ -476,7 +476,18 @@ void tpi6525_device::write(offs_t offset, uint8_t data)
 		m_port_c = data;
 
 		if (!INTERRUPT_MODE)
+		{
 			m_out_pc_cb((offs_t)0, (m_port_c & m_ddr_c) | (m_ddr_c ^ 0xff));
+		}
+		else
+		{
+			// clear latches
+			if (BIT(data, 0) == 0) m_irq_level[0] = 1;
+			if (BIT(data, 1) == 0) m_irq_level[1] = 1;
+			if (BIT(data, 2) == 0) m_irq_level[2] = 1;
+			if (BIT(data, 3) == 0) m_irq_level[3] = INTERRUPT3_RISING_EDGE ? 0 : 1;
+			if (BIT(data, 4) == 0) m_irq_level[4] = INTERRUPT4_RISING_EDGE ? 0 : 1;
+		}
 		break;
 
 	case 3:
@@ -531,21 +542,4 @@ void tpi6525_device::port_line_w(uint8_t &port, int line, int state)
 {
 	port &= ~(1 << line);
 	port |= state << line;
-}
-
-/* this should probably be done better, needed for amigacd.c */
-
-uint8_t tpi6525_device::get_ddr_a()
-{
-	return m_ddr_a;
-}
-
-uint8_t tpi6525_device::get_ddr_b()
-{
-	return m_ddr_b;
-}
-
-uint8_t tpi6525_device::get_ddr_c()
-{
-	return m_ddr_c;
 }

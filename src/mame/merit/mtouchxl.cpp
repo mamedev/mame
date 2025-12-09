@@ -203,7 +203,7 @@ void mtxl_state::machine_reset()
 #ifndef REAL_PCI_CHIPSET
 static void mt6k_ata_devices(device_slot_interface &device)
 {
-	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("cdrom", ATAPI_CDROM);
 	device.option_add("hdd", IDE_HARDDISK);
 }
 
@@ -213,11 +213,6 @@ void mtxl_state::cdrom(device_t *device)
 	ide0->option_reset();
 	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("cdrom");
-	ide0->set_fixed(true);
-
-	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
-	ide1->set_default_option("hdd");
-	ide1->set_fixed(true);
 }
 
 void mtxl_state::hdd(device_t *device)
@@ -226,11 +221,6 @@ void mtxl_state::hdd(device_t *device)
 	ide0->option_reset();
 	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("hdd");
-	ide0->set_fixed(true);
-
-	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
-	ide1->set_default_option("cdrom");
-	ide1->set_fixed(true);
 }
 #endif
 
@@ -247,7 +237,8 @@ void mtxl_state::at486(machine_config &config)
 
 	// on board devices
 	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
-	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
+	// TODO: original is a gd-5440, PCI only (svga_dm is '30)
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true);
 
 	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));

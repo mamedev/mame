@@ -1,12 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Nigel Barnes
-/**********************************************************************
-
-    BBC Micro SD Card
-
-**********************************************************************/
-
-
 #ifndef MAME_BUS_BBC_USERPORT_SDCARD_H
 #define MAME_BUS_BBC_USERPORT_SDCARD_H
 

@@ -22,6 +22,7 @@
 #define LOG_RELOAD  (1U << 2)
 #define LOG_ECC     (1U << 3)
 #define LOG_INVALID (1U << 4)
+#define LOG_LED     (1U << 5)
 
 //#define VERBOSE (LOG_GENERAL|LOG_TLB|LOG_RELOAD|LOG_ECC|LOG_INVALID)
 #include "logmacro.h"
@@ -226,8 +227,6 @@ void rosetta_device::device_start()
 	m_ecc = std::make_unique<u8[]>(m_ram_size);
 	m_rca = std::make_unique<u8[]>(2048);
 
-	offs_t const mask = m_rom.bytes() - 1;
-	m_mem_space->install_rom(0, mask, 0xffffff & ~mask, m_rom);
 	m_mem_space->cache(m_mem);
 }
 
@@ -357,6 +356,78 @@ bool rosetta_device::iow(u32 address, u32 data)
 	}
 
 	LOGMASKED(LOG_INVALID, "iow unknown address 0x%06x data 0x%08x (%s)\n", address, data, machine().describe_context());
+	return true;
+}
+
+// translate logical to physical address ignoring protection and without side effects
+bool rosetta_device::translate(u32 &address) const
+{
+	unsigned const segment = address >> 28;
+
+	// segment present
+	if (!(m_segment[segment] & SEGMENT_P))
+		return false;
+
+	// segment zero virtual equal to real
+	if ((m_control[TCR] & TCR_V) && !segment)
+	{
+		address &= 0x00ff'ffffU;
+
+		return true;
+	}
+
+	u64 const virtual_address = (u64(m_segment[segment] & SEGMENT_ID) << 26) | (address & 0x0fff'ffffU);
+
+	// ignore tlb and directly search inverted page table
+	u32 page_address = 0;
+	{
+		// compute hat index
+		u16 hat_offset = (((virtual_address >> 26) & SEGMENT_ID) ^ (virtual_address >> (m_page_shift - 2))) & m_hat_mask;
+
+		// fetch hat entry
+		u32 hat_entry = m_ram[m_hat_base + hat_offset + 1];
+
+		// page fault
+		if (hat_entry & HAT_E)
+			return false;
+
+		// compute ipt entry pointer
+		hat_offset = ((hat_entry & HAT_HATP) >> 14);
+		u32 const address = (virtual_address >> 11) & m_atag_mask;
+
+		// ipt search
+		for (unsigned count = 0; count < 1024; count++)
+		{
+			// fetch ipt entry
+			u32 const ipt_entry = m_ram[m_hat_base + hat_offset + 0];
+
+			if ((ipt_entry & m_atag_mask) == address)
+			{
+				// reload tlb
+				page_address = (hat_offset << 1) | TLB_V | (ipt_entry >> 30);
+
+				// found
+				break;
+			}
+
+			// fetch next hat entry
+			hat_entry = m_ram[m_hat_base + hat_offset + 1];
+			if (hat_entry & HAT_L)
+				return false;
+
+			// select next ipt entry
+			hat_offset = (hat_entry & HAT_IPTP) << 2;
+		}
+
+		// search failed
+		if (!page_address)
+			return false;
+	}
+
+	u32 const real_page = (page_address << 8) & m_page_mask;
+
+	address = real_page | (address & ~m_page_mask);
+
 	return true;
 }
 
@@ -763,7 +834,7 @@ u32 rosetta_device::rca_r(offs_t offset)
 
 	if (!m_led_lock)
 	{
-		LOG("led 0x%02x (%s)\n", u8(offset), machine().describe_context());
+		LOGMASKED(LOG_LED, "led 0x%02x (%s)\n", u8(offset), machine().describe_context());
 
 		m_leds[0] = led_pattern[(offset >> 0) & 15];
 		m_leds[1] = led_pattern[(offset >> 4) & 15];

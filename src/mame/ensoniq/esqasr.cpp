@@ -130,13 +130,12 @@ void esqasr_state::asr(machine_config &config)
 
 	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(16'000'000) / (16 * 32));
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, "lspeaker", 1.0);
-	m_pump->add_route(1, "rspeaker", 1.0);
+	m_pump->add_route(0, "speaker", 1.0, 0);
+	m_pump->add_route(1, "speaker", 1.0, 1);
 
 	es5506_device &ensoniq(ES5506(config, "ensoniq", XTAL(16'000'000)));
 	ensoniq.sample_rate_changed().set(FUNC(esqasr_state::es5506_clock_changed));
@@ -167,13 +166,12 @@ void esqasr_state::asrx(machine_config &config)
 
 	ESQ2X40_SQ1(config, m_sq1vfd, 60);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ESQ_5505_5510_PUMP(config, m_pump, XTAL(16'000'000) / (16 * 32)); // Actually ES5511
 	m_pump->set_esp(m_esp);
-	m_pump->add_route(0, "lspeaker", 1.0);
-	m_pump->add_route(1, "rspeaker", 1.0);
+	m_pump->add_route(0, "speaker", 1.0, 0);
+	m_pump->add_route(1, "speaker", 1.0, 1);
 
 	es5506_device &ensoniq(ES5506(config, "ensoniq", XTAL(16'000'000)));
 	ensoniq.sample_rate_changed().set(FUNC(esqasr_state::es5506_clock_changed));

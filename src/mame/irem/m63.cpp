@@ -212,7 +212,6 @@ private:
 	int irq_r();
 	uint8_t snddata_r(offs_t offset);
 	void fghtbskt_samples_w(uint8_t data);
-	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
 	void nmi_mask_w(int state);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -684,18 +683,6 @@ static GFXDECODE_START( gfx_fghtbskt )
 GFXDECODE_END
 
 
-SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
-{
-	int i, len = memregion("samples")->bytes();
-	uint8_t *ROM = memregion("samples")->base();
-
-	m_samplebuf = std::make_unique<int16_t[]>(len);
-	save_pointer(NAME(m_samplebuf), len);
-
-	for(i = 0; i < len; i++)
-		m_samplebuf[i] = ((int8_t)(ROM[i] ^ 0x80)) * 256;
-}
-
 INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 {
 	m_sound_irq = 1;
@@ -821,7 +808,6 @@ void m63_state::fghtbskt(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(m63_state::fghtbskt_sh_start));
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -1007,6 +993,16 @@ void m63_state::init_wilytowr()
 void m63_state::init_fghtbskt()
 {
 	m_sy_offset = 240;
+
+	// initialize samples
+	int len = memregion("samples")->bytes();
+	uint8_t *ROM = memregion("samples")->base();
+
+	m_samplebuf = std::make_unique<int16_t[]>(len);
+	save_pointer(NAME(m_samplebuf), len);
+
+	for(int i = 0; i < len; i++)
+		m_samplebuf[i] = ((int8_t)(ROM[i] ^ 0x80)) * 256;
 }
 
 } // Anonymous namespace

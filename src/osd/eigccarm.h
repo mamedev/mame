@@ -199,40 +199,6 @@ _recip_approx(float value)
 #endif
 
 
-/*-------------------------------------------------
-    mul_64x64 - perform a signed 64 bit x 64 bit
-    multiply and return the full 128 bit result
--------------------------------------------------*/
-
-#if defined(__aarch64__)
-#define mul_64x64 _mul_64x64
-inline int64_t ATTR_FORCE_INLINE
-_mul_64x64(int64_t a, int64_t b, int64_t &hi)
-{
-	__int128 const r(__int128(a) * b);
-	hi = int64_t(uint64_t((unsigned __int128)r >> 64));
-	return int64_t(uint64_t((unsigned __int128)r));
-}
-#endif
-
-
-/*-------------------------------------------------
-    mulu_64x64 - perform an unsigned 64 bit x 64
-    bit multiply and return the full 128 bit result
--------------------------------------------------*/
-
-#if defined(__aarch64__)
-#define mulu_64x64 _mulu_64x64
-inline uint64_t ATTR_FORCE_INLINE
-_mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
-{
-	unsigned __int128 const r((unsigned __int128)a * b);
-	hi = uint64_t(r >> 64);
-	return uint64_t(r);
-}
-#endif
-
-
 
 /***************************************************************************
     INLINE BIT MANIPULATION FUNCTIONS

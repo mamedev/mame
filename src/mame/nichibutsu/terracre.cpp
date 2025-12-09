@@ -93,7 +93,6 @@ AT-2
 #include "machine/rescap.h"
 #include "sound/dac.h"
 #include "sound/flt_biquad.h"
-#include "sound/mixer.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
 #include "video/bufsprite.h"
@@ -120,7 +119,6 @@ public:
 		, m_dacfilter1(*this, "dacfilter1")
 		, m_dacfilter2(*this, "dacfilter2")
 		, m_ymfilter(*this, "ymfilter")
-		, m_ssgmixer(*this, "ssgmixer")
 		, m_ssgfilter_cfilt(*this, "ssg_cfilt")
 		, m_ssgfilter_cgain(*this, "ssg_cgain")
 		, m_ssgfilter_abgain(*this, "ssg_abgain")
@@ -151,7 +149,6 @@ private:
 	required_device<filter_biquad_device> m_dacfilter1;
 	required_device<filter_biquad_device> m_dacfilter2;
 	required_device<filter_biquad_device> m_ymfilter;
-	optional_device<mixer_device> m_ssgmixer;
 	optional_device<filter_biquad_device> m_ssgfilter_cfilt;
 	optional_device<filter_biquad_device> m_ssgfilter_cgain;
 	optional_device<filter_biquad_device> m_ssgfilter_abgain;
@@ -877,16 +874,13 @@ void terracre_state::ym2203(machine_config &config)
 	FILTER_BIQUAD(config, m_ssgfilter_abgain).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_N(100)/10000.0);
 	m_ssgfilter_abgain->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MIXER(config, m_ssgmixer);
-	m_ssgmixer->add_route(0, m_ssgfilter_abgain, 0.022219);
-
 	// HACK: there is still something not right about the volumes of the SSG channels
 	// from the YM2203 relative to the others, so I'm multiplying them by a factor here.
 	// Once this is converted to a netlist, this can likely be removed.
 	double constexpr ssg_hack_factor = 1.333;
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(16'000'000) / 4)); // 4MHz verified on PCB
-	ym1.add_route(0, m_ssgmixer, 1.0 * ssg_hack_factor); // SSG A
-	ym1.add_route(1, m_ssgmixer, 1.0 * ssg_hack_factor); // SSG B
+	ym1.add_route(0, m_ssgfilter_abgain, 0.022219 * ssg_hack_factor); // SSG A
+	ym1.add_route(1, m_ssgfilter_abgain, 0.022219 * ssg_hack_factor); // SSG B
 	ym1.add_route(2, m_ssgfilter_cfilt, 0.033666 * ssg_hack_factor); // SSG C
 	ym1.add_route(3, m_ymfilter, 0.241517); // FM
 

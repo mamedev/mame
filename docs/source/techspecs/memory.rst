@@ -282,7 +282,7 @@ view can be re-enabled at any time.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some specific CPUs have been upgraded to be interruptible which allows
-to add bus contention and wait states capabitilites.  Being
+to add bus contention and wait states capabilities.  Being
 interruptible means, in practice, that an instruction can be
 interrupted at any time and the execute_run method of the core exited.
 Other devices can then run, then eventually controls returns to the
@@ -950,7 +950,7 @@ data passed around.  A write tap happens before the access, and can
 change the value to be written.  A read tap happens after the access,
 and can change the value returned.
 
-Taps must be of the same width and alignement than the bus.  Multiple
+Taps must be of the same width and alignment as the bus.  Multiple
 taps can act over the same addresses.
 
 The ``memory_passthrough_handler`` object collates a number of taps

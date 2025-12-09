@@ -136,7 +136,7 @@ void nabupc_format::build_nabu_track_mfm(int track, int head, floppy_image &imag
 			mfm_w(track_data, 8, sects[i].deleted ? 0xf8 : 0xfb);
 			for (int j = 0; j < sects[i].actual_size; j++) mfm_w(track_data, 8, sects[i].data[j]);
 			crc = calc_crc_ccitt(track_data, cpos, track_data.size());
-			if (sects[i].bad_crc) {
+			if (sects[i].bad_data_crc) {
 				crc = 0xffff^crc;
 			}
 			mfm_w(track_data, 16, crc);
@@ -177,7 +177,8 @@ bool nabupc_format::load(util::random_read &io, uint32_t form_factor, const std:
 				sects[i].actual_size = sector_size;
 				sects[i].data = sectdata + sector_size * i;
 				sects[i].deleted = false;
-				sects[i].bad_crc = false;
+				sects[i].bad_data_crc = false;
+				sects[i].bad_addr_crc = false;
 			}
 			build_nabu_track_mfm(track, head, image, 100000, sector_count, sects, f.gap_3, f.gap_1, f.gap_2, f.dpb);
 		}

@@ -80,6 +80,23 @@ const uint8_t i8086_cpu_device::m_i8086_timing[] =
 	18, 9,17,       /* MOVS 16-bit */
 };
 
+const uint8_t i8086_cpu_device::m_i8086_ea_timing[] =
+{
+	 7,  8,  8,  7,  5,  5,  6,  5,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	11, 12, 12, 11,  9,  9,  9,  9,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	11, 12, 11, 11,  9,  9,  9,  9,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	 0,  0,  0,  0,  0,  0,  0,  0,
+};
+
 /***************************************************************************/
 /* cpu state                                                               */
 /***************************************************************************/
@@ -94,6 +111,7 @@ i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *ta
 	: i8086_cpu_device(mconfig, I8088, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i8086_timing, sizeof(m_i8086_timing));
+	memcpy(m_ea_timing, m_i8086_ea_timing, sizeof(m_i8086_ea_timing));
 }
 
 i8086_cpu_device::i8086_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -191,7 +209,7 @@ void i8086_cpu_device::execute_run()
 			m_prev_ip = m_ip;
 			m_seg_prefix = false;
 
-				/* Dispatch IRQ */
+			/* Dispatch IRQ */
 			if ( m_pending_irq && (m_no_interrupt == 0) )
 			{
 				if ( m_pending_irq & NMI_IRQ )
@@ -528,14 +546,6 @@ void i8086_common_cpu_device::device_reset()
 {
 	m_ZeroVal = 1;
 	m_ParityVal = 1;
-	m_regs.w[AX] = 0;
-	m_regs.w[CX] = 0;
-	m_regs.w[DX] = 0;
-	m_regs.w[BX] = 0;
-	m_regs.w[SP] = 0;
-	m_regs.w[BP] = 0;
-	m_regs.w[SI] = 0;
-	m_regs.w[DI] = 0;
 	m_sregs[ES] = 0;
 	m_sregs[CS] = 0xffff;
 	m_sregs[SS] = 0;
@@ -1512,28 +1522,28 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 			m_modrm = fetch();
 			m_src = RegByte();
 			PutRMByte(m_src);
-			CLKM(ALU_RR8,ALU_MR8);
+			CLKM(MOV_RR8,MOV_MR8);
 			break;
 
 		case 0x89: // i_mov_wr16
 			m_modrm = fetch();
 			m_src = RegWord();
 			PutRMWord(m_src);
-			CLKM(ALU_RR16,ALU_MR16);
+			CLKM(MOV_RR16,MOV_MR16);
 			break;
 
 		case 0x8a: // i_mov_r8b
 			m_modrm = fetch();
 			m_src = GetRMByte();
 			RegByte(m_src);
-			CLKM(ALU_RR8,ALU_RM8);
+			CLKM(MOV_RR8,MOV_RM8);
 			break;
 
 		case 0x8b: // i_mov_r16w
 			m_modrm = fetch();
 			m_src = GetRMWord();
 			RegWord(m_src);
-			CLKM(ALU_RR16,ALU_RM16);
+			CLKM(MOV_RR16,MOV_RM16);
 			break;
 
 		case 0x8c: // i_mov_wsreg
@@ -2285,7 +2295,8 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						uresult = m_regs.w[AX];
 						uresult2 = uresult % tmp;
-						if ((uresult /= tmp) > 0xff)
+						uresult /= tmp;
+						if (uresult > 0xff)
 						{
 							interrupt(0);
 						}
@@ -2306,7 +2317,9 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						result = (int16_t)m_regs.w[AX];
 						result2 = result % (int16_t)((int8_t)tmp);
-						if ((result /= (int16_t)((int8_t)tmp)) > 0xff)
+						result /= (int16_t)((int8_t)tmp);
+						int32_t lower_bound = m_MF ? -0x7f : -0x80;
+						if (result > 0x7f || result < lower_bound)
 						{
 							interrupt(0);
 						}
@@ -2377,7 +2390,8 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						uresult = (((uint32_t)m_regs.w[DX]) << 16) | m_regs.w[AX];
 						uresult2 = uresult % tmp;
-						if ((uresult /= tmp) > 0xffff)
+						uresult /= tmp;
+						if (uresult > 0xffff)
 						{
 							interrupt(0);
 						}
@@ -2398,7 +2412,9 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						result = ((uint32_t)m_regs.w[DX] << 16) + m_regs.w[AX];
 						result2 = result % (int32_t)((int16_t)tmp);
-						if ((result /= (int32_t)((int16_t)tmp)) > 0xffff)
+						result /= (int32_t)((int16_t)tmp);
+						int32_t lower_bound = m_MF ? -0x7fff : -0x8000;
+						if (result > 0x7fff || result < lower_bound)
 						{
 							interrupt(0);
 						}

@@ -49,10 +49,13 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	template <class BitmapClass> void zoom_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack);
+
 	// internal state
 	std::unique_ptr<uint16_t[]>    m_ctrl;
 	std::unique_ptr<uint16_t[]>    m_linectrl;
-	int       m_wrap, m_xoff, m_yoff;
+	int       m_xoff, m_yoff;
+	bool      m_wrap;
 };
 
 DECLARE_DEVICE_TYPE(K053936, k053936_device)

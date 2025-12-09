@@ -17,6 +17,7 @@ char const *const NODE_WINDOW_HISTORY = "history";
 char const *const NODE_HISTORY_ITEM = "item";
 
 char const *const ATTR_DEBUGGER_SAVE_WINDOWS = "savewindows";
+char const *const ATTR_DEBUGGER_GROUP_WINDOWS = "groupwindows";
 
 char const *const ATTR_WINDOW_TYPE = "type";
 char const *const ATTR_WINDOW_POSITION_X = "position_x";

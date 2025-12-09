@@ -12,8 +12,8 @@
 #include "tutankhm.h"
 #include "video/resnet.h"
 
-#define STAR_RNG_PERIOD         ((1 << 17) - 1)
-#define RGB_MAXIMUM             224
+static constexpr uint32_t STAR_RNG_PERIOD = (1 << 17) - 1;
+static constexpr unsigned RGB_MAXIMUM     = 224;
 
 /*************************************
  *
@@ -39,12 +39,12 @@ void tutankhm_state::flip_screen_y_w(int state)
  *
  *************************************/
 
-uint32_t tutankhm_state::screen_update_tutankhm_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tutankhm_state::screen_update_bootleg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	int xorx = m_flipscreen_x ? 255 : 0;
-	int xory = m_flipscreen_y ? 255 : 0;
+	int const xorx = m_flipscreen_x ? 255 : 0;
+	int const xory = m_flipscreen_y ? 255 : 0;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -52,27 +52,27 @@ uint32_t tutankhm_state::screen_update_tutankhm_bootleg(screen_device &screen, b
 
 		for (int x = cliprect.min_x / GALAXIAN_XSCALE; x <= cliprect.max_x / GALAXIAN_XSCALE; x++)
 		{
-			uint8_t effx = x ^ xorx;
-			uint8_t yscroll = (effx < 192 && m_scroll.found()) ? *m_scroll : 0;
-			uint8_t effy = (y ^ xory) + yscroll;
-			uint8_t vrambyte = m_videoram[effy * 128 + effx / 2];
-			uint8_t shifted = vrambyte >> (4 * (effx % 2));
+			uint8_t const effx = x ^ xorx;
+			uint8_t const yscroll = (effx < 192 && m_scroll.found()) ? *m_scroll : 0;
+			uint8_t const effy = (y ^ xory) + yscroll;
+			uint8_t const vrambyte = m_videoram[effy * 128 + effx / 2];
+			uint8_t const shifted = vrambyte >> (4 * (effx & 1));
 
-			uint8_t blink_state = m_stars_blink_state & 3;
-			uint8_t enab = 0;
+			uint8_t const blink_state = m_stars_blink_state & 3;
+			bool enab = false;
 			switch (blink_state)
 			{
-				case 0: enab = 1; break;
-				case 1: enab = (y & 1) == 1; break;
-				case 2: enab = (y & 2) == 2; break;
-				case 3: enab = (x & 8) == 0; break;
+				case 0: enab = true; break;
+				case 1: enab = BIT(y, 0); break;
+				case 2: enab = BIT(y, 1); break;
+				case 3: enab = BIT(~x, 3); break;
 			}
 			//enab &= (((y>>1) ^ (x >> 3)) & 1);
 
-			int offset = y * 384 + x + 84;
+			int const offset = y * 384 + x + 84;
 
-			uint8_t star = m_stars[offset % STAR_RNG_PERIOD ];
-			if (m_stars_enabled && enab && (shifted & 0x02) == 0 && (star & 0x80) != 0
+			uint8_t const star = m_stars[offset % STAR_RNG_PERIOD];
+			if (m_stars_enabled && enab && BIT(~shifted, 1) && BIT(star, 7)
 				&& x > 63)
 			{
 				bitmap.pix(y, GALAXIAN_XSCALE*x + 0) = m_star_color[star & 0x3f];
@@ -83,7 +83,7 @@ uint32_t tutankhm_state::screen_update_tutankhm_bootleg(screen_device &screen, b
 			else
 			{
 				auto color = m_palette->pen_color(shifted & 0x0f);
-				u32 *dbase = dst + x * GALAXIAN_XSCALE;
+				u32 *const dbase = dst + x * GALAXIAN_XSCALE;
 				if(shifted || dbase[0] == 0xff000000) dbase[0] = color;
 				if(shifted || dbase[1] == 0xff000000) dbase[1] = color;
 				if(shifted || dbase[2] == 0xff000000) dbase[2] = color;
@@ -94,12 +94,12 @@ uint32_t tutankhm_state::screen_update_tutankhm_bootleg(screen_device &screen, b
 	return 0;
 }
 
-uint32_t tutankhm_state::screen_update_tutankhm_scramble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tutankhm_state::screen_update_scramble(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	scramble_draw_background(bitmap, cliprect);
 
-	int xorx = m_flipscreen_x ? 255 : 0;
-	int xory = m_flipscreen_y ? 255 : 0;
+	int const xorx = m_flipscreen_x ? 255 : 0;
+	int const xory = m_flipscreen_y ? 255 : 0;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -107,13 +107,13 @@ uint32_t tutankhm_state::screen_update_tutankhm_scramble(screen_device &screen, 
 
 		for (int x = cliprect.min_x / GALAXIAN_XSCALE; x <= cliprect.max_x / GALAXIAN_XSCALE; x++)
 		{
-			uint8_t effx = x ^ xorx;
-			uint8_t yscroll = (effx < 192 && m_scroll.found()) ? *m_scroll : 0;
-			uint8_t effy = (y ^ xory) + yscroll;
-			uint8_t vrambyte = m_videoram[effy * 128 + effx / 2];
-			uint8_t shifted = vrambyte >> (4 * (effx % 2));
+			uint8_t const effx = x ^ xorx;
+			uint8_t const yscroll = (effx < 192 && m_scroll.found()) ? *m_scroll : 0;
+			uint8_t const effy = (y ^ xory) + yscroll;
+			uint8_t const vrambyte = m_videoram[effy * 128 + effx / 2];
+			uint8_t const shifted = vrambyte >> (4 * (effx & 1));
 			auto color = m_palette->pen_color(shifted & 0x0f);
-			u32 *dbase = dst + x * GALAXIAN_XSCALE;
+			u32 *const dbase = dst + x * GALAXIAN_XSCALE;
 			if(shifted || dbase[0] == 0xff000000) dbase[0] = color;
 			if(shifted || dbase[1] == 0xff000000) dbase[1] = color;
 			if(shifted || dbase[2] == 0xff000000) dbase[2] = color;
@@ -123,9 +123,9 @@ uint32_t tutankhm_state::screen_update_tutankhm_scramble(screen_device &screen, 
 	return 0;
 }
 
-uint32_t tutankhm_state::screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tutankhm_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u8 mode = m_stars_config.read_safe(m_star_mode);
+	u8 const mode = m_stars_config.read_safe(m_star_mode);
 	if (mode != m_star_mode)
 	{
 		m_star_mode = mode;
@@ -133,9 +133,9 @@ uint32_t tutankhm_state::screen_update_tutankhm(screen_device &screen, bitmap_rg
 	}
 
 	if (m_star_mode)
-		return screen_update_tutankhm_scramble(screen, bitmap, cliprect);
+		return screen_update_scramble(screen, bitmap, cliprect);
 	else
-		return screen_update_tutankhm_bootleg(screen, bitmap, cliprect);
+		return screen_update_bootleg(screen, bitmap, cliprect);
 }
 
 /*************************************
@@ -291,14 +291,14 @@ void tutankhm_state::stars_init_bootleg()
 	uint32_t shiftreg = 0;
 	for (int i = 0; i < STAR_RNG_PERIOD; i++)
 	{
-		int newbit = ((shiftreg >> 12) ^ ~shiftreg) & 1;
+		int const newbit = ((shiftreg >> 12) ^ ~shiftreg) & 1;
 
 		/* stars are enabled if the upper 8 bits are 1 and the new bit is 0 */
-		int enabled = ((shiftreg & 0x1fe00) == 0x1fe00) && (newbit == 0);
+		int const enabled = ((shiftreg & 0x1fe00) == 0x1fe00) && (newbit == 0);
 		//int enabled = ((shiftreg & 0x1fe01) == 0x1fe00); // <- scramble
 
 		/* color comes from the 6 bits below the top 8 bits */
-		int color = (~shiftreg & 0x1f8) >> 3;
+		int const color = (~shiftreg & 0x1f8) >> 3;
 
 		/* store the color value in the low 6 bits and the enable in the upper bit */
 		m_stars[i] = color | (enabled << 7);
@@ -315,12 +315,12 @@ void tutankhm_state::stars_init_scramble()
 	uint32_t shiftreg = 0;
 	for (int i = 0; i < STAR_RNG_PERIOD; i++)
 	{
-		const uint8_t shift = 12;
+		uint8_t const shift = 12;
 		/* stars are enabled if the upper 8 bits are 1 and the low bit is 0 */
-		int enabled = ((shiftreg & 0x1fe01) == 0x1fe00);
+		int const enabled = ((shiftreg & 0x1fe01) == 0x1fe00);
 
 		/* color comes from the 6 bits below the top 8 bits */
-		int color = (~shiftreg & 0x1f8) >> 3;
+		int const color = (~shiftreg & 0x1f8) >> 3;
 
 		/* store the color value in the low 6 bits and the enable in the upper bit */
 		m_stars[i] = color | (enabled << 7);
@@ -346,7 +346,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tutankhm_state::scramble_stars_blink_timer)
 
 void tutankhm_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs)
 {
-	uint8_t flipxor = (m_flipscreen_x ? 0xC0 : 0x00);
+	uint8_t const flipxor = (m_flipscreen_x ? 0xc0 : 0x00);
 
 	/* ensure our star offset is valid */
 	star_offs %= STAR_RNG_PERIOD;
@@ -354,22 +354,21 @@ void tutankhm_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 	/* iterate over the specified number of 6MHz pixels */
 	for (int x = 0; x < maxx; x++)
 	{
-		uint8_t h8q = ((x>>3) & 1) ^ 1; // H8 signal is inverted.
+		uint8_t const h8q = BIT(~x, 3); // H8 signal is inverted.
 		/* stars are suppressed unless V1 ^ H8 == 1 */
-		int enable_star = (y ^ h8q) & 1;
-		uint8_t star;
+		bool enable_star = BIT(y ^ h8q, 0);
 
-		uint8_t blink_state = m_stars_blink_state & 3;
-		uint8_t enab = 0;
+		uint8_t const blink_state = m_stars_blink_state & 3;
+		bool enab = false;
 		switch (blink_state)
 		{
-			case 0: enab = 1;            break;
-			case 1: enab = (y & 1) == 1; break;
-			case 2: enab = (y & 2) == 2; break;
-			case 3: enab = h8q;          break; // H8 signal is inverted.
+			case 0: enab = true;      break;
+			case 1: enab = BIT(y, 0); break;
+			case 2: enab = BIT(y, 1); break;
+			case 3: enab = h8q;       break; // H8 signal is inverted.
 		}
 
-		enable_star &= (enab && ((x & 0xC0) ^ flipxor) != 0xC0);
+		enable_star &= (enab && ((x & 0xc0) ^ flipxor) != 0xc0);
 
 		/*
 		    The RNG clock is the master clock (18MHz) ANDed with the pixel clock (6MHz).
@@ -388,18 +387,19 @@ void tutankhm_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 		    clock with two pixels.
 		*/
 
+		uint8_t star;
 		/* first RNG clock: one pixel */
 		star = m_stars[star_offs++];
 		if (star_offs >= STAR_RNG_PERIOD)
 			star_offs = 0;
-		if (enable_star && (star & 0x80) != 0)
+		if (enable_star && BIT(star, 7))
 			bitmap.pix(y, GALAXIAN_XSCALE*x + 0) = m_star_color[star & 0x3f];
 
 		/* second RNG clock: two pixels */
 		star = m_stars[star_offs++];
 		if (star_offs >= STAR_RNG_PERIOD)
 			star_offs = 0;
-		if (enable_star && (star & 0x80) != 0)
+		if (enable_star && BIT(star, 7))
 		{
 			bitmap.pix(y, GALAXIAN_XSCALE*x + 1) = m_star_color[star & 0x3f];
 			bitmap.pix(y, GALAXIAN_XSCALE*x + 2) = m_star_color[star & 0x3f];
@@ -432,13 +432,13 @@ void tutankhm_state::scramble_draw_background(bitmap_rgb32 &bitmap, const rectan
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
 
-void tutankhm_state::galaxian_stars_enable_w(uint8_t data)
+void tutankhm_state::stars_enable_w(uint8_t data)
 {
-	if ((m_stars_enabled ^ data) & 0x01)
+	if (BIT(m_stars_enabled ^ data, 0))
 	{
 //      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 
-	m_stars_enabled = data & 0x01;
+	m_stars_enabled = BIT(data, 0);
 }

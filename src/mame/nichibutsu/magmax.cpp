@@ -35,7 +35,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/flt_biquad.h"
-#include "sound/mixer.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -68,7 +67,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_ay(*this, "ay%u", 0U)
-		, m_aymixer(*this, "aymixer%u", 0U)
 		, m_ayfilter(*this, "ayfilter%u", 0U)
 		, m_soundlatch(*this, "soundlatch")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -92,7 +90,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<ay8910_device, 3> m_ay;
-	required_device_array<mixer_device, 3> m_aymixer;
 	required_device_array<filter_biquad_device, 4> m_ayfilter;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -620,26 +617,22 @@ void magmax_state::magmax(machine_config &config)
 	FILTER_BIQUAD(config, m_ayfilter[3]).opamp_mfb_lowpass_setup(RES_K(33), 0.0, RES_K(150), 0.0, CAP_P(330));
 	m_ayfilter[3]->add_route(ALL_OUTPUTS, "speaker", 1.0); // <- gain here is controlled by m_ay[0] IOA3 and resistor R34
 
-	MIXER(config, m_aymixer[0]).add_route(0, m_ayfilter[1], 1.0);
-	MIXER(config, m_aymixer[1]).add_route(0, m_ayfilter[2], 1.0);
-	MIXER(config, m_aymixer[2]).add_route(0, m_ayfilter[3], 1.0);
-
 	AY8910(config, m_ay[0], XTAL(20'000'000) / 16); // @20G verified on PCB and schematics
 	m_ay[0]->port_a_write_callback().set(FUNC(magmax_state::ay8910_porta_0_w));
 	m_ay[0]->port_b_write_callback().set(FUNC(magmax_state::ay8910_portb_0_w));
 	m_ay[0]->add_route(0, m_ayfilter[0], 1.0);
-	m_ay[0]->add_route(1, m_aymixer[0], 1.0);
-	m_ay[0]->add_route(2, m_aymixer[0], 1.0);
+	m_ay[0]->add_route(1, m_ayfilter[1], 1.0);
+	m_ay[0]->add_route(2, m_ayfilter[1], 1.0);
 
 	AY8910(config, m_ay[1], XTAL(20'000'000) / 16); // @18G verified on PCB and schematics
-	m_ay[1]->add_route(0, m_aymixer[0], 1.0);
-	m_ay[1]->add_route(1, m_aymixer[0], 1.0);
-	m_ay[1]->add_route(2, m_aymixer[1], 1.0);
+	m_ay[1]->add_route(0, m_ayfilter[1], 1.0);
+	m_ay[1]->add_route(1, m_ayfilter[1], 1.0);
+	m_ay[1]->add_route(2, m_ayfilter[2], 1.0);
 
 	AY8910(config, m_ay[2], XTAL(20'000'000) / 16); // @16G verified on PCB and schematics
-	m_ay[2]->add_route(0, m_aymixer[1], 1.0);
-	m_ay[2]->add_route(1, m_aymixer[2], 1.0);
-	m_ay[2]->add_route(2, m_aymixer[2], 1.0);
+	m_ay[2]->add_route(0, m_ayfilter[2], 1.0);
+	m_ay[2]->add_route(1, m_ayfilter[3], 1.0);
+	m_ay[2]->add_route(2, m_ayfilter[3], 1.0);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
