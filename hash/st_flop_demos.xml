@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="st_flop_demos" description="Atari ST demo disk images">
+
+	<!-- https://www.pouet.net/prod.php?which=102708 -->
+	<software name="amjfaith">
+		<description>George Michael - Faith</description>
+		<year>1987</year>
+		<publisher>AMJ</publisher>
+		<info name="release" value="19871217" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="791357">
+				<rom name="faith.msa" size="791357" crc="22541b09" sha1="686c3f9fe4044a5f3bc520856125db82f782a894" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.pouet.net/prod.php?which=102706 -->
+	<software name="amjfmj">
+		<description>Full Metal Jacket</description>
+		<year>1988</year>
+		<publisher>AMJ</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="708115">
+				<rom name="fullmetl.msa" size="708115" crc="89afcf47" sha1="cdd852970c05fda85c36c106f06be049e62306d3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.pouet.net/prod.php?which=102707 -->
+	<software name="amjholiday">
+		<description>Madonna - Holiday</description>
+		<year>1987</year>
+		<publisher>AMJ</publisher>
+		<info name="release" value="19871217" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="691393">
+				<rom name="holiday.msa" size="691393" crc="741419db" sha1="71c807baba4c1284ac792db6f5212aff6c735797" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.pouet.net/prod.php?which=102705 -->
+	<software name="amjinxs">
+		<description>INXS - Need You Tonight</description>
+		<year>1988</year>
+		<publisher>AMJ</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="751458">
+				<rom name="inxs.msa" size="751458" crc="e7561874" sha1="d53d83c481cee2005338473d19959f58e593a074" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.pouet.net/prod.php?which=102704 -->
+	<software name="amjmiami">
+		<description>Theme From Miami Vice</description>
+		<year>1988</year>
+		<publisher>AMJ</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="840018">
+				<rom name="miami.msa" size="840018" crc="c3d5b403" sha1="7e7eed1e38690c1981f091ec1ae61275b1137a08" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.pouet.net/prod.php?which=102709 -->
+	<software name="amjmjway">
+		<description>Michael Jackson - The Way You Make Me Feel</description>
+		<year>1987</year>
+		<publisher>AMJ</publisher>
+		<info name="release" value="19871128" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="667586">
+				<rom name="mj_way.msa" size="667586" crc="e7a2e84a" sha1="c2a11a07f5105dcab8dc0ab55003ad617d9a1252" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.pouet.net/prod.php?which=102710 -->
+	<software name="amjnggyu">
+		<description>Rick Astley - Never Gonna Give You Up</description>
+		<year>1987</year>
+		<publisher>AMJ</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="816309">
+				<rom name="amjnggyu.msa" size="816309" crc="5b15a9c2" sha1="71c53610c4bce566d5e1f1b2abab75bbe5316c72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.pouet.net/prod.php?which=102703 -->
+	<software name="amjyazz">
+		<description>Yazz - The Only Way Is Up</description>
+		<year>1987</year>
+		<publisher>AMJ</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="645311">
+				<rom name="yazz.msa" size="645311" crc="4a374229" sha1="f6fbdc431992696b48b1003f40c2e5da902226bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
