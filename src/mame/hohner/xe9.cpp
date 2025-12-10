@@ -10,7 +10,8 @@
 #define LOG_SERIAL (1U << 1)
 #define LOG_KEYS   (1U << 2)
 #define LOG_COMM   (1U << 3)
-#define VERBOSE (LOG_SERIAL | LOG_KEYS | LOG_COMM)
+#define LOG_SOUND  (1U << 4)
+#define VERBOSE (LOG_SERIAL | LOG_KEYS | LOG_COMM | LOG_SOUND)
 #include "logmacro.h"
 
 namespace {
@@ -53,6 +54,16 @@ private:
     u8 soundcpu_l_port1_r();
     u8 soundcpu_r_port1_r();
     void update_handshake();
+
+    // Sound chip interface (0x8000-0x8007 on sound CPUs)
+    u8 soundchip_l_r(offs_t offset);
+    void soundchip_l_w(offs_t offset, u8 data);
+    u8 soundchip_r_r(offs_t offset);
+    void soundchip_r_w(offs_t offset, u8 data);
+
+    // Sound CPU port handlers (P2 used for external memory addressing)
+    void soundcpu_l_port2_w(u8 data) { }  // Address high byte during MOVX
+    void soundcpu_r_port2_w(u8 data) { }  // Address high byte during MOVX
 
     required_device<i80c32_device> m_maincpu;
     required_device<i80c32_device> m_soundcpu_l;
@@ -160,6 +171,7 @@ void xe9_state::soundcpu_l_program_map(address_map &map)
 void xe9_state::soundcpu_l_data_map(address_map &map)
 {
     map(0x0000, 0x1fff).ram();  // 8KB RAM
+    map(0x8000, 0x8007).rw(FUNC(xe9_state::soundchip_l_r), FUNC(xe9_state::soundchip_l_w));
 }
 
 void xe9_state::soundcpu_r_program_map(address_map &map)
@@ -169,7 +181,30 @@ void xe9_state::soundcpu_r_program_map(address_map &map)
 
 void xe9_state::soundcpu_r_data_map(address_map &map)
 {
-    map(0x000, 0x1fff).ram();  // 8KB RAM
+    map(0x0000, 0x1fff).ram();  // 8KB RAM
+    map(0x8000, 0x8007).rw(FUNC(xe9_state::soundchip_r_r), FUNC(xe9_state::soundchip_r_w));
+}
+
+u8 xe9_state::soundchip_l_r(offs_t offset)
+{
+    LOGMASKED(LOG_SOUND, "Sound chip L read: [0x%04X]\n", 0x8000 + offset);
+    return 0xff;
+}
+
+void xe9_state::soundchip_l_w(offs_t offset, u8 data)
+{
+    LOGMASKED(LOG_SOUND, "Sound chip L write: [0x%04X] = 0x%02X\n", 0x8000 + offset, data);
+}
+
+u8 xe9_state::soundchip_r_r(offs_t offset)
+{
+    LOGMASKED(LOG_SOUND, "Sound chip R read: [0x%04X]\n", 0x8000 + offset);
+    return 0xff;
+}
+
+void xe9_state::soundchip_r_w(offs_t offset, u8 data)
+{
+    LOGMASKED(LOG_SOUND, "Sound chip R write: [0x%04X] = 0x%02X\n", 0x8000 + offset, data);
 }
 
 void xe9_state::palette_init(palette_device &palette)
@@ -204,7 +239,7 @@ u8 xe9_state::port2_r()
 
 u8 xe9_state::port3_r()
 {
-    if (m_port3 != 0xff) LOGMASKED(LOG_SERIAL, "P3 read: 0x%02X\n", m_port3);
+    // if (m_port3 != 0xff) LOGMASKED(LOG_SERIAL, "P3 read: 0x%02X\n", m_port3);
     return m_port3;
 }
 
@@ -231,8 +266,8 @@ void xe9_state::port2_w(u8 data)
 
 void xe9_state::port3_w(u8 data)
 {
-    if (m_port3 != data)
-        LOGMASKED(LOG_SERIAL, "P3 write: 0x%02X\n", data);
+    // if (m_port3 != data)
+    //     LOGMASKED(LOG_SERIAL, "P3 write: 0x%02X\n", data);
     m_port3 = data;
     update_handshake();
 }
