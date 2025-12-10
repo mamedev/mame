@@ -79,10 +79,10 @@ void jammin_state::pal_init(palette_device &palette) const
 	uint8_t const *const colours = m_proms;
 	for (int i = 0; i < 0x200; i++)
 	{
-		uint16_t const data = (colours[i + 0x200] + (colours[i] << 4));
-		int r = (data >> 0) & 7;
+		uint16_t const data = (colours[i] + (colours[i + 0x200] << 4)) ^ 0xff;
+		int g = (data >> 0) & 7;
 		int b = (data >> 3) & 3;
-		int g = (data >> 5) & 7;
+		int r = (data >> 5) & 7;
 
 		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal2bit(b));
 	}
@@ -266,7 +266,7 @@ static const gfx_layout tile_layout =
 	8,8,
 	RGN_FRAC(1,2),
 	2,
-	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
+	{ RGN_FRAC(1,2), RGN_FRAC(0,2) },
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
 	8*8
