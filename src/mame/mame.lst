@@ -2157,9 +2157,6 @@ maxf_ng
 maxforce
 vcircle
 
-@source:atari/jammin.cpp
-jammin
-
 @source:atari/jedi.cpp
 jedi
 
@@ -35653,6 +35650,9 @@ mduckspa
 @source:nintendo/gba.cpp
 gba
 robotech
+
+@source:nintendo/jammin.cpp
+jammin
 
 @source:nintendo/mario.cpp
 mario

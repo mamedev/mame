@@ -3,6 +3,8 @@
 
 // Thanks to SynaMax & Dutchman2000
 
+// The hardware design is cloned from Donkey Kong
+
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
