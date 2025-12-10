@@ -766,7 +766,6 @@ esqpanel2x40_vfx_device::esqpanel2x40_vfx_device(const machine_config &mconfig, 
 	m_panel_type(panel_type),
 	m_vfd(*this, "vfd"),
 	m_lights(*this, "lights"),
-	m_media(*this, "media"),
 	m_buttons_0(*this, "buttons_0"),
 	m_buttons_32(*this, "buttons_32"),
 	m_analog_data_entry(*this, "analog_data_entry"),
@@ -786,11 +785,6 @@ bool esqpanel2x40_vfx_device::write_contents(std::ostream &o)
 		o.put((char)(m_light_states[i] << 6) | i);
 	}
 	return true;
-}
-
-void esqpanel2x40_vfx_device::update_media()
-{
-	m_media = (m_floppy_loaded << 1) | (m_cartridge_loaded);
 }
 
 void esqpanel2x40_vfx_device::update_lights()
@@ -823,7 +817,6 @@ void esqpanel2x40_vfx_device::device_start()
 {
 	esqpanel_device::device_start();
 
-	m_media.resolve();
 	m_lights.resolve();
 
 	m_blink_timer = timer_alloc(FUNC(esqpanel2x40_vfx_device::update_blink), this);
@@ -965,18 +958,6 @@ INPUT_CHANGED_MEMBER(esqpanel2x40_vfx_device::key_change)
 			key_pressure(key, pressure);
 		}
 	}
-}
-
-void esqpanel2x40_vfx_device::set_cartridge_loaded(bool loaded)
-{
-	m_cartridge_loaded = loaded;
-	update_media();
-}
-
-void esqpanel2x40_vfx_device::set_floppy_loaded(bool loaded)
-{
-	m_floppy_loaded = loaded;
-	update_media();
 }
 
 void esqpanel2x40_vfx_device::set_floppy_active(bool floppy_active)

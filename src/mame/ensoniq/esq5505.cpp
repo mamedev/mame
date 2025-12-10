@@ -336,9 +336,6 @@ void esq5505_state::cartridge_loaded(bool loaded)
 	// On VFX and later, DUART input bit 1 is 0 for cartridge present.
 	LOG("ip1 -> %d\n", state);
 	m_duart->ip1_w(state);
-
-	// Also upadte the panel.
-	m_panel->set_cartridge_loaded(loaded);
 }
 
 void esq5505_state::cartridge_load(ensoniq_vfx_cartridge *cart)
@@ -407,9 +404,6 @@ void esq5505_state::floppy_loaded(bool loaded)
 
 		LOG("Floppy %s\n", loaded ? "Inserted" : "Ejected");
 		update_floppy_inputs();
-
-		// Also update the panel.
-		m_panel->set_floppy_loaded(loaded);
 	}
 	else
 	{
