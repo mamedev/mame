@@ -13,3 +13,6 @@
 @source:hohner/ustudio.cpp
 ustudio_proto                   // 12/1986 (c) 1986
 ustudio                         // 12/1986 (c) 1986
+
+@source:hohner/xe9.cpp
+xe9                             // 1990

@@ -16,12 +16,13 @@
 CPUS["M6809"] = true
 -- CPUS["M680X0"] = true
 -- CPUS["MCS48"] = true
--- CPUS["MCS51"] = true
+CPUS["MCS51"] = true
 -- CPUS["TMS9900"] = true
 -- CPUS["Z80"] = true
 CPUS["I8085"] = true
 CPUS["I86"] = true
 
+VIDEOS["HD44780"] = true
 VIDEOS["HD61830"] = true
 
 SOUNDS["DAC"] = true
@@ -50,7 +51,9 @@ MACHINES["ACIA6850"] = true
 BUSES["MIDI"] = true
 
 -- Set all the device flag setting commands from the block headers
+-- NOTE: This was enabling ALL devices! Commented out for minimal build.
 
+--[[
 local function selectors_get(path)
 	local selector = ""
 	for l in io.lines(path) do
@@ -71,6 +74,7 @@ local selectors =
 		selectors_get(MAME_DIR .. "scripts/src/formats.lua")
 
 load(selectors)()
+--]]
 
 
 function createProjects_mame_muse(_target, _subtarget)
@@ -97,6 +101,7 @@ files {
 	-- MAME_DIR .. "src/mame/hohner/d86.cpp",
 	-- MAME_DIR .. "src/mame/hohner/gp98.cpp",
 	MAME_DIR .. "src/mame/hohner/ustudio.cpp",
+	MAME_DIR .. "src/mame/hohner/xe9.cpp",
 	-- MAME_DIR .. "src/mame/hohner/wersidx.cpp",
     -- MAME_DIR .. "src/mame/hohner/boehm1224.cpp",
     -- MAME_DIR .. "src/mame/hohner/boehm_sinus.cpp",
