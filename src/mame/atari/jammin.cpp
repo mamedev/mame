@@ -41,9 +41,22 @@ private:
 	required_shared_ptr<uint8_t> m_bgram;
 
 	tilemap_t *m_bg_tilemap = nullptr;
+	uint8_t m_dma_param0;
+	uint16_t m_dma_param1;
+	uint16_t m_dma_param2;
+	uint16_t m_dma_param3;
+	uint16_t m_dma_param4;
+	uint8_t m_dma_go;
 
 	void bgram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	void dma_param0_w(uint8_t data);
+	void dma_param1_w(uint8_t data);
+	void dma_param2_w(uint8_t data);
+	void dma_param3_w(uint8_t data);
+	void dma_param4_w(uint8_t data);
+	void dma_go_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
@@ -76,6 +89,31 @@ uint32_t jammin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
+void jammin_state::dma_param0_w(uint8_t data) { m_dma_param0 = data; }
+void jammin_state::dma_param1_w(uint8_t data) { m_dma_param1 = (m_dma_param1 >> 8) | (data << 8); }
+void jammin_state::dma_param2_w(uint8_t data) { m_dma_param2 = (m_dma_param2 >> 8) | (data << 8); }
+void jammin_state::dma_param3_w(uint8_t data) { m_dma_param3 = (m_dma_param3 >> 8) | (data << 8); }
+void jammin_state::dma_param4_w(uint8_t data) { m_dma_param4 = (m_dma_param4 >> 8) | (data << 8); }
+
+void jammin_state::dma_go_w(uint8_t data)
+{
+	if (m_dma_go != data)
+	{
+		if (data)
+		{
+			logerror("do DMA with params %02x %04x %04x %04x %04x\n", m_dma_param0, m_dma_param1, m_dma_param2, m_dma_param3, m_dma_param4 );
+			// always triggered with 53 6900 41fc 7000 81fc
+			// (a copy from 6900 to 7000?)
+			for (int i = 0; i < 0x400; i++)
+			{
+				uint8_t dat = m_maincpu->space(AS_PROGRAM).read_byte(m_dma_param1 + i);
+				m_maincpu->space(AS_PROGRAM).write_byte(m_dma_param3 + i, dat);
+			}
+		}
+	}
+	m_dma_go = data;
+}
+
 void jammin_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
@@ -89,12 +127,12 @@ void jammin_state::prg_map(address_map &map)
 	map(0x7000, 0x73ff).ram(); // sprites?
 	map(0x7400, 0x77ff).ram().w(FUNC(jammin_state::bgram_w)).share(m_bgram);
 
-	map(0x7800, 0x7800).nopw(); // DMACTL
-	map(0x7801, 0x7801).nopw();
-	map(0x7802, 0x7802).nopw();
-	map(0x7803, 0x7803).nopw();
+	map(0x7800, 0x7800).w(FUNC(jammin_state::dma_param1_w)); // DMACTL
+	map(0x7801, 0x7801).w(FUNC(jammin_state::dma_param2_w));
+	map(0x7802, 0x7802).w(FUNC(jammin_state::dma_param3_w));
+	map(0x7803, 0x7803).w(FUNC(jammin_state::dma_param4_w));
 
-	map(0x7808, 0x7808).nopw();
+	map(0x7808, 0x7808).w(FUNC(jammin_state::dma_param0_w));
 
 	map(0x7c00, 0x7c00).portr("IN0"); // player inputs
 	map(0x7c80, 0x7c80).portr("IN1"); // player inputs
@@ -104,7 +142,7 @@ void jammin_state::prg_map(address_map &map)
 	map(0x7d82, 0x7d82).nopw(); // VFLIP
 	map(0x7d83, 0x7d83).nopw(); // MOCNTL
 	map(0x7d84, 0x7d84).nopw(); // NMILAT
-	map(0x7d85, 0x7d85).nopw(); // DMAGO
+	map(0x7d85, 0x7d85).nopw().w(FUNC(jammin_state::dma_go_w));
 	map(0x7d86, 0x7d86).nopw(); // PAL1
 	map(0x7d87, 0x7d87).nopw(); // PAL2
 
@@ -196,10 +234,22 @@ GFXDECODE_END
 
 void jammin_state::machine_start()
 {
+	save_item(NAME(m_dma_param0));
+	save_item(NAME(m_dma_param1));
+	save_item(NAME(m_dma_param2));
+	save_item(NAME(m_dma_param3));
+	save_item(NAME(m_dma_param4));
+	save_item(NAME(m_dma_go));
 }
 
 void jammin_state::machine_reset()
 {
+	m_dma_param0 = 0;
+	m_dma_param1 = 0;
+	m_dma_param2 = 0;
+	m_dma_param3 = 0;
+	m_dma_param4 = 0;
+	m_dma_go = 0;
 }
 
 void jammin_state::jammin(machine_config &config)
@@ -233,7 +283,7 @@ void jammin_state::jammin(machine_config &config)
 
 ROM_START( jammin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	// rebuilt from sources, the bytes for a table at 9B6c-9b87 were missing and may need to be reconstructed
+	// rebuilt from sources, the bytes for a table at 9b6c-9b87 were missing and may need to be reconstructed
 	ROM_LOAD( "jammin.bin", 0x00000, 0xb853, CRC(449ce727) SHA1(83a96284072cd5fc3aae5ad327fc95ad90346954) )
 
 	ROM_REGION( 0x1000, "tiles", 0 ) // backgrounds?
