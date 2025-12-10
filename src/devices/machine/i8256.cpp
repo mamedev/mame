@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "i8256.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
