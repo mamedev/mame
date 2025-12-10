@@ -282,6 +282,10 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 			m_timers[i]--;
 			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) // If the interrupt is enabled
 			{
+				// For Timer2, only trigger if BITI=0
+				if (i == I8256_INT_TIMER2 && BIT(m_command1, I8256_CMD1_BITI))
+					continue;
+
 				m_current_interrupt_level = timer_interrupt[i];
 				m_out_int_cb(ASSERT_LINE); // it occurs when the counter changes from 1 to 0.
 
@@ -453,6 +457,14 @@ uint8_t i8256_device::p1_r()
 
 void i8256_device::p1_w(uint8_t data)
 {
+	// Check for P17 interrupt if BITI=1
+	if (BIT(m_command1, I8256_CMD1_BITI) && !BIT(m_port1_int, 7) && BIT(data, 7) && BIT(m_interrupts, I8256_INT_TIMER2))
+	{
+		m_current_interrupt_level = I8256_INT_TIMER2;
+		m_out_int_cb(ASSERT_LINE);
+		m_interrupts &= ~(1 << I8256_INT_TIMER2);
+	}
+
 	m_port1_int = (m_port1_int & ~m_port1_control) | (data & m_port1_control);
 	m_out_p1_cb(0, m_port1_int & m_port1_control);
 }
