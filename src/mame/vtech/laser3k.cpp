@@ -81,6 +81,10 @@ enum
 
 class laser3k_state : public driver_device
 {
+	// actual timing is determined by ASIC; these timings are typical of Apple II printer cards
+	static constexpr attotime PRSTROBE_DELAY = attotime::from_nsec(500);
+	static constexpr attotime PRSTROBE_WIDTH = attotime::from_usec(1);
+
 public:
 	laser3k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -121,6 +125,7 @@ private:
 	void prdata_w(uint8_t data);
 	void prack_w(int state);
 	void prbusy_w(int state);
+	TIMER_CALLBACK_MEMBER(printer_strobe);
 
 	uint8_t printer_rom_r(offs_t offset);
 	void printer_rombank_w(offs_t offset, uint8_t data);
@@ -181,6 +186,8 @@ private:
 	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 	bool m_prack;
 	bool m_prbusy;
+	bool m_prstrobe;
+	emu_timer *m_prstrobe_timer;
 };
 
 /***************************************************************************
@@ -278,6 +285,8 @@ void laser3k_state::machine_start()
 
 	m_prack = false;
 	m_prbusy = false;
+
+	m_prstrobe_timer = timer_alloc(FUNC(laser3k_state::printer_strobe), this);
 }
 
 void laser3k_state::machine_reset()
@@ -302,6 +311,7 @@ void laser3k_state::machine_reset()
 	m_mix = false;
 	m_gfxmode = TEXT;
 
+	m_prstrobe = false;
 	m_printer->write_strobe(1);
 }
 
@@ -611,10 +621,7 @@ uint8_t laser3k_state::io2_r(offs_t offset)
 void laser3k_state::prdata_w(uint8_t data)
 {
 	m_platch->write(data);
-
-	// timing (determined by ASIC) is probably wrong for this
-	m_printer->write_strobe(0);
-	m_printer->write_strobe(1);
+	m_prstrobe_timer->adjust(PRSTROBE_DELAY);
 }
 
 void laser3k_state::prack_w(int state)
@@ -625,6 +632,14 @@ void laser3k_state::prack_w(int state)
 void laser3k_state::prbusy_w(int state)
 {
 	m_prbusy = state;
+}
+
+TIMER_CALLBACK_MEMBER(laser3k_state::printer_strobe)
+{
+	m_printer->write_strobe(m_prstrobe);
+	m_prstrobe = !m_prstrobe;
+	if (m_prstrobe)
+		m_prstrobe_timer->adjust(PRSTROBE_WIDTH);
 }
 
 uint8_t laser3k_state::printer_rom_r(offs_t offset)
