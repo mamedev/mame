@@ -30,7 +30,7 @@ public:
 		, m_vr0soc(*this, "vr0soc")
 	{}
 
-	void v0bowl(machine_config &config);
+	void v0bowl(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -138,7 +138,7 @@ void v0bowl_state::v0bowl(machine_config &config)
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 6);
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
-	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, se3208_device::SE3208_INT);
 
 	SPEAKER(config, "speaker", 2).front();
 	m_vr0soc->add_route(0, "speaker", 1.0, 0);

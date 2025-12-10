@@ -8,6 +8,7 @@
     original mods on this driver by Luca Elia
 
     TODO:
+	- Move flash memory implementation into machine/intelfsh.cpp
     - touch panel, according to service mode can be generic, atouch or 3M
       (microtouch?). It interfaces thru UART0 port;
     - RTC (unknown type);
@@ -47,7 +48,7 @@ public:
 	{ }
 
 
-	void trivrus(machine_config &config);
+	void trivrus(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -55,8 +56,8 @@ protected:
 
 private:
 	// memory pointers
-	required_shared_ptr<uint32_t> m_workram;
-	required_region_ptr<uint32_t> m_flash;
+	required_shared_ptr<u32> m_workram;
+	required_region_ptr<u32> m_flash;
 
 	// devices
 	required_device<se3208_device> m_maincpu;
@@ -68,54 +69,55 @@ private:
 	required_ioport_array<5> m_inputs;
 	required_ioport m_dsw;
 
-	uint32_t m_flashcmd;
-	uint32_t m_bank;
-	uint32_t m_maxbank;
+	u32 m_flashcmd = 0;
+	u32 m_bank = 0;
+	u32 m_maxbank = 0;
 
-	uint32_t flashcmd_r();
-	void flashcmd_w(uint32_t data);
-	void banksw_w(uint32_t data);
+	u32 m_pio = 0;
+	u8 m_input_sel = 0;
 
-	void trivrus_mem(address_map &map) ATTR_COLD;
+	u32 flashcmd_r();
+	void flashcmd_w(u32 data);
+	void banksw_w(u32 data);
+
+	void main_map(address_map &map) ATTR_COLD;
 
 	// pio
-	uint32_t pioldat_r();
-	uint32_t m_pio;
-	void pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t pioedat_r();
+	u32 pioldat_r();
+	void pioldat_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pioedat_r();
 
-	uint8_t trivrus_input_r();
-	void trivrus_input_w(uint8_t data);
-	uint8_t m_trivrus_input;
+	u8 input_sel_r();
+	void input_sel_w(u8 data);
 };
 
 
-void trivrus_state::flashcmd_w(uint32_t data)
+void trivrus_state::flashcmd_w(u32 data)
 {
 	m_flashcmd = data;
 }
 
-uint32_t trivrus_state::pioedat_r()
+u32 trivrus_state::pioedat_r()
 {
 	return 0;
 }
 
-uint32_t trivrus_state::pioldat_r()
+u32 trivrus_state::pioldat_r()
 {
 	// ...
 	return m_pio;
 }
 
 // pio Latched output DATa Register
-void trivrus_state::pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void trivrus_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// ...
 	COMBINE_DATA(&m_pio);
 }
 
-uint8_t trivrus_state::trivrus_input_r()
+u8 trivrus_state::input_sel_r()
 {
-	switch (m_trivrus_input)
+	switch (m_input_sel)
 	{
 		case 1: return m_inputs[0]->read();
 		case 2: return m_inputs[1]->read();
@@ -124,22 +126,23 @@ uint8_t trivrus_state::trivrus_input_r()
 		case 5: return m_inputs[4]->read();
 		case 6: return m_dsw->read();
 	}
-	logerror("%s: unknown input %02x read\n", machine().describe_context(), m_trivrus_input);
+	if (!machine().side_effects_disabled())
+		logerror("%s: unknown input %02x read\n", machine().describe_context(), m_input_sel);
 	return 0xff;
 }
 
-void trivrus_state::trivrus_input_w(uint8_t data)
+void trivrus_state::input_sel_w(u8 data)
 {
-	m_trivrus_input = data;
+	m_input_sel = data;
 }
 
-uint32_t trivrus_state::flashcmd_r()
+u32 trivrus_state::flashcmd_r()
 {
 	if ((m_flashcmd & 0xff) == 0xff)
 	{
 		if (m_bank < m_maxbank)
 		{
-			uint32_t *ptr = (uint32_t*)(m_mainbank->base());
+			u32 *ptr = (u32*)(m_mainbank->base());
 			return ptr[0];
 		}
 		else
@@ -156,19 +159,19 @@ uint32_t trivrus_state::flashcmd_r()
 }
 
 
-void trivrus_state::banksw_w(uint32_t data)
+void trivrus_state::banksw_w(u32 data)
 {
 	m_bank = (data >> 1) & 7;
 	m_mainbank->set_entry(m_bank);
 }
 
-void trivrus_state::trivrus_mem(address_map &map)
+void trivrus_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().nopw();
 
 	map(0x01280000, 0x01280003).w(FUNC(trivrus_state::banksw_w));
 
-	map(0x01500000, 0x01500000).rw(FUNC(trivrus_state::trivrus_input_r), FUNC(trivrus_state::trivrus_input_w));
+	map(0x01500000, 0x01500000).rw(FUNC(trivrus_state::input_sel_r), FUNC(trivrus_state::input_sel_w));
 	// reads occurs by SELECTING the given register on successive ODD addresses then reading at 0x01500011
 	// bit 0 of 1500010 looks some kind of busy flag (game tight loops if on)
 	// on write:
@@ -197,9 +200,9 @@ void trivrus_state::trivrus_mem(address_map &map)
 void trivrus_state::machine_start()
 {
 	m_maxbank = (m_flash) ? m_flash.bytes() / 0x1000000 : 0;
-	std::unique_ptr<uint8_t[]> dummy_region = std::make_unique<uint8_t[]>(0x1000000);
+	std::unique_ptr<u8[]> dummy_region = std::make_unique<u8[]>(0x1000000);
 	std::fill_n(&dummy_region[0], 0x1000000, 0xff); // 0xff Filled at Unmapped area
-	uint8_t *rom = (m_flash) ? (uint8_t *)&m_flash[0] : dummy_region.get();
+	u8 *rom = (m_flash) ? (u8 *)&m_flash[0] : dummy_region.get();
 	for (int i = 0; i < 8; i++)
 	{
 		if (i < m_maxbank)
@@ -211,7 +214,7 @@ void trivrus_state::machine_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_flashcmd));
 	save_item(NAME(m_pio));
-	save_item(NAME(m_trivrus_input));
+	save_item(NAME(m_input_sel));
 }
 
 void trivrus_state::machine_reset()
@@ -295,14 +298,14 @@ INPUT_PORTS_END
 void trivrus_state::trivrus(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // unknown clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &trivrus_state::trivrus_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &trivrus_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 6); // unknown clock
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
-	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, se3208_device::SE3208_INT);
 	m_vr0soc->set_external_vclk(28636360);
 	m_vr0soc->tx_callback<0>().set(m_microtouch, FUNC(microtouch_device::rx));
 
