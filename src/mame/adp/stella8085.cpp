@@ -130,7 +130,7 @@ void stella8085_state::machine_start()
 void stella8085_state::program_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom(); // ICE6, ICD6, ICC5
-	map(0x9000, 0x900d).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+	map(0x9000, 0x903f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0xa000, 0xafff).ram(); // ??
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
@@ -147,7 +147,7 @@ void stella8085_state::small_program_map(address_map &map)
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
 	map(0x6000, 0x6fff).ram();
-	//map(0x6000, 0x633f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
+	//map(0x6000, 0x603f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0x7000, 0x7fff).rom();
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xffff).ram();
