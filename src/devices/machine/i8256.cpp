@@ -411,7 +411,7 @@ void i8256_device::write(offs_t offset, u8 data)
 			m_interrupts = m_interrupts & ~data;
 			break;
 		case I8256_REG_BUFFER:
-			LOG("I8256 write serial: %u\n", data);
+			LOG("I8256 write serial: %u %c\n", data, data);
 			m_tx_buffer = data;
 			break;
 		case I8256_REG_PORT1:
