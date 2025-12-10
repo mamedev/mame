@@ -779,10 +779,6 @@ void sb16_lle_device::device_start()
 
 	set_isa_device();
 
-	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
-	m_isa->install_device(0x0220, 0x023f, *this, &sb16_lle_device::host_io);
-	m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_w)));
-	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*m_opl3, FUNC(ymf262_device::read)), write8sm_delegate(*m_opl3, FUNC(ymf262_device::write)));
 	m_isa->set_dma_channel(1, this, false);
 	m_isa->set_dma_channel(5, this, false);
 	m_timer = timer_alloc(FUNC(sb16_lle_device::timer_tick), this);
@@ -811,7 +807,20 @@ void sb16_lle_device::device_reset()
 	m_irqs->in_w<1>(0);
 	m_irqs->in_w<2>(0);
 	m_dma8_done = m_dma16_done = false;
+	remap(AS_IO, 0, 0xffff);
 }
+
+void sb16_lle_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+		m_isa->install_device(0x0220, 0x023f, *this, &sb16_lle_device::host_io);
+		m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_w)));
+		m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*m_opl3, FUNC(ymf262_device::read)), write8sm_delegate(*m_opl3, FUNC(ymf262_device::write)));
+	}
+}
+
 
 TIMER_CALLBACK_MEMBER(sb16_lle_device::timer_tick)
 {
