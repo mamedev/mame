@@ -190,6 +190,9 @@ def check_cpp_file(path: Path, fix: bool = False):
         if m and not is_screaming_snake(m.group(1)):
             errors.append((i, f"Macro '{m.group(1)}' should use SCREAMING_SNAKE_CASE"))
 
+        if re.match(r"^\s*#define\s+VERBOSE\s+1\b", line):
+            errors.append((i, "VERBOSE define not commented out"))
+
         c = re.search(r"\bconst\b[^;=()]*\b([A-Za-z_][A-Za-z0-9_]*)\b\s*(?:=|;)", line)
         if c and not is_screaming_snake(c.group(1)):
             errors.append((i, f"Constant '{c.group(1)}' should use SCREAMING_SNAKE_CASE"))
