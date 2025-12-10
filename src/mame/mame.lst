@@ -35614,6 +35614,7 @@ herbiedk
 herodk
 herodku
 hunchbkd
+jammin
 jrking
 maguila
 pestplce
@@ -35650,9 +35651,6 @@ mduckspa
 @source:nintendo/gba.cpp
 gba
 robotech
-
-@source:nintendo/jammin.cpp
-jammin
 
 @source:nintendo/mario.cpp
 mario

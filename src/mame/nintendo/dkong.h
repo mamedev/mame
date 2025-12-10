@@ -20,6 +20,7 @@
 #include "machine/z80dma.h"
 #include "sound/discrete.h"
 #include "sound/tms5110.h"
+#include "sound/ymopm.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -162,7 +163,7 @@ public:
 
 	void dk_braze_a15(int state);
 
-private:
+protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<mcs48_cpu_device> m_soundcpu;
@@ -344,6 +345,23 @@ private:
 	void check_palette(void);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t mask_bank, uint32_t shift_bits);
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+class jammin_state : public dkong_state
+{
+public:
+	jammin_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dkong_state(mconfig, type, tag)
+		, m_ym2151(*this, "ym2151")
+	{
+	}
+
+	void jammin(machine_config &config);
+
+protected:
+	void jammin_map(address_map &map) ATTR_COLD;
+
+	required_device<ym2151_device> m_ym2151;
 };
 
 #endif // MAME_NINTENDO_DKONG_H
