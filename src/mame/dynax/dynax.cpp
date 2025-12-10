@@ -38,6 +38,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
+91 Mj Tokkyu Kaitenban P2  D5902258L-0               TLCS  AY8910        YM2413                   Various scratched off devices
 91 Mj Ougon no Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
@@ -6892,6 +6893,30 @@ ROM_START( mjcomv1 )
 ROM_END
 
 
+/*
+特急回転盤 Part 2 - Mahjong Tokkyū Kaiten-ban Part 2
+Dynax 1991
+*/
+
+ROM_START( mjtkp2 )
+	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "5909c_dynax.5a", 0x00000, 0x20000, CRC(61916017) SHA1(2f39749512a3e36966e3bd787f1fa3378e96b4bb) )
+	ROM_RELOAD(                 0x10000, 0x20000 )
+	ROM_LOAD( "tmp90840.",      0x00000, 0x02000, NO_DUMP ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
+	ROM_FILL(                   0x00000, 0x02000, 0xff ) // avoid fatal error due to random crap in the first 0x2000 of the external ROM. TODO: remove it once internal ROM is dumped
+
+	ROM_REGION( 0x100000, "blitter", 0 )
+	ROM_LOAD( "5908_dynax.6a",  0x00000, 0x20000, CRC(7ef47e7b) SHA1(15d05b8c52b82f1b43f0cc03979b2f2e8dd05ddd) )
+	ROM_LOAD( "5907_dynax.7a",  0x20000, 0x20000, CRC(f36baf94) SHA1(8474404a4137f7448c66a5adf507b474a97443a2) )
+	ROM_LOAD( "5906_dynax.8a",  0x40000, 0x20000, CRC(283935b1) SHA1(6af14310e44dfd7102f3c649c0c729ef406545e6) )
+	ROM_LOAD( "5905a_dynax.9a", 0x60000, 0x20000, CRC(62f9f922) SHA1(b75978db127fa24b28ac2c7c2587f3a5a360df6d) )
+	ROM_LOAD( "5904_dynax.10a", 0x80000, 0x20000, CRC(098a15dc) SHA1(4cc3313ca56c9c9a42e294e6d837c24c00463f73) )
+	ROM_LOAD( "5903_dynax.12a", 0xa0000, 0x20000, CRC(20f68aa7) SHA1(e18d39962caefb22c1ff39fd0fda0563877fa79c) )
+	ROM_LOAD( "5902_dynax.13a", 0xc0000, 0x20000, CRC(c053ba24) SHA1(76524a5a8f727c50be13adbca5eb9388c1f9887c) )
+	ROM_LOAD( "5901_dynax.15a", 0xe0000, 0x20000, CRC(8b9d0192) SHA1(77ba366c87d3f1eb5549de30a1d066684950622a) )
+ROM_END
+
+
 /***************************************************************************
 
 華仁義 Hana Jingi
@@ -7129,6 +7154,7 @@ GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty
 GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjtkp2,     0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing internal ROM dump
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreacha,   mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )
