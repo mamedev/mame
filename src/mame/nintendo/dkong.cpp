@@ -3967,4 +3967,4 @@ GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, init_strtheat
 GAME( 1985, strtheata, strtheat, strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat (set 2, older?)", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
 
 /* Atari */
-GAME( 1985, jammin,  0,    jammin, jammin,  jammin_state, empty_init, ROT270, "Atari", "Jammin' (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1985, jammin,  0,    jammin, jammin,  jammin_state, empty_init, ROT270, "Atari Games", "Jammin' (prototype)", MACHINE_SUPPORTS_SAVE )
