@@ -8,7 +8,8 @@
 #include "screen.h"
 
 #define LOG_SERIAL (1U << 1)
-#define VERBOSE (LOG_SERIAL)
+#define LOG_KEYS   (1U << 2)
+#define VERBOSE (LOG_SERIAL | LOG_KEYS)
 #include "logmacro.h"
 
 namespace {
@@ -40,6 +41,8 @@ private:
     void palette_init(palette_device &palette);
     HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
+    void keys_w(offs_t offset, u8 data);
+
     required_device<i80c32_device> m_maincpu;
     required_device<hd44780_device> m_lcdc;
     u8 m_port0 = 0xff;
@@ -58,6 +61,12 @@ void xe9_state::data_map(address_map &map)
     //map(0x0000, 0xffff).ram();
     map(0x0000, 0x1fff).ram();
     map(0x2000, 0x2001).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+    map(0x8000, 0x8010).w(FUNC(xe9_state::keys_w));
+}
+
+void xe9_state::keys_w(offs_t offset, u8 data)
+{
+    //LOGMASKED(LOG_KEYS, "Keys write: [0x%04X] = 0x%02X\n", 0x8000 + offset, data);
 }
 
 void xe9_state::palette_init(palette_device &palette)
