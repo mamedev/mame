@@ -24,7 +24,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_ym2151(*this, "ym2151"),
 		m_bgram(*this, "bgram"),
-		m_spram(*this, "spram")
+		m_spram(*this, "spram"),
+		m_proms(*this, "proms"),
+		m_proms2(*this, "proms_lookup")
 	{ }
 
 	void jammin(machine_config &config);
@@ -41,6 +43,8 @@ private:
 	required_device<ym2151_device> m_ym2151;
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_spram;
+	required_region_ptr<uint8_t> m_proms;
+	required_region_ptr<uint8_t> m_proms2;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_dma_param0;
@@ -49,6 +53,10 @@ private:
 	uint16_t m_dma_param3;
 	uint16_t m_dma_param4;
 	uint8_t m_dma_go;
+	uint8_t m_pal1;
+	uint8_t m_pal2;
+
+	void pal_init(palette_device &palette) const;
 
 	void bgram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -59,19 +67,48 @@ private:
 	void dma_param3_w(uint8_t data);
 	void dma_param4_w(uint8_t data);
 	void dma_go_w(uint8_t data);
+	void pal1_w(uint8_t data);
+	void pal2_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map) ATTR_COLD;
 };
 
+void jammin_state::pal_init(palette_device &palette) const
+{
+	uint8_t const *const colours = m_proms;
+	for (int i = 0; i < 0x200; i++)
+	{
+		uint16_t const data = (colours[i + 0x200] + (colours[i] << 4));
+		int r = (data >> 0) & 7;
+		int b = (data >> 3) & 3;
+		int g = (data >> 5) & 7;
+
+		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal2bit(b));
+	}
+
+}
+
+
 TILE_GET_INFO_MEMBER(jammin_state::get_bg_tile_info)
 {
 	int code = m_bgram[tile_index];
 
+	int col = tile_index & 0x01f;
+	int row = (tile_index & 0x3e0) >> 5;
+
+	int lookup = col + ((row / 4) * 0x20);
+
+	lookup += (m_pal2 & 1) * 0x100;
+
+	int colour = m_proms2[lookup];
+
+	colour += (m_pal1 & 1) * 0x10;
+
 	tileinfo.set(0,
-			code,
-			0,
-			0);
+		code,
+		colour,
+		0);
 }
 
 void jammin_state::bgram_w(offs_t offset, uint8_t data)
@@ -99,7 +136,7 @@ uint32_t jammin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		bool flipx = param2 & 0x80;
 		bool flipy = !(param1 & 0x80);
 
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, param1, 0, flipx, flipy, param3, param0-8, 0);
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, param1, 0, flipx, flipy, param3-8, param0-8, 0);
 	}
 
 	return 0;
@@ -128,6 +165,22 @@ void jammin_state::dma_go_w(uint8_t data)
 		}
 	}
 	m_dma_go = data;
+}
+
+void jammin_state::pal1_w(uint8_t data)
+{
+	// palette banking
+	logerror("pal1_w %02x\n", data );
+	m_pal1 = data;
+	m_bg_tilemap->mark_all_dirty();
+}
+
+void jammin_state::pal2_w(uint8_t data)
+{
+	// palette map select?
+	logerror("pal2_w %02x\n", data );
+	m_pal2 = data;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 void jammin_state::prg_map(address_map &map)
@@ -159,8 +212,8 @@ void jammin_state::prg_map(address_map &map)
 	map(0x7d83, 0x7d83).nopw(); // MOCNTL
 	map(0x7d84, 0x7d84).nopw(); // NMILAT
 	map(0x7d85, 0x7d85).nopw().w(FUNC(jammin_state::dma_go_w));
-	map(0x7d86, 0x7d86).nopw(); // PAL1
-	map(0x7d87, 0x7d87).nopw(); // PAL2
+	map(0x7d86, 0x7d86).nopw().w(FUNC(jammin_state::pal1_w));
+	map(0x7d87, 0x7d87).nopw().w(FUNC(jammin_state::pal2_w));
 
 	map(0x8000, 0xbfff).rom();
 }
@@ -243,9 +296,9 @@ static const gfx_layout tile_layout3 =
 };
 
 static GFXDECODE_START( gfx_jammin )
-	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 0, 1 )
-	GFXDECODE_ENTRY( "tiles2", 0, tile_layout2, 0, 1 )
-	GFXDECODE_ENTRY( "tiles3", 0, tile_layout3, 0, 1 )
+	GFXDECODE_ENTRY( "tiles", 0, tile_layout, 0, 64 )
+	GFXDECODE_ENTRY( "tiles2", 0, tile_layout2, 0, 64 )
+	GFXDECODE_ENTRY( "tiles3", 0, tile_layout3, 0, 64 )
 GFXDECODE_END
 
 void jammin_state::machine_start()
@@ -256,6 +309,8 @@ void jammin_state::machine_start()
 	save_item(NAME(m_dma_param3));
 	save_item(NAME(m_dma_param4));
 	save_item(NAME(m_dma_go));
+	save_item(NAME(m_pal1));
+	save_item(NAME(m_pal2));
 }
 
 void jammin_state::machine_reset()
@@ -266,6 +321,8 @@ void jammin_state::machine_reset()
 	m_dma_param3 = 0;
 	m_dma_param4 = 0;
 	m_dma_go = 0;
+	m_pal1 = 0;
+	m_pal2 = 0;
 }
 
 void jammin_state::jammin(machine_config &config)
@@ -287,7 +344,7 @@ void jammin_state::jammin(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_jammin);
 
 	// wrong
-	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
+	PALETTE(config, "palette").set_init(FUNC(jammin_state::pal_init)).set_entries(0x200);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -317,19 +374,16 @@ ROM_START( jammin )
 	ROM_REGION( 0x4000, "tiles3", 0 ) // 4bpp of sprite data
 	ROM_LOAD16_WORD_SWAP( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
 
-	ROM_REGION( 0x100, "proms_col_n", 0 ) // lookup?
-	ROM_LOAD( "col2n.bin", 0x000, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
-
-	ROM_REGION( 0x200, "proms_col_ef", 0 ) // colours?
-	ROM_LOAD( "col2f.bin", 0x000, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
-	ROM_LOAD( "col2e.bin", 0x100, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
-
-	ROM_REGION( 0x100, "proms_mac_n", 0 ) // lookup?
+	ROM_REGION( 0x200, "proms_lookup", 0 ) // lookup?
 	ROM_LOAD( "mac2n.bin", 0x000, 0x0100, CRC(e8198448) SHA1(20fc8da7858daa56be758148e5e80f5de30533f9) )
+	ROM_LOAD( "col2n.bin", 0x100, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
 
-	ROM_REGION( 0x200, "proms_mac_ef", 0 ) // colours?
+	ROM_REGION( 0x400, "proms", 0 ) // colours?
 	ROM_LOAD( "mac2f.bin", 0x000, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) )
-	ROM_LOAD( "mac2e.bin", 0x100, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
+	ROM_LOAD( "col2f.bin", 0x100, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
+
+	ROM_LOAD( "mac2e.bin", 0x200, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
+	ROM_LOAD( "col2e.bin", 0x300, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
 ROM_END
 
 } // anonymous namespace
