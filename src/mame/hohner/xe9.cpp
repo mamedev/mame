@@ -9,7 +9,8 @@
 
 #define LOG_SERIAL (1U << 1)
 #define LOG_KEYS   (1U << 2)
-#define VERBOSE (LOG_SERIAL | LOG_KEYS)
+#define LOG_COMM   (1U << 3)
+#define VERBOSE (LOG_SERIAL | LOG_KEYS | LOG_COMM)
 #include "logmacro.h"
 
 namespace {
@@ -48,6 +49,10 @@ private:
     HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
     void keys_w(offs_t offset, u8 data);
+    void sam_data_w(u8 data);
+    u8 soundcpu_l_port1_r();
+    u8 soundcpu_r_port1_r();
+    void update_handshake();
 
     required_device<i80c32_device> m_maincpu;
     required_device<i80c32_device> m_soundcpu_l;
@@ -57,6 +62,11 @@ private:
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
     u8 m_port3 = 0xff;
+
+    // Handshake flip-flops (U9) and data latch (U22)
+    u8 m_ff_l = 0;       // FF1 state (LEFT co-CPU interrupt)
+    u8 m_ff_r = 0;       // FF2 state (RIGHT co-CPU interrupt)
+    u8 m_sam_data = 0;   // Data latch U22
 };
 
 void xe9_state::program_map(address_map &map)
@@ -70,11 +80,76 @@ void xe9_state::data_map(address_map &map)
     map(0x0000, 0x1fff).ram();
     map(0x2000, 0x2001).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
     map(0x8000, 0x8010).w(FUNC(xe9_state::keys_w));
+    map(0xa000, 0xa000).w(FUNC(xe9_state::sam_data_w));  // U22 data latch
 }
 
 void xe9_state::keys_w(offs_t offset, u8 data)
 {
     //LOGMASKED(LOG_KEYS, "Keys write: [0x%04X] = 0x%02X\n", 0x8000 + offset, data);
+}
+
+void xe9_state::sam_data_w(u8 data)
+{
+    LOGMASKED(LOG_COMM, "SAM data latch write: 0x%02X\n", data);
+    m_sam_data = data;
+}
+
+u8 xe9_state::soundcpu_l_port1_r()
+{
+    LOGMASKED(LOG_COMM, "Sound CPU L P1 read: 0x%02X\n", m_sam_data);
+    return m_sam_data;
+}
+
+u8 xe9_state::soundcpu_r_port1_r()
+{
+    LOGMASKED(LOG_COMM, "Sound CPU R P1 read: 0x%02X\n", m_sam_data);
+    return m_sam_data;
+}
+
+void xe9_state::update_handshake()
+{
+    // Decode T0 (P3.4) and T1 (P3.5) from main CPU port3
+    // U8 74LS139: A1=T0, A0=T1
+    int t0 = BIT(m_port3, 4);  // P3.4/T0
+    int t1 = BIT(m_port3, 5);  // P3.5/T1
+
+    // Decoder outputs (directly from T0,T1 bits - active low)
+    // O0 active when T0=0, T1=0 -> reset both flip-flops
+    // O1 active when T0=0, T1=1 -> set FF1 (LEFT)
+    // O2 active when T0=1, T1=0 -> set FF2 (RIGHT)
+    // O3 active when T0=1, T1=1 -> other function (address decoder enable)
+
+    if (t0 == 0 && t1 == 0)
+    {
+        // Reset both flip-flops
+        if (m_ff_l || m_ff_r)
+            LOGMASKED(LOG_COMM, "Handshake: Reset both flip-flops\n");
+        m_ff_l = 0;
+        m_ff_r = 0;
+    }
+    else if (t0 == 0 && t1 == 1)
+    {
+        // Set FF1 (LEFT co-CPU)
+        if (!m_ff_l)
+            LOGMASKED(LOG_COMM, "Handshake: Trigger LEFT co-CPU INT0\n");
+        m_ff_l = 1;
+    }
+    else if (t0 == 1 && t1 == 0)
+    {
+        // Set FF2 (RIGHT co-CPU)
+        if (!m_ff_r)
+            LOGMASKED(LOG_COMM, "Handshake: Trigger RIGHT co-CPU INT0\n");
+        m_ff_r = 1;
+    }
+
+    // Update interrupt lines
+    // FF.Q -> INT0 on sound CPUs (directly active high)
+    m_soundcpu_l->set_input_line(MCS51_INT0_LINE, m_ff_l ? ASSERT_LINE : CLEAR_LINE);
+    m_soundcpu_r->set_input_line(MCS51_INT0_LINE, m_ff_r ? ASSERT_LINE : CLEAR_LINE);
+
+    // FF.~Q -> INT0/INT1 on main CPU (directly active high, so inverted)
+    m_maincpu->set_input_line(MCS51_INT0_LINE, m_ff_l ? CLEAR_LINE : ASSERT_LINE);
+    m_maincpu->set_input_line(MCS51_INT1_LINE, m_ff_r ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void xe9_state::soundcpu_l_program_map(address_map &map)
@@ -94,7 +169,7 @@ void xe9_state::soundcpu_r_program_map(address_map &map)
 
 void xe9_state::soundcpu_r_data_map(address_map &map)
 {
-    map(0x0000, 0x1fff).ram();  // 8KB RAM
+    map(0x000, 0x1fff).ram();  // 8KB RAM
 }
 
 void xe9_state::palette_init(palette_device &palette)
@@ -159,6 +234,7 @@ void xe9_state::port3_w(u8 data)
     if (m_port3 != data)
         LOGMASKED(LOG_SERIAL, "P3 write: 0x%02X\n", data);
     m_port3 = data;
+    update_handshake();
 }
 
 static INPUT_PORTS_START(xe9)
@@ -197,11 +273,13 @@ void xe9_state::xe9(machine_config &config)
     I80C32(config, m_soundcpu_l, 16_MHz_XTAL);
     m_soundcpu_l->set_addrmap(AS_PROGRAM, &xe9_state::soundcpu_l_program_map);
     m_soundcpu_l->set_addrmap(AS_DATA, &xe9_state::soundcpu_l_data_map);
+    m_soundcpu_l->port_in_cb<1>().set(FUNC(xe9_state::soundcpu_l_port1_r));  // Read data from U22 latch
 
     // Sound CPU R
     I80C32(config, m_soundcpu_r, 16_MHz_XTAL);
     m_soundcpu_r->set_addrmap(AS_PROGRAM, &xe9_state::soundcpu_r_program_map);
     m_soundcpu_r->set_addrmap(AS_DATA, &xe9_state::soundcpu_r_data_map);
+    m_soundcpu_r->port_in_cb<1>().set(FUNC(xe9_state::soundcpu_r_port1_r));  // Read data from U22 latch
 }
 
 ROM_START(xe9)
