@@ -119,7 +119,7 @@ protected:
 	optional_device<dsb2_device> m_dsb2;            // 68k-based MPEG Digital Sound Board
 	optional_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
 	required_device<i8251_device> m_uart;
-	optional_device<m2comm_device> m_m2comm;        // Model 2 communication board
+	optional_device<sega_m2comm_device> m_m2comm;   // Model 2 communication board
 	optional_device<cpu_device> m_audiocpu;
 	required_device<generic_fifo_u32_device> m_copro_fifo_in;
 	required_device<generic_fifo_u32_device> m_copro_fifo_out;
