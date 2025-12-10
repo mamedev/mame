@@ -280,7 +280,7 @@ COMP(1993, jd5000, 0, 0, superjr, superjr, superjr_state, empty_init, "Casio", "
 
 // SUPER 電子手帳 Jr. 似顔絵テレパシー
 // ROM date 9335EAI
-COMP(1993?, jd320, 0, 0, superjr, superjr, superjr_state, empty_init, "Casio", "Super Denshi Techou Jr. - Caricature Telepathy", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1993?, jd320, 0, 0, superjr, superjr, superjr_state, empty_init, "Casio", "Super Denshi Techou Jr. - Nigaoe Telepathy", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // SUPER 電子手帳 Jr. パピーテレパシー
 // Release date 1994-09 from "Casio Game Perfect Catalogue"

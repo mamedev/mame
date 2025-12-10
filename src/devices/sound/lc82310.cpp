@@ -229,7 +229,7 @@ void lc82310_device::handle_command(uint8_t cmd, uint8_t param)
 			0.0,                          // 76
 		};
 
-		int speaker_idx = cmd == CMD_UNK15_VOL ? 1 : 0; // guessed, both are set at the same time in current use cases
+		const int speaker_idx = (cmd == CMD_UNK15_VOL) ? 1 : 0; // guessed, both are set at the same time in current use cases
 		m_output_gain[speaker_idx] = gain_table[std::min<uint8_t>(param, 0x4c)];
 
 		set_output_gain(speaker_idx, m_output_gain[speaker_idx]);
