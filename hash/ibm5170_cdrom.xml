@@ -7651,6 +7651,31 @@ Shows Phantagram logo with bottom red strip (DOS 6.22)
 	<!--               Applications              -->
 	<!--                                         -->
 
+	<!-- Windows 3.1/95 -->
+	<!-- From: https://archive.org/details/bsd-on-windows -->
+	<!-- Some documentation is in Japanese, most is in English -->
+	<software name="bow">
+		<description>BSD on Windows (1.5)</description>
+		<year>1996</year>
+		<publisher>ASCII</publisher>
+		<info name="developer" value="Hiroshi Oota" />
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
+		<info name="usage" value="Start installation from the floppy disk \SETUP.EXE" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="bsd on windows 1.5" sha1="1ccddf4e9eec446d51a1b9e9a15060d9ffd57ec3" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup Disk" />
+			<!-- baddump: Files were accessed in 2023 and two deleted files from 2023 -->
+			<dataarea name="flop" size="1474560">
+				<rom name="bsd on windows 1.5.img" size="1474560" crc="0d44812e" sha1="83fd924a58b6e21bccc76117bdc13d5f9273f3d3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Windows 95 -->
 	<software name="cdraw6" supported="no">
 		<description>Corel DRAW! 6</description>
