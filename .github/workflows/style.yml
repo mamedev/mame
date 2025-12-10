@@ -39,9 +39,10 @@ jobs:
               body: r.body
             }));
 
-            if (comments.length > 0) {
-              console.debug("Reviews: ", reviews);
-
+            if (comments.length > 50) {
+              console.error("More than 50 comments");
+            }
+            else if (comments.length > 0) {
               // Get previous reviews from github-actions[bot]
               const { data: existingReviews } = await github.rest.pulls.listReviews({
                 owner: context.repo.owner,
@@ -86,7 +87,4 @@ jobs:
               }
             } else {
               console.info("Review list empty.");
-            }
-            if (comments.length > 50) {
-              console.error("More than 50 comments");
             }
