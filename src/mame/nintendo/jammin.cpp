@@ -180,7 +180,7 @@ uint32_t jammin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		bool flipx = pal & 0x80;
 		bool flipy = tile & 0x80;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, tile, 0, flipx, flipy, x-8, y-8, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, tile, pal & 0xf, flipx, flipy, x-8, y-8, 0);
 	}
 
 	return 0;
@@ -321,7 +321,7 @@ static const gfx_layout tile_layout2 =
 	16,16,
 	RGN_FRAC(1,1),
 	2,
-	{ 0, 8 },
+	{ 8, 0 },
 	{ 0,1,2,3,4,5,6,7, 16,17,18,19,20,21,22,23 },
 	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32,8*32,9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
 	16*32
@@ -426,7 +426,7 @@ ROM_START( jammin )
 	ROM_LOAD( "mac2e.bin", 0x000, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
 	ROM_LOAD( "mac2f.bin", 0x100, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) )
 
-	ROM_REGION( 0x400, "promsx", 0 )
+	ROM_REGION( 0x400, "promsx", 0 ) // more colours, what are these for?
 	ROM_LOAD( "col2e.bin", 0x000, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
 	ROM_LOAD( "col2f.bin", 0x100, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
 ROM_END
