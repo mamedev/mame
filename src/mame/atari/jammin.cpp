@@ -128,15 +128,17 @@ uint32_t jammin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int i = 0; i < 0x200; i += 4)
 	{
-		uint8_t param0 = m_spram[i + 0];
-		uint8_t param1 = m_spram[i + 1];
-		uint8_t param2 = m_spram[i + 2];
-		uint8_t param3 = m_spram[i + 3];
+		uint8_t y = m_spram[i + 0];
+		uint8_t tile = m_spram[i + 1];
+		uint8_t pal = m_spram[i + 2];
+		uint8_t x = m_spram[i + 3];
 
-		bool flipx = param2 & 0x80;
-		bool flipy = !(param1 & 0x80);
+		y = 255 - y;
 
-		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, param1, 0, flipx, flipy, param3-8, param0-8, 0);
+		bool flipx = pal & 0x80;
+		bool flipy = tile & 0x80;
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, tile, 0, flipx, flipy, x-8, y-8, 0);
 	}
 
 	return 0;
