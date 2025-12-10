@@ -3676,18 +3676,11 @@ ROM_END
 
 ROM_START( jammin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	// ROM was assembled from source, split into 0x1000 chunks as that's realistic for a DK type board
-	ROM_LOAD( "jammin_0000.bin", 0x00000, 0x1000, CRC(0d63ba5a) SHA1(aae83fc66d8db6297edb4ca2853a202ab4aa5dd7) )
-	ROM_LOAD( "jammin_1000.bin", 0x01000, 0x1000, CRC(61a7a602) SHA1(b75d0a46a009c94b348c14d8d39fa4255aca7ada) )
-	ROM_LOAD( "jammin_2000.bin", 0x02000, 0x1000, CRC(f566e30d) SHA1(294ddbfb8c709e0fd4ceeb04a657f354b115a8dd) )
-	ROM_LOAD( "jammin_3000.bin", 0x03000, 0x1000, CRC(3932d532) SHA1(7919c86a3fb9a6f69cb6e74ffb102b204ca36b23) )
-
-	ROM_LOAD( "jammin_8000.bin", 0x08000, 0x1000, CRC(7ad98aec) SHA1(141d8b00f2801db7578535070920d4eb5c1293eb) )
+	// ROM was assembled from source, split into 0x4000 chunks as that's realistic for a DK type board / sub-board
+	ROM_LOAD( "jammin_0000.bin", 0x0000, 0x4000, CRC(71742497) SHA1(cd535759466de2236607942f0adaffb72b774e00) )
 	// the bytes for a table at 9b6c-9b87 were missing and have been reconstructed
 	// but may not be accurate, they're used for 2 background tilemap columns on one stage
-	ROM_LOAD( "jammin_9000.bin", 0x09000, 0x1000, BAD_DUMP CRC(8debca0d) SHA1(6091945dd3267b42ae16645452db151b842630a0) )
-	ROM_LOAD( "jammin_a000.bin", 0x0a000, 0x1000, CRC(c4c91c81) SHA1(ffc62c4c53458590e23f2cfbc72a287931fe9881) )
-	ROM_LOAD( "jammin_b000.bin", 0x0b000, 0x1000, CRC(ce5f120f) SHA1(bf7f215497affa6b71327c27e0ffb5153b35fa30) )
+	ROM_LOAD( "jammin_8000.bin", 0x8000, 0x4000, BAD_DUMP CRC(43fb6a6c) SHA1(8727d5339e0ee6df2f33498bcc2eec612ac4e1b6) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "jambak.pl0", 0x0000, 0x0800, CRC(af808d29) SHA1(cad060ee4e529f9a2ffa9675682b9e17bed4dffe) )
