@@ -20,6 +20,8 @@ public:
     xe9_state(const machine_config &mconfig, device_type type, const char *tag)
         : driver_device(mconfig, type, tag)
         , m_maincpu(*this, "maincpu")
+        , m_soundcpu_l(*this, "soundcpu_l")
+        , m_soundcpu_r(*this, "soundcpu_r")
         , m_lcdc(*this, "lcdc")
     { }
 
@@ -28,6 +30,10 @@ public:
 private:
     void program_map(address_map &map) ATTR_COLD;
     void data_map(address_map &map) ATTR_COLD;
+    void soundcpu_l_program_map(address_map &map) ATTR_COLD;
+    void soundcpu_l_data_map(address_map &map) ATTR_COLD;
+    void soundcpu_r_program_map(address_map &map) ATTR_COLD;
+    void soundcpu_r_data_map(address_map &map) ATTR_COLD;
 
     void port0_w(u8 data);
     void port1_w(u8 data);
@@ -44,6 +50,8 @@ private:
     void keys_w(offs_t offset, u8 data);
 
     required_device<i80c32_device> m_maincpu;
+    required_device<i80c32_device> m_soundcpu_l;
+    required_device<i80c32_device> m_soundcpu_r;
     required_device<hd44780_device> m_lcdc;
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
@@ -67,6 +75,26 @@ void xe9_state::data_map(address_map &map)
 void xe9_state::keys_w(offs_t offset, u8 data)
 {
     //LOGMASKED(LOG_KEYS, "Keys write: [0x%04X] = 0x%02X\n", 0x8000 + offset, data);
+}
+
+void xe9_state::soundcpu_l_program_map(address_map &map)
+{
+    map(0x0000, 0xffff).rom().region("soundcpu_l", 0);
+}
+
+void xe9_state::soundcpu_l_data_map(address_map &map)
+{
+    map(0x0000, 0x1fff).ram();  // 8KB RAM
+}
+
+void xe9_state::soundcpu_r_program_map(address_map &map)
+{
+    map(0x0000, 0xffff).rom().region("soundcpu_r", 0);
+}
+
+void xe9_state::soundcpu_r_data_map(address_map &map)
+{
+    map(0x0000, 0x1fff).ram();  // 8KB RAM
 }
 
 void xe9_state::palette_init(palette_device &palette)
@@ -164,16 +192,27 @@ void xe9_state::xe9(machine_config &config)
     HD44780(config, m_lcdc, 270'000);  // typical HD44780 clock
     m_lcdc->set_lcd_size(2, 20);
     m_lcdc->set_pixel_update_cb(FUNC(xe9_state::lcd_pixel_update));
+
+    // Sound CPU L
+    I80C32(config, m_soundcpu_l, 16_MHz_XTAL);
+    m_soundcpu_l->set_addrmap(AS_PROGRAM, &xe9_state::soundcpu_l_program_map);
+    m_soundcpu_l->set_addrmap(AS_DATA, &xe9_state::soundcpu_l_data_map);
+
+    // Sound CPU R
+    I80C32(config, m_soundcpu_r, 16_MHz_XTAL);
+    m_soundcpu_r->set_addrmap(AS_PROGRAM, &xe9_state::soundcpu_r_program_map);
+    m_soundcpu_r->set_addrmap(AS_DATA, &xe9_state::soundcpu_r_data_map);
 }
 
 ROM_START(xe9)
-    ROM_REGION(0x10000, "program", 0)
-    ROM_SYSTEM_BIOS(0, "v14", "V1.4")
-    ROMX_LOAD("xe9v_v14.bin", 0x0000, 0x10000, CRC(c1fd59d5) SHA1(36d28ca3eba29faecfad11e953833777ea1ed6e4), ROM_BIOS(0))
-    ROM_SYSTEM_BIOS(1, "v141l", "V1.41 (L)")
-    ROMX_LOAD("xe9l_v141.bin", 0x0000, 0x10000, CRC(5c826efe) SHA1(ea3b61129baafeb0bf0e2ff72f297f6eb098287c), ROM_BIOS(1))
-    ROM_SYSTEM_BIOS(2, "v141r", "V1.41 (R)")
-    ROMX_LOAD("xe9r_v141.bin", 0x0000, 0x10000, CRC(37e2e807) SHA1(1039870d922c09685eb4c32a1a8e3fa8922ffd42), ROM_BIOS(2))
+    ROM_REGION(0x10000, "program", 0)  // Main CPU
+    ROM_LOAD("xe9v_v14.bin", 0x0000, 0x10000, CRC(c1fd59d5) SHA1(36d28ca3eba29faecfad11e953833777ea1ed6e4))
+
+    ROM_REGION(0x10000, "soundcpu_l", 0)  // Sound CPU L
+    ROM_LOAD("xe9l_v141.bin", 0x0000, 0x10000, CRC(5c826efe) SHA1(ea3b61129baafeb0bf0e2ff72f297f6eb098287c))
+
+    ROM_REGION(0x10000, "soundcpu_r", 0)  // Sound CPU R
+    ROM_LOAD("xe9r_v141.bin", 0x0000, 0x10000, CRC(37e2e807) SHA1(1039870d922c09685eb4c32a1a8e3fa8922ffd42))
 ROM_END
 
 } // anonymous namespace
