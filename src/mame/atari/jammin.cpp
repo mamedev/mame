@@ -23,7 +23,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_ym2151(*this, "ym2151"),
-		m_bgram(*this, "bgram")
+		m_bgram(*this, "bgram"),
+		m_spram(*this, "spram")
 	{ }
 
 	void jammin(machine_config &config);
@@ -39,6 +40,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ym2151_device> m_ym2151;
 	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_spram;
 
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_dma_param0;
@@ -86,6 +88,20 @@ void jammin_state::video_start()
 uint32_t jammin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	for (int i = 0; i < 0x200; i += 4)
+	{
+		uint8_t param0 = m_spram[i + 0];
+		uint8_t param1 = m_spram[i + 1];
+		uint8_t param2 = m_spram[i + 2];
+		uint8_t param3 = m_spram[i + 3];
+
+		bool flipx = param2 & 0x80;
+		bool flipy = !(param1 & 0x80);
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, param1, 0, flipx, flipy, param3, param0-8, 0);
+	}
+
 	return 0;
 }
 
@@ -104,7 +120,7 @@ void jammin_state::dma_go_w(uint8_t data)
 			logerror("do DMA with params %02x %04x %04x %04x %04x\n", m_dma_param0, m_dma_param1, m_dma_param2, m_dma_param3, m_dma_param4 );
 			// always triggered with 53 6900 41fc 7000 81fc
 			// (a copy from 6900 to 7000?)
-			for (int i = 0; i < 0x400; i++)
+			for (int i = 0; i < 0x200; i++)
 			{
 				uint8_t dat = m_maincpu->space(AS_PROGRAM).read_byte(m_dma_param1 + i);
 				m_maincpu->space(AS_PROGRAM).write_byte(m_dma_param3 + i, dat);
@@ -124,7 +140,7 @@ void jammin_state::prg_map(address_map &map)
 
 	map(0x6000, 0x6bff).ram();
 
-	map(0x7000, 0x73ff).ram(); // sprites?
+	map(0x7000, 0x73ff).ram().share(m_spram); // sprites?
 	map(0x7400, 0x77ff).ram().w(FUNC(jammin_state::bgram_w)).share(m_bgram);
 
 	map(0x7800, 0x7800).w(FUNC(jammin_state::dma_param1_w)); // DMACTL
