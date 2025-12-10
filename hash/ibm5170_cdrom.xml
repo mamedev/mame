@@ -4184,6 +4184,30 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- 486 DX2/66 minimum -->
+	<software name="guimode" supported="no">
+		<!-- origin: redump.org -->
+		<!-- http://redump.org/disc/52621/ -->
+		<description>Guimo (Germany, v2.2)</description>
+		<year>1998</year>
+		<publisher>Jack in the Box Computing</publisher>
+		<notes><![CDATA[
+Has several [SB16] sound issues (by default starts very quiet, workaround by bumping SB16MIX to max level)
+Starting sparkle animation in Setup level is very offset, [VGA] or [x86]
+Runs very slow for ct486, except it unnaturally speed up at times
+Setup level has ENDE text flipping around at set times (btanb?)
+]]></notes>
+		<info name="barcode" value="9 783896 482662"/>
+		<!-- ISBN: 3-89648-266-1 -->
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="guimo_(germany)" sha1="cc5928d6f5a3ba64326ae145f438295b0056745e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- There's also a later Windows version hence the extra "DOS" tag -->
 	<software name="heromm1">
 		<description>Heroes of Might and Magic (USA, DOS, v1.0)</description>
@@ -5219,8 +5243,8 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
 		<notes><![CDATA[
-Throws EMS warning at startup (FreeDOS only?)
-Has [SB16] issues in both HLE and LLE cores (workaround with voicebuffer = 1 in DOTT.CD\DOTT.INI)
+Throws EMS warning at startup (FreeDOS only? With actual JEMM386 TSR will just crash)
+Has [SB16] issues in both HLE and LLE cores (partial workaround with voicebuffer = 1 in DOTT.CD\DOTT.INI)
 Untested demos
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -6321,10 +6345,13 @@ Bit of desync when Rosalind Chao starts talking at beginning of an attract cycle
 		</part>
 	</software>
 
-	<software name="sideline">
+	<software name="sideline" supported="partial">
 		<description>Sideline</description>
 		<year>1996</year>
 		<publisher>EMAG Soft</publisher>
+		<notes><![CDATA[
+Unresponsive [keyboard] on ranking screen
+]]></notes>
 		<info name="version" value="1.20" />
 
 		<part name="cdrom" interface="cdrom">
