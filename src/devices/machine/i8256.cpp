@@ -284,6 +284,9 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 			{
 				m_current_interrupt_level = timer_interrupt[i];
 				m_out_int_cb(ASSERT_LINE); // it occurs when the counter changes from 1 to 0.
+
+				// The timer interrupts are automatically disabled when the interrupt request is generated.
+				m_interrupts = m_interrupts & ~(1 << timer_interrupt[i]);
 			}
 		}
 	}
