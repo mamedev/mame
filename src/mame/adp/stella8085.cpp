@@ -416,48 +416,11 @@ int stella8085_state::soundfreq(uint8_t channel, uint8_t clockdiv)
 {
 	const int SOUND_CLOCK = (m_maincpu->clock() / 3);
 	const int INT_CLOCK = SOUND_CLOCK >> (4-clockdiv);
-	const int C8SHARP = INT_CLOCK / 451;
-	const int D8 = INT_CLOCK / 426;
-	const int D8SHARP = INT_CLOCK / 402;
-	const int E8 = INT_CLOCK / 379;
-	const int F8 = INT_CLOCK / 358;
-	const int F8SHARP = INT_CLOCK / 338;
-	const int G8 = INT_CLOCK / 319;
-	const int G8SHARP = INT_CLOCK / 301;
-	const int A8 = INT_CLOCK / 284;
-	const int A8SHARP = INT_CLOCK / 268;
-	const int B8 = INT_CLOCK / 253;
-	const int C9 = INT_CLOCK / 239;
-	const int C8 = INT_CLOCK / 478; //unused?
-	switch (channel)
-	{
-		case 1:
-			return C9;
-		case 2:
-			return B8;
-		case 3:
-			return A8SHARP;
-		case 4:
-			return A8;
-		case 5:
-			return G8SHARP;
-		case 6:
-			return G8;
-		case 7:
-			return F8SHARP;
-		case 8:
-			return F8;
-		case 9:
-			return E8;
-		case 10:
-			return D8SHARP;
-		case 11:
-			return D8;
-		case 12:
-			return C8SHARP;
-		default:
-			return C8;
-	}
+
+	//                             C9   B8   A8#  A8   G8#  G8   F8#  F8   E8   D8#  D8   C8#
+	const int FREQOUT[16] = { 478, 239, 253, 268, 284, 301, 319, 338, 358, 379, 402, 426, 451, 478, 478, 478 };
+
+	return INT_CLOCK / FREQOUT[channel & 0x0f];
 }
 
 static INPUT_PORTS_START( stella8085_tatatur )
