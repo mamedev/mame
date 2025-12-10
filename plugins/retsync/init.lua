@@ -55,9 +55,26 @@ local regmaps = {
 		addrsize = 2,
 		pcreg = "PC"
 	},
+	i80c32 = {
+		togdb = {
+			PC = 1, SP = 2, PSW = 3, A = 4, B = 5, DPTR = 6,
+			R0 = 7, R1 = 8, R2 = 9, R3 = 10, R4 = 11, R5 = 12, R6 = 13, R7 = 14 },
+		fromgdb = {
+			"PC", "SP", "PSW", "A", "B", "DPTR",
+			"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7" },
+		regsize = 1,
+		addrsize = 2,
+		pcreg = "PC"
+	},
 }
 regmaps.i486 = regmaps.i386
 regmaps.pentium = regmaps.i386
+regmaps.i8051 = regmaps.i80c32
+regmaps.i8052 = regmaps.i80c32
+regmaps.i80c51 = regmaps.i80c32
+regmaps.i80c52 = regmaps.i80c32
+regmaps.i8031 = regmaps.i80c32
+regmaps.i8032 = regmaps.i80c32
 
 local reset_subscription, stop_subscription
 
