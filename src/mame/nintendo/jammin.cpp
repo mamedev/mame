@@ -9,6 +9,7 @@
 
 #include "cpu/z80/z80.h"
 #include "sound/ymopm.h"
+#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -76,19 +77,58 @@ private:
 	void prg_map(address_map &map) ATTR_COLD;
 };
 
+
+static const res_net_decode_info dkong_decode_info =
+{
+	2,      /*  there may be two proms needed to construct color */
+	0,      /*  start at 0 */
+	255,    /*  end at 255 */
+	/*  R,   G,   B,   R,   G,   B */
+	{ 256, 256,   0,   0,   0,   0},        /*  offsets */
+	{   1,  -2,   0,   0,   2,   0},        /*  shifts */
+	{0x07,0x04,0x03,0x00,0x03,0x00}         /*  masks */
+};
+
+static const res_net_info dkong_net_info =
+{
+	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7052 |  RES_NET_MONITOR_SANYO_EZV20,
+	{
+		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_EMITTER,    680, 0, 2, {  470, 220,   0 } }  /*  dkong */
+	}
+};
+
+static const res_net_info dkong_net_bck_info =
+{
+	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_MB7052 |  RES_NET_MONITOR_SANYO_EZV20,
+	{
+		{ RES_NET_AMP_DARLINGTON, 470, 0, 0, { 0 } },
+		{ RES_NET_AMP_DARLINGTON, 470, 0, 0, { 0 } },
+		{ RES_NET_AMP_EMITTER,    680, 0, 0, { 0 } }
+	}
+};
+
+
 void jammin_state::pal_init(palette_device &palette) const
 {
-	uint8_t const *const colours = m_proms;
-	for (int i = 0; i < 0x200; i++)
-	{
-		uint16_t const data = (colours[i] + (colours[i + 0x200] << 4)) ^ 0xff;
-		int g = (data >> 0) & 7;
-		int b = (data >> 3) & 3;
-		int r = (data >> 5) & 7;
+	const uint8_t *color_prom = m_proms;
 
-		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal2bit(b));
-	}
+	std::vector<rgb_t> rgb;
+	compute_res_net_all(rgb, color_prom, dkong_decode_info, dkong_net_info);
+	palette.set_pen_colors(0, rgb);
 
+	// Now treat tri-state black background generation
+	for (int i = 0; i < 256; i++)
+		if ((i & 0x03) == 0x00)  // NOR => CS=1 => Tristate => real black
+		{
+			int const r = compute_res_net(1, 0, dkong_net_bck_info);
+			int const g = compute_res_net(1, 1, dkong_net_bck_info);
+			int const b = compute_res_net(1, 2, dkong_net_bck_info);
+			palette.set_pen_color(i, r, g, b);
+		}
+
+	palette.palette()->normalize_range(0, 255);
 }
 
 
@@ -383,11 +423,12 @@ ROM_START( jammin )
 	ROM_LOAD( "col2n.bin", 0x100, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
 
 	ROM_REGION( 0x400, "proms", 0 ) // colours?
-	ROM_LOAD( "mac2f.bin", 0x000, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) )
-	ROM_LOAD( "col2f.bin", 0x100, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
+	ROM_LOAD( "mac2e.bin", 0x000, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
+	ROM_LOAD( "mac2f.bin", 0x100, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) )
 
-	ROM_LOAD( "mac2e.bin", 0x200, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
-	ROM_LOAD( "col2e.bin", 0x300, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
+	ROM_REGION( 0x400, "promsx", 0 )
+	ROM_LOAD( "col2e.bin", 0x000, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
+	ROM_LOAD( "col2f.bin", 0x100, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
 ROM_END
 
 } // anonymous namespace
