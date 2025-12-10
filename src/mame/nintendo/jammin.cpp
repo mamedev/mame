@@ -429,8 +429,11 @@ void jammin_state::jammin(machine_config &config)
 
 ROM_START( jammin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	// rebuilt from sources, the bytes for a table at 9b6c-9b87 were missing and may need to be reconstructed
-	ROM_LOAD( "jammin.bin", 0x00000, 0xb853, CRC(449ce727) SHA1(83a96284072cd5fc3aae5ad327fc95ad90346954) )
+	// ROM was assembled from source
+	// 
+	// the bytes for a table at 9b6c-9b87 were missing and have been reconstructed
+	// but may not be accurate, they're used for 2 background tilemap columns on one stage
+	ROM_LOAD( "jammin.bin", 0x00000, 0xb853, BAD_DUMP CRC(1396b1bd) SHA1(8593e0e6dc5c5f1706f620d9da449a7668248d19) )
 
 	ROM_REGION( 0x1000, "tiles", 0 ) // backgrounds?
 	ROM_LOAD( "jambak.pl0", 0x0000, 0x0800, CRC(af808d29) SHA1(cad060ee4e529f9a2ffa9675682b9e17bed4dffe) )
