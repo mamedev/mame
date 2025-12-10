@@ -140,12 +140,9 @@ TILE_GET_INFO_MEMBER(jammin_state::get_bg_tile_info)
 	int row = (tile_index & 0x3e0) >> 5;
 
 	int lookup = col + ((row / 4) * 0x20);
-
-	lookup += (m_pal2 & 1) * 0x100;
-
 	int colour = m_proms2[lookup];
 
-	colour += (m_pal1 & 1) * 0x10;
+	colour += ((m_pal1 & 1) | ((m_pal2 & 1)<<1)) * 0x10;
 
 	tileinfo.set(0,
 		code,
@@ -172,15 +169,17 @@ uint32_t jammin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		uint8_t y = m_spram[i + 0];
 		uint8_t tile = m_spram[i + 1];
-		uint8_t pal = m_spram[i + 2];
+		uint8_t attr = m_spram[i + 2];
 		uint8_t x = m_spram[i + 3];
 
 		y = 255 - y;
+		int colour = attr & 0xf;
+		colour += ((m_pal1 & 1) | ((m_pal2 & 1)<<1)) * 0x10;
 
-		bool flipx = pal & 0x80;
+		bool flipx = attr & 0x80;
 		bool flipy = tile & 0x80;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, tile, pal & 0xf, flipx, flipy, x-8, y-8, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, tile, colour, flipx, flipy, x-8, y-8, 0);
 	}
 
 	return 0;
@@ -407,26 +406,32 @@ ROM_START( jammin )
 	ROM_LOAD( "jambak.pl0", 0x0000, 0x0800, CRC(af808d29) SHA1(cad060ee4e529f9a2ffa9675682b9e17bed4dffe) )
 	ROM_LOAD( "jambak.pl1", 0x0800, 0x0800, CRC(43eaccef) SHA1(37e032b60c0bbaea81b55b4d137cb2d9d047e521) )
 
-	// do these sprite regions need combining into 6bpp gfx?
-	// the layouts are very different
 	ROM_REGION( 0x2000, "tiles2", 0 ) // 2bpp of sprite data
 	ROM_LOAD32_BYTE( "jammin.7c", 0x0000, 0x0800, CRC(82361b24) SHA1(ed070586296c329cb88e3dfc4741d591ec59fb8d) )
 	ROM_LOAD32_BYTE( "jammin.7e", 0x0001, 0x0800, CRC(9563c301) SHA1(3947af64f3becf36afaacdb8c962bfccc236525d) )
 	ROM_LOAD32_BYTE( "jammin.7d", 0x0002, 0x0800, CRC(0f02eb55) SHA1(b97ee07dbd71bdc698ac775a721f220afd6bb7cc) )
 	ROM_LOAD32_BYTE( "jammin.7f", 0x0003, 0x0800, CRC(26c7f3b8) SHA1(a0a13ce692bcf40104099a4d9bb2c36aca885350) )
 
-	ROM_REGION( 0x4000, "tiles3", 0 ) // 4bpp of sprite data
-	ROM_LOAD16_WORD_SWAP( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
-
-	ROM_REGION( 0x200, "proms_lookup", 0 ) // lookup?
+	ROM_REGION( 0x100, "proms_lookup", 0 ) // lookup
 	ROM_LOAD( "mac2n.bin", 0x000, 0x0100, CRC(e8198448) SHA1(20fc8da7858daa56be758148e5e80f5de30533f9) )
-	ROM_LOAD( "col2n.bin", 0x100, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // colours?
+	ROM_REGION( 0x200, "proms", 0 ) // colours
 	ROM_LOAD( "mac2e.bin", 0x000, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) )
 	ROM_LOAD( "mac2f.bin", 0x100, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) )
 
-	ROM_REGION( 0x400, "promsx", 0 ) // more colours, what are these for?
+	// ROMs below aren't being used in the emulation at the moment
+
+	// 4bpp version of the sprite graphics, all planes are unique compared to the 2bpp version
+	// did this get used?
+	ROM_REGION( 0x4000, "tiles3", 0 ) // 4bpp of sprite data
+	ROM_LOAD16_WORD_SWAP( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
+
+	// a 2nd set of lookup tables + proms
+	// what are they for?
+	ROM_REGION( 0x100, "proms_lookupx", 0 )
+	ROM_LOAD( "col2n.bin", 0x000, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
+
+	ROM_REGION( 0x200, "promsx", 0 )
 	ROM_LOAD( "col2e.bin", 0x000, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
 	ROM_LOAD( "col2f.bin", 0x100, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
 ROM_END
