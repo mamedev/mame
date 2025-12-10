@@ -5,7 +5,6 @@
     aka Cobra 3
 
    TODO: MPEG decoding currently not implemented
-         Checksum fails for all games, looks like a CPU bug
 */
 
 
@@ -107,6 +106,7 @@ uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 
 					case 0x400:
 						//input reads, haven't got far enough to trigger any
+						logerror("%s maincpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 						break;
 
 					case 0x500: //SCSI DMA
@@ -154,12 +154,12 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 	switch (cs)
 	{
 		case 1:// ROM, shouldn't write here?
-				logerror("%sx maincpu write access(1) offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
-				break;
+			logerror("%sx maincpu write access(1) offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
+			break;
 
 		case 2:// (NV)RAM
-				COMBINE_DATA(&m_mainram[offset & 0x1fff]);
-				break;
+			COMBINE_DATA(&m_mainram[offset & 0x1fff]);
+			break;
 
 		case 3: // I/O
 			{
@@ -168,10 +168,12 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 				switch(cs_addr_8_11)
 				{
 					case 0x000:
+						logerror("%s maincpu write access lamp drive io latch offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 						// lamps;
 						break;
 
 					case 0x100:
+						logerror("%s maincpu write access lockout latch offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 						if(ACCESSING_BITS_8_15)
 						{
 							// coin lockout and optional vfd (debug only?)
@@ -179,6 +181,7 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 						break;
 
 					case 0x200:
+						logerror("%s maincpu write access io latch offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
 						// volume, watchdog and other stuff ? That's where it would be elsewhere
 						break;
 
@@ -200,21 +203,20 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 						if(ACCESSING_BITS_0_7)
 						{
 							offset &= 7;
-							if(offset == 0)
+							switch (offset)
 							{
+							case 0:
 								m_ramdac->index_w(data);
-							}
-							else if(offset == 1)
-							{
+								break;
+							case 1:
 								m_ramdac->pal_w(data);
-							}
-							else if(offset == 2)
-							{
+								break;
+							case 2:
 								m_ramdac->mask_w(data);
-							}
-							else if(offset == 3)
-							{
+								break;
+							case 3:
 								m_ramdac->index_r_w(data);
+								break;
 							}
 						}
 						break;
@@ -228,16 +230,16 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 			break;
 
 		case 4: // SCSI controller
-				offset &= 0x0f;
-				if(ACCESSING_BITS_8_15)
-				{
-					m_scsic->write(offset, data >> 8);
-				}
-				break;
+			offset &= 0x0f;
+			if(ACCESSING_BITS_8_15)
+			{
+				m_scsic->write(offset, data >> 8);
+			}
+			break;
 
 		default:
-				logerror("%s maincpu write access(0) offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
-				break;
+			logerror("%s maincpu write access(0) offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
+			break;
 	}
 }
 
