@@ -32,6 +32,7 @@ enum class error : int {
 	invalid_name,
 	incorrect_size,
 	already_exists,
+	circular_reference,
 };
 
 enum class dir_entry_type {

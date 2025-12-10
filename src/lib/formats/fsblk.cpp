@@ -295,6 +295,7 @@ std::error_category const &fs_category() noexcept
 					"Invalid filename or path"sv,
 					"Incorrect file size"sv,
 					"File already exists"sv,
+					"Circular reference"sv,
 			};
 			if ((0 <= condition) && (std::size(s_messages) > condition))
 				return std::string(s_messages[condition]);

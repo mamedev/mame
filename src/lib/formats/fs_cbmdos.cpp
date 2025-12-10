@@ -126,8 +126,8 @@ private:
 
 	fsblk_t::block_t::ptr read_sector(int track, int sector) const;
 	std::optional<cbmdos_dirent> dirent_from_path(const std::vector<std::string> &path) const;
-	void iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
-	void iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
+	std::error_condition iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
+	std::error_condition iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
 	meta_data metadata_from_dirent(const cbmdos_dirent &dirent) const;
 	bool is_valid_filename(const std::string &filename) const;
 	std::pair<std::error_condition, u8> claim_track_sector(u8 track) const;
@@ -339,8 +339,8 @@ std::pair<std::error_condition, std::vector<dir_entry>> impl::directory_contents
 		results.emplace_back(dir_entry_type::file, metadata_from_dirent(ent));
 		return false;
 	};
-	iterate_directory_entries(callback);
-	return std::make_pair(std::error_condition(), std::move(results));
+	std::error_condition err = iterate_directory_entries(callback);
+	return std::make_pair(err != error::not_found ? err : std::error_condition(), std::move(results));
 }
 
 
@@ -361,7 +361,7 @@ std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vect
 	while (iter.next())
 		iter.append_data(result);
 
-	return std::make_pair(std::error_condition(), std::move(result));
+	return std::make_pair(iter.track() != CHAIN_END ? error::circular_reference : std::error_condition(), std::move(result));
 }
 
 
@@ -387,7 +387,9 @@ std::error_condition impl::file_create(const std::vector<std::string> &path, con
 		}
 		return found;
 	};
-	iterate_all_directory_entries(callback);
+	std::error_condition direrr = iterate_all_directory_entries(callback);
+	if (direrr && direrr != error::not_found)
+		return direrr;
 
 	if (!result)
 	{
@@ -455,7 +457,9 @@ std::error_condition impl::file_write(const std::vector<std::string> &path, cons
 		}
 		return found;
 	};
-	iterate_directory_entries(callback);
+	std::error_condition err = iterate_directory_entries(callback);
+	if (err)
+		return err;
 
 	if (!result)
 		return error::not_found;
@@ -656,7 +660,7 @@ std::optional<impl::cbmdos_dirent> impl::dirent_from_path(const std::vector<std:
 			result = dirent;
 		return found;
 	};
-	iterate_directory_entries(callback);
+	std::ignore = iterate_directory_entries(callback);
 	return result;
 }
 
@@ -665,7 +669,7 @@ std::optional<impl::cbmdos_dirent> impl::dirent_from_path(const std::vector<std:
 //  impl::iterate_directory_entries
 //-------------------------------------------------
 
-void impl::iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
+std::error_condition impl::iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
 {
 	block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
 	while (iter.next())
@@ -676,13 +680,14 @@ void impl::iterate_directory_entries(const std::function<bool(u8 track, u8 secto
 			if (entry.m_file_type != 0x00)
 			{
 				if (callback(iter.track(), iter.sector(), file_index, entry))
-					return;
+					return std::error_condition();
 			}
 		}
 	}
+	return iter.track() != CHAIN_END ? error::circular_reference : error::not_found;
 }
 
-void impl::iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
+std::error_condition impl::iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
 {
 	block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
 	while (iter.next())
@@ -691,9 +696,10 @@ void impl::iterate_all_directory_entries(const std::function<bool(u8 track, u8 s
 		{
 			cbmdos_dirent entry = iter.get_dirent(file_index);
 			if (callback(iter.track(), iter.sector(), file_index, entry))
-				return;
+				return std::error_condition();
 		}
 	}
+	return iter.track() != CHAIN_END ? error::circular_reference : error::not_found;
 }
 
 //-------------------------------------------------
