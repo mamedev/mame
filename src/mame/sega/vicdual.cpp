@@ -1666,9 +1666,7 @@ static INPUT_PORTS_START( headon2sl )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_COCKTAIL
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_COCKTAIL
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_DIPNAME(0x08, 0x00, DEF_STR(Lives))          PORT_DIPLOCATION("DSW:1")
-	PORT_DIPSETTING(   0x00, "5")
-	PORT_DIPSETTING(   0x08, "4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x001>))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1694,13 +1692,21 @@ static INPUT_PORTS_START( headon2sl )
 	PORT_START("IN3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_COCKTAIL
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x002>))  /* Nintendo THO boards cannot use this*/
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::coin_status_r))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_COIN_DEFAULT
+
+	
+	PORT_START("FAKE_LIVES.0")
+	PORT_DIPNAME( 0x03, 0x01, "Lives" )   PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	//PORT_DIPSETTING(    0x02, "5" ) /* Duplicate Value - Each switch set adds a life */
+	PORT_DIPSETTING(    0x03, "6" )
 INPUT_PORTS_END
 
 
@@ -5285,7 +5291,7 @@ GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,   empty_i
 GAME( 1979, bumba,      headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Niemer)",        "Bumba (bootleg of Head On)",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, colision,   headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (ASSA)",          "Colision (bootleg of Head On)",                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,   empty_init, ROT0,   "Sega",                    "Head On 2",                                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2sl,  0,        headon2sl, headon2sl, vicdual_state,   empty_init, ROT270, "Sega",                    "Head On 2 (Sega Slimline)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2sl,  headon2,  headon2sl, headon2sl, vicdual_state,   empty_init, ROT270, "Sega",                    "Head On 2 (Sega Slimline)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On 2 (Sidam bootleg)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
