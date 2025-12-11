@@ -1812,7 +1812,7 @@ void jammin_state::jammin(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, m_ym2151, 14'318'181 / 4); // ?? used sys2 clock
+	YM2151(config, m_ym2151, I8035_CLOCK / 2); // matches video reference
 	m_ym2151->add_route(0, "speaker", 0.60, 0);
 	m_ym2151->add_route(1, "speaker", 0.60, 1);
 }
