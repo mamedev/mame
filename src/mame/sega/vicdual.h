@@ -54,6 +54,7 @@ public:
 	void invinco_audio(machine_config &config);
 	void invds(machine_config &config);
 	void headon2(machine_config &config);
+	void headon2sl(machine_config &config);
 	void pulsar(machine_config &config);
 	void pulsar_audio(machine_config &config);
 	void spacetrk(machine_config &config);
@@ -124,6 +125,8 @@ protected:
 	DECLARE_MACHINE_RESET(headon2);
 	uint8_t headon2_io_r(offs_t offset);
 	void headon2_io_w(offs_t offset, uint8_t data);
+//	uint8_t headon2sl_io_r(offs_t offset);
+	void headon2sl_io_w(offs_t offset, uint8_t data);
 	void digger_io_w(offs_t offset, uint8_t data);
 	void invho2_io_w(offs_t offset, uint8_t data);
 	void invds_io_w(offs_t offset, uint8_t data);
@@ -178,6 +181,8 @@ protected:
 	void frogs_map(address_map &map) ATTR_COLD;
 	void headon2_io_map(address_map &map) ATTR_COLD;
 	void headon2_map(address_map &map) ATTR_COLD;
+	void headon2sl_io_map(address_map &map) ATTR_COLD;
+	//void headon2sl_map(address_map &map) ATTR_COLD;
 	void headon_io_map(address_map &map) ATTR_COLD;
 	void headon_map(address_map &map) ATTR_COLD;
 	void headonn_io_map(address_map &map) ATTR_COLD;

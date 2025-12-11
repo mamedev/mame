@@ -13,6 +13,7 @@
         * Space Attack / Head On
         * Head On
         * Head On 2
+		* Head On 2 (Slimline)
         * Invinco / Head On 2
         * N-Sub
         * Samurai
@@ -1535,6 +1536,7 @@ void vicdual_state::sspaceat(machine_config &config)
 /*************************************
  *
  *  Head On 2
+ *  Head On 2 (Sega Slimline)
  *  Digger
  *
  *************************************/
@@ -1555,6 +1557,20 @@ void vicdual_state::headon2_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01) assert_coin_status();
 	if (offset & 0x02) headon_audio_w(data);
+}
+
+void vicdual_state::headon2sl_io_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0x01) invho2_audio_w(data);
+	if (offset & 0x02)
+	{
+		// 7654----  unused?
+		// ----32--  always 1
+		// ------10  palette bank (bit 0 inverted)
+
+		palette_bank_w((data & 3) ^ 1);
+	}
+	if (offset & 0x08) assert_coin_status();
 }
 
 
@@ -1590,6 +1606,19 @@ void vicdual_state::headon2_io_map(address_map &map)
 	map(0x00, 0x1f).rw(FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
 }
 
+void vicdual_state::headon2sl_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(FUNC(vicdual_state::headon2sl_io_w));
+}
 
 void vicdual_state::digger_io_map(address_map &map)
 {
@@ -1628,6 +1657,48 @@ static INPUT_PORTS_START( headon2 )
 	PORT_DIPSETTING(   0x02, DEF_STR( On ) )
 	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::coin_status_r))
+
+	PORT_COIN_DEFAULT
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( headon2sl )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_COCKTAIL
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_DIPNAME(0x08, 0x00, DEF_STR(Lives))          PORT_DIPLOCATION("DSW:1")
+	PORT_DIPSETTING(   0x00, "5")
+	PORT_DIPSETTING(   0x08, "4")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::coin_status_r))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
@@ -1734,6 +1805,18 @@ void vicdual_state::headon2(machine_config &config)
 
 	// video hardware
 	m_screen->set_screen_update(FUNC(vicdual_state::screen_update_color));
+
+	// audio hardware
+	SPEAKER(config, "mono").front_center();
+	headon_audio(config);
+}
+
+void vicdual_state::headon2sl(machine_config &config)
+{
+	vicdual_dualgame_root(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headon2sl_io_map);
 
 	// audio hardware
 	SPEAKER(config, "mono").front_center();
@@ -4232,6 +4315,27 @@ ROM_START( headon2 )
 	ROM_LOAD( "316-0206.u65", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    // control PROM
 ROM_END
 
+/* Head On 2 - Sega Slimline (VIC Dual PCB Set)*/
+/* Head On Part 2 - Nintendo Table (Nintendo THO PCB Set) */
+ROM_START( headon2sl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-170.u33",   0x0000, 0x0400, CRC(C108625D) SHA1(b6e255b819a001a0147f2ddf5f78689e0491da88) )
+	ROM_LOAD( "epr-171.u32",   0x0400, 0x0400, CRC(05814307) SHA1(c94798f71096beb9a9291f0f37f906f35305c815) )
+	ROM_LOAD( "epr-172.u31",   0x0800, 0x0400, CRC(77108D24) SHA1(87974956e386c5cc2ffa9b14f31a0eec12b238a6) )
+	ROM_LOAD( "epr-173.u30",   0x0c00, 0x0400, CRC(3D711E00) SHA1(06c10be4dd6b9ac454c2907c501a038554ef0dc8) )
+	ROM_LOAD( "epr-174.u29",   0x1000, 0x0400, CRC(89F98392) SHA1(51104ebf15bf8a1a003a068ea1136bd1a085824e) )
+	ROM_LOAD( "epr-175.u28",   0x1400, 0x0400, CRC(FD9034C5) SHA1(149017997f9db9d304bbe5acc32f9c93adff052d) )
+	ROM_LOAD( "epr-176.u27",   0x1800, 0x0400, CRC(319D3465) SHA1(56f3108a3ba38eb94b8b59f4aac52ab9a921292d) )
+	ROM_LOAD( "epr-177.u26",   0x1c00, 0x0400, CRC(F43A9846) SHA1(29bb6527eca00d84390e005d24d17753ce2c79bc) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "316-0138.u49", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    // timing PROMs
+	ROM_LOAD( "316-0043.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM
+	ROM_LOAD( "316-0042.u15", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    // sequence PROM
+ROM_END
+
 
 /*
     Car 2 (Headon 2)
@@ -5181,6 +5285,7 @@ GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,   empty_i
 GAME( 1979, bumba,      headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Niemer)",        "Bumba (bootleg of Head On)",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, colision,   headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (ASSA)",          "Colision (bootleg of Head On)",                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,   empty_init, ROT0,   "Sega",                    "Head On 2",                                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2sl,  0,        headon2sl, headon2sl, vicdual_state,   empty_init, ROT270, "Sega",                    "Head On 2 (Sega Slimline)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On 2 (Sidam bootleg)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
