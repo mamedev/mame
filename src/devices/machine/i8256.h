@@ -92,7 +92,7 @@ private:
 
 	uint8_t m_command1, m_command2, m_command3;
 	uint8_t m_data_bits_count;
-	parity_t m_parity;
+	uint8_t m_parity;
 	stop_bits_t m_stop_bits;
 
 	uint8_t m_mode;
