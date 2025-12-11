@@ -269,7 +269,7 @@ void i8256_device::reset_timer()
 	{
 		divider = 1024;
 	}
-	const attotime TIME = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) / divider);
+	const attotime TIME = attotime::from_hz((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]) / divider);
 	m_timer->adjust(TIME, 0, TIME);
 }
 
@@ -389,9 +389,9 @@ void i8256_device::write(offs_t offset, u8 data)
 
 				set_data_frame(1, m_data_bits_count, m_parity, m_stop_bits);
 
-				LOG("I8256 Clock Scale: %u\n", SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]);
-				if ((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]) != 1024000)
-					logerror("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30 >> 4)]));
+				LOG("I8256 Clock Scale: %u\n", SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]);
+				if ((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]) != 1024000)
+					logerror("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]));
 			}
 			break;
 		case I8256_REG_CMD3:
