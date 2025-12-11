@@ -63,8 +63,8 @@ public:
 	{ }
 
 	void dicemstr(machine_config &config);
-	void doppelpot(machine_config &config);
-	void excellent(machine_config &config);
+	void board4040(machine_config &config);
+	void board4087(machine_config &config);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -84,9 +84,9 @@ private:
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
-	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
-	void small_program_map(address_map &map) ATTR_COLD;
+	void program_4087_map(address_map &map) ATTR_COLD;
+	void program_4040_map(address_map &map) ATTR_COLD;
 	void io_4040_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -127,7 +127,7 @@ void stella8085_state::machine_start()
 	save_item(NAME(m_digit));
 }
 
-void stella8085_state::program_map(address_map &map)
+void stella8085_state::program_4087_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom(); // ICE6, ICD6, ICC5
 	map(0x9000, 0x903f).rw("rtc", FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
@@ -142,7 +142,7 @@ void stella8085_state::large_program_map(address_map &map)
 	map(0xa000, 0xffff).rom(); // ICD6
 }
 
-void stella8085_state::small_program_map(address_map &map)
+void stella8085_state::program_4040_map(address_map &map)
 {
 	map(0x0000, 0x4fff).rom();
 	map(0x5000, 0x5fff).ram();
@@ -559,21 +559,21 @@ void stella8085_state::dicemstr(machine_config &config)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void stella8085_state::doppelpot(machine_config &config)
+void stella8085_state::board4087(machine_config &config)
 {
-	excellent(config);
+	board4040(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4087_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 }
 
-void stella8085_state::excellent(machine_config &config)
+void stella8085_state::board4040(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::small_program_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
 
@@ -878,33 +878,33 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL( 1982, excellent,            0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1983, bahia,                0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1984, disc,                 0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1985, doppelstart,          0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, discolympia,          0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Olympia",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1986, doppelpot,            0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, elitedisc,            0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1986, rasant,               0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, superjackpot,         0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Nova",   "Super Jackpot",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, vmulti,               0, excellent, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Multi",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, disc2000,             0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, disc2001,             0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, fullhouse,            0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Full House",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, herzas,       herzasf10, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, herzasf8,     herzasf10, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F8)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, herzasf10,            0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F10)",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1982, excellent,            0, board4040, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1983, bahia,                0, board4040, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1984, disc,                 0, board4040, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1985, doppelstart,          0, board4040, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, discolympia,          0, board4040, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Olympia",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1986, doppelpot,            0, board4087, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, elitedisc,            0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1986, rasant,               0, board4087, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, superjackpot,         0, board4087, disc,     stella8085_state, empty_init, ROT0, "Nova",   "Super Jackpot",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, vmulti,               0, board4040, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Multi",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, disc2000,             0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, disc2001,             0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, fullhouse,            0, board4087, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Full House",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzas,       herzasf10, board4087, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf8,     herzasf10, board4087, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F8)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf10,            0, board4087, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F10)",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1987, kniffi,               0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, sesam,                0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Sesam",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, supermulti, supermultib, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, supermultib,          0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, sesam,                0, board4087, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Sesam",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, supermulti, supermultib, board4087, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, supermultib,          0, board4087, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, extrablatt,           0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, juwel,                0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, mastro,               0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Merkur Astro",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, superherzas,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz AS",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1989, disc3000,             0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1989, discroyal,   discroyalb, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1989, discroyalb,           0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal (DOB)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, disc3000,             0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, discroyal,   discroyalb, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, discroyalb,           0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal (DOB)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1989, mas,                  0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "As",                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1990, v4assef1,      v4assef2, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "4 Asse (F1)",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1990, v4assef2,             0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "4 Asse (F2)",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
@@ -914,7 +914,7 @@ GAMEL( 1991, mclub,                0, dicemstr,  disc,     stella8085_state, emp
 GAMEL( 1991, superpro,             0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Pro",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1991, treffasm,             0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Treff As",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1992, m21point,             0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "MEGA",   "21 Point",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1992, disciiplus,           0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc II Plus",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, disciiplus,           0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc II Plus",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1992, karoas,               0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1992, mmax,                 0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "MEGA",   "Max",               MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1992, mtrio,                0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Trio",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
