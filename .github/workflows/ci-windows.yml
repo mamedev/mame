@@ -17,6 +17,7 @@ on:
     - 'src/**'
     - 'COPYING'
     - 'makefile'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -25,6 +26,7 @@ jobs:
   build-windows:
     strategy:
       matrix:
+        # compiler: [gcc-x64, clang-x64, clang-arm64]
         compiler: [gcc-x64]
         include:
           - compiler: gcc-x64
@@ -36,6 +38,12 @@ jobs:
             subtarget: mame
             executable: mame
     runs-on: ${{ matrix.os }}
+    # write permission needed for setup-ccache-action to remove its stale caches
+    # see its readme to disable that if no permissions are to be allowed
+    permissions:
+        actions: write
+    env:
+       CCACHE_DIR: "${{ github.workspace }}/.ccache"
     defaults:
       run:
         shell: msys2 {0}
@@ -43,10 +51,29 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         msystem: ${{ matrix.msys }}
-        install: git make ${{ matrix.slug }}-${{ matrix.cc }} ${{ matrix.slug }}-python ${{ matrix.slug }}-lld ${{ matrix.slug }}-llvm ${{ matrix.slug }}-libc++ ${{ matrix.extrapkg }}
+        install: git make ${{ matrix.slug }}-${{ matrix.cc }} ${{ matrix.slug }}-python ${{ matrix.slug }}-lld ${{ matrix.slug }}-llvm ${{ matrix.slug }}-libc++ ${{ matrix.slug }}-ccache ${{ matrix.extrapkg }}
     - uses: actions/checkout@main
       with:
         fetch-depth: 0
+    - name: Setup ccache
+      uses: Chocobo1/setup-ccache-action@v1.5.2
+      with:
+         windows_compile_environment: msys2
+         install_ccache: false
+         update_packager_index: false
+    - name: Prepare for complay cache
+      run: |
+          grep complay makefile >complay.prehash
+          cat scripts/build/complay.py >>complay.prehash
+    - name: cache complay-ed layouts
+      uses: actions/cache@v3
+      with:
+          path: ${{ github.workspace }}/build/generated/mame/layout
+          key: complay_${{ hashFiles('complay.prehash','**.lay') }}
+    - name: Touch complay-ed layouts
+      continue-on-error: true
+      run: |
+        [ -d build/generated/mame/layout ] && cd build/generated/mame/layout && touch *.lh
     - name: Build
       env:
         OVERRIDE_AR: "llvm-ar"
@@ -56,12 +83,18 @@ jobs:
         SUBTARGET: ${{ matrix.subtarget }}
         SOURCES: sinclair/sprinter.cpp,sinclair/tsconf.cpp,sinclair/specnext.cpp,sinclair/pentevo.cpp,sinclair/spectrum.cpp,sinclair/spec128.cpp,sinclair/specpls3.cpp,sinclair/scorpion.cpp
         TOOLS: 1
+        REGENIE: 1
+        PRECOMPILE: 0
       run: make -j2
+    - name: Sneaking
+      run: |
+        ls -la
+        find build
+    - name: Validate
+      run: ./${{ matrix.executable }}.exe -validate
     - uses: actions/upload-artifact@main
       with:
         name: ${{ matrix.executable }}-windows-${{ matrix.compiler }}-${{ github.sha }}
         path: |
           ${{ matrix.executable }}.exe
-          chdman.exe
-          unidasm.exe
         if-no-files-found: error
