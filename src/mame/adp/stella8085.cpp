@@ -679,6 +679,18 @@ ROM_START( discolympia )
 	ROM_LOAD( "olympia_pr6", 0x7000, 0x1000, CRC(e6830d26) SHA1(dbe7a39f24a1dcee298dae3ec1b2d6249a914262) )
 ROM_END
 
+ROM_START( discroyal )
+    ROM_REGION( 0x10000, "maincpu", 0 )
+    ROM_LOAD("disc_royal_1_m27256.ice6", 0x0000, 0x8000, CRC(b286c166) SHA1(08fecc3bf21013f8dbcc08fef3755757c7ff8053))
+    ROM_LOAD("disc_royal_2_m27256.icd6", 0x8000, 0x8000, CRC(be2a96c2) SHA1(07efc914832fe549b69a2ec0de5fd5725502ee86))
+ROM_END
+
+ROM_START( discroyalb )
+    ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("disc_royal_dob._i.ice6", 0x0000, 0x8000, CRC(eafe92ca) SHA1(5dc172d7cd4efca7a49ac5884ff30fea7be02a30))
+    ROM_LOAD("disc_royal_dob.ii.icd6", 0x8000, 0x8000, CRC(ad58476d) SHA1(4565156cac372f45058bce20006692e9afa53ebe))
+ROM_END
+
 ROM_START( elitedisc )
 	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "elitedisc.ice6", 0x0000, 0x4000, CRC(7f7a2f30) SHA1(01e3ce5fce2c9d51d3f4b8aab7dd67ed4b26d8f4) )
@@ -856,6 +868,8 @@ GAMEL( 1988, juwel,                0, dicemstr,  disc,     stella8085_state, emp
 GAMEL( 1988, mastro,               0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Merkur Astro",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, superherzas,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz AS",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1989, disc3000,             0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, discroyal,   discroyalb, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, discroyalb,           0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal (DOB)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1990, v4asse,               0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "4 Asse",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1991, macao,                0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Macao",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1991, mclub,                0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Merkur", "Club",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
