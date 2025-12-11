@@ -3912,7 +3912,7 @@ void segas1x_bootleg_state::init_wb3bble()
 		0x1144, 0x0405, 0x0405, 0x5511, 0x0555, 0x0004, 0x5104, 0x1104
 	};
 
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *ROM = &memregion("maincpu")->as_u16();
 
 	for (int i = 0; i < 0x10000; i++)
 	{
@@ -3929,7 +3929,7 @@ void segas1x_bootleg_state::init_wb3bble()
 /* Sys16B */
 void segas1x_bootleg_state::init_goldnaxeb1()
 {
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *ROM = &memregion("maincpu")->as_u16();
 	uint8_t *KEY = memregion("decryption")->base();
 	uint16_t data[0x800];
 
@@ -3965,7 +3965,7 @@ void segas1x_bootleg_state::init_bayrouteb1()
 	// decrypt
 	init_goldnaxeb1();
 
-	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	uint16_t *ROM = &memregion("maincpu")->as_u16();
 
 	// patch interrupt vector
 	ROM[0x0070/2] = 0x000b;
@@ -4028,7 +4028,7 @@ void segas1x_bootleg_state::init_bloxeedbl()
 	init_sys18bl_oki();
 
 	// HACK: patch out undumped MCU handshake for now
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = &memregion("maincpu")->as_u16();
 
 	rom[0x508 / 2] = 0x6100;
 	rom[0x50a / 2] = 0x020a;
@@ -4094,7 +4094,7 @@ void segas1x_bootleg_state::init_altbeastbl()
 /* Tetris-based */
 void segas1x_bootleg_state::init_beautyb()
 {
-	uint16_t*rom = (uint16_t*)memregion( "maincpu" )->base();
+	uint16_t *rom = &memregion("maincpu")->as_u16();
 	for (int x = 0; x < 0x8000; x++)
 	{
 		rom[x] = rom[x] ^ 0x2400;
