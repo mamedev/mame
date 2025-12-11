@@ -83,7 +83,7 @@ authors:hap
 	<element name="text_bon"><text string="ON"><color red="0.99" green="0.99" blue="0.99" /></text></element>
 	<element name="text_boff"><text string="OFF"><color red="0.99" green="0.99" blue="0.99" /></text></element>
 	<element name="text_bs"><text string="SUSPECT"><color red="0.99" green="0.99" blue="0.99" /></text></element>
-	<element name="text_bpq"><text string="PRIVATE QUESTION"><color red="0.99" green="0.99" blue="0.99" /></text></element>
+	<element name="text_bpq"><text string=" PRIVATE QUESTION "><color red="0.99" green="0.99" blue="0.99" /></text></element>
 	<element name="text_bia"><text string="I ACCUSE"><color red="0.99" green="0.99" blue="0.99" /></text></element>
 	<element name="text_bent"><text string="ENTER"><color red="0.99" green="0.99" blue="0.99" /></text></element>
 	<element name="text_bet"><text string="END TURN"><color red="0.99" green="0.99" blue="0.99" /></text></element>
@@ -119,20 +119,20 @@ authors:hap
 		<element ref="red"><bounds x="10.05" y="0" width="15" height="6" /></element>
 		<element ref="text_r1a"><bounds x="7.5" y="7.7" width="8" height="0.6" /></element>
 		<element ref="text_r1b"><bounds x="8.0" y="7.7" width="8" height="0.6" /></element>
-		<element ref="text_r2a"><bounds x="14.5" y="7.7" width="8" height="0.6" /></element>
-		<element ref="text_r2b"><bounds x="15.0" y="7.7" width="8" height="0.6" /></element>
+		<element ref="text_r2a"><bounds x="14.8" y="7.7" width="8" height="0.6" /></element>
+		<element ref="text_r2b"><bounds x="15.3" y="7.7" width="8" height="0.6" /></element>
 
 		<element ref="black"><bounds x="10.95" y="0" width="13" height="7.05" /></element>
 		<element ref="orange"><bounds x="11.05" y="0" width="13" height="6.95" /></element>
 		<element ref="text_o1a"><bounds x="11.3" y="5.35" width="8" height="0.6" /></element>
 		<element ref="text_o1b"><bounds x="11.8" y="5.35" width="8" height="0.6" /></element>
-		<element ref="text_o1c"><bounds x="12.0" y="5.95" width="8" height="0.6" /></element>
-		<element ref="text_o2a"><bounds x="14.5" y="5.35" width="8" height="0.6" /></element>
-		<element ref="text_o2b"><bounds x="15.0" y="5.35" width="8" height="0.6" /></element>
-		<element ref="text_o2c"><bounds x="15.2" y="5.95" width="8" height="0.6" /></element>
-		<element ref="text_o3a"><bounds x="17.7" y="5.35" width="8" height="0.6" /></element>
-		<element ref="text_o3b"><bounds x="18.2" y="5.35" width="8" height="0.6" /></element>
-		<element ref="text_o3c"><bounds x="18.4" y="5.95" width="8" height="0.6" /></element>
+		<element ref="text_o1c"><bounds x="11.95" y="5.95" width="8" height="0.6" /></element>
+		<element ref="text_o2a"><bounds x="14.8" y="5.35" width="8" height="0.6" /></element>
+		<element ref="text_o2b"><bounds x="15.3" y="5.35" width="8" height="0.6" /></element>
+		<element ref="text_o2c"><bounds x="15.45" y="5.95" width="8" height="0.6" /></element>
+		<element ref="text_o3a"><bounds x="18.3" y="5.35" width="8" height="0.6" /></element>
+		<element ref="text_o3b"><bounds x="18.8" y="5.35" width="8" height="0.6" /></element>
+		<element ref="text_o3c"><bounds x="18.95" y="5.95" width="8" height="0.6" /></element>
 
 		<element ref="black"><bounds x="11.95" y="0" width="14" height="5.05" /></element>
 		<element ref="yellow"><bounds x="13.05" y="0" width="12" height="4.95" /></element>
@@ -143,12 +143,12 @@ authors:hap
 		<element ref="text_y2b"><bounds x="14.0" y="3.45" width="8" height="0.6" /></element>
 		<element ref="text_y3a"><bounds x="13.5" y="4.05" width="8" height="0.6" /></element>
 		<element ref="text_y3b"><bounds x="14.0" y="4.05" width="8" height="0.6" /></element>
-		<element ref="text_y4a"><bounds x="16.9" y="2.85" width="8" height="0.6" /></element>
-		<element ref="text_y4b"><bounds x="17.4" y="2.85" width="8" height="0.6" /></element>
-		<element ref="text_y5a"><bounds x="16.9" y="3.45" width="8" height="0.6" /></element>
-		<element ref="text_y5b"><bounds x="17.4" y="3.45" width="8" height="0.6" /></element>
-		<element ref="text_y6a"><bounds x="16.9" y="4.05" width="8" height="0.6" /></element>
-		<element ref="text_y6b"><bounds x="17.4" y="4.05" width="8" height="0.6" /></element>
+		<element ref="text_y4a"><bounds x="17.4" y="2.85" width="8" height="0.6" /></element>
+		<element ref="text_y4b"><bounds x="17.9" y="2.85" width="8" height="0.6" /></element>
+		<element ref="text_y5a"><bounds x="17.4" y="3.45" width="8" height="0.6" /></element>
+		<element ref="text_y5b"><bounds x="17.9" y="3.45" width="8" height="0.6" /></element>
+		<element ref="text_y6a"><bounds x="17.4" y="4.05" width="8" height="0.6" /></element>
+		<element ref="text_y6b"><bounds x="17.9" y="4.05" width="8" height="0.6" /></element>
 
 		<element ref="black"><bounds x="13.95" y="0" width="10" height="2.05" /></element>
 		<element ref="white2"><bounds x="14.05" y="0" width="10" height="1.95" /></element>

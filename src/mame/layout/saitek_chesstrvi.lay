@@ -109,7 +109,7 @@ authors:hap
 		<element ref="blackb"><bounds x="29.15" y="32.7" width="0.7" height="0.7" /></element>
 
 		<element ref="text_l09a"><bounds x="0" y="37.7" width="3" height="0.8" /></element>
-		<element ref="text_l09b"><bounds x="2.5" y="37.6" width="3" height="0.5" /></element>
+		<element ref="text_l09b"><bounds x="2.6" y="37.6" width="3" height="0.5" /></element>
 		<element ref="text_l10a"><bounds x="4" y="37.35" width="4" height="0.8" /></element>
 		<element ref="text_l10b"><bounds x="4" y="38.15" width="4" height="0.8" /></element>
 		<element ref="text_l11a"><bounds x="8" y="37.35" width="4" height="0.8" /></element>

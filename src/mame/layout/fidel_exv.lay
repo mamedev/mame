@@ -386,7 +386,7 @@ authors:hap
 		<element ref="text_ld"><bounds x="33.5" y="85.8" width="10" height="2" /></element>
 		<element ref="text_le"><bounds x="43.5" y="85.8" width="10" height="2" /></element>
 		<element ref="text_lh"><bounds x="73.5" y="85.8" width="10" height="2" /></element>
-		<element ref="text_lg"><bounds x="62.5" y="85.8" width="12" height="2" /></element>
+		<element ref="text_lg"><bounds x="63.5" y="85.8" width="10" height="2" /></element>
 		<element ref="text_lf"><bounds x="53.5" y="85.8" width="10" height="2" /></element>
 
 		<!-- chessboard leds -->
