@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "i8256.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -213,7 +213,7 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 
 void i8256_device::device_start()
 {
-	// FIXME: not everything that needs to be is saved here
+	// internal register
 	save_item(NAME(m_command1));
 	save_item(NAME(m_command2));
 	save_item(NAME(m_command3));
@@ -227,7 +227,27 @@ void i8256_device::device_start()
 	save_item(NAME(m_port2_int));
 	save_item(NAME(m_timers));
 	save_item(NAME(m_status));
-
+	
+	// serial
+	save_item(NAME(m_rxc));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_cts));
+	save_item(NAME(m_txc));
+	save_item(NAME(m_data_bits_count));
+	save_item(NAME(m_parity));
+	save_item(NAME(m_stop_bits));
+	save_item(NAME(m_sync_byte_count));
+	save_item(NAME(m_rxc_count));
+	save_item(NAME(m_txc_count));
+	save_item(NAME(m_br_factor));
+	save_item(NAME(m_rxd_bits));
+	save_item(NAME(m_rx_data));
+	save_item(NAME(m_tx_data));
+	save_item(NAME(m_sync1));
+	save_item(NAME(m_sync2));
+	save_item(NAME(m_sync8));
+	save_item(NAME(m_sync16));
+	
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 }
 
