@@ -390,9 +390,9 @@ void i8256_device::write(offs_t offset, u8 data)
 					LOG("I8256 Enabled 8086 mode\n");
 
 				m_data_bits_count = 8 - (BIT(m_command1, I8256_CMD1_L0) | (BIT(m_command1, I8256_CMD1_L1) << 1));
-				m_stop_bits = STOP_BITS[BIT(m_command1, I8256_CMD1_S0) | (BIT(m_command1, I8256_CMD1_S1) << 1)];
+				m_stop_bits = BIT(m_command1, I8256_CMD1_S0) | (BIT(m_command1, I8256_CMD1_S1) << 1);
 
-				set_data_frame(1, m_data_bits_count, (parity_t)m_parity, m_stop_bits);
+				set_data_frame(1, m_data_bits_count, (parity_t)m_parity, STOP_BITS[m_stop_bits]);
 			}
 			break;
 		case I8256_REG_CMD2:
@@ -407,7 +407,7 @@ void i8256_device::write(offs_t offset, u8 data)
 				else
 					m_parity = PARITY_NONE;
 
-				set_data_frame(1, m_data_bits_count, (parity_t)m_parity, m_stop_bits);
+				set_data_frame(1, m_data_bits_count, (parity_t)m_parity, STOP_BITS[m_stop_bits]);
 
 				LOG("I8256 Clock Scale: %u\n", SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]);
 				if ((clock() / SYS_CLOCK_DIVIDER[(m_command2 & 0x30) >> 4]) != 1024000)
