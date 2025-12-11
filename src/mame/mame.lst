@@ -506,7 +506,8 @@ supermulti
 supermultib
 superpro
 treffasm
-v4asse
+v4assef1
+v4assef2
 
 @source:adp/stellafr.cpp
 action
