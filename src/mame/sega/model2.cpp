@@ -1364,16 +1364,22 @@ void model2o_maxx_state::model2o_maxx_mem(address_map &map)
 
 u8 model2o_gtx_state::gtx_r(offs_t offset)
 {
-	auto ROM = util::little_endian_cast<u8>(&memregion("prot_data")->as_u32());
+	auto ROM = util::little_endian_cast<u8>(&m_prot_data[0]);
 
-	if(offset == 0xffffc) // disable protection ROM overlay (fallbacks to data rom?)
-		m_gtx_state = 2;
-	else if(offset == 0xff00c || offset == 0xf0003) // enable protection bank 0
-		m_gtx_state = 0;
-	else if(offset == 0xff000) // enable protection bank 1
-		m_gtx_state = 1;
+	int gtx_state;
+	if (offset == 0xffffc) // disable protection ROM overlay (fallbacks to data ROM?)
+		gtx_state = 2;
+	else if (offset == 0xff00c || offset == 0xf0003) // enable protection bank 0
+		gtx_state = 0;
+	else if (offset == 0xff000) // enable protection bank 1
+		gtx_state = 1;
+	else
+		gtx_state = m_gtx_state;
 
-	return ROM[m_gtx_state*0x100000+offset];
+	if (!machine().side_effects_disabled())
+		m_gtx_state = gtx_state;
+
+	return ROM[gtx_state * 0x100000 + offset];
 }
 
 void model2o_gtx_state::model2o_gtx_mem(address_map &map)
@@ -1385,7 +1391,7 @@ void model2o_gtx_state::model2o_gtx_mem(address_map &map)
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
 u32 model2_state::copro_status_r()
 {
-	if(m_coprocnt == 0)
+	if (m_coprocnt == 0)
 		return -1;
 
 	return 0;
