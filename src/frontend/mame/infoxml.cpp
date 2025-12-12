@@ -208,6 +208,7 @@ constexpr char f_dtd_string[] =
 		"\t\t\t<!ATTLIST disk optional (yes|no) \"no\">\n"
 		"\t\t<!ELEMENT device_ref EMPTY>\n"
 		"\t\t\t<!ATTLIST device_ref name CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST device_ref tag CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT sample EMPTY>\n"
 		"\t\t\t<!ATTLIST sample name CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT chip EMPTY>\n"
