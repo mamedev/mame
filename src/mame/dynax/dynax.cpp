@@ -6902,7 +6902,7 @@ ROM_START( mjtkp2 )
 	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "5909c_dynax.5a", 0x00000, 0x20000, CRC(61916017) SHA1(2f39749512a3e36966e3bd787f1fa3378e96b4bb) )
 	ROM_RELOAD(                 0x10000, 0x20000 )
-	ROM_LOAD( "tmp90840.",      0x00000, 0x02000, NO_DUMP ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
+	ROM_LOAD( "tmp90840.2c",    0x00000, 0x02000, NO_DUMP ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
 	ROM_FILL(                   0x00000, 0x02000, 0xff ) // avoid fatal error due to random crap in the first 0x2000 of the external ROM. TODO: remove it once internal ROM is dumped
 
 	ROM_REGION( 0x100000, "blitter", 0 )
