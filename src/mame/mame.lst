@@ -44387,7 +44387,7 @@ bbustersua
 bbustersj
 bbustersja
 
-@source:misc/drderby.cpp
+@source:snk/drderby.cpp
 drderby
 
 @source:snk/dmndrby.cpp
