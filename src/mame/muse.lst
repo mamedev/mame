@@ -16,3 +16,6 @@ ustudio                         // 12/1986 (c) 1986
 
 @source:hohner/xe9.cpp
 xe9                             // 1990
+
+@source:wersi/keyfox10.cpp
+keyfox10                        // 1990

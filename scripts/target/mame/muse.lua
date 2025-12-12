@@ -102,6 +102,7 @@ files {
 	-- MAME_DIR .. "src/mame/hohner/gp98.cpp",
 	MAME_DIR .. "src/mame/hohner/ustudio.cpp",
 	MAME_DIR .. "src/mame/hohner/xe9.cpp",
+	MAME_DIR .. "src/mame/wersi/keyfox10.cpp",
 	-- MAME_DIR .. "src/mame/hohner/wersidx.cpp",
     -- MAME_DIR .. "src/mame/hohner/boehm1224.cpp",
     -- MAME_DIR .. "src/mame/hohner/boehm_sinus.cpp",
