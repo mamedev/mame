@@ -33408,9 +33408,6 @@ vparadis2
 @source:misc/unkgolf.cpp
 unkgolf
 
-@source:misc/unkhorse.cpp
-unkhorse
-
 @source:misc/unkpoker.cpp
 unkpoker
 
@@ -44389,6 +44386,9 @@ bbustersu
 bbustersua
 bbustersj
 bbustersja
+
+@source:misc/drderby.cpp
+drderby
 
 @source:snk/dmndrby.cpp
 dmndrby
