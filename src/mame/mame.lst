@@ -44387,13 +44387,13 @@ bbustersua
 bbustersj
 bbustersja
 
-@source:snk/drderby.cpp
-drderby
-
 @source:snk/dmndrby.cpp
 dmndrby
 dmndrbya
 dmndrbybl
+
+@source:snk/drderby.cpp
+drderby
 
 @source:snk/hng64.cpp
 bbust2
