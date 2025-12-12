@@ -240,7 +240,7 @@ protected:
 	std::error_condition image_checkhash();
 
 	const software_part *find_software_item(std::string_view identifier, bool restrict_to_interface, software_list_device **device = nullptr) const;
-	std::string software_get_default_slot(std::string_view default_card_slot) const;
+	std::string software_get_default_slot(std::string_view image_name, std::string_view default_card_slot) const;
 
 	void add_format(std::unique_ptr<image_device_format> &&format);
 	void add_format(std::string &&name, std::string &&description, std::string &&extensions, std::string &&optspec);

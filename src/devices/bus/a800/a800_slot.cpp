@@ -683,7 +683,7 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot(is_xegs ? "xegs" : "a800_8k");
+	return software_get_default_slot(hook.image_name(), is_xegs ? "xegs" : "a800_8k");
 }
 
 
@@ -716,7 +716,7 @@ std::string a5200_cart_slot_device::get_default_card_software(get_default_card_s
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("a5200_rom");
+	return software_get_default_slot(hook.image_name(), "a5200_rom");
 }
 
 

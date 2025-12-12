@@ -17,6 +17,7 @@
 #include "fileio.h"
 #include "main.h"
 #include "softlist.h"
+#include "softlist_dev.h"
 
 // lib/util
 #include "corestr.h"
@@ -37,6 +38,10 @@
 image_manager::image_manager(running_machine &machine)
 	: m_machine(machine)
 {
+	// ensure the software lists are parsed
+	for (software_list_device &swlistdev : software_list_device_enumerator(machine.root_device()))
+		swlistdev.parse_if_necessary(machine.options());
+
 	// make sure that any required devices have been allocated
 	for (device_image_interface &image : image_interface_enumerator(machine.root_device()))
 	{

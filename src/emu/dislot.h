@@ -17,7 +17,10 @@ class get_default_card_software_hook
 {
 	// goofy "hook" to pass to device_slot_interface::get_default_card_software
 public:
-	get_default_card_software_hook(const std::string &path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo);
+	get_default_card_software_hook(std::string path, std::function<bool(util::core_file &, std::string&)> &&get_hashfile_extrainfo);
+
+	// image name from options - needed by software_get_default_slot()
+	std::string_view image_name() const { return m_image_name; }
 
 	// accesses the image file to be scrutinized by get_default_card_software(); is
 	// nullptr in the case of images loaded by software list
@@ -30,6 +33,7 @@ public:
 	bool hashfile_extrainfo(std::string &extrainfo);
 
 private:
+	const std::string                                       m_image_name;
 	util::core_file::ptr                                    m_image_file;
 	std::string                                             m_file_type;
 	std::function<bool(util::core_file &, std::string&)>    m_get_hashfile_extrainfo;

@@ -145,5 +145,5 @@ void casloopy_cart_slot_device::call_unload()
 
 std::string casloopy_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("std");
+	return software_get_default_slot(hook.image_name(), "std");
 }

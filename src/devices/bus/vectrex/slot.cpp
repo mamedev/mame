@@ -209,7 +209,7 @@ std::string vectrex_cart_slot_device::get_default_card_software(get_default_card
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("vec_rom");
+	return software_get_default_slot(hook.image_name(), "vec_rom");
 }
 
 /*-------------------------------------------------

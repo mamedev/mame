@@ -90,14 +90,11 @@ bool hashfile_extrainfo(const char *hash_path, const game_driver &driver, const 
 }
 
 
-
 bool hashfile_extrainfo(device_image_interface &image, std::string &result)
 {
 	return hashfile_extrainfo(
-		image.device().mconfig().options().hash_path(),
+		image.device().machine().options().hash_path(),
 		image.device().mconfig().gamedrv(),
 		image.hash(),
 		result);
 }
-
-

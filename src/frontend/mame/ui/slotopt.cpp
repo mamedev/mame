@@ -175,7 +175,8 @@ void menu_slot_devices::populate()
 {
 	// we need to keep our own copy of the machine_config because we
 	// can change this out from under the caller
-	m_config = std::make_unique<machine_config>(machine().system(), machine().options());
+	m_config = std::make_unique<machine_config>(machine().system());
+	m_config->add_slot_options(machine().options());
 
 	// cycle through all devices for this system
 	for (device_slot_interface &slot : slot_interface_enumerator(m_config->root_device()))

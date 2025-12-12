@@ -117,10 +117,10 @@ std::string mtx_exp_slot_device::get_default_card_software(get_default_card_soft
 		hook.image_file()->length(len); // FIXME: check error return
 
 		if (len == 0x80000)
-			return software_get_default_slot("magrom");
+			return software_get_default_slot(hook.image_name(), "magrom");
 	}
 
-	return software_get_default_slot("rompak");
+	return software_get_default_slot(hook.image_name(), "rompak");
 }
 
 

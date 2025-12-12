@@ -114,13 +114,14 @@ public:
 	bool is_compatible() const { return softlist_type::COMPATIBLE_SYSTEM == m_list_type; }
 	const char *filter() const { return m_filter; }
 
-	// getters that may trigger a parse
-	const std::string &description() { if (!m_parsed) parse(); return m_description; }
-	bool valid() { if (!m_parsed) parse(); return !m_infolist.empty(); }
-	const char *errors_string() { if (!m_parsed) parse(); return m_errors.c_str(); }
-	const std::list<software_info> &get_info() { if (!m_parsed) parse(); return m_infolist; }
+	// getters that require the software list be parsed
+	const std::string &description() { assert(m_parsed); return m_description; }
+	bool valid() { assert(m_parsed); return !m_infolist.empty(); }
+	const char *errors_string() { assert(m_parsed); return m_errors.c_str(); }
+	const std::list<software_info> &get_info() { assert(m_parsed); return m_infolist; }
 
 	// operations
+	void parse_if_necessary(const emu_options &options);
 	const software_info *find(std::string_view look_for);
 	void find_approx_matches(std::string_view name, int matches, const software_info **list, const char *interface);
 	void release();
@@ -139,7 +140,6 @@ protected:
 
 private:
 	// internal helpers
-	void parse();
 	void internal_validity_check(validity_checker &valid) ATTR_COLD;
 
 	// configuration state

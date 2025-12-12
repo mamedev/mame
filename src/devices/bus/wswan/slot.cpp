@@ -299,7 +299,7 @@ std::string ws_cart_slot_device::get_default_card_software(get_default_card_soft
 		return std::string(slot_string);
 	}
 
-	return software_get_default_slot("ws_rom");
+	return software_get_default_slot(hook.image_name(), "ws_rom");
 }
 
 /*-------------------------------------------------
