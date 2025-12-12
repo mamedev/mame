@@ -2744,7 +2744,7 @@ ROM_START( passshtb )
 	ROM_LOAD16_BYTE( "opr11864.b3",  0x40001, 0x10000, CRC(05733ca8) SHA1(1dbc7c99450ebe6a9fd8c0244fd3cb38b74984ef) )
 	ROM_LOAD16_BYTE( "opr11867.b7",  0x40000, 0x10000, CRC(81e49697) SHA1(a70fa409e3555ad6c8f28930a7026fdf2deb8c65) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x30000, "soundcpu", 0 )
 	ROM_LOAD( "epr11857.a7",  0x00000, 0x08000, CRC(789edc06) SHA1(8c89c94e503513c287807d187de78a7fbd75a7cf) )
 	ROM_LOAD( "epr11858.a8",  0x10000, 0x08000, CRC(08ab0018) SHA1(0685f80a7d403208c9cfffea3f2035324f3924fe) )
 	ROM_LOAD( "epr11859.a9",  0x18000, 0x08000, CRC(8673e01b) SHA1(e79183ab30e683fdf61ced2e9dbe010567c324cb) )
@@ -2770,7 +2770,7 @@ ROM_START( passht4b )
 	ROM_LOAD16_BYTE( "opr11864.b3",  0x40001, 0x10000, CRC(05733ca8) SHA1(1dbc7c99450ebe6a9fd8c0244fd3cb38b74984ef) )
 	ROM_LOAD16_BYTE( "opr11867.b7",  0x40000, 0x10000, CRC(81e49697) SHA1(a70fa409e3555ad6c8f28930a7026fdf2deb8c65) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x20000, "soundcpu", 0 )
 	ROM_LOAD( "pas4p.1",  0x00000, 0x08000, CRC(e60fb017) SHA1(21298036eab55c74427f1c2e3a9623d41bca4849) )
 	ROM_LOAD( "pas4p.2",  0x10000, 0x10000, CRC(092e016e) SHA1(713638749efa9dce19c547b84308236110bc85fe) )
 ROM_END
@@ -2797,7 +2797,7 @@ ROM_START( wb3bbl )
 	ROM_LOAD16_BYTE( "epr12093.b4", 0x60001, 0x010000, CRC(4891e7bb) SHA1(1be04fcabe9bfa8cf746263a5bcca67902a021a0) )
 	ROM_LOAD16_BYTE( "epr12097.b8", 0x60000, 0x010000, CRC(e645902c) SHA1(497cfcf6c25cc2e042e16dbcb1963d2223def15a) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr12127.a10", 0x0000, 0x8000, CRC(0bb901bb) SHA1(c81b198df8e3b0ec568032c76addf0d1a1711194) )
 ROM_END
 
@@ -2870,7 +2870,7 @@ ROM_START( bayrouteb1 )
 	ROM_LOAD16_BYTE( "br_obj3o.4b", 0x60001, 0x10000, CRC(a2e238ac) SHA1(c854774c0ffd1ccf6e46591a8fa3c80a4630e007) )
 	ROM_LOAD16_BYTE( "bs7.bin",     0x60000, 0x10000, CRC(0c91abcc) SHA1(d25608f3cbacd1bd169f1a2247f007ac8bc8dda0) )
 
-	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x50000, "soundcpu", 0 )
 	ROM_LOAD( "epr12459.a10", 0x00000, 0x08000, CRC(3e1d29d0) SHA1(fe3d985983e5132e8a26a02a3f2d8d420cbf1a49) )
 	ROM_LOAD( "mpr12460.a11", 0x10000, 0x20000, CRC(0bae570d) SHA1(05fa4a3405666342ab66e696a7344cca97569f19) )
 	ROM_LOAD( "mpr12461.a12", 0x30000, 0x20000, CRC(b03b8b46) SHA1(b0283ac377d464f3d9374a992192ec6c515a3c2f) )
@@ -2918,7 +2918,7 @@ ROM_START( bayrouteb2 )
 	ROM_LOAD16_BYTE( "br_obj3o.4b", 0x60001, 0x10000, CRC(a2e238ac) SHA1(c854774c0ffd1ccf6e46591a8fa3c80a4630e007) )
 	ROM_LOAD16_BYTE( "bs7.bin",     0x60000, 0x10000, CRC(0c91abcc) SHA1(d25608f3cbacd1bd169f1a2247f007ac8bc8dda0) )
 
-	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x50000, "soundcpu", 0 )
 	ROM_LOAD( "br_01", 0x10000, 0x10000, CRC(b87156ec) SHA1(bdfef2ab5a4d3cac4077c92ce1ef4604b4c11cf8) )
 	ROM_LOAD( "br_02", 0x20000, 0x10000, CRC(ef63991b) SHA1(4221741780f88c80b3213ddca949bee7d4c1469a) )
 ROM_END
@@ -3041,7 +3041,7 @@ ROM_START( goldnaxeb1 )
 	ROM_LOAD16_BYTE( "26.bin",      0x1a0000, 0x10000, CRC(bea4d237) SHA1(46e51e89b4ee1e2701da1004758d7da547a2e4c2) )
 
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x30000, "soundcpu", 0 )
 	ROM_LOAD( "2.3",     0x00000, 0x08000, CRC(399fc5f5) SHA1(6f290b36dc71ff4759598e2a9c185a8945a3c9e7) )
 	ROM_LOAD( "3.1",     0x10000, 0x10000, CRC(50eb5a56) SHA1(d59ba04254000de5577e8a58d0b51c73112a4c80) )
 	ROM_LOAD( "1.2",     0x20000, 0x10000, CRC(b372eb94) SHA1(8f82530633589de003a5462b227335526a6a61a6) )
@@ -3147,7 +3147,7 @@ ROM_START( tturfbl )
 	ROM_LOAD16_BYTE( "12276.4b", 0x60001, 0x10000, CRC(838bd71f) SHA1(82d9d127438f5e1906b1cf40bf3b4727f2ee5685) )
 	ROM_LOAD16_BYTE( "12280.8b", 0x60000, 0x10000, CRC(639a57cb) SHA1(84fd8b96758d38f9e1ba1a3c2cf8099ec0452784) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x30000, "soundcpu", 0 )
 	ROM_LOAD( "tt014d68.rom", 0x10000, 0x10000, CRC(d4aab1d9) SHA1(94885896d59da1ecabe2377a194fcf61eaae3765) )
 	ROM_LOAD( "tt0246ff.rom", 0x20000, 0x10000, CRC(bb4bba8f) SHA1(b182a7e1d0425e93c2c1b93472aafd30a6af6907) )
 ROM_END
@@ -3175,7 +3175,7 @@ ROM_START( dduxbl )
 	ROM_LOAD16_BYTE( "dduxb09.bin", 0x60000, 0x010000, CRC(6b64f665) SHA1(df07fcf2bbec6fa78f89b95272762aebd6f3ec0e) )
 	ROM_LOAD16_BYTE( "dduxb13.bin", 0x60001, 0x010000, CRC(efe57759) SHA1(69b8969b20ab9480df2735bd2bcd527069196bd7) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "dduxb01.bin", 0x0000, 0x8000, CRC(0dbef0d7) SHA1(8b9afb2fcb946cec467b1e691c267194b503f841) )
 
 	/* stuff below isn't used but loaded because it was on the board .. */
@@ -3345,7 +3345,7 @@ ROM_START( eswatbl )
 	ROM_LOAD16_BYTE( "ic14", 0x080000, 0x20000, CRC(6773fef6) SHA1(91e646ea447be02254d060daf255d26afe0cc79e) )
 	ROM_CONTINUE(            0x180000, 0x20000 )
 
-	ROM_REGION( 0x50000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x50000, "soundcpu", 0 )
 	ROM_LOAD( "ic8", 0x00000, 0x08000, CRC(7efecf23) SHA1(2b87af7cfaab5942a3f7b38c987fcba01d3475ab) )
 	ROM_LOAD( "ic6", 0x10000, 0x40000, CRC(254347c2) SHA1(bf2d83a69a5be375c7e42e9f7d6e65c1095a354c) )
 ROM_END
@@ -3393,9 +3393,51 @@ ROM_START( eswatbl2 ) //PCB: GENSYS-1/I like goldnaxeb2
 	ROM_LOAD16_BYTE( "9.ic69",  0x1a0000, 0x10000, CRC(3023e7dc) SHA1(440f5a9b09bf9707d00629671df8058d1431fc17) )
 	ROM_LOAD16_BYTE( "21.ic84", 0x1a0001, 0x10000, CRC(2533190e) SHA1(4c5ae231a30481801abb231fc6458fdee292ddfb) )
 
-	ROM_REGION( 0x180000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x180000, "soundcpu", 0 )
 	ROM_LOAD( "8.ic45", 0x00000, 0x08000, CRC(f90b1f5f) SHA1(8e7207e6563382291417247db15b08c6253e4725) )
 	ROM_LOAD( "7.ic46", 0x10000, 0x10000, CRC(a093552b) SHA1(ba0c8d5f625edefa8ef63bc0f28b4ea13365e4c0) )
+ROM_END
+
+ROM_START( eswatbl3 )
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "12.c.bin", 0x000000, 0x10000, CRC(73ba1516) SHA1(71e465980686e12653b703fb1436bed4b6618a54) ) // 99.926758% similar to eswatbl
+	ROM_LOAD16_BYTE( "21.f.bin", 0x000001, 0x10000, CRC(cc0eaea7) SHA1(d58056d76ac023ac69af0f1d58e1c9772c8ed827) ) // 99.920654% similar to eswatbl
+	ROM_LOAD16_BYTE( "11.b.bin", 0x020000, 0x10000, CRC(87c6b1b5) SHA1(a9f29e29a9c0e3daf272dce263a5fd7866642c77) ) // same as eswatbl
+	ROM_LOAD16_BYTE( "20.e.bin", 0x020001, 0x10000, CRC(937ddf9a) SHA1(9fc73f93e9c4221a4dc778593edc02cb405b2f78) ) // "
+	ROM_LOAD16_BYTE( "10.a.bin", 0x040000, 0x08000, CRC(2af4fc62) SHA1(f7b1539a5ab9560bd49dfecf44699abccfb649be) ) // "
+	ROM_LOAD16_BYTE( "19.d.bin", 0x040001, 0x08000, CRC(b4751e19) SHA1(57c9687dc864c163d13dbb89057cd42684a199cd) ) // "
+
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "mc68705r3p", 0x000, 0x800, NO_DUMP )
+
+	ROM_REGION( 0xc0000, "tiles", ROMREGION_INVERT ) // same as eswatbl2
+	ROM_LOAD( "6.f.bin", 0x00000, 0x20000, CRC(795856da) SHA1(e77c87755b055c7a376cda8b939b9cf428aa1966) )
+	ROM_LOAD( "5.e.bin", 0x20000, 0x10000, CRC(3e9bd162) SHA1(f696d2a5df31c0b632fbaee7b519e5a65b4a0899) )
+	ROM_LOAD( "9.i.bin", 0x40000, 0x20000, CRC(583788d1) SHA1(692ecee0243c54ff8fb93e3b2720656fa9b7fb1a) )
+	ROM_LOAD( "8.h.bin", 0x60000, 0x10000, CRC(79070433) SHA1(d266bc7fe9f550a099ad3bbf567e9178c3927786) )
+	ROM_LOAD( "4.d.bin", 0x80000, 0x20000, CRC(586fb454) SHA1(afe4896593e3677938f750069f2e0dda3c7057d7) )
+	ROM_LOAD( "7.g.bin", 0xa0000, 0x10000, CRC(798bf2b4) SHA1(e7ce125c335c320a477543e4f7428718fd698225) )
+
+	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) // same contents as eswatbl but half sized ROMs
+	ROM_LOAD16_BYTE( "13.1.bin",  0x000000, 0x20000, CRC(10a27526) SHA1(8299d4888d5d7530d864d7e33f264efe66272b44) )
+	ROM_LOAD16_BYTE( "22.7.bin",  0x000001, 0x20000, CRC(2ff5cb9e) SHA1(2468a928515640e1bdd651aaadcbc918661c3312) )
+	ROM_LOAD16_BYTE( "14.2.bin",  0x040000, 0x20000, CRC(ba3ba6fd) SHA1(799e9899630d417fc508af22e04c7c2526a88ee1) )
+	ROM_LOAD16_BYTE( "23.8.bin",  0x040001, 0x20000, CRC(01b2e832) SHA1(6b7aa350498c54a9fac54fee1e65fcada4284fd6) )
+	ROM_LOAD16_BYTE( "15.3.bin",  0x080000, 0x20000, CRC(54b51ca4) SHA1(2f477885500ac4c0875ae956d574334332e225b6) )
+	ROM_LOAD16_BYTE( "24.9.bin",  0x080001, 0x20000, CRC(d12ef57a) SHA1(e0d6d350ce20d84f12df3ab777b9aaa40b906339) )
+	ROM_LOAD16_BYTE( "16.4.bin",  0x100000, 0x20000, CRC(6ac4cbfb) SHA1(84b00eff7ee0d702d31850074d7107a2ab2d5c08) )
+	ROM_LOAD16_BYTE( "25.10.bin", 0x100001, 0x20000, CRC(a8afd649) SHA1(f1474533b001f71a18a75bfeb65c6cf66505c63d) )
+	ROM_LOAD16_BYTE( "17.5.bin",  0x140000, 0x20000, CRC(99784b36) SHA1(7ba41d4a4434f2157ce78a701cbe3d9584dd2ab6) )
+	ROM_LOAD16_BYTE( "26.11.bin", 0x140001, 0x20000, CRC(b4c4a2ab) SHA1(7507204ac7dc6167da93d5e8645ca1ad87f88d3e) )
+	ROM_LOAD16_BYTE( "18.6.bin",  0x180000, 0x20000, CRC(ac329586) SHA1(98994f41ee2f0fa5cd800f565b277ba21f2bb0c3) )
+	ROM_LOAD16_BYTE( "27.12.bin", 0x180001, 0x20000, CRC(f321452c) SHA1(cdccd8facc2941745f05fba25ad7d76b445eb873) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 )
+	ROM_LOAD( "1.a.bin", 0x00000, 0x08000, CRC(fba1a61f) SHA1(a17669221ddbfcc335cc31b765bd475f5aa1162f) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                   0x08000)
+	// the following 2 ROMs contain only half the data of the eswatbl bootleg. Weird, but verified chips are 27512.
+	ROM_LOAD( "2.b.bin", 0x10000, 0x10000, CRC(18d4cf4f) SHA1(a9e34699be499a36f4d69f49b562e660ab7df64d) ) // 2.B.BIN                 ic6          [1/4]      IDENTICAL
+	ROM_LOAD( "3.c.bin", 0x30000, 0x10000, CRC(cae37641) SHA1(bdd2be2320028b5526127149c126ec5611d1cd1d) ) // 3.C.BIN                 ic6          [3/4]      IDENTICAL
 ROM_END
 
 ROM_START( tetrisbl )
@@ -3412,7 +3454,7 @@ ROM_START( tetrisbl )
 	ROM_LOAD16_BYTE( "obj0-o.rom", 0x00001, 0x10000, CRC(2fb38880) SHA1(0e1b601bbda78d1887951c1f7e752531c281bc83) )
 	ROM_LOAD16_BYTE( "obj0-e.rom", 0x00000, 0x10000, CRC(d6a02cba) SHA1(d80000f92e754e89c6ca7b7273feab448fc9a061) )
 
-	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD( "epr12168.a7", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
 ROM_END
 
@@ -3441,7 +3483,7 @@ ROM_START( beautyb )
 
 	/* no sprites on this */
 
-	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD( "1.bin", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
 	// ROM above 0x8000 would have 5205 ADPCM data, but this is unpopulated
 
@@ -3468,7 +3510,7 @@ ROM_START( iqpipe )
 
 	/* no sprites on this */
 
-	ROM_REGION( 0x40000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD( "iqpipe.1", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -3611,7 +3653,7 @@ ROM_START( shdancbl )
 	ROM_LOAD16_BYTE( "ic88", 0x1C0000, 0x10000, CRC(9de140e1) SHA1(f1125e056a898a4fa519b49ae866c5c742e36bf7) )
 	ROM_LOAD16_BYTE( "ic87", 0x1E0000, 0x10000, CRC(8172a991) SHA1(6d12b1533a19cb02613b473cc8ba73ece1f2a2fc) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x30000, "soundcpu", 0 )
 	ROM_LOAD( "ic45", 0x10000, 0x10000, CRC(576b3a81) SHA1(b65356a3837ed3875634ab0cbcd61acce44f2bb9) )
 	ROM_LOAD( "ic46", 0x20000, 0x10000, CRC(c84e8c84) SHA1(f57895bedb6152c30733e91e6f4795702a62ac3a) )
 ROM_END
@@ -3670,7 +3712,7 @@ ROM_START( shdancbla )
 	ROM_LOAD16_BYTE( "ic88", 0x1C0000, 0x10000, CRC(9de140e1) SHA1(f1125e056a898a4fa519b49ae866c5c742e36bf7) )
 	ROM_LOAD16_BYTE( "ic87", 0x1E0000, 0x10000, CRC(8172a991) SHA1(6d12b1533a19cb02613b473cc8ba73ece1f2a2fc) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x30000, "soundcpu", 0 )
 	ROM_LOAD( "10.bin", 0x10000, 0x10000, CRC(d47a1610) SHA1(96d22068321de3c285a41d28342ab97d1dfa09da) )
 	ROM_LOAD( "9.bin",  0x20000, 0x10000, CRC(430faf5e) SHA1(dfe34a757937d7a971911fcefd14dfd7f5942b02) )
 ROM_END
@@ -4161,6 +4203,7 @@ GAME( 1988, altbeastbl2, altbeast,  altbeastbl,    tetris,   segas1x_bootleg_sta
 GAME( 1988, mutantwarr,  altbeast,  altbeastbl,    tetris,   segas1x_bootleg_state,  init_altbeastbl, ROT0,   "bootleg (Datsu)", "Mutant Warrior (Datsu bootleg of Altered Beast)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl,     eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "Cyber Police ESWAT (bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, eswatbl2,    eswat,     eswatbl2,      eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "Cyber Police ESWAT (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1989, eswatbl3,    eswat,     eswatbl,       eswat,    segas1x_bootleg_state,  init_eswatbl,    ROT0,   "bootleg", "Cyber Police ESWAT (bootleg with MC68705)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 GAME( 1987, timescanbl,  timescan,  tetrisbl,      tetris,   segas1x_bootleg_state,  empty_init,      ROT0,   "bootleg", "Time Scanner (bootleg)", MACHINE_NOT_WORKING ) // encrypted
 
