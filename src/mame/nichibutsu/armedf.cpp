@@ -419,7 +419,7 @@ void armedf_state::common_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
 	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
@@ -480,7 +480,7 @@ void armedf_state::cclimbr2_map(address_map &map)
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
 	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
@@ -522,7 +522,7 @@ void armedf_state::legion_map(address_map &map)
 {
 	legion_common_map(map);
 
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
 }
 
@@ -540,7 +540,7 @@ void armedf_state::legionjb_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x040000, 0x04003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 }
 
@@ -549,7 +549,7 @@ void armedf_state::legionjb2_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x000000, 0x00003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 	//also writes to 7c0010 / 70c020 / 70c030. These could possibly be the scroll registers on this bootleg and the writes to 000000 - 00003f could just be leftovers.
 }
@@ -561,7 +561,7 @@ void armedf_state::armedf_map(address_map &map)
 	map(0x061000, 0x065fff).ram();
 	map(0x066000, 0x066fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
 	map(0x067000, 0x067fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x06b000, 0x06bfff).ram().share("spr_pal_clut");
 	map(0x06c000, 0x06c7ff).ram();
@@ -610,7 +610,7 @@ void bigfghtr_state::bigfghtr_map(address_map &map)
 	map(0x084000, 0x085fff).ram(); //work ram
 	map(0x086000, 0x086fff).ram().w(FUNC(bigfghtr_state::bg_videoram_w)).share("bg_videoram");
 	map(0x087000, 0x087fff).ram().w(FUNC(bigfghtr_state::fg_videoram_w)).share("fg_videoram");
-	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::text_videoram_r), FUNC(bigfghtr_state::text_videoram_w)).umask16(0x00ff);
+	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::text_videoram_r), FUNC(bigfghtr_state::armedf_text_videoram_w)).umask16(0x00ff);
 	map(0x08a000, 0x08afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08b000, 0x08bfff).ram().share("spr_pal_clut");
 	map(0x08c000, 0x08c001).portr("P1");
