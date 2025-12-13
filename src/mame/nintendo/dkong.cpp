@@ -1615,7 +1615,6 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( jammin )
-
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Drum 4 - Hit 2 / Start 2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Drum 3 - Hit 2")
@@ -1807,12 +1806,12 @@ void jammin_state::jammin(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &jammin_state::jammin_map);
 
-	GFXDECODE(config.replace() , m_gfxdecode, m_palette, gfx_jammin);
+	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_jammin);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, m_ym2151, MASTER_CLOCK / 20); // matches video reference
+	YM2151(config, m_ym2151, CLOCK_1H); // matches video reference
 	m_ym2151->add_route(0, "speaker", 0.60, 0);
 	m_ym2151->add_route(1, "speaker", 0.60, 1);
 }
