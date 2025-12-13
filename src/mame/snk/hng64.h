@@ -350,7 +350,7 @@ private:
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	output_finder<> m_wheel_motor;
-	output_finder<64> m_lamps_out;
+	output_finder<8> m_lamps_out;
 
 	u16 main_latch[2]{};
 	u16 sound_latch[2]{};
