@@ -1,10 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* 68340 DMA module */
+/* 68340 DMA module 
+
+TODO: Implement
+*/
 
 #include "emu.h"
 #include "68340.h"
 
+
+void m68340_cpu_device::dreq_w(uint8_t id, uint8_t state)
+{
+	if (m_dreq[id] != state)
+	{
+		m_dreq[id] = state;
+		if (!m_dreq[id])
+		{
+			//start DMA
+			m_dack[id] = 0;
+		}
+	}
+}
+
+void m68340_cpu_device::dreq1_w(uint8_t state)
+{
+	dreq_w(0, state);
+}
+
+void m68340_cpu_device::dreq2_w(uint8_t state)
+{
+	dreq_w(1, state);
+}
 
 uint16_t m68340_cpu_device::m68340_internal_dma_r(offs_t offset, uint16_t mem_mask)
 {
