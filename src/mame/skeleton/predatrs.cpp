@@ -13,7 +13,7 @@
 
 
 /*
-Unknown Falcon\Williams host & satellite terminal gambling game.
+Williams / QVS - The Predators
 
 From a unfunctional set of 3 host PCBs and 5 matching Falcon terminal PCBs
 and auxiliary PCBs without any ROM.
@@ -25,16 +25,16 @@ Recovered ROMSs are from a mixture of PCBs and could be incomplete.
 
 namespace {
 
-class falconun_state : public driver_device
+class predatrs_state : public driver_device
 {
 public:
-	falconun_state(const machine_config &mconfig, device_type type, const char *tag) :
+	predatrs_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{ }
 
-	void falconun(machine_config &config);
+	void predatrs(machine_config &config);
 
 private:
 	required_device<m6802_cpu_device> m_maincpu;
@@ -46,25 +46,25 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 };
 
-static INPUT_PORTS_START( falconun )
+static INPUT_PORTS_START( predatrs )
 INPUT_PORTS_END
 
-void falconun_state::memmap(address_map &map)
+void predatrs_state::memmap(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x2003).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xc000, 0xffff).rom().region("falcon_terminal", 0xc000);
 }
 
-void falconun_state::slavemap(address_map &map)
+void predatrs_state::slavemap(address_map &map)
 {
 	map(0x000, 0xfff).rom().region("slave", 0);
 }
 
-void falconun_state::falconun(machine_config &config)
+void predatrs_state::predatrs(machine_config &config)
 {
 	M6802(config, m_maincpu, 40'000'000 / 4); // TODO 10 MHz for a M6802??
-	m_maincpu->set_addrmap(AS_PROGRAM, &falconun_state::memmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &predatrs_state::memmap);
 	m_maincpu->set_ram_enable(false);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
@@ -74,17 +74,17 @@ void falconun_state::falconun(machine_config &config)
 	pia.irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	i8035_device &slavemcu(I8035(config, "slavemcu", 6'000'000));
-	slavemcu.set_addrmap(AS_PROGRAM, &falconun_state::slavemap);
+	slavemcu.set_addrmap(AS_PROGRAM, &predatrs_state::slavemap);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 255-1);
-	m_screen->set_screen_update(FUNC(falconun_state::screen_update));
+	m_screen->set_screen_update(FUNC(predatrs_state::screen_update));
 }
 
 
-ROM_START( falconun )
+ROM_START( predatrs )
 	ROM_REGION( 0x10000, "falcon_terminal", 0 )
 	// STICKER FALCON 1985 FOR MC6802P
 	ROM_LOAD( "falcon-83", 0x0000, 0x8000, CRC(49bf0180) SHA1(40ea3049dd35dc9b306fc516c7b814be025cd39f) ) // 1 PCB ONLY X2
@@ -127,4 +127,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 198?, falconun, 0, falconun, falconun, falconun_state, empty_init, ROT0, "Falcon", "unknown Falcon gambling machine", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1985, predatrs, 0, predatrs, predatrs, predatrs_state, empty_init, ROT0, "Williams / QVS", "The Predators (prototype)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
