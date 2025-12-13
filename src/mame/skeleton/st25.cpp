@@ -49,6 +49,9 @@ RAM: Mosel-Vitelic V62C518256LL-70P 32Kx8 SRAM
  | [CONNECTOR]  |
  _______________
 
+ Unimint Arena reference: https://www.youtube.com/watch?v=EEvGKFtBhi8
+ Xeno reference: https://www.youtube.com/watch?v=EGBh0htXmbc
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -208,7 +211,7 @@ ROM_START(avanti)
 	ROM_LOAD("avantie_w27e040.ic1", 0x00000, 0x80000, CRC(47defe53) SHA1(65c246e9051fa1b0f9a855331d55282c6b4ccbc0))
 ROM_END
 
-ROM_START(ballermann)
+ROM_START(ballermn)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -219,7 +222,7 @@ ROM_START(ballermann)
 	ROM_LOAD("27c4001.ic1", 0x00000, 0x80000, CRC(1dd6fee1) SHA1(bdd0e478069f822d2b940aa449ec61e9f07d4b3b))
 ROM_END
 
-ROM_START(bigactione)
+ROM_START(bgaction)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -255,7 +258,7 @@ ROM_START(blizzard)
 	ROM_LOAD("tms27c020dip32_blizzard_snd_118999_090595.ic1", 0x00000, 0x80000, CRC(4a609ee5) SHA1(a65aa3cb57f36c56d19cbc1116541dc4a320c6bc))
 ROM_END
 
-ROM_START(boostersp)
+ROM_START(boosters)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -269,7 +272,7 @@ ROM_START(boostersp)
 	ROM_LOAD("w27e040_booster_speed_st25.ic1", 0x00000, 0x80000, CRC(11c8eead) SHA1(2bac833eb0d894fa54c01311b7dbf35b16e1f984))
 ROM_END
 
-ROM_START(citytower)
+ROM_START(cttower)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -294,7 +297,7 @@ ROM_START(colossos)
 	ROM_LOAD("w27c40.ic1", 0x00000, 0x80000, CRC(11c8eead) SHA1(2bac833eb0d894fa54c01311b7dbf35b16e1f984))
 ROM_END
 
-ROM_START(galaktica)
+ROM_START(galaktca)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -358,7 +361,7 @@ ROM_START(matrixx)
 	ROM_LOAD("winbondw27e040_12_sound_10_08_02", 0x00000, 0x80000, CRC(2ccf9464) SHA1(02b16fe7465ad28ce96f38390fafbceafca2d23c))
 ROM_END
 
-ROM_START(multiclassic)
+ROM_START(mtclssic)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -400,7 +403,7 @@ ROM_START(robin)
 	ROM_LOAD("m27c4001_panther_robin_musik.ic1", 0x00000, 0x80000, CRC(0dcf91a7) SHA1(2e29b55c83bfd649dd92c087eeaa887676755e9f))
 ROM_END
 
-ROM_START(stakeoffe)
+ROM_START(stakeoff)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -414,7 +417,7 @@ ROM_START(stakeoffe)
 	ROM_LOAD("27c040.ic1",   0x00000, 0x80000, CRC(d9592e5e) SHA1(5de917a1c584a39a85e6f356d25924a65eaddf89))
 ROM_END
 
-ROM_START(superpasch)
+ROM_START(spasch)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
@@ -465,28 +468,28 @@ ROM_END
 } // anonymous namespace
 
 
-//   YEAR  NAME      PARENT   MACHINE INPUT    CLASS   INIT        ROT   COMPANY         FULLNAME                                                  FLAGS
-GAME(1995, blizzard,     0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Blizzard",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1995, tango,        0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Tango",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1996, tobago,       0,     st25, st25, st25_state, empty_init, ROT0, "Bergmann", "Tobago",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1997, ballermann,   0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Ballermann 6",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1998, arenau,       0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Unimint Arena",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1998, citytower,    0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "City Tower",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1998, jamaica,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Jamaica",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1998, majesto,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Majesto",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1998, purpurr,      0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Pur Pur Royal",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1999, robin,        0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Robin",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2000, bigactione,   0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Big Action 3000 E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2001, stakeoffe,    0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Super Take Off E",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2002, boostersp,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Booster Speed",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2003, colossos,     0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Colossos",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2003, matrixx,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Matrixx",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2004, avanti,       0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Avanti",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2004, macaor,       0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Macao",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2004, multiclassic, 0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Multiclassic",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2005, alphar,       0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Alpha",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2005, superpasch,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Super Pasch",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2006, bigkick,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Big Kick",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2006, galaktica,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Galaktica",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2007, amarillo,     0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Amarillo",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2007, xeno,         0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Xeno",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+//   YEAR  NAME    PARENT   MACHINE INPUT    CLASS   INIT        ROT   COMPANY         FULLNAME                                                  FLAGS
+GAME(1995, blizzard,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Blizzard",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1995, tango,     0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Tango",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1996, tobago,    0,     st25, st25, st25_state, empty_init, ROT0, "Bergmann", "Tobago",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, ballermn,  0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Ballermann 6",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, arenau,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Unimint Arena",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, cttower,   0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "City Tower",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, jamaica,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Jamaica",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, majesto,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Majesto",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1998, purpurr,   0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Pur Pur Royal",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1999, robin,     0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Robin",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2000, bgaction,  0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Big Action 3000 E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2001, stakeoff,  0,     st25, st25, st25_state, empty_init, ROT0, "Panther",  "Super Take Off E",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2002, boosters,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Booster Speed",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2003, colossos,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Colossos",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2003, matrixx,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Matrixx",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2004, avanti,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Avanti",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2004, macaor,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Macao",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2004, mtclssic,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "mtclssic",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2005, alphar,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Alpha",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2005, spasch,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Super Pasch",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2006, bigkick,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Big Kick",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2006, galaktca,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Galaktica",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2007, amarillo,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Amarillo",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2007, xeno,      0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Xeno",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
