@@ -223,6 +223,8 @@ std::vector<meta_description> fs::cbmdos_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
 	results.emplace_back(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 16; }, "Volume name, up to 16 characters");
+	results.emplace_back(meta_name::disk_id, "ZX", false, [](const meta_value &m) { return m.as_string().size() <= 2; }, "Disk ID, 2 characters");
+	results.emplace_back(meta_name::os_version, "2A", true, [](const meta_value &m) { return m.as_string().size() <= 2; }, "OS version and format type");
 	return results;
 }
 
@@ -307,9 +309,13 @@ meta_data impl::volume_metadata()
 {
 	auto bam_block = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
 	std::string disk_name = bam_block->rstr(0x90, 16);
+	std::string disk_id = bam_block->rstr(0xa2, 2);
+	std::string os_version = bam_block->rstr(0xa5, 2);
 
 	meta_data results;
 	results.set(meta_name::name, strtrimright_cbm(disk_name));
+	results.set(meta_name::disk_id, strtrimright_cbm(disk_id));
+	results.set(meta_name::os_version, strtrimright_cbm(os_version));
 	return results;
 }
 

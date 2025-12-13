@@ -228,6 +228,7 @@ std::vector<meta_description> coco_os9_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
 	results.emplace_back(meta_description(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 32; }, "Volume name, up to 32 characters"));
+	results.emplace_back(meta_description(meta_name::disk_id, 1, true, [](const meta_value &m) { return m.as_string().size() <= 32; }, "Disk ID"));
 	results.emplace_back(meta_description(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
 	return results;
 }
@@ -296,6 +297,7 @@ meta_data coco_os9_impl::volume_metadata()
 {
 	meta_data results;
 	results.set(meta_name::name, m_volume_header.name());
+	results.set(meta_name::disk_id, m_volume_header.disk_id());
 	results.set(meta_name::creation_date, m_volume_header.creation_date());
 	return results;
 }
