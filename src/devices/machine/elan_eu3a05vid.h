@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_TVGAMES_ELAN_EU3A05VID_H
-#define MAME_TVGAMES_ELAN_EU3A05VID_H
+#ifndef MAME_MACHINE_ELAN_EU3A05VID_H
+#define MAME_MACHINE_ELAN_EU3A05VID_H
 
 #include "elan_eu3a05commonvid.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/bankdev.h"
 #include "screen.h"
 
 class elan_eu3a05vid_device : public elan_eu3a05commonvid_device, public device_memory_interface
@@ -15,11 +14,10 @@ public:
 	elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
 
 	void map(address_map &map) ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	elan_eu3a05vid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -38,7 +36,6 @@ protected:
 	uint8_t m_vidctrl = 0;
 private:
 	required_device<m6502_device> m_cpu;
-	required_device<address_map_bank_device> m_bank;
 	const address_space_config      m_space_config;
 
 
@@ -55,10 +52,10 @@ private:
 
 	uint16_t get_scroll(int which);
 
-	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
-	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
-	void draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int tileline, int xpos, uint16_t *row);
+	bool get_tile_data(int base, int drawpri, int &tile, int &attr, int &unk2);
+	void draw_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int drawpri);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
+	void draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int tileline, int xpos, uint32_t *row);
 	uint16_t get_tilemapindex_from_xy(uint16_t x, uint16_t y);
 
 	uint8_t read_spriteram(int offset);
@@ -113,4 +110,4 @@ DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)
 DECLARE_DEVICE_TYPE(ELAN_EU3A13_VID, elan_eu3a13vid_device)
 DECLARE_DEVICE_TYPE(ELAN_EP3A19A_VID, elan_ep3a19avid_device)
 
-#endif // MAME_TVGAMES_ELAN_EU3A05VID_H
+#endif // MAME_MACHINE_ELAN_EU3A05VID_H
