@@ -128,13 +128,14 @@ public:
 
 	template <unsigned N> auto lamps_out_cb() { return m_lamps_out_cb[N].bind(); }
 
-	void lamps_w(offs_t offset, u8 data) { m_lamps_out_cb[offset](data); }
+	void lamps_w(offs_t offset, u8 data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
 	devcb_write8::array<8> m_lamps_out_cb;
+	output_finder<8 * 8> m_lamps;
 };
 
 
@@ -181,7 +182,8 @@ public:
 		m_in(*this, "IN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0),
-		m_vertsrom(*this, "verts")
+		m_vertsrom(*this, "verts"),
+		m_wheel_motor(*this, "wheel_motor")
 	{
 	}
 
@@ -211,7 +213,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-
+	
 private:
 	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
 
@@ -346,6 +348,8 @@ private:
 
 	required_region_ptr<u16> m_vertsrom;
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
+
+	output_finder<> m_wheel_motor;
 
 	u16 main_latch[2]{};
 	u16 sound_latch[2]{};

@@ -2235,6 +2235,8 @@ void hng64_state::machine_start()
 	save_item(NAME(m_raster_irq_pos));
 
 	save_item(NAME(m_texture_wrapsize_table));
+
+	m_wheel_motor.resolve();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
@@ -2329,14 +2331,25 @@ u8 hng64_state::ioport3_r()
 
 DEFINE_DEVICE_TYPE(HNG64_LAMPS, hng64_lamps_device, "hng64_lamps", "HNG64 Lamps")
 
-hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+hng64_lamps_device::hng64_lamps_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
 	: device_t(mconfig, HNG64_LAMPS, tag, owner, clock)
 	, m_lamps_out_cb(*this)
+	, m_lamps(*this, "lamp%u", 0U)
 {
 }
 
 void hng64_lamps_device::device_start()
 {
+	m_lamps.resolve();
+}
+
+void hng64_lamps_device::lamps_w(offs_t offset, u8 data)
+{
+	const u32 base = (offset & 7) * 8;
+	for (int bit = 0; bit < 8; bit++)
+	m_lamps[base + bit] = BIT(data, bit);
+
+	m_lamps_out_cb[offset](data);
 }
 
 void hng64_state::drive_lamps7_w(u8 data)
@@ -2371,6 +2384,7 @@ void hng64_state::drive_lamps6_w(u8 data)
 void hng64_state::drive_lamps5_w(u8 data)
 {
 	// force feedback steering position
+	m_wheel_motor = data;
 }
 
 void hng64_state::shoot_lamps7_w(u8 data)
