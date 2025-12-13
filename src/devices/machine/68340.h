@@ -42,6 +42,9 @@ public:
 	void tin2_w(int state)  { m_timer[1]->tin_w(state);  }
 	void tgate2_w(int state){ m_timer[1]->tgate_w(state); }
 
+	void dreq1_w(uint8_t state);
+	void dreq2_w(uint8_t state);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -49,6 +52,8 @@ protected:
 	virtual void device_config_complete() override;
 
 	void reset_peripherals(int state);
+
+	void dreq_w(uint8_t id, uint8_t state);
 
 private:
 	required_device<mc68340_serial_module_device> m_serial;
@@ -75,6 +80,10 @@ private:
 	uint32_t m_crystal;
 	uint32_t m_extal;
 
+	int m_dack[2];
+	int m_dreq[2];
+	int m_done[2];
+
 	// TODO: Support Limp mode and external clock with no PLL
 	void set_crystal(int crystal)
 	{
@@ -86,6 +95,7 @@ private:
 	void m68340_internal_base_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t m68340_internal_dma_r(offs_t offset, uint16_t mem_mask = ~0);
 	void m68340_internal_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	uint16_t m68340_internal_sim_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint8_t m68340_internal_sim_ports_r(offs_t offset);
 	uint16_t m68340_internal_sim_cs_r(offs_t offset, uint16_t mem_mask = ~0);
