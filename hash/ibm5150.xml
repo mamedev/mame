@@ -3849,7 +3849,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 				<rom name="the norton utilities 2.01 (nov) side 1.img" size="163840" crc="a7269716" sha1="3adf1963f4b96171385545768b5a86e1beb35ae3" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="diskette TWO - HU, Label, Lprint, Reverse, ScrAtr, SM, SSAR, TimeMark, UE" />
 			<dataarea name="flop" size="163840">
 				<rom name="the norton utilities 2.01 (nov) side 2.img" size="163840" crc="ec26d020" sha1="b2fcdcc51bd6387351cabfa4d3d055dac2653560" />
@@ -3869,7 +3869,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 				<rom name="the norton utilities 2.01 (jul) side 1.img" size="163840" crc="3891cfc5" sha1="43bee3fe9a45045d33797ecaa3bbb310dc6a725e" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="diskette TWO - HU, Label, Lprint, Reverse, ScrAtr, SM, SSAR, TimeMark, UE" />
 			<dataarea name="flop" size="163840">
 				<rom name="the norton utilities 2.01 (jul) side 2.img" size="163840" crc="efcf6309" sha1="a30d15cc11d690eb89fd9068deb606ea49d59bbf" />
@@ -3889,7 +3889,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 				<rom name="the norton utilities 2.00 side 1.img" size="163840" crc="33e9fa4b" sha1="7342ef95d46fba1e614a9d41fb5ab193ca7f1b2f" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="diskette TWO - HU, Label, Lprint, Reverse, ScrAtr, SM, SSAR, TimeMark, UE" />
 			<dataarea name="flop" size="163840">
 				<rom name="the norton utilities 2.00 side 2.img" size="163840" crc="c5cdaf48" sha1="efcfe6f881261e1ef7fda3b4260bc4a246775525" />
@@ -3921,7 +3921,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 				<rom name="the norton utilities 3.00 disk 1.img" size="163840" crc="26535655" sha1="ac3dc74a1687d7d22c923658fea596d384118760" />
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Update diskette" />
 			<dataarea name="flop" size="163840">
 				<rom name="the norton utilities 3.00 disk 2.img" size="163840" crc="31f1b361" sha1="8252602490098ab2963ceb096621bf4047b4b75d" />
