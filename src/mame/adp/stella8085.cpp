@@ -269,9 +269,9 @@ void stella8085_state::disp_w(uint8_t data)
 	else
 	{
 		// service kb A0-A3
-		output_digit(m_kbd_sl, data & 0x0f);
+		output_digit(m_kbd_sl, data >> 4);
 		// money counter B0-B3
-		output_digit(m_kbd_sl-8, data >> 4);
+		output_digit(m_kbd_sl-8, data & 0x0f);
 	}
 }
 
