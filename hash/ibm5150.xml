@@ -3941,7 +3941,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="727280">
+			<dataarea name="flop" size="737280">
 				<rom name="the norton utilities advanced edition 4.51 3.5-disk 2.img" size="737280" crc="1deca609" sha1="ce44f120e27c748baaf349096553db368e79181f" />
 			</dataarea>
 		</part>
