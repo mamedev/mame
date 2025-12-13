@@ -657,8 +657,7 @@ void armedf_state::cclimbr2_soundmap(address_map &map)
 void armedf_state::blitter_txram_w(offs_t offset, u8 data)
 {
 	m_text_videoram[offset] = data;
-	if (offset < 0x1000)
-		m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_tx_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
 void armedf_state::terrafjb_fg_scrollx_w(u8 data)

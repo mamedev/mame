@@ -30,7 +30,7 @@ TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type2)
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type3)
 {   /* col: 0..63; row: 0..31 */
 	/* legion & legiono */
-	return (col & 0x1f) * 32 + row + 0x800 * (col / 32);
+	return 32 * (col & 0x1f) + row + 0x800 * (col / 32);
 }
 
 TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
