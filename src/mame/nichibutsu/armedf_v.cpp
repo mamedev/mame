@@ -167,7 +167,7 @@ void armedf_state::armedf_text_videoram_w(offs_t offset, u8 data)
 void armedf_state::terraf_text_videoram_w(offs_t offset, u8 data)
 {
 	m_text_videoram[offset] = data;
-	m_tx_tilemap->mark_tile_dirty(offset & 0xbff);
+	m_tx_tilemap->mark_tile_dirty(offset & 0xbff); // yes, 0xbff
 }
 
 void armedf_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)

@@ -115,7 +115,6 @@ protected:
 
 	// video handlers
 	void legionjb_fg_scroll_w(offs_t offset, u8 data);
-	void blitter_txram_w(offs_t offset, u8 data);
 	void terrafjb_fg_scrollx_w(u8 data);
 	void terrafjb_fg_scrolly_w(u8 data);
 	void terrafjb_fg_scroll_msb_w(u8 data);

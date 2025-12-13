@@ -654,12 +654,6 @@ void armedf_state::cclimbr2_soundmap(address_map &map)
 	map(0xc000, 0xffff).ram();
 }
 
-void armedf_state::blitter_txram_w(offs_t offset, u8 data)
-{
-	m_text_videoram[offset] = data;
-	m_tx_tilemap->mark_tile_dirty(offset & 0xbff);
-}
-
 void armedf_state::terrafjb_fg_scrollx_w(u8 data)
 {
 	m_fg_scrollx = (data & 0xff) | (m_fg_scrollx & 0x300);
@@ -680,7 +674,7 @@ void armedf_state::terrafjb_fg_scroll_msb_w(u8 data)
 void armedf_state::terrafjb_extraz80_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).ram().w(FUNC(armedf_state::blitter_txram_w)).share("text_videoram");
+	map(0x4000, 0x4fff).ram().w(FUNC(armedf_state::terraf_text_videoram_w)).share("text_videoram");
 	map(0x5000, 0x5fff).ram();
 	map(0x8000, 0x87ff).ram();
 }
