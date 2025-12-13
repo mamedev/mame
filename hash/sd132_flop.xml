@@ -5,34 +5,20 @@ license:CC0-1.0
 -->
 <softwarelist name="sd132_flop" description="Ensoniq SD-1 32 Voice disk images">
 
-	<software name="os400" cloneof="os410" supported="yes">
-		<description>SD-1 Sequencer OS version 4.00</description>
-		<year>1991</year>
-		<publisher>Ensoniq</publisher>
-
-		<part name="flop" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="SD1_OS_4_00.img" size="819200" crc="e218f989" sha1="6ba14f4ff2ad99800478893716d9c14a61a7eb38" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="os410" supported="yes">
-		<description>SD-1 Sequencer OS version 4.10</description>
-		<year>1992</year>
-		<publisher>Ensoniq</publisher>
-
-		<part name="flop" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="SD1_OS_4_10.img" size="819200" crc="82fb69a4" sha1="152a1147ccb0424a9e8d96ca948c085fadcaf361" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sd1_32_demo1" supported="yes">
 		<description>SD-1 32 Voice Demo Disk #1</description>
 		<year>1992</year>
 		<publisher>Ensoniq</publisher>
+		<notes><![CDATA[
+FEATURES MULTIPLE DEMOS*:
+"DOWN-HOME", "CHEW-EM-UP", "RAYZ-H/HOP",
+"OH-YEAH" AND "AINT-ENUFF"
+
+SEQUENCED BY RICHARD SOUTHER/
+SCOTT FRANKFURT AND RAY CHEW
+*ALSO FEATURES DEMO PRESET FILE
+]]></notes>
+		<sharedfeat name="compatibility" value="sd132" />
 
 		<part name="flop" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -45,6 +31,15 @@ license:CC0-1.0
 		<description>Multi-Product Demo Disk #1</description>
 		<year>1992</year>
 		<publisher>Ensoniq</publisher>
+		<notes><![CDATA[
+INCLUDES SD-1 32 VOICE DEMOS: "3 STYLES" AND "SOUNDBLAST"
+KS-32 DEMOS: "KS DEMO1", "KS MEDIEVAL", "KS BROADWAY",
+SQ-2 DEMOS: "SQ-2 DIXIE"
+ALSO INCLUDES PREVIOUSLY RELEASED DEMOS
+
+P/N 8506000701
+]]></notes>
+		<sharedfeat name="compatibility" value="sd132" />
 
 		<part name="flop" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -57,6 +52,14 @@ license:CC0-1.0
 		<description>Multi-Product Demo Disk #2</description>
 		<year>1993</year>
 		<publisher>Ensoniq</publisher>
+		<notes><![CDATA[
+Includes eight SD-1 32 Voice Demos, four SQ-2 demos and two KS-32 Demos
+
+Sequenced by Ray Chew, Mike Ford, Richard Souther.
+
+P/N 8506000801
+]]></notes>
+		<sharedfeat name="compatibility" value="sd132" />
 
 		<part name="flop" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -66,9 +69,16 @@ license:CC0-1.0
 	</software>
 
 	<software name="sq32_demo1" supported="yes">
-		<description>SQ 32 Voice Demo Disk #2</description>
+		<description>SQ 32 Voice Demo Disk #1</description>
 		<year>1993</year>
 		<publisher>Ensoniq</publisher>
+		<notes><![CDATA[
+FEATURES "DESI-SLAM*" AND "CONTRASTS 123"
+
+*KEYBOARD AND RACK VERSIONS
+SD-1 DISK FORMAT
+]]></notes>
+		<sharedfeat name="compatibility" value="sd132" />
 
 		<part name="flop" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
