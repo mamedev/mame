@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders: stonedDiscord
+// copyright-holders:stonedDiscord
 
-/*
+/***************************************************************************
+
 Skeleton driver for NSM/Löwen ST25 platform of gambling machines
 Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System_Modul_25
 
@@ -48,7 +49,7 @@ RAM: Mosel-Vitelic V62C518256LL-70P 32Kx8 SRAM
  | [CONNECTOR]  |
  _______________
 
-*/
+***************************************************************************/
 
 #include "emu.h"
 
