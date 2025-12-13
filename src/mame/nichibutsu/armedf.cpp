@@ -439,8 +439,8 @@ void armedf_state::common_map(address_map &map)
 void armedf_state::terraf_common_map(address_map &map)
 {
 	common_map(map);
-	map(0x060000, 0x0603ff).ram().share("spriteram");
-	map(0x060400, 0x063fff).ram();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x063fff).ram();
 }
 
 void armedf_state::terraf_map(address_map &map)
