@@ -135,7 +135,6 @@ protected:
 
 private:
 	devcb_write8::array<8> m_lamps_out_cb;
-	output_finder<8 * 8> m_lamps;
 };
 
 
@@ -183,7 +182,8 @@ public:
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0),
 		m_vertsrom(*this, "verts"),
-		m_wheel_motor(*this, "wheel_motor")
+		m_wheel_motor(*this, "wheel_motor"),
+		m_lamps_out(*this, "lamp%u", 0U)
 	{
 	}
 
@@ -350,6 +350,7 @@ private:
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	output_finder<> m_wheel_motor;
+	output_finder<64> m_lamps_out;
 
 	u16 main_latch[2]{};
 	u16 sound_latch[2]{};
