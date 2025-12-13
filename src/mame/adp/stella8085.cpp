@@ -299,14 +299,7 @@ void stella8085_state::output_digit(uint8_t i, uint8_t data)
 		0x71  // F: 0b01110001
 	};
 
-	if (i > 7)
-	{
-		uint8_t debug = data & 0x0f;
-		uint8_t cash = data >> 4;
-
-		m_digits[i - 8] = bcd_to_7seg[debug];
-		m_digits[i] = bcd_to_7seg[cash];
-	}
+	m_digits[i & 0x0F] = bcd_to_7seg[data & 0x0F];
 }
 
 TIMER_CALLBACK_MEMBER(stella8085_state::sound_stop)
