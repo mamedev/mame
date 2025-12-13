@@ -2345,9 +2345,12 @@ void hng64_lamps_device::device_start()
 
 void hng64_lamps_device::lamps_w(offs_t offset, u8 data)
 {
-	const u32 base = (offset & 7) * 8;
+	const u32 base = (offset & 7) << 3;
+
 	for (int bit = 0; bit < 8; bit++)
-	m_lamps[base + bit] = BIT(data, bit);
+	{
+		m_lamps[base + bit] = BIT(data, bit);
+	}
 
 	m_lamps_out_cb[offset](data);
 }
