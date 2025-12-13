@@ -156,7 +156,8 @@ void model2_state::machine_start()
 	debug_init();
 
 	m_lamps.resolve();
-	
+	m_wheel_motor.resolve();
+
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intena));
 	save_item(NAME(m_coproctl));
@@ -1594,6 +1595,7 @@ void model2_state::rchase2_drive_board_w(u8 data)
 
 void model2_state::drive_board_w(u8 data)
 {
+	m_wheel_motor = data;
 	m_driveio_comm_data = data;
 	if (m_drivecpu)
 		m_drivecpu->set_input_line(0, HOLD_LINE);
