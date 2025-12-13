@@ -10,12 +10,116 @@ license:CC0-1.0
 	<!-- Some cartridges contain no ROM, but just bridges between edge connector pins. -->
 
 	<!-- pinout is identical to Storio cartridges -->
-
-	<software name="mmousec" supported="no">
-		<description>Mickey Mouse Clubhouse (UK)</description>
+	<!--
+	Also known as "Storio 2 and Future versions" in Europe excluding UK
+	
+	Language:
+	********0 = US / Canada / Hong Kong
+	********1 = Unused
+	********2 = Canadian English
+	*******22 = Spain / Mexico / Latin America
+	********3 = UK
+	*******23 = Netherlands
+	********4 = Germany
+	********5 = France / Canada (French)
+	********6 = Unused
+	********7 = Italy (Distributed by Hasbro)
+	
+	80-230000(US) - Toy Story 3 (gray cart)
+	80-230000-101(US) - Toy Story 3 (blue cart)
+	80-230003(UK) - Toy Story 3 (gray cart)
+	80-230003-103(UK) - Toy Story 3 (blue cart)
+	80-230104(GE) - Cars 2 (InnoTab Max Compatible)
+	80-230105(FR) - Cars 2 (InnoTab Max Compatible)
+	80-230122(SP) - Cars 2 (InnoTab Max Compatible)
+	80-230123(NL) - Cars 2 (InnoTab Max Compatible)
+	80-230200(US) - Disney Princesses (gray cart)
+	80-230200-101(US) - Disney Princesses (blue cart)
+	80-230204(GE) - Princess (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
+	80-230205(FR) - Princesses (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
+	80-230222(SP) - Disney Princesas (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
+	80-230223(NL) - Disney Princess (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
+	80-230300(US) - Fairies
+	80-230303(UK) - Fairies
+	80-230304(GE) - Fairies (contains the story Tinker Bell And The Great Fairy Rescue, but with MobiGo TinkerBell games)
+	80-230305(FR) - Les fees Disney (contains the story Tinker Bell And The Great Fairy Rescue, but with MobiGo TinkerBell games)
+	80-230403(UK) - Mickey's Clubhouse (InnoTab Max Compatible) (DUMPED) (contains the story Mickey Go Seek)
+	80-230404(GE) - Mickey Maus Wunderhaus (InnoTab Max Compatible) (contains the story Mickey Go Seek)
+	80-230405(FR) - La Maison de Mickey (InnoTab Max Compatible) (contains the story Mickey Go Seek)
+	80-230423(NL) - Mickey Mouse Clubhouse (InnoTab Max Compatible) (label in Dutch) (contains the story Mickey Go Seek)
+	80-230500(US) - The Penguins of Madagascar (DUMPED)
+	80-230604(GE) - Dora: Lass Dem Hilfen! (InnoTab Max Compatible)
+	80-230605(FR) - Dora l'Exploratrice a la rescousse (InnoTab Max Compatible)
+	80-230622(SP) - Dora la Exploradora (InnoTab Max Compatible)
+	80-230623(NL) - Dora the Explorer: Laten we Helpen! (InnoTab Max Compatible)
+	80-230704(GE) - SpongeBob Schwammkopf
+	80-230805(FR) - Scooby Doo: Mystery Madness (contains the Mummy story)
+	80-230900(US) - Shrek: Forever After (contains the story Shrek's Vacation and a couple of Shrek Forever After minigames)
+	80-231004(GE) - Dino-Zug: Weltreise (contains T.Rex Teeth story)
+	80-231100(US) - Hello Kitty
+	80-231104(GE) - Hello Kitty
+	80-231105(FR) - Hello Kitty
+	80-231123(NL) - Hello Kitty
+	80-231200(US) - InnoTab 2 (contains the What's That Noise? story and a Learning Lodge game)
+	80-231300(US) - TMNT: Turtle Power! (InnoTab Max Compatible) (DUMPED)
+	80-231304(GE) - TMNT: Turtle Power! (InnoTab Max Compatible)
+	80-231305(FR) - Tortues Ninja (InnoTab Max Compatible)
+	80-231322(SP) - TMNT (InnoTab Max Compatible)
+	80-231323(NL) - TMNT: Turtle Power! (InnoTab Max Compatible)
+	80-231404(GE) - Merida
+	80-231500(US) - InnoTab 2S (contains the What's That Noise? story and a Learning Lodge game)
+	80-231503(UK) - Thomas Exploring Sodor
+	80-231604(GE) - Jake und die Piraten (InnoTab Max Compatible)
+	80-231605(FR) - Jake et les pirates (InnoTab Max Compatible)
+	80-231622(SP) - Jake y las Piratas (InnoTab Max Compatible)
+	80-231704(GE) - Minnie Maus (InnoTab Max Compatible)
+	80-231705(FR) - La Boutique de Minnie (InnoTab Max Compatible)
+	80-231722(SP) - Minnie (InnoTab Max Compatible)
+	80-231723(NL) - Minnie (InnoTab Max Compatible)
+	80-231804(GE) - Planes (InnoTab Max Compatible)
+	80-231805(FR) - Planes (InnoTab Max Compatible)
+	80-231823(NL) - Planes (InnoTab Max Compatible)
+	80-231903(UK) - Monsters University
+	80-231905(FR) - Monstres Academy (InnoTab Max Compatible)
+	80-232004(GE) - Sofia der Erste (InnoTab Max Compatible)
+	80-232005(FR) - Princesse Sofia (InnoTab Max Compatible)
+	80-232023(NL) - Sofia het Prinsesje (InnoTab Max Compatible)
+	80-232104(GE) - Doc McStuffins (InnoTab Max Compatible)
+	80-232105(FR) - Docteur la peluche (InnoTab Max Compatible)
+	80-232200(US) - InnoTab 3 (contains the What's That Noise? story and a Learning Lodge game)
+	80-232300(US) - InnoTab 3S (contains the What's That Noise? story and a Learning Lodge game)
+	80-232400(US) - InnoTab 3 Baby
+	80-232504(GE) - Tut Tut Baby Flitzer (InnoTab Max Compatible)
+	80-232505(FR) - Tut Tut Bolides - La Ville Alphabet (InnoTab Max Compatible)
+	80-232523(NL) - Toet Toet Auto's - Drukke dag in het Alphabetstad (InnoTab Max Compatible)
+	80-232600(US) - Learn to Write with Cody and Cora (InnoTab Max Compatible)
+	80-232604(GE) - Nino & Nina Lernen Schreissen (InnoTab Max Compatible)
+	80-232605(FR) - J'apprends crire avec Nino & Nina (InnoTab Max Compatible)
+	80-232623(NL) - Leer schrijven met Nino & Nina (InnoTab Max Compatible)
+	80-233004(GE) - Ultimate Spiderman (InnoTab Max Compatible)
+	80-233005(FR) - Ultimate Spiderman (InnoTab Max Compatible)
+	80-233023(NL) - Ultimate Spiderman (InnoTab Max Compatible)
+	80-233104(GE) - Winnie Puuh
+	80-233105(FR) - Winnie l'ourson
+	80-233122(SP) - Winnie Puuh (ever released?)
+	80-233123(NL) - Winnie de Poeh
+	80-233300(US) - My first Nursery Rhymes (NTSC-U)
+	80-233304(GE) - Nino & Nina Hoerne Musik
+	80-233305(FR) - Mes Comptines Animéés
+	80-233323(NL) - Vrolijke Kinderliedjes (ever released?)
+	80-233404(GE) - Peppa (InnoTab Max Compatible)
+	80-233423(NL) - Peppa (InnoTab Max Compatible)
+	80-233505(FR) - Pixar Aventures (InnoTab Max Compatible)
+	80-233704(GE) - Classic stories
+	80-234004(GE) - Octonauts (InnoTab Max Compatible)
+	80-234005(FR) - Octonauts (InnoTab Max Compatible)
+	-->
+	
+	<software name="mickeychuk" supported="no">
+		<description>Mickey Mouse Clubhouse (UK) (InnoTab Max Compatible) (Blue cart)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
-		<info name="serial" value="80-230403-103"/>
+		<info name="serial" value="80-230403-103(UK)"/>
 		<part name="cart" interface="vtech_innotab_cart">
 			<dataarea name="rom" size="0x8400000">
 				<rom name="80-230403-103 - Mickey Mouse Clubhouse (UK).bin" size="0x8400000" crc="839567a9" sha1="bd4e2c8138d6f62bcac1978745a2b752bcefb07d" />
@@ -36,7 +140,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tmnttp" supported="no">
-		<description>Teenage Mutant Ninja Turtles - Turtle Power! (USA)</description>
+		<description>Teenage Mutant Ninja Turtles - Turtle Power! (USA) (InnoTab Max Compatible)</description>
 		<year>2013</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-231300(US)"/>
