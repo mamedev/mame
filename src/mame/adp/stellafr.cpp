@@ -90,17 +90,20 @@ Connectors:
 
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
+
+#include "stellafr.lh"
 
 //#define VERBOSE 1
 #include "logmacro.h"
-
-#include "stellafr.lh"
 
 namespace {
 
@@ -197,6 +200,7 @@ public:
 		m_duart(*this, "duart"),
 		m_nvram(*this, "nvram"),
 		m_dac(*this, "dac"),
+		m_st(*this, "st"),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U),
@@ -214,6 +218,7 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<nvram_device> m_nvram;
 	required_device<ad7224_device> m_dac;
+	required_device<rs232_port_device> m_st;
 	output_finder<8> m_digits;
 	output_finder<128> m_lamps;
 	output_finder<2> m_leds;
@@ -228,12 +233,16 @@ private:
 	uint8_t m_anz2;
 	uint8_t m_mux2;
 
+	bool m_outst;
+
 	uint8_t mux_r();
 	void mux_w(uint8_t data);
 	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 	void lamps_w(uint8_t row, uint16_t data);
+
+	void st_in(uint8_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
@@ -246,7 +255,6 @@ uint8_t stellafr_state::mux_r()
 	bool li = false;
 	bool emp = false;
 	bool ma = false;
-	bool st = false;
 	bool t = false; // main buttons in
 	bool t2 = false;
 	bool emp2 = false;
@@ -257,7 +265,7 @@ uint8_t stellafr_state::mux_r()
 	if (li)   data |= (1 << U10_OUTLI);
 	if (emp)  data |= (1 << U10_OUTEMP);
 	if (ma)   data |= (1 << U10_OUTMA);
-	if (st)   data |= (1 << U10_OUTST);
+	if (m_outst)   data |= (1 << U10_OUTST);
 	if (t)    data |= (1 << U10_OUTT);
 	if (t2)   data |= (1 << U10_OUTT2);
 	if (emp2) data |= (1 << U10_EMP2);
@@ -275,6 +283,11 @@ void stellafr_state::lamps_w(uint8_t row, uint16_t data)
 		bool lamp_value = BIT(data, i);
 		m_lamps[lamp_index] = lamp_value;
 	}
+}
+
+void stellafr_state::st_in(uint8_t data)
+{
+	m_outst = data;
 }
 
 void stellafr_state::mux_w(uint8_t data)
@@ -308,6 +321,8 @@ void stellafr_state::mux_w(uint8_t data)
 		;
 	if (aw2)
 		;
+
+	m_st->write_dtr(enanz1);
 }
 
 void stellafr_state::mux2_w(uint8_t data)
@@ -322,6 +337,8 @@ void stellafr_state::mux2_w(uint8_t data)
 	m_mux1  = (m_mux1  << 1) | BIT(data,U1_MUX1);
 	m_anz2  = (m_anz2  << 1) | BIT(data,U1_ANZ2);
 	m_mux2  = (m_mux2  << 1) | BIT(data,U1_MUX2);
+
+	m_st->write_txd(m_ma1);
 }
 
 void stellafr_state::duart_output_w(uint8_t data)
@@ -391,6 +408,9 @@ void stellafr_state::stellafr(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	AD7224(config, m_dac, 0);
+
+	RS232_PORT(config, m_st, default_rs232_devices, nullptr);
+	m_st->rxd_handler().set(FUNC(stellafr_state::st_in));
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
