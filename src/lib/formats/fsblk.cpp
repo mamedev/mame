@@ -266,6 +266,11 @@ std::pair<std::error_condition, std::vector<u8>> filesystem_t::file_rsrc_read(co
 	return std::make_pair(error::unsupported, std::vector<u8>());
 }
 
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> filesystem_t::enum_blocks(const std::vector<std::string> &path)
+{
+	return std::make_tuple(error::unsupported, std::vector<u32>(), std::vector<u32>());
+}
+
 std::error_condition filesystem_t::file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	return error::unsupported;
