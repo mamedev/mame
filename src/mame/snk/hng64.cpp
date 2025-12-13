@@ -2331,7 +2331,7 @@ u8 hng64_state::ioport3_r()
 
 DEFINE_DEVICE_TYPE(HNG64_LAMPS, hng64_lamps_device, "hng64_lamps", "HNG64 Lamps")
 
-hng64_lamps_device::hng64_lamps_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock)
+hng64_lamps_device::hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HNG64_LAMPS, tag, owner, clock)
 	, m_lamps_out_cb(*this)
 	, m_lamps(*this, "lamp%u", 0U)
