@@ -1,14 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders: David Haywood
-
 /***********************************************************************************************************************
 
    Austrian Gaming Industries / Novomatic 'CoolFire' hardware (1st generation).
    Used late 2002 - early 2008?
    Main hardware:
-    -Main PCB (P379-6)
+    - Main PCB (P379-6)
      * ColdFire MCF5406ECAB40 near a 33.3330 MHz xtal.
-     * 3 SIMM slots, two for game ROM and other for RAM (2 x GM71C18163CT6 RAM for Cobra 4').
+     * 3 SIMM slots, two for game ROM and other for RAM (2 x GM71C18163CT6 RAM for 'Cobra 4').
      * 2 x CS18LV10245CIR55 RAM chips.
      * 3.6V battery.
      * Epson RTC72423 Real Time Clock.
@@ -19,13 +18,13 @@
      * Maxim MAX807LCWE.
      * Connectors for two VGA boards.
      * Bank of two dip-switches.
-     * TPM on a small sub-PCB (Atmel 89C5131A-UL for USB, Atmel SC144144CT secure MCU, 24 MHz xtal and a 24C02 SEEPROM).
-    -I/O PCB (BPV1-0).
+     * TPM on a small sub-PCB (Atmel 89C5131A-UL for USB, Atmel SC144144CT secure MCU, 24 MHz xtal and a FM24C04A SEEPROM).
+    - I/O PCB (BPV1-0).
      * Lot of connectors (RS-485, 2 x RS-232, 2 x VGA, FVD, WBA, 2 x NRI, Clashflow, EBA, Meter, 3 x Hopper, etc.).
      * 2 x Maxim MAX1488ECPD.
      * 3 x ULN2803A, 3 x ULN2064B.
-    -One or two VGA boards (Novomatic P378-1 D9701).
-     * 4 x IS41C16256-35K ROM chips (1MB total).
+    - One or two VGA boards (Novomatic P378-1 D9701).
+     * 4 x IS41C16256-35K RAM chips (1MB total).
      * 14.3181 MHz xtal.
      * ATF16V8C PLD.
      * Chips & Technologies 65550 B.
@@ -33,23 +32,20 @@
    The main Gaminator cab uses a Money Controls Universal Hopper model MK4 with parallel interface (PIC16C620A on main
    PCB, PIC12C671 on LEDs PCB) and a Ithaca Epic 950 Payment Tickets Printer with serial interface.
 
+
+   Interrupt vectors get put in RAM at 0x08000000
+
+   Preliminary video based on llcharm / g4u5 set ONLY
+   there is clearly a way to set the base address for the tiles, or they should get
+   DMAd elsewhere before use.
+
+   Ends up making some accesses to the ROM area because the pointer it gets from RAM is 0
+   and dies during what it calls 'EEPROM test' (investigate - is it hooked up in the ColdFire
+   peripheral area?).
+
+   Update: Calls MBUS in ColdFire (I2C), which currently is tied to machine().rand() ...
+
 ***********************************************************************************************************************/
-
-/*
-
-  Interrupt vectors get put in RAM at 0x08000000
-
-  Preliminary video based on llcharm / g4u5 set ONLY
-  there is clearly a way to set the base address for the tiles, or they should get
-  DMAd elsewhere before use.
-
-  Ends up making some accesses to the ROM area because the pointer it gets from RAM is 0
-  and dies during what it calls 'EEPROM test' (investigate - is it hooked up in the ColdFire
-  peripheral area?).
-
-  Update: calls MBUS in Coldfire (i2c), which currently is tied to machine().rand() ...
-
-*/
 
 
 #include "emu.h"
@@ -136,7 +132,6 @@ uint16_t gamtor_vga_device::offset()
 	return vga_device::offset() << 1;
 }
 
-
 namespace {
 
 class gaminator_state : public driver_device
@@ -192,7 +187,7 @@ INPUT_PORTS_END
 
 void gaminator_state::gaminator(machine_config &config)
 {
-	MCF5206E(config, m_maincpu, 33.333_MHz_XTAL); // Coldfire MCF5406ECAB40
+	MCF5206E(config, m_maincpu, 33.333_MHz_XTAL); // ColdFire MCF5406ECAB40
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -206,9 +201,8 @@ void gaminator_state::gaminator(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 	// unknown sound
 
-	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses it own internal crystal
+	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
 }
-
 
 
 
@@ -217,7 +211,6 @@ ROM_START( g4u5 )
 	ROM_LOAD( "games4y_594v5.6-5@1.bin", 0x0000000, 0x4000000, CRC(3eb0a6fe) SHA1(2c8a1f3850a1377c2e2430d527787d2586d7dbea) ) // GAMES4Y5 V5.6-5 May 16 2007
 	ROM_LOAD( "games4y_594v5.6-5@2.bin", 0x4000000, 0x4000000, CRC(b26afd49) SHA1(28ae48467581517be12922c7920afc0f54e4fe4f) )
 ROM_END
-
 
 ROM_START( g4u6 )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -313,7 +306,6 @@ ROM_START( gamt4dbag )
 	ROM_LOAD( "g4_5.5-6bag,lady.bin", 0x4000000, 0x4000000, CRC(d4a299ac) SHA1(a9984f46868905e38d5458aed69e9be8e7a76818) )
 ROM_END
 
-
 ROM_START( gamt4e )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "4_94-5.5-8_1", 0x0000000, 0x4000000, CRC(3a8d890e) SHA1(9883d55201ce1f7f5c1d1298e7dd2b487c13d976) ) // V5.5-8 Dec 07 2005
@@ -332,16 +324,11 @@ ROM_START( gamt4fbag )
 	ROM_LOAD( "g4_5.5-9bag,lady.bin", 0x4000000, 0x4000000, CRC(e394ddf8) SHA1(3de6309d11bea0aa800f23c7044e5519f8328df6) )
 ROM_END
 
-
-
 ROM_START( gamt4g )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "gaminator494___1_v 5.5-10a.rom", 0x0000000, 0x4000000, CRC(61cae731) SHA1(4324a30f9b04efd6b48e21070e31eb8bda0c607f) ) // V5.5-10A Jul 19 2006
 	ROM_LOAD( "gaminator494___2_v 5.5-10a.rom", 0x4000000, 0x4000000, CRC(3878a4f2) SHA1(c7f63f19e99368fd9b47abcfd17526dc360ddecd) )
 ROM_END
-
-
-
 
 ROM_START( gamt4h )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -361,9 +348,6 @@ ROM_START( gamt4hbag )
 	ROM_LOAD( "gaminator4@2 v.5.6-0.rom", 0x4000000, 0x4000000, CRC(e5177c37) SHA1(b4006401ecd4840aa8a5fb5349e6da6746cfe2f3) )
 ROM_END
 
-
-
-
 ROM_START( gamt4i )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "gaminator494_v5.6-5@1.rom", 0x0000000, 0x4000000, CRC(652cbd62) SHA1(a420bc61434ff56b38fa088becf4cbf43a998f9b) ) // V5.6-5 Feb 26 2007
@@ -375,7 +359,6 @@ ROM_START( gamt4ibag )
 	ROM_LOAD( "gaminator494_v5.6-5@1.rom", 0x0000000, 0x4000000, CRC(652cbd62) SHA1(a420bc61434ff56b38fa088becf4cbf43a998f9b) ) // V5.6-5 Feb 26 2007
 	ROM_LOAD( "gaminator4@2 v.5.6-5.rom", 0x4000000, 0x4000000, CRC(66b1fba0) SHA1(3fb798a19a6b44f6993787bbe2e6747c6c826674) )
 ROM_END
-
 
 ROM_START( gamt4j )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -551,8 +534,6 @@ ROM_START( gamt10bag )
 	ROM_LOAD( "g10_5.5-5bag,money.bin", 0x4000000, 0x4000000, CRC(6318d6f8) SHA1(4b4fdb31da8d1a058053326b77c1d206b13e3734) )
 ROM_END
 
-
-
 ROM_START( gamt10a )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "gamt10-94-5.5-9.rom1", 0x0000000, 0x4000000, CRC(7c8588ab) SHA1(c69b2218893fb09bb13ecfdfc2a45a1fa67e10d0) ) // V5.5-9 Dec 13 2005
@@ -600,8 +581,6 @@ ROM_START( gamt10gmult )
 	ROM_LOAD( "gamt10-94-5.6-4.rom1", 0x0000000, 0x4000000, CRC(880a3374) SHA1(defbd9273b3b84cc2a6a4b784dada582b9d8a399) ) // V5.6-4 Dec 04 2006
 	ROM_LOAD( "g1094_v5.6-4_2", 0x4000000, 0x4000000, CRC(5ad52530) SHA1(1aa300d65e790a8e83e35068f0b7656c0afaaa67) )
 ROM_END
-
-
 
 ROM_START( gamt10h )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -676,8 +655,6 @@ ROM_START( gamt11bmult )
 	ROM_LOAD( "gamt11-94-5.6-0.rom1", 0x0000000, 0x4000000, CRC(d591cde6) SHA1(5769962209e7364426d2c24149229e45e5531e73) ) // V5.6-0 Sep 11 2006
 	ROM_LOAD( "gam_11_94_5.6-0_2.rom", 0x4000000, 0x4000000, CRC(e1e476c7) SHA1(c513df590d0a8e9d26fc58a066cf9d3a1a77cc7a) )
 ROM_END
-
-
 
 ROM_START( gamt11c )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -755,8 +732,6 @@ ROM_START( gamt16fmult )
 	ROM_LOAD( "g16 92_v5.6-5_2", 0x4000000, 0x4000000, CRC(bfad3326) SHA1(b94ac12130563295f2b99d77205a211118f95f37) )
 ROM_END
 
-
-
 ROM_START( gamt16g )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "gamtor1694_@1_5.6-5.rom", 0x0000000, 0x4000000, CRC(dd433df3) SHA1(b4a89cf4e190c1d32900fa5425a6b1326c722e6d) ) // V5.6-5 Feb 28 2007
@@ -833,8 +808,6 @@ ROM_START( gamt18bmult )
 	ROM_LOAD( "g18_94_5.6-0_2.rom", 0x4000000, 0x4000000, CRC(1d9e7456) SHA1(3c9b56816dfa7b6f782f27510f69a2bf40b3415f) )
 ROM_END
 
-
-
 ROM_START( gamt18c )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "gamtor18_94_5.6-5@1.rom", 0x0000000, 0x4000000, CRC(2095957f) SHA1(a0ae6275875cd77999e105a88c0a8334efc2dd53) ) // 5.6-5 Mar 16 2007
@@ -860,8 +833,6 @@ ROM_START( gamt19mult )
 	ROM_LOAD( "gamtor1994_5.6-0@1.rom", 0x0000000, 0x4000000, CRC(a3bc17c4) SHA1(ce1e0efb578c5de9e4f27f60a30cd291071568aa) ) // V5.6-0 Aug 02 2006
 	ROM_LOAD( "19_94_5.6-1_2.rom", 0x4000000, 0x4000000, CRC(518c7400) SHA1(1b9ed91bdfc677bb0f7ead331369d40e85452838) )
 ROM_END
-
-
 
 ROM_START( gamt19a )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -909,8 +880,6 @@ ROM_START( gamt21amult )
 	ROM_LOAD( "21_94_5.6-5_2.rom", 0x4000000, 0x4000000, CRC(92b36a02) SHA1(e13fd3b122a87251e3735dce6a38d5f966997a7e) )
 ROM_END
 
-
-
 // Gaminator 22
 
 ROM_START( gamt22 )
@@ -930,7 +899,6 @@ ROM_START( gamt22amult )
 	ROM_LOAD( "gamtor2292_@1_5.6-5.rom", 0x0000000, 0x4000000, CRC(bec1afe1) SHA1(2304aac2aacd78358c12ed3a797c7cda36990324) ) // V5.6-5 Mar 06 2007
 	ROM_LOAD( "g22_2", 0x4000000, 0x4000000, CRC(91fd9d7b) SHA1(786f54b8ecc607f9a99db068590e7dbc718fb66a) )
 ROM_END
-
 
 ROM_START( gamt22b )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -994,8 +962,6 @@ ROM_START( gamt31mult )
 	ROM_LOAD( "g3194_v5.6-12_2", 0x4000000, 0x4000000, CRC(4cd4ba07) SHA1(b146db07134b4fa28377f45cdd22ef19bb4b2262) )
 ROM_END
 
-
-
 // Hot Spot 2
 
 ROM_START( hspot2 )
@@ -1019,7 +985,6 @@ ROM_START( megakat )
 	ROM_LOAD( "megakatok2_94_5.6-0_@1.rom", 0x0000000, 0x4000000, CRC(39ef31ec) SHA1(7a04c15d37b2921a475294dd9e474be4c2a1a0db) )
 	ROM_LOAD( "megakatok2_94_5.6-0_@2.rom", 0x4000000, 0x4000000, CRC(d2024952) SHA1(fcc1c7574eeef0ae26ba80d30fac3e74b8a9dbf2) )
 ROM_END
-
 
 ROM_START( gamt1lotc )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -1087,7 +1052,6 @@ ROM_START( gamt4lotca ) // zip was 'mk4.zip', might be something else (mulitkaro
 	ROM_LOAD( "gamt4lotca_read@2.bin", 0x4000000, 0x4000000, CRC(d33f55b4) SHA1(f3f822998977e485f0f7c2e7335602490fc13ba7) )
 ROM_END
 
-
 ROM_START( gamt4lotm )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "g_4_1.bin", 0x0000000, 0x4000000, CRC(bec5e028) SHA1(091fd37883225373f65fcaafcc9e3be465a4fca0) )
@@ -1105,8 +1069,6 @@ ROM_START( gamt20lotm )
 	ROM_LOAD( "g_20_1.bin", 0x0000000, 0x4000000, CRC(a914c063) SHA1(8a1b9cc69241eb2f533697e4e92e7bb8aee5724b) )
 	ROM_LOAD( "g_20_2.bin", 0x4000000, 0x4000000, CRC(17ccd29c) SHA1(7e3f1ca89f660e8a018a7e8a9c240cc2bab36760) )
 ROM_END
-
-
 
 ROM_START( gamt1ent )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -1150,7 +1112,6 @@ ROM_START( gamt20ent )
 	ROM_LOAD( "gr20.5_6-0.02.rom", 0x4000000, 0x4000000, CRC(0dd0fea8) SHA1(39ed9083b374f1af13cc04671fad520e4e7223be) )
 ROM_END
 
-
 // Ancient Atlantis
 
 ROM_START( ancienta )
@@ -1179,6 +1140,7 @@ ROM_START( ancientad )
 ROM_END
 
 // Bananas Go Bahamas
+
 ROM_START( bananas )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "banana92.rom", 0x0000, 0x2000000, CRC(52d3a923) SHA1(0aa0a2d3cafaa19a4672ac2d34d5442ce238e179) )
@@ -1189,9 +1151,7 @@ ROM_START( bananasa )
 	ROM_LOAD( "banana94.rom", 0x0000, 0x2000000, CRC(ecdac445) SHA1(a50225a4d3208b622847ec22daaaff392c064f4f) )
 ROM_END
 
-
 // Bee Bop
-
 
 ROM_START( beebop )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
@@ -1223,8 +1183,8 @@ ROM_START( beebope )
 	ROM_LOAD( "bbop96-v5.4-20.rom", 0x0000, 0x2000000, CRC(cef0508a) SHA1(61603cd9ed4ef3196d8558a4c9b0af837b6e2f78) )
 ROM_END
 
-
 // Beetlemania
+
 ROM_START( beetlem )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "beetle90_5_0_21.rom", 0x0000, 0x1000000, CRC(fe6e8595) SHA1(ec590fd981ae8cb59a65cbfdf53dff6387abde94) )
@@ -1250,9 +1210,8 @@ ROM_START( beetlemd )
 	ROM_LOAD( "beetle96_5.3-17.rom", 0x0000, 0x1000000, CRC(5f9433e0) SHA1(0b6d53a6feb31a28f30029cad3626a71c2d46c1f) )
 ROM_END
 
-
-
 // Bungee Monkey
+
 ROM_START( bungeem )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "bm92_1", 0x000000, 0x2000000, CRC(b7beae4d) SHA1(42f93a50daf8cf0e4a31ba5e72732d8c0fd611c9) )
@@ -1265,22 +1224,19 @@ ROM_START( bungeema )
 	ROM_LOAD( "bmonkey96@2_5.4-18.rom", 0x2000000, 0x1000000, CRC(3598cdc8) SHA1(5cf8e8d6df031dac0f3894d2a9964640d65612e8) )
 ROM_END
 
-
 // Book of Ra
+
 ROM_START( bookra )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "bookra94_v5.5-6_@1.bin", 0x0000000, 0x4000000, CRC(a1576b33) SHA1(6820759f11e1946cb2b3d89f3d7c72835e487ad1) )
 ROM_END
 
-
-
 // Banana Splash
+
 ROM_START( bsplash )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "bsplash92.rom", 0x0000, 0x2000000, CRC(5111ab61) SHA1(22b44c92ab7239c1f7c18b47aea2d832c1282b1b) )
 ROM_END
-
-
 
 // Chilli Con Cash
 
@@ -1327,8 +1283,6 @@ ROM_START( columbusf )
 	ROM_LOAD( "columbus96-v5.4-18.demo.rom", 0x0000, 0x2000000, CRC(cf3b305d) SHA1(3f9816dde3857fa6f8f50644b17ec2b45cbb878c) )
 ROM_END
 
-
-
 // Diamond Trio
 
 ROM_START( ditrio )
@@ -1336,13 +1290,12 @@ ROM_START( ditrio )
 	ROM_LOAD( "dtrio_96_5.5-10.rom", 0x0000, 0x2000000, CRC(689b5220) SHA1(1daefb9b7d597d6e35afd598fe3e5737afc53639) )
 ROM_END
 
-
 // Dolphin's Pearl
+
 ROM_START( dolphinp )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "dpearl96_v5.4-16.rom", 0x0000, 0x1000000, CRC(93a015ec) SHA1(6bbf87c8762e04d20710337c1b3a4378360c1d68) )
 ROM_END
-
 
 // The Euro Game
 
@@ -1356,14 +1309,12 @@ ROM_START( eurogamea )
 	ROM_LOAD( "32mb_eurogame94_", 0x0000, 0x2000000, CRC(f55bcd7f) SHA1(04171cfbd2e2557436ed1485ff389e4b359b1161) )
 ROM_END
 
-
 // First Class Traveller
+
 ROM_START( firstcl )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "fclass_96_5.5-10.rom", 0x0000, 0x2000000, CRC(7729061e) SHA1(1e0e3e7c4478edc5cdbf0d13a974e5b6eeef2d67) )
 ROM_END
-
-
 
 // Lucky Lady's Charm
 
@@ -1399,14 +1350,12 @@ GAME( 2002?, g4u6,        0,        gaminator, gaminator, gaminator_state, init_
 
 GAME( 2002?, g4u7,        0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Games 4 U 7 (94 5.6-5a)", GAME_FLAGS )
 
-
 GAME( 2002?, gamt1,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 1 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt1a,      gamt1,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 1 (set 2)", GAME_FLAGS )
 GAME( 2002?, gamt1b,      gamt1,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 1 (set 3)", GAME_FLAGS )
 
 GAME( 2002?, gamt1lotc,   gamt1,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 1 (bootleg, C-Loto)", GAME_FLAGS )
 GAME( 2002?, gamt1ent,    gamt1,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 1 (bootleg, Ent)",    GAME_FLAGS )
-
 
 GAME( 2002?, gamt4,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt4a,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 2)", GAME_FLAGS )
@@ -1430,8 +1379,7 @@ GAME( 2002?, gamt4fbag,   gamt4,    gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, gamt4hbag,   gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 4 (bootleg, Bag, set 3)", GAME_FLAGS )
 GAME( 2002?, gamt4ibag,   gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 4 (bootleg, Bag, set 4)", GAME_FLAGS )
 
-
-GAME( 2002?, gamt5,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech","Gaminator 5 (set 1)", GAME_FLAGS )
+GAME( 2002?, gamt5,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 5 (set 1)", GAME_FLAGS )
 
 GAME( 2002?, gamt6,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 6 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt6a,      gamt6,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 6 (set 2)", GAME_FLAGS )
@@ -1442,8 +1390,7 @@ GAME( 2002?, gamt6e,      gamt6,    gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, gamt6f,      gamt6,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 6 (set 7)", GAME_FLAGS )
 
 GAME( 2002?, gamt6lotc,   gamt6,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 6 (bootleg, C-Loto)", GAME_FLAGS )
-GAME( 2002?, gamt6ent,    gamt6,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 6 (bootleg, Ent)", GAME_FLAGS )
-
+GAME( 2002?, gamt6ent,    gamt6,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 6 (bootleg, Ent)",    GAME_FLAGS )
 
 GAME( 2002?, gamt7,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 7 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt7a,      gamt7,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 7 (set 2)", GAME_FLAGS )
@@ -1463,12 +1410,10 @@ GAME( 2002?, gamt8d,      gamt8,    gaminator, gaminator, gaminator_state, init_
 
 GAME( 2002?, gamt8lotc,   gamt8,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 8 (bootleg, C-Loto)", GAME_FLAGS )
 
-
 GAME( 2002?, gamt9,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 9 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt9a,      gamt9,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 9 (set 2)", GAME_FLAGS )
 
 GAME( 2002?, gamt9lotc,   gamt9,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 9 (bootleg, C-Loto)", GAME_FLAGS )
-
 
 GAME( 2002?, gamt10,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt10a,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 2)", GAME_FLAGS )
@@ -1500,7 +1445,6 @@ GAME( 2002?, gamt11c,     gamt11,   gaminator, gaminator, gaminator_state, init_
 
 GAME( 2002?, gamt11bmult, gamt11,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 11 (bootleg, Multiloto)", GAME_FLAGS )
 
-
 GAME( 2002?, gamt12,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 12 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt12a,     gamt12,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 12 (set 2)", GAME_FLAGS )
 GAME( 2002?, gamt12b,     gamt12,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 12 (set 3)", GAME_FLAGS )
@@ -1521,7 +1465,6 @@ GAME( 2002?, gamt16k,     gamt16,   gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, gamt16lotc,  gamt16,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 16 (bootleg, C-Loto)",    GAME_FLAGS )
 GAME( 2002?, gamt16fmult, gamt16,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 16 (bootleg, Multiloto)", GAME_FLAGS )
 
-
 GAME( 2002?, gamt17,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 17 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt17a,     gamt17,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 17 (set 2)", GAME_FLAGS )
 GAME( 2002?, gamt17b,     gamt17,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 17 (set 3)", GAME_FLAGS )
@@ -1536,14 +1479,12 @@ GAME( 2002?, gamt18lotc,  gamt18,   gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, gamt18bmult, gamt18,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 18 (bootleg, Multiloto)", GAME_FLAGS )
 GAME( 2002?, gamt18ent,   gamt18,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 18 (bootleg, Ent)",       GAME_FLAGS )
 
-
 GAME( 2002?, gamt19,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 19 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt19a,     gamt19,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 19 (set 2)", GAME_FLAGS )
 
 GAME( 2002?, gamt19lotc,  gamt19,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 19 (bootleg, C-Loto)",    GAME_FLAGS )
 GAME( 2002?, gamt19mult,  gamt19,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 19 (bootleg, Multiloto)", GAME_FLAGS )
 GAME( 2002?, gamt19ent,   gamt19,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 19 (bootleg, Ent)",       GAME_FLAGS )
-
 
 GAME( 2002?, gamt20,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 20 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt20a,     gamt20,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 20 (set 2)", GAME_FLAGS )
@@ -1552,7 +1493,6 @@ GAME( 2002?, gamt20b,     gamt20,   gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, gamt20lotc,  gamt20,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 20 (bootleg, C-Loto)",    GAME_FLAGS )
 GAME( 2002?, gamt20lotm,  gamt20,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 20 (bootleg, Lotomatic)", GAME_FLAGS )
 GAME( 2002?, gamt20ent,   gamt20,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 20 (bootleg, Ent)",       GAME_FLAGS )
-
 
 GAME( 2002?, gamt21,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 21 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt21a,     gamt21,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 21 (set 2)", GAME_FLAGS )
@@ -1564,7 +1504,6 @@ GAME( 2002?, gamt22a,     gamt22,   gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, gamt22b,     gamt22,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 22 (set 3)", GAME_FLAGS )
 
 GAME( 2002?, gamt22amult, gamt22,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 22 (bootleg, Multiloto)", GAME_FLAGS )
-
 
 GAME( 2002?, gamt23,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 23 (set 1)", GAME_FLAGS )
 GAME( 2002?, gamt23a,     gamt23,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 23 (set 2)", GAME_FLAGS )
@@ -1582,7 +1521,6 @@ GAME( 2002?, gamt31mult,  gamt31,   gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, megakat,     0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Mega Katok 2", GAME_FLAGS )
 GAME( 2002?, hspot2,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Hot Spot 2",   GAME_FLAGS )
 GAME( 2002?, hspot3,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Hot Spot 3",   GAME_FLAGS )
-
 
 GAME( 2002?, ancienta,    0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Ancient Atlantis (set 1)",      GAME_FLAGS )
 GAME( 2002?, ancientaa,   ancienta, gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Ancient Atlantis (set 2)",      GAME_FLAGS )
