@@ -129,7 +129,7 @@ license:CC0-1.0
 
 	-->
 
-	<software name="scoobysp" supported="no">
+	<software name="scoobys" supported="no">
 		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -140,7 +140,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dora" supported="no">
+	<software name="dora3pig" supported="no">
 		<description>Dora and the 3 Little Pigs (USA)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -152,7 +152,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="doragr" cloneof="dora" supported="no">
+	<software name="dora3pigg" cloneof="dora3pig" supported="no">
 		<description>Dora und die drei Schweinchen (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -164,7 +164,7 @@ license:CC0-1.0
 	</software>
 	
 	<!-- also known as Mickey Mouse Clubhouse: Mickey Go Seek -->
-	<software name="mickeych" supported="no">
+	<software name="mmclub" supported="no">
 		<description>Mickey Mouse Clubhouse (USA)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -180,7 +180,7 @@ license:CC0-1.0
 	     the data structure is very different, and doesn't start with the FAT16 filesystem?
 	     does the system BIOS detect different cartridge types and handle them in different ways? -->
 	<!-- also known as Mickey Mouse Clubhouse: Mickey Go Seek -->
-	<software name="mickeycha" cloneof="mickeych" supported="no">
+	<software name="mmcluba" cloneof="mmclub" supported="no">
 		<description>Mickey Mouse Clubhouse (USA, flash chip)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -194,7 +194,7 @@ license:CC0-1.0
 
 
 
-	<software name="mickeychgr" cloneof="mickeych" supported="no">
+	<software name="mmclubg" cloneof="mmclub" supported="no">
 		<description>Micky Maus Wunderhaus (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -205,7 +205,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spongbobgr" supported="no">
+	<software name="spongebobg" supported="no">
 		<description>SpongeBob Schwammkopf - Ein Schwamm will nach oben (Germany)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
@@ -216,7 +216,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tangledgr" supported="no">
+	<software name="tangledg" supported="no">
 		<description>Rapunzel - Neu verföhnt (Germany)</description>
 		<year>20??</year>
 		<publisher>VTech</publisher>
