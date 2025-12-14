@@ -144,6 +144,8 @@ private:
 		}
 	}
 
+	void iocint_w(u32 data);
+
 	// devices
 	required_device<m68030_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -186,16 +188,28 @@ void luna_68k_state::machine_reset()
 	m_ioc_boot.select(0);
 }
 
+void luna_68k_state::iocint_w(u32 data)
+{
+	logerror("iocint_w %08x\n", data);
+	m_cpu->space(AS_PROGRAM).write_word(0x20280020, 0x00);
+	m_cpu->space(AS_PROGRAM).write_word(0x20280022, 0x00);
+	m_cpu->space(AS_PROGRAM).write_word(0x20280024, 0x00);
+	m_cpu->space(AS_PROGRAM).write_word(0x20280026, 0x00);
+	m_cpu->space(AS_PROGRAM).write_word(0x20280028, 0x80);
+	m_cpu->space(AS_PROGRAM).write_word(0x2028002a, 0x80);
+	m_cpu->space(AS_PROGRAM).write_word(0x2028002c, 0x80);
+	m_cpu->space(AS_PROGRAM).write_word(0x2028002e, 0x80);
+}
+
 void luna_68k_state::cpu_map(address_map &map)
 {
-	map(0x20280000, 0x202bffff).rw(FUNC(luna_68k_state::ioc_ram_r), FUNC(luna_68k_state::ioc_ram_w));
+	map(0x20280000, 0x2029ffff).rw(FUNC(luna_68k_state::ioc_ram_r), FUNC(luna_68k_state::ioc_ram_w));
 
 	map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
-	if (0) // FIXME: won't boot to monitor if this is enabled
-	{
-		map(0x30000d00, 0x30000d1f).m(m_ioc_spc[0], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
-		map(0x30000d20, 0x30000d3f).m(m_ioc_spc[1], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
-	}
+	map(0x30000800, 0x300008ff).unmaprw();
+	map(0x30000834, 0x30000837).w(FUNC(luna_68k_state::iocint_w));
+	map(0x30000d00, 0x30000d1f).m(m_ioc_spc[0], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
+	map(0x30000d20, 0x30000d3f).m(m_ioc_spc[1], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
 
 	map(0x40000000, 0x4001ffff).rom().region("eprom", 0);
 
@@ -229,9 +243,10 @@ void luna_68k_state::ioc_cpu_map(address_map &map)
 	// hd63450ps10 x 2 dma
 	// z0853606psc cio
 
-	map(0x000000, 0x03ffff).ram().share(m_ioc_ram).mirror(0x100000); // HM62256LP-10x8 (32768x8) - 256KB
+	map(0x000000, 0x01ffff).ram(); // HM62256LP-10x4 (32768x8) - 128KB
 	map(0x000000, 0x000fff).view(m_ioc_boot);
 	m_ioc_boot[0](0x000000, 0x000fff).rom().region("ioc", 0).w(FUNC(luna_68k_state::ioc_boot_disable_w));
+	map(0x100000, 0x11ffff).ram().share(m_ioc_ram); // HM62256LP-10x8 (32768x4) - 128KB
 	map(0xfc0000, 0xfcffff).rom().region("ioc", 0);
 	map(0xfe0000, 0xfe0fff).rom().region("ioc", 0);
 
