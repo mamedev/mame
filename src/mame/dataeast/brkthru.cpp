@@ -1,53 +1,60 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-/***************************************************************************
+/*******************************************************************************
 
-    Break Thru Doc. Data East (1986)
+Break Thru Doc. Data East (1986)
 
-    driver by Phil Stroffolino
+driver by Phil Stroffolino
 
-    UNK-1.1    (16Kb)  Code (4000-7FFF)
-    UNK-1.2    (32Kb)  Main 6809 (8000-FFFF)
-    UNK-1.3    (32Kb)  Mapped (2000-3FFF)
-    UNK-1.4    (32Kb)  Mapped (2000-3FFF)
+UNK-1.1    (16Kb)  Code (4000-7FFF)
+UNK-1.2    (32Kb)  Main 6809 (8000-FFFF)
+UNK-1.3    (32Kb)  Mapped (2000-3FFF)
+UNK-1.4    (32Kb)  Mapped (2000-3FFF)
 
-    UNK-1.5    (32Kb)  Sound 6809 (8000-FFFF)
+UNK-1.5    (32Kb)  Sound 6809 (8000-FFFF)
 
-    Background has 4 banks, with 256 16x16x8 tiles in each bank.
-    UNK-1.6    (32Kb)  GFX Background
-    UNK-1.7    (32Kb)  GFX Background
-    UNK-1.8    (32Kb)  GFX Background
+Background has 4 banks, with 256 16x16x8 tiles in each bank.
+UNK-1.6    (32Kb)  GFX Background
+UNK-1.7    (32Kb)  GFX Background
+UNK-1.8    (32Kb)  GFX Background
 
-    UNK-1.9    (32Kb)  GFX Sprites
-    UNK-1.10   (32Kb)  GFX Sprites
-    UNK-1.11   (32Kb)  GFX Sprites
+UNK-1.9    (32Kb)  GFX Sprites
+UNK-1.10   (32Kb)  GFX Sprites
+UNK-1.11   (32Kb)  GFX Sprites
 
-    Text has 256 8x8x4 characters.
-    UNK-1.12   (8Kb)   GFX Text
+Text has 256 8x8x4 characters.
+UNK-1.12   (8Kb)   GFX Text
 
-    **************************************************************************
-    Memory Map for Main CPU by Carlos A. Lozano
-    **************************************************************************
+********************************************************************************
+  Memory Map for Main CPU by Carlos A. Lozano
+********************************************************************************
 
-    MAIN CPU
-    0000-03FF                                   W                   Plane0
-    0400-0BFF                                  R/W                  RAM
-    0C00-0FFF                                   W                   Plane2(Background)
-    1000-10FF                                   W                   Plane1(sprites)
-    1100-17FF                                  R/W                  RAM
-    1800-180F                                  R/W                  In/Out
-    1810-1FFF                                  R/W                  RAM (unmapped?)
-    2000-3FFF                                   R                   ROM Mapped(*)
-    4000-7FFF                                   R                   ROM(UNK-1.1)
-    8000-FFFF                                   R                   ROM(UNK-1.2)
+MAIN CPU
+0000-03FF                                   W                   Plane0
+0400-0BFF                                  R/W                  RAM
+0C00-0FFF                                   W                   Plane2(Background)
+1000-10FF                                   W                   Plane1(sprites)
+1100-17FF                                  R/W                  RAM
+1800-180F                                  R/W                  In/Out
+1810-1FFF                                  R/W                  RAM (unmapped?)
+2000-3FFF                                   R                   ROM Mapped(*)
+4000-7FFF                                   R                   ROM(UNK-1.1)
+8000-FFFF                                   R                   ROM(UNK-1.2)
 
-    Interrupts: Reset, NMI, IRQ
-    The test routine is at F000
+Interrupts: Reset, NMI, IRQ
+The test routine is at F000
 
-    Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
+Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
 
-    2008-07
-    Dip locations verified with manual for brkthru (US conv. kit) and darwin
+2008-07
+Dip locations verified with manual for brkthru (US conv. kit) and darwin
+
+brkthru, brkthruj and brkthrut have a Self Test Mode not mentioned anywhere
+in the manual. It is accessed by holding down both player 1 and player 2 start
+buttons while powering up the game. It can be accessed in MAME by holding the
+buttons down after the game has started then pressing F3 to reset the game.
+
+********************************************************************************
 
 Darwin 4078 PCB layout
 f205v
@@ -133,13 +140,18 @@ Notes:
     Connectors:
                2x flat cable to upper board
 
+    Horizontal video frequency:
+        HSync = Dot Clock / Horizontal Frame Length
+              = Xtal /2   / (HDisplay + HBlank)
+              = 12MHz/2   / (256 + 128)
+              = 15.625kHz
+    Vertical Video frequency:
+        VSync = HSync / Vertical Frame Length
+              = HSync / (VDisplay + VBlank)
+              = 15.625kHz / (240 + 32)
+              = 57.444855Hz
 
-brkthru, brkthruj and brkthrut have a Self Test Mode not mentioned anywhere
-in the manual. It is accessed by holding down both player 1 and player 2 start
-buttons while powering up the game. It can be accessed in MAME by holding the
-buttons down after the game has started then pressing F3 to reset the game.
-
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -456,7 +468,6 @@ void brkthru_state::darwin_0803_w(uint8_t data)
 	if (data & 2)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 
-
 	// bit 1 = ? maybe IRQ acknowledge
 }
 
@@ -744,13 +755,11 @@ void brkthru_state::vblank_irq(int state)
 
 void brkthru_state::brkthru(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = XTAL(12'000'000);
-
 	// basic machine hardware
-	MC6809E(config, m_maincpu, MASTER_CLOCK / 8);         // 1.5 MHz ?
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::brkthru_main_map);
 
-	MC6809(config, m_audiocpu, MASTER_CLOCK / 2);         // 1.5 MHz ?
+	MC6809(config, m_audiocpu, 12_MHz_XTAL / 2); // 1.5 MHz ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	// video hardware
@@ -758,19 +767,7 @@ void brkthru_state::brkthru(machine_config &config)
 	PALETTE(config, m_palette, FUNC(brkthru_state::palette), 256);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK / 2, 384, 8, 248, 272, 8, 248); // verified for darwin, not 100% sure it's the same for brkthru
-	/* frames per second, vblank duration
-	    Horizontal video frequency:
-	        HSync = Dot Clock / Horizontal Frame Length
-	              = Xtal /2   / (HDisplay + HBlank)
-	              = 12MHz/2   / (240 + 144)
-	              = 15.625kHz
-	    Vertical Video frequency:
-	        VSync = HSync / Vertical Frame Length
-	              = HSync / (VDisplay + VBlank)
-	              = 15.625kHz / (240 + 32)
-	              = 57.444855Hz
-	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248);
 	screen.set_screen_update(FUNC(brkthru_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(brkthru_state::vblank_irq));
@@ -780,13 +777,13 @@ void brkthru_state::brkthru(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK / 8));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8));
 	ym1.add_route(0, "mono", 0.10);
 	ym1.add_route(1, "mono", 0.10);
 	ym1.add_route(2, "mono", 0.10);
 	ym1.add_route(3, "mono", 0.50);
 
-	ym3526_device &ym2(YM3526(config, "ym2", MASTER_CLOCK / 4));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL / 4));
 	ym2.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1076,4 +1073,5 @@ GAME( 1986, brkthruu,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, RO
 GAME( 1986, brkthruj,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1986, brkthrut,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, forcebrk,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, darwin,    0,       darwin,  darwin,   brkthru_state, empty_init, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )
