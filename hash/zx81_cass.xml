@@ -11859,7 +11859,7 @@ Defender: not working
 		<info name="usage" value="type RUN after loading the tape" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="2116">
-				<rom name="Tempo de Reação.tzx" size="2116" crc="4a3e3381" sha1="13864b18ab10a8dfffb67ece28dbb486c20d3676"/>
+				<rom name="Tempo de Reacao.tzx" size="2116" crc="4a3e3381" sha1="13864b18ab10a8dfffb67ece28dbb486c20d3676"/>
 			</dataarea>
 		</part>
 	</software>
