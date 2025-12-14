@@ -28806,7 +28806,7 @@ ROM_END
   | 13 | Dream Catcher.               | YES     | YES      |
   | 14 | Dynamite Diamonds 1.         | NO      | NO       |
   | 15 | Dynamite Diamonds 2.         | NO      | NO       |
-  | 16 | Egyptian Gold.               | NO      | NO       |
+  | 16 | Egyptian Gold.               | YES     | YES      |
   | 17 | Gold Country.                | NO      | NO       |
   | 18 | Golden Treasure.             | NO      | NO       |
   | 19 | Greenbacks.                  | NO      | NO       |
@@ -28856,6 +28856,7 @@ ROM_END
   | 04 | Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers    | YES     | YES      |
   | 05 | Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers        | YES     | YES      |
   | 06 | Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers         | YES     | YES      |
+  | 07 | Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers         | YES     | YES      |
   +----+-------------------------------------------------------------------+---------+----------+
 
   We will name the sets using the order of appearance and availability
@@ -29528,6 +29529,35 @@ ROM_START( fl7_50_gs06 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "fl7_gs06.u3",   0x0000, 0x8000, CRC(6eae4506) SHA1(1a5b0ec1213f04d2f8b94d6557b8c1b49de0c4dc) )
+
+	// Proper bipolar PROM dump
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
+	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
+  Custom Hardware.
+
+  GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers
+
+*/
+ROM_START( fl7_50_gs07 )
+	ROM_REGION( 0x8000, "maincpu", 0 )  // Serial 00000069A1C9.
+	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "m27c1001.u6",  0x00000, 0x20000, CRC(5a2157bb) SHA1(2b170102caf1224df7a6d33bb84d19114f453d89) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gs07.u3",   0x0000, 0x8000, CRC(11241dae) SHA1(7197813304623c022dc37aa603c0cb067c8bf1fd) )
 
 	// Proper bipolar PROM dump
 	ROM_REGION( 0x200, "proms", 0 )
@@ -32837,6 +32867,7 @@ GAME(  199?, fl7_50_gs03, fl7_50,  flaming7, flaming7, wingco_state,   init_flam
 GAME(  199?, fl7_50_gs04, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS04: Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers)", 0 )
 GAME(  199?, fl7_50_gs05, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS05: Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers)",     0 )
 GAME(  199?, fl7_50_gs06, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS06: Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers)",      0 )
+GAME(  199?, fl7_50_gs07, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers)",      0 )
 
 // special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )
