@@ -504,12 +504,12 @@ void swp00_device::envelope_block::keyon()
 
 u8 swp00_device::envelope_block::status() const
 {
-	return m_envelope_mode == DECAY_DONE ? 0xff : (m_envelope_mode << 6) | (m_envelope_level >> 6);
+	return (m_envelope_mode << 6) | (m_envelope_level >> 6);
 }
 
 bool swp00_device::envelope_block::active() const
 {
-	return m_envelope_mode != DECAY_DONE;
+	return m_envelope_mode != DECAY_DONE || m_envelope_level < 0x800;
 }
 
 u16 swp00_device::envelope_block::step(u32 sample_counter)
