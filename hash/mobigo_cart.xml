@@ -238,7 +238,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mickeychs" cloneof="mickeych" supported="no"> <!-- By now, cloneof "mickey" -->
+	<software name="mickeychs" cloneof="mickeych" supported="no">
 		<description>Disney La Casa de Mickey Mouse (Spain)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
