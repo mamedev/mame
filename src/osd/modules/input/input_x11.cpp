@@ -22,7 +22,7 @@
 #include "inpttype.h"
 
 // standard SDL header
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 // for X11 xinput
 #include <X11/Xlib.h>

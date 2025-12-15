@@ -10,7 +10,7 @@
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <cassert>
 #include <chrono>

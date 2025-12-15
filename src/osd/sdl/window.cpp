@@ -21,9 +21,6 @@
 #include "osdsdl.h"
 #include "window.h"
 
-// standard SDL headers
-#include <SDL2/SDL_syswm.h>
-
 // standard C headers
 #include <algorithm>
 #include <cassert>
@@ -79,23 +76,19 @@ bool sdl_osd_interface::window_init()
 	// The code below will document which hints were set.
 	char const *const hints[] = {
 			SDL_HINT_FRAMEBUFFER_ACCELERATION,
-			SDL_HINT_RENDER_DRIVER, SDL_HINT_RENDER_OPENGL_SHADERS,
-			SDL_HINT_RENDER_SCALE_QUALITY,
+			SDL_HINT_RENDER_DRIVER,
 			SDL_HINT_RENDER_VSYNC,
-			SDL_HINT_VIDEO_X11_XVIDMODE, SDL_HINT_VIDEO_X11_XINERAMA,
-			SDL_HINT_VIDEO_X11_XRANDR, SDL_HINT_GRAB_KEYBOARD,
-			SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, SDL_HINT_IDLE_TIMER_DISABLED,
+			SDL_HINT_VIDEO_X11_XRANDR,
+			SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS,
 			SDL_HINT_ORIENTATIONS,
 			SDL_HINT_XINPUT_ENABLED, SDL_HINT_GAMECONTROLLERCONFIG,
-			SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_ALLOW_TOPMOST,
+			SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, SDL_HINT_WINDOW_ALLOW_TOPMOST,
 			SDL_HINT_TIMER_RESOLUTION,
 			SDL_HINT_RENDER_DIRECT3D_THREADSAFE, SDL_HINT_VIDEO_ALLOW_SCREENSAVER,
-			SDL_HINT_ACCELEROMETER_AS_JOYSTICK, SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
-			SDL_HINT_VIDEO_WIN_D3DCOMPILER, SDL_HINT_VIDEO_WINDOW_SHARE_PIXEL_FORMAT,
-			SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES, SDL_HINT_MOUSE_RELATIVE_MODE_WARP,
-			SDL_HINT_RENDER_DIRECT3D11_DEBUG, SDL_HINT_VIDEO_HIGHDPI_DISABLED,
-			SDL_HINT_WINRT_PRIVACY_POLICY_URL, SDL_HINT_WINRT_PRIVACY_POLICY_LABEL,
-			SDL_HINT_WINRT_HANDLE_BACK_BUTTON,
+			SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK,
+			SDL_HINT_VIDEO_WIN_D3DCOMPILER,
+			SDL_HINT_VIDEO_MAC_FULLSCREEN_SPACES,
+			SDL_HINT_RENDER_DIRECT3D11_DEBUG
 			};
 
 	osd_printf_verbose("\nHints:\n");
@@ -136,8 +129,9 @@ void sdl_window_info::capture_pointer()
 {
 	if (!m_mouse_captured)
 	{
-		SDL_SetWindowGrab(platform_window(), SDL_TRUE);
-		SDL_SetRelativeMouseMode(SDL_TRUE);
+		SDL_SetWindowMouseGrab(platform_window(), true);
+		SDL_SetWindowKeyboardGrab(platform_window(), true);
+		SDL_SetWindowRelativeMouseMode(platform_window(), true);
 		m_mouse_captured = true;
 	}
 }
@@ -146,8 +140,9 @@ void sdl_window_info::release_pointer()
 {
 	if (m_mouse_captured)
 	{
-		SDL_SetWindowGrab(platform_window(), SDL_FALSE);
-		SDL_SetRelativeMouseMode(SDL_FALSE);
+		SDL_SetWindowMouseGrab(platform_window(), false);
+		SDL_SetWindowKeyboardGrab(platform_window(), false);
+		SDL_SetWindowRelativeMouseMode(platform_window(), false);
 		m_mouse_captured = false;
 	}
 }
@@ -156,7 +151,7 @@ void sdl_window_info::hide_pointer()
 {
 	if (!m_mouse_hidden)
 	{
-		SDL_ShowCursor(SDL_DISABLE);
+		SDL_HideCursor();
 		m_mouse_hidden = true;
 	}
 }
@@ -165,7 +160,7 @@ void sdl_window_info::show_pointer()
 {
 	if (m_mouse_hidden)
 	{
-		SDL_ShowCursor(SDL_ENABLE);
+		SDL_ShowCursor();
 		m_mouse_hidden = false;
 	}
 }
@@ -223,7 +218,7 @@ void sdl_window_info::toggle_full_screen()
 	if (fullscreen() && (video_config.switchres || is_osx))
 	{
 		SDL_SetWindowFullscreen(platform_window(), 0);
-		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode);
+		SDL_SetWindowFullscreenMode(platform_window(), &m_original_mode);
 		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);
 	}
 	SDL_DestroyWindow(platform_window());
@@ -633,7 +628,7 @@ void sdl_window_info::complete_destroy()
 	if (fullscreen() && video_config.switchres)
 	{
 		SDL_SetWindowFullscreen(platform_window(), 0);
-		SDL_SetWindowDisplayMode(platform_window(), &m_original_mode);
+		SDL_SetWindowFullscreenMode(platform_window(), &m_original_mode);
 		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);
 	}
 
@@ -669,9 +664,7 @@ osd_dim sdl_window_info::pick_best_mode()
 		minimum_height -= 4;
 	}
 
-	// FIXME: this should be provided by monitor !
-	num = SDL_GetNumDisplayModes(monitor()->oshandle());
-
+	SDL_DisplayMode **modes = SDL_GetFullscreenDisplayModes(monitor()->oshandle(), &num);
 	if (num == 0)
 	{
 		osd_printf_error("SDL: No modes available?!\n");
@@ -681,35 +674,32 @@ osd_dim sdl_window_info::pick_best_mode()
 	{
 		for (i = 0; i < num; ++i)
 		{
-			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(monitor()->oshandle(), i, &mode);
-
 			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + abs((int32_t)mode.w - target_width) + abs((int32_t)mode.h - target_height));
+			size_score = 1.0f / (1.0f + abs((int32_t)modes[i]->w - target_width) + abs((int32_t)modes[i]->h - target_height));
 
 			// if the mode is too small, give a big penalty
-			if (mode.w < minimum_width || mode.h < minimum_height)
+			if (modes[i]->w < minimum_width || modes[i]->h < minimum_height)
 				size_score *= 0.01f;
 
 			// if mode is smaller than we'd like, it only scores up to 0.1
-			if (mode.w < target_width || mode.h < target_height)
+			if (modes[i]->w < target_width || modes[i]->h < target_height)
 				size_score *= 0.1f;
 
 			// if we're looking for a particular mode, that's a winner
-			if (mode.w == m_win_config.width && mode.h == m_win_config.height)
+			if (modes[i]->w == m_win_config.width && modes[i]->h == m_win_config.height)
 				size_score = 2.0f;
 
 			// refresh adds some points
 			if (m_win_config.refresh)
-				size_score *= 1.0f / (1.0f + abs(m_win_config.refresh - mode.refresh_rate) / 10.0f);
+				size_score *= 1.0f / (1.0f + abs(m_win_config.refresh - modes[i]->refresh_rate) / 10.0f);
 
-			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, (double) size_score);
+			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)modes[i]->w, (int)modes[i]->h, (int) modes[i]->refresh_rate, (double) size_score);
 
 			// best so far?
 			if (size_score > best_score)
 			{
 				best_score = size_score;
-				ret = osd_dim(mode.w, mode.h);
+				ret = osd_dim(modes[i]->w, modes[i]->h);
 			}
 
 		}
@@ -832,27 +822,11 @@ int sdl_window_info::complete_create()
 
 	// create the window .....
 
-	/* FIXME: On Ubuntu and potentially other Linux OS you should use
-	 * to disable panning. This has to be done before every invocation of mame.
-	 *
-	 * xrandr --output HDMI-0 --panning 0x0+0+0 --fb 0x0
-	 *
-	 */
-	osd_printf_verbose("Enter sdl_info::create\n");
+	osd_printf_verbose("Enter sdl_window_info::create\n");
 	if (renderer_sdl_needs_opengl())
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-		m_extra_flags = SDL_WINDOW_OPENGL;
 	}
-	else
-	{
-		m_extra_flags = 0;
-	}
-
-	// create the SDL window
-	// soft driver also used | SDL_WINDOW_INPUT_GRABBED | SDL_WINDOW_MOUSE_FOCUS
-	m_extra_flags |= (fullscreen() ?
-			SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE);
 
 #if defined(SDLMAME_WIN32)
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
@@ -868,6 +842,26 @@ int sdl_window_info::complete_create()
 #else
 	const char *attach_window = nullptr;
 #endif
+
+	// create the SDL window
+	SDL_PropertiesID props = SDL_CreateProperties();
+	SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title().c_str());
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, work.left() + (work.width() - temp.width()) / 2);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, work.top() + (work.height() - temp.height()) / 2);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, temp.width());
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, temp.height());
+	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
+
+	if (fullscreen())
+	{
+		SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_FULLSCREEN_BOOLEAN, true);
+	}
+
+	if (renderer_sdl_needs_opengl())
+	{
+		SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
+	}
+
 	if (attach_window && *attach_window)
 	{
 		// we're attaching to an existing window; parse the argument
@@ -883,55 +877,23 @@ int sdl_window_info::complete_create()
 		}
 
 		// and attach to it
-		sdlwindow = SDL_CreateWindowFrom((void *)attach_window_value);
-		if (!sdlwindow)
-		{
-			osd_printf_error("Failed to attach to window \"%s\": %s\n", attach_window, SDL_GetError());
-			return 1;
-		}
-
-		// perform SDL subsystem-specific tasks
-		SDL_SysWMinfo swmi;
-		SDL_VERSION(&swmi.version);
-		if (SDL_GetWindowWMInfo(sdlwindow, &swmi))
-		{
-			switch (swmi.subsystem)
-			{
-#ifdef SDLMAME_X11
-			case SDL_SYSWM_X11:
-				// by default, SDL_CreateWindowFrom() doesn't ensure that we're getting the events that we
-				// expect
-				XSelectInput(swmi.info.x11.display, swmi.info.x11.window,
-					FocusChangeMask | EnterWindowMask | LeaveWindowMask |
-					PointerMotionMask | KeyPressMask | KeyReleaseMask |
-					PropertyChangeMask | StructureNotifyMask |
-					ExposureMask | KeymapStateMask);
-				break;
-#endif // SDLMAME_X11
-
-			default:
-				break;
-			}
-		}
-	}
-	else
-	{
-		// create the SDL window
-		sdlwindow = SDL_CreateWindow(title().c_str(),
-			work.left() + (work.width() - temp.width()) / 2,
-			work.top() + (work.height() - temp.height()) / 2,
-			temp.width(), temp.height(), m_extra_flags);
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, attach_window_value);
 	}
 
-	//window().sdl_window() = SDL_CreateWindow(window().m_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-	//      width, height, m_extra_flags);
+	sdlwindow = SDL_CreateWindowWithProperties(props);
 
-	if  (sdlwindow == nullptr )
+	if (sdlwindow == nullptr)
 	{
 		if (renderer_sdl_needs_opengl())
+		{
 			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
+		}
 		else
+		{
 			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
+		}
+
+		osd_printf_verbose("Exit sdl_window_info::create\n");
 		return 1;
 	}
 
@@ -940,16 +902,16 @@ int sdl_window_info::complete_create()
 
 	if (fullscreen() && video_config.switchres)
 	{
-		SDL_DisplayMode mode;
-		//SDL_GetCurrentDisplayMode(window().monitor()->handle, &mode);
-		SDL_GetWindowDisplayMode(platform_window(), &mode);
-		m_original_mode = mode;
-		mode.w = temp.width();
-		mode.h = temp.height();
+		const SDL_DisplayMode *mode = SDL_GetWindowFullscreenMode(platform_window());
+		m_original_mode = *mode;
+		SDL_DisplayMode newmode;
+		newmode.w = temp.width();
+		newmode.h = temp.height();
 		if (m_win_config.refresh)
-			mode.refresh_rate = m_win_config.refresh;
-
-		SDL_SetWindowDisplayMode(platform_window(), &mode);    // Try to set mode
+		{
+			newmode.refresh_rate = m_win_config.refresh;
+		}
+		SDL_SetWindowFullscreenMode(platform_window(), &newmode);    // Try to set mode
 #ifndef SDLMAME_WIN32
 		/* FIXME: Warp the mouse to 0,0 in case a virtual desktop resolution
 		 * is in place after the mode switch - which will most likely be the case
@@ -960,7 +922,7 @@ int sdl_window_info::complete_create()
 	}
 	else
 	{
-		//SDL_SetWindowDisplayMode(window().sdl_window(), nullptr); // Use desktop
+		//SDL_SetWindowFullscreenMode(window().sdl_window(), nullptr); // Use desktop
 	}
 
 	// show window
@@ -971,8 +933,8 @@ int sdl_window_info::complete_create()
 	SDL_RaiseWindow(platform_window());
 
 #ifdef SDLMAME_WIN32
-	if (fullscreen())
-		SDL_SetWindowGrab(platform_window(), SDL_TRUE);
+//  if (fullscreen())
+//      SDL_SetWindowGrab(platform_window(), true);
 #endif
 
 	// update monitor resolution after mode change to ensure proper pixel aspect
@@ -985,8 +947,8 @@ int sdl_window_info::complete_create()
 		return 1;
 
 	// Make sure we have a consistent state
-	SDL_ShowCursor(SDL_DISABLE);
-	SDL_ShowCursor(SDL_ENABLE);
+	SDL_HideCursor();
+	SDL_ShowCursor();
 
 	return 0;
 }

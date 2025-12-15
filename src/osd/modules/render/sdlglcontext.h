@@ -17,7 +17,7 @@
 
 #include "strformat.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <string>
 
@@ -38,7 +38,7 @@ public:
 	virtual ~sdl_gl_context()
 	{
 		if (m_context)
-			SDL_GL_DeleteContext(m_context);
+			SDL_GL_DestroyContext(m_context);
 	}
 
 	virtual explicit operator bool() const override
@@ -66,7 +66,7 @@ public:
 
 	virtual void *get_proc_address(const char *proc) override
 	{
-		return SDL_GL_GetProcAddress(proc);
+		return (void *)SDL_GL_GetProcAddress(proc);
 	}
 
 	virtual void swap_buffer() override
