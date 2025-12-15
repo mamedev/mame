@@ -17,7 +17,9 @@
 #include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "machine/rescap.h"
 #include "machine/scc66470.h"
+#include "machine/watchdog.h"
 #include "sound/ymz280b.h"
 #include "screen.h"
 #include "speaker.h"
@@ -37,15 +39,17 @@ public:
 			m_palette(*this, "palette"),
 			m_ramdac(*this, "ramdac"),
 			m_scc66470(*this, "scc66470"),
-			// m_strobein(*this, "STROBE%u", 0),
+			m_strobein(*this, "STROBE%u", 0),
 			m_meters(*this, "meters"),
 			m_lamps(*this, "lamp%u", 0U),
 			m_scsibus(*this, "scsi"),
-			m_scsic(*this, "scsi:6:ncr5380")
+			m_scsic(*this, "scsi:6:ncr5380"),
+			m_watchdog(*this, "watchdog")
 	{ }
 
 	std::unique_ptr<uint16_t[]> m_mainram;
 
+	void volume_control(uint8_t direction, uint8_t clock);
 	uint16_t bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask = ~0);
 	void bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -64,12 +68,17 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<ramdac_device> m_ramdac;
 	required_device<scc66470_device> m_scc66470;
-	// required_ioport_array<4> m_strobein;
+	required_ioport_array<5> m_strobein;
 	optional_device<meters_device> m_meters;
 	output_finder<256> m_lamps;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr5380_device> m_scsic;
+	required_device<watchdog_timer_device> m_watchdog;
 
+	uint8_t m_active_strobe;
+	uint8_t m_triac_latch;
+	uint8_t m_vol_clock;
+	uint8_t m_volume;
 
 	virtual void machine_start() override ATTR_COLD;
 	static void scsi_devices(device_slot_interface &device);
@@ -78,6 +87,32 @@ protected:
 	void scc66470_irq(int state);
 
 };
+
+void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
+{
+	int clock_changed = m_vol_clock^clock;
+
+	m_vol_clock = clock;
+	if ( clock_changed )
+	{ // digital volume clock line changed
+		if ( !(clock) )
+		{ // changed from high to low,
+			if ( !(direction) )
+			{
+				if ( m_volume < 31 ) m_volume++; //0-31 expressed as 1-32
+			}
+			else
+			{
+				if ( m_volume > 0  ) m_volume--;
+			}
+
+			float percent = (64 - m_volume) / 64.0f;
+
+			m_ymz->set_output_gain(0, percent);
+			m_ymz->set_output_gain(1, percent);
+		}
+	}
+}
 
 uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 {
@@ -105,10 +140,10 @@ uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 						break;
 
 					case 0x400:
-						//input reads, haven't got far enough to trigger any
-						logerror("%s maincpu read access offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
-						break;
-
+						{
+							//input reads, haven't got far enough to trigger any
+							return m_strobein[m_active_strobe]->read();
+						}
 					case 0x500: //SCSI DMA
 						if(ACCESSING_BITS_8_15)
 						{
@@ -168,21 +203,41 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 				switch(cs_addr_8_11)
 				{
 					case 0x000:
-						logerror("%s maincpu write access lamp drive io latch offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
+						logerror("%s maincpu write access lamp drive io latch offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
 						// lamps;
 						break;
 
 					case 0x100:
-						logerror("%s maincpu write access lockout latch offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
-						if(ACCESSING_BITS_8_15)
-						{
-							// coin lockout and optional vfd (debug only?)
-						}
+						logerror("%s maincpu write access lockout latch offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
+						//TODO, does this need the ACCESSING_BITS_8_15?
+						// coin lockout and optional vfd (debug only?)
 						break;
 
 					case 0x200:
-						logerror("%s maincpu write access io latch offset %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, mem_mask, cs);
-						// volume, watchdog and other stuff ? That's where it would be elsewhere
+						if (data > 0x100)
+						{
+							logerror("%s maincpu write access io latch offset %08x data %08x mem_mask %08x cs %d\n", machine().describe_context(), offset*4, data, mem_mask, cs);
+						}
+						for (int i=0; i<4; i++)
+						{
+							m_meters->update(i, BIT(data, i));
+
+						}
+						for (int i=4; i<6; i++)
+						{
+							//triacs
+						}
+						m_triac_latch = BIT(data, 9);
+						volume_control(BIT(data,7), BIT(data,15));
+						m_watchdog->reset_line_w(BIT(data , 8));
+
+						for (int i=10; i<15; i++)
+						{
+							if (BIT(data, i))
+							{
+								m_active_strobe = i - 10;
+							}
+						}
 						break;
 
 					case 0x300:
@@ -302,11 +357,23 @@ static INPUT_PORTS_START( bfm_cobra3 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON14 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON15 )
 
+	PORT_START("STROBE4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "DIL:!01" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DIL:!02" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "DIL:!03" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "DIL:!04" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "DIL:!05" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "DIL:!06" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "DIL:!07" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "DIL:!08" )
+
 INPUT_PORTS_END
 
 
 void bfm_cobra3_state::machine_start()
 {
+	m_active_strobe = 0;
+	m_lamps.resolve();
 	m_mainram = make_unique_clear<uint16_t[]>((1024 * 16) / 2);
 	m_nvram->set_base(m_mainram.get(), 1024 * 16);
 }
@@ -320,7 +387,7 @@ static void cobra_scsi_devices(device_slot_interface &device)
 
 void bfm_cobra3_state::dma1_drq(int state)
 {
-	// Triggers, but seems not to do anything, may be CPU bug related.
+//	m_maincpu->dma_dreq1_w(state);
 }
 
 void bfm_cobra3_state::scc66470_irq(int state)
@@ -431,6 +498,9 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 			ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
 			adapter.drq_handler().set(*this, FUNC(bfm_cobra3_state::dma1_drq));
 		});
+
+	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9)); //TODO: Check timings	
+	METERS(config, m_meters, 0).set_number(4);
 }
 
 ROM_START( c3_rtime )
