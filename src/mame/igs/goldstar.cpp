@@ -29149,6 +29149,9 @@ ROM_END
 
   Custom Hardware Notes:
 
+  The hardware uses 1-wire Dallas iButton DS1994L-F5 instead of the W4 3-wires
+  Dallas DS2401.
+
   To initialize the game the first time, enter BOOKS/STATS/SETUP (Key 0),
   and advance through the menus with RESET key (key R). When finish press
   again BOOKS/STATS/SETUP (Key 0) to exit the setup mode.
