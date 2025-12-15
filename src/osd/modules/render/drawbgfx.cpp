@@ -45,14 +45,9 @@
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 // standard windows headers
 #include <windows.h>
-#if defined(SDLMAME_WIN32)
-#include <SDL2/SDL_syswm.h>
-#endif
 #else
 #if defined(OSD_MAC)
 extern void *GetOSWindow(void *wincontroller);
-#else
-#include <SDL2/SDL_syswm.h>
 #endif
 #endif
 
@@ -398,56 +393,37 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 	platform_data.ndt = nullptr;
 	platform_data.nwh = (void *)"#canvas"; // HTML5 target selector
 #else // defined(OSD_*)
-	SDL_SysWMinfo wmi;
-	SDL_VERSION(&wmi.version);
-	if (!SDL_GetWindowWMInfo(dynamic_cast<sdl_window_info const &>(window).platform_window(), &wmi))
+	const auto winProps = SDL_GetWindowProperties(dynamic_cast<sdl_window_info const &>(window).platform_window());
+#if defined(SDL_PLATFORM_WINDOWS)
+							  platform_data.ndt = nullptr;
+	platform_data.nwh = (HWND)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+#endif
+#if defined(SDL_PLATFORM_MACOS)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL);
+#endif
+#if defined(SDL_PLATFORM_LINUX)
+	if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
 	{
-		osd_printf_error("BGFX: Error getting SDL window info: %s\n", SDL_GetError());
-		return false;
+		platform_data.ndt = (void *)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, NULL);
+		platform_data.nwh = (void *)SDL_GetNumberProperty(winProps, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
 	}
-
-	switch (wmi.subsystem)
+	else if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
 	{
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
-	case SDL_SYSWM_WINDOWS:
-		platform_data.ndt = nullptr;
-		platform_data.nwh = wmi.info.win.window;
-		break;
-#endif
-#if defined(SDL_VIDEO_DRIVER_X11)
-	case SDL_SYSWM_X11:
-		platform_data.ndt = wmi.info.x11.display;
-		platform_data.nwh = (void *)uintptr_t(wmi.info.x11.window);
-		break;
-#endif
-#if defined(SDL_VIDEO_DRIVER_COCOA)
-	case SDL_SYSWM_COCOA:
-		platform_data.ndt = nullptr;
-		platform_data.nwh = wmi.info.cocoa.window;
-		break;
-#endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
-	case SDL_SYSWM_WAYLAND:
-		platform_data.ndt = wmi.info.wl.display;
-		platform_data.nwh = wmi.info.wl.surface;
+		platform_data.ndt = (struct wl_display *)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
+		platform_data.nwh = (struct wl_surface *)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
 		if (!platform_data.nwh)
 		{
 			osd_printf_error("BGFX: Error creating a Wayland window\n");
 			return false;
 		}
 		platform_data.type = bgfx::NativeWindowHandleType::Wayland;
-		break;
-#endif
-#if defined(SDL_VIDEO_DRIVER_ANDROID)
-	case SDL_SYSWM_ANDROID:
-		platform_data.ndt = nullptr;
-		platform_data.nwh = wmi.info.android.window;
-		break;
-#endif
-	default:
-		osd_printf_error("BGFX: Unsupported SDL window manager type %u\n", wmi.subsystem);
-		return false;
 	}
+#endif
+#if defined(SDL_PLATFORM_ANDROID)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, NULL);
+#endif
 #endif // defined(OSD_*)
 
 	platform_data.context = nullptr;
@@ -503,36 +479,26 @@ uint32_t renderer_bgfx::s_height[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 #ifdef OSD_SDL
 static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
 {
-	SDL_SysWMinfo wmi;
-	SDL_VERSION(&wmi.version);
-	if (!SDL_GetWindowWMInfo(window, &wmi))
-		return std::make_pair(nullptr, false);
-
-	switch (wmi.subsystem)
+#if defined(SDL_PLATFORM_WIN32)
+	return std::make_pair((HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL), true);
+#endif
+#if defined(SDLMAME_MACOSX)
+	return std::make_pair(SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL), true);
+#endif
+#if defined(SDL_PLATFORM_LINUX)
+	if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
 	{
-#if defined(SDL_VIDEO_DRIVER_WINDOWS)
-	case SDL_SYSWM_WINDOWS:
-		return std::make_pair(wmi.info.win.window, true);
-#endif
-#if defined(SDL_VIDEO_DRIVER_X11)
-	case SDL_SYSWM_X11:
-		return std::make_pair((void *)uintptr_t(wmi.info.x11.window), true);
-#endif
-#if defined(SDL_VIDEO_DRIVER_COCOA)
-	case SDL_SYSWM_COCOA:
-		return std::make_pair(wmi.info.cocoa.window, true);
-#endif
-#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
-	case SDL_SYSWM_WAYLAND:
-		return std::make_pair(wmi.info.wl.surface, true);
-#endif
-#if defined(SDL_VIDEO_DRIVER_ANDROID)
-	case SDL_SYSWM_ANDROID:
-		return std::make_pair(wmi.info.android.window, true);
-#endif
-	default:
-		return std::make_pair(nullptr, false);
+		return std::make_pair((void *)uintptr_t(SDL_GetNumberProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0)), true);
 	}
+	else if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
+	{
+		return std::make_pair((struct wl_surface *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL), true);
+	}
+#endif
+#if defined(SDL_PLATFORM_ANDROID)
+		return std::make_pair(SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, NULL), true);
+#endif
+		return std::make_pair(nullptr, false);
 }
 #endif // OSD_SDL
 

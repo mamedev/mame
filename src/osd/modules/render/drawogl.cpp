@@ -49,7 +49,7 @@ typedef uint64_t HashT;
 
 // standard SDL headers
 #define TOBEMIGRATED 1
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #endif // !defined(OSD_WINDOWS && !defined(OSD_MAC)
 
@@ -1241,39 +1241,6 @@ int renderer_ogl::draw(const int update)
 		// (0,h)     (w,h)
 
 		GLsizei iScale = 1;
-
-		/*
-		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
-		    assuming you do support Retina.  SDL 2.0.11 is scheduled to fix this, but it's not out yet.
-		    So we double-scale everything if you're on 10.15 or later and SDL is not at least version 2.0.11.
-		*/
-		#if defined(SDLMAME_MACOSX) && !defined(OSD_MAC)
-		SDL_version sdlVers;
-		SDL_GetVersion(&sdlVers);
-		// Only do this if SDL is not at least 2.0.11.
-		if ((sdlVers.major == 2) && (sdlVers.minor == 0) && (sdlVers.patch < 11))
-		#endif
-		#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
-		{
-			// now get the Darwin kernel version
-			int dMaj, dMin, dPatch;
-			char versStr[64];
-			dMaj = dMin = dPatch = 0;
-			size_t size = sizeof(versStr);
-			int retVal = sysctlbyname("kern.osrelease", versStr, &size, NULL, 0);
-			if (retVal == 0)
-			{
-			  sscanf(versStr, "%d.%d.%d", &dMaj, &dMin, &dPatch);
-			  // 10.15 Catalina is Darwin version 19
-			  if (dMaj >= 19)
-			  {
-				  // do the workaround for Retina being forced on
-				  osd_printf_verbose("OpenGL: enabling Retina workaround\n");
-				  iScale = 2;
-			  }
-			}
-		}
-		#endif
 
 		glViewport(0.0, 0.0, (GLsizei) m_width * iScale, (GLsizei) m_height * iScale);
 		glMatrixMode(GL_PROJECTION);
@@ -3002,7 +2969,7 @@ int video_opengl::init(osd_interface &osd, osd_options const &options)
 #if defined(OSD_WINDOWS)
 	osd_printf_verbose("Using Windows OpenGL driver\n");
 #else // defined(OSD_WINDOWS)
-	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
+	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 3.2+)\n");
 #endif // defined(OSD_WINDOWS)
 
 	return 0;

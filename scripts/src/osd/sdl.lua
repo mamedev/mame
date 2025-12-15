@@ -46,7 +46,7 @@ function maintargetosdoptions(_target,_subtarget)
 
 	if BASE_TARGETOS=="unix" and _OPTIONS["targetos"]~="macosx" and _OPTIONS["targetos"]~="android" and _OPTIONS["targetos"]~="asmjs" then
 		links {
-			"SDL2_ttf",
+			"SDL3_ttf",
 		}
 		local str = backtick(pkgconfigcmd() .. " --libs fontconfig")
 		addlibfromstring(str)
@@ -57,12 +57,11 @@ function maintargetosdoptions(_target,_subtarget)
 		if _OPTIONS["USE_LIBSDL"]~="1" then
 			configuration { "mingw*"}
 				links {
-					"SDL2main",
-					"SDL2",
+					"SDL3",
 				}
 			configuration { "vs*" }
 				links {
-					"SDL2",
+					"SDL3",
 					"imm32",
 					"version",
 				}
@@ -105,11 +104,11 @@ end
 
 function sdlconfigcmd()
 	if _OPTIONS["targetos"]=="asmjs" then
-		return "sdl2-config"
+		return "sdl3-config"
 	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
-		return pkgconfigcmd() .. " sdl2"
+		return pkgconfigcmd() .. " sdl3"
 	else
-		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin","sdl2") .. "-config"
+		return path.join(_OPTIONS["SDL_INSTALL_ROOT"],"bin","sdl3") .. "-config"
 	end
 end
 
@@ -172,19 +171,6 @@ if not _OPTIONS["NO_USE_XINPUT_WII_LIGHTGUN_HACK"] then
 end
 
 newoption {
-	trigger = "SDL2_MULTIAPI",
-	description = "Use couriersud's multi-keyboard patch for SDL 2.1? (this API was removed prior to the 2.0 release)",
-	allowed = {
-		{ "0",  "Use single-keyboard API"  },
-		{ "1",  "Use multi-keyboard API"   },
-	},
-}
-
-if not _OPTIONS["SDL2_MULTIAPI"] then
-	_OPTIONS["SDL2_MULTIAPI"] = "0"
-end
-
-newoption {
 	trigger = "SDL_INSTALL_ROOT",
 	description = "Equivalent to the ./configure --prefix=<path>",
 }
@@ -194,8 +180,10 @@ newoption {
 	description = "Location of SDL framework for custom OS X installations",
 }
 
+-- SDL 3's framework now contains all Apple platforms in a single framework, so we need to
+-- specifically ask for the macOS version.
 if not _OPTIONS["SDL_FRAMEWORK_PATH"] then
-	_OPTIONS["SDL_FRAMEWORK_PATH"] = "/Library/Frameworks/"
+	_OPTIONS["SDL_FRAMEWORK_PATH"] = "/Library/Frameworks/SDL3.xcframework/macos-arm64_x86_64/"
 end
 
 newoption {
@@ -246,7 +234,7 @@ if BASE_TARGETOS=="unix" then
 				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 			}
 			links {
-				"SDL2.framework",
+				"SDL3.framework",
 			}
 		else
 			local str = backtick(sdlconfigcmd() .. " --libs --static | sed 's/-lSDLmain//'")

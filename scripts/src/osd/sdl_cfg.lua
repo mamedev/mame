@@ -78,13 +78,8 @@ if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 end
 
 defines {
-	"SDLMAME_SDL2=1",
+	"SDLMAME_SDL3=1",
 }
-if _OPTIONS["SDL2_MULTIAPI"]=="1" then
-	defines {
-		"SDL2_MULTIAPI",
-	}
-end
 
 defines {
 	"OSD_SDL",
@@ -104,12 +99,12 @@ if BASE_TARGETOS=="unix" then
 				"MACOSX_USE_LIBSDL",
 			}
 			buildoptions {
-				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
+				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL3::'"),
 			}
 		end
 	elseif _OPTIONS["targetos"]=="android" then
 		buildoptions {
-			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
+			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL3::'"),
 		}
 	else
 		buildoptions {

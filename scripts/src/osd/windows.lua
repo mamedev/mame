@@ -24,7 +24,7 @@ function maintargetosdoptions(_target,_subtarget)
 
 	if _OPTIONS["USE_SDL"] == "1" then
 		links {
-			"SDL2.dll",
+			"SDL3.dll",
 		}
 	end
 

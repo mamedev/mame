@@ -36,8 +36,8 @@
 		#include <OpenGL/gl.h>
 		#include <OpenGL/glext.h>
 	#else
-		#include <SDL2/SDL_version.h>
-		#include <SDL2/SDL_opengl.h>
+		#include <SDL3/SDL_version.h>
+		#include <SDL3/SDL_opengl.h>
 	#endif
 
 	class osd_gl_context

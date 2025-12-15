@@ -12,7 +12,7 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <csignal>
 #include <cstdio>
@@ -183,7 +183,7 @@ std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
 	try
 	{
 		std::string const clip(text); // need to do this to ensure there's a terminating NUL for SDL
-		if (0 > SDL_SetClipboardText(clip.c_str()))
+		if (!SDL_SetClipboardText(clip.c_str()))
 		{
 			// SDL_GetError returns a message, can't really convert it to an error condition
 			return std::errc::io_error; // TODO: better error code?

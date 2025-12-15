@@ -18,7 +18,7 @@
 #include "osdcore.h"
 #include "window.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <algorithm>
 
@@ -44,13 +44,6 @@ public:
 private:
 	void refresh() override
 	{
-		SDL_DisplayMode dmode;
-
-#if defined(SDLMAME_WIN32)
-		SDL_GetDesktopDisplayMode(oshandle(), &dmode);
-#else
-		SDL_GetCurrentDisplayMode(oshandle(), &dmode);
-#endif
 		SDL_Rect dimensions;
 		SDL_GetDisplayBounds(oshandle(), &dimensions);
 
@@ -102,7 +95,7 @@ public:
 		if (!m_initialized)
 			return nullptr;
 
-		std::uint64_t display = SDL_GetWindowDisplayIndex(static_cast<const sdl_window_info &>(window).platform_window());
+		std::uint64_t display = SDL_GetDisplayForWindow(static_cast<const sdl_window_info &>(window).platform_window());
 		return monitor_from_handle(display);
 	}
 
@@ -115,13 +108,15 @@ protected:
 
 			osd_printf_verbose("Enter init_monitors\n");
 
-			for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
+			int num_displays = 0;
+			const auto displays = SDL_GetDisplays(&num_displays);
+			for (i = 0; i < num_displays; i++)
 			{
 				char temp[64];
 				snprintf(temp, sizeof(temp) - 1, "%s%d", OSDOPTION_SCREEN, i);
 
 				// allocate a new monitor info
-				std::shared_ptr<osd_monitor_info> monitor = std::make_shared<sdl_monitor_info>(*this, i, temp, 1.0f);
+				std::shared_ptr<osd_monitor_info> monitor = std::make_shared<sdl_monitor_info>(*this, displays[i], temp, 1.0f);
 
 				osd_printf_verbose("Adding monitor %s (%d x %d)\n",
 						monitor->devicename(),
@@ -155,7 +150,7 @@ private:
 		osdrect_to_sdlrect(rect2, sdl2);
 
 		SDL_Rect intersection;
-		if (SDL_IntersectRect(&sdl1, &sdl2, &intersection))
+		if (SDL_GetRectIntersection(&sdl1, &sdl2, &intersection))
 			return intersection.w + intersection.h;
 
 		return 0;
