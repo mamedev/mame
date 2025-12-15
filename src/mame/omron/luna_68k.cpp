@@ -327,7 +327,7 @@ void luna_68k_state::ioc_cpu_map(address_map &map)
 void luna_68k_state::ioc_cpuspace_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_ioc_cpu, FUNC(m68000_device::autovectors_map));
-	map(0xfffff3, 0xfffff3).r(FUNC(luna_68k_state::ioc_cio_vector_r)); // Actual level unknown, just not 2 or 7
+	map(0xfffff5, 0xfffff5).r(FUNC(luna_68k_state::ioc_cio_vector_r)); // Actual level unknown, just not 2 or 7
 }
 
 void luna_68k_state::gpu_cpu_map(address_map &map)
