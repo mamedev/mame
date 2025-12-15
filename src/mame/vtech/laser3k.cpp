@@ -7,7 +7,7 @@
 
   This machine is somewhat similar to a 48K Apple II if you blur your eyes
   a lot, but it generally fits in poorly with 100% compatible machines
-  (no chance of a compatible language card or auxmem) so it gets its own driver.
+  (no lo-res graphics, unique memory banking) so it gets its own driver.
 
   An "emulation cartridge" is required to run Apple II software; this appears
   to be just a language card with 16K bytes of RAM that overlay the BASIC
