@@ -342,7 +342,7 @@ void finalizr_state::flipscreen_w(uint8_t data)
 	m_nmi_enable = BIT(data, 0);
 	m_irq_enable = BIT(data, 1);
 
-	flip_screen_set(BIT(~data, 3));
+	flip_screen_set(BIT(data, 3));
 }
 
 void finalizr_state::sound_irq_w(uint8_t data)
@@ -451,9 +451,9 @@ static INPUT_PORTS_START( finalizr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )         PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
