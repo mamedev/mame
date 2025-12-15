@@ -5794,6 +5794,8 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.h",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.h",
+		MAME_DIR .. "src/devices/bus/multibus/sun1.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/sun1.h",
 	}
 end
 

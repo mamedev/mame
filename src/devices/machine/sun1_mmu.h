@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_SUN_SUN1_MMU_H
-#define MAME_SUN_SUN1_MMU_H
+#ifndef MAME_MACHINE_SUN1_MMU_H
+#define MAME_MACHINE_SUN1_MMU_H
 
 #pragma once
 
 #include "cpu/m68000/m68000.h"
 
-class sun1mmu_device
+class sun1_mmu_device
 	: public device_t
 	, public m68000_device::mmu
 {
@@ -22,7 +22,7 @@ public:
 	};
 	auto error() { return m_error.bind(); }
 
-	sun1mmu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	sun1_mmu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	// register access
 	void context_w(u16 data);
@@ -67,6 +67,6 @@ private:
 	bool m_super;
 };
 
-DECLARE_DEVICE_TYPE(SUN1MMU, sun1mmu_device)
+DECLARE_DEVICE_TYPE(SUN1_MMU, sun1_mmu_device)
 
-#endif // MAME_SUN_SUN1_MMU_H
+#endif // MAME_MACHINE_SUN1_MMU_H

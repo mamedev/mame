@@ -5467,3 +5467,14 @@ if (MACHINES["SCI4"]~=null) then
 		MAME_DIR .. "src/devices/machine/sci4.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sun1_mmu.h,MACHINES["SUN1_MMU"] = true
+---------------------------------------------------
+if (MACHINES["SUN1_MMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sun1_mmu.cpp",
+		MAME_DIR .. "src/devices/machine/sun1_mmu.h",
+	}
+end

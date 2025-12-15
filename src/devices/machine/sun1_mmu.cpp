@@ -16,7 +16,7 @@
 
 #include "sun1_mmu.h"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 enum segment_mask : u16
@@ -43,10 +43,10 @@ enum mode_mask : unsigned
 	P_RWX = P_R | P_W | P_X,
 };
 
-DEFINE_DEVICE_TYPE(SUN1MMU, sun1mmu_device, "sun1mmu", "Sun-1 MMU")
+DEFINE_DEVICE_TYPE(SUN1_MMU, sun1_mmu_device, "sun1_mmu", "Sun-1 MMU")
 
-sun1mmu_device::sun1mmu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, SUN1MMU, tag, owner, clock)
+sun1_mmu_device::sun1_mmu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SUN1_MMU, tag, owner, clock)
 	, m_space{
 		{*this, finder_base::DUMMY_TAG, 0},
 		{*this, finder_base::DUMMY_TAG, 1},
@@ -61,7 +61,7 @@ sun1mmu_device::sun1mmu_device(machine_config const &mconfig, char const *tag, d
 {
 }
 
-void sun1mmu_device::device_start()
+void sun1_mmu_device::device_start()
 {
 	save_item(NAME(m_context));
 	save_item(NAME(m_segment));
@@ -75,7 +75,7 @@ void sun1mmu_device::device_start()
 	m_space[3]->specific(m_bus_pio);
 }
 
-void sun1mmu_device::device_reset()
+void sun1_mmu_device::device_reset()
 {
 	m_stall = false;
 }
@@ -99,33 +99,33 @@ static bool access(bool const super, unsigned const code, unsigned const mode)
 	return protection[super][code] & mode;
 }
 
-void sun1mmu_device::context_w(u16 data)
+void sun1_mmu_device::context_w(u16 data)
 {
 	LOG("context 0x%04x (%s)\n", data, machine().describe_context());
 
 	m_context = data & 0xf000U;
 }
 
-u16 sun1mmu_device::segment_r(offs_t offset)
+u16 sun1_mmu_device::segment_r(offs_t offset)
 {
 	return m_context | m_segment[m_context >> 12][BIT(offset, 14, 6)];
 }
 
-void sun1mmu_device::segment_w(offs_t offset, u16 data, u16 mem_mask)
+void sun1_mmu_device::segment_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	LOG("segment[0x%x][0x%02x] 0x%04x (%s)\n", m_context >> 12, BIT(offset, 14, 6), data, machine().describe_context());
 
 	m_segment[m_context >> 12][BIT(offset, 14, 6)] = data & 0x0fffU;
 }
 
-u16 sun1mmu_device::page_r(offs_t offset)
+u16 sun1_mmu_device::page_r(offs_t offset)
 {
 	u16 const segment = m_segment[m_context >> 12][BIT(offset, 14, 6)];
 
 	return m_page[(segment & SEGMENT_PPTR) << 4 | BIT(offset, 10, 4)];
 }
 
-void sun1mmu_device::page_w(offs_t offset, u16 data, u16 mem_mask)
+void sun1_mmu_device::page_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u16 const segment = m_segment[m_context >> 12][BIT(offset, 14, 6)];
 
@@ -134,7 +134,7 @@ void sun1mmu_device::page_w(offs_t offset, u16 data, u16 mem_mask)
 	m_page[(segment & SEGMENT_PPTR) << 4 | BIT(offset, 10, 4)] = data;
 }
 
-std::optional<std::pair<unsigned, offs_t>> sun1mmu_device::translate(offs_t const logical, unsigned const mode)
+std::optional<std::pair<unsigned, offs_t>> sun1_mmu_device::translate(offs_t const logical, unsigned const mode)
 {
 	// check for mapped address
 	if (logical < 0x20'0000)
@@ -171,7 +171,7 @@ std::optional<std::pair<unsigned, offs_t>> sun1mmu_device::translate(offs_t cons
 	return std::nullopt;
 }
 
-template <bool Execute> u16 sun1mmu_device::mmu_read(offs_t logical, u16 mem_mask)
+template <bool Execute> u16 sun1_mmu_device::mmu_read(offs_t logical, u16 mem_mask)
 {
 	u16 data = 0;
 
@@ -228,7 +228,7 @@ template <bool Execute> u16 sun1mmu_device::mmu_read(offs_t logical, u16 mem_mas
 	return data;
 }
 
-void sun1mmu_device::mmu_write(offs_t logical, u16 data, u16 mem_mask)
+void sun1_mmu_device::mmu_write(offs_t logical, u16 data, u16 mem_mask)
 {
 	if (m_stall)
 	{
@@ -278,32 +278,32 @@ void sun1mmu_device::mmu_write(offs_t logical, u16 data, u16 mem_mask)
 		m_error(MMU_ERROR);
 }
 
-u16 sun1mmu_device::read_program(offs_t logical, u16 mem_mask)
+u16 sun1_mmu_device::read_program(offs_t logical, u16 mem_mask)
 {
 	return mmu_read<true>(logical, mem_mask);
 }
 
-void sun1mmu_device::write_program(offs_t logical, u16 data, u16 mem_mask)
+void sun1_mmu_device::write_program(offs_t logical, u16 data, u16 mem_mask)
 {
 	mmu_write(logical, data, mem_mask);
 }
 
-u16 sun1mmu_device::read_data(offs_t logical, u16 mem_mask)
+u16 sun1_mmu_device::read_data(offs_t logical, u16 mem_mask)
 {
 	return mmu_read<false>(logical, mem_mask);
 }
 
-void sun1mmu_device::write_data(offs_t logical, u16 data, u16 mem_mask)
+void sun1_mmu_device::write_data(offs_t logical, u16 data, u16 mem_mask)
 {
 	mmu_write(logical, data, mem_mask);
 }
 
-u16 sun1mmu_device::read_cpu(offs_t logical, u16 mem_mask)
+u16 sun1_mmu_device::read_cpu(offs_t logical, u16 mem_mask)
 {
 	return m_cpu_spc.read_word(logical, mem_mask);
 }
 
-void sun1mmu_device::set_super(bool super)
+void sun1_mmu_device::set_super(bool super)
 {
 	m_super = super;
 }
