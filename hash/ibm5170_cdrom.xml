@@ -4195,7 +4195,8 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<notes><![CDATA[
 Has several [SB16] sound issues (by default starts very quiet, workaround by bumping SB16MIX to max level)
 Starting sparkle animation in Setup level is very offset, [VGA] or [x86]
-Runs very slow for ct486, except it unnaturally speed up at times
+Runs very slow for ct486, except it unnaturally speed up at times [PIT]?
+Crashes with "out of memory" if info is selected in main menu
 Setup level has ENDE text flipping around at set times (btanb?)
 ]]></notes>
 		<info name="barcode" value="9 783896 482662"/>
