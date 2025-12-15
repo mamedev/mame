@@ -29312,8 +29312,8 @@ ROM_START( fl7_1000 )  // Serial 00000031A9EE
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
-	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
-	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_1000.bin", 0x0000, 0x0008, CRC(57688fe9) SHA1(cdbf7f7fee341dcf45a67b6ba8d655ff4ad5f91e) )
 ROM_END
 
 /*
