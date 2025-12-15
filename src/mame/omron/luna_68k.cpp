@@ -45,6 +45,7 @@
 #include "machine/hd63450.h"
 #include "machine/mb87030.h"
 #include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
 #include "machine/z80scc.h"
 #include "machine/z8536.h"
 
@@ -77,6 +78,7 @@ public:
 		, m_ioc_dma(*this, "dma%u", 0U)
 		, m_ioc_spc(*this, "scsi%u:7:spc", 0U)
 		, m_ioc_fdc(*this, "fdc")
+		, m_ioc_floppy(*this, "fdc:0")
 		, m_ioc_scc(*this, "scc")
 		, m_ioc_cio(*this, "cio")
 		, m_ioc_ram(*this, "ioc_ram")
@@ -102,8 +104,9 @@ protected:
 	void cpu_map(address_map &map) ATTR_COLD;
 	void cpu_autovector_map(address_map &map) ATTR_COLD;
 
-	void ioc_cpu_map(address_map &map);
-	void gpu_cpu_map(address_map &map);
+	void ioc_cpu_map(address_map &map) ATTR_COLD;
+	void ioc_cpuspace_map(address_map &map) ATTR_COLD;
+	void gpu_cpu_map(address_map &map) ATTR_COLD;
 
 private:
 	u32 bus_error_r(offs_t offset)
@@ -144,7 +147,13 @@ private:
 		}
 	}
 
-	void iocint_w(u32 data);
+	void m2i_w(u32 data);
+	u8 m2i_r();
+	void m2i_int_clear(u8 data);
+	void i2m_w(u8 data);
+	void i2m_int_clear(u32 data);
+	u8 i2m_vector_r();
+	u8 ioc_cio_vector_r();
 
 	// devices
 	required_device<m68030_device> m_cpu;
@@ -161,10 +170,13 @@ private:
 	required_device_array<hd63450_device, 2> m_ioc_dma;
 	required_device_array<mb89352_device, 2> m_ioc_spc;
 	required_device<mb8877_device> m_ioc_fdc;
+	required_device<floppy_connector> m_ioc_floppy;
 	required_device<z80scc_device> m_ioc_scc;
 	required_device<z8536_device> m_ioc_cio;
 	required_shared_ptr<u16> m_ioc_ram;
 	memory_view m_ioc_boot;
+	u8 m_m2i;
+	u8 m_i2m;
 
 	// gpu
 	required_device<m68020fpu_device> m_gpu_cpu;
@@ -178,6 +190,8 @@ private:
 
 void luna_68k_state::machine_start()
 {
+	save_item(NAME(m_m2i));
+	save_item(NAME(m_i2m));
 }
 
 void luna_68k_state::machine_reset()
@@ -185,20 +199,67 @@ void luna_68k_state::machine_reset()
 	// mirror eprom at reset
 	m_cpu->space(AS_PROGRAM).install_rom(0, m_eprom.bytes() - 1, m_eprom);
 
+	// there may be a select/motor/side select on somewhere
+	auto *floppy = m_ioc_floppy->get_device();
+	m_ioc_fdc->set_floppy(floppy);
+	if (floppy)
+	{
+		floppy->ss_w(0);
+		floppy->mon_w(0);
+	}
+
+	m_m2i = 0;
+	m_i2m = 0;
 	m_ioc_boot.select(0);
 }
 
-void luna_68k_state::iocint_w(u32 data)
+void luna_68k_state::m2i_w(u32 data)
 {
-	logerror("iocint_w %08x\n", data);
-	m_cpu->space(AS_PROGRAM).write_word(0x20280020, 0x00);
-	m_cpu->space(AS_PROGRAM).write_word(0x20280022, 0x00);
-	m_cpu->space(AS_PROGRAM).write_word(0x20280024, 0x00);
-	m_cpu->space(AS_PROGRAM).write_word(0x20280026, 0x00);
-	m_cpu->space(AS_PROGRAM).write_word(0x20280028, 0x80);
-	m_cpu->space(AS_PROGRAM).write_word(0x2028002a, 0x80);
-	m_cpu->space(AS_PROGRAM).write_word(0x2028002c, 0x80);
-	m_cpu->space(AS_PROGRAM).write_word(0x2028002e, 0x80);
+	logerror("m2i_w %08x\n", data);
+	m_m2i = data;
+	m_ioc_cpu->set_input_line(1, ASSERT_LINE);
+}
+
+u8 luna_68k_state::m2i_r()
+{
+	return m_m2i;
+}
+
+void luna_68k_state::m2i_int_clear(u8 data)
+{
+	logerror("m2i interrupt clear %d\n", data);
+	m_ioc_cpu->set_input_line(1, CLEAR_LINE);
+}
+
+void luna_68k_state::i2m_w(u8 data)
+{
+	logerror("%s i2m_w %02x\n", machine().time().to_string(), data);
+	m_i2m = data;
+
+	// First two clears happen before the interrupt is raised, wtf?
+	static int cc = 0;
+	cc ++;
+	if (cc <= 2)
+		return;
+	m_cpu->set_input_line(1, ASSERT_LINE);
+}
+
+void luna_68k_state::i2m_int_clear(u32 data)
+{
+	logerror("%s i2m interrupt clear %d\n", machine().time().to_string(), data);
+	m_cpu->set_input_line(1, CLEAR_LINE);
+}
+
+u8 luna_68k_state::i2m_vector_r()
+{
+	// Code tries to clear the interrupt at 30000838 but the mmu misroutes the address (to 838, in ram)?
+	m_cpu->set_input_line(1, CLEAR_LINE);
+	return 0x50 | (m_i2m & 0xf);
+}
+
+u8 luna_68k_state::ioc_cio_vector_r()
+{
+	return 0x60 | (m_ioc_cio->intack_r() & 0xf);
 }
 
 void luna_68k_state::cpu_map(address_map &map)
@@ -207,7 +268,8 @@ void luna_68k_state::cpu_map(address_map &map)
 
 	map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
 	map(0x30000800, 0x300008ff).unmaprw();
-	map(0x30000834, 0x30000837).w(FUNC(luna_68k_state::iocint_w));
+	map(0x30000834, 0x30000837).w(FUNC(luna_68k_state::m2i_w));
+	map(0x30000838, 0x3000083b).w(FUNC(luna_68k_state::i2m_int_clear));
 	map(0x30000d00, 0x30000d1f).m(m_ioc_spc[0], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
 	map(0x30000d20, 0x30000d3f).m(m_ioc_spc[1], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
 
@@ -226,7 +288,7 @@ void luna_68k_state::cpu_map(address_map &map)
 
 void luna_68k_state::cpu_autovector_map(address_map &map)
 {
-	map(0xfffffff3, 0xfffffff3).lr8(NAME([]() { return m68000_base_device::autovector(1); }));
+	map(0xfffffff3, 0xfffffff3).r(FUNC(luna_68k_state::i2m_vector_r));
 	map(0xfffffff5, 0xfffffff5).lr8(NAME([]() { return m68000_base_device::autovector(2); }));
 	map(0xfffffff7, 0xfffffff7).lr8(NAME([]() { return m68000_base_device::autovector(3); }));
 	map(0xfffffff9, 0xfffffff9).lr8(NAME([]() { return m68000_base_device::autovector(4); }));
@@ -243,17 +305,29 @@ void luna_68k_state::ioc_cpu_map(address_map &map)
 	// hd63450ps10 x 2 dma
 	// z0853606psc cio
 
-	map(0x000000, 0x01ffff).ram(); // HM62256LP-10x4 (32768x8) - 128KB
+	map(0x000000, 0x01ffff).ram(); // HM62256LP-10x4 (32768x4) - 128KB
 	map(0x000000, 0x000fff).view(m_ioc_boot);
 	m_ioc_boot[0](0x000000, 0x000fff).rom().region("ioc", 0).w(FUNC(luna_68k_state::ioc_boot_disable_w));
 	map(0x100000, 0x11ffff).ram().share(m_ioc_ram); // HM62256LP-10x8 (32768x4) - 128KB
+	map(0xf86001, 0xf86001).w(FUNC(luna_68k_state::m2i_int_clear));
+	map(0xf87000, 0xf87000).w(FUNC(luna_68k_state::i2m_w));
+	map(0xf87001, 0xf87001).r(FUNC(luna_68k_state::m2i_r));
 	map(0xfc0000, 0xfcffff).rom().region("ioc", 0);
 	map(0xfe0000, 0xfe0fff).rom().region("ioc", 0);
+	map(0xfef300, 0xfef307).rw(m_ioc_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)).umask16(0x00ff);
 
 	map(0xfef400, 0xfef400).rw(m_ioc_scc, FUNC(z80scc_device::da_r), FUNC(z80scc_device::da_w));
 	map(0xfef401, 0xfef401).rw(m_ioc_scc, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
 	map(0xfef402, 0xfef402).rw(m_ioc_scc, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
 	map(0xfef403, 0xfef403).rw(m_ioc_scc, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
+
+	map(0xfef600, 0xfef607).rw(m_ioc_cio, FUNC(z8536_device::read), FUNC(z8536_device::write)).umask16(0x00ff);
+}
+
+void luna_68k_state::ioc_cpuspace_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_ioc_cpu, FUNC(m68000_device::autovectors_map));
+	map(0xfffff3, 0xfffff3).r(FUNC(luna_68k_state::ioc_cio_vector_r)); // Actual level unknown, just not 2 or 7
 }
 
 void luna_68k_state::gpu_cpu_map(address_map &map)
@@ -280,6 +354,10 @@ DEVICE_INPUT_DEFAULTS_END
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
+}
+static void luna_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 void luna_68k_state::luna(machine_config &config)
@@ -367,10 +445,13 @@ void luna_68k_state::luna(machine_config &config)
 			//spc.out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<1>));
 		});
 
-	MB8877(config, m_ioc_fdc, 0);
+	MB8877(config, m_ioc_fdc, 32_MHz_XTAL / 4);
+	FLOPPY_CONNECTOR(config, m_ioc_floppy, luna_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+
 	SCC8530(config, m_ioc_scc, 4.9152_MHz_XTAL); // AM8530H-6PC
 	m_ioc_scc->configure_channels(4'915'200, 4'915'200, 4'915'200, 4'915'200);
 	Z8536(config, m_ioc_cio, 10'000'000);
+	m_ioc_cio->irq_wr_cb().set_inputline(m_ioc_cpu, 2);
 
 	// GPU
 	M68020FPU(config, m_gpu_cpu, 33'340'000 / 2);
