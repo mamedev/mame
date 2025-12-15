@@ -1559,21 +1559,6 @@ void vicdual_state::headon2_io_w(offs_t offset, uint8_t data)
 	if (offset & 0x02) headon_audio_w(data);
 }
 
-void vicdual_state::headon2sl_io_w(offs_t offset, uint8_t data)
-{
-	if (offset & 0x01) invho2_audio_w(data);
-	if (offset & 0x02)
-	{
-		// 7654----  unused?
-		// ----32--  always 1
-		// ------10  palette bank (bit 0 inverted)
-
-		palette_bank_w((data & 3) ^ 1);
-	}
-	if (offset & 0x08) assert_coin_status();
-}
-
-
 void vicdual_state::digger_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
@@ -1604,20 +1589,6 @@ void vicdual_state::headon2_io_map(address_map &map)
 {
 	map.global_mask(0x1f);
 	map(0x00, 0x1f).rw(FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
-}
-
-void vicdual_state::headon2sl_io_map(address_map &map)
-{
-	map.global_mask(0x7f);
-
-	map(0x00, 0x00).mirror(0x7c).portr("IN0");
-	map(0x01, 0x01).mirror(0x7c).portr("IN1");
-	map(0x02, 0x02).mirror(0x7c).portr("IN2");
-	map(0x03, 0x03).mirror(0x7c).portr("IN3");
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	map(0x00, 0x7f).w(FUNC(vicdual_state::headon2sl_io_w));
 }
 
 void vicdual_state::digger_io_map(address_map &map)
@@ -1822,7 +1793,7 @@ void vicdual_state::headon2sl(machine_config &config)
 	vicdual_dualgame_root(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headon2sl_io_map);
+	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headonn_io_map);
 
 	// audio hardware
 	SPEAKER(config, "mono").front_center();
