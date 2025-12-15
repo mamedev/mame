@@ -29177,6 +29177,7 @@ ROM_END
   The chars/text graphics are properly decodes, but texts strings
   look bad in the game.
 
+
 *******************************************************************************************/
 
 /*
@@ -29199,7 +29200,7 @@ ROM_END
   navigate between pages. Press BOOKS/STATS/SETUP (key 0) to exit the Bookkeeping mode.
 
 */
-ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063B800000.
+ROM_START( fl7_3121 )  // Red, White & Blue 7's + Hollywood Nights. Serial 7D063B000000.
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "main.14b",  0x0000, 0x8000, CRC(5756e927) SHA1(5448e1ca4ae060b086145eee10b8dc6eb05acc56) )
 
@@ -29254,8 +29255,8 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
-	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
-	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -32149,8 +32150,8 @@ void wingco_state::init_flaming7()
           just patched to jump to $5D80 (jmp $6115)
           where the check is succesfull.
 */
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x5d7a] = 0x05;
+//	uint8_t *rom = memregion("maincpu")->base();
+//	rom[0x5d7a] = 0x05;
 }
 
 /*
