@@ -107,8 +107,7 @@ Rz          Rudder
 #include "util/corestr.h"
 
 #ifdef SDLMAME_WIN32
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_syswm.h>
+#include <SDL3/SDL.h>
 #endif
 
 #include <algorithm>
@@ -1272,11 +1271,9 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 		window_handle = window.platform_window();
 #elif defined(SDLMAME_WIN32)
 		auto const sdlwindow = window.platform_window();
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
-		if (!SDL_GetWindowWMInfo(sdlwindow, &info))
-			return std::make_pair(nullptr, nullptr);
-		window_handle = info.info.win.window;
+		const auto winProps = SDL_GetWindowProperties(sdlwindow);
+
+		window_handle = (HWND)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
 #endif
 		switch (cooperative_level)
 		{

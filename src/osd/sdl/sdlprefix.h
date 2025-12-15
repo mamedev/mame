@@ -18,9 +18,9 @@
 #endif
 
 
-#ifdef __APPLE__
+#ifdef SDL_PLATFORM_APPLE
 #define SDLMAME_DARWIN 1
-#endif /* __APPLE__ */
+#endif /* SDL_PLATFORM_APPLE */
 
 #ifdef SDLMAME_UNIX
 
@@ -58,7 +58,7 @@
 #define SDLMAME_BSD 1
 #endif
 
-#if defined(__HAIKU__)
+#if defined(SDL_PLATFORM_HAIKU)
 #define SDLMAME_HAIKU 1
 #define SDLMAME_NO64BITIO 1
 #endif

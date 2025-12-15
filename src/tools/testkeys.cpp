@@ -2,7 +2,7 @@
 //
 //  testkeys.cpp - A small utility to analyze SDL keycodes
 //
-//  Copyright (c) 1996-2022, Nicola Salmoria and the MAME Team.
+//  Copyright (c) 1996-2025, Nicola Salmoria and the MAME Team.
 //  Visit https://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
@@ -10,15 +10,37 @@
 //
 //============================================================
 
-#include "osdcore.h"
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 
-#include "SDL2/SDL.h"
+#include "osdcore.h"
 
 #include <iostream>
 #include <string>
 
 //#include "unicode.h"
 
+#if defined(SDL_PLATFORM_WINDOWS)
+#ifndef WINAPI
+	#define WINAPI __stdcall
+#endif
+
+// TODO: Why is this is necessary here but not for MAME itself?
+typedef struct HINSTANCE__ * HINSTANCE;
+typedef char *LPSTR;
+typedef wchar_t *PWSTR;
+
+extern "C" {
+	int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
+	{
+		(void)hInst;
+		(void)hPrev;
+		(void)szCmdLine;
+		(void)sw;
+		return SDL_RunApp(0, NULL, SDL_main, NULL);
+	}
+} /* extern "C" */
+#endif
 
 struct key_lookup_table { int code; const char *name; };
 
@@ -254,16 +276,12 @@ static constexpr key_lookup_table sdl_lookup[] =
 	KE(RGUI)
 
 	KE(MODE)
-	KE(AUDIONEXT)
-	KE(AUDIOPREV)
-	KE(AUDIOSTOP)
-	KE(AUDIOPLAY)
-	KE(AUDIOMUTE)
-	KE(MEDIASELECT)
-	KE(WWW)
-	KE(MAIL)
-	KE(CALCULATOR)
-	KE(COMPUTER)
+	KE(MEDIA_NEXT_TRACK)
+	KE(MEDIA_PREVIOUS_TRACK)
+	KE(MEDIA_STOP)
+	KE(MEDIA_PLAY)
+	KE(MUTE)
+	KE(MEDIA_SELECT)
 	KE(AC_SEARCH)
 	KE(AC_HOME)
 	KE(AC_BACK)
@@ -272,17 +290,8 @@ static constexpr key_lookup_table sdl_lookup[] =
 	KE(AC_REFRESH)
 	KE(AC_BOOKMARKS)
 
-	KE(BRIGHTNESSDOWN)
-	KE(BRIGHTNESSUP)
-	KE(DISPLAYSWITCH)
-	KE(KBDILLUMTOGGLE)
-	KE(KBDILLUMDOWN)
-	KE(KBDILLUMUP)
-	KE(EJECT)
+	KE(MEDIA_EJECT)
 	KE(SLEEP)
-
-	KE(APP1)
-	KE(APP2)
 };
 
 static char const *lookup_key_name(int kc)
@@ -297,41 +306,41 @@ static char const *lookup_key_name(int kc)
 
 int main(int argc, char *argv[])
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
 		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
-	SDL_CreateWindow("Input Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 100, 100, 0);
+	SDL_CreateWindow("Input Test", 100, 100, 0);
 
 	SDL_Event event;
 	bool quit = false;
 	std::string lasttext;
 	while (SDL_PollEvent(&event) || !quit) {
 		switch(event.type) {
-		case SDL_QUIT:
+		case SDL_EVENT_QUIT:
 			quit = true;
 			break;
-		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_ESCAPE) {
+		case SDL_EVENT_KEY_DOWN:
+			if (event.key.scancode == SDLK_ESCAPE) {
 				quit = true;
 			} else {
 				std::cout
 					<< "ITEM_ID_XY "
-					<< lookup_key_name(event.key.keysym.scancode)
+					<< lookup_key_name(event.key.scancode)
 					<< ' '
 					<< std::endl;
 				lasttext.clear();
 			}
 			break;
-		case SDL_KEYUP:
+		case SDL_EVENT_KEY_UP:
 			std::cout
 				<< "ITEM_ID_XY "
-				<< lookup_key_name(event.key.keysym.scancode)
+				<< lookup_key_name(event.key.scancode)
 				<< ' '
 				<< lasttext
 				<< std::endl;
 			break;
-		case SDL_TEXTINPUT:
+		case SDL_EVENT_TEXT_INPUT:
 			lasttext = event.text.text;
 			break;
 		}
