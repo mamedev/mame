@@ -463,31 +463,31 @@ authors:hap
 		<element ref="blackb"><bounds x="86.533" y="42.7" width="17.933" height="20.1" /></element>
 		<element ref="text_printer"><bounds x="87.5" y="41.8" width="7" height="1.5" /></element>
 
-		<element ref="text_rb00"><bounds x="84" y="4.2" width="14" height="1.5" /></element>
-		<element ref="text_rb01"><bounds x="84" y="10.3" width="14" height="1.5" /></element>
-		<element ref="text_rb02"><bounds x="84" y="12.7" width="14" height="1.5" /></element>
-		<element ref="text_rb03"><bounds x="84" y="14.2" width="14" height="1.5" /></element>
-		<element ref="text_rb04"><bounds x="84" y="20.3" width="14" height="1.5" /></element>
-		<element ref="text_rb05"><bounds x="84" y="21.8" width="14" height="1.5" /></element>
-		<element ref="text_rb06"><bounds x="84" y="24.2" width="14" height="1.5" /></element>
-		<element ref="text_rb07"><bounds x="84" y="30.3" width="14" height="1.5" /></element>
-		<element ref="text_rb08"><bounds x="84" y="34.2" width="14" height="1.5" /></element>
-		<element ref="text_rb09"><bounds x="84" y="44.2" width="14" height="1.5" /></element>
-		<element ref="text_rb0a"><bounds x="84" y="54.2" width="14" height="1.5" /></element>
-		<element ref="text_rb0b"><bounds x="84" y="60.3" width="14" height="1.5" /></element>
-		<element ref="text_rb0c"><bounds x="84" y="64.2" width="14" height="1.5" /></element>
-		<element ref="text_rb0d"><bounds x="84" y="74.2" width="14" height="1.5" /></element>
+		<element ref="text_rb00"><bounds x="87" y="4.2" width="8" height="1.5" /></element>
+		<element ref="text_rb01"><bounds x="87" y="10.3" width="8" height="1.5" /></element>
+		<element ref="text_rb02"><bounds x="87" y="12.7" width="8" height="1.5" /></element>
+		<element ref="text_rb03"><bounds x="87" y="14.2" width="8" height="1.5" /></element>
+		<element ref="text_rb04"><bounds x="87" y="20.3" width="8" height="1.5" /></element>
+		<element ref="text_rb05"><bounds x="87" y="21.8" width="8" height="1.5" /></element>
+		<element ref="text_rb06"><bounds x="87" y="24.2" width="8" height="1.5" /></element>
+		<element ref="text_rb07"><bounds x="87" y="30.3" width="8" height="1.5" /></element>
+		<element ref="text_rb08"><bounds x="87" y="34.2" width="8" height="1.5" /></element>
+		<element ref="text_rb09"><bounds x="87" y="44.2" width="8" height="1.5" /></element>
+		<element ref="text_rb0a"><bounds x="87" y="54.2" width="8" height="1.5" /></element>
+		<element ref="text_rb0b"><bounds x="87" y="60.3" width="8" height="1.5" /></element>
+		<element ref="text_rb0c"><bounds x="87" y="64.2" width="8" height="1.5" /></element>
+		<element ref="text_rb0d"><bounds x="87" y="74.2" width="8" height="1.5" /></element>
 
-		<element ref="text_rb10"><bounds x="93" y="4.2" width="14" height="1.5" /></element>
-		<element ref="text_rb11"><bounds x="93" y="14.2" width="14" height="1.5" /></element>
-		<element ref="text_rb12"><bounds x="93" y="20.3" width="14" height="1.5" /></element>
-		<element ref="text_rb13"><bounds x="93" y="24.2" width="14" height="1.5" /></element>
-		<element ref="text_rb14"><bounds x="93" y="34.2" width="14" height="1.5" /></element>
-		<element ref="text_rb15"><bounds x="93" y="44.2" width="14" height="1.5" /></element>
-		<element ref="text_rb16"><bounds x="93" y="54.2" width="14" height="1.5" /></element>
-		<element ref="text_rb17"><bounds x="93" y="64.2" width="14" height="1.5" /></element>
-		<element ref="text_rb18"><bounds x="93" y="70.3" width="14" height="1.5" /></element>
-		<element ref="text_rb19"><bounds x="93" y="74.2" width="14" height="1.5" /></element>
+		<element ref="text_rb10"><bounds x="96" y="4.2" width="8" height="1.5" /></element>
+		<element ref="text_rb11"><bounds x="96" y="14.2" width="8" height="1.5" /></element>
+		<element ref="text_rb12"><bounds x="96" y="20.3" width="8" height="1.5" /></element>
+		<element ref="text_rb13"><bounds x="96" y="24.2" width="8" height="1.5" /></element>
+		<element ref="text_rb14"><bounds x="96" y="34.2" width="8" height="1.5" /></element>
+		<element ref="text_rb15"><bounds x="96" y="44.2" width="8" height="1.5" /></element>
+		<element ref="text_rb16"><bounds x="96" y="54.2" width="8" height="1.5" /></element>
+		<element ref="text_rb17"><bounds x="96" y="64.2" width="8" height="1.5" /></element>
+		<element ref="text_rb18"><bounds x="96" y="70.3" width="8" height="1.5" /></element>
+		<element ref="text_rb19"><bounds x="96" y="74.2" width="8" height="1.5" /></element>
 
 		<element ref="white"><bounds x="88" y="6" width="6" height="4" /></element>
 		<element ref="white"><bounds x="88" y="16" width="6" height="4" /></element>
@@ -596,16 +596,16 @@ authors:hap
 		<element ref="blackb"><bounds x="96" y="45" width="8" height="30" /></element>
 
 		<!-- labels -->
-		<element ref="text_ro00"><bounds x="84" y="4.2" width="14" height="1.5" /></element>
-		<element ref="text_ro01"><bounds x="84" y="10.3" width="14" height="1.5" /></element>
-		<element ref="text_ro08"><bounds x="84" y="34.2" width="14" height="1.5" /></element>
-		<element ref="text_ro09"><bounds x="84" y="44.2" width="14" height="1.5" /></element>
-		<element ref="text_ro0c"><bounds x="84" y="64.2" width="14" height="1.5" /></element>
-		<element ref="text_ro0d"><bounds x="84" y="74.2" width="14" height="1.5" /></element>
+		<element ref="text_ro00"><bounds x="87" y="4.2" width="8" height="1.5" /></element>
+		<element ref="text_ro01"><bounds x="87" y="10.3" width="8" height="1.5" /></element>
+		<element ref="text_ro08"><bounds x="87" y="34.2" width="8" height="1.5" /></element>
+		<element ref="text_ro09"><bounds x="87" y="44.2" width="8" height="1.5" /></element>
+		<element ref="text_ro0c"><bounds x="87" y="64.2" width="8" height="1.5" /></element>
+		<element ref="text_ro0d"><bounds x="87" y="74.2" width="8" height="1.5" /></element>
 
-		<element ref="text_ro10"><bounds x="93" y="4.2" width="14" height="1.5" /></element>
-		<element ref="text_ro14"><bounds x="93" y="34.2" width="14" height="1.5" /></element>
-		<element ref="text_rb19"><bounds x="93" y="74.2" width="14" height="1.5" /></element>
+		<element ref="text_ro10"><bounds x="96" y="4.2" width="8" height="1.5" /></element>
+		<element ref="text_ro14"><bounds x="96" y="34.2" width="8" height="1.5" /></element>
+		<element ref="text_rb19"><bounds x="96" y="74.2" width="8" height="1.5" /></element>
 	</group>
 
 

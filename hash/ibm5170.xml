@@ -12887,6 +12887,40 @@ Differences between clone/parent:
 		</part>
 	</software>
 
+	<software name="doom2_1666g" cloneof="doom2">
+		<description>DOOM II: Hell on Earth (1.666) (Germany)</description>
+		<year>1994</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="version" value="1.666" />
+		<!-- baddump: disk images were constructed from loose files -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="doom 2 1.666 (germany)-1.img" size="1474560" crc="a455b10e" sha1="748ace260dec67c4a2fc2c6bb9dc1642bf996947" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="doom 2 1.666 (germany)-2.img" size="1474560" crc="de001e20" sha1="8ddffbe7a2c76b4a3827bbd97c71f53411f37181" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="doom 2 1.666 (germany)-3.img" size="1474560" crc="7c8bd463" sha1="c295bea1a3bf44f02d37bb49f7f4ad261721cde9" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="doom 2 1.666 (germany)-4.img" size="1474560" crc="e634ed0f" sha1="ac58ca363fe2e28a4dcf71a871613dc537c72d03" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="doom 2 1.666 (germany)-5.img" size="1474560" crc="d0875060" sha1="b91c07479eb63d1384d974913e9958db1c16b4cd" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dokyusei">
 		<description>Doukyuusei</description>
 		<year>1994</year>

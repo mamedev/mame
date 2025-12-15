@@ -478,9 +478,9 @@ authors:hap
 		<element ref="text_2"><bounds xc="1.85" y="70.1" width="2" height="1.8" /></element>
 		<element ref="text_1"><bounds xc="1.85" y="80.1" width="2" height="1.8" /></element>
 
-		<element ref="text_l1"><bounds xc="1.85" y="76.25" width="5" height="1.4" /></element>
-		<element ref="text_l2"><bounds xc="1.85" y="66.25" width="5" height="1.4" /></element>
-		<element ref="text_l3"><bounds xc="1.85" y="56.25" width="5" height="1.4" /></element>
+		<element ref="text_l1"><bounds xc="1.85" y="76.25" width="3" height="1.4" /></element>
+		<element ref="text_l2"><bounds xc="1.85" y="66.25" width="3" height="1.4" /></element>
+		<element ref="text_l3"><bounds xc="1.85" y="56.25" width="3" height="1.4" /></element>
 
 		<element ref="text_a"><bounds x="9.8"  y="85.2" width="2" height="1.8" /></element>
 		<element ref="text_b"><bounds x="19.8" y="85.2" width="2" height="1.8" /></element>

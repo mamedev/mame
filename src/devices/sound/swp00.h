@@ -72,7 +72,6 @@ private:
 		void read_8c(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1);
 
 		void dpcm_step(u8 input);
-		void update_loop_size();
 
 		std::string describe() const;
 	};

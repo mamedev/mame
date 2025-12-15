@@ -480,15 +480,15 @@ authors:hap
 		<repeat count="8">
 			<param name="y" start="23.05" increment="7.71" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_m~i~a"><bounds x="87.63" yc="~y~" width="14" height="1.4" /></element>
-			<element ref="text_r~i~a"><bounds x="97.25" yc="~y~" width="14" height="1.4" /></element>
+			<element ref="text_m~i~a"><bounds xc="94.63"  yc="~y~" width="10" height="1.4" /></element>
+			<element ref="text_r~i~a"><bounds xc="104.25" yc="~y~" width="10" height="1.4" /></element>
 		</repeat>
 
 		<repeat count="8">
 			<param name="y" start="28.90" increment="7.71" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_m~i~b"><bounds x="87.63" yc="~y~" width="14" height="1.4" /></element>
-			<element ref="text_r~i~b"><bounds x="97.25" yc="~y~" width="14" height="1.4" /></element>
+			<element ref="text_m~i~b"><bounds xc="94.63"  yc="~y~" width="10" height="1.4" /></element>
+			<element ref="text_r~i~b"><bounds xc="104.25" yc="~y~" width="10" height="1.4" /></element>
 		</repeat>
 
 		<repeat count="6">
@@ -500,7 +500,7 @@ authors:hap
 		<repeat count="6">
 			<param name="y" start="33.71" increment="7.71" />
 			<param name="i" start="2" increment="1" />
-			<element ref="text_r~i~x"><bounds x="101.4" yc="~y~" width="5.7" height="1.4" /></element>
+			<element ref="text_r~i~x"><bounds xc="104.25" yc="~y~" width="5.2" height="1.4" /></element>
 		</repeat>
 
 		<element ref="text_r8x"><bounds x="101.4" y="78.30" width="5.7" height="3" /></element>

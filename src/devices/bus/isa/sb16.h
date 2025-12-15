@@ -38,6 +38,7 @@ protected:
 	uint16_t dack16_r(int line) override;
 	void dack16_w(int line, uint16_t data) override;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
 	uint8_t mpu401_r(offs_t offset);
 	void mpu401_w(offs_t offset, uint8_t data);

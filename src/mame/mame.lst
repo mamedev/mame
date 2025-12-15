@@ -992,14 +992,14 @@ maciisi
 maciifx
 
 @source:apple/maciivx.cpp
-maciivx
 maciivi
+maciivx
 
 @source:apple/maclc.cpp
+maccclas
+macclas2
 maclc
 maclc2
-macclas2
-maccclas
 mactv
 
 @source:apple/maclc3.cpp
@@ -1012,8 +1012,8 @@ maclc550
 pmac6100
 
 @source:apple/macprtb.cpp
-macprtb
 macpb100
+macprtb
 
 @source:apple/macpwrbk030.cpp
 macpb140
@@ -1035,13 +1035,13 @@ macpd280
 macpd280c
 
 @source:apple/macquadra605.cpp
-macqd605
 maclc475
 maclc575
+macqd605
 
 @source:apple/macquadra630.cpp
-macqd630
 maclc580
+macqd630
 
 @source:apple/macquadra700.cpp
 macqd700
@@ -1049,23 +1049,23 @@ macqd900
 macqd950
 
 @source:apple/macquadra800.cpp
-macqd800
 macct610
 macct650
 macqd610
 macqd650
+macqd800
 
 @source:apple/newton.cpp
+emate
+motmarco
+mp110
+mp120
+mp130
+mp2000
+mp2100
 newtnotp
 newtonmp
 spi7000
-mp110
-mp120
-motmarco
-mp130
-emate
-mp2000
-mp2100
 
 @source:apple/pippin.cpp
 pippin
@@ -17849,6 +17849,7 @@ mjreach
 mjreacha
 mjreachbl
 mjreachp2
+mjtkp2
 neruton
 nerutona
 ougonhai
@@ -17906,6 +17907,7 @@ janputer
 janputera
 jansou
 jansoua
+janyou
 janyoup2
 janyoup2702
 janyoup2a
@@ -17941,6 +17943,7 @@ seljan
 suzume
 tahjong
 tontonb
+tontonba
 
 @source:eaca/cgenie.cpp
 cgenie
@@ -20748,6 +20751,15 @@ feverchtw
 feverchw4
 fl7_3121
 fl7_50
+fl7_50_gs01
+fl7_50_gs02
+fl7_50_gs03
+fl7_50_gs04
+fl7_50_gs05
+fl7_50_gs06
+fl7_50_gs07
+fl7_50_gs08
+fl7_50_gs09
 fl7_500
 fl7_1000
 fl7_2000
@@ -21362,6 +21374,7 @@ kov3hd101
 @source:igs/spoker.cpp
 3super8
 dafuwng3
+dahuangg
 hsheng2
 huahuas2
 huahuas2a
@@ -32373,6 +32386,7 @@ czmon_8c
 czmon_8d
 czmon_8e
 czmon_8f
+czmon_8g
 czmon_9a
 czmon_9b
 czmon_9c
@@ -33403,9 +33417,6 @@ vparadis2
 
 @source:misc/unkgolf.cpp
 unkgolf
-
-@source:misc/unkhorse.cpp
-unkhorse
 
 @source:misc/unkpoker.cpp
 unkpoker
@@ -35215,6 +35226,7 @@ legionj2
 legionjb
 legionjb2
 skyrobo
+skyrobobl
 terraf
 terrafb
 terrafj
@@ -35616,6 +35628,7 @@ herbiedk
 herodk
 herodku
 hunchbkd
+jammin
 jrking
 maguila
 pestplce
@@ -41767,6 +41780,7 @@ wrestwar1
 wrestwar1d
 wrestwar2
 wrestwar2d
+wwthomas
 
 @source:sega/segas16b_isgsm.cpp
 isgsm
@@ -42340,6 +42354,7 @@ ddcrewbl
 dduxbl
 eswatbl
 eswatbl2
+eswatbl3
 goldnaxeb1
 goldnaxeb2
 iqpipe
@@ -44391,6 +44406,9 @@ bbustersja
 dmndrby
 dmndrbya
 dmndrbybl
+
+@source:snk/drderby.cpp
+drderby
 
 @source:snk/hng64.cpp
 bbust2
@@ -47179,6 +47197,7 @@ pvmil8
 pvmilfin
 pvwwcas
 rad_ftet
+rad_ftetp
 rad_sinv
 rad_tetr
 sudelan

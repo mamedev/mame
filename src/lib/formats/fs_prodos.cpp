@@ -31,6 +31,7 @@ public:
 
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 
 	virtual std::error_condition format(const meta_data &meta) override;
 
@@ -41,6 +42,7 @@ private:
 	std::tuple<fsblk_t::block_t::ptr, u32> path_find_step(const std::string &name, u16 block);
 	std::tuple<fsblk_t::block_t::ptr, u32, bool> path_find(const std::vector<std::string> &path);
 	std::pair<std::error_condition, std::vector<u8>> any_read(u8 type, u16 block, u32 length);
+	std::error_condition any_blocks(std::vector<u32> &alloc_blocks, std::vector<u32> &data_blocks, u8 type, u16 block, u32 length);
 };
 }
 
@@ -412,7 +414,7 @@ std::tuple<fsblk_t::block_t::ptr, u32> prodos_impl::path_find_step(const std::st
 std::tuple<fsblk_t::block_t::ptr, u32, bool> prodos_impl::path_find(const std::vector<std::string> &path)
 {
 	if(path.size() == 0)
-		return std::tuple<fsblk_t::block_t::ptr, u32, bool>(fsblk_t::block_t::ptr(), 0, false);
+		return std::tuple<fsblk_t::block_t::ptr, u32, bool>(fsblk_t::block_t::ptr(), 0, true);
 
 	u16 block = 2;
 	for(u32 pathc = 0;; pathc++) {
@@ -553,4 +555,86 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_rsrc_read(con
 
 	} else
 		return std::make_pair(std::error_condition(), std::vector<u8>());
+}
+
+std::error_condition prodos_impl::any_blocks(std::vector<u32> &alloc_blocks, std::vector<u32> &data_blocks, u8 type, u16 block, u32 length)
+{
+	u32 nb = (length + 511) / 512;
+
+	switch(type) {
+	case 1:
+		// Seedling files always take up 1 block, no more or less
+		data_blocks.push_back(block);
+		break;
+
+	case 2: {
+		alloc_blocks.push_back(block);
+		auto iblk = m_blockdev.get(block);
+		for(u32 i=0; i != 256 && nb != 0; i++, nb--) {
+			u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
+			if(blk)
+				data_blocks.push_back(blk);
+		}
+		break;
+	}
+
+	case 3: {
+		alloc_blocks.push_back(block);
+		auto mblk = m_blockdev.get(block);
+		for(u32 j=0; nb != 0; j += 256) {
+			u32 idx = j/256;
+			alloc_blocks.push_back(mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8));
+			auto iblk = m_blockdev.get(alloc_blocks.back());
+			for(u32 i=0; i != 256 && nb != 0; i++, nb--) {
+				u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
+				if(blk)
+					data_blocks.push_back(blk);
+			}
+		}
+		break;
+	}
+
+	default:
+		return error::unsupported;
+	}
+
+	return std::error_condition();
+}
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> prodos_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	auto [blk, off, dir] = path_find(path);
+	if(!off && !path.empty())
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	if(dir) {
+		std::vector<u32> dir_blocks;
+		u32 block = path.empty() ? 2 : blk->r16l(off + 0x11);
+		for(;;) {
+			if(block >= m_blockdev.block_count())
+				return std::make_tuple(error::invalid_block, std::vector<u32>(), std::move(dir_blocks));
+			if(std::find(dir_blocks.begin(), dir_blocks.end(), block) != dir_blocks.end())
+				return std::make_tuple(error::circular_reference, std::vector<u32>(), std::move(dir_blocks));
+			dir_blocks.push_back(block);
+			block = m_blockdev.get(block)->r16l(2);
+			if(!block)
+				return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(dir_blocks));
+		}
+	} else {
+		std::vector<u32> alloc_blocks;
+		std::vector<u32> data_blocks;
+		if((blk->r8(off) & 0xf0) == 0x50) {
+			alloc_blocks.push_back(blk->r16l(off + 0x11));
+			auto kblk = m_blockdev.get(alloc_blocks.back());
+			for(u16 koff = 0; koff != 0x200; koff += 0x100) {
+				std::error_condition err = any_blocks(alloc_blocks, data_blocks, kblk->r8(koff + 0), kblk->r16l(koff + 1), kblk->r24l(koff + 5));
+				if(err)
+					return std::make_tuple(err, alloc_blocks, data_blocks);
+			}
+			return std::make_tuple(std::error_condition(), alloc_blocks, data_blocks);
+		} else {
+			std::error_condition err = any_blocks(alloc_blocks, data_blocks, blk->r8(off) >> 4, blk->r16l(off + 0x11), blk->r24l(off + 0x15));
+			return std::make_tuple(err, alloc_blocks, data_blocks);
+		}
+	}
 }

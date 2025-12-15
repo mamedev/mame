@@ -2,20 +2,21 @@
 // copyright-holders:hap, Tomasz Slanina
 /*******************************************************************************
 
-unknown Japanese horse gambling game
-probably early 80s, manufacturer unknown
+SNK Derby Derby
 
 from a broken PCB, labeled EFI TG-007
 M5L8085AP CPU + M5L8155P (for I/O and sound)
+14KB ROM (7*Fujitsu MB8516 EPROM)
 8KB RAM mainly for bitmap video, and 512x4 RAM for color map
 
+SNK Bye Bye Game is probably on the same hardware.
+
 TODO:
-- identify game!
 - improve I/O:
   * more buttons/sensors?
-  * horse_output_w bits
+  * output_w bits
   * 6-pos dipswitch on the pcb, only 4 are known at the moment
-- confirm colors and sound pitch
+- confirm sound pitch
 
 *******************************************************************************/
 
@@ -32,10 +33,10 @@ TODO:
 
 namespace {
 
-class horse_state : public driver_device
+class drderby_state : public driver_device
 {
 public:
-	horse_state(const machine_config &mconfig, device_type type, const char *tag) :
+	drderby_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i8155(*this, "i8155"),
@@ -45,7 +46,7 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	void horse(machine_config &config);
+	void drderby(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -66,11 +67,11 @@ private:
 	void output_w(u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void horse_io_map(address_map &map) ATTR_COLD;
-	void horse_map(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 };
 
-void horse_state::machine_start()
+void drderby_state::machine_start()
 {
 	save_item(NAME(m_output));
 }
@@ -81,7 +82,7 @@ void horse_state::machine_start()
     Video
 *******************************************************************************/
 
-u32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 drderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -104,12 +105,12 @@ u32 horse_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
     I/O
 *******************************************************************************/
 
-u8 horse_state::input_r()
+u8 drderby_state::input_r()
 {
 	return m_inputs[m_output >> 6 & 3]->read();
 }
 
-void horse_state::output_w(u8 data)
+void drderby_state::output_w(u8 data)
 {
 	// d4: payout related
 	// d6-d7: input mux
@@ -123,15 +124,15 @@ void horse_state::output_w(u8 data)
     Address Maps
 *******************************************************************************/
 
-void horse_state::horse_map(address_map &map)
+void drderby_state::main_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
 	map(0x4000, 0x40ff).rw(m_i8155, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x6000, 0x7fff).ram().share("vram");
-	map(0x8000, 0x87ff).mirror(0x0800).rw(FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
+	map(0x8000, 0x87ff).mirror(0x0800).rw(FUNC(drderby_state::colorram_r), FUNC(drderby_state::colorram_w));
 }
 
-void horse_state::horse_io_map(address_map &map)
+void drderby_state::io_map(address_map &map)
 {
 	map(0x40, 0x47).rw(m_i8155, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 }
@@ -142,7 +143,7 @@ void horse_state::horse_io_map(address_map &map)
     Input Ports
 *******************************************************************************/
 
-static INPUT_PORTS_START( horse )
+static INPUT_PORTS_START( drderby )
 	PORT_START("IN.0")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -195,16 +196,16 @@ INPUT_PORTS_END
     Machine Configs
 *******************************************************************************/
 
-void horse_state::horse(machine_config &config)
+void drderby_state::drderby(machine_config &config)
 {
 	// basic machine hardware
 	I8085A(config, m_maincpu, 12_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &horse_state::horse_map);
-	m_maincpu->set_addrmap(AS_IO, &horse_state::horse_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &drderby_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &drderby_state::io_map);
 
 	I8155(config, m_i8155, 12_MHz_XTAL / 4); // port A input, B output, C output but unused
-	m_i8155->in_pa_callback().set(FUNC(horse_state::input_r));
-	m_i8155->out_pb_callback().set(FUNC(horse_state::output_w));
+	m_i8155->in_pa_callback().set(FUNC(drderby_state::input_r));
+	m_i8155->out_pb_callback().set(FUNC(drderby_state::output_w));
 	m_i8155->out_to_callback().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	// video hardware
@@ -213,7 +214,7 @@ void horse_state::horse(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-	m_screen->set_screen_update(FUNC(horse_state::screen_update));
+	m_screen->set_screen_update(FUNC(drderby_state::screen_update));
 	m_screen->screen_vblank().set_inputline(m_maincpu, I8085_RST75_LINE);
 	m_screen->set_palette("palette");
 
@@ -230,15 +231,15 @@ void horse_state::horse(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( unkhorse )
+ROM_START( drderby )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	ROM_LOAD( "h1.bin", 0x0000, 0x0800, CRC(2b6fc963) SHA1(bdbf71bd0994231517ecf8188ea19cc7d42e5333) )
-	ROM_LOAD( "h2.bin", 0x0800, 0x0800, CRC(b9653e78) SHA1(fd1369c734a0fec8def5b7819b14e4c0d1361896) )
-	ROM_LOAD( "h3.bin", 0x1000, 0x0800, CRC(77ce7149) SHA1(e6a38f9eb676f84ec0e4c28e27d0aa959b97301f) )
-	ROM_LOAD( "h4.bin", 0x1800, 0x0800, CRC(7e77d95d) SHA1(0e0b7acd622806b4eee3c691f05a04bd2989dbea) )
-	ROM_LOAD( "h5.bin", 0x2000, 0x0800, CRC(e2c6abdb) SHA1(555f759897904e577a0a38abaaa7636e974192da) )
-	ROM_LOAD( "h6.bin", 0x2800, 0x0800, CRC(8b179039) SHA1(079bec1ead7e04e29e552e3b48bec740a869751d) )
-	ROM_LOAD( "h7.bin", 0x3000, 0x0800, CRC(db21fc82) SHA1(38cf58c4d33da3e919d058abb482566c8f70d276) )
+	ROM_LOAD( "h1", 0x0000, 0x0800, CRC(2b6fc963) SHA1(bdbf71bd0994231517ecf8188ea19cc7d42e5333) )
+	ROM_LOAD( "h2", 0x0800, 0x0800, CRC(b9653e78) SHA1(fd1369c734a0fec8def5b7819b14e4c0d1361896) )
+	ROM_LOAD( "h3", 0x1000, 0x0800, CRC(77ce7149) SHA1(e6a38f9eb676f84ec0e4c28e27d0aa959b97301f) )
+	ROM_LOAD( "h4", 0x1800, 0x0800, CRC(7e77d95d) SHA1(0e0b7acd622806b4eee3c691f05a04bd2989dbea) )
+	ROM_LOAD( "h5", 0x2000, 0x0800, CRC(e2c6abdb) SHA1(555f759897904e577a0a38abaaa7636e974192da) )
+	ROM_LOAD( "h6", 0x2800, 0x0800, CRC(8b179039) SHA1(079bec1ead7e04e29e552e3b48bec740a869751d) )
+	ROM_LOAD( "h7", 0x3000, 0x0800, CRC(db21fc82) SHA1(38cf58c4d33da3e919d058abb482566c8f70d276) )
 ROM_END
 
 } // anonymous namespace
@@ -249,5 +250,5 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR   NAME      PARENT  MACHINE  INPUT  CLASS        INIT        SCREEN  COMPANY      FULLNAME                                FLAGS
-GAME( 1981?, unkhorse, 0,      horse,   horse, horse_state, empty_init, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
+//    YEAR  NAME     PARENT  MACHINE   INPUT    CLASS          INIT        SCREEN  COMPANY  FULLNAME       FLAGS
+GAME( 1981, drderby, 0,      drderby,  drderby, drderby_state, empty_init, ROT270, "SNK",   "Derby Derby", MACHINE_SUPPORTS_SAVE )

@@ -7,6 +7,8 @@
 #include "fsblk.h"
 #include "oric_dsk.h"
 
+#include <numeric>
+
 using namespace fs;
 
 namespace fs { const oric_jasmin_image ORIC_JASMIN; }
@@ -63,6 +65,7 @@ public:
 	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
 	virtual std::error_condition format(const meta_data &meta) override;
@@ -525,6 +528,65 @@ std::pair<std::error_condition, std::vector<u8>> oric_jasmin_impl::file_read(con
 	}
 
 	return std::make_pair(std::error_condition(), data);
+}
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> oric_jasmin_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if(path.empty()) {
+		std::vector<u32> dir_blocks;
+		dir_blocks.push_back(20*17+1);
+		auto bdir = m_blockdev.get(dir_blocks.back());
+		for(;;) {
+			u16 ref = bdir->r16b(2);
+			if(!ref || !ref_valid(ref))
+				break;
+			if(std::find(dir_blocks.begin(), dir_blocks.end(), cs_to_block(ref)) != dir_blocks.end())
+				return std::make_tuple(error::circular_reference, std::vector<u32>(), std::move(dir_blocks));
+			dir_blocks.push_back(cs_to_block(ref));
+			bdir = m_blockdev.get(dir_blocks.back());
+		}
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(dir_blocks));
+	}
+
+	if(path.size() != 1)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	auto [bdir, off, sys] = file_find(path[0]);
+	if(!off)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	if(sys) {
+		std::vector<u32> sys_blocks(62);
+		std::iota(sys_blocks.begin(), sys_blocks.end(), 0);
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(sys_blocks));
+
+	} else {
+		std::vector<u32> data_blocks;
+		u16 ref = bdir->r16b(off);
+		std::vector<u32> alloc_blocks(1, cs_to_block(ref));
+		auto iblk = m_blockdev.get(alloc_blocks.back());
+		u32 length = iblk->r16l(4);
+		while(ref_valid(ref)) {
+			for(u32 pos = 6; pos != 256; pos += 2) {
+				u16 dref = iblk->r16b(pos);
+				if(!ref_valid(dref))
+					goto done;
+				data_blocks.push_back(cs_to_block(dref));
+				if(length <= 256)
+					goto done;
+				length -= 256;
+			}
+			ref = iblk->r16b(2);
+			if(!ref_valid(ref))
+				break;
+			if(std::find(alloc_blocks.begin(), alloc_blocks.end(), cs_to_block(ref)) != alloc_blocks.end())
+				return std::make_tuple(error::circular_reference, std::move(alloc_blocks), std::move(data_blocks));
+			alloc_blocks.push_back(cs_to_block(ref));
+			iblk = m_blockdev.get(alloc_blocks.back());
+		}
+	done:
+		return std::make_tuple(std::error_condition(), std::move(alloc_blocks), std::move(data_blocks));
+	}
 }
 
 std::error_condition oric_jasmin_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)

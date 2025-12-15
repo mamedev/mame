@@ -370,6 +370,38 @@ MUSIC
 		</part>
 	</software>
 
+	<software name="4magnifi">
+		<description>4 Magnificent Machine Code Games</description>
+		<year>198?</year>
+		<publisher>C-Tech</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Scramble - Invaders - Galaxians - Gunfight"/>
+			<dataarea name="cass" size="31629">
+				<rom name="4 Magnificent Machine Code Games (C-Tech).tzx" size="31629" crc="d74c6024" sha1="aa90b28233b5c4c4b94f2c397df3752ca3d44a33"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4magnifi_a" cloneof="4magnifi">
+		<description>4 Magnificent Machine Code Games (alt)</description>
+		<year>198?</year>
+		<publisher>C-Tech</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="114926">
+				<rom name="4 Magnificent Machine Code Games - Alternate - Side 1.tzx" size="114926" crc="0704b238" sha1="a3f7408b1de7df1625a917b83d646fec3abd75a7"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass" size="15763">
+				<rom name="4 Magnificent Machine Code Games - Alternate - Side 2.tzx" size="15763" crc="3252b7de" sha1="3a30ea327c2622445a3d6d34374ffcea4d05dccb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="52kfampak">
 		<description>5-2K Family Pak</description>
 		<year>198?</year>
@@ -2429,6 +2461,20 @@ MUSIC
 		</part>
 	</software>
 
+	<software name="condred">
+		<description>Condition Red</description>
+		<year>1982</year>
+		<publisher>Work Force</publisher>
+		<info name="developer" value="C. Rogers" />
+		<info name="developer" value="F. McLean" />
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7898">
+				<rom name="Condition Red (Work Force).tzx" size="7898" crc="ec2c8e6c" sha1="4c547506c2d431876bdff28126582e19aaef562d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="constell">
 		<description>Constellation</description>
 		<year>1982</year>
@@ -4446,6 +4492,17 @@ MUSIC
 		</part>
 	</software>
 
+	<software name="ggamesv1">
+		<description>Greatest Games V1</description>
+		<year>1982</year>
+		<publisher>Work Force</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="51362">
+				<rom name="Greatest Games v1 (Work Force).tzx" size="51362" crc="5f3a8dc1" sha1="d45768939b736634c29104e7c2811f353dc24616"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grimmft">
 		<description>Grimm's Fairy Trails</description>
 		<year>1982</year>
@@ -5956,6 +6013,20 @@ Defender: not working
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="14737">
 				<rom name="Inheritance - Side 2.tzx" size="14737" crc="765d3a83" sha1="4efbed9b425186bd6ea97040d1ce3319fe362b25"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inherita_b" cloneof="inherita">
+		<description>Inheritance (alt 2)</description>
+		<year>1981</year>
+		<publisher>Simon W. Hessel Software</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="29519">
+				<rom name="Inheritance v2.tzx" size="29519" crc="efbf2998" sha1="f5007f1a490ea4d4c6ffafabb6ca6ec93e17f176"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8207,6 +8278,7 @@ Defender: not working
 		<description>Scramble</description>
 		<year>198?</year>
 		<publisher>Mikro-Gen</publisher>
+		<info name="language" value="English" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="4693">
 				<rom name="Scramble.tzx" size="4693" crc="dd9359a4" sha1="84760e3b08c0e5686c9ace4b23dff5b6187da367"/>
@@ -8218,6 +8290,7 @@ Defender: not working
 		<description>Scramble (colour inlay)</description>
 		<year>198?</year>
 		<publisher>Mikro-Gen</publisher>
+		<info name="language" value="English" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="4693">
 				<rom name="Scramble(CI).tzx" size="4693" crc="0ef260a9" sha1="338ba99e7d814653800311cd67be49fca764a822"/>
@@ -9941,6 +10014,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="tradrjack">
+		<description>Trader Jack</description>
+		<year>1982</year>
+		<publisher>Work Force</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15044">
+				<rom name="Trader Jack.tzx" size="15044" crc="faaf439a" sha1="922bad1400d917230b579c7b7ef7348c611900f7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="traffic">
 		<description>Traffic</description>
 		<year>1984</year>
@@ -11257,13 +11343,37 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="zx81arcade">
+		<description>ZX81 Arcade Pack</description>
+		<year>198?</year>
+		<publisher>C-Tech</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="31607">
+				<rom name="ZX81 Arcade Pack (C-Tech).tzx" size="31607" crc="62e9eeed" sha1="00a579751a90aad6af6be96767ed19ee3fd17a48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zx81micro">
+		<description>ZX81 Micro Computer Software</description>
+		<year>198?</year>
+		<publisher>C-Tech</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="114926">
+				<rom name="ZX81 Micro Computer Software (C-Tech).tzx" size="114926" crc="ff22b4a0" sha1="ac42a71fee8d1de5070a9de60cda4819015f5870"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zx81ppack2">
 		<description>ZX81 Program Pack 2</description>
 		<year>198?</year>
 		<publisher>Bug-Byte</publisher>
-		<notes>OXO / Pontoon / Bio-Rtythms / Fruit Machine</notes>
 		<info name="language" value="English" />
 		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="OXO / Pontoon / Bio-Rtythms / Fruit Machine"/>
 			<dataarea name="cass" size="16780">
 				<rom name="ZX81 Program Pack 2.tzx" size="16780" crc="7c8c0035" sha1="5483bb2a4bb943c95adec80fb0d976784b66952a"/>
 			</dataarea>
@@ -11336,6 +11446,18 @@ Defender: not working
 
 <!-- Type-ins -->
 
+	<software name="antiaereo">
+		<description>Antiaéreo (type-in, Encliclopédia Prática de Informática - Volume 1)</description>
+		<year>1984</year>
+		<publisher>Ediciones Nueva Lente / Ediciones Ingelek / Abril Cultural</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2341">
+				<rom name="Antiaereo.tzx" size="2341" crc="752772a0" sha1="49849ba3c97971c42efe4cc7cc3a6a4f1bacf818"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="avselva">
 		<description>Aventuras na Selva (type-in, Micro Sistemas Nº 23 - Agosto 1983)</description>
@@ -11463,6 +11585,18 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="jogoletra">
+		<description>Jogo das Letras (type-in, Encliclopédia Prática de Informática - Volume 1)</description>
+		<year>1984</year>
+		<publisher>Ediciones Nueva Lente / Ediciones Ingelek / Abril Cultural</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2284">
+				<rom name="Jogo das Letras - ZX81.tzx" size="2284" crc="25cd63cb" sha1="4a746f36396c1cf4496df960b3171fd160d7a910"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jparejas">
 		<description>Juego de las Parejas (type-in, Revista Española de Electrónica - Agosto-Septiembre 1982)</description>
 		<year>1982</year>
@@ -11534,6 +11668,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1066">
 				<rom name="Monster Maths.tzx" size="1066" crc="d3664643" sha1="04f4bd98bb191aaa13116a16ed6a5ff42e509aa6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barqueiro">
+		<description>O Barqueiro (type-in, Encliclopédia Prática de Informática - Volume 1)</description>
+		<year>1984</year>
+		<publisher>Ediciones Nueva Lente / Ediciones Ingelek / Abril Cultural</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3089">
+				<rom name="O Barqueiro.tzx" size="3089" crc="fb510d12" sha1="f442aaee9e52a2bb0d3f2bbe81b97c2ab28baa66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11677,6 +11824,20 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="tabuada">
+		<description>Tabuada (type-in, Encliclopédia Prática de Informática - Volume 1)</description>
+		<year>1984</year>
+		<publisher>Ediciones Nueva Lente / Ediciones Ingelek / Abril Cultural</publisher>
+		<info name="developer" value="Rejane F. Sabbatini" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2032">
+				<rom name="Tabuada.tzx" size="2032" crc="10cbc653" sha1="6bbc0fe71460933666fc14d953c344186a351e5a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tank">
 		<description>Tank (type-in)</description>
 		<year>198?</year>
@@ -11685,6 +11846,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1042">
 				<rom name="Tank.tzx" size="1042" crc="dca16bb2" sha1="627db84ca22d40bd7fe178e8624c4cf9609c0998"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="temporea">
+		<description>Tempo de Reação (type-in, Encliclopédia Prática de Informática - Volume 1)</description>
+		<year>1984</year>
+		<publisher>Ediciones Nueva Lente / Ediciones Ingelek / Abril Cultural</publisher>
+		<info name="developer" value="Renato M. E. Sabbatini" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2116">
+				<rom name="Tempo de Reacao.tzx" size="2116" crc="4a3e3381" sha1="13864b18ab10a8dfffb67ece28dbb486c20d3676"/>
 			</dataarea>
 		</part>
 	</software>

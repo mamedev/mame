@@ -88,15 +88,15 @@ u16 swp00_device::interpolation_step(u32 speed, u32 sample_counter)
 	// Phase is incorrect, and very weird
 
 	if(speed >= 0x78)
-		return 0x7f;
+        return 0x1f;
 
 	u32 k0 = speed >> 3;
 	u32 k1 = speed & 7;
 
 	if(speed >= 0x58) {
 		k0 -= 10;
-		u32 a = (4 << k0) - 1;
-		u32 b = (2 << k0) - 1;
+		u32 a = (2 << k0) - 1;
+		u32 b = (1 << k0) - 1;
 		static const u8 mx[8] = { 0x00, 0x80, 0x88, 0xa8, 0xaa, 0xea, 0xee, 0xfe };
 		return ((mx[k1] << (sample_counter & 7)) & 0x80) ? a : b;
 	}
@@ -401,7 +401,7 @@ u32 swp00_device::streaming_block::sample_address_get()
 std::string swp00_device::streaming_block::describe() const
 {
 	std::string desc;
-	desc = util::string_format("[%04x %08x %08x %08x] ", m_pitch, m_start, m_loop, m_address) + util::string_format("sample %04x-%04x @ %06x ", m_start, m_loop, m_address);
+	desc = util::string_format("sample %04x-%04x @ %06x ", m_start, m_loop, m_address);
 	switch(m_format >> 6) {
 	case 0: desc += "16"; break;
 	case 1: desc += "12"; break;
@@ -504,12 +504,12 @@ void swp00_device::envelope_block::keyon()
 
 u8 swp00_device::envelope_block::status() const
 {
-	return m_envelope_mode == DECAY_DONE ? 0xff : (m_envelope_mode << 6) | (m_envelope_level >> 6);
+	return (m_envelope_mode << 6) | (m_envelope_level >> 6);
 }
 
 bool swp00_device::envelope_block::active() const
 {
-	return m_envelope_mode != DECAY_DONE;
+	return m_envelope_mode != DECAY_DONE || m_envelope_level < 0x800;
 }
 
 u16 swp00_device::envelope_block::step(u32 sample_counter)
@@ -543,6 +543,7 @@ u16 swp00_device::envelope_block::step(u32 sample_counter)
 				}
 				result = 0;
 			}
+			m_envelope_level = level;
 		}
 		break;
 	}
@@ -574,6 +575,7 @@ u16 swp00_device::envelope_block::step(u32 sample_counter)
 	case DECAY_DONE:
 		break;
 	}
+
 	return result;
 }
 
@@ -589,8 +591,7 @@ u8 swp00_device::envelope_block::attack_speed_r() const
 
 void swp00_device::envelope_block::attack_speed_w(u8 data)
 {
-	if(m_envelope_mode == DECAY_DONE)
-		m_attack_speed = data;
+	m_attack_speed = data;
 }
 
 u8 swp00_device::envelope_block::attack_level_r() const
@@ -610,12 +611,9 @@ u8 swp00_device::envelope_block::decay_speed_r() const
 
 void swp00_device::envelope_block::decay_speed_w(u8 data)
 {
-	if(data & 0x80) {
-		m_decay_speed = data;
+	m_decay_speed = data;
+	if(data & 0x80)
 		m_envelope_mode = DECAY;
-
-	} else if(m_envelope_mode == DECAY_DONE)
-		m_decay_speed = data;
 }
 
 u8 swp00_device::envelope_block::decay_level_r() const

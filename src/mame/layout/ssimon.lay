@@ -200,7 +200,7 @@ authors:hap
 		<element ref="text_2"><bounds x="50.25" y="21.15" width="1" height="0.9" /></element>
 		<element ref="text_1"><bounds x="50.25" y="22.40" width="1" height="0.9" /></element>
 
-		<element ref="text_hh"><bounds x="47.25" y="29.65" width="4" height="0.9" /></element>
+		<element ref="text_hh"><bounds x="47.25" y="29.65" width="3.7" height="0.9" /></element>
 		<element ref="text_1"><bounds x="50.25" y="30.90" width="1" height="0.9" /></element>
 		<element ref="text_2"><bounds x="50.25" y="32.15" width="1" height="0.9" /></element>
 		<element ref="text_3"><bounds x="50.25" y="33.40" width="1" height="0.9" /></element>

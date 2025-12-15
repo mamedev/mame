@@ -74,12 +74,14 @@ public:
 	class file_header
 	{
 	public:
-		file_header(fsblk_t::block_t::ptr &&block, std::string &&filename);
+		file_header(u32 lsn, fsblk_t::block_t::ptr &&block, std::string &&filename);
 		file_header(const file_header &) = delete;
 		file_header(file_header &&) = default;
 
 		file_header &operator=(const file_header &) = delete;
 		file_header &operator=(file_header &&) = default;
+
+		u32 lsn() const { return m_lsn; }
 
 		u8  attributes() const { return m_block->r8(0); }
 		u16 owner_id() const { return m_block->r16b(1); }
@@ -100,6 +102,7 @@ public:
 		void get_sector_map_entry(int entry_number, u32 &start_lsn, u16 &count) const;
 
 	private:
+		u32                     m_lsn;
 		fsblk_t::block_t::ptr   m_block;
 		std::string             m_filename;
 	};
@@ -112,6 +115,7 @@ public:
 	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition format(const meta_data &meta) override;
 
 	std::optional<file_header> find(const std::vector<std::string> &path, std::optional<dir_entry_type> expected_entry_type) const;
@@ -224,6 +228,7 @@ std::vector<meta_description> coco_os9_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
 	results.emplace_back(meta_description(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 32; }, "Volume name, up to 32 characters"));
+	results.emplace_back(meta_description(meta_name::disk_id, 1, true, nullptr, "Disk ID"));
 	results.emplace_back(meta_description(meta_name::creation_date, util::arbitrary_datetime::now(), false, nullptr, "Creation time"));
 	return results;
 }
@@ -292,6 +297,7 @@ meta_data coco_os9_impl::volume_metadata()
 {
 	meta_data results;
 	results.set(meta_name::name, m_volume_header.name());
+	results.set(meta_name::disk_id, m_volume_header.disk_id());
 	results.set(meta_name::creation_date, m_volume_header.creation_date());
 	return results;
 }
@@ -327,7 +333,7 @@ std::pair<std::error_condition, std::vector<dir_entry>> coco_os9_impl::directory
 	std::vector<dir_entry> results;
 	auto callback = [this, &results](std::string &&filename, u32 lsn)
 	{
-		file_header header(m_blockdev.get(lsn), std::move(filename));
+		file_header header(lsn, m_blockdev.get(lsn), std::move(filename));
 		dir_entry_type entry_type = header.is_directory()
 			? dir_entry_type::dir
 			: dir_entry_type::file;
@@ -354,6 +360,37 @@ std::pair<std::error_condition, std::vector<u8>> coco_os9_impl::file_read(const 
 
 	std::vector<u8> data = read_file_data(*header);
 	return std::make_pair(std::error_condition(), std::move(data));
+}
+
+
+//-------------------------------------------------
+//  coco_os9_impl::enum_blocks
+//-------------------------------------------------
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> coco_os9_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	// look up the path
+	std::optional<file_header> header = find(path, dir_entry_type::file);
+	if (!header)
+	{
+		header = find(path, dir_entry_type::dir);
+		if (!header)
+			return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+	}
+
+	std::vector<u32> blocks;
+	int entry_count = header->get_sector_map_entry_count();
+	for (int i = 0; i < entry_count; i++)
+	{
+		u32 start_lsn;
+		u16 count;
+		header->get_sector_map_entry(i, start_lsn, count);
+
+		blocks.resize(blocks.size() + count);
+		std::iota(blocks.end() - count, blocks.end(), start_lsn);
+	}
+
+	return std::make_tuple(std::error_condition(), std::vector<u32>{ header->lsn() }, std::move(blocks));
 }
 
 
@@ -475,7 +512,7 @@ std::error_condition coco_os9_impl::format(const meta_data &meta)
 std::optional<coco_os9_impl::file_header> coco_os9_impl::find(const std::vector<std::string> &path, std::optional<dir_entry_type> expected_entry_type) const
 {
 	u32 lsn = m_volume_header.root_dir_lsn();
-	file_header current(m_blockdev.get(lsn), "");
+	file_header current(lsn, m_blockdev.get(lsn), "");
 
 	// traverse the directory
 	for (const std::string &path_part : path)
@@ -494,7 +531,7 @@ std::optional<coco_os9_impl::file_header> coco_os9_impl::find(const std::vector<
 		// did we find the child?
 		if (!child_lsn)
 			return { };
-		current = file_header(m_blockdev.get(*child_lsn), std::string(path_part));
+		current = file_header(*child_lsn, m_blockdev.get(*child_lsn), std::string(path_part));
 	}
 
 	// ensure that we found the entry type we expect
@@ -685,8 +722,9 @@ std::string coco_os9_impl::volume_header::name() const
 //  file_header ctor
 //-------------------------------------------------
 
-coco_os9_impl::file_header::file_header(fsblk_t::block_t::ptr &&block, std::string &&filename)
-	: m_block(std::move(block))
+coco_os9_impl::file_header::file_header(u32 lsn, fsblk_t::block_t::ptr &&block, std::string &&filename)
+	: m_lsn(lsn)
+	, m_block(std::move(block))
 	, m_filename(std::move(filename))
 {
 }

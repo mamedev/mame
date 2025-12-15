@@ -253,6 +253,7 @@ public:
 	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 	virtual std::error_condition remove(const std::vector<std::string> &path) override;
@@ -668,6 +669,29 @@ std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vect
 		block->read(0, &*(result.end() - length), length);
 	}
 	return std::make_pair(std::error_condition(), std::move(result));
+}
+
+
+//-------------------------------------------------
+//  impl::enum_blocks
+//-------------------------------------------------
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if (path.empty())
+	{
+		// the root directory is treated differently
+		u32 first_sector = m_starting_sector + m_reserved_sector_count + (u32)m_file_allocation_table.size() / m_bytes_per_sector;
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), root_directory_span(*this, first_sector, m_root_directory_size).get_directory_sectors());
+	}
+
+	// find the file
+	std::optional<directory_entry> dirent = find_entity(path);
+	if (!dirent)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	// get the list of sectors for this file
+	return std::make_tuple(std::error_condition(), std::vector<u32>(), get_sectors_from_fat(*dirent));
 }
 
 

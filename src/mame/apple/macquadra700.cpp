@@ -268,10 +268,10 @@ void quadrax00_state::machine_start()
 	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
 	m_sonic->set_mac(&m_mac[0]);
 
-	m_ram_ptr = (u32*)m_ram->pointer();
+	m_ram_ptr = m_ram->pointer<u32>();
 	m_ram_size = m_ram->size()>>1;
 	m_ram_mask = m_ram_size - 1;
-	m_rom_ptr = (u32*)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u32();
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;

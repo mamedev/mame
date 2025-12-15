@@ -156,8 +156,8 @@ authors:hap
 		<element ref="blackb"><bounds x="91" y="47" width="95" height="53" /></element>
 		<group ref="buttons"><bounds x="93" y="48.634" width="87.8" height="45.8" /></group>
 
-		<element ref="blackb"><bounds x="170" y="-1" width="20" height="4" /></element>
-		<element ref="text_switch" inputtag="IN.3" inputmask="0x01"><bounds x="171" y="0" width="13" height="2.7" /></element>
+		<element ref="blackb"><bounds x="168" y="-1" width="20" height="4" /></element>
+		<element ref="text_switch" inputtag="IN.3" inputmask="0x01"><bounds x="169.5" y="0" width="13" height="2.7" /></element>
 	</view>
 
 	<view name="Internal Layout (Screen)">

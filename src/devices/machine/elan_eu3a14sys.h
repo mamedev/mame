@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_TVGAMES_ELAN_EU3A14SYS_H
-#define MAME_TVGAMES_ELAN_EU3A14SYS_H
+#ifndef MAME_MACHINE_ELAN_EU3A14SYS_H
+#define MAME_MACHINE_ELAN_EU3A14SYS_H
 
 #include "elan_eu3a05commonsys.h"
 
@@ -34,4 +34,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A14_SYS, elan_eu3a14sys_device)
 
-#endif // MAME_TVGAMES_ELAN_EU3A14SYS_H
+#endif // MAME_MACHINE_ELAN_EU3A14SYS_H

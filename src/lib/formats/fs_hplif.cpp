@@ -17,6 +17,7 @@
 #include "strformat.h"
 
 #include <array>
+#include <numeric>
 #include <optional>
 #include <set>
 #include <string_view>
@@ -77,6 +78,7 @@ public:
 	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 
 private:
 	fsblk_t::block_t::ptr read_sector(u32 starting_sector) const;
@@ -320,6 +322,37 @@ std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vect
 		iter.append_data(result);
 
 	return std::make_pair(std::error_condition(), std::move(result));
+}
+
+
+//-------------------------------------------------
+//  impl::enum_blocks
+//-------------------------------------------------
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if (path.empty())
+	{
+		// count the directory entries
+		u32 count = 0;
+		iterate_directory_entries([&count](const hplif_dirent &dirent) { count++; return false; });
+
+		fsblk_t::block_t::ptr block = m_blockdev.get(0);
+		std::vector<u32> dir_sectors(std::min(count / 8 + 1, block->r32b(16)));
+		std::iota(dir_sectors.begin(), dir_sectors.end(), block->r32b(8));
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(dir_sectors));
+	}
+	else
+	{
+		// find the file
+		std::optional<hplif_dirent> dirent = dirent_from_path(path);
+		if (!dirent)
+			return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+		std::vector<u32> sectors(big_endianize_int32(dirent->m_sector_count));
+		std::iota(sectors.begin(), sectors.end(), big_endianize_int32(dirent->m_starting_sector));
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(sectors));
+	}
 }
 
 
