@@ -29256,7 +29256,7 @@ ROM_START( fl7_50 )  // Serial 00000069A1C9.
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29282,8 +29282,8 @@ ROM_START( fl7_500 )  // Serial 000000125873.
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
-	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
-	ROM_LOAD( "eserial.bin",  0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_500.bin", 0x0000, 0x0008, CRC(b34d646f) SHA1(bcd6c4475412ecb1904b6732cf44e8f6bfce9d90) )
 ROM_END
 
 /*
@@ -29393,7 +29393,7 @@ ROM_START( fl7_50_gs01 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29422,7 +29422,7 @@ ROM_START( fl7_50_gs02 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29451,7 +29451,7 @@ ROM_START( fl7_50_gs03 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29480,7 +29480,7 @@ ROM_START( fl7_50_gs04 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29509,7 +29509,7 @@ ROM_START( fl7_50_gs05 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29538,7 +29538,7 @@ ROM_START( fl7_50_gs06 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29567,7 +29567,7 @@ ROM_START( fl7_50_gs07 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 /*
@@ -29596,7 +29596,7 @@ ROM_START( fl7_50_gs08 )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
 	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
-	ROM_LOAD( "ds2401_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
 ROM_END
 
 
