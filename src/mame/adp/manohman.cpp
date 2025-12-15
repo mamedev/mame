@@ -236,7 +236,7 @@ static INPUT_PORTS_START( backgamn )
 	PORT_DIPSETTING(0x01, "pro Spiel")            // per Game
 	PORT_DIPNAME(0x02, 0x00, "Spielpreis")        // Game Price
 	PORT_DIPSETTING(0x00, "voller Preis")         // full price
-  PORT_DIPSETTING(0x02, "halber Preis")         // half price
+	PORT_DIPSETTING(0x02, "halber Preis")         // half price
 	PORT_DIPNAME(0x08, 0x00, "Highscore löschen") // Clear Highscore
 	PORT_DIPSETTING(0x00, "nach 30 Tg.")          // after 30 days
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
