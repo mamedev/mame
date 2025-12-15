@@ -405,6 +405,7 @@ void luna_68k_state::luna(machine_config &config)
 	// IOC2
 	M68000(config, m_ioc_cpu, 10_MHz_XTAL);
 	m_ioc_cpu->set_addrmap(AS_PROGRAM, &luna_68k_state::ioc_cpu_map);
+	m_ioc_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &luna_68k_state::ioc_cpuspace_map);
 
 	HD63450(config, m_ioc_dma[0], 20'000'000 / 2, "ioc");
 	HD63450(config, m_ioc_dma[1], 20'000'000 / 2, "ioc");
