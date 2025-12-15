@@ -5267,6 +5267,28 @@ Untested demos
 		</part>
 	</software>
 
+	<!-- '96 Windows version known to exist -->
+	<software name="megamnx" supported="partial">
+		<!-- origin: redump.org -->
+		<!-- http://redump.org/disc/13025/ -->
+		<description>Mega Man X (USA, DOS)</description>
+		<year>1995</year>
+		<publisher>Capcom USA</publisher>
+		<notes><![CDATA[
+https://www.pcgamingwiki.com/wiki/Mega_Man_X
+Unemulated [Capcom pad]
+]]></notes>
+		<info name="barcode" value="0 13388 31001 2"/>
+		<info name="developer" value="Rozner Labs Software Group" />
+		<info name="release" value="19950310" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mega_man_x_(usa)" sha1="9d3f47b36019642ca52b5f43b18f84a0ee1b4fd9"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95/NT4 -->
 	<software name="mfma_addsub">
 		<description>My First Math Adventure: Adding and Subtracting</description>
