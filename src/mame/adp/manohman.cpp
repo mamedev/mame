@@ -239,10 +239,10 @@ static INPUT_PORTS_START( backgamn )
 	PORT_DIPSETTING(0x02, "halber Preis")         // half price
 	PORT_DIPNAME(0x08, 0x00, "Highscore löschen") // Clear Highscore
 	PORT_DIPSETTING(0x00, "nach 30 Tg.")          // after 30 days
-	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x08, DEF_STR(Off))
 	PORT_DIPNAME(0x80, 0x00, "Sprache")           // Language
 	PORT_DIPSETTING(0x00, "deutsch")              // German
-	PORT_DIPSETTING(0x08, "enfglisch")            // English
+	PORT_DIPSETTING(0x80, "englisch")            	// English
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( manohman )
