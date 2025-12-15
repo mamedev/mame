@@ -327,7 +327,8 @@ void nscsi_full_device::step(bool timeout)
 			break;
 		buf_control_push()->action = BC_MSG_OR_COMMAND;
 		scsi_state = TARGET_NEXT_CONTROL;
-		step(false);
+		scsi_timer->adjust(scsi_bus_set_delay(), false);
+		//step(false);
 		break;
 
 	case RECV_BYTE_T_WAIT_ACK_1 << SUB_SHIFT:
@@ -404,7 +405,8 @@ void nscsi_full_device::step(bool timeout)
 			else {
 				scsi_state = TARGET_NEXT_CONTROL;
 			}
-			step(false);
+			scsi_timer->adjust(scsi_bus_set_delay(), false);
+			//step(false);
 			break;
 
 		case BC_DATA_OUT:
@@ -418,7 +420,8 @@ void nscsi_full_device::step(bool timeout)
 			else {
 				scsi_state = TARGET_NEXT_CONTROL;
 			}
-			step(false);
+			scsi_timer->adjust(scsi_bus_set_delay(), false);
+			//step(false);
 			break;
 
 		case BC_MESSAGE_1:
