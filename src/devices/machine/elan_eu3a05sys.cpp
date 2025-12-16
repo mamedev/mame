@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "elan_eu3a05sys.h"
 
+#include "elan_eu3a05_soc.h"
+
 // DMA size and destination are 16-bit here, they're 24-bit on EU3A14
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device, "elan_eu3a05sys", "Elan EU3A05 System")
@@ -36,7 +38,7 @@ device_memory_interface::space_config_vector elan_eu3a05sys_device::memory_space
 	};
 }
 
-void elan_eu3a05sys_device::map(address_map& map)
+void elan_eu3a05sys_device::map(address_map &map)
 {
 	elan_eu3a05commonsys_device::map(map); // 00 - 0e
 	map(0x0f, 0x15).rw(FUNC(elan_eu3a05sys_device::dma_param_r), FUNC(elan_eu3a05sys_device::dma_param_w));
@@ -81,8 +83,8 @@ void elan_eu3a05sys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 	logerror("%s: elan_eu3a05_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;
 
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	address_space& destspace = m_cpu->space(AS_PROGRAM);
+	address_space &extspace = m_cpu->space(elan_eu3a05_soc_device::AS_EXTERNAL);
+	address_space &destspace = m_cpu->space(AS_PROGRAM);
 
 	if (data)
 	{
@@ -94,7 +96,7 @@ void elan_eu3a05sys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 
 		for (int i = 0; i < size; i++)
 		{
-			uint8_t dat = fullbankspace.read_byte(src + i);
+			uint8_t dat = extspace.read_byte(src + i);
 			destspace.write_byte(dest + i, dat);
 		}
 	}

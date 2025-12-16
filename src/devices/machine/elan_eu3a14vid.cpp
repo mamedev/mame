@@ -4,14 +4,14 @@
 #include "emu.h"
 #include "elan_eu3a14vid.h"
 
+#include "elan_eu3a14_soc.h"
+
 DEFINE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device, "elan_eu3a14vid", "Elan EU3A14 Video")
 
 elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A14_VID, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_bank(*this, finder_base::DUMMY_TAG),
-	m_screen(*this, finder_base::DUMMY_TAG),
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 7, 0, address_map_constructor(FUNC(elan_eu3a14vid_device::map), this))
 {
 }
@@ -146,7 +146,7 @@ void elan_eu3a14vid_device::device_reset()
 
 uint8_t elan_eu3a14vid_device::read_vram(int offset)
 {
-	address_space& cpuspace = m_cpu->space(AS_PROGRAM);
+	address_space &cpuspace = m_cpu->space(AS_PROGRAM);
 	int realoffset = offset + 0x200;
 	if (realoffset < 0x4000)
 	{
@@ -156,11 +156,11 @@ uint8_t elan_eu3a14vid_device::read_vram(int offset)
 		return 0x00;
 }
 
-uint32_t elan_eu3a14vid_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t elan_eu3a14vid_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_spriterambase = (m_spriteaddr * 0x200) - 0x200;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(m_palette->pens()[0], cliprect);
 	m_prioritybitmap.fill(0, cliprect);
 
 	draw_background(screen, bitmap, cliprect);
@@ -169,16 +169,16 @@ uint32_t elan_eu3a14vid_device::screen_update(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-void elan_eu3a14vid_device::video_start()
+void elan_eu3a14vid_device::create_bitmaps(screen_device* screen)
 {
-	m_screen->register_screen_bitmap(m_prioritybitmap);
+	screen->register_screen_bitmap(m_prioritybitmap);
 }
 
 
 uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 {
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	return fullbankspace.read_byte((offset+x) & 0x7fffff);
+	address_space &extspace = m_cpu->space(elan_eu3a14_soc_device::AS_EXTERNAL);
+	return extspace.read_byte((offset+x) & 0x7fffff);
 }
 
 uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
@@ -191,14 +191,16 @@ uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
 	}
 	else
 	{
-		address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-		pix =  fullbankspace.read_byte((baseaddr+count) & 0x7fffff);
+		address_space &extspace = m_cpu->space(elan_eu3a14_soc_device::AS_EXTERNAL);
+		pix =  extspace.read_byte((baseaddr+count) & 0x7fffff);
 	}
 	return pix;
 }
 
-void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
+void elan_eu3a14vid_device::draw_background_tile(bitmap_rgb32 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
+	const pen_t *pen = m_palette->pens();
+
 	int baseaddr = base * 256;
 
 	int xstride = 8;
@@ -253,7 +255,7 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 			// RAM tile layer has no scrolling? (or we've never seen it used / enabled)
 		}
 
-		uint16_t *const dst = &bitmap.pix(ypos + y);
+		uint32_t *const dst = &bitmap.pix(ypos + y);
 		uint8_t *const pridst = &m_prioritybitmap.pix(ypos + y);
 
 		for (int x = 0; x < xstride; x++)
@@ -271,7 +273,7 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 						{
 							if (pridst[realx] <= priority)
 							{
-								dst[realx] = pix | palette;
+								dst[realx] = pen[pix | palette];
 								pridst[realx] = priority;
 							}
 
@@ -309,7 +311,7 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 								{
 									if (pridst[realx] <= priority)
 									{
-										dst[realx] = ((pix & mask) >> shift) | palette;
+										dst[realx] = pen[((pix & mask) >> shift) | palette];
 										pridst[realx] = priority;
 									}
 								}
@@ -343,7 +345,7 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 								{
 									if (pridst[realx] <= priority)
 									{
-										dst[realx] = ((pix & mask) >> shift) | palette;
+										dst[realx] = pen[((pix & mask) >> shift) | palette];
 										pridst[realx] = priority;
 									}
 								}
@@ -411,7 +413,7 @@ int elan_eu3a14vid_device::get_xscroll_for_screenypos(int ydraw)
 }
 
 
-void elan_eu3a14vid_device::draw_background_page(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
+void elan_eu3a14vid_device::draw_background_page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
 {
 
 	int palette = ((palettepri & 0xf0) >> 4) | ((palettepri & 0x08) << 1);
@@ -464,7 +466,7 @@ void elan_eu3a14vid_device::draw_background_page(screen_device& screen, bitmap_i
 	}
 }
 
-void elan_eu3a14vid_device::draw_background_ramlayer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+void elan_eu3a14vid_device::draw_background_ramlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// this register use is questionable
 	if (m_ramtilecfg[0] & 0x80)
@@ -523,7 +525,7 @@ void elan_eu3a14vid_device::draw_background_ramlayer(screen_device& screen, bitm
 }
 
 
-void elan_eu3a14vid_device::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void elan_eu3a14vid_device::draw_background(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
 
@@ -655,7 +657,7 @@ void elan_eu3a14vid_device::draw_background(screen_device &screen, bitmap_ind16 
 
 }
 
-void elan_eu3a14vid_device::draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
+void elan_eu3a14vid_device::draw_sprite_pix(const rectangle &cliprect, uint32_t *dst, uint8_t *pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
 {
 	if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 	{
@@ -663,14 +665,15 @@ void elan_eu3a14vid_device::draw_sprite_pix(const rectangle& cliprect, uint16_t*
 		{
 			if (pix & mask)
 			{
-				dst[realx] = ((pix & mask) >> shift) | palette;
+				const pen_t *pen = m_palette->pens();
+				dst[realx] = pen[((pix & mask) >> shift) | palette];
 				pridst[realx] = priority;
 			}
 		}
 	}
 }
 
-void elan_eu3a14vid_device::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int palette, int flipx, int priority, int xpos, int ypos, int bpp)
+void elan_eu3a14vid_device::draw_sprite_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offset, int line, int palette, int flipx, int priority, int xpos, int ypos, int bpp)
 {
 	offset = offset * 2;
 
@@ -707,7 +710,7 @@ void elan_eu3a14vid_device::draw_sprite_line(screen_device &screen, bitmap_ind16
 
 	if (ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 	{
-		uint16_t *const dst = &bitmap.pix(ypos);
+		uint32_t *const dst = &bitmap.pix(ypos);
 		uint8_t *const pridst = &m_prioritybitmap.pix(ypos);
 
 		int count = 0;
@@ -782,7 +785,7 @@ void elan_eu3a14vid_device::draw_sprite_line(screen_device &screen, bitmap_ind16
 }
 
 
-void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int i = m_spriterambase; i < m_spriterambase + 0x800; i += 8)
 	{

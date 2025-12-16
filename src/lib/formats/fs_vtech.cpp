@@ -48,6 +48,7 @@ public:
 	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
 	virtual std::error_condition format(const meta_data &meta) override;
@@ -318,6 +319,52 @@ std::pair<std::error_condition, std::vector<u8>> vtech_impl::file_read(const std
 		sector = dblk->r8(127);
 	}
 	return std::make_pair(std::error_condition(), data);
+}
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> vtech_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if(path.empty()) {
+		std::vector<u32> blocks;
+
+		for(int sect = 0; sect != 14; sect++) {
+			blocks.push_back(sect);
+			auto bdir = m_blockdev.get(sect);
+			for(u32 i = 0; i != 8; i++) {
+				u32 off = i*16;
+				u8 type = bdir->r8(off);
+				if(type == 0x00)
+					goto done;
+			}
+		}
+	done:
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(blocks));
+	}
+
+	if(path.size() != 1)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	auto [bdir, off] = file_find(path[0]);
+	if(off == 0xffffffff)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	u8 track = bdir->r8(off + 0xa);
+	u8 sector = bdir->r8(off + 0xb);
+	int len = (bdir->r16l(off + 0xe) - bdir->r16l(off + 0xc)) & 0xffff;
+	std::vector<u32> blocks;
+
+	while(len != 0) {
+		if(track >= 40 || sector >= 16)
+			return std::make_tuple(error::invalid_block, std::vector<u32>(), std::move(blocks));
+		if(std::find(blocks.begin(), blocks.end(), track*16 + sector) != blocks.end())
+			return std::make_tuple(error::circular_reference, std::vector<u32>(), std::move(blocks));
+		blocks.push_back(track*16 + sector);
+		auto dblk = m_blockdev.get(track*16 + sector);
+		len = (len < 126) ? 0 : len - 126;
+		track = dblk->r8(126);
+		sector = dblk->r8(127);
+	}
+
+	return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(blocks));
 }
 
 std::error_condition vtech_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)

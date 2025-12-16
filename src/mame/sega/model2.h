@@ -443,6 +443,7 @@ class model2o_gtx_state : public model2o_state
 public:
 	model2o_gtx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: model2o_state(mconfig, type, tag)
+		, m_prot_data(*this, "prot_data")
 	{}
 
 	void daytona_gtx(machine_config &config);
@@ -451,6 +452,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	required_region_ptr<u32> m_prot_data;
 	int m_gtx_state = 0;
 
 	u8 gtx_r(offs_t offset);

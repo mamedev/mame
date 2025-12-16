@@ -30,15 +30,13 @@ authors:hap
 <!-- panel text -->
 
 	<element name="text_door">
-		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
 		<text string="doors" align="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="text_lets">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-		<text string="LET'S GO BY TRAIN!" align="1">
+		<text string="LET'S GO BY TRAIN!">
 			<color red="0.3" green="0.6" blue="0.9" />
 		</text>
 	</element>
@@ -47,38 +45,32 @@ authors:hap
 <!-- throttle -->
 
 	<element name="text_throttle">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="THROTTLE:" align="1">
 			<color red="0.8" green="0.8" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_dot">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<text string="." align="1">
+		<text string="." align="0">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
 	<element name="text_kmh">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="km/h" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="counter_throttle" defstate="0">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_speed1" defstate="0">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<simplecounter maxstate="999" digits="3" align="1">
+		<simplecounter maxstate="999" digits="3" align="2">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_speed2" defstate="0">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
@@ -88,26 +80,22 @@ authors:hap
 <!-- brake -->
 
 	<element name="text_brake">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="BRAKE:" align="1">
 			<color red="0.8" green="0.8" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_kpa">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<text string="kPa" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="counter_brake" defstate="0">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="99" digits="2" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
 	</element>
 	<element name="counter_pressure" defstate="0">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 		<simplecounter maxstate="9999" digits="4" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</simplecounter>
@@ -124,7 +112,7 @@ authors:hap
 	<element name="lamp_power" defstate="0">
 		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string="PWR">
+		<text string=" PWR ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.333" width="1.0" height="0.333" />
 		</text>
@@ -133,7 +121,7 @@ authors:hap
 	<element name="lamp_normal" defstate="0">
 		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string="OK">
+		<text string=" OK ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.333" width="1.0" height="0.333" />
 		</text>
@@ -142,7 +130,7 @@ authors:hap
 	<element name="lamp_emergency" defstate="0">
 		<rect state="1"><color red="1.0" green="0.1" blue="0.1" /></rect>
 		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
-		<text string="EME">
+		<text string=" EME ">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.333" width="1.0" height="0.333" />
 		</text>
@@ -173,8 +161,6 @@ authors:hap
 	</element>
 
 
-
-
 <!-- build screen -->
 
 	<view name="Simple Artwork">
@@ -183,8 +169,7 @@ authors:hap
 			<bounds left="0" right="400" top="0" bottom="300" />
 		</screen>
 
-<!-- static background -->
-
+		<!-- static background -->
 		<element ref="static_black">
 			<bounds left="0" right="400" top="300" bottom="330" />
 		</element>
@@ -211,12 +196,10 @@ authors:hap
 		</element>
 
 		<element ref="text_lets">
-			<bounds x="264" y="306" width="85" height="10" />
+			<bounds xc="302.75" y="306" width="75" height="10" />
 		</element>
 
-
-<!-- lamps -->
-
+		<!-- lamps -->
 		<element name="lamp4" ref="lamp_power">
 			<bounds x="8" y="304" width="17" height="24" />
 		</element>
@@ -250,38 +233,36 @@ authors:hap
 			<bounds x="370" y="300" width="20" height="20" />
 		</element>
 
-
-<!-- meters -->
-
+		<!-- meters -->
 		<element ref="text_throttle">
-			<bounds x="121" y="306" width="45" height="10" />
+			<bounds x="121" y="306" width="40" height="10" />
 		</element>
 		<element name="counter0" ref="counter_throttle">
 			<bounds x="164" y="306" width="10" height="10" />
 		</element>
 
 		<element name="counter2" ref="counter_speed1">
-			<bounds x="121" y="316" width="30" height="10" />
+			<bounds x="121" y="316" width="13.5" height="10" />
 		</element>
 		<element ref="text_dot">
-			<bounds x="134" y="316" width="10" height="10" />
+			<bounds x="134" y="316" width="3" height="10" />
 		</element>
 		<element name="counter3" ref="counter_speed2">
-			<bounds x="137" y="316" width="10" height="10" />
+			<bounds x="137" y="316" width="4.25" height="10" />
 		</element>
 		<element ref="text_kmh">
 			<bounds x="146" y="316" width="30" height="10" />
 		</element>
 
 		<element ref="text_brake">
-			<bounds x="180" y="306" width="40" height="10" />
+			<bounds x="180" y="306" width="27" height="10" />
 		</element>
 		<element name="counter1" ref="counter_brake">
 			<bounds x="209" y="306" width="12" height="10" />
 		</element>
 
 		<element name="counter4" ref="counter_pressure">
-			<bounds x="180" y="316" width="30" height="10" />
+			<bounds x="180" y="316" width="18" height="10" />
 		</element>
 		<element ref="text_kpa">
 			<bounds x="201" y="316" width="18" height="10" />

@@ -106,6 +106,42 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/elan_eu3a14_soc.h,MACHINES["ELAN_6502_SOC"] = true
+--@src/devices/machine/elan_eu3a05_soc.h,MACHINES["ELAN_6502_SOC"] = true
+--@src/devices/machine/elan_ep3a19a_soc.h,MACHINES["ELAN_6502_SOC"] = true
+---------------------------------------------------
+
+if (MACHINES["ELAN_6502_SOC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/elan_ep3a19asys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_ep3a19asys.h",
+		MAME_DIR .. "src/devices/machine/elan_ep3a19a_soc.cpp",
+		MAME_DIR .. "src/devices/machine/elan_ep3a19a_soc.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonsys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonsys.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonvid.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonvid.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05gpio.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05gpio.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05sys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05sys.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05vid.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05vid.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_a.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_a.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_soc.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_soc.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14sys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14sys.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14vid.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14vid.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14_soc.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14_soc.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/acorn_lc.h,MACHINES["ACORN_LC"] = true
 ---------------------------------------------------
 

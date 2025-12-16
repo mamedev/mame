@@ -66,6 +66,7 @@
 
 #include <bitset>
 #include <map>
+#include <numeric>
 #include <stdexcept>
 
 using namespace fs;
@@ -115,6 +116,8 @@ namespace {
 		virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 
 		virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+
+		virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 
 		virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
@@ -455,6 +458,38 @@ std::pair<std::error_condition, std::vector<u8>> hp98x5_impl::file_read(const st
 		}
 	}
 	return std::make_pair(err, std::vector<u8>{});
+}
+
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> hp98x5_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if (path.empty()) {
+		ensure_dir_loaded();
+		std::vector<u32> sectors(m_dir.size() / (SECTOR_SIZE / DIR_ENTRY_SIZE) + 1);
+		std::iota(sectors.begin(), sectors.end(), m_dir_start);
+		return std::make_tuple(std::error_condition(), std::vector<u32>{}, std::move(sectors));
+	}
+
+	if (path.size() != 1) {
+		return std::make_tuple(error::not_found, std::vector<u32>{}, std::vector<u32>{});
+	}
+	std::string basename;
+	int bpr;
+	u8 file_type;
+
+	auto err = parse_filename(path.front(), basename, bpr, file_type);
+
+	if (!err) {
+		auto it = find_file(basename, bpr, file_type);
+		if (it == m_dir.end()) {
+			err = error::not_found;
+		} else {
+			std::vector<u32> sectors(it->m_sectors);
+			std::iota(sectors.begin(), sectors.end(), it->m_1st_sect);
+			return std::make_tuple(std::error_condition(), std::vector<u32>{}, std::move(sectors));
+		}
+	}
+	return std::make_tuple(err, std::vector<u32>{}, std::vector<u32>{});
 }
 
 std::error_condition hp98x5_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)

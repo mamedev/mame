@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H
-#define MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H
+#ifndef MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
+#define MAME_MACHINE_ELAN_EU3A05COMMONSYS_H
 
 #include "cpu/m6502/m6502.h"
-#include "machine/bankdev.h"
 
 class elan_eu3a05commonsys_device : public device_t
 {
@@ -14,9 +13,10 @@ public:
 	elan_eu3a05commonsys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
 	void set_pal(void) { m_is_pal = true; }
 	void disable_timer_irq(void) { m_allow_timer_irq = false; }
+
+	auto bank_change_callback() { return m_bankchange_cb.bind(); }
 
 	void generate_custom_interrupt(int level);
 
@@ -34,7 +34,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(unknown_timer_tick);
 
 	required_device<m6502_device> m_cpu;
-	required_device<address_map_bank_device> m_bank;
 
 	uint8_t m_intmask[2]{};
 
@@ -49,7 +48,7 @@ protected:
 	bool m_is_pal; // this is usually a jumper connected to the chip that the software can read (clocks also differ on PAL units)
 	bool m_allow_timer_irq;
 	bool m_bank_on_low_bank_writes;
-private:
+protected:
 	uint8_t intmask_r(offs_t offset);
 	void intmask_w(offs_t offset, uint8_t data);
 
@@ -65,9 +64,10 @@ private:
 
 	emu_timer *m_unk_timer = nullptr;
 	int m_whichtimer;
+	devcb_write16 m_bankchange_cb;
 
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_COMMONSYS, elan_eu3a05commonsys_device)
 
-#endif // MAME_TVGAMES_ELAN_EU3A05COMMONSYS_H
+#endif // MAME_MACHINE_ELAN_EU3A05COMMONSYS_H

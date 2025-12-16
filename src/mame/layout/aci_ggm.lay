@@ -64,7 +64,7 @@ authors:hap
 	<element name="text_r1"><text string="MEM"><color red="0.3" green="0.3" blue="0.3" /></text></element>
 	<element name="text_r2"><text string="ON"><color red="0.3" green="0.3" blue="0.3" /></text></element>
 
-	<element name="text_boris01" defstate="0"><text state="1" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_boris01" defstate="0"><text state="1" string=" RESTORE "><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_boris02" defstate="0"><text state="1" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_boris03" defstate="0"><text state="1" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_boris04" defstate="0"><text state="1" string="9"><color red="0.55" green="0.6" blue="0.35" /></text></element>
@@ -86,7 +86,7 @@ authors:hap
 	<element name="text_boris19" defstate="0"><text state="1" string="B/W"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_boris20" defstate="0"><text state="1" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 
-	<element name="text_morphy01" defstate="0"><text state="2" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_morphy01" defstate="0"><text state="2" string=" RESTORE "><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_morphy02" defstate="0"><text state="2" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_morphy03" defstate="0"><text state="2" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_morphy04" defstate="0"><text state="2" string="AUDIO"><color red="0.55" green="0.6" blue="0.35" /></text></element>
@@ -108,7 +108,7 @@ authors:hap
 	<element name="text_morphy19" defstate="0"><text state="2" string="B/W"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_morphy20" defstate="0"><text state="2" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 
-	<element name="text_steinitz01a" defstate="0"><text state="3" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_steinitz01a" defstate="0"><text state="3" string=" RESTORE "><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_steinitz01b" defstate="0"><text state="3" string="TIMING"><color red="0.05" green="0.7" blue="0.15" /></text></element>
 	<element name="text_steinitz02" defstate="0"><text state="3" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_steinitz03" defstate="0"><text state="3" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
@@ -143,7 +143,7 @@ authors:hap
 	<element name="text_lasvegas03" defstate="0"><text state="4" string="8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas04" defstate="0"><text state="4" string="9"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas05" defstate="0"><text state="4" string="CE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
-	<element name="text_lasvegas06a" defstate="0"><text state="4" string="SHUFFLE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_lasvegas06a" defstate="0"><text state="4" string=" SHUFFLE "><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas06b" defstate="0"><text state="4" string="POINT"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas07" defstate="0"><text state="4" string="4"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas08" defstate="0"><text state="4" string="5"><color red="0.55" green="0.6" blue="0.35" /></text></element>
@@ -162,7 +162,7 @@ authors:hap
 	<element name="text_lasvegas19" defstate="0"><text state="4" string="HIT"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas20" defstate="0"><text state="4" string="ENTER"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 
-	<element name="text_odin01" defstate="0"><text state="5" string="RESTORE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_odin01" defstate="0"><text state="5" string=" RESTORE "><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_odin02" defstate="0"><text state="5" string="G.7"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_odin03" defstate="0"><text state="5" string="H.8"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_odin04" defstate="0"><text state="5" string="AUDIO"><color red="0.55" green="0.6" blue="0.35" /></text></element>
@@ -406,8 +406,8 @@ authors:hap
 		<element ref="text_lasvegas12" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="7.5" width="3.3" height="1.7" /></element>
 		<element ref="text_lasvegas13" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="8.1" y="7.5" width="3.3" height="1.7" /></element>
 		<element ref="text_lasvegas14" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="12.1" y="7.5" width="3.3" height="1.7" /></element>
-		<element ref="text_lasvegas15a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.45" y="7.75" width="3.0" height="0.8" /></element>
-		<element ref="text_lasvegas15b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.45" y="8.45" width="3.0" height="0.8" /></element>
+		<element ref="text_lasvegas15a" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.4" y="7.75" width="2.8" height="0.8" /></element>
+		<element ref="text_lasvegas15b" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="16.4" y="8.45" width="2.8" height="0.8" /></element>
 
 		<element ref="text_lasvegas16" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="0.1" y="11.5" width="3.3" height="0.8" /></element>
 		<element ref="text_lasvegas17" inputtag="IN.6" inputmask="0x0f" inputraw="yes" blend="add"><bounds x="4.1" y="11.0" width="3.3" height="1.7" /></element>

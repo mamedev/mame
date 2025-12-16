@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_TVGAMES_ELAN_EU3A05GPIO_H
-#define MAME_TVGAMES_ELAN_EU3A05GPIO_H
+#ifndef MAME_MACHINE_ELAN_EU3A05GPIO_H
+#define MAME_MACHINE_ELAN_EU3A05GPIO_H
 
 
 class elan_eu3a05gpio_device : public device_t
@@ -10,12 +10,8 @@ class elan_eu3a05gpio_device : public device_t
 public:
 	elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto write_0_callback() { return m_write_0_callback.bind(); }
-	auto write_1_callback() { return m_write_1_callback.bind(); }
-	auto write_2_callback() { return m_write_2_callback.bind(); }
-	auto read_0_callback() { return m_read_0_callback.bind(); }
-	auto read_1_callback() { return m_read_1_callback.bind(); }
-	auto read_2_callback() { return m_read_2_callback.bind(); }
+	template <int Port> auto write_callback() { return m_write_callback[Port].bind(); }
+	template <int Port> auto read_callback() { return m_read_callback[Port].bind(); }
 
 	uint8_t gpio_r(offs_t offset);
 	void gpio_w(offs_t offset, uint8_t data);
@@ -28,12 +24,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	devcb_write8 m_write_0_callback;
-	devcb_write8 m_write_1_callback;
-	devcb_write8 m_write_2_callback;
-	devcb_read8 m_read_0_callback;
-	devcb_read8 m_read_1_callback;
-	devcb_read8 m_read_2_callback;
+	devcb_read8::array<3> m_read_callback;
+	devcb_write8::array<3> m_write_callback;
 
 	uint8_t read_port_data(int which);
 	uint8_t read_direction(int which);
@@ -46,4 +38,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_GPIO, elan_eu3a05gpio_device)
 
-#endif // MAME_TVGAMES_RAD_EU3A05GPIO_H
+#endif // MAME_MACHINE_RAD_EU3A05GPIO_H

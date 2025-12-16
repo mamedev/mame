@@ -13,11 +13,11 @@ authors:hap
 
 	<element name="text_erase">
 		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="ERASE" align="1"><color red="0.66" green="0.66" blue="0.66" /></text>
+		<text string="ERASE" align="2"><color red="0.66" green="0.66" blue="0.66" /></text>
 	</element>
 	<element name="text_color">
 		<rect><color red="1" green="1" blue="1" /></rect>
-		<text string="COLOR" align="1"><color red="0.66" green="0.66" blue="0.66" /></text>
+		<text string="COLOR" align="2"><color red="0.66" green="0.66" blue="0.66" /></text>
 	</element>
 
 	<element name="led" defstate="0">
@@ -61,12 +61,12 @@ authors:hap
 
 		<element ref="white"><bounds x="0" y="0" width="401" height="10" /></element>
 
-		<element ref="text_erase" blend="multiply"><bounds x="16" yc="5" width="30" height="6" /></element>
+		<element ref="text_erase" blend="multiply"><bounds x="0" yc="5" width="30" height="6" /></element>
 		<element name="led" ref="led"><bounds x="33" yc="5" width="4" height="4" /></element>
 
 		<element ref="color" inputtag="AN0" inputmask="0xff" inputraw="yes"><bounds x="54" y="2" width="360" height="6" /></element>
 		<element ref="nothing" clickthrough="no"><bounds x="54" y="2" width="360" height="6" /></element> <!-- block clickable input -->
-		<element ref="text_color" blend="multiply"><bounds x="55" yc="5" width="30" height="6" /></element>
+		<element ref="text_color" blend="multiply"><bounds x="40" yc="5" width="30" height="6" /></element>
 
 		<element ref="black"><bounds x="400" y="-1" width="40" height="12" /></element>
 

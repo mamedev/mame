@@ -54,6 +54,8 @@ namespace {
 
 		virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 
+		virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
+
 		virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
 		virtual std::error_condition format(const meta_data &meta) override;
@@ -173,9 +175,9 @@ namespace {
 		void check_map();
 		std::vector<u8> encode_dir() const;
 		void store_dir_map();
-		dir_t::iterator scan_dir(const std::string& name);
+		dir_t::iterator scan_dir(std::string_view name);
 		static meta_data get_metadata(const entry& e);
-		std::pair<const lba_list*, unsigned> find_file(const std::string& name);
+		std::pair<const lba_list*, unsigned> find_file(std::string_view name);
 		std::pair<const lba_list*, unsigned> find_file(const std::vector<std::string> &path);
 		lba_list get_file_allocation(lba_t first_link, unsigned size, sect_map& in_use);
 		std::vector<u8> get_file_content(const lba_list& sects, unsigned size);
@@ -338,6 +340,24 @@ std::pair<std::error_condition, std::vector<u8>> isis_impl::file_read(const std:
 		return std::make_pair(std::error_condition(), std::move(file_data));
 	}
 	return std::make_pair(error::not_found, std::vector<u8>{});
+}
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> isis_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	const auto& [ lbas, size ] = path.empty() ? find_file(ISIS_DIR) : find_file(path);
+	if (lbas != nullptr) {
+		std::vector<u32> alloc_blocks;
+		std::vector<u32> data_blocks;
+		for (unsigned idx = 0; idx < lbas->size(); idx++) {
+			// Skip over linkage blocks
+			if ((idx % (PTRS_PER_BLOCK + 1)) != 0)
+				data_blocks.push_back((*lbas)[ idx ]);
+			else
+				alloc_blocks.push_back((*lbas)[ idx ]);
+		}
+		return std::make_tuple(std::error_condition(), std::move(alloc_blocks), std::move(data_blocks));
+	}
+	return std::make_tuple(error::not_found, std::vector<u32>{}, std::vector<u32>{});
 }
 
 std::error_condition isis_impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
@@ -724,7 +744,7 @@ void isis_impl::store_dir_map()
 	store_file_content(map_lbas, map_content);
 }
 
-isis_impl::dir_t::iterator isis_impl::scan_dir(const std::string& name)
+isis_impl::dir_t::iterator isis_impl::scan_dir(std::string_view name)
 {
 	for (auto it = m_dir.begin(); it != m_dir.end(); it++) {
 		if (it->m_alloc_state == DIR_IN_USE && it->m_name == name) {
@@ -753,7 +773,7 @@ meta_data isis_impl::get_metadata(const entry& e)
 	return meta;
 }
 
-std::pair<const isis_impl::lba_list*, unsigned> isis_impl::find_file(const std::string& name)
+std::pair<const isis_impl::lba_list*, unsigned> isis_impl::find_file(std::string_view name)
 {
 	ensure_dir_loaded();
 

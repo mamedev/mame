@@ -149,8 +149,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="1" string="兵">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="1" string="兵" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.9" green="0.05" blue="0.05" />
 		</text>
 
@@ -162,8 +162,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="2" string="炮">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="2" string="炮" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -175,8 +175,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="3" string="車">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="3" string="車" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -188,8 +188,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="4" string="馬">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="4" string="馬" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -201,8 +201,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="5" string="相">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="5" string="相" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -214,8 +214,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="6" string="仕">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="6" string="仕" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -227,8 +227,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="7" string="帥">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="7" string="帥" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -241,8 +241,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="8" string="卒">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="8" string="卒" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -254,8 +254,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="9" string="砲">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="9" string="砲" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -267,8 +267,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="10" string="車">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="10" string="車" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -280,8 +280,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="11" string="馬">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="11" string="馬" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -293,8 +293,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="12" string="象">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="12" string="象" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -306,8 +306,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="13" string="士">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="13" string="士" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -319,8 +319,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="14" string="將">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="14" string="將" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 	</element>
@@ -338,8 +338,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="15" string="兵">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="15" string="兵" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -351,8 +351,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="16" string="炮">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="16" string="炮" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -364,8 +364,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="17" string="車">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="17" string="車" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -377,8 +377,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="18" string="馬">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="18" string="馬" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -390,8 +390,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="19" string="相">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="19" string="相" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -403,8 +403,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="20" string="仕">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="20" string="仕" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -416,8 +416,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="21" string="帥">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="21" string="帥" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0.85" green="0.05" blue="0.05" />
 		</text>
 
@@ -430,8 +430,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="22" string="卒">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="22" string="卒" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -443,8 +443,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="23" string="砲">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="23" string="砲" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -456,8 +456,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="24" string="車">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="24" string="車" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -469,8 +469,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="25" string="馬">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="25" string="馬" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -482,8 +482,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="26" string="象">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="26" string="象" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -495,8 +495,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="27" string="士">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="27" string="士" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 
@@ -508,8 +508,8 @@ authors:hap
 			<bounds xc="0.5" yc="0.5" width="0.65" height="0.65" />
 			<color red="1" green="1" blue="1" />
 		</disk>
-		<text state="28" string="將">
-			<bounds xc="0.51" yc="0.48" width="0.6" height="0.6" />
+		<text state="28" string="將" align="1">
+			<bounds xc="0.545" yc="0.5" width="0.6" height="0.6" />
 			<color red="0" green="0.25" blue="0" />
 		</text>
 	</element>
@@ -817,11 +817,11 @@ authors:hap
 		<element ref="but1b"><bounds x="10" yc="90" width="10" height="5" /></element>
 		<element ref="but1b"><bounds x="10" yc="100" width="10" height="5" /></element>
 
-		<element ref="text_bw1"><bounds x="10" y="7.9" width="10" height="2.2" /></element>
-		<element ref="text_bw1a"><bounds x="10" y="9.9" width="10" height="2.2" /></element>
-		<element ref="text_bw2"><bounds x="10" y="87.9" width="10" height="2.2" /></element>
-		<element ref="text_bw2a"><bounds x="10" y="89.9" width="10" height="2.2" /></element>
-		<element ref="text_bw3"><bounds x="10" yc="100" width="10" height="2.2" /></element>
+		<element ref="text_bw1"><bounds xc="15" y="7.9" width="7.5" height="2.2" /></element>
+		<element ref="text_bw1a"><bounds xc="15" y="9.9" width="7.5" height="2.2" /></element>
+		<element ref="text_bw2"><bounds xc="15" y="87.9" width="7.5" height="2.2" /></element>
+		<element ref="text_bw2a"><bounds xc="15" y="89.9" width="7.5" height="2.2" /></element>
+		<element ref="text_bw3"><bounds xc="15" yc="100" width="7.5" height="2.2" /></element>
 
 		<element ref="but1a" inputtag="IN.0" inputmask="0x200"><bounds x="10" yc="10" width="10" height="5" /><color alpha="0.2" /></element>
 		<element ref="but1a" inputtag="IN.0" inputmask="0x02"><bounds x="10" yc="90" width="10" height="5" /><color alpha="0.2" /></element>
@@ -829,13 +829,13 @@ authors:hap
 
 		<repeat count="7">
 			<param name="y" start="20" increment="10" />
-			<param name="yl" start="19.85" increment="10" />
+			<param name="yl" start="19.95" increment="10" />
 			<param name="i" start="1" increment="1" />
 			<param name="mask" start="0x100" rshift="1" />
 
 			<element ref="but2b"><bounds x="10" yc="~y~" width="10" height="5" /></element>
-			<element ref="text_br~i~"><bounds x="9.9" yc="~yl~" width="5" height="4" /></element>
-			<element ref="text_bg~i~"><bounds x="15.15" yc="~yl~" width="5" height="4" /></element>
+			<element ref="text_br~i~"><bounds x="9.85" yc="~yl~" width="5" height="4" /></element>
+			<element ref="text_bg~i~"><bounds x="15.05" yc="~yl~" width="5" height="4" /></element>
 			<element ref="but2a" inputtag="IN.0" inputmask="~mask~"><bounds x="10" yc="~y~" width="10" height="5" /><color alpha="0.12" /></element>
 		</repeat>
 

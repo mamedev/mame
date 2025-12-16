@@ -14,6 +14,7 @@
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -32,6 +33,7 @@ enum class error : int {
 	invalid_name,
 	incorrect_size,
 	already_exists,
+	circular_reference,
 };
 
 enum class dir_entry_type {
@@ -152,6 +154,9 @@ public:
 
 	// Replace the resource fork of a file, the file must already exist
 	virtual std::error_condition file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data);
+
+	// Enumerate the blocks used by a file or directory.  If path is empty, list blocks for root directory.
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path);
 
 	// Format an image, provide the volume metadata
 	virtual std::error_condition format(const meta_data &meta);

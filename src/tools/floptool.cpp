@@ -61,6 +61,10 @@ static const command_info s_command_usage[] =
 		"List hashes for each file on a floppy image"
 	},
 	{
+		"flopblocks", "input_format filesystem <image>",
+		"Enumerate blocks used by each file/directory on a floppy image"
+	},
+	{
 		"flopread", "input_format filesystem <image> <path> <outputfile>",
 		"Extract a file from a floppy image"
 	},
@@ -87,6 +91,10 @@ static const command_info s_command_usage[] =
 	{
 		"hdhashes", "filesystem <image>",
 		"List hashes for each file on a hard disk image"
+	},
+	{
+		"hdblocks", "filesystem <image>",
+		"Enumerate blocks used by each file/directory on a hard disk image"
 	},
 	{
 		"hdread", "filesystem <image> <path> <outputfile>",
@@ -752,6 +760,146 @@ static int flophashes(int argc, char *argv[])
 	return generic_hashes(ih);
 }
 
+static std::string blocks_to_string(const std::vector<u32> &blocks)
+{
+	std::string str;
+	for(u32 i = 0; i != blocks.size(); i++) {
+		if(i != 0)
+			str += ",";
+		str += std::to_string(blocks[i]);
+		if(i+1 < blocks.size()) {
+			using s32 = std::int32_t;
+			s32 delta = blocks[i+1] - blocks[i];
+			if(delta == 1 || delta == -1) {
+				u32 j = i+1;
+				while(j+1 != blocks.size() && s32(blocks[j+1] - blocks[j]) == delta)
+					j++;
+				str += "-" + std::to_string(blocks[j]);
+				i = j;
+			}			
+		}
+	}
+	return str;
+}
+
+static std::error_condition dir_scan_blocks(fs::filesystem_t *fs, u32 depth, const std::vector<std::string> &path, std::vector<std::vector<std::string>> &entries)
+{
+	std::string head;
+	for(u32 i = 0; i != depth; i++)
+		head += "  ";
+	auto [err, contents] = fs->directory_contents(path);
+	if(err)
+		return err;
+	for(const auto &c : contents) {
+		size_t id = entries.size();
+		entries.resize(id+1);
+		entries[id].resize(entries[0].size());
+		auto npath = path;
+		npath.push_back(c.m_name);
+		auto [err, alloc_blocks, data_blocks] = fs->enum_blocks(npath);
+		switch(c.m_type) {
+		case fs::dir_entry_type::dir: {
+			entries[id][0] = head + "dir  " + c.m_name;
+			entries[id][1] = blocks_to_string(alloc_blocks);
+			if(data_blocks.empty())
+				entries[id][2] = err ? err.message() : "nil";
+			else
+				entries[id][2] = blocks_to_string(data_blocks);
+			if(std::error_condition err2 = dir_scan_blocks(fs, depth+1, npath, entries)) {
+				entries.resize(id+2);
+				entries[id+1].resize(entries[0].size());
+				entries[id+1][2] = err2.message();
+			}
+			break;
+		}
+		case fs::dir_entry_type::file: {
+			entries[id][0] = head + "file " + c.m_name;
+			entries[id][1] = blocks_to_string(alloc_blocks);
+			if(data_blocks.empty())
+				entries[id][2] = err ? err.message() : "nil";
+			else {
+				entries[id][2] = blocks_to_string(data_blocks);
+				if(err) {
+					entries.resize(id+2);
+					entries[id+1].resize(entries[0].size());
+					entries[id+1][2] = err.message();
+				}
+			}
+			break;
+		}
+		}
+	}
+	return std::error_condition();
+}
+
+static int generic_blocks(image_handler &ih)
+{
+	auto [fsm, fs] = ih.get_fs();
+
+	auto [err0, alloc_blocks, data_blocks] = fs->enum_blocks(std::vector<std::string>());
+	if(err0 && alloc_blocks.empty() && data_blocks.empty()) {
+		fprintf(stderr, "Error scanning root directory: %s\n", err0.message().c_str());
+		return 1;
+	}
+
+	std::vector<std::vector<std::string>> entries(2);
+	entries[0].push_back("name");
+	entries[0].push_back("alloc_blocks");
+	entries[0].push_back("data_blocks");
+	entries[1].push_back("root");
+	entries[1].push_back(blocks_to_string(alloc_blocks));
+	entries[1].push_back(blocks_to_string(data_blocks));
+
+	std::error_condition err = dir_scan_blocks(fs, 0, std::vector<std::string>(), entries);
+	if(err) {
+		fprintf(stderr, "Error scanning directory: %s\n", err.message().c_str());
+		return 1;
+	}
+
+	dir_report(entries, entries[0].size());
+
+	return 0;
+}
+
+static int flopblocks(int argc, char *argv[])
+{
+	if(argc!=5) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(stderr, argv[0], argv[1]);
+		return 1;
+	}
+
+	image_handler ih;
+	ih.set_on_disk_path(argv[4]);
+
+	const floppy_format_info *source_format = find_floppy_source_format(argv[2], ih);
+	if(!source_format)
+		return 1;
+
+	auto fs = formats.find_filesystem_format_by_key(argv[3]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[3]);
+		return 1;
+	}
+
+	if(ih.floppy_load(*source_format)) {
+		fprintf(stderr, "Error: Loading as format '%s' failed\n", source_format->m_format->name());
+		return 1;
+	}
+
+	if(ih.floppy_mount_fs(*fs)) {
+		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
+		return 1;
+	}
+
+	return generic_blocks(ih);
+}
+
 static int hdhashes(int argc, char *argv[])
 {
 	if(argc!=4) {
@@ -780,6 +928,36 @@ static int hdhashes(int argc, char *argv[])
 	}
 
 	return generic_hashes(ih);
+}
+
+static int hdblocks(int argc, char *argv[])
+{
+	if(argc!=4) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage(stderr, argv[0], argv[1]);
+		return 1;
+	}
+
+	image_handler ih;
+	ih.set_on_disk_path(argv[3]);
+
+	auto fs = formats.find_filesystem_format_by_key(argv[2]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+		return 1;
+	}
+
+	if(ih.hd_mount_fs(*fs)) {
+		fprintf(stderr, "Error: Parsing as filesystem '%s' failed\n", fs->m_manager->name());
+		return 1;
+	}
+
+	return generic_blocks(ih);
 }
 
 
@@ -1279,6 +1457,8 @@ int CLIB_DECL main(int argc, char *argv[])
 			return flopdir(argc, argv);
 		else if(!core_stricmp("flophashes", argv[1]))
 			return flophashes(argc, argv);
+		else if(!core_stricmp("flopblocks", argv[1]))
+			return flopblocks(argc, argv);
 		else if(!core_stricmp("flopread", argv[1]))
 			return flopread(argc, argv);
 		else if(!core_stricmp("flopwrite", argv[1]))
@@ -1293,6 +1473,8 @@ int CLIB_DECL main(int argc, char *argv[])
 			return hddir(argc, argv);
 		else if(!core_stricmp("hdhashes", argv[1]))
 			return hdhashes(argc, argv);
+		else if(!core_stricmp("hdblocks", argv[1]))
+			return hdblocks(argc, argv);
 		else if(!core_stricmp("hdread", argv[1]))
 			return hdread(argc, argv);
 		else if(!core_stricmp("hdwrite", argv[1]))
