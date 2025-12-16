@@ -105,6 +105,8 @@ end
 function sdlconfigcmd()
 	if _OPTIONS["targetos"]=="asmjs" then
 		return "sdl3-config"
+	elseif _OPTIONS["SDL_PKGCONFIG_PATH"] then
+		return path.join(_OPTIONS["SDL_PKGCONFIG_PATH"],"pkg-config") .. " sdl3"
 	elseif not _OPTIONS["SDL_INSTALL_ROOT"] then
 		return pkgconfigcmd() .. " sdl3"
 	else
@@ -173,6 +175,11 @@ end
 newoption {
 	trigger = "SDL_INSTALL_ROOT",
 	description = "Equivalent to the ./configure --prefix=<path>",
+}
+
+newoption {
+	trigger = "SDL_PKGCONFIG_PATH",
+	description = "Location of pkg-config command that knows about SDL.  Useful for non-root Homebrew installs on Linux.",
 }
 
 newoption {
