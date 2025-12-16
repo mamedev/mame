@@ -5745,7 +5745,7 @@ COMP( 199?, ecsfx3000, ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1992, ecsum386,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems",      "UM386 (Rev 1.1)", MACHINE_NOT_WORKING )
 COMP( 199?, fic4386vchd,ibm5170,0,       at486,     0,     at_state,     init_at,        "First International Computer", "4386-VC-HD", MACHINE_NOT_WORKING )
 COMP( 199?, frx386c,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Micro-Express Inc.", "Forex 386 Cache", MACHINE_NOT_WORKING )
-COMP( 199?, frxc402,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards with a FOREX FRX46C402/FRX36C300/SIS85C206 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, frxc402,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Modula Tech", "FRX/386DX Cache System", MACHINE_NOT_WORKING )
 COMP( 1991, fu340,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Abit",        "FU340", MACHINE_NOT_WORKING )
 COMP( 199?, ges9051n,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "GES 9051N-386C VER -0.01", MACHINE_NOT_WORKING )
 COMP( 198?, gs611606a, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Goldstar",    "GOLDSTAR P/N 611-606A Rev 1.0A", MACHINE_NOT_WORKING )
@@ -5782,7 +5782,7 @@ COMP( 199?, qdu386dx,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1988, qi600,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
 COMP( 199?, sisrabb,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 motherboards using the SiS Rabbit chipset", MACHINE_NOT_WORKING )
 COMP( 199?, sm38640f,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "SM 386-40F", MACHINE_NOT_WORKING )
-COMP( 19??, smih0107,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Forex Computer Company", "unknown 386 AT clone with Forex chipset", MACHINE_NOT_WORKING )
+COMP( 1991, smih0107,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "AVT Industrial", "unknown 386 AT clone with Forex chipset", MACHINE_NOT_WORKING ) // a.k.a Delta 186-2.1-0392 or Informtech IT386SM-P
 COMP( 199?, sy012,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "SY-012 16/25 386MB VER: 5.2", MACHINE_NOT_WORKING )
 COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "SY-019H and SY-019I", MACHINE_NOT_WORKING )
 COMP( 199?, sybaby386, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "Baby AT 386", MACHINE_NOT_WORKING )
