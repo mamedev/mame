@@ -97,6 +97,7 @@ private:
 	double m_filter_frequency;        // baseline filter frequency
 	double m_filter_modulation;       // depth of modulation (up to 1.0)
 	double m_filter_resonance;        // depth of modulation (up to 1.0)
+	double m_filter_osc_position;     // current filter self-oscillation position (always < 1.0)
 	double m_filter_in[4];            // filter input history
 	double m_filter_out[4];           // filter output history
 
