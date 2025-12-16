@@ -60,6 +60,7 @@ jobs:
         ARCHOPTS: ${{ matrix.archopts }}
         SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
+        SDL_PKGCONFIG_PATH: /home/linuxbrew/.linuxbrew/bin
       run: make -j3
     - name: Validate
       run: ./${{ matrix.executable }} -validate
