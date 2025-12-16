@@ -112,7 +112,7 @@ protected:
 	bool m_parity;
 };
 
-DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SUN1,    device_multibus_interface, multibus_sun1_device, "sun1", "Sun Microsystems SUN1")
+DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SUN1, device_multibus_interface, multibus_sun1_device, "sun1_cpu", "Sun Microsystems Sun-1 CPU board")
 
 void multibus_sun1_device::device_start()
 {
