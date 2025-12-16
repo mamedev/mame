@@ -489,9 +489,7 @@ void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 
 	// 3d ROM Offset
 	const u32 threeDOffset = (u32(packet[2]) << 16) | u32(packet[3]);
-	const u16 *const threeDPointer = &m_vertsrom[threeDOffset * 3];
-
-	if (threeDOffset >= m_vertsrom.length())
+	if ((threeDOffset * 3) >= m_vertsrom.length())
 	{
 		// bbust2 quite often spams this invalid pointer
 		if ((packet[2] == 0x2347) && (packet[3] == 0x5056))
@@ -501,6 +499,8 @@ void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 		printPacket(packet, 1);
 		return;
 	}
+
+	const u16 *const threeDPointer = &m_vertsrom[threeDOffset * 3];
 
 #if 0
 	// Debug - ajg
@@ -586,7 +586,7 @@ void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 			}
 
 			// Syntactical simplification
-			polygon& currentPoly = m_polys[numPolys];
+			polygon &currentPoly = m_polys[numPolys];
 
 			// Debug - ajg
 			//LOG3D("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
@@ -614,7 +614,7 @@ void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 			currentPoly.palOffset = 0;
 
 			//u16 explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
-			u16 explicitPaletteValue = ((chunkOffset[1] & 0x0ff0) >> 4);
+			u16 explicitPaletteValue = (chunkOffset[1] & 0x0ff0) >> 4;
 			explicitPaletteValue = explicitPaletteValue << 3;
 
 			// HACK: this is not the enable, the cars in roadedge rely on this to switch palettes

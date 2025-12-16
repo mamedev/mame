@@ -9,11 +9,10 @@
 #include "fsblk.h"
 
 #include "corestr.h"
-#include "multibyte.h"
 #include "strformat.h"
 
+#include <algorithm>
 #include <map>
-#include <stdexcept>
 
 using namespace fs;
 
@@ -32,6 +31,7 @@ public:
 
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 
 	virtual std::error_condition format(const meta_data &meta) override;
 
@@ -42,6 +42,7 @@ private:
 	std::tuple<fsblk_t::block_t::ptr, u32> path_find_step(const std::string &name, u16 block);
 	std::tuple<fsblk_t::block_t::ptr, u32, bool> path_find(const std::vector<std::string> &path);
 	std::pair<std::error_condition, std::vector<u8>> any_read(u8 type, u16 block, u32 length);
+	std::error_condition any_blocks(std::vector<u32> &alloc_blocks, std::vector<u32> &data_blocks, u8 type, u16 block, u32 length);
 };
 }
 
@@ -293,7 +294,6 @@ std::error_condition prodos_impl::format(const meta_data &meta)
 	// Mark blocks from first_free_block to blocks-1 (the last one) as free
 	for(u32 i = 0; i != fmap_block_count; i++) {
 		auto fmap = m_blockdev.get(6 + i);
-		u8 *fdata = fmap->data();
 		u32 start = i ? 0 : first_free_block;
 		u32 end = i != fmap_block_count - 1 ? 4095 : (blocks - 1) & 4095;
 		end += 1;
@@ -302,13 +302,13 @@ std::error_condition prodos_impl::format(const meta_data &meta)
 		u32 eb = end >> 3;
 		u32 ei = end & 7;
 		if(sb == eb)
-			fdata[sb] = (0xff >> si) & ~(0xff >> ei);
+			fmap->w8(sb, (0xff >> si) & ~(0xff >> ei));
 		else {
-			fdata[sb] = 0xff >> si;
+			fmap->w8(sb, 0xff >> si);
 			if(eb != 512)
-				fdata[eb] = ~(0xff >> ei);
+				fmap->w8(eb, ~(0xff >> ei));
 			if(eb - sb > 1)
-				memset(fdata+sb, 0xff, eb-sb-1);
+				fmap->fill(sb, 0xff, eb-sb-1);
 		}
 	}
 	return std::error_condition();
@@ -356,7 +356,7 @@ std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_c
 		auto [blk, off, dir] = path_find(path);
 		if(!off || !dir)
 			return std::make_pair(error::not_found, std::vector<dir_entry>());
-		block = blk->r16l(off+0x11);
+		block = blk->r16l(off + 0x11);
 	}
 
 	std::vector<dir_entry> res;
@@ -368,11 +368,11 @@ std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_c
 			// skip inactive entries and subroutine/volume headers
 			if(type != 0 && type < 0xe0) {
 				meta_data meta;
-				meta.set(meta_name::name, blk->rstr(off+1, type & 0xf));
+				meta.set(meta_name::name, blk->rstr(off + 1, type & 0xf));
 				type >>= 4;
 
 				if(type == 5) {
-					auto rootblk = m_blockdev.get(blk->r16l(off+0x11));
+					auto rootblk = m_blockdev.get(blk->r16l(off + 0x11));
 					meta.set(meta_name::length, rootblk->r24l(0x005));
 					meta.set(meta_name::rsrc_length, rootblk->r24l(0x105));
 
@@ -402,7 +402,7 @@ std::tuple<fsblk_t::block_t::ptr, u32> prodos_impl::path_find_step(const std::st
 		auto blk = m_blockdev.get(block);
 		for(u32 off = 4; off < 511; off += 39) {
 			u8 type = blk->r8(off);
-			if(type != 0 && type < 0xe0 && name == blk->rstr(off+1, type & 0xf))
+			if(type != 0 && type < 0xe0 && name.size() == (type & 0xf) && blk->eqstr(off + 1, name))
 				return std::make_tuple(blk, off);
 		}
 		block = blk->r16l(2);
@@ -414,7 +414,7 @@ std::tuple<fsblk_t::block_t::ptr, u32> prodos_impl::path_find_step(const std::st
 std::tuple<fsblk_t::block_t::ptr, u32, bool> prodos_impl::path_find(const std::vector<std::string> &path)
 {
 	if(path.size() == 0)
-		return std::tuple<fsblk_t::block_t::ptr, u32, bool>(fsblk_t::block_t::ptr(), 0, false);
+		return std::tuple<fsblk_t::block_t::ptr, u32, bool>(fsblk_t::block_t::ptr(), 0, true);
 
 	u16 block = 2;
 	for(u32 pathc = 0;; pathc++) {
@@ -443,25 +443,20 @@ std::pair<std::error_condition, meta_data> prodos_impl::metadata(const std::vect
 	if(!off)
 		return std::make_pair(error::not_found, meta_data());
 
-	const u8 *entry = blk->rodata() + off;
-
 	meta_data res;
-	if(dir) {
-		u8 type = entry[0];
-		std::string_view name = rstr(entry+1, type & 0xf);
-		res.set(meta_name::name, name);
-	} else {
-		u8 type = entry[0];
-		std::string_view name = rstr(entry+1, type & 0xf);
+	u8 type = blk->r8(off);
+	std::string name = blk->rstr(off + 1, type & 0xf);
+	res.set(meta_name::name, name);
+
+	if(!dir) {
 		type >>= 4;
-		res.set(meta_name::name, name);
 		if(type == 5) {
-			auto rootblk = m_blockdev.get(get_u16le(entry+0x11));
+			auto rootblk = m_blockdev.get(blk->r16l(off + 0x11));
 			res.set(meta_name::length, rootblk->r24l(0x005));
 			res.set(meta_name::rsrc_length, rootblk->r24l(0x105));
 
 		} else if(type >= 1 && type <= 3)
-			res.set(meta_name::length, get_u24le(entry + 0x15));
+			res.set(meta_name::length, blk->r24l(off + 0x15));
 
 		else
 			return std::make_pair(error::unsupported, meta_data());
@@ -491,7 +486,10 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::any_read(u8 type, 
 		auto iblk = m_blockdev.get(block);
 		for(u32 i=0; i != 256 && dst != end; i++) {
 			u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
-			m_blockdev.get(blk)->read(0, dst, 512);
+			if(blk)
+				m_blockdev.get(blk)->read(0, dst, 512);
+			else
+				std::fill_n(dst, 512, 0);
 			dst += 512;
 		}
 		break;
@@ -504,7 +502,10 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::any_read(u8 type, 
 			auto iblk = m_blockdev.get(mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8));
 			for(u32 i=0; i != 256 && dst != end; i++) {
 				u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
-				m_blockdev.get(blk)->read(0, dst, 512);
+				if(blk)
+					m_blockdev.get(blk)->read(0, dst, 512);
+				else
+					std::fill_n(dst, 512, 0);
 				dst += 512;
 			}
 		}
@@ -527,14 +528,13 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_read(const st
 	if(!off || dir)
 		return std::make_pair(error::not_found, std::vector<u8>());
 
-	const u8 *entry = blk->rodata() + off;
-	u8 type = entry[0] >> 4;
+	u8 type = blk->r8(off) >> 4;
 
 	if(type >= 1 && type <= 3)
-		return any_read(type, get_u16le(entry+0x11), get_u24le(entry + 0x15));
+		return any_read(type, blk->r16l(off + 0x11), blk->r24l(off + 0x15));
 
 	else if(type == 5) {
-		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
+		auto kblk = m_blockdev.get(blk->r16l(off + 0x11));
 		return any_read(kblk->r8(0x000), kblk->r16l(0x001), kblk->r24l(0x005));
 
 	} else
@@ -547,13 +547,94 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_rsrc_read(con
 	if(!off || dir)
 		return std::make_pair(error::not_found, std::vector<u8>());
 
-	const u8 *entry = blk->rodata() + off;
-	u8 type = entry[0] >> 4;
+	u8 type = blk->r8(off) >> 4;
 
 	if(type == 5) {
-		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
+		auto kblk = m_blockdev.get(blk->r16l(off + 0x11));
 		return any_read(kblk->r8(0x100), kblk->r16l(0x101), kblk->r24l(0x105));
 
 	} else
-		return std::make_pair(error::unsupported, std::vector<u8>());
+		return std::make_pair(std::error_condition(), std::vector<u8>());
+}
+
+std::error_condition prodos_impl::any_blocks(std::vector<u32> &alloc_blocks, std::vector<u32> &data_blocks, u8 type, u16 block, u32 length)
+{
+	u32 nb = (length + 511) / 512;
+
+	switch(type) {
+	case 1:
+		// Seedling files always take up 1 block, no more or less
+		data_blocks.push_back(block);
+		break;
+
+	case 2: {
+		alloc_blocks.push_back(block);
+		auto iblk = m_blockdev.get(block);
+		for(u32 i=0; i != 256 && nb != 0; i++, nb--) {
+			u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
+			if(blk)
+				data_blocks.push_back(blk);
+		}
+		break;
+	}
+
+	case 3: {
+		alloc_blocks.push_back(block);
+		auto mblk = m_blockdev.get(block);
+		for(u32 j=0; nb != 0; j += 256) {
+			u32 idx = j/256;
+			alloc_blocks.push_back(mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8));
+			auto iblk = m_blockdev.get(alloc_blocks.back());
+			for(u32 i=0; i != 256 && nb != 0; i++, nb--) {
+				u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
+				if(blk)
+					data_blocks.push_back(blk);
+			}
+		}
+		break;
+	}
+
+	default:
+		return error::unsupported;
+	}
+
+	return std::error_condition();
+}
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> prodos_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	auto [blk, off, dir] = path_find(path);
+	if(!off && !path.empty())
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	if(dir) {
+		std::vector<u32> dir_blocks;
+		u32 block = path.empty() ? 2 : blk->r16l(off + 0x11);
+		for(;;) {
+			if(block >= m_blockdev.block_count())
+				return std::make_tuple(error::invalid_block, std::vector<u32>(), std::move(dir_blocks));
+			if(std::find(dir_blocks.begin(), dir_blocks.end(), block) != dir_blocks.end())
+				return std::make_tuple(error::circular_reference, std::vector<u32>(), std::move(dir_blocks));
+			dir_blocks.push_back(block);
+			block = m_blockdev.get(block)->r16l(2);
+			if(!block)
+				return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(dir_blocks));
+		}
+	} else {
+		std::vector<u32> alloc_blocks;
+		std::vector<u32> data_blocks;
+		if((blk->r8(off) & 0xf0) == 0x50) {
+			alloc_blocks.push_back(blk->r16l(off + 0x11));
+			auto kblk = m_blockdev.get(alloc_blocks.back());
+			for(u16 koff = 0; koff != 0x200; koff += 0x100) {
+				std::error_condition err = any_blocks(alloc_blocks, data_blocks, kblk->r8(koff + 0), kblk->r16l(koff + 1), kblk->r24l(koff + 5));
+				if(err)
+					return std::make_tuple(err, alloc_blocks, data_blocks);
+			}
+			return std::make_tuple(std::error_condition(), alloc_blocks, data_blocks);
+		} else {
+			std::error_condition err = any_blocks(alloc_blocks, data_blocks, blk->r8(off) >> 4, blk->r16l(off + 0x11), blk->r24l(off + 0x15));
+			return std::make_tuple(err, alloc_blocks, data_blocks);
+		}
+	}
 }

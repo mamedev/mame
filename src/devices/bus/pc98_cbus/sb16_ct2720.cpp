@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(SB16_CT2720, sb16_ct2720_device, "sb16_ct2720", "Creative Sou
 
 sb16_ct2720_device::sb16_ct2720_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SB16_CT2720, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opl3(*this, "opl3")
 	, m_mixer(*this, "mixer")
 	, m_ldac(*this, "ldac")
@@ -71,12 +71,21 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 
 void sb16_ct2720_device::device_start()
 {
-	m_bus->install_device(0x0000, 0xffff, *this, &sb16_ct2720_device::io_map);
 }
 
 void sb16_ct2720_device::device_reset()
 {
 }
+
+void sb16_ct2720_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0xffff, *this, &sb16_ct2720_device::io_map);
+	}
+}
+
+
 
 void sb16_ct2720_device::io_map(address_map &map)
 {

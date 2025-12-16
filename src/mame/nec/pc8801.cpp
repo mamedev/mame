@@ -279,14 +279,21 @@ uint8_t pc8801_state::dma_mem_r(offs_t offset)
 {
 	// TODO: TVRAM readback
 	//if ((offset & 0xf000) == 0xf000)
-	//	return m_hi_work_ram[offset & 0xfff];
+	//  return m_hi_work_ram[offset & 0xfff];
 	return m_work_ram[offset & 0xffff];
 }
 
 void pc8801_state::dma_mem_w(offs_t offset, u8 data)
 {
-//	printf("%04x %02x\n", offset, data);
+//  printf("%04x %02x\n", offset, data);
 	m_work_ram[offset & 0xffff] = data;
+}
+
+// the pc8801 appears to just to dma memr and iow cycles if verify mode is set
+uint8_t pc8801_state::dackv(offs_t offset)
+{
+	m_crtc->dack_w(dma_mem_r(offset));
+	return 0;
 }
 
 uint8_t pc8801_state::alu_r(offs_t offset)
@@ -1644,7 +1651,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
-//	config.set_perfect_quantum(m_maincpu);
+//  config.set_perfect_quantum(m_maincpu);
 	// TODO: get rid of this
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
@@ -1701,6 +1708,7 @@ void pc8801_state::pc8801(machine_config &config)
 	// CH0: 5-inch floppy DMA
 	// CH1: 8-inch floppy DMA, SCSI CD-ROM interface (on MA/MC)
 	m_dma->out_iow_cb<2>().set(m_crtc, FUNC(upd3301_device::dack_w));
+	m_dma->verify_cb<2>().set(FUNC(pc8801_state::dackv));
 	// CH3: <autoload only?>
 
 	TIMER(config, "rtc_timer").configure_periodic(FUNC(pc8801_state::clock_irq_w), attotime::from_hz(600));
@@ -1797,7 +1805,7 @@ void pc8801mc_state::pc8801mc(machine_config &config)
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
 	m_cdrom_if->drq_cb().set(m_dma, FUNC(i8257_device::dreq1_w));
 	m_dma->in_ior_cb<1>().set(m_cdrom_if, FUNC(pc8801_31_device::dma_r));
-//	m_dma->out_iow_cb<1>().set([] (u8 data) { printf("SASI iow\n"); });
+//  m_dma->out_iow_cb<1>().set([] (u8 data) { printf("SASI iow\n"); });
 }
 
 ROM_START( pc8801 )

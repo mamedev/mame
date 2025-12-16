@@ -29,9 +29,8 @@ starting point.
     many useful features for home computer emulation.  Written in C++, the
     `source code is on GitHub <https://github.com/npwoods/bletchmame>`__.
 `IV/Play <https://john-iv.github.io/iv-play/>`__ (Microsoft Windows)
-    A fast, keyboard-driven, DirectX-accelerated launcher for MAME. IV/Play 
-    features a flexible filtering system, integrated browsing and launching
-    for software lists, and a highly customizable interface. Written in C#.
+    IV/Play has a customisable interface designed to be navigated with a
+    keyboard.  It supports software lists and has flexible filtering.
 `Emu Loader <http://emuloader.mameworld.info/>`__ (Microsoft Windows)
     Emu Loader provides a Windows interface for launching systems in multiple
     emulators, including MAME, Supermodel and DEMUL.  Written in Delphi Pascal,

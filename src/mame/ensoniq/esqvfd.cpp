@@ -17,66 +17,66 @@ DEFINE_DEVICE_TYPE(ESQ2X40_SQ1, esq2x40_sq1_device, "esq2x40_sq1", "Ensoniq 2x40
 DEFINE_DEVICE_TYPE(ESQ2X40_VFX, esq2x40_vfx_device, "esq2x40_vfx", "Ensoniq 2x40 VFD (VFX Family variant)")
 
 // adapted from bfm_bd1, rearranged to work with ASCII data used by the Ensoniq h/w
-static const uint16_t font[]=
-{           // FEDC BA98 7654 3210
+static const uint16_t font[] = {
+			// FEDC BA98 7654 3210
 	0x0000, // 0000 0000 0000 0000 (space)
 	0x0000, // 0000 0000 0000 0000 ! (not defined)
 	0x0009, // 0000 0000 0000 1001 ".
-	0xC62A, // 1100 0110 0010 1010 #.
-	0xC62D, // 1100 0110 0010 1101 $.
+	0xc62a, // 1100 0110 0010 1010 #.
+	0xc62d, // 1100 0110 0010 1101 $.
 	0x0000, // 0000 0000 0000 0000 % (not defined)
 	0x0000, // 0000 0000 0000 0000 & (not defined)
 	0x0040, // 0000 0000 1000 0000 '.
 	0x0880, // 0000 1000 1000 0000 (.
 	0x0050, // 0000 0000 0101 0000 ).
-	0xCCD8, // 1100 1100 1101 1000 *.
-	0xC408, // 1100 0100 0000 1000 +.
+	0xccd8, // 1100 1100 1101 1000 *.
+	0xc408, // 1100 0100 0000 1000 +.
 	0x0000, // 0000 0000 0000 0000 , (not defined)
-	0xC000, // 1100 0000 0000 0000 -.
+	0xc000, // 1100 0000 0000 0000 -.
 	0x1000, // 0001 0000 0000 0000 .
 	0x0090, // 0000 0000 1001 0000 /
-	0x22B7, // 0010 0010 1011 0111 0.
+	0x22b7, // 0010 0010 1011 0111 0.
 	0x0408, // 0000 0100 0000 1000 1.
-	0xE206, // 1110 0010 0000 0110 2.
+	0xe206, // 1110 0010 0000 0110 2.
 	0x4226, // 0100 0010 0010 0110 3.
-	0xC023, // 1100 0000 0010 0011 4.
-	0xC225, // 1100 0010 0010 0101 5.
-	0xE225, // 1110 0010 0010 0101 6.
+	0xc023, // 1100 0000 0010 0011 4.
+	0xc225, // 1100 0010 0010 0101 5.
+	0xe225, // 1110 0010 0010 0101 6.
 	0x0026, // 0000 0000 0010 0110 7.
-	0xE227, // 1110 0010 0010 0111 8.
-	0xC227, // 1100 0010 0010 0111 9.
+	0xe227, // 1110 0010 0010 0111 8.
+	0xc227, // 1100 0010 0010 0111 9.
 	0x0000, // 0000 0000 0000 0000 : (not defined)
 	0x0000, // 0000 0000 0000 0000 ; (not defined)
 	0x0290, // 0000 0010 1001 0000 <.
-	0xC200, // 1100 0010 0000 0000 =.
-	0x0A40, // 0000 1010 0100 0000 >.
+	0xc200, // 1100 0010 0000 0000 =.
+	0x0a40, // 0000 1010 0100 0000 >.
 	0x0000, // 0000 0000 0000 0000 ? (not defined)
-	0xA626, // 1010 0110 0010 0110 @.
-	0xE027, // 1110 0000 0010 0111 A.
-	0x462E, // 0100 0110 0010 1110 B.
+	0xa626, // 1010 0110 0010 0110 @.
+	0xe027, // 1110 0000 0010 0111 A.
+	0x462e, // 0100 0110 0010 1110 B.
 	0x2205, // 0010 0010 0000 0101 C.
-	0x062E, // 0000 0110 0010 1110 D.
-	0xA205, // 1010 0010 0000 0101 E.
-	0xA005, // 1010 0000 0000 0101 F.
+	0x062e, // 0000 0110 0010 1110 D.
+	0xa205, // 1010 0010 0000 0101 E.
+	0xa005, // 1010 0000 0000 0101 F.
 	0x6225, // 0110 0010 0010 0101 G.
-	0xE023, // 1110 0000 0010 0011 H.
-	0x060C, // 0000 0110 0000 1100 I.
+	0xe023, // 1110 0000 0010 0011 H.
+	0x060c, // 0000 0110 0000 1100 I.
 	0x2222, // 0010 0010 0010 0010 J.
-	0xA881, // 1010 1000 1000 0001 K.
+	0xa881, // 1010 1000 1000 0001 K.
 	0x2201, // 0010 0010 0000 0001 L.
-	0x20E3, // 0010 0000 1110 0011 M.
+	0x20e3, // 0010 0000 1110 0011 M.
 	0x2863, // 0010 1000 0110 0011 N.
 	0x2227, // 0010 0010 0010 0111 O.
-	0xE007, // 1110 0000 0000 0111 P.
-	0x2A27, // 0010 1010 0010 0111 Q.
-	0xE807, // 1110 1000 0000 0111 R.
-	0xC225, // 1100 0010 0010 0101 S.
-	0x040C, // 0000 0100 0000 1100 T.
+	0xe007, // 1110 0000 0000 0111 P.
+	0x2a27, // 0010 1010 0010 0111 Q.
+	0xe807, // 1110 1000 0000 0111 R.
+	0xc225, // 1100 0010 0010 0101 S.
+	0x040c, // 0000 0100 0000 1100 T.
 	0x2223, // 0010 0010 0010 0011 U.
 	0x2091, // 0010 0000 1001 0001 V.
 	0x2833, // 0010 1000 0011 0011 W.
-	0x08D0, // 0000 1000 1101 0000 X.
-	0x04C0, // 0000 0100 1100 0000 Y.
+	0x08d0, // 0000 1000 1101 0000 X.
+	0x04c0, // 0000 0100 1100 0000 Y.
 	0x0294, // 0000 0010 1001 0100 Z.
 	0x2205, // 0010 0010 0000 0101 [.
 	0x0840, // 0000 1000 0100 0000 \.
@@ -84,31 +84,31 @@ static const uint16_t font[]=
 	0x0810, // 0000 1000 0001 0000 ^.
 	0x0200, // 0000 0010 0000 0000 _
 	0x0040, // 0000 0000 0100 0000 `
-	0xE027, // 1110 0000 0010 0111 A.
-	0x462E, // 0100 0110 0010 1110 B.
+	0xe027, // 1110 0000 0010 0111 A.
+	0x462e, // 0100 0110 0010 1110 B.
 	0x2205, // 0010 0010 0000 0101 C.
-	0x062E, // 0000 0110 0010 1110 D.
-	0xA205, // 1010 0010 0000 0101 E.
-	0xA005, // 1010 0000 0000 0101 F.
+	0x062e, // 0000 0110 0010 1110 D.
+	0xa205, // 1010 0010 0000 0101 E.
+	0xa005, // 1010 0000 0000 0101 F.
 	0x6225, // 0110 0010 0010 0101 G.
-	0xE023, // 1110 0000 0010 0011 H.
-	0x060C, // 0000 0110 0000 1100 I.
+	0xe023, // 1110 0000 0010 0011 H.
+	0x060c, // 0000 0110 0000 1100 I.
 	0x2222, // 0010 0010 0010 0010 J.
-	0xA881, // 1010 1000 1000 0001 K.
+	0xa881, // 1010 1000 1000 0001 K.
 	0x2201, // 0010 0010 0000 0001 L.
-	0x20E3, // 0010 0000 1110 0011 M.
+	0x20e3, // 0010 0000 1110 0011 M.
 	0x2863, // 0010 1000 0110 0011 N.
 	0x2227, // 0010 0010 0010 0111 O.
-	0xE007, // 1110 0000 0000 0111 P.
-	0x2A27, // 0010 1010 0010 0111 Q.
-	0xE807, // 1110 1000 0000 0111 R.
-	0xC225, // 1100 0010 0010 0101 S.
-	0x040C, // 0000 0100 0000 1100 T.
+	0xe007, // 1110 0000 0000 0111 P.
+	0x2a27, // 0010 1010 0010 0111 Q.
+	0xe807, // 1110 1000 0000 0111 R.
+	0xc225, // 1100 0010 0010 0101 S.
+	0x040c, // 0000 0100 0000 1100 T.
 	0x2223, // 0010 0010 0010 0011 U.
 	0x2091, // 0010 0000 1001 0001 V.
 	0x2833, // 0010 1000 0011 0011 W.
-	0x08D0, // 0000 1000 1101 0000 X.
-	0x04C0, // 0000 0100 1100 0000 Y.
+	0x08d0, // 0000 1000 1101 0000 X.
+	0x04c0, // 0000 0100 1100 0000 Y.
 	0x0294, // 0000 0010 1001 0100 Z.
 	0x2205, // 0010 0010 0000 0101 [.
 	0x0408, // 0000 0100 0000 1000 |
@@ -128,6 +128,16 @@ esqvfd_device::esqvfd_device(const machine_config &mconfig, device_type type, co
 void esqvfd_device::device_start()
 {
 	m_vfds->resolve();
+	save_item(NAME(m_cursx));
+	save_item(NAME(m_cursy));
+	save_item(NAME(m_savedx));
+	save_item(NAME(m_savedy));
+	save_item(NAME(m_curattr));
+	save_item(NAME(m_chars));
+	save_item(NAME(m_attrs));
+	save_item(NAME(m_dirty));
+	save_item(NAME(m_lastchar));
+	save_item(NAME(m_blink_on));
 }
 
 void esqvfd_device::device_reset()
@@ -136,6 +146,7 @@ void esqvfd_device::device_reset()
 	m_savedx = m_savedy = 0;
 	m_curattr = AT_NORMAL;
 	m_lastchar = 0;
+	m_blink_on = false;
 	memset(m_chars, 0, sizeof(m_chars));
 	memset(m_attrs, 0, sizeof(m_attrs));
 	memset(m_dirty, 1, sizeof(m_attrs));
@@ -144,12 +155,9 @@ void esqvfd_device::device_reset()
 // generic display update; can override from child classes if not good enough
 void esqvfd_device::update_display()
 {
-	for (int row = 0; row < m_rows; row++)
-	{
-		for (int col = 0; col < m_cols; col++)
-		{
-			if (m_dirty[row][col])
-			{
+	for (int row = 0; row < m_rows; row++) {
+		for (int col = 0; col < m_cols; col++) {
+			if (m_dirty[row][col]) {
 				uint32_t segdata = conv_segments(font[m_chars[row][col]]);
 
 				// digits:
@@ -167,8 +175,7 @@ void esqvfd_device::update_display()
 inline void esqvfd_device::cursor_left()
 {
 	m_cursx--;
-	if (m_cursx < 0)
-	{
+	if (m_cursx < 0) {
 		m_cursx += m_cols;
 		m_cursy--;
 		if (m_cursy < 0)
@@ -179,8 +186,7 @@ inline void esqvfd_device::cursor_left()
 inline void esqvfd_device::cursor_right()
 {
 	m_cursx++;
-	if (m_cursx >= m_cols)
-	{
+	if (m_cursx >= m_cols) {
 		m_cursx -= m_cols;
 		m_cursy++;
 		if (m_cursy >= m_rows)
@@ -188,20 +194,20 @@ inline void esqvfd_device::cursor_right()
 	}
 }
 
-void esqvfd_device::set_blink_on(bool blink_on) {
+void esqvfd_device::set_blink_on(bool blink_on)
+{
 	m_blink_on = blink_on;
 
-	for (int row = 0; row < m_rows; row++)
-	{
-		for (int col = 0; col < m_cols; col++)
-		{
+	for (int row = 0; row < m_rows; row++) {
+		for (int col = 0; col < m_cols; col++) {
 			m_dirty[row][col] |= m_attrs[row][col] & AT_BLINK;
 		}
 	}
 	update_display();
 }
 
-void esqvfd_device::clear() {
+void esqvfd_device::clear()
+{
 	m_cursx = m_cursy = m_curattr = 0;
 	memset(m_chars, 0, sizeof(m_chars));
 	memset(m_attrs, 0, sizeof(m_attrs));
@@ -220,13 +226,10 @@ void esq2x40_device::device_add_mconfig(machine_config &config)
 
 void esq2x40_device::write_char(uint8_t data)
 {
-	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
-	if (m_lastchar == 0xfa)
-	{
-		for (uint8_t j = 0; j < m_rows; j++)
-		{
-			for (uint8_t i = 0; i < m_cols; i++)
-			{
+	if (m_lastchar == 0xfa) {
+		// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
+		for (uint8_t j = 0; j < m_rows; j++) {
+			for (uint8_t i = 0; i < m_cols; i++) {
 				if (m_cursy == j && i >= m_cursx && i < m_cursx + data)
 					m_attrs[j][i] |= AT_UNDERLINE;
 				else
@@ -239,19 +242,20 @@ void esq2x40_device::write_char(uint8_t data)
 		m_lastchar = 0;
 		update_display();
 		return;
+	} else if (m_lastchar == 0xff) {
+		// 0xff light commands are followed by a byte indicating the light and
+		// its requested status. Ignore this.
+		m_lastchar = 0;
+		return;
 	}
 
 	m_lastchar = data;
 
-	if ((data >= 0x80) && (data < 0xd0))
-	{
+	if ((data >= 0x80) && (data < 0xd0)) {
 		m_cursy = ((data & 0x7f) >= 40) ? 1 : 0;
 		m_cursx = (data & 0x7f) % 40;
-	}
-	else if (data >= 0xd0)
-	{
-		switch (data)
-		{
+	} else if (data >= 0xd0) {
+		switch (data) {
 			case 0xd0:  // blink start
 				m_curattr |= AT_BLINK;
 				break;
@@ -280,6 +284,10 @@ void esq2x40_device::write_char(uint8_t data)
 				clear();
 				break;
 
+			case 0xe8:  // also cancel attributes
+				m_curattr = 0;
+				break;
+
 			case 0xf5:  // save cursor position
 				m_savedx = m_cursx;
 				m_savedy = m_cursy;
@@ -295,21 +303,18 @@ void esq2x40_device::write_char(uint8_t data)
 				clear();
 				break;
 
+			case 0xff: // light status; ignore. Next byte will also be ignored.
+				break;
+
 			default:
-//                printf("Unknown control code %02x\n", data);
 				break;
 		}
-	}
-	else
-	{
-		if ((data >= 0x20) && (data <= 0x5f))
-		{
-			m_chars[m_cursy][m_cursx] = data - ' ';
-			m_attrs[m_cursy][m_cursx] = m_curattr;
-			m_dirty[m_cursy][m_cursx] = 1;
+	} else if ((data >= 0x20) && (data <= 0x5f)) {
+		m_chars[m_cursy][m_cursx] = data - ' ';
+		m_attrs[m_cursy][m_cursx] = m_curattr;
+		m_dirty[m_cursy][m_cursx] = 1;
 
-			cursor_right();
-		}
+		cursor_right();
 	}
 
 	update_display();
@@ -320,25 +325,20 @@ bool esq2x40_device::write_contents(std::ostream &o)
 	o.put((char) 0xd6); // clear screen
 
 	uint8_t attrs = 0;
-	for (int row = 0; row < 2; row++)
-	{
+	for (int row = 0; row < 2; row++) {
 		o.put((char) (0x80 + (40 * row))); // move to first column this row
 
-		for (int col = 0; col < 40; col++)
-		{
-			if (m_attrs[row][col] != attrs)
-			{
+		for (int col = 0; col < 40; col++) {
+			if (m_attrs[row][col] != attrs) {
 				attrs = m_attrs[row][col];
 
 				o.put((char) 0xd1); // all attributes off
 
-				if (attrs & AT_BLINK)
-				{
+				if (attrs & AT_BLINK) {
 					o.put((char) 0xd0); // blink on
 				}
 
-				if (attrs & AT_UNDERLINE)
-				{
+				if (attrs & AT_UNDERLINE) {
 					o.put((char) 0xd3); // underline
 				}
 			}
@@ -363,6 +363,7 @@ esq2x40_device::esq2x40_device(const machine_config &mconfig, device_type type, 
 	esqvfd_device(mconfig, type, tag, owner, clock, make_dimensions<2, 40>(*this))
 {
 }
+
 esq2x40_device::esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	esq2x40_device(mconfig, ESQ2X40, tag, owner, clock)
 {
@@ -394,27 +395,22 @@ void esq2x40_vfx_device::device_add_mconfig(machine_config &config)
 // Handles blinking of underline and of entire character,
 void esq2x40_vfx_device::update_display()
 {
-	for (int row = 0; row < m_rows; row++)
-	{
-		for (int col = 0; col < m_cols; col++)
-		{
-			if (m_dirty[row][col])
-			{
+	for (int row = 0; row < m_rows; row++) {
+		for (int col = 0; col < m_cols; col++) {
+			if (m_dirty[row][col]) {
 				uint8_t c = m_chars[row][col];
 
 				uint16_t char_segments = m_font[c < 96 ? c : 0];
 				auto attr = m_attrs[row][col];
 				uint16_t segments;
 
-				if ((attr & AT_BLINK) && !m_blink_on)  // something is blinked off
-				{
+				if ((attr & AT_BLINK) && !m_blink_on) {
+					// something is blinked off
 					if (attr & AT_UNDERLINE) // blink the underline off
 						segments = char_segments;
 					else // there is no underline, blink the entire character
 						segments = 0;
-				}
-				else
-				{
+				} else {
 					if (attr & AT_UNDERLINE)
 						segments = char_segments | 0x8000;
 					else
@@ -440,10 +436,8 @@ void esq1x22_device::device_add_mconfig(machine_config &config)
 
 void esq1x22_device::write_char(uint8_t data)
 {
-	if (data >= 0x60)
-	{
-		switch (data)
-		{
+	if (data >= 0x60) {
+		switch (data) {
 			case 'f':   // clear screen
 				m_cursx = m_cursy = 0;
 				memset(m_chars, 0, sizeof(m_chars));
@@ -455,17 +449,13 @@ void esq1x22_device::write_char(uint8_t data)
 				printf("Unhandled control code %02x\n", data);
 				break;
 		}
-	}
-	else
-	{
-		if ((data >= 0x20) && (data <= 0x5f))
-		{
+	} else {
+		if ((data >= 0x20) && (data <= 0x5f)) {
 			m_chars[0][m_cursx] = data - ' ';
 			m_dirty[0][m_cursx] = 1;
 			m_cursx++;
 
-			if (m_cursx >= 23)
-			{
+			if (m_cursx >= 23) {
 				m_cursx = 23;
 			}
 		}
@@ -487,52 +477,38 @@ void esq2x40_sq1_device::device_add_mconfig(machine_config &config)
 
 void esq2x40_sq1_device::write_char(uint8_t data)
 {
-	if (data == 0x09)   // musical note
-	{
+	if (data == 0x09) {
+		// musical note
 		data = '^'; // approximate for now
 	}
 
-	if (m_wait87shift)
-	{
+	if (m_wait87shift) {
 		m_cursy = (data >> 4) & 0xf;
 		m_cursx = data & 0xf;
 		m_wait87shift = false;
-	}
-	else if (m_wait88shift)
-	{
+	} else if (m_wait88shift) {
 		m_wait88shift = false;
-	}
-	else if ((data >= 0x20) && (data <= 0x7f))
-	{
+	} else if ((data >= 0x20) && (data <= 0x7f)) {
 		m_chars[m_cursy][m_cursx] = data - ' ';
 		m_attrs[m_cursy][m_cursx] = m_curattr;
 		m_dirty[m_cursy][m_cursx] = 1;
 		m_cursx++;
 
-		if (m_cursx >= 39)
-		{
+		if (m_cursx >= 39) {
 			m_cursx = 39;
 		}
 
 		update_display();
-	}
-	else if (data == 0x83)
-	{
+	} else if (data == 0x83) {
 		m_cursx = m_cursy = 0;
 		memset(m_chars, 0, sizeof(m_chars));
 		memset(m_attrs, 0, sizeof(m_attrs));
 		memset(m_dirty, 1, sizeof(m_dirty));
-	}
-	else if (data == 0x87)
-	{
+	} else if (data == 0x87) {
 		m_wait87shift = true;
-	}
-	else if (data == 0x88)
-	{
+	} else if (data == 0x88) {
 		m_wait88shift = true;
-	}
-	else
-	{
+	} else {
 //        printf("SQ-1 unhandled display char %02x\n", data);
 	}
 }

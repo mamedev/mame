@@ -409,17 +409,17 @@ authors:hap
 	<element name="text_p7"><image file="chess/wp.svg"/></element>
 
 	<element name="text_l10"><text string="0"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l10a"><text string=" FORWARD "><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l10a"><text string="FORWARD"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l11"><text string="9"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l11a"><text string=" TAKE BACK "><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- actually 2 lines of text -->
+	<element name="text_l11a"><text string="TAKE BACK"><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- actually 2 lines of text -->
 	<element name="text_l12"><text string="TEACH"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l13"><text string="MULTI"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l13a"><text string="MOVE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_l14"><text string="SET"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l14a"><text string="UP"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l15"><text string=" NEW GAME "><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- actually 2 lines of text -->
-	<element name="text_l15a"><text string=" CL. BOARD "><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- actually "CLEAR BOARD", 2 lines of text -->
+	<element name="text_l15"><text string="NEW GAME"><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- actually 2 lines of text -->
+	<element name="text_l15a"><text string="CL. BOARD"><color red="0.81" green="0.8" blue="0.79" /></text></element> <!-- actually "CLEAR BOARD", 2 lines of text -->
 	<element name="text_l16"><text string="LEVEL"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l17"><text string="PLAY"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
@@ -433,12 +433,12 @@ authors:hap
 		<element ref="white"><bounds x="0" y="0" width="25" height="76" /></element>
 
 		<element ref="whiteb"><bounds x="0" y="0" width="6" height="6" /></element>
-		<element ref="text_l00"><bounds x="0.6" y="1" width="5" height="1.5" /></element>
-		<element ref="text_l00a"><bounds x="0.5" y="3.5" width="5" height="1.5" /></element>
+		<element ref="text_l00"><bounds xc="3" y="1" width="3.5" height="1.5" /></element>
+		<element ref="text_l00a"><bounds xc="3" y="3.5" width="5" height="1.5" /></element>
 
 		<element ref="black"><bounds x="0" y="10" width="6" height="6" /></element>
-		<element ref="text_l01"><bounds x="0.6" y="11" width="5" height="1.5" /></element>
-		<element ref="text_l01a"><bounds x="0.5" y="13.5" width="5" height="1.5" /></element>
+		<element ref="text_l01"><bounds xc="3" y="11" width="3.5" height="1.5" /></element>
+		<element ref="text_l01a"><bounds xc="3" y="13.5" width="5" height="1.5" /></element>
 
 		<repeat count="6">
 			<param name="y" start="20" increment="10" />
@@ -448,8 +448,8 @@ authors:hap
 
 			<element ref="blackb"><bounds x="0" y="~y~" width="6" height="6" /></element>
 
-			<element ref="text_l0~it~"><bounds x="0.6" y="~yt~" width="5" height="1.5" /></element>
-			<element ref="text_p~it~"><bounds x="1.5" y="~yp~" width="3" height="3" /></element>
+			<element ref="text_l0~it~"><bounds xc="3" y="~yt~" width="3.5" height="1.5" /></element>
+			<element ref="text_p~it~"><bounds xc="3" y="~yp~" width="3" height="3" /></element>
 
 			<element ref="whitem" blend="multiply"><bounds x="0" y="~y~" width="6" height="6" /></element>
 			<element ref="black" blend="add"><bounds x="0" y="~y~" width="6" height="6" /></element>
@@ -460,32 +460,32 @@ authors:hap
 		<element ref="black"><bounds x="8.5" y="20" width="6" height="6" /></element>
 		<element ref="black"><bounds x="8.5" y="30" width="6" height="6" /></element>
 
-		<element ref="text_l10"><bounds x="12.1" y="1" width="1" height="1.5" /></element>
-		<element ref="text_l11"><bounds x="12.1" y="11" width="1" height="1.5" /></element>
-		<element ref="text_l10a"><bounds x="8.5" y="3.5" width="6" height="1.5" /></element>
-		<element ref="text_l11a"><bounds x="8.5" y="13.5" width="6" height="1.5" /></element>
-		<element ref="text_l12"><bounds x="8.5" y="22.25" width="6" height="1.5" /></element>
-		<element ref="text_l13"><bounds x="8.5" y="31.5" width="6" height="1.5" /></element>
-		<element ref="text_l13a"><bounds x="8.5" y="33" width="6" height="1.5" /></element>
+		<element ref="text_l10"><bounds x="12.2" y="1" width="1" height="1.5" /></element>
+		<element ref="text_l11"><bounds x="12.2" y="11" width="1" height="1.5" /></element>
+		<element ref="text_l10a"><bounds xc="11.5" y="3.5" width="5" height="1.5" /></element>
+		<element ref="text_l11a"><bounds xc="11.5" y="13.5" width="5" height="1.5" /></element>
+		<element ref="text_l12"><bounds xc="11.5" y="22.25" width="5" height="1.5" /></element>
+		<element ref="text_l13"><bounds xc="11.5" y="31.5" width="5" height="1.5" /></element>
+		<element ref="text_l13a"><bounds xc="11.5" y="33" width="5" height="1.5" /></element>
 
 		<element ref="black"><bounds x="17" y="0" width="6" height="6" /></element>
 		<element ref="black"><bounds x="17" y="10" width="6" height="6" /></element>
 
-		<element ref="text_l21"><bounds x="17" y="12.25" width="6" height="1.5" /></element>
-		<element ref="text_l20"><bounds x="17" y="1.5" width="6" height="1.5" /></element>
-		<element ref="text_l20a"><bounds x="17" y="3" width="6" height="1.5" /></element>
+		<element ref="text_l21"><bounds xc="20" y="12.25" width="5" height="1.5" /></element>
+		<element ref="text_l20"><bounds xc="20" y="1.5" width="5" height="1.5" /></element>
+		<element ref="text_l20a"><bounds xc="20" y="3" width="5" height="1.5" /></element>
 
 		<element ref="red"><bounds x="8.5" y="40" width="6" height="6" /></element>
 		<element ref="red"><bounds x="8.5" y="50" width="6" height="6" /></element>
 		<element ref="red"><bounds x="8.5" y="60" width="6" height="6" /></element>
 		<element ref="red"><bounds x="8.5" y="70" width="6" height="6" /></element>
 
-		<element ref="text_l14"><bounds x="8.5" y="41.5" width="6" height="1.5" /></element>
-		<element ref="text_l14a"><bounds x="8.5" y="43" width="6" height="1.5" /></element>
-		<element ref="text_l15"><bounds x="8.5" y="51" width="6" height="1.5" /></element>
-		<element ref="text_l15a"><bounds x="8.5" y="53.5" width="6" height="1.5" /></element>
-		<element ref="text_l16"><bounds x="8.5" y="62.25" width="6" height="1.5" /></element>
-		<element ref="text_l17"><bounds x="8.5" y="72.25" width="6" height="1.5" /></element>
+		<element ref="text_l14"><bounds xc="11.5" y="41.5" width="5" height="1.5" /></element>
+		<element ref="text_l14a"><bounds xc="11.5" y="43" width="5" height="1.5" /></element>
+		<element ref="text_l15"><bounds xc="11.5" y="51" width="5" height="1.5" /></element>
+		<element ref="text_l15a"><bounds xc="11.5" y="53.5" width="5" height="1.5" /></element>
+		<element ref="text_l16"><bounds xc="11.5" y="62.25" width="5" height="1.5" /></element>
+		<element ref="text_l17"><bounds xc="11.5" y="72.25" width="5" height="1.5" /></element>
 
 		<repeat count="8">
 			<param name="y" start="0" increment="10" />
@@ -507,7 +507,7 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-13" right="118.5" top="-10" bottom="87" />
+		<bounds left="-13" right="119.5" top="-10" bottom="87" />
 
 		<element ref="white"><bounds x="0" y="-10" width="120" height="97" /></element>
 
@@ -552,7 +552,7 @@ authors:hap
 		<element ref="text_r7a"><bounds x="112" y="47.11" width="7" height="1.579" /></element>
 		<element ref="text_r7b"><bounds x="112" y="48.69" width="7" height="1.579" /></element>
 
-		<element ref="blackb"><bounds x="118.5" y="-11" width="10" height="100" /></element>
+		<element ref="blackb"><bounds x="119.5" y="-11" width="10" height="100" /></element>
 
 	</view>
 </mamelayout>

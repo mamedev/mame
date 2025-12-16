@@ -17,6 +17,7 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 {
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
+	u8 *const fill = &m_fillmap.pix(scanline);
 	u8  *gamma_value = &state->m_gamma_table[0];
 
 	// extract color information
@@ -58,11 +59,20 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	if (checker && !((x ^ scanline) & 1))
 		x++;
 
-	for (; x < extent.stopx; x += dx)
-		p[x] = color;
+	for ( ; x < extent.stopx; x += dx)
+	{
+		if (fill[x] == 0)
+		{
+			p[x] = color;
+			fill[x] = 0xff;
+		}
+	}
 }
 
-#define LERP(X, Y, A) (((X) + ((((Y) - (X)) * (A)) >> 8)) & 0x00ff00ff)
+constexpr u32 LERP(u32 x, u32 y, unsigned a)
+{
+	return (x + (((y - x) * a) >> 8)) & 0x00ff00ff;
+}
 
 template <bool Translucent>
 u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 u, s32 v)
@@ -135,7 +145,7 @@ u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, cons
 			v1 = v0, v0--, vfrac = 0x100; // bottom edge of texture
 	}
 
-	// read the four texels from the texture sheet 
+	// read the four texels from the texture sheet
 	u32 tex00 = get_texel(tex_x, tex_y, u0, v0, sheet) << 4;
 	u32 tex01 = get_texel(tex_x, tex_y, u1, v0, sheet) << 4;
 	u32 tex10 = get_texel(tex_x, tex_y, u0, v1, sheet) << 4;
@@ -174,7 +184,7 @@ u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, cons
 inline s32 ATTR_FORCE_INLINE fast_log2(float value)
 {
 	// return 0 for negative values; should never happen
-	if (UNEXPECTED(value < 0.0f))
+	if (UNEXPECTED(value < 0.0F))
 		return 0;
 
 	// we only need the exponent and highest 7 bits of mantissa
@@ -206,6 +216,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 {
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
+	u8 *const fill = &m_fillmap.pix(scanline);
 
 	/* extract color information */
 	const u16 *colortable_r = &state->m_colorxlat[0x0000/2];
@@ -224,7 +235,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	float dvoz = extent.param[2].dpdx;
 
 	// calculate maximum mipmap level from texture dimensions; we go down to 2x2
-	s32 max_level = (f2u(float(std::min(object.texwidth, object.texheight))) >> 23) - 128;
+	s32 max_level = 30 - count_leading_zeros_32(std::min(object.texwidth, object.texheight));
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
@@ -238,22 +249,33 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	{
 		// if the first pixel is transparent, skip to the next one
 		if (!((x ^ scanline) & 1))
-			x++, ooz += dooz, uoz += duoz, voz += dvoz;
+		{
+			x++;
+			ooz += dooz;
+			uoz += duoz;
+			voz += dvoz;
+		}
 
 		// increment by 2 pixels each time, skipping every other pixel
-		dx = 2, dooz *= 2.0f, duoz *= 2.0f, dvoz *= 2.0f;
+		dx = 2;
+		dooz *= 2.0F;
+		duoz *= 2.0F;
+		dvoz *= 2.0F;
 	}
 
 	for ( ; x < extent.stopx; x += dx, ooz += dooz, uoz += duoz, voz += dvoz)
 	{
+		if (fill[x] > 0)
+			continue;
+
 		float z = recip_approx(ooz);
 
-		s32 mml = -object.texlod + fast_log2(z);	// equivalent to log2(z^2)
+		s32 mml = -object.texlod + fast_log2(z);    // equivalent to log2(z^2)
 		s32 level = std::clamp(mml >> 7, 0, max_level);
 
 		// we give texture coordinates 8 fractional bits
-		s32 u = (s32)(uoz * z * 256.0f);
-		s32 v = (s32)(voz * z * 256.0f);
+		s32 u = s32(uoz * z * 256.0F);
+		s32 v = s32(voz * z * 256.0F);
 
 		u32 t = fetch_bilinear_texel<Translucent>(object, level, u, v);
 
@@ -265,9 +287,9 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		}
 		else if (object.utex && mml < 0)
 		{
-			// microtexture; blend up to 50%
+			// microtexture; blend up to almost 50%
 			u32 t2 = fetch_bilinear_texel<Translucent>(object, -1, u, v);
-			s32 frac = std::min(-mml >> object.utexminlod, 128);
+			s32 frac = std::min(-mml >> object.utexminlod, 127);
 			t = LERP(t, t2, frac);
 		}
 
@@ -282,21 +304,22 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		}
 
 		// filtered texel has 8 bits of precision but translator map has 128 (7-bit) entries; need to shift right by 1
-		u8 luma = (u32)lumaram[lumabase + (t >> 1)] * object.luma / 256;
+		u8 luma = u32(lumaram[lumabase + (t >> 1)]) * object.luma / 256;
 
 		// Virtua Striker sets up a luma of 0x40 for national flags on bleachers, fix here.
-		luma = std::min(int(luma), 0x3f);
+		luma = std::min(luma, u8(0x3f));
 
-		/* we have the 6 bits of luma information along with 5 bits per color component */
-		/* now build and index into the master color lookup table and extract the raw RGB values */
-		u32 tr = colortable_r[(luma)] & 0xff;
-		u32 tg = colortable_g[(luma)] & 0xff;
-		u32 tb = colortable_b[(luma)] & 0xff;
+		// we have the 6 bits of luma information along with 5 bits per color component
+		// now build and index into the master color lookup table and extract the raw RGB values
+		u32 tr = colortable_r[luma] & 0xff;
+		u32 tg = colortable_g[luma] & 0xff;
+		u32 tb = colortable_b[luma] & 0xff;
 		tr = gamma_value[tr];
 		tg = gamma_value[tg];
 		tb = gamma_value[tb];
 
 		p[x] = rgb_t(tr, tg, tb);
+		fill[x] = 0xff;
 	}
 }
 

@@ -1736,7 +1736,8 @@ protected:
 	void textram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void textchar_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void paletteram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void sprites_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprites_idx_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sprites_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u16 c404_ram_r(offs_t offset);
 	void c404_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -1778,10 +1779,15 @@ protected:
 	u16 c417_ptrom_lsw_r();
 	void c417_irq_ack_w(offs_t offset, u16 data);
 
-	u16 c412_ram_r(offs_t offset);
-	void c412_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 c412_r(offs_t offset, u16 mem_mask = ~0);
-	void c412_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 c412_flags_r(); // offset 0x06
+	u16 c412_addr_lsw_r(); // offset 0x10
+	u16 c412_addr_msw_r(); // offset 0x12
+	u16 c412_ram_r(); // offset 0x14
+	u16 c412_status_r(); // offset 0x18
+	void c412_flags_w(offs_t offset, u16 data, u16 mem_mask = ~0); // offset 0x04
+	void c412_addr_lsw_w(offs_t offset, u16 data, u16 mem_mask = ~0); // offset 0x10
+	void c412_addr_msw_w(offs_t offset, u16 data, u16 mem_mask = ~0); // offset 0x12
+	void c412_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0); // offset 0x14
 
 	u16 c421_ram_r();
 	void c421_ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -1790,6 +1796,7 @@ protected:
 	u16 c421_addr_lsw_r();
 	void c421_addr_lsw_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
+	void direct_buf_start_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void direct_buf_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void ctl_leds_w(offs_t offset, u16 data);
@@ -1809,6 +1816,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
 
 	u16 c422_r(offs_t offset);
+	void c422_irq_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void c422_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void mcuen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -1854,8 +1862,9 @@ protected:
 	u16 sharedram_sub_r(offs_t offset);
 
 	void sub_interrupt_main_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 sub_comm_r(offs_t offset);
-	void sub_comm_w(offs_t offset, u8 data);
+	u16 sub_comm_status_r();
+	u16 sub_comm_data_r();
+	void sub_comm_data_w(offs_t offset, u8 data);
 
 	u8 mcu_p8_r();
 	void mcu_p8_w(u8 data);
@@ -2384,22 +2393,28 @@ void namcos23_state::c435_state_pio_w(u16 data)
 
 int namcos23_state::c435_get_state_entry_size(u16 type)
 {
-	switch (type)
+	constexpr int STATE_SIZES[0x100] =
 	{
-	case 0x0000: return 43;
-	case 0x0001: return 1;
-	case 0x0002: return 53;
-	case 0x0009: return 19;
-	case 0x000a: return 47;
-	case 0x0042: return 41;
-	case 0x0046: return 13;
-	case 0x00c0: return 33;
-	case 0x00c6: return 13;
-	case 0x00c8: return 17;
-	default:
+		43,  1, 53, -1, -1, -1, -1, -1, -1, 19, 47, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, 41, -1, -1, -1, 13, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		33, -1, -1, -1, -1, -1, 13, -1, 17, -1, -1, -1, -1, -1, -1, -1,
+	};
+
+	if (STATE_SIZES[type & 0xff] == -1)
+	{
 		LOGMASKED(LOG_3D_STATE_UNK, "%s: WARNING: Unknown size for state type %04x\n", machine().describe_context(), type);
-		return -1;
 	}
+	return STATE_SIZES[type & 0xff];
 }
 
 static void transpose_matrix(s16 *m1)
@@ -4416,19 +4431,16 @@ void namcos23_state::render_run(screen_device &screen, bitmap_rgb32 &bitmap)
 
 // C404 (gamma/palette/sprites)
 
-void namcos23_state::sprites_w(offs_t offset, u16 data, u16 mem_mask)
+void namcos23_state::sprites_idx_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	switch (offset)
-	{
-		case 0:
-			m_c404.spritedata_idx = data >> 1;
-			break;
-		case 1:
-			m_c404.sprites[(m_c404.spritedata_idx >> 2) % 0x280].d[m_c404.spritedata_idx & 3] = data;
-			m_c404.spritedata_idx++;
-			break;
-	}
-	LOGMASKED(LOG_SPRITES, "%s: sprites_w: %d = %04x\n", machine().describe_context(), offset, data);
+	m_c404.spritedata_idx = data >> 1;
+	LOGMASKED(LOG_SPRITES, "%s: sprites_idx_w: %d = %04x\n", machine().describe_context(), offset, data);
+}
+
+void namcos23_state::sprites_data_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_c404.sprites[(m_c404.spritedata_idx >> 2) % 0x280].d[m_c404.spritedata_idx & 3] = data;
+	m_c404.spritedata_idx++;
 }
 
 void namcos23_state::paletteram_w(offs_t offset, u32 data, u32 mem_mask)
@@ -5089,104 +5101,92 @@ void crszone_state::c450_dma_size_w(address_space &space, offs_t offset, u32 dat
 
 // C412
 
-u16 namcos23_state::c412_ram_r(offs_t offset)
+u16 namcos23_state::c412_flags_r() // offset 0x06
 {
-	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
-	if (offset < 0x100000)
-		return m_c412.sdram_a[offset & 0xfffff];
-	else if (offset < 0x200000)
-		return m_c412.sdram_b[offset & 0xfffff];
-	else if (offset < 0x220000)
-		return m_c412.sram[offset & 0x1ffff];
-	else if (offset < 0x220200)
-		return m_c412.pczram[offset & 0x1ff];
+	LOGMASKED(LOG_C412_UNK, "%s: c412_flags_r: %04x\n", machine().describe_context(), 0x0002);
+	return 0x0002; // 0001 = busy, 0002 = game uploads things
+}
+
+u16 namcos23_state::c412_addr_lsw_r() // offset 0x10
+{
+	LOGMASKED(LOG_C412_UNK, "%s: c412_addr_lsw_r: %04x\n", machine().describe_context(), (u16)m_c412.adr);
+	return m_c412.adr;
+}
+
+u16 namcos23_state::c412_addr_msw_r() // offset 0x12
+{
+	LOGMASKED(LOG_C412_UNK, "%s: c412_addr_msw_r: %04x\n", machine().describe_context(), (u16)(m_c412.adr >> 16));
+	return m_c412.adr >> 16;
+}
+
+u16 namcos23_state::c412_ram_r() // offset 0x14
+{
+	//  logerror("c412_ram_r %06x\n", m_c412.adr);
+	if (m_c412.adr < 0x100000)
+		return m_c412.sdram_a[m_c412.adr & 0xfffff];
+	else if (m_c412.adr < 0x200000)
+		return m_c412.sdram_b[m_c412.adr & 0xfffff];
+	else if (m_c412.adr < 0x220000)
+		return m_c412.sram[m_c412.adr & 0x1ffff];
+	else if (m_c412.adr < 0x220200)
+		return m_c412.pczram[m_c412.adr & 0x1ff];
 
 	return 0xffff;
 }
 
+u16 namcos23_state::c412_status_r() // offset 0x18
+{
+	// unknown status, 500gp reads it and waits for a transition
+	// no other games use it?
+	m_c412.status_c ^= 1;
+	return m_c412.status_c;
+}
+
+void namcos23_state::c412_flags_w(offs_t offset, u16 data, u16 mem_mask) // offset 0x04
+{
+	// d0: cz on
+	// other bits: no function?
+	LOGMASKED(LOG_C412_UNK, "%s: c412 write %x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
+}
+
+void namcos23_state::c412_addr_lsw_w(offs_t offset, u16 data, u16 mem_mask) // offset 0x10
+{
+	m_c412.adr = (data & mem_mask) | (m_c412.adr & (0xffffffff ^ mem_mask));
+}
+
+void namcos23_state::c412_addr_msw_w(offs_t offset, u16 data, u16 mem_mask) // offset 0x12
+{
+	m_c412.adr = ((data & mem_mask) << 16) | (m_c412.adr & (0xffffffff ^ (mem_mask << 16)));
+}
+
 void namcos23_state::c412_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, m_maincpu->pc(), (unsigned int)m_maincpu->state_int(MIPS3_R31));
-	if (offset < 0x100000)
+	if (m_c412.adr < 0x100000)
 	{
-		//if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 SDRAM A write: %08x = %04x & %04x\n", (offset << 1), data, mem_mask);
-		COMBINE_DATA(m_c412.sdram_a + (offset & 0xfffff));
+		//if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 SDRAM A write: %08x = %04x & %04x\n", (m_c412.adr << 1), data, mem_mask);
+		COMBINE_DATA(m_c412.sdram_a + (m_c412.adr & 0xfffff));
 	}
-	else if (offset < 0x200000)
+	else if (m_c412.adr < 0x200000)
 	{
-		//if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 SDRAM B write: %08x = %04x & %04x\n", (offset << 1), data, mem_mask);
-		COMBINE_DATA(m_c412.sdram_b + (offset & 0xfffff));
+		//if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 SDRAM B write: %08x = %04x & %04x\n", (m_c412.adr << 1), data, mem_mask);
+		COMBINE_DATA(m_c412.sdram_b + (m_c412.adr & 0xfffff));
 	}
-	else if (offset < 0x220000)
+	else if (m_c412.adr < 0x220000)
 	{
-		if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 SRAM write: %08x = %04x & %04x\n", (offset << 1), data, mem_mask);
-		COMBINE_DATA(m_c412.sram    + (offset & 0x1ffff));
+		if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 SRAM write: %08x = %04x & %04x\n", (m_c412.adr << 1), data, mem_mask);
+		COMBINE_DATA(m_c412.sram + (m_c412.adr & 0x1ffff));
 	}
-	else if (offset < 0x220200)
+	else if (m_c412.adr < 0x220200)
 	{
-		if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 PCZRAM write: %08x = %04x & %04x\n", (offset << 1), data, mem_mask);
-		COMBINE_DATA(m_c412.pczram  + (offset & 0x1ff));
+		if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 PCZRAM write: %08x = %04x & %04x\n", (m_c412.adr << 1), data, mem_mask);
+		COMBINE_DATA(m_c412.pczram + (m_c412.adr & 0x1ff));
 	}
 	else
 	{
-		if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 Unknown RAM write: %08x = %04x & %04x\n", (offset << 1), data, mem_mask);
+		if (!m_c417.test_mode) LOGMASKED(LOG_C412_RAM, "C412 Unknown RAM write: %08x = %04x & %04x\n", (m_c412.adr << 1), data, mem_mask);
 	}
+	m_c412.adr++;
 }
-
-u16 namcos23_state::c412_r(offs_t offset, u16 mem_mask)
-{
-	switch (offset)
-	{
-	case 0x3:
-		LOGMASKED(LOG_C412_UNK, "%s: read c412 offset %x & %04x: %04x\n", machine().describe_context(), offset, mem_mask, 0x0002);
-		return 0x0002; // 0001 = busy, 0002 = game uploads things
-	case 0x8:
-		LOGMASKED(LOG_C412_UNK, "%s: read c412 offset %x & %04x: %04x\n", machine().describe_context(), offset, mem_mask, (u16)m_c412.adr);
-		return m_c412.adr;
-	case 0x9:
-		LOGMASKED(LOG_C412_UNK, "%s: read c412 offset %x & %04x: %04x\n", machine().describe_context(), offset, mem_mask, (u16)(m_c412.adr >> 16));
-		return m_c412.adr >> 16;
-	case 0xa:
-	{
-		u16 data = c412_ram_r(m_c412.adr);
-		return data;
-	}
-	case 0xc:
-		// unknown status, 500gp reads it and waits for a transition
-		// no other games use it?
-		m_c412.status_c ^= 1;
-		return m_c412.status_c;
-	}
-
-	LOGMASKED(LOG_C412_UNK, "%s: c412 unknown read %x & %04x\n", machine().describe_context(), offset, mem_mask);
-	return 0;
-}
-
-void namcos23_state::c412_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	switch (offset)
-	{
-	case 0x2:
-		// d0: cz on
-		// other bits: no function?
-		LOGMASKED(LOG_C412_UNK, "%s: c412 write %x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
-		break;
-	case 0x8:
-		m_c412.adr = (data & mem_mask) | (m_c412.adr & (0xffffffff ^ mem_mask));
-		break;
-	case 0x9:
-		m_c412.adr = ((data & mem_mask) << 16) | (m_c412.adr & (0xffffffff ^ (mem_mask << 16)));
-		break;
-	case 0xa:
-		c412_ram_w(m_c412.adr, data, mem_mask);
-		m_c412.adr++;
-		break;
-	default:
-		LOGMASKED(LOG_C412_UNK, "%s: c412 unknown write %x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
-		break;
-	}
-}
-
 
 
 // C421
@@ -5249,28 +5249,26 @@ u16 namcos23_state::c422_r(offs_t offset)
 	return m_c422.regs[offset];
 }
 
-void namcos23_state::c422_w(offs_t offset, u16 data, u16 mem_mask)
+void namcos23_state::c422_irq_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	switch (offset)
+	LOGMASKED(LOG_C422_IRQ, "%s: c422_irq_w: offset 1: %04x\n", machine().describe_context(), data);
+	if (data == 0xfffb)
 	{
-	case 1:
-		LOGMASKED(LOG_C422_IRQ, "%s: c422_w: offset 1: %04x\n", machine().describe_context(), data);
-		if (data == 0xfffb)
-		{
-			LOGMASKED(LOG_C422_IRQ, "%s: c422_w: raise IRQ 3\n", machine().describe_context());
-			irq_update(m_main_irqcause | MAIN_C422_IRQ);
-		}
-		else if (data == 0x000f)
-		{
-			LOGMASKED(LOG_C422_IRQ, "%s: c422_w: ack IRQ 3\n", machine().describe_context());
-			irq_update(m_main_irqcause & ~MAIN_C422_IRQ);
-		}
-		break;
-	default:
-		LOGMASKED(LOG_C422_UNK, "%s: c422 unknown write %x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
-		break;
+		LOGMASKED(LOG_C422_IRQ, "%s: c422_irq_w: raise IRQ 3\n", machine().describe_context());
+		irq_update(m_main_irqcause | MAIN_C422_IRQ);
+	}
+	else if (data == 0x000f)
+	{
+		LOGMASKED(LOG_C422_IRQ, "%s: c422_irq_w: ack IRQ 3\n", machine().describe_context());
+		irq_update(m_main_irqcause & ~MAIN_C422_IRQ);
 	}
 
+	COMBINE_DATA(&m_c422.regs[1]);
+}
+
+void namcos23_state::c422_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	LOGMASKED(LOG_C422_UNK, "%s: c422 unknown write %x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 	COMBINE_DATA(&m_c422.regs[offset]);
 }
 
@@ -5367,15 +5365,15 @@ u16 namcos23_state::c361_vblank_r()
 
 // C?? (control)
 
+void namcos23_state::direct_buf_start_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_c435.direct_buf_open = (bool)data;
+	m_c435.direct_buf_pos = 0;
+	return;
+}
+
 void namcos23_state::direct_buf_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (offset == 1)
-	{
-		m_c435.direct_buf_open = (bool)data;
-		m_c435.direct_buf_pos = 0;
-		return;
-	}
-
 	if (!m_c435.direct_buf_open)
 		return;
 
@@ -5565,29 +5563,25 @@ void namcos23_state::mcuen_w(offs_t offset, u16 data, u16 mem_mask)
 // data ready is signalled thru MIPS irq 4
 // 3f0fa8 (phys address) is where data pops up in TC2 & PP
 // PC=0xbfc03838 bit 7 high => fail (data loaded must be parsed somehow)
-u16 namcos23_state::sub_comm_r(offs_t offset)
+u16 namcos23_state::sub_comm_status_r()
 {
-	// status register
 	m_maincpu->set_input_line(m_rs232_irqnum, CLEAR_LINE);
-	if (offset == 0)
-	{
-		LOGMASKED(LOG_MCU, "%s: sub_comm_r status read: %04x\n", machine().describe_context(), 3);
-		return 1 | 2;
-	}
+	LOGMASKED(LOG_MCU, "%s: sub_comm_status_r: %04x\n", machine().describe_context(), 3);
+	return 1 | 2;
+}
 
+u16 namcos23_state::sub_comm_data_r()
+{
 	// data rx, TBD
-	LOGMASKED(LOG_MCU, "%s: sub_comm_r data read: %04x\n", machine().describe_context(), 0);
+	LOGMASKED(LOG_MCU, "%s: sub_comm_data_r data read: %04x\n", machine().describe_context(), 0);
 	return 0;
 }
 
-void namcos23_state::sub_comm_w(offs_t offset, u8 data)
+void namcos23_state::sub_comm_data_w(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_MCU, "%s: sub_comm_w data write to %d: %02x\n", machine().describe_context(), data);
-	if (offset == 1)
-	{
-		// data tx
-		m_maincpu->set_input_line(m_rs232_irqnum, ASSERT_LINE);
-	}
+	LOGMASKED(LOG_MCU, "%s: sub_comm_data_w: %02x\n", machine().describe_context(), data);
+	// data tx
+	m_maincpu->set_input_line(m_rs232_irqnum, ASSERT_LINE);
 }
 
 void crszone_state::irq_vbl_ack_w(offs_t offset, u32 data)
@@ -5694,7 +5688,8 @@ void gorgon_state::mips_map(address_map &map)
 	c404_map(map, 0x06108000);
 
 	map(0x06110000, 0x0613ffff).ram().w(FUNC(gorgon_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
-	map(0x06300000, 0x06300007).w(FUNC(gorgon_state::sprites_w));
+	map(0x06300000, 0x06300001).w(FUNC(gorgon_state::sprites_idx_w));
+	map(0x06300002, 0x06300003).w(FUNC(gorgon_state::sprites_data_w));
 	map(0x06400000, 0x0641dfff).ram().w(FUNC(gorgon_state::textchar_w)).share("charram"); // Text CGRAM (C361)
 	map(0x0641e000, 0x0641ffff).ram().w(FUNC(gorgon_state::textram_w)).share("textram"); // Text VRAM (C361)
 
@@ -5704,9 +5699,11 @@ void gorgon_state::mips_map(address_map &map)
 
 	map(0x0c000000, 0x0c00ffff).ram().share("nvram"); // Backup RAM
 
-	map(0x0f000000, 0x0f000003).rw(FUNC(gorgon_state::sub_comm_r), FUNC(gorgon_state::sub_comm_w));
+	map(0x0f000000, 0x0f000001).r(FUNC(gorgon_state::sub_comm_status_r));
+	map(0x0f000002, 0x0f000003).rw(FUNC(gorgon_state::sub_comm_data_r), FUNC(gorgon_state::sub_comm_data_w));
 	map(0x0f200000, 0x0f203fff).ram(); // C422 RAM
 	map(0x0f300000, 0x0f30000f).rw(FUNC(gorgon_state::c422_r), FUNC(gorgon_state::c422_w)); // C422 registers
+	map(0x0f300002, 0x0f300003).w(FUNC(gorgon_state::c422_irq_w));
 }
 
 // (Super) System 23
@@ -5717,6 +5714,7 @@ void namcos23_state::mips_map(address_map &map)
 	map(0x06000000, 0x0600ffff).ram().share("nvram"); // Backup RAM
 	map(0x06200000, 0x06203fff).ram(); // C422 RAM
 	map(0x06400000, 0x0640000f).rw(FUNC(namcos23_state::c422_r), FUNC(namcos23_state::c422_w)); // C422 registers
+	map(0x06400002, 0x06400003).w(FUNC(gorgon_state::c422_irq_w));
 	map(0x06800000, 0x0681dfff).ram().w(FUNC(namcos23_state::textchar_w)).share("charram"); // Text CGRAM (C361)
 	map(0x0681e000, 0x0681ffff).ram().w(FUNC(namcos23_state::textram_w)).share("textram"); // Text VRAM (C361)
 
@@ -5726,7 +5724,13 @@ void namcos23_state::mips_map(address_map &map)
 	map(0x06a10000, 0x06a3ffff).ram().w(FUNC(namcos23_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
 	map(0x08000000, 0x08ffffff).rom().region("data", 0x0000000).mirror(0x1000000); // data ROMs
 	map(0x0a000000, 0x0affffff).rom().region("data", 0x1000000).mirror(0x1000000);
-	map(0x0c000000, 0x0c00001f).rw(FUNC(namcos23_state::c412_r), FUNC(namcos23_state::c412_w));
+
+	map(0x0c000004, 0x0c000005).w(FUNC(namcos23_state::c412_flags_w));
+	map(0x0c000006, 0x0c000007).r(FUNC(namcos23_state::c412_flags_r));
+	map(0x0c000010, 0x0c000011).rw(FUNC(namcos23_state::c412_addr_lsw_r), FUNC(namcos23_state::c412_addr_lsw_w));
+	map(0x0c000012, 0x0c000013).rw(FUNC(namcos23_state::c412_addr_msw_r), FUNC(namcos23_state::c412_addr_msw_w));
+	map(0x0c000014, 0x0c000015).rw(FUNC(namcos23_state::c412_ram_r), FUNC(namcos23_state::c412_ram_w));
+	map(0x0c000018, 0x0c000019).r(FUNC(namcos23_state::c412_status_r));
 
 	map(0x0c400000, 0x0c400001).rw(FUNC(namcos23_state::c421_ram_r), FUNC(namcos23_state::c421_ram_w));
 	map(0x0c400004, 0x0c400005).rw(FUNC(namcos23_state::c421_addr_msw_r), FUNC(namcos23_state::c421_addr_msw_w));
@@ -5734,9 +5738,11 @@ void namcos23_state::mips_map(address_map &map)
 
 	map(0x0c800010, 0x0c800011).w(FUNC(namcos23_state::c435_state_reset_w));
 	map(0x0c800016, 0x0c800017).w(FUNC(namcos23_state::c435_state_pio_w));
-	map(0x0cc00000, 0x0cc00003).w(FUNC(namcos23_state::direct_buf_w));
+	map(0x0cc00000, 0x0cc00001).w(FUNC(namcos23_state::direct_buf_w));
+	map(0x0cc00002, 0x0cc00003).w(FUNC(namcos23_state::direct_buf_start_w));
 
-	map(0x0e800000, 0x0e800003).rw(FUNC(namcos23_state::sub_comm_r), FUNC(namcos23_state::sub_comm_w)); // not sure
+	map(0x0e800000, 0x0e800001).r(FUNC(namcos23_state::sub_comm_status_r));
+	map(0x0e800002, 0x0e800003).rw(FUNC(namcos23_state::sub_comm_data_r), FUNC(namcos23_state::sub_comm_data_w));
 }
 
 void crszone_state::mips_map(address_map &map)
@@ -5767,6 +5773,7 @@ void crszone_state::mips_map(address_map &map)
 	map(0x16000000, 0x1600ffff).ram().share("nvram"); // Backup RAM
 	map(0x16200000, 0x16203fff).ram(); // C422 RAM
 	map(0x16400000, 0x1640000f).rw(FUNC(crszone_state::c422_r), FUNC(crszone_state::c422_w)); // C422 registers
+	map(0x16400002, 0x16400003).w(FUNC(crszone_state::c422_irq_w));
 	map(0x16800000, 0x1681dfff).ram().w(FUNC(crszone_state::textchar_w)).share("charram"); // Text CGRAM (C361)
 	map(0x1681e000, 0x1681ffff).ram().w(FUNC(crszone_state::textram_w)).share("textram"); // Text VRAM (C361)
 
@@ -5776,7 +5783,13 @@ void crszone_state::mips_map(address_map &map)
 	map(0x16a10000, 0x16a3ffff).ram().w(FUNC(crszone_state::paletteram_w)).share("paletteram"); // Palette RAM (C404)
 	map(0x18000000, 0x18ffffff).rom().region("data", 0x0000000).mirror(0x1000000); // data ROMs
 	map(0x1a000000, 0x1affffff).rom().region("data", 0x1000000).mirror(0x1000000);
-	map(0x1c000000, 0x1c00001f).rw(FUNC(crszone_state::c412_r), FUNC(crszone_state::c412_w));
+
+	map(0x1c000004, 0x1c000005).w(FUNC(crszone_state::c412_flags_w));
+	map(0x1c000006, 0x1c000007).r(FUNC(crszone_state::c412_flags_r));
+	map(0x1c000010, 0x1c000011).rw(FUNC(crszone_state::c412_addr_lsw_r), FUNC(crszone_state::c412_addr_lsw_w));
+	map(0x1c000012, 0x1c000013).rw(FUNC(crszone_state::c412_addr_msw_r), FUNC(crszone_state::c412_addr_msw_w));
+	map(0x1c000014, 0x1c000015).rw(FUNC(crszone_state::c412_ram_r), FUNC(crszone_state::c412_ram_w));
+	map(0x1c000018, 0x1c000019).r(FUNC(crszone_state::c412_status_r));
 
 	map(0x1c400000, 0x1c400001).rw(FUNC(crszone_state::c421_ram_r), FUNC(crszone_state::c421_ram_w));
 	map(0x1c400004, 0x1c400005).rw(FUNC(crszone_state::c421_addr_msw_r), FUNC(crszone_state::c421_addr_msw_w));

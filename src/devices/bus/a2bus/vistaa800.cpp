@@ -63,6 +63,8 @@ public:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
+	virtual bool take_c800() const override { return true; }
+	virtual void reset_from_bus() override;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -159,6 +161,15 @@ void a2bus_vistaa800_device::device_reset()
 	m_density = 0;
 	m_side = 0;
 	m_twosided = 0;
+}
+
+// TODO: does anything else need to be reset here?
+void a2bus_vistaa800_device::reset_from_bus()
+{
+	m_dmaenable_read = false;
+	m_dmaenable_write = false;
+
+	m_fdc->reset();
 }
 
 //----------------------------------------------

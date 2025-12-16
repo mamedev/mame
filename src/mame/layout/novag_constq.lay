@@ -473,7 +473,7 @@ authors:hap
 		</repeat>
 
 		<element ref="text_m1a"><bounds x="87.63" y="22.35" width="14" height="1.4" /></element>
-		<element ref="text_m2a"><bounds x="87.63" y="30.26" width="14" height="1.15" /></element>
+		<element ref="text_m2a"><bounds x="90.43" y="30.26" width="8.6" height="1.2" /></element>
 		<element ref="text_m2b"><bounds x="87.63" y="35.91" width="14" height="1.4" /></element>
 		<element ref="text_m3a"><bounds x="87.63" y="37.78" width="14" height="1.4" /></element>
 		<element ref="text_m3b"><bounds x="87.63" y="43.63" width="14" height="1.4" /></element>

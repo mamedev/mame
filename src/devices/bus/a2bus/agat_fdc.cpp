@@ -149,6 +149,11 @@ void a2bus_agat_fdc_device::device_start()
 
 void a2bus_agat_fdc_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_agat_fdc_device::reset_from_bus()
+{
 	active = 0;
 	cycles = time_to_cycles(machine().time());
 	data_reg = 0x00;
@@ -160,6 +165,9 @@ void a2bus_agat_fdc_device::device_reset()
 	// Just a timer to be sure that the lss is updated from time to
 	// time, so that there's no hiccup when it's talked to again.
 	m_timer_lss->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+
+	m_d14->reset();
+	m_d15->reset();
 }
 
 TIMER_CALLBACK_MEMBER(a2bus_agat_fdc_device::motor_off)

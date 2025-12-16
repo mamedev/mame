@@ -98,7 +98,7 @@ authors:hap
 		<text state="7" string=" "><color red="0.0" green="0.0" blue="0.0" /></text>
 	</element>
 
-	<element name="text_m1"><text string="(motor pos: 0." align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="text_m1"><text string="(motor pos: 0." align="2"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="text_m2"><text string=")" align="1"><color red="0.95" green="0.95" blue="0.95" /></text></element>
 	<element name="counter" defstate="0">
 		<simplecounter maxstate="99" digits="2" align="1">
@@ -190,9 +190,9 @@ authors:hap
 		</element>
 
 		<!-- motor status info -->
-		<element ref="text_m1"><bounds x="7" y="112" width="22" height="4" /></element>
+		<element ref="text_m1"><bounds x="0" y="112" width="27.7" height="4" /></element>
 		<element name="motor_pos" ref="counter"><bounds x="27.6" y="112" width="10" height="4" /></element>
-		<element ref="text_m2"><bounds x="31.4" y="112" width="5" height="4" /></element>
+		<element ref="text_m2"><bounds x="31.7" y="112" width="5" height="4" /></element>
 		<element name="motor_on" ref="mask">
 			<bounds x="1" y="111" width="38" height="6" />
 			<color alpha="0.75" />

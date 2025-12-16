@@ -21,6 +21,7 @@ public:
 	void lexizeus(machine_config &config);
 
 	void init_zeus();
+	void init_cybrtvfe();
 
 protected:
 	//virtual void machine_start() override ATTR_COLD;
@@ -42,6 +43,30 @@ protected:
 	//virtual void machine_reset() override ATTR_COLD;
 
 	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
+class spg2xx_cybrtvfe_game_state : public spg2xx_lexiseal_game_state
+{
+public:
+	spg2xx_cybrtvfe_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_lexiseal_game_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+};
+
+class spg2xx_cybrtvbb_game_state : public spg2xx_cybrtvfe_game_state
+{
+public:
+	spg2xx_cybrtvbb_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_cybrtvfe_game_state(mconfig, type, tag)
+	{ }
+
+	void cybrtvbb(machine_config& config);
+
+protected:
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
 class spg2xx_vsplus_game_state : public spg2xx_lexizeus_game_state
@@ -221,6 +246,13 @@ static INPUT_PORTS_START( lexiseal )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cybrtvbb )
+	PORT_INCLUDE( lexiseal )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( vsplus )
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -258,6 +290,12 @@ void spg2xx_lexiseal_game_state::portb_w(offs_t offset, uint16_t data, uint16_t 
 		switch_bank(2);
 }
 
+void spg2xx_cybrtvfe_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int bank = data & mem_mask;
+	logerror("%s: portb_w %04x %04x - %04x\n", machine().describe_context(), data, mem_mask, bank);
+	switch_bank(bank & 0x07);
+}
 
 void spg2xx_vsplus_game_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -270,6 +308,15 @@ void spg2xx_vsplus_game_state::portb_w(offs_t offset, uint16_t data, uint16_t me
 	}
 }
 
+void spg2xx_cybrtvbb_game_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	logerror("%s: portc_w %04x %04x masked %04x\n", machine().describe_context(), data, mem_mask, data & mem_mask);
+
+	m_i2cmem->write_sda(BIT(mem_mask, 7) ? BIT(data, 7) : 1);
+	m_i2cmem->write_scl(BIT(mem_mask, 8) ? BIT(data, 8) : 0);
+}
+
+
 void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
 {
 	non_spg_base(config);
@@ -277,6 +324,15 @@ void spg2xx_lexiseal_game_state::lexiseal(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
+}
+
+void spg2xx_cybrtvbb_game_state::cybrtvbb(machine_config &config)
+{
+	lexiseal(config);
+	m_maincpu->portc_out().set(FUNC(spg2xx_cybrtvbb_game_state::portc_w));
+
+	// cybrtvfe has a position for this too, but it's unpopulated
+	I2C_24C02(config, "i2cmem", 0);
 }
 
 void spg2xx_lexizeus_game_state::lexizeus(machine_config &config)
@@ -330,6 +386,13 @@ void spg2xx_lexizeus_game_state::init_zeus()
 	}
 }
 
+void spg2xx_lexizeus_game_state::init_cybrtvfe()
+{
+	init_zeus();
+	int size = memregion("maincpu")->bytes();
+	init_crc(size / 0x800000, 0xc00);
+}
+
 void spg2xx_vsplus_game_state::init_vsplus()
 {
 	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
@@ -366,6 +429,29 @@ ROM_END
 ROM_START( disppal )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vgpocketdisney.u3", 0x0000, 0x400000, CRC(051bd073) SHA1(e453677437206e11fb50b8b86853e466978338a2) )
+ROM_END
+
+ROM_START( cybrtvfe )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	// Block 0 Calculated Byte Sum of bytes from 0x00000c10 to 0x007fffff is 3482e6f7, in header 3482E6F7
+	// Block 1 Calculated Byte Sum of bytes from 0x00800c10 to 0x00ffffff is 2f5fab76, in header 2F5FAB76
+	// Block 2 Calculated Byte Sum of bytes from 0x01000c10 to 0x017fffff is 29dcb774, in header 29DCB774
+	// Block 3 Calculated Byte Sum of bytes from 0x01800c10 to 0x01ffffff is 2ac8e204, in header 2AC8E204
+	// Block 4 Calculated Byte Sum of bytes from 0x02000c10 to 0x027fffff is 2eb7963d, in header 2EB7963D
+	// Block 5 Calculated Byte Sum of bytes from 0x02800c10 to 0x02ffffff is 372ddefe, in header 372DDEFE
+	// Block 6 Calculated Byte Sum of bytes from 0x03000c10 to 0x037fffff is 129dee7c, in header 129DEE7C
+	// Block 7 Calculated Byte Sum of bytes from 0x03800c10 to 0x03ffffff is 129dee7c, in header 129DEE7C
+	ROM_LOAD16_WORD_SWAP( "jl2500fe.u6", 0x0000, 0x4000000, CRC(2fce6685) SHA1(6fc329204fdb401c72884349f29201fb783fe2ea) )
+ROM_END
+
+ROM_START( cybrtvbb )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	// Block 0 Calculated Byte Sum of bytes from 0x00000c10 to 0x007fffff is 2bd64edb, in header 2BD64EDB
+	// Block 1 Calculated Byte Sum of bytes from 0x00800c10 to 0x00ffffff is 30f4f3f0, in header 30F4F3F0
+	// Block 2 Calculated Byte Sum of bytes from 0x01000c10 to 0x017fffff is 2c24e8d5, in header 2C24E8D5
+	// Block 3 Calculated Byte Sum of bytes from 0x01800c10 to 0x01ffffff is 320d1f5a, in header 320D1F5A
+	ROM_LOAD16_WORD_SWAP( "jl2500bb.u6", 0x0000, 0x2000000, CRC(8d6e0c99) SHA1(e54660381ff20ecf9b023da7703802f256f7fba5) )
+	ROM_RELOAD(0x2000000,0x2000000)
 ROM_END
 
 /*
@@ -437,6 +523,10 @@ CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeu
 
 CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// marked as SPG260
+CONS( 2010, cybrtvfe,    0,     0,        lexiseal,     lexiseal, spg2xx_cybrtvfe_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Ferrari 105-in-1 (JL2500FE)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// need to hook up seeprom
+CONS( 2010, cybrtvbb,    0,     0,        cybrtvbb,     cybrtvbb, spg2xx_cybrtvbb_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Barbie 75-in-1 (JL2500BB)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, lexiseal,    0,     0,        lexiseal,     lexiseal, spg2xx_lexiseal_game_state, init_zeus, "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
 // There are versions of the Seal 50-in-1 that actually show Lexibook on the boot screen rather than it just being on the unit.  The Seal name was also used for some VT systems

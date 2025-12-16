@@ -19,6 +19,7 @@ public:
 	pc9821_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801bx_state(mconfig, type, tag)
 		, m_ext_gvram(*this, "ext_gvram")
+		, m_pegc_vram_view(*this, "pegc_vram_view")
 		, m_pegc_mmio_view(*this, "pegc_mmio_view")
 	{
 	}
@@ -37,6 +38,7 @@ protected:
 
 private:
 	required_shared_ptr<uint32_t> m_ext_gvram;
+	memory_view m_pegc_vram_view;
 	memory_view m_pegc_mmio_view;
 
 	uint16_t pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -86,6 +88,7 @@ public:
 
 protected:
 	void pc9821as_map(address_map &map) ATTR_COLD;
+	void pc9821ap2_map(address_map &map) ATTR_COLD;
 	void pc9821as_io(address_map &map) ATTR_COLD;
 
 	virtual void itf_43d_bank_w(offs_t offset, uint8_t data) override;
@@ -137,6 +140,8 @@ private:
 
 	DECLARE_MACHINE_START(pc9821_canbe);
 	DECLARE_MACHINE_RESET(pc9821_canbe);
+
+	virtual void hole_15m_control_w(offs_t offset, u8 data) override;
 
 };
 

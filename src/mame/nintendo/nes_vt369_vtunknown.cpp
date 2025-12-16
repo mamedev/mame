@@ -98,6 +98,7 @@ public:
 	void init_lxcmcypp();
 	void init_dgun2572();
 	void init_s10fake();
+	void init_f5_620();
 
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
@@ -626,15 +627,7 @@ ROM_END
 
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
-	// some of the higher address lines might be swapped
-	ROM_LOAD( "lexibook300.bin", 0x00000, 0x0800000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
-	ROM_CONTINUE(0x2000000, 0x0800000)
-	ROM_CONTINUE(0x3000000, 0x0800000)
-	ROM_CONTINUE(0x2800000, 0x0800000)
-	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_LOAD( "jg7800.bin", 0x00000, 0x8000000, CRC(44f50d4c) SHA1(39ad63220ddd72c5a77f125614efa77501efe59f) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -681,16 +674,16 @@ ROM_START( lxcmcy ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( jl2377 ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2377.u2", 0x00000, 0x4000000, CRC(cb3643c8) SHA1(c0d6211eddf28d1541e791d0bd3e5aef9f1d4d46) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcysw ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "jl2365swr-1.u2", 0x0000000, 0x0800000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
-	ROM_CONTINUE(0x2000000, 0x0800000)
-	ROM_CONTINUE(0x3000000, 0x0800000)
-	ROM_CONTINUE(0x2800000, 0x0800000)
-	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_LOAD( "starwars_jl2365swr-1.u2", 0x00000, 0x4000000, CRC(a34669db) SHA1(fc5c432492473cd0896ef95a67832d422294925a) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -698,14 +691,21 @@ ROM_END
 ROM_START( lxcmcyfz ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "jl2365_frozen.u1", 0x00000, 0x0800000, CRC(64d4c708) SHA1(1bc2d161326ce3039ab9ba46ad62695060cfb2e1) )
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
-	ROM_CONTINUE(0x2000000, 0x0800000)
-	ROM_CONTINUE(0x3000000, 0x0800000)
-	ROM_CONTINUE(0x2800000, 0x0800000)
-	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_LOAD( "frozen_jl2365.u1", 0x00000, 0x4000000, CRC(41c64019) SHA1(17ec755d5f4afc39c2863b75367e6368c039f347) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcmcyfza ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2365fz-6.u2", 0x00000, 0x4000000, CRC(8d365623) SHA1(1484295264601113c2edd31a7b673266f10157d7) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcmcyfzb ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2367fz.u2", 0x00000, 0x4000000, CRC(c6fee0f2) SHA1(55ece7cebeda87eb0a7461073192e25944ffacc8) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -718,10 +718,25 @@ ROM_START( lxcmcydp ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcyco ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2360dc-1.u1", 0x00000, 0x4000000, CRC(710fcafc) SHA1(bfd7dba546b62f1ea337d6f7f8f32ffccffa0a0d) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+
 ROM_START( lxcmcysp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "lexibookspiderman.bin", 0x00000, 0x4000000, CRC(ef6e8847) SHA1(0012df193c52fd48595d85886fd431619c5d5e3e) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcmcyspa ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl2350sp.u2", 0x00000, 0x4000000, CRC(54c66fe0) SHA1(44d71881c0edb2c913f144fe0da8026958c6cfbb) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -735,15 +750,7 @@ ROM_END
 
 ROM_START( lxcmcypj ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// sub-board was marked for 1GB capacity (A0-A25 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "cob66-1g-new02.u4", 0x00000, 0x0800000, CRC(78149671) SHA1(00dab8c0919e909e910525c18142e6a195b364f8) )
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
-	ROM_CONTINUE(0x2000000, 0x0800000)
-	ROM_CONTINUE(0x3000000, 0x0800000)
-	ROM_CONTINUE(0x2800000, 0x0800000)
-	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_LOAD( "pjmasks_cob66-1g-new02.u4", 0x00000, 0x4000000, CRC(d4380394) SHA1(d2b467db12ef541ab5e102ac095a84a64e66d4fe) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -758,6 +765,13 @@ ROM_END
 ROM_START( lxcmcybt ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "batman.bin", 0x00000, 0x4000000, CRC(9f8f15ce) SHA1(396122ce68008e9c8f35b98f5246e8dc7725df17) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcmcyls ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "lexibook_stitch.bin", 0x00000, 0x4000000, CRC(f15f6a2d) SHA1(b92dbf0ce12aea0b58c7a873a3c72afcae11cde5) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -819,33 +833,34 @@ ROM_START( lxcypkpp ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcypkfz ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "jl1895fz.u2", 0x00000, 0x4000000, CRC(6346a6cb) SHA1(a8172119fa49c90813f9a2b4341abbb4bd86f8ab) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+
 ROM_START( lxcmc250 ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "cca250in1.u1", 0x00000, 0x0800000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
-	ROM_CONTINUE(0x1000000, 0x0800000)
-	ROM_CONTINUE(0x0800000, 0x0800000)
-	ROM_CONTINUE(0x1800000, 0x0800000)
-	ROM_CONTINUE(0x2000000, 0x0800000)
-	ROM_CONTINUE(0x3000000, 0x0800000)
-	ROM_CONTINUE(0x2800000, 0x0800000)
-	ROM_CONTINUE(0x3800000, 0x0800000)
+	ROM_LOAD( "250in1_cca250in1.u1", 0x00000, 0x4000000, CRC(54335d7c) SHA1(ecddc74b751806a61551d495dc733a642515f719) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( lxccminn ) // all games selectable
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
-	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(3f8e5a69) SHA1(c9f11f3e5f9b73832a191f4d1620a85c1b70f79e) )
-	ROM_IGNORE(0x4000000)
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// has also been seen with double sized ROM, but 2nd half only contained garbage and upper pin wasn't connected
+	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(1434460c) SHA1(9a0951f630d5412172e0a912d043897e4b8e9007) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( lxccplan ) // all games selectable
-	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
-	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
-	ROM_IGNORE(0x4000000)
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// has also been seen with double sized ROM, but 2nd half only contained garbage and upper pin wasn't connected
+	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(f9ba6cfc) SHA1(e0f83f286653fb410638c01b928b391c5868d14f) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -1046,6 +1061,11 @@ ROM_START( vibes240 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( retro620 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "620in1_retrofc.bin", 0x00000, 0x1000000, CRC(2698f4e5) SHA1(8b9551c22071c48a7ebc1635ca37ebe7a3b33c4b) ) // BGA on subboard
+ROM_END
+
 ROM_START( t3_630 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128n10tfi01.bin", 0x00000, 0x1000000, CRC(7458a598) SHA1(cd35dda56c4531095c7026c88e02e35b1aae730a) )
@@ -1054,6 +1074,13 @@ ROM_END
 ROM_START( lexi30 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexi30.u3", 0x00000, 0x800000, CRC(0d4307ea) SHA1(0d7cf492f796b0bb871deebaca38a3ff3b2ed1e6) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( jl1810gr )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "jl1810gr.u3", 0x00000, 0x1000000, CRC(c0a62d05) SHA1(1d5536e96d65ee9a0aab2fd5b155ee87d5eb2938) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -1175,6 +1202,26 @@ ROM_START( h12p1000 )
 	ROM_LOAD( "h12pro1000.u12", 0x00000, 0x2000000, CRC(b471cb79) SHA1(2324d82a6ae00537090fb534cdf4e4ac6a74ebaf) )
 ROM_END
 
+ROM_START( s10_520 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s10_white_520.bin", 0x00000, 0x1000000, CRC(552ffddb) SHA1(6a1be8bead43eceb51e674499159e850d4c115be) )
+	ROM_FILL( 0x07f3d9, 1, 0x64 ) // bug in init code? how does this work on hardware
+ROM_END
+
+ROM_START( s5_520 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s5_520_gamebox.u4", 0x00000, 0x1000000, CRC(19a7608e) SHA1(e2560752be0eda30cb935d601ee96a41215a277c) )
+ROM_END
+
+ROM_START( 500in1hh )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "500in1.bin", 0x00000, 0x1000000, CRC(50f44c1a) SHA1(8ba3d2b71d0619b3ae45bcbcc6d58162f93b1069) )
+ROM_END
+
+ROM_START( f5_620 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "f5_620in1.u4", 0x00000, 0x1000000, CRC(e3ec27c8) SHA1(d377ccf9bdbe60f6d484360b4b13c3b132628676) )
+ROM_END
 
 void vt369_state::init_lxcmcypp()
 {
@@ -1189,6 +1236,7 @@ void vt369_state::init_lxcmcypp()
 
 void vt369_state::init_dgun2572()
 {
+	// this might simply be due to an incorrect pinout when dumping
 	u8 *rom = memregion("mainrom")->base();
 	for (offs_t base = 0; base < 0x2000000; base += 0x200)
 	{
@@ -1204,10 +1252,22 @@ void vt369_state::init_dgun2572()
 void vt369_state::init_s10fake()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
-	for (offs_t i = 0; i < 0x800000; i += 2)
+	int size = memregion("mainrom")->bytes();
+	for (offs_t i = 0; i < size; i += 2)
 	{
 		uint16_t w = get_u16le(&romdata[i]);
 		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0600) >> 8 | (w & 0x0006) << 8);
+	}
+}
+
+void vt369_state::init_f5_620()
+{
+	uint8_t *romdata = memregion("mainrom")->base();
+	int size = memregion("mainrom")->bytes();
+	for (offs_t i = 0; i < size; i += 2)
+	{
+		uint16_t w = get_u16le(&romdata[i]);
+		put_u16le(&romdata[i], (w & 0xfbfb) | (w & 0x0400) >> 8 | (w & 0x0004) << 8);
 	}
 }
 
@@ -1231,15 +1291,18 @@ CONS( 201?, dvnimbus,   0,        0,  vt369_unk_16mb, vt369, vt36x_state, empty_
 
 ****************************************************************************************************************/
 
-CONS( 2012, lexi30,  0,0,  vt36x_8mb, vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2012, lexi30,    0,  0,  vt36x_8mb,  vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 30-in-1 (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
 
+// Q2 1.8 VER1.2 2012.03.18 on PCB
+CONS( 2012, jl1810gr,  0,  0,  vt36x_16mb, vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 60-in-1 (JL1810GR)", MACHINE_NOT_WORKING | ROT270 )
 
-CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
+CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
 CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
-CONS( 200?, lxcmc250,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcyspa, lxcmcysp,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2350SP, 120-in-1)", MACHINE_NOT_WORKING | ROT270)
 CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyco,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2360DC-1, 120-in-1)", MACHINE_NOT_WORKING )
 // JL2365 models (150-in-1 versions)
 CONS( 200?, lxcmcysw,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels (JL2365SW)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfz,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ)", MACHINE_NOT_WORKING )
@@ -1247,23 +1310,33 @@ CONS( 2018, lxcmcypj,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_s
 CONS( 2014, lxcmcyba,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcycr,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2365DC)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyfd,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Finding Dory", MACHINE_NOT_WORKING )
-CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_NOT_WORKING ) // yes, it has the bitswap even if it's a JL2365 unit
+// later JL2365 models (with added bitswap)
+CONS( 200?, lxcmcyfza, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2365FZ-6)", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcyppa, lxcmcypp,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2365PA-5)", MACHINE_NOT_WORKING )
 // JL2367 models (150-in-1 versions, newer case style)
 CONS( 2018, lxcmcypp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol (JL2367PA)", MACHINE_NOT_WORKING )
 CONS( 2020, lxcmcybt,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman (JL2367BAT)", MACHINE_NOT_WORKING )
+CONS( 2021, lxcmcyls,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Lilo & Stitch (JL2367D)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcydpn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (JL2367DP, 150-in-1)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyspn, 0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2367SP, 150-in-1)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfzb, lxcmcyfz,  0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Frozen (JL2367FZ)", MACHINE_NOT_WORKING )
 
 // JL1895 models, Cyber Arcade Pocket.  This make strange use of the LCDC, the menus are vertical (so must be copied to the LCD rotated) but the games are horizontal as usual
 CONS( 201?, lxcypkdp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Disney Princess (JL1895DP)", MACHINE_NOT_WORKING )
 CONS( 201?, lxcypksp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Spider-Man (JL1895SP-2)", MACHINE_NOT_WORKING )
 CONS( 201?, lxcypkpp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Paw Patrol (JL1895PA)", MACHINE_NOT_WORKING )
+CONS( 201?, lxcypkfz,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Frozen (JL1895FZ)", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse (JL2800MN)", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes (JL2800PL)", MACHINE_NOT_WORKING )
 // similar menus to the lxccminn/lxccplan sets
 CONS( 2013, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 200 in 1 (JL2355)", MACHINE_NOT_WORKING )
-CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING )
+
+CONS( 200?, lxcmc250,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+
+// JL2367-V1.03 20200228 on PCB, JL2377 on case
+CONS( 2020, jl2377,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - 250 in 1 (JL2377)", MACHINE_NOT_WORKING )
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
 CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
@@ -1337,6 +1410,8 @@ CONS( 202?, t3_630,   0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, em
 
 CONS( 202?, zl383,    0,        0,  vt36x_vibesswap_8mb,  vt369, vt36x_state, empty_init, "<unknown>", "ZL-383 400-in-1 Handheld Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 202?, retro620, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Retro FC 620-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 // has extra protection?
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
@@ -1347,6 +1422,15 @@ CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,  
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)
 // there are other S10 units available
 CONS( 202?, s10fake,   0,  0,  vt36x_s10swap_8mb, vt369, vt36x_state, init_s10fake, "<unknown>", "S10 Handheld Game Console (520-in-1, fake entries)", MACHINE_NOT_WORKING )
+// different version, same packaging.  Larger ROM, fewer duplicates etc.
+CONS( 202?, s10_520,   0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "S10 Handheld Game Console (520-in-1)",  MACHINE_NOT_WORKING )
+// similar to above, but no scramble?
+CONS( 202?, s5_520,    0,  0,  vt36x_16mb,          vt369, vt36x_state, empty_init, "<unknown>", "S5 Game Box (520-in-1)",  MACHINE_NOT_WORKING )
+// fewer games, but does have the scramble
+CONS( 202?, 500in1hh,  0,  0,  vt36x_gbox2020_16mb, vt369, vt36x_state, empty_init, "<unknown>", "500-in-1 Handheld Game",  MACHINE_NOT_WORKING )
+
+// there were also 'F1' units, shaped like a car, ROM may or may not be the same
+CONS( 202?, f5_620,    0,  0,  vt36x_16mb,        vt369, vt36x_state, init_f5_620,   "<unknown>", "F5 Handheld Game Console (620-in-1)",  MACHINE_NOT_WORKING )
 
 // banking(?) issues, some games don't boot (writes data to ALU mirror, then some other ports)
 CONS( 202?, h12p1000,  0,        0,  vt36x,     vt369, vt36x_state, empty_init, "<unknown>", "H12 Pro 1000 in 1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
