@@ -54,7 +54,6 @@ public:
 	void invinco_audio(machine_config &config);
 	void invds(machine_config &config);
 	void headon2(machine_config &config);
-	void headon2sl(machine_config &config);
 	void pulsar(machine_config &config);
 	void pulsar_audio(machine_config &config);
 	void spacetrk(machine_config &config);

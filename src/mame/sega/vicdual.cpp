@@ -1790,17 +1790,6 @@ void vicdual_state::headon2(machine_config &config)
 	headon_audio(config);
 }
 
-void vicdual_state::headon2sl(machine_config &config)
-{
-	vicdual_dualgame_root(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_IO, &vicdual_state::headonn_io_map);
-
-	// audio hardware
-	SPEAKER(config, "mono").front_center();
-	headon_audio(config);
-}
 
 void vicdual_state::headon2bw(machine_config &config)
 {
@@ -5264,8 +5253,8 @@ GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,   empty_i
 GAME( 1979, bumba,      headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (Niemer)",        "Bumba (bootleg of Head On)",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, colision,   headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (ASSA)",          "Colision (bootleg of Head On)",                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,   empty_init, ROT0,   "Sega",                    "Head On 2",                                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headon2sl,  headon2,  headon2sl, headon2sl, vicdual_state,   empty_init, ROT270, "Sega",                    "Head On 2 (Sega Slimline)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On 2 (Sidam bootleg)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2sl,  headon2,  headonn,   headon2sl, vicdual_state,   empty_init, ROT270, "Sega",                    "Head On 2 (Sega Slimline)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 2)",                            MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
