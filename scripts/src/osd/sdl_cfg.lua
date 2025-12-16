@@ -102,13 +102,9 @@ if BASE_TARGETOS=="unix" then
 				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL3::'"),
 			}
 		end
-	elseif _OPTIONS["targetos"]=="android" then
-		buildoptions {
-			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL3::'"),
-		}
 	else
 		buildoptions {
-			backtick(sdlconfigcmd() .. " --cflags"),
+			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL3::'"),
 		}
 		if _OPTIONS["targetos"]~="asmjs" then
 			buildoptions {
