@@ -1559,6 +1559,7 @@ void vicdual_state::headon2_io_w(offs_t offset, uint8_t data)
 	if (offset & 0x02) headon_audio_w(data);
 }
 
+
 void vicdual_state::digger_io_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)  assert_coin_status();
@@ -1590,6 +1591,7 @@ void vicdual_state::headon2_io_map(address_map &map)
 	map.global_mask(0x1f);
 	map(0x00, 0x1f).rw(FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
 }
+
 
 void vicdual_state::digger_io_map(address_map &map)
 {
