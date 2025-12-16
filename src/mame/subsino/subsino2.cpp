@@ -4273,6 +4273,23 @@ ROM_START( blushark )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(581f6bfb) SHA1(2b6e9e4800e22913474551c5c70b66933003c12f) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
+ROM_START( goldenti )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "27c200.u21",             0x080000, 0x040000, CRC(712beb01) SHA1(2598043d802f0ec18df9bfd09401e84eed5e6e5c) )
+	ROM_FILL(                           0x0c0000, 0x040000, 0xff )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "m27c160.u43", 0x000001, 0x200000, CRC(27675d81) SHA1(8a3620c1d91f452ae040cd0ab8b384dd4065f0c2) )
+	ROM_LOAD16_BYTE( "m27c160.u44", 0x000000, 0x200000, CRC(c4e27e0b) SHA1(e1f00ed0f5e4ef0ca0605857d9c688a48a507630) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c040.u9", 0x000000, 0x80000, CRC(191e3551) SHA1(f4e9fc56e71ec99bff91678608b6bd97afbfc31b) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds1971.bin", 0x00, 0x28, CRC(bcb1a630) SHA1(3ebd6f85b7267e86dc5458996978f3e22b71a214) )
+ROM_END
+
 
 GAME( 1997, mtrain,      0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.4)",                0 )  // inside the program ROM says 1997, but on screen shows 1996
 GAME( 1996, mtraina,     mtrain,   mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
@@ -4325,3 +4342,5 @@ GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, empty_ini
 GAME( 2003, qbeebing,    0,        humlan,   qbeebing, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 200?, treamary,    0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Treasure Mary",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 200?, goldenti,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Golden Treasure Island (Ver. Alpha 100)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
