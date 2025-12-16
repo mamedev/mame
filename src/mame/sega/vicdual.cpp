@@ -1678,7 +1678,7 @@ static INPUT_PORTS_START( headon2sl )
 	PORT_DIPNAME( 0x03, 0x01, "Lives" )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
-	//PORT_DIPSETTING(    0x02, "5" ) /* Duplicate Value - Each switch set adds a life */
+	PORT_DIPSETTING(    0x02, "5 (Duplicate)" ) /* Duplicate Value - Each switch set adds a life */
 	PORT_DIPSETTING(    0x03, "6" )
 INPUT_PORTS_END
 
