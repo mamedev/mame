@@ -7,7 +7,9 @@
 /*
  * TODO:
  * - UART is connected to MIDI port, mixer, adc
- * - Needs the equivalent of https://github.com/mamedev/mame/pull/11441 for sideline/jagdead
+ * - jagdead: Gus utterances randomly drifts (enables both DMA controls)
+ * - tentacle: misses voice playback quite often (voice mixing?)
+ * - guimo: acts weird with sound detail and frequency (really a PIT bug?)
  * - Move DSP code out, for bus/pc98_cbus/sb16_ct2720
  *
  */
@@ -110,8 +112,10 @@ void sb16_lle_device::p2_w(uint8_t data)
 	*/
 }
 
-void sb16_lle_device::control_timer(bool start)
+void sb16_lle_device::control_timer()
 {
+	const bool start = !BIT(m_ctrl8, 1) || !BIT(m_ctrl16, 1) || BIT(m_mode, 1);
+
 	if(start && m_freq)
 	{
 		double rate = ((46.61512_MHz_XTAL).dvalue()/1024/256) * m_freq;
@@ -124,8 +128,7 @@ void sb16_lle_device::control_timer(bool start)
 void sb16_lle_device::rate_w(uint8_t data)
 {
 	m_freq = data;
-	if(!(m_ctrl8 & 2) || !(m_ctrl16 & 2))
-		control_timer(true);
+	control_timer();
 }
 
 uint8_t sb16_lle_device::dma8_r()
@@ -180,13 +183,11 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 		m_dma8_cnt ++;
 		m_dma8_done = false;
 	}
-	if(!(data & 2) || !(m_ctrl16 & 2))
-		control_timer(true);
 	if(data & 2)
 	{
 		m_isa->drq1_w(0);
-		if(m_ctrl16 & 2)
-			control_timer(false);
+		//if(m_ctrl16 & 2)
+		//	control_timer(false);
 	}
 	// wolf3d disagrees with drq high here (will be short by 1 sample, cfr. MT09316)
 	//else
@@ -211,6 +212,7 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 		m_irqs->in_w<0>(ASSERT_LINE);
 	}
 	m_ctrl8 = data;
+	control_timer();
 }
 
 uint8_t sb16_lle_device::ctrl16_r()
@@ -238,13 +240,13 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 		m_dma16_cnt ++;
 		m_dma16_done = false;
 	}
-	if(!(data & 2) || !(m_ctrl8 & 2))
-		control_timer(true);
+	//if(!(data & 2) || !(m_ctrl8 & 2))
+	//	control_timer(true);
 	if(data & 2)
 	{
 		m_isa->drq5_w(0);
-		if(m_ctrl8 & 2)
-			control_timer(false);
+		//if(m_ctrl8 & 2)
+		//	control_timer(false);
 	}
 	//else
 	//  m_isa->drq5_w(1);
@@ -255,6 +257,7 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 		m_irqs->in_w<1>(ASSERT_LINE);
 	}
 	m_ctrl16 = data;
+	control_timer();
 }
 
 uint8_t sb16_lle_device::dac_fifo_ctrl_r()
@@ -321,7 +324,7 @@ void sb16_lle_device::mode_w(uint8_t data)
 {
 	/* port 0x04
 	 * bit0 - 1 -- dac 16, adc 8; 0 -- adc 16, dac 8
-	 * bit1 - int every sample
+	 * bit1 - output silence (required for fwmigolf for card detection)
 	 * bit2 - int dma complete
 	 * bit3 -
 	 * bit4 - 8 bit signed
@@ -330,6 +333,7 @@ void sb16_lle_device::mode_w(uint8_t data)
 	 * bit7 - 16 bit mono
 	*/
 	m_mode = data;
+	control_timer();
 }
 
 uint8_t sb16_lle_device::dma8_ready_r()
@@ -827,10 +831,11 @@ TIMER_CALLBACK_MEMBER(sb16_lle_device::timer_tick)
 	uint16_t dacl = 0, dacr = 0, adcl = 0, adcr = 0;
 	//printf("mode %02x ctrl8 %02x ctrl16 %02x\n", m_mode, m_ctrl8, m_ctrl16);
 
-	if(m_mode & 2)
+	if(BIT(m_mode, 1))
 	{
 		// it might be possible to run the adc though dma simultaneously but the rom doesn't appear to permit it
-		if(!(m_ctrl8 & 2))
+		// Update: fwmigolf uses this for card detection
+		//if(!(m_ctrl8 & 2))
 			m_cpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 		return;
 	}

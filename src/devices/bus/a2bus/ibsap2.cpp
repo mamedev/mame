@@ -4,10 +4,13 @@
 
     IBS Computertechnik AP 2 Serial Interface
 
-    This V.24/RS-232-C interface is nearly a functional copy of the
-    Apple Super Serial Card, but is only partially compatible. The
-    firmware only recognizes two input mode commands: ESC L for
-    lowercase mode and ESC U for uppercase mode.
+    This V.24/RS-232-C interface card, released around 1981, is
+    nearly equivalent to Apple's Serial Interface Card in firmware
+    features and switch settings, though it uses a 6551 ACIA like
+    the later Super Serial Card.
+
+    The firmware only recognizes two commands in input mode: ESC L
+    for lowercase mode and ESC U for uppercase mode.
 
 **********************************************************************/
 

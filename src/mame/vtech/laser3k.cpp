@@ -7,7 +7,7 @@
 
   This machine is somewhat similar to a 48K Apple II if you blur your eyes
   a lot, but it generally fits in poorly with 100% compatible machines
-  (no chance of a compatible language card or auxmem) so it gets its own driver.
+  (no lo-res graphics, unique memory banking) so it gets its own driver.
 
   An "emulation cartridge" is required to run Apple II software; this appears
   to be just a language card with 16K bytes of RAM that overlay the BASIC
@@ -25,7 +25,6 @@
 
   TODO:
     - Dump and emulate keyboard
-    - RGB graphics mode
 
 ***************************************************************************/
 
@@ -109,6 +108,8 @@ public:
 
 	void laser3k(machine_config &config);
 
+	void cpu_reset_w(int state);
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -139,6 +140,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+	void rgb_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 	int ay3600_shift_r();
@@ -313,6 +315,11 @@ void laser3k_state::machine_reset()
 
 	m_prstrobe = false;
 	m_printer->write_strobe(1);
+}
+
+void laser3k_state::cpu_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t laser3k_state::mem_r(offs_t offset)
@@ -807,6 +814,46 @@ void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 }
 
+void laser3k_state::rgb_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	static const uint8_t bit_image_color_table[] =
+	{
+		BLACK,  DKRED,  GREEN,  YELLOW,
+        BLUE,   PURPLE, AQUA,   WHITE
+	};
+
+	/* sanity checks */
+	if (beginrow < cliprect.min_y)
+		beginrow = cliprect.min_y;
+	if (endrow > cliprect.max_y)
+		endrow = cliprect.max_y;
+	if (endrow < beginrow)
+		return;
+
+	uint8_t const *const vram = m_ram->pointer() + (m_disp_page ? 0xa000 : 0x4000);
+
+	for (int row = beginrow; row <= endrow; row++)
+	{
+		uint16_t *p = &bitmap.pix(row);
+
+		for (int col = 0; col < 40; col++)
+		{
+			int offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
+
+			uint8_t r = vram[offset] & 0x7f;
+			uint8_t g = vram[offset + 0x2000] & 0x7f;
+			uint8_t b = vram[offset + 0x4000] & 0x7f;
+
+			for (int i = 0; i < 7; i++)
+			{
+				uint8_t v = bit_image_color_table[BIT(r, i) | (BIT(g, i) << 1) | (BIT(b, i) << 2)];
+				*(p++) = v;
+				*(p++) = v;
+			}
+		}
+	}
+}
+
 void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	/* sanity checks */
@@ -879,6 +926,15 @@ uint32_t laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			break;
 
 		case RGB:
+			if (m_mix)
+			{
+				rgb_update(screen, bitmap, cliprect, 0, 159);
+				text_update(screen, bitmap, cliprect, 160, 191);
+			}
+			else
+			{
+				rgb_update(screen, bitmap, cliprect, 0, 191);
+			}
 			break;
 
 		case DHIRES:
@@ -1115,7 +1171,8 @@ static INPUT_PORTS_START( laser3k )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+	// reset is controlled by switch on back of unit and not connected to the keyboard
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER)    PORT_NAME("Reset")        PORT_CODE(KEYCODE_F12) PORT_WRITE_LINE_MEMBER(FUNC(laser3k_state::cpu_reset_w))
 INPUT_PORTS_END
 
 // this is an apple II palette; it seems more likely the

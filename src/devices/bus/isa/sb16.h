@@ -87,7 +87,7 @@ private:
 	void sb16_data(address_map &map) ATTR_COLD;
 	void host_io(address_map &map) ATTR_COLD;
 
-	void control_timer(bool start);
+	void control_timer();
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
