@@ -7761,6 +7761,131 @@ Other stuff untested
 		</part>
 	</software>
 
+	<!-- Windows 95 and Windows 95 OSR1/SP1 only. -->
+	<software name="nuwin10">
+		<description>Norton Utilities for Windows 95 (version 1.0)</description>
+		<year>1996</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19960221" />
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows 95 v1.0" sha1="a6c807d3da90666422658b2b565ad066630e86e3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows NT 4.0 only. -->
+	<software name="nuwin20nt">
+		<description>Norton Utilities for Windows NT 4.0</description>
+		<year>1997</year>
+		<publisher>Symantec</publisher>
+		<info name="language=" value="English" />
+		<info name="release" value="19970116" />
+		<info name="version" value="2.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows nt 4.0" sha1="199cf28b94745ae5536fcad8236da9b377541e8d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- For all versions of Windows 95 -->
+	<software name="nuwin20">
+		<description>Norton Utilities for Windows 95 (version 2.0)</description>
+		<year>1997</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19970605" />
+		<info name="version" value="2.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows 95 v2.0" sha1="13da9f0f14eafe88ab4c1692ddfc8f88fd7b3fa7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- For all versions of Windows 95 -->
+	<software name="nuwin30">
+		<description>Norton Utilities for Windows 95 (version 3.0)</description>
+		<year>1997</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19971116" />
+		<info name="version" value="3.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows 95 v3.0" sha1="f9c7b416b55b25aae9890968659ce320d77382a3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/98 -->
+	<software name="nuwin40">
+		<description>Norton Utilities 4.0</description>
+		<year>1999</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="release" value="19990228" />
+		<info name="version" value="4.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 4.0" sha1="1df10640139f876507928f83d8d07cd1135e17f4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/98 and El Torito bootable -->
+	<software name="nuwin45">
+		<description>Norton Utilities 2000</description>
+		<year>1999</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19990809" />
+		<info name="version" value="4.5" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 2000" sha1="c338b8e9abca7570a7c6c98f920f67ba61fe816f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/NT 4.0/98/2000/Me and El Torito bootable -->
+	<software name="nuwin50">
+		<description>Norton Utilities 2001</description>
+		<year>2000</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20000827" />
+		<info name="version" value="5.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 2001" sha1="b2f56325694da71a646e5fc28784c38eb54abbe8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows NT 4.0/98/2000/Me and El Torito bootable -->
+	<software name="nuwin60">
+		<description>Norton Utilities 2002</description>
+		<year>2001</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20010809" />
+		<info name="version" value="6.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 2002" sha1="4b1acf7724d7d266f7e9974ec119b42839bc6af3" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS, Windows 95B, Windows 98, Windows Me, Windows 2000, Windows XP
 	     and El Torito bootable. -->
 	<software name="pmagic">

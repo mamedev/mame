@@ -56,6 +56,10 @@
 #include "video/bt45x.h"
 #include "machine/nvram.h"
 
+// cmc
+#include "machine/am79c90.h"
+#include "machine/tms9914.h"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -81,6 +85,7 @@ public:
 		, m_ioc_floppy(*this, "fdc:0")
 		, m_ioc_scc(*this, "scc")
 		, m_ioc_cio(*this, "cio")
+		, m_ioc_boot_ram(*this, "ioc_boot_ram")
 		, m_ioc_ram(*this, "ioc_ram")
 		, m_ioc_boot(*this, "ioc_boot")
 		// gpu
@@ -89,6 +94,15 @@ public:
 		, m_gpu_mfp(*this, "mfp")
 		, m_gpu_tty(*this, "tty")
 		, m_gpu_duart(*this, "duart%u", 0U)
+		// cmc
+		, m_cmc_cpu(*this, "cmc")
+		, m_cmc_eth(*this, "lance")
+		, m_cmc_gpib(*this, "gpib")
+		, m_cmc_stc(*this, "cmc_stc")
+		, m_cmc_scc1(*this, "cmc_scc1")
+		, m_cmc_scc2(*this, "cmc_scc2")
+		, m_cmc_ram(*this, "cmc_ram")
+		, m_cmc_boot(*this, "cmc_boot")
 	{
 	}
 
@@ -102,11 +116,14 @@ protected:
 
 	// address maps
 	void cpu_map(address_map &map) ATTR_COLD;
-	void cpu_autovector_map(address_map &map) ATTR_COLD;
+	void cpu_cpuspace_map(address_map &map) ATTR_COLD;
 
 	void ioc_cpu_map(address_map &map) ATTR_COLD;
 	void ioc_cpuspace_map(address_map &map) ATTR_COLD;
+
 	void gpu_cpu_map(address_map &map) ATTR_COLD;
+
+	void cmc_cpu_map(address_map &map) ATTR_COLD;
 
 private:
 	u32 bus_error_r(offs_t offset)
@@ -134,7 +151,14 @@ private:
 	{
 		if (!machine().side_effects_disabled())
 			m_ioc_boot.disable();
-		m_ioc_ram[offset & 0x1ffff] = data;
+		m_ioc_boot_ram[offset & 0x1ffff] = data;
+	}
+
+	void cmc_boot_disable_w(offs_t offset, u16 data)
+	{
+		if (!machine().side_effects_disabled())
+			m_cmc_boot.disable();
+		m_cmc_ram[offset & 0x3ffff] = data;
 	}
 
 	void ram_size_w(u32 data)
@@ -173,6 +197,7 @@ private:
 	required_device<floppy_connector> m_ioc_floppy;
 	required_device<z80scc_device> m_ioc_scc;
 	required_device<z8536_device> m_ioc_cio;
+	required_shared_ptr<u16> m_ioc_boot_ram;
 	required_shared_ptr<u16> m_ioc_ram;
 	memory_view m_ioc_boot;
 	u8 m_m2i;
@@ -185,6 +210,15 @@ private:
 	required_device<rs232_port_device> m_gpu_tty;
 	required_device_array<mc68681_device, 2> m_gpu_duart;
 
+	// cmc
+	required_device<m68020_device> m_cmc_cpu;
+	required_device<am7990_device> m_cmc_eth;
+	required_device<tms9914_device> m_cmc_gpib;
+	required_device<am9513_device> m_cmc_stc;
+	required_device<z80scc_device> m_cmc_scc1, m_cmc_scc2;
+	required_shared_ptr<u32> m_cmc_ram;
+
+	memory_view m_cmc_boot;
 	u32 m_ram_size = 0U;
 };
 
@@ -211,6 +245,7 @@ void luna_68k_state::machine_reset()
 	m_m2i = 0;
 	m_i2m = 0;
 	m_ioc_boot.select(0);
+	m_cmc_boot.select(0);
 }
 
 void luna_68k_state::m2i_w(u32 data)
@@ -286,7 +321,7 @@ void luna_68k_state::cpu_map(address_map &map)
 	map(0xe1f00038, 0xe1f0003b).nopr(); // jrc graphics
 }
 
-void luna_68k_state::cpu_autovector_map(address_map &map)
+void luna_68k_state::cpu_cpuspace_map(address_map &map)
 {
 	map(0xfffffff3, 0xfffffff3).r(FUNC(luna_68k_state::i2m_vector_r));
 	map(0xfffffff5, 0xfffffff5).lr8(NAME([]() { return m68000_base_device::autovector(2); }));
@@ -305,7 +340,7 @@ void luna_68k_state::ioc_cpu_map(address_map &map)
 	// hd63450ps10 x 2 dma
 	// z0853606psc cio
 
-	map(0x000000, 0x01ffff).ram(); // HM62256LP-10x4 (32768x4) - 128KB
+	map(0x000000, 0x01ffff).ram().share(m_ioc_boot_ram); // HM62256LP-10x4 (32768x4) - 128KB
 	map(0x000000, 0x000fff).view(m_ioc_boot);
 	m_ioc_boot[0](0x000000, 0x000fff).rom().region("ioc", 0).w(FUNC(luna_68k_state::ioc_boot_disable_w));
 	map(0x100000, 0x11ffff).ram().share(m_ioc_ram); // HM62256LP-10x8 (32768x4) - 128KB
@@ -327,7 +362,7 @@ void luna_68k_state::ioc_cpu_map(address_map &map)
 void luna_68k_state::ioc_cpuspace_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_ioc_cpu, FUNC(m68000_device::autovectors_map));
-	map(0xfffff3, 0xfffff3).r(FUNC(luna_68k_state::ioc_cio_vector_r)); // Actual level unknown, just not 2 or 7
+	map(0xfffff5, 0xfffff5).r(FUNC(luna_68k_state::ioc_cio_vector_r)); // Actual level unknown, just not 2 or 7
 }
 
 void luna_68k_state::gpu_cpu_map(address_map &map)
@@ -344,6 +379,15 @@ void luna_68k_state::gpu_cpu_map(address_map &map)
 
 	map(0xc0000000, 0xc000ffff).ram(); // M5M5178P-55 64kb (8k x 8) static RAM (2x4)   -  64kB
 	map(0xf0000000, 0xf003ffff).ram(); // M5M5258P-35 256kb (64k x 4) static RAM (x8)  - 256kB
+}
+
+void luna_68k_state::cmc_cpu_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).ram().share(m_cmc_ram); // NEC D43256AC-10L x 8 (32768x8)
+	map(0x000000, 0x000fff).view(m_cmc_boot);
+	m_cmc_boot[0](0x000000, 0x000fff).rom().region("cmc", 0).w(FUNC(luna_68k_state::cmc_boot_disable_w));
+
+	map(0x400000, 0x407fff).rom().region("cmc", 0);
 }
 
 static DEVICE_INPUT_DEFAULTS_START(terminal)
@@ -364,7 +408,7 @@ void luna_68k_state::luna(machine_config &config)
 {
 	M68030(config, m_cpu, 50_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &luna_68k_state::cpu_map);
-	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &luna_68k_state::cpu_autovector_map);
+	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &luna_68k_state::cpu_cpuspace_map);
 
 	// 8 SIMMs for RAM arranged as two groups of 4, soldered
 	RAM(config, m_ram);
@@ -474,6 +518,20 @@ void luna_68k_state::luna(machine_config &config)
 	MC68681(config, m_gpu_duart[1], 3.6864_MHz_XTAL);
 
 	NVRAM(config, "gpu_nvram");
+
+	// CMC
+	M68020(config, m_cmc_cpu, 25_MHz_XTAL/2);
+	m_cmc_cpu->set_addrmap(AS_PROGRAM, &luna_68k_state::cmc_cpu_map);
+
+	AM7990(config, m_cmc_eth); // Linked to an AM7992BCD, 
+	TMS9914(config, m_cmc_gpib, 25_MHz_XTAL/5);
+	AM9513(config, m_cmc_stc, 25_MHz_XTAL/2); // FIXME: clock unknown
+
+	SCC8530(config, m_cmc_scc1, 4.9152_MHz_XTAL); // AM8530H-6PC
+	SCC8530(config, m_cmc_scc2, 4.9152_MHz_XTAL); // AM8530H-6PC
+	m_cmc_scc1->configure_channels(4'915'200, 4'915'200, 4'915'200, 4'915'200);
+	m_cmc_scc2->configure_channels(4'915'200, 4'915'200, 4'915'200, 4'915'200);
+	
 }
 
 ROM_START(luna)
@@ -491,6 +549,9 @@ ROM_START(luna)
 	ROM_REGION32_BE(0x40000, "gpu", 0)
 	ROM_LOAD("jaw-2500__rom0__v1.21.rom0", 0x00000, 0x20000, CRC(915e0e86) SHA1(1115a8d3101f6d16e397016ae02fc64202edfc3a))
 	ROM_LOAD("jaw-2500__rom1__v1.21.rom1", 0x20000, 0x20000, CRC(b4c21f3f) SHA1(577833dfbbceba8ee32fd2ac5b1809f860143d44))
+
+	ROM_REGION16_BE(0x8000, "cmc", 0)
+	ROM_LOAD("8112_v1_1.icnn", 0x0000, 0x8000, CRC(b87e0122) SHA1(22290850761ed3dddb2369e062012679e2963fa3))
 ROM_END
 
 } // anonymous namespace
