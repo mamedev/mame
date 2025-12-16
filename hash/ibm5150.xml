@@ -3840,7 +3840,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	<software name="nu2">
 		<description>The Norton Utilities 2.01 (1983-11-03)</description>
 		<year>1983</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="2.01" />
 		<info name="release" value="19831103" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3860,7 +3860,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	<software name="nu201o" cloneof="nu2">
 		<description>The Norton Utilities 2.01 (1983-07-04)</description>
 		<year>1983</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="2.01" />
 		<info name="release" value="19830704" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3880,7 +3880,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	<software name="nu200" cloneof="nu2">
 		<description>The Norton Utilities 2.00</description>
 		<year>1983</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="2.00" />
 		<info name="release" value="19830601" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3900,7 +3900,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	<software name="nu3">
 		<description>The Norton Utilities 3.10</description>
 		<year>1985</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="3.10" />
 		<info name="release" value="19851101" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3913,7 +3913,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	<software name="nu300" cloneof="nu3">
 		<description>The Norton Utilities 3.00</description>
 		<year>1985</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="3.00" />
 		<info name="release" value="19850114" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3932,7 +3932,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	<software name="nu4">
 		<description>The Norton Utilities Advanced Edition 4.51 (3.5" disk)</description>
 		<year>1989</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="4.51" />
 		<info name="release" value="19890103" />
 		<part name="flop1" interface="floppy_3_5">
@@ -3950,7 +3950,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 	<software name="nu451_525" cloneof="nu4">
 		<description>The Norton Utilities Advanced Edition 4.51 (5.25" disk)</description>
 		<year>1989</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="4.51" />
 		<info name="release" value="19890103" />
 		<part name="flop1" interface="floppy_5_25">
@@ -3970,10 +3970,34 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		</part>
 	</software>
 
+	<software name="nu450_525" cloneof="nu4">
+		<description>The Norton Utilities Advanced Edition 4.50 (5.25" disk)</description>
+		<year>1988</year>
+		<publisher>Peter Norton Computing</publisher>
+		<info name="version" value="4.50" />
+		<info name="release" value="19881016" />
+		<!-- baddump: OEM IDs changed to “PCJS.ORG” -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities advanced edition 4.50 5.25-disk 1.img" size="368640" crc="e70f8cec" sha1="5ae5980663fa753fff7d52ace00f14a0afa653f7" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities advanced edition 4.50 5.25-disk 2.img" size="368640" crc="f3f6f70d" sha1="07730d81998febe6e8478f6c0a71de3542e922bf" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities advanced edition 4.50 5.25-disk 3.img" size="368640" crc="f266fabe" sha1="8c613b33c5b52b85d3ba4d7578702d67c48bf737" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nu450" cloneof="nu4">
 		<description>The Norton Utilities Advanced Edition 4.50 (3.5" disk)</description>
 		<year>1988</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="4.50" />
 		<info name="release" value="19881016" />
 		<!-- baddump: has volume label and file creation dates in 2010
@@ -3990,10 +4014,23 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		</part>
 	</software>
 
+	<software name="nu401" cloneof="nu4">
+		<description>The Norton Utilities Advanced Edition 4.01</description>
+		<year>1988</year>
+		<publisher>Peter Norton Computing</publisher>
+		<info name="version" value="4.01" />
+		<info name="release" value="19880215" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities advanced edition 4.01.img" size="737280" crc="386412b5" sha1="907626c680b410f63a2eb3f442237b5354bbffbb" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nu400" cloneof="nu4">
 		<description>The Norton Utilities 4.00</description>
 		<year>1987</year>
-		<publisher>Peter Norton Computing, Inc.</publisher>
+		<publisher>Peter Norton Computing</publisher>
 		<info name="version" value="4.00" />
 		<info name="release" value="19870301" />
 		<part name="flop1" interface="floppy_5_25">
