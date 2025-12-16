@@ -51,10 +51,10 @@ TODO:
 
 TODO (MD side):
 - some games (orunnersj, timekillu, rhythmld and late SGDK games) fails on Z80 bus request stuff;
-- dashdes: is a flickerfest during gameplay;
+- dashdes: is a flickerfest during gameplay (fixed?);
 - sonic2/combatca: no interlace support in 2-players mode;
 - dheadj: scrolling issues in stage 4-1 (blocks overflowing with );
-- shangon/skitchin: one line off during gameplay;
+- skitchin: one line off during gameplay;
 - caesar: no sound;
 - gynougj: stray tile on top-left of title screen;
 

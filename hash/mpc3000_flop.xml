@@ -3,12 +3,44 @@
 <!--
 license:CC0-1.0
 
-We currently lack any native MPC3000 disks, so these are the first 4 MPC60 factory
-disks loaded into the MPC3000 emulation and saved in MPC3000 format onto 1.44MB
-FAT12 floppies.
+The mpc60d* disks are the first 4 MPC60 factory disks loaded into the MPC3000
+emulation and saved in MPC3000 format onto 1.44M FAT12 floppies.
 -->
 <softwarelist name="mpc3000_flop" description="Akai MPC3000 floppies">
-	<software name="mpc60d1">
+	<software name="os316" supported="yes">
+		<description>MPC3000 OS 3.16</description>
+		<year>2005</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="362955">
+				<rom name="os316.imd" size="362955" crc="6c7d3228" sha1="f6632fbb9755afe3f6f94ce3e3fc1efde58ba79a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disk3funk" supported="yes">
+		<description>MPC3000 Disk 3 - Funk Set</description>
+		<year>1997</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mpc3kd3funk.dsk" size="1474560" crc="6db46039" sha1="041a6381379c5c2f61628be348cae03e7cce67bb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="disk4perc" supported="yes">
+		<description>MPC3000 Disk 4 - Percussion Set</description>
+		<year>1997</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use with MPC3000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mpc3kd4perc.img" size="1474560" crc="e902e0f0" sha1="d3c614058c2f74d1eb8f3f1a10328bb2dce8c63a"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="mpc60d1" supported="yes">
 		<description>MPC60 Disk 1 - Studio Set</description>
 		<year>1988</year>
 		<publisher>Akai</publisher>
@@ -19,7 +51,7 @@ FAT12 floppies.
 			</dataarea>
 		</part>
 	</software>
-	<software name="mpc60d2">
+	<software name="mpc60d2" supported="yes">
 		<description>MPC60 Disk 2 - Rock Set</description>
 		<year>1988</year>
 		<publisher>Akai</publisher>
@@ -30,7 +62,7 @@ FAT12 floppies.
 			</dataarea>
 		</part>
 	</software>
-	<software name="mpc60d3">
+	<software name="mpc60d3" supported="yes">
 		<description>MPC60 Disk 3 - Dry Set</description>
 		<year>1988</year>
 		<publisher>Akai</publisher>
@@ -41,7 +73,7 @@ FAT12 floppies.
 			</dataarea>
 		</part>
 	</software>
-	<software name="mpc60d4">
+	<software name="mpc60d4" supported="yes">
 		<description>MPC60 Disk 4 - Synth Set</description>
 		<year>1988</year>
 		<publisher>Akai</publisher>

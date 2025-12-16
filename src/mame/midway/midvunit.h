@@ -135,6 +135,7 @@ class midvunit_state : public midvunit_base_state
 public:
 	void midvunit(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(gear_button);
 	DECLARE_INPUT_CHANGED_MEMBER(shift_button);
 
 protected:

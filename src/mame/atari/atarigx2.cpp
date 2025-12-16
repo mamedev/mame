@@ -2013,6 +2013,53 @@ ROM_START( motofrenft )
 ROM_END
 
 
+ROM_START( motofrenfta )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_LOAD32_BYTE( "136094-0021d.23e", 0x000000, 0x020000, CRC(9f2c4280) SHA1(1952dbb76d1dca25b381ce86041fad6b3e212133) )
+	ROM_LOAD32_BYTE( "136094-0022d.23j", 0x000001, 0x020000, CRC(efaee63a) SHA1(2c37655394a4f32b93777fdb38684a6cf8188da9) )
+	ROM_LOAD32_BYTE( "136094-0023d.37e", 0x000002, 0x020000, CRC(e966c3b5) SHA1(fe76a3705b5f2feb1536a2fc9fd55ac23c692923) )
+	ROM_LOAD32_BYTE( "136094-0024d.37j", 0x000003, 0x020000, CRC(29796ead) SHA1(535514eb25d79bc533a06f862afd62a6689228f9) )
+
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136094-0080a.12c", 0x00000, 0x10000, CRC(0b1e565c) SHA1(03bdeafd8cf680f76bbd1f9aba6efac27f19a93c) )
+
+	ROM_REGION( 0x180000, "tiles", 0 )
+	ROM_LOAD( "136094-0036a.2d", 0x000000, 0x80000, CRC(1b63b493) SHA1(980141fec011fa2b5cb020eeecb4784d31679dba) ) /* playfield, planes 0-1 */
+	ROM_LOAD( "136094-0037a.5d", 0x080000, 0x80000, CRC(6d290056) SHA1(fa32dbe5ac5e735d700d086353461eaa2c1dee55) ) /* playfield, planes 2-3 */
+	ROM_LOAD( "136094-0038a.8d", 0x100000, 0x80000, CRC(38197c88) SHA1(dc5d4d878759503b8500e8e3a032f499bfeedcb1) ) /* playfield, planes 4-5 */
+
+	ROM_REGION( 0x020000, "chars", 0 )
+	ROM_LOAD( "136094-0025a.13n", 0x000000, 0x20000, CRC(6ab762ad) SHA1(c52dd207ff5adaffa458e020e7d452a1d1e65194) ) /* alphanumerics */
+
+	ROM_REGION16_BE( 0x700000, "rle", 0 )
+	ROM_LOAD16_BYTE( "136094-0041a.31n", 0x000000, 0x80000, CRC(474770e9) SHA1(507dac654d1c350ab530892e3ec19793629d3a07) )
+	ROM_LOAD16_BYTE( "136094-0040a.31l", 0x000001, 0x80000, CRC(cb777468) SHA1(aa199bc02ab966b9f270057857aec50add8d684c) )
+	ROM_LOAD16_BYTE( "136094-0043a.33n", 0x100000, 0x80000, CRC(353d2dc3) SHA1(82c2c862404ea4c94c9baee1d0ac32696fcf78bd) )
+	ROM_LOAD16_BYTE( "136094-0042a.33l", 0x100001, 0x80000, CRC(17d49f77) SHA1(7ed85035128f3c9dc2bc3d9f387dba01a882e3f4) )
+	ROM_LOAD16_BYTE( "136094-0045a.35n", 0x200000, 0x80000, CRC(13d89355) SHA1(becd43a51c643732025386d7781dcf784b20d031) )
+	ROM_LOAD16_BYTE( "136094-0044a.35l", 0x200001, 0x80000, CRC(924c817e) SHA1(2c23fd8a85833875cfb2d60e1072bd59cea57e0c) )
+	ROM_LOAD16_BYTE( "136094-0047a.37n", 0x300000, 0x80000, CRC(43ee7453) SHA1(3549f62e6b2f50d663fbb4068cb8907b5073ef5e) )
+	ROM_LOAD16_BYTE( "136094-0046a.37l", 0x300001, 0x80000, CRC(980b9b92) SHA1(6a5cfb77b65c0a28dba705d4738c883be983cd4d) )
+	ROM_LOAD16_BYTE( "136094-0049a.31t", 0x400000, 0x80000, CRC(25ac33af) SHA1(e76af04d2e2cbf5769c1f53e2eac4f85e57003ba) )
+	ROM_LOAD16_BYTE( "136094-0048a.31r", 0x400001, 0x80000, CRC(d725a27d) SHA1(9d8d332a6c1d773888c2d9ef1d7ea1e865f6dd02) )
+	ROM_LOAD16_BYTE( "136094-0051a.33t", 0x500000, 0x80000, CRC(a0fc90b2) SHA1(08ac2510287e8c3e8e52995d8f741b2a58e5b37b) )
+	ROM_LOAD16_BYTE( "136094-0050a.33r", 0x500001, 0x80000, CRC(dcc206cf) SHA1(f0b7d5d289f4c0de99b536dd2874ffdabf648cb2) )
+	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
+	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
+
+	ROM_REGION( 0x80000, "jsa:oki1", 0 )
+	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
+
+	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
+
+	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
+	ROM_LOAD( "136094-001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) )
+	ROM_LOAD( "136094-002a.21s",  0x0200, 0x0200, CRC(f4768b4d) SHA1(a506fa5386ab0ea2851ff1f8474d4bfc66deaa70) )
+	ROM_LOAD( "136094-003a.20s",  0x0400, 0x0200, CRC(22a76ad4) SHA1(ce840c283bbd3a5f19dc8d91b19d1571eff51ff4) )
+ROM_END
+
+
 ROM_START( motofrenmf )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
 	ROM_LOAD32_BYTE( "136094-ftmd0.23e", 0x000000, 0x020000, CRC(9be0803e) SHA1(b5e3029ef43adfeafd5979d4ee49a3eb62efd629) )
@@ -2304,10 +2351,11 @@ GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init
 GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", MACHINE_NODEVICE_LAN )
 GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", MACHINE_NODEVICE_LAN )
 
-GAME( 1992, motofren,   0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", MACHINE_NODEVICE_LAN )
-GAME( 1992, motofrenmd, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", MACHINE_NODEVICE_LAN )
-GAME( 1992, motofrenft, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version)", MACHINE_NODEVICE_LAN )
-GAME( 1992, motofrenmf, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofren,    0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmd,  motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenft,  motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version, Jul 17, 1992)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenfta, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version, Jul 22, 1992)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmf,  motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", MACHINE_NODEVICE_LAN )
 
 GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )

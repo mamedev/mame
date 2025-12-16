@@ -204,7 +204,7 @@ u32 vr0uart_device::receive_buffer_r(offs_t offset, u32 mem_mask)
 	u8 res = 0;
 
 	if (ACCESSING_BITS_0_7 && !m_urxb_fifo.empty())
-		res = m_urxb_fifo.dequeue(!machine().side_effects_disabled());
+		res = machine().side_effects_disabled() ? m_urxb_fifo.peek() : m_urxb_fifo.dequeue();
 
 	return res;
 }

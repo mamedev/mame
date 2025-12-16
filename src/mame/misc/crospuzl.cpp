@@ -86,17 +86,17 @@ private:
 	void flash_addr_w(u8 data);
 
 	// PIO
-	u32 pio_lddr_r();
-	void pio_lddr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 pio_ldat_r();
-	void pio_ldat_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 pio_edat_r();
+	u32 piolddr_r();
+	void piolddr_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pioldat_r();
+	void pioldat_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pioedat_r();
 
 	void main_map(address_map &map) ATTR_COLD;
 };
 
 
-u32 crospuzl_state::pio_edat_r()
+u32 crospuzl_state::pioedat_r()
 {
 	// TODO: this needs fixing in nand_device
 	// (has a laconic constant for the ready line)
@@ -154,12 +154,12 @@ void crospuzl_state::flash_addr_w(u8 data)
 		logerror("%s: %08x %02x ADDR\n", machine().describe_context(), m_flash_addr, m_flash_shift);
 }
 
-u32 crospuzl_state::pio_lddr_r()
+u32 crospuzl_state::piolddr_r()
 {
 	return m_ddr;
 }
 
-void crospuzl_state::pio_lddr_w(offs_t offset, u32 data, u32 mem_mask)
+void crospuzl_state::piolddr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (BIT(m_ddr, 19) != BIT(data, 19))
 		m_rtc->sda_w(BIT(data, 19) ? 1 : BIT(m_pio, 19));
@@ -168,14 +168,14 @@ void crospuzl_state::pio_lddr_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_ddr);
 }
 
-u32 crospuzl_state::pio_ldat_r()
+u32 crospuzl_state::pioldat_r()
 {
 	return m_pio;
 }
 
 // PIO Latched output DATa Register
 // TODO: change me
-void crospuzl_state::pio_ldat_w(offs_t offset, u32 data, u32 mem_mask)
+void crospuzl_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (!BIT(m_ddr, 19))
 		m_rtc->sda_w(BIT(data, 19));
@@ -201,9 +201,9 @@ void crospuzl_state::main_map(address_map &map)
 
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 	map(0x0180001c, 0x0180001f).noprw();
-	map(0x01802000, 0x01802003).rw(FUNC(crospuzl_state::pio_lddr_r), FUNC(crospuzl_state::pio_lddr_w));
-	map(0x01802004, 0x01802007).rw(FUNC(crospuzl_state::pio_ldat_r), FUNC(crospuzl_state::pio_ldat_w));
-	map(0x01802008, 0x0180200b).r(FUNC(crospuzl_state::pio_edat_r));
+	map(0x01802000, 0x01802003).rw(FUNC(crospuzl_state::piolddr_r), FUNC(crospuzl_state::piolddr_w));
+	map(0x01802004, 0x01802007).rw(FUNC(crospuzl_state::pioldat_r), FUNC(crospuzl_state::pioldat_w));
+	map(0x01802008, 0x0180200b).r(FUNC(crospuzl_state::pioedat_r));
 
 	map(0x02000000, 0x027fffff).ram().share(m_workram);
 

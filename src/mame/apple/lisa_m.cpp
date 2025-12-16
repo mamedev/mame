@@ -746,7 +746,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			}
 			else
 			{   /* system ROMs */
-				direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, m_rom_ptr - (address & 0x3fff));
+				direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, (uint8_t *)m_rom_ptr - (address & 0x3fff));
 			}
 
 			return -1;
@@ -775,7 +775,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 				/* out of segment limits : bus error */
 				printf("illegal opbase address%lX\n", (long) address);
 			}
-			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, m_ram_ptr + mapped_address - address);
+			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, (uint8_t *)m_ram_ptr + mapped_address - address);
 			printf("RAM\n");
 			break;
 
@@ -788,7 +788,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			break;
 
 		case special_IO:
-			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, m_rom_ptr + (mapped_address & 0x003fff) - address);
+			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, (uint8_t *)m_rom_ptr + (mapped_address & 0x003fff) - address);
 			printf("ROM\n");
 			break;
 		}
@@ -857,8 +857,8 @@ void lisa_state::init_lisa1(void)
 
 void lisa_state::init_lisa2()
 {
-	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
-	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
+	m_ram_ptr = &memregion("maincpu")->as_u16(RAM_OFFSET >> 1);
+	m_rom_ptr = &memregion("maincpu")->as_u16(ROM_OFFSET >> 1);
 	m_model = lisa2;
 	m_features.has_fast_timers = 0;
 	m_features.floppy_hardware = sony_lisa2;
@@ -870,8 +870,8 @@ void lisa_state::init_lisa2()
 
 void lisa_state::init_lisa210()
 {
-	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
-	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
+	m_ram_ptr = &memregion("maincpu")->as_u16(RAM_OFFSET >> 1);
+	m_rom_ptr = &memregion("maincpu")->as_u16(ROM_OFFSET >> 1);
 	m_model = lisa_210;
 	m_features.has_fast_timers = 1;
 	m_features.floppy_hardware = sony_lisa210;
@@ -883,8 +883,8 @@ void lisa_state::init_lisa210()
 
 void lisa_state::init_mac_xl()
 {
-	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
-	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
+	m_ram_ptr = &memregion("maincpu")->as_u16(RAM_OFFSET >> 1);
+	m_rom_ptr = &memregion("maincpu")->as_u16(ROM_OFFSET >> 1);
 	m_model = mac_xl;
 	m_features.has_fast_timers = 1;
 	m_features.floppy_hardware = sony_lisa210;
@@ -913,8 +913,8 @@ void lisa_state::machine_start()
 
 void lisa_state::machine_reset()
 {
-	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
-	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
+	m_ram_ptr = &memregion("maincpu")->as_u16(RAM_OFFSET >> 1);
+	m_rom_ptr = &memregion("maincpu")->as_u16(ROM_OFFSET >> 1);
 	m_videoROM_ptr = memregion("gfx1")->base();
 
 //  m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine()));
@@ -938,7 +938,7 @@ void lisa_state::machine_reset()
 	set_VTIR(0);
 
 	m_video_address_latch = 0;
-	m_videoram_ptr = (uint16_t *) m_ram_ptr;
+	m_videoram_ptr = m_ram_ptr;
 
 	m_FDIR = 0;
 	m_via0->write_pb4(m_FDIR);
@@ -1219,7 +1219,7 @@ uint16_t lisa_state::lisa_r(offs_t offset, uint16_t mem_mask)
 			}
 			else
 			{   /* system ROMs */
-				answer = ((uint16_t*)m_rom_ptr)[(offset & 0x001fff)];
+				answer = m_rom_ptr[offset & 0x001fff];
 				/*logerror("dst address in ROM (setup mode)\n");*/
 			}
 
@@ -1250,7 +1250,7 @@ uint16_t lisa_state::lisa_r(offs_t offset, uint16_t mem_mask)
 				/* out of segment limits : bus error */
 
 			}
-			answer = *(uint16_t *)(m_ram_ptr + address);
+			answer = m_ram_ptr[address >> 1];
 
 			if (m_bad_parity_count && m_test_parity
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
@@ -1268,7 +1268,7 @@ uint16_t lisa_state::lisa_r(offs_t offset, uint16_t mem_mask)
 				/* out of segment limits : bus error */
 
 			}
-			answer = *(uint16_t *)(m_ram_ptr + address);
+			answer = m_ram_ptr[address >> 1];
 
 			if (m_bad_parity_count && m_test_parity
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
@@ -1292,8 +1292,8 @@ uint16_t lisa_state::lisa_r(offs_t offset, uint16_t mem_mask)
 			break;
 
 		case special_IO:
-			if (! (address & 0x008000))
-				answer = *(uint16_t *)(m_rom_ptr + (address & 0x003fff));
+			if (!(address & 0x008000))
+				answer = m_rom_ptr[(address & 0x003fff) >> 1];
 			else
 			{   /* read serial number from ROM */
 				/* this has to be be the least efficient way to read a ROM :-) */
@@ -1452,7 +1452,7 @@ void lisa_state::lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				/* out of segment limits : bus error */
 
 			}
-			COMBINE_DATA((uint16_t *) (m_ram_ptr + address));
+			COMBINE_DATA(m_ram_ptr + (address >> 1));
 			if (m_diag2)
 			{
 				if ((ACCESSING_BITS_0_7)
@@ -1491,7 +1491,7 @@ void lisa_state::lisa_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				/* out of segment limits : bus error */
 
 			}
-			COMBINE_DATA((uint16_t *) (m_ram_ptr + address));
+			COMBINE_DATA(m_ram_ptr + (address >> 1));
 			if (m_diag2)
 			{
 				if ((ACCESSING_BITS_0_7)
@@ -1825,7 +1825,7 @@ void lisa_state::lisa_IO_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x1:   /* Video Address Latch */
 			/*logerror("video address latch write offs=%X, data=%X\n", offset, data);*/
 			COMBINE_DATA(& m_video_address_latch);
-			m_videoram_ptr = ((uint16_t *)m_ram_ptr) + ((m_video_address_latch << 6) & 0xfc000);
+			m_videoram_ptr = m_ram_ptr + ((m_video_address_latch << 6) & 0xfc000);
 			/*logerror("video address latch %X -> base address %X\n", m_video_address_latch,
 			                (m_video_address_latch << 7) & 0x1f8000);*/
 			break;

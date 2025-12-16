@@ -27,14 +27,12 @@
 #include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "machine/upd4991a.h"
 #include "machine/upd765.h"
 
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 
@@ -69,7 +67,6 @@
 #include "formats/nfd_dsk.h"
 
 #define RTC_TAG      "rtc"
-#define SASIBUS_TAG  "sasi"
 
 #define ATTRSEL_REG 0
 #define WIDTH40_REG 2
@@ -142,22 +139,18 @@ public:
 		, m_dsw2(*this, "DSW2")
 		, m_ppi_mouse(*this, "ppi_mouse")
 		, m_fdc_2hd(*this, "fdc_2hd")
-		, m_fdc_2dd(*this, "fdc_2dd")
-		, m_ram(*this, RAM_TAG)
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
-		, m_cbus(*this, "cbus%d", 0)
+		, m_cbus_root(*this, "cbus")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
-		, m_sasibus(*this, SASIBUS_TAG)
-		, m_sasi_data_out(*this, "sasi_data_out")
-		, m_sasi_data_in(*this, "sasi_data_in")
-		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
 	{
 	}
 
 	void pc9801(machine_config &config);
+	void pc9801f(machine_config &config);
+	void pc9801m(machine_config &config);
 
 	void init_pc9801_kanji();
 
@@ -173,19 +166,13 @@ protected:
 	// TODO: should really be one FDC
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
-	optional_device<upd765a_device> m_fdc_2dd;
-	optional_device<ram_device> m_ram;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
-	required_device_array<pc98_cbus_slot_device, 2> m_cbus;
+	required_device<pc98_cbus_root_device> m_cbus_root;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 private:
 	required_device<pc98_memsw_device> m_memsw;
-	optional_device<scsi_port_device> m_sasibus;
-	optional_device<output_latch_device> m_sasi_data_out;
-	optional_device<input_buffer_device> m_sasi_data_in;
-	optional_device<input_buffer_device> m_sasi_ctrl_in;
 
 //  Infrastructure declaration
 protected:
@@ -196,7 +183,6 @@ protected:
 	void config_keyboard(machine_config &config);
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
-	void pc9801_sasi(machine_config &config);
 	void pc9801_common(machine_config &config);
 	void config_floppy_525hd(machine_config &config);
 	void config_floppy_35hd(machine_config &config);
@@ -221,13 +207,6 @@ private:
 
 	u8 ppi_sys_portb_r();
 
-	void sasi_data_w(uint8_t data);
-	uint8_t sasi_data_r();
-	void write_sasi_io(int state);
-	void write_sasi_req(int state);
-	uint8_t sasi_status_r();
-	void sasi_ctrl_w(uint8_t data);
-
 	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
 
 //  uint8_t winram_r();
@@ -251,13 +230,6 @@ protected:
 	u8 m_fdc_2hd_ctrl = 0;
 
 	bool fdc_drive_ready_r(upd765a_device *fdc);
-private:
-	void fdc_2dd_irq(int state);
-
-	uint8_t fdc_2dd_ctrl_r();
-	void fdc_2dd_ctrl_w(uint8_t data);
-
-	u8 m_fdc_2dd_ctrl = 0;
 
 //  DMA
 protected:
@@ -335,11 +307,6 @@ private:
 	uint8_t m_txt_scroll_reg[8]{};
 	uint8_t m_pal_clut[4]{};
 
-//  SASI
-	uint8_t m_sasi_data = 0;
-	int m_sasi_data_enable = 0;
-	uint8_t m_sasi_ctrl = 0;
-
 //  Mouse
 protected:
 	struct{
@@ -395,10 +362,14 @@ public:
 protected:
 	TIMER_CALLBACK_MEMBER(fdc_trigger);
 
+	void pc9801vm_map(address_map &map) ATTR_COLD;
+	void pc9801vm_io(address_map &map) ATTR_COLD;
+
 	void pc9801rs_io(address_map &map) ATTR_COLD;
 	void pc9801rs_map(address_map &map) ATTR_COLD;
-	void pc9801ux_io(address_map &map) ATTR_COLD;
 	void pc9801ux_map(address_map &map) ATTR_COLD;
+	void pc9801vx_map(address_map &map) ATTR_COLD;
+	void pc9801dx_map(address_map &map) ATTR_COLD;
 
 	uint16_t grcg_gvram_r(offs_t offset, uint16_t mem_mask = ~0);
 	void grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -460,8 +431,6 @@ private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
-
-	uint8_t midi_r();
 
 	// 286-based machines except for PC98XA
 	u8 dma_access_ctrl_r(offs_t offset);
@@ -564,6 +533,7 @@ class pc9801bx_state : public pc9801us_state
 public:
 	pc9801bx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801us_state(mconfig, type, tag)
+		, m_hole_15M_view(*this, "hole_15M_view")
 	{
 	}
 
@@ -576,6 +546,12 @@ protected:
 	DECLARE_MACHINE_START(pc9801bx2);
 	DECLARE_MACHINE_RESET(pc9801bx2);
 
+	virtual void hole_15m_control_w(offs_t offset, u8 data);
+	u8 hole_15m_control_r(offs_t offset);
+
+	u8 m_hole_15m;
+
+	memory_view m_hole_15M_view;
 private:
 	u8 i486_cpu_mode_r(offs_t offset);
 	u8 gdc_31kHz_r(offs_t offset);

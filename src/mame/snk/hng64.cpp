@@ -2235,6 +2235,9 @@ void hng64_state::machine_start()
 	save_item(NAME(m_raster_irq_pos));
 
 	save_item(NAME(m_texture_wrapsize_table));
+
+	m_wheel_motor.resolve();
+	m_lamps_out.resolve();
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
@@ -2339,6 +2342,11 @@ void hng64_lamps_device::device_start()
 {
 }
 
+void hng64_lamps_device::lamps_w(offs_t offset, u8 data)
+{
+	m_lamps_out_cb[offset](data);
+}
+
 void hng64_state::drive_lamps7_w(u8 data)
 {
 	/*
@@ -2351,6 +2359,8 @@ void hng64_state::drive_lamps7_w(u8 data)
 	   0x02
 	   0x01
 	*/
+	for (int i = 0; i < 2; i++)
+		m_lamps_out[i] = BIT(data, i + 6);
 }
 
 void hng64_state::drive_lamps6_w(u8 data)
@@ -2366,11 +2376,15 @@ void hng64_state::drive_lamps6_w(u8 data)
 	   0x01 - Coin Counter #1
 	*/
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	for (int i = 0; i < 6; i++)
+		m_lamps_out[i + 2] = BIT(data, i + 2);
 }
 
 void hng64_state::drive_lamps5_w(u8 data)
 {
 	// force feedback steering position
+	m_wheel_motor = data;
 }
 
 void hng64_state::shoot_lamps7_w(u8 data)

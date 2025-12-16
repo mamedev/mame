@@ -2253,6 +2253,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/wren_dsk.h,FORMATS["WREN_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "WREN_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/wren_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/wren_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/x07_cas.h,FORMATS["X07_CAS"] = true
 --------------------------------------------------
 

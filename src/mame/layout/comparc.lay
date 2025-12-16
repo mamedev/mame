@@ -368,21 +368,21 @@ authors:hap
 		</element>
 
 		<!-- gamename labels -->
-		<element ref="text_g1"><bounds x="3.8" y="21.8" width="12" height="1.4" /></element>
-		<element ref="text_g5"><bounds x="16.8" y="21.8" width="12" height="1.4" /></element>
-		<element ref="text_g9"><bounds x="29.8" y="21.8" width="12" height="1.4" /></element>
+		<element ref="text_g1"><bounds x="3.8" y="21.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g5"><bounds x="16.8" y="21.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g9"><bounds x="29.8" y="21.8" width="9.2" height="1.4" /></element>
 
-		<element ref="text_g2"><bounds x="3.8" y="36.8" width="12" height="1.4" /></element>
-		<element ref="text_g6"><bounds x="16.8" y="36.8" width="12" height="1.4" /></element>
-		<element ref="text_g10"><bounds x="29.8" y="36.8" width="12" height="1.4" /></element>
+		<element ref="text_g2"><bounds x="3.8" y="36.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g6"><bounds x="16.8" y="36.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g10"><bounds x="29.8" y="36.8" width="9.2" height="1.4" /></element>
 
-		<element ref="text_g3"><bounds x="3.8" y="51.8" width="12" height="1.4" /></element>
-		<element ref="text_g7"><bounds x="16.8" y="51.8" width="12" height="1.4" /></element>
-		<element ref="text_g11"><bounds x="29.8" y="51.8" width="12" height="1.4" /></element>
+		<element ref="text_g3"><bounds x="3.8" y="51.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g7"><bounds x="16.8" y="51.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g11"><bounds x="29.8" y="51.8" width="9.2" height="1.4" /></element>
 
-		<element ref="text_g4"><bounds x="3.8" y="66.8" width="12" height="1.4" /></element>
-		<element ref="text_g8"><bounds x="16.8" y="66.8" width="12" height="1.4" /></element>
-		<element ref="text_g12"><bounds x="29.8" y="66.8" width="12" height="1.4" /></element>
+		<element ref="text_g4"><bounds x="3.8" y="66.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g8"><bounds x="16.8" y="66.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g12"><bounds x="29.8" y="66.8" width="9.2" height="1.4" /></element>
 
 		<!-- number labels -->
 		<element ref="text_b1"><bounds x="12.8" y="20.8" width="2" height="2" /></element>

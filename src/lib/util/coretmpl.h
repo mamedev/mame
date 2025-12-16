@@ -487,17 +487,14 @@ public:
 		}
 	}
 
-	T const &dequeue(bool allow_side_effects = true)
+	T const &dequeue()
 	{
 		T const &result(*m_head);
-		if (allow_side_effects)
+		if (ReadWrap || !m_empty)
 		{
-			if (ReadWrap || !m_empty)
-			{
-				if (this->end() == ++m_head)
-					m_head = this->begin();
-				m_empty = (m_head == m_tail);
-			}
+			if (this->end() == ++m_head)
+				m_head = this->begin();
+			m_empty = (m_head == m_tail);
 		}
 		return result;
 	}

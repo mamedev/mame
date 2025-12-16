@@ -21,8 +21,8 @@ authors:hap
 	<element name="text_b1"><text string="REPLAY"><color red="0.9" green="0.89" blue="0.8" /></text></element>
 	<element name="text_b2"><text string="PLAY"><color red="0.9" green="0.89" blue="0.8" /></text></element>
 	<element name="text_b3"><text string="BEST PLAY"><color red="0.9" green="0.89" blue="0.8" /></text></element>
-	<element name="text_s1"><text string="SKILL:" align="1"><color red="0.9" green="0.89" blue="0.8" /></text></element>
-	<element name="text_s2"><text string="GAME:" align="1"><color red="0.9" green="0.89" blue="0.8" /></text></element>
+	<element name="text_s1"><text string="SKILL:" align="2"><color red="0.9" green="0.89" blue="0.8" /></text></element>
+	<element name="text_s2"><text string="GAME:" align="2"><color red="0.9" green="0.89" blue="0.8" /></text></element>
 
 	<element name="nothing"><text string=" "></text></element>
 
@@ -122,13 +122,13 @@ authors:hap
 
 		<element ref="switch" inputtag="IN.1" inputmask="0x0f" inputraw="yes"><bounds x="6.3" y="4.925" width="1" height="0.25" /></element>
 		<element ref="nothing" clickthrough="no"><bounds x="6.25" y="4.9" width="1.2" height="0.5" /></element>
-		<element ref="text_s1"><bounds x="5.15" y="4.925" width="1.5" height="0.25" /></element>
+		<element ref="text_s1"><bounds x="4.25" y="4.925" width="1.5" height="0.25" /></element>
 		<element ref="text_ro"><bounds x="5.825" y="4.875" width="0.35" height="0.35" /></element>
 		<element ref="nothing" inputtag="IN.1" inputmask="0x0f" inputraw="yes"><bounds x="5.8" y="4.85" width="0.4" height="0.4" /></element>
 
 		<element ref="switch" inputtag="IN.2" inputmask="0x07" inputraw="yes"><bounds x="6.3" y="7.275" width="1" height="0.25" /></element>
 		<element ref="nothing" clickthrough="no"><bounds x="6.25" y="7.2" width="1.2" height="0.5" /></element>
-		<element ref="text_s2"><bounds x="5.15" y="7.275" width="1.5" height="0.25" /></element>
+		<element ref="text_s2"><bounds x="4.25" y="7.275" width="1.5" height="0.25" /></element>
 		<element ref="text_rg"><bounds x="5.825" y="7.225" width="0.35" height="0.35" /></element>
 		<element ref="nothing" inputtag="IN.2" inputmask="0x07" inputraw="yes"><bounds x="5.8" y="7.2" width="0.4" height="0.4" /></element>
 

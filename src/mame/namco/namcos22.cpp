@@ -2816,6 +2816,14 @@ void namcos22_state::handle_driving_io()
 		m_shareram[0x034/2] = gas;
 		m_shareram[0x036/2] = brake;
 		handle_coinage(flags);
+		
+		// lamps, coin counters, and also leds for acedrive and victlap
+		const u16 outputs = (m_shareram[0x42 / 2] << 8) | (m_shareram[0x20 / 2] & 0xff);
+		for (int i = 0; i < 16; i++)
+			m_mcu_out[i] = BIT(outputs, i);
+
+		// drive commands (raverace, acedrive, victlap)
+		m_wheel_motor = m_shareram[0x40 / 2] & 0xff;
 	}
 }
 
@@ -3625,6 +3633,8 @@ void namcos22_state::machine_start()
 {
 	m_mcu_out.resolve();
 	m_cpuled_out.resolve();
+	m_wheel_motor.resolve();
+
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
 	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;

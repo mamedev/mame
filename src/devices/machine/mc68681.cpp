@@ -1380,7 +1380,7 @@ void duart_channel::rcv_complete()
 
 	//printf("%s ch %d rcv complete\n", tag(), m_ch);
 
-	if (rx_enabled)
+	if (rx_enabled || (MR2 & 0xc0) == 0x80)
 	{
 		uint8_t errors = 0;
 		if (is_receive_framing_error())

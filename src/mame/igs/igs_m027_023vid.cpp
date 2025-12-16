@@ -11,7 +11,7 @@ Main components for the PCB-0457-03-GS are:
 - 33 MHz XTAL
 - IGS 023 graphics chip
 - ICS2115V Wavefront sound chip
-- IGS 026B I/O chip
+- IGS 026B I/O chip (or sometimes 026A)
 - 3 banks of 8 DIP switches
 
 Notes:
@@ -449,6 +449,27 @@ ROM_START( mxsqy )
 	ROM_LOAD( "igs_s2402.u21", 0x000000, 0x400000, CRC(a3e3b2e0) SHA1(906e5839ab62e570d9716e01b49e5b067e041269) )
 ROM_END
 
+ROM_START( mxsqy102tw )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "n6_027a.u41", 0x00000, 0x4000, CRC(f9ada8c4) SHA1(0715fdc3d15ae2d1af4e9c7d25f6410ae7c22d42) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-102tw.u39", 0x000000, 0x80000, CRC(16095b98) SHA1(9fe2f06253a4ddaf47df7f998137f66f0c0cf4e2) )
+
+	ROM_REGION( 0x80000, "igs023",  0 )
+	ROM_LOAD( "text.u38", 0x00000, 0x80000, CRC(2f20eade) SHA1(aa11d26cb51483af5fdd4b181dff0f222baeaaff) )
+
+	ROM_REGION16_LE( 0x400000, "igs023:sprcol", 0 )
+	ROM_LOAD( "cg_u23.u23", 0x000000, 0x400000, CRC(dc8ff7ae) SHA1(4609b5543d8bea7a8dea4e744f81c407688a96ee) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION16_LE( 0x400000, "igs023:sprmask", 0 )
+	ROM_LOAD( "cg_u22.u22", 0x000000, 0x400000, CRC(53940332) SHA1(3c703cbdc51dfb100f3ce10452a81091305dee01) )
+
+	ROM_REGION( 0x400000, "ics", 0 )
+	ROM_LOAD( "u21", 0x000000, 0x400000, CRC(a3e3b2e0) SHA1(906e5839ab62e570d9716e01b49e5b067e041269) )
+ROM_END
+
 
 void igs_m027_023vid_state::init_mxsqy()
 {
@@ -465,4 +486,5 @@ void igs_m027_023vid_state::init_mxsqy()
 ***************************************************************************/
 
 // internal ROM is 2003
-GAME( 2003, mxsqy, 0, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (China, V201CN)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, mxsqy,          0, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (China, V201CN)",  MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, mxsqy102tw, mxsqy, m027_023vid, mxsqy, igs_m027_023vid_state, init_mxsqy, ROT0, "IGS", "Mingxing San Que Yi (Taiwan, V102TW)", MACHINE_IMPERFECT_GRAPHICS )

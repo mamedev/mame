@@ -40,6 +40,7 @@ public:
 
 	// Sets target voltage to (dis)charge towards.
 	va_rc_eg_device &set_target_v(float v);
+	float get_target_v() const { return m_v_end; }
 
 	// Sets the voltage to the given value, instantly.
 	va_rc_eg_device &set_instant_v(float v);
