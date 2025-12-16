@@ -105,6 +105,7 @@ void n64_state::video_start()
 
 	m_rdp->init_internal_state();
 	m_rdp->set_n64_periphs(m_rcp_periphs);
+	m_rcp_periphs->set_rdp(*m_rdp);
 
 	m_rdp->m_aux_buf = make_unique_clear<uint8_t[]>(EXTENT_AUX_COUNT);
 
