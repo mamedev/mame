@@ -197,10 +197,14 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 
 	<!-- DOS -->
 	<!-- http://redump.org/disc/69748/ -->
-	<software name="abspinball">
+	<!-- 486DX2 66 MHz minimum -->
+	<software name="abspinball" supported="partial">
 		<description>Absolute Pinball (Europe)</description>
 		<year>1996</year>
-		<publisher>21st Century Entertainment, Ltd.</publisher>
+		<publisher>21st Century Entertainment</publisher>
+		<notes><![CDATA[
+Unsupported optional [Thrustmaster Wizzard] or [Philips Virtual] Pinball controllers
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="absolute pinball (europe) (1996)" sha1="9758201f0f9d5578b0f72f7e53ab49a71daf7c31" />
@@ -209,10 +213,14 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 	</software>
 
 	<!-- http://redump.org/disc/20998/ -->
-	<software name="abspinballu" cloneof="abspinball">
+	<!-- 486DX2 66 MHz minimum -->
+	<software name="abspinballu" cloneof="abspinball" supported="partial">
 		<description>Absolute Pinball (USA)</description>
 		<year>1996</year>
-		<publisher>21st Century Entertainment, Ltd.</publisher>
+		<publisher>21st Century Entertainment</publisher>
+		<notes><![CDATA[
+Unsupported optional [Thrustmaster Wizzard] or [Philips Virtual] Pinball controllers
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="absolute pinball (usa) (1996)" sha1="10ef1b4ab7e885f24b27e2a41c35fd15b44d8b4c" />
@@ -629,12 +637,15 @@ Finnish language is only available in the installation setup
 		</part>
 	</software>
 
-	<!-- TODO: can't setup sb16 sound card properly, hangs at "TimerRegister Event" -->
-	<!-- TODO: disc swap doesn't work properly -->
 	<software name="alienscb" supported="partial">
 		<description>Aliens - A Comic Book Adventure (v1.01A)</description>
 		<year>1995</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+[SB16 LLE] autodetection can sometimes throw wrong results (or outright crash the system).
+[SB16 LLE] doesn't silence sound exiting playback test.
+Untested disc swap in game
+]]></notes>
 		<info name="version" value="1.01a" />
 
 		<part name="cdrom1" interface="cdrom">
@@ -1112,6 +1123,7 @@ Includes DOS and Windows installation setup.
 	</software>
 
 	<!-- DOS (recommended), Windows 95 -->
+	<!-- 486DX2 100 MHz -->
 	<software name="archdyn" supported="no">
 		<!-- 24/10/1996 RE -->
 		<description>Archimedean Dynasty (v1.115)</description>
@@ -1119,6 +1131,7 @@ Includes DOS and Windows installation setup.
 		<publisher>Blue Byte</publisher>
 		<notes><![CDATA[
 [SB16] No sound after title screen, hangs on every video (bypass by pressing mouse left button)
+Crashes when selecting instant action (at least in FreeDOS, verify)
 Cannot read sound configuration from Windows 95
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -4041,12 +4054,12 @@ This release doesn't have audio speech.
 
 	<!-- Windows 95 -->
 	<!-- 256 colors / 800x600 -->
-	<!-- TODO: no sound? -->
 	<software name="geolight" supported="partial">
 		<description>Geo Light Moon (Japan v1.00)</description>
 		<year>1997</year>
 		<publisher>Nihon Softec / J-Ware</publisher>
 		<info name="version" value="1.00" />
+		<info name="usage" value="Tick first two options to the left for sound" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4694,7 +4707,7 @@ CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate 
 		<!-- Virgin Interactive for Europe -->
 		<publisher>Sir-Tech</publisher>
 		<notes><![CDATA[
-Has no [SB16] voices/SFXs in-game
+Bit of voice/SFXs trailing for [SB16 LLE] in-game
 Nemesis demo untested
 Untested multiplayer options
 ]]></notes>
@@ -6175,8 +6188,7 @@ Looks too dark on s3_764 (verify)
 	</software>
 
 	<!-- DOS / Windows 95 -->
-	<!-- TODO: no sound in DOS installer with SB16 -->
-	<!-- TODO: With sound card black screens when launching game in either OSes -->
+	<!-- 486DX2 66 MHz -->
 	<software name="redalert" supported="partial">
 		<description>Command &amp; Conquer - Red Alert</description>
 		<year>1996</year>
@@ -7687,8 +7699,7 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		<year>1995</year>
 		<publisher>Phantagram</publisher>
 		<notes><![CDATA[
-No [soundblaster] BGMs no matter the setting set in CONFIG.EXE
-Shows Phantagram logo with bottom red strip (DOS 6.22)
+Crashes in Windows 95 (verify)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
