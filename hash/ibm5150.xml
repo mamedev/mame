@@ -3837,16 +3837,392 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		</part>
 	</software>
 
-	<!-- sold also for the IBM PCjr-->
-	<software name="nortutil">
-		<description>The Norton Utilities 3.10</description>
-		<year>1986</year>
+	<software name="nu2">
+		<description>The Norton Utilities 2.01 (1983-11-03)</description>
+		<year>1983</year>
 		<publisher>Peter Norton Computing, Inc.</publisher>
-		<info name="usage" value="boot from PC DOS 2.1 and then load, using: nc /d1" />
-		<!-- marked as bad since source is questionable, needs a redump -->
+		<info name="version" value="2.01" />
+		<info name="release" value="19831103" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="DISKLOOK demonstration - diskette ONE - BatHide, Beep, Bload, Clear, DiskOpt, DL, FH, FileFix, FileSort, HL, HM" />
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 2.01 (nov) side 1.img" size="163840" crc="a7269716" sha1="3adf1963f4b96171385545768b5a86e1beb35ae3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="diskette TWO - HU, Label, Lprint, Reverse, ScrAtr, SM, SSAR, TimeMark, UE" />
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 2.01 (nov) side 2.img" size="163840" crc="ec26d020" sha1="b2fcdcc51bd6387351cabfa4d3d055dac2653560" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu201o" cloneof="nu2">
+		<description>The Norton Utilities 2.01 (1983-07-04)</description>
+		<year>1983</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="2.01" />
+		<info name="release" value="19830704" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="DISKLOOK demonstration - diskette ONE - BatHide, Beep, Bload, Clear, DiskOpt, DL, FH, FileFix, FileSort, HL, HM" />
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 2.01 (jul) side 1.img" size="163840" crc="3891cfc5" sha1="43bee3fe9a45045d33797ecaa3bbb310dc6a725e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="diskette TWO - HU, Label, Lprint, Reverse, ScrAtr, SM, SSAR, TimeMark, UE" />
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 2.01 (jul) side 2.img" size="163840" crc="efcf6309" sha1="a30d15cc11d690eb89fd9068deb606ea49d59bbf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu200" cloneof="nu2">
+		<description>The Norton Utilities 2.00</description>
+		<year>1983</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="2.00" />
+		<info name="release" value="19830601" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="DISKLOOK demonstration - diskette ONE - BatHide, Beep, Bload, Clear, DiskOpt, DL, FH, FileFix, FileSort, HL, HM" />
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 2.00 side 1.img" size="163840" crc="33e9fa4b" sha1="7342ef95d46fba1e614a9d41fb5ab193ca7f1b2f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="diskette TWO - HU, Label, Lprint, Reverse, ScrAtr, SM, SSAR, TimeMark, UE" />
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 2.00 side 2.img" size="163840" crc="c5cdaf48" sha1="efcfe6f881261e1ef7fda3b4260bc4a246775525" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu3">
+		<description>The Norton Utilities 3.10</description>
+		<year>1985</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="3.10" />
+		<info name="release" value="19851101" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="norton utilities 310.img" size="368640" crc="b27b8cbb" sha1="34b5973fe5354a08b4d2a987473f82cd82a581cd" status="baddump" />
+				<rom name="the norton utilities 3.10.img" size="368640" crc="d710eff6" sha1="35e7e4ea22d1359e5921ae753a9326cf1e962a10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu300" cloneof="nu3">
+		<description>The Norton Utilities 3.00</description>
+		<year>1985</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="3.00" />
+		<info name="release" value="19850114" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 3.00 disk 1.img" size="163840" crc="26535655" sha1="ac3dc74a1687d7d22c923658fea596d384118760" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Update diskette" />
+			<dataarea name="flop" size="163840">
+				<rom name="the norton utilities 3.00 disk 2.img" size="163840" crc="31f1b361" sha1="8252602490098ab2963ceb096621bf4047b4b75d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu4">
+		<description>The Norton Utilities Advanced Edition 4.51 (3.5" disk)</description>
+		<year>1989</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="4.51" />
+		<info name="release" value="19890103" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities advanced edition 4.51 3.5-disk 1.img" size="737280" crc="9971f614" sha1="e3e02f8735a9f3fd2219380e81849c0fdc36cc01" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities advanced edition 4.51 3.5-disk 2.img" size="737280" crc="1deca609" sha1="ce44f120e27c748baaf349096553db368e79181f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu451_525" cloneof="nu4">
+		<description>The Norton Utilities Advanced Edition 4.51 (5.25" disk)</description>
+		<year>1989</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="4.51" />
+		<info name="release" value="19890103" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities advanced edition 4.51 5.25-disk 1.img" size="368640" crc="4883740e" sha1="4c233618fec82097cd21d4069284606d0f33df6d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities advanced edition 4.51 5.25-disk 2.img" size="368640" crc="4c41649b" sha1="7597560463ca5d7306b9f5b0993f0299849452c9" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities advanced edition 4.51 5.25-disk 3.img" size="368640" crc="52b95f12" sha1="7c1b43d17b52f7b22487ae865ae659d0f0580d15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu450" cloneof="nu4">
+		<description>The Norton Utilities Advanced Edition 4.50 (3.5" disk)</description>
+		<year>1988</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="4.50" />
+		<info name="release" value="19881016" />
+		<!-- baddump: has volume label and file creation dates in 2010
+			 That type of metadata wasn't even introduced until Windows 95 -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities advanced edition 4.50 3.5-disk 1.img" size="737280" crc="ccdf5293" sha1="37fd31c47f77d1ab02772f5f0127bb597c35ad87" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities advanced edition 4.50 3.5-disk 2.img" size="737280" crc="c2d7190b" sha1="90c0f94cfcbd4f3afb1d255e7a1bb297c9eb6cb2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu400" cloneof="nu4">
+		<description>The Norton Utilities 4.00</description>
+		<year>1987</year>
+		<publisher>Peter Norton Computing, Inc.</publisher>
+		<info name="version" value="4.00" />
+		<info name="release" value="19870301" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 4.00 disk 1.img" size="368640" crc="7d9b10d0" sha1="37ae696cd99c102037968b13420d4549d87f7d03" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 4.00 disk 2.img" size="368640" crc="f19b47bc" sha1="bca8d75c5b0694cd057036252be0c99583e9aafd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu5">
+		<description>The Norton Utilities 5.00 (1990-12-11) (3.5" disk)</description>
+		<year>1990</year>
+		<publisher>Symantec</publisher>
+		<info name="version" value="5.00" />
+		<info name="release" value="19901211" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 5.00 (dec) disk 1.img" size="737280" crc="3fbe2d21" sha1="fcd880a96361af4b99e0bf04bdec39a34cbe317b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 5.00 (dec) disk 2.img" size="737280" crc="5b011590" sha1="b0a9a69eff8d3f2b3bdae3162a21c8b1dc5e169c" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 5.00 (dec) disk 3.img" size="737280" crc="dfcf4f44" sha1="b0b42b3b04b5f03a7fe1d16a919eb2f501a0ab82" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu5_525" cloneof="nu5">
+		<description>The Norton Utilities 5.00 (1990-09-25) (5.25" disk)</description>
+		<year>1990</year>
+		<publisher>Symantec</publisher>
+		<info name="version" value="5.00" />
+		<info name="release" value="19900925" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (sep) disk 1.img" size="368640" crc="8b776fc7" sha1="48133f824469b598ed28555ce630d66b25a1deeb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (sep) disk 2.img" size="368640" crc="c765dc6b" sha1="c53b8019e12628f7315a4bf3eb61ea52db8239b5" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (sep) disk 3.img" size="368640" crc="d6051d37" sha1="8a3880697eb62b58b8f553db6d6400d8165d1944" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (sep) disk 4.img" size="368640" crc="b491dae8" sha1="93b40bc68b864429814b31f6ce312f301f480319" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (sep) disk 5.img" size="368640" crc="332a18ee" sha1="97ff03c4c96fb2d5df31cab21f4374fed3f4733d" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (sep) disk 6.img" size="368640" crc="011006cf" sha1="58ef3825410e97cb03026739c92017fff95c8f10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu5_525o" cloneof="nu5">
+		<description>The Norton Utilities 5.00 (1990-07-17) (5.25" disk)</description>
+		<year>1990</year>
+		<publisher>Symantec</publisher>
+		<info name="version" value="5.00" />
+		<info name="release" value="19900717" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (jul) disk 1.img" size="368640" crc="43e4eb6c" sha1="1c8dc5701b50270aae1c5ec3d002cec97cce094f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (jul) disk 2.img" size="368640" crc="f7a8b759" sha1="fd612628a94957ccd83c5da8e32cfdba9116e8eb" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (jul) disk 3.img" size="368640" crc="d0d56e09" sha1="9d37ea0b7f4bd01563043be903227d7615a2733a" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (jul) disk 4.img" size="368640" crc="a4a2aa08" sha1="d88f09b631eb2dbc15f1bbfc3b69792f2eeccdf8" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (jul) disk 5.img" size="368640" crc="2d3b6242" sha1="1ba7ae59e9f9c820ec024815c7d4f78e20c8086d" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 5.00 (jul) disk 6.img" size="368640" crc="066bfe20" sha1="b05b26bc644ff3540656429091c6c9516900da2a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu6">
+		<description>The Norton Utilities 6.01 (3.5" disk)</description>
+		<year>1992</year>
+		<publisher>Symantec</publisher>
+		<info name="version" value="6.01" />
+		<info name="release" value="19920601" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.01 3.5-disk 1.img" size="737280" crc="ff9e9dfe" sha1="dcf6de8468f9abde6ced901158861cca98596a44" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Emergency Disk" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.01 3.5-disk 2.img" size="737280" crc="74fb78d9" sha1="f4290824c0cf4e520b02b1acb01275562c87162b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.01 3.5-disk 3.img" size="737280" crc="2232458c" sha1="6e4f9e6d5581beaa7ed4ec303dff184c191ce5bc" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 2" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.01 3.5-disk 4.img" size="737280" crc="1bf4a826" sha1="f3bbe4151f8a8f0eb995695b577a72497d841bcf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu6_525" cloneof="nu6">
+		<description>The Norton Utilities 6.01 (5.25" disk)</description>
+		<year>1992</year>
+		<publisher>Symantec</publisher>
+		<info name="version" value="6.01" />
+		<info name="release" value="19920805" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Installation Disk" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 1.img" size="368640" crc="94291092" sha1="8ece75d42042394e592c56f2488dfabf487c3209" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Emergency Disk 1" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 2.img" size="368640" crc="f665ad4b" sha1="79136b00571c0bd5554f978c09ad3463d012bc27" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Emergency Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 3.img" size="368640" crc="362226ce" sha1="b0265f9c086696f2f60a0eefa2d9c8b36f00f206" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 1" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 4.img" size="368640" crc="098833f4" sha1="c207cfb844abad74bece073cfaf8498721bebd58" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 5.img" size="368640" crc="e2085e6a" sha1="c815b7b0e6ebe72b18aa18eb3a2e6a19a40f35b4" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 3" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 6.img" size="368640" crc="920f9dc1" sha1="3a3e0c32aac0bf7b32bc358474c385da46034999" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 4" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 7.img" size="368640" crc="943b2e24" sha1="fa54d138049e1eaab175537b597f61cf75fe0568" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities Disk 5" />
+			<dataarea name="flop" size="368640">
+				<rom name="the norton utilities 6.01 5.25-disk 8.img" size="368640" crc="01c1edeb" sha1="4b07cdaf668bf0f83faf65fd3729d178ed1b124f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nu600" cloneof="nu6">
+		<description>The Norton Utilities 6.00 (International) (3.5" disk)</description>
+		<year>1992</year>
+		<publisher>Symantec</publisher>
+		<info name="version" value="6.00" />
+		<info name="release" value="19920606" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.00 3.5-disk 1.img" size="737280" crc="adef63bf" sha1="a4c8d8022c48215dff5fc8cb4e54972a7dda4ca9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Emergency Disk" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.00 3.5-disk 2.img" size="737280" crc="fa54fb39" sha1="24f204a360e804fda056dcc58c8b6dc58831c287" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.00 3.5-disk 3.img" size="737280" crc="f6474cc4" sha1="73be3c413e1e47a6cc9ae0cf12519621e53b7058" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities Disk 2" />
+			<dataarea name="flop" size="737280">
+				<rom name="the norton utilities 6.00 3.5-disk 4.img" size="737280" crc="9add1568" sha1="c12d7277e8be00a80afee519a1ddf724de59f0b0" />
 			</dataarea>
 		</part>
 	</software>
