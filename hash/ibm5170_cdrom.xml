@@ -1171,8 +1171,9 @@ Cannot read sound configuration from Windows 95
 	</software>
 
 	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
+	<!-- TODO: installer painfully slow in PC-98 -->
 	<software name="arabkid">
-		<description>Arabian Kid</description>
+		<description>Arabian Kid (Japan)</description>
 		<year>1996</year>
 		<publisher>ASCII / Yellow Horn</publisher>
 		<info name="alt_title" value="あらびあんKid" />
@@ -2424,13 +2425,13 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 
 	<!-- Windows 95 -->
 	<!-- Very slow on 486 -->
-	<!-- also known as Captain Claw -->
 	<!-- TODO: has transparency issues on main menu -->
 	<software name="clawj" supported="partial">
 		<description>Claw (Japan v1.2)</description>
 		<year>1997</year>
 		<publisher>Monolith Productions Inc.</publisher>
 		<info name="version" value="1.2" />
+		<info name="alt_title" value="Captain Claw" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3049,24 +3050,6 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Dig, The (USA) (Alt)" sha1="c4087004a4716ab167c5dc9d8556b8a985b3846a" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Source: http://redump.org/disc/92228/ -->
-	<!-- <rom name="Dig, The (Japan).cue" size="82" crc="7127b717" sha1="d0ffba436592b115b8ab5eb3b400210562d8031e"/> -->
-	<!-- <rom name="Dig, The (Japan).bin" size="778196832" crc="550c8138" sha1="3b3f8c72d86e380142299a91218139f32b34a682"/> -->
-	<software name="thedig_jp" cloneof="thedig">
-		<description>The Dig (Japan)</description>
-		<year>1995</year>
-		<publisher>MicroMouse</publisher>
-		<info name="developer" value="LucasArts" />
-		<info name="region" value="Japan" />
-		<sharedfeat name="platform" value="Windows 95 / NEC PC-98" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="Dig, The (Japan)" sha1="0930e3f659a57797e81b8c4c4b3cce44948f7a8f" />
 			</diskarea>
 		</part>
 	</software>
@@ -4052,22 +4035,6 @@ This release doesn't have audio speech.
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
-	<!-- 256 colors / 800x600 -->
-	<software name="geolight" supported="partial">
-		<description>Geo Light Moon (Japan v1.00)</description>
-		<year>1997</year>
-		<publisher>Nihon Softec / J-Ware</publisher>
-		<info name="version" value="1.00" />
-		<info name="usage" value="Tick first two options to the left for sound" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="geolight" sha1="e49202c3ff76db5f7fb5f794655d40cc91acb4d9" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Source: http://redump.org/disc/63327/ -->
 	<!-- <rom name="Gobliiins (Italy) (En,Fr,De,Es,It).cue" size="238" crc="52c186e0" sha1="61eceed7d05957fdb3abd271f7a071edda51057f"/> -->
 	<!-- <rom name="Gobliiins (Italy) (En,Fr,De,Es,It) (Track 1).bin" size="21454944" crc="1bdb016b" sha1="550554365c94351a62a9709666cac1ce266b8fb0"/> -->
@@ -4723,22 +4690,6 @@ Untested multiplayer options
 		</part>
 	</software>
 
-
-	<!-- Windows 95 -->
-	<!-- Pentium class 60 MHz minimum -->
-	<software name="jakebrstj" supported="no">
-		<description>Jake Burst (Japan)</description>
-		<year>1997</year>
-		<publisher>Sierra / Pioneer Inc</publisher>
-		<info name="alt_title" value="ジェイクバースト" />
-		<part name="cdrom" interface="cdrom">
-			<feature name="disk_label" value="SPRW·5015" />
-			<diskarea name="cdrom">
-				<disk name="jake_b" sha1="5efd03633979db40cd37a4c1ba1176cdb8b35c83" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Windows 98 -->
 	<!-- Intel Celeron 266 MHz class minimum / DirectX 7.0 -->
 	<!-- Korean game, published in Japan by Media Kite -->
@@ -5014,20 +4965,6 @@ Untested multiplayer options
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 95 -->
-	<!-- Created from "KU2_IMPACT.cue" size="1107" crc="c08e9181" sha1="d051cf135a5c238ff0a44c08b85a9facfb453f54" -->
-	<!-- Created from "KU2_IMPACT.bin" size="725053392" crc="6980d026" sha1="71ce80ba25d657968d914df9a834172b99487b4f" -->
-	<software name="ku2impact">
-		<description>KU2 Impact (Japan)</description>
-		<year>1995</year>
-		<publisher>Panther Software</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
 			</diskarea>
 		</part>
 	</software>
@@ -6298,7 +6235,7 @@ Looks too dark on s3_764 (verify)
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
 On 486 has popup and sometimes punts to Windows with no exception (verify)
-Sound mixing uses [8514] 16bpp
+Sound mixing menu screen uses [8514] 16bpp
 https://www.pcgamingwiki.com/wiki/Road_Rash
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -6322,7 +6259,7 @@ https://www.pcgamingwiki.com/wiki/Road_Rash
 	<!-- Windows 95 / Mac OS Japan AppleTalk 7.5 -->
 	<!-- Requires 16-bit True Color and 800x600 screen resolution -->
 	<software name="segata" supported="partial">
-		<description>Segata Sanshirou Choujin Densetsu</description>
+		<description>Segata Sanshirou Choujin Densetsu (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="せがた三四郎超人伝説" />
