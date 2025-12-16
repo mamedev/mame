@@ -255,7 +255,7 @@ public:
 		m_reel_scroll_ram(*this, "reel_scroll_ram.%u", 0U)
 	{ }
 
-	void jb(machine_config &config);
+	void jb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -2509,7 +2509,7 @@ ROM_START( jinhuang2 )
 	ROM_LOAD( "sp.u34", 0x00000, 0x40000, CRC(1250998d) SHA1(57f81bc6661f1cfe94fd44ccf8b7bdd064521816) ) // same as xjinhuang
 ROM_END
 
-// 大皇冠 (Dà Huáng Guān)
+// 大皇冠 (Dà Huángguān)
 // IGS PCB NO.T0058-7. HD64180RP8, 12.28800 MHz XTAL, MK6264UN-60, AMT 001, IGS 002, AR17961, 2x D8255AC, 3 banks of 8 switches
 ROM_START( dahuangg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2829,4 +2829,4 @@ GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_d
 GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huangguan",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
 GAME( 1998,  sleyuan2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan2,      ROT0,  "IGS",       "Shuiguo Leyuan II (V150UI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
-GAME( 1995,  dahuangg,      0,        jinhuang, jinhuang, jinhulu2_state, init_dahuangg,      ROT0,  "IGS",       "Da Huang Guan",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1995,  dahuangg,      0,        jinhuang, jinhuang, jinhulu2_state, init_dahuangg,      ROT0,  "IGS",       "Da Huangguan",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
