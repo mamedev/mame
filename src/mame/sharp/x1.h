@@ -43,12 +43,18 @@ public:
 	// construction/destruction
 	x1_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto flag_cb() { return m_flag_cb.bind(); }
+	auto ack_cb() { return m_ack_cb.bind(); }
+
 private:
 	virtual void device_start() override ATTR_COLD;
 	// z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;
 	virtual int z80daisy_irq_ack() override;
 	virtual void z80daisy_irq_reti() override;
+
+	devcb_read_line m_flag_cb;
+	devcb_read8 m_ack_cb;
 };
 
 class x1_state : public driver_device
@@ -209,6 +215,9 @@ protected:
 	int priority_mixer_pri(int color);
 	void cmt_command( uint8_t cmd );
 	uint16_t jis_convert(int kanji_addr);
+
+	int key_irq_flag_r() { return m_key_irq_flag; }
+	uint8_t key_irq_ack_r();
 
 	required_device<address_map_bank_device> m_iobank;
 	optional_device<ym2151_device> m_ym; // turbo-only
