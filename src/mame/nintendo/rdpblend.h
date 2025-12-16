@@ -35,7 +35,6 @@ class n64_blender_t
 
 	private:
 		running_machine&    m_machine;
-		n64_rdp&            m_rdp;
 
 		int32_t min(const int32_t x, const int32_t min);
 		bool alpha_reject(rdp_span_aux* userdata, const rdp_poly_state& object);

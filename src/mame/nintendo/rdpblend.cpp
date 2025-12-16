@@ -19,7 +19,6 @@
 
 n64_blender_t::n64_blender_t(running_machine &machine, n64_rdp &rdp)
 	: m_machine(machine)
-	, m_rdp(rdp)
 {
 	blend1[0] = &n64_blender_t::cycle1_noblend_noacvg_nodither;
 	blend1[1] = &n64_blender_t::cycle1_noblend_noacvg_dither;
