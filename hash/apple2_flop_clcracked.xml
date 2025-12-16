@@ -123,18 +123,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cntdsht">
-		<description>Countdown to Shutdown (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Activision</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="countdown to shutdown (1985)(activision)(trex crack).dsk" size="143360" crc="cf4ac129" sha1="ee6843930f3c78c738f3ef4cf1e306ef5897d8af" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cogito">
 		<description>Cogito! (cleanly cracked)</description>
 		<year>1984</year>
@@ -1523,19 +1511,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="anihotel">
-		<description>Animal Hotel (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2017-03-03"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="animal hotel (4am crack).dsk" size="143360" crc="1a3ebd0a" sha1="06e87b90198feefe446e66a86bb154758bd34c3a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ankh">
 		<description>Ankh (cleanly cracked)</description>
 		<year>1983</year>
@@ -1646,19 +1621,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="applewriter ][ (4am crack).dsk" size="143360" crc="11653ab4" sha1="94e6417ae83a9f5094f2d9936276c676deb931f2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="apvatlan">
-		<description>Apventure to Atlantis (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2017-07-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="apventure to atlantis (4am crack).dsk" size="143360" crc="6234256c" sha1="96e6ad0e0507f9d1b903e8afe184f6b6aa572848" />
 			</dataarea>
 		</part>
 	</software>
@@ -2078,19 +2040,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Scenery"/>
 			<dataarea name="flop" size="143360">
 				<rom name="blue powder grey smoke (4am crack) disk 2 - scenery.dsk" size="143360" crc="4afe34ae" sha1="cda137195728ba5878dbbf926c2b081239e9becd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bolo">
-		<description>Bolo (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2018-10-07"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bolo (4am crack).dsk" size="143360" crc="6494af2c" sha1="0a2c77c0fe3199e4b7eb27774c924ced182479e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -3802,19 +3751,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="elmusksd">
-		<description>Elements of Music - Key-Signatures Drill (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2019-01-05"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="elements of music - key-signatures drill (4am crack).dsk" size="143360" crc="b2601218" sha1="97df9c952211c29b5af8c237d801df49faa8986d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="elite">
 		<description>Elite (cleanly cracked)</description>
 		<year>1985</year>
@@ -3922,19 +3858,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="ernie's quiz (4am crack).dsk" size="143360" crc="1233545f" sha1="ffed1a0f8a1d3dfc68d7f6f553c55641af36342f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="escarctr">
-		<description>Escape from Arcturus (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2018-04-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="escape from arcturus (4am crack).dsk" size="143360" crc="f5f2cf9d" sha1="39399ee63d2e12d91edd58d0c2f609ef8defe9ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -5348,19 +5271,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="h2weleph">
-		<description>How to Weigh An Elephant (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2017-04-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="how to weigh an elephant (4am crack).dsk" size="143360" crc="38ec0d92" sha1="231f6674a4f17be54ad347389c34034aca1ea9fa" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="icdemons">
 		<description>Ice Demons (cleanly cracked)</description>
 		<year>1982</year>
@@ -6016,19 +5926,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lgfishng">
-		<description>Let's Go Fishing (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2017-04-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="let's go fishing (4am crack).dsk" size="143360" crc="c037df88" sha1="7ec81326407298c790718f67d22a994c8657594e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="lettrman">
 		<description>Letter Man (cleanly cracked)</description>
 		<year>1982</year>
@@ -6287,19 +6184,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="math for everyday living (4am crack) disk 2.dsk" size="143360" crc="88b04045" sha1="e3727d8f73e89fe965f7ebccbab64575d6a25b5b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthnutsh">
-		<description>Math in a Nutshell (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2015-11-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math in a nutshell (4am crack).dsk" size="143360" crc="fa85b751" sha1="79a94f8d16e086b08c44ec3587b5db30b514aae2" />
 			</dataarea>
 		</part>
 	</software>
@@ -7404,32 +7288,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="microbe">
-		<description>Microbe (supports Mockingboard) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2017-04-30"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="microbe (supports mockingboard)(4am crack).dsk" size="143360" crc="ab19e7b6" sha1="aa7842f68f60f3ac55c502ea423f6fc8958b37cd" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="microbe3">
-		<description>Microbe (Revision 3) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2017-05-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="microbe rev. 3 (4am crack).dsk" size="143360" crc="287270b1" sha1="3f9a1950131310c3cbaf5b45c7992ec4748e662f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcorgtrl">
 		<description>MECC-A157 Oregon Trail (version 1.1) (cleanly cracked)</description>
 		<year>1985</year>
@@ -8109,19 +7967,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="number patterns (4am crack).dsk" size="143360" crc="0812367a" sha1="3a0a189cdfb8be0def0cccb5cc417944de310c3b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="numbpls">
-		<description>Number Please (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2018-08-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="number please (4am crack).dsk" size="143360" crc="d602d78b" sha1="b92aba698a15ad8ba56fa04469d7b46bb108a104" />
 			</dataarea>
 		</part>
 	</software>
@@ -9096,19 +8941,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="elemusic">
-		<description>Elements of Music (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2019-04-26"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="elements of music (4am crack).dsk" size="143360" crc="63514a75" sha1="a2f19c4698e11be6ad89e600f255fcc942bac36f" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="highorbt">
 		<description>High Orbit (cleanly cracked)</description>
 		<year>1982</year>
@@ -9311,19 +9143,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spdydvry">
-		<description>Speedy Delivery (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2019-05-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="speedy delivery (4am crack).dsk" size="143360" crc="7c9b225b" sha1="23c3480ea1e6e96613d2b8a13e394afcdd9f2a53" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tenlrobt">
 		<description>Ten Little Robots (cleanly cracked)</description>
 		<year>1983</year>
@@ -9357,19 +9176,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="ten little robots (imperfect 4am crack).dsk" size="143360" crc="b7b4d0c2" sha1="5e627a8d20d78f67ca18bc110fd12e55a4642b21" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tuneit2">
-		<description>Tune It ][ (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2019-04-26"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="Tune it ][ (4am crack).dsk" size="143360" crc="e512029f" sha1="e8acc071da75974b42a4d4ed9b956984a05c8546" />
 			</dataarea>
 		</part>
 	</software>
@@ -9850,19 +9656,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="spellicopter (4am crack).dsk" size="143360" crc="cf7c681b" sha1="1c0a177eae27bb1efa28242537feae1e9d54e40b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gaccrace">
-		<description>The Great American Cross-Country Road Race (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Activision</publisher>
-		<info name="release" value="2014-08-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the great american cross-country road race (4am crack).dsk" size="143360" crc="0c3f2ef8" sha1="6da5d873e8f98c785073207c8ab789dc494daaac" />
 			</dataarea>
 		</part>
 	</software>
@@ -11139,19 +10932,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="typing is a ball, charlie brown (4am crack) side b.dsk" size="143360" crc="afe9b1fd" sha1="609e867a95f13a3dc9935024cba62a17471ae643" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flyncrpt">
-		<description>The Flying Carpet (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Litag</publisher>
-		<info name="release" value="2015-12-31"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the flying carpet (4am crack).dsk" size="143360" crc="9816fdac" sha1="788e9b3b0e09d811b38da1e26e614da13bd22a23" />
 			</dataarea>
 		</part>
 	</software>
@@ -12888,19 +12668,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="synspcgm">
-		<description>Space Games: Appointment at Aldebaran and Procyon Warrior (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2017-04-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="space games - appointment at aldebaran and procyon warrior (4am crack).dsk" size="143360" crc="0e44e284" sha1="9771e6eee41bef375a88c96abaa44c1e76fd25f6" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="typistrt">
 		<description>Typing Strategy (cleanly cracked)</description>
 		<year>1982</year>
@@ -12949,19 +12716,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the great number chase (4am crack).dsk" size="143360" crc="fee3b698" sha1="595701b7a0907388e5d4ed313b22c451c554e8df" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tnkadthr">
-		<description>Tank Attack and Death Run (cleanly cracked)</description>
-		<year>1980</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2017-05-15"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="tank attack and death run (4am crack).dsk" size="143360" crc="f0dd901b" sha1="fabf685b8939c2597d3fad42c6015925f02161de" />
 			</dataarea>
 		</part>
 	</software>
@@ -14501,22 +14255,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="nmgallry">
-		<description>Nightmare Gallery (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2018-05-03"/>
-		<!-- Left & Right arrows or Paddle0 for controls - Select with "K" for keyboard / "P" for paddle -->
-		<!-- press SLASH "/" to fire with keyboard or use Button0 when using the paddle -->
-		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="nightmare gallery (4am crack).dsk" size="143360" crc="86421eea" sha1="cfa679c34cc728a3abc28ac2c64e636970d47409" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alnmnchs">
 		<description>Alien Munchies (cleanly cracked)</description>
 		<year>1983</year>
@@ -14619,19 +14357,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="basic fraction concepts (4am crack) side b.dsk" size="143360" crc="f669f9cf" sha1="83793809db077e98bcafd8462cad2acf92b386f6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="scrmbegg">
-		<description>Scrambled Eggs (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2018-08-01"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="scrambled eggs (4am crack).dsk" size="143360" crc="b371a101" sha1="5fb00fdabe96223870f9e177bd4d6f1e9b890163" />
 			</dataarea>
 		</part>
 	</software>
@@ -14826,19 +14551,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="swashbuckler (4am crack).dsk" size="143360" crc="b81cc65a" sha1="9903ba62cc7f7290d81f8bdbfa25b7fc316ac8a2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="planguid">
-		<description>The Planetary Guide (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2018-10-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the planetary guide (4am crack).dsk" size="143360" crc="9da21338" sha1="7f86e27049f6bc7d4eaa544816660431c862bb15" />
 			</dataarea>
 		</part>
 	</software>
@@ -16746,19 +16458,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="uboatcmd">
-		<description>U-Boat Command (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2020-08-09"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="u-boat command (4am crack).dsk" size="143360" crc="c134e816" sha1="cdf9e04801e96e9d5aa7dbd6a785a0e822ec262b"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcrocfct">
 		<description>MECC-A308 Rocket Factory (version 1.0) (cleanly cracked)</description>
 		<year>1992</year>
@@ -17090,19 +16789,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lraddsub">
-		<description>Learning to Add and Subtract (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Panda Learning Systems</publisher>
-		<info name="release" value="2020-08-30"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="learning to add and subtract (4am crack).dsk" size="143360" crc="9b336a84" sha1="3534dcacdf79690fd0f88286e79e956dab7038c2"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="negotedg">
 		<description>The Negotiation Edge (cleanly cracked)</description>
 		<year>1984</year>
@@ -17255,26 +16941,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="vortex (4am crack).dsk" size="143360" crc="f82bc31a" sha1="3ee47a454af5b10a923ccb3d37488e967985808d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="camptril">
-		<description>Campaign Trilogy (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Synergistic Software</publisher>
-		<info name="release" value="2020-11-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="campaign trilogy (4am crack) side a.dsk" size="143360" crc="2ac785e6" sha1="c377255bc975d5039739a79adcc87da3a23ff5ae"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="campaign trilogy (4am crack) side b.dsk" size="143360" crc="37137e35" sha1="3cbbfaa18e5ce4786d5ffaf53f58820156ce2276"/>
 			</dataarea>
 		</part>
 	</software>
@@ -17550,19 +17216,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Story Disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="playwriter- castles and creatures (4am crack) disk 2 - story disk.dsk" size="143360" crc="75ee41a3" sha1="af11ca63e3c5f9cc0a5fad72c93b4a0acacc58f1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pipeline">
-		<description>Pipeline (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Technologies</publisher>
-		<info name="release" value="2021-02-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pipeline (4am crack).dsk" size="143360" crc="e50c7c1c" sha1="47d65b3724944926b9762430693ff6b6c8b937d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20950,76 +20603,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="amazwrds">
-		<description>A-mazing Words (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>World Book</publisher>
-		<info name="release" value="2021-11-28"/>
-		<!-- "A-mazing Words" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="a-mazing words (4am crack).dsk" size="143360" crc="2e7829ee" sha1="557999bc8ccdbd21dddd825f59ab3947dd02c62f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mghtmath">
-		<description>Mighty Math (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>World Book</publisher>
-		<info name="release" value="2021-11-28"/>
-		<!-- "Mighty Math" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="mighty math (4am crack).dsk" size="143360" crc="cde288ce" sha1="f1eadcf76376196ebfd65e5921c71293549a2bf3"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="takenrth">
-		<description>Take Me North (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>World Book</publisher>
-		<info name="release" value="2021-11-28"/>
-		<!-- "Take Me North" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="take me north (4am crack).dsk" size="143360" crc="956ec497" sha1="8b6e02aef35c165b742efc7b0a4d96573a9e4309"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spacport">
-		<description>Space Port (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>World Book</publisher>
-		<info name="release" value="2021-11-28"/>
-		<!-- "Space Port" is a 1984 educational program developed by Interactive Image Technologies and distributed by World Book. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="space port (4am crack).dsk" size="143360" crc="6c3ecdef" sha1="a51d6534737b539448dd8ea36999e0e4305d53fa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrdplayr">
-		<description>Word-Player (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>World Book</publisher>
-		<info name="release" value="2021-11-28"/>
-		<!-- "Word-Player" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="word-player (4am crack).dsk" size="143360" crc="4aa95a21" sha1="3f99eb15c8adc83895f9ec1e8c38d2624907e6b5"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="perpanic">
 		<description>Percentage Panic (cleanly cracked)</description>
 		<year>1987</year>
@@ -21200,76 +20783,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dinolnch">
-		<description>Dinosaur's Lunch (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-03"/>
-		<!-- "Dinosaur's Lunch" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="dinosaur's lunch (4am crack).dsk" size="143360" crc="87f9d6c6" sha1="426ef821a5448d9ce8955195cf7c46efaa5736af"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="racekeys">
-		<description>Race Car Keys (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-03"/>
-		<!-- "Race Car Keys" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="race car keys (4am crack).dsk" size="143360" crc="ae68c7c6" sha1="69dca0d7e57edb59fadde9c6da482d045558c19f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fhbchord">
-		<description>Functional Harmony: Basic Chords (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-03"/>
-		<!-- "Functional Harmony: Basic Chords" is a 1987 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="functional harmony- basic chords (4am crack).dsk" size="143360" crc="3cf27e56" sha1="c74402014e1fb0d372e925df22eeb0c4f151b21e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fhdia7th">
-		<description>Functional Harmony: Diatonic Seventh Chords (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-03"/>
-		<!-- "Functional Harmony: Diatonic Seventh Chords" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="functional harmony- diatonic seventh chords (4am crack).dsk" size="143360" crc="d9e14b76" sha1="70cdb71b772f0124901a1efec89663b6ac54277c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fhboachr">
-		<description>Functional Harmony: Borrowed and Altered Chords (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-03"/>
-		<!-- "Functional Harmony: Borrowed and Altered Chords" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="functional harmony- borrowed and altered chords (4am crack).dsk" size="143360" crc="cd53e752" sha1="1bc8a7db008717854b9c1b2493939e533f63e03f"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="brsltrsnd">
 		<description>Building Reading Skills: The Letter-Sound Farm (cleanly cracked)</description>
 		<year>1984</year>
@@ -21280,21 +20793,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="building reading skills- the letter-sound farm (4am crack).dsk" size="143360" crc="e856ffbe" sha1="4ad13935ebc7d9ba2c62c041a459f2620dc34b40"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="followme">
-		<description>Follow Me (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="usage" value="Requires MIDI keyboard" />
-		<info name="release" value="2022-01-03"/>
-		<!-- "Follow Me" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It requires a MIDI keyboard. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="follow me (4am crack).dsk" size="143360" crc="2f7d52d5" sha1="174d8d956bf71a1820ad8fed563245354e48b507"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21436,34 +20934,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="notespelr">
-		<description>Note Speller (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Note Speller" is a 1984 educational program developed by Lolita Walker Gilkes and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="note speller (4am crack).dsk" size="143360" crc="c8c3a19a" sha1="dbd40352ce2aa2a9b0cb977714504887dcb037c2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="permushist">
-		<description>Perspectives in Music History (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Perspectives in Music History" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="perspectives in music history (4am crack).dsk" size="143360" crc="d51b35b2" sha1="0b48300464a387a5bcc9637305f062ee23b5168e"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ripleyuos">
 		<description>Ripley's Using Other Sources (cleanly cracked)</description>
 		<year>1985</year>
@@ -21513,48 +20983,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="clefnote">
-		<description>Clef Notes (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-13"/>
-		<!-- "Clef Notes" is a 1983 educational program developed by David Peters and distribute by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="clef notes (4am crack).dsk" size="143360" crc="4588d8e5" sha1="5d2d8946cc787ac18ba5e39bfe47204caeb870ab"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="12btunes">
-		<description>12-Bar Tunesmith (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-21"/>
-		<!-- "12-Bar Tunesmith" is a 1983 educational program developed by Fred Willman and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="12-bar tunesmith (4am crack).dsk" size="143360" crc="fc332203" sha1="859ca82f02ac1d0f61a77285f137adc12595a482"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="asbchrds">
-		<description>Aural Skills: Basic Chords (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Aural Skills: Basic Chords" is a 1983 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="aural skills trainer- basic chords (4am crack).dsk" size="143360" crc="21f69bd0" sha1="d412b744c31f1bbb8febc0b8357c0f83bd5989e5"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fbcollprep">
 		<description>Funbunch College Prep (cleanly cracked)</description>
 		<year>1983</year>
@@ -21565,397 +20993,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="funbunch college prep (4am and san inc crack).dsk" size="143360" crc="5e8c4ce3" sha1="be4cc0100733c7034f69792fe0115d82457228db"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="asinterv">
-		<description>Aural Skills: Intervals (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Aural Skills: Intervals" is a 1983 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="aural skills trainer- intervals (4am crack).dsk" size="143360" crc="94deba21" sha1="c7ca6b485c070f807ea7785aa080e10fbf30e42c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="as7thchd">
-		<description>Aural Skills: Seventh Chords (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Aural Skills: Seventh Chords" is a 1983 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="aural skills trainer- seventh chords (4am crack).dsk" size="143360" crc="9b5d891b" sha1="018c073610c14fafdfa467f22dd443b917149e38"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="earchlng">
-		<description>Ear Challenger: A Music Game (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Ear Challenger: A Music Game" is a 1982 educational program developed by Chris Alix and Stephen L. Walker, and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="ear challenger (4am crack).dsk" size="143360" crc="373bcf01" sha1="43ab2c9aa068891aa783fc76a05b0ed2f0450453"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="eartrskl">
-		<description>Ear Training Skills (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Ear Training Skills" is a 1985 educational program developed by Penny Pursell and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="ear training skills (4am crack).dsk" size="143360" crc="9f6b1e92" sha1="e2aaf6b3c48977619dfb5f6d54f2fd83002024fc"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="findtune">
-		<description>Find That Tune (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Find That Tune" is a 1985 educational program developed by Penny Pursell and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="find that tune (4am crack).dsk" size="143360" crc="2cd7a442" sha1="edb20db5603062cb063a16709665cfb1b4e95887"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybtutr">
-		<description>Keyboard Tutor (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Keyboard Tutor" is a 1987 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard tutor (4am crack).dsk" size="143360" crc="efad3427" sha1="5d1a92664913d1d8880168c12d6238136d9722a6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="listenms">
-		<description>Listen! A Music Skills Program (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Listen! A Music Skills Program" is a 1985 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="listen a music skills program (4am crack).dsk" size="143360" crc="c39fe4c0" sha1="bb816d121e4ebd781fd4f66c041abf240646c95f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="musaptml">
-		<description>Music Appreciation: The Musical Language (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Music Appreciation: The Musical Language" is a 1986 educational program developed by Joseph E. Koob and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="music appreciation- the musical language (4am crack) side a.dsk" size="143360" crc="3a76c487" sha1="618e9f985c6cfb0cbc930c57227dd5bc45bd537e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="music appreciation- the musical language (4am crack) side b.dsk" size="143360" crc="ecec5c44" sha1="46708fcd36bf964e48986507f140d0e8dcdfe327"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="musapmush">
-		<description>Music Appreciation: Music History (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Music Appreciation: Music History" is a 1986 educational program developed by Joseph E. Koob and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="music appreciation- music history (4am crack) side a.dsk" size="143360" crc="c253a847" sha1="13a908efe8e928872b74c05c092c5e4be6e9fb6b"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="music appreciation- music history (4am crack) side b.dsk" size="143360" crc="dd5e735b" sha1="29ded79a22705bbf53bffa4487af17377eb63072"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mhrcomp">
-		<description>Music History Review: Composers (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-01-23"/>
-		<!-- "Music History Review: Composers" is a 1988 educational program developed by William R. Higgins and Ronald L. Miller, and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="music history review- composers (4am crack).dsk" size="143360" crc="1996a711" sha1="81b8b21f1d5010d294ae7ac9a2bce391a6ee46f7"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="patpitl1">
-		<description>Patterns in Pitch: Level One (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-03-09"/>
-		<!-- "Patterns in Pitch: Level One" is a 1986 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="patterns in pitch- level one (4am crack).dsk" size="143360" crc="38999691" sha1="0d915d0196a7f702d944b3fcea29d5cf71e6db7d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="patpitl2">
-		<description>Patterns in Pitch: Level Two (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-03-09"/>
-		<!-- "Patterns in Pitch: Level Two" is a 1986 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="patterns in pitch- level two (4am crack).dsk" size="143360" crc="b1f90ab6" sha1="0c1147489a0aa3f096e79206b66230db806e3f5b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="patpitl3">
-		<description>Patterns in Pitch: Level Three (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-03-09"/>
-		<!-- "Patterns in Pitch: Level Three" is a 1985 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="patterns in pitch- level three (4am crack).dsk" size="143360" crc="d73aea3a" sha1="18a5159a69861938939aaa134b2afdc895bfb24a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="patrhyl2">
-		<description>Patterns in Rhythm: Level Two (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-03-09"/>
-		<!-- "Patterns in Rhythm: Level Two" is a 1986 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="patterns in rhythm- level two (4am crack).dsk" size="143360" crc="45680647" sha1="0c05a7a359411d25c8cbe8c16a08384d625e3243"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nd1elem">
-		<description>Note Detective I: Elementary Level (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-03-13"/>
-		<!-- "Note Detective I: Elementary Level" is a 1989 educational program developed by Reid Alexander and JoEllen DeVilbiss, and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="note detective i- elementary level (4am crack).dsk" size="143360" crc="0bdf95cf" sha1="355a54d958f8f92d80865aeb8ad6f276837b1996"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="patrhyl3">
-		<description>Patterns in Rhythm: Level Three (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-03-13"/>
-		<!-- "Patterns in Rhythm: Level Three" is a 1984 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="patterns in rhythm- level three (4am crack).dsk" size="143360" crc="dad7cec3" sha1="0de0f94c2754d2810b998e3ac6d82e4bc16fa2fa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mtflscrd">
-		<description>Music Theory Flash Cards (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-03-02"/>
-		<!-- "Music Theory Flash Cards" is a 1984 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. This version is dated 10/2/84. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="music theory flash cards (4am crack) disk 1.dsk" size="143360" crc="956664c8" sha1="6d1120f6fcb8da7d871c9b2e17ed84222b1a1d7d"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="music theory flash cards (4am crack) disk 2.dsk" size="143360" crc="5b251d38" sha1="73915f53108d92eeb2f2c7573808299fc2c6ed6c"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="music theory flash cards (4am crack) disk 3.dsk" size="143360" crc="a5a757a0" sha1="7bb6b29759431f5ed3ada0cfc079ad50fc8d3919"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dainterv">
-		<description>Descending/Ascending Intervals (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Descending/Ascending Intervals" is a 1986 educational program developed by Penny Pursell and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="descending-ascending intervals (4am crack).dsk" size="143360" crc="bbef08f0" sha1="81ac265fa435ba0c233430153a5894adc8c74f97"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fhsecdom">
-		<description>Functional Harmony: Secondary Dominants (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Functional Harmony: Secondary Dominants" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="functional harmony- secondary dominants (4am crack).dsk" size="143360" crc="e58f2315" sha1="2b9797450a1ec616aac1de2bf59ecadb37cff0e1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybndrl">
-		<description>Keyboard Note Drill (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Keyboard Note Drill" is a 1985 educational program developed by John M. Eddins and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard note drill (4am crack).dsk" size="143360" crc="bf5837ed" sha1="b07e169398ae828f3e71bc98716851b8e28193fd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdicbegl">
-		<description>Melodic Dictation: Beginning Level (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Melodic Dictation: Beginning Level" is a 1988 educational program developed by Penny Pursell and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="melodic dictation - beginning level (4am crack).dsk" size="143360" crc="d943a185" sha1="e31e6466f4ace7748d9ee2ca6675612019c8346b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mdicintl">
-		<description>Melodic Dictation: Intermediate Level (cleanly cracked)</description>
-		<year>1988</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Melodic Dictation: Intermediate Level" is a 1988 educational program developed by Penny Pursell and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="melodic dictation - intermediate level (4am crack).dsk" size="143360" crc="8c32f0b7" sha1="25ddf535414a286cb1b0f791d85c4f1e539e8126"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mcpquiz">
-		<description>Music Composer Quiz (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Music Composer Quiz" is a 1985 educational program developed by Joseph A. Brownlee and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="music composer quiz (4am crack).dsk" size="143360" crc="debe0831" sha1="99c071c9dada9df9fc3e491ef90b9097a86d3d88"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mstermin">
-		<description>Music Terminology (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Music Terminology" is a 1984 educational program developed by Vincent Oddo and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="music terminology (4am crack).dsk" size="143360" crc="55e03305" sha1="ba3f200155a076f6be4001d7f8d0644e5b58c2c5"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tapit">
-		<description>Tap-It (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Tap-It" is a 1987 educational program developed by G. David Peters and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="tap-it (4am crack).dsk" size="143360" crc="193c5293" sha1="3e4afbef063161782d66533c73c609682b301061"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zoopupth">
-		<description>Zoo Puppet Theater (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Electronic Courseware</publisher>
-		<info name="release" value="2022-03-28"/>
-		<!-- "Zoo Puppet Theater" is a 1989 educational program developed and distributed by Electronic Courseware. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="zoo puppet theater (4am crack).dsk" size="143360" crc="fa74042f" sha1="8eccccffd1ca8416b536934290bf5811e4880e47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21995,104 +21032,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="keybfing">
-		<description>Keyboard Fingerings (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Fingerings" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard fingerings (4am crack).dsk" size="143360" crc="4698d95d" sha1="79fbb021fead12425f212f60ffcefef1e3d35d13"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybintv">
-		<description>Keyboard Intervals (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Intervals" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard intervals (4am crack).dsk" size="143360" crc="58528f13" sha1="3d8bf802ced06c1c21ee1f54f8dd8a2538d0fe63"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybjazzh">
-		<description>Keyboard Jazz Harmonies (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Jazz Harmonies" is a 1985 educational program developed by Joseph A. Brownlee and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard jazz harmonies (4am crack).dsk" size="143360" crc="5ea5aa72" sha1="b2575b5fa2c9a0f7cde103fe928b0d752f4a2343"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybejazzh">
-		<description>Keyboard Extended Jazz Harmonies (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Extended Jazz Harmonies" is a 1987 educational program developed by Joseph A. Brownlee and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard extended jazz harmonies (4am crack).dsk" size="143360" crc="07cefb6f" sha1="7bd20ae0b41957185dcdce40c96c97a7983a0e5b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybsread">
-		<description>Keyboard Speed Reading (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Speed Reading" is a 1985 educational program developed by Ray E. Zubler and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard speed reading (4am crack).dsk" size="143360" crc="accbe520" sha1="d81dc34cbf3cae530b084928f00159a129792af9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="musicstairs">
-		<description>Musical Stairs (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Musical Stairs" is a 1985 educational program developed by Stephen L. Walker and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="musical stairs (4am crack).dsk" size="143360" crc="808705d0" sha1="5aea1cfdad848820ddbedf63584147de4b60ec9b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="notedet2int">
-		<description>Note Detective II: Intermediate Level (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Note Detective II: Intermediate Level" is a 1989 educational program developed by Reid Alexander and JoEllen DeVilbiss, and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="note detective ii- intermediate level (4am crack).dsk" size="143360" crc="c8620d0d" sha1="ab05536d490cc7dfc9118403109e6d6558523581"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="geosearch">
 		<description>Geography Search (cleanly cracked)</description>
 		<year>1982</year>
@@ -22117,62 +21056,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="cubes, prisms, and cylinders (4am crack).dsk" size="143360" crc="c36a007c" sha1="109131498188be0fe0f91d6953481c7a250838d7"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="erlymussk">
-		<description>Early Music Skills (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Early Music Skills" is a 1985 educational program developed by Lolita Walker Gilkes and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="early music skills (4am crack).dsk" size="143360" crc="f8dc4380" sha1="40cbaaaf0441c80794f2b92dba1a612d985deb47"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybarpeg">
-		<description>Keyboard Arpeggios (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Arpeggios" is a 1985 educational program developed by Reid Alexander and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard arpeggios (4am crack).dsk" size="143360" crc="fa3e26a4" sha1="9e66acc9367a65ab219c4fb29651d31a38f917e1"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keyblues">
-		<description>Keyboard Blues (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Blues" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard blues (4am crack).dsk" size="143360" crc="c32ddf6a" sha1="bddd4ca4b792050bef3702b38e977375855ac27c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="keybchords">
-		<description>Keyboard Chords (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-04-20"/>
-		<!-- "Keyboard Chords" is a 1985 educational program developed by G. David Peters and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="keyboard chords (4am crack).dsk" size="143360" crc="5d41b232" sha1="70856b9d56282d6b0218d32611638f15a4e0b1c7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22225,21 +21108,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Tool disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="easy graph ii (4am crack) disk 2 - tool.dsk" size="143360" crc="dd4a193b" sha1="5552fcf0fcfccc5aade53f28a1af4465766524e7"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="suprearc">
-		<description>Super Ear Challenger (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-06-09"/>
-		<!-- "Super Ear Challenger" is a 1985 educational program developed by Stephen Walker and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. It is preserved here for the first time. -->
-		<!-- It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2 and will crash spectacularly without one. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="super ear challenger- a music game (4am crack).dsk" size="143360" crc="461f0401" sha1="5002c1a3c9de2dc015fb46746f105dbec1c0a145"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22344,39 +21212,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 - Data disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="ginn reading program (4am crack) disk 3 - data.dsk" size="143360" crc="fef483a9" sha1="e0f16bf0a3478a55d63e02092b2a216852f672aa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="plyrdmus">
-		<description>Playing and Reading Music (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Electronic Courseware Systems</publisher>
-		<info name="release" value="2022-06-23"/>
-		<!-- "Playing and Reading Music" is a 1987 educational program developed by Vincent Oddo and Henry Levy, and distributed by Electronic Courseware Systems. It requires a MIDI keyboard connected to a Passport or Roland MIDI card in slot 2. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="playing and reading music (4am crack) disk 1.dsk" size="143360" crc="eaeb5ac1" sha1="ba313892322d045160cfe623330c8fdaf6f591d7"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="playing and reading music (4am crack) disk 2.dsk" size="143360" crc="673ffe87" sha1="ce7529d7e0f890d65a914b3a2a485ac7db095610"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="playing and reading music (4am crack) disk 3.dsk" size="143360" crc="85172747" sha1="f0ac3b037273682f668486733108554e169e06d6"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="143360">
-				<rom name="playing and reading music (4am crack) disk 4.dsk" size="143360" crc="1ac3aab4" sha1="4864efcbdf539e896e2f8961e3c10fd3d37cf0af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22935,6 +21770,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="12btunes">
+		<description>12-Bar Tunesmith (4am crack)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Fred Willman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-21 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="12-bar tunesmith (4am crack).dsk" size="143360" crc="fc332203" sha1="859ca82f02ac1d0f61a77285f137adc12595a482"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2400ad">
 		<description>2400 A.D. (4am crack)</description>
 		<year>1987</year>
@@ -23164,6 +22015,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="a week that changed the world (4am crack) side b.dsk" size="143360" crc="5de32c03" sha1="9da24d2da6528248f40ffb7e625e6495f0b862e7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazwrds">
+		<description>A-mazing Words (4am crack)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="developer" value="Synergistic Software"/>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-11-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="a-mazing words (4am crack).dsk" size="143360" crc="2e7829ee" sha1="557999bc8ccdbd21dddd825f59ab3947dd02c62f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24576,9 +23443,10 @@ license:CC0-1.0
 		<description>Alpine Tram Ride (revision 0) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Learning Technologies</publisher>
-		<info name="developer" value="Learning Technologies" />
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 0" />
+		<!-- Does not show the Litag developer screen. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-06-27 -->
 		<!-- educational program -->
@@ -24592,12 +23460,12 @@ license:CC0-1.0
 	<software name="alptramr">
 		<description>Alpine Tram Ride (revision 1) (4am crack)</description>
 		<year>1985</year>
-		<publisher>Litag Productions</publisher>
+		<publisher>Learning Technologies</publisher>
 		<info name="original_publisher" value="Learning Technologies" />
-		<info name="developer" value="Learning Technologies" />
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
-		<!-- Has a different intro and developer information than revision 0. -->
+		<!-- Shows the Litag developer screen and the Learning Technologies screen is different. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-07-15 -->
 		<!-- educational program -->
@@ -24650,7 +23518,7 @@ license:CC0-1.0
 		<description>American Government (Intellectual Software) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Intellectual Software</publisher>
-		<info name="developer" value="Queue, Inc." />
+		<info name="developer" value="Queue" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-02-19 -->
@@ -24915,6 +23783,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="anihotel">
+		<description>Animal Hotel (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-03-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="animal hotel (4am crack).dsk" size="143360" crc="1a3ebd0a" sha1="06e87b90198feefe446e66a86bb154758bd34c3a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="anphotof">
 		<description>Animal Photo Fun (4am crack)</description>
 		<year>1984</year>
@@ -25103,6 +23987,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="apple galaxian (starcraft) (4am crack).dsk" size="143360" crc="f2015816" sha1="d7f2e879638238bf909eceb194a7f4a1c66c7754"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apvatlan">
+		<description>Apventure to Atlantis (4am crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="programmer" value="Robert C. Clardy" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-07-18 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apventure to atlantis (4am crack).dsk" size="143360" crc="6234256c" sha1="96e6ad0e0507f9d1b903e8afe184f6b6aa572848" />
 			</dataarea>
 		</part>
 	</software>
@@ -25921,6 +24821,54 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="143360">
 				<rom name="audubon grizzly bears - wildlife adventures (4am crack) disk 5.dsk" size="143360" crc="58c81bd5" sha1="f2e0915e3d8dd6fd724edbc85805d23e412757c2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asbchrds">
+		<description>Aural Skills Trainer: Basic Chords (4am crack)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="aural skills trainer- basic chords (4am crack).dsk" size="143360" crc="21f69bd0" sha1="d412b744c31f1bbb8febc0b8357c0f83bd5989e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asinterv">
+		<description>Aural Skills Trainer: Intervals (4am crack)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="aural skills trainer- intervals (4am crack).dsk" size="143360" crc="94deba21" sha1="c7ca6b485c070f807ea7785aa080e10fbf30e42c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="as7thchd">
+		<description>Aural Skills Trainer: Seventh Chords (4am crack)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="aural skills trainer- seventh chords (4am crack).dsk" size="143360" crc="9b5d891b" sha1="018c073610c14fafdfa467f22dd443b917149e38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26787,10 +25735,10 @@ license:CC0-1.0
 		<description>Bike Hike (revision 0) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Learning Technologies</publisher>
-		<info name="developer" value="Learning Technologies" />
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 0" />
-		<!-- Has a different intro and developer information than revision 1. -->
+		<!-- Does not show the Litag developer screen. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2024-06-27 -->
 		<!-- educational program -->
@@ -26804,12 +25752,11 @@ license:CC0-1.0
 	<software name="bikehike">
 		<description>Bike Hike (revision 1) (4am crack)</description>
 		<year>1985</year>
-		<publisher>Litag Productions</publisher>
-		<info name="original_publisher" value="Learning Technologies" />
-		<info name="developer" value="Learning Technologies" />
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
-		<!-- Has a different intro and developer information than revision 0. -->
+		<!-- Shows the Litag developer screen and the Learning Technologies screen is different. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-07-14 -->
 		<!-- educational program -->
@@ -26983,6 +25930,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a256 bluegrass bluff v1.0 (4am crack).dsk" size="143360" crc="2be155ea" sha1="f7b731c72d7eb45df95dfdcb1b86d2f4917d04ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bolo">
+		<description>Bolo (4am crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="developer" value="Elvyn Software" />
+		<info name="programmer" value="Jim Lane" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-10-07 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bolo (4am crack).dsk" size="143360" crc="6494af2c" sha1="0a2c77c0fe3199e4b7eb27774c924ced182479e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -27671,6 +26635,29 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="calendar skills (4am crack).dsk" size="143360" crc="0a607950" sha1="15b8a8a76d0e00003a8ba222add1d80fc0f06d23" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="camptril">
+		<description>Campaign Trilogy (4am crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="programmer" value="Robert C. Clardy" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-11-02 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="campaign trilogy (4am crack) side a.dsk" size="143360" crc="2ac785e6" sha1="c377255bc975d5039739a79adcc87da3a23ff5ae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="campaign trilogy (4am crack) side b.dsk" size="143360" crc="37137e35" sha1="3cbbfaa18e5ce4786d5ffaf53f58820156ce2276"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28836,6 +27823,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="clefnote">
+		<description>Clef Notes Drill (4am crack)</description>
+		<year>1983</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="David Peters" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-13-->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="clef notes (4am crack).dsk" size="143360" crc="4588d8e5" sha1="5d2d8946cc787ac18ba5e39bfe47204caeb870ab"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="clocktt070683" cloneof="clocktt">
 		<description>Clock: Time Teaching (version 07.06.83) (4am crack)</description>
 		<year>1983</year>
@@ -28906,8 +27909,10 @@ license:CC0-1.0
 		<description>Clowning Around (revision 1) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
+		<!-- Does not show the Litag developer screen. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-12-16 -->
 		<!-- educational program -->
@@ -28922,9 +27927,10 @@ license:CC0-1.0
 		<description>Clowning Around (revision 2) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
-		<!-- This updated revision has updated copy protection and unspecified bug fixes. -->
+		<!-- This updated revision has updated copy protection and unspecified bug fixes. Title screen changed to Panda and shows the Litag developer screen. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-09-12 -->
 		<!-- educational program -->
@@ -30350,6 +29356,25 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="cotton's first files (4am crack) side b.dsk" size="143360" crc="ae7d19e8" sha1="afbcc8066fa1bf4869186dbcbb0f42685dda8d17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cntdsht">
+		<description>Countdown to Shutdown (trex crack)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Creative Sparks" />
+		<info name="developer" value="Synergistic Software" />
+		<info name="programmer" value="T.L. Gale" />
+		<info name="programmer" value="Ivan Manley" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-01-27 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="countdown to shutdown (1985)(activision)(trex crack).dsk" size="143360" crc="cf4ac129" sha1="ee6843930f3c78c738f3ef4cf1e306ef5897d8af" />
 			</dataarea>
 		</part>
 	</software>
@@ -32154,6 +31179,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dinolnch">
+		<description>Dinosaur's Lunch (4am crack)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Brenna Bailey" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-01-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur's lunch (4am crack).dsk" size="143360" crc="87f9d6c6" sha1="426ef821a5448d9ce8955195cf7c46efaa5736af"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dinosarsr1" cloneof="dinosars">
 		<description>Dinosaurs (release 1) (4am crack)</description>
 		<!-- 4am calls this version 1.0, but no version exists anywhere. -->
@@ -32690,6 +31732,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="earchlng">
+		<description>Ear Challenger: A Music Game (4am crack)</description>
+		<year>1982</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Chris Alix" />
+		<info name="programmer" value="Stephen L. Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ear challenger (4am crack).dsk" size="143360" crc="373bcf01" sha1="43ab2c9aa068891aa783fc76a05b0ed2f0450453"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="edobsclas">
 		<description>Early Discoveries: Observation and Classification (version 09.23.85) (4am crack)</description>
 		<year>1985</year>
@@ -32927,6 +31986,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="erlymussk">
+		<description>Early Music Skills (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Lolita Walker Gilkes" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="early music skills (4am crack).dsk" size="143360" crc="f8dc4380" sha1="40cbaaaf0441c80794f2b92dba1a612d985deb47"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="earskill">
 		<description>Early Skills (version 06.05.86) (4am crack)</description>
 		<year>1986</year>
@@ -33158,6 +32234,40 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="elemusic">
+		<description>Elements of Music (4am crack)</description>
+		<year>1981</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="John M. Eddins" />
+		<info name="programmer" value="Robert L. Weiss, Jr." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-04-26 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="elements of music (4am crack).dsk" size="143360" crc="63514a75" sha1="a2f19c4698e11be6ad89e600f255fcc942bac36f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmusksd">
+		<description>Elements of Music: Key-Signatures Drill (4am crack)</description>
+		<year>1981</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="John M. Eddins" />
+		<info name="programmer" value="Robert L. Weiss, Jr." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-01-05 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="elements of music - key-signatures drill (4am crack).dsk" size="143360" crc="b2601218" sha1="97df9c952211c29b5af8c237d801df49faa8986d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="enctriv">
 		<description>Encyclopedia Trivia (4am crack)</description>
 		<year>1986</year>
@@ -33338,6 +32448,21 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="equations i (4am crack).dsk" size="143360" crc="7718ac2a" sha1="d75afc6eb44a374728039ad7ca5ad87701ee3d29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escarctr">
+		<description>Escape from Arcturus (4am crack)</description>
+		<year>1981</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-04-23 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="escape from arcturus (4am crack).dsk" size="143360" crc="f5f2cf9d" sha1="39399ee63d2e12d91edd58d0c2f609ef8defe9ae" />
 			</dataarea>
 		</part>
 	</software>
@@ -34176,6 +33301,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="followme">
+		<description>Follow Me (4am crack)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Brenna Bailey" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-01-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="follow me (4am crack).dsk" size="143360" crc="2f7d52d5" sha1="174d8d956bf71a1820ad8fed563245354e48b507"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fdotcdirt">
 		<description>Following Directions: One and Two-Level Commands - Directional Terms (4am crack)</description>
 		<year>1986</year>
@@ -34803,6 +33945,74 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="fun with directions (4am crack).dsk" size="143360" crc="64361419" sha1="ae09410f8217b49d9a68618da63806a0f9bdac38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhbchord">
+		<description>Functional Harmony: Basic Chords (4am crack)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-01-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- basic chords (4am crack).dsk" size="143360" crc="3cf27e56" sha1="c74402014e1fb0d372e925df22eeb0c4f151b21e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhboachr">
+		<description>Functional Harmony: Borrowed and Altered Chords (4am crack)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-01-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- borrowed and altered chords (4am crack).dsk" size="143360" crc="cd53e752" sha1="1bc8a7db008717854b9c1b2493939e533f63e03f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhdia7th">
+		<description>Functional Harmony: Diatonic Seventh Chords (4am crack)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-01-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- diatonic seventh chords (4am crack).dsk" size="143360" crc="d9e14b76" sha1="70cdb71b772f0124901a1efec89663b6ac54277c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhsecdom">
+		<description>Functional Harmony: Secondary Dominants (4am crack)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- secondary dominants (4am crack).dsk" size="143360" crc="e58f2315" sha1="2b9797450a1ec616aac1de2bf59ecadb37cff0e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -36261,6 +35471,86 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hpdesascin">
+		<description>Hear Today... Play Tomorrow: Descending/Ascending Intervals (4am crack)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Penny Pursell" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="descending-ascending intervals (4am crack).dsk" size="143360" crc="bbef08f0" sha1="81ac265fa435ba0c233430153a5894adc8c74f97"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpeartrsk">
+		<description>Hear Today... Play Tomorrow: Ear Training Skills (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Penny Pursell" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ear training skills (4am crack).dsk" size="143360" crc="9f6b1e92" sha1="e2aaf6b3c48977619dfb5f6d54f2fd83002024fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpfdtune">
+		<description>Hear Today... Play Tomorrow: Find That Tune (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Penny Pursell" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="find that tune (4am crack).dsk" size="143360" crc="2cd7a442" sha1="edb20db5603062cb063a16709665cfb1b4e95887"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpmdbegl">
+		<description>Hear Today... Play Tomorrow: Melodic Dictation Beginning Level (4am crack)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Penny Pursell" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="melodic dictation - beginning level (4am crack).dsk" size="143360" crc="d943a185" sha1="e31e6466f4ace7748d9ee2ca6675612019c8346b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpmdintl">
+		<description>Hear Today... Play Tomorrow: Melodic Dictation Intermediate Level (4am crack)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Penny Pursell" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="melodic dictation - intermediate level (4am crack).dsk" size="143360" crc="8c32f0b7" sha1="25ddf535414a286cb1b0f791d85c4f1e539e8126"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heydidle">
 		<description>Hey Diddle Diddle! (4am crack)</description>
 		<year>1983</year>
@@ -36830,6 +36120,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="how to do research (4am crack).dsk" size="143360" crc="08ab26cd" sha1="d79ec74e57991caf048ab0b9fe9cc755c5ac9532" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="h2weleph">
+		<description>How to Weigh an Elephant (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="developer" value="Educational Technologies" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="how to weigh an elephant (4am crack).dsk" size="143360" crc="38ec0d92" sha1="231f6674a4f17be54ad347389c34034aca1ea9fa" />
 			</dataarea>
 		</part>
 	</software>
@@ -37591,6 +36898,91 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="keybarpeg">
+		<description>Keyboard Arpeggios (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Reid Alexander" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard arpeggios (4am crack).dsk" size="143360" crc="fa3e26a4" sha1="9e66acc9367a65ab219c4fb29651d31a38f917e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyblues">
+		<description>Keyboard Blues (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="G. David Peters" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard blues (4am crack).dsk" size="143360" crc="c32ddf6a" sha1="bddd4ca4b792050bef3702b38e977375855ac27c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybchords">
+		<description>Keyboard Chords (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="G. David Peters" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard chords (4am crack).dsk" size="143360" crc="5d41b232" sha1="70856b9d56282d6b0218d32611638f15a4e0b1c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybejazzh">
+		<description>Keyboard Extended Jazz Harmonies (4am crack)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Joseph A. Brownlee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard extended jazz harmonies (4am crack).dsk" size="143360" crc="07cefb6f" sha1="7bd20ae0b41957185dcdce40c96c97a7983a0e5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybfing">
+		<description>Keyboard Fingerings (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="G. David Peters" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard fingerings (4am crack).dsk" size="143360" crc="4698d95d" sha1="79fbb021fead12425f212f60ffcefef1e3d35d13"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kbdgolf">
 		<description>Keyboard Golf (Softsmith) (4am and san inc crack)</description>
 		<year>1981</year>
@@ -37611,6 +37003,91 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="143360">
 				<rom name="keyboard golf (softsmith) (4am and san inc crack) side b.dsk" size="143360" crc="b94e7b07" sha1="ccc7689f7f8a3fe1e7edd3497157b1a4dc74535c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybintv">
+		<description>Keyboard Intervals (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="G. David Peters" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard intervals (4am crack).dsk" size="143360" crc="58528f13" sha1="3d8bf802ced06c1c21ee1f54f8dd8a2538d0fe63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybjazzh">
+		<description>Keyboard Jazz Harmonies (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Joseph A. Brownlee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard jazz harmonies (4am crack).dsk" size="143360" crc="5ea5aa72" sha1="b2575b5fa2c9a0f7cde103fe928b0d752f4a2343"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybndrl">
+		<description>Keyboard Note Drill (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Joseph A. Brownlee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard note drill (4am crack).dsk" size="143360" crc="bf5837ed" sha1="b07e169398ae828f3e71bc98716851b8e28193fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybsread">
+		<description>Keyboard Speed Reading (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Ray E. Zubler" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard speed reading (4am crack).dsk" size="143360" crc="accbe520" sha1="d81dc34cbf3cae530b084928f00159a129792af9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keybtutr">
+		<description>Keyboard Tutor (4am crack)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="keyboard tutor (4am crack).dsk" size="143360" crc="efad3427" sha1="5d1a92664913d1d8880168c12d6238136d9722a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38738,6 +38215,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lraddsub">
+		<description>Learning to Add &amp; Subtract (revision 2) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Title screen changed to Panda and shows the Litag developer screen. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-08-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="learning to add and subtract (4am crack).dsk" size="143360" crc="9b336a84" sha1="3534dcacdf79690fd0f88286e79e956dab7038c2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lrn2time">
 		<description>Learning to Tell Time (4am crack)</description>
 		<year>1986</year>
@@ -38914,6 +38409,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="let's explore word processing (media materials) (4am crack).dsk" size="143360" crc="3d69b0d6" sha1="d560e5556abe856c791ea47cdadf7ecaefe0b127" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgfishng">
+		<description>Let's Go Fishing (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="let's go fishing (4am crack).dsk" size="143360" crc="c037df88" sha1="7ec81326407298c790718f67d22a994c8657594e" />
 			</dataarea>
 		</part>
 	</software>
@@ -39138,6 +38649,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="life story frog (4am crack).dsk" size="143360" crc="e107f2f8" sha1="f15828fe236a02b0ce18346e2c7c041010f1fb4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="listenms">
+		<description>Listen! A Music Skills Program (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="listen a music skills program (4am crack).dsk" size="143360" crc="c39fe4c0" sha1="bb816d121e4ebd781fd4f66c041abf240646c95f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41092,6 +40619,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mthnutsh">
+		<description>Math in a Nutshell (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-11-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math in a nutshell (4am crack).dsk" size="143360" crc="fa85b751" sha1="79a94f8d16e086b08c44ec3587b5db30b514aae2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mthmagic">
 		<description>Math Magic (4am crack)</description>
 		<year>1986</year>
@@ -42542,6 +42085,43 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="microbem" cloneof="microbe">
+		<description>Microbe: The Anatomical Adventure (supports Mockingboard) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="alt_title" value="Eduventure #1: Microbe: The Anatomical Adventure" />
+		<info name="programmer" value="Robert C. Clardy" />
+		<info name="programmer" value="Alan H. Zalta, M.D." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microbe (supports mockingboard)(4am crack).dsk" size="143360" crc="ab19e7b6" sha1="aa7842f68f60f3ac55c502ea423f6fc8958b37cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="microbe">
+		<description>Microbe: The Anatomical Adventure (revision 3) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="alt_title" value="Eduventure #1: Microbe: The Anatomical Adventure" />
+		<info name="programmer" value="Robert C. Clardy" />
+		<info name="programmer" value="Alan H. Zalta, M.D." />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="revision 3" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="microbe rev. 3 (4am crack).dsk" size="143360" crc="287270b1" sha1="3f9a1950131310c3cbaf5b45c7992ec4748e662f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="micrjrny">
 		<description>Microscopic Journey (4am crack)</description>
 		<year>1982</year>
@@ -43514,6 +43094,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mghtmath">
+		<description>Mighty Math (4am crack)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="developer" value="Synergistic Software"/>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-11-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mighty math (4am crack).dsk" size="143360" crc="cde288ce" sha1="f1eadcf76376196ebfd65e5921c71293549a2bf3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mmdaddsub">
 		<description>Milt's Math Drills: Addition and Subtraction (version 10.03.86) (4am crack)</description>
 		<year>1986</year>
@@ -44001,16 +43597,18 @@ license:CC0-1.0
 	<software name="mnkybsnsr1" cloneof="mnkybsns">
 		<description>Monkey Business (revision 1) (4am crack)</description>
 		<year>1985</year>
-		<publisher>Litag Productions</publisher>
-		<info name="developer" value="Learning Technologies" />
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
+		<!-- Does not show the Litag developer screen. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2015-12-05 -->
+		<!-- Dump released: 2023-09-13 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="monkey business (4am crack).dsk" size="143360" crc="e8504441" sha1="96de16bfc87ade8c28b498632261a9b47f5447b4" />
+				<!-- Asked 4am to update to revision 1 to match Woz releases for Monkey Business. -->
+				<rom name="monkey business rev. 2 (4am crack).dsk" size="143360" crc="85e865a8" sha1="f6a770e91e05431c1eb9cfa25674ee5403210d41" />
 			</dataarea>
 		</part>
 	</software>
@@ -44019,17 +43617,16 @@ license:CC0-1.0
 		<description>Monkey Business (revision 2) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Learning Technologies</publisher>
-		<info name="original_publisher" value="Litag Productions" />
-		<info name="developer" value="Learning Technologies" />
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
-		<!-- This updated revision has unspecified bug fixes. -->
+		<!-- Shows the Litag developer screen and the Learning Technologies screen is different. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-09-13 -->
+		<!-- Dump released: 2015-12-05 -->
 		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="monkey business rev. 2 (4am crack).dsk" size="143360" crc="85e865a8" sha1="f6a770e91e05431c1eb9cfa25674ee5403210d41" />
+				<rom name="monkey business (4am crack).dsk" size="143360" crc="e8504441" sha1="96de16bfc87ade8c28b498632261a9b47f5447b4" />
 			</dataarea>
 		</part>
 	</software>
@@ -44812,6 +44409,57 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="musicapp">
+		<description>Music Appreciation: A Study Guide (4am crack)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Joseph E. Koob" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - The Musical Language" />
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- the musical language (4am crack) side a.dsk" size="143360" crc="3a76c487" sha1="618e9f985c6cfb0cbc930c57227dd5bc45bd537e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - The Musical Language" />
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- the musical language (4am crack) side b.dsk" size="143360" crc="ecec5c44" sha1="46708fcd36bf964e48986507f140d0e8dcdfe327"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Music History" />
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- music history (4am crack) side a.dsk" size="143360" crc="c253a847" sha1="13a908efe8e928872b74c05c092c5e4be6e9fb6b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Music History" />
+			<dataarea name="flop" size="143360">
+				<rom name="music appreciation- music history (4am crack) side b.dsk" size="143360" crc="dd5e735b" sha1="29ded79a22705bbf53bffa4487af17377eb63072"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpquiz">
+		<description>Music Composer Quiz (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Joseph A. Brownlee" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="music composer quiz (4am crack).dsk" size="143360" crc="debe0831" sha1="99c071c9dada9df9fc3e491ef90b9097a86d3d88"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcsr3" cloneof="mcs">
 		<description>Music Construction Set (revision 3) (4am and san inc crack)</description>
 		<year>1984</year>
@@ -44848,6 +44496,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mhrcomp">
+		<description>Music History Review: Composers (4am crack)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="William R. Higgins" />
+		<info name="programmer" value="Ronald L. Miller" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="music history review- composers (4am crack).dsk" size="143360" crc="1996a711" sha1="81b8b21f1d5010d294ae7ac9a2bce391a6ee46f7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="musimaes">
 		<description>Music Maestro (4am crack)</description>
 		<year>1983</year>
@@ -44860,6 +44525,36 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="music maestro (4am crack).dsk" size="143360" crc="dbd35900" sha1="534e21bed165e5ba182fac875143895b07a183e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtflscrd">
+		<description>Music Theory Flash Cards (version 10/2/84) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="10/2/84" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-02 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music theory flash cards (4am crack) disk 1.dsk" size="143360" crc="956664c8" sha1="6d1120f6fcb8da7d871c9b2e17ed84222b1a1d7d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music theory flash cards (4am crack) disk 2.dsk" size="143360" crc="5b251d38" sha1="73915f53108d92eeb2f2c7573808299fc2c6ed6c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="music theory flash cards (4am crack) disk 3.dsk" size="143360" crc="a5a757a0" sha1="7bb6b29759431f5ed3ada0cfc079ad50fc8d3919"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44889,6 +44584,41 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 - Teacher" />
 			<dataarea name="flop" size="143360">
 				<rom name="music tutor (4am crack) disk 3 - teacher disk.dsk" size="143360" crc="92c0b221" sha1="34738e553302faa52faeefdd0887b5c40f1b9399" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstairs">
+		<description>Musical Stairs (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Stephen L. Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later and a compatible MIDI peripheral card in slot 2." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- The 1984 version does not use MIDI, but the 1985 version requires it. -->
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="musical stairs (4am crack).dsk" size="143360" crc="808705d0" sha1="5aea1cfdad848820ddbedf63584147de4b60ec9b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mstermin">
+		<description>Musical Terminology (4am crack)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="music terminology (4am crack).dsk" size="143360" crc="55e03305" sha1="ba3f200155a076f6be4001d7f8d0644e5b58c2c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45132,6 +44862,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="nightgal">
+		<description>Nightmare Gallery (4am crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="programmer" value="Ron Aldrich" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-05-03 -->
+		<!-- action game -->
+		<!-- Left & Right arrows or Paddle0 for controls - Select with "K" for keyboard / "P" for paddle -->
+		<!-- press SLASH "/" to fire with keyboard or use Button0 when using the paddle -->
+		<!-- "C" for continuous fire, SPACE BAR for shields, CRTL-S toggles sound on/off, ESC for pause -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="nightmare gallery (4am crack).dsk" size="143360" crc="86421eea" sha1="cfa679c34cc728a3abc28ac2c64e636970d47409" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nthatl86">
 		<description>North Atlantic 86 (4am and san inc crack)</description>
 		<year>1982</year>
@@ -45144,6 +44893,58 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="north atlantic 86 (4am and san inc crack).dsk" size="143360" crc="fb1e63c0" sha1="b33928ead103f906091b6b8ab989be0cbdbf2f79" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nd1eleml">
+		<description>Note Detective I: Elementary Level (4am crack)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Reid Alexander" />
+		<info name="programmer" value="JoEllen DeVilbiss" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-03-13 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="note detective i- elementary level (4am crack).dsk" size="143360" crc="0bdf95cf" sha1="355a54d958f8f92d80865aeb8ad6f276837b1996"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nd2intl">
+		<description>Note Detective II: Intermediate Level (4am crack)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Reid Alexander" />
+		<info name="programmer" value="JoEllen DeVilbiss" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later, and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-04-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="note detective ii- intermediate level (4am crack).dsk" size="143360" crc="c8620d0d" sha1="ab05536d490cc7dfc9118403109e6d6558523581"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="notespelr">
+		<description>Note Speller (4am crack)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Lolita Walker Gilkes" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="note speller (4am crack).dsk" size="143360" crc="c8c3a19a" sha1="dbd40352ce2aa2a9b0cb977714504887dcb037c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45319,6 +45120,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="number farm (4am crack).dsk" size="143360" crc="7beb091c" sha1="ee2155533ff204a91ce2dd6db665eefbb3feeec0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbpls">
+		<description>Number Please: Visual and Sequential Memory Practice (release 2) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="release 2" />
+		<!-- Litag developer is added to Learning Technologies screen. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-08-02 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="number please (4am crack).dsk" size="143360" crc="d602d78b" sha1="b92aba698a15ad8ba56fa04469d7b46bb108a104" />
 			</dataarea>
 		</part>
 	</software>
@@ -45928,6 +45747,86 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="patpitl1">
+		<description>Patterns in Pitch (Composition and Dictation): Level One (4am crack)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in pitch- level one (4am crack).dsk" size="143360" crc="38999691" sha1="0d915d0196a7f702d944b3fcea29d5cf71e6db7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patpitl2">
+		<description>Patterns in Pitch (Composition and Dictation): Level Two (4am crack)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in pitch- level two (4am crack).dsk" size="143360" crc="b1f90ab6" sha1="0c1147489a0aa3f096e79206b66230db806e3f5b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patpitl3">
+		<description>Patterns in Pitch (Composition and Dictation): Level Three (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in pitch- level three (4am crack).dsk" size="143360" crc="d73aea3a" sha1="18a5159a69861938939aaa134b2afdc895bfb24a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patrhyl2">
+		<description>Patterns in Rhythm (Composition and Dictation): Level Two (4am crack)</description>
+		<year>1986</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in rhythm- level two (4am crack).dsk" size="143360" crc="45680647" sha1="0c05a7a359411d25c8cbe8c16a08384d625e3243"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patrhyl3">
+		<description>Patterns in Rhythm (Composition and Dictation): Level Three (4am crack)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-13 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="patterns in rhythm- level three (4am crack).dsk" size="143360" crc="dad7cec3" sha1="0de0f94c2754d2810b998e3ac6d82e4bc16fa2fa"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="patrnmkr">
 		<description>PatternMaker (4am crack)</description>
 		<year>1984</year>
@@ -46245,6 +46144,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="permushist">
+		<description>Perspectives in Music History (4am crack)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="perspectives in music history (4am crack).dsk" size="143360" crc="d51b35b2" sha1="0b48300464a387a5bcc9637305f062ee23b5168e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="petshop">
 		<description>Pet Shop (A-347 version 1.0) (4am crack)</description>
 		<year>1994</year>
@@ -46502,12 +46417,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pipeline">
+		<description>Pipeline (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Learning Technologies" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-02-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pipeline (4am crack).dsk" size="143360" crc="e50c7c1c" sha1="47d65b3724944926b9762430693ff6b6c8b937d8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pitstop2">
 		<description>Pitstop II (4am crack)</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Ivan Manley" />
-		<info name="programmer" value="R. Clardy" />
+		<info name="programmer" value="Robert C. Clardy" />
 		<info name="programmer" value="D. Stinnett" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
@@ -48093,6 +48024,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="race car 'rithmetic (4am crack).dsk" size="143360" crc="136fcd47" sha1="3f3a4a5d9465366a22a1e01fc5d0b771f57be7b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racekeys">
+		<description>Race Car Keys (4am crack)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Brenna Bailey" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-01-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="race car keys (4am crack).dsk" size="143360" crc="ae68c7c6" sha1="69dca0d7e57edb59fadde9c6da482d045558c19f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50783,6 +50730,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="scrmbegg">
+		<description>Scrambled Eggs! (revision 2) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Shows the Litag developer screen and the Learning Technologies screen is different. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-08-01 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="scrambled eggs (4am crack).dsk" size="143360" crc="b371a101" sha1="5fb00fdabe96223870f9e177bd4d6f1e9b890163" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scrnwrit">
 		<description>Screen Writer (version 2.0) (4am and san inc crack)</description>
 		<year>1982</year>
@@ -51453,10 +51418,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="slidblokl" cloneof="slidblok">
-		<description>Sliding Block (revision 1) (4am crack)</description>
+	<software name="slidblokr1" cloneof="slidblok">
+		<description>Sliding Block (revision 1) (Learning Technologies) (4am crack)</description>
 		<year>1985</year>
-		<publisher>Litag</publisher>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -51470,11 +51436,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="slidblok">
-		<description>Sliding Block (revision 2) (Merit) (4am crack)</description>
+		<description>Sliding Block (revision 2) (Merit Software) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Merit Software</publisher>
-		<info name="developer" value="Learning Technologies" />
-		<info name="original_publisher" value="Litag" />
+		<info name="developer" value="Litag" />
+		<info name="original_publisher" value="Learning Technologies" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 2" />
 		<!-- Re-released by Merit Software with updated copy protection. -->
@@ -51991,6 +51957,21 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="synspcgm">
+		<description>Space Games: Appointment at Aldebaran &amp; Procyon Warrior (4am crack)</description>
+		<year>1981</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-29 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space games - appointment at aldebaran and procyon warrior (4am crack).dsk" size="143360" crc="0e44e284" sha1="9771e6eee41bef375a88c96abaa44c1e76fd25f6" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sjplanst">
 		<description>Space Journey: Planets and Stars (4am crack)</description>
 		<year>1991</year>
@@ -52006,6 +51987,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="space journey- planets and stars (4am crack).dsk" size="143360" crc="2a5efedf" sha1="a7b317634ed2ff992ecb6b27e31b2e720ef9189f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacport">
+		<description>Space Port (4am crack)</description>
+		<year>1984</year>
+		<publisher>World Book</publisher>
+		<info name="developer" value="Interactive Image Technologies"/>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-11-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space port (4am crack).dsk" size="143360" crc="6c3ecdef" sha1="a51d6534737b539448dd8ea36999e0e4305d53fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52371,6 +52368,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B - Data"/>
 			<dataarea name="flop" size="143360">
 				<rom name="speed reader ii 091286 (4am crack) side b.dsk" size="143360" status="nodump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spdydvry">
+		<description>Speedy Delivery (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-05-25 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="speedy delivery (4am crack).dsk" size="143360" crc="7c9b225b" sha1="23c3480ea1e6e96613d2b8a13e394afcdd9f2a53" />
 			</dataarea>
 		</part>
 	</software>
@@ -54481,6 +54494,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="suprearc">
+		<description>Super Ear Challenger (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="alt_title" value="Super Challenger" />
+		<info name="programmer" value="Stephen L. Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later and a compatible MIDI peripheral card in slot 2." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- The 1984 version does not use MIDI, but the 1985 version requires it. -->
+		<!-- Dump released: 2022-06-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="super ear challenger- a music game (4am crack).dsk" size="143360" crc="461f0401" sha1="5002c1a3c9de2dc015fb46746f105dbec1c0a145"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swrdf386">
 		<description>Super Wordfind (version 03.13.86) (4am crack)</description>
 		<year>1986</year>
@@ -54810,6 +54843,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="takenrth">
+		<description>Take Me North (4am crack)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="developer" value="Synergistic Software"/>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-11-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="take me north (4am crack).dsk" size="143360" crc="956ec497" sha1="8b6e02aef35c165b742efc7b0a4d96573a9e4309"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tchances">
 		<description>Taking Chances (4am crack)</description>
 		<year>1991</year>
@@ -55049,6 +55098,38 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 - Lands beyond"/>
 			<dataarea name="flop" size="143360">
 				<rom name="talisman (4am crack) disk 3 - lands beyond.dsk" size="143360" crc="214ff3b5" sha1="0ddcfbd830e431988e96c19382a247bb232931e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tnkadthr">
+		<description>Tank Attack &amp; Death Run (4am crack)</description>
+		<year>1980</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="developer" value="The SoftWizard" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-15 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tank attack and death run (4am crack).dsk" size="143360" crc="f0dd901b" sha1="fabf685b8939c2597d3fad42c6015925f02161de" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapit">
+		<description>Tap-It (4am crack)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="G. David Peters" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tap-it (4am crack).dsk" size="143360" crc="193c5293" sha1="3e4afbef063161782d66533c73c609682b301061"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55314,6 +55395,43 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="that's my job level 1 (4am crack) disk 2.dsk" size="143360" crc="3ddf705b" sha1="65363301cb29f0c821dcb329808d6fbc452abd94" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plyrdmus">
+		<description>The 21st Century Music Series: Playing and Reading Music (4am crack)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Vincent Oddo" />
+		<info name="programmer" value="Henry Levy" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later and a compatible MIDI peripheral card in slot 2." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2022-06-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 1.dsk" size="143360" crc="eaeb5ac1" sha1="ba313892322d045160cfe623330c8fdaf6f591d7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 2.dsk" size="143360" crc="673ffe87" sha1="ce7529d7e0f890d65a914b3a2a485ac7db095610"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 3.dsk" size="143360" crc="85172747" sha1="f0ac3b037273682f668486733108554e169e06d6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - Supplemental Songs"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playing and reading music (4am crack) disk 4.dsk" size="143360" crc="1ac3aab4" sha1="4864efcbdf539e896e2f8961e3c10fd3d37cf0af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56339,6 +56457,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="flyncrpt">
+		<description>The Flying Carpet (4am crack)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="developer" value="Litag" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-12-31 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the flying carpet (4am crack).dsk" size="143360" crc="9816fdac" sha1="788e9b3b0e09d811b38da1e26e614da13bd22a23" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="forthr">
 		<description>The Fourth R -- Reasoning (4am crack)</description>
 		<year>1984</year>
@@ -56559,6 +56693,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the goofy ghost (4am crack).dsk" size="143360" crc="013ddcab" sha1="241bbd553e0203cb3eb5237b841d339431b1773f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gaccrace">
+		<description>The Great American Cross-Country Road Race (4am crack)</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="author" value="Alex DeMeo" />
+		<info name="developer" value="Synergistic Software" />
+		<info name="programmer" value="Ivan Manley" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-08-20 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the great american cross-country road race (4am crack).dsk" size="143360" crc="0c3f2ef8" sha1="6da5d873e8f98c785073207c8ab789dc494daaac" />
 			</dataarea>
 		</part>
 	</software>
@@ -57188,6 +57340,23 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk F Side 2 - Timed test of standard written English"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the perfect score (4am crack) disk f side 2 - timed test of standard written english.dsk" size="143360" crc="189509f4" sha1="476393b85703b29de492cba92057f69d4d49669b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planguid">
+		<description>The Planetary Guide (4am crack)</description>
+		<year>1981</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="programmer" value="Kevin Bagley" />
+		<info name="programmer" value="David Kampschafer" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-10-13 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the planetary guide (4am crack).dsk" size="143360" crc="9da21338" sha1="7f86e27049f6bc7d4eaa544816660431c862bb15" />
 			</dataarea>
 		</part>
 	</software>
@@ -59706,6 +59875,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="tuneit2">
+		<description>Tune It ][ (4am crack)</description>
+		<year>1984</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="programmer" value="Fred Willman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-04-26 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Tune it ][ (4am crack).dsk" size="143360" crc="e512029f" sha1="e8acc071da75974b42a4d4ed9b956984a05c8546" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="typehype">
 		<description>Type Hype (revision 2) (4am crack)</description>
 		<year>1984</year>
@@ -60301,6 +60486,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="understanding maps and globes (4am crack) disk 2.dsk" size="143360" crc="d1f5e742" sha1="86a9e50c4876a54a189e59ee607de22fb1045fe1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uboatcmd">
+		<description>U-Boat Command (4am crack)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="programmer" value="Charles Fleishman" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-08-09 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="u-boat command (4am crack).dsk" size="143360" crc="c134e816" sha1="cdf9e04801e96e9d5aa7dbd6a785a0e822ec262b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62611,6 +62812,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wrdplayr">
+		<description>Word-Player (4am crack)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="developer" value="Synergistic Software"/>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-11-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="word-player (4am crack).dsk" size="143360" crc="4aa95a21" sha1="3f99eb15c8adc83895f9ec1e8c38d2624907e6b5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wrktgthr">
 		<description>Working Together (4am crack)</description>
 		<year>1988</year>
@@ -63034,6 +63251,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="zoo master rev. 2 (4am crack).dsk" size="143360" crc="c8a682f4" sha1="79534d2e394a16cddf8e68d77cf66e128ac48f68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoopupth">
+		<description>Zoo Puppet Theater (4am crack)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="developer" value="Electronic Courseware Systems" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2022-03-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="zoo puppet theater (4am crack).dsk" size="143360" crc="fa74042f" sha1="8eccccffd1ca8416b536934290bf5811e4880e47"/>
 			</dataarea>
 		</part>
 	</software>
