@@ -15,9 +15,6 @@
 
     TODO (per-game issues)
     - doa, doaa: corrupted sound, eventually becomes silent;
-    - dynamcopc: corrupts palette for 2d;
-    - hpyagu98: stops with 'Error #1' message during boot.
-      Also writes to the 0x600000-0x62ffff range in main CPU program map;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
     - lastbrnx: has wrong graphics, uses several SHARC opcodes that needs to be double checked
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
@@ -25,6 +22,8 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
+	- vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
+	         yet it should appear underneath tilemap A ("shoot to select") which does not
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -73,6 +72,12 @@
 #include "emu.h"
 #include "model2.h"
 
+#include "315_5296.h"
+#include "315_5649.h"
+#include "model1io.h"
+#include "model1io2.h"
+#include "segaic24.h"
+
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -82,12 +87,8 @@
 #include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
-#include "315_5296.h"
-#include "315_5649.h"
-#include "model1io.h"
-#include "model1io2.h"
 #include "sound/ymopn.h"
-#include "segaic24.h"
+
 #include "speaker.h"
 
 #include "model1io2.lh"
@@ -139,11 +140,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
 	m_timerrun[TNum] = 0;
 }
 
+TIMER_CALLBACK_MEMBER(model2_state::check_sound_irq)
+{
+	const u32 line = 1 << 10;
+	if ((m_uart->status_r() & 0x03) && (m_intena & line))
+	{
+		m_intreq |= line;
+		irq_update();
+	}
+}
+
 void model2_state::machine_start()
 {
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
 
+	m_lamps.resolve();
+	
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intena));
 	save_item(NAME(m_coproctl));
@@ -159,9 +172,14 @@ void model2_state::machine_start()
 	save_item(NAME(m_timerrun[1]));
 	save_item(NAME(m_timerrun[2]));
 	save_item(NAME(m_timerrun[3]));
+	save_item(NAME(m_videocontrol));
+	save_item(NAME(m_framenum));
 
 	save_item(NAME(m_geo_write_start_address));
 	save_item(NAME(m_geo_read_start_address));
+
+	m_irq_delay_timer = timer_alloc(FUNC(model2_state::check_sound_irq), this);
+	m_irq_delay_timer->adjust(attotime::never);
 }
 
 void model2_tgp_state::machine_start()
@@ -324,9 +342,9 @@ void model2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 	u16 palcolor = m_palram[offset];
-	u8 r = m_colorxlat[0x0080 / 2 + ((palcolor >> 0) & 0x1f) * 0x100];
-	u8 g = m_colorxlat[0x4080 / 2 + ((palcolor >> 5) & 0x1f) * 0x100];
-	u8 b = m_colorxlat[0x8080 / 2 + ((palcolor >> 10) & 0x1f) * 0x100];
+	u8 r = m_colorxlat[(0x0080 >> 1) + (((palcolor >> 0) & 0x1f) << 8)];
+	u8 g = m_colorxlat[(0x4080 >> 1) + (((palcolor >> 5) & 0x1f) << 8)];
+	u8 b = m_colorxlat[(0x8080 >> 1) + (((palcolor >> 10) & 0x1f) << 8)];
 	r = m_gamma_table[r];
 	g = m_gamma_table[g];
 	b = m_gamma_table[b];
@@ -352,25 +370,9 @@ u16 model2_state::colorxlat_r(offs_t offset)
 	return m_colorxlat[offset];
 }
 
-// Apparently original Model 2 doesn't have fifo control?
-u32 model2o_state::fifo_control_2o_r()
+u32 model2_state::fifo_control_r()
 {
-	return 0xffffffff;
-}
-
-u32 model2_state::fifo_control_2a_r()
-{
-	u32 r = 0;
-
-	if (m_copro_fifo_out->is_empty())
-	{
-		r |= 1;
-	}
-
-	// #### 1 if fifo empty, zerogun needs | 0x04 set
-	// TODO: 0x04 is probably fifo full, zeroguna stalls with a fresh nvram with that enabled?
-	return r;
-//  return r | 0x04;
+	return m_copro_fifo_out->is_empty() ? 1 : 0;
 }
 
 u32 model2_state::videoctl_r()
@@ -378,9 +380,9 @@ u32 model2_state::videoctl_r()
 	u8 framenum;
 
 	if(m_render_mode == false)
-		framenum = (m_screen->frame_number() & 2) << 1;
+		framenum = (m_framenum & 2) << 1;
 	else
-		framenum = (m_screen->frame_number() & 1) << 2;
+		framenum = (m_framenum & 1) << 2;
 
 	return (framenum) | (m_videocontrol & 3);
 }
@@ -500,9 +502,9 @@ u32 model2_tgp_state::copro_sincos_r(offs_t offset)
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
 	if (ang & 0x4000)
-		index = std::min(0x4000 - (int)index, 0x3fff);
+		index = std::min(0x4000 - int(index), 0x3fff);
 	u32 result = m_copro_tgp_tables[index];
-	if(ang & 0x8000)
+	if (ang & 0x8000)
 		result ^= 0x80000000;
 	return result;
 }
@@ -536,7 +538,7 @@ u32 model2_tgp_state::copro_isqrt_r(offs_t offset)
 	u8 bexp = (m_copro_isqrt_base >> 24) & 0x7f;
 	u8 exp = (result >> 23) + (0x3f - bexp);
 	result = (result & 0x807fffff) | (exp << 23);
-	if(!(offset & 1))
+	if (!(offset & 1))
 		result &= 0x7fffffff;
 	return result;
 }
@@ -562,11 +564,11 @@ u32 model2_tgp_state::copro_atan_r()
 
 	u32 result = m_copro_tgp_tables[index | 0x4000];
 
-	if(s0 ^ s1 ^ s2)
+	if (s0 ^ s1 ^ s2)
 		result >>= 16;
-	if(s2)
+	if (s2)
 		result += 0x4000;
-	if((s0 && !s2) || (s1 && s2))
+	if ((s0 && !s2) || (s1 && s2))
 		result += 0x8000;
 
 	return result & 0xffff;
@@ -934,12 +936,8 @@ void model2_state::irq_enable_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_intena);
 
-	const u32 line = 1 << 10;
-	if ((m_uart->status_r() & 0x03) && (m_intena & line))
-	{
-		m_intreq |= line;
-		irq_update();
-	}
+	// delay sound IRQ check by 2 cycles; vcop2 needs this
+	m_irq_delay_timer->adjust(attotime::from_nsec(80));
 }
 
 void model2_state::irq_update()
@@ -1075,7 +1073,7 @@ void model2_state::model2_base_mem(address_map &map)
 
 	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram").flags(i960_cpu_device::BURST);
 
-	map(0x00980004, 0x00980007).r(FUNC(model2_state::fifo_control_2a_r));
+	map(0x00980004, 0x00980007).r(FUNC(model2_state::fifo_control_r));
 	map(0x0098000c, 0x0098000f).rw(FUNC(model2_state::videoctl_r), FUNC(model2_state::videoctl_w));
 	map(0x00980030, 0x0098003f).r(FUNC(model2_state::tgpid_r));
 
@@ -1188,45 +1186,93 @@ u8 model2_state::lightgun_offscreen_r(offs_t offset)
 //  OUTPUTS
 //**************************************************************************
 
-void model2o_state::daytona_output_w(u8 data)
-{
-	// 7-------  leader led
-	// -6------  vr4 led
-	// --5-----  vr3 led
-	// ---4----  vr2 led
-	// ----3---  vr1 led
-	// -----2--  start led
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
+/*
+	Daytona
+	7-------  leader lamp
+	-6------  vr4 lamp
+	--5-----  vr3 lamp
+	---4----  vr2 lamp
+	----3---  vr1 lamp
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
 
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	Desert
+	7-------  cannon motor
+	-6------  machine gun motor
+	--5-----  vr1 lamp
+	---4----  vr2 lamp
+	----3---  vr3 lamp
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
+
+	Vcop
+	7654----  unknown (not used?)
+	----32--  start lamps (always set together)
+	------1-  coin counter 2
+	-------0  coin counter 1
+
+	Srallyc
+	7-------  leader lamp   
+	-6------  unknown
+	--5-----  vr lamp
+	---4----  unknown
+	----3---  unknown
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
+
+	STCC
+	7-------  unknown
+	-6------  unknown
+	--5-----  view 2 (zoom out) lamp  
+	---4----  view 1 (zoom in) lamp 
+	----3---  rev max lamp 
+	-----2--  start lamp 
+	------1-  coin counter 2
+	-------0  coin counter 1
+
+	Indy500
+	7-------  race leader lamp 
+	-6------  unknown
+	--5-----  view 2 (zoom out) lamp
+	---4----  view 1 (zoom in) lamp 
+	----3---  unknown
+	-----2--  start lamp 
+	------1-  coin counter 2
+	-------0  coin counter 1
+
+	Overrev
+	7-------  unknown
+	-6------  unknown
+	--5-----  view 2 lamp
+	---4----  view 1 lamp
+	----3---  unknown
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
+
+	Sgt24h
+	7-------  unknown
+	-6------  unknown
+	--5-----  view 2 lamp
+	---4----  view 1 lamp
+	----3---  unknown
+	-----2--  start lamp
+	------1-  coin counter 2
+	-------0  coin counter 1
+*/
+
+void model2_state::lamp_output_w(u8 data)
+{
+	// Coin counters
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-}
-
-void model2o_state::desert_output_w(u8 data)
-{
-	// 7-------  cannon motor
-	// -6------  machine gun motor
-	// --5-----  vr1
-	// ---4----  vr2
-	// ----3---  vr3
-	// -----2--  start
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
-
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-}
 
-void model2o_state::vcop_output_w(u8 data)
-{
-	// 7654----  unknown (not used?)
-	// ----32--  start leds (always set together)
-	// ------1-  coin counter 2
-	// -------0  coin counter 1
-
-	machine().bookkeeping().coin_counter_w(1, BIT(~data, 1));
-	machine().bookkeeping().coin_counter_w(0, BIT(~data, 0));
+	// Lamps (bits 2–7)
+	for (int i = 0; i < 6; i++)
+		m_lamps[i] = BIT(data, i + 2);
 }
 
 
@@ -1264,7 +1310,6 @@ void model2o_state::model2o_mem(address_map &map)
 
 	map(0x00200000, 0x0021ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000).flags(i960_cpu_device::BURST);
-	map(0x00980004, 0x00980007).r(FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
 	map(0x01c80000, 0x01c80003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
@@ -1272,7 +1317,7 @@ void model2o_state::model2o_mem(address_map &map)
 /* Daytona "To The MAXX" PIC protection simulation */
 u32 model2o_maxx_state::maxx_r(offs_t offset, u32 mem_mask)
 {
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
+	u32 *ROM = &memregion("maincpu")->as_u32();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1319,16 +1364,22 @@ void model2o_maxx_state::model2o_maxx_mem(address_map &map)
 
 u8 model2o_gtx_state::gtx_r(offs_t offset)
 {
-	u8 *ROM = memregion("prot_data")->base();
+	auto ROM = util::little_endian_cast<u8>(&m_prot_data[0]);
 
-	if(offset == 0xffffc) // disable protection ROM overlay (fallbacks to data rom?)
-		m_gtx_state = 2;
-	else if(offset == 0xff00c || offset == 0xf0003) // enable protection bank 0
-		m_gtx_state = 0;
-	else if(offset == 0xff000) // enable protection bank 1
-		m_gtx_state = 1;
+	int gtx_state;
+	if (offset == 0xffffc) // disable protection ROM overlay (fallbacks to data ROM?)
+		gtx_state = 2;
+	else if (offset == 0xff00c || offset == 0xf0003) // enable protection bank 0
+		gtx_state = 0;
+	else if (offset == 0xff000) // enable protection bank 1
+		gtx_state = 1;
+	else
+		gtx_state = m_gtx_state;
 
-	return ROM[m_gtx_state*0x100000+offset];
+	if (!machine().side_effects_disabled())
+		m_gtx_state = gtx_state;
+
+	return ROM[gtx_state * 0x100000 + offset];
 }
 
 void model2o_gtx_state::model2o_gtx_mem(address_map &map)
@@ -1340,7 +1391,7 @@ void model2o_gtx_state::model2o_gtx_mem(address_map &map)
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
 u32 model2_state::copro_status_r()
 {
-	if(m_coprocnt == 0)
+	if (m_coprocnt == 0)
 		return -1;
 
 	return 0;
@@ -1544,7 +1595,8 @@ void model2_state::rchase2_drive_board_w(u8 data)
 void model2_state::drive_board_w(u8 data)
 {
 	m_driveio_comm_data = data;
-	m_drivecpu->set_input_line(0, HOLD_LINE);
+	if (m_drivecpu)
+		m_drivecpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -1585,12 +1637,11 @@ u8 model2_state::in0_r()
 ioport_value model2_state::daytona_gearbox_r()
 {
 	u8 res = m_gears.read_safe(0);
-	int i;
 	const u8 gearvalue[5] = { 0, 2, 1, 6, 5 };
 
-	for(i=0;i<5;i++)
+	for (int i = 0; i < 5; i++)
 	{
-		if(res & 1<<i)
+		if (BIT(res, i))
 		{
 			m_gearsel = i;
 			return gearvalue[i];
@@ -1807,8 +1858,10 @@ INPUT_PORTS_START( vf2 )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-template <unsigned N> ioport_value model2a_airwlkrs_state::start_in_r() {
-	return BIT(m_start_in->read(), N + m_key_matrix * 2);
+template <unsigned N>
+ioport_value model2a_airwlkrs_state::start_in_r()
+{
+	return BIT(m_start_in->read(), (m_key_matrix << 1) | N);
 }
 
 INPUT_PORTS_START( airwlkrs )
@@ -2405,21 +2458,25 @@ INPUT_PORTS_END
  *
  **********************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
+void model2_state::screen_vblank(int state)
 {
-	int scanline = param;
+	if (!state)
+		return;
 
-	if(scanline == 384)
+	m_framenum = m_screen->frame_number();
+
+	// if 60 Hz mode or frame number is even, trigger geometrizer to start new frame
+	if ((m_videocontrol & 1) == 0 || (m_framenum & 1) == 0)
+		geo_parse();
+
+	const u32 line = 1 << 0;
+	if (m_intena & line)
 	{
-		const u32 line = 1 << 0;
-		if (m_intena & line)
-		{
-			m_intreq |= line;
-			irq_update();
-		}
-		if (m_m2comm != nullptr)
-			m_m2comm->check_vint_irq();
+		m_intreq |= line;
+		irq_update();
 	}
+	if (m_m2comm)
+		m_m2comm->check_vint_irq();
 }
 
 void model2_state::sound_ready_w(int state)
@@ -2502,7 +2559,8 @@ void model2_state::model2_screen(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// TODO: from System 24, might not be accurate for Model 2
 	m_screen->set_raw(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
-	m_screen->set_screen_update(FUNC(model2_state::screen_update_model2));
+	m_screen->set_screen_update(FUNC(model2_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(model2_state::screen_vblank));
 
 	PALETTE(config, m_palette).set_entries(8192);
 }
@@ -2534,8 +2592,6 @@ void model2o_state::model2o(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2o_state::copro_tgp_prog_map);
@@ -2634,7 +2690,7 @@ void model2o_state::daytona(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STEER");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
-	ioboard.output_callback().set(FUNC(model2o_state::daytona_output_w));
+	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 }
 
 void model2o_maxx_state::daytona_maxx(machine_config &config)
@@ -2659,7 +2715,7 @@ void model2o_state::desert(machine_config &config)
 	ioboard.an_callback<0>().set_ioport("STEER");
 	ioboard.an_callback<1>().set_ioport("ACCEL");
 	ioboard.an_callback<2>().set_ioport("BRAKE");
-	ioboard.output_callback().set(FUNC(model2o_state::desert_output_w));
+	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 }
 
 void model2o_state::vcop(machine_config &config)
@@ -2673,7 +2729,7 @@ void model2o_state::vcop(machine_config &config)
 	ioboard.in_callback<0>().set_ioport("IN0");
 	ioboard.in_callback<1>().set_ioport("IN1");
 	ioboard.in_callback<2>().set_ioport("IN2");
-	ioboard.output_callback().set(FUNC(model2o_state::vcop_output_w));
+	ioboard.output_callback().set(FUNC(model2_state::lamp_output_w));
 	ioboard.set_lightgun_p1x_tag("P1_X");
 	ioboard.set_lightgun_p1y_tag("P1_Y");
 	ioboard.set_lightgun_p2x_tag("P2_X");
@@ -2687,7 +2743,6 @@ void model2a_state::model2a(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2a_state::copro_tgp_prog_map);
@@ -2708,6 +2763,7 @@ void model2a_state::model2a(machine_config &config)
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (u8 data) { m_billboard->write(data); });
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2727,12 +2783,8 @@ void model2a_airwlkrs_state::airwlkrs(machine_config &config)
 	// P3 / P4 support routes input sides depending on content of port F
 	// this implicitly fallback to regular handling when cabinet is set in two players mode
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.in_pc_callback().set([this] () {
-		return m_player_in[m_key_matrix * 2]->read();
-	});
-	io.in_pd_callback().set([this] () {
-		return m_player_in[m_key_matrix * 2 + 1]->read();
-	});
+	io.in_pc_callback().set([this] () { return m_player_in[m_key_matrix << 1]->read(); });
+	io.in_pd_callback().set([this] () { return m_player_in[(m_key_matrix << 1) | 1]->read(); });
 	io.out_pf_callback().set([this] (u8 data) { m_key_matrix = BIT(data, 7); });
 }
 
@@ -2764,6 +2816,7 @@ void model2a_state::srallyc(machine_config &config)
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.out_pe_callback().set(FUNC(model2a_state::drive_board_w));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -2789,8 +2842,8 @@ void model2a_state::skytargt(machine_config &config)
 
 u16 model2_state::crypt_read_callback(u32 addr)
 {
-	u16 dat= m_maincpu->space().read_word((0x1d80000+2*addr));
-	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
+	u16 dat= m_maincpu->space().read_word((0x1d80000 + 2*addr));
+	return ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
 }
 
 void model2a_state::model2a_5881(machine_config &config)
@@ -2824,8 +2877,6 @@ void model2b_state::model2b(machine_config &config)
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
 
-	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
-
 	ADSP21062(config, m_copro_adsp, 32_MHz_XTAL);
 	m_copro_adsp->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
 	m_copro_adsp->set_addrmap(AS_DATA, &model2b_state::copro_sharc_map);
@@ -2849,6 +2900,7 @@ void model2b_state::model2b(machine_config &config)
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
 	io.out_pe_callback().set([this] (u8 data) { m_billboard->write(data); });
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2886,16 +2938,7 @@ void model2b_state::indy500(machine_config &config)
 	model2b(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
-	io.an_port_callback<0>().set_ioport("STEER");
-	io.an_port_callback<1>().set_ioport("ACCEL");
-	io.an_port_callback<2>().set_ioport("BRAKE");
-}
-
-void model2b_state::overrev2b(machine_config &config)
-{
-	model2b(config);
-
-	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pe_callback().set(FUNC(model2b_state::drive_board_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -2978,7 +3021,6 @@ void model2c_state::model2c(machine_config &config)
 {
 	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
-	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
 	MB86235(config, m_copro_tgpx4, 20_MHz_XTAL);
 	m_copro_tgpx4->set_addrmap(AS_PROGRAM, &model2c_state::copro_tgpx4_map);
@@ -2998,6 +3040,7 @@ void model2c_state::model2c(machine_config &config)
 	io.in_pc_callback().set_ioport("IN1");
 	io.in_pd_callback().set_ioport("IN2");
 	io.in_pg_callback().set_ioport("SW");
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 
 	model2_timers(config);
 	model2_screen(config);
@@ -3020,6 +3063,7 @@ void model2c_state::stcc(machine_config &config)
 	model2c(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -3077,6 +3121,7 @@ void model2c_state::overrev2c(machine_config &config)
 	model2c(config);
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.out_pf_callback().set(FUNC(model2_state::lamp_output_w));
 	io.an_port_callback<0>().set_ioport("STEER");
 	io.an_port_callback<1>().set_ioport("ACCEL");
 	io.an_port_callback<2>().set_ioport("BRAKE");
@@ -7441,8 +7486,8 @@ ROM_START( hpyagu98 ) /* Hanguk Pro Yagu 98, Model 2A, ROM board# 834-11342 REV.
 	ROM_LOAD32_WORD( "bb-tp-3.21", 0x800002, 0x400000, CRC(dbadc020) SHA1(101cab02cf6e14b7438faa0dadc565e0837aba34) )
 
 	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF ) // Textures
-	ROM_LOAD32_WORD( "bb-tx-0.25", 0x000000, 0x400000, CRC(d241a138) SHA1(bd2dff3d76b25705f474acd428b301fa984ff321) )
-	ROM_LOAD32_WORD( "bb-tx-1.24", 0x000002, 0x400000, CRC(ac04ce3c) SHA1(aa35e34957d5215d7f784cadc59fe1c74d4b6d01) )
+	ROM_LOAD32_WORD( "bb-tx-1.25", 0x000000, 0x400000, CRC(ac04ce3c) SHA1(aa35e34957d5215d7f784cadc59fe1c74d4b6d01) )
+	ROM_LOAD32_WORD( "bb-tx-0.24", 0x000002, 0x400000, CRC(d241a138) SHA1(bd2dff3d76b25705f474acd428b301fa984ff321) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "am27c1024.30", 0x000000, 0x020000, CRC(023c64f1) SHA1(43b9bb1c7a3da8650a6da60f58466d4ac759b228) ) // without label
@@ -7453,6 +7498,12 @@ ROM_START( hpyagu98 ) /* Hanguk Pro Yagu 98, Model 2A, ROM board# 834-11342 REV.
 	ROM_LOAD16_WORD_SWAP( "bb-sn-3.36", 0x400000, 0x200000, CRC(e4c938b2) SHA1(3a96433f58a52dea026ab47bf93dc6a9c620e1dd) )
 	ROM_LOAD16_WORD_SWAP( "bb-sn-4.37", 0x600000, 0x200000, CRC(8692fbf3) SHA1(d8e854bba7b54fba85e182d761a9fd02fd13646f) )
 
+	ROM_REGION16_LE(0x80, "eeprom", 0) // EEPROM (required to prevent error #0 on boot)
+	ROM_LOAD("hpyagu98_nvram", 0x00, 0x80, CRC(3634c60f) SHA1(1ab7b74fd05b2d21496af9b2a477c0d197847c55)) // partly handcrafted, same settings as dynabb97 default
+
+	ROM_REGION(0x4000, "backup1", 0) // Backup RAM (required to prevent error #0 on boot)
+	ROM_LOAD("hpyagu98_backup", 0x0000, 0x4000, CRC(979751d5) SHA1(2f6c6d12b77d7fbd3e44b05f4c21ca479fae782c)) // partly handcrafted
+
 	MODEL2_CPU_BOARD
 	MODEL2A_VID_BOARD
 ROM_END
@@ -7461,30 +7512,30 @@ ROM_END
 void model2_state::init_pltkids()
 {
 	// HACK: fix bug in program: it destroys the interrupt table and never fixes it
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
+	u32 *ROM = &memregion("maincpu")->as_u32();
 	ROM[0x730/4] = 0x08000004;
 }
 
 void model2_state::init_zerogun()
 {
 	// HACK: fix bug in program: it destroys the interrupt table and never fixes it
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
+	u32 *ROM = &memregion("maincpu")->as_u32();
 	ROM[0x700/4] = 0x08000004;
 }
 
 void model2_state::init_sgt24h()
 {
-//  u32 *ROM = (u32 *)memregion("maincpu")->base();
-//  ROM[0x56578/4] = 0x08000004;
+	//u32 *ROM = &memregion("maincpu")->as_u32();
+	//ROM[0x56578/4] = 0x08000004;
 	//ROM[0x5b3e8/4] = 0x08000004;
 }
 
 void model2_state::init_powsledm()
 {
-	u8 *ROM = (u8 *)memregion("maincpu")->base();
-	ROM[0x1571C] = 0x01; // Main mode
-	ROM[0x1584C] = 0x89; // set node ID 0x200 = main
-	ROM[0x1585D] = 0xFD; // inverted node ID
+	auto ROM = util::little_endian_cast<u8>(&memregion("maincpu")->as_u32());
+	ROM[0x1571c] = 0x01; // Main mode
+	ROM[0x1584c] = 0x89; // set node ID 0x200 = main
+	ROM[0x1585d] = 0xfd; // inverted node ID
 }
 
 u32 model2_state::doa_prot_r(offs_t offset, u32 mem_mask)
@@ -7599,14 +7650,14 @@ GAME( 1996, lastbrnxu,  lastbrnx, model2b,      vf2,       model2b_state, empty_
 GAME( 1996, lastbrnxj,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,        0,        model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision C)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Jan 10 1997
 GAME( 1996, doab,       doa,      model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // Dec 4 1996
-GAME( 1996, sgt24h,     0,        overrev2b,    sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, sgt24h,     0,        indy500,      sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, powsled,    0,        powsled,      powsled,   model2b_state, empty_init,    ROT0, "Sega",   "Power Sled (Slave, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, powsledr,   powsled,  powsled,      powsled,   model2b_state, empty_init,    ROT0, "Sega",   "Power Sled (Relay, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, powsledm,   powsled,  powsled,      powsled,   model2b_state, init_powsledm, ROT0, "Sega",   "Power Sled (Main, hack of Relay)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, dynabb,     0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, dynabb97,   0,        dynabb,       dynabb,    model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrevb,   overrev,  overrev2b,    overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, overrevba,  overrev,  overrev2b,    overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrevb,   overrev,  indy500,      overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, overrevba,  overrev,  indy500,      overrev,   model2b_state, empty_init,    ROT0, "Jaleco", "Over Rev (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogun,    0,        zerogun,      zerogun,   model2b_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, zerogunj,   zerogun,  zerogun,      zerogun,   model2b_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dynamcopb,  dynamcop, model2b_5881, dynamcop,  model2b_state, empty_init,    ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

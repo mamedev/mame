@@ -3,14 +3,10 @@
 /**************************************************************************************************
 
 NEC PC-9801-86 sound card
-NEC PC-9801-SpeakBoard sound card
 Mad Factory Otomi-chan Kai sound card
 
 Similar to PC-9801-26, this one has YM2608 instead of YM2203 and an
 additional DAC port
-
-SpeakBoard sound card seems to be derived design from -86, with an additional
-OPNA mapped at 0x58*
 
 Otomi-chan Kai is a doujinshi sound card based off SpeakBoard design.
 It uses YM3438 OPL2C mapped at 0x78*, and anything that uses the nax.exe sound driver
@@ -48,9 +44,8 @@ TODO:
 #define LOGDAC(...)    LOGMASKED(LOG_DAC, __VA_ARGS__)
 
 
-DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
-DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC-9801 SpeakBoard")
-DEFINE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device, "pc98_otomichan_kai", "MAD Factory Otomi-chan Kai") // 音美(おとみ)ちゃん改
+DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86 sound card")
+DEFINE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device, "pc98_otomichan_kai", "MAD Factory Otomi-chan Kai sound card") // 音美(おとみ)ちゃん改
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -75,7 +70,7 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *ta
 
 void pc9801_86_device::pc9801_86_config(machine_config &config)
 {
-	// TODO: "SecondBus86" PCB contents differs from current hookup
+	// TODO: "SecondBus86" PCB contents differs from current hookup (different board?)
 	// XTAL 15.9744 (X1)
 	// HD641180X0 MCU (U7) (!)
 	// YM2608B (U11)
@@ -106,7 +101,7 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	m_opna->add_route(1, "speaker", 0.50, 0);
 	m_opna->add_route(2, "speaker", 0.50, 1);
 
-	// 2x burr brown pcm61p
+	// 2x Burr-Brown pcm61p
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
@@ -238,6 +233,7 @@ void pc9801_86_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// TODO: check against unmap ROM option
 		logerror("map ROM at 0x000cc000-0x000cffff\n");
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xcc000,
@@ -489,60 +485,6 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 		m_irqs->in_w<1>(CLEAR_LINE);
 		m_irqs->in_w<1>(ASSERT_LINE);
 	}
-}
-
-//**************************************************************************
-//
-//  SpeakBoard device section
-//
-//**************************************************************************
-
-ROM_START( pc9801_spb )
-	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "spb lh5764 ic21_pink.bin",    0x0001, 0x2000, CRC(5bcefa1f) SHA1(ae88e45d411bf5de1cb42689b12b6fca0146c586) )
-	ROM_LOAD16_BYTE( "spb lh5764 ic22_green.bin",   0x0000, 0x2000, CRC(a7925ced) SHA1(3def9ee386ab6c31436888261bded042cd64a0eb) )
-ROM_END
-
-const tiny_rom_entry *pc9801_speakboard_device::device_rom_region() const
-{
-	return ROM_NAME( pc9801_spb );
-}
-
-pc9801_speakboard_device::pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_86_device(mconfig, PC9801_SPEAKBOARD, tag, owner, clock)
-	, m_opna_slave(*this, "opna_slave")
-{
-}
-
-void pc9801_speakboard_device::device_add_mconfig(machine_config &config)
-{
-	pc9801_86_config(config);
-	opna_reset_routes_config(config);
-	// TODO: confirm RAM mapping configuration (shared? not present on either chip? misc?)
-	m_opna->set_addrmap(0, &pc9801_speakboard_device::opna_map);
-
-	YM2608(config, m_opna_slave, 7.987_MHz_XTAL);
-	m_opna_slave->set_addrmap(0, &pc9801_speakboard_device::opna_map);
-	m_opna_slave->add_route(0, "speaker", 0.50, 0);
-	m_opna_slave->add_route(0, "speaker", 0.50, 1);
-	m_opna_slave->add_route(1, "speaker", 0.50, 0);
-	m_opna_slave->add_route(2, "speaker", 0.50, 1);
-}
-
-void pc9801_speakboard_device::device_start()
-{
-	pc9801_86_device::device_start();
-}
-
-void pc9801_speakboard_device::device_reset()
-{
-	pc9801_86_device::device_reset();
-}
-
-void pc9801_speakboard_device::io_map(address_map &map)
-{
-	pc9801_86_device::io_map(map);
-	map(0x0588, 0x058f).rw(m_opna_slave, FUNC(ym2608_device::read), FUNC(ym2608_device::write)).umask16(0x00ff);
 }
 
 //**************************************************************************

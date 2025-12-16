@@ -1921,7 +1921,7 @@ void saturn_state::vdp1_process_list()
 	CEF_0;
 
 	// TODO: is there an actual limit for this?
-	while (spritecount<16383) // max 16383 with texture or max 16384 without texture - vitrually unlimited
+	while (spritecount < 16383) // max 16383 with texture or max 16384 without texture - virtually unlimited
 	{
 		int draw_this_sprite;
 
@@ -2041,7 +2041,7 @@ void saturn_state::vdp1_process_list()
 		}
 
 		/* continue to draw this sprite only if the command wasn't to skip it */
-		if (draw_this_sprite ==1)
+		if (draw_this_sprite == 1)
 		{
 			if ( current_sprite.CMDPMOD & 0x0400 )
 			{
@@ -8323,7 +8323,7 @@ int saturn_state::get_hblank_duration()
 
 	/* double pump horizontal max res */
 	if(VDP2_HRES & 2)
-		res<<=1;
+		res <<= 1;
 
 	return res;
 }
@@ -8338,7 +8338,7 @@ int saturn_state::get_vblank_duration()
 
 	/* compensate for interlacing */
 	if((VDP2_LSMD & 3) == 3)
-		res<<=1;
+		res <<= 1;
 
 	if(VDP2_HRES & 4)
 		res = (VDP2_HRES & 1) ? 561 : 525;  //Hi-Vision / 31kHz Monitor
@@ -8351,19 +8351,19 @@ int saturn_state::get_pixel_clock()
 	int res,divider;
 
 	res = (m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320).value();
-	/* TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ... */
+	// TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ...
 	divider = 8;
 
 	if(VDP2_HRES & 2)
-		divider>>=1;
+		divider >>= 1;
 
 	if((VDP2_LSMD & 3) == 3)
-		divider>>=1;
+		divider >>= 1;
 
 	if(VDP2_HRES & 4) //TODO
-		divider>>=1;
+		divider >>= 1;
 
-	return res/divider;
+	return res / divider;
 }
 
 /* TODO: hblank position and hblank firing doesn't really match HW behaviour. */
@@ -8400,7 +8400,7 @@ uint8_t saturn_state::get_odd_bit()
 //       But the documentation claims that "non-interlaced" mode is always 1.
 //       grdforce tests this bit to be 1 from title screen to gameplay, ditto for finlarch/sasissu/magzun.
 //       Assume documentation is wrong and actually always flip this bit.
-	return m_vdp2.odd;//m_screen->frame_number() & 1;
+	return m_vdp2.odd; // m_screen->frame_number() & 1;
 }
 
 int saturn_state::get_vblank_start_position()
@@ -8563,22 +8563,22 @@ VIDEO_START_MEMBER(saturn_state,vdp2_video_start)
 
 	/* calc V counter offsets */
 	/* 224 mode */
-	for(i=0;i<263;i++)
+	for(i = 0; i < 263; i++)
 	{
 		true_vcount[i][0] = i;
-		if(i>0xec)
+		if(i > 0xec)
 			true_vcount[i][0]+=0xf9;
 	}
 
-	for(i=0;i<263;i++)
+	for(i = 0; i < 263; i++)
 	{
 		true_vcount[i][1] = i;
-		if(i>0xf5)
+		if(i > 0xf5)
 			true_vcount[i][1]+=0xf9;
 	}
 
 	/* 256 mode, todo */
-	for(i=0;i<263;i++)
+	for(i = 0; i < 263; i++)
 	{
 		true_vcount[i][2] = i;
 		true_vcount[i][3] = i;
@@ -8601,7 +8601,7 @@ void saturn_state::vdp2_dynamic_res_change()
 		popmessage("Illegal VRES MODE");
 
 	/*Double-density interlace mode,doubles the vertical res*/
-	if((VDP2_LSMD & 3) == 3) { vert_res*=2;  }
+	if((VDP2_LSMD & 3) == 3) { vert_res *= 2;  }
 
 	horz_res = d_hres[VDP2_HRES & 3];
 	/*Exclusive modes,they sets the Vertical Resolution without considering the

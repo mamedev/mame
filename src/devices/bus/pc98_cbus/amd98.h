@@ -22,7 +22,7 @@
 // ======================> amd98_device
 
 class amd98_device : public device_t
-                   , public device_pc98_cbus_slot_interface
+				   , public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -43,10 +43,10 @@ protected:
 
 private:
 	void io_map(address_map &map) ATTR_COLD;
-	void ay3_address_w(uint8_t data);
-	void ay3_data_latch_w(uint8_t data);
+	void ay3_address_w(u8 data);
+	void ay3_data_latch_w(u8 data);
 
-	uint8_t m_ay3_latch, m_ay3_ff;
+	u8 m_ay3_latch, m_ay3_ff;
 
 	required_device<ay8910_device>  m_ay1;
 	required_device<ay8910_device>  m_ay2;

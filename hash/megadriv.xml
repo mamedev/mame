@@ -19351,10 +19351,13 @@ Patches protection checks, original uses Squirrel King cart scheme
 		</part>
 	</software>
 
-	<software name="gamenko">
+	<software name="gamenko" supported="no">
 		<description>Game no Kanzume Otokuyou (Japan, Sega Channel)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Missing [CART] handler (works in teradrive)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="seganet"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">

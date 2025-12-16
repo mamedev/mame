@@ -336,10 +336,10 @@ private:
 
 void macpb030_state::machine_start()
 {
-	m_ram_ptr = (u32 *)m_ram->pointer();
+	m_ram_ptr = m_ram->pointer<u32>();
 	m_ram_size = m_ram->size() >> 1;
 	m_ram_mask = m_ram_size - 1;
-	m_rom_ptr = (u32 *)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u32();
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
@@ -804,6 +804,9 @@ void macpb030_state::swim_w(offs_t offset, u16 data, u16 mem_mask)
 		m_swim->write((offset >> 8) & 0xf, data & 0xff);
 	else
 		m_swim->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 u16 macpb030_state::scc_r(offs_t offset)

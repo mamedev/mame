@@ -97,20 +97,22 @@ public:
 	template<std::size_t Line> auto int_cb() { return m_int_cb[Line].bind(); }
 	template<std::size_t Line> auto drq_cb() { return m_drq_cb[Line].bind(); }
 
-	uint8_t dack_r(int line);
-	void dack_w(int line, uint8_t data);
+	u8 dack_r(int line);
+	void dack_w(int line, u8 data);
+	void eop_w(int line, int state);
 
 	// from card to C-Bus
 	void int_w(int Line, int state) { m_int_cb[Line](state); }
 	void drq_w(int Line, int state) { m_drq_cb[Line](state); }
 
-	void set_dma_channel(uint8_t channel, device_pc98_cbus_slot_interface *dev, bool do_eop);
+	void set_dma_channel(u8 channel, device_pc98_cbus_slot_interface *dev, bool do_eop);
 
 protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_reset_after_children() override ATTR_COLD;
 	virtual void device_config_complete() override ATTR_COLD;
 
 	std::forward_list<device_slot_interface *> m_slot_list;
@@ -118,7 +120,7 @@ private:
 	address_space_config m_space_mem_config;
 	address_space_config m_space_io_config;
 
-	devcb_write_line::array<7> m_int_cb;
+	devcb_write_line::array<8> m_int_cb;
 	devcb_write_line::array<4> m_drq_cb;
 
 	device_pc98_cbus_slot_interface *m_dma_device[8];
@@ -135,8 +137,9 @@ public:
 	virtual ~device_pc98_cbus_slot_interface();
 
 	virtual void remap(int space_id, offs_t start, offs_t end) {}
-	virtual uint8_t dack_r(int line);
-	virtual void dack_w(int line, uint8_t data);
+	virtual u8 dack_r(int line);
+	virtual void dack_w(int line, u8 data);
+	virtual void eop_w(int state);
 
 	void set_bus(pc98_cbus_root_device *cbus_device) { m_bus = cbus_device; }
 

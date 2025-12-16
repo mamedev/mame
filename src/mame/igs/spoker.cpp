@@ -212,6 +212,7 @@ public:
 	void jinhulu2(machine_config &config)ATTR_COLD;
 
 	void init_dafuwng3() ATTR_COLD;
+	void init_dahuangg() ATTR_COLD;
 	void init_hsheng2() ATTR_COLD;
 	void init_huahuas2() ATTR_COLD;
 	void init_huluw2() ATTR_COLD;
@@ -2508,6 +2509,20 @@ ROM_START( jinhuang2 )
 	ROM_LOAD( "sp.u34", 0x00000, 0x40000, CRC(1250998d) SHA1(57f81bc6661f1cfe94fd44ccf8b7bdd064521816) ) // same as xjinhuang
 ROM_END
 
+// 大皇冠 (Dà Huáng Guān)
+// IGS PCB NO.T0058-7. HD64180RP8, 12.28800 MHz XTAL, MK6264UN-60, AMT 001, IGS 002, AR17961, 2x D8255AC, 3 banks of 8 switches
+ROM_START( dahuangg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u5.u5", 0x00000, 0x10000, CRC(64eb5e52) SHA1(f0ceb50488c7395d102c6b18e49a7589ec18ab3c) )
+
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "b_crown_bg.u17", 0x00000, 0x20000, CRC(728a450b) SHA1(944269dca76424b669e6a4971f0b086979d94dc5) )
+	ROM_LOAD16_BYTE( "b_crown_bg.u18", 0x00001, 0x20000, CRC(95e4e63d) SHA1(14063311bd761d1a328819e686c11c9c4a5d76e5) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "b_crown_bg.u41", 0x00000, 0x20000, CRC(65b59683) SHA1(5450c337e5369698f0be19215425a9d107d91825) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 /***************************************************************************
                               Driver Init
 ***************************************************************************/
@@ -2647,6 +2662,19 @@ void jinhulu2_state::init_jinhuang()
 	// extra layer
 	for (int a = 0; a < 0xf000; a++)
 		if ((a & 0x0300) != 0x0100) rom[a] ^= 0x40;
+}
+
+void jinhulu2_state::init_dahuangg()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0xf000; a++)
+	{
+		rom[a] ^= 0x01;
+		if ((a & 0x0282) == 0x0282) rom[a] ^= 0x01;
+		if ((a & 0x0940) == 0x0940) rom[a] ^= 0x02;
+		if ((a & 0x0300) != 0x0100) rom[a] ^= 0x40;
+	}
 }
 
 void spoker_state::init_spk116it()
@@ -2801,3 +2829,4 @@ GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_d
 GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huangguan",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
 GAME( 1998,  sleyuan2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan2,      ROT0,  "IGS",       "Shuiguo Leyuan II (V150UI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1995,  dahuangg,      0,        jinhuang, jinhuang, jinhulu2_state, init_dahuangg,      ROT0,  "IGS",       "Da Huang Guan",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper

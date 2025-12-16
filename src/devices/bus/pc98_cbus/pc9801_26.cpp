@@ -30,15 +30,20 @@ TODO:
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K")
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K sound card")
 
-pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_26, tag, owner, clock)
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opn(*this, "opn")
 	, m_joy(*this, "joy_p%u", 1U)
 	, m_bios(*this, "bios")
 	, m_irq_jp(*this, "JP6A1_JP6A3")
+{
+}
+
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_26_device(mconfig, PC9801_26, tag, owner, clock)
 {
 }
 
@@ -162,6 +167,7 @@ void pc9801_26_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// TODO: move base in device_reset
 		const u8 rom_setting = ioport("JP6A2")->read() & 7;
 		static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
 		const u32 start_address = rom_addresses[rom_setting & 7];

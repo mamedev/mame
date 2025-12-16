@@ -471,6 +471,11 @@ ROM_START( gbox2019 )
 	ROM_LOAD( "fgb2019.bin", 0x00000, 0x1000000, CRC(7ef130d5) SHA1(00f45974494707fdac78153b13d8cfb503716ad0) ) // flash ROM
 ROM_END
 
+ROM_START( gbox2022 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "sup400.bin", 0x00000, 0x1000000, CRC(56ea270d) SHA1(0949ed9d2aacfaa46f7399fda6d4d29e903cbe61) )
+ROM_END
+
 ROM_START( gprnrs1 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "gprnrs1.bin", 0x00000, 0x800000, CRC(c3ffcec8) SHA1(313a790fb51d0b155257f9de84726ed67da43a8f) )
@@ -609,7 +614,9 @@ CONS( 201?, mc_hh210, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, emp
 
 CONS( 201?, retro400, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2019, gbox2019, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2019, gbox2019, 0,        0, nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2019 PCB)", MACHINE_NOT_WORKING )
+// ZY003-V8.9 090322 on PCB
+CONS( 2022, gbox2022, gbox2019, 0, nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2022 PCB)", MACHINE_NOT_WORKING )
 
 CONS( 200?, gprnrs1,  0,  0,  nes_vt42xx_8mb,  nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16, 0,  0,  nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )

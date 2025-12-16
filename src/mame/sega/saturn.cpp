@@ -431,7 +431,6 @@ test1f diagnostic hacks:
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
 #include "machine/nvram.h"
-#include "machine/smpc.h"
 
 #include "bus/saturn/bram.h"
 #include "bus/saturn/dram.h"
@@ -547,7 +546,7 @@ uint32_t sat_console_state::abus_dummy_r(offs_t offset)
 void sat_console_state::saturn_mem(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom().mirror(0x20000000).region("bios", 0).nopw(); // bios
-	map(0x00100000, 0x0010007f).rw(m_smpc_hle, FUNC(smpc_hle_device::read), FUNC(smpc_hle_device::write));
+	map(0x00100000, 0x0010007f).mirror(0x2007ff80).m(m_smpc_hle, FUNC(smpc_hle_device::io_map));
 	map(0x00180000, 0x0018ffff).rw(FUNC(sat_console_state::backupram_r), FUNC(sat_console_state::backupram_w)).share("share1");
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
 	map(0x01000000, 0x017fffff).w(FUNC(sat_console_state::saturn_minit_w));
@@ -568,7 +567,7 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::vdp2_vram_r), FUNC(sat_console_state::vdp2_vram_w));
 	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::vdp2_cram_r), FUNC(sat_console_state::vdp2_cram_w));
 	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::vdp2_regs_r), FUNC(sat_console_state::vdp2_regs_w));
-	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //rw(FUNC(sat_console_state::saturn_scu_r), FUNC(sat_console_state::saturn_scu_w));
+	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(saturn_scu_device::regs_map));
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x40000000, 0x46ffffff).nopw(); // associative purge page
 	map(0x60000000, 0x600003ff).nopw(); // cache address array
@@ -682,13 +681,13 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	}
 
 	// save states
-//  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
 }
 
-/* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
+// diehardt tests RAM address $25e7ffe bit 2 with Slave during FRT minit irq
+// in-development tool for breaking execution of it?
 uint32_t sat_console_state::saturn_null_ram_r()
 {
 	return 0xffffffff;
@@ -826,7 +825,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
 	m_audiocpu->reset_cb().set(FUNC(sat_console_state::m68k_reset_callback));
 
-	SEGA_SCU(config, m_scu, 0);
+	SATURN_SCU(config, m_scu, 0);
 	m_scu->set_hostcpu(m_maincpu);
 
 //  SH-1
@@ -846,7 +845,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_smpc_hle->system_reset_handler().set(FUNC(saturn_state::system_reset_w));
 	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
 	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
-	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(sega_scu_device::smpc_irq_w));
+	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(saturn_scu_device::smpc_irq_w));
 
 	MCFG_MACHINE_START_OVERRIDE(sat_console_state,saturn)
 	MCFG_MACHINE_RESET_OVERRIDE(sat_console_state,saturn)
@@ -869,7 +868,7 @@ void sat_console_state::saturn(machine_config &config)
 	SCSP(config, m_scsp, 8467200*8/3); // 8.4672 MHz EXTCLK * 8 / 3 = 22.5792 MHz
 	m_scsp->set_addrmap(0, &sat_console_state::scsp_mem);
 	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
-	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
+	m_scsp->main_irq_cb().set(m_scu, FUNC(saturn_scu_device::sound_req_w));
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
@@ -971,7 +970,6 @@ template <bool is_pal> void sat_console_state::init_saturn()
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-//  m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 

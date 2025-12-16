@@ -114,7 +114,7 @@ uint32_t spg2xx_video_device::screen_update(screen_device &screen, bitmap_rgb32 
 			m_renderer->draw_page(cliprect, scanline, i, page2_addr, page2_scroll, page2_regs, mem, m_paletteram, m_scrollram, 1);
 			m_renderer->draw_sprites(cliprect, scanline, i, sprite_addr, mem, m_paletteram, m_spriteram, m_sprlimit_read_cb());
 		}
-		
+
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
 	}
 

@@ -147,6 +147,7 @@ public:
 	void xtrain(machine_config &config) ATTR_COLD;
 	void ptrain(machine_config &config) ATTR_COLD;
 	void jgaoshou(machine_config &config) ATTR_COLD;
+	void trea2000(machine_config &config) ATTR_COLD;
 
 	void init_wtrnymph() ATTR_COLD;
 	void init_mtrain() ATTR_COLD;
@@ -2938,6 +2939,15 @@ void subsino2_state::new2001(machine_config &config)
 	m_screen->set_visarea(0, 640-1, 0, 256-16-1);
 }
 
+void subsino2_state::trea2000(machine_config &config)
+{
+	new2001(config);
+
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
+
+}
+
 void subsino2_state::humlan(machine_config &config)
 {
 	bishjan(config);
@@ -3373,6 +3383,24 @@ ROM_START( new2001 )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(71281d72) SHA1(1661181a5a5331083d649b10a7d3a36062e617c0) BAD_DUMP ) // handcrafted to pass protection check
 ROM_END
 
+ROM_START( trea2000 ) // same PCB as new2001
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "t2000_alpha_1_v107.u21", 0x080000, 0x040000, CRC(20377102) SHA1(f9d2b50a62c7c89141a5232937067cd75ece33e8) )
+	ROM_RELOAD(                         0x0c0000, 0x040000 )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "t2000_alpha_3_v105.0.u25", 0x00000, 0x40000, CRC(5a4c0a75) SHA1(32f71892455f55e38e0e6cef65a8430a5fcdb5ee) )
+	ROM_LOAD32_BYTE( "t2000_alpha_4_v105.1.u26", 0x00002, 0x40000, CRC(0af5454f) SHA1(2bbbaa7b8671accf8766a35316f6736b4c3e2bbc) )
+	ROM_LOAD32_BYTE( "t2000_alpha_5_v105.2.u27", 0x00001, 0x40000, CRC(f07386be) SHA1(dfe04022532a90089393dd4bd5c0082c341c5a1a) )
+	ROM_LOAD32_BYTE( "t2000_alpha_6_v105.3.u28", 0x00003, 0x40000, CRC(585c66f7) SHA1(8ef31af9bc45dd79610fcfe4681424429af442ba) )
+
+	ROM_REGION( 0x80000, "samples", 0 ) // SS9904
+	ROM_LOAD( "t2000_alpha_2_v105.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) ) // same as new2001
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds1971.bin", 0x00, 0x28, CRC(41e15587) SHA1(0f93e0256f2520e4be2433c74059a9113b57a474) )
+ROM_END
 
 /***************************************************************************
 
@@ -3399,7 +3427,60 @@ ROM_START( queenbee )
 	ROM_LOAD( "27c4001 u9.bin", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(f64b92e5) SHA1(fbef61b1046c6559d5ac71e665e822f9a6704461) BAD_DUMP ) // handcrafted to pass protection check
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(9391211f) SHA1(2fb536cfe01a3813422c6af7d136a26d266a13bf) )
+ROM_END
+
+ROM_START( queenbee117a )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "msm27c201.u21",          0x080000, 0x040000, CRC(493de707) SHA1(259d8f8d95724260b732d6c83df9ffa7613a6b02) )
+	ROM_FILL(                           0x0c0000, 0x040000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "queen-bee_alpha_3_v200.u43", 0x000001, 0x100000, CRC(7ef42192) SHA1(2f2b1143ce60b6b868bd3466634cff297c9a335f) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                                              0x100000 )
+	ROM_LOAD16_BYTE( "queen-bee_alpha_4_v200.u44", 0x000000, 0x100000, CRC(7d135b7b) SHA1(71da2db3913198c709591e9640ab5ab9c0b404f8) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                                              0x100000 )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c040.u9", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(1cff6592) SHA1(1a18a5d2fa176a627e33bda3386ee727525f4bd2) )
+ROM_END
+
+ROM_START( queenbee123a )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "27c040.u21",             0x080000, 0x080000, CRC(ee58809f) SHA1(9489b5a1f1e57382ac384131f33ebe6ce02f6bc6) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x200000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "27c4001.u25", 0x000000, 0x80000, CRC(628ed650) SHA1(dadbc5f73f6a5773303d834a44d2eab836874cfe) )
+	ROM_LOAD32_BYTE( "27c4001.u26", 0x000002, 0x80000, CRC(27a169df) SHA1(d36989c300051a0c41752638ab5134a9b04c50a4) )
+	ROM_LOAD32_BYTE( "27c4001.u27", 0x000001, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
+	ROM_LOAD32_BYTE( "27c4001.u28", 0x000003, 0x80000, CRC(7f139a04) SHA1(595a114806756e6f77a6fe20a13515b211ffdf2a) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "queen_bee_u9_v123a.u9", 0x000000, 0x80000, CRC(aa4edabb) SHA1(b117ad5bba2e410e20b5cbdb606688c6e2112450) ) // 27C040
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(c29dbf56) SHA1(3a8b4578bbfe994c2f42f6352ae5dd5dc22831a2) )
+ROM_END
+
+ROM_START( queenbee107u )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "27c020 u21.bin",         0x080000, 0x040000, CRC(6231e3f7) SHA1(e5c83b9d3c532388720ac512d10a62786b4970a1) )
+	ROM_FILL(                           0x0c0000, 0x040000, 0xff )
+
+	ROM_REGION( 0x200000, "tilemap", 0 ) // this PCB has a single surface mounted ROM, which hasn't been dumped.
+	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c4001 u9.bin", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(3a8a11f3) SHA1(3668160332f1004e44bdb609b26328d34d44a6a1) )
 ROM_END
 
 ROM_START( queenbeeb )
@@ -4162,6 +4243,53 @@ void subsino2_state::init_wtrnymph()
 	subsino_decrypt(memregion("program")->base() + 0x8100, victor5_bitswaps, victor5_xors, 0x7f00);
 }
 
+// runs on the same original PCB as mtrain, wtrnymph. All labels are hand-written and the copyright is Subsino 1981. Is this an hack?
+ROM_START( blushark )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	HD647180X_FAKE_INTERNAL_ROM
+
+	ROM_REGION( 0x10000, "program", 0 )
+	// code starts at 0x8100!
+	ROM_LOAD( "1 v1.0.u17", 0x00000, 0x10000, CRC(e659142c) SHA1(f1608f7164a624ea48d4579715959af15ae75c28) )
+
+	ROM_REGION( 0x100000, "tilemap", 0 )
+	ROM_LOAD32_BYTE( "2_v1.u2", 0x00000, 0x40000, CRC(e720ac2b) SHA1(4b2b89075a848e24fb16f98f0da2f18606ae8e10) )
+	ROM_LOAD32_BYTE( "3_v1.u3", 0x00002, 0x40000, CRC(4c5c4ef8) SHA1(62076c27129af3649e244d8095056fddcfeaddfc) )
+	ROM_LOAD32_BYTE( "4_v1.u4", 0x00001, 0x40000, CRC(d3367795) SHA1(7ca4f3c2472c70b17a5929d492c8bc54fae27950) )
+	ROM_LOAD32_BYTE( "5_v1.u5", 0x00003, 0x40000, CRC(d0806709) SHA1(feb98c5892050e57eac35126b6e573883c23a335) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "6_v1.u27", 0x00000, 0x40000, CRC(943ac197) SHA1(4880aca75a135d1932eb8c4de05013b0b60069e9) ) // same as trsocean in subsino/subsino.cpp
+	ROM_RELOAD(           0x40000, 0x40000 )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8d.u6",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u18", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u19", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u26", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(581f6bfb) SHA1(2b6e9e4800e22913474551c5c70b66933003c12f) BAD_DUMP ) // handcrafted to pass protection check
+ROM_END
+
+ROM_START( goldenti )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "27c200.u21",             0x080000, 0x040000, CRC(712beb01) SHA1(2598043d802f0ec18df9bfd09401e84eed5e6e5c) )
+	ROM_FILL(                           0x0c0000, 0x040000, 0xff )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "m27c160.u43", 0x000001, 0x200000, CRC(27675d81) SHA1(8a3620c1d91f452ae040cd0ab8b384dd4065f0c2) )
+	ROM_LOAD16_BYTE( "m27c160.u44", 0x000000, 0x200000, CRC(c4e27e0b) SHA1(e1f00ed0f5e4ef0ca0605857d9c688a48a507630) )
+
+	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_LOAD( "27c040.u9", 0x000000, 0x80000, CRC(191e3551) SHA1(f4e9fc56e71ec99bff91678608b6bd97afbfc31b) )
+
+	ROM_REGION( 0x28, "eeprom", 0 )
+	ROM_LOAD( "ds1971.bin", 0x00, 0x28, CRC(bcb1a630) SHA1(3ebd6f85b7267e86dc5458996978f3e22b71a214) )
+ROM_END
+
 
 GAME( 1997, mtrain,      0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.4)",                0 )  // inside the program ROM says 1997, but on screen shows 1996
 GAME( 1996, mtraina,     mtrain,   mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
@@ -4171,6 +4299,7 @@ GAME( 1996, strain,      0,        mtrain,   strain,   subsino2_state, init_mtra
 GAME( 1995, tbonusal,    0,        tbonusal, tbonusal, subsino2_state, init_tbonusal, ROT0, "Subsino (American Alpha license)", "Treasure Bonus (American Alpha, Ver. 1.6)", MACHINE_NOT_WORKING )
 
 GAME( 1996, wtrnymph,    0,        mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "Subsino",                          "Water-Nymph (Ver. 1.4)",                0 )
+GAME( 199?, blushark,    wtrnymph, mtrain,   wtrnymph, subsino2_state, init_wtrnymph, ROT0, "hack?",                            "Blue Shark (Subsino, Ver. 1.0)",        MACHINE_NOT_WORKING )
 
 GAME( 1998, expcard,     0,        expcard,  expcard,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Express Card / Top Card (Ver. 1.5)",    0 )
 GAME( 1999, jgaoshou,    expcard,  jgaoshou, jgaoshou, subsino2_state, empty_init,    ROT0, "Subsino",                          "Jiyou Gaoshou (China, Ver 1.2)",        MACHINE_IMPERFECT_GRAPHICS ) // missing GFX ROM
@@ -4190,9 +4319,14 @@ GAME( 1999, xiaoao,      bishjan,  xiaoao,   bishjan,  subsino2_state, empty_ini
 
 GAME( 2000, new2001,     0,        new2001,  new2001,  subsino2_state, empty_init,    ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
 
+GAME( 2000, trea2000,    0,        trea2000, new2001,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Treasure 2000 (Ver. 107)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
 GAME( 2006, xplan,       0,        xplan,    xplan,    subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Plan (Ver. 101)",                     MACHINE_NOT_WORKING )
 
 GAME( 2001, queenbee,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee117a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 117)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee123a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 123A)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee107u,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (USA, Ver. 107)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 GAME( 2001, queenbeeb,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
 GAME( 2001, queenbeei,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
 GAME( 2001, queenbeesa,  queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (SA-101-HARD)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
@@ -4208,3 +4342,5 @@ GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, empty_ini
 GAME( 2003, qbeebing,    0,        humlan,   qbeebing, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 200?, treamary,    0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Treasure Mary",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 200?, goldenti,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Golden Treasure Island (Ver. Alpha 100)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues

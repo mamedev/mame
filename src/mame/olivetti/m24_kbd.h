@@ -28,22 +28,29 @@ protected:
 	TIMER_CALLBACK_MEMBER(reset_mcu);
 
 private:
+	devcb_write_line m_out_data;
+
+	required_device<i8049_device> m_mcu;
+
 	required_ioport_array<16> m_rows;
 	required_ioport m_mousebtn;
 	required_ioport m_mousex;
 	required_ioport m_mousey;
+
+	emu_timer *m_reset_timer;
+
 	uint8_t m_p1;
 	bool m_keypress, m_kbcdata;
-	devcb_write_line m_out_data;
-	required_device<i8049_device> m_mcu;
-	emu_timer *m_reset_timer;
+
+	uint32_t m_mouse_read_count;
+	int32_t m_count_mx, m_count_my;
+	uint8_t m_bits_mx, m_bits_my;
+	uint8_t m_last_mx, m_last_my;
 
 	void bus_w(uint8_t data);
 	uint8_t p1_r();
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
-	int t0_r();
-	int t1_r();
 };
 
 DECLARE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device)

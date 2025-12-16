@@ -88,26 +88,26 @@ u16 swp00_device::interpolation_step(u32 speed, u32 sample_counter)
 	// Phase is incorrect, and very weird
 
 	if(speed >= 0x78)
-        return 0x7f;
+        return 0x1f;
 
-    u32 k0 = speed >> 3;
-    u32 k1 = speed & 7;
+	u32 k0 = speed >> 3;
+	u32 k1 = speed & 7;
 
-    if(speed >= 0x58) {
-        k0 -= 10;
-		u32 a = (4 << k0) - 1;
-        u32 b = (2 << k0) - 1;
-        static const u8 mx[8] = { 0x00, 0x80, 0x88, 0xa8, 0xaa, 0xea, 0xee, 0xfe };
-        return ((mx[k1] << (sample_counter & 7)) & 0x80) ? a : b;
+	if(speed >= 0x58) {
+		k0 -= 10;
+		u32 a = (2 << k0) - 1;
+		u32 b = (1 << k0) - 1;
+		static const u8 mx[8] = { 0x00, 0x80, 0x88, 0xa8, 0xaa, 0xea, 0xee, 0xfe };
+		return ((mx[k1] << (sample_counter & 7)) & 0x80) ? a : b;
 	}
 
-    k0 = 10 - k0;
+	k0 = 10 - k0;
 
 	if(sample_counter & util::make_bitmask<u32>(k0))
 		return 0;
 
 	static const u16 mx[8] = { 0xaaaa, 0xeaaa, 0xeaea, 0xeeea, 0xeeee, 0xfeee, 0xfefe, 0xfffe };
-    return (mx[k1] << ((sample_counter >> k0) & 0xf)) & 0x8000 ? 1 : 0;
+	return (mx[k1] << ((sample_counter >> k0) & 0xf)) & 0x8000 ? 1 : 0;
 }
 
 
@@ -277,7 +277,7 @@ void swp00_device::streaming_block::read_8c(memory_access<24, 0, 0, ENDIANNESS_L
 		dpcm_step(wave.read_byte(m_address + m_dpcm_pos));
 		m_dpcm_pos++;
 	}
-		
+
 	val0 = m_dpcm_s0;
 	val1 = m_dpcm_s1;
 }
@@ -323,7 +323,7 @@ std::pair<s16, bool> swp00_device::streaming_block::step(memory_access<24, 0, 0,
 			}
 		}
 	}
-	return std::make_pair(result, false);				
+	return std::make_pair(result, false);
 }
 
 template<int sel> void swp00_device::streaming_block::phase_w(u8 data)
@@ -401,7 +401,7 @@ u32 swp00_device::streaming_block::sample_address_get()
 std::string swp00_device::streaming_block::describe() const
 {
 	std::string desc;
-	desc = util::string_format("[%04x %08x %08x %08x] ", m_pitch, m_start, m_loop, m_address) + util::string_format("sample %04x-%04x @ %06x ", m_start, m_loop, m_address);
+	desc = util::string_format("sample %04x-%04x @ %06x ", m_start, m_loop, m_address);
 	switch(m_format >> 6) {
 	case 0: desc += "16"; break;
 	case 1: desc += "12"; break;
@@ -504,12 +504,12 @@ void swp00_device::envelope_block::keyon()
 
 u8 swp00_device::envelope_block::status() const
 {
-	return m_envelope_mode == DECAY_DONE ? 0xff : (m_envelope_mode << 6) | (m_envelope_level >> 6);
+	return (m_envelope_mode << 6) | (m_envelope_level >> 6);
 }
 
 bool swp00_device::envelope_block::active() const
 {
-	return m_envelope_mode != DECAY_DONE;
+	return m_envelope_mode != DECAY_DONE || m_envelope_level < 0x800;
 }
 
 u16 swp00_device::envelope_block::step(u32 sample_counter)
@@ -543,6 +543,7 @@ u16 swp00_device::envelope_block::step(u32 sample_counter)
 				}
 				result = 0;
 			}
+			m_envelope_level = level;
 		}
 		break;
 	}
@@ -574,6 +575,7 @@ u16 swp00_device::envelope_block::step(u32 sample_counter)
 	case DECAY_DONE:
 		break;
 	}
+
 	return result;
 }
 
@@ -589,8 +591,7 @@ u8 swp00_device::envelope_block::attack_speed_r() const
 
 void swp00_device::envelope_block::attack_speed_w(u8 data)
 {
-	if(m_envelope_mode == DECAY_DONE)
-		m_attack_speed = data;
+	m_attack_speed = data;
 }
 
 u8 swp00_device::envelope_block::attack_level_r() const
@@ -610,12 +611,9 @@ u8 swp00_device::envelope_block::decay_speed_r() const
 
 void swp00_device::envelope_block::decay_speed_w(u8 data)
 {
-	if(data & 0x80) {
-		m_decay_speed = data;
+	m_decay_speed = data;
+	if(data & 0x80)
 		m_envelope_mode = DECAY;
-
-	} else if(m_envelope_mode == DECAY_DONE) 
-		m_decay_speed = data;
 }
 
 u8 swp00_device::envelope_block::decay_level_r() const
@@ -700,7 +698,7 @@ s32 swp00_device::filter_block::step(s16 input, s32 lmod, u32 sample_counter)
 			m_k += swp00_device::interpolation_step(m_speed & 0x7f, sample_counter);
 			if(m_k > m_k_target)
 				m_k = m_k_target;
-		
+
 		} else if(m_k > m_k_target) {
 			m_k -= swp00_device::interpolation_step(m_speed & 0x7f, sample_counter);
 			if(m_k < m_k_target)
@@ -941,7 +939,7 @@ s32 swp00_device::mixer_block::volume_apply(s32 level, s32 sample)
 		return 0;
 
 	s32 e = level >> 8;
-	s32 m = level & 0xff; 
+	s32 m = level & 0xff;
 	s64 mul = (0x1000000 - (m << 15)) >> e;
 	return (sample * mul) >> 24;
 }
@@ -1738,7 +1736,7 @@ u8 swp00_device::state_r()
 
 	case 4:  // panning l
 		return m_mixer[chan].status_panl();
-									   
+
 	case 5:  // panning r
 		return m_mixer[chan].status_panr();
 	}

@@ -33,7 +33,6 @@
 #include "machine/upd765.h"
 
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/pc9801_sasi.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 
@@ -68,7 +67,6 @@
 #include "formats/nfd_dsk.h"
 
 #define RTC_TAG      "rtc"
-#define SASIBUS_TAG  "sasi"
 
 #define ATTRSEL_REG 0
 #define WIDTH40_REG 2
@@ -141,17 +139,12 @@ public:
 		, m_dsw2(*this, "DSW2")
 		, m_ppi_mouse(*this, "ppi_mouse")
 		, m_fdc_2hd(*this, "fdc_2hd")
-		, m_fdc_2dd(*this, "fdc_2dd")
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
-		, m_cbus_root(*this, "cbus_root")
+		, m_cbus_root(*this, "cbus")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
-		, m_sasibus(*this, SASIBUS_TAG)
-		, m_sasi_data_out(*this, "sasi_data_out")
-		, m_sasi_data_in(*this, "sasi_data_in")
-		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
 	{
 	}
 
@@ -173,7 +166,6 @@ protected:
 	// TODO: should really be one FDC
 	// (I/O $90-$93 is a "simplified" version)
 	required_device<upd765a_device> m_fdc_2hd;
-	optional_device<upd765a_device> m_fdc_2dd;
 	required_device_array<upd7220_device, 2> m_hgdc;
 	required_shared_ptr_array<uint16_t, 2> m_video_ram;
 	required_device<pc98_cbus_root_device> m_cbus_root;
@@ -181,10 +173,6 @@ protected:
 	required_device<pic8259_device> m_pic2;
 private:
 	required_device<pc98_memsw_device> m_memsw;
-	optional_device<scsi_port_device> m_sasibus;
-	optional_device<output_latch_device> m_sasi_data_out;
-	optional_device<input_buffer_device> m_sasi_data_in;
-	optional_device<input_buffer_device> m_sasi_ctrl_in;
 
 //  Infrastructure declaration
 protected:
@@ -195,7 +183,6 @@ protected:
 	void config_keyboard(machine_config &config);
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
-	void pc9801_sasi(machine_config &config);
 	void pc9801_common(machine_config &config);
 	void config_floppy_525hd(machine_config &config);
 	void config_floppy_35hd(machine_config &config);
@@ -220,13 +207,6 @@ private:
 
 	u8 ppi_sys_portb_r();
 
-	void sasi_data_w(uint8_t data);
-	uint8_t sasi_data_r();
-	void write_sasi_io(int state);
-	void write_sasi_req(int state);
-	uint8_t sasi_status_r();
-	void sasi_ctrl_w(uint8_t data);
-
 	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
 
 //  uint8_t winram_r();
@@ -250,13 +230,6 @@ protected:
 	u8 m_fdc_2hd_ctrl = 0;
 
 	bool fdc_drive_ready_r(upd765a_device *fdc);
-private:
-	void fdc_2dd_irq(int state);
-
-	uint8_t fdc_2dd_ctrl_r();
-	void fdc_2dd_ctrl_w(uint8_t data);
-
-	u8 m_fdc_2dd_ctrl = 0;
 
 //  DMA
 protected:
@@ -333,11 +306,6 @@ private:
 	uint8_t m_gfx_ff = 0;
 	uint8_t m_txt_scroll_reg[8]{};
 	uint8_t m_pal_clut[4]{};
-
-//  SASI
-	uint8_t m_sasi_data = 0;
-	int m_sasi_data_enable = 0;
-	uint8_t m_sasi_ctrl = 0;
 
 //  Mouse
 protected:

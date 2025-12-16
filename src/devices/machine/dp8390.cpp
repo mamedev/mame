@@ -60,6 +60,8 @@ void dp8390_device::check_dma_complete() {
 	m_regs.isr |= 0x40;
 	check_irq();
 	m_rdma_active = 0;
+	// Required by pc98_cbus:lgy98 DOS driver init
+	m_regs.cr |= 0x20;
 }
 
 void dp8390_device::do_tx() {

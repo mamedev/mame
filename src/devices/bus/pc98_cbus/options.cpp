@@ -7,34 +7,50 @@
 #include "amd98.h"
 #include "fdd_2dd.h"
 #include "fdd_2hd.h"
+#include "lgy98.h"
+#include "lha201.h"
 #include "pc9801_02.h"
 #include "pc9801_14.h"
 #include "pc9801_26.h"
+#include "pc9801_27.h"
 #include "pc9801_55.h"
 #include "pc9801_86.h"
 #include "pc9801_118.h"
 #include "mif201.h"
 #include "mpu_pc98.h"
 #include "sb16_ct2720.h"
+#include "sound_orchestra.h"
 #include "sound.h"
+#include "speakboard.h"
 #include "wavestar.h"
 
 void pc98_cbus_devices(device_slot_interface &device)
 {
-	// official HW
+	// sound cards
+	// NEC
 	device.option_add("pc9801_14",  PC9801_14);
 	device.option_add("pc9801_26",  PC9801_26);
-	device.option_add("pc9801_55u", PC9801_55U);
-	device.option_add("pc9801_55l", PC9801_55L);
 	device.option_add("pc9801_86",  PC9801_86);
 	device.option_add("pc9801_118", PC9801_118);
-	device.option_add("pc9801_spb", PC9801_SPEAKBOARD);
+	// System Sacom
+	device.option_add("amd98",           AMD98);
+	// Creative Labs
+	device.option_add("sb16",            SB16_CT2720);
+	// SNE
+	device.option_add("sound_orchestra", SOUND_ORCHESTRA);
+	// Idol Japan
+	device.option_add("speakboard",      SPEAKBOARD);
+//  device.option_add("sparkboard",      SPARKBOARD);
+	// QVision
+	device.option_add("wavestar",        QVISION_WAVESTAR);
+	// doujinshi HW
+	// MAD Factory / Doujin Hard (同人ハード)
+	// MAD Factory Chibi-Oto: an ADPCM override for -86
+	// MAD Factory Otomi-chan: "TORIE9211 MAD FACTORY" printed on proto PCB, just overrides for ADPCM for -86?
+	device.option_add("otomichan_kai", OTOMICHAN_KAI);
 
-//  Spark Board
-	device.option_add("amd98",      AMD98);
+	// MIDI
 	device.option_add("mpu_pc98",   MPU_PC98);
-	device.option_add("sb16",       SB16_CT2720);
-	device.option_add("wavestar",   QVISION_WAVESTAR);
 
 	// File Bay
 	// for first gen only
@@ -43,11 +59,20 @@ void pc98_cbus_devices(device_slot_interface &device)
 	// PC-9801-08 (2dd, external unit)
 	// PC-9801-15 (8' unit)
 
-	// doujinshi HW
-// MAD Factory / Doujin Hard (同人ハード)
-// MAD Factory Chibi-Oto: an ADPCM override for -86
-// MAD Factory Otomi-chan: "TORIE9211 MAD FACTORY" printed on proto PCB, just overrides for ADPCM for -86?
-	device.option_add("otomichan_kai", OTOMICHAN_KAI);
+	// SASI
+	device.option_add("pc9801_27",  PC9801_27);
+
+	// SCSI
+	// NEC
+//  device_option_add("pc9801_55",  PC9801_55);
+	device.option_add("pc9801_55u", PC9801_55U);
+	device.option_add("pc9801_55l", PC9801_55L);
+//  device.option_add("pc9801_92",  PC9801_92);
+	// Logitec
+	device.option_add("lha201", LHA201);
+
+	// Ethernet
+	device.option_add("lgy98", LGY98);
 
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);
@@ -63,16 +88,18 @@ void pc98_cbus_ram_devices(device_slot_interface &device)
 	device.option_add("640kb", PC9801_02_640KB);
 }
 
-// TODO: add just a subset for now, all needs to be verified if compatible with C-Bus.
+// TODO: add just a subset for now, all needs to be verified if compatible with this C-Bus variant.
 void pc88va_cbus_devices(device_slot_interface &device)
 {
-//	device.option_add("pc9801_55u", PC9801_55U);
-//	device.option_add("pc9801_55l", PC9801_55L);
+	device.option_add("pc9801_27",  PC9801_27);
+//  device.option_add("pc9801_55u", PC9801_55U);
+//  device.option_add("pc9801_55l", PC9801_55L);
 	device.option_add("mif_201",    MIF201);
 	device.option_add("mpu_pc98",   MPU_PC98);
 }
 
 // https://man.openbsd.org/cbus.4
+// Add the known options only
 void luna88k2_cbus_devices(device_slot_interface &device)
 {
 	// Allied Telesis CentreCOM LA-98

@@ -4,17 +4,44 @@ license:CC0-1.0
 -->
 <mamelayout version="2">
 
-<!-- define elements -->
-
 	<element name="vector_art">
 		<image><data><![CDATA[
-		<svg width="1280" height="640" viewBox="0 0 338.6 169.3">
-			<g transform="translate(47.95,-15.32)">
-				<path style="stroke:#222;stroke-width:0.2;" d="m 189.36,21.12 v 5.13 m 0.69,-5.17 v 5.20 M 51.92,21.12 v 5.13 m 0.69,-5.17 v 5.20 m 125.41,-2.17 -0.03,2.19 h 1.67 l -0.66,-2.18 -0.97,-0 z M 69.13,165.59 c -0.21,1.74 -0.34,3.5 -0.38,5.26 0.036,1.76 0.16,3.51 0.38,5.26 H 172.72 c 0.21,-1.74 0.34,-3.5 0.38,-5.26 -0,-1.76 -0.09,-3.51 -0.27,-5.26 h -41.75 c -3.15,2.10 -6.85,3.23 -10.63,3.23 -3.78,-0 -7.48,-1.13 -10.63,-3.23 z M 290.58,26.85 C 258.15,24.17 225.69,21.81 193.14,21.16 H 49.61 c -32.55,0.44 -65,3.19 -97.44,5.7 m 0,101.11 H 290.58 m -83.17,0.03 -7.89,-96.95 c -0.21,-2.62 -2.11,-4.74 -4.74,-4.74 H 47.6 c -2.62,0 -4.54,2.1 -4.74,4.74 l -7.1,96.95" />
-				<path style="fill:#cba47d" d="m 184,28 v 0.6 h -3 v 0.46 h 5.43 v -0.3 l -1.82,-0.73 z M -32.27,74.75 c -0.1,0 -0.09,0.06 -0.09,0.13 v 1.92 c 0,0 -0.05,0 -0.09,0 -0.29,-0.02 -0.61,0.2 -0.64,0.5 -0.03,0.24 0.22,0.44 0.45,0.41 0.29,-0.03 0.5,-0.32 0.46,-0.61 v -1.52 c 0.02,-0.02 0.06,0.03 0.08,0.03 0.23,0.14 0.43,0.36 0.45,0.65 0.02,0.22 -0.05,0.44 -0.13,0.64 0.25,-0.31 0.33,-0.76 0.16,-1.13 -0.09,-0.21 -0.29,-0.34 -0.4,-0.54 a 1.08,1.08 0 0 1 -0.16,-0.44 c -0.02,-0.03 -0.06,-0.04 -0.09,-0.04 z m 54.37,105 0.97,2.56 1.07,-2.6 z m 44.4,0 0.97,2.56 1.07,-2.56 z m 54.5,0 0.97,2.6 1.1,-2.6 z" />
-			</g>
+		<svg width="1280" height="640">
+			<!-- background color -->
+			<rect width="1280" height="44" fill="#044"/>
+
+			<!-- Main (bottom) panel. -->
+			<rect y="382" width="1280" height="258" fill="#303031"/>
+
+			<!-- Outline around the region of the fill-in, intro & ending,
+			    start/stop, synchro & break, and tap tempo buttons. -->
+			<path transform="translate(441, 568)" stroke="#000" fill="#333333" stroke-width="1" d="
+				M 1.9,0.5 C 1.1,7.1 0.6,13.8 0.5,20.5 0.6,27.2 1.1,33.9 1.9,40.5 H 393.1
+				c 0.8,-6.6 1.3,-13.3 1.4,-20 -0,-6.7 -0.3,-13.4 -1,-20 H 235.8
+				C 224,8.5 210,12.8 195.7,12.8 181.4,12.8 167.4,8.5 155.6,0.5 Z"/>
+
+			<!-- Top curved panel that contains the speakers. -->
+			<path stroke="#000" fill="#2a2827" stroke-width="1" d="
+				M 1281,44 C 1157,33 1034,25 911,22 H 367 c -123,2 -246,12 -368,22 v 382 H 1281 z"/>
+
+			<!-- Center panel that contains the screen. -->
+			<path stroke="#000" fill="#39383a" stroke-width="1" d="
+				M 966,426 l -30,-366 c -1,-10 -8,-18 -18,-18 H 362 c -10,0 -17,8 -18,18 l -27,366 z" />
+
+			<!-- Display angle lever -->
+			<path stroke="#000" fill="#232323" stroke-width="1" d="M855,33 v 9 h 7 l -3,-9 Z" />
+
+			<!-- Display angle icon -->
+			<path transform="translate(864, 50)" stroke="none" fill="#2a2827" d="
+				M 11,0 V 2 H 0 V 4 H 21 V 3 L 13,0 Z" />
 		</svg>
 		]]></data></image>
+	</element>
+
+	<element name="black_transparent_rect">
+		<rect>
+			<color red="0" green="0" blue="0" alpha="0.2" />
+		</rect>
 	</element>
 
 	<element name="red_led" defstate="0">
@@ -35,43 +62,412 @@ license:CC0-1.0
 		</disk>
 	</element>
 
-	<element name="light_grey_round_button">
-		<disk state="0"><color red="0.2" green="0.2" blue="0.2"/></disk>
-		<disk state="1"><color red="0.3" green="0.3" blue="0.3"/></disk>
+	<element name="music_note"> <!-- for the DEMO button. -->
+		<image><data><![CDATA[
+		<svg width="6" height="11">
+			<path fill="#cba47d" stroke="none" d="
+				M 2.9,0.6 V 7.7 C -0.5,7.4 -0.7,11 1.4,11 c 1.1,0 2.2,-0.9 2.2,-2.2 V 3.1
+				C 5.9,3.7 5.9,6.3 5.1,8 5.8,7.3 6.1,6.4 6.1,5.3 6.1,2.8 4,2.8 3.6,0.2 3.5,-0.1 2.9,-0 2.9,0.6 Z" />
+		</svg>
+		]]></data></image>
 	</element>
 
-	<element name="dark_grey_round_button">
-		<disk state="0"><color red="0.1" green="0.1" blue="0.1"/></disk>
-		<disk state="1"><color red="0.2" green="0.2" blue="0.2"/></disk>
+	<element name="split_point_indicator">
+		<image><data><![CDATA[
+		<svg width="5" height="8">
+			<path fill="#cba47d" stroke="none" d="m 0,0 2.5,8 2.5,-8 z" />
+		</svg>
+		]]></data></image>
 	</element>
 
-	<element name="blueish_gray_button">
-		<rect state="0"><color red="0.36" green="0.39" blue="0.41"/></rect>
-		<rect state="1"><color red="0.46" green="0.49" blue="0.51"/></rect>
+	<element name="dark_round_button">
+		<image state="0"><data><![CDATA[
+			<svg width="29" height="29">
+				<circle stroke="#000" stroke-width="1px" fill="#232323" cx="14.5" cy="14.5" r="14" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="29" height="29">
+				<circle stroke="#000" stroke-width="1px" fill="#1b1b1b" cx="14.5" cy="14.5" r="14" />
+			</svg>
+		]]></data></image>
 	</element>
 
-	<element name="light_grey_pill_button">
-		<disk state="0"><color red="0.2" green="0.2" blue="0.2"/></disk>
-		<disk state="1"><color red="0.3" green="0.3" blue="0.3"/></disk>
+	<element name="dark_half_left_ellipse_button">
+		<image state="0"><data><![CDATA[
+		<svg width="41" height="23">
+			<path stroke="#000" stroke-width="1px" fill="#232323" d="
+				M 40.5,0.5 A 40,11 0 0 0 0.5,11.5 40,11 0 0 0 40.5,22.5 Z" />
+		</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+		<svg width="41" height="23">
+			<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+				M 40.5,0.5 A 40,11 0 0 0 0.5,11.5 40,11 0 0 0 40.5,22.5 Z" />
+		</svg>
+		]]></data></image>
 	</element>
 
-	<element name="dark_grey_pill_button">
-		<disk state="0"><color red="0.1" green="0.1" blue="0.1"/></disk>
-		<disk state="1"><color red="0.2" green="0.2" blue="0.2"/></disk>
+	<element name="dark_half_right_ellipse_button">
+		<image state="0"><data><![CDATA[
+		<svg width="41" height="23">
+			<path transform="translate(41, 0) scale(-1, 1)" stroke="#000" stroke-width="1px" fill="#232323" d="
+				M 40.5,0.5 A 40,11 0 0 0 0.5,11.5 40,11 0 0 0 40.5,22.5 Z" />
+		</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+		<svg width="41" height="23">
+			<path transform="translate(41, 0) scale(-1, 1)" stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+				M 40.5,0.5 A 40,11 0 0 0 0.5,11.5 40,11 0 0 0 40.5,22.5 Z" />
+		</svg>
+		]]></data></image>
 	</element>
 
-	<element name="dark_grey_button">
-		<rect state="0"><color red="0.1" green="0.1" blue="0.1"/></rect>
-		<rect state="1"><color red="0.2" green="0.2" blue="0.2"/></rect>
+	<element name="light_ellipse_button">
+		<image state="0"><data><![CDATA[
+			<svg width="81" height="23">
+				<ellipse stroke="#000" stroke-width="1px" fill="#353535" cx="40.5" cy="11.5" rx="39.5" ry="11" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="81" height="23">
+				<ellipse stroke="#000" stroke-width="1px" fill="#282828" cx="40.5" cy="11.5" rx="39.5" ry="11" />
+			</svg>
+		]]></data></image>
 	</element>
 
-	<element name="light_grey_button">
-		<rect state="0"><color red="0.2" green="0.2" blue="0.2"/></rect>
-		<rect state="1"><color red="0.3" green="0.3" blue="0.3"/></rect>
+	<element name="msp_corner_button">
+		<image state="0"><data><![CDATA[
+			<svg width="63" height="39">
+				<path stroke="#000" stroke-width="1px" fill="#5f6367" d="M 62.5,0.5 C 40,2 18.8,5.2 0.5,9.7 V 38.5 H 62.5 Z" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="63" height="39">
+				<path stroke="#000" stroke-width="1px" fill="#505860" d="M 62.5,0.5 C 40,2 18.8,5.2 0.5,9.7 V 38.5 H 62.5 Z" />
+			</svg>
+		]]></data></image>
 	</element>
 
-	<element name="button_split">
-		<rect><color red="0" green="0" blue="0"/></rect>
+	<element name="msp_middle_button">
+		<image state="0"><data><![CDATA[
+			<svg width="61" height="40">
+				<path stroke="#000" stroke-width="1px" fill="#5f6367" d="
+					M 30.1,0.5 C 20.1,0.5 10.2,0.9 0.5,1.5 V 39.5 H 60.5 V 1.6 C 50.5,0.9 40.3,0.5 30.1,0.5 Z" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="61" height="40">
+				<path stroke="#000" stroke-width="1px" fill="#505860" d="
+					M 30.1,0.5 C 20.1,0.5 10.2,0.9 0.5,1.5 V 39.5 H 60.5 V 1.6 C 50.5,0.9 40.3,0.5 30.1,0.5 Z" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="tempo_encoder">
+		<image><data><![CDATA[
+			<svg width="91" height="91">
+				<circle stroke="#000" stroke-width="2px" fill="#232323" cx="45.5" cy="45.5" r="43.5" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="tempo_encoder_finger">
+		<image><data><![CDATA[
+			<svg width="27" height="27">
+				<circle stroke="#000" stroke-width="1px" fill="#1b1b1b" cx="13.5" cy="13.5" r="13" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="contrast_track">
+		<image><data><![CDATA[
+			<svg width="7" height="69">
+				<rect stroke="#000" stroke-width="1px" fill="#232323" x="0.5" y="0.5" width="6" height="68"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="contrast_knob">
+		<image><data><![CDATA[
+			<svg width="7" height="9">
+				<rect stroke="#000" stroke-width="1px" fill="#232323" x="0.5" y="0.5" width="6" height="8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="dark_pill_button">
+		<image state="0"><data><![CDATA[
+			<svg width="37" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#232323" x="0.5" y="0.5" width="36" height="20" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="37" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#1b1b1b" x="0.5" y="0.5" width="36" height="20" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="light_pill_button">
+		<image state="0"><data><![CDATA[
+			<svg width="37" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#353535" x="0.5" y="0.5" width="36" height="20" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="37" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#282828" x="0.5" y="0.5" width="36" height="20" rx="10" ry="10"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="page_up_button"> <!-- dark 30x25 -->
+		<image state="0"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#232323" d="
+					M 15,0.5 A 25.7,26.4 0 0 0 0.5,5.1 V 24.5 H 29.5 V 5.1 A 25.7,26.4 0 0 0 15,0.5 Z" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+					M 15,0.5 A 25.7,26.4 0 0 0 0.5,5.1 V 24.5 H 29.5 V 5.1 A 25.7,26.4 0 0 0 15,0.5 Z" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="page_down_button"> <!-- dark 30x25 -->
+		<image state="0"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#232323" d="
+					M 15,24.2 C 9.8,24.2 4.8,22.6 0.5,19.6 V 0.5 h 29 v 19.1 c -4.3,3 -9.3,4.6 -14.5,4.6 z" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+					M 15,24.2 C 9.8,24.2 4.8,22.6 0.5,19.6 V 0.5 h 29 v 19.1 c -4.3,3 -9.3,4.6 -14.5,4.6 z" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="screen_up_button"> <!-- dark 30x25 -->
+		<image state="0"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#232323" d="
+					m 4.2,0.5 c -2.1,0 -3.7,1.6 -3.7,3.7 V 24.5 H 29.5 V 4.2 c 0,-2 -1.7,-3.7 -3.7,-3.7 z" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+					m 4.2,0.5 c -2.1,0 -3.7,1.6 -3.7,3.7 V 24.5 H 29.5 V 4.2 c 0,-2 -1.7,-3.7 -3.7,-3.7 z" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="screen_up_and_down_button"> <!-- dark 26x9 -->
+		<image state="0"><data><![CDATA[
+			<svg width="26" height="9">
+				<rect stroke="#000" stroke-width="1px" fill="#302e2d" x="0.5" y="0.5" width="25" height="8"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="26" height="9">
+				<rect stroke="#000" stroke-width="1px" fill="#1b1b1b" x="0.5" y="0.5" width="25" height="8"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="screen_down_button"> <!-- dark 30x25 -->
+		<image state="0"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#232323" d="
+					M 4.2,24.5 C 2.1,24.5 0.5,22.9 0.5,20.8 V 0.5 h 29 v 20.3 c 0,2 -1.7,3.7 -3.7,3.7 z" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="30" height="25">
+				<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+					M 4.2,24.5 C 2.1,24.5 0.5,22.9 0.5,20.8 V 0.5 h 29 v 20.3 c 0,2 -1.7,3.7 -3.7,3.7 z" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="dark_25x25_button">
+		<image state="0"><data><![CDATA[
+			<svg width="25" height="25">
+				<rect stroke="#000" stroke-width="1px" fill="#232323" x="0.5" y="0.5" width="24" height="24"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="25" height="25">
+				<rect stroke="#000" stroke-width="1px" fill="#1b1b1b" x="0.5" y="0.5" width="24" height="24"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="dark_37x21_button">
+		<image state="0"><data><![CDATA[
+			<svg width="37" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#232323" x="0.5" y="0.5" width="36" height="20"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="37" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#1b1b1b" x="0.5" y="0.5" width="36" height="20"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="dark_curved_18x34_button">
+		<image state="0"><data><![CDATA[
+			<svg width="18" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#232323" d="
+					M 1.7,0.6 C 1.2,6.1 0.9,11.5 0.8,17 0.9,22.5 1.2,28.1 1.7,33.6
+					l 14.6,0 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="18" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+					M 1.7,0.6 C 1.2,6.1 0.9,11.5 0.8,17 0.9,22.5 1.2,28.1 1.7,33.6
+					l 14.6,0 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="dark_curved_27x34_button">
+		<image state="0"><data><![CDATA[
+			<svg width="27" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#232323" d="
+					M 1.7,0.6 C 1.2,6.1 0.9,11.5 0.8,17 0.9,22.5 1.2,28.1 1.7,33.6
+					l 23.6,0 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="27" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+					M 1.7,0.6 C 1.2,6.1 0.9,11.5 0.8,17 0.9,22.5 1.2,28.1 1.7,33.6
+					l 23.6,0 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="dark_curved_30x34_button">
+		<image state="0"><data><![CDATA[
+			<svg width="30" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#353535" d="
+					M 1.7,0.6 C 1.2,6.1 0.9,11.5 0.8,17 0.9,22.5 1.2,28.1 1.7,33.6
+					l 26.7,0 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="30" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#282828" d="
+					M 1.7,0.6 C 1.2,6.1 0.9,11.5 0.8,17 0.9,22.5 1.2,28.1 1.7,33.6
+					l 26.7,0 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="light_curved_53x34_button">
+		<image state="0"><data><![CDATA[
+			<svg width="53" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#353535" d="
+					m 1.7,0.6 c -0.5,5.5 -0.8,10.9 -0.9,16.4 0.1,5.5 0.4,11.1 0.9,16.6
+					H 51.3 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="53" height="34">
+				<path stroke="#000" stroke-width="1px" fill="#282828" d="
+					m 1.7,0.6 c -0.5,5.5 -0.8,10.9 -0.9,16.4 0.1,5.5 0.4,11.1 0.9,16.6
+					H 51.3 c 0.5,-5.5 0.8,-11 0.9,-16.6 0,-5.5 -0.3,-11 -0.8,-16.4 z"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="light_21x21_button">
+		<image state="0"><data><![CDATA[
+			<svg width="21" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#353535" x="0.5" y="0.5" width="20" height="20"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="21" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#282828" x="0.5" y="0.5" width="20" height="20"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="light_31x31_button">
+		<image state="0"><data><![CDATA[
+			<svg width="31" height="31">
+				<rect stroke="#000" stroke-width="1px" fill="#353535" x="0.5" y="0.5" width="30" height="30"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="31" height="31">
+				<rect stroke="#000" stroke-width="1px" fill="#282828" x="0.5" y="0.5" width="30" height="30"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="light_37x21_button">
+		<image state="0"><data><![CDATA[
+			<svg width="33" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#353535" x="0.5" y="0.5" width="32" height="20"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="33" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#282828" x="0.5" y="0.5" width="32" height="20"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="screen_side_button">
+		<image state="0"><data><![CDATA[
+			<svg width="56" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#39383a" x="33.5" y="0.5" width="22" height="20" />
+				<path stroke="#000" stroke-width="1px" fill="#232323" d="
+					m 2.4,0.5 c -1.3,3.2 -1.9,6.6 -1.9,10 0,3.4 0.7,6.8 1.9,10
+					h 31.2 c 1.3,-3.2 1.9,-6.6 1.9,-10 0,-3.4 -0.6,-6.8 -1.9,-10 z"/>
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="56" height="21">
+				<rect stroke="#000" stroke-width="1px" fill="#39383a" x="33.5" y="0.5" width="22" height="20" />
+				<path stroke="#000" stroke-width="1px" fill="#1b1b1b" d="
+					m 2.4,0.5 c -1.3,3.2 -1.9,6.6 -1.9,10 0,3.4 0.7,6.8 1.9,10
+					h 31.2 c 1.3,-3.2 1.9,-6.6 1.9,-10 0,-3.4 -0.6,-6.8 -1.9,-10 z"/>
+			</svg>
+		]]></data></image>
 	</element>
 
 	<element name="line">
@@ -101,8 +497,8 @@ license:CC0-1.0
 	<element name="msp_5_text"><text string="5"><color red="0.79" green="0.64" blue="0.49" /></text></element>
 	<element name="msp_6_text"><text string="6"><color red="0.79" green="0.64" blue="0.49" /></text></element>
 
-	<element name="screen_display_angle_text1"><text string="DISPLAY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
-	<element name="screen_display_angle_text2"><text string=" ANGLE "><color red="0.79" green="0.64" blue="0.49" /></text></element>
+	<element name="screen_display_angle_text1"><text string="DISPLAY"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="screen_display_angle_text2"><text string=" ANGLE "><color red="0.15" green="0.15" blue="0.15" /></text></element>
 	<element name="screen_contrast_text"><text string="CONTRAST"><color red="0.79" green="0.64" blue="0.49" /></text></element>
 	<element name="screen_help_text"><text string="HELP"><color red="0.79" green="0.64" blue="0.49" /></text></element>
 	<element name="screen_other_parts_text1"><text string=" OTHER "><color red="0.79" green="0.64" blue="0.49" /></text></element>
@@ -291,9 +687,9 @@ license:CC0-1.0
 	<element name="memory_b_text1"><text string="MEMORY"><color red="0.79" green="0.64" blue="0.49" /></text></element>
 	<element name="memory_b_text2"><text string="  B  "><color red="0.79" green="0.64" blue="0.49" /></text></element>
 
-<!-- build screen -->
 
-	<view name="Internal Layout">
+	<group name="compact">
+
 	<bounds left="0" right="1280" top="0" bottom="640"/>
 	<element ref="vector_art"><bounds left="0" right="1280" top="0" bottom="640"/></element>
 	<element ref="screen_border"><bounds x="449" y="63" width="380" height="275"/></element>
@@ -301,367 +697,391 @@ license:CC0-1.0
 
 <!-- Buttons and LEDs -->
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x02"><!-- screen button: left 1 --><bounds x="394" y="108" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x01"><!-- screen button: left 2 --><bounds x="394" y="150" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x04"><!-- screen button: left 3 --><bounds x="394" y="191" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x02"><!-- screen button: left 4 --><bounds x="394" y="232" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x01"><!-- screen button: left 5 --><bounds x="394" y="274" width="36" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG10" inputmask="0x02"><!-- screen button: left 1 --><bounds x="394" y="108" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG10" inputmask="0x01"><!-- screen button: left 2 --><bounds x="394" y="150" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG9" inputmask="0x04"><!-- screen button: left 3 --><bounds x="394" y="191" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG9" inputmask="0x02"><!-- screen button: left 4 --><bounds x="394" y="232" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG9" inputmask="0x01"><!-- screen button: left 5 --><bounds x="394" y="274" width="56" height="21"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x04"><!-- screen button: right 1 --><bounds x="849" y="108" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x02"><!-- screen button: right 2 --><bounds x="849" y="150" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x01"><!-- screen button: right 3 --><bounds x="849" y="191" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x02"><!-- screen button: right 4 --><bounds x="849" y="232" width="36" height="21"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x01"><!-- screen button: right 5 --><bounds x="849" y="274" width="36" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG8" inputmask="0x04"><!-- screen button: right 1 --><orientation flipx="yes" /><bounds x="828" y="108" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG8" inputmask="0x02"><!-- screen button: right 2 --><orientation flipx="yes" /><bounds x="828" y="150" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG8" inputmask="0x01"><!-- screen button: right 3 --><orientation flipx="yes" /><bounds x="828" y="191" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG7" inputmask="0x02"><!-- screen button: right 4 --><orientation flipx="yes" /><bounds x="828" y="232" width="56" height="21"/></element>
+	<element ref="screen_side_button" inputtag="CPL_SEG7" inputmask="0x01"><!-- screen button: right 5 --><orientation flipx="yes" /><bounds x="828" y="274" width="56" height="21"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x20"><!-- screen button: up 1 --><bounds x="491" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x80"><!-- screen button: up 2 --><bounds x="529" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x20"><!-- screen button: up 3 --><bounds x="567" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x80"><!-- screen button: up 4 --><bounds x="605" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x20"><!-- screen button: up 5 --><bounds x="643" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x80"><!-- screen button: up 6 --><bounds x="681" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x20"><!-- screen button: up 7 --><bounds x="720" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x80"><!-- screen button: up 8 --><bounds x="758" y="349" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x80"><!-- screen button: page up --><bounds x="804" y="350" width="29" height="24"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x10"><!-- screen button: down 1 --><bounds x="491" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG10" inputmask="0x40"><!-- screen button: down 2 --><bounds x="529" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x10"><!-- screen button: down 3 --><bounds x="567" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG9" inputmask="0x40"><!-- screen button: down 4 --><bounds x="605" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x10"><!-- screen button: down 5 --><bounds x="643" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG8" inputmask="0x40"><!-- screen button: down 6 --><bounds x="681" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x10"><!-- screen button: down 7 --><bounds x="720" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG7" inputmask="0x40"><!-- screen button: down 8 --><bounds x="758" y="378" width="29" height="25"/></element>
-	<element ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x40"><!-- screen button: page down --><bounds x="804" y="378" width="29" height="24"/></element>
+<!-- Review this:
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG10" inputmask="0x30"> screen button: up+down 1 <bounds x="493" y="372" width="26" height="9"/></element>
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG10" inputmask="0xc0"> screen button: up+down 2 <bounds x="531" y="372" width="26" height="9"/></element>
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG9" inputmask="0x30"> screen button: up+down 3 <bounds x="568" y="372" width="26" height="9"/></element>
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG9" inputmask="0xc0"> screen button: up+down 4 <bounds x="607" y="372" width="26" height="9"/></element>
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG8" inputmask="0x30"> screen button: up+down 5 <bounds x="645" y="372" width="26" height="9"/></element>
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG8" inputmask="0xc0"> screen button: up+down 6 <bounds x="683" y="372" width="26" height="9"/></element>
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG7" inputmask="0x30"> screen button: up+down 7 <bounds x="722" y="372" width="26" height="9"/></element>
+    <element ref="screen_up_and_down_button" inputtag="CPL_SEG7" inputmask="0xc0"> screen button: up+down 8 <bounds x="760" y="372" width="26" height="9"/></element>
+-->
 
-	<element ref="dark_grey_round_button" inputtag="CPL_SEG10" inputmask="0x04"><!-- screen button: help --><bounds x="379" y="362" width="29" height="29"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPL_SEG10" inputmask="0x08"><!-- screen button: other parts / tr --><bounds x="417" y="362" width="29" height="29"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPL_SEG7" inputmask="0x04"><!-- screen button: display hold --><bounds x="851" y="362" width="29" height="29"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPL_SEG7" inputmask="0x08"><!-- screen button: exit --><bounds x="889" y="362" width="29" height="29"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 1 --><bounds x="493" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 2 --><bounds x="531" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 3 --><bounds x="569" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 4 --><bounds x="607" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 5 --><bounds x="645" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 6 --><bounds x="683" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 7 --><bounds x="722" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: up+down 8 --><bounds x="760" y="372" width="26" height="9"/></element>
+	<element ref="screen_up_and_down_button"><!-- screen button: pgup+pgdown --><bounds x="806" y="372" width="26" height="9"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x01"><bounds x="229" y="477" width="33" height="21"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG10" inputmask="0x20"><!-- screen button: up 1 --><bounds x="491" y="349" width="30" height="25"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG10" inputmask="0x80"><!-- screen button: up 2 --><bounds x="529" y="349" width="30" height="25"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG9" inputmask="0x20"><!-- screen button: up 3 --><bounds x="567" y="349" width="30" height="25"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG9" inputmask="0x80"><!-- screen button: up 4 --><bounds x="605" y="349" width="30" height="25"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG8" inputmask="0x20"><!-- screen button: up 5 --><bounds x="643" y="349" width="30" height="25"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG8" inputmask="0x80"><!-- screen button: up 6 --><bounds x="681" y="349" width="30" height="25"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG7" inputmask="0x20"><!-- screen button: up 7 --><bounds x="720" y="349" width="30" height="25"/></element>
+	<element ref="screen_up_button" inputtag="CPL_SEG7" inputmask="0x80"><!-- screen button: up 8 --><bounds x="758" y="349" width="30" height="25"/></element>
+	<element ref="page_up_button" inputtag="CPL_SEG2" inputmask="0x80"><!-- screen button: page up --><bounds x="804" y="350" width="30" height="24"/></element>
+
+	<element ref="screen_down_button" inputtag="CPL_SEG10" inputmask="0x10"><!-- screen button: down 1 --><bounds x="491" y="378" width="30" height="25"/></element>
+	<element ref="screen_down_button" inputtag="CPL_SEG10" inputmask="0x40"><!-- screen button: down 2 --><bounds x="529" y="378" width="30" height="25"/></element>
+	<element ref="screen_down_button" inputtag="CPL_SEG9" inputmask="0x10"><!-- screen button: down 3 --><bounds x="567" y="378" width="30" height="25"/></element>
+	<element ref="screen_down_button" inputtag="CPL_SEG9" inputmask="0x40"><!-- screen button: down 4 --><bounds x="605" y="378" width="30" height="25"/></element>
+	<element ref="screen_down_button" inputtag="CPL_SEG8" inputmask="0x10"><!-- screen button: down 5 --><bounds x="643" y="378" width="30" height="25"/></element>
+	<element ref="screen_down_button" inputtag="CPL_SEG8" inputmask="0x40"><!-- screen button: down 6 --><bounds x="681" y="378" width="30" height="25"/></element>
+	<element ref="screen_down_button" inputtag="CPL_SEG7" inputmask="0x10"><!-- screen button: down 7 --><bounds x="720" y="378" width="30" height="25"/></element>
+	<element ref="screen_down_button" inputtag="CPL_SEG7" inputmask="0x40"><!-- screen button: down 8 --><bounds x="758" y="378" width="30" height="25"/></element>
+	<element ref="page_down_button" inputtag="CPL_SEG2" inputmask="0x40"><!-- screen button: page down --><bounds x="804" y="378" width="30" height="24"/></element>
+
+	<element ref="dark_round_button" inputtag="CPL_SEG10" inputmask="0x04"><!-- screen button: help --><bounds x="379" y="362" width="29" height="29"/></element>
+	<element ref="dark_round_button" inputtag="CPL_SEG10" inputmask="0x08"><!-- screen button: other parts / tr --><bounds x="417" y="362" width="29" height="29"/></element>
+	<element ref="dark_round_button" inputtag="CPL_SEG7" inputmask="0x04"><!-- screen button: display hold --><bounds x="851" y="362" width="29" height="29"/></element>
+	<element ref="dark_round_button" inputtag="CPL_SEG7" inputmask="0x08"><!-- screen button: exit --><bounds x="889" y="362" width="29" height="29"/></element>
+
+	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x01"><bounds x="227" y="477" width="37" height="21"/></element>
 	<element name="CPL_1" ref="green_led"><!-- COMPOSER: MEMORY --><bounds x="242" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x02"><bounds x="264" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x02"><bounds x="262" y="477" width="37" height="21"/></element>
 	<element name="CPL_2" ref="green_led"><!-- COMPOSER: MENU --><bounds x="277" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x04"><bounds x="299" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x04"><bounds x="297" y="477" width="37" height="21"/></element>
 	<element name="CPL_3" ref="green_led"><!-- SOUND ARRANGER: SET --><bounds x="312" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG1" inputmask="0x08"><bounds x="334" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG1" inputmask="0x08"><bounds x="332" y="477" width="37" height="21"/></element>
 	<element name="CPL_4" ref="green_led"><!-- SOUND ARRANGER: ON/OFF --><bounds x="348" y="469" width="5" height="5"/></element>
 
-	<element id="tempo_program_encoder" ref="dark_grey_round_button"><bounds x="591" y="460" width="90" height="90"/></element>
-	<element id="tempo_program_encoder_finger" ref="light_grey_round_button"><bounds x="641" y="512" width="27" height="27"/></element>
+	<element id="tempo_program_encoder" ref="tempo_encoder"><bounds x="591" y="460" width="91" height="91"/></element>
+	<element id="tempo_program_encoder_finger" ref="tempo_encoder_finger"><bounds x="641" y="512" width="27" height="27"/></element>
 
-	<element ref="light_grey_round_button" inputtag="CPL_SEG1" inputmask="0x10"><bounds x="444" y="455" width="81" height="23"/></element>
-	<element name="CPL_5" ref="green_led"><!-- MUSIC STYLIST --><bounds x="483" y="448" width="5" height="5"/></element>
+	<element ref="light_ellipse_button" inputtag="CPL_SEG1" inputmask="0x10"><bounds x="444" y="455" width="81" height="23"/></element>
+	<element name="CPL_5" ref="green_led"><!-- MUSIC STYLIST: ONE TOUCH PLAY --><bounds x="483" y="448" width="5" height="5"/></element>
 
-	<element ref="dark_grey_round_button"><bounds x="444" y="500" width="81" height="24"/></element>
-	<element ref="button_split"><bounds x="483" y="500" width="2" height="24"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPL_SEG1" inputmask="0x20"><!-- fade in --><bounds x="448" y="503" width="35" height="19"/></element>
+	<element ref="dark_half_left_ellipse_button" inputtag="CPL_SEG1" inputmask="0x20"><!-- fade in --><bounds x="444" y="500" width="41" height="23"/></element>
 	<element name="CPL_6" ref="green_led"><!-- FADE IN --><bounds x="452" y="497" width="5" height="5"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPL_SEG1" inputmask="0x40"><!-- fade out --><bounds x="485" y="503" width="35" height="19"/></element>
+
+	<element ref="dark_half_right_ellipse_button" inputtag="CPL_SEG1" inputmask="0x40"><!-- fade out --><bounds x="484" y="500" width="41" height="23"/></element>
 	<element name="CPL_7" ref="green_led"><!-- FADE OUT --><bounds x="513" y="497" width="5" height="5"/></element>
 
 	<element name="CPL_8" ref="red_led"><!-- DISPLAY HOLD --><bounds x="863" y="354" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x01"><bounds x="97" y="529" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x01"><bounds x="95" y="529" width="37" height="21"/></element>
 	<element name="CPL_9" ref="red_led"><!-- U.S. TRAD --><bounds x="111" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x02"><bounds x="132" y="529" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x02"><bounds x="130" y="529" width="37" height="21"/></element>
 	<element name="CPL_10" ref="red_led"><!-- COUNTRY --><bounds x="146" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x04"><bounds x="167" y="529" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x04"><bounds x="165" y="529" width="37" height="21"/></element>
 	<element name="CPL_11" ref="red_led"><!-- LATIN --><bounds x="181" y="521" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x08"><bounds x="27" y="582" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x08"><bounds x="25" y="582" width="37" height="21"/></element>
 	<element name="CPL_12" ref="red_led"><!-- MARCH & WALTZ --><bounds x="41" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x10"><bounds x="62" y="582" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x10"><bounds x="60" y="582" width="37" height="21"/></element>
 	<element name="CPL_13" ref="red_led"><!-- PARTY TIME --><bounds x="76" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x20"><bounds x="97" y="582" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x20"><bounds x="95" y="582" width="37" height="21"/></element>
 	<element name="CPL_14" ref="red_led"><!-- SHOWTIME & TRAD DANCE --><bounds x="111" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x40"><bounds x="132" y="582" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x40"><bounds x="130" y="582" width="37" height="21"/></element>
 	<element name="CPL_15" ref="red_led"><!-- WORLD --><bounds x="146" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG6" inputmask="0x80"><bounds x="167" y="582" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG6" inputmask="0x80"><bounds x="165" y="582" width="37" height="21"/></element>
 	<element name="CPL_16" ref="green_led"><!-- CUSTOM --><bounds x="181" y="573" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x01"><bounds x="27" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x01"><bounds x="25" y="477" width="37" height="21"/></element>
 	<element name="CPL_17" ref="red_led"><!-- STANDARD ROCK --><bounds x="41" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x02"><bounds x="62" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x02"><bounds x="60" y="477" width="37" height="21"/></element>
 	<element name="CPL_18" ref="red_led"><!-- R & ROLL & BLUES --><bounds x="76" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x04"><bounds x="97" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x04"><bounds x="95" y="477" width="37" height="21"/></element>
 	<element name="CPL_19" ref="red_led"><!-- POP & BALLAD --><bounds x="111" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x08"><bounds x="132" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x08"><bounds x="130" y="477" width="37" height="21"/></element>
 	<element name="CPL_20" ref="red_led"><!-- FUNK & FUSION --><bounds x="146" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x10"><bounds x="167" y="477" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x10"><bounds x="165" y="477" width="37" height="21"/></element>
 	<element name="CPL_21" ref="red_led"><!-- SOUL & MODERN DANCE --><bounds x="181" y="469" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x20"><bounds x="27" y="529" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x20"><bounds x="25" y="529" width="37" height="21"/></element>
 	<element name="CPL_22" ref="red_led"><!-- BIG BAND & SWING --><bounds x="41" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG0" inputmask="0x40"><bounds x="62" y="529" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPL_SEG0" inputmask="0x40"><bounds x="60" y="529" width="37" height="21"/></element>
 	<element name="CPL_23" ref="red_led"><!-- JAZZ COMBO --><bounds x="76" y="521" width="5" height="5"/></element>
 
+	<element ref="music_note"><bounds x="58" y="225" width="6" height="11"/></element>
+	<element ref="light_pill_button" inputtag="CPL_SEG3" inputmask="0x01"><!-- DEMO --><bounds x="25" y="247" width="37" height="21"/></element>
 
-	<element ref="light_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x01"><!-- DEMO --><bounds x="25" y="247" width="37" height="21"/></element>
-
-	<element ref="dark_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x02"><!-- MSP: BANK --><bounds x="111" y="247" width="37" height="21"/></element>
-	<element ref="dark_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x04"><!-- MSP: MENU --><bounds x="184" y="247" width="37" height="21"/></element>
-	<element ref="dark_grey_pill_button" inputtag="CPL_SEG3" inputmask="0x08"><!-- MSP: STOP/RECORD --><bounds x="260" y="247" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPL_SEG3" inputmask="0x02"><!-- MSP: BANK --><bounds x="111" y="247" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPL_SEG3" inputmask="0x04"><!-- MSP: MENU --><bounds x="184" y="247" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPL_SEG3" inputmask="0x08"><!-- MSP: STOP/RECORD --><bounds x="260" y="247" width="37" height="21"/></element>
 	<element name="CPL_24" ref="green_led"><!-- MSP: MENU --><bounds x="200" y="236" width="5" height="5"/></element>
 
-	<element ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x01"><!-- MSP 1 --><bounds x="112" y="300" width="60" height="36"/></element>
-	<element ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x02"><!-- MSP 2 --><bounds x="174" y="300" width="60" height="36"/></element>
-	<element ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x04"><!-- MSP 3 --><bounds x="236" y="300" width="60" height="36"/></element>
-	<element ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x08"><!-- MSP 4 --><bounds x="112" y="338" width="60" height="36"/></element>
-	<element ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x10"><!-- MSP 5 --><bounds x="174" y="338" width="60" height="36"/></element>
-	<element ref="blueish_gray_button" inputtag="CPL_SEG5" inputmask="0x20"><!-- MSP 6 --><bounds x="236" y="338" width="60" height="36"/></element>
+	<element ref="msp_corner_button" inputtag="CPL_SEG5" inputmask="0x01"><!-- MSP 1 --><orientation flipx="no" flipy="no"/><bounds x="111" y="293" width="63" height="39"/></element>
+	<element ref="msp_middle_button" inputtag="CPL_SEG5" inputmask="0x02"><!-- MSP 2 --><orientation flipx="no" flipy="no"/><bounds x="173" y="292" width="61" height="40"/></element>
+	<element ref="msp_corner_button" inputtag="CPL_SEG5" inputmask="0x04"><!-- MSP 3 --><orientation flipx="yes" flipy="no"/><bounds x="233" y="293" width="63" height="39"/></element>
+	<element ref="msp_corner_button" inputtag="CPL_SEG5" inputmask="0x08"><!-- MSP 4 --><orientation flipx="no" flipy="yes"/><bounds x="111" y="331" width="63" height="39"/></element>
+	<element ref="msp_middle_button" inputtag="CPL_SEG5" inputmask="0x10"><!-- MSP 5 --><orientation flipx="no" flipy="yes"/><bounds x="173" y="331" width="61" height="40"/></element>
+	<element ref="msp_corner_button" inputtag="CPL_SEG5" inputmask="0x20"><!-- MSP 6 --><orientation flipx="yes" flipy="yes"/><bounds x="233" y="331" width="63" height="39"/></element>
 
 	<element ref="line"><bounds x="221" y="537" width="11" height="1"/></element>
 	<element ref="line"><bounds x="221" y="537" width="1" height="52"/></element>
 	<element ref="line"><bounds x="221" y="589" width="6" height="1"/></element>
 
-	<element ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x01"><bounds x="228" y="572" width="31" height="31"/></element>
+	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x01"><bounds x="228" y="572" width="31" height="31"/></element>
 	<element name="CPL_25" ref="red_led"><!-- VARIATION & MSA 1 --><bounds x="241" y="563" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x02"><bounds x="264" y="572" width="31" height="31"/></element>
+	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x02"><bounds x="264" y="572" width="31" height="31"/></element>
 	<element name="CPL_26" ref="red_led"><!-- VARIATION & MSA 2 --><bounds x="277" y="563" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x04"><bounds x="300" y="572" width="31" height="31"/></element>
+	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x04"><bounds x="300" y="572" width="31" height="31"/></element>
 	<element name="CPL_27" ref="red_led"><!-- VARIATION & MSA 3 --><bounds x="312" y="563" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x08"><bounds x="336" y="572" width="31" height="31"/></element>
+	<element ref="light_31x31_button" inputtag="CPL_SEG4" inputmask="0x08"><bounds x="336" y="572" width="31" height="31"/></element>
 	<element name="CPL_28" ref="red_led"><!-- VARIATION & MSA 4 --><bounds x="348" y="563" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x10"><bounds x="233" y="529" width="21" height="21"/></element>
+	<element ref="light_21x21_button" inputtag="CPL_SEG4" inputmask="0x10"><bounds x="233" y="529" width="21" height="21"/></element>
 	<element name="CPL_29" ref="red_led"><!-- MUSIC STYLE ARRANGER --><bounds x="241" y="521" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x20"><!-- SPLIT POINT --><bounds x="299" y="529" width="33" height="21"/></element>
+	<element ref="light_37x21_button" inputtag="CPL_SEG4" inputmask="0x20"><!-- SPLIT POINT --><bounds x="297" y="529" width="37" height="21"/></element>
 
-	<element ref="light_grey_button" inputtag="CPL_SEG4" inputmask="0x40"><bounds x="334" y="529" width="33" height="21"/></element>
+	<element ref="light_37x21_button" inputtag="CPL_SEG4" inputmask="0x40"><bounds x="332" y="529" width="37" height="21"/></element>
 	<element name="CPL_30" ref="green_led"><!-- AUTO PLAY CHORD --><bounds x="348" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x01"><bounds x="444" y="571" width="30" height="34"/></element>
+	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x01"><bounds x="444" y="571" width="30" height="34"/></element>
 	<element name="CPL_33" ref="red_led"><!-- FILL IN 1 --><bounds x="455" y="558" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x02"><bounds x="479" y="571" width="30" height="34"/></element>
+	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x02"><bounds x="479" y="571" width="30" height="34"/></element>
 	<element name="CPL_34" ref="red_led"><!-- FILL IN 2 --><bounds x="490" y="558" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x04"><bounds x="520" y="571" width="30" height="34"/></element>
+	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x04"><bounds x="520" y="571" width="30" height="34"/></element>
 	<element name="CPL_35" ref="red_led"><!-- INTRO & ENDING 1 --><bounds x="533" y="558" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPL_SEG2" inputmask="0x08"><bounds x="555" y="571" width="30" height="34"/></element>
+	<element ref="dark_curved_30x34_button" inputtag="CPL_SEG2" inputmask="0x08"><bounds x="555" y="571" width="30" height="34"/></element>
 	<element name="CPL_36" ref="red_led"><!-- INTRO & ENDING 2 --><bounds x="569" y="558" width="5" height="5"/></element>
 
+	<element ref="split_point_indicator"><bounds x="266" y="619" width="5" height="8"/></element>
 	<element name="CPL_37" ref="red_led"><!-- SPLIT POINT INDICATOR (LEFT) --><bounds x="266" y="612" width="5" height="5"/></element>
+
+	<element ref="split_point_indicator"><bounds x="434" y="619" width="5" height="8"/></element>
 	<element name="CPL_38" ref="red_led"><!-- SPLIT POINT INDICATOR (CENTER) --><bounds x="434" y="612" width="5" height="5"/></element>
+
+	<element ref="split_point_indicator"><bounds x="640" y="619" width="5" height="8"/></element>
 	<element name="CPL_39" ref="red_led"><!-- SPLIT POINT INDICATOR (RIGHT) --><bounds x="640" y="612" width="5" height="5"/></element>
+
 	<element name="CPL_40" ref="green_led"><!-- TEMPO/PROGRAM --><bounds x="636" y="448" width="5" height="5"/></element>
 
 	<element name="CPL_49" ref="red_led"><!-- OTHER PARTS/TR --><bounds x="430" y="354" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x01"><bounds x="857" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x01"><bounds x="855" y="476" width="37" height="21"/></element>
 	<element name="CPR_1" ref="red_led"><!-- EFFECT: SUSTAIN --><bounds x="872" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x02"><bounds x="892" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x02"><bounds x="890" y="476" width="37" height="21"/></element>
 	<element name="CPR_2" ref="red_led"><!-- EFFECT: DIGITAL EFFECT --><bounds x="907" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x04"><bounds x="927" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x04"><bounds x="925" y="476" width="37" height="21"/></element>
 	<element name="CPR_3" ref="red_led"><!-- EFFECT: DSP EFFECT --><bounds x="942" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x08"><bounds x="962" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x08"><bounds x="960" y="476" width="37" height="21"/></element>
 	<element name="CPR_4" ref="red_led"><!-- EFFECT: DIGITAL REVERB --><bounds x="977" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG3" inputmask="0x10"><bounds x="997" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG3" inputmask="0x10"><bounds x="995" y="476" width="37" height="21"/></element>
 	<element name="CPR_5" ref="red_led"><!-- EFFECT: ACOUSTIC ILLUSION --><bounds x="1013" y="469" width="5" height="5"/></element>
 
 
-	<element ref="light_grey_button" inputtag="CPR_SEG5" inputmask="0x08"><bounds x="981" y="235" width="33" height="21"/></element>
+	<element ref="light_37x21_button" inputtag="CPR_SEG5" inputmask="0x08"><bounds x="979" y="235" width="37" height="21"/></element>
 	<element name="CPR_6" ref="green_led"><!-- SEQUENCER: PLAY --><bounds x="996" y="226" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG5" inputmask="0x10"><bounds x="1032" y="235" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG5" inputmask="0x10"><bounds x="1030" y="235" width="37" height="21"/></element>
 	<element ref="red_line"><bounds x="1040" y="244" width="19" height="4"/></element>
 	<element name="CPR_7" ref="green_led"><!-- SEQUENCER: EASY REC --><bounds x="1047" y="226" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG5" inputmask="0x20"><bounds x="1067" y="235" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG5" inputmask="0x20"><bounds x="1065" y="235" width="37" height="21"/></element>
 	<element name="CPR_8" ref="green_led"><!-- SEQUENCER: MENU --><bounds x="1082" y="226" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x01"><bounds x="1054" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x01"><bounds x="1052" y="476" width="37" height="21"/></element>
 	<element name="CPR_9" ref="red_led"><!-- PIANO --><bounds x="1067" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x02"><bounds x="1089" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x02"><bounds x="1087" y="476" width="37" height="21"/></element>
 	<element name="CPR_10" ref="red_led"><!-- GUITAR --><bounds x="1103" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x04"><bounds x="1124" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x04"><bounds x="1122" y="476" width="37" height="21"/></element>
 	<element name="CPR_11" ref="red_led"><!-- STRINGS & VOCAL --><bounds x="1138" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x08"><bounds x="1159" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x08"><bounds x="1157" y="476" width="37" height="21"/></element>
 	<element name="CPR_12" ref="red_led"><!-- BRASS --><bounds x="1173" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x10"><bounds x="1194" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x10"><bounds x="1192" y="476" width="37" height="21"/></element>
 	<element name="CPR_13" ref="red_led"><!-- FLUTE --><bounds x="1208" y="469" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x20"><bounds x="1229" y="476" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x20"><bounds x="1227" y="476" width="37" height="21"/></element>
 	<element name="CPR_14" ref="red_led"><!-- SAX & REED --><bounds x="1243" y="469" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x40"><bounds x="1054" y="528" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x40"><bounds x="1052" y="528" width="37" height="21"/></element>
 	<element name="CPR_15" ref="red_led"><!-- MALLET & ORCH PERC --><bounds x="1067" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG2" inputmask="0x80"><bounds x="1089" y="528" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG2" inputmask="0x80"><bounds x="1087" y="528" width="37" height="21"/></element>
 	<element name="CPR_16" ref="red_led"><!-- WORLD PERC --><bounds x="1103" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x01"><bounds x="1124" y="528" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x01"><bounds x="1122" y="528" width="37" height="21"/></element>
 	<element name="CPR_17" ref="red_led"><!-- ORGAN & ACCORDION --><bounds x="1138" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x02"><bounds x="1159" y="528" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x02"><bounds x="1157" y="528" width="37" height="21"/></element>
 	<element name="CPR_18" ref="red_led"><!-- ORCHESTRAL PAD --><bounds x="1173" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x04"><bounds x="1194" y="528" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x04"><bounds x="1192" y="528" width="37" height="21"/></element>
 	<element name="CPR_19" ref="red_led"><!-- SYNTH --><bounds x="1208" y="521" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x08"><bounds x="1229" y="528" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x08"><bounds x="1227" y="528" width="37" height="21"/></element>
 	<element name="CPR_20" ref="red_led"><!-- BASS --><bounds x="1243" y="521" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x10"><bounds x="1054" y="581" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x10"><bounds x="1052" y="581" width="37" height="21"/></element>
 	<element ref="line"><bounds x="1061" y="589" width="19" height="4"/></element>
 	<element name="CPR_21" ref="red_led"><!-- DIGITAL DRAWBAR --><bounds x="1067" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x20"><bounds x="1089" y="581" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x20"><bounds x="1087" y="581" width="37" height="21"/></element>
 	<element ref="line"><bounds x="1096" y="589" width="19" height="4"/></element>
 	<element name="CPR_22" ref="red_led"><!-- ACCORDION REGISTER --><bounds x="1103" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x40"><bounds x="1124" y="581" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x40"><bounds x="1122" y="581" width="37" height="21"/></element>
 	<element name="CPR_23" ref="red_led"><!-- GM SPECIAL --><bounds x="1138" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG1" inputmask="0x80"><bounds x="1159" y="581" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG1" inputmask="0x80"><bounds x="1157" y="581" width="37" height="21"/></element>
 	<element name="CPR_24" ref="red_led"><!-- DRUM KITS --><bounds x="1173" y="573" width="5" height="5"/></element>
 
 	<element ref="line"><bounds x="973" y="296" width="7" height="1"/></element>
 	<element ref="line"><bounds x="973" y="296" width="1" height="52"/></element>
 	<element ref="line"><bounds x="973" y="348" width="7" height="1"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x01"><bounds x="980" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x01"><bounds x="980" y="335" width="25" height="25"/></element>
 	<element name="CPR_25" ref="green_led"><!-- PANEL MEMORY 1 --><bounds x="988" y="327" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x02"><bounds x="1017" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x02"><bounds x="1017" y="335" width="25" height="25"/></element>
 	<element name="CPR_26" ref="green_led"><!-- PANEL MEMORY 2 --><bounds x="1024" y="327" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x04"><bounds x="1054" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x04"><bounds x="1054" y="335" width="25" height="25"/></element>
 	<element name="CPR_27" ref="green_led"><!-- PANEL MEMORY 3 --><bounds x="1061" y="327" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x08"><bounds x="1090" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x08"><bounds x="1090" y="335" width="25" height="25"/></element>
 	<element name="CPR_28" ref="green_led"><!-- PANEL MEMORY 4 --><bounds x="1098" y="327" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x10"><bounds x="1127" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x10"><bounds x="1127" y="335" width="25" height="25"/></element>
 	<element name="CPR_29" ref="green_led"><!-- PANEL MEMORY 5 --><bounds x="1135" y="327" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x20"><bounds x="1164" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x20"><bounds x="1164" y="335" width="25" height="25"/></element>
 	<element name="CPR_30" ref="green_led"><!-- PANEL MEMORY 6 --><bounds x="1172" y="327" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x40"><bounds x="1201" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x40"><bounds x="1201" y="335" width="25" height="25"/></element>
 	<element name="CPR_31" ref="green_led"><!-- PANEL MEMORY 7 --><bounds x="1209" y="327" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG6" inputmask="0x80"><bounds x="1238" y="335" width="25" height="25"/></element>
+	<element ref="dark_25x25_button" inputtag="CPR_SEG6" inputmask="0x80"><bounds x="1238" y="335" width="25" height="25"/></element>
 	<element name="CPR_32" ref="green_led"><!-- PANEL MEMORY 8 --><bounds x="1245" y="327" width="5" height="5"/></element>
 
 
-	<element ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x01"><bounds x="864" y="529" width="21" height="21"/></element>
+	<element ref="light_21x21_button" inputtag="CPR_SEG4" inputmask="0x01"><bounds x="864" y="529" width="21" height="21"/></element>
 	<element name="CPR_33" ref="red_led"><!-- PART SELECT: LEFT --><bounds x="872" y="521" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x02"><bounds x="899" y="529" width="21" height="21"/></element>
+	<element ref="light_21x21_button" inputtag="CPR_SEG4" inputmask="0x02"><bounds x="899" y="529" width="21" height="21"/></element>
 	<element name="CPR_34" ref="red_led"><!-- PART SELECT: RIGHT 2 --><bounds x="907" y="521" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x04"><bounds x="933" y="529" width="21" height="21"/></element>
+	<element ref="light_21x21_button" inputtag="CPR_SEG4" inputmask="0x04"><bounds x="933" y="529" width="21" height="21"/></element>
 	<element name="CPR_35" ref="red_led"><!-- PART SELECT: RIGHT 1 --><bounds x="941" y="521" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_pill_button" inputtag="CPR_SEG4" inputmask="0x08"><bounds x="994" y="528" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPR_SEG4" inputmask="0x08"><bounds x="994" y="528" width="37" height="21"/></element>
 	<element name="CPR_36" ref="green_led"><!-- ENTERTAINER --><bounds x="1010" y="521" width="5" height="5"/></element>
 
 
-	<element ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x10"><bounds x="859" y="574" width="31" height="31"/></element>
+	<element ref="light_31x31_button" inputtag="CPR_SEG4" inputmask="0x10"><bounds x="859" y="574" width="31" height="31"/></element>
 	<element name="CPR_37" ref="red_led"><!-- CONDUCTOR: LEFT --><bounds x="872" y="564" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x20"><bounds x="893" y="574" width="31" height="31"/></element>
+	<element ref="light_31x31_button" inputtag="CPR_SEG4" inputmask="0x20"><bounds x="893" y="574" width="31" height="31"/></element>
 	<element name="CPR_38" ref="red_led"><!-- CONDUCTOR: RIGHT 2 --><bounds x="907" y="564" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPR_SEG4" inputmask="0x40"><bounds x="927" y="574" width="31" height="31"/></element>
+	<element ref="light_31x31_button" inputtag="CPR_SEG4" inputmask="0x40"><bounds x="927" y="574" width="31" height="31"/></element>
 	<element name="CPR_39" ref="red_led"><!-- CONDUCTOR: RIGHT 1 --><bounds x="941" y="564" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_pill_button" inputtag="CPR_SEG4" inputmask="0x80"><bounds x="994" y="580" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPR_SEG4" inputmask="0x80"><bounds x="994" y="580" width="37" height="21"/></element>
 	<element name="CPR_40" ref="red_led"><!-- TECHNI CHORD --><bounds x="1010" y="573" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x04"><bounds x="1123" y="235" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x04"><bounds x="1121" y="235" width="37" height="21"/></element>
 	<element name="CPR_49" ref="green_led"><!-- MENU: SOUND --><bounds x="1138" y="226" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x08"><bounds x="1158" y="235" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x08"><bounds x="1156" y="235" width="37" height="21"/></element>
 	<element name="CPR_50" ref="green_led"><!-- MENU: CONTROL --><bounds x="1173" y="226" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x10"><bounds x="1193" y="235" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x10"><bounds x="1191" y="235" width="37" height="21"/></element>
 	<element name="CPR_51" ref="green_led"><!-- MENU: MIDI --><bounds x="1208" y="226" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG10" inputmask="0x20"><bounds x="1228" y="235" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG10" inputmask="0x20"><bounds x="1226" y="235" width="37" height="21"/></element>
 	<element name="CPR_52" ref="green_led"><!-- MENU: DISK --><bounds x="1244" y="226" width="5" height="5"/></element>
 
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG9" inputmask="0x40"><bounds x="1194" y="581" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG9" inputmask="0x40"><bounds x="1192" y="581" width="37" height="21"/></element>
 	<element name="CPR_57" ref="green_led"><!-- MEMORY A --><bounds x="1208" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG9" inputmask="0x80"><bounds x="1229" y="581" width="33" height="21"/></element>
+	<element ref="dark_37x21_button" inputtag="CPR_SEG9" inputmask="0x80"><bounds x="1227" y="581" width="37" height="21"/></element>
 	<element name="CPR_58" ref="green_led"><!-- MEMORY B --><bounds x="1243" y="573" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG8" inputmask="0x40"><bounds x="774" y="571" width="18" height="34"/></element>
+	<element ref="dark_curved_18x34_button" inputtag="CPR_SEG8" inputmask="0x40"><bounds x="774" y="571" width="18" height="34"/></element>
 	<element name="CPR_61" ref="red_led"><!-- SYNCHRO & BREAK --><bounds x="780" y="558" width="5" height="5"/></element>
 
-	<element ref="dark_grey_button" inputtag="CPR_SEG8" inputmask="0x80"><!-- TAP TEMPO --><bounds x="805" y="571" width="27" height="34"/></element>
+	<element ref="dark_curved_27x34_button" inputtag="CPR_SEG8" inputmask="0x80"><!-- TAP TEMPO --><bounds x="805" y="571" width="27" height="34"/></element>
 
-	<element ref="dark_grey_round_button"><bounds x="748" y="455" width="81" height="24"/></element>
-	<element ref="button_split"><bounds x="787" y="455" width="2" height="24"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPR_SEG0" inputmask="0x20"><!-- TRANSPOSE - --><bounds x="752" y="458" width="35" height="19"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPR_SEG0" inputmask="0x40"><!-- TRANSPOSE + --><bounds x="790" y="458" width="35" height="19"/></element>
+	<element ref="dark_half_left_ellipse_button" inputtag="CPR_SEG0" inputmask="0x20"><!-- TRANSPOSE - --><bounds x="748" y="455" width="41" height="23"/></element>
+	<element ref="dark_half_right_ellipse_button" inputtag="CPR_SEG0" inputmask="0x40"><!-- TRANSPOSE + --><bounds x="788" y="455" width="41" height="23"/></element>
 
-	<element ref="dark_grey_round_button"><bounds x="748" y="500" width="81" height="24"/></element>
-	<element ref="button_split"><bounds x="787" y="500" width="2" height="24"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPR_SEG8" inputmask="0x08"><!-- MINUS --><bounds x="752" y="503" width="35" height="19"/></element>
+	<element ref="dark_half_left_ellipse_button" inputtag="CPR_SEG8" inputmask="0x08"><!-- MINUS --><bounds x="748" y="503" width="41" height="23"/></element>
 	<element name="CPR_62" ref="red_led"><!-- R1/R2 OCTAVE MINUS --><bounds x="756" y="497" width="5" height="5"/></element>
-	<element ref="dark_grey_round_button" inputtag="CPR_SEG8" inputmask="0x10"><!-- PLUS --><bounds x="790" y="503" width="35" height="19"/></element>
+	<element ref="dark_half_right_ellipse_button" inputtag="CPR_SEG8" inputmask="0x10"><!-- PLUS --><bounds x="788" y="503" width="41" height="23"/></element>
 	<element name="CPR_63" ref="red_led"><!-- R1/R2 OCTAVE PLUS --><bounds x="817" y="497" width="5" height="5"/></element>
 
-	<element ref="dark_grey_pill_button" inputtag="CPR_SEG7" inputmask="0x01"><!-- SEQUENCER: SET --><bounds x="979" y="286" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPR_SEG7" inputmask="0x01"><!-- SEQUENCER: SET --><bounds x="979" y="286" width="37" height="21"/></element>
 	<element ref="red_line"><bounds x="988" y="295" width="19" height="4"/></element>
-	<element ref="dark_grey_pill_button" inputtag="CPR_SEG7" inputmask="0x02"><!-- SEQUENCER: NEXT BANK --><bounds x="1031" y="286" width="37" height="21"/></element>
-	<element ref="dark_grey_pill_button" inputtag="CPR_SEG7" inputmask="0x04"><!-- SEQUENCER: BANK VIEW --><bounds x="1082" y="286" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPR_SEG7" inputmask="0x02"><!-- SEQUENCER: NEXT BANK --><bounds x="1031" y="286" width="37" height="21"/></element>
+	<element ref="dark_pill_button" inputtag="CPR_SEG7" inputmask="0x04"><!-- SEQUENCER: BANK VIEW --><bounds x="1082" y="286" width="37" height="21"/></element>
 	<element name="CPR_64" ref="green_led"><!-- BANK VIEW --><bounds x="1098" y="277" width="5" height="5"/></element>
 
-	<element ref="light_grey_button" inputtag="CPR_SEG8" inputmask="0x20"><!-- START/STOP --><bounds x="687" y="571" width="53" height="34"/></element>
+	<element ref="light_curved_53x34_button" inputtag="CPR_SEG8" inputmask="0x20"><!-- START/STOP --><bounds x="687" y="571" width="53" height="34"/></element>
 	<element name="CPR_65" ref="red_led"><!-- BEAT #1 --><bounds x="685" y="558" width="5" height="5"/></element>
 	<element name="CPR_66" ref="green_led"><!-- BEAT #2 --><bounds x="700" y="558" width="5" height="5"/></element>
 	<element name="CPR_67" ref="green_led"><!-- BEAT #3 --><bounds x="716" y="558" width="5" height="5"/></element>
 	<element name="CPR_68" ref="green_led"><!-- BEAT #4 --><bounds x="732" y="558" width="5" height="5"/></element>
 
+	<element ref="black_transparent_rect"><bounds x="1232" y="5" width="46" height="26" /></element>
+	<element ref="maincpu_text"><bounds x="1235" y="8" width="30" height="8"/></element>
+	<element ref="subcpu_text"><bounds x="1235" y="18" width="30" height="8"/></element>
 	<element name="checking_device_led_cn11" ref="red_led"><!-- MAINCPU CHECK LED --><bounds x="1270" y="10" width="5" height="5"/></element>
 	<element name="checking_device_led_cn12" ref="red_led"><!-- SUBCPU CHECK LED --><bounds x="1270" y="20" width="5" height="5"/></element>
 
 <!-- Labels -->
 
-	<element ref="maincpu_text"><bounds x="1235" y="8" width="30" height="8"/></element>
-	<element ref="subcpu_text"><bounds x="1235" y="18" width="30" height="8"/></element>
 
 	<element ref="demo_text"><bounds x="34" y="228" width="20" height="8"/></element>
 
@@ -673,19 +1093,19 @@ license:CC0-1.0
 	<element ref="msp_menu_text"><bounds x="192" y="227" width="22" height="8"/></element>
 	<element ref="msp_stop_record_text"><bounds x="250" y="227" width="56" height="8"/></element>
 
-	<element ref="msp_1_text"><bounds x="140" y="314" width="6" height="10"/></element>
-	<element ref="msp_2_text"><bounds x="200" y="314" width="6" height="10"/></element>
-	<element ref="msp_3_text"><bounds x="264" y="314" width="6" height="10"/></element>
-	<element ref="msp_4_text"><bounds x="140" y="350" width="6" height="10"/></element>
-	<element ref="msp_5_text"><bounds x="200" y="350" width="6" height="10"/></element>
-	<element ref="msp_6_text"><bounds x="264" y="350" width="6" height="10"/></element>
+	<element ref="msp_1_text"><bounds x="140" y="310" width="6" height="10"/></element>
+	<element ref="msp_2_text"><bounds x="200" y="310" width="6" height="10"/></element>
+	<element ref="msp_3_text"><bounds x="264" y="310" width="6" height="10"/></element>
+	<element ref="msp_4_text"><bounds x="140" y="346" width="6" height="10"/></element>
+	<element ref="msp_5_text"><bounds x="200" y="346" width="6" height="10"/></element>
+	<element ref="msp_6_text"><bounds x="264" y="346" width="6" height="10"/></element>
 
 	<element ref="screen_display_angle_text1"><bounds x="864" y="56" width="22" height="7"/></element>
 	<element ref="screen_display_angle_text2"><bounds x="864" y="64" width="22" height="7"/></element>
 
 	<element ref="screen_contrast_text"><bounds x="329" y="329" width="42" height="7"/></element>
-	<element ref="dark_grey_button"><bounds x="348" y="338" width="5" height="69"/></element>
-	<element ref="light_grey_button"><bounds x="346" y="378" width="9" height="9"/></element>
+	<element ref="contrast_track"><bounds x="347" y="338" width="7" height="69"/></element>
+	<element ref="contrast_knob"><bounds x="347" y="378" width="7" height="9"/></element>
 
 	<element ref="screen_help_text"><bounds x="385" y="347" width="20" height="8"/></element>
 	<element ref="screen_other_parts_text1"><bounds x="414" y="337" width="36" height="7"/></element>
@@ -768,7 +1188,7 @@ license:CC0-1.0
 	<element ref="composer_title"><bounds x="241" y="438" width="43" height="8"/></element>
 	<element ref="sound_arranger_title"><bounds x="297" y="438" width="73" height="8"/></element>
 
-	<element ref="composer_memory_text"><bounds x="234" y="460" width="27" height="7"/></element>
+	<element ref="composer_memory_text"><bounds x="232" y="460" width="27" height="7"/></element>
 	<element ref="composer_menu_text"><bounds x="273" y="460" width="17" height="7"/></element>
 	<element ref="sound_arranger_set_text"><bounds x="310" y="460" width="11" height="7"/></element>
 	<element ref="sound_arranger_on_off_text"><bounds x="339" y="460" width="23" height="7"/></element>
@@ -896,5 +1316,22 @@ license:CC0-1.0
 	<element ref="memory_b_text1"><bounds x="1233" y="557" width="26" height="7"/></element>
 	<element ref="memory_b_text2"><bounds x="1233" y="565" width="26" height="7"/></element>
 
+	</group> <!-- name="compact" -->
+
+
+<!-- TODO:
+    <view name="Full Unit">
+        <bounds x="?" y="?" width="?" height="?"/>
+        <group ref="fullunit"><bounds x="?" y="?" width="?" height="?"/></group>
+    </view>
+-->
+	<view name="Compact">
+		<bounds x="0" y="0" width="1280" height="640"/>
+		<group ref="compact"><bounds x="0" y="0" width="1280" height="640"/></group>
+	</view>
+
+	<view name="Screen close-up">
+		<bounds x="320" y="30" width="640" height="390"/>
+		<group ref="compact"><bounds x="0" y="0" width="1280" height="640"/></group>
 	</view>
 </mamelayout>

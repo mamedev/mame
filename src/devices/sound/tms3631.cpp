@@ -21,7 +21,7 @@ tms3631_device::tms3631_device(const machine_config &mconfig, const char *tag, d
 	, m_basefreq(0)
 	, m_enable(0)
 {
-//	std::fill(std::begin(m_counter8), std::end(m_counter8), 0);
+//  std::fill(std::begin(m_counter8), std::end(m_counter8), 0);
 	std::fill(std::begin(m_channel_data), std::end(m_channel_data), 0);
 }
 
@@ -39,7 +39,7 @@ void tms3631_device::device_start()
 
 void tms3631_device::sound_stream_update(sound_stream &stream)
 {
-//	int samplerate = stream.sample_rate();
+//  int samplerate = stream.sample_rate();
 
 	for (int i = 0; i < 8; i++)
 		stream.fill(i, 0);

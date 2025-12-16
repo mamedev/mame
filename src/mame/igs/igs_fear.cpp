@@ -2,9 +2,10 @@
 // copyright-holders:David Haywood, XingXing
 /*
 Default bookkeeping passwords:
-* fearless 1234
-* icescape all Start
-* superkds (unknown)
+* fearless: 1234
+* icescape: all Start
+* superkds: (unknown)
+* mjzb:     all Start
 
 Other games on this hardware:
 * Fist Talks

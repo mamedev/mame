@@ -203,7 +203,7 @@ authors:hap
 	</element>
 	<element name="text_l1b">
 		<rect><color red="0" green="0" blue="0" /></rect>
-		<text string="STARTING LINE" align="1"><color red="0.82" green="0.82" blue="0.82" /></text>
+		<text string="STARTING LINE"><color red="0.82" green="0.82" blue="0.82" /></text>
 	</element>
 	<element name="text_l2">
 		<text string="START EVENT"><color red="0.82" green="0.82" blue="0.82" /></text>
@@ -353,52 +353,52 @@ authors:hap
 		<element ref="text_i0" blend="add"><bounds xc="63" yc="48" width="60" height="3" /></element>
 
 		<element ref="text_i1a" blend="add"><bounds x="31.75" y="51.0" width="3" height="3" /></element>
-		<element ref="text_i1b" blend="add"><bounds x="35.75" y="51.25" width="40" height="1.75" /></element>
-		<element ref="text_i1c" blend="add"><bounds x="21.5" y="51.75" width="40" height="1.25" /></element>
+		<element ref="text_i1b" blend="add"><bounds x="35.75" y="51.25" width="6.5" height="1.75" /></element>
+		<element ref="text_i1c" blend="add"><bounds left="43" y="51.75" right="61.5" height="1.25" /></element>
 
 		<element ref="text_i2a" blend="add"><bounds x="34.5" y="54.75" width="3" height="3" /></element>
-		<element ref="text_i2b" blend="add"><bounds x="38.5" y="53.92" width="40" height="1.75" /></element>
-		<element ref="text_i2c" blend="add"><bounds x="21.5" y="54.42" width="40" height="1.25" /></element>
-		<element ref="text_i2d" blend="add"><bounds x="21.5" y="55.67" width="40" height="1.25" /></element>
-		<element ref="text_i2e" blend="add"><bounds x="41.5" y="56.92" width="40" height="1.25" /></element>
+		<element ref="text_i2b" blend="add"><bounds x="38.5" y="53.92" width="6.25" height="1.75" /></element>
+		<element ref="text_i2c" blend="add"><bounds left="46" y="54.42" right="61.5" height="1.25" /></element>
+		<element ref="text_i2d" blend="add"><bounds left="40" y="55.67" right="61.5" height="1.25" /></element>
+		<element ref="text_i2e" blend="add"><bounds x="41.5" y="56.92" width="10" height="1.25" /></element>
 
 		<element ref="text_i3a" blend="add"><bounds x="37.0" y="59.5" width="3" height="3" /></element>
-		<element ref="text_i3b" blend="add"><bounds x="41.0" y="59.58" width="40" height="1.75" /></element>
-		<element ref="text_i3c" blend="add"><bounds x="21.5" y="60.08" width="40" height="1.25" /></element>
-		<element ref="text_i3d" blend="add"><bounds x="21.5" y="61.33" width="40" height="1.25" /></element>
+		<element ref="text_i3b" blend="add"><bounds x="41.0" y="59.58" width="4.75" height="1.75" /></element>
+		<element ref="text_i3c" blend="add"><bounds left="47" y="60.08" right="61.5" height="1.25" /></element>
+		<element ref="text_i3d" blend="add"><bounds left="41.5" y="61.33" right="61.5" height="1.25" /></element>
 
 		<element ref="text_i4a"><bounds x="40" y="63.375" width="3.5" height="3.5" /></element>
-		<element ref="text_i4b" blend="add"><bounds x="44.0" y="63.5" width="40" height="1.75" /></element>
-		<element ref="text_i4c" blend="add"><bounds x="21.5" y="64.0" width="40" height="1.25" /></element>
-		<element ref="text_i4d" blend="add"><bounds x="21.5" y="65.25" width="40" height="1.25" /></element>
-		<element ref="text_i4e" blend="add"><bounds x="21.5" y="66.5" width="40" height="1.25" /></element>
+		<element ref="text_i4b" blend="add"><bounds x="44.0" y="63.5" width="5" height="1.75" /></element>
+		<element ref="text_i4c" blend="add"><bounds left="49.75" y="64.0" right="61.5" height="1.25" /></element>
+		<element ref="text_i4d" blend="add"><bounds left="47" y="65.25" right="61.5" height="1.25" /></element>
+		<element ref="text_i4e" blend="add"><bounds left="48" y="66.5" right="61.5" height="1.25" /></element>
 
 		<element ref="text_i5a" blend="add"><bounds xc="64.0" y="51.0" width="3" height="3" /></element>
-		<element ref="text_i5b" blend="add"><bounds x="66.5" y="51.25" width="40" height="1.75" /></element>
-		<element ref="text_i5c" blend="add"><bounds x="77.75" y="51.75" width="40" height="1.25" /></element>
-		<element ref="text_i5d" blend="add"><bounds x="66.5" y="53.0" width="40" height="1.25" /></element>
+		<element ref="text_i5b" blend="add"><bounds x="66.5" y="51.25" width="10" height="1.75" /></element>
+		<element ref="text_i5c" blend="add"><bounds x="77.75" y="51.75" width="15" height="1.25" /></element>
+		<element ref="text_i5d" blend="add"><bounds x="66.5" y="53.0" width="25" height="1.25" /></element>
 
 		<element ref="text_i6a" blend="add"><bounds xc="64.0" y="55.0" width="3" height="3" /></element>
-		<element ref="text_i6b" blend="add"><bounds x="66.5" y="54.5" width="40" height="1.75" /></element>
-		<element ref="text_i6c" blend="add"><bounds x="77.75" y="55.0" width="40" height="1.25" /></element>
-		<element ref="text_i6d" blend="add"><bounds x="66.5" y="56.25" width="40" height="1.25" /></element>
-		<element ref="text_i6e" blend="add"><bounds x="66.5" y="57.5" width="40" height="1.25" /></element>
+		<element ref="text_i6b" blend="add"><bounds x="66.5" y="54.5" width="10" height="1.75" /></element>
+		<element ref="text_i6c" blend="add"><bounds x="77.75" y="55.0" width="14" height="1.25" /></element>
+		<element ref="text_i6d" blend="add"><bounds x="66.5" y="56.25" width="24" height="1.25" /></element>
+		<element ref="text_i6e" blend="add"><bounds x="66.5" y="57.5" width="14.5" height="1.25" /></element>
 
 		<element ref="text_i7a" blend="add"><bounds xc="64.0" y="59.75" width="3" height="3" /></element>
-		<element ref="text_i7b" blend="add"><bounds x="66.5" y="59.0" width="40" height="1.75" /></element>
-		<element ref="text_i7c" blend="add"><bounds x="75.5" y="59.5" width="40" height="1.25" /></element>
-		<element ref="text_i7d" blend="add"><bounds x="66.5" y="60.75" width="40" height="1.25" /></element>
-		<element ref="text_i7e" blend="add"><bounds x="66.5" y="62.0" width="40" height="1.25" /></element>
-		<element ref="text_i7f" blend="add"><bounds x="66.5" y="63.25" width="40" height="1.25" /></element>
+		<element ref="text_i7b" blend="add"><bounds x="66.5" y="59.0" width="8" height="1.75" /></element>
+		<element ref="text_i7c" blend="add"><bounds x="75.5" y="59.5" width="11.5" height="1.25" /></element>
+		<element ref="text_i7d" blend="add"><bounds x="66.5" y="60.75" width="20.5" height="1.25" /></element>
+		<element ref="text_i7e" blend="add"><bounds x="66.5" y="62.0" width="20" height="1.25" /></element>
+		<element ref="text_i7f" blend="add"><bounds x="66.5" y="63.25" width="17" height="1.25" /></element>
 
 		<element ref="text_i8a"><bounds xc="64.0" y="64.25" width="3.5" height="3.5" /></element>
-		<element ref="text_i8b" blend="add"><bounds x="66.5" y="64.75" width="40" height="1.75" /></element>
-		<element ref="text_i8c" blend="add"><bounds x="75.5" y="65.25" width="40" height="1.25" /></element>
-		<element ref="text_i8d" blend="add"><bounds x="66.5" y="66.5" width="40" height="1.25" /></element>
+		<element ref="text_i8b" blend="add"><bounds x="66.5" y="64.75" width="7.5" height="1.75" /></element>
+		<element ref="text_i8c" blend="add"><bounds x="75.5" y="65.25" width="6.5" height="1.25" /></element>
+		<element ref="text_i8d" blend="add"><bounds x="66.5" y="66.5" width="17" height="1.25" /></element>
 
 		<!-- outer labels -->
 		<element ref="text_l1a"><bounds xc="47.17" yc="72.25" width="10" height="1.25" /></element>
-		<element ref="text_l1b"><bounds xc="40.5" y="76.5" width="1.25" height="8.5" /><orientation rotate="90" /></element>
+		<element ref="text_l1b"><bounds xc="40.5" yc="80.25" width="1.25" height="8.5" /><orientation rotate="90" /></element>
 
 		<element ref="text_l2"><bounds xc="63" yc="72.5" width="10" height="1.25" /></element>
 

@@ -80,11 +80,11 @@ authors:hap
 	</element>
 	<element name="text_bent">
 		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="ENT"><color red="0.07" green="0.07" blue="0.07" /></text>
+		<text string=" ENT "><color red="0.07" green="0.07" blue="0.07" /></text>
 	</element>
 	<element name="text_bclr">
 		<rect><color red="0.77" green="0.77" blue="0.77" /></rect>
-		<text string="CLR"><color red="0.07" green="0.07" blue="0.07" /></text>
+		<text string=" CLR "><color red="0.07" green="0.07" blue="0.07" /></text>
 	</element>
 
 	<element name="text_bp">
