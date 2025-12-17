@@ -443,7 +443,7 @@ uint32_t powervr2_device::tex_r_yuv_vq(texinfo *t, float x, float y)
 {
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
-	int idx = (reinterpret_cast<uint8_t *>(dc_texture_ram))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
+	int idx = (reinterpret_cast<uint8_t *>(&dc_texture_ram[0]))[BYTE_XOR_LE(t->address + dilated1[t->cd][xt >> 1] + dilated0[t->cd][yt >> 1])];
 	int addrp = t->vqbase + 8*idx + (dilated1[t->cd][xt & 1] + dilated0[t->cd][yt & 1])*2;
 	uint16_t c1 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp));
 	uint16_t c2 = *(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp+4));
@@ -456,7 +456,7 @@ uint32_t powervr2_device::tex_r_1555_n(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (t->stride*yt + xt) * 2;
-	return cv_1555z(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_1555z(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_1555_tw(texinfo *t, float x, float y)
@@ -464,7 +464,7 @@ uint32_t powervr2_device::tex_r_1555_tw(texinfo *t, float x, float y)
 	int xt = t->u_func(x, t->sizex);
 	int yt = t->v_func(y, t->sizey);
 	int addrp = t->address + (dilated1[t->cd][xt] + dilated0[t->cd][yt]) * 2;
-	return cv_1555(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram)) + WORD_XOR_LE(addrp)));
+	return cv_1555(*(uint16_t *)((reinterpret_cast<uint8_t *>(&dc_texture_ram[0])) + WORD_XOR_LE(addrp)));
 }
 
 uint32_t powervr2_device::tex_r_1555_vq(texinfo *t, float x, float y)
