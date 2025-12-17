@@ -236,47 +236,47 @@ static INPUT_PORTS_START( backgamn )
 	PORT_DIPSETTING(0x01, "pro Spiel")            // per Game
 	PORT_DIPNAME(0x02, 0x00, "Spielpreis")        // Game Price
 	PORT_DIPSETTING(0x00, "voller Preis")         // full price
-  PORT_DIPSETTING(0x02, "halber Preis")         // half price
-  PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, "halber Preis")         // half price
+	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x04, DEF_STR(On))
 	PORT_DIPNAME(0x08, 0x00, "Highscore löschen") // Clear Highscore
 	PORT_DIPSETTING(0x00, "nach 30 Tg.")          // after 30 days
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
-  PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x10, DEF_STR(On))
-  PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x20, DEF_STR(On))
-  PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x40, DEF_STR(On))
 	PORT_DIPNAME(0x80, 0x00, "Sprache")           // Language
 	PORT_DIPSETTING(0x00, "deutsch")              // German
 	PORT_DIPSETTING(0x80, "englisch")             // English
 
-  PORT_START("SW2")
+	PORT_START("SW2")
 	PORT_DIPNAME(0x01, 0x00, DEF_STR(Unused))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 	PORT_DIPNAME(0x02, 0x00, DEF_STR(Unused))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
-  PORT_DIPSETTING(0x02, DEF_STR(On))
-  PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x04, DEF_STR(On))
 	PORT_DIPNAME(0x08, 0x00, DEF_STR(Unused))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
-  PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x10, DEF_STR(On))
-  PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x20, DEF_STR(On))
-  PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
-  PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 	PORT_DIPSETTING(0x40, DEF_STR(On))
 	PORT_DIPNAME(0x80, 0x00, DEF_STR(Unused))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
@@ -330,7 +330,7 @@ ROM_START( backgamn )
 	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 ROM_END
 
-ROM_START( backgamw )
+ROM_START( backgamnw )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "backgammon_wand_f2_i.u19",  0x00000, 0x10000, CRC(45e280d2) SHA1(65dff9d4884af2d37138f79d71bddd223433b13c) )
 	ROM_LOAD16_BYTE( "backgammon_wand_f2_ii.u20", 0x00001, 0x10000, CRC(ccc536c3) SHA1(82d9243d6f6e05d4ce83d1080c6c038852d2398c) )
@@ -343,7 +343,7 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME                FLAGS
-GAME( 199?, manohman, 0,        manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Mann, oh-Mann",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME( 1990, backgamn, 0,        manohman, backgamn, manohman_state, empty_init, ROT0, "Merkur", "Backgammon",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME( 1990, backgamw, backgamn, manohman, backgamn, manohman_state, empty_init, ROT0, "Merkur", "Backgammon (Wand)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY   FULLNAME                FLAGS
+GAME( 199?, manohman,  0,        manohman, manohman, manohman_state, empty_init, ROT0, "Merkur", "Mann, oh-Mann",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, backgamn,  0,        manohman, backgamn, manohman_state, empty_init, ROT0, "Merkur", "Backgammon",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, backgamnw, backgamn, manohman, backgamn, manohman_state, empty_init, ROT0, "Merkur", "Backgammon (Wand)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_REQUIRES_ARTWORK )
