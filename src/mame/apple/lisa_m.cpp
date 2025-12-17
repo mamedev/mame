@@ -721,9 +721,8 @@ uint32_t lisa_state::screen_update_lisa(screen_device &screen, bitmap_ind16 &bit
 }
 
 #if 0   // we can execute directly out of read handlers now, so this shouldn't be necessary any more.  #if 0'd for documentation until we get everything working.
-DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
+DIRECT_UPDATE_HANDLER (lisa_state::lisa_OPbaseoverride)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 	/* upper 7 bits -> segment # */
 	int segment = (address >> 17) & 0x7f;
 	int the_seg = m_seg;

@@ -96,6 +96,7 @@ void sb16_lle_device::p1_w(uint8_t data)
 uint8_t sb16_lle_device::p2_r()
 {
 	return 0;
+	// return (m_timer->period() == attotime::never) << 4;
 }
 
 void sb16_lle_device::p2_w(uint8_t data)
@@ -106,7 +107,7 @@ void sb16_lle_device::p2_w(uint8_t data)
 	 * bit2 -
 	 * bit3 -
 	 * bit4 - clock running?
-	 * bit5 - ?
+	 * bit5 - prescaler or clock input source (checked around PC=af1, guimo on low sound detail)
 	 * bit6 - ?
 	 * bit7 - ?
 	*/

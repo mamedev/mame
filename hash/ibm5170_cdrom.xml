@@ -197,10 +197,14 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 
 	<!-- DOS -->
 	<!-- http://redump.org/disc/69748/ -->
-	<software name="abspinball">
+	<!-- 486DX2 66 MHz minimum -->
+	<software name="abspinball" supported="partial">
 		<description>Absolute Pinball (Europe)</description>
 		<year>1996</year>
-		<publisher>21st Century Entertainment, Ltd.</publisher>
+		<publisher>21st Century Entertainment</publisher>
+		<notes><![CDATA[
+Unsupported optional [Thrustmaster Wizzard] or [Philips Virtual] Pinball controllers
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="absolute pinball (europe) (1996)" sha1="9758201f0f9d5578b0f72f7e53ab49a71daf7c31" />
@@ -209,10 +213,14 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 	</software>
 
 	<!-- http://redump.org/disc/20998/ -->
-	<software name="abspinballu" cloneof="abspinball">
+	<!-- 486DX2 66 MHz minimum -->
+	<software name="abspinballu" cloneof="abspinball" supported="partial">
 		<description>Absolute Pinball (USA)</description>
 		<year>1996</year>
-		<publisher>21st Century Entertainment, Ltd.</publisher>
+		<publisher>21st Century Entertainment</publisher>
+		<notes><![CDATA[
+Unsupported optional [Thrustmaster Wizzard] or [Philips Virtual] Pinball controllers
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="absolute pinball (usa) (1996)" sha1="10ef1b4ab7e885f24b27e2a41c35fd15b44d8b4c" />
@@ -629,12 +637,15 @@ Finnish language is only available in the installation setup
 		</part>
 	</software>
 
-	<!-- TODO: can't setup sb16 sound card properly, hangs at "TimerRegister Event" -->
-	<!-- TODO: disc swap doesn't work properly -->
 	<software name="alienscb" supported="partial">
 		<description>Aliens - A Comic Book Adventure (v1.01A)</description>
 		<year>1995</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+[SB16 LLE] autodetection can sometimes throw wrong results (or outright crash the system).
+[SB16 LLE] doesn't silence sound exiting playback test.
+Untested disc swap in game
+]]></notes>
 		<info name="version" value="1.01a" />
 
 		<part name="cdrom1" interface="cdrom">
@@ -1112,6 +1123,7 @@ Includes DOS and Windows installation setup.
 	</software>
 
 	<!-- DOS (recommended), Windows 95 -->
+	<!-- 486DX2 100 MHz -->
 	<software name="archdyn" supported="no">
 		<!-- 24/10/1996 RE -->
 		<description>Archimedean Dynasty (v1.115)</description>
@@ -1119,6 +1131,7 @@ Includes DOS and Windows installation setup.
 		<publisher>Blue Byte</publisher>
 		<notes><![CDATA[
 [SB16] No sound after title screen, hangs on every video (bypass by pressing mouse left button)
+Crashes when selecting instant action (at least in FreeDOS, verify)
 Cannot read sound configuration from Windows 95
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -1158,8 +1171,9 @@ Cannot read sound configuration from Windows 95
 	</software>
 
 	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
+	<!-- TODO: installer painfully slow in PC-98 -->
 	<software name="arabkid">
-		<description>Arabian Kid</description>
+		<description>Arabian Kid (Japan)</description>
 		<year>1996</year>
 		<publisher>ASCII / Yellow Horn</publisher>
 		<info name="alt_title" value="あらびあんKid" />
@@ -2411,13 +2425,13 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 
 	<!-- Windows 95 -->
 	<!-- Very slow on 486 -->
-	<!-- also known as Captain Claw -->
 	<!-- TODO: has transparency issues on main menu -->
 	<software name="clawj" supported="partial">
 		<description>Claw (Japan v1.2)</description>
 		<year>1997</year>
 		<publisher>Monolith Productions Inc.</publisher>
 		<info name="version" value="1.2" />
+		<info name="alt_title" value="Captain Claw" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3036,24 +3050,6 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Dig, The (USA) (Alt)" sha1="c4087004a4716ab167c5dc9d8556b8a985b3846a" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Source: http://redump.org/disc/92228/ -->
-	<!-- <rom name="Dig, The (Japan).cue" size="82" crc="7127b717" sha1="d0ffba436592b115b8ab5eb3b400210562d8031e"/> -->
-	<!-- <rom name="Dig, The (Japan).bin" size="778196832" crc="550c8138" sha1="3b3f8c72d86e380142299a91218139f32b34a682"/> -->
-	<software name="thedig_jp" cloneof="thedig">
-		<description>The Dig (Japan)</description>
-		<year>1995</year>
-		<publisher>MicroMouse</publisher>
-		<info name="developer" value="LucasArts" />
-		<info name="region" value="Japan" />
-		<sharedfeat name="platform" value="Windows 95 / NEC PC-98" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="Dig, The (Japan)" sha1="0930e3f659a57797e81b8c4c4b3cce44948f7a8f" />
 			</diskarea>
 		</part>
 	</software>
@@ -4039,22 +4035,6 @@ This release doesn't have audio speech.
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
-	<!-- 256 colors / 800x600 -->
-	<!-- TODO: no sound? -->
-	<software name="geolight" supported="partial">
-		<description>Geo Light Moon (Japan v1.00)</description>
-		<year>1997</year>
-		<publisher>Nihon Softec / J-Ware</publisher>
-		<info name="version" value="1.00" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="geolight" sha1="e49202c3ff76db5f7fb5f794655d40cc91acb4d9" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Source: http://redump.org/disc/63327/ -->
 	<!-- <rom name="Gobliiins (Italy) (En,Fr,De,Es,It).cue" size="238" crc="52c186e0" sha1="61eceed7d05957fdb3abd271f7a071edda51057f"/> -->
 	<!-- <rom name="Gobliiins (Italy) (En,Fr,De,Es,It) (Track 1).bin" size="21454944" crc="1bdb016b" sha1="550554365c94351a62a9709666cac1ce266b8fb0"/> -->
@@ -4694,7 +4674,7 @@ CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate 
 		<!-- Virgin Interactive for Europe -->
 		<publisher>Sir-Tech</publisher>
 		<notes><![CDATA[
-Has no [SB16] voices/SFXs in-game
+Bit of voice/SFXs trailing for [SB16 LLE] in-game
 Nemesis demo untested
 Untested multiplayer options
 ]]></notes>
@@ -4706,22 +4686,6 @@ Untested multiplayer options
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jagged_alliance_deadly_games_(sir-tech_software)(version_1.0)(multiplayer_cd)" sha1="8e4b601266c597a4dfe4b261c773b07dab4bc5bf"/>
-			</diskarea>
-		</part>
-	</software>
-
-
-	<!-- Windows 95 -->
-	<!-- Pentium class 60 MHz minimum -->
-	<software name="jakebrstj" supported="no">
-		<description>Jake Burst (Japan)</description>
-		<year>1997</year>
-		<publisher>Sierra / Pioneer Inc</publisher>
-		<info name="alt_title" value="ジェイクバースト" />
-		<part name="cdrom" interface="cdrom">
-			<feature name="disk_label" value="SPRW·5015" />
-			<diskarea name="cdrom">
-				<disk name="jake_b" sha1="5efd03633979db40cd37a4c1ba1176cdb8b35c83" />
 			</diskarea>
 		</part>
 	</software>
@@ -5001,20 +4965,6 @@ Untested multiplayer options
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="betrayal_at_krondor_1998" sha1="d58acdb5bc10c2ad9a4b6dd51438102785c44216" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 95 -->
-	<!-- Created from "KU2_IMPACT.cue" size="1107" crc="c08e9181" sha1="d051cf135a5c238ff0a44c08b85a9facfb453f54" -->
-	<!-- Created from "KU2_IMPACT.bin" size="725053392" crc="6980d026" sha1="71ce80ba25d657968d914df9a834172b99487b4f" -->
-	<software name="ku2impact">
-		<description>KU2 Impact (Japan)</description>
-		<year>1995</year>
-		<publisher>Panther Software</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
 			</diskarea>
 		</part>
 	</software>
@@ -6175,8 +6125,7 @@ Looks too dark on s3_764 (verify)
 	</software>
 
 	<!-- DOS / Windows 95 -->
-	<!-- TODO: no sound in DOS installer with SB16 -->
-	<!-- TODO: With sound card black screens when launching game in either OSes -->
+	<!-- 486DX2 66 MHz -->
 	<software name="redalert" supported="partial">
 		<description>Command &amp; Conquer - Red Alert</description>
 		<year>1996</year>
@@ -6286,7 +6235,7 @@ Looks too dark on s3_764 (verify)
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
 On 486 has popup and sometimes punts to Windows with no exception (verify)
-Sound mixing uses [8514] 16bpp
+Sound mixing menu screen uses [8514] 16bpp
 https://www.pcgamingwiki.com/wiki/Road_Rash
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
@@ -6310,7 +6259,7 @@ https://www.pcgamingwiki.com/wiki/Road_Rash
 	<!-- Windows 95 / Mac OS Japan AppleTalk 7.5 -->
 	<!-- Requires 16-bit True Color and 800x600 screen resolution -->
 	<software name="segata" supported="partial">
-		<description>Segata Sanshirou Choujin Densetsu</description>
+		<description>Segata Sanshirou Choujin Densetsu (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="せがた三四郎超人伝説" />
@@ -7687,8 +7636,7 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		<year>1995</year>
 		<publisher>Phantagram</publisher>
 		<notes><![CDATA[
-No [soundblaster] BGMs no matter the setting set in CONFIG.EXE
-Shows Phantagram logo with bottom red strip (DOS 6.22)
+Crashes in Windows 95 (verify)
 ]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7757,6 +7705,131 @@ Other stuff untested
 		<part name="cdrom4" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="corel_draw_6_cd4" sha1="7e88e8537ee0587554e60a77aeb4b2ecaad62f71" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 and Windows 95 OSR1/SP1 only. -->
+	<software name="nuwin10">
+		<description>Norton Utilities for Windows 95 (version 1.0)</description>
+		<year>1996</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19960221" />
+		<info name="version" value="1.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows 95 v1.0" sha1="a6c807d3da90666422658b2b565ad066630e86e3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows NT 4.0 only. -->
+	<software name="nuwin20nt">
+		<description>Norton Utilities for Windows NT 4.0</description>
+		<year>1997</year>
+		<publisher>Symantec</publisher>
+		<info name="language=" value="English" />
+		<info name="release" value="19970116" />
+		<info name="version" value="2.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows nt 4.0" sha1="199cf28b94745ae5536fcad8236da9b377541e8d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- For all versions of Windows 95 -->
+	<software name="nuwin20">
+		<description>Norton Utilities for Windows 95 (version 2.0)</description>
+		<year>1997</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19970605" />
+		<info name="version" value="2.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows 95 v2.0" sha1="13da9f0f14eafe88ab4c1692ddfc8f88fd7b3fa7" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- For all versions of Windows 95 -->
+	<software name="nuwin30">
+		<description>Norton Utilities for Windows 95 (version 3.0)</description>
+		<year>1997</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19971116" />
+		<info name="version" value="3.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities for windows 95 v3.0" sha1="f9c7b416b55b25aae9890968659ce320d77382a3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/98 -->
+	<software name="nuwin40">
+		<description>Norton Utilities 4.0</description>
+		<year>1999</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="release" value="19990228" />
+		<info name="version" value="4.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 4.0" sha1="1df10640139f876507928f83d8d07cd1135e17f4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/98 and El Torito bootable -->
+	<software name="nuwin45">
+		<description>Norton Utilities 2000</description>
+		<year>1999</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="19990809" />
+		<info name="version" value="4.5" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 2000" sha1="c338b8e9abca7570a7c6c98f920f67ba61fe816f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/NT 4.0/98/2000/Me and El Torito bootable -->
+	<software name="nuwin50">
+		<description>Norton Utilities 2001</description>
+		<year>2000</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20000827" />
+		<info name="version" value="5.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 2001" sha1="b2f56325694da71a646e5fc28784c38eb54abbe8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows NT 4.0/98/2000/Me and El Torito bootable -->
+	<software name="nuwin60">
+		<description>Norton Utilities 2002</description>
+		<year>2001</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English" />
+		<info name="release" value="20010809" />
+		<info name="version" value="6.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="norton utilities 2002" sha1="4b1acf7724d7d266f7e9974ec119b42839bc6af3" />
 			</diskarea>
 		</part>
 	</software>
