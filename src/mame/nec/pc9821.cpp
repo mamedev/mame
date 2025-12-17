@@ -513,16 +513,15 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0070, 0x007f).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
-	// TODO: check me, should derive from templated fn instead
-	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
+	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_2dd_ctrl_r<1>), FUNC(pc9821_state::fdc_2hd_2dd_ctrl_w<1>));
 	map(0x00a0, 0x00af).rw(FUNC(pc9821_state::pc9821_a0_r), FUNC(pc9821_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
 //  map(0x00b0, 0x00b3) PC9861k (serial port?)
 //  map(0x00b9, 0x00b9) PC9861k
 //  map(0x00bb, 0x00bb) PC9861k
 //  map(0x00bc, 0x00bf).rw(FUNC(pc9821_state::fdc_mode_ctrl_r), FUNC(pc9821_state::fdc_mode_ctrl_w));
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
-//  map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
-	//  map(0x00d8, 0x00df) AMD98 (sound?) board
+	map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_2dd_ctrl_r<0>), FUNC(pc9821_state::fdc_2hd_2dd_ctrl_w<0>));
+//  map(0x00d8, 0x00df) AMD98 sound board, N/A for PC-9821
 //  map(0x00f0, 0x00ff).rw(FUNC(pc9821_state::a20_ctrl_r), FUNC(pc9821_state::a20_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x0188, 0x018f).rw(FUNC(pc9821_state::pc9801_opn_r), FUNC(pc9821_state::pc9801_opn_w)); //ym2203 opn / <undefined>
 //  map(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
