@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!-- Spectrum Next software is typically distributed as loose files to be placed on SD cards for use with the system
+     This Software List contains those loose files put into SD card images as the system would expect -->
+
+<softwarelist name="specnext_sd" description="Spectrum Next SD Card images">
+
+	<!-- Operating System images -->
+
+	<software name="sys2411">
+		<description>System/Next 24.11</description>
+		<year>2024</year>
+		<publisher>SpecNext Ltd.</publisher>
+		<part name="card" interface="sdcard">
+			<diskarea name="harddriv">
+				<disk name="sys2411" sha1="947b7598a034258a3ead994eb3e96f3cada896a8" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+	
+	<!-- Software images -->
+	
+	<software name="fiona">
+		<description>Fiona's Flight</description>
+		<year>2025</year>
+		<publisher>rcallenbach</publisher>
+		<part name="card" interface="sdcard">
+			<diskarea name="harddriv">
+				<disk name="fiona" sha1="4e55ef0fb7323bc9d97ac3bb39d13f6825005709" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>	
+
+</softwarelist>
