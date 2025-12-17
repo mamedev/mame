@@ -1170,21 +1170,6 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
-	<!-- TODO: installer painfully slow in PC-98 -->
-	<software name="arabkid">
-		<description>Arabian Kid (Japan)</description>
-		<year>1996</year>
-		<publisher>ASCII / Yellow Horn</publisher>
-		<info name="alt_title" value="あらびあんKid" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kid" sha1="a837c3f4cde66b244bccbae22cb1cec83df6698d" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- DOS -->
 	<!-- TODO: videos farts/doesn't complete playback, eventually dies with a out of conventional memory error -->
 	<software name="arcappled" supported="no">
@@ -2423,23 +2408,6 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
-	<!-- Very slow on 486 -->
-	<!-- TODO: has transparency issues on main menu -->
-	<software name="clawj" supported="partial">
-		<description>Claw (Japan v1.2)</description>
-		<year>1997</year>
-		<publisher>Monolith Productions Inc.</publisher>
-		<info name="version" value="1.2" />
-		<info name="alt_title" value="Captain Claw" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="clawj" sha1="eb48e779ba6cb342fa661f3aa64df23149f16449" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- "CDROM not ISO9660 or High Sierra" when trying to DIR it -->
 	<software name="clifdang" supported="no">
 		<description>Clif Danger (Budget Smile Edition)</description>
@@ -3467,10 +3435,17 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		</part>
 	</software>
 
-	<software name="elecpop">
+	<!-- DOS / Windows -->
+	<!-- 486 minimum -->
+	<!-- Earlier Korean and Capcom USA versions known to exist -->
+	<!-- TODO: test with FM Towns -->
+	<software name="elecpopj">
 		<description>Electronic Popple (Japan)</description>
-		<year>1997</year>
-		<publisher>Nativesoft Inc. / Fujitsu / Byteshock!</publisher>
+		<year>1998</year>
+		<publisher>Nativesoft / Fujitsu / Byteshock!</publisher>
+		<notes><![CDATA[
+pc98: incompatible? DOS installer tries to check AT-style keyboard, Windows manages to install but hangs on .exe at DPMI allocation (verify)
+]]></notes>
 		<info name="alt_title" value="Electronic ぽっぷる" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4930,20 +4905,6 @@ Untested multiplayer options
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
-	<!-- Cannot be installed on non-Japanese OS -->
-	<!-- Created from "Kotobuki.iso" size="90093568" crc="ff036452" sha1="ee62d7a2fa124b3535d0f1abc323a4aa3e1f1a35" -->
-	<software name="kotobuki" supported="partial">
-		<description>Kotobuki (Japan)</description>
-		<year>1997</year>
-		<publisher>C's Ware</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="kotobuki" sha1="7b0afa327d4b4d4be2c1069e60d9679900db93b8" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Untouched image from original CD created with an ASUS DRW-1814BLT (EAC drive sample read offset reported as +6)
 	   If you subtract 0x18 (4 * 6) bytes from a .wav extracted from this CHD the audio matches a rip done with EAC (verified) -->
 	<software name="krondor">
@@ -5340,33 +5301,6 @@ The Curse of Monkey Island (Windows 95 demo version)
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Monkey Island Madness (USA)" sha1="2749dffef8844ef0edffb206a7d127b9fe3d34fb" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 95J -->
-	<software name="moon" supported="no">
-		<description>Moon (Japan)</description>
-		<year>1998</year>
-		<publisher>Over Rise</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="moon" sha1="fbed194fc5a070dd7be8dc20f990dda9e73a2322" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 95 -->
-	<!-- Pentium class -->
-	<!-- Direct 3D -->
-	<!-- Missing dependency on English Win 98, requires Japanese OS? -->
-	<software name="moondrg" supported="no">
-		<description>Moon Dragon (Japan)</description>
-		<year>1997</year>
-		<publisher>Gaea</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="moondrg" sha1="fc79ee0bbc66f22c32fa4a171ba7c97094b195e6" />
 			</diskarea>
 		</part>
 	</software>
