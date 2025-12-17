@@ -2740,24 +2740,25 @@ public:
 
 		osd_printf_verbose("Game Controller: Start initialization\n");
 		int stick_count = 0;
-		SDL_GetJoysticks(&stick_count);
+		const auto joysticks = SDL_GetJoysticks(&stick_count);
 		for (int physical_stick = 0; physical_stick < stick_count; physical_stick++)
 		{
 			// try to open as a game controller
 			SDL_Gamepad *ctrl = nullptr;
-			if (m_initialized_game_controller && SDL_IsGamepad(physical_stick))
+			if (m_initialized_game_controller && SDL_IsGamepad(joysticks[physical_stick]))
 			{
-				ctrl = SDL_OpenGamepad(physical_stick);
+				ctrl = SDL_OpenGamepad(joysticks[physical_stick]);
 				if (!ctrl)
-					osd_printf_warning("Game Controller: Could not open SDL game controller %d: %s.\n", physical_stick, SDL_GetError());
+					osd_printf_warning("Game Controller: Could not open SDL game controller %d: %s.\n", joysticks[physical_stick], SDL_GetError());
 			}
 
 			// fall back to joystick API if necessary
 			if (!ctrl)
-				create_joystick_device(physical_stick, sixaxis_mode);
+				create_joystick_device(joysticks[physical_stick], sixaxis_mode);
 			else
-				create_game_controller_device(physical_stick, ctrl);
+				create_game_controller_device(joysticks[physical_stick], ctrl);
 		}
+		SDL_free(joysticks);
 
 		constexpr int joy_event_types[] = {
 				int(SDL_EVENT_JOYSTICK_AXIS_MOTION),
