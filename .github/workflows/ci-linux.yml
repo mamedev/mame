@@ -60,8 +60,7 @@ jobs:
         ARCHOPTS: ${{ matrix.archopts }}
         SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
-        SDL_PKGCONFIG_PATH: /home/linuxbrew/.linuxbrew/bin
-      run: make -j3
+      run: export PKG_CONFIG_PATH=`/home/linuxbrew/.linuxbrew/bin/brew --prefix sdl3`/lib/pkgconfig ; make -j3
     - name: Validate
       run: ./${{ matrix.executable }} -validate
     - name: Reconcile driver list
