@@ -10,56 +10,56 @@
     from the 1980s.
 
     CPU: MAF 80A39HL
-	ROM: ST M2764AF6
-	ADC0809CCN
-	LM2901
-	SN74LS373N
-	SN74LS00N
-	XTAL 7.372 MHz
+    ROM: ST M2764AF6
+    ADC0809CCN
+    LM2901
+    SN74LS373N
+    SN74LS00N
+    XTAL 7.372 MHz
 
-	_________________________
-	|          7   A 0       |
-	|          4   D 8       |
-	C          3   C 0    7  |
-	O          7     9    4  |
-	N  L2      3          0  |
-	N  M0    M2764AF6  X  0  |
-	|  91          80A39HL   |
-	|________________________|
+    _________________________
+    |          7   A 0       |
+    |          4   D 8       |
+    C          3   C 0    7  |
+    O          7     9    4  |
+    N  L2      3          0  |
+    N  M0    M2764AF6  X  0  |
+    |  91          80A39HL   |
+    |________________________|
 
-	Connector
-	1  Engine RPM
-	2  Coolant temperture (ADC IN2)
-	3  GND
-	4  Throttle switch (T0)
-	5  Lambda sensor
-	6  GND Air sensor
-	7  GND
-	8  Check engine (not populated) (P1.3)
-	9  GND
-	10 GND
-	11 Injector (P1.5)
-	12 Injector (P1.5)
-	13 Ignition (ADC IN1)
-	14 Air in temperature (ADC IN3)
-	15 Air amount (ADC IN0)
-	16 GND
-	17 GND
-	18 GND
-	19 Air sensor power
-	20 Fuel pump (P1.4)
-	21 Fuel pump (P1.4)
-	22 GND
-	23 Injector (P1.5)
-	24 Injector (P1.5)
-	25 GND
+    Connector
+    1  Engine RPM
+    2  Coolant temperture (ADC IN2)
+    3  GND
+    4  Throttle switch (T0)
+    5  Lambda sensor
+    6  GND Air sensor
+    7  GND
+    8  Check engine (not populated) (P1.3)
+    9  GND
+    10 GND
+    11 Injector (P1.5)
+    12 Injector (P1.5)
+    13 Ignition (ADC IN1)
+    14 Air in temperature (ADC IN3)
+    15 Air amount (ADC IN0)
+    16 GND
+    17 GND
+    18 GND
+    19 Air sensor power
+    20 Fuel pump (P1.4)
+    21 Fuel pump (P1.4)
+    22 GND
+    23 Injector (P1.5)
+    24 Injector (P1.5)
+    25 GND
 
 **************************************************************************/
 
 /*
     TODO:
 
-	- Figure out how the ADC is accessed
+    - Figure out how the ADC is accessed
 */
 
 #include "emu.h"
@@ -148,7 +148,7 @@ void digijet_state::p1_w(uint8_t data)
 	machine().output().set_value("led_fuel", !fuel);
 	machine().output().set_value("led_inject", !inject);
 	machine().output().set_value("led_check", !check);
-	
+
 	if (watchdog)
 	{
 		m_watchdog->watchdog_reset();
@@ -202,7 +202,7 @@ void digijet_state::digijet(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &digijet_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
-	
+
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set_ioport("LAMBDA");
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
@@ -221,7 +221,7 @@ void digijet_state::digijet90(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &digijet_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
-	
+
 	m_maincpu->p1_out_cb().set(FUNC(digijet_state::p1_w));
 	m_maincpu->p2_in_cb().set_ioport("LAMBDA");
 	m_maincpu->t0_in_cb().set_ioport("THROTTLE");
