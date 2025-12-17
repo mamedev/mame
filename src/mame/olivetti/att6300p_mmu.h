@@ -18,14 +18,11 @@ public:
 	// construction/destruction
 	att6300p_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// All CPU accesses are directed to the MMU via these calls
-	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
-	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint16_t io_r(offs_t offset, uint16_t mem_mask);
-	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	auto trapio_callback() { return m_trapio.bind(); }
 
 	// MMU configuration
-	void set_protected_mode_enabled(bool enabled);
+	void set_a20_enabled(bool enabled);
+	void set_protection_enabled(bool enabled);
 	void set_mem_mapping(uint32_t target_addr[32]);
 	void set_mem_setup_enabled(bool enabled);
 	void set_io_setup_enabled(bool enabled);
@@ -33,7 +30,11 @@ public:
 	void set_io_read_traps_enabled(bool enabled);
 	void set_io_write_traps_enabled(bool enabled);
 
-	auto trapio_callback() { return m_trapio.bind(); }
+	// All CPU accesses are directed to the MMU via these calls
+	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
+	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t io_r(offs_t offset, uint16_t mem_mask);
+	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 protected:
 	// device-level overrides
@@ -53,7 +54,7 @@ private:
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_mem16_space;
 	address_space *m_io;
 
-	bool m_protected_mode;
+	bool m_protection_enabled;
 	uint32_t m_map_table[32];
 	uint32_t m_map_imask, m_map_omask;
 	bool m_mem_wr_fastpath;

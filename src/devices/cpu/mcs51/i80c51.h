@@ -24,10 +24,19 @@ public:
 	i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	u8 m_slave_address, m_slave_mask;
+
 	i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width);
 
+	virtual void sfr_map(address_map &map) override ATTR_COLD;
 	virtual bool manage_idle_on_interrupt(u8 ints) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual void device_start() override ATTR_COLD;
+
+	void slave_address_w(u8 data);
+	u8 slave_address_r();
+	void slave_mask_w(u8 data);
+	u8 slave_mask_r();
 };
 
 class i80c31_device : public i80c51_device

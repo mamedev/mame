@@ -11,8 +11,8 @@ authors:hap
 	<element name="disk_black"><disk><color red="0.0" green="0.0" blue="0.0" /></disk></element>
 	<element name="disk_grey"><disk><color red="0.6" green="0.6" blue="0.6" /></disk></element>
 
-	<element name="text_game"><text string="GAME (1-3)" align="1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
-	<element name="text_skill"><text string="SKILL LEVEL (1-4)" align="1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_game"><text string="GAME (1-3)"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="text_skill"><text string="SKILL LEVEL (1-4)"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="text_last"><text string="LAST"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="text_start"><text string="START"><color red="0.0" green="0.0" blue="0.0" /></text></element>
 	<element name="text_long"><text string="LONGEST"><color red="0.0" green="0.0" blue="0.0" /></text></element>
@@ -129,7 +129,7 @@ authors:hap
 		<element ref="black"><bounds x="52" y="90" width="96" height="1" /></element>
 
 		<!-- switches -->
-		<element ref="text_game"><bounds x="68" y="93" width="20" height="4" /></element>
+		<element ref="text_game"><bounds x="53" y="93" width="45" height="4" /></element>
 		<element ref="switch_game" inputtag="IN.0" inputmask="0x07" inputraw="yes"><bounds x="74" y="98" width="3" height="4" /></element>
 		<element ref="nothing" clickthrough="no"><bounds x="73.9" y="97.9" width="3.2" height="4.2" /></element>
 		<element ref="text_lg"><bounds x="66.5" y="97" width="6" height="6" /></element>
@@ -137,7 +137,7 @@ authors:hap
 		<element ref="text_rg"><bounds x="78" y="97" width="6" height="6" /></element>
 		<element ref="nothing" inputtag="SWITCH" inputmask="0x02"><bounds x="77" y="96" width="8" height="8" /></element>
 
-		<element ref="text_skill"><bounds x="112" y="93" width="30" height="4" /></element>
+		<element ref="text_skill"><bounds x="102" y="93" width="45" height="4" /></element>
 		<element ref="switch_skill" inputtag="IN.3" inputmask="0x0f" inputraw="yes"><bounds x="123" y="98" width="3" height="4" /></element>
 		<element ref="nothing" clickthrough="no"><bounds x="122.9" y="97.9" width="3.2" height="4.2" /></element>
 		<element ref="text_lb"><bounds x="115.5" y="97" width="6" height="6" /></element>

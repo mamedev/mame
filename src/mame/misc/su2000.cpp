@@ -82,9 +82,10 @@ class su2000_state : public pcat_base_state
 {
 public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag){ }
+		: pcat_base_state(mconfig, type, tag)
+	{ }
 
-	void su2000(machine_config &config);
+	void su2000(machine_config &config) ATTR_COLD;
 
 private:
 	void pcat_io(address_map &map) ATTR_COLD;
@@ -129,10 +130,9 @@ void su2000_state::pcat_io(address_map &map)
  *************************************************************/
 
 #if 0
-static void ide_interrupt(device_t *device, int state)
+void su2000_state::ide_interrupt(int state)
 {
-	su2000_state *drvstate = device->machine().driver_data<su2000_state>();
-	pic8259_ir6_w(drvstate->m_pic8259_2, state);
+	m_pic8259_2->ir6_w(state);
 }
 #endif
 

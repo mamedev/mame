@@ -60,13 +60,13 @@ private:
 	void data_w(u8 data);
 	void scsi_reset_w(u8 data);
 	u8 clock_r();
-	void volume_control_w(u8 data);
 	u8 id_r();
 	void rom_bank_w(u8 data);
 	template <unsigned N> u8 volume_meter_r();
 
 	bool m_clock_hb;
 	bool m_cddrive_enable;
+	bool m_dma_enable;
 	int m_sasi_sel;
 	int m_sasi_req;
 

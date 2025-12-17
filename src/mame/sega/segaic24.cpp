@@ -16,7 +16,10 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 
 #include "emu.h"
 #include "segaic24.h"
+
 #include "screen.h"
+
+#include "vr.lh"
 
 
 DEFINE_DEVICE_TYPE(S24TILE,   segas24_tile_device,   "segas24_tile",   "Sega System 24 Tilemap")
@@ -99,7 +102,7 @@ void segas24_tile_device::device_start()
 }
 
 void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const uint16_t *mask,
-								uint16_t tpri, uint8_t lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
+								uint16_t tpri, uint8_t lpri, int flags, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	const uint16_t *source = &bm.pix(sy, sx);
 	const uint8_t  *trans = &tm.pix(sy, sx);
@@ -138,7 +141,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 				if(!m) {
 					// 1- 128 pixels from this layer
 					for(int x=0; x<128; x++) {
-						if(*srct++ == tpri) {
+						if(*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE) {
 							*dst = *src;
 							*pr |= lpri;
 						}
@@ -160,7 +163,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 						if(!(m & 0x8000)) {
 							int xx;
 							for(xx=0; xx<8; xx++)
-								if(srct[xx] == tpri) {
+								if(srct[xx] == tpri || flags & TILEMAP_DRAW_OPAQUE) {
 									dst[xx] = src[xx];
 									pr[xx] |= lpri;
 								}
@@ -179,7 +182,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 				if(!m) {
 					// 1- 128 pixels from this layer
 					for(int x = cur_x; x<llx1; x++) {
-						if(*srct++ == tpri) {
+						if(*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE) {
 							*dst = *src;
 							*pr |= lpri;
 						}
@@ -198,7 +201,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 				} else {
 					// 3- 128 pixels from both layers
 					for(int x=cur_x; x<llx1; x++) {
-						if(*srct++ == tpri && !(m & (0x8000 >> (x >> 3)))) {
+						if((*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE) && !(m & (0x8000 >> (x >> 3)))) {
 							*dst = *src;
 							*pr |= lpri;
 						}
@@ -226,7 +229,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 // priority_bitmap
 
 void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const uint16_t *mask,
-								uint16_t tpri, uint8_t lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
+								uint16_t tpri, uint8_t lpri, int flags, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	const uint16_t *source = &bm.pix(sy, sx);
 	const uint8_t  *trans = &tm.pix(sy, sx);
@@ -264,7 +267,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 				if(!m) {
 					// 1- 128 pixels from this layer
 					for(int x=0; x<128; x++) {
-						if(*srct++ == tpri)
+						if(*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE)
 							*dst = pens[*src];
 						src++;
 						dst++;
@@ -281,7 +284,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 					for(int x=0; x<128; x+=8) {
 						if(!(m & 0x8000)) {
 							for(int xx=0; xx<8; xx++)
-								if(srct[xx] == tpri)
+								if(srct[xx] == tpri || flags & TILEMAP_DRAW_OPAQUE)
 									dst[xx] = pens[src[xx]];
 						}
 						src += 8;
@@ -297,7 +300,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 				if(!m) {
 					// 1- 128 pixels from this layer
 					for(int x = cur_x; x<llx1; x++) {
-						if(*srct++ == tpri)
+						if(*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE)
 							*dst = pens[*src];
 						src++;
 						dst++;
@@ -313,7 +316,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 					// 3- 128 pixels from both layers
 					int x;
 					for(x=cur_x; x<llx1; x++) {
-						if(*srct++ == tpri && !(m & (0x8000 >> (x >> 3))))
+						if((*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE) && !(m & (0x8000 >> (x >> 3))))
 							*dst = pens[*src];
 
 						src++;
@@ -377,7 +380,7 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 
 					h = hscr & 0x1ff;
 					tile_layer[l1]->set_scrollx(0, -h);
-					tile_layer[l1]->draw(screen, bitmap, c, tpri, lpri);
+					tile_layer[l1]->draw(screen, bitmap, c, tpri | flags, lpri);
 				}
 				break;
 			}
@@ -404,8 +407,8 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 
 					c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
 
-					tile_layer[l1]->draw(screen, bitmap, c1, tpri, lpri);
-					tile_layer[l1^1]->draw(screen, bitmap, c2, tpri, lpri);
+					tile_layer[l1]->draw(screen, bitmap, c1, tpri | flags, lpri);
+					tile_layer[l1^1]->draw(screen, bitmap, c2, tpri | flags, lpri);
 				}
 				break;
 			}
@@ -428,8 +431,8 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
 
-				tile_layer[layer]->draw(screen, bitmap, c1, tpri, lpri);
-				tile_layer[layer^1]->draw(screen, bitmap, c2, tpri, lpri);
+				tile_layer[layer]->draw(screen, bitmap, c1, tpri | flags, lpri);
+				tile_layer[layer^1]->draw(screen, bitmap, c2, tpri | flags, lpri);
 				break;
 			}
 			case 2: case 3: {
@@ -444,8 +447,8 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 				if(!((+hscr) & 0x200))
 					layer ^= 1;
 
-				tile_layer[layer]->draw(screen, bitmap, c1, tpri, lpri);
-				tile_layer[layer^1]->draw(screen, bitmap, c2, tpri, lpri);
+				tile_layer[layer]->draw(screen, bitmap, c1, tpri | flags, lpri);
+				tile_layer[layer^1]->draw(screen, bitmap, c2, tpri | flags, lpri);
 				break;
 			}
 			}
@@ -466,11 +469,11 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 				hscr = (-hscrtb[y]) & 0x1ff;
 				if(hscr + 496 <= 512) {
 					// Horizontal split unnecessary
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y,      496,      y+1);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr, vscr,        0,        y,      496,      y+1);
 				} else {
 					// Horizontal split necessary
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y, 512-hscr,      y+1);
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        y,      496,      y+1);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr, vscr,        0,        y, 512-hscr,      y+1);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win,    0, vscr, 512-hscr,        y,      496,      y+1);
 				}
 				vscr = (vscr + 1) & 0x1ff;
 			}
@@ -482,25 +485,25 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 				// Horizontal split unnecessary
 				if(vscr + 384 <= 512) {
 					// Vertical split unnecessary
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496,      384);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr, vscr,        0,        0,      496,      384);
 				} else {
 					// Vertical split necessary
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0,      496, 512-vscr);
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr,      496,      384);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr, vscr,        0,        0,      496, 512-vscr);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr,    0,        0, 512-vscr,      496,      384);
 
 				}
 			} else {
 				// Horizontal split necessary
 				if(vscr + 384 <= 512) {
 					// Vertical split unnecessary
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr,      384);
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496,      384);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr, vscr,        0,        0, 512-hscr,      384);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win,    0, vscr, 512-hscr,        0,      496,      384);
 				} else {
 					// Vertical split necessary
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        0, 512-hscr, 512-vscr);
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win,    0, vscr, 512-hscr,        0,      496, 512-vscr);
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win, hscr,    0,        0, 512-vscr, 512-hscr,      384);
-					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, win,    0,    0, 512-hscr, 512-vscr,      496,      384);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr, vscr,        0,        0, 512-hscr, 512-vscr);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win,    0, vscr, 512-hscr,        0,      496, 512-vscr);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win, hscr,    0,        0, 512-vscr, 512-hscr,      384);
+					draw_rect(screen, bm, tm, bitmap, mask, tpri, lpri, flags, win,    0,    0, 512-hscr, 512-vscr,      496,      384);
 				}
 			}
 		}

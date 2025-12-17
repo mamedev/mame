@@ -51,10 +51,10 @@ TODO:
 
 TODO (MD side):
 - some games (orunnersj, timekillu, rhythmld and late SGDK games) fails on Z80 bus request stuff;
-- dashdes: is a flickerfest during gameplay;
+- dashdes: is a flickerfest during gameplay (fixed?);
 - sonic2/combatca: no interlace support in 2-players mode;
 - dheadj: scrolling issues in stage 4-1 (blocks overflowing with );
-- shangon/skitchin: one line off during gameplay;
+- skitchin: one line off during gameplay;
 - caesar: no sound;
 - gynougj: stray tile on top-left of title screen;
 
@@ -880,6 +880,7 @@ void teradrive_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 //  SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+//  SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 //  SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");

@@ -1739,6 +1739,7 @@ void pc6001_state::pc6001(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
 	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
+	SOFTWARE_LIST(config, "cass_list_pc6001").set_original("pc6001_cass");
 
 //  CASSETTE(config, m_cassette);
 //  m_cassette->set_formats(pc6001_cassette_formats);
@@ -1776,6 +1777,9 @@ void pc6001mk2_state::pc6001mk2(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pc6001m2);
 
 	UPD7752(config, "upd7752", PC6001_MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	SOFTWARE_LIST(config, "cass_list_pc6001mk2").set_original("pc6001mk2_cass");
+
 }
 
 void pc6601_state::floppy_formats(format_registration &fr)

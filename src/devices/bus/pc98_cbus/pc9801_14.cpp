@@ -6,9 +6,6 @@ PC9801-14 sound board
 
 TMS3631 sound chip (same as Siel DK-600 / Opera 6)
 4 octaves, 12 notes, 8 channels
-CH1 and CH2 are fixed to center with no envelope
-CH3-5 are fixed to the left
-CH6-8 to the right
 7 knobs on back panel, F2/F4/F8/F16 then L/R and VOL
 
 References:
@@ -23,13 +20,13 @@ TODO:
 
 - Known games with PC9801-14 support
   gamepac1 - flappy
+  albatros (maybe? Reads $188 at startup but doesn't do anything with it?)
 
 **************************************************************************************************/
 
 #include "emu.h"
 
 #include "pc9801_14.h"
-
 #include "speaker.h"
 
 
@@ -39,14 +36,15 @@ TODO:
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_14, pc9801_14_device, "pc9801_14", "NEC PC-9801-14")
+DEFINE_DEVICE_TYPE(PC9801_14, pc9801_14_device, "pc9801_14", "NEC PC-9801-14 music card")
 
 pc9801_14_device::pc9801_14_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_14, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_ppi(*this, "ppi")
 	, m_pit(*this, "pit")
-//  , m_tms(*this, "tms")
+	, m_tms(*this, "tms")
+	, m_bios(*this, "bios")
 {
 }
 
@@ -60,23 +58,36 @@ void pc9801_14_device::device_add_mconfig(machine_config &config)
 	PIT8253(config, m_pit);
 	m_pit->set_clk<2>(1'996'800 / 8);
 	m_pit->out_handler<2>().set([this] (int state) {
-		m_bus->int_w<5>(state);
+		// TODO: may require inverted polarity
+		m_bus->int_w(5, state);
 	});
 
 	I8255(config, m_ppi);
-	m_ppi->out_pa_callback().set([this](uint8_t data) { LOG("TMS3631: PA envelope 1 %02x\n", data); });
-	m_ppi->out_pb_callback().set([this](uint8_t data) { LOG("TMS3631: PB envelope 2 %02x\n", data); });
+	m_ppi->out_pa_callback().set([this](u8 data) { LOG("TMS3631: PA envelope 1 %02x\n", data); });
+	m_ppi->out_pb_callback().set([this](u8 data) { LOG("TMS3631: PB envelope 2 %02x\n", data); });
 //  m_ppi->in_pc_callback().set_constant(0x08);
-	m_ppi->out_pc_callback().set([this](uint8_t data) { LOG("TMS3631: data %02x\n", data); });
+	m_ppi->out_pc_callback().set(m_tms, FUNC(tms3631_device::data_w));
 
 	// TODO: TMS3631-RI104 & TMS3631-RI105
-	// TMS3631(config, m_tms, 1'996'800);
-	// m_tms->add_route(0, "speaker", 0.5, 0);
-	// m_tms->add_route(1, "speaker", 0.5, 1);
+	TMS3631(config, m_tms, 1'996'800);
+	// CH1 and CH2 are fixed to center with no envelope
+	m_tms->add_route(0, "speaker", 0.5, 0);
+	m_tms->add_route(0, "speaker", 0.5, 1);
+	m_tms->add_route(1, "speaker", 0.5, 0);
+	m_tms->add_route(1, "speaker", 0.5, 1);
+	// CH3-5 are fixed to the left
+	m_tms->add_route(2, "speaker", 0.5, 0);
+	m_tms->add_route(3, "speaker", 0.5, 0);
+	m_tms->add_route(4, "speaker", 0.5, 0);
+	// CH6-8 to the right
+	m_tms->add_route(5, "speaker", 0.5, 1);
+	m_tms->add_route(6, "speaker", 0.5, 1);
+	m_tms->add_route(7, "speaker", 0.5, 1);
+
 }
 
 ROM_START( pc9801_14 )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "vfz01_00.bin", 0x0001, 0x2000, CRC(3b227477) SHA1(85474b0550d58395ae9ca53658f93ad2f87fdd4d) )
 	ROM_LOAD16_BYTE( "vfz02_00.bin", 0x0000, 0x2000, CRC(a386ab6b) SHA1(5b014c5de1b8e41a412cafd61d7e9d18abdeb6be) )
 ROM_END
@@ -107,15 +118,26 @@ void pc9801_14_device::device_start()
 
 void pc9801_14_device::device_reset()
 {
-	// assumed, loads up in n88bas61 with switch.n88 setup
-	m_bus->program_space().install_rom(
-		0xcc000,
-		0xcffff,
-		memregion(this->subtag("sound_bios").c_str())->base()
-	);
-
-	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_14_device::io_map);
 }
+
+void pc9801_14_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		// assumed, loads up in n88bas61 with switch.n88 setup
+		logerror("map ROM at 0xcc000-0xcffff\n");
+		m_bus->space(AS_PROGRAM).install_rom(
+			0xcc000,
+			0xcffff,
+			m_bios->base()
+		);
+	}
+	else if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_14_device::io_map);
+	}
+}
+
 
 void pc9801_14_device::io_map(address_map &map)
 {
@@ -128,7 +150,7 @@ void pc9801_14_device::io_map(address_map &map)
 	// 0x00 and 0xff values aren't valid
 	map(0x008e, 0x008e).lr8(NAME([this] () { LOG("PC9801-14: read base port / identifier\n"); return 0x08; }));
 	// mirror according to io_sound.txt
-	map(0x0188, 0x0188).mirror(2).lw8(NAME([this] (offs_t offset, u8 data) { LOG("TMS3631 mask %02x\n", data); }));
+	map(0x0188, 0x0188).mirror(2).w(m_tms, FUNC(tms3631_device::enable_w));
 	map(0x018c, 0x018c).lrw8(
 		NAME([this] (offs_t offset) { return m_pit->read(2); }),
 		NAME([this] (offs_t offset, u8 data) { m_pit->write(2, data); })

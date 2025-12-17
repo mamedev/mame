@@ -2121,7 +2121,7 @@ void alpha68k_V_state::init_gangwars()
 
 void alpha68k_V_state::init_sbasebal()
 {
-	u16 *rom = (u16 *)memregion("maincpu")->base();
+	u16 *rom = &memregion("maincpu")->as_u16();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
 	   calculate the ball speed when a strike is scored, notice that current emulation

@@ -102,8 +102,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	uint8_t stv_ioga_r(offs_t offset);
-	void stv_ioga_w(offs_t offset, uint8_t data);
+	uint8_t ioga_r(offs_t offset);
+	void ioga_w(offs_t offset, uint8_t data);
 	uint8_t critcrsh_ioga_r(offs_t offset);
 	void critcrsh_ioga_w(offs_t offset, uint8_t data);
 	uint8_t magzun_ioga_r(offs_t offset);
@@ -197,9 +197,9 @@ public:
 #define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
 #define BEF_0   m_vdp1_regs[0x010/2]&=~0x0001
-#define STV_VDP1_TVMR ((m_vdp1_regs[0x000/2])&0xffff)
-#define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
-#define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
+#define VDP1_TVMR ((m_vdp1_regs[0x000/2])&0xffff)
+#define VDP1_VBE  ((VDP1_TVMR & 0x0008) >> 3)
+#define VDP1_TVM  ((VDP1_TVMR & 0x0007) >> 0)
 
 extern gfx_decode_entry const gfx_stv[];
 

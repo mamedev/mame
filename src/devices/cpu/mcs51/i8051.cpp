@@ -1252,10 +1252,10 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_DPTR, "DPTR", m_dptr).formatstr("%04X");
 	state_add( MCS51_IE,   "IE",   m_ie  ).formatstr("%02X");
 	state_add( MCS51_IP,   "IP",   m_ip  ).formatstr("%02X");
-	state_add<u8>( MCS51_P0,  "P0", [this](){ return p0_r(); }, [this](u8 p){ p0_w(p); }).formatstr("%02X");
-	state_add<u8>( MCS51_P1,  "P1", [this](){ return p1_r(); }, [this](u8 p){ p1_w(p); }).formatstr("%02X");
-	state_add<u8>( MCS51_P2,  "P2", [this](){ return p2_r(); }, [this](u8 p){ p2_w(p); }).formatstr("%02X");
-	state_add<u8>( MCS51_P3,  "P3", [this](){ return p3_r(); }, [this](u8 p){ p3_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P0,  "P0", [this](){ auto dis = machine().disable_side_effects(); return p0_r(); }, [this](u8 p){ p0_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P1,  "P1", [this](){ auto dis = machine().disable_side_effects(); return p1_r(); }, [this](u8 p){ p1_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P2,  "P2", [this](){ auto dis = machine().disable_side_effects(); return p2_r(); }, [this](u8 p){ p2_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P3,  "P3", [this](){ auto dis = machine().disable_side_effects(); return p3_r(); }, [this](u8 p){ p3_w(p); }).formatstr("%02X");
 	state_add<u8>( MCS51_R0,  "R0", [this](){ return r_reg(0); }, [this](u8 r){ set_reg(0, r); }).formatstr("%02X");
 	state_add<u8>( MCS51_R1,  "R1", [this](){ return r_reg(1); }, [this](u8 r){ set_reg(1, r); }).formatstr("%02X");
 	state_add<u8>( MCS51_R2,  "R2", [this](){ return r_reg(2); }, [this](u8 r){ set_reg(2, r); }).formatstr("%02X");

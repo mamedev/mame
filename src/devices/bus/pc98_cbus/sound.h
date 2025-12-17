@@ -27,11 +27,11 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
+	virtual void io_map(address_map &map) override ATTR_COLD;
 private:
 	address_space_config m_space_io_config;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	void pnp_map(address_map &map);
 	void pnp_io_map(address_map &map);
 
 	u16 config_r(offs_t offset);
@@ -55,6 +55,7 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
+	virtual void io_map(address_map &map) override ATTR_COLD;
 private:
 	address_space_config m_space_io_config;
 

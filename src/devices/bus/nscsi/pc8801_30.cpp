@@ -9,17 +9,21 @@
 
 #define LOG_CMD            (1U << 1)
 #define LOG_CDDA           (1U << 2)
+#define LOG_FADER          (1U << 3)
 
-#define VERBOSE (LOG_GENERAL | LOG_CMD)
+#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
 #define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
+#define LOGFADER(...)       LOGMASKED(LOG_FADER, __VA_ARGS__)
+
+#define LIVE_SUBQ_VIEW    0
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_PC8801_30, nscsi_cdrom_pc8801_30_device, "scsi_pc8801_30", "SCSI NEC PC8801-30 CD-ROM")
 
-nscsi_cdrom_pc8801_30_device::nscsi_cdrom_pc8801_30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nscsi_cdrom_pc8801_30_device::nscsi_cdrom_pc8801_30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nscsi_cdrom_device(mconfig, NSCSI_CDROM_PC8801_30, tag, owner, clock)
 {
 }
@@ -30,16 +34,43 @@ void nscsi_cdrom_pc8801_30_device::device_add_mconfig(machine_config &config)
 	cdda->audio_end_cb().set(FUNC(nscsi_cdrom_pc8801_30_device::cdda_end_mark_cb));
 }
 
+void nscsi_cdrom_pc8801_30_device::device_start()
+{
+	nscsi_cdrom_device::device_start();
+	m_cdda_fader_timer = timer_alloc(FUNC(nscsi_cdrom_pc8801_30_device::cdda_fader_cb), this);
+
+	save_item(NAME(m_current_frame));
+	save_item(NAME(m_end_frame));
+	save_item(NAME(m_last_frame));
+	save_item(NAME(m_cdda_status));
+	save_item(NAME(m_cdda_play_mode));
+	save_item(NAME(m_end_mark));
+
+	save_item(NAME(m_cdda_volume));
+	save_item(NAME(m_fader_ctrl));
+}
 
 void nscsi_cdrom_pc8801_30_device::device_reset()
 {
 	nscsi_cdrom_device::device_reset();
+
+	m_current_frame = 0;
+	m_end_frame = 0;
+	m_last_frame = 0;
+	m_cdda_status = 0;
+	m_cdda_play_mode = 0;
+	m_end_mark = 0;
+
 	m_cdda_status = PCE_CD_CDDA_OFF;
 	cdda->stop_audio();
+	m_fader_ctrl = 0;
+	m_cdda_volume = 100.0;
+	cdda->set_output_gain(ALL_OUTPUTS, 1.0);
+	m_cdda_fader_timer->adjust(attotime::never);
 }
 
 
-bool nscsi_cdrom_pc8801_30_device::scsi_command_done(uint8_t command, uint8_t length)
+bool nscsi_cdrom_pc8801_30_device::scsi_command_done(u8 command, u8 length)
 {
 	switch (command)
 	{
@@ -55,10 +86,16 @@ bool nscsi_cdrom_pc8801_30_device::scsi_command_done(uint8_t command, uint8_t le
 	}
 }
 
+//attotime nscsi_cdrom_pc8801_30_device::scsi_data_command_delay()
+//{
+//  return attotime::from_msec(1'000'000 / 44'150);
+//}
+//
+
 void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 {
-	uint32_t frame = 0;
-	const uint8_t mode = scsi_cmdbuf[9] & 0xc0;
+	u32 frame = 0;
+	const u8 mode = scsi_cmdbuf[9] & 0xc0;
 
 	LOGCMD("0xd8 SET AUDIO PLAYBACK START POSITION (NEC): mode %02x\n", mode);
 	if (!image->exists())
@@ -82,7 +119,6 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 			const u8 f = bcd_2_dec(scsi_cmdbuf[4]);
 			frame = f + 75 * (s + m * 60);
 
-
 			const u32 pregap = toc.tracks[image->get_track(frame)].pregap;
 
 			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, pregap);
@@ -99,6 +135,12 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 			const u32 pregap = toc.tracks[image->get_track(track_number - 1)].pregap;
 			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
 			frame = toc.tracks[ track_number - 1 ].logframeofs;
+
+			// tested in takabako item #2 (no end position command issued)
+			const u8 last_track = image->get_last_track() - 1;
+			m_last_frame = image->get_track_start(last_track);
+			m_last_frame += toc.tracks[last_track].frames;
+			m_end_frame = m_last_frame;
 			// Not right for emeraldd, breaks intro lip sync
 			//frame -= std::max(pregap, (u32)150);
 			break;
@@ -148,6 +190,8 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 		// - audio CD player ("fade out" button trigger, otherwise will playback the
 		//                    very next track at the end of the sequence)
 		// - ppersia (picking up sword in stage 1, cancels then restarts redbook BGM)
+		// TODO: pc8801_flop:dslayed contradicts here, almost never playing a redbook
+		// perhaps pc8801-30 doesn't have this register hooked up?
 		cdda->pause_audio(1);
 		m_cdda_play_mode = 3;
 		m_end_mark = 0;
@@ -166,8 +210,8 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 
 void nscsi_cdrom_pc8801_30_device::nec_set_audio_stop_position()
 {
-	uint32_t frame = 0;
-	const uint8_t mode = scsi_cmdbuf[9] & 0xc0;
+	u32 frame = 0;
+	const u8 mode = scsi_cmdbuf[9] & 0xc0;
 	LOGCMD("0xd9 SET AUDIO PLAYBACK END POSITION (NEC): mode %02x\n", mode);
 
 	if (!image->exists())
@@ -284,7 +328,7 @@ void nscsi_cdrom_pc8801_30_device::nec_pause()
 void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 {
 	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
-	uint32_t msf_abs, msf_rel, track, frame;
+	u32 msf_abs, msf_rel, track, frame;
 	//LOGCMD("0xdd READ SUBCHANNEL Q (NEC) %d\n", m_cdda_status);
 
 	if (!image->exists())
@@ -293,17 +337,15 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 		return;
 	}
 
-	frame = m_current_frame;
+	frame = cdda->get_audio_lba();
 
 	switch (m_cdda_status)
 	{
 		case PCE_CD_CDDA_PAUSED:
 			scsi_cmdbuf[0] = 2;
-			frame = cdda->get_audio_lba();
 			break;
 		case PCE_CD_CDDA_PLAYING:
 			scsi_cmdbuf[0] = 0;
-			frame = cdda->get_audio_lba();
 			break;
 		default:
 			scsi_cmdbuf[0] = 3;
@@ -314,11 +356,11 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 	track = image->get_track(frame);
 	msf_rel = cdrom_file::lba_to_msf_alt(frame - image->get_track_start(track));
 
-	scsi_cmdbuf[1] = 0x01 | ((image->get_track_type(image->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
+	scsi_cmdbuf[1] = 0x01 | ((image->get_track_type(track+1) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
 	// track
 	scsi_cmdbuf[2] = dec_2_bcd(track+1);
 	// index
-	scsi_cmdbuf[3] = 1;
+	scsi_cmdbuf[3] = std::max(image->get_track_index(frame), 1U);
 	// MSF (relative)
 	scsi_cmdbuf[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);
 	scsi_cmdbuf[5] = dec_2_bcd((msf_rel >> 8) & 0xFF);
@@ -327,18 +369,18 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 	scsi_cmdbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);
 	scsi_cmdbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xFF);
 	scsi_cmdbuf[9] = dec_2_bcd(msf_abs & 0xFF);
-	//if(LIVE_SUBQ_VIEW)
-	//{
-	//	const std::vector<std::string> status_types = {"standby", "play", "pause"};
-	//	popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
-	//		, status_types[m_cdda_status]
-	//		, m_data_buffer[1]
-	//		, track + 1
-	//		, 1
-	//		, msf_rel
-	//		, msf_abs
-	//	);
-	//}
+	if(LIVE_SUBQ_VIEW)
+	{
+		const std::vector<std::string> status_types = {"standby", "play", "pause"};
+		popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
+			, status_types[m_cdda_status]
+			, scsi_cmdbuf[1]
+			, track + 1
+			, scsi_cmdbuf[3]
+			, msf_rel
+			, msf_abs
+		);
+	}
 
 	scsi_data_in(SBUF_MAIN, 10);
 	scsi_status_complete(SS_GOOD);
@@ -347,7 +389,7 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 
 void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 {
-	uint32_t frame, msf, track = 0;
+	u32 frame, msf, track = 0;
 	LOGCMD("0xde GET DIR INFO (NEC)\n");
 
 	if (!image->exists())
@@ -390,8 +432,8 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 		}
 		case 0x02:
 		{
-			uint32_t frame;
-			uint8_t track_type;
+			u32 frame;
+			u8 track_type;
 			if (scsi_cmdbuf[2] == 0xaa)
 			{
 				frame = toc.tracks[toc.numtrks-1].logframeofs;
@@ -496,5 +538,79 @@ void nscsi_cdrom_pc8801_30_device::cdda_end_mark_cb(int state)
 	}
 	else
 		LOGCDDA(" - No end mark encountered, check me\n");
+}
+
+// TODO: emulated here for simplicity, but should be an external mixer chip
+void nscsi_cdrom_pc8801_30_device::fader_control_w(u8 data)
+{
+	if (data & 0xf8)
+		popmessage("fader_control_w: unknown bit set %02x", data);
+	m_cdda_fader_timer->adjust(attotime::never);
+	m_fader_ctrl = data & 7;
+	switch(m_fader_ctrl >> 1)
+	{
+		case 0:
+			LOGFADER("fader: CD-DA enable %d\n", m_fader_ctrl);
+			cdda->set_output_gain(ALL_OUTPUTS, 1.0);
+			break;
+		case 1:
+			LOGFADER("fader: CD-DA disable %d\n", m_fader_ctrl);
+			cdda->set_output_gain(ALL_OUTPUTS, 0.0);
+			break;
+		case 2:
+		{
+			const int fader_time = BIT(m_fader_ctrl, 0) ? 1500 : 100;
+			LOGFADER("fader: CD-DA fade-in %d (%dms)\n", m_fader_ctrl, fader_time);
+			m_cdda_volume = 0.0;
+			cdda->set_output_gain(ALL_OUTPUTS, 0.0);
+			m_cdda_fader_timer->adjust(attotime::from_usec(fader_time), fader_time);
+			break;
+		}
+		case 3:
+		{
+			const int fader_time = BIT(m_fader_ctrl, 0) ? 5000 : 100;
+			LOGFADER("fader: CD-DA fade-out %d (%dms)\n", m_fader_ctrl, fader_time);
+			m_cdda_volume = 100.0;
+			cdda->set_output_gain(ALL_OUTPUTS, 1.0);
+			m_cdda_fader_timer->adjust(attotime::from_usec(fader_time), fader_time);
+			break;
+		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(nscsi_cdrom_pc8801_30_device::cdda_fader_cb)
+{
+	if (!BIT(m_fader_ctrl, 2))
+		return;
+
+	const bool is_fade_out = !!BIT(m_fader_ctrl, 1);
+	const int fader_time = (int)param;
+
+	if (is_fade_out)
+	{
+		m_cdda_volume -= 0.1;
+		if (m_cdda_volume <= 0.0)
+		{
+			m_cdda_volume = 0.0;
+			m_cdda_fader_timer->adjust(attotime::never);
+
+		}
+		else
+			m_cdda_fader_timer->adjust(attotime::from_usec(fader_time), fader_time);
+	}
+	else
+	{
+		m_cdda_volume += 0.1;
+		if (m_cdda_volume >= 100.0)
+		{
+			m_cdda_volume = 100.0;
+			m_cdda_fader_timer->adjust(attotime::never);
+
+		}
+		else
+			m_cdda_fader_timer->adjust(attotime::from_usec(fader_time), fader_time);
+	}
+
+	cdda->set_output_gain(ALL_OUTPUTS, m_cdda_volume / 100.0);
 }
 

@@ -6,12 +6,14 @@ System Sacom AMD-98 (AmuseMent boarD)
 
 3 PSG chips, one of the first sound boards released for PC98
 Superseded by later NEC in-house sound boards
+Incompatible with 286+ machines (that uses $f0 for machine status read)
 
 TODO:
 - not sure if it's AY8910 or YM2149, from a PCB pic it looks with stock AY logos?
 - f/f not completely understood;
-- PIT control;
 - PCM section;
+- mixing routing on itself and against -26 (thexder);
+- convert joystick to MSX_GENERAL_PURPOSE_PORTs;
 
 ===================================================================================================
 
@@ -41,17 +43,18 @@ TODO:
 
 #define LOGLATCH(...)     LOGMASKED(LOG_LATCH, __VA_ARGS__)
 
+DEFINE_DEVICE_TYPE(AMD98, amd98_device, "amd98", "System Sacom AMD-98 sound card")
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+amd98_device::amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, AMD98, tag, owner, clock)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
+	, m_ay1(*this, "ay1")
+	, m_ay2(*this, "ay2")
+	, m_ay3(*this, "ay3")
+	, m_pit(*this, "pit")
+{
+}
 
-// device type definition
-DEFINE_DEVICE_TYPE(AMD98, amd98_device, "amd98", "System Sacom AMD-98")
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
 
 void amd98_device::device_add_mconfig(machine_config &config)
 {
@@ -72,6 +75,14 @@ void amd98_device::device_add_mconfig(machine_config &config)
 		LOG("AMD-98 DAC %02x\n", data);
 	});
 	m_ay3->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	// dome/marchen1~2 needs this
+	PIT8253(config, m_pit);
+	m_pit->set_clk<2>(1'996'800);
+	m_pit->out_handler<2>().set([this] (int state) {
+		// requires inverted polarity
+		m_bus->int_w(6, !state);
+	});
 }
 
 static INPUT_PORTS_START( pc9801_amd98 )
@@ -101,27 +112,6 @@ ioport_constructor amd98_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc9801_amd98 );
 }
 
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  amd98_device - constructor
-//-------------------------------------------------
-
-amd98_device::amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AMD98, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
-	, m_ay1(*this, "ay1")
-	, m_ay2(*this, "ay2")
-	, m_ay3(*this, "ay3")
-{
-}
-
-
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
 //  on this device
@@ -146,59 +136,50 @@ void amd98_device::device_start()
 
 void amd98_device::device_reset()
 {
-	m_bus->install_io(0x00d8, 0x00df, read8sm_delegate(*this, FUNC(amd98_device::read)), write8sm_delegate(*this, FUNC(amd98_device::write)));
-	// thexder access with following
-	m_bus->install_io(0x38d8, 0x38df, read8sm_delegate(*this, FUNC(amd98_device::read)), write8sm_delegate(*this, FUNC(amd98_device::write)));
 }
+
+void amd98_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x00ff, *this, &amd98_device::io_map);
+		// thexder access with following
+		m_bus->install_device(0x3800, 0x38ff, *this, &amd98_device::io_map);
+	}
+}
+
 
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-uint8_t amd98_device::read(offs_t offset)
+void amd98_device::io_map(address_map &map)
 {
-	switch(offset)
-	{
-		case 2:
-			return m_ay1->data_r();
-		case 3:
-			return m_ay2->data_r();
-	}
+	// TODO: configurable PnP, needs dip/jumper sheet
+	map(0xf0, 0xf0).lr8(NAME([] () { return 0x18; }));
 
-	LOG("AMD-98: unhandled %02x read\n", offset + 0xd8);
-
-	return 0xff;
+	map(0xd8, 0xd8).w(m_ay1, FUNC(ay8910_device::address_w));
+	map(0xd9, 0xd9).w(m_ay2, FUNC(ay8910_device::address_w));
+	map(0xda, 0xda).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xdb, 0xdb).rw(m_ay2, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xdc, 0xdc).lrw8(
+		NAME([this] (offs_t offset) { return m_pit->read(2); }),
+		NAME([this] (offs_t offset, u8 data) { m_pit->write(2, data); })
+	);
+	map(0xde, 0xde).lrw8(
+		NAME([this] (offs_t offset) { return m_pit->read(3); }),
+		NAME([this] (offs_t offset, u8 data) { m_pit->write(3, data); })
+	);
 }
 
-void amd98_device::write(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 0:
-			m_ay1->address_w(data);
-			break;
-		case 1:
-			m_ay2->address_w(data);
-			break;
-		case 2:
-			m_ay1->data_w(data);
-			break;
-		case 3:
-			m_ay2->data_w(data);
-			break;
-		default:
-			LOG("AMD-98: unhandled %02x write %02x\n", offset + 0xd8, data);
-	}
-}
-
-void amd98_device::ay3_address_w(uint8_t data)
+void amd98_device::ay3_address_w(u8 data)
 {
 	LOGLATCH("AMD-98 AY3 latch %02x\n", data);
 	m_ay3_latch = data;
 }
 
-void amd98_device::ay3_data_latch_w(uint8_t data)
+void amd98_device::ay3_data_latch_w(u8 data)
 {
 	// TODO: actually goes 0 -> 1 -> 0
 	// TODO: thexder is the odd one: uses 0x00 -> 0x40 -> 0x47 (address) -> 0x40 -> 0x40 -> 0x43 (data) -> 0x40

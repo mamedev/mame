@@ -20,10 +20,8 @@ MAX693ACPE watchdog
 bank of 8 DIP switches
 battery (near CPU)
 
-Undumped games known to run on this PCB:
-* Multi Spin
-
 TODO
+- multspin doesn't like current tile banking implementation;
 - EEPROM write doesn't always work;
 - layout for lamps;
 - sprite colors aren't always correct (i.e. specd9 title screen). Is palette banked, too?;
@@ -575,13 +573,31 @@ ROM_START( starball )
 
 	ROM_REGION( 0x280000, "gfx", 0 )
 	ROM_LOAD( "t58.u50", 0x000000, 0x200000, CRC(7a572d9e) SHA1(9a1d842ac78fea6047242c405aaf81c827dc2358) ) // contains Multi Spin logo
-	ROM_LOAD( "1.u51",   0x200000, 0x080000, CRC(f7e97d23) SHA1(9aa86e545e9438ab693d8f9b1c137dada86be5cc) ) // this is an EPROM, contains Special Dream 9 logo
+	ROM_LOAD( "1.u51",   0x200000, 0x080000, CRC(f7e97d23) SHA1(9aa86e545e9438ab693d8f9b1c137dada86be5cc) ) // this is an EPROM, contains Star Ball logo
 
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "t59.u23", 0x000000, 0x200000, CRC(b11857b4) SHA1(c0a6478fd8a8ef1ed35cfbfa9fd2af44eb258725) )
 
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(e91dc32e) SHA1(b2e44321882abef012afc363cd78409a06a58764) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "3.u37", 0x000, 0x117, CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // PALCE16V8H
+ROM_END
+
+ROM_START( multspin )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "4.u33", 0x00000, 0x40000, CRC(7313511f) SHA1(f160ab19a1a3a941f9a9b287283990229036d35f) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "3.u31", 0x00001, 0x40000, CRC(b06626a9) SHA1(80a2394209a45bc49083889d2be1427c8d3e841a) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "t58.u50", 0x000000, 0x200000, CRC(7a572d9e) SHA1(9a1d842ac78fea6047242c405aaf81c827dc2358) )
+
+	ROM_REGION( 0x200000, "ymz", 0 )
+	ROM_LOAD( "t59.u23", 0x000000, 0x200000, CRC(b11857b4) SHA1(c0a6478fd8a8ef1ed35cfbfa9fd2af44eb258725) )
+
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, CRC(522dc2b3) SHA1(52f89640d50a81f0633df17c6ad7950d46d5ef9e) )
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "3.u37", 0x000, 0x117, CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // PALCE16V8H
@@ -595,3 +611,4 @@ GAME( 1998, d9flowera,  d9flower, es9501, specd9, es9501_state, empty_init, ROT0
 GAME( 1997, specd9,     0,        es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.7G)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, specd9105g, specd9,   es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, starball,   0,        es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Star Ball (v1.0.0S)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, multspin,   0,        es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Multi Spin (v1.0)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
