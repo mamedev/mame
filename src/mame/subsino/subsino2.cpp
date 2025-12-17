@@ -4290,6 +4290,26 @@ ROM_START( goldenti )
 	ROM_LOAD( "ds1971.bin", 0x00, 0x28, CRC(bcb1a630) SHA1(3ebd6f85b7267e86dc5458996978f3e22b71a214) )
 ROM_END
 
+// 董事长 (Dǒngshìzhǎng)
+ROM_START( dongshiz ) // default password is all bet
+	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
+	ROM_LOAD( "ss9689_6433044a22f.u16",  0x000000, 0x008000, CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "mrboss_china_1_v212.u21", 0x080000, 0x040000, CRC(6148ea97) SHA1(7231b470b6279315e94f26ea7729340854f339a7) )
+	ROM_RELOAD(                          0x0c0000, 0x040000 )
+
+	ROM_REGION( 0x400000, "tilemap", 0 )
+	ROM_LOAD16_BYTE( "mrboss_china_3_v209.u43", 0x000001, 0x200000, CRC(a2fea997) SHA1(e49dfde9eb7023485f1ba5b02fd079f76718203e) )
+	ROM_LOAD16_BYTE( "mrboss_china_4_v209.u44", 0x000000, 0x200000, CRC(7f4a402d) SHA1(bfce5efb9bd19ffbd392c3a4ff189cd22db7dc5c) )
+
+	ROM_REGION( 0x100000, "samples", 0 )
+	ROM_LOAD( "mrboss_china_2_v300.u9", 0x000000, 0x100000, CRC(165f31ae) SHA1(1a0e63e63ce953271e980a66ab2f31f3c830da5a) )
+
+	ROM_REGION( 0x28, "eeprom", 0 ) // bp 340,1,{ER6=00081f78;g} can be used to bypass the failing check for now
+	ROM_LOAD( "ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(b653cf03) SHA1(6b64dbe6c58a38b63ce7971964f2f8cafd19844e) ) // the '64-bit registration number' (0x20-0x27) is all 0xff
+	ROM_FILL(              0x20, 0x01, 0x14 ) // return correct device ID for now
+	ROM_FILL(              0x27, 0x01, 0x1d ) // return expected checksum for now
+ROM_END
+
 
 GAME( 1997, mtrain,      0,        mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.4)",                0 )  // inside the program ROM says 1997, but on screen shows 1996
 GAME( 1996, mtraina,     mtrain,   mtrain,   mtrain,   subsino2_state, init_mtrain,   ROT0, "Subsino",                          "Magic Train (Ver. 1.31)",               0 )
@@ -4344,3 +4364,5 @@ GAME( 2003, qbeebing,    0,        humlan,   qbeebing, subsino2_state, empty_ini
 GAME( 200?, treamary,    0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Treasure Mary",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 200?, goldenti,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Golden Treasure Island (Ver. Alpha 100)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+
+GAME( 2005, dongshiz,    0,        new2001,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Dongshizhang (China, Ver. 212)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // incomplete DS dump, fails start up check
