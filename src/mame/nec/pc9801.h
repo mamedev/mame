@@ -440,10 +440,10 @@ private:
 protected:
 	// TODO: map me as a cpu_f0_map
 	void a20_ctrl_w(offs_t offset, uint8_t data);
-private:
 	template <unsigned port> u8 fdc_2hd_2dd_ctrl_r();
 	template <unsigned port> void fdc_2hd_2dd_ctrl_w(u8 data);
 
+private:
 	void fdc_irq_w(int state);
 	void fdc_drq_w(int state);
 

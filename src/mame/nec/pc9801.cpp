@@ -543,10 +543,13 @@ TIMER_CALLBACK_MEMBER(pc9801vm_state::fdc_trigger)
 
 // TODO: undefined/disallow read/writes if I/F mode doesn't match
 // (and that applies to FDC mapping too!)
-// id port 0 -> 2DD
-// id port 1 -> 2HD
+// id port 0 -> 2DD (0x00c8 ~ 0x00cc)
+// id port 1 -> 2HD (0x0090 ~ 0x0094)
 template <unsigned port> u8 pc9801vm_state::fdc_2hd_2dd_ctrl_r()
 {
+//	if (port != BIT(m_fdc_mode, 0))
+//		return 0xff;
+
 	u8 res = fdc_2hd_ctrl_r();
 	if (port == 0)
 	{
@@ -558,6 +561,9 @@ template <unsigned port> u8 pc9801vm_state::fdc_2hd_2dd_ctrl_r()
 
 template <unsigned port> void pc9801vm_state::fdc_2hd_2dd_ctrl_w(u8 data)
 {
+//	if (port != BIT(m_fdc_mode, 0))
+//		return;
+
 	bool prev_trig = false;
 	bool cur_trig = false;
 

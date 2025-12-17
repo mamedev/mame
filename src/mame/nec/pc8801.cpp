@@ -1079,7 +1079,7 @@ void pc8801mc_state::main_io(address_map &map)
 void pc8801fh_state::opna_map(address_map &map)
 {
 	// TODO: confirm it really is ROMless
-	// TODO: confirm size
+	// TODO: confirm size (should be 256K according to p8suite memtest88)
 	map(0x000000, 0x1fffff).ram();
 }
 
