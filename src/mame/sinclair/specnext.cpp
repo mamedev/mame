@@ -3829,6 +3829,8 @@ void specnext_state::tbblue(machine_config &config)
 	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
 
+	SOFTWARE_LIST(config, "sd_list").set_original("specnext_sd");
+
 	config.device_remove("snapshot");
 }
 
