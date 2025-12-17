@@ -1585,23 +1585,24 @@ public:
 			{
 				int bind_count = 0;
 				SDL_GamepadBinding **binding = SDL_GetGamepadBindings(m_ctrldevice, &bind_count);
+				bool hasAxisBinding = false;
 				for (int idx = 0; idx < bind_count; idx++)
 				{
 					if (binding[idx]->input.axis.axis == axis)
 					{
-						switch (binding[idx]->input_type)
+						// SDL 3 returns both analog (button) and digital (axis) bindings for
+						// analog triggers.  So just allow it if there's an analog binding.
+						if (binding[idx]->input_type == SDL_GAMEPAD_BINDTYPE_AXIS)
 						{
-						case SDL_GAMEPAD_BINDTYPE_NONE:
-							avail = false;
-							break;
-						case SDL_GAMEPAD_BINDTYPE_BUTTON:
-							if (buttontest)
-								avail = false;
-							break;
-						default:
+							hasAxisBinding = true;
 							break;
 						}
 					}
+				}
+
+				if (!hasAxisBinding)
+				{
+					avail = false;
 				}
 			}
 			if (avail)
