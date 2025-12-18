@@ -215,7 +215,7 @@ private:
 		if (state)
 		{
 			m_cbus_irq->in_clear<Line>();
-			m_cbus_cisr &= ~1 << Line;
+			m_cbus_cisr &= ~(1 << Line);
 		}
 	}
 };
