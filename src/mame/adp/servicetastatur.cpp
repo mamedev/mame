@@ -41,7 +41,6 @@ ___| XTAL  80C31          +KEYPAD+       |__
 
 #include "emu.h"
 
-#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/i80c51.h"
 #include "machine/i2cmem.h"
 #include "video/hd44780.h"
@@ -85,7 +84,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "eeprom"),
 		m_lcd(*this, "hd44780"),
-		m_dte(*this, "dte"),
 		m_io_keys(*this, "IN%u", 0U)
 
 	{ }
@@ -111,8 +109,6 @@ private:
 	void gsg_w(offs_t offset, uint8_t data);
 
 	void enable_in(int state);
-	void clock_in(int state);
-	void data_in(int state);
 
 	void servicet_data(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
@@ -124,7 +120,6 @@ private:
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<hd44780_device> m_lcd;
-	required_device<rs232_port_device> m_dte;
 	required_ioport_array<3> m_io_keys;
 
 	bool m_datain = 0;
@@ -328,28 +323,6 @@ void servicet_state::gsg_w(offs_t offset, uint8_t data)
 	}
 }
 
-void servicet_state::data_in(int state)
-{
-	m_datain = state;
-}
-
-void servicet_state::clock_in(int state)
-{
-	if (state)
-	{
-		// --- INPUT SHIFT CHAIN (U20 + U19, 74HC4094) ---
-		uint16_t chain = (m_u19 << 8) | m_u20;
-		chain = ((chain << 1) | m_datain) & 0xffff;
-		m_u20 = chain & 0xff;
-		m_u19 = (chain >> 8) & 0xff;
-
-		// --- OUTPUT SHIFT REGISTER (U13, 74HC165) ---
-		int q7 = (m_u13 >> 7) & 1;
-		m_dte->write_txd(q7);
-		m_u13 = (m_u13 << 1) & 0xff;
-	}
-}
-
 void servicet_state::enable_in(int newval)
 {
 	//strobe u19 and u20
@@ -376,12 +349,6 @@ void servicet_state::servicet(machine_config &config)
 
 	// I2C EEPROM: 24C16 (2KB) - connected to P3.4 (SDA) and P3.5 (SCL)
 	I2C_24C16(config, m_i2cmem);
-
-	// SERIAL: WE ARE THE DCE
-	RS232_PORT(config, m_dte, default_rs232_devices, nullptr);
-	m_dte->dsr_handler().set(FUNC(servicet_state::enable_in));
-	m_dte->rxd_handler().set(FUNC(servicet_state::data_in));
-	m_dte->cts_handler().set(FUNC(servicet_state::clock_in));
 
 	// LCD4002A
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
