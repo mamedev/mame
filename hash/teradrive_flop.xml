@@ -17,6 +17,10 @@ Known undumped list (* denotes availablity in HDD folder):
 - Princess Maker (プリンセスメーカー), may be just DOS/V compatible
 - Wibarm U.S.A. (ウイバーン U.S.A.), may be just DOS/V compatible
 
+TODO:
+- Verify cross-platform compatibility with other DOS/V machines (once they are actually dumped),
+  rename list accordingly;
+
 -->
 <softwarelist name="teradrive_flop" description="Sega Teradrive floppy disk images">
 

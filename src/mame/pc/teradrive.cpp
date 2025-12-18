@@ -885,10 +885,9 @@ void teradrive_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 //  SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
-//  TODO: MD portion
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-J");
 	SOFTWARE_LIST(config, "td_disk_list").set_original("teradrive_flop");
-//  TODO: Teradrive HDD SW list
+	SOFTWARE_LIST(config, "td_hdd_list").set_original("teradrive_hdd");
 }
 
 void teradrive_state::teradrive(machine_config &config)
