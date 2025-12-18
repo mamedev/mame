@@ -6,7 +6,7 @@
 	<software name="baron" supported="yes">
 		<description>Baron de Munchausen</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="537856">
 				<rom name="BARON.dsk" size="537856" crc="758e7d8a" sha1="71cd3b35fcca9fc025d3dc604ee81f0fc07f64cc"/>
@@ -17,7 +17,7 @@
 	<software name="cassbriq" supported="yes">
 		<description>Super Casse-Briques</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="537856">
 				<rom name="STRBRIQUE.dsk" size="537856" crc="25f701eb" sha1="b317dfabffde8a60a6fdb6acebce9754407bd9b7"/>
@@ -28,7 +28,7 @@
 	<software name="labyrnth" supported="yes">
 		<description>Labyrinthe pour Telestrat</description>
 		<year>2008</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="537856">
 				<rom name="LABYSTRAT.dsk" size="537856" crc="b483457c" sha1="be3ef4f82b202d7dc674793b69094bccb1e2ad8f"/>
@@ -61,7 +61,7 @@
 	<software name="stratmnd" supported="yes">
 		<description>Stratmind</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="537856">
 				<rom name="STRATMIND.dsk" size="537856" crc="13250bb4" sha1="d8a6b7ffccf35ffe537a94e00f571b9ff5fd65f8"/>
