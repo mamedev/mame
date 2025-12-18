@@ -5,12 +5,12 @@ license:CC0-1.0
 
 TODO:
 - system bootstrap checks if cart has 0x5a05 as first word, if that check fails it tries for $03
-  on second byte. Compatibility/version flag for an earlier system?
+  on second byte. Compatibility/version flag? All these carts are 0x5a03.
 
 -->
 <softwarelist name="pls1000_cart" description="Brainchild PLS-1000 cartridges">
 
-	<software name="algebra" supported="no">
+	<software name="algebra">
 		<!-- Compile date 8/16/1995 -->
 		<description>Introduction to Algebra (v2.83)</description>
 		<year>1995</year>
@@ -23,7 +23,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="capital" supported="no">
+	<software name="capital">
 		<!-- Compile date 6/7/1995 -->
 		<description>Capitalization (v2.83)</description>
 		<year>1995</year>
@@ -36,7 +36,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="decmath" supported="no">
+	<software name="decmath">
 		<!-- Compile date 8/16/1995 -->
 		<description>Decimal Math (v2.83)</description>
 		<year>1995</year>
@@ -49,7 +49,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="punctua" supported="no">
+	<software name="punctua">
 		<!-- Compile date 8/6/1997 -->
 		<description>Punctuation (v2.90)</description>
 		<year>1997</year>
@@ -62,7 +62,7 @@ TODO:
 		</part>
 	</software>
 
-	<software name="wordknow" supported="no">
+	<software name="wordknow">
 		<!-- Compile date 6/8/1995 -->
 		<description>Word Knowledge (v2.83)</description>
 		<year>1995</year>
