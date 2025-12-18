@@ -231,56 +231,56 @@ void manohman_state::cpu_space_map(address_map &map)
 
 static INPUT_PORTS_START( backgamn )
 	PORT_START("SW1")
-	PORT_DIPNAME(0x01, 0x00, "Spielvariante")     // Game Variant
-	PORT_DIPSETTING(0x00, "pro Zug")              // per Move
-	PORT_DIPSETTING(0x01, "pro Spiel")            // per Game
-	PORT_DIPNAME(0x02, 0x00, "Spielpreis")        // Game Price
-	PORT_DIPSETTING(0x00, "voller Preis")         // full price
-	PORT_DIPSETTING(0x02, "halber Preis")         // half price
+	PORT_DIPNAME(0x01, 0x00, "Game Variant")       // Spielvariante
+	PORT_DIPSETTING(   0x00, "Per move")           // pro Zug
+	PORT_DIPSETTING(   0x01, "Per game")           // pro Spiel
+	PORT_DIPNAME(0x02, 0x00, "Game Price")         // Spielpreis
+	PORT_DIPSETTING(   0x02, "Half price")         // halber Preis
+	PORT_DIPSETTING(   0x00, "Full price")         // voller Preis
 	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x04, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x00, "Highscore löschen") // Clear Highscore
-	PORT_DIPSETTING(0x00, "nach 30 Tg.")          // after 30 days
-	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x04, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x00, "Clear Highscores")   // Highscore löschen
+	PORT_DIPSETTING(   0x08, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, "After 30 days")      // nach 30 Tg.
 	PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x10, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x10, DEF_STR(On))
 	PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x20, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x20, DEF_STR(On))
 	PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x40, DEF_STR(On))
-	PORT_DIPNAME(0x80, 0x00, "Sprache")           // Language
-	PORT_DIPSETTING(0x00, "deutsch")              // German
-	PORT_DIPSETTING(0x80, "englisch")             // English
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
+	PORT_DIPNAME(0x80, 0x00, DEF_STR(Language))    // Sprache
+	PORT_DIPSETTING(   0x00, DEF_STR(German))      // deutsch
+	PORT_DIPSETTING(   0x80, DEF_STR(English))     // englisch
 
 	PORT_START("SW2")
 	PORT_DIPNAME(0x01, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x01, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x01, DEF_STR(On))
 	PORT_DIPNAME(0x02, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x02, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x02, DEF_STR(On))
 	PORT_DIPNAME(0x04, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x04, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x04, DEF_STR(On))
 	PORT_DIPNAME(0x08, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x08, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x08, DEF_STR(Off))
 	PORT_DIPNAME(0x10, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x10, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x10, DEF_STR(On))
 	PORT_DIPNAME(0x20, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x20, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x20, DEF_STR(On))
 	PORT_DIPNAME(0x40, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x40, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x40, DEF_STR(On))
 	PORT_DIPNAME(0x80, 0x00, DEF_STR(Unused))
-	PORT_DIPSETTING(0x00, DEF_STR(Off))
-	PORT_DIPSETTING(0x80, DEF_STR(On))
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x80, DEF_STR(On))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( manohman )
