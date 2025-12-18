@@ -1524,21 +1524,7 @@ public:
 			axisnames = CONTROLLER_AXIS_PS;
 			buttonnames = CONTROLLER_BUTTON_PS5;
 			break;
-#if 0 //SDL_VERSION_ATLEAST(2, 0, 16)
-		//case SDL_CONTROLLER_TYPE_AMAZON_LUNA:
-		case SDL_CONTROLLER_TYPE_GOOGLE_STADIA:
-			osd_printf_verbose("Game Controller:   ...  Google Stadia type\n");
-			axisnames = CONTROLLER_AXIS_PS;
-			buttonnames = CONTROLLER_BUTTON_STADIA;
-			break;
-#endif
-#if 0
-		case SDL_CONTROLLER_TYPE_NVIDIA_SHIELD:
-			osd_printf_verbose("Game Controller:   ...  NVIDIA Shield type\n");
-			axisnames = CONTROLLER_AXIS_XBOX;
-			buttonnames = CONTROLLER_BUTTON_SHIELD;
-			break;
-#endif
+
 		case SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR:
 			osd_printf_verbose("Game Controller:   ...  Joy-Con pair type\n");
 			axisnames = CONTROLLER_AXIS_SWITCH;
@@ -1547,8 +1533,29 @@ public:
 			avoidpaddles = true;
 			break;
 
-		default: // default to Xbox 360 names
-			osd_printf_verbose("Game Controller:   ...  unrecognized type (%d)\n", int(ctrltype));
+		default: // do some other checks and fall back to Xbox layout if still unrecognized
+			{
+				const auto joystick = SDL_GetJoystickFromID(SDL_GetGamepadID(m_ctrldevice));
+				const auto vendor_id = SDL_GetJoystickVendor(joystick);
+				const auto product_id = SDL_GetJoystickProduct(joystick);
+
+				if (vendor_id == 0x18d1 && product_id == 0x9400)
+				{
+					osd_printf_verbose("Game Controller:   ...  Google Stadia type\n");
+					axisnames = CONTROLLER_AXIS_PS;
+					buttonnames = CONTROLLER_BUTTON_STADIA;
+				}
+				else if (vendor_id == 0x0955 && (product_id == 0x7210 || product_id == 0x7214))
+				{
+					osd_printf_verbose("Game Controller:   ...  NVIDIA Shield type\n");
+					axisnames = CONTROLLER_AXIS_XBOX;
+					buttonnames = CONTROLLER_BUTTON_SHIELD;
+				}
+				else
+				{
+					osd_printf_verbose("Game Controller:   ...  unrecognized type (%d)\n", int(ctrltype));
+				}
+			}
 			break;
 		}
 
@@ -1653,13 +1660,9 @@ public:
 					{
 						if (binding[idx]->input.button == button)
 						{
-							switch (binding[idx]->input_type)
+							if (binding[idx]->input_type == SDL_GAMEPAD_BINDTYPE_NONE)
 							{
-							case SDL_GAMEPAD_BINDTYPE_NONE:
 								avail = false;
-								break;
-							default:
-								break;
 							}
 						}
 					}
@@ -1696,6 +1699,7 @@ public:
 								break;
 							default:
 								avail = digitaltriggers;
+								break;
 							}
 						}
 					}
@@ -2213,11 +2217,11 @@ public:
 		// in SDL 3.4.  X11 will return all of the available keyboards but only return keypresses for the system
 		// composite device #0 unless SDL is specially compiled (which its not in distro packages).
 		// On macOS only the system keyboard is supported, but it's ID 1 instead of 0.
-		#ifdef SDLMAME_MACOSX
+#ifdef SDLMAME_MACOSX
 		const SDL_KeyboardID syskbd = (SDL_KeyboardID)1;
-		#else
+#else
 		const SDL_KeyboardID syskbd = (SDL_KeyboardID)0;
-		#endif
+#endif
 		auto &devinfo = create_device<sdl_keyboard_device>(
 			DEVICE_CLASS_KEYBOARD,
 			"System keyboard",
@@ -2507,15 +2511,13 @@ protected:
 		}
 	}
 
-	sdl_joystick_device *create_joystick_device(int index, bool sixaxis)
+	sdl_joystick_device *create_joystick_device(SDL_JoystickID sdl_id, bool sixaxis)
 	{
-		const auto joysticks = SDL_GetJoysticks(nullptr);
 		// open the joystick device
-		SDL_Joystick *const joy = SDL_OpenJoystick(joysticks[index]);
-		SDL_free(joysticks);
+		SDL_Joystick *const joy = SDL_OpenJoystick(sdl_id);
 		if (!joy)
 		{
-			osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", index, SDL_GetError());
+			osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", (int)sdl_id, SDL_GetError());
 			return nullptr;
 		}
 
@@ -2634,9 +2636,12 @@ public:
 
 		osd_printf_verbose("Joystick: Start initialization\n");
 		int stick_count = 0;
-		SDL_GetJoysticks(&stick_count);
+		const auto joysticks = SDL_GetJoysticks(&stick_count);
 		for (int physical_stick = 0; physical_stick < stick_count; physical_stick++)
-			create_joystick_device(physical_stick, sixaxis_mode);
+		{
+			create_joystick_device(joysticks[physical_stick], sixaxis_mode);
+		}
+		SDL_free(joysticks);
 
 		constexpr int event_types[] = {
 				int(SDL_EVENT_JOYSTICK_AXIS_MOTION),
@@ -2869,11 +2874,11 @@ public:
 	}
 
 private:
-	sdl_game_controller_device *create_game_controller_device(int index, SDL_Gamepad *ctrl)
+	sdl_game_controller_device *create_game_controller_device(SDL_JoystickID sdl_id, SDL_Gamepad *ctrl)
 	{
 		// get basic info
 		char const *const name = SDL_GetGamepadName(ctrl);
-		SDL_GUID guid = SDL_GetJoystickGUIDForID(index);
+		SDL_GUID guid = SDL_GetJoystickGUIDForID(sdl_id);
 		char guid_str[256];
 		guid_str[0] = '\0';
 		SDL_GUIDToString(guid, guid_str, sizeof(guid_str) - 1);
