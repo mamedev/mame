@@ -30345,8 +30345,8 @@ ROM_START( fl7_tw )  // Serial 00000050E9B7.
 	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
 	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
 
-	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial
-	ROM_LOAD( "eserial.bin", 0x0000, 0x0008, NO_DUMP )  // Hand built to match our ROM set
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_tw.bin", 0x0000, 0x0008, CRC(c88b5fc9) SHA1(672472f1b7b49175640905985b017912c8be91c5) )
 ROM_END
 
 ROM_START( fl7_twa )  // Serial 00000014D7A1.
@@ -32892,8 +32892,8 @@ void wingco_state::init_flam7_tw()
           Just patched to jump to $60B9 (jmp $644E) where the check
           is successful.
 */
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x60b3] = 0x05;
+//	uint8_t *rom = memregion("maincpu")->base();
+//	rom[0x60b3] = 0x05;
 }
 
 void wingco_state::init_special7()
