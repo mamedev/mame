@@ -2363,6 +2363,7 @@ void vegas_state::cartfury(machine_config &config)
 
 // there is a socket next to the main bios roms for updates, this is what the update region is.
 
+// TODO: Bootroms for gauntleg should be configured as BIOS options at some point while the disk update roms should be configured as a software list instead.
 
 ROM_START( gauntleg )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
@@ -2380,6 +2381,31 @@ ROM_START( gauntleg )
 	ROM_LOAD( "322_gauntlet.u37", 0x0000, 0x2000, CRC(0fe0bd0a) SHA1(bfd54572e2923d26392e89961d044357f551872a) )
 ROM_END
 
+ROM_START( gauntleg14 )
+	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
+	ROM_LOAD( "legend13.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) ) // EPROM Boot code. Version: Sep 25 1998 18:34:43 / 1.3 Sep 25 1998 18:33:45
+	ROM_LOAD( "legend14.bin", 0x000000, 0x80000, CRC(66869402) SHA1(bf470e0b9198b80f8baf8b9432a7e1df8c7d18ca) ) // EPROM Boot code. Version: Oct 30 1998 17:48:21 / 1.4 Oct 30 1998 17:44:29
+
+	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
+
+	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update to 1.6 Step 1 of 3" )
+	ROMX_LOAD("12to16.1.bin", 0x000000, 0x100000, CRC(253c6bf2) SHA1(5e129576afe2bc4c638242e010735655d269a747), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update to 1.6 Step 2 of 3" )
+	ROMX_LOAD("12to16.2.bin", 0x000000, 0x100000, CRC(15b1fe78) SHA1(532c4937b55befcc3a8cb25b0282d63e206fba47), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update to 1.6 Step 3 of 3" )
+	ROMX_LOAD("12to16.3.bin", 0x000000, 0x100000, CRC(1027e54f) SHA1(a841f5cc5b022ddfaf70c97a64d1582f0a2ca70e), ROM_BIOS(3))
+
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.4 10/28/1998 Main 11/10/1998
+	DISK_IMAGE( "gauntleg14", 0, SHA1(920a1048fb0503026ab0da2c1f82f6c11a51e0e7) ) 
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
+	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "322_gauntlet.u37", 0x0000, 0x2000, CRC(0fe0bd0a) SHA1(bfd54572e2923d26392e89961d044357f551872a) )
+ROM_END
 
 ROM_START( gauntleg12 )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
@@ -2389,11 +2415,11 @@ ROM_START( gauntleg12 )
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 
-	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.2 to 1.6 Step 1 of 3" )
+	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update to 1.6 Step 1 of 3" )
 	ROMX_LOAD("12to16.1.bin", 0x000000, 0x100000, CRC(253c6bf2) SHA1(5e129576afe2bc4c638242e010735655d269a747), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.2 to 1.6 Step 2 of 3" )
+	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update to 1.6 Step 2 of 3" )
 	ROMX_LOAD("12to16.2.bin", 0x000000, 0x100000, CRC(15b1fe78) SHA1(532c4937b55befcc3a8cb25b0282d63e206fba47), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.2 to 1.6 Step 3 of 3" )
+	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update to 1.6 Step 3 of 3" )
 	ROMX_LOAD("12to16.3.bin", 0x000000, 0x100000, CRC(1027e54f) SHA1(a841f5cc5b022ddfaf70c97a64d1582f0a2ca70e), ROM_BIOS(3))
 
 
@@ -2425,7 +2451,6 @@ ROM_START( gauntdl )
 	ROM_LOAD( "346_gauntlet-dl.u37", 0x0000, 0x2000, CRC(09420dd3) SHA1(9ffc62049b3e329b525469849944896163b1582b) )
 ROM_END
 
-
 ROM_START( gauntdl24 )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 ) // EPROM 1.7 12/14/1999
 	ROM_LOAD( "gauntdl.bin", 0x000000, 0x80000, CRC(3d631518) SHA1(d7f5a3bc109a19c9c7a711d607ff87e11868b536) )
@@ -2443,15 +2468,27 @@ ROM_START( gauntdl24 )
 	ROM_LOAD( "346_gauntlet-dl.u37", 0x0000, 0x2000, CRC(09420dd3) SHA1(9ffc62049b3e329b525469849944896163b1582b) )
 ROM_END
 
+// For some reason, the last two bootroms are bugged to show the hard drive version as "GUTS 1.3 Apr 7 1999 16:41:48 / Game Apr 7 1999 16:32:26" so we're defaulting to "19" instead
+#define WARFA_BIOS \
+		ROM_DEFAULT_BIOS("19") \
+		ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 ) \
+		ROM_SYSTEM_BIOS( 0, "16", "Boot Code 1.6" ) \
+		ROMX_LOAD( "warboot.v16", 0x000000, 0x80000, CRC(1c44b3a3) SHA1(e81c15d7c9bc19078787d39c7f5e48eab003c5f4), ROM_BIOS(0) ) /* EPROM Boot code. Version: Jan 14 1999 18:18:03 / 1.6 Jan 14 1999 18:07:05 */ \
+		ROM_SYSTEM_BIOS( 1, "19", "Boot Code 1.9" ) \
+		ROMX_LOAD( "warboot.v19", 0x000000, 0x80000, CRC(b0c095cd) SHA1(d3b8cccdca83f0ecb49aa7993864cfdaa4e5c6f0), ROM_BIOS(1) ) /* EPROM Boot code. Version: Mar 23 1999 13:45:01 / 1.9 Mar 25 1999 17:57:33 */ \
+		ROM_SYSTEM_BIOS( 2, "13", "Boot Code 1.3" ) \
+		ROMX_LOAD( "war42ce.bin", 0x000000, 0x80000, CRC(1a6e7f59) SHA1(0d8b4ce1e4b1132689796c4374aa54447b9a3369), ROM_BIOS(2) ) /* EPROM Boot code. Version: Apr 7 1999 15:55:17 / 1.3 Apr 7 1999 16:41:48 */ \
+		ROM_SYSTEM_BIOS( 3, "191", "Boot Code 1.91" ) \
+		ROMX_LOAD( "war__upgrade__ver_1.91.u27", 0x000000, 0x80000, CRC(4d8fe0f8) SHA1(b809d29760ff229200509ba6751d8255faca7082), ROM_BIOS(3) ) // EPROM Boot code. Version: Apr 7 1999 15:55:17 / 1.91 Apr 13 1999 20:02:15
+
 
 ROM_START( warfa )
-	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 ) // EPROM 1.9 3/25/1999
-	ROM_LOAD( "warboot.v19", 0x000000, 0x80000, CRC(b0c095cd) SHA1(d3b8cccdca83f0ecb49aa7993864cfdaa4e5c6f0) )
+	WARFA_BIOS
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 4/20/1999 Game 4/20/1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 Apr 20 1999 15:27:22 / Game Apr 20 1999 15:38:56
 	DISK_IMAGE( "warfa", 0, SHA1(87f8a8878cd6be716dbd6c68fb1bc7f564ede484) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2459,13 +2496,12 @@ ROM_START( warfa )
 ROM_END
 
 ROM_START( warfaa )
-	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 ) // EPROM 1.6 Jan 14 1999
-	ROM_LOAD( "warboot.v16", 0x000000, 0x80000, CRC(1c44b3a3) SHA1(e81c15d7c9bc19078787d39c7f5e48eab003c5f4) )
+	WARFA_BIOS
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.1 Mar 16 1999, GAME Mar 16 1999
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.1 Mar 16 1999 17:52:03 / Game Mar 16 1999 19:46:49
 	DISK_IMAGE( "warfaa", 0, SHA1(b443ba68003f8492e5c20156e0d3091fe51e9224) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
@@ -2473,33 +2509,17 @@ ROM_START( warfaa )
 ROM_END
 
 ROM_START( warfab )
-	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 ) //EPROM 1.3 Apr 7 1999
-	// label: WAR 42CE / BOOT V1.9 / PROG V1.6
-	ROM_LOAD( "war42ce.bin", 0x000000, 0x80000, CRC(1a6e7f59) SHA1(0d8b4ce1e4b1132689796c4374aa54447b9a3369) )
+	WARFA_BIOS
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 Apr 7 1999 GAME 1.3 Apr 7 1999
-	// V1.5
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 Mar 25 1999 17:09:09 / Game Mar 23 1999 13:50:55
 	DISK_IMAGE( "warfa15", 0, SHA1(bd538bf2f6a245545dae4ea97c433bb3f7d4394e) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
 	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
-ROM_START( warfac )
-	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 ) // EPROM 1.91 Apr 13 1999
-	ROM_LOAD( "war__upgrade__ver_1.91.u27", 0x000000, 0x80000, CRC(4d8fe0f8) SHA1(b809d29760ff229200509ba6751d8255faca7082) )
-
-	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
-
-	// required HDD image version is guess
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.3 4/20/1999 GAME 4/20/1999
-	DISK_IMAGE( "warfa", 0, SHA1(87f8a8878cd6be716dbd6c68fb1bc7f564ede484) )
-
-	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
-	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
-ROM_END
 
 ROM_START( tenthdeg )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
@@ -2566,10 +2586,15 @@ ROM_END
 
 ROM_START( nbanfl )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
-	ROM_LOAD( "2.5.u27", 0x000000, 0x80000, CRC(6a9bd382) SHA1(18b942df6af86ea944c24166dbe88148334eaff9) ) // 16:00:32 Sep 22 1999 BIOS FOR BLITZ00 USING BANSHEE / 16:00:26 Sep 22 1999 POST FOR BLITZ00 USING BANSHEE
-	ROM_LOAD( "2.6.u27", 0x000000, 0x80000, CRC(ec2885e5) SHA1(a7cc77b00d509f87563b57be31df3f8190700905) ) // 10:45:23 Oct 5 1999 BIOS FOR BLITZ00 USING BANSHEE / 10:42:26 Oct 5 1999 POST FOR BLITZ00 USING BANSHEE
-	// Bad dump: First 3 bytes of reset vector (0x0) are FF's.  Reset vector is fixed in driver init.
-	ROM_LOAD( "2.7.u27", 0x000000, 0x80000, CRC(4242bf14) SHA1(c1fcec67d7463df5f41afc89f22c3b4484279534) BAD_DUMP) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
+	ROM_SYSTEM_BIOS( 0, "25", "BIOS Version 2.5" )
+	ROMX_LOAD( "2.5.u27", 0x000000, 0x80000, CRC(6a9bd382) SHA1(18b942df6af86ea944c24166dbe88148334eaff9), ROM_BIOS(0) ) // 16:00:32 Sep 22 1999 BIOS FOR BLITZ00 USING BANSHEE / 16:00:26 Sep 22 1999 POST FOR BLITZ00 USING BANSHEE
+	ROM_SYSTEM_BIOS( 1, "26", "BIOS Version 2.6" )
+	ROMX_LOAD( "2.6.u27", 0x000000, 0x80000, CRC(ec2885e5) SHA1(a7cc77b00d509f87563b57be31df3f8190700905), ROM_BIOS(1) ) // 10:45:23 Oct 5 1999 BIOS FOR BLITZ00 USING BANSHEE / 10:42:26 Oct 5 1999 POST FOR BLITZ00 USING BANSHEE
+	// The first three bytes of the 2.7.u27 ROM were FF's which breaks the reset vector.
+	// These bytes were replaced with the first three from 2.5.u27 which allows the this ROM to start.
+	// The last byte which is part of the checksum was also FF. By changing it to 0x01 the 4 byte checksum matches with the other 3 changes.
+	ROM_SYSTEM_BIOS( 2, "27", "BIOS Version 2.7" )
+	ROMX_LOAD( "2.7.u27", 0x000000, 0x80000, CRC(44a086a1) SHA1(a5553c18b61148a31ee32c614b33ae0b0b32b15e) BAD_DUMP, ROM_BIOS(2) ) // 15:10:49 Nov 30 1999 BIOS FOR BLITZ00 USING BANSHEE / 15:10:43 Nov 30 1999 POST FOR BLITZ00 USING BANSHEE
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_NILE":update", ROMREGION_ERASEFF )
 
@@ -2587,7 +2612,7 @@ ROM_END
 
 
 
-ROM_START( nbagold ) //Also known as "Sportstation"
+ROM_START( nbagold )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )
 	ROM_LOAD( "nbagold_jan10_2000.u27", 0x000000, 0x80000, CRC(6768e802) SHA1(d994e3efe14f57e261841134ddd1489fa67d418b) ) // 11:29:11 Jan 10 2000. BIOS FOR NBAGOLD USING BANSHEE / 11:23:58 Jan 10 2000. POST FOR NBAGOLD USING BANSHEE
 
@@ -2742,14 +2767,6 @@ void vegas_state::init_nbashowt()
 void vegas_state::init_nbanfl()
 {
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS | MIPS3DRC_STRICT_VERIFY | MIPS3DRC_EXTRA_INSTR_CHECK);
-	// The first three bytes of the blitz00_nov30_1999.u27 ROM are FF's which breaks the reset vector.
-	// These bytes are from blitz00_sep22_1999.u27 which allows the other ROM to start.
-	// The last byte which is part of the checksum is also FF. By changing it to 0x01 the 4 byte checksum matches with the other 3 changes.
-	uint8_t *romPtr = memregion(PCI_ID_NILE":rom")->base();
-	romPtr[0x0] = 0xe2;
-	romPtr[0x1] = 0x00;
-	romPtr[0x2] = 0xf0;
-	romPtr[0x7ffff] = 0x01;
 }
 
 
@@ -2792,16 +2809,16 @@ void vegas_state::init_cartfury()
 
 // Vegas + Vegas SIO + Voodoo 2
 GAME( 1998, gauntleg,   0,         gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gauntleg14, gauntleg,  gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, gauntleg12, gauntleg,  gauntleg, gauntleg, vegas_state, init_gauntleg, ROT0, "Atari Games",  "Gauntlet Legends (version 1.2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, tenthdeg,   0,         tenthdeg, tenthdeg, vegas_state, init_tenthdeg, ROT0, "Atari Games",  "Tenth Degree (prototype)", MACHINE_SUPPORTS_SAVE )
 
 // Vegas/Durango + Vegas SIO + Voodoo 2
 GAME( 1999, gauntdl,    0,         gauntdl,  gauntleg, vegas_state, init_gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.52)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, gauntdl24,  gauntdl,   gauntdl,  gauntleg, vegas_state, init_gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfa,      0,         warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfaa,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.6 Jan 14 1999, GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, warfab,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.3 Apr 7 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE ) // version numbers comes from test mode, can be unreliable
-GAME( 1999, warfac,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (EPROM 1.91 Apr 13 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfa,      0,         warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfaa,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfab,     warfa,     warfa,    warfa,    vegas_state, init_warfa,    ROT0, "Atari Games",  "War: Final Assault (GUTS 1.3 Mar 25 1999, GAME Mar 23 1999)", MACHINE_SUPPORTS_SAVE )
 
 // Durango + DSIO + Voodoo 2
 GAME( 1999, roadburn,   0,         roadburn, roadburn, vegas_state, init_roadburn, ROT0, "Atari Games",  "Road Burners (ver 1.04)", MACHINE_SUPPORTS_SAVE )
