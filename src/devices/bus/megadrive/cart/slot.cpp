@@ -95,6 +95,11 @@ void megadrive_cart_slot_device::device_start()
 
 	m_space_mem = &space(AS_PROGRAM);
 	m_space_io = &space(AS_IO);
+
+	// NOTE: this is (sortof) duct tape until we implement /CART pin in host drivers properly
+	// teradrive TMSS wants to read high on no cart presence otherwise refuses to boot PC side
+	m_space_mem->unmap_value_high();
+	m_space_io->unmap_value_high();
 }
 
 const char *megadrive_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)

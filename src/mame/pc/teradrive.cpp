@@ -26,6 +26,8 @@ NOTES (PC side):
 - F1 at POST will bring a setup menu;
 - F2 (allegedly at DOS/V boot) will dual boot the machine;
 - a program named VVCHG switches back and forth between MD and PC, and setup 68k to 10 MHz mode;
+- WDL-330PS needs -chs 921,2,33 to sucessfully boot
+  cfr. https://github.com/86Box/86Box/issues/4505#issuecomment-2143369708
 
 NOTES (MD side):
 - 16 KiB of Z80 RAM (vs. 8 of stock)
@@ -42,8 +44,6 @@ NOTES (MD side):
 TODO:
 - RAM size always gets detected as 2560K even when it's not (from chipset?);
 - Quadtel EMM driver fails recognizing WD76C10 chipset with drv4;
-- Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
-  Attached disk is a WDL-330PS with no geometry info available;
 - TMSS unlock and respective x86<->MD bus grants are sketchy;
 - SEGA TERADRIVE テラドライブ ユーザーズマニュアル known to exist (not scanned yet)
 - "TIMER FAIL" when exiting from F1 setup menu (keyboard? reset from chipset?);
@@ -1081,5 +1081,5 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1991, teradrive,  0,         0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 2)", MACHINE_NOT_WORKING )
-COMP( 1991, teradrive3, teradrive, 0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 3)", MACHINE_NOT_WORKING )
+COMP( 1991, teradrive,  0,         0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 2)", 0 )
+COMP( 1991, teradrive3, teradrive, 0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 3)", 0 )
