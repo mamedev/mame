@@ -20,6 +20,72 @@ Keeps ringing [DAC1BIT] when ball goes O.B.
 		</part>
 	</software>
 
+	<software name="akarui" supported="yes">
+		<description>Akarui Noen</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="4070572">
+				<rom name="akarui noen.wav" size="4070572" crc="92ca1ee8" sha1="d2e907ad4dde6c9a5e5a87bf96b5c50d361f7c8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphos" supported="yes">
+		<description>Alphos</description>
+		<year>1983</year>
+		<publisher>Namco</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6947322">
+				<rom name="alphos.wav" size="6947322" crc="91a14b84" sha1="398e878ce9a35b31cf55057a191d20a460353e69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ameno" supported="yes">
+		<description>Ame No Hi Wa Oisogashi</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="3618652">
+				<rom name="ame no hi wa oisogashi.wav" size="3618652" crc="05d0c079" sha1="21e5fe0569e2591ef9f26f6954ca3fd37c4a7724"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombrman" supported="yes">
+		<description>Bomber Man</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="9753792">
+				<rom name="bomber man.wav" size="9753792" crc="2a3ee7f5" sha1="987bd1f3a8b6074a3beb2928d01f6cceacabd173"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubblekd" supported="yes">
+		<description>Bubble Kund 1999</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="3230262">
+				<rom name="bubble kund 1999.wav" size="3230262" crc="34ee7a0d" sha1="9efd2074bc1f10ccbbf849a35e82d6f111c518d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannonbl" supported="yes">
+		<description>Cannon Ball</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="2188752">
+				<rom name="cannon ball.wav" size="2188752" crc="0a7926ea" sha1="f651dcee04aa84f14d5aaeb8457454d796942461"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spacebs" supported="no">
 		<description>Space Battle Ship</description>
 		<year>1988</year>
