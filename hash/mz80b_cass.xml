@@ -134,7 +134,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 
 	<software name="donkey" supported="partial">
 		<description>Donkey Climber</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
 		<info name="usage" value="SB-5520 LOAD" />
@@ -147,7 +147,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 
 	<software name="galaxian" supported="partial">
 		<description>Galaxian</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
 		<info name="usage" value="SB-5520 MON" />
@@ -213,7 +213,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 
 	<software name="spaceinv" supported="partial">
 		<description>Space Invader</description>
-		<year>19??</year>
+		<year>1981</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
 		<info name="usage" value="SB-5520 MON" />
