@@ -135,7 +135,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	<software name="donkey" supported="partial">
 		<description>Donkey Climber</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
 		<info name="usage" value="SB-5520 LOAD" />
 		<part name="cass1" interface="mz_cass">
@@ -148,7 +148,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	<software name="galaxian" supported="partial">
 		<description>Galaxian</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
 		<info name="usage" value="SB-5520 MON" />
 		<part name="cass1" interface="mz_cass">
@@ -214,7 +214,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	<software name="spaceinv" supported="partial">
 		<description>Space Invader</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
 		<info name="usage" value="SB-5520 MON" />
 		<part name="cass1" interface="mz_cass">
@@ -268,8 +268,8 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 
 	<software name="walkwan" supported="partial">
 		<description>Walk Wan</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<year>1982</year>
+		<publisher>Tecno Soft</publisher>
 		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
 		<info name="usage" value="SB-5520 LOAD" />
 		<part name="cass1" interface="mz_cass">
