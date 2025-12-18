@@ -200,7 +200,6 @@ public:
 		m_duart(*this, "duart"),
 		m_nvram(*this, "nvram"),
 		m_dac(*this, "dac"),
-		m_st(*this, "st"),
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u", 0U),
 		m_leds(*this, "led%u", 0U),
@@ -218,7 +217,6 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<nvram_device> m_nvram;
 	required_device<ad7224_device> m_dac;
-	required_device<rs232_port_device> m_st;
 	output_finder<8> m_digits;
 	output_finder<128> m_lamps;
 	output_finder<2> m_leds;
@@ -321,8 +319,6 @@ void stellafr_state::mux_w(uint8_t data)
 		;
 	if (aw2)
 		;
-
-	m_st->write_dtr(enanz1);
 }
 
 void stellafr_state::mux2_w(uint8_t data)
@@ -337,8 +333,6 @@ void stellafr_state::mux2_w(uint8_t data)
 	m_mux1  = (m_mux1  << 1) | BIT(data,U1_MUX1);
 	m_anz2  = (m_anz2  << 1) | BIT(data,U1_ANZ2);
 	m_mux2  = (m_mux2  << 1) | BIT(data,U1_MUX2);
-
-	m_st->write_txd(m_ma1);
 }
 
 void stellafr_state::duart_output_w(uint8_t data)
@@ -408,9 +402,6 @@ void stellafr_state::stellafr(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
 	AD7224(config, m_dac, 0);
-
-	RS232_PORT(config, m_st, default_rs232_devices, nullptr);
-	m_st->rxd_handler().set(FUNC(stellafr_state::st_in));
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
