@@ -10,7 +10,7 @@ NVRAM usage needs to be enabled in Brainchild Setup -> Turn Bookmark ON
 TODO:
 - Trace remaining I/Os;
 - Samples inputs thru the same irq 4 used for RTC cfr. PC=649a
-- How to enter test mode? There are strings in BIOS at 0x9690
+- How to enter test mode? There are strings in BIOS at $9690, perhaps wants a specific dev cart?
 - DAC1BIT usage is assumed;
 
 ===================================================================================================
@@ -203,5 +203,7 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 1998, pls1000,  0, 0,  pls1000,  pls1000, pls1000_state, empty_init, "Brainchild", "PLS-1000", MACHINE_NOT_WORKING )
+CONS( 1998, pls1000,  0, 0,  pls1000,  pls1000, pls1000_state, empty_init, "Brainchild", "PLS-1000", 0 ) // 94A model?
+// 2001 purple variant known to exist, with MC68EZ328
 
+// PLS-2000 known to exist (with compact flash media), should not belong here
