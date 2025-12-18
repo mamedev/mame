@@ -15,7 +15,7 @@
  *
  *  C25   CPU, FPU, serial, RTC, 68030 + 68882 @ 25MHz?
  *  IOC2  I/O controller (floppy, SCSI, serial), 68000 @ 10MHz?
- *  GPU8  graphics processor + serial, 68020 @ 20MHz? + +68881 @ 16MHz?
+ *  GPU8  graphics processor + serial, 68020 @ 20MHz? + 68881 @ 16MHz?
  *  DPU8  video/framebuffer, Bt458 @ 108MHz
  *  CMC   communications (GPIB, Ethernet, serial), 68020 @ 12.5MHz?
  *
@@ -133,7 +133,7 @@ private:
 	u8 m_m2i;
 	u8 m_i2m;
 
-	u32 bus_error_r(offs_t offset);
+	[[maybe_unused]] u32 bus_error_r(offs_t offset);
 	u16 ioc_ram_r(offs_t offset);
 	void ioc_ram_w(offs_t offset, u16 data, u16 mem_mask);
 	void cpu_reset_cb(int);
