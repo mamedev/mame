@@ -62,6 +62,10 @@
      On models with localized keyboards, it switches between US QWERTY
      and the local keyboard layout and character set.
 
+     Early IIcs have no 1.8432 MHz XTAL for the ACIAs, which instead use the
+     master clock divided by 8 (~1.789 MHz), producing baud rates 2.9% slower
+     than nominal.  This was fixed before the UniDisk ROM revision was released.
+
     IIc (UniDisk 3.5): IIc with ROM doubled to 32K and the ROMSWITCH register
          added to page between the original 16K ROM and the new added 16K.  The
          extra firmware space was dedicated to implementing the Protocol Converter,
@@ -5035,7 +5039,7 @@ void apple2e_state::apple2c(machine_config &config)
 	config.device_remove("sl7");
 
 	MOS6551(config, m_acia1, 0);
-	m_acia1->set_xtal(XTAL(14'318'181) / 8); // ~1.789 MHz
+	m_acia1->set_xtal(1.8432_MHz_XTAL);
 	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
 
