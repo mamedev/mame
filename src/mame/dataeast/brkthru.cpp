@@ -214,10 +214,11 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	void control_w(uint8_t data);
+	void bgscroll_w(uint8_t data);
 	void int_enable_w(uint8_t data);
 	void bgram_w(offs_t offset, uint8_t data);
 	void fgram_w(offs_t offset, uint8_t data);
-	void control_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
@@ -336,36 +337,6 @@ void brkthru_state::video_start()
 }
 
 
-void brkthru_state::control_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)    // low 8 bits of scroll
-		m_bgscroll = (m_bgscroll & 0x100) | data;
-	else if (offset == 1)
-	{
-		// bit 0-2 = ROM bank select
-		m_mainbank->set_entry(data & 0x07);
-
-		// bit 3-5 = background tiles color code
-		if (((data & 0x38) >> 2) != m_bgbasecolor)
-		{
-			m_bgbasecolor = (data & 0x38) >> 2;
-			m_bg_tilemap->mark_all_dirty();
-		}
-
-		// bit 6 = screen flip
-		if (m_flipscreen != (data & 0x40))
-		{
-			m_flipscreen = data & 0x40;
-			m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_fg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
-		}
-
-		// bit 7 = high bit of scroll
-		m_bgscroll = (m_bgscroll & 0xff) | ((data & 0x80) << 1);
-	}
-}
-
 void brkthru_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int prio)
 {
 	// Draw the sprites. Note that it is important to draw them exactly in this order, to have the correct priorities.
@@ -446,6 +417,36 @@ uint32_t brkthru_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
+void brkthru_state::control_w(uint8_t data)
+{
+	// bit 0-2 = ROM bank select
+	m_mainbank->set_entry(data & 0x07);
+
+	// bit 3-5 = background tiles color code
+	if (((data & 0x38) >> 2) != m_bgbasecolor)
+	{
+		m_bgbasecolor = (data & 0x38) >> 2;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	// bit 6 = screen flip
+	if (m_flipscreen != (data & 0x40))
+	{
+		m_flipscreen = data & 0x40;
+		m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_fg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	}
+
+	// bit 7 = high bit of scroll
+	m_bgscroll = (m_bgscroll & 0xff) | ((data & 0x80) << 1);
+}
+
+void brkthru_state::bgscroll_w(uint8_t data)
+{
+	// low 8 bits of scroll
+	m_bgscroll = (m_bgscroll & 0x100) | data;
+}
+
 void brkthru_state::int_enable_w(uint8_t data)
 {
 	// bit 0 = IRQ enable, bit 1 = NMI enable
@@ -480,7 +481,8 @@ void brkthru_state::brkthru_main_map(address_map &map)
 	map(0x1801, 0x1801).portr("P2");
 	map(0x1802, 0x1802).portr("DSW1");
 	map(0x1803, 0x1803).portr("DSW2_COIN");
-	map(0x1800, 0x1801).w(FUNC(brkthru_state::control_w)); // bg scroll and color, ROM bank selection, flip screen
+	map(0x1800, 0x1800).w(FUNC(brkthru_state::bgscroll_w));
+	map(0x1801, 0x1801).w(FUNC(brkthru_state::control_w));
 	map(0x1802, 0x1802).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1803, 0x1803).w(FUNC(brkthru_state::int_enable_w));
 	map(0x2000, 0x3fff).bankr(m_mainbank);
@@ -499,7 +501,8 @@ void brkthru_state::darwin_main_map(address_map &map)
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("DSW1");
 	map(0x0803, 0x0803).portr("DSW2_COIN");
-	map(0x0800, 0x0801).w(FUNC(brkthru_state::control_w)); // bg scroll and color, ROM bank selection, flip screen
+	map(0x0800, 0x0800).w(FUNC(brkthru_state::bgscroll_w));
+	map(0x0801, 0x0801).w(FUNC(brkthru_state::control_w));
 	map(0x0802, 0x0802).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0803, 0x0803).w(FUNC(brkthru_state::int_enable_w)); // always 0xff?
 	map(0x2000, 0x3fff).bankr(m_mainbank);
@@ -597,6 +600,22 @@ static INPUT_PORTS_START( brkthruj )
 
 	PORT_MODIFY("DSW2_COIN")
 	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( brkthrut )
+	PORT_INCLUDE( brkthru )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( darwin )
@@ -1055,7 +1074,7 @@ ROM_END
 GAME( 1986, brkthru,   0,       brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Break Thru (World)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1986, brkthruu,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1986, brkthruj,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthrut,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthrut,  brkthru, brkthru, brkthrut, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, forcebrk,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, darwin,    0,       darwin,  darwin,   brkthru_state, empty_init, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )
