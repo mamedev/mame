@@ -161,7 +161,7 @@ Freezes at loading screen.
 		<publisher>Hudson Soft</publisher>
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="3837482">
-				<rom name="hitsuji ya-i!.wav" size="3837482" crc="219bf296" sha1="74f28e21e6f075830913d278c8a7ba1abe76d783"/>
+				<rom name="hitsuji yai.wav" size="3837482" crc="219bf296" sha1="74f28e21e6f075830913d278c8a7ba1abe76d783"/>
 			</dataarea>
 		</part>
 	</software>
