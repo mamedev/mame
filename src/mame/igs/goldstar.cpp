@@ -28888,6 +28888,7 @@ ROM_END
   | 36 | Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus | YES     | YES      |
   | 37 | Sweethearts & Sevens, Diamonds 7's, Cherry Bonus, Nevada Numbers       | YES     | YES      |
   | 38 | Wild Thing, Jokers Wild, Cherry Bonus Wild, Nevada Numbers Wild        | YES     | YES      |
+  | 39 | Wild Fire, Diamonds 7's, Cherry Bonus, Nevada Numbers                  | YES     | YES      |
   +----+------------------------------------------------------------------------+---------+----------+
 
   We will name the sets using the order of appearance and availability
@@ -29436,7 +29437,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS02: Black Bart, Diamonds 7's, Cherry Bonus, Nevada Numbers)
+  GS02: Black Bart, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs02 )
@@ -29465,7 +29466,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS03: Cash Cabaret, Wild West, Cherry Bonus, Nevada Numbers
+  GS03: Cash Cabaret, Wild West, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs03 )
@@ -29494,7 +29495,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS04: Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers)
+  GS04: Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs04 )
@@ -29523,7 +29524,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS05: Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS05: Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs05 )
@@ -29552,7 +29553,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS06: Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS06: Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs06 )
@@ -29581,7 +29582,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs07 )
@@ -29610,7 +29611,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS08: Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS08: Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs08 )
@@ -29639,7 +29640,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS09: Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers
+  GS09: Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs09 )
@@ -29668,7 +29669,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS10: Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers
+  GS10: Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs10 )
@@ -29697,7 +29698,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS11: Harley Davidson Black, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS11: Harley Davidson Black, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs11 )
@@ -29726,7 +29727,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS12: Harley Davidson White, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS12: Harley Davidson White, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs12 )
@@ -29755,7 +29756,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS13: Hollywood Nights, Dynamite Diamonds, Cherry Bonus, Nevada Numbers
+  GS13: Hollywood Nights, Dynamite Diamonds, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs13 )
@@ -29784,7 +29785,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS14: House of Fury, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS14: House of Fury, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs14 )
@@ -29813,7 +29814,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS15: Independence Day, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS15: Independence Day, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs15 )
@@ -29842,7 +29843,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS16: Infinity, Diamond Doubles, Cherry Bonus, All Sevens
+  GS16: Infinity, Diamond Doubles, Cherry Bonus, All Sevens.
 
 */
 ROM_START( fl7_50_gs16 )
@@ -29871,7 +29872,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS17: Jackpot Junction, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS17: Jackpot Junction, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs17 )
@@ -29900,7 +29901,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS18: Jokers Wild, Deuces Wild, Cherry Bonus, Nevada Numbers
+  GS18: Jokers Wild, Deuces Wild, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs18 )
@@ -29929,7 +29930,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS19: Konocti Gold, Bar TNT, Cherry Bonus, Nevada Numbers
+  GS19: Konocti Gold, Bar TNT, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs19 )
@@ -29958,7 +29959,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS20: Midnight 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS20: Midnight 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs20 )
@@ -29987,7 +29988,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS21: Mighty Buffalo, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS21: Mighty Buffalo, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs21 )
@@ -30016,7 +30017,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS22: Moolah, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS22: Moolah, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs22 )
@@ -30045,7 +30046,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS23: Moon Over SA, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS23: Moon Over SA, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs23 )
@@ -30074,7 +30075,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS24: Sturgeon 7's, Native American Gold, Cherry Bonus, Nevada Numbers
+  GS24: Sturgeon 7's, Native American Gold, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs24 )
@@ -30103,7 +30104,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS25: Native Nickels, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS25: Native Nickels, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs25 )
@@ -30132,7 +30133,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS26: Native Nickels, Sun God, Cherry Bonus, Nevada Numbers
+  GS26: Native Nickels, Sun God, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs26 )
@@ -30161,7 +30162,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS27: Palace of Riches, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS27: Palace of Riches, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs27 )
@@ -30190,7 +30191,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS28: Phantom, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS28: Phantom, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs28 )
@@ -30219,7 +30220,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS29: Prospector's Gold, Red Hot Ice, Cherry Bonus, Nevada Numbers
+  GS29: Prospector's Gold, Red Hot Ice, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs29 )
@@ -30248,7 +30249,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS30: Prospector's Gold, Red White & Blue 7's, Cherry Bonus, Nevada Numbers
+  GS30: Prospector's Gold, Red White & Blue 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs30 )
@@ -30277,7 +30278,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS31: Red Hot Ice, Red White & Blue 7's, Cherry Bonus, Nevada Numbers
+  GS31: Red Hot Ice, Red White & Blue 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs31 )
@@ -30306,7 +30307,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS32: Rising Star, Trophy Bucks, Cherry Bonus, Nevada Numbers
+  GS32: Rising Star, Trophy Bucks, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs32 )
@@ -30335,7 +30336,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS33: Rockin' Reels, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS33: Rockin' Reels, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs33 )
@@ -30364,7 +30365,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS34: Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers
+  GS34: Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs34 )
@@ -30393,7 +30394,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS35: Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS35: Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs35 )
@@ -30422,7 +30423,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS36: Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus
+  GS36: Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus.
 
 */
 ROM_START( fl7_50_gs36 )
@@ -30451,7 +30452,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS37: Sweethearts & Sevens, Diamonds 7's, Cherry Bonus, Nevada Numbers
+  GS37: Sweethearts & Sevens, Diamonds 7's, Cherry Bonus, Nevada Numbers.
 
 */
 ROM_START( fl7_50_gs37 )
@@ -30480,7 +30481,7 @@ ROM_END
   Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
   Custom Hardware.
 
-  GS38: Wild Thing, Jokers Wild, Cherry Bonus Wild, Nevada Numbers Wild
+  GS38: Wild Thing, Jokers Wild, Cherry Bonus Wild, Nevada Numbers Wild.
 
 */
 ROM_START( fl7_50_gs38 )
@@ -30492,6 +30493,35 @@ ROM_START( fl7_50_gs38 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "fl7_gs38.u3",  0x0000, 0x8000, CRC(2a2db8be) SHA1(b847f4b8a70895515c1f0a8436be1133ac0be7cd) )
+
+	// Proper bipolar PROM dump
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
+  Custom Hardware.
+
+  GS39: Wild Fire, Diamonds 7's, Cherry Bonus, Nevada Numbers.
+
+*/
+ROM_START( fl7_50_gs39 )
+	ROM_REGION( 0x8000, "maincpu", 0 )  // Serial 00000069A1C9.
+	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gs39.u3",  0x0000, 0x8000, CRC(4e3bd980) SHA1(202d3135da7ab435f487943079d88b170dc10955) )
 
 	// Proper bipolar PROM dump
 	ROM_REGION( 0x200, "proms", 0 )
@@ -33833,6 +33863,7 @@ GAME(  199?, fl7_50_gs35, fl7_50,  flaming7, flaming7, wingco_state,   init_flam
 GAME(  199?, fl7_50_gs36, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS36: Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus)", 0 )
 GAME(  199?, fl7_50_gs37, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS37: Sweethearts & Sevens, Diamonds 7's, Cherry Bonus, Nevada Numbers)",       0 )
 GAME(  199?, fl7_50_gs38, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS38: Wild Thing, Jokers Wild, Cherry Bonus Wild, Nevada Numbers Wild)",        0 )
+GAME(  199?, fl7_50_gs39, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS39: Wild Fire, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                  0 )
 
 // special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )
