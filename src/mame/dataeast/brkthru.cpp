@@ -2,7 +2,7 @@
 // copyright-holders:Phil Stroffolino
 /*******************************************************************************
 
-Break Thru Doc. Data East (1986)
+Break Thru (C) Data East (1986)
 
 driver by Phil Stroffolino
 
@@ -94,10 +94,10 @@ upper PCB - 3002A
 Notes:
 
       Chips:
-      HD68A09P : 3G1-UL-HD68A09P Japan (DIP40)
-      HD6809EP : 5M1-HD6809EP Japan (DIP40)
-       YM2203C : Yamaha YM2203C-5X-18-89-F (DIP40)
-        YM3526 : Yamaha YM3526-61-09-75-E (DIP40)
+      HD68A09P : 3G1-UL-HD68A09P Japan (DIP40) @ 6.0MHz
+      HD6809EP : 5M1-HD6809EP Japan (DIP40) @ 1.5MHz
+       YM2203C : Yamaha YM2203C-5X-18-89-F (DIP40) @ 1.5MHz
+        YM3526 : Yamaha YM3526-61-09-75-E (DIP40) @ 3.0MHz
 
       ROMs:
     1,2,3,5,6,7,8 : Intel IP27256
@@ -149,7 +149,7 @@ Notes:
         VSync = HSync / Vertical Frame Length
               = HSync / (VDisplay + VBlank)
               = 15.625kHz / (240 + 32)
-              = 57.444855Hz
+              = 57.444855Hz (measured 57.40Hz)
 
 *******************************************************************************/
 
@@ -449,7 +449,7 @@ void brkthru_state::bgscroll_w(uint8_t data)
 
 void brkthru_state::int_enable_w(uint8_t data)
 {
-	// bit 0 = IRQ enable, bit 1 = NMI enable
+	// bit 0 = IRQ disable, bit 1 = NMI enable
 	m_int_enable = data;
 
 	if (data & 1)
@@ -759,10 +759,10 @@ void brkthru_state::vblank_irq(int state)
 void brkthru_state::brkthru(machine_config &config)
 {
 	// basic machine hardware
-	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5 MHz ?
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::brkthru_main_map);
 
-	MC6809(config, m_audiocpu, 12_MHz_XTAL / 2); // 1.5 MHz ?
+	MC6809(config, m_audiocpu, 12_MHz_XTAL / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	// video hardware
