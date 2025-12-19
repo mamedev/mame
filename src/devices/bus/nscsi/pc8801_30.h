@@ -21,6 +21,8 @@ public:
 
 	int16_t get_channel_sample(offs_t offset) { return cdda->get_channel_sample(offset); };
 	virtual void fader_control_w(u8 data);
+	// I/O port $98
+	bool is_motor_on() { return image->exists(); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
