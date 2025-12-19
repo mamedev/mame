@@ -12,7 +12,7 @@
 --local PROGRAM_NAME = 'ustudio_dump.bin'
 --local PROGRAM_NAME = 'ustudio2.bin'
 
-local PROGRAM_NAME = '5322-02-4481186.bin'
+local PROGRAM_NAME = 'kf10_ic27_v2.bin'
 
 local socket = require("socket")
 
