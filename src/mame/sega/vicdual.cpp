@@ -1672,7 +1672,6 @@ static INPUT_PORTS_START( headon2sl )
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_COIN_DEFAULT
-
 	
 	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x01, "Lives" )   PORT_DIPLOCATION("SW1:1,2")
@@ -4283,8 +4282,8 @@ ROM_START( headon2 )
 	ROM_LOAD( "316-0206.u65", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    // control PROM
 ROM_END
 
-/* Head On 2 - Sega Slimline (VIC Dual PCB Set)*/
-/* Head On Part 2 - Nintendo Table (Nintendo THO PCB Set) */
+// Head On 2 - Sega Slimline (VIC Dual PCB Set)
+// Head On Part 2 - Nintendo Table (Nintendo THO PCB Set)
 ROM_START( headon2sl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-170.u33",   0x0000, 0x0400, CRC(C108625D) SHA1(b6e255b819a001a0147f2ddf5f78689e0491da88) )

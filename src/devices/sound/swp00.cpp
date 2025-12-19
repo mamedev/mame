@@ -6,6 +6,8 @@
 #include "emu.h"
 #include "swp00.h"
 
+#include <sstream>
+
 /*
 
   Used in the MU50, the SWP00 is the combination of a rompler called
@@ -97,17 +99,17 @@ u16 swp00_device::interpolation_step(u32 speed, u32 sample_counter)
 		k0 -= 10;
 		u32 a = (2 << k0) - 1;
 		u32 b = (1 << k0) - 1;
-		static const u8 mx[8] = { 0x00, 0x80, 0x88, 0xa8, 0xaa, 0xea, 0xee, 0xfe };
+		constexpr u8 mx[8] = { 0x00, 0x80, 0x88, 0xa8, 0xaa, 0xea, 0xee, 0xfe };
 		return ((mx[k1] << (sample_counter & 7)) & 0x80) ? a : b;
+	} else {
+		k0 = 10 - k0;
+
+		if(sample_counter & util::make_bitmask<u32>(k0))
+			return 0;
+
+		constexpr u16 mx[8] = { 0xaaaa, 0xeaaa, 0xeaea, 0xeeea, 0xeeee, 0xfeee, 0xfefe, 0xfffe };
+		return (mx[k1] << ((sample_counter >> k0) & 0xf)) & 0x8000 ? 1 : 0;
 	}
-
-	k0 = 10 - k0;
-
-	if(sample_counter & util::make_bitmask<u32>(k0))
-		return 0;
-
-	static const u16 mx[8] = { 0xaaaa, 0xeaaa, 0xeaea, 0xeeea, 0xeeee, 0xfeee, 0xfefe, 0xfffe };
-	return (mx[k1] << ((sample_counter >> k0) & 0xf)) & 0x8000 ? 1 : 0;
 }
 
 
@@ -147,7 +149,7 @@ u16 swp00_device::interpolation_step(u32 speed, u32 sample_counter)
 // Dpcm delta expansion table
 const std::array<s16, 256> swp00_device::streaming_block::dpcm_expand = []() {
 	std::array<s16, 256> deltas;
-	static const s16 offset[4] = { 0, 0x20, 0x60, 0xe0 };
+	constexpr s16 offset[4] = { 0, 0x20, 0x60, 0xe0 };
 	for(u32 i=0; i != 128; i++) {
 		u32 e = i >> 5;
 		s16 base = ((i & 0x1f) << e) + offset[e];
@@ -191,14 +193,14 @@ void swp00_device::streaming_block::keyon()
 	m_done = false;
 }
 
-void swp00_device::streaming_block::read_16(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1)
+void swp00_device::streaming_block::read_16(wave_access_cache &wave, s16 &val0, s16 &val1)
 {
 	offs_t adr = m_address + (m_pos << 1);
 	val0 = wave.read_word(adr);
 	val1 = wave.read_word(adr+2);
 }
 
-void swp00_device::streaming_block::read_12(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1)
+void swp00_device::streaming_block::read_12(wave_access_cache &wave, s16 &val0, s16 &val1)
 {
 	offs_t adr = m_address + (m_pos >> 2)*6;
 
@@ -235,7 +237,7 @@ void swp00_device::streaming_block::read_12(memory_access<24, 0, 0, ENDIANNESS_L
 	}
 }
 
-void swp00_device::streaming_block::read_8(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1)
+void swp00_device::streaming_block::read_8(wave_access_cache &wave, s16 &val0, s16 &val1)
 {
 	offs_t adr = m_address + m_pos;
 	val0 = wave.read_byte(adr  ) << 8;
@@ -271,7 +273,7 @@ void swp00_device::streaming_block::dpcm_step(u8 input)
 	m_dpcm_delta = delta;
 }
 
-void swp00_device::streaming_block::read_8c(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1)
+void swp00_device::streaming_block::read_8c(wave_access_cache &wave, s16 &val0, s16 &val1)
 {
 	while(m_dpcm_pos != m_pos + 2) {
 		dpcm_step(wave.read_byte(m_address + m_dpcm_pos));
@@ -282,7 +284,7 @@ void swp00_device::streaming_block::read_8c(memory_access<24, 0, 0, ENDIANNESS_L
 	val1 = m_dpcm_s1;
 }
 
-std::pair<s16, bool> swp00_device::streaming_block::step(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s32 fmod)
+std::pair<s16, bool> swp00_device::streaming_block::step(wave_access_cache &wave, s32 fmod)
 {
 	if(m_done)
 		return std::make_pair(m_last, false);
@@ -326,33 +328,33 @@ std::pair<s16, bool> swp00_device::streaming_block::step(memory_access<24, 0, 0,
 	return std::make_pair(result, false);
 }
 
-template<int sel> void swp00_device::streaming_block::phase_w(u8 data)
+template<int Sel> void swp00_device::streaming_block::phase_w(u8 data)
 {
-	constexpr int shift = 8*sel;
+	constexpr int shift = 8*Sel;
 	m_phase = (m_phase & ~(0xff << shift)) | (data << shift);
 }
 
-template<int sel> void swp00_device::streaming_block::start_w(u8 data)
+template<int Sel> void swp00_device::streaming_block::start_w(u8 data)
 {
-	constexpr int shift = 8*sel;
+	constexpr int shift = 8*Sel;
 	m_start = (m_start & ~(0xff << shift)) | (data << shift);
 }
 
-template<int sel> void swp00_device::streaming_block::loop_w(u8 data)
+template<int Sel> void swp00_device::streaming_block::loop_w(u8 data)
 {
-	constexpr int shift = 8*sel;
+	constexpr int shift = 8*Sel;
 	m_loop = (m_loop & ~(0xff << shift)) | (data << shift);
 }
 
-template<int sel> void swp00_device::streaming_block::address_w(u8 data)
+template<int Sel> void swp00_device::streaming_block::address_w(u8 data)
 {
-	constexpr int shift = 8*sel;
+	constexpr int shift = 8*Sel;
 	m_address = (m_address & ~(0xff << shift)) | (data << shift);
 }
 
-template<int sel> void swp00_device::streaming_block::pitch_w(u8 data)
+template<int Sel> void swp00_device::streaming_block::pitch_w(u8 data)
 {
-	constexpr int shift = 8*sel;
+	constexpr int shift = 8*Sel;
 	m_pitch = (m_pitch & ~(0xff << shift)) | (data << shift);
 }
 
@@ -361,29 +363,29 @@ void swp00_device::streaming_block::format_w(u8 data)
 	m_format = data;
 }
 
-template<int sel> u8 swp00_device::streaming_block::phase_r() const
+template<int Sel> u8 swp00_device::streaming_block::phase_r() const
 {
-	return m_phase >> (8*sel);
+	return m_phase >> (8*Sel);
 }
 
-template<int sel> u8 swp00_device::streaming_block::start_r() const
+template<int Sel> u8 swp00_device::streaming_block::start_r() const
 {
-	return m_start >> (8*sel);
+	return m_start >> (8*Sel);
 }
 
-template<int sel> u8 swp00_device::streaming_block::loop_r() const
+template<int Sel> u8 swp00_device::streaming_block::loop_r() const
 {
-	return m_loop >> (8*sel);
+	return m_loop >> (8*Sel);
 }
 
-template<int sel> u8 swp00_device::streaming_block::address_r() const
+template<int Sel> u8 swp00_device::streaming_block::address_r() const
 {
-	return m_address >> (8*sel);
+	return m_address >> (8*Sel);
 }
 
-template<int sel> u8 swp00_device::streaming_block::pitch_r() const
+template<int Sel> u8 swp00_device::streaming_block::pitch_r() const
 {
-	return m_pitch >> (8*sel);
+	return m_pitch >> (8*Sel);
 }
 
 u8 swp00_device::streaming_block::format_r() const
@@ -400,29 +402,29 @@ u32 swp00_device::streaming_block::sample_address_get()
 
 std::string swp00_device::streaming_block::describe() const
 {
-	std::string desc;
-	desc = util::string_format("sample %04x-%04x @ %06x ", m_start, m_loop, m_address);
+	std::ostringstream desc;
+	util::stream_format(desc, "sample %04x-%04x @ %06x ", m_start, m_loop, m_address);
 	switch(m_format >> 6) {
-	case 0: desc += "16"; break;
-	case 1: desc += "12"; break;
-	case 2: desc += "8 "; break;
-	case 3: desc += util::string_format("c%x", m_format & 3); break;
+	case 0: desc << "16"; break;
+	case 1: desc << "12"; break;
+	case 2: desc << "8 "; break;
+	case 3: util::stream_format(desc, "c%x", m_format & 3); break;
 	}
 	if((m_format & 0xc0) == 0xc0)
-		desc += util::string_format(" scale %x", (m_format >> 2) & 7);
+		util::stream_format(desc, " scale %x", (m_format >> 2) & 7);
 	if(!m_loop)
-		desc += " fwd ";
+		desc << " fwd ";
 	else
-		desc += " loop";
+		desc << " loop";
 	if((m_format & 0xc0) != 0xc0 && (m_format & 0x3f))
-		desc += util::string_format(" loop-adjust %02x", m_format & 0x3f);
+		util::stream_format(desc, " loop-adjust %02x", m_format & 0x3f);
 	if(m_pitch & 0x8000) {
 		u32 p = 0x10000 - m_pitch;
-		desc += util::string_format(" pitch -%x.%03x", p >> 12, p & 0xfff);
+		util::stream_format(desc, " pitch -%x.%03x", p >> 12, p & 0xfff);
 	} else if(m_pitch)
-		desc += util::string_format(" pitch +%x.%03x", (m_pitch >> 12) & 7, m_pitch & 0xfff);
+		util::stream_format(desc, " pitch +%x.%03x", (m_pitch >> 12) & 7, m_pitch & 0xfff);
 
-	return desc;
+	return std::move(desc).str();
 }
 
 
@@ -722,9 +724,9 @@ u8 swp00_device::filter_block::status() const
 	return (m_sweep == SWEEP_DONE || (m_sweep == SWEEP_NONE && m_k == m_k_target) ? 0xc0 : 0x00) | ((m_k >> 6) ^ 0x3f);
 }
 
-template<int sel> void swp00_device::filter_block::info_w(u8 data)
+template<int Sel> void swp00_device::filter_block::info_w(u8 data)
 {
-	if(sel) {
+	if(Sel) {
 		m_info = (m_info & 0xff) | (data << 8);
 		s32 q = (m_info >> 11) + 4;
 		m_q = (0x10 - (q & 7)) << (4 - (q >> 3));
@@ -736,9 +738,9 @@ template<int sel> void swp00_device::filter_block::info_w(u8 data)
 		m_k_target |= 0x800;
 }
 
-template<int sel> u8 swp00_device::filter_block::info_r()
+template<int Sel> u8 swp00_device::filter_block::info_r()
 {
-	return m_info >> (8*sel);
+	return m_info >> (8*Sel);
 }
 
 void swp00_device::filter_block::speed_w(u8 data)
@@ -1398,15 +1400,15 @@ void swp00_device::map(address_map &map)
 
 
 // Voice control
-template<int sel> void swp00_device::lpf_info_w(offs_t offset, u8 data)
+template<int Sel> void swp00_device::lpf_info_w(offs_t offset, u8 data)
 {
 	m_stream->update();
-	m_filter[offset >> 1].info_w<sel>(data);
+	m_filter[offset >> 1].info_w<Sel>(data);
 }
 
-template<int sel> u8 swp00_device::lpf_info_r(offs_t offset)
+template<int Sel> u8 swp00_device::lpf_info_r(offs_t offset)
 {
-	return m_filter[offset >> 1].info_r<sel>();
+	return m_filter[offset >> 1].info_r<Sel>();
 }
 
 void swp00_device::lpf_speed_w(offs_t offset, u8 data)
@@ -1562,48 +1564,48 @@ u8 swp00_device::decay_level_r(offs_t offset)
 	return m_envelope[offset >> 1].decay_level_r();
 }
 
-template<int sel> void swp00_device::pitch_w(offs_t offset, u8 data)
+template<int Sel> void swp00_device::pitch_w(offs_t offset, u8 data)
 {
 	m_stream->update();
-	m_streaming[offset >> 1].pitch_w<sel>(data);
+	m_streaming[offset >> 1].pitch_w<Sel>(data);
 }
 
-template<int sel> u8 swp00_device::pitch_r(offs_t offset)
+template<int Sel> u8 swp00_device::pitch_r(offs_t offset)
 {
-	return m_streaming[offset >> 1].pitch_r<sel>();
+	return m_streaming[offset >> 1].pitch_r<Sel>();
 }
 
-template<int sel> void swp00_device::start_w(offs_t offset, u8 data)
-{
-	m_stream->update();
-	m_streaming[offset >> 1].start_w<sel>(data);
-}
-
-template<int sel> u8 swp00_device::start_r(offs_t offset)
-{
-	return m_streaming[offset >> 1].start_r<sel>();
-}
-
-template<int sel> void swp00_device::phase_w(offs_t offset, u8 data)
+template<int Sel> void swp00_device::start_w(offs_t offset, u8 data)
 {
 	m_stream->update();
-	m_streaming[offset >> 1].phase_w<sel>(data);
+	m_streaming[offset >> 1].start_w<Sel>(data);
 }
 
-template<int sel> u8 swp00_device::phase_r(offs_t offset)
+template<int Sel> u8 swp00_device::start_r(offs_t offset)
 {
-	return m_streaming[offset >> 1].phase_r<sel>();
+	return m_streaming[offset >> 1].start_r<Sel>();
 }
 
-template<int sel> void swp00_device::loop_w(offs_t offset, u8 data)
+template<int Sel> void swp00_device::phase_w(offs_t offset, u8 data)
 {
 	m_stream->update();
-	m_streaming[offset >> 1].loop_w<sel>(data);
+	m_streaming[offset >> 1].phase_w<Sel>(data);
 }
 
-template<int sel> u8 swp00_device::loop_r(offs_t offset)
+template<int Sel> u8 swp00_device::phase_r(offs_t offset)
 {
-	return m_streaming[offset >> 1].loop_r<sel>();
+	return m_streaming[offset >> 1].phase_r<Sel>();
+}
+
+template<int Sel> void swp00_device::loop_w(offs_t offset, u8 data)
+{
+	m_stream->update();
+	m_streaming[offset >> 1].loop_w<Sel>(data);
+}
+
+template<int Sel> u8 swp00_device::loop_r(offs_t offset)
+{
+	return m_streaming[offset >> 1].loop_r<Sel>();
 }
 
 void swp00_device::format_w(offs_t offset, u8 data)
@@ -1617,15 +1619,15 @@ u8 swp00_device::format_r(offs_t offset)
 	return m_streaming[offset >> 1].format_r();
 }
 
-template<int sel> void swp00_device::address_w(offs_t offset, u8 data)
+template<int Sel> void swp00_device::address_w(offs_t offset, u8 data)
 {
 	m_stream->update();
-	m_streaming[offset >> 1].address_w<sel>(data);
+	m_streaming[offset >> 1].address_w<Sel>(data);
 }
 
-template<int sel> u8 swp00_device::address_r(offs_t offset)
+template<int Sel> u8 swp00_device::address_r(offs_t offset)
 {
-	return m_streaming[offset >> 1].address_r<sel>();
+	return m_streaming[offset >> 1].address_r<Sel>();
 }
 
 void swp00_device::keyon(int chan)
@@ -1640,11 +1642,11 @@ void swp00_device::keyon(int chan)
 	m_mixer    [chan].keyon();
 }
 
-template<int sel> void swp00_device::keyon_w(u8 data)
+template<int Sel> void swp00_device::keyon_w(u8 data)
 {
 	for(int i=0; i < 8; i++)
 		if(BIT(data, i))
-			keyon(8*sel+i);
+			keyon(8*Sel+i);
 }
 
 void swp00_device::offset_w(offs_t offset, u8 data)
@@ -1798,23 +1800,23 @@ s32 swp00_device::m9(s32 value, int reg) const
 	return m9v(value, rext(reg));
 }
 
-template<size_t size> swp00_device::delay_block<size>::delay_block(swp00_device *swp, std::array<s32, size> &buffer) :
+template<size_t Size> swp00_device::delay_block<Size>::delay_block(swp00_device *swp, std::array<s32, Size> &buffer) :
 	m_swp(swp),
 	m_buffer(buffer)
 {
 }
 
-template<size_t size> s32 swp00_device::delay_block<size>::r(int offreg) const
+template<size_t Size> s32 swp00_device::delay_block<Size>::r(int offreg) const
 {
-	return m_buffer[(m_swp->m_buffer_offset + m_swp->m_offset[offreg/3]) & (size - 1)];
+	return m_buffer[(m_swp->m_buffer_offset + m_swp->m_offset[offreg/3]) & (Size - 1)];
 }
 
-template<size_t size> void swp00_device::delay_block<size>::w(int offreg, s32 value) const
+template<size_t Size> void swp00_device::delay_block<Size>::w(int offreg, s32 value) const
 {
-	m_buffer[(m_swp->m_buffer_offset + m_swp->m_offset[offreg/3]) & (size - 1)] = value;
+	m_buffer[(m_swp->m_buffer_offset + m_swp->m_offset[offreg/3]) & (Size - 1)] = value;
 }
 
-template<size_t size> s32 swp00_device::delay_block<size>::rlfo(int offreg, u32 phase, s32 delta_phase, int levelreg) const
+template<size_t Size> s32 swp00_device::delay_block<Size>::rlfo(int offreg, u32 phase, s32 delta_phase, int levelreg) const
 {
 	// Phase is on 23 bits
 	// Delta phase is on 10 bits shifts for a maximum of a full period (e.g. left shift of 13)
@@ -1830,13 +1832,13 @@ template<size_t size> s32 swp00_device::delay_block<size>::rlfo(int offreg, u32 
 
 	// Uses in reality offreg and offreg+3 (which are offset by 1)
 	u32 pos = m_swp->m_buffer_offset + m_swp->m_offset[offreg/3] + lfo_i_offset;
-	s32 val0 = m_buffer[pos & (size - 1)];
-	s32 val1 = m_buffer[(pos + 1) & (size - 1)];
+	s32 val0 = m_buffer[pos & (Size - 1)];
+	s32 val1 = m_buffer[(pos + 1) & (Size - 1)];
 
 	return s32((val1 * s64(lfo_i_frac) + val0 * s64(0x400000 - lfo_i_frac)) >> 22);
 }
 
-template<size_t size> s32 swp00_device::delay_block<size>::rlfo2(int offreg, s32 offset) const
+template<size_t Size> s32 swp00_device::delay_block<Size>::rlfo2(int offreg, s32 offset) const
 {
 	// Offset is 12.11
 	u32 lfo_i_offset = offset >> 11;
@@ -1844,8 +1846,8 @@ template<size_t size> s32 swp00_device::delay_block<size>::rlfo2(int offreg, s32
 
 	// Uses in reality offreg and offreg+3 (which are offset by 1)
 	u32 pos = m_swp->m_buffer_offset + m_swp->m_offset[offreg/3] + lfo_i_offset;
-	s32 val0 = m_buffer[pos & (size - 1)];
-	s32 val1 = m_buffer[(pos + 1) & (size - 1)];
+	s32 val0 = m_buffer[pos & (Size - 1)];
+	s32 val1 = m_buffer[(pos + 1) & (Size - 1)];
 
 	return s32((val1 * s64(lfo_i_frac) + val0 * s64(0x800 - lfo_i_frac)) >> 11);
 }

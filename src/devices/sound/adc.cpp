@@ -7,11 +7,11 @@
 #include "adc.h"
 
 
-zn449_device::zn449_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ZN449, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(nullptr),
-	  m_current_value(0)
+zn449_device::zn449_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ZN449, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_current_value(0)
 {
 }
 
@@ -37,11 +37,11 @@ DEFINE_DEVICE_TYPE(ZN449, zn449_device, "zn449", "ZN449 ADC")
 
 
 
-adc10_device::adc10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADC10, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(nullptr),
-	  m_current_value(0)
+adc10_device::adc10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ADC10, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_current_value(0)
 {
 }
 
@@ -63,13 +63,13 @@ void adc10_device::sound_stream_update(sound_stream &stream)
 	m_current_value = std::clamp(int(512 * last_sample), -512, 511);
 }
 
-DEFINE_DEVICE_TYPE(ADC10, adc10_device, "adc10", "10-bits signed ADC")
+DEFINE_DEVICE_TYPE(ADC10, adc10_device, "adc10", "10-bit signed ADC")
 
-adc16_device::adc16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADC16, tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(nullptr),
-	  m_current_value(0)
+adc16_device::adc16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ADC16, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_current_value(0)
 {
 }
 
@@ -103,4 +103,4 @@ void adc16_device::sound_stream_update(sound_stream &stream)
 	m_current_value = std::clamp(int(32768 * last_sample), -32768, 32767);
 }
 
-DEFINE_DEVICE_TYPE(ADC16, adc16_device, "adc16", "16-bits signed ADC")
+DEFINE_DEVICE_TYPE(ADC16, adc16_device, "adc16", "16-bit signed ADC")
