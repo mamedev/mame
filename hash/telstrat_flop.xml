@@ -61,7 +61,7 @@
 	<software name="stratmnd" supported="yes">
 		<description>Stratmind</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>www.stratix.fr</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="537856">
 				<rom name="STRATMIND.dsk" size="537856" crc="13250bb4" sha1="d8a6b7ffccf35ffe537a94e00f571b9ff5fd65f8"/>
