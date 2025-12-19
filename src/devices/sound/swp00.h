@@ -26,6 +26,8 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 private:
+	using wave_access_cache = memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache;
+
 	struct streaming_block {
 		static const std::array<s16, 256> dpcm_expand;
 		static const std::array<s32, 8> max_value;
@@ -48,28 +50,28 @@ private:
 
 		void clear();
 		void keyon();
-		std::pair<s16, bool> step(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s32 fmod);
+		std::pair<s16, bool> step(wave_access_cache &wave, s32 fmod);
 
-		template<int sel> void phase_w(u8 data);
-		template<int sel> void start_w(u8 data);
-		template<int sel> void loop_w(u8 data);
-		template<int sel> void address_w(u8 data);
-		template<int sel> void pitch_w(u8 data);
+		template<int Sel> void phase_w(u8 data);
+		template<int Sel> void start_w(u8 data);
+		template<int Sel> void loop_w(u8 data);
+		template<int Sel> void address_w(u8 data);
+		template<int Sel> void pitch_w(u8 data);
 		void format_w(u8 data);
 
-		template<int sel> u8 phase_r() const;
-		template<int sel> u8 start_r() const;
-		template<int sel> u8 loop_r() const;
-		template<int sel> u8 address_r() const;
-		template<int sel> u8 pitch_r() const;
+		template<int Sel> u8 phase_r() const;
+		template<int Sel> u8 start_r() const;
+		template<int Sel> u8 loop_r() const;
+		template<int Sel> u8 address_r() const;
+		template<int Sel> u8 pitch_r() const;
 		u8 format_r() const;
 
 		u32 sample_address_get();
 
-		void read_16(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1);
-		void read_12(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1);
-		void read_8 (memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1);
-		void read_8c(memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache &wave, s16 &val0, s16 &val1);
+		void read_16(wave_access_cache &wave, s16 &val0, s16 &val1);
+		void read_12(wave_access_cache &wave, s16 &val0, s16 &val1);
+		void read_8 (wave_access_cache &wave, s16 &val0, s16 &val1);
+		void read_8c(wave_access_cache &wave, s16 &val0, s16 &val1);
 
 		void dpcm_step(u8 input);
 
@@ -125,8 +127,8 @@ private:
 		void keyon();
 		s32 step(s16 input, s32 lmod, u32 sample_counter);
 		u8 status() const;
-		template<int sel> void info_w(u8 data);
-		template<int sel> u8 info_r();
+		template<int Sel> void info_w(u8 data);
+		template<int Sel> u8 info_r();
 		void speed_w(u8 data);
 		u8 speed_r();
 	};
@@ -176,11 +178,11 @@ private:
 		u8 var_r();
 	};
 
-	template<size_t size> struct delay_block {
+	template<size_t Size> struct delay_block {
 		swp00_device *m_swp;
-		std::array<s32, size> &m_buffer;
+		std::array<s32, Size> &m_buffer;
 
-		delay_block(swp00_device *swp, std::array<s32, size> &buffer);
+		delay_block(swp00_device *swp, std::array<s32, Size> &buffer);
 		s32 r(int offreg) const;
 		s32 rlfo(int offreg, u32 phase, s32 delta_phase, int levelreg) const;
 		s32 rlfo2(int offreg, s32 offset) const;
@@ -244,8 +246,8 @@ private:
 
 	// Voice control
 
-	template<int sel> void lpf_info_w(offs_t offset, u8 data);
-	template<int sel> u8 lpf_info_r(offs_t offset);
+	template<int Sel> void lpf_info_w(offs_t offset, u8 data);
+	template<int Sel> u8 lpf_info_r(offs_t offset);
 	void lpf_speed_w(offs_t offset, u8 data);
 	u8 lpf_speed_r(offs_t offset);
 	void lfo_lamod_w(offs_t offset, u8 data);
@@ -274,16 +276,16 @@ private:
 	u8 decay_speed_r(offs_t offset);
 	void decay_level_w(offs_t offset, u8 data);
 	u8 decay_level_r(offs_t offset);
-	template<int sel> void pitch_w(offs_t offset, u8 data);
-	template<int sel> u8 pitch_r(offs_t offset);
-	template<int sel> void phase_w(offs_t offset, u8 data);
-	template<int sel> u8 phase_r(offs_t offset);
-	template<int sel> void start_w(offs_t offset, u8 data);
-	template<int sel> u8 start_r(offs_t offset);
-	template<int sel> void loop_w(offs_t offset, u8 data);
-	template<int sel> u8 loop_r(offs_t offset);
-	template<int sel> void address_w(offs_t offset, u8 data);
-	template<int sel> u8 address_r(offs_t offset);
+	template<int Sel> void pitch_w(offs_t offset, u8 data);
+	template<int Sel> u8 pitch_r(offs_t offset);
+	template<int Sel> void phase_w(offs_t offset, u8 data);
+	template<int Sel> u8 phase_r(offs_t offset);
+	template<int Sel> void start_w(offs_t offset, u8 data);
+	template<int Sel> u8 start_r(offs_t offset);
+	template<int Sel> void loop_w(offs_t offset, u8 data);
+	template<int Sel> u8 loop_r(offs_t offset);
+	template<int Sel> void address_w(offs_t offset, u8 data);
+	template<int Sel> u8 address_r(offs_t offset);
 	void format_w(offs_t offset, u8 data);
 	u8 format_r(offs_t offset);
 
@@ -301,7 +303,7 @@ private:
 
 	// Control registers
 	void keyon(int chan);
-	template<int sel> void keyon_w(u8 data);
+	template<int Sel> void keyon_w(u8 data);
 
 	void waverom_access_w(u8 data);
 	u8 waverom_access_r();

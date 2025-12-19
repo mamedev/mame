@@ -988,7 +988,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	else // colors mixing case
 	{
-		if(ula_en && (m_nr_68_blend_mode == 0b00 || m_nr_68_blend_mode == 0b10)) // blending with ULA
+		if (ula_en && (m_nr_68_blend_mode == 0b00 || m_nr_68_blend_mode == 0b10)) // blending with ULA
 		{
 			screen.priority().fill(1, cliprect);
 			screen.priority().fill(0, clip256x192);
@@ -2865,7 +2865,7 @@ void specnext_state::map_io(address_map &map)
 		}
 	}));
 	map(0xe0f7, 0xe0f7).mirror(0x0f00).lw8(NAME([this](u8 data) {
-		if(port_eff7_io_en())
+		if (port_eff7_io_en())
 		{
 			m_port_eff7_data = data;
 			memory_change(0xeff7, data);
@@ -2890,7 +2890,7 @@ void specnext_state::map_io(address_map &map)
 	map(0x113b, 0x113b).lrw8(NAME([this]() {
 		return port_i2c_io_en() ? (0xfe | (m_i2c_sda_data & 1)) : 0x00;
 	}), NAME([this](u8 data) {
-		if(port_i2c_io_en())
+		if (port_i2c_io_en())
 			m_i2c->sda_write(data & 1);
 	}));
 	map(0x183b, 0x183b).select(0x0700).lrw8(NAME([this](offs_t offset) {
@@ -2898,7 +2898,7 @@ void specnext_state::map_io(address_map &map)
 		return port_ctc_io_en() && (chanel < 4) ? m_ctc->read(chanel) : 0x00;
 	}), NAME([this](offs_t offset, u8 data) {
 		u8 chanel = offset >> 8;
-		if(port_ctc_io_en() && (chanel < 4))
+		if (port_ctc_io_en() && (chanel < 4))
 			m_ctc->write(chanel, data);
 	}));
 	map(0x123b, 0x123b).lrw8(NAME([this]() {
