@@ -196,6 +196,30 @@ protected:
 };
 
 
+// ======================> abc80l_state
+
+class abc80l_state : public abc80_state
+{
+public:
+	abc80l_state(const machine_config &mconfig, device_type type, const char *tag) :
+		abc80_state(mconfig, type, tag),
+		m_rom_5000(*this, "abc80l"),
+		m_ram(*this, "ram", 0x4000, ENDIANNESS_LITTLE)
+	{ }
+
+	void abc80l(machine_config &config);
+
+protected:
+	void abc80l_mem(address_map &map) ATTR_COLD;
+
+	virtual u8 read(offs_t offset) override;
+	virtual void write(offs_t offset, u8 data) override;
+
+	required_memory_region m_rom_5000;
+	memory_share_creator<uint8_t> m_ram;
+};
+
+
 // ======================> tkn80_state
 
 class tkn80_state : public abc80_state
