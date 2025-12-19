@@ -206,6 +206,7 @@ private:
 	uint16_t m_bgscroll = 0;
 	uint8_t m_bgbasecolor = 0;
 	uint8_t m_flipscreen = 0;
+	uint8_t m_int_enable = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -213,13 +214,10 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_nmi_mask = 0U;
-
-	void brkthru_1803_w(uint8_t data);
-	void darwin_0803_w(uint8_t data);
+	void int_enable_w(uint8_t data);
 	void bgram_w(offs_t offset, uint8_t data);
 	void fgram_w(offs_t offset, uint8_t data);
-	void _1800_w(offs_t offset, uint8_t data);
+	void control_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
@@ -338,7 +336,7 @@ void brkthru_state::video_start()
 }
 
 
-void brkthru_state::_1800_w(offs_t offset, uint8_t data)
+void brkthru_state::control_w(offs_t offset, uint8_t data)
 {
 	if (offset == 0)    // low 8 bits of scroll
 		m_bgscroll = (m_bgscroll & 0x100) | data;
@@ -448,33 +446,19 @@ uint32_t brkthru_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
-void brkthru_state::brkthru_1803_w(uint8_t data)
+void brkthru_state::int_enable_w(uint8_t data)
 {
-	// bit 0 = NMI enable
-	m_nmi_mask = ~data & 1;
+	// bit 0 = IRQ enable, bit 1 = NMI enable
+	m_int_enable = data;
 
-	if (data & 2)
+	if (data & 1)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
-
-	// bit 1 = ? maybe IRQ acknowledge
-}
-
-void brkthru_state::darwin_0803_w(uint8_t data)
-{
-	// bit 0 = NMI enable
-	m_nmi_mask = data & 1;
-	logerror("0803 %02X\n", data);
-
-	if (data & 2)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-
-	// bit 1 = ? maybe IRQ acknowledge
 }
 
 INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
 {
 	// coin insertion causes an IRQ
-	if (oldval)
+	if (oldval && BIT(~m_int_enable, 0))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -496,9 +480,9 @@ void brkthru_state::brkthru_main_map(address_map &map)
 	map(0x1801, 0x1801).portr("P2");
 	map(0x1802, 0x1802).portr("DSW1");
 	map(0x1803, 0x1803).portr("DSW2_COIN");
-	map(0x1800, 0x1801).w(FUNC(brkthru_state::_1800_w));   // bg scroll and color, ROM bank selection, flip screen
+	map(0x1800, 0x1801).w(FUNC(brkthru_state::control_w)); // bg scroll and color, ROM bank selection, flip screen
 	map(0x1802, 0x1802).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1803, 0x1803).w(FUNC(brkthru_state::brkthru_1803_w));   // NMI enable, + ?
+	map(0x1803, 0x1803).w(FUNC(brkthru_state::int_enable_w));
 	map(0x2000, 0x3fff).bankr(m_mainbank);
 	map(0x4000, 0xffff).rom();
 }
@@ -515,9 +499,9 @@ void brkthru_state::darwin_main_map(address_map &map)
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("DSW1");
 	map(0x0803, 0x0803).portr("DSW2_COIN");
-	map(0x0800, 0x0801).w(FUNC(brkthru_state::_1800_w));     // bg scroll and color, ROM bank selection, flip screen
+	map(0x0800, 0x0801).w(FUNC(brkthru_state::control_w)); // bg scroll and color, ROM bank selection, flip screen
 	map(0x0802, 0x0802).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0803, 0x0803).w(FUNC(brkthru_state::darwin_0803_w));     // NMI enable, + ?
+	map(0x0803, 0x0803).w(FUNC(brkthru_state::int_enable_w)); // always 0xff?
 	map(0x2000, 0x3fff).bankr(m_mainbank);
 	map(0x4000, 0xffff).rom();
 }
@@ -736,7 +720,7 @@ void brkthru_state::machine_start()
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_bgbasecolor));
 	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_int_enable));
 }
 
 void brkthru_state::machine_reset()
@@ -744,12 +728,12 @@ void brkthru_state::machine_reset()
 	m_bgscroll = 0;
 	m_bgbasecolor = 0;
 	m_flipscreen = 0;
-	m_nmi_mask = 0;
+	m_int_enable = 0;
 }
 
 void brkthru_state::vblank_irq(int state)
 {
-	if (state && m_nmi_mask)
+	if (state && BIT(m_int_enable, 1))
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
