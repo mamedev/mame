@@ -8,7 +8,8 @@
 #define LOG_SERIAL (1U << 1)
 #define LOG_PORT   (1U << 2)
 #define LOG_SAM    (1U << 3)
-#define VERBOSE (LOG_SERIAL | LOG_SAM)
+#define LOG_IO     (1U << 4)
+#define VERBOSE (LOG_SERIAL | LOG_SAM | LOG_IO)
 #include "logmacro.h"
 
 namespace {
@@ -71,6 +72,30 @@ private:
     sam8905_state m_sam[2];
 
     int sam_chip_select() const { return BIT(m_port3, 5) ? 0 : 1; }
+
+    // P1 pin definitions:
+    // P1.0: CLK_SW   (out) - switch scan clock
+    // P1.1: CLK_BEAT (out) - beat LED clock
+    // P1.2: CLK_LED  (out) - LED clock
+    // P1.3: CLK_DISP (out) - display shift register clock
+    // P1.4: ENABLE   (out)
+    // P1.5: MODE     (out)
+    // P1.6: DATA     (out) - serial data for shift registers
+    // P1.7: SENSE    (in)  - input from switches
+    static constexpr u8 P1_CLK_SW   = 0x01;
+    static constexpr u8 P1_CLK_BEAT = 0x02;
+    static constexpr u8 P1_CLK_LED  = 0x04;
+    static constexpr u8 P1_CLK_DISP = 0x08;
+    static constexpr u8 P1_ENABLE   = 0x10;
+    static constexpr u8 P1_MODE     = 0x20;
+    static constexpr u8 P1_DATA     = 0x40;
+    static constexpr u8 P1_SENSE    = 0x80;
+
+    // 3x 74HC164 shift registers for 7-segment display (active low segments)
+    // IC7 -> DISPLAY1, IC6 -> DISPLAY2, IC10 -> DISPLAY3
+    u8 m_disp_sr[3] = {0xff, 0xff, 0xff};  // Shift registers (active low, init to all off)
+
+    void disp_shift_clock();
 };
 
 void keyfox10_state::program_map(address_map &map)
@@ -93,8 +118,13 @@ u8 keyfox10_state::port0_r()
 
 u8 keyfox10_state::port1_r()
 {
-    LOGMASKED(LOG_PORT, "P1 read: 0x%02X\n", m_port1);
-    return m_port1;
+    // P1.7 (SENSE) is input - directly driven low based on MODE
+    // When MODE=0, SENSE should be low to indicate "data ready"
+    u8 data = m_port1 & 0x7f;  // Clear SENSE bit
+    // Return SENSE low (0) to prevent stuck in scanning loop
+    // TODO: implement proper switch matrix scanning
+    LOGMASKED(LOG_PORT, "P1 read: 0x%02X (SENSE=%d)\n", data, 0);
+    return data;
 }
 
 u8 keyfox10_state::port2_r()
@@ -120,15 +150,39 @@ void keyfox10_state::port0_w(u8 data)
 
 void keyfox10_state::port1_w(u8 data)
 {
-    if (m_port1 != data)
-        LOGMASKED(LOG_PORT, "P1 write: 0x%02X\n", data);
+    u8 changed = m_port1 ^ data;
+    u8 rising = changed & data;
+
+    if (changed)
+    {
+        LOGMASKED(LOG_IO, "P1 write: 0x%02X [%s%s%s%s%s%s%s]\n",
+            data,
+            (changed & P1_CLK_SW)   ? ((data & P1_CLK_SW)   ? "CLK_SW↑ "   : "CLK_SW↓ ")   : "",
+            (changed & P1_CLK_BEAT) ? ((data & P1_CLK_BEAT) ? "CLK_BEAT↑ " : "CLK_BEAT↓ ") : "",
+            (changed & P1_CLK_LED)  ? ((data & P1_CLK_LED)  ? "CLK_LED↑ "  : "CLK_LED↓ ")  : "",
+            (changed & P1_CLK_DISP) ? ((data & P1_CLK_DISP) ? "CLK_DISP↑ " : "CLK_DISP↓ ") : "",
+            (changed & P1_ENABLE)   ? ((data & P1_ENABLE)   ? "ENABLE↑ "   : "ENABLE↓ ")   : "",
+            (changed & P1_MODE)     ? ((data & P1_MODE)     ? "MODE↑ "     : "MODE↓ ")     : "",
+            (changed & P1_DATA)     ? ((data & P1_DATA)     ? "DATA↑ "     : "DATA↓ ")     : "");
+    }
+
+    // CLK_DISP rising edge: shift DATA bit into display shift registers
+    if (rising & P1_CLK_DISP)
+    {
+        disp_shift_clock();
+    }
+
     m_port1 = data;
 }
 
 void keyfox10_state::port2_w(u8 data)
 {
     if (m_port2 != data)
+    {
         LOGMASKED(LOG_PORT, "P2 write: 0x%02X\n", data);
+        // Log P2 changes specifically since it's used for external memory address high byte
+        LOGMASKED(LOG_SAM, "P2 = 0x%02X (ext addr A8-A15)\n", data);
+    }
     m_port2 = data;
 }
 
@@ -140,6 +194,27 @@ void keyfox10_state::port3_w(u8 data)
     if ((m_port3 ^ data) & 0x02)
         m_midi_out->write_txd(BIT(data, 1));
     m_port3 = data;
+}
+
+void keyfox10_state::disp_shift_clock()
+{
+    // 74HC164 shift registers are daisy-chained:
+    // DATA -> IC7 -> IC6 -> IC10 (bit 7 of each feeds into bit 0 of next)
+    // On rising CLK_DISP edge, shift all registers left by 1 bit
+
+    u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;  // DATA bit to shift in
+
+    // Get carry bits from each register before shifting
+    u8 ic7_carry = BIT(m_disp_sr[0], 7);
+    u8 ic6_carry = BIT(m_disp_sr[1], 7);
+
+    // Shift all registers left, insert carry/data into LSB
+    m_disp_sr[2] = (m_disp_sr[2] << 1) | ic6_carry;  // IC10: receives from IC6
+    m_disp_sr[1] = (m_disp_sr[1] << 1) | ic7_carry;  // IC6: receives from IC7
+    m_disp_sr[0] = (m_disp_sr[0] << 1) | data_in;    // IC7: receives DATA
+
+    LOGMASKED(LOG_IO, "DISP shift: DATA=%d -> IC7=0x%02X IC6=0x%02X IC10=0x%02X\n",
+        data_in, m_disp_sr[0], m_disp_sr[1], m_disp_sr[2]);
 }
 
 u8 keyfox10_state::sam8905_r(offs_t offset)
