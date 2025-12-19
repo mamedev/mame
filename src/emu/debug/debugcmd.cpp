@@ -4561,9 +4561,9 @@ void debugger_commands::execute_memdump(const std::vector<std::string_view> &par
 						for (memory_entry &entry : entries[mode])
 						{
 							if (octal)
-								fprintf(file, "%0*llo - %0*llo:", nc, entry.start, nc, entry.end);
+								fprintf(file, "%s", string_format("%0*o - %0*o:", nc, entry.start, nc, entry.end).c_str());
 							else
-								fprintf(file, "%0*llx - %0*llx:", nc, entry.start, nc, entry.end);
+								fprintf(file, "%s", string_format("%0*x - %0*x:", nc, entry.start, nc, entry.end).c_str());
 							for (const auto &c : entry.context)
 								if (c.disabled)
 									fprintf(file, " %s[off]", c.view->name().c_str());
