@@ -116,6 +116,20 @@ Keeps ringing [DAC1BIT] when ball goes O.B.
 		</part>
 	</software>
 
+	<software name="flyboy" supported="no">
+		<description>Fly Boy</description>
+		<year>1983</year>
+		<publisher>SilverBall Software</publisher>		
+		<notes><![CDATA[
+Freezes during loading.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6391482">
+				<rom name="fly boy.wav" size="6391482" crc="333ad602" sha1="d1bfdfbf582542c1343e3c09fb0599083746a4a4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fruitpar" supported="yes">
 		<description>Fruits Paradise</description>
 		<year>1984</year>
@@ -127,6 +141,20 @@ Keeps ringing [DAC1BIT] when ball goes O.B.
 		</part>
 	</software>
 
+	<software name="golfgame" supported="no">
+		<description>Golf game</description>
+		<year>1984</year>
+		<publisher>Tatsuno System</publisher>		
+		<notes><![CDATA[
+Freezes at loading screen.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6066032">
+				<rom name="golf game.wav" size="6066032" crc="d70dccb8" sha1="414229740bab909a3379158c7054762aa832f18a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hitsuji" supported="yes">
 		<description>Hitsuji Ya-i!</description>
 		<year>1983</year>
@@ -134,6 +162,20 @@ Keeps ringing [DAC1BIT] when ball goes O.B.
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="3837482">
 				<rom name="hitsuji ya-i!.wav" size="3837482" crc="219bf296" sha1="74f28e21e6f075830913d278c8a7ba1abe76d783"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceblock" supported="no">
+		<description>Ice Block</description>
+		<year>1983</year>
+		<publisher>dB-Soft</publisher>		
+		<notes><![CDATA[
+Freezes at loading screen.
+]]>]</notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6828832">
+				<rom name="ice block.wav" size="6828832" crc="8Bb13e5b" sha1="c9546d481bc348cb6679048706d1934cb2b6adb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -167,6 +209,20 @@ Keeps ringing [DAC1BIT] when ball goes O.B.
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="2140262">
 				<rom name="kaeru shooter.wav" size="2140262" crc="b15f28e3" sha1="8258e4aa00536c8f6b587ab843e47e4381df6e69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjong" supported="no">
+		<description>Mahjong</description>
+		<year>1983</year>
+		<publisher>Tatsuno System</publisher>		
+		<notes><![CDATA[
+Freezes during loading.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="7231862">
+				<rom name="mahjong.wav" size="7231862" crc="14787598" sha1="46631c97b051ab9af26207f9ef155763962aeeba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -205,6 +261,20 @@ Loads but marked unsupported as instruction to start game is not known.
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="2766952">
 				<rom name="packings.wav" size="2766952" crc="bbce454b" sha1="9bd7447b6ca1d9b5493ef6a5df336ae14de87d93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pasprogs" supported="no">
+		<description>Pasopia7 Programs (System Tape)</description>
+		<year>19??</year>
+		<publisher>Toshiba</publisher>		
+		<notes><![CDATA[
+Freezes at loading screen.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="35571600">
+				<rom name="pasopia7 programs.wav" size="35571600" crc="a93aa810" sha1="c6de7d9ff5e2b95293a048d83cad50f6f8a18fc1"/>
 			</dataarea>
 		</part>
 	</software>
