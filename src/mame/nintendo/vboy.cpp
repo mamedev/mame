@@ -703,12 +703,10 @@ void vboy_state::vip_map(address_map &map)
 // - vfishing draws selection accents in main menu with BRTA signal (currently almost invisible);
 void vboy_state::set_brightness()
 {
-	int a,b,c;
-
-	//d = (m_vip_io.BRTA + m_vip_io.BRTB + m_vip_io.BRTC + m_vip_io.REST);
-	a = (0xff * (m_vip_io.BRTA)) / 0x80;
-	b = (0xff * (m_vip_io.BRTA + m_vip_io.BRTB)) / 0x80;
-	c = (0xff * (m_vip_io.BRTA + m_vip_io.BRTB + m_vip_io.BRTC)) / 0x80;
+	//int d = (m_vip_io.BRTA + m_vip_io.BRTB + m_vip_io.BRTC + m_vip_io.REST);
+	int a = (0xff * (m_vip_io.BRTA)) / 0x80;
+	int b = (0xff * (m_vip_io.BRTA + m_vip_io.BRTB)) / 0x80;
+	int c = (0xff * (m_vip_io.BRTA + m_vip_io.BRTB + m_vip_io.BRTC)) / 0x80;
 
 	if(a < 0) { a = 0; }
 	if(b < 0) { b = 0; }
@@ -811,7 +809,7 @@ uint16_t vboy_state::vip_io_r(offs_t offset)
 		case 0x42:  //XPCTRL
 					return m_vip_io.XPCTRL;
 		case 0x44:  //VER
-					printf("%08x read VER\n",m_maincpu->pc());
+					printf("%08x read VER\n", (uint32_t)m_maincpu->pc());
 					return m_vip_io.VER;
 		case 0x48:  //SPT0
 					return m_vip_io.SPT[0];

@@ -245,13 +245,13 @@ uint32_t juicebox_state::juicebox_nand_r(offs_t offset, uint32_t mem_mask)
 	if (ACCESSING_BITS_8_15) data = data | (smc_read() <<  8);
 	if (ACCESSING_BITS_16_23) data = data | (smc_read() << 16);
 	if (ACCESSING_BITS_24_31) data = data | (smc_read() << 24);
-	verboselog( 5, "juicebox_nand_r %08X %08X %08X\n", offset, mem_mask, data);
+	verboselog( 5, "juicebox_nand_r %08X %08X %08X\n", (uint32_t)offset, mem_mask, data);
 	return data;
 }
 
 void juicebox_state::juicebox_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	verboselog( 5, "juicebox_nand_w %08X %08X %08X\n", offset, mem_mask, data);
+	verboselog( 5, "juicebox_nand_w %08X %08X %08X\n", (uint32_t)offset, mem_mask, data);
 	if (ACCESSING_BITS_0_7) smc_write((data >>  0) & 0xFF);
 	if (ACCESSING_BITS_8_15) smc_write((data >>  8) & 0xFF);
 	if (ACCESSING_BITS_16_23) smc_write((data >> 16) & 0xFF);

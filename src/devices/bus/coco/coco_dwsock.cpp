@@ -162,7 +162,7 @@ u8 beckerport_device::read(offs_t offset)
 			//logerror("beckerport_device: data read 1 byte (0x%02x).  %i bytes remaining.\n", data&0xff, m_rx_pending);
 			break;
 		default:
-			fprintf(stderr, "%s: read from bad offset %d\n", __FILE__, offset);
+			fprintf(stderr, "%s: read from bad offset %04x\n", __FILE__, (uint16_t)offset);
 	}
 
 	return data;
@@ -193,7 +193,7 @@ void beckerport_device::write(offs_t offset, u8 data)
 			//logerror("beckerport_write: data write one byte (0x%02x)\n", d & 0xff);
 			break;
 		default:
-			fprintf(stderr, "%s: write to bad offset %d\n", __FILE__, offset);
+			fprintf(stderr, "%s: write to bad offset %04x\n", __FILE__, (uint16_t)offset);
 	}
 }
 

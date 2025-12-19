@@ -479,7 +479,7 @@ void sega_315_5195_mapper_device::compute_region(region_info &info, u8 index, u3
 	info.base = (m_regs[0x11 + 2 * index] << 16) & ~info.size_mask;
 	info.mirror = mirror & info.size_mask;
 	info.start = info.base + (offset & info.size_mask);
-	info.end = info.start + std::min(length - 1, info.size_mask);
+	info.end = info.start + std::min(length - 1, (u32)info.size_mask);
 }
 
 

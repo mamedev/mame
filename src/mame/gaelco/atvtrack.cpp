@@ -208,9 +208,7 @@ inline u32 atvtrack_state::decode64_32(offs_t offset64, u64 data, u64 mem_mask, 
 
 u64 atvtrack_state::control_r(offs_t offset, u64 mem_mask)
 {
-	u32 addr;
-
-	addr = 0;
+	offs_t addr = 0;
 	decode64_32(offset, 0, mem_mask, addr);
 	if (addr == (0x00020000-0x00020000)/4)
 		return -1;
@@ -221,11 +219,9 @@ u64 atvtrack_state::control_r(offs_t offset, u64 mem_mask)
 
 void atvtrack_state::control_w(offs_t offset, u64 data, u64 mem_mask)
 {
-	u32 addr, dat; //, old;
-
-	addr = 0;
-	dat = decode64_32(offset, data, mem_mask, addr);
-//  old = m_area1_data[addr];
+	offs_t addr = 0;
+	u32 dat = decode64_32(offset, data, mem_mask, addr);
+//  u32 old = m_area1_data[addr];
 	m_area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
 		if ((data & 4) && m_slaverun)

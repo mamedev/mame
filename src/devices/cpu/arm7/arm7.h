@@ -233,12 +233,12 @@ protected:
 	int detect_fault(int desc_lvl1, int ap, int flags);
 	void arm7_check_irq_state();
 	void update_irq_state();
-	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data);
-	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data);
-	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data);
-	virtual uint32_t arm7_cpu_read32(uint32_t addr);
-	virtual uint32_t arm7_cpu_read16(uint32_t addr);
-	virtual uint8_t arm7_cpu_read8(uint32_t addr);
+	virtual void arm7_cpu_write32(offs_t addr, uint32_t data);
+	virtual void arm7_cpu_write16(offs_t addr, uint16_t data);
+	virtual void arm7_cpu_write8(offs_t addr, uint8_t data);
+	virtual uint32_t arm7_cpu_read32(offs_t addr);
+	virtual uint32_t arm7_cpu_read16(offs_t addr);
+	virtual uint8_t arm7_cpu_read8(offs_t addr);
 
 	// Coprocessor support
 	void arm7_do_callback(uint32_t data);
@@ -417,12 +417,12 @@ public:
 	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
 	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
 
-	virtual void arm7_cpu_write32(uint32_t addr, uint32_t data) override;
-	virtual void arm7_cpu_write16(uint32_t addr, uint16_t data) override;
-	virtual void arm7_cpu_write8(uint32_t addr, uint8_t data) override;
-	virtual uint32_t arm7_cpu_read32(uint32_t addr) override;
-	virtual uint32_t arm7_cpu_read16(uint32_t addr) override;
-	virtual uint8_t arm7_cpu_read8(uint32_t addr) override;
+	virtual void arm7_cpu_write32(offs_t addr, uint32_t data) override;
+	virtual void arm7_cpu_write16(offs_t addr, uint16_t data) override;
+	virtual void arm7_cpu_write8(offs_t addr, uint8_t data) override;
+	virtual uint32_t arm7_cpu_read32(offs_t addr) override;
+	virtual uint32_t arm7_cpu_read16(offs_t addr) override;
+	virtual uint8_t arm7_cpu_read8(offs_t addr) override;
 
 protected:
 	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

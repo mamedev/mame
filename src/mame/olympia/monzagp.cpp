@@ -295,42 +295,42 @@ uint8_t monzagp_state::port_r(offs_t offset)
 	uint8_t data = 0xff;
 	if (!(m_p1 & 0x01))             // 8350 videoram
 	{
-		//printf("ext 0 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//printf("ext 0 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
 		int const addr = ((m_p2 & 0x3f) << 5) | (offset & 0x1f);
 		data = m_vram[addr];
 	}
 	if (!(m_p1 & 0x02))
 	{
-		printf("ext 1 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		printf("ext 1 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
 	}
 	if (!(m_p1 & 0x04))             // GFX
 	{
-		//printf("ext 2 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
-		int const addr = ((m_p2 & 0x7f) << 5) | (offset & 0x1f);
+		//printf("ext 2 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
+		uint64_t const addr = ((m_p2 & 0x7f) << 5) | (offset & 0x1f);
 		data = m_gfx[0][addr];
 	}
 	if (!(m_p1 & 0x08))
 	{
-		//printf("ext 3 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//printf("ext 3 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
 		data = m_in[1]->read();
 	}
 	if (!(m_p1 & 0x10))
 	{
-		//printf("ext 4 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//printf("ext 4 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
 		data = (m_dsw->read() & 0x1f) | (m_in[0]->read() & 0xe0);
 	}
 	if (!(m_p1 & 0x20))
 	{
-		printf("ext 5 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		printf("ext 5 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
 	}
 	if (!(m_p1 & 0x40))             // digits
 	{
 		data = m_score_ram[bitswap<8>(offset, 3, 2, 1, 0, 7, 6, 5, 4)];
-		//printf("ext 6 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//printf("ext 6 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
 	}
 	if (!(m_p1 & 0x80))
 	{
-		//printf("ext 7 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, offset);
+		//printf("ext 7 r P1:%02x P2:%02x %02x\n", m_p1, m_p2, (uint8_t)offset);
 		data = m_collisions_ff | (m_time_tick ? 0x10 : 0);
 	}
 
@@ -341,19 +341,19 @@ void monzagp_state::port_w(offs_t offset, uint8_t data)
 {
 	if (!(m_p1 & 0x01))     // 8350 videoram
 	{
-		//printf("ext 0 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//printf("ext 0 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
 
 		int const addr = ((m_p2 & 0x3f) << 5) | (offset & 0x1f);
 		m_vram[addr] = data;
 	}
 	if (!(m_p1 & 0x02))
 	{
-		printf("ext 1 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		printf("ext 1 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
 	}
 	if (!(m_p1 & 0x04))    // GFX
 	{
-		//printf("ext 2 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
-		int const addr = ((m_p2 & 0x7f) << 5) | (offset & 0x1f);
+		//printf("ext 2 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
+		uint64_t const addr = ((m_p2 & 0x7f) << 5) | (offset & 0x1f);
 		if (addr < 0x400)
 		{
 			static int pt[] = { 0x0e, 0x0c, 0x0d, 0x08, 0x09, 0x0a, 0x0b, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x0f };
@@ -363,19 +363,19 @@ void monzagp_state::port_w(offs_t offset, uint8_t data)
 	}
 	if (!(m_p1 & 0x08))
 	{
-		//printf("ext 3 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//printf("ext 3 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
 	}
 	if (!(m_p1 & 0x10))
 	{
-		printf("ext 4 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		printf("ext 4 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
 	}
 	if (!(m_p1 & 0x20))
 	{
-		//printf("ext 5 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//printf("ext 5 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
 	}
 	if (!(m_p1 & 0x40))    // digits
 	{
-		//printf("ext 6 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//printf("ext 6 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
 		offs_t const ram_offset = bitswap<8>(offset, 3, 2, 1, 0, 7, 6, 5, 4);
 		m_score_ram[ram_offset] = data & 0x0f;
 
@@ -388,7 +388,7 @@ void monzagp_state::port_w(offs_t offset, uint8_t data)
 	}
 	if (!(m_p1 & 0x80))
 	{
-		//printf("ext 7 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, offset, data);
+		//printf("ext 7 w P1:%02x P2:%02x, %02x = %02x\n", m_p1, m_p2, (uint8_t)offset, data);
 		m_video_ctrl[0][(offset >> 0) & 0x07] = data;
 		m_video_ctrl[1][(offset >> 3) & 0x07] = data;
 

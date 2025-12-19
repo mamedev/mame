@@ -262,7 +262,7 @@ uint8_t exidy440_sound_device::sound_volume_r(offs_t offset)
 void exidy440_sound_device::sound_volume_w(offs_t offset, uint8_t data)
 {
 	if (SOUND_LOG && m_debuglog)
-		fprintf(m_debuglog, "Volume %02X=%02X\n", offset, data);
+		fprintf(m_debuglog, "Volume %02llX=%02X\n", offset, data);
 
 	/* update the stream */
 	m_stream->update();

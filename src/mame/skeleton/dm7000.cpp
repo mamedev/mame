@@ -355,7 +355,7 @@ uint32_t dm7000_state::screen_update_dm7000(screen_device &screen, bitmap_rgb32 
 uint32_t dm7000_state::dcr_r(offs_t offset)
 {
 	osd_printf_debug("DCR %03X read\n", offset);
-	if(offset>=1024) {printf("get %04X\n", offset); return 0;} else
+	if(offset>=1024) {printf("get %04X\n", (uint16_t)offset); return 0;} else
 	switch(offset) {
 		case DCRSTB045_CMD_STAT:
 			return 0; // assume that video dev is always ready
@@ -368,7 +368,7 @@ uint32_t dm7000_state::dcr_r(offs_t offset)
 void dm7000_state::dcr_w(offs_t offset, uint32_t data)
 {
 	osd_printf_debug("DCR %03X write = %08X\n", offset, data);
-	if(offset>=1024) {printf("get %04X\n", offset); } else
+	if(offset>=1024) {printf("get %04X\n", (uint16_t)offset); } else
 	dcr[offset] = data;
 }
 

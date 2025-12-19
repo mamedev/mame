@@ -84,14 +84,14 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 uint32_t next_state::rom_map_r()
 {
 	if(0 && !machine().side_effects_disabled())
-		printf("%08x ROM MAP?\n",maincpu->pc());
+		printf("%08x ROM MAP?\n", (uint32_t)maincpu->pc());
 	return 0x01000000;
 }
 
 uint32_t next_state::scr2_r()
 {
 	if(0 && !machine().side_effects_disabled())
-		printf("%08x\n",maincpu->pc());
+		printf("%08x\n", (uint32_t)maincpu->pc());
 	/*
 	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
 	-x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
@@ -128,7 +128,7 @@ uint32_t next_state::scr2_r()
 void next_state::scr2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(0 && !machine().side_effects_disabled())
-		printf("scr2_w %08x (%08x)\n", data, maincpu->pc());
+		printf("scr2_w %08x (%08x)\n", data, (uint32_t)maincpu->pc());
 	COMBINE_DATA(&scr2);
 
 	rtc->ce_w(BIT(scr2, 8));

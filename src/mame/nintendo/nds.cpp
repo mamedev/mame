@@ -86,7 +86,7 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 				double time, ticks;
 				int timer = (offset - TIMER_OFFSET) + 4;
 
-				printf("Read timer reg %x (PC=%x)\n", timer, m_arm7->pc());
+				printf("Read timer reg %x (PC=%x)\n", timer, (uint32_t)m_arm7->pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -190,7 +190,7 @@ uint32_t nds_state::arm7_io_r(offs_t offset, uint32_t mem_mask)
 			return (m_wramcnt << 8) | temp1 | temp2;
 
 		default:
-			verboselog(*this, 0, "[ARM7] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
+			verboselog(*this, 0, "[ARM7] [IO] Unknown read: %08x (%08x)\n", (uint32_t)offset * 4, mem_mask);
 			break;
 	}
 
@@ -215,7 +215,7 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-				printf("%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, m_arm7->pc());
+				printf("%08x to timer %d (mask %08x PC %x)\n", data, timer, ~mem_mask, (uint32_t)m_arm7->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -355,7 +355,7 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 		default:
-			verboselog(*this, 0, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
+			verboselog(*this, 0, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", (uint32_t)offset * 4, data, mem_mask);
 			break;
 	}
 }
@@ -427,7 +427,7 @@ uint32_t nds_state::arm9_io_r(offs_t offset, uint32_t mem_mask)
 			*/
 			return m_arm9_postflg;
 		default:
-			verboselog(*this, 0, "[ARM9] [IO] Unknown read: %08x (%08x)\n", offset*4, mem_mask);
+			verboselog(*this, 0, "[ARM9] [IO] Unknown read: %08x (%08x)\n", (uint32_t)offset * 4, mem_mask);
 			break;
 	}
 
@@ -452,7 +452,7 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-				printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, m_arm9->pc());
+				printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, (uint32_t)m_arm9->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -579,7 +579,7 @@ void nds_state::arm9_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_arm9_postflg |= data & POSTFLG_RAM_MASK;
 			break;
 		default:
-			verboselog(*this, 0, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", offset*4, data, mem_mask);
+			verboselog(*this, 0, "[ARM7] [IO] Unknown write: %08x = %08x (%08x)\n", (uint32_t)offset * 4, data, mem_mask);
 			break;
 	}
 }
