@@ -28886,6 +28886,7 @@ ROM_END
   | 34 | Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers               | YES     | YES      |
   | 35 | Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers            | YES     | YES      |
   | 36 | Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus | YES     | YES      |
+  | 37 | Sweethearts & Sevens, Diamonds 7's, Cherry Bonus, Nevada Numbers       | YES     | YES      |
   +----+------------------------------------------------------------------------+---------+----------+
 
   We will name the sets using the order of appearance and availability
@@ -30432,6 +30433,35 @@ ROM_START( fl7_50_gs36 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "fl7_gs36.u3",  0x0000, 0x8000, CRC(8225b1eb) SHA1(a650daf63b239accf87793578227fca8253b6ce8) )
+
+	// Proper bipolar PROM dump
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
+  Custom Hardware.
+
+  GS37: Sweethearts & Sevens, Diamonds 7's, Cherry Bonus, Nevada Numbers
+
+*/
+ROM_START( fl7_50_gs37 )
+	ROM_REGION( 0x8000, "maincpu", 0 )  // Serial 00000069A1C9.
+	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gs37.u3",  0x0000, 0x8000, CRC(478fa591) SHA1(a8e35280af8fdf14e48d6ed6c68801b376077610) )
 
 	// Proper bipolar PROM dump
 	ROM_REGION( 0x200, "proms", 0 )
@@ -33771,6 +33801,7 @@ GAME(  199?, fl7_50_gs33, fl7_50,  flaming7, flaming7, wingco_state,   init_flam
 GAME(  199?, fl7_50_gs34, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS34: Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers)",               0 )
 GAME(  199?, fl7_50_gs35, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS35: Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers)",            0 )
 GAME(  199?, fl7_50_gs36, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS36: Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus)", 0 )
+GAME(  199?, fl7_50_gs37, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS37: Sweethearts & Sevens, Diamonds 7's, Cherry Bonus, Nevada Numbers)",       0 )
 
 // special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )
