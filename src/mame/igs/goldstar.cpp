@@ -28828,9 +28828,9 @@ ROM_END
   | 35 | Soboba Gold.                 | NO      | NO       |
   | 36 | Star Sevens / American Gold. | YES     | YES      |
   | 37 | Sun God.                     | YES     | YES      |
-  | 38 | Super Stars & Stripes.       | NO      | NO       |
+  | 38 | Super Stars & Stripes.       | YES     | YES      |
   | 39 | Sweet Dreams.                | NO      | NO       |
-  | 40 | Sweethearts & Sevens.        | NO      | NO       |
+  | 40 | Sweethearts & Sevens.        | YES     | YES      |
   | 41 | Tropical Treasure.           | NO      | NO       |
   | 42 | Vegas Classic.               | NO      | NO       |
   | 43 | White Buffalo.               | NO      | NO       |
@@ -28847,45 +28847,46 @@ ROM_END
 
   Will present the existent packed sets in the following table:
 
-  +----+-----------------------------------------------------------------------+---------+----------+
-  | N# | Title:                                                                | Dumped  | Emulated |
-  +----+-----------------------------------------------------------------------+---------+----------+
-  | 01 | American Gold, Star Sevens, Cherry Bonus, Nevada Numbers              | YES     | YES      |
-  | 02 | Black Bart, Diamonds 7's, Cherry Bonus, Nevada Numbers                | YES     | YES      |
-  | 03 | Cash Cabaret, Wild West, Cherry Bonus, Nevada Numbers                 | YES     | YES      |
-  | 04 | Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers        | YES     | YES      |
-  | 05 | Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers            | YES     | YES      |
-  | 06 | Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers             | YES     | YES      |
-  | 07 | Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers             | YES     | YES      |
-  | 08 | Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers               | YES     | YES      |
-  | 09 | Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers         | YES     | YES      |
-  | 10 | Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers      | YES     | YES      |
-  | 11 | Harley Davidson Black, Diamonds 7's, Cherry Bonus, Nevada Numbers     | YES     | YES      |
-  | 12 | Harley Davidson White, Diamonds 7's, Cherry Bonus, Nevada Numbers     | YES     | YES      |
-  | 13 | Hollywood Nights, Dynamite Diamonds, Cherry Bonus, Nevada Numbers     | YES     | YES      |
-  | 14 | House of Fury, Diamonds 7's, Cherry Bonus, Nevada Numbers             | YES     | YES      |
-  | 15 | Independence Day, Diamonds 7's, Cherry Bonus, Nevada Numbers          | YES     | YES      |
-  | 16 | Infinity, Diamond Doubles, Cherry Bonus, All Sevens                   | YES     | YES      |
-  | 17 | Jackpot Junction, Diamonds 7's, Cherry Bonus, Nevada Numbers          | YES     | YES      |
-  | 18 | Jokers Wild, Deuces Wild, Cherry Bonus, Nevada Numbers                | YES     | YES      |
-  | 19 | Konocti Gold, Bar TNT, Cherry Bonus, Nevada Numbers                   | YES     | YES      |
-  | 20 | Midnight 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers              | YES     | YES      |
-  | 21 | Mighty Buffalo, Diamonds 7's, Cherry Bonus, Nevada Numbers            | YES     | YES      |
-  | 22 | Moolah, Diamonds 7's, Cherry Bonus, Nevada Numbers                    | YES     | YES      |
-  | 23 | Moon Over SA, Diamonds 7's, Cherry Bonus, Nevada Numbers              | YES     | YES      |
-  | 24 | Sturgeon 7's, Native American Gold, Cherry Bonus, Nevada Numbers      | YES     | YES      |
-  | 25 | Native Nickels, Diamonds 7's, Cherry Bonus, Nevada Numbers            | YES     | YES      |
-  | 26 | Native Nickels, Sun God, Cherry Bonus, Nevada Numbers                 | YES     | YES      |
-  | 27 | Palace of Riches, Diamonds 7's, Cherry Bonus, Nevada Numbers          | YES     | YES      |
-  | 28 | Phantom, Diamonds 7's, Cherry Bonus, Nevada Numbers                   | YES     | YES      |
-  | 29 | Prospector's Gold, Red Hot Ice, Cherry Bonus, Nevada Numbers          | YES     | YES      |
-  | 30 | Prospector's Gold, Red White & Blue 7's, Cherry Bonus, Nevada Numbers | YES     | YES      |
-  | 31 | Red Hot Ice, Red White & Blue 7's, Cherry Bonus, Nevada Numbers       | YES     | YES      |
-  | 32 | Rising Star, Trophy Bucks, Cherry Bonus, Nevada Numbers               | YES     | YES      |
-  | 33 | Rockin' Reels, Diamonds 7's, Cherry Bonus, Nevada Numbers             | YES     | YES      |
-  | 34 | Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers              | YES     | YES      |
-  | 35 | Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers           | YES     | YES      |
-  +----+-----------------------------------------------------------------------+---------+----------+
+  +----+------------------------------------------------------------------------+---------+----------+
+  | N# | Title:                                                                 | Dumped  | Emulated |
+  +----+------------------------------------------------------------------------+---------+----------+
+  | 01 | American Gold, Star Sevens, Cherry Bonus, Nevada Numbers               | YES     | YES      |
+  | 02 | Black Bart, Diamonds 7's, Cherry Bonus, Nevada Numbers                 | YES     | YES      |
+  | 03 | Cash Cabaret, Wild West, Cherry Bonus, Nevada Numbers                  | YES     | YES      |
+  | 04 | Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers         | YES     | YES      |
+  | 05 | Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers             | YES     | YES      |
+  | 06 | Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers              | YES     | YES      |
+  | 07 | Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers              | YES     | YES      |
+  | 08 | Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers                | YES     | YES      |
+  | 09 | Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers          | YES     | YES      |
+  | 10 | Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers       | YES     | YES      |
+  | 11 | Harley Davidson Black, Diamonds 7's, Cherry Bonus, Nevada Numbers      | YES     | YES      |
+  | 12 | Harley Davidson White, Diamonds 7's, Cherry Bonus, Nevada Numbers      | YES     | YES      |
+  | 13 | Hollywood Nights, Dynamite Diamonds, Cherry Bonus, Nevada Numbers      | YES     | YES      |
+  | 14 | House of Fury, Diamonds 7's, Cherry Bonus, Nevada Numbers              | YES     | YES      |
+  | 15 | Independence Day, Diamonds 7's, Cherry Bonus, Nevada Numbers           | YES     | YES      |
+  | 16 | Infinity, Diamond Doubles, Cherry Bonus, All Sevens                    | YES     | YES      |
+  | 17 | Jackpot Junction, Diamonds 7's, Cherry Bonus, Nevada Numbers           | YES     | YES      |
+  | 18 | Jokers Wild, Deuces Wild, Cherry Bonus, Nevada Numbers                 | YES     | YES      |
+  | 19 | Konocti Gold, Bar TNT, Cherry Bonus, Nevada Numbers                    | YES     | YES      |
+  | 20 | Midnight 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers               | YES     | YES      |
+  | 21 | Mighty Buffalo, Diamonds 7's, Cherry Bonus, Nevada Numbers             | YES     | YES      |
+  | 22 | Moolah, Diamonds 7's, Cherry Bonus, Nevada Numbers                     | YES     | YES      |
+  | 23 | Moon Over SA, Diamonds 7's, Cherry Bonus, Nevada Numbers               | YES     | YES      |
+  | 24 | Sturgeon 7's, Native American Gold, Cherry Bonus, Nevada Numbers       | YES     | YES      |
+  | 25 | Native Nickels, Diamonds 7's, Cherry Bonus, Nevada Numbers             | YES     | YES      |
+  | 26 | Native Nickels, Sun God, Cherry Bonus, Nevada Numbers                  | YES     | YES      |
+  | 27 | Palace of Riches, Diamonds 7's, Cherry Bonus, Nevada Numbers           | YES     | YES      |
+  | 28 | Phantom, Diamonds 7's, Cherry Bonus, Nevada Numbers                    | YES     | YES      |
+  | 29 | Prospector's Gold, Red Hot Ice, Cherry Bonus, Nevada Numbers           | YES     | YES      |
+  | 30 | Prospector's Gold, Red White & Blue 7's, Cherry Bonus, Nevada Numbers  | YES     | YES      |
+  | 31 | Red Hot Ice, Red White & Blue 7's, Cherry Bonus, Nevada Numbers        | YES     | YES      |
+  | 32 | Rising Star, Trophy Bucks, Cherry Bonus, Nevada Numbers                | YES     | YES      |
+  | 33 | Rockin' Reels, Diamonds 7's, Cherry Bonus, Nevada Numbers              | YES     | YES      |
+  | 34 | Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers               | YES     | YES      |
+  | 35 | Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers            | YES     | YES      |
+  | 36 | Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus | YES     | YES      |
+  +----+------------------------------------------------------------------------+---------+----------+
 
   We will name the sets using the order of appearance and availability
   of both sets of custom graphics respectively.
@@ -30402,6 +30403,35 @@ ROM_START( fl7_50_gs35 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "fl7_gs35.u3",  0x0000, 0x8000, CRC(8a53ff35) SHA1(81364595a6897884645339dffcbfaa7ee9ad271f) )
+
+	// Proper bipolar PROM dump
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_50.bin", 0x0000, 0x0008, CRC(a300a20f) SHA1(2fd78faf792c59225eb124ebc736a0bebc3b2902) )
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CYB1092), 50 bonus.
+  Custom Hardware.
+
+  GS36: Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus
+
+*/
+ROM_START( fl7_50_gs36 )
+	ROM_REGION( 0x8000, "maincpu", 0 )  // Serial 00000069A1C9.
+	ROM_LOAD( "50-main.u22",  0x0000, 0x8000, CRC(e097e317) SHA1(a903144cc2290b7e22045490784b592adbf9ba97) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gs36.u3",  0x0000, 0x8000, CRC(8225b1eb) SHA1(a650daf63b239accf87793578227fca8253b6ce8) )
 
 	// Proper bipolar PROM dump
 	ROM_REGION( 0x200, "proms", 0 )
@@ -33705,41 +33735,42 @@ GAME(  199?, fl7_tw,     fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam
 GAME(  199?, fl7_twa,    fl7_50,   flam7_tw, flaming7, wingco_state,   init_flam7_tw,  ROT0, "Cyberdyne Systems", "Flaming 7's (Taiwanese Hardware, v6.5)",                   0 )
 
 // --- Flaming 7's hardware (original upgrade graphics sets) ---
-GAME(  199?, fl7_50_gs01, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS01: American Gold, Star Sevens, Cherry Bonus, Nevada Numbers)",              0 )
-GAME(  199?, fl7_50_gs02, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS02: Black Bart, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                0 )
-GAME(  199?, fl7_50_gs03, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS03: Cash Cabaret, Wild West, Cherry Bonus, Nevada Numbers)",                 0 )
-GAME(  199?, fl7_50_gs04, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS04: Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers)",        0 )
-GAME(  199?, fl7_50_gs05, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS05: Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers)",            0 )
-GAME(  199?, fl7_50_gs06, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS06: Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
-GAME(  199?, fl7_50_gs07, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
-GAME(  199?, fl7_50_gs08, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS08: Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers)",               0 )
-GAME(  199?, fl7_50_gs09, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS09: Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers)",         0 )
-GAME(  199?, fl7_50_gs10, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS10: Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers)",      0 )
-GAME(  199?, fl7_50_gs11, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS11: Harley Davidson Black, Diamonds 7's, Cherry Bonus, Nevada Numbers)",     0 )
-GAME(  199?, fl7_50_gs12, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS12: Harley Davidson White, Diamonds 7's, Cherry Bonus, Nevada Numbers)",     0 )
-GAME(  199?, fl7_50_gs13, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS13: Hollywood Nights, Dynamite Diamonds, Cherry Bonus, Nevada Numbers)",     0 )
-GAME(  199?, fl7_50_gs14, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS14: House of Fury, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
-GAME(  199?, fl7_50_gs15, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS15: Independence Day, Diamonds 7's, Cherry Bonus, Nevada Numbers)",          0 )
-GAME(  199?, fl7_50_gs16, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS16: Infinity, Diamond Doubles, Cherry Bonus, All Sevens)",                   0 )
-GAME(  199?, fl7_50_gs17, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS17: Jackpot Junction, Diamonds 7's, Cherry Bonus, Nevada Numbers)",          0 )
-GAME(  199?, fl7_50_gs18, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS18: Jokers Wild, Deuces Wild, Cherry Bonus, Nevada Numbers)",                0 )
-GAME(  199?, fl7_50_gs19, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS19: Konocti Gold, Bar TNT, Cherry Bonus, Nevada Numbers)",                   0 )
-GAME(  199?, fl7_50_gs20, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS20: Midnight 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers)",              0 )
-GAME(  199?, fl7_50_gs21, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS21: Mighty Buffalo, Diamonds 7's, Cherry Bonus, Nevada Numbers)",            0 )
-GAME(  199?, fl7_50_gs22, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS22: Moolah, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                    0 )
-GAME(  199?, fl7_50_gs23, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS23: Moon Over SA, Diamonds 7's, Cherry Bonus, Nevada Numbers)",              0 )
-GAME(  199?, fl7_50_gs24, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS24: Sturgeon 7's, Native American Gold, Cherry Bonus, Nevada Numbers)",      0 )
-GAME(  199?, fl7_50_gs25, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS25: Native Nickels, Diamonds 7's, Cherry Bonus, Nevada Numbers)",            0 )
-GAME(  199?, fl7_50_gs26, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS26: Native Nickels, Sun God, Cherry Bonus, Nevada Numbers)",                 0 )
-GAME(  199?, fl7_50_gs27, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS27: Palace of Riches, Diamonds 7's, Cherry Bonus, Nevada Numbers)",          0 )
-GAME(  199?, fl7_50_gs28, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS28: Phantom, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                   0 )
-GAME(  199?, fl7_50_gs29, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS29: Prospector's Gold, Red Hot Ice, Cherry Bonus, Nevada Numbers)",          0 )
-GAME(  199?, fl7_50_gs30, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS30: Prospector's Gold, Red White & Blue 7's, Cherry Bonus, Nevada Numbers)", 0 )
-GAME(  199?, fl7_50_gs31, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS31: Red Hot Ice, Red White & Blue 7's, Cherry Bonus, Nevada Numbers)",       0 )
-GAME(  199?, fl7_50_gs32, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS32: Rising Star, Trophy Bucks, Cherry Bonus, Nevada Numbers)",               0 )
-GAME(  199?, fl7_50_gs33, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS33: Rockin' Reels, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
-GAME(  199?, fl7_50_gs34, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS34: Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers)",              0 )
-GAME(  199?, fl7_50_gs35, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS35: Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers)",           0 )
+GAME(  199?, fl7_50_gs01, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS01: American Gold, Star Sevens, Cherry Bonus, Nevada Numbers)",               0 )
+GAME(  199?, fl7_50_gs02, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS02: Black Bart, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                 0 )
+GAME(  199?, fl7_50_gs03, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS03: Cash Cabaret, Wild West, Cherry Bonus, Nevada Numbers)",                  0 )
+GAME(  199?, fl7_50_gs04, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS04: Diamond Delight II, Diamonds 7's, Cherry Bonus, Nevada Numbers)",         0 )
+GAME(  199?, fl7_50_gs05, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS05: Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
+GAME(  199?, fl7_50_gs06, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS06: Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers)",              0 )
+GAME(  199?, fl7_50_gs07, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers)",              0 )
+GAME(  199?, fl7_50_gs08, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS08: Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                0 )
+GAME(  199?, fl7_50_gs09, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS09: Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers)",          0 )
+GAME(  199?, fl7_50_gs10, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS10: Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers)",       0 )
+GAME(  199?, fl7_50_gs11, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS11: Harley Davidson Black, Diamonds 7's, Cherry Bonus, Nevada Numbers)",      0 )
+GAME(  199?, fl7_50_gs12, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS12: Harley Davidson White, Diamonds 7's, Cherry Bonus, Nevada Numbers)",      0 )
+GAME(  199?, fl7_50_gs13, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS13: Hollywood Nights, Dynamite Diamonds, Cherry Bonus, Nevada Numbers)",      0 )
+GAME(  199?, fl7_50_gs14, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS14: House of Fury, Diamonds 7's, Cherry Bonus, Nevada Numbers)",              0 )
+GAME(  199?, fl7_50_gs15, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS15: Independence Day, Diamonds 7's, Cherry Bonus, Nevada Numbers)",           0 )
+GAME(  199?, fl7_50_gs16, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS16: Infinity, Diamond Doubles, Cherry Bonus, All Sevens)",                    0 )
+GAME(  199?, fl7_50_gs17, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS17: Jackpot Junction, Diamonds 7's, Cherry Bonus, Nevada Numbers)",           0 )
+GAME(  199?, fl7_50_gs18, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS18: Jokers Wild, Deuces Wild, Cherry Bonus, Nevada Numbers)",                 0 )
+GAME(  199?, fl7_50_gs19, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS19: Konocti Gold, Bar TNT, Cherry Bonus, Nevada Numbers)",                    0 )
+GAME(  199?, fl7_50_gs20, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS20: Midnight 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers)",               0 )
+GAME(  199?, fl7_50_gs21, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS21: Mighty Buffalo, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
+GAME(  199?, fl7_50_gs22, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS22: Moolah, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                     0 )
+GAME(  199?, fl7_50_gs23, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS23: Moon Over SA, Diamonds 7's, Cherry Bonus, Nevada Numbers)",               0 )
+GAME(  199?, fl7_50_gs24, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS24: Sturgeon 7's, Native American Gold, Cherry Bonus, Nevada Numbers)",       0 )
+GAME(  199?, fl7_50_gs25, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS25: Native Nickels, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
+GAME(  199?, fl7_50_gs26, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS26: Native Nickels, Sun God, Cherry Bonus, Nevada Numbers)",                  0 )
+GAME(  199?, fl7_50_gs27, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS27: Palace of Riches, Diamonds 7's, Cherry Bonus, Nevada Numbers)",           0 )
+GAME(  199?, fl7_50_gs28, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS28: Phantom, Diamonds 7's, Cherry Bonus, Nevada Numbers)",                    0 )
+GAME(  199?, fl7_50_gs29, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS29: Prospector's Gold, Red Hot Ice, Cherry Bonus, Nevada Numbers)",           0 )
+GAME(  199?, fl7_50_gs30, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS30: Prospector's Gold, Red White & Blue 7's, Cherry Bonus, Nevada Numbers)",  0 )
+GAME(  199?, fl7_50_gs31, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS31: Red Hot Ice, Red White & Blue 7's, Cherry Bonus, Nevada Numbers)",        0 )
+GAME(  199?, fl7_50_gs32, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS32: Rising Star, Trophy Bucks, Cherry Bonus, Nevada Numbers)",                0 )
+GAME(  199?, fl7_50_gs33, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS33: Rockin' Reels, Diamonds 7's, Cherry Bonus, Nevada Numbers)",              0 )
+GAME(  199?, fl7_50_gs34, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS34: Rockin' Reels, Rising Star, Cherry Bonus, Nevada Numbers)",               0 )
+GAME(  199?, fl7_50_gs35, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS35: Rolling Thunder, Diamonds 7's, Cherry Bonus, Nevada Numbers)",            0 )
+GAME(  199?, fl7_50_gs36, fl7_50,  flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (50 bonus, GS36: Super Stars & Stripes, Sweethearts & Sevens, Star Sevens, Cherry Bonus)", 0 )
 
 // special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )
