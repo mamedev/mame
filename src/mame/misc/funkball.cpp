@@ -1,9 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Philip Bennett
+/**************************************************************************************************
 
-// dgPIX 'VRender 2 Beta Rev4' hardware
-// MEDIAGX CPU + 3dFX VooDoo chipset
-/***************************************************************************
+dgPIX 'VRender 2 Beta Rev4' hardware
+MEDIAGX CPU + 3dFX VooDoo chipset
+
+TODO:
+- convert to new PCI;
+- Uneven animations in places (dgPIX logo animation, flags in Kang stage); (*)
+- Player 1 side serve logic looks broken; (*)
+- Actual timer source;
+- I/Os, and actual test mode (if exists);
+- Hangs when trying to save settings in options menu, or alternatively throws "Erase TIME OUT".
+- Doesn't update bookkeeping;
+- Can lockup on soft resets;
+- One H pixel display off in Voodoo screen setup;
+
+(*) https://www.youtube.com/watch?v=VbTskI8E7EY those are regressions, weren't like that in 2021
+
+Notes:
+- dgPIX logo looks odd, but that's a btanb. cfr. https://www.youtube.com/watch?v=T99K9dESszw&t=4658s
+
+===================================================================================================
 
 Funky Ball
 dgPIX, 1998
@@ -60,7 +78,7 @@ Notes:
       ICS5342      - combination dual programmable clock generator, 256bytes x18-bit RAM and a triple 8-bit video DAC (PLCC68)
       XCS05        - Xilinx Spartan XCS05 FPGA (PLCC84)
 
-***************************************************************************/
+**************************************************************************************************/
 
 
 
@@ -91,6 +109,7 @@ public:
 	funkball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
 		, m_voodoo(*this, "voodoo_0")
+		, m_screen(*this, "screen")
 		, m_sound(*this, "ks0164")
 		, m_unk_ram(*this, "unk_ram")
 		, m_flashbank(*this, "flashbank")
@@ -112,6 +131,7 @@ private:
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
+	required_device<screen_device> m_screen;
 	required_device<ks0164_device> m_sound;
 
 	required_shared_ptr<uint32_t> m_unk_ram;
@@ -182,7 +202,7 @@ uint32_t funkball_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask
 {
 	uint32_t val = 0;
 
-	printf("Voodoo PCI R: %x\n", reg);
+	//printf("Voodoo PCI R: %x\n", reg);
 
 	switch (reg)
 	{
@@ -201,7 +221,7 @@ uint32_t funkball_state::voodoo_0_pci_r(int function, int reg, uint32_t mem_mask
 
 void funkball_state::voodoo_0_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-	printf("Voodoo [%x]: %x\n", reg, data);
+	//printf("Voodoo [%x]: %x\n", reg, data);
 
 	switch (reg)
 	{
@@ -284,7 +304,7 @@ void funkball_state::flash_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	int tempbank = (flashbank_addr & 0x7fff) | ((flashbank_addr & 0x00800000) >> 8);
 	m_flashbank->set_bank(tempbank);
 
-	// note, other bits get used, but ignoring to keep the virtual bank space size sane.
+	// NOTE: other bits get used, but ignoring to keep the virtual bank space size sane.
 
 }
 
@@ -603,7 +623,6 @@ static INPUT_PORTS_START( funkball )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-
 	PORT_START("IN.10")
 	PORT_DIPNAME( 0x01, 0x01, "10" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -755,7 +774,7 @@ void funkball_state::funkball(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "flashbank").set_map(&funkball_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
-	/* video hardware */
+	// Obsidian GE according to debug strings
 	VOODOO_1(config, m_voodoo, voodoo_1_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
@@ -763,12 +782,11 @@ void funkball_state::funkball(machine_config &config)
 	m_voodoo->set_screen("screen");
 	m_voodoo->set_cpu(m_maincpu);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_screen_update(FUNC(funkball_state::screen_update));
-	screen.set_size(1024, 1024);
-	screen.set_visarea(0, 511, 16, 447);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// 494 263 (62 380 ~ 10 249)
+	// vestigial, updated by Voodoo core
+	m_screen->set_raw(XTAL(14'318'181) / 2, 494, 62, 381, 263, 10, 250);
+	m_screen->set_screen_update(FUNC(funkball_state::screen_update));
 
 	ns16550_device &uart(NS16550(config, "uart", 1843200)); // exact type unknown
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -800,11 +818,12 @@ ROM_START( funkball )
 	ROM_REGION(0x400000, "ks0164", ROMREGION_ERASE00) // Sound Program / Samples
 	ROM_LOAD16_WORD_SWAP( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
 
+	// baddump: contains non-factory user saves, defaults to demo sounds off
 	ROM_REGION16_BE(0x400000, "u29", ROMREGION_ERASE00) // Main Program
-	ROM_LOAD16_WORD_SWAP( "flash.u29",0x000000, 0x400000, CRC(7cf6ff4b) SHA1(4ccdd4864ad92cc218998f3923997119a1a9dd1d) )
+	ROM_LOAD16_WORD_SWAP( "flash.u29",0x000000, 0x400000, BAD_DUMP CRC(7cf6ff4b) SHA1(4ccdd4864ad92cc218998f3923997119a1a9dd1d) )
 
 	ROM_REGION16_BE(0x400000, "u30", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP( "flash.u30",0x000000, 0x400000, CRC(1d46717a) SHA1(acfbd0a2ccf4d717779733c4a9c639296c3bbe0e) )
+	ROM_LOAD16_WORD_SWAP( "flash.u30",0x000000, 0x400000, BAD_DUMP CRC(1d46717a) SHA1(acfbd0a2ccf4d717779733c4a9c639296c3bbe0e) )
 ROM_END
 
 } // anonymous namespace
