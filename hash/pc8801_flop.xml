@@ -10526,12 +10526,12 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="dslayed">
+	<software name="dslayed" supported="partial">
 		<description>Dragon Slayer - Eiyuu Densetsu</description>
 		<year>1989</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<notes><![CDATA[
-Uses [redbook] audio CD on PC-8801MC
+Optional [redbook] audio CD on PC-8801MC, requires dump of the actual OST to fix playback there
 ]]></notes>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
