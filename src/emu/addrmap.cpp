@@ -1067,7 +1067,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 	if (m_spacenum != spacenum)
 		osd_printf_error("Space %d has address space %d handlers!\n", spacenum, m_spacenum);
 
-	offs_t globalmask = (~0ULL) >> (64 - spaceconfig.m_addr_width);
+	offs_t globalmask = (~offs_t(0)) >> (8 * sizeof(offs_t) - spaceconfig.m_addr_width);
 	if (m_globalmask != 0)
 		globalmask = m_globalmask;
 
