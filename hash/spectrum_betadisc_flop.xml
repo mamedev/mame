@@ -257,7 +257,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ataka_10" cloneof="ataka">
-		<description>Attack (v1.0, Party Version)</description>
+		<description>Attack (v1.0, Party Version)</description>
 		<year>2025</year>
 		<publisher>YRGB</publisher>
 		<info name="alt_title" value="Атака" />
