@@ -1816,7 +1816,7 @@ void drcbe_x64::movsd_p64_r128(Assembler &a, be_parameter const &param, Vec cons
 
 void drcbe_x64::debug_log_hashjmp(offs_t pc, int mode)
 {
-	std::printf("mode=%d PC=%16llX\n", mode, pc);
+	std::printf("mode=%d PC=%s\n", mode, util::string_format("%x", pc).c_str());
 }
 
 
