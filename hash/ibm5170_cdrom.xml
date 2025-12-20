@@ -2193,29 +2193,18 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
-	<!-- EMS386 v3.0 required -->
-	<software name="cfootman" supported="partial">
-		<description>Club Football - The Manager</description>
-		<year>1995</year>
-		<publisher>BOMS</publisher>
-
+	<!-- DOS 4.0 + Windows 95 setup.exe wrapper (just a copy, goes in DOS mode anyway) -->
+	<!-- 486DX2 66 MHz -->
+	<software name="chasm" supported="partial">
+		<description>Chasm: The Rift (Europe)</description>
+		<year>1997</year>
+		<publisher>Megamedia Corp</publisher>
+		<notes><![CDATA[
+https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
+]]></notes>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="club football - the manager (1995)(boms)(m6)" sha1="07f330b6f789f9d9fbd1572b5f799b5d90dc5403" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- OS/2 Warp, untested -->
-	<software name="cgameos2">
-		<description>Classic Games for OS/2 Warp</description>
-		<year>1995</year>
-		<publisher>IBM</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="classic games for os2 warp (1995)(ibm)" sha1="4a377af3d8de57c46870c8c3d56b0a5999123082" />
+				<disk name="chasm_-_the_rift_(europe)" sha1="b348f7feae7d5b4dc7288d8f5d2e6186a00c26ab"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2314,6 +2303,33 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chronomaster (1995)(capstone)" sha1="e780eabb9a271e28f5a9daac1620630cb61da4a5" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- EMS386 v3.0 required -->
+	<software name="cfootman" supported="partial">
+		<description>Club Football - The Manager</description>
+		<year>1995</year>
+		<publisher>BOMS</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="club football - the manager (1995)(boms)(m6)" sha1="07f330b6f789f9d9fbd1572b5f799b5d90dc5403" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- OS/2 Warp, untested -->
+	<software name="cgameos2">
+		<description>Classic Games for OS/2 Warp</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="classic games for os2 warp (1995)(ibm)" sha1="4a377af3d8de57c46870c8c3d56b0a5999123082" />
 			</diskarea>
 		</part>
 	</software>
@@ -3785,6 +3801,22 @@ This release doesn't have audio speech.
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Legend of Kyrandia, The - Book Two - The Hand of Fate (UK) (Sold Out Software)" sha1="49ab1512d8b3b5ffa2e8c3c0d7d08e5b5e7ccaa9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="falloutu" supported="no">
+		<description>Fallout (USA)</description>
+		<year>1997</year>
+		<publisher>Interplay</publisher>
+		<notes><![CDATA[
+https://www.pcgamingwiki.com/wiki/Fallout
+Crashes in FreeDOS with minimal installation
+https://mametesters.org/view.php?id=9334
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="fallout_(usa)" sha1="72a3aa4266a383f693459265122ac06cdf8986d6"/>
 			</diskarea>
 		</part>
 	</software>
