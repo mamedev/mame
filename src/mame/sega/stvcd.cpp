@@ -775,7 +775,7 @@ void stvcd_device::cmd_init_cdsystem()
 		//cddevice = (filterT *)nullptr;
 	}
 
-	hirqreg |= (CMOK|ESEL);
+	hirqreg |= (CMOK | ESEL | EFLS | ECPY | EHST);
 	cr_standard_return(cd_stat);
 	status_type = 0;
 }
@@ -894,7 +894,7 @@ void stvcd_device::cmd_play_disc()
 			else
 			{
 				// FIXME: Waku Waku 7 sets up track 0, that basically doesn't make any sense. Just skip it for now.
-				popmessage("Warning: track mode == 0, contact MAMEdev");
+				popmessage("Warning: track mode == 0");
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK);
 				return;
@@ -1114,24 +1114,24 @@ void stvcd_device::cmd_get_subcode_q_rw_channel()
 void stvcd_device::cmd_set_cddevice_connection()
 {
 	// Set CD Device connection
-	uint8_t parm;
+	uint8_t param;
 
 	// get operation
-	parm = cr3>>8;
+	param = cr3 >> 8;
 
-	LOGCMD("%s: Set CD Device Connection filter # %x\n",   machine().describe_context(), parm);
+	LOGCMD("%s: Set CD Device Connection filter # %x\n",   machine().describe_context(), param);
 
-	cddevicenum = parm;
+	cddevicenum = param;
 
-	if (parm == 0xff)
+	if (param == 0xff)
 	{
 		cddevice = (filterT *)nullptr;
 	}
 	else
 	{
-		if (parm < MAX_FILTERS)
+		if (param < MAX_FILTERS)
 		{
-			cddevice = &filters[parm];
+			cddevice = &filters[param];
 		}
 	}
 
@@ -1142,7 +1142,13 @@ void stvcd_device::cmd_set_cddevice_connection()
 
 void stvcd_device::cmd_get_cddevice_connection()
 {
-	popmessage("Get CD Device Connection, contact MAMEdev");
+	LOGCMD("%s: Get CD Device Connection filter\n",   machine().describe_context());
+	cr1 = cd_stat | 0;
+	cr2 = 0;
+	cr3 = cddevicenum << 8;
+	cr4 = 0;
+
+	// TODO: unverified
 	hirqreg |= CMOK;
 }
 
@@ -1178,7 +1184,7 @@ void stvcd_device::cmd_set_filter_range()
 
 void stvcd_device::cmd_get_filter_range()
 {
-	popmessage("Get Filter Range, contact MAMEdev");
+	popmessage("Get Filter Range");
 	hirqreg |= CMOK;
 }
 
@@ -1382,12 +1388,11 @@ void stvcd_device::cmd_get_buffer_partition_sector_number()
 
 	uint32_t bufnum = cr3>>8;
 
-	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 	cr1 = cd_stat;
 	cr2 = 0;
 	cr3 = 0;
 	if(cr1 & 0xff || cr2 || cr3 & 0xff || cr4)
-		LOGWARN("Get # sectors used with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
+		LOGWARN("Get Sector Number issued with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
 
 	// is the partition empty?
 	if (partitions[bufnum].size == -1)
@@ -1399,6 +1404,8 @@ void stvcd_device::cmd_get_buffer_partition_sector_number()
 		cr4 = partitions[bufnum].numblks;
 		//LOGWARN("Partition %08x %04x\n",bufnum,cr4);
 	}
+
+	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 
 	//LOGWARN("%04x\n",cr4);
 	if(cr4 == 0)
@@ -1444,7 +1451,7 @@ void stvcd_device::cmd_get_actual_data_size()
 	cr2 = (calcsize & 0xffff);
 	cr3 = 0;
 	cr4 = 0;
-	hirqreg |= (CMOK|ESEL);
+	hirqreg |= (CMOK);
 	status_type = 1;
 }
 
@@ -1669,6 +1676,8 @@ void stvcd_device::cmd_put_sector_data()
 	uint32_t sectofs = cr2;
 	uint32_t bufnum = cr3>>8;
 
+	LOGCMD("%s: Put sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+
 	xfertype32 = XFERTYPE32_PUTSECTOR;
 
 	/*TODO: eventual errors? */
@@ -1701,7 +1710,7 @@ void stvcd_device::cmd_put_sector_data()
 
 void stvcd_device::cmd_move_sector_data()
 {
-	popmessage("Move Sector data, contact MAMEdev");
+	popmessage("Move Sector data");
 	hirqreg |= (CMOK);
 }
 
@@ -2094,7 +2103,7 @@ void stvcd_device::cd_exec_command()
 
 		default:
 			LOG("Unknown command %04x\n", cr1>>8);
-			popmessage("CD Block unknown command %02x, contact MAMEdev",cr1>>8);
+			popmessage("CD Block unknown command %02x",cr1>>8);
 
 			hirqreg |= (CMOK);
 			break;
@@ -2249,7 +2258,7 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 		while ((!foundpd) && (cfad < 200))
 		{
 			if(sectlenin != 2048)
-				popmessage("Sector Length %d, contact MAMEdev (0)",sectlenin);
+				popmessage("Sector Length %d (0)",sectlenin);
 
 			memset(sect, 0, 2048);
 			cd_readblock(cfad++, sect);
@@ -2325,7 +2334,7 @@ void stvcd_device::make_dir_current(uint32_t fad)
 
 	memset(&sect[0], 0, MAX_DIR_SIZE);
 	if(sectlenin != 2048)
-		popmessage("Sector Length %d, contact MAMEdev (1)",sectlenin);
+		popmessage("Sector Length %d (1)",sectlenin);
 
 	for (i = 0; i < (curroot.length/2048); i++)
 	{

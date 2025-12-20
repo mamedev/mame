@@ -508,6 +508,17 @@ if (SOUNDS["K056800"]~=null) then
 	}
 end
 
+---------------------------------------------------
+-- L4003
+--@src/devices/sound/l4003.h,SOUNDS["L4003"] = true
+---------------------------------------------------
+
+if (SOUNDS["L4003"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/l4003.cpp",
+		MAME_DIR .. "src/devices/sound/l4003.h",
+	}
+end
 
 ---------------------------------------------------
 -- L7A1045 L6028 DSP-A

@@ -399,21 +399,21 @@ authors:hap
 		<element ref="text_l5"><bounds x="92.3" y="22.1" width="10" height="1.3" /></element>
 		<element ref="text_l6"><bounds x="92.3" y="25.1" width="10" height="1.3" /></element>
 
-		<element ref="text_b1a"><bounds x="89.0"  y="32.2" width="4.5" height="1.3" /></element>
-		<element ref="text_b1b"><bounds x="89.0"  y="33.4" width="4.5" height="1.3" /></element>
-		<element ref="text_b2a"><bounds x="96.5"  y="32.2" width="4.5" height="1.3" /></element>
-		<element ref="text_b2b"><bounds x="96.5"  y="33.4" width="4.5" height="1.3" /></element>
-		<element ref="text_b3a"><bounds x="104.0" y="32.2" width="4.5" height="1.3" /></element>
-		<element ref="text_b3b"><bounds x="104.0" y="33.4" width="4.5" height="1.3" /></element>
-		<element ref="text_b4b"><bounds x="111.5" y="33.4" width="4.5" height="1.3" /></element>
+		<element ref="text_b1a"><bounds x="89.2"  y="32.2" width="4.1" height="1.3" /></element>
+		<element ref="text_b1b"><bounds x="89.2"  y="33.4" width="4.1" height="1.3" /></element>
+		<element ref="text_b2a"><bounds x="96.7"  y="32.2" width="4.1" height="1.3" /></element>
+		<element ref="text_b2b"><bounds x="96.7"  y="33.4" width="4.1" height="1.3" /></element>
+		<element ref="text_b3a"><bounds x="104.2" y="32.2" width="4.1" height="1.3" /></element>
+		<element ref="text_b3b"><bounds x="104.2" y="33.4" width="4.1" height="1.3" /></element>
+		<element ref="text_b4b"><bounds x="111.7" y="33.4" width="4.1" height="1.3" /></element>
 
-		<element ref="text_b5b"><bounds x="89.0"  y="41.4" width="4.5" height="1.3" /></element>
-		<element ref="text_b6a"><bounds x="96.5"  y="40.2" width="4.5" height="1.3" /></element>
-		<element ref="text_b6b"><bounds x="96.5"  y="41.4" width="4.5" height="1.3" /></element>
-		<element ref="text_b7a"><bounds x="104.0" y="40.2" width="4.5" height="1.3" /></element>
-		<element ref="text_b7b"><bounds x="104.0" y="41.4" width="4.5" height="1.3" /></element>
-		<element ref="text_b8a"><bounds x="111.5" y="40.2" width="4.5" height="1.3" /></element>
-		<element ref="text_b8b"><bounds x="111.5" y="41.4" width="4.5" height="1.3" /></element>
+		<element ref="text_b5b"><bounds x="89.2"  y="41.4" width="4.1" height="1.3" /></element>
+		<element ref="text_b6a"><bounds x="96.7"  y="40.2" width="4.1" height="1.3" /></element>
+		<element ref="text_b6b"><bounds x="96.7"  y="41.4" width="4.1" height="1.3" /></element>
+		<element ref="text_b7a"><bounds x="104.2" y="40.2" width="4.1" height="1.3" /></element>
+		<element ref="text_b7b"><bounds x="104.2" y="41.4" width="4.1" height="1.3" /></element>
+		<element ref="text_b8a"><bounds x="111.7" y="40.2" width="4.1" height="1.3" /></element>
+		<element ref="text_b8b"><bounds x="111.7" y="41.4" width="4.1" height="1.3" /></element>
 
 		<element ref="cwhite" blend="multiply"><bounds x="87" y="5" width="31" height="59" /></element>
 

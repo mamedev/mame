@@ -171,6 +171,23 @@ public:
 
 protected:
 	wd90c31_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	virtual space_config_vector memory_space_config() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	address_space_config m_sysctrl_space_config;
+	address_space_config m_bitblt_space_config;
+	address_space_config m_cursor_space_config;
+
+	void sysctrl_map(address_map &map);
+	void bitblt_map(address_map &map);
+	void cursor_map(address_map &map);
+
+	u8 m_ext_index;
+	u8 m_ext_device;
+	bool m_ext_noautoinc;
+	bool m_ext_invalid;
 };
 
 class wd90c33_vga_device : public wd90c31_vga_device

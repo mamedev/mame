@@ -33,6 +33,7 @@ device_memory_interface::space_config_vector sound_pc9821ce_device::memory_space
 
 const tiny_rom_entry *sound_pc9821ce_device::device_rom_region() const
 {
+	// mapped from pc9821ce base
 	return nullptr;
 }
 
@@ -153,6 +154,7 @@ device_memory_interface::space_config_vector sound_pc9821cx3_device::memory_spac
 
 const tiny_rom_entry *sound_pc9821cx3_device::device_rom_region() const
 {
+	// mapped from pc9821cx3 base
 	return nullptr;
 }
 

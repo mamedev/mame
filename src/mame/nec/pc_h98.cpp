@@ -141,7 +141,7 @@ static INPUT_PORTS_START( pc_h98 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
-	PORT_START("ROM_LOAD")
+	PORT_START("BIOS_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_CONFNAME( 0x04, 0x00, "Load IDE BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
@@ -174,8 +174,8 @@ void pc_hyper98_state::pc_h98s(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_hyper98_state, pc_h98)
 
 	// RAM 1.6 MB ~ 45.6 MB
-	m_ram->set_default_size("14M");
-	m_ram->set_extra_options("2M,4M,8M,16M,32M,46M");
+//  m_ram->set_default_size("14M");
+//  m_ram->set_extra_options("2M,4M,8M,16M,32M,46M");
 }
 
 // Stolen from pc9821

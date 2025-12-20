@@ -415,14 +415,14 @@ CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04_2mb, epo_bowl,    xavix_i2c_stat
 
 // スーパーショット！ エキサイトゴルフ
 // needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)  (2002 date on PCB, 2003 ingame)
-CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_no_timer, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_xavix, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // とっとこハム太郎 ハムハム大サーカス！
 CONS( 2002, epo_hamc,  0,      0, xavix2000_4mb,       epo_hamc,   xavix_epo_hamc_state, init_xavix,    "Epoch / SSD Company LTD",       "Tottoko Hamtaro - Ham Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
-CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_no_timer, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_xavix, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // カードスキャン!　エキサイトステージ サッカー日本代表チーム
 CONS( 2006, epo_es2j,   0,     0,  xavix2000_4mb,      xavix,      xavix_state,          init_xavix,    "Epoch / SSD Company LTD",        "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -456,7 +456,7 @@ CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_sta
 
 // Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
 // stalls unless timers are disabled like epo_mini / epo_golf, 2004 date on PCB, 2005 ingame
-CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_no_timer, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ディズニープリンセス　キラキラ魔法のレッスン
 CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

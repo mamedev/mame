@@ -51,14 +51,14 @@
 
 /**************************************************************************************/
 
-void saturn_state::saturn_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void saturn_state::soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//machine().scheduler().synchronize(); // force resync
 
 	COMBINE_DATA(&m_sound_ram[offset]);
 }
 
-uint16_t saturn_state::saturn_soundram_r(offs_t offset)
+uint16_t saturn_state::soundram_r(offs_t offset)
 {
 	//machine().scheduler().synchronize(); // force resync
 
@@ -128,7 +128,7 @@ void saturn_state::saturn_sinit_w(uint32_t data)
 }
 
 
-uint8_t saturn_state::saturn_backupram_r(offs_t offset)
+uint8_t saturn_state::backupram_r(offs_t offset)
 {
 	if(!(offset & 1))
 		return 0; // yes, it makes sure the "holes" are there.
@@ -136,7 +136,7 @@ uint8_t saturn_state::saturn_backupram_r(offs_t offset)
 	return m_backupram[offset >> 1] & 0xff;
 }
 
-void saturn_state::saturn_backupram_w(offs_t offset, uint8_t data)
+void saturn_state::backupram_w(offs_t offset, uint8_t data)
 {
 	if(!(offset & 1))
 		return;
@@ -173,7 +173,7 @@ void saturn_state::scsp_irq(offs_t offset, uint8_t data)
 
 /*
 (Preliminary) explanation about this:
-VBLANK-OUT is used at the start of the vblank period.It also sets the timer zero
+VBLANK-OUT is used at the start of the vblank period. It also sets the timer zero
 variable to 0.
 If the Timer Compare register is zero too,the Timer 0 irq is triggered.
 
@@ -197,7 +197,7 @@ TODO:
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 {
 	int scanline = param;
-	int y_step,vblank_line;
+	int y_step, vblank_line;
 
 	vblank_line = get_vblank_start_position();
 	y_step = get_ystep_count();
@@ -215,23 +215,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		// flip odd bit here
 		m_vdp2.odd ^= 1;
 		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
-		video_update_vdp1();
+		vdp1_video_update();
 	}
-	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
+	else if((scanline % y_step) == 0 && scanline < vblank_line * y_step)
 	{
 		m_scu->hblank_in_w(1);
 	}
 
-	if(scanline == (vblank_line+1)*y_step)
+	if(scanline == (vblank_line+1) * y_step)
 	{
 		/* docs mentions that VBE happens one line after vblank-in. */
-		if(STV_VDP1_VBE)
+		if(VDP1_VBE)
 			m_vdp1.framebuffer_clear_on_next_frame = 1;
 	}
 
 	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
 	//       VDP1 timing needs some HW work anyway so I'm currently firing VDP1 after 8 scanlines for now, will de-anon the timers in a later stage.
-	if(scanline == (vblank_line+8)*y_step)
+	if(scanline == (vblank_line+8) * y_step)
 	{
 		m_scu->vdp1_end_w(1);
 	}
@@ -242,7 +242,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 {
 	int scanline = param;
-	int y_step,vblank_line;
+	int y_step, vblank_line;
 
 	vblank_line = get_vblank_start_position();
 	y_step = get_ystep_count();
@@ -375,7 +375,7 @@ void saturn_state::dot_select_w(int state)
 	m_slave->set_unscaled_clock(xtal/2);
 
 	m_vdp2.dotsel = state ^ 1;
-	stv_vdp2_dynamic_res_change();
+	vdp2_dynamic_res_change();
 }
 
 

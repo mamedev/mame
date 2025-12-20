@@ -268,6 +268,7 @@ const double XTAL::known_xtals[] = {
 	 15'300'720, // 15.30072_MHz_XTAL      Microterm 420
 	 15'360'000, // 15.36_MHz_XTAL         Visual 1050
 	 15'400'000, // 15.4_MHz_XTAL          DVK KSM
+	 15'468'000, // 15.468_MHz_XTAL        Koi Koi
 	 15'468'480, // 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80
 	 15'582'000, // 15.582_MHz_XTAL        Zentec Zephyr
 	 15'625'000, // 15.625_MHz_XTAL        Zaccaria The Invaders
@@ -415,6 +416,7 @@ const double XTAL::known_xtals[] = {
 	 28'636'363, // 28.636363_MHz_XTAL     Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier), NEC PC-88xx
 	 28'640'000, // 28.64_MHz_XTAL         Fuuki FG-1c AI AM-2 PCB
 	 28'700'000, // 28.7_MHz_XTAL          -
+	 28'759'500, // 28.7595_MHz_XTAL       Videx UltraTerm
 	 29'376'000, // 29.376_MHz_XTAL        Qume QVT-103
 	 29'491'200, // 29.4912_MHz_XTAL       Xerox Alto-II system clock (tagged 29.4MHz in the schematics)
 	 30'000'000, // 30_MHz_XTAL            Impera Magic Card

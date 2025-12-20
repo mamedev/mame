@@ -333,7 +333,7 @@ ROM_START( ivanto )
 	ROM_LOAD("1996_701e_excalibur_ivan_t.ic2", 0x000000, 0x100000, CRC(f7c386a1) SHA1(357ca0b0c0b1409d33876b6fa00c5ad74b2643fc) )
 
 	ROM_REGION( 109652, "screen", 0 )
-	ROM_LOAD("regency.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
+	ROM_LOAD("kchal.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
 ROM_END
 
 } // anonymous namespace

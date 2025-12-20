@@ -1,315 +1,322 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// Yamaha SWP30/30B, rompler/dsp combo
+// Yamaha SWP30/30B, ROMpler/DSP combo
 
 #include "emu.h"
-#include "debugger.h"
 #include "swp30.h"
+
 #include "cpu/drcumlsh.h"
 
-// TODOs:
-//   - 7 bits are still not understood in the MEG instructions
-//   - in the lfo, the top of slot 9 is not understood
-//   - slot b is not understood but used (and even read at times)
-//   - some instruments from the demo don't work well (not sure which)
-//   - there seems to be some saturation at times in the demo
-//   - lots of control registers are not understood, in particular
-//     the 5x ones, one of which is used in the talk mod effect
-//   - the timing of communication between the meg registers and the
-//     the environment is known but not implemented
+#include "debugger.h"
+
+#include <algorithm>
+#include <sstream>
+
+/*
+TODOs:
+  - 7 bits are still not understood in the MEG instructions
+  - in the lfo, the top of slot 9 is not understood
+  - slot b is not understood but used (and even read at times)
+  - some instruments from the demo don't work well (not sure which)
+  - there seems to be some saturation at times in the demo
+  - lots of control registers are not understood, in particular
+    the 5x ones, one of which is used in the talk mod effect
+  - the timing of communication between the meg registers and the
+    the environment is known but not implemented
 
 
-//   The SWP30 is the combination of a rompler called AWM2 (Advanced
-//   Wave Memory 2) and an effects DSP called MEG (Multiple Effects
-//   Generator).  It also includes some routing/mixing capabilities,
-//   moving data between AWM2, MEG and serial inputs (MELI) and
-//   outputs (MELO) with volume management capabilities everywhere.
-//   Its clock is 33.9MHz and the output is at 44100Hz stereo (768
-//   cycles per sample pair) per dac output.
+  The SWP30 is the combination of a rompler called AWM2 (Advanced
+  Wave Memory 2) and an effects DSP called MEG (Multiple Effects
+  Generator).  It also includes some routing/mixing capabilities,
+  moving data between AWM2, MEG and serial inputs (MELI) and
+  outputs (MELO) with volume management capabilities everywhere.
+  Its clock is 33.9MHz and the output is at 44100Hz stereo (768
+  cycles per sample pair) per dac output.
 
-//   I/O wise, the chip has 8 generic audio serial inputs and 8
-//   outputs for external plugins, and two dac outputs, all
-//   stereo. The MU100 connects a stereo ADC to the first input, and
-//   routes the third input and output to the plugin board.
-
-
-//     Registers:
-
-//   The chip interface presents 4096 16-bits registers in a 64x64 grid.
-//   They are mostly read/write.  Some of this grid is for per-channel
-//   values for AWM2, but parts are isolated and renumbered for MEG
-//   registers or for general control functions.
+  I/O wise, the chip has 8 generic audio serial inputs and 8
+  outputs for external plugins, and two dac outputs, all
+  stereo. The MU100 connects a stereo ADC to the first input, and
+  routes the third input and output to the plugin board.
 
 
-//     AWM2:
+    Registers:
 
-//   The AWM2 is in charge of handling the individual channels.  It
-//   manages reading the rom, decoding the samples, applying volume and
-//   pitch envelopes and lfos and filtering the result.  Each channel is
-//   then sent as a mono signal to the mixer for further processing.
-
-//   It is composed of a number of blocks, please refer to the individual
-//   documentations further in the file:
-//   - streaming
-//   - dual special filters
-//   - dual iir1 filters
-//   - envelope control
-//   - lfo
-
-//   The sound data can be four formats (8 bits, 12 bits, 16 bits, and
-//   a 8-bits kinda-apdcm format).  The rom bus is 25 bits address and
-//   32 bits data wide.  It applies four filters to the sample data in
-//   two dual filter blocks.  The first block has two filters
-//   configurable between iir1 and chamberlain, lpf, hpf, band or
-//   notch, with our without configurable resonance.  The second block
-//   is two free iir1 filters.  Envelopes are handled automatically,
-//   and the final result is sent to the mixer for panning, volume
-//   control and routing.  In addition lfo acts on the pitch and the
-//   volume.
+  The chip interface presents 4096 16-bits registers in a 64x64 grid.
+  They are mostly read/write.  Some of this grid is for per-channel
+  values for AWM2, but parts are isolated and renumbered for MEG
+  registers or for general control functions.
 
 
-//     MEG:
+    AWM2:
 
-//   The MEG is a DSP with 384 program steps connected to a reverb
-//   samples ram.  It computes all the effects and sends to result to
-//   the adcs and the serial outputs.
+  The AWM2 is in charge of handling the individual channels.  It
+  manages reading the rom, decoding the samples, applying volume and
+  pitch envelopes and lfos and filtering the result.  Each channel is
+  then sent as a mono signal to the mixer for further processing.
 
+  It is composed of a number of blocks, please refer to the individual
+  documentations further in the file:
+  - streaming
+  - dual special filters
+  - dual iir1 filters
+  - envelope control
+  - lfo
 
-//     Mixer:
-
-//   The mixer gets the outputs of the AWM2, the MEG (for the previous
-//   sample) and the external inputs, attenuates and sums them
-//   according to its mapping instructions, and pushes the results to
-//   the MEG and the external outputs.
-
-
-//--------------------------------------------------------------------------------
-//
-//    Memory map in rough numerical order with block indications
-//
-//   cccccc 000000  AMW2/Filters     mmmm .aaa aaaa aaaa                      Filter 1 mode and main parameter
-//   cccccc 000001  AMW2/Filters     .xxx xxxx uuuu uuuu                      Bypass/dry level
-//   cccccc 000010  AMW2/Filters     .... .ccc cccc cccc                      Filter 2 mode and main parameter
-//   cccccc 000011  AMW2/Filters     .... .... vvvv vvvv                      Post-filter level
-//   cccccc 000100  AMW2/Filters     bbbb b... .... ....                      Filters second parameter
-
-//   cccccc 000101  AWM2/LFO         .... .... .aaa aaaa                      LFO amplitude depth
-//   cccccc 000110  AWM2/Envelope    ssss ssss iiii iiii                      Attack speed and start volume
-//   cccccc 000111  AWM2/Envelope    ssss ssss tttt tttt                      Decay 1 speed and target
-//   cccccc 001000  AWM2/Envelope    ssss ssss tttt tttt                      Decay 2 speed and target
-//   cccccc 001001  AWM2/Envelope    ssss ssss gggg gggg                      Release speed & global volume
-//   cccccc 001010  AWM2/LFO         tt.s ssss mppp pppp                      LFO type, step, pitch mode, pitch depth
-//   cccccc 001011   ?
-//   cccccc 001100   ?
-//   cccccc 001101   ?
-
-//   000000 001110                   9100 at startup
-//   000000 001111                   c002 at startup then c003
-//   000001 001110  AWM2/Control     internal register address
-//   000001 001111  AWM2/Control     (read) internal register value
-//   000010 00111*  AWM2/Control     wave direct access address
-//   000011 00111*  AWM2/Control     wave direct access size
-//   000100 001110  AWM2/Control     wave direct access trigger (8000 = read sample from rom, 9000 = read sample from ram, 5000 = write sample to ram)
-//   000100 001111  AWM2/Control     wave direct access status
-//   000101 00111*  AWM2/Control     wave direct access data
-//   00011* 00111*  AWM2/Control     keyon mask
-//   001000 001110  AWM2/Control     keyon trigger
-//   001101 001110                   1100 at startup then 0040
-//   010000 001110  MEG/Control      .... .... .... ....    commit LFO increments on write
-//   010000 001111  MEG/Control      .... ...a aaaa aaaa    program address
-//   010001 00111*  MEG/Control      dddd dddd dddd dddd    program data 1/2
-//   010010 00111*  MEG/Control      dddd dddd dddd dddd    program data 2/2
-//   010011 001110   ? sy26
-//   010011 001111   ? sy27
-//   010100 001111                   00ff after part 1
-//   010101 001110                   00ff after part 1
-//   010101 001111                   00ff after part 1
-//   011mmm 001110  MEG/Reverb       memory map
-//   100000 001110  MEG/Reverb       ram memory map tlb enable (0=on, 1=off, bits 0-7)
-//   100000 001111  MEG/Reverb       ram memory bank clear (1=trigger a clear)
-//   100001 001110  MEG/Reverb       ram direct access status
-//   100101 00111*  MEG/Reverb       ram direct access address
-//   100110 00111*  MEG/Reverb       ram direct access data
-
-//   101*** 00111*   ? sy5x
-
-//   cccccc 010000   ?
-
-//   cccccc 010001  AMW2/Streaming   ?-pp pppp pppp pppp                      Pitch
-//   cccccc 01001*  AMW2/Streaming   ?Lll llll ssss ssss ssss ssss ssss ssss  Loop disable. Loop size adjust. Number of samples before the loop point
-//   cccccc 01010*  AMW2/Streaming   bfff ffff ssss ssss ssss ssss ssss ssss  Backwards. Finetune. Number of samples in the loop
-//   cccccc 01011*  AMW2/Streaming   ffSS Smma aaaa aaaa aaaa aaaa aaaa aaaa  Format, Scaling, Compressor mode, Sample address
-
-//   cccccc 100000  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a1
-//   aaaaaa 100001  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 0
-//   cccccc 100010  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 b1
-//   aaaaaa 100011  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 1
-//   cccccc 100100  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a0
-//   aaaaaa 100101  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 2
-//   cccccc 100110  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a1
-//   aaaaaa 100111  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 3
-//   cccccc 101000  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 b1
-//   aaaaaa 101001  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 4
-//   cccccc 101010  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a0
-//   aaaaaa 101011  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 5
+  The sound data can be four formats (8 bits, 12 bits, 16 bits, and
+  a 8-bits kinda-apdcm format).  The rom bus is 25 bits address and
+  32 bits data wide.  It applies four filters to the sample data in
+  two dual filter blocks.  The first block has two filters
+  configurable between iir1 and chamberlain, lpf, hpf, band or
+  notch, with our without configurable resonance.  The second block
+  is two free iir1 filters.  Envelopes are handled automatically,
+  and the final result is sent to the mixer for panning, volume
+  control and routing.  In addition lfo acts on the pitch and the
+  volume.
 
 
-//   aaaaaa 11000a  MEG/Data         oooo oooo oooo oooo                      offset index a
-//   ssssss 110010  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s
-//   ssssss 110011  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s
-//   ssssss 110100  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s
-//   ssssss 110101  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s output 0-f
-//   ssssss 110110  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s output 0-f
-//   ssssss 110111  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s output 0-f
-//   ssssss 111000  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s+40
-//   ssssss 111001  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s+40
-//   ssssss 111010  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s+40
-//   ssssss 111011  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s+40 output 0-f
-//   ssssss 111100  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s+40 output 0-f
-//   ssssss 111101  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s+40 output 0-f
-//   aaaaaa 11111a  MEG/LFO          pppp ttss iiii iiii                      LFO index a, phase, type, shift, increment
+    MEG:
+
+  The MEG is a DSP with 384 program steps connected to a reverb
+  samples ram.  It computes all the effects and sends to result to
+  the adcs and the serial outputs.
 
 
-//======================= AWM2 blocks ============================================
+    Mixer:
 
-// Streaming block
-//
-//   cccccc 010001   ?-pp pppp pppp pppp                      Pitch
-//   cccccc 01001*   ?Lll llll ssss ssss ssss ssss ssss ssss  Loop disable. Loop size adjust. Number of samples before the loop point
-//   cccccc 01010*   bfff ffff ssss ssss ssss ssss ssss ssss  Backwards. Finetune. Number of samples in the loop
-//   cccccc 01011*   ffSS Smma aaaa aaaa aaaa aaaa aaaa aaaa  Format, Scaling, Compressor mode, Sample address
-//
-// The streaming block manages reading and decoding samples from rom
-// and/or dram at a given pitch and format.  The samples are
-// interpolated for a better quality.
-//
-// Addresses 000000-ffffff are in rom (and maybe sram?),
-// 1000000-1ffffff are in dram.
-//
-// The unknown bit in the 010001 slot tends to be set when reading a
-// compressed sample and unset otherwise.  It does not seem to impact
-// the result though.  The unknown bit in the 010010 slot doesn't seem
-// to ever been set in the mu100 and does not seem to impact the
-// result.
-//
-//   Sample formats
-//
-// Samples can be in one of four formats, 8 bits, 12
-// bits, 16 bits and adaptive-delta-compression with 8 bits per
-// sample.  Non-compressed samples are zero-extended on the right to
-// get a almost-full-range 16-bits value.
-//
-// The compressed format uses a running delta and an accumulator.  The
-// input byte is expanded into a 10-bit signed value through a fixed
-// table, which is added to the current delta.  The delta is then
-// added to the accumulator, which gives the current sample value.
-// Then the current delta is, depending on the mode bits, multiplied
-// by either 0.875 (7/8), 0.75 (3/4), 0.5 (1/2) or 0 (e.g. cleared).
-//
-// The multiplier on the delta is buggy and bias towards negative
-// numbers, but it's not entirely clear how exactly.  Even worse, the
-// multiplier results change depending on whether the scaling is zero
-// or non-zero, and also has some kind of context or extra state bits
-// hidden somewhere.
-//
-//
-//   Sample scaling
-//
-// Samples just read are then shifted left by Scaling bits (0-7).
-// While the scaling is in practice only used for compressed samples,
-// the hardware applies it to any format.  The result is clamped
-// between -0x8000 and a value depending on the amount of scaling
-// (0x7fff for 0, 0x7ffe for 1, ..., 0x7f80 for 7).
-//
-//
-//   Sample addressing, pitching and looping
-//
-// The chip has two 25-bits address, 16-bits data buses to the sample
-// roms and drams.  The samples are interleaved between the two buses,
-// looking as if the data bus was 32 bits wide.  It directly manages
-// dram signals, so there must be a way somewhere for it to tell
-// whether a sample address is in dram or not.  When in dual-chip
-// configuration, the address and data lines of the buses are directly
-// connected, so they have a way to arbitrate their accesses.  The
-// amount of data needed at a given time varying depending on pitch
-// and sample format, the design of the memory access controller must
-// have been interesting.
-//
-// The current sample position is in signed 25.15 format.  The initial
-// value of the sample position is minus the number of samples before
-// the loop point (unsigned 24 bits, slots 010010 and 010011).  It is
-// incremented by the unsigned 7.15 step value for each sample, until
-// it reaches a positive value more or equal to the loop size
-// (unsigned 24 bits, slots 010100 and 010101).  Then if looping is
-// enabled the position is decreased by the loop size and incremented
-// by the loop size adjust, otherwise the last sample value output is
-// held and a maximum speed envelope release is triggered.
-//
-// The loop size adjust is a 0.6 unsigned value (e.g. between 0 and
-// 0.984375).
-//
-// Looping is enabled when L=0 (slot 010010) and b=0 (slot 010110).
-//
-// The unsigned 7.15 step is computed from the pitch and the finetune
-// values.  The base step value is 2**pitch with pitch encoded as a
-// signed 4.10 value, e.g. giving a result between 1/256 and almost
-// but not quite 256.  The exponentiation table has 13 bits of
-// precision including the left 1 bit.  The finetune is a signed value
-// between -64 and +63 that is added to the pitch once position 0 is
-// reached.
-//
-// Backwards sample reading negates the sample position value before
-// fetching.  Note that backwards reading disable looping.
-//
-// Samples are read with sample pos 0 corresponding to the bottom
-// sample at the 25-bits address. It is important to note that four
-// consecutive sample values are required for the interpolation block,
-// and the hardware manages to provide the correct values even for
-// compressed samples with large steps, requiring to compute and
-// accumulate the deltas for all the bytes on the way.  The memory
-// controller must be REALLY interesting.
-//
-// A pitch skip bigger than the loop size ends up with results
-// somewhere between weird and utterly insane.  Don't do that.
-//
-//
-//   Sample interpolation
-//
-// Samples go through an interpolator which uses two past samples and
-// two future samples to compute the final value for a non-integer
-// position, with a weight for each history sample.  The weights are
-// computed from two polynoms:
-//   f0(t) = (t - t**3)/6
-//   f1(t) = t + (t**2 - t**3)/2
-//
-// The polynoms are used with the decimal part 'p' (as in phase) of
-// the sample position.  The computation from the four samples s0..s3
-// is:
-//   s = - s0 * f0(1-p) + s1 * f1(1-p) + s2 * f1(p) - s3 * f0(p)
-//
-// f0(0) = f0(1) = f1(0) = 0 and f1(1) = 1, so when phase is 0 (sample
-// streaming with no frequency shifting) the sample s1 is output.
-//
-// The implementation of the weights uses two tables with apparently
-// 2048 entries and 10 bits precision (e.g. between 0 and 0.999), but
-// are in reality 1023 entries.  Each entry of the 1023-entries tables
-// goes to slots 2n-1 and 2n (n=1..1023), and slots 0 and 2047 are
-// hardcoded to both 0 for f0 and 0/1.0 for f1. That way the tables
-// can be used in both directions and the computation of 1-p consists
-// of inverting all the bits.
-//
-// The two-past sample for the first position, the first pointed at by
-// the streamer, is forced to zero.
-//
-// Post-interpolation, the output is a 16-bits signed value with no
-// decimals.
+  The mixer gets the outputs of the AWM2, the MEG (for the previous
+  sample) and the external inputs, attenuates and sums them
+  according to its mapping instructions, and pushes the results to
+  the MEG and the external outputs.
+*/
 
 
-// Dpcm delta expansion table
+/*--------------------------------------------------------------------------------
+
+   Memory map in rough numerical order with block indications
+
+  cccccc 000000  AMW2/Filters     mmmm .aaa aaaa aaaa                      Filter 1 mode and main parameter
+  cccccc 000001  AMW2/Filters     .xxx xxxx uuuu uuuu                      Bypass/dry level
+  cccccc 000010  AMW2/Filters     .... .ccc cccc cccc                      Filter 2 mode and main parameter
+  cccccc 000011  AMW2/Filters     .... .... vvvv vvvv                      Post-filter level
+  cccccc 000100  AMW2/Filters     bbbb b... .... ....                      Filters second parameter
+
+  cccccc 000101  AWM2/LFO         .... .... .aaa aaaa                      LFO amplitude depth
+  cccccc 000110  AWM2/Envelope    ssss ssss iiii iiii                      Attack speed and start volume
+  cccccc 000111  AWM2/Envelope    ssss ssss tttt tttt                      Decay 1 speed and target
+  cccccc 001000  AWM2/Envelope    ssss ssss tttt tttt                      Decay 2 speed and target
+  cccccc 001001  AWM2/Envelope    ssss ssss gggg gggg                      Release speed & global volume
+  cccccc 001010  AWM2/LFO         tt.s ssss mppp pppp                      LFO type, step, pitch mode, pitch depth
+  cccccc 001011   ?
+  cccccc 001100   ?
+  cccccc 001101   ?
+
+  000000 001110                   9100 at startup
+  000000 001111                   c002 at startup then c003
+  000001 001110  AWM2/Control     internal register address
+  000001 001111  AWM2/Control     (read) internal register value
+  000010 00111*  AWM2/Control     wave direct access address
+  000011 00111*  AWM2/Control     wave direct access size
+  000100 001110  AWM2/Control     wave direct access trigger (8000 = read sample from rom, 9000 = read sample from ram, 5000 = write sample to ram)
+  000100 001111  AWM2/Control     wave direct access status
+  000101 00111*  AWM2/Control     wave direct access data
+  00011* 00111*  AWM2/Control     keyon mask
+  001000 001110  AWM2/Control     keyon trigger
+  001101 001110                   1100 at startup then 0040
+  010000 001110  MEG/Control      .... .... .... ....    commit LFO increments on write
+  010000 001111  MEG/Control      .... ...a aaaa aaaa    program address
+  010001 00111*  MEG/Control      dddd dddd dddd dddd    program data 1/2
+  010010 00111*  MEG/Control      dddd dddd dddd dddd    program data 2/2
+  010011 001110   ? sy26
+  010011 001111   ? sy27
+  010100 001111                   00ff after part 1
+  010101 001110                   00ff after part 1
+  010101 001111                   00ff after part 1
+  011mmm 001110  MEG/Reverb       memory map
+  100000 001110  MEG/Reverb       ram memory map tlb enable (0=on, 1=off, bits 0-7)
+  100000 001111  MEG/Reverb       ram memory bank clear (1=trigger a clear)
+  100001 001110  MEG/Reverb       ram direct access status
+  100101 00111*  MEG/Reverb       ram direct access address
+  100110 00111*  MEG/Reverb       ram direct access data
+
+  101*** 00111*   ? sy5x
+
+  cccccc 010000   ?
+
+  cccccc 010001  AMW2/Streaming   ?-pp pppp pppp pppp                      Pitch
+  cccccc 01001*  AMW2/Streaming   ?Lll llll ssss ssss ssss ssss ssss ssss  Loop disable. Loop size adjust. Number of samples before the loop point
+  cccccc 01010*  AMW2/Streaming   bfff ffff ssss ssss ssss ssss ssss ssss  Backwards. Finetune. Number of samples in the loop
+  cccccc 01011*  AMW2/Streaming   ffSS Smma aaaa aaaa aaaa aaaa aaaa aaaa  Format, Scaling, Compressor mode, Sample address
+
+  cccccc 100000  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a1
+  aaaaaa 100001  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 0
+  cccccc 100010  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 b1
+  aaaaaa 100011  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 1
+  cccccc 100100  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a0
+  aaaaaa 100101  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 2
+  cccccc 100110  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a1
+  aaaaaa 100111  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 3
+  cccccc 101000  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 b1
+  aaaaaa 101001  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 4
+  cccccc 101010  AWM2/IIR         vvvv vvvv vvvv vvvv                      IIR1 a0
+  aaaaaa 101011  MEG/Data         cccc cccc cccc cccc                      constant index 6*a + 5
+
+
+  aaaaaa 11000a  MEG/Data         oooo oooo oooo oooo                      offset index a
+  ssssss 110010  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s
+  ssssss 110011  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s
+  ssssss 110100  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s
+  ssssss 110101  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s output 0-f
+  ssssss 110110  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s output 0-f
+  ssssss 110111  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s output 0-f
+  ssssss 111000  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s+40
+  ssssss 111001  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s+40
+  ssssss 111010  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s+40
+  ssssss 111011  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s+40 output 0-f
+  ssssss 111100  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s+40 output 0-f
+  ssssss 111101  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s+40 output 0-f
+  aaaaaa 11111a  MEG/LFO          pppp ttss iiii iiii                      LFO index a, phase, type, shift, increment
+*/
+
+/*======================= AWM2 blocks ============================================
+
+Streaming block
+
+  cccccc 010001   ?-pp pppp pppp pppp                      Pitch
+  cccccc 01001*   ?Lll llll ssss ssss ssss ssss ssss ssss  Loop disable. Loop size adjust. Number of samples before the loop point
+  cccccc 01010*   bfff ffff ssss ssss ssss ssss ssss ssss  Backwards. Finetune. Number of samples in the loop
+  cccccc 01011*   ffSS Smma aaaa aaaa aaaa aaaa aaaa aaaa  Format, Scaling, Compressor mode, Sample address
+
+The streaming block manages reading and decoding samples from rom
+and/or dram at a given pitch and format.  The samples are
+interpolated for a better quality.
+
+Addresses 000000-ffffff are in rom (and maybe sram?),
+1000000-1ffffff are in dram.
+
+The unknown bit in the 010001 slot tends to be set when reading a
+compressed sample and unset otherwise.  It does not seem to impact
+the result though.  The unknown bit in the 010010 slot doesn't seem
+to ever been set in the mu100 and does not seem to impact the
+result.
+
+  Sample formats
+
+Samples can be in one of four formats, 8 bits, 12
+bits, 16 bits and adaptive-delta-compression with 8 bits per
+sample.  Non-compressed samples are zero-extended on the right to
+get a almost-full-range 16-bits value.
+
+The compressed format uses a running delta and an accumulator.  The
+input byte is expanded into a 10-bit signed value through a fixed
+table, which is added to the current delta.  The delta is then
+added to the accumulator, which gives the current sample value.
+Then the current delta is, depending on the mode bits, multiplied
+by either 0.875 (7/8), 0.75 (3/4), 0.5 (1/2) or 0 (e.g. cleared).
+
+The multiplier on the delta is buggy and bias towards negative
+numbers, but it's not entirely clear how exactly.  Even worse, the
+multiplier results change depending on whether the scaling is zero
+or non-zero, and also has some kind of context or extra state bits
+hidden somewhere.
+
+
+  Sample scaling
+
+Samples just read are then shifted left by Scaling bits (0-7).
+While the scaling is in practice only used for compressed samples,
+the hardware applies it to any format.  The result is clamped
+between -0x8000 and a value depending on the amount of scaling
+(0x7fff for 0, 0x7ffe for 1, ..., 0x7f80 for 7).
+
+
+  Sample addressing, pitching and looping
+
+The chip has two 25-bits address, 16-bits data buses to the sample
+roms and drams.  The samples are interleaved between the two buses,
+looking as if the data bus was 32 bits wide.  It directly manages
+dram signals, so there must be a way somewhere for it to tell
+whether a sample address is in dram or not.  When in dual-chip
+configuration, the address and data lines of the buses are directly
+connected, so they have a way to arbitrate their accesses.  The
+amount of data needed at a given time varying depending on pitch
+and sample format, the design of the memory access controller must
+have been interesting.
+
+The current sample position is in signed 25.15 format.  The initial
+value of the sample position is minus the number of samples before
+the loop point (unsigned 24 bits, slots 010010 and 010011).  It is
+incremented by the unsigned 7.15 step value for each sample, until
+it reaches a positive value more or equal to the loop size
+(unsigned 24 bits, slots 010100 and 010101).  Then if looping is
+enabled the position is decreased by the loop size and incremented
+by the loop size adjust, otherwise the last sample value output is
+held and a maximum speed envelope release is triggered.
+
+The loop size adjust is a 0.6 unsigned value (e.g. between 0 and
+0.984375).
+
+Looping is enabled when L=0 (slot 010010) and b=0 (slot 010110).
+
+The unsigned 7.15 step is computed from the pitch and the finetune
+values.  The base step value is 2**pitch with pitch encoded as a
+signed 4.10 value, e.g. giving a result between 1/256 and almost
+but not quite 256.  The exponentiation table has 13 bits of
+precision including the left 1 bit.  The finetune is a signed value
+between -64 and +63 that is added to the pitch once position 0 is
+reached.
+
+Backwards sample reading negates the sample position value before
+fetching.  Note that backwards reading disable looping.
+
+Samples are read with sample pos 0 corresponding to the bottom
+sample at the 25-bits address. It is important to note that four
+consecutive sample values are required for the interpolation block,
+and the hardware manages to provide the correct values even for
+compressed samples with large steps, requiring to compute and
+accumulate the deltas for all the bytes on the way.  The memory
+controller must be REALLY interesting.
+
+A pitch skip bigger than the loop size ends up with results
+somewhere between weird and utterly insane.  Don't do that.
+
+
+  Sample interpolation
+
+Samples go through an interpolator which uses two past samples and
+two future samples to compute the final value for a non-integer
+position, with a weight for each history sample.  The weights are
+computed from two polynoms:
+  f0(t) = (t - t**3)/6
+  f1(t) = t + (t**2 - t**3)/2
+
+The polynoms are used with the decimal part 'p' (as in phase) of
+the sample position.  The computation from the four samples s0..s3
+is:
+  s = - s0 * f0(1-p) + s1 * f1(1-p) + s2 * f1(p) - s3 * f0(p)
+
+f0(0) = f0(1) = f1(0) = 0 and f1(1) = 1, so when phase is 0 (sample
+streaming with no frequency shifting) the sample s1 is output.
+
+The implementation of the weights uses two tables with apparently
+2048 entries and 10 bits precision (e.g. between 0 and 0.999), but
+are in reality 1023 entries.  Each entry of the 1023-entries tables
+goes to slots 2n-1 and 2n (n=1..1023), and slots 0 and 2047 are
+hardcoded to both 0 for f0 and 0/1.0 for f1. That way the tables
+can be used in both directions and the computation of 1-p consists
+of inverting all the bits.
+
+The two-past sample for the first position, the first pointed at by
+the streamer, is forced to zero.
+
+Post-interpolation, the output is a 16-bits signed value with no
+decimals.
+*/
+
+// DPCM delta expansion table
 const std::array<s16, 256> swp30_device::streaming_block::dpcm_expand = []() {
 	std::array<s16, 256> deltas;
-	static const s16 offset[4] = { 0, 0x20, 0x60, 0xe0 };
+	constexpr s16 offset[4] = { 0, 0x20, 0x60, 0xe0 };
 	for(u32 i=0; i != 128; i++) {
 		u32 e = i >> 5;
 		s16 base = ((i & 0x1f) << e) + offset[e];
@@ -810,189 +817,190 @@ u16 swp30_device::streaming_block::pitch_r() const
 
 std::string swp30_device::streaming_block::describe() const
 {
-	std::string desc;
-	desc = util::string_format("[%04x %08x %08x %08x] ", m_pitch, m_start, m_loop, m_address) + util::string_format("sample %06x-%06x @ %07x ", m_start & 0xffffff, m_loop & 0xffffff, m_address & 0x1ffffff);
+	std::ostringstream desc;
+	util::stream_format(desc, "[%04x %08x %08x %08x] ", m_pitch, m_start, m_loop, m_address);
+	util::stream_format(desc, "sample %06x-%06x @ %07x ", m_start & 0xffffff, m_loop & 0xffffff, m_address & 0x1ffffff);
 	switch(m_address >> 30) {
-	case 0: desc += "16"; break;
-	case 1: desc += "12"; break;
-	case 2: desc += "8 "; break;
-	case 3: desc += util::string_format("c%x", (m_address >> 25) & 3); break;
+	case 0: desc << "16"; break;
+	case 1: desc << "12"; break;
+	case 2: desc << "8 "; break;
+	case 3: util::stream_format(desc, "c%x", (m_address >> 25) & 3); break;
 	}
 	if(m_address & 0x38000000)
-		desc += util::string_format(" scale %x", (m_address >> 27) & 7);
+		util::stream_format(desc, " scale %x", (m_address >> 27) & 7);
 	if(m_loop & 0x80000000)
-		desc += " back";
+		desc << " back";
 	else if(m_start & 0x40000000)
-		desc += " fwd ";
+		desc << " fwd ";
 	else
-		desc += " loop";
+		desc << " loop";
 	if(m_start & 0x3f000000)
-		desc += util::string_format(" loop-adjust %02x", (m_start >> 24) & 0x3f);
+		util::stream_format(desc, " loop-adjust %02x", (m_start >> 24) & 0x3f);
 	if(m_loop & 0x7f000000) {
 		if(m_loop & 0x40000000)
-			desc += util::string_format(" loop-tune -%02x", 0x40 - ((m_loop >> 24) & 0x3f));
+			util::stream_format(desc, " loop-tune -%02x", 0x40 - ((m_loop >> 24) & 0x3f));
 		else
-			desc += util::string_format(" loop-tune +%02x", (m_loop >> 24) & 0x3f);
+			util::stream_format(desc, " loop-tune +%02x", (m_loop >> 24) & 0x3f);
 	}
 	if(m_pitch & 0x2000) {
 		u32 p = 0x4000 - (m_pitch & 0x3fff);
-		desc += util::string_format(" pitch -%x.%03x", p >> 10, p & 0x3ff);
+		util::stream_format(desc, " pitch -%x.%03x", p >> 10, p & 0x3ff);
 	} else if(m_pitch & 0x3fff)
-		desc += util::string_format(" pitch +%x.%03x", (m_pitch >> 10) & 7, m_pitch & 0x3ff);
+		util::stream_format(desc, " pitch +%x.%03x", (m_pitch >> 10) & 7, m_pitch & 0x3ff);
 
-	return desc;
+	return std::move(desc).str();
 }
 
 
-//--------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------
 
-// Special filters block
+Special filters block
 
-//   cccccc 000000   mmmm .aaa aaaa aaaa                      Filter 1 mode and main parameter
-//   cccccc 000001   .xxx xxxx uuuu uuuu                      Bypass/dry level
-//   cccccc 000010   mmmm .aaa aaaa aaaa                      Filter 2 mode and main parameter
-//   cccccc 000011   .... .... vvvv vvvv                      Post-filter level
-//   cccccc 000100   bbbb b... .... ....                      Filters second parameter
-//
-// This block takes samples from the streaming block and applies two
-// recursive filters to them.  The type of filter and its coefficient
-// encoding depends on the 4-bits mode.  Filter 1 has encoded
-// parameters a and b, filter 2 has c and d.  First parameter is 11
-// bits and the second 5.  A first paramter of 0 disables the
-// associated filter.
-//
-//
-//
-//   Volumes
-//
-// Three attenuations are used, in 4.4 format.
-//
-// Attenuation u in slot 000001 is the bypass/dry level, adding an
-// attenuated version of the input directly the output.
-//
-// Attenuation v in slot 000011 is the filter 1 level, attenuating its
-// output before summing to the block output.
-//
-//   Filter types
-// 0: Chamberlin configuration low pass filter with fixed q=1
-//
-//    a is fp 3.8
-//    k = ((0x101 + a.m) << a.e) / 65536
-//
-//    B(0) = L(0) = 0
-//    H' = x0 - L - B
-//    B' = B + k * H'
-//    L' = L + k * B'
-//    y0 = L'
-//
-// 1: Chamberlin configuration low pass filter
-//
-//    a is fp 3.8, (b+4) is fp 3.3
-//    k = ((0x101 + a.m) << a.e) / 65536
-//    q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
-//
-//    B(0) = L(0) = 0
-//    H' = x0 - L - q*B
-//    B' = B + k * H'
-//    L' = L + k * B'
-//    y0 = L'
-//
-// 2: order-1 lowpass IIR
-//
-//    a is fp 3.8, b is unused
-//
-//    a0 = ((0x101 + a.m) << a.e) / 65536
-//    b1 = 1-a0
-//    y0 = x0 * a0 + y1 * b1 = y1 + (x0 - y1) * a0
-//
-// 3: order-2 lowpass IIR
-//
-//    a is fp3.8, (b+4) is fp 2.3
-//
-//    dt = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
-//
-//    a0 = ((0x101 + a.m) << a.e) / 65536
-//    b1 = (2 - dt - a0)
-//    b2 = dt - 1
-//
-//    y0 = x0 * a0 + y1 * (2 - dt - a0) + y2 * (dt - 1)
-//       = (x0 - y1) * a0 + (y2 - y1) * dt + 2*y1 - y2
-//
-// 4: Chamberlin configuration band pass filter with fixed q=1
-//
-//    a is fp 3.8
-//    k = ((0x101 + a.m) << a.e) / 65536
-//
-//    B(0) = L(0) = 0
-//    B' = B + k * (x0 - L - B)
-//    L' = L + k * B'
-//    y0 = B'
-//
-// 5: Chamberlin configuration band pass filter
-//
-//    a is fp 3.8, (b+4) is fp 3.3
-//    k = ((0x101 + a.m) << a.e) / 65536
-//    q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
-//
-//    B(0) = L(0) = 0
-//    B' = B + k * (x0 - L - q*B)
-//    L' = L + k * B'
-//    y0 = B'
-//
-// 6: order-1 ?pass IIR
-//
-//    a is fp 3.8, b is unused
-//
-//    a0 = ((0x101 + a.m) << a.e) / 65536
-//    b1 = 1-a0
-//    y0 = x0 - x1 + y1 * b1 = x0 - x1 + y1 - y1 * a0
-//
-// 8: Chamberlin configuration high pass filter with fixed q=1
-//
-//    a is fp 3.8
-//    k = ((0x101 + a.m) << a.e) / 65536
-//
-//    B(0) = L(0) = 0
-//    H' = x0 - L - B
-//    B' = B + k * H'
-//    L' = L + k * B'
-//    y0 = B'
-//
-// 9: Chamberlin configuration high pass filter
-//
-//    a is fp 3.8, (b+4) is fp 3.3
-//    k = ((0x101 + a.m) << a.e) / 65536
-//    q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
-//
-//    B(0) = L(0) = 0
-//    H' = x0 - L - q*B
-//    B' = B + k * H'
-//    L' = L + k * B'
-//    y0 = H'
-//
-// c: Chamberlin configuration notch filter with fixed q=1
-//
-//    a is fp 3.8
-//    k = ((0x101 + a.m) << a.e) / 65536
-//
-//    B(0) = L(0) = 0
-//    H' = x0 - L - B
-//    B' = B + k * H'
-//    L' = L + k * B'
-//    y0 = H' + L
-//
-// d: Chamberlin configuration notch filter
-//
-//    a is fp 3.8, (b+4) is fp 3.3
-//    k = ((0x101 + a.m) << a.e) / 65536
-//    q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
-//
-//    B(0) = L(0) = 0
-//    H' = x0 - L - q*B
-//    B' = B + k * H'
-//    L' = L + k * B'
-//    y0 = H' + L
-//
+  cccccc 000000   mmmm .aaa aaaa aaaa                      Filter 1 mode and main parameter
+  cccccc 000001   .xxx xxxx uuuu uuuu                      Bypass/dry level
+  cccccc 000010   mmmm .aaa aaaa aaaa                      Filter 2 mode and main parameter
+  cccccc 000011   .... .... vvvv vvvv                      Post-filter level
+  cccccc 000100   bbbb b... .... ....                      Filters second parameter
+
+This block takes samples from the streaming block and applies two
+recursive filters to them.  The type of filter and its coefficient
+encoding depends on the 4-bits mode.  Filter 1 has encoded
+parameters a and b, filter 2 has c and d.  First parameter is 11
+bits and the second 5.  A first paramter of 0 disables the
+associated filter.
+
+
+
+  Volumes
+
+Three attenuations are used, in 4.4 format.
+
+Attenuation u in slot 000001 is the bypass/dry level, adding an
+attenuated version of the input directly the output.
+
+Attenuation v in slot 000011 is the filter 1 level, attenuating its
+output before summing to the block output.
+
+  Filter types
+0: Chamberlin configuration low pass filter with fixed q=1
+
+   a is fp 3.8
+   k = ((0x101 + a.m) << a.e) / 65536
+
+   B(0) = L(0) = 0
+   H' = x0 - L - B
+   B' = B + k * H'
+   L' = L + k * B'
+   y0 = L'
+
+1: Chamberlin configuration low pass filter
+
+   a is fp 3.8, (b+4) is fp 3.3
+   k = ((0x101 + a.m) << a.e) / 65536
+   q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
+
+   B(0) = L(0) = 0
+   H' = x0 - L - q*B
+   B' = B + k * H'
+   L' = L + k * B'
+   y0 = L'
+
+2: order-1 lowpass IIR
+
+   a is fp 3.8, b is unused
+
+   a0 = ((0x101 + a.m) << a.e) / 65536
+   b1 = 1-a0
+   y0 = x0 * a0 + y1 * b1 = y1 + (x0 - y1) * a0
+
+3: order-2 lowpass IIR
+
+   a is fp3.8, (b+4) is fp 2.3
+
+   dt = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
+
+   a0 = ((0x101 + a.m) << a.e) / 65536
+   b1 = (2 - dt - a0)
+   b2 = dt - 1
+
+   y0 = x0 * a0 + y1 * (2 - dt - a0) + y2 * (dt - 1)
+      = (x0 - y1) * a0 + (y2 - y1) * dt + 2*y1 - y2
+
+4: Chamberlin configuration band pass filter with fixed q=1
+
+   a is fp 3.8
+   k = ((0x101 + a.m) << a.e) / 65536
+
+   B(0) = L(0) = 0
+   B' = B + k * (x0 - L - B)
+   L' = L + k * B'
+   y0 = B'
+
+5: Chamberlin configuration band pass filter
+
+   a is fp 3.8, (b+4) is fp 3.3
+   k = ((0x101 + a.m) << a.e) / 65536
+   q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
+
+   B(0) = L(0) = 0
+   B' = B + k * (x0 - L - q*B)
+   L' = L + k * B'
+   y0 = B'
+
+6: order-1 ?pass IIR
+
+   a is fp 3.8, b is unused
+
+   a0 = ((0x101 + a.m) << a.e) / 65536
+   b1 = 1-a0
+   y0 = x0 - x1 + y1 * b1 = x0 - x1 + y1 - y1 * a0
+
+8: Chamberlin configuration high pass filter with fixed q=1
+
+   a is fp 3.8
+   k = ((0x101 + a.m) << a.e) / 65536
+
+   B(0) = L(0) = 0
+   H' = x0 - L - B
+   B' = B + k * H'
+   L' = L + k * B'
+   y0 = B'
+
+9: Chamberlin configuration high pass filter
+
+   a is fp 3.8, (b+4) is fp 3.3
+   k = ((0x101 + a.m) << a.e) / 65536
+   q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
+
+   B(0) = L(0) = 0
+   H' = x0 - L - q*B
+   B' = B + k * H'
+   L' = L + k * B'
+   y0 = H'
+
+c: Chamberlin configuration notch filter with fixed q=1
+
+   a is fp 3.8
+   k = ((0x101 + a.m) << a.e) / 65536
+
+   B(0) = L(0) = 0
+   H' = x0 - L - B
+   B' = B + k * H'
+   L' = L + k * B'
+   y0 = H' + L
+
+d: Chamberlin configuration notch filter
+
+   a is fp 3.8, (b+4) is fp 3.3
+   k = ((0x101 + a.m) << a.e) / 65536
+   q = ((0x10 - (b+4).m) << (4 - (b+4).e)) / 128
+
+   B(0) = L(0) = 0
+   H' = x0 - L - q*B
+   B' = B + k * H'
+   L' = L + k * B'
+   y0 = H' + L
+*/
 
 
 void swp30_device::filter_block::clear()
@@ -1261,34 +1269,34 @@ s32 swp30_device::iir1_block::step(s32 input)
 	return yb;
 }
 
-template<u32 filter> u16 swp30_device::iir1_block::a0_r() const
+template<u32 Filter> u16 swp30_device::iir1_block::a0_r() const
 {
-	return m_a[filter][0];
+	return m_a[Filter][0];
 }
 
-template<u32 filter> u16 swp30_device::iir1_block::a1_r() const
+template<u32 Filter> u16 swp30_device::iir1_block::a1_r() const
 {
-	return m_a[filter][1];
+	return m_a[Filter][1];
 }
 
-template<u32 filter> u16 swp30_device::iir1_block::b1_r() const
+template<u32 Filter> u16 swp30_device::iir1_block::b1_r() const
 {
-	return m_b[filter];
+	return m_b[Filter];
 }
 
-template<u32 filter> void swp30_device::iir1_block::a0_w(u16 data)
+template<u32 Filter> void swp30_device::iir1_block::a0_w(u16 data)
 {
-	m_a[filter][0] = data;
+	m_a[Filter][0] = data;
 }
 
-template<u32 filter> void swp30_device::iir1_block::a1_w(u16 data)
+template<u32 Filter> void swp30_device::iir1_block::a1_w(u16 data)
 {
-	m_a[filter][1] = data;
+	m_a[Filter][1] = data;
 }
 
-template<u32 filter> void swp30_device::iir1_block::b1_w(u16 data)
+template<u32 Filter> void swp30_device::iir1_block::b1_w(u16 data)
 {
-	m_b[filter] = data;
+	m_b[Filter] = data;
 }
 
 
@@ -1528,46 +1536,46 @@ void swp30_device::envelope_block::trigger_release()
 }
 
 
-//--------------------------------------------------------------------------------
+/*--------------------------------------------------------------------------------
 
-// LFO block
+LFO block
 
-//   cccccc 000101  .... .... .aaa aaaa       LFO amplitude depth
-//   cccccc 001010  tt.s ssss mppp pppp       LFO type, step, pitch mode, pitch depth
+  cccccc 000101  .... .... .aaa aaaa       LFO amplitude depth
+  cccccc 001010  tt.s ssss mppp pppp       LFO type, step, pitch mode, pitch depth
 
-// The LFO is a slow oscillator with a period between 0.2 and 6
-// seconds (0.17 to 5.2Hz).  It starts with a 18-bits counter which is
-// initialized to a random value on keyon.  At each sample the value
-// of step is added to the counter.  When sep is zero, the counter is
-// frozen.  In addition, somewhere in every 0x4000 block at a somewhat
-// unpredictable time, the counter jumps by an extra 0x40.  The final
-// period thus ends up being 0x3fc00/step cycles, or between 8423 and
-// 261120 cycles.
+The LFO is a slow oscillator with a period between 0.2 and 6
+seconds (0.17 to 5.2Hz).  It starts with a 18-bits counter which is
+initialized to a random value on keyon.  At each sample the value
+of step is added to the counter.  When sep is zero, the counter is
+frozen.  In addition, somewhere in every 0x4000 block at a somewhat
+unpredictable time, the counter jumps by an extra 0x40.  The final
+period thus ends up being 0x3fc00/step cycles, or between 8423 and
+261120 cycles.
 
-// From the 18-bits counter a 12-bit state value is created.  How
-// depends on the type:
+From the 18-bits counter a 12-bit state value is created.  How
+depends on the type:
 
-//  Type 0 (saw);  state is bits 6-17 of the counter
+ Type 0 (saw);  state is bits 6-17 of the counter
 
-//  Type 1 (triangle): state is bits 6-16 of the counter followed by a
-//     zero if bit 17 = 0, inverted bits 6-16 followed by a zero if
-//     bit 17 = 1
+ Type 1 (triangle): state is bits 6-16 of the counter followed by a
+    zero if bit 17 = 0, inverted bits 6-16 followed by a zero if
+    bit 17 = 1
 
-//  Type 2 (rectangle): state is 0 if bit 17 = 0, fff if bit 17 = 1
+ Type 2 (rectangle): state is 0 if bit 17 = 0, fff if bit 17 = 1
 
-//  Type 3 (sample&hold): state is random, changes of value when bits
-//     9-17 change
+ Type 3 (sample&hold): state is random, changes of value when bits
+    9-17 change
 
-//  Amplitude LFO.  The current value of the state is multiplied by
-//  the amplitude depth (zero hence makes it disabled) and divided by
-//  0x20, giving a 14-bit, 4.10 attenuation (same format as for the
-//  envelope).
+ Amplitude LFO.  The current value of the state is multiplied by
+ the amplitude depth (zero hence makes it disabled) and divided by
+ 0x20, giving a 14-bit, 4.10 attenuation (same format as for the
+ envelope).
 
-//  Pitch LFO.  The value of the state minus 0x400 is multiplied by
-//  the pitch depth.  It is then shifted by 8 in coarse mode (m=1) and
-//  11 in fine mode (m=0).  The resulting signed value is added to the
-//  pitch used by the streaming block.
-
+ Pitch LFO.  The value of the state minus 0x400 is multiplied by
+ the pitch depth.  It is then shifted by 8 in coarse mode (m=1) and
+ 11 in fine mode (m=0).  The resulting signed value is added to the
+ pitch used by the streaming block.
+*/
 
 void swp30_device::lfo_block::clear()
 {
@@ -2029,14 +2037,14 @@ void swp30_device::map(address_map &map)
 }
 
 // Control registers
-template<int sel> u16 swp30_device::keyon_mask_r()
+template<int Sel> u16 swp30_device::keyon_mask_r()
 {
-	return m_keyon_mask >> (16*sel);
+	return m_keyon_mask >> (16*Sel);
 }
 
-template<int sel> void swp30_device::keyon_mask_w(u16 data)
+template<int Sel> void swp30_device::keyon_mask_w(u16 data)
 {
-	m_keyon_mask = (m_keyon_mask & ~(u64(0xffff) << (16*sel))) | (u64(data) << (16*sel));
+	m_keyon_mask = (m_keyon_mask & ~(u64(0xffff) << (16*Sel))) | (u64(data) << (16*Sel));
 }
 
 u16 swp30_device::keyon_r()
@@ -2075,33 +2083,33 @@ void swp30_device::meg_state::prg_address_w(u16 data)
 		m_program_address = 0;
 }
 
-template<int sel> u16 swp30_device::meg_state::prg_r()
+template<int Sel> u16 swp30_device::meg_state::prg_r()
 {
-	constexpr offs_t shift = 48-16*sel;
+	constexpr offs_t shift = 48-16*Sel;
 	return m_program[m_program_address] >> shift;
 }
 
-template<int sel> void swp30_device::meg_state::prg_w(u16 data)
+template<int Sel> void swp30_device::meg_state::prg_w(u16 data)
 {
-	constexpr offs_t shift = 48-16*sel;
+	constexpr offs_t shift = 48-16*Sel;
 	constexpr u64 mask = ~(u64(0xffff) << shift);
 	m_program[m_program_address] = (m_program[m_program_address] & mask) | (u64(data) << shift);
 
-	if(sel == 3) {
+	if(Sel == 3) {
 		m_program_address ++;
 		if(m_program_address == 0x180)
 			m_program_address = 0;
 	}
 }
 
-template<int sel> u16 swp30_device::meg_state::map_r()
+template<int Sel> u16 swp30_device::meg_state::map_r()
 {
-	return m_map[sel];
+	return m_map[Sel];
 }
 
-template<int sel> void swp30_device::meg_state::map_w(u16 data)
+template<int Sel> void swp30_device::meg_state::map_w(u16 data)
 {
-	m_map[sel] = data;
+	m_map[Sel] = data;
 }
 
 
@@ -2116,55 +2124,55 @@ void swp30_device::meg_prg_address_w(u16 data)
 	m_meg->prg_address_w(data);
 }
 
-template<int sel> u16 swp30_device::meg_prg_r()
+template<int Sel> u16 swp30_device::meg_prg_r()
 {
-	return m_meg->prg_r<sel>();
+	return m_meg->prg_r<Sel>();
 }
 
-template<int sel> void swp30_device::meg_prg_w(u16 data)
+template<int Sel> void swp30_device::meg_prg_w(u16 data)
 {
-	m_meg->prg_w<sel>(data);
+	m_meg->prg_w<Sel>(data);
 	m_meg_program_changed = true;
 }
 
 
-template<int sel> u16 swp30_device::meg_map_r()
+template<int Sel> u16 swp30_device::meg_map_r()
 {
-	return m_meg->map_r<sel>();
+	return m_meg->map_r<Sel>();
 }
 
-template<int sel> void swp30_device::meg_map_w(u16 data)
+template<int Sel> void swp30_device::meg_map_w(u16 data)
 {
-	m_meg->map_w<sel>(data);
+	m_meg->map_w<Sel>(data);
 }
 
 
-template<int sel> void swp30_device::wave_adr_w(u16 data)
+template<int Sel> void swp30_device::wave_adr_w(u16 data)
 {
-	if(sel)
+	if(Sel)
 		m_wave_adr = (m_wave_adr & 0x0000ffff) | (data << 16);
 	else
 		m_wave_adr = (m_wave_adr & 0xffff0000) |  data;
 	logerror("wave_adr_w %08x\n", m_wave_adr);
 }
 
-template<int sel> u16 swp30_device::wave_adr_r()
+template<int Sel> u16 swp30_device::wave_adr_r()
 {
-	return m_wave_adr >> (16*sel);
+	return m_wave_adr >> (16*Sel);
 }
 
-template<int sel> void swp30_device::wave_size_w(u16 data)
+template<int Sel> void swp30_device::wave_size_w(u16 data)
 {
-	if(sel)
+	if(Sel)
 		m_wave_size = (m_wave_size & 0x0000ffff) | (data << 16);
 	else
 		m_wave_size = (m_wave_size & 0xffff0000) |  data;
 	logerror("wave_size_w %08x\n", m_wave_size);
 }
 
-template<int sel> u16 swp30_device::wave_size_r()
+template<int Sel> u16 swp30_device::wave_size_r()
 {
-	return m_wave_size >> (16*sel);
+	return m_wave_size >> (16*Sel);
 }
 
 void swp30_device::wave_access_w(u16 data)
@@ -2187,18 +2195,18 @@ u16 swp30_device::wave_busy_r()
 	return m_wave_size ? 0 : 0xffff;
 }
 
-template<int sel> u16 swp30_device::wave_val_r()
+template<int Sel> u16 swp30_device::wave_val_r()
 {
-	return m_wave_val >> (16*sel);
+	return m_wave_val >> (16*Sel);
 }
 
-template<int sel> void swp30_device::wave_val_w(u16 data)
+template<int Sel> void swp30_device::wave_val_w(u16 data)
 {
-	if(sel)
+	if(Sel)
 		m_wave_val = (m_wave_val & 0x0000ffff) | (data << 16);
 	else
 		m_wave_val = (m_wave_val & 0xffff0000) |  data;
-	if(!sel) {
+	if(!Sel) {
 		//      logerror("wave_val_w %08x\n", m_wave_val);
 		if(m_wave_access == 0x5000) {
 			m_wave_cache.write_dword(m_wave_adr, m_wave_val);
@@ -2255,31 +2263,31 @@ u16 swp30_device::revram_status_r()
 	return 0;
 }
 
-template<int sel> void swp30_device::revram_adr_w(u16 data)
+template<int Sel> void swp30_device::revram_adr_w(u16 data)
 {
-	if(sel)
+	if(Sel)
 		m_revram_adr = (m_revram_adr & 0x0000ffff) | (data << 16);
 	else
 		m_revram_adr = (m_revram_adr & 0xffff0000) |  data;
 }
 
-template<int sel> void swp30_device::revram_data_w(u16 data)
+template<int Sel> void swp30_device::revram_data_w(u16 data)
 {
-	if(sel)
+	if(Sel)
 		m_revram_data = (m_revram_data & 0x0000ffff) | (data << 16);
 	else
 		m_revram_data = (m_revram_data & 0xffff0000) |  data;
 
-	if(!sel)
+	if(!Sel)
 		m_reverb->write_word(m_revram_adr, meg_state::revram_encode(m_revram_data >> 5));
 }
 
-template<int sel> u16 swp30_device::revram_data_r()
+template<int Sel> u16 swp30_device::revram_data_r()
 {
-	if(sel)
+	if(Sel)
 		m_revram_data = meg_state::revram_decode(m_reverb->read_word(m_revram_adr)) << 5;
 
-	return sel ? m_revram_data >> 16 : m_revram_data;
+	return Sel ? m_revram_data >> 16 : m_revram_data;
 }
 
 
@@ -2408,34 +2416,34 @@ void swp30_device::filter_b_w(offs_t offset, u16 data)
 }
 
 // FIR block trampolines
-template<u32 filter> u16 swp30_device::a0_r(offs_t offset)
+template<u32 Filter> u16 swp30_device::a0_r(offs_t offset)
 {
-	return m_iir1[offset >> 6].a0_r<filter>();
+	return m_iir1[offset >> 6].a0_r<Filter>();
 }
 
-template<u32 filter> u16 swp30_device::a1_r(offs_t offset)
+template<u32 Filter> u16 swp30_device::a1_r(offs_t offset)
 {
-	return m_iir1[offset >> 6].a1_r<filter>();
+	return m_iir1[offset >> 6].a1_r<Filter>();
 }
 
-template<u32 filter> u16 swp30_device::b1_r(offs_t offset)
+template<u32 Filter> u16 swp30_device::b1_r(offs_t offset)
 {
-	return m_iir1[offset >> 6].b1_r<filter>();
+	return m_iir1[offset >> 6].b1_r<Filter>();
 }
 
-template<u32 filter> void swp30_device::a0_w(offs_t offset, u16 data)
+template<u32 Filter> void swp30_device::a0_w(offs_t offset, u16 data)
 {
-	m_iir1[offset >> 6].a0_w<filter>(data);
+	m_iir1[offset >> 6].a0_w<Filter>(data);
 }
 
-template<u32 filter> void swp30_device::a1_w(offs_t offset, u16 data)
+template<u32 Filter> void swp30_device::a1_w(offs_t offset, u16 data)
 {
-	m_iir1[offset >> 6].a1_w<filter>(data);
+	m_iir1[offset >> 6].a1_w<Filter>(data);
 }
 
-template<u32 filter> void swp30_device::b1_w(offs_t offset, u16 data)
+template<u32 Filter> void swp30_device::b1_w(offs_t offset, u16 data)
 {
-	m_iir1[offset >> 6].b1_w<filter>(data);
+	m_iir1[offset >> 6].b1_w<Filter>(data);
 }
 
 // Envelope block trampolines
@@ -2482,24 +2490,24 @@ void swp30_device::release_glo_w(offs_t offset, u16 data)
 
 
 
-template<int sel> u16 swp30_device::vol_r(offs_t offset)
+template<int Sel> u16 swp30_device::vol_r(offs_t offset)
 {
-	return m_mixer[(sel & 0x40) | (offset >> 6)].vol[sel & 3];
+	return m_mixer[(Sel & 0x40) | (offset >> 6)].vol[Sel & 3];
 }
 
-template<int sel> void swp30_device::vol_w(offs_t offset, u16 data)
+template<int Sel> void swp30_device::vol_w(offs_t offset, u16 data)
 {
-	m_mixer[(sel & 0x40) | (offset >> 6)].vol[sel & 3] = data;
+	m_mixer[(Sel & 0x40) | (offset >> 6)].vol[Sel & 3] = data;
 }
 
-template<int sel> u16 swp30_device::route_r(offs_t offset)
+template<int Sel> u16 swp30_device::route_r(offs_t offset)
 {
-	return m_mixer[(sel & 0x40) | (offset >> 6)].route[sel & 3];
+	return m_mixer[(Sel & 0x40) | (offset >> 6)].route[Sel & 3];
 }
 
-template<int sel> void swp30_device::route_w(offs_t offset, u16 data)
+template<int Sel> void swp30_device::route_w(offs_t offset, u16 data)
 {
-	m_mixer[(sel & 0x40) | (offset >> 6)].route[sel & 3] = data;
+	m_mixer[(Sel & 0x40) | (offset >> 6)].route[Sel & 3] = data;
 }
 
 u16 swp30_device::lfo_type_step_pitch_r(offs_t offset)
@@ -2650,62 +2658,62 @@ void swp30_device::state_string_export(const device_state_entry &entry, std::str
 {
 }
 
-//======================= Mixer block ============================================
+/*======================= Mixer block ============================================
 
-//   ssssss 110010  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s
-//   ssssss 110011  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s
-//   ssssss 110100  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s
-//   ssssss 110101  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s output 0-f
-//   ssssss 110110  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s output 0-f
-//   ssssss 110111  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s output 0-f
-//   ssssss 111000  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s+40
-//   ssssss 111001  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s+40
-//   ssssss 111010  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s+40
-//   ssssss 111011  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s+40 output 0-f
-//   ssssss 111100  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s+40 output 0-f
-//   ssssss 111101  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s+40 output 0-f
+  ssssss 110010  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s
+  ssssss 110011  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s
+  ssssss 110100  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s
+  ssssss 110101  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s output 0-f
+  ssssss 110110  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s output 0-f
+  ssssss 110111  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s output 0-f
+  ssssss 111000  Mixer            llll llll rrrr rrrr                      Route attenuation left/right input s+40
+  ssssss 111001  Mixer            0000 0000 1111 1111                      Route attenuation slot 0/1   input s+40
+  ssssss 111010  Mixer            2222 2222 3333 3333                      Route attenuation slot 2/3   input s+40
+  ssssss 111011  Mixer            fedc ba98 7654 3210                      Route mode bit 2 input s+40 output 0-f
+  ssssss 111100  Mixer            fedc ba98 7654 3210                      Route mode bit 1 input s+40 output 0-f
+  ssssss 111101  Mixer            fedc ba98 7654 3210                      Route mode bit 0 input s+40 output 0-f
 
-// The mixer block ensures mixing and routing in the whole system,
-// between the AM2, the MEG, and the MELI/MELO streams.  The values
-// passing through are all 27-bits wide.
+The mixer block ensures mixing and routing in the whole system,
+between the AM2, the MEG, and the MELI/MELO streams.  The values
+passing through are all 27-bits wide.
 
-// It has 96 mono inputs:
-//   - 64 outputs of the AWM2 block, numbered 0-63
-//   - 16 outputs of the MEG, numbered 64-79, which are read from MEG
-//     registers m20-m2f
-//   - 16 inputs (8 stereo) on the MELI ports, numbered 80-95
+It has 96 mono inputs:
+  - 64 outputs of the AWM2 block, numbered 0-63
+  - 16 outputs of the MEG, numbered 64-79, which are read from MEG
+    registers m20-m2f
+  - 16 inputs (8 stereo) on the MELI ports, numbered 80-95
 
-// It has 16 stereo outputs:
-//   - 8 outputs on the MELO ports, numbered 0-7
-//   - 8 outputs to the MEG as 16 mono streams, numbered 8-15, which
-//     are written to MEG registers m20-m2f
+It has 16 stereo outputs:
+  - 8 outputs on the MELO ports, numbered 0-7
+  - 8 outputs to the MEG as 16 mono streams, numbered 8-15, which
+    are written to MEG registers m20-m2f
 
-// Six 8-bit values provide attenuations, and three 16-bits values
-// provide routing for each of the 96 inputs to each of the 16
-// outputs.
+Six 8-bit values provide attenuations, and three 16-bits values
+provide routing for each of the 96 inputs to each of the 16
+outputs.
 
-// For a given source, target pair the three bits of routing target
-// are interpreted following in the following way:
+For a given source, target pair the three bits of routing target
+are interpreted following in the following way:
 
-//          210
-//       0: 000 - Not routed
-//       1: 001 - No attenuation, add to both channels
-//       2: 010 - No attenuation, add to left channel
-//       3: 011 - No attenuation, add to right channel
-//       4: 100 - Use attenuation slot 0
-//       5: 101 - Use attenuation slot 1
-//       6: 110 - Use attenuation slot 2
-//       7: 111 - Use attenuation slot 3
+         210
+      0: 000 - Not routed
+      1: 001 - No attenuation, add to both channels
+      2: 010 - No attenuation, add to left channel
+      3: 011 - No attenuation, add to right channel
+      4: 100 - Use attenuation slot 0
+      5: 101 - Use attenuation slot 1
+      6: 110 - Use attenuation slot 2
+      7: 111 - Use attenuation slot 3
 
-// The attenuation slots are built from the six attenuation values.
-// Attenuation for a given channel (left/right) and a slot (0-3) is
-// the sum of the left/right attenuation and the slot attenuation.
-// Final value is 4.4 with >= ff hardcoded to mute.
+The attenuation slots are built from the six attenuation values.
+Attenuation for a given channel (left/right) and a slot (0-3) is
+the sum of the left/right attenuation and the slot attenuation.
+Final value is 4.4 with >= ff hardcoded to mute.
 
-// There is space in the map for channels number 96-127.  The MUs
-// never touch that space, it seems that it may have (mostly negative)
-// impacts on the adc outputs (MEG registers m30-m33).
-
+There is space in the map for channels number 96-127.  The MUs
+never touch that space, it seems that it may have (mostly negative)
+impacts on the adc outputs (MEG registers m30-m33).
+*/
 
 s32 swp30_device::mixer_att(s32 sample, s32 att)
 {
@@ -3015,8 +3023,8 @@ const tiny_rom_entry *swp30_device::device_rom_region() const
 
 const std::array<u32, 256> swp30_device::meg_state::lfo_increment_table = []() {
 	std::array<u32, 256> increments;
-	static const int dt[8] = { 0, 32, 64, 128, 256, 512,  1024, 2048 };
-	static const int sh[8] = { 0,  0,  1,   2,   3,   4,     5,    6 };
+	constexpr int dt[8] = { 0, 32, 64, 128, 256, 512,  1024, 2048 };
+	constexpr int sh[8] = { 0,  0,  1,   2,   3,   4,     5,    6 };
 
 	for(u32 i=0; i != 256; i++) {
 		int scale = (i >> 5) & 7;
@@ -3047,7 +3055,7 @@ std::string swp30_disassembler::goffset(offs_t address) const
 	return m_info ? util::string_format("%x", m_info->swp30d_offset_r(address)) : util::string_format("of%02x", address);
 }
 
-void swp30_disassembler::append(std::string &r, const std::string &e)
+inline void swp30_disassembler::append(std::string &r, const std::string &e)
 {
 	if(r != "")
 		r += " ; ";
@@ -3092,39 +3100,39 @@ void swp30_device::meg_state::lfo_commit_w()
 }
 
 
-template<int sel> u16 swp30_device::meg_const_r(offs_t offset)
+template<int Sel> u16 swp30_device::meg_const_r(offs_t offset)
 {
-	return m_meg->const_r((offset >> 6)*6 + sel);
+	return m_meg->const_r((offset >> 6)*6 + Sel);
 }
 
-template<int sel> void swp30_device::meg_const_w(offs_t offset, u16 data)
+template<int Sel> void swp30_device::meg_const_w(offs_t offset, u16 data)
 {
-	//  logerror("meg const[%03x] = %04x / %f\n", (offset >> 6)*6 + sel, data, s16(data) / 32768.0);
-	m_meg->const_w((offset >> 6)*6 + sel, data);
+	//  logerror("meg const[%03x] = %04x / %f\n", (offset >> 6)*6 + Sel, data, s16(data) / 32768.0);
+	m_meg->const_w((offset >> 6)*6 + Sel, data);
 }
 
-template<int sel> u16 swp30_device::meg_offset_r(offs_t offset)
+template<int Sel> u16 swp30_device::meg_offset_r(offs_t offset)
 {
-	return m_meg->offset_r((offset >> 6)*2 + sel);
+	return m_meg->offset_r((offset >> 6)*2 + Sel);
 }
 
-template<int sel> void swp30_device::meg_offset_w(offs_t offset, u16 data)
+template<int Sel> void swp30_device::meg_offset_w(offs_t offset, u16 data)
 {
-	//  logerror("meg offset[%02x/%03x] = %x / %d\n", (offset >> 6)*2 + sel, 3*((offset >> 6)*2 + sel), data, data);
-	m_meg->offset_w((offset >> 6)*2 + sel, data);
+	//  logerror("meg offset[%02x/%03x] = %x / %d\n", (offset >> 6)*2 + Sel, 3*((offset >> 6)*2 + Sel), data, data);
+	m_meg->offset_w((offset >> 6)*2 + Sel, data);
 }
 
-template<int sel> u16 swp30_device::meg_lfo_r(offs_t offset)
+template<int Sel> u16 swp30_device::meg_lfo_r(offs_t offset)
 {
-	return m_meg->lfo_r((offset >> 6)*2 + sel);
+	return m_meg->lfo_r((offset >> 6)*2 + Sel);
 }
 
-template<int sel> void swp30_device::meg_lfo_w(offs_t offset, u16 data)
+template<int Sel> void swp30_device::meg_lfo_w(offs_t offset, u16 data)
 {
-	if((offset >> 6)*2 + sel >= 0x18) {
-		logerror("nolfo[%02x] = %04x\n", (offset >> 6)*2 + sel, data);
+	if((offset >> 6)*2 + Sel >= 0x18) {
+		logerror("nolfo[%02x] = %04x\n", (offset >> 6)*2 + Sel, data);
 	}
-	m_meg->lfo_w((offset >> 6)*2 + sel, data);
+	m_meg->lfo_w((offset >> 6)*2 + Sel, data);
 	m_meg_program_changed = true;
 }
 
@@ -3153,7 +3161,7 @@ u32 swp30_device::meg_state::resolve_address(u16 pc, s32 offset)
 
 u32 swp30_device::meg_state::get_lfo(int lfo)
 {
-	static const u32 offsets[16] = {
+	constexpr u32 offsets[16] = {
 		0x00000, 0x02aaa, 0x04000, 0x05555,
 		0x08000, 0x0aaaa, 0x0c000, 0x0d555,
 		0x10000, 0x12aaa, 0x14000, 0x15555,
@@ -3202,7 +3210,7 @@ s16 swp30_device::meg_state::m1_expand(s16 v)
 		return 0;
 	u32 s = v >> 12;
 	v = 0x1000 | (v & 0xfff);
-	return s == 5 ? v : s < 5 ? v >> (5-s) : v << (s-5);
+	return (s == 5) ? v : (s < 5) ? (v >> (5-s)) : (v << (s-5));
 }
 
 offs_t swp30_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -3481,7 +3489,6 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			} else
 				UML_DSAR(block, I1, mem(&m_p), 15);
 			break;
-			break;
 		case 2:
 			if(sm) {
 				UML_DLOADS(block, I1, m_m.data(), sm, SIZE_DWORD, SCALE_x4);
@@ -3505,10 +3512,9 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			break;
 		case 2:
 			if(!a_is_zero) {
-				UML_DMOV(block, I2,  0x0000000000);
-				UML_DCMP(block, I1, I2);
+				UML_DCMP(block, I1, 0x0000000000);
 				UML_JMPc(block, COND_GE, (pc << 4) | L_ABS2);
-				UML_DSUB(block, I1, I2, I1);
+				UML_DSUB(block, I1, 0x0000000000, I1);
 				UML_LABEL(block, (pc << 4) | L_ABS2);
 				UML_DADD(block, I0, I0, I1);
 			}
@@ -3581,7 +3587,7 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 			UML_MOV(block, I0, mem(&m_lfo_counter[lfo]));
 			UML_SAR(block, I0, I0, 5);
 			if(info & 0xf300) {
-				static const u32 offsets[16] = {
+				constexpr u32 offsets[16] = {
 					0x00000, 0x02aaa, 0x04000, 0x05555,
 					0x08000, 0x0aaaa, 0x0c000, 0x0d555,
 					0x10000, 0x12aaa, 0x14000, 0x15555,

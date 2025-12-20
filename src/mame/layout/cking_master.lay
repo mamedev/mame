@@ -365,13 +365,13 @@ authors:hap
 		<element ref="white"><bounds x="91" y="72.500" width="13" height="5" /></element>
 		<element ref="white"><bounds x="91" y="77.833" width="13" height="5" /></element>
 
-		<element ref="text_l1"><bounds x="91.4" y="4.916"  width="12.5" height="1.5" /></element>
-		<element ref="text_l2"><bounds x="91.4" y="10.250" width="12.5" height="1.5" /></element>
-		<element ref="text_l3"><bounds x="91.4" y="15.583" width="12.5" height="1.5" /></element>
-		<element ref="text_l4"><bounds x="91.4" y="20.916" width="12.5" height="1.5" /></element>
-		<element ref="text_l13"><bounds x="91.4" y="68.916" width="12.5" height="1.5" /></element>
-		<element ref="text_l14"><bounds x="91.4" y="74.250" width="12.5" height="1.5" /></element>
-		<element ref="text_l15"><bounds x="91.4" y="79.583" width="12.5" height="1.5" /></element>
+		<element ref="text_l1"><bounds x="91.5" y="4.916"  width="12" height="1.5" /></element>
+		<element ref="text_l2"><bounds x="91.5" y="10.250" width="12" height="1.5" /></element>
+		<element ref="text_l3"><bounds x="91.5" y="15.583" width="12" height="1.5" /></element>
+		<element ref="text_l4"><bounds x="91.5" y="20.916" width="12" height="1.5" /></element>
+		<element ref="text_l13"><bounds x="91.5" y="68.916" width="12" height="1.5" /></element>
+		<element ref="text_l14"><bounds x="91.5" y="74.250" width="12" height="1.5" /></element>
+		<element ref="text_l15"><bounds x="91.5" y="79.583" width="12" height="1.5" /></element>
 
 		<repeat count="6">
 			<param name="y" start="24.7" increment="5.333333" />

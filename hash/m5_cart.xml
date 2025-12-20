@@ -94,10 +94,9 @@ and why some of the dumps below have weird size?
 		<publisher>Namco</publisher>
 		<info name="serial" value="2" />
 		<info name="alt_title" value="タンクバタリアン" />
-		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="tank battalion (1980)(namco)(jp).bin" size="8192" crc="daa0d610" sha1="5867090fbe2584654dd2c2aaa215e69243f2f599" offset="00000"/>
+				<rom name="tank battalion (1980)(namco)(jp).bin" size="8192" crc="e05b2c70" sha1="c724e0777aa89ee58937bd9ca60e4d82baeabb66" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +172,6 @@ and why some of the dumps below have weird size?
 		<publisher>Konami</publisher>
 		<info name="serial" value="8" />
 		<info name="alt_title" value="ガッタンゴットン" />
-		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="9216">
 				<rom name="guttang gottong (1981)(konami)(jp).bin" size="9216" crc="4fcb8e75" sha1="976cb6b260d1276cf0ff01c62ba11c56420d0856" offset="00000" />
@@ -289,7 +287,6 @@ and why some of the dumps below have weird size?
 		<publisher>Irem</publisher>
 		<info name="serial" value="16" />
 		<info name="alt_title" value="ワンダーホール" />
-		<info name="usage" value="Requires 36k RAM" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="wonder hole (1982)(irem)(jp).bin" size="8192" crc="5274f575" sha1="667f09f256bd8b2fb7f77681d10426970961490f" offset="00000" />
@@ -310,7 +307,7 @@ and why some of the dumps below have weird size?
 		</part>
 	</software>
 
-	<software name="upupball" supported="no">
+	<software name="upupball" supported="yes">
 		<description>Up Up Balloon</description>
 		<year>1983</year>
 		<publisher>Takara ~ Monkey Punch</publisher>
@@ -538,8 +535,9 @@ and why some of the dumps below have weird size?
 	<software name="baseball">
 		<description>Baseball</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Takara</publisher>
 		<info name="usage" value="Requires 36k RAM" />
+		<info name="alt_title" value="野球 ゲーム" />
 		<part name="cart" interface="m5_cart">
 			<dataarea name="rom" size="11264">
 				<rom name="baseball (19xx)(-).bin" size="11264" crc="e79e9cd5" sha1="b7899280a775f89f457260c18b947c9d297add67" offset="00000" />

@@ -124,12 +124,12 @@ Cannot select other options in main menu, including user disk creation [KBD]
 		</part>
 	</software>
 
-	<software name="alpha" supported="no">
+	<software name="alpha" supported="yes">
 		<description>Alpha</description>
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<notes><![CDATA[
-Corrupt space ship GFX on first gameplay screen, [z80dma] or [FDC]
+Extensive use of [z80dma]
 ]]></notes>
 
 		<info name="usage" value="x1turbo only" />

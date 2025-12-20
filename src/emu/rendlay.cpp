@@ -3219,15 +3219,12 @@ protected:
 					bitmap_argb32 tempbitmap(dest.width(), dest.height());
 
 					// get the width of the string
-					float aspect = 1.0f;
-					s32 width;
-
-					while (1)
+					s32 width = font->string_width(ourheight / num_shown, 1.0f, m_stopnames[fruit]);
+					float aspect = 1.0;
+					if (width > bounds.width())
 					{
-						width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit]);
-						if (width < bounds.width())
-							break;
-						aspect *= 0.95f;
+						aspect = float(bounds.width()) / float(width);
+						width = bounds.width();
 					}
 
 					float curx = bounds.left() + (bounds.width() - width) / 2.0f;
@@ -3368,14 +3365,12 @@ private:
 				else // render text (fallback)
 				{
 					// get the width of the string
-					float aspect = 1.0f;
-					s32 width;
-					while (1)
+					s32 width = font->string_width(dest.height(), 1.0f, m_stopnames[fruit]);
+					float aspect = 1.0;
+					if (width > bounds.width())
 					{
-						width = font->string_width(dest.height(), aspect, m_stopnames[fruit]);
-						if (width < bounds.width())
-							break;
-						aspect *= 0.95f;
+						aspect = float(bounds.width()) / float(width);
+						width = bounds.width();
 					}
 
 					float curx = bounds.left();
@@ -3716,15 +3711,13 @@ void layout_element::component::draw_text(
 		const render_color &color)
 {
 	// get the width of the string
-	float aspect = 1.0f;
-	s32 width;
-
-	while (1)
+	s32 width = font.string_width(bounds.height(), 1.0f, str);
+	float aspect = 1.0;
+	if ((align == 3) || (width > bounds.width()))
 	{
-		width = font.string_width(bounds.height(), aspect, str);
-		if (width < bounds.width())
-			break;
-		aspect *= 0.95f;
+		if (width != 0)
+			aspect = float(bounds.width()) / float(width);
+		width = bounds.width();
 	}
 
 	// get alignment
@@ -3738,7 +3731,12 @@ void layout_element::component::draw_text(
 
 		// right
 		case 2:
-			curx = bounds.right() - width;
+			curx = bounds.left() + bounds.width() - width;
+			break;
+
+		// stretch (aligned both left & right)
+		case 3:
+			curx = bounds.left();
 			break;
 
 		// default to center
@@ -3868,7 +3866,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
@@ -3893,7 +3891,7 @@ void layout_element::component::draw_segment_diagonal_2(bitmap_argb32 &dest, int
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)
@@ -3917,14 +3915,14 @@ void layout_element::component::draw_segment_decimal(bitmap_argb32 &dest, int mi
 {
 	// compute parameters
 	width /= 2;
-	float ooradius2 = 1.0f / (float)(width * width);
+	float ooradius2 = 1.0f / float(width * width);
 
 	// iterate over y
 	for (u32 y = 0; y <= width; y++)
 	{
 		u32 *const d0 = &dest.pix(midy - y);
 		u32 *const d1 = &dest.pix(midy + y);
-		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
+		float xval = width * sqrt(1.0f - float(y * y) * ooradius2);
 		s32 left, right;
 
 		// compute left/right coordinates
@@ -3946,7 +3944,7 @@ void layout_element::component::draw_segment_comma(bitmap_argb32 &dest, int minx
 {
 	// compute parameters
 	width *= 1.5;
-	float ratio = (maxy - miny - width) / (float)(maxx - minx);
+	float ratio = (maxy - miny - width) / float(maxx - minx);
 
 	// draw line
 	for (int x = minx; x < maxx; x++)

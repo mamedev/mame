@@ -40,6 +40,7 @@ protected:
 	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_c800(uint16_t offset) override;
 	virtual void write_c800(uint16_t offset, uint8_t data) override;
+	virtual bool take_c800() const override { return true; }
 
 	required_device<nscsi_bus_device> m_sasibus;
 	required_device<nscsi_callback_device> m_sasi;

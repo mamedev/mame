@@ -426,6 +426,8 @@ void n64_console_state::n64(machine_config &config)
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	N64PERIPH(config, m_rcp_periphs, 0);
+	m_rcp_periphs->set_sram(m_sram);
+	m_rcp_periphs->set_rdram(m_rdram);
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "n64_cart", "v64,z64,rom,n64,bin"));

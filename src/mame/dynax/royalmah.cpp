@@ -4565,6 +4565,26 @@ ROM_START( janputera ) // FRM-03 + PS-101 PCBs
 	ROM_LOAD( "prom",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
+/*
+Janyou Part I
+(c)1983 Shonan
+
+this set comes from a loose set of ROMs, so no PCB info available
+has 'OU PART 1' and 'ULY 1 1983 BY SHONAN' strings
+shows no title, so it's an educated guess based on Shonan's known games' list and code similarity with janyoup2
+*/
+ROM_START( janyou )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d", 0x0000, 0x2000, CRC(eb7dda8c) SHA1(cf6fae80168ddef78f283aa55a3388bbc54e3506) ) // 2764
+	ROM_LOAD( "3", 0x2000, 0x1000, CRC(2f0a1da4) SHA1(3d407e668f1510ebe357bde51ba7c2160878a8cd) ) // 2732
+	ROM_LOAD( "4", 0x3000, 0x1000, CRC(538cbe03) SHA1(8634332d883033a5800901be664036c08fced61b) ) // "
+	ROM_LOAD( "5", 0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) ) // "
+	ROM_LOAD( "6", 0x5000, 0x1000, CRC(8ce5e09a) SHA1(5f134e218ddf2ad8849ed8915bb780a9cb6f6381) ) // "
+	ROM_LOAD( "7", 0x6000, 0x1000, CRC(0e060269) SHA1(1e626f25fc86f4cace36919c827c84d36706293e) ) // "
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051",  0x0000, 0x0020, CRC(bc9b0be5) SHA1(dbbf0639c5928abe175578439009a45a3298b316) ) // no label
+ROM_END
 
 /***************************************************************************
 Janyou Part II
@@ -4741,6 +4761,21 @@ ROM_END
 ROM_START( tontonb )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "091.5e",     0x00000, 0x10000, CRC(d8d67b59) SHA1(7e7a85df738f80fc031cda8a104ac9c7b3e24785) )
+	// bank switched ROMs follow
+	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
+	/**/                                                    // 2,3 unused
+	ROM_LOAD( "093.5b",     0x30000, 0x10000, CRC(24b6be55) SHA1(11390d6ed55d7d0b7b84c6d36d4ac5330a06abba) )    // 4,5
+	/**/                                                    // 6,7 unused
+	ROM_LOAD( "092.5c",     0x50000, 0x10000, CRC(7ff2738b) SHA1(89a49f89705f499439dc024fc70c87141a84780b) )    // 8,9
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
+ROM_END
+
+
+ROM_START( tontonba ) // Ver. 1.00 string in ROM
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "0911.5e",    0x00000, 0x10000, CRC(8658ab39) SHA1(922f2e49661d1c08af3ac03b51beeae0b65c8c50) )
 	// bank switched ROMs follow
 	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
 	/**/                                                    // 2,3 unused
@@ -5062,6 +5097,25 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjtensin )
+	ROM_REGION( 0x290000, "maincpu", 0 )
+	ROM_LOAD( "1001-2.5e", 0x000000, 0x80000, CRC(f43baf99) SHA1(df3cbe57987ea478cd7efd10e5396189cfe3361c) )
+	// bank switched ROMs follow
+	ROM_RELOAD(            0x010000, 0x80000 )
+	ROM_RELOAD(            0x090000, 0x80000 )
+
+	ROM_LOAD( "1002.4e", 0x110000, 0x80000, CRC(240eb7af) SHA1(2309e1c251fe55f6e6b97b5db94fa2fe914b88f4) )
+
+	ROM_LOAD( "1003.3e", 0x210000, 0x80000, CRC(876081bf) SHA1(fe962cfa9318a9444123bcaf3406e22fb08e8c4e) )
+
+	ROM_REGION( 0x2000, "internal_rom", 0 ) // the MCU is configured for external ROM usage, but does have the internal ROM. Let's load it for completeness' sake.
+	ROM_LOAD( "mjtensin-mcu.3c", 0x0000, 0x2000, CRC(13804e4f) SHA1(34b5072528ad42c78ecae344da09182b850b4db1) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d100-2.7e",  0x000, 0x200, CRC(6edeed23) SHA1(f4420c473ebbe3df92b0f5b1f0e4d5495fcb9fda) )
+	ROM_LOAD( "d100-1.6e",  0x200, 0x200, CRC(88befd59) SHA1(cbcb437f9f6b5e542dc69f5c9e85ccbae47080af) )
+ROM_END
+
+ROM_START( mjtensina )
 	ROM_REGION( 0x290000, "maincpu", 0 )
 	ROM_LOAD( "1001.5e", 0x000000, 0x80000, CRC(960e1fe9) SHA1(11f5164b2c75c0e684e910ee8e09de978bdaff2f) )
 	// bank switched ROMs follow
@@ -5537,6 +5591,21 @@ ROM_START( mjvegasa )
 	ROM_RELOAD(           0x070000, 0x20000 )   // 0c-0f
 	ROM_LOAD( "5002.1d",  0x210000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) ) // 40-4f
 	ROM_LOAD( "5003.1e",  0x2f0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) ) // 5c-5f
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
+	ROM_LOAD( "d50-1_82s147.4g", 0x200, 0x200, CRC(50c0d0ec) SHA1(222899456cd2e15391d8d0f771bbd5e5333d6ba3) )
+ROM_END
+
+ROM_START( mjvegasb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF  )
+	ROM_LOAD( "5001b.1b",          0x00000, 0x20000, CRC(945bf766) SHA1(81d1126b404f2088ceeb21c52f2f8d87322554f8) ) // external ROM with first 0x2000 empty
+	ROM_LOAD( "50xx.tmp90840",     0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // internal ROM, MCU has pins 9 to 14 stripped out
+
+	// bank switched ROMs follow
+	ROM_COPY( "maincpu", 0x000000, 0x070000, 0x020000 )   // 0c-0f
+	ROM_LOAD( "5002.1d",           0x210000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) ) // 40-4f
+	ROM_LOAD( "5003.1e",           0x2f0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) ) // 5c-5f
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
@@ -6436,6 +6505,7 @@ GAME( 1981?, openmj,      royalmj,  royalmah, royalmah,   royalmah_state,       
 GAME( 1982,  royalmah,    royalmj,  royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1984?, chalgirl,    0,        chalgirl, royalmah,   royalmah_prgbank_state, init_chalgirl, ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // verify ROM loading / banking, bad girl colors
 GAME( 1983,  seljan,      0,        seljan,   seljan,     royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan (Japan)",                       0 )
+GAME( 1983,  janyou,      royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Shonan",                     "Janyou Part I (Double Bet)",            0 )
 GAME( 1983,  janyoup2,    royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1983,  janyoup2a,   royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983, no title screen)",0 )
 GAME( 1983,  janyoup2702, royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.02, July 1 1983)",0 )
@@ -6460,7 +6530,8 @@ GAME( 1986,  mjyarou,     0,        mjyarou,  mjyarou,    royalmah_prgbank_state
 GAME( 1986,  mjyarou2,    mjyarou,  mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 2)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986?, mjclub,      0,        mjclub,   mjclub,     royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club (Japan)",                  0 )
 GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
-GAME( 1987,  tontonb,     0,        tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan)",                        0 )
+GAME( 1987,  tontonb,     0,        tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, set 1)",                 0 )
+GAME( 1987,  tontonba,    tontonb,  tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, ver. 1.00)",             MACHINE_NOT_WORKING ) // hangs when entering bookkeeping, works after reset
 GAME( 1987,  makaijan,    0,        makaijan, makaijan,   royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan (Japan)",                      0 )
 GAME( 1988,  majs101b,    0,        majs101b, majs101b,   royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Studio 101 (Japan)",            0 )
 GAME( 1988,  mjapinky,    0,        mjapinky, mjapinky,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Almond Pinky (Japan)",                  0 )
@@ -6472,7 +6543,8 @@ GAME( 1990,  mjifb,       0,        mjifb,    mjifb,      royalmah_prgbank_state
 GAME( 1990,  mjifb2,      mjifb,    mjifb,    mjifb,      royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? (2921)",                 0 )
 GAME( 1990,  mjifb3,      mjifb,    mjifb,    mjifb,      royalmah_prgbank_state, init_mjifb,    ROT0,   "Dynax",                      "Mahjong If...? (2931)",                 0 )
 GAME( 1991,  mjvegasa,    0,        mjvegasa, mjvegasa,   royalmah_prgbank_state, init_mjvegasa, ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
-GAME( 1991,  mjvegas,     mjvegasa, mjvegas,  mjvegasa,   royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 0 )
+GAME( 1991,  mjvegas,     mjvegasa, mjvegas,  mjvegasa,   royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan, set 1)",          0 )
+GAME( 1991,  mjvegasb,    mjvegasa, mjvegas,  mjvegasa,   royalmah_prgbank_state, init_mjvegas,  ROT0,   "Dynax",                      "Mahjong Vegas (Japan, set 2)",          0 )
 GAME( 1992,  cafetime,    0,        cafetime, cafetime,   royalmah_prgbank_state, init_cafetime, ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll,    0,        cafedoll, cafedoll,   royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan, Ver. 1.00)",  MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
 GAME( 1993,  cafedollg,   cafedoll, cafedoll, cafedoll,   royalmah_prgbank_state, init_cafedoll, ROT0,   "Dynax",                      "Mahjong Cafe Doll Great (Japan, Ver. 1.00)", MACHINE_NOT_WORKING ) // fails protection check (at 0x178 it puts 0x55 in 0xFFBF instead of 0x56 like the code expects and chaos ensues)
@@ -6480,7 +6552,8 @@ GAME( 1993,  ichiban,     0,        ichiban,  ichiban,    royalmah_prgbank_state
 GAME( 1993,  ichiban235,  ichiban,  ichiban,  ichiban235, royalmah_prgbank_state, init_ichiban,  ROT0,   "Excel",                      "Ichi Ban Jyan (Ver 2.35)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // ROM banking is wrong, causing several GFX problems
 GAME( 1993,  dragonmj,    0,        ichiban,  ichiban,    royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.20)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.20 1993/11/09
 GAME( 1993,  dragonmj103, dragonmj, ichiban,  ichiban,    royalmah_prgbank_state, init_ichiban,  ROT0,   "OCT",                        "Dragon Mahjong (Ver 1.03)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - DRAGON Ver1.03 1993/10/16
-GAME( 1995,  mjtensin,    0,        mjtensin, mjtensin,   royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             MACHINE_NOT_WORKING )
+GAME( 1995,  mjtensin,    0,        mjtensin, mjtensin,   royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan, set 1)",      MACHINE_NOT_WORKING )
+GAME( 1995,  mjtensina,   mjtensin, mjtensin, mjtensin,   royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan, set 2)",      MACHINE_NOT_WORKING )
 GAME( 1996,  majrjhdx,    0,        majrjh,   mjtensin,   royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai DX (Ver. D105)",      0 )
 GAME( 1996,  majrjh,      majrjhdx, majrjh,   mjtensin,   royalmah_prgbank_state, init_mjtensin, ROT0,   "Dynax",                      "Mahjong Raijinhai (Ver. D105)",         0 )
 GAME( 1996,  janptr96,    0,        janptr96, janptr96,   royalmah_prgbank_state, init_janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )

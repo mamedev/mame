@@ -599,7 +599,7 @@ imgtool::partition::partition(imgtool::image &image, const imgtool_class &imgcla
 		m_create_dir = nullptr;
 		m_delete_dir = nullptr;
 		m_writefile_optguide = nullptr;
-		m_writefile_optspec = nullptr;
+		m_writefile_optspec.clear();
 	}
 }
 

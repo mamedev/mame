@@ -210,11 +210,11 @@ void aws_state::fdc_board(machine_config &config)
 	PIC8259(config, m_pic, 0);
 	PIT8253(config, m_fdc_pit, 0);
 	m_fdc_pit->set_clk<0>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
-//	m_fdc_pit->out_handler<0>().set(FUNC(aws_state::pit_out0_w));  // INT5
+//  m_fdc_pit->out_handler<0>().set(FUNC(aws_state::pit_out0_w));  // INT5
 	m_fdc_pit->set_clk<1>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
-//	m_fdc_pit->out_handler<1>().set(FUNC(aws_state::pit_out1_w));  // RS-232C port B
+//  m_fdc_pit->out_handler<1>().set(FUNC(aws_state::pit_out1_w));  // RS-232C port B
 	m_fdc_pit->set_clk<2>(19.6608_MHz_XTAL / 16);  // 1.23 MHz
-//	m_fdc_pit->out_handler<2>().set(FUNC(aws_state::pit_out2_w));  // RS-232C port A
+//  m_fdc_pit->out_handler<2>().set(FUNC(aws_state::pit_out2_w));  // RS-232C port A
 
 	UPD7201(config, m_fdc_serial, 24_MHz_XTAL / 8);
 }
