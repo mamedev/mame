@@ -421,7 +421,7 @@ private:
 
 	u8 m_ram_mode = 0;
 	u8 m_ram_type = 0;
-	memory_region *m_cart_rom = nullptr;
+	//memory_region *m_cart_rom = nullptr;
 	std::unique_ptr<u8[]> m_ignore_writes;
 
 	// floppy state for fd5
@@ -1324,7 +1324,7 @@ void m5_state::machine_reset()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	uint32_t romcart_rom_size = 0;
 	uint32_t romcart_ram_size = 0;
-	uint32_t ramcart_ram_size = 0;
+	//uint32_t ramcart_ram_size = 0;
 	uint8_t* romcart_ram_base = nullptr;
 	uint8_t* romcart_rom_base = nullptr;
 	uint8_t* ramcart_ram_base = nullptr;
@@ -1370,7 +1370,7 @@ void m5_state::machine_reset()
 	if (m_ramcart)
 	{
 		m_ram_type=m_ramcart->get_type();
-		ramcart_ram_size = m_ramcart->get_ram_size();
+		//ramcart_ram_size = m_ramcart->get_ram_size();
 		ramcart_ram_base = m_ramcart->get_ram_base();
 		ramcart_rom_base = m_ramcart->get_rom_base();
 
