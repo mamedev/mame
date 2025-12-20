@@ -328,7 +328,7 @@ INVESTIGATE
 	</software>
 
 	<software name="n88basfra" cloneof="n88basfr">
-		<description>N88-BASIC FR (v2.3, Alt)</description>
+		<description>N88-BASIC FR (v2.3, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -339,7 +339,7 @@ INVESTIGATE
 	</software>
 
 	<software name="n88basfrb" cloneof="n88basfr">
-		<description>N88-BASIC FR (v2.3, Alt 2)</description>
+		<description>N88-BASIC FR (v2.3, alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -372,7 +372,7 @@ INVESTIGATE
 	</software>
 
 	<software name="n88bastra" cloneof="n88bastr">
-		<description>N88-BASIC TR (v2.3, Alt)</description>
+		<description>N88-BASIC TR (v2.3, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -416,7 +416,7 @@ INVESTIGATE
 	</software>
 
 	<software name="n88nbfra" cloneof="n88nbfr">
-		<description>N88-Nihongo BASIC FR (v1.0, Alt)</description>
+		<description>N88-Nihongo BASIC FR (v1.0, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -2757,7 +2757,7 @@ Unemulated optional [GSX8800] sound board support
 	</software>
 
 	<software name="angelusa" cloneof="angelus" supported="yes">
-		<description>Angelus (v1.3 Alt, exit confirmed?)</description>
+		<description>Angelus (v1.3 alt, exit confirmed?)</description>
 		<year>1988</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801mk2SR -->
@@ -24403,7 +24403,7 @@ Should be supported by [PC8001mkIISR] too
 
 	<!-- TODO: hacked to work on PC-8801 V1? Recheck when pc8001 has floppy support -->
 	<software name="mysterhma" cloneof="mysterhm">
-		<description>Mystery House (Micro Cabin, Alt)</description>
+		<description>Mystery House (Micro Cabin, alt)</description>
 		<year>1982</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801 -->
@@ -25211,7 +25211,7 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		<!--combined image-->
 		<!--rom name="oji binbin monogatari(a).d88" size="697680" crc="0e1b4c3b" sha1="b253fc86e05ca21c4fb078259cc5abb070aa274a"/-->
 
-		<!-- Disk 1 is same as Alt 2 -->
+		<!-- Disk 1 is same as alt 2 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="oji binbin monogatari(a)_02.d88" size="348848" crc="c9204e68" sha1="09f1191c869382068945a414cb3cc8795ac7c7fd"/>
@@ -29395,7 +29395,7 @@ ExtractDisk  [01]"ｻﾝｺﾞｸｼ A      " -> "Sangokushi 01.d88"
 ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 -->
 	<software name="sangokua" cloneof="sangoku" supported="yes">
-		<description>Sangokushi (19860416, Alt)</description>
+		<description>Sangokushi (19860416, alt)</description>
 		<year>1985</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801 -->
@@ -29456,7 +29456,7 @@ ExtractDisk  [02]"ｻﾝｺﾞｸｼ B      " -> "Sangokushi 02.d88"
 
 	<!-- TODO: shouldn't be a clone of sangoku? -->
 	<software name="sangokuc" cloneof="sangoku" supported="no">
-		<description>Sangokushi (19861210, SR Ban?, Alt)</description>
+		<description>Sangokushi (19861210, SR Ban?, alt)</description>
 		<year>1985</year>
 		<publisher>光栄 (Koei)</publisher>
 		<notes><![CDATA[
@@ -30659,7 +30659,7 @@ Kinda ugly to look at without a shader
 	</software>
 
 	<software name="shanghsca" cloneof="shanghsc">
-		<description>Shanghai (Starcraft, Alt)</description>
+		<description>Shanghai (Starcraft, alt)</description>
 		<year>1985</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801 -->
@@ -32522,7 +32522,7 @@ ExtractDisk  [27]"Program V1.0  " -> "sorcerian(full package)_27.d88"   [1574042
 	</software>
 
 <!--
-Alt set was: rom name="sorcerian - full set.d88" size="9069632" crc="5d72bf01" sha1="30b5c8400298bdb088e369d8872a46cd498a8b5f" offset="0"
+alt set was: rom name="sorcerian - full set.d88" size="9069632" crc="5d72bf01" sha1="30b5c8400298bdb088e369d8872a46cd498a8b5f" offset="0"
 same disks, just diff headers. I keep here these checksum atm, for documentation purpose.
 ExtractDisk  [01]"Program Disk(V1." -> "Sorcerian - Full Set 01.d88"    [5deed07a]
 ExtractDisk  [02]"User Disk    " -> "Sorcerian - Full Set 02.d88"   [ff893079]
@@ -40889,7 +40889,7 @@ Gameplay is a bit too fast
 	</software>
 
 	<software name="ys3d2" cloneof="ys3">
-		<description>Wanderers from Ys (Demo, Alt)</description>
+		<description>Wanderers from Ys (Demo, alt)</description>
 		<year>1989</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -42073,7 +42073,7 @@ No BGM on title screen, locks up on game selection, requires a [i8214] sound irq
 		</part>
 	</software>
 
-<!-- Alt ver. of the disk above? -->
+<!-- alt ver. of the disk above? -->
 	<software name="charieg2" supported="no">
 		<description>Charie Music Gallery Vol.2</description>
 		<year>19??</year>
@@ -47847,7 +47847,7 @@ ExtractDisk  [02]"              " -> "sound on-ten vol.1(a)_02.d88"
 	</software>
 
 <!--
-ExtractDisk  [01]"LOAD_RUNNER    " -> "lode runner with level disks_01.d88" 03323138 (same as Alt 2 set)
+ExtractDisk  [01]"LOAD_RUNNER    " -> "lode runner with level disks_01.d88" 03323138 (same as alt 2 set)
 ExtractDisk  [02]"LRDAT(BUG  ) " -> "lode runner with level disks_02.d88"
 ExtractDisk  [03]"LRDAT(CHAMP   ) " -> "lode runner with level disks_03.d88"
 ExtractDisk  [04]"LRDAT(DMG  ) " -> "lode runner with level disks_04.d88"
@@ -52334,7 +52334,7 @@ Tests [Sound Board 2]
 	</software>
 
 	<software name="dxkitdis" cloneof="ginga2dx" supported="no">
-		<!-- Alt ginga2dx boot disk -->
+		<!-- alt ginga2dx boot disk -->
 		<description>Ginga Densetsu II DX Kit (alt)</description>
 		<year>1991</year>
 		<publisher>ボーステック (Bothtec)</publisher>
@@ -55677,7 +55677,7 @@ ExtractDisk  [11]"Super-88_Disk#11" -> "pc88 oldgame collection (super-88 disks 
 ExtractDisk  [12]"Super-88_Disk#12" -> "pc88 oldgame collection (super-88 disks 1-12)_12.d88"   5fbceedf (same as sp88-12)
 -->
 <!--
-Alt disk exists with disks 1-6 (sixth disk underdumped)
+alt disk exists with disks 1-6 (sixth disk underdumped)
                 <rom name="88 oldgame collection(super 88 1-6).d88" size="1832540" crc="51e02647" sha1="1a872df51ccba34f193ce88c154e3ada79f888a9"/>
 -->
 	<software name="pc88oldg">
@@ -58027,7 +58027,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-<!-- Alt version of P8N?? -->
+<!-- alt version of P8N?? -->
 	<software name="filemstp8" cloneof="filemst">
 		<description>The File Master - Parameter 8 New</description>
 		<year>19??</year>
