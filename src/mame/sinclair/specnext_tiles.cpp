@@ -67,8 +67,8 @@ TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 {
 	const bool strip_flags_n = BIT(~m_control, 5);
 	const u8 *data = &m_tiles_info[tile_index << (strip_flags_n ? 1 : 0)];
-	u8 attr = strip_flags_n ?*(data + strip_flags_n) :  m_default_flags;
-	u16 code = *data;
+	u8 attr = strip_flags_n ? data[strip_flags_n] : m_default_flags;
+	u16 code = data[0];
 	u32 category = 1;
 
 	if (BIT(m_control, 1))

@@ -145,6 +145,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	void reset_hard();
 	virtual void video_start() override ATTR_COLD;
@@ -366,6 +367,7 @@ private:
 	video_timings_info m_video_timings;
 	rectangle m_clip256x192;
 	rectangle m_clip320x256;
+	int m_video_output_hdmi = -1;
 	int m_page_shadow[8];
 	bool m_bootrom_en;
 	u8 m_port_ff_data;
@@ -913,7 +915,6 @@ void specnext_state::update_video_mode()
 			};
 	}
 
-	const bool is_hdmi = ~m_io_video.read_safe(1) & 1;
 	const int left = m_video_timings.min_hactive << 1;
 	const int top = m_video_timings.min_vactive;
 	const int width = (m_video_timings.max_hc + 1) << 1;
@@ -921,11 +922,13 @@ void specnext_state::update_video_mode()
 	m_clip256x192 = rectangle(left, left + (256 << 1) - 1, top, top + 192 - 1);
 	m_clip320x256 = rectangle(left - (32 << 1), left + ((256 + 32) << 1) - 1, top - 32, top + 192 + 32 - 1);
 
-	m_screen->configure(width, height
-		, is_hdmi
+	rectangle visarea = m_video_output_hdmi
 			? rectangle(m_video_timings.hdmi_xmin << 1, (m_video_timings.hdmi_xmax << 1) | 1, m_video_timings.hdmi_ymin, m_video_timings.hdmi_ymax)
-			: m_clip320x256
-		, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
+			: m_clip320x256;
+	// The visarea can't overlap with screen last vpos. Posssibly related to https://github.com/mamedev/mame/pull/9945
+	visarea.max_y = std::min(visarea.max_y, height - 2);
+
+	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
 	m_ula_scr->set_raster_offset(left, top);
 	m_lores->set_raster_offset(left, top);
 	m_tiles->set_raster_offset(left, top);
@@ -934,7 +937,7 @@ void specnext_state::update_video_mode()
 
 	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
 	m_eff_nr_05_5060 = m_nr_05_5060;
-	LOG("%s: %s %dHz\n", machine_name, is_hdmi ? "HDMI" : "VGA", m_nr_05_5060 ? 60 : 50);
+	LOG("%s@%dHz\n", machine_name, m_nr_05_5060 ? 60 : 50);
 }
 
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2591,8 +2594,12 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1): Santa's Pressie, The Next War
 
-	if (m_eff_nr_05_5060 != m_nr_05_5060 || m_nr_03_machine_timing != m_eff_nr_03_machine_timing)
+	const bool tmp = ~m_io_video.read_safe(0) & 1;
+	if (m_video_output_hdmi != tmp || m_eff_nr_05_5060 != m_nr_05_5060 || m_nr_03_machine_timing != m_eff_nr_03_machine_timing)
+	{
+		m_video_output_hdmi = tmp;
 		update_video_mode();
+	}
 
 	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
@@ -3348,6 +3355,11 @@ void specnext_state::machine_start()
 	save_item(NAME(m_i2c_sda_data));
 }
 
+void specnext_state::device_post_load()
+{
+	m_video_output_hdmi = -1;
+}
+
 void specnext_state::reset_hard()
 {
 	m_nr_02_hard_reset = 0;
@@ -3460,8 +3472,6 @@ void specnext_state::reset_hard()
 
 	// m_port_00_data = 0;
 	m_nr_0a_divmmc_automap_en = 1;
-
-	update_video_mode();
 }
 
 void specnext_state::machine_reset()
@@ -3717,6 +3727,7 @@ void specnext_state::machine_reset()
 	mmu_x2_w(6, 0x00);
 
 	m_ay_select = 0;
+	m_video_output_hdmi = -1;
 }
 
 static const gfx_layout bootrom_charlayout =
