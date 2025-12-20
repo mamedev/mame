@@ -477,31 +477,31 @@ disc
 disc2000
 disc2001
 disc3000
-doppelpot
-doppelstart
-elitedisc
-excellent
-extrablatt
-glucksstern
+dpplpot
+dpplstrt
+elitdisc
+excellnt
+extrbltt
+glksstrn
 juwel
 karoas
 kniffi
 macao
 rasant
-supermultib
+sprmltib
 
 @source:adp/stellafr.cpp
 action
 allfred
-big_jackpot
-disc_bonus
-disc_jackpot
-grandhand
-jokerpoker
-jumbojumbo
-jumbojumbof
-kleopatra
-multimulti
+bigjkpot
+dscbonus
+dscjkpot
+grandhnd
+jkrpoker
+jmbojmbo
+jmbojmbf
+kleoptra
+multmult
 st_ohla
 st_vulkn
 sunny
@@ -20560,14 +20560,14 @@ rtpc025
 rtpca25
 
 @source:ibm/thinkpad600.cpp
-thinkpad600
-thinkpad600e
-thinkpad600x
-thinkpad760xd
-thinkpad770z
+tpad600
+tpad600e
+tpad600x
+tpad760xd
+tpad770z
 
 @source:ibm/thinkpad8xx.cpp
-thinkpad850
+tpad850
 
 @source:ice/chexx.cpp
 chexx83
@@ -30405,9 +30405,9 @@ xfilesk
 
 @source:misc/diamondking.cpp
 caribe
-diamondking
-diamondkinp
-goldenchip
+diamondk
+diamondko
+goldnchp
 
 @source:misc/discoboy.cpp
 discoboy
@@ -32925,9 +32925,9 @@ quizpun
 quizpun2
 
 @source:misc/rawthrillspc.cpp
-doodlejmp
+doodljmp
 fnf
-guitarheroac
+gtrhroac
 
 @source:misc/rcorsair.cpp
 rcorsair
@@ -37370,7 +37370,7 @@ ast611
 ct486
 
 @source:pc/cuttherope.cpp
-cuttherope
+cutrope
 
 @source:pc/dawg.cpp
 dawg
@@ -43694,8 +43694,8 @@ css11501sk9
 megatrix
 
 @source:skeleton/cubieboard4.cpp
-cubieboard4
-monkeyjmp
+cubibrd4
+monkyjmp
 
 @source:skeleton/cxhumax.cpp
 hxhdci2k
@@ -44042,7 +44042,7 @@ micromon7141
 micronic
 
 @source:skeleton/mightyframe.cpp
-mightyframe
+mightfrm
 
 @source:skeleton/milwaukee.cpp
 mc1200
@@ -44252,7 +44252,7 @@ shine
 
 @source:skeleton/shoken_md06.cpp
 petitlot
-polarstar2
+polstar2
 
 @source:skeleton/si5500.cpp
 si5500
