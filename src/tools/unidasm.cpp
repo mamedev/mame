@@ -10,7 +10,7 @@
 #include "coretmpl.h"
 #include "disasmintf.h"
 
-using offs_t = osd::u32;
+using offs_t = osd::u64;
 using util::BIT;
 
 #include "cpu/8x300/8x300dasm.h"
