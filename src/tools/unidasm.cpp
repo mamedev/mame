@@ -1235,7 +1235,7 @@ static int parse_options(int argc, char *argv[], options *opts)
 		} else if(pending_base) {
 			// base PC
 			u32 basepc_dword = 0;
-			if(parse_number(curarg, "%x", &opts->basepc) != 1)
+			if(parse_number(curarg, "%x", &basepc_dword) != 1)
 				goto usage;
 			opts->basepc = basepc_dword;
 			pending_base = false;
