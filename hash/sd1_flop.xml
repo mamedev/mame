@@ -49,8 +49,17 @@ P/N 8506000201-A MODEL VSD-201
 
 	<software name="os300" cloneof="os410" supported="yes">
 		<description>SD-1 Sequencer OS version 3.00</description>
-		<year>1990</year>
+		<year>1991</year>
 		<publisher>Ensoniq</publisher>
+		<notes><![CDATA[
+SEQUENCER O.S. DISK - VERSION 3.00
+(REQUIRES ROM O.S. VER. 3.00 OR HIGHER)
+THIS DISK ALSO CONTAINS
+MULTIPLE SOUND PROGRAM FILES,
+PRESET FILES AND DEMO SEQUENCES
+
+P/N 8506000101-B MODEL VSD-200 (C) 1991
+]]></notes>
 
 		<part name="flop" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
