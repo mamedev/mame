@@ -210,170 +210,6 @@ Switch to 80 column mode:
 
 
 //**************************************************************************
-//  MEMORY MANAGEMENT
-//**************************************************************************
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-u8 abc80_state::read(offs_t offset)
-{
-	u8 data = 0xff;
-	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
-
-	if (!(mmu & MMU_XM))
-	{
-		data = m_bus->xmemfl_r(offset);
-	}
-	else if (!(mmu & MMU_ROM))
-	{
-		data = m_rom->base()[offset & 0x3fff];
-	}
-	else if (mmu & MMU_VRAMS)
-	{
-		data = m_video_ram[offset & 0x3ff];
-	}
-	else if (!(mmu & MMU_RAM))
-	{
-		data = m_ram->pointer()[offset & 0x3fff];
-	}
-
-	return data;
-}
-
-u8 abc80l_state::read(offs_t offset)
-{
-	u8 data = abc80_state::read(offset);
-
-	if (offset >= 0x5000 && offset < 0x5800)
-	{
-		data = m_rom_5000->base()[offset & 0x7ff];
-	}
-	else if (offset >= 0x8000 && offset < 0xc000)
-	{
-		data = m_ram[offset & 0x3fff];
-	}
-
-	return data;
-}
-
-u8 tkn80_state::read(offs_t offset)
-{
-	/*
-
-	    TKN 000-3ff -> ZA3506 000-3ff (9913/10042)
-	    TKN 400-7ff -> ZA3507 000-3ff (9913/10042)
-	    TKN 800-cff -> ZA3506 000-3ff (11273)
-	    TKN c00-FFF -> ZA3507 000-3ff (11273)
-
-	*/
-
-	u8 data = 0xff;
-	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
-
-	if (offset < 0x400)
-	{
-		if (m_80)
-			data = m_rom_e->base()[m_rom_offset | (offset & 0x3ff)];
-		else
-			data = m_rom->base()[offset & 0x3fff];
-	}
-	else if (offset >= 0x400 && offset < 0x2000)
-	{
-		data = m_rom->base()[offset & 0x3fff];
-	}
-	else if (offset >= 0x2000 && offset < 0x2400)
-	{
-		if (m_80)
-			data = m_rom_e->base()[m_rom_offset | 0x400 | (offset & 0x3ff)];
-		else
-			data = m_rom->base()[offset & 0x3fff];
-	}
-	else if (offset >= 0x2400 && offset < 0x4000)
-	{
-		data = m_rom->base()[offset & 0x3fff];
-	}
-	else if (offset >= 0x5800 && offset < 0x6000)
-	{
-		data = m_char_ram[offset & 0x7ff];
-	}
-	else if (offset >= 0x7c00 && offset < 0x8000)
-	{
-		data = m_char_ram[offset & 0x7ff];
-	}
-	else if (!(mmu & MMU_XM))
-	{
-		data = m_bus->xmemfl_r(offset);
-	}
-	else if (!(mmu & MMU_RAM))
-	{
-		data = m_ram->pointer()[offset & 0x3fff];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void abc80_state::write(offs_t offset, u8 data)
-{
-	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
-
-	if (!(mmu & MMU_XM))
-	{
-		m_bus->xmemw_w(offset, data);
-	}
-	else if (mmu & MMU_VRAMS)
-	{
-		m_video_ram[offset & 0x3ff] = data;
-	}
-	else if (!(mmu & MMU_RAM))
-	{
-		m_ram->pointer()[offset & 0x3fff] = data;
-	}
-}
-
-void abc80l_state::write(offs_t offset, u8 data)
-{
-	if (offset >= 0x8000 && offset < 0xc000)
-	{
-		m_ram[offset & 0x3fff] = data;
-	}
-	else
-	{
-		abc80_state::write(offset, data);
-	}
-}
-
-void tkn80_state::write(offs_t offset, u8 data)
-{
-	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
-
-	if (offset >= 0x5800 && offset < 0x6000)
-	{
-		m_char_ram[offset & 0x7ff] = data;
-	}
-	else if (offset >= 0x7c00 && offset < 0x8000)
-	{
-		m_char_ram[offset & 0x7ff] = data;
-	}
-	else if (!(mmu & MMU_XM))
-	{
-		m_bus->xmemw_w(offset, data);
-	}
-	else if (!(mmu & MMU_RAM))
-	{
-		m_ram->pointer()[offset & 0x3fff] = data;
-	}
-}
-
-
-
-//**************************************************************************
 //  SOUND
 //**************************************************************************
 
@@ -406,7 +242,13 @@ void abc80_state::csg_w(u8 data)
 void abc80_state::abc80_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(abc80_state::read), FUNC(abc80_state::write));
+	map(0x0000, 0x3fff).rom().region(Z80_TAG, 0);
+	map(0x4000, 0xbfff).lrw8( // fix offset for external memory
+		NAME([this](offs_t offset) { return m_bus->xmemfl_r(offset + 0x4000); }),
+		NAME([this](offs_t offset, uint8_t data) { m_bus->xmemw_w(offset + 0x4000, data); })
+	);
+	map(0x7c00, 0x7fff).ram().share(m_video_ram);
+	map(0xc000, 0xffff).ram();
 }
 
 
@@ -416,8 +258,32 @@ void abc80_state::abc80_mem(address_map &map)
 
 void abc80l_state::abc80l_mem(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(abc80l_state::read), FUNC(abc80l_state::write));
+	abc80_mem(map);
+	map(0x5000, 0x57ff).rom().region("abc80l", 0);
+	map(0x8000, 0xbfff).ram();
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( tkn80_mem )
+//-------------------------------------------------
+
+void tkn80_state::tkn80_mem(address_map &map)
+{
+	abc80_mem(map);
+	map(0x0000, 0x03ff).view(m_view_rom0);
+	m_view_rom0[0](0x0000, 0x03ff).rom().region(Z80_TAG, 0);
+	m_view_rom0[1](0x0000, 0x03ff).rom().region("tkn80", 0);
+	m_view_rom0[2](0x0000, 0x03ff).rom().region("tkn80", 0x800);
+	map(0x2000, 0x23ff).view(m_view_rom2);
+	m_view_rom2[0](0x2000, 0x23ff).rom().region(Z80_TAG, 0x2000);
+	m_view_rom2[1](0x2000, 0x23ff).rom().region("tkn80", 0x400);
+	m_view_rom2[2](0x2000, 0x23ff).rom().region("tkn80", 0xc00);
+	map(0x5800, 0x5fff).ram().share(m_char_ram);
+	map(0x7c00, 0x7fff).lrw8( // map only the upper 1K of char RAM
+		NAME([this](offs_t offset) { return m_char_ram[0x400 | offset]; }),
+		NAME([this](offs_t offset, uint8_t data) { m_char_ram[0x400 | offset] = data; })
+	);
 }
 
 
@@ -733,20 +599,13 @@ void tkn80_state::machine_start()
 
 	// register for state saving
 	save_item(NAME(m_80));
-	save_item(NAME(m_rom_offset));
 }
 
-
-//-------------------------------------------------
-//  machine_reset
-//-------------------------------------------------
 
 void tkn80_state::machine_reset()
 {
-	u8 config = m_config->read();
-
-	m_rom_offset = BIT(config, 2) << 11;
 }
+
 
 
 //-------------------------------------------------
@@ -862,6 +721,9 @@ void abc80l_state::abc80l(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc80l_state::abc80l_mem);
+
+	// video hardware
+	abc80_video(config);
 }
 
 
@@ -874,6 +736,7 @@ void tkn80_state::tkn80(machine_config &config)
 	abc80_state::abc80_common(config);
 
 	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &tkn80_state::tkn80_mem);
 	m_maincpu->set_addrmap(AS_IO, &tkn80_state::tkn80_io);
 
 	// video hardware
@@ -1021,5 +884,5 @@ ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME             FLAGS
 COMP( 1978, abc80,  0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 1981, abc80l, abc80,  0,      abc80,   0,     abc80l_state, empty_init, "Cat AB",           "ABC 80 with ABC80L", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, abc80l, abc80,  0,      abc80l,  0,     abc80l_state, empty_init, "Cat AB",           "ABC 80 with ABC80L", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 COMP( 198?, tkn80,  abc80,  0,      tkn80,   tkn80, tkn80_state,  empty_init, "MYAB",             "ABC 80 with TKN80",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
