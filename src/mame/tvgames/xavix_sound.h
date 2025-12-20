@@ -42,6 +42,7 @@ public:
 	uint32_t  phase_step_per_tick(uint32_t rate) const;
 	uint32_t envelope_period_ticks(uint8_t tp) const;
 
+	void set_default_tempo(uint8_t tempo) { m_tempo_reset_value = tempo; }
 
 protected:
 	// device_t implementation
@@ -128,6 +129,9 @@ private:
 	void step_envelope(int voice);
 	uint8_t fetch_env_byte(int voice, int channel, uint32_t idx);
 	uint8_t fetch_env_byte_direct(int voice, int channel, uint16_t addr);
+
+	// config
+	uint8_t m_tempo_reset_value; // set from the xavix.cpp side to 0x80 for most games, 0x40 for the music games
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)

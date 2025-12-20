@@ -28,6 +28,9 @@
 #include "machine/w83787f.h"
 #include "video/voodoo_pci.h"
 
+#include "softlist.h"
+#include "softlist_dev.h"
+
 
 class sis496_state : public driver_device
 {
@@ -140,6 +143,14 @@ void sis496_state::sis496(machine_config &config)
 	serport1.cts_handler().set("board4:w83787f", FUNC(w83787f_device::ncts2_w));
 
 	// TODO: 9-10-11-12 for PCI_SLOT (according to BIOS)
+
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)

@@ -6486,6 +6486,36 @@ ROM_END
 
 ROM_START( progear )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "pgae.03", 0x000000, 0x80000, CRC(8577bc86) SHA1(474ed45d3b84cd38de166b101aa122123c886882) )
+	ROM_LOAD16_WORD_SWAP( "pgae.04", 0x080000, 0x80000, CRC(d850da04) SHA1(b768b34bda8802b645a4c1e1a4429b68d370558f) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD64_BYTE( "pga-simm.01c",   0x0000000, 0x200000,  CRC(452f98b0) SHA1(a10e615c32098f6d25becd466da8faa967523a7b) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.01d",   0x0000001, 0x200000,  CRC(9e672092) SHA1(fce0b8b43a1c069262f4e3e81c1a04621e232c88) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.01a",   0x0000002, 0x200000,  CRC(ae9ddafe) SHA1(afbb26fed6cd0cb5c0099a10d35aeb453318c14d) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.01b",   0x0000003, 0x200000,  CRC(94d72d94) SHA1(df6a3fe49c008f73b160eb6f2a44dc371ff73cba) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03c",   0x0000004, 0x200000,  CRC(48a1886d) SHA1(ebf44b42d784924e08a832a7e5f66a887bab244b) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03d",   0x0000005, 0x200000,  CRC(172d7e37) SHA1(0eaedd24cd3fa87b6f35fbd63078d40c493c92d0) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03a",   0x0000006, 0x200000,  CRC(9ee33d98) SHA1(85d1bd31940e35ac8c732165020881a2d65cd6b1) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03b",   0x0000007, 0x200000,  CRC(848dee32) SHA1(c591288e86ad1624d0fe66563808af9fac786e64) ) // ROM on a SIMM
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "pga.01",   0x00000, 0x08000, CRC(bdbfa992) SHA1(7c5496c1daaea6a7ab95c0b25625d325ec3427cc) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x800000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "pga-simm.05a",   0x000000, 0x200000, CRC(c0aac80c) SHA1(91784d35d4f7e113529bb5be6081b67094b150ea) ) // ROM on a SIMM
+	ROM_LOAD16_WORD_SWAP( "pga-simm.05b",   0x200000, 0x200000, CRC(37a65d86) SHA1(374d562a4648734f82aa2ddb6d258e870896dd45) ) // ROM on a SIMM
+	ROM_LOAD16_WORD_SWAP( "pga-simm.06a",   0x400000, 0x200000, CRC(d3f1e934) SHA1(5dcea28c873d0d472f5b94e07d97cd77ace2b252) ) // ROM on a SIMM
+	ROM_LOAD16_WORD_SWAP( "pga-simm.06b",   0x600000, 0x200000, CRC(8b39489a) SHA1(fd790efaf37dc2c4c16f657941044e3e2d3c2711) ) // ROM on a SIMM
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "progear.key",  0x000000, 0x000014, CRC(eee6b2a8) SHA1(d97e2da6b48f0ebdfdf54a10614b6fd505b75def) )
+ROM_END
+
+
+ROM_START( progearu )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "pgau.03", 0x000000, 0x80000, CRC(343a783e) SHA1(7ba8ae041b062767bf64328adf22ef100c38cdfd) )
 	ROM_LOAD16_WORD_SWAP( "pgau.04", 0x080000, 0x80000, CRC(16208d79) SHA1(c477de7f31df44144a60d10dc4d933f3a7c20722) )
 
@@ -6510,7 +6540,7 @@ ROM_START( progear )
 	ROM_LOAD16_WORD_SWAP( "pga-simm.06b",   0x600000, 0x200000, CRC(8b39489a) SHA1(fd790efaf37dc2c4c16f657941044e3e2d3c2711) ) // ROM on a SIMM
 
 	ROM_REGION( 0x20, "key", 0 )
-	ROM_LOAD( "progear.key",  0x000000, 0x000014, CRC(46736b17) SHA1(3fd0cc78fad80210a7cf8b1150cba1e6121998dd) )
+	ROM_LOAD( "progearu.key",  0x000000, 0x000014, CRC(46736b17) SHA1(3fd0cc78fad80210a7cf8b1150cba1e6121998dd) )
 ROM_END
 
 ROM_START( progearj )
@@ -12852,7 +12882,8 @@ GAME( 2000, 1944u,      1944,     cps2, cps2_2p2b, cps2_state, init_cps2,     RO
 
 // Games released on CPS-2 hardware by Cave
 
-GAME( 2001, progear,    0,        cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (USA 010117)",             MACHINE_SUPPORTS_SAVE )
+GAME( 2001, progear,    0,        cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (Europe 010117)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, progearu,   progear,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (USA 010117)",             MACHINE_SUPPORTS_SAVE )
 GAME( 2001, progearj,   progear,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear no Arashi (Japan 010117)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, progeara,   progear,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (Asia 010117)",            MACHINE_SUPPORTS_SAVE )
 

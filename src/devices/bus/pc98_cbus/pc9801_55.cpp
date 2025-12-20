@@ -7,8 +7,18 @@ NEC PC-9801-55/-55U/-55L
 SCSI interface, running on WD33C93A
 HDDs apparently needs to be with 8 heads and 25 cylinders only
 
+https://www7b.biglobe.ne.jp/~drachen6jp/98scsi.html
+
 TODO:
-- Requires C-Bus root implementation for DMA DACK to work;
+- hangs on wdc core with a Negate ACK command when not initiator (cfr. issue #14532);
+- Wants to read "NEC" around PC=dc632, currently reads " SE" (from nscsi/hd.cpp " SEAGATE" inquiry)
+\- Wants specifically -ss 256 in chdman, DOS will throw a "run-time error R6003 otherwise".
+\- Should really require a nscsi/hd.cpp subclass, seems to detect 130 MB hdd from mode sense 6 pages
+   no matter the actual HDD options ...
+- Throws Unhandled command LOCATE/POSITION_TO_ELEMENT/SEEK_10 (10): 2b 00 ff ff ff ff 00 00 00 00
+  (non fatal?)
+- Manages to install msdos622 after all above but doesn't mark HDD as bootable;
+- Sometimes BIOS fails to boot entirely, why?
 - PC-9801-55 also runs on this except with vanilla WD33C93 instead;
 
 **************************************************************************************************/
@@ -16,16 +26,17 @@ TODO:
 #include "emu.h"
 #include "pc9801_55.h"
 
-DEFINE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device, "pc9801_55u", "NEC PC-9801-55U")
-DEFINE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device, "pc9801_55l", "NEC PC-9801-55L")
+DEFINE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device, "pc9801_55u", "NEC PC-9801-55U SCSI interface")
+DEFINE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device, "pc9801_55l", "NEC PC-9801-55L SCSI interface")
 
 pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_scsi_bus(*this, "scsi")
 	, m_wdc(*this, "scsi:7:wdc")
-	, m_space_io_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55_device::internal_map), this))
+//  , m_space_io_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, amap)
+	, m_bios(*this, "bios")
 	, m_dsw1(*this, "DSW1")
 	, m_dsw2(*this, "DSW2")
 {
@@ -34,18 +45,19 @@ pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type ty
 pc9801_55u_device::pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_55_device(mconfig, PC9801_55U, tag, owner, clock)
 {
+	m_space_io_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55u_device::internal_map), this));
 
 }
 
 pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_55_device(mconfig, PC9801_55L, tag, owner, clock)
 {
-
+	m_space_io_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55l_device::internal_map), this));
 }
 
 
 ROM_START( pc9801_55u )
-	ROM_REGION16_LE( 0x10000, "scsi_bios", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	// JNC2B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	// JNC3B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	ROM_LOAD16_BYTE( "jnc2b_00.bin", 0x000000, 0x008000, CRC(ddace1b7) SHA1(614569be28a90bd385cf8abc193e629e568125b7) )
@@ -58,7 +70,7 @@ const tiny_rom_entry *pc9801_55u_device::device_rom_region() const
 }
 
 ROM_START( pc9801_55l )
-	ROM_REGION16_LE( 0x10000, "scsi_bios", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	// ETA1B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	// ETA3B_00.BIN                                    BADADDR         ---xxxxxxxxxxxx
 	ROM_LOAD16_BYTE( "eta1b_00.bin", 0x000000, 0x008000, CRC(300ff6c1) SHA1(6cdee535b77535fe6c4dda4427aeb803fcdea0b8) )
@@ -72,43 +84,57 @@ const tiny_rom_entry *pc9801_55l_device::device_rom_region() const
 
 void pc9801_55_device::scsi_irq_w(int state)
 {
-	m_bus->int_w<3>(BIT(m_port30, 2) && state);
+	m_bus->int_w(m_int_line, BIT(m_port30, 2) && state);
 }
 
 void pc9801_55_device::scsi_drq_w(int state)
 {
-	// TODO: needs a C-Bus root
-//	m_bus->drq_w<0>(state);
+	m_bus->drq_w(0, state);
 }
 
-//u8 pc9801_55_device::dma_r()
-//{
-//	return m_wdc->dma_r();
-//}
-//
-//void pc9801_55_device::dma_w(u8 data)
-//{
-//	m_wdc->dma_w(data);
-//}
+u8 pc9801_55_device::dack_r(int line)
+{
+	//if (!m_dma_enable)
+	//  return 0xff;
+	const u8 res = m_wdc->dma_r();
+	return res;
+}
+
+void pc9801_55_device::dack_w(int line, u8 data)
+{
+	//if (!m_dma_enable)
+	//  return;
+
+	m_wdc->dma_w(data);
+}
+
+// opt-in, works with specific options only
+static void pc98_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_PC98_HD);
+	// TODO: at least a CD-ROM option
+}
 
 
 void pc9801_55_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsi_bus);
 	// TODO: currently returning default_scsi_devices, checkout if true for PC-98
-	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:1", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", pc98_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", pc98_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("wdc", WD33C93A).machine_config(
 		[this](device_t *device)
 		{
 			wd33c9x_base_device &adapter = downcast<wd33c9x_base_device &>(*device);
 
-			// TODO: unknown clock
+			// 33C93 @ 8 MHz
+			// 33C93A @ 10 MHz
+			// 33C93B @ 20 MHz
 			adapter.set_clock(10'000'000);
 			adapter.irq_cb().set(*this, FUNC(pc9801_55_device::scsi_irq_w));
 			adapter.drq_cb().set(*this, FUNC(pc9801_55_device::scsi_drq_w));
@@ -169,7 +195,7 @@ ioport_constructor pc9801_55_device::device_input_ports() const
 device_memory_interface::space_config_vector pc9801_55_device::memory_space_config() const
 {
 	return space_config_vector{
-		std::make_pair(AS_IO, &m_space_io_config)
+		std::make_pair(0, &m_space_io_config)
 	};
 }
 
@@ -185,6 +211,8 @@ void pc9801_55_device::device_start()
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_pkg_id));
 	save_item(NAME(m_dma_enable));
+
+	m_bus->set_dma_channel(0, this, false);
 }
 
 
@@ -194,9 +222,9 @@ void pc9801_55_device::device_start()
 
 void pc9801_55_device::device_reset()
 {
+	m_int_line = 3;
+
 	m_rom_bank = 0;
-	flush_rom_bank();
-	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_55_device::io_map);
 
 	m_pkg_id = 0xfd;
 	m_port30 = 0x00;
@@ -204,13 +232,33 @@ void pc9801_55_device::device_reset()
 	m_dma_enable = false;
 }
 
-void pc9801_55_device::flush_rom_bank()
+void pc9801_55_device::remap(int space_id, offs_t start, offs_t end)
 {
-	m_bus->program_space().install_rom(
-		0xdc000,
-		0xdcfff,
-		memregion(this->subtag("scsi_bios").c_str())->base() + m_rom_bank * 0x1000
-	);
+	if (space_id == AS_PROGRAM)
+	{
+		// TODO: move base to device_reset
+		// incredibly verbose for LHA-201
+		// logerror("map ROM at 0x000dc000-0x000dcfff (bank %d)\n", m_rom_bank);
+		m_bus->space(AS_PROGRAM).install_rom(
+			0xdc000,
+			0xdcfff,
+			m_bios->base() + m_rom_bank * 0x1000
+		);
+	}
+	else if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_55_device::io_map);
+	}
+}
+
+// required by MS-DOS to actually detect the disk size for format.
+// Mimic wd33c9x core here
+void pc9801_55_device::increment_addr()
+{
+	if (machine().side_effects_disabled()) return;
+
+	if (m_ar <= 0x19)
+		m_ar ++;
 }
 
 void pc9801_55_device::io_map(address_map &map)
@@ -221,10 +269,13 @@ void pc9801_55_device::io_map(address_map &map)
 	);
 	map(0x0cc2, 0x0cc2).lrw8(
 		NAME([this] (offs_t offset) {
-			return space(AS_IO).read_byte(m_ar);
+			const u8 reg = m_ar;
+			increment_addr();
+			return space(0).read_byte(reg);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			space(AS_IO).write_byte(m_ar, data);
+			space(0).write_byte(m_ar, data);
+			increment_addr();
 		})
 	);
 	map(0x0cc4, 0x0cc4).lrw8(
@@ -259,19 +310,25 @@ void pc9801_55_device::internal_map(address_map &map)
 	// xx-- ---- ROM bank
 	// ---- x--- MEM1 allow memory access (DMA?)
 	// ---- -x-- IRE1 allow interrupts
-	// ---- --x- WRS1 SCSI bus RST (active low)
+	// ---- --x- WRS1 SCSI bus RST (1 -> 0)
 	map(0x30, 0x30).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_port30;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			logerror("$30 Memory Bank %02x\n", data);
-			m_wdc->reset_w(!BIT(data, 1));
+			if ((m_port30 & 0x3f) != (data & 0x3f))
+				logerror("$30 Memory Bank %02x\n", data);
+
+			if (BIT(m_port30, 1) && !(BIT(data, 1)))
+			{
+				m_wdc->reset_w(1);
+				m_wdc->reset_w(0);
+			}
 
 			if ((data & 0xc0) != (m_port30 & 0xc0))
 			{
 				m_rom_bank = data >> 6;
-				flush_rom_bank();
+				remap(AS_PROGRAM, 0xc0000, 0xdffff);
 			}
 			m_port30 = data;
 		})
@@ -302,3 +359,5 @@ void pc9801_55_device::internal_map(address_map &map)
 		})
 	);
 }
+
+

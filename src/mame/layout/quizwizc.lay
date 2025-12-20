@@ -33,7 +33,7 @@ authors:hap
 	<view name="Internal Layout">
 		<bounds left="4" right="29" top="4" bottom="29" />
 
-		<element ref="text_qw"><bounds x="4.5" y="19.5" width="9" height="2.25" /></element>
+		<element ref="text_qw"><bounds x="4.5" y="19.5" width="8" height="2.25" /></element>
 		<element ref="text_ch"><bounds x="4.5" y="21.5" width="8" height="2.25" /></element>
 
 		<element name="digit6" ref="digit"><bounds x="5.5" y="25" width="1.5" height="2.25" /></element>

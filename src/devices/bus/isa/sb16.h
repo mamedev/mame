@@ -7,6 +7,7 @@
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/i80c52.h"
+#include "machine/input_merger.h"
 #include "sound/ct1745.h"
 #include "sound/dac.h"
 #include "sound/ymopl.h"
@@ -37,6 +38,7 @@ protected:
 	uint16_t dack16_r(int line) override;
 	void dack16_w(int line, uint16_t data) override;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
 	uint8_t mpu401_r(offs_t offset);
 	void mpu401_w(offs_t offset, uint8_t data);
@@ -85,13 +87,15 @@ private:
 	void sb16_data(address_map &map) ATTR_COLD;
 	void host_io(address_map &map) ATTR_COLD;
 
-	void control_timer(bool start);
+	void control_timer();
 
 	TIMER_CALLBACK_MEMBER(timer_tick);
 
+	required_device<ymf262_device> m_opl3;
 	required_device<ct1745_mixer_device> m_mixer;
 	required_device<dac_16bit_r2r_device> m_ldac;
 	required_device<dac_16bit_r2r_device> m_rdac;
+	required_device<input_merger_device> m_irqs;
 	required_device<pc_joy_device> m_joy;
 	required_device<i80c52_device> m_cpu;
 

@@ -512,7 +512,7 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout (LCD H)">
-		<bounds left="-13" right="111.5" top="0.5" bottom="93" />
+		<bounds left="-13" right="112" top="0.5" bottom="93" />
 		<group ref="common"><bounds left="-13" right="111.5" top="0.5" bottom="93" /></group>
 
 		<!-- lcd panels (actually they're above eachother instead of side by side, but it looks better this way) -->
@@ -524,11 +524,11 @@ authors:hap
 	</view>
 
 	<view name="Internal Layout (LCD V)">
-		<bounds left="-13" right="111.5" top="0.5" bottom="98.75" />
+		<bounds left="-13" right="112" top="0.5" bottom="98.75" />
 		<group ref="common"><bounds left="-13" right="111.5" top="0.5" bottom="93" /></group>
 
 		<!-- lcd panels -->
-		<element ref="brown"><bounds x="-0.5" y="87" width="112" height="11.75" /></element>
+		<element ref="brown"><bounds x="-0.5" y="87" width="112.5" height="11.75" /></element>
 		<element ref="blackb"><bounds xc="88.9" y="86.5" width="11" height="15" /></element>
 
 		<element ref="text_black"><bounds xc="88.9" y="86.8" width="5" height="1.5" /></element>

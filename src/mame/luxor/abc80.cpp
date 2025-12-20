@@ -20,7 +20,7 @@ PCB Layout
 |                                                   |-------|                          |
 |   |-----CN6-----|   LS241   LS241    LS138  LS32  |SN76477| LS04    LM339            |
 |                                                   |-------|                          |
-|   |--------------|  |------------|   PROM0  LS132   LS273   7406             LS08    |
+|   |--------------|  |------------|   PROM0  LS132   LS273   7406    XTAL     LS08    |
 |   |   Z80A PIO   |  |    Z80A    |                                                   |
 |   |--------------|  |------------|   LS04   LS74A   LS86    LS161   LS166    74393   |
 |                                                                                      |
@@ -49,6 +49,7 @@ Notes:
     74S263  - Texas Instruments SN74S263N Row Output Character Generator
     MC1488  - Texas Instruments MC1488 Quadruple Line Driver
     MC1489  - Texas Instruments MC1489 Quadruple Line Receiver
+	XTAL    - 11.9808 MHz Crystal
     CN1     - RS-232 connector
     CN2     - ABC bus connector (DIN 41612)
     CN3     - video connector
@@ -72,6 +73,59 @@ RUN
 
 /*
 
+Luxor ABC 80 with ABC80L
+
+PCB Layout
+----------
+
+CATAB-80:1718
+
+          CN1               CN2                                                CN5
+  SW1   |-----|  |------------------------|                                  |-----|
+|-------|     |--|                        |----------------------------------|     |---|
+|                                                             CN3       CN4            |
+|                                                    7912                              |
+|            MC1488                                                                    |
+|   MC1489                                           7812                              |
+|            LS245                     LS138                                           |
+|                 |-------------------------------------------------|                  |
+|   |-----CN6-----|                                                 | LM339            |
+|                 |   |------------|                                |                  |
+|   |-------------|   |    Z80A    |	LS266 LS04 LS00 LS10 LS03   | XTAL     LS08    |
+|   |   Z80A PIO  |   |------------|                                |                  |
+|   |-------------|                                                 | LS166    74393   |
+|                 |                                                 |                  |
+|     ROM0   LS107|   LS367       RAM RAM RAM RAM       LS125 LS74  | LS107    PROM2   |
+|                 |        LS157    RAM RAM RAM RAM     LS139 LS74  |                  |
+|     ROM2   LS257|   ROM                                           | LS175    74393   |
+|                 |        LS157  *   *   *   *                     |                  |
+|     ROM1   LS257|                 *   *   *   *                   | PROM1    74393   |
+|                 |-------------------------------------------------|                  |
+|     ROM3   LS257    4116    4116     LS257  74393   LS375   74S263  LS145    PROM4   |
+|                                                                                      |
+|     SB1    SB2      4045    4045     LS257  LS245   LS375   LS273   LS166    PROM3   |
+|--------------------------------------------------------------------------------------|
+
+Notes:
+    All IC's shown.
+
+	ROM     - Mostek MK2716J-B 2Kx8 EPROM "L3.0"
+	RAM     - Mostek MK4116J-3 16Kx1 Dynamic RAM
+	*       - Empty footprints for additional RAM chips
+
+
+Activation:
+
+;CALL(20480)
+
+New BASIC commands:
+
+IPR, EXIT, CAT, DEL, LIST, RUN, VAR, CROSS, LEN, FREE, BOFA, EOFA, CONT, AUTO, ED, <Ctrl-L>
+
+*/
+
+/*
+
 Luxor ABC 80 with TKN 80
 
 PCB Layout
@@ -90,7 +144,7 @@ PCB Layout
 |                                                   |-------|                          |
 |   |-----CN6-----|   LS241   LS241    LS138  LS32  |SN76477| LS04    LM339            |
 |                                                   |-------|                          |
-|   |--------------|  |------------|   PROM0  LS132   LS273   7406             LS08    |
+|   |--------------|  |------------|   PROM0  LS132   LS273   7406    XTAL     LS08    |
 |   |   Z80A PIO   |  |    Z80A    |                                                   |
 |   |--------------|  |------------|   LS04   LS74A   LS86    LS161   LS166    74393   |
 |                                                                                      |
@@ -188,6 +242,22 @@ u8 abc80_state::read(offs_t offset)
 	return data;
 }
 
+u8 abc80l_state::read(offs_t offset)
+{
+	u8 data = abc80_state::read(offset);
+
+	if (offset >= 0x5000 && offset < 0x5800)
+	{
+		data = m_rom_5000->base()[offset & 0x7ff];
+	}
+	else if (offset >= 0x8000 && offset < 0xc000)
+	{
+		data = m_ram[offset & 0x3fff];
+	}
+
+	return data;
+}
+
 u8 tkn80_state::read(offs_t offset)
 {
 	/*
@@ -267,6 +337,18 @@ void abc80_state::write(offs_t offset, u8 data)
 	}
 }
 
+void abc80l_state::write(offs_t offset, u8 data)
+{
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		m_ram[offset & 0x3fff] = data;
+	}
+	else
+	{
+		abc80_state::write(offset, data);
+	}
+}
+
 void tkn80_state::write(offs_t offset, u8 data)
 {
 	u8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
@@ -325,6 +407,17 @@ void abc80_state::abc80_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xffff).rw(FUNC(abc80_state::read), FUNC(abc80_state::write));
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( abc80l_mem )
+//-------------------------------------------------
+
+void abc80l_state::abc80l_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(FUNC(abc80l_state::read), FUNC(abc80l_state::write));
 }
 
 
@@ -760,6 +853,19 @@ void abc80_state::abc80(machine_config &config)
 
 
 //-------------------------------------------------
+//  machine_config( abc80l )
+//-------------------------------------------------
+
+void abc80l_state::abc80l(machine_config &config)
+{
+	abc80_state::abc80_common(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc80l_state::abc80l_mem);
+}
+
+
+//-------------------------------------------------
 //  machine_config( tkn80 )
 //-------------------------------------------------
 
@@ -821,6 +927,51 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( abc80l )
+//-------------------------------------------------
+
+ROM_START( abc80l )
+	ROM_REGION( 0x4000, Z80_TAG, 0 )
+	ROM_DEFAULT_BIOS("9913")
+	ROM_SYSTEM_BIOS( 0, "11273", "Checksum 11273" )
+	ROMX_LOAD( "za3506_11273.a5", 0x0000, 0x1000, CRC(7c004fb6) SHA1(9aee1d085122f4537c3e6ecdab9d799bd429ef52), ROM_BIOS(0) )
+	ROMX_LOAD( "za3507_11273.a3", 0x1000, 0x1000, CRC(d1850a84) SHA1(f7719f3af9173601a2aa23ae38ae00de1a387ad8), ROM_BIOS(0) )
+	ROMX_LOAD( "za3508_11273.a4", 0x2000, 0x1000, CRC(b55528e9) SHA1(3e5017e8cacad1f13215242f1bbd89d1d3eee131), ROM_BIOS(0) )
+	ROMX_LOAD( "za3509_11273.a2", 0x3000, 0x1000, CRC(659cab1e) SHA1(181db748cef22cdcccd311a60aa6189c85343db7), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "10042", "Checksum 10042" )
+	ROMX_LOAD( "za3506_9913.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(1) )
+	ROMX_LOAD( "za3507_9913.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(1) )
+	ROMX_LOAD( "za3508_9913.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(1) )
+	ROMX_LOAD( "za3509_10042.a2", 0x3000, 0x1000, CRC(346f0cdb) SHA1(4262137cff9dfc82c5bd5727994ed5f9b7d22395), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "9913", "Checksum 9913" )
+	ROMX_LOAD( "za3506_9913.a5", 0x0000, 0x1000, CRC(e2afbf48) SHA1(9883396edd334835a844dcaa792d29599a8c67b9), ROM_BIOS(2) )
+	ROMX_LOAD( "za3507_9913.a3", 0x1000, 0x1000, CRC(d224412a) SHA1(30968054bba7c2aecb4d54864b75a446c1b8fdb1), ROM_BIOS(2) )
+	ROMX_LOAD( "za3508_9913.a4", 0x2000, 0x1000, CRC(1502ba5b) SHA1(5df45909c2c4296e5701c6c99dfaa9b10b3a729b), ROM_BIOS(2) )
+	ROMX_LOAD( "za3509_9913.a2", 0x3000, 0x1000, CRC(bc8860b7) SHA1(28b6cf7f5a4f81e017c2af091c3719657f981710), ROM_BIOS(2) )
+
+	ROM_REGION( 0x100, "hsync", 0 )
+	ROM_LOAD( "abc80_11.k5", 0x0000, 0x0100, CRC(e4f7e018) SHA1(63e718a39537f37286ea183e6469808c271dbfa5) ) // "64 40029-01" 82S129 256x4 horizontal sync
+
+	ROM_REGION( 0x200, "vsync", 0 )
+	ROM_LOAD( "abc80_21.k2", 0x0000, 0x0200, CRC(445a45b9) SHA1(bcc1c4fafe68b3500b03de785ca32abd63cea252) ) // "64 40030-01" 82S131 512x4 vertical sync
+
+	ROM_REGION( 0x100, "attr", 0 )
+	ROM_LOAD( "abc80_12.j3", 0x0000, 0x0100, CRC(6c46811c) SHA1(2d3bdf2d3a2a88ddb1c0c637967e1b2b9541a928) ) // "64 40056-01" 82S129 256x4 attribute
+
+	ROM_REGION( 0x200, "line", 0 )
+	ROM_LOAD( "abc80_22.k1", 0x0000, 0x0200, CRC(74de7a0b) SHA1(96f37b0ca65aa8af4242bad38124f410b7f657fe) ) // "64 40058-01" 82S131 512x4 chargen 74S263 row address
+
+	ROM_REGION( 0x100, "mmu", 0 )
+	ROM_LOAD( "abc80_13.e7", 0x0000, 0x0100, CRC(f7738834) SHA1(b02df3e678fb50c9cb75b4a97615222d3b4577a3) ) // "64 40057-01" 82S129 256x4 address decoder
+
+	ROM_REGION( 0x800, "abc80l", 0 )
+	ROM_LOAD( "l",    0x000, 0x800, CRC(3389c97c) SHA1(8fc0119286755f250d8f689dc330379f1325e6e1) )
+	ROM_LOAD( "l2.0", 0x000, 0x800, CRC(4b943785) SHA1(a10812294e6aa6051d40c87053362d3bbebed139) )
+	ROM_LOAD( "l3.0", 0x000, 0x800, CRC(e25f14e4) SHA1(07ffbc1e9374e232f0dd9ff7ca49dd87aef6e915) ) // v2.1
+ROM_END
+
+
+//-------------------------------------------------
 //  ROM( tkn80 )
 //-------------------------------------------------
 
@@ -868,6 +1019,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME             FLAGS
-COMP( 1978, abc80, 0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80",            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-COMP( 198?, tkn80, abc80,  0,      tkn80,   tkn80, tkn80_state,  empty_init, "MYAB",             "ABC 80 with TKN80", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY             FULLNAME             FLAGS
+COMP( 1978, abc80,  0,      0,      abc80,   0,     abc80_state,  empty_init, "Luxor Datorer AB", "ABC 80",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 1981, abc80l, abc80,  0,      abc80,   0,     abc80l_state, empty_init, "Cat AB",           "ABC 80 with ABC80L", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+COMP( 198?, tkn80,  abc80,  0,      tkn80,   tkn80, tkn80_state,  empty_init, "MYAB",             "ABC 80 with TKN80",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

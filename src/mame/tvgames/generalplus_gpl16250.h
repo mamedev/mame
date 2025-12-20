@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "generalplus_gpl16250_m.h"
-
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "machine/generalplus_gpl951xx_soc.h"
@@ -17,21 +15,22 @@
 
 
 
-class gcm394_game_state : public driver_device
+class gcm394_game_state : public driver_device, public device_memory_interface
 {
 public:
 	gcm394_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
+		device_memory_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_io(*this, "IN%u", 0U),
 		m_romregion(*this, "maincpu"),
-		m_memory(*this, "memory")
+		m_full_mem_config("external", ENDIANNESS_BIG, 16, 32, -1)
 	{
 	}
 
-	void base(machine_config &config);
-	void base_alt_irq(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
+	void base_alt_irq(machine_config &config) ATTR_COLD;
 
 	void cs_map_base(address_map &map) ATTR_COLD;
 
@@ -52,133 +51,26 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-
-	required_device<sunplus_gcm394_base_device> m_maincpu;
-	required_device<screen_device> m_screen;
-
-
-	required_ioport_array<3> m_io;
-
-
-	optional_region_ptr<uint16_t> m_romregion;
-	required_device<full_memory_device> m_memory;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 	virtual uint16_t porta_r();
 	virtual uint16_t portb_r();
 	virtual uint16_t portc_r();
 	virtual void porta_w(uint16_t data);
 
-	virtual uint16_t read_external_space(offs_t offset);
-	virtual void write_external_space(offs_t offset, uint16_t data);
+	virtual uint16_t read_external_space(offs_t offset) { return m_memory.read_word(offset); }
+	virtual void write_external_space(offs_t offset, uint16_t data) { m_memory.write_word(offset, data); }
 
-private:
+	memory_access<32, 1, -1, ENDIANNESS_BIG>::specific m_memory;
+
+	required_device<sunplus_gcm394_base_device> m_maincpu;
+	required_device<screen_device> m_screen;
+
+	required_ioport_array<3> m_io;
+
+	optional_region_ptr<uint16_t> m_romregion;
+
+	const address_space_config m_full_mem_config;
 };
-
-
-
-
-class tkmag220_game_state : public gcm394_game_state
-{
-public:
-	tkmag220_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	void tkmag220(machine_config &config);
-
-protected:
-
-	virtual void machine_reset() override ATTR_COLD;
-
-private:
-	int m_upperbase = 0;
-
-	virtual uint16_t cs0_r(offs_t offset) override;
-
-	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-};
-
-
-class gormiti_game_state : public gcm394_game_state
-{
-public:
-	gormiti_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-
-protected:
-
-	virtual void machine_reset() override ATTR_COLD;
-
-private:
-};
-
-class beijuehh_game_state : public gcm394_game_state
-{
-public:
-	beijuehh_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	void beijuehh(machine_config &config);
-
-protected:
-
-	virtual void machine_reset() override ATTR_COLD;
-
-private:
-	int m_upperbase = 0;
-
-	virtual uint16_t cs0_r(offs_t offset) override;
-
-	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	uint16_t m_portb_data = 0U;
-	uint16_t m_portd_data = 0U;
-	uint8_t m_bank = 0U;
-};
-
-
-class gameu_handheld_game_state : public gcm394_game_state
-{
-public:
-	gameu_handheld_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-		gcm394_game_state(mconfig, type, tag)
-	{
-	}
-
-	virtual uint16_t cs0_r(offs_t offset) override;
-
-	void gameu(machine_config &config);
-
-	void init_gameu();
-	void init_gameu50();
-	void init_gameu108();
-
-protected:
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-private:
-	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void decrypt_gameu();
-
-	uint32_t m_upperbase;
-	uint16_t m_porta_data;
-	uint16_t m_portb_data;
-	uint16_t m_portc_data;
-	uint16_t m_portd_data;
-};
-
 
 #endif // MAME_TVGAMES_GENERALPLUS_GPL16250_H

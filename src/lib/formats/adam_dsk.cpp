@@ -18,16 +18,16 @@
     permutation of the sectors to transform their native interleave to or
     from the non-native interleave.
 
-	Track description for 160KB SSDD format:
-	100x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	100x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	100x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	100x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	100x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	100x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	100x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	100x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
-	859x4e
+    Track description for 160KB SSDD format:
+    100x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    100x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    100x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    100x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    100x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    100x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    100x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    100x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512xe5 f7
+    859x4e
 
 ***************************************************************************/
 
@@ -199,7 +199,8 @@ bool adam_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			sector_desc[sector].actual_size = 512;
 			sector_desc[sector].data = &track_data[uint32_t(sector) * 512];
 			sector_desc[sector].deleted = false;
-			sector_desc[sector].bad_crc = false;
+			sector_desc[sector].bad_data_crc = false;
+			sector_desc[sector].bad_addr_crc = false;
 		}
 
 		// For double-sided 5.25" images, read one side after the other
@@ -236,7 +237,8 @@ bool adam_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			sector_desc[sector].actual_size = 512;
 			sector_desc[sector].data = &track_data[uint32_t(i) * 512];
 			sector_desc[sector].deleted = false;
-			sector_desc[sector].bad_crc = false;
+			sector_desc[sector].bad_data_crc = false;
+			sector_desc[sector].bad_addr_crc = false;
 		}
 
 		// For 3.5" images, tracks are interleaved between sides

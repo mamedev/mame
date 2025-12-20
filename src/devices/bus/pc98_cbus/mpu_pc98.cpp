@@ -32,7 +32,7 @@ DIP-SWs
 
 void mpu_pc98_device::mpu_irq_out(int state)
 {
-	m_bus->int_w<2>(state);
+	m_bus->int_w(2, state);
 }
 
 //**************************************************************************
@@ -57,7 +57,7 @@ void mpu_pc98_device::device_add_mconfig(machine_config &config)
 
 mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MPU_PC98, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_mpu401(*this, MPU_CORE_TAG)
 {
 }
@@ -76,7 +76,14 @@ void mpu_pc98_device::device_start()
 
 void mpu_pc98_device::device_reset()
 {
-	m_bus->install_device(0x0000, 0xffff, *this, &mpu_pc98_device::io_map);
+}
+
+void mpu_pc98_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0xffff, *this, &mpu_pc98_device::io_map);
+	}
 }
 
 void mpu_pc98_device::io_map(address_map &map)

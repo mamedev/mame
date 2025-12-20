@@ -409,14 +409,14 @@ authors:hap
 		<element ref="blackl"><bounds x="3.5" y="86.5" width="4.25" height="0.3" /></element>
 		<element ref="blackl"><bounds x="79.25" y="86.5" width="4.25" height="0.3" /></element>
 
-		<element ref="text_b2"><bounds x="7.85" y="87" width="11.3" height="2" /></element>
+		<element ref="text_b2"><bounds x="9" y="87" width="9" height="2" /></element>
 		<element ref="text_b31"><bounds x="19.25" y="87" width="8.5" height="2" /></element>
 		<element ref="text_b32"><bounds x="19.25" y="89.01" width="8.5" height="2" /></element>
 		<element ref="text_b41"><bounds x="29.25" y="87" width="8.5" height="2" /></element>
 		<element ref="text_b42"><bounds x="29.25" y="89.01" width="8.5" height="2" /></element>
 		<element ref="text_b61"><bounds x="49.25" y="87" width="8.5" height="2" /></element>
 		<element ref="text_b62"><bounds x="49.25" y="89.01" width="8.5" height="2" /></element>
-		<element ref="text_b5"><bounds x="37.75" y="87" width="12" height="2" /></element>
+		<element ref="text_b5"><bounds x="39" y="87" width="9" height="2" /></element>
 		<element ref="text_b7"><bounds x="59.25" y="87" width="8.5" height="2" /></element>
 		<element ref="text_b8"><bounds x="69.25" y="87" width="8.5" height="2" /></element>
 

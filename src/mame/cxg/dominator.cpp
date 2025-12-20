@@ -10,7 +10,7 @@ Hold Pawn + Knight buttons at boot for test mode, it will tell the version numbe
 This engine was also used in the newer Mephisto Modena.
 
 Hardware notes:
-- R65C02P4 @ 4MHz
+- R65C02P4 or G65SC02P-4 @ 4MHz
 - 32KB ROM, 8KB RAM battery-backed
 - Sanyo LC7582, 2 LCD panels (each 4-digit, some unused segments)
 - TTL, piezo, 8*8+8 LEDs, button sensors

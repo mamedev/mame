@@ -57,9 +57,10 @@ To enter input test, keep '9' pressed and press 'F3'.
 
 TODO:
 - correct / complete CPU decryption table. Most games run for a while before getting stuck.
-  dynastye is the exception. It's a very early game which seems to use a rather different
-  codebase and trips on not yet decrypted opcodes almost immediately;
-- the DC3001 GFX custom is suspected to have internal ROM (seems used by scherrym and clones);
+  bsb, crzybell and dynastye are exceptions. They have a rather different codebase and trip
+  on not yet decrypted opcodes almost immediately;
+- the DC3001 GFX custom is suspected to have internal ROM (seems used by scherrym and clones
+  and possibly by pdouble8 for the reels;
 - dynastye doesn't seem to have the DC3001 GFX custom or at least uses a different GFX format;
 - all games will need proper i/o once they fully work.
 
@@ -146,6 +147,7 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 };
 
+// TODO: 0x3a, 0x3d, 0x43, 0x74 and 0x89 appear 2 times in the table below
 
 #define xxxx 0x90 // Unknown
 
@@ -1800,6 +1802,20 @@ ROM_START( pdouble8 ) // DYNA D9304 PCB; DYNA SCM V5.3FA 1993 in bookkeeping scr
 	ROM_LOAD( "82s135.2d", 0x100, 0x100, CRC(43b5fe34) SHA1(81fd9767443f04a96b2eb879a20168cd5de83004) )
 ROM_END
 
+ROM_START( bsbonanza ) // DYNA D9902 PCB; DYNA DYNA BSB  V1.1G in bookkeeping screen. Has no DIPs and no PROMs.
+	ROM_REGION16_LE( 0x40000, "boot_prg", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD( "bsb_11g.4c", 0x00000, 0x40000, CRC(6d58b5db) SHA1(ed4f44ecdd66efc433d956f4c571492affa77ff3) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )
+	ROM_LOAD16_BYTE( "bsb_1d.12e", 0x00000, 0x40000, CRC(bb74f46c) SHA1(7a969df9adf28c1fa747e553b6cda99cc866ee0c) )
+	// 11e not populated
+	ROM_LOAD16_BYTE( "bsb_3g.9e",  0x00001, 0x40000, CRC(30e2065e) SHA1(6ada4b4c2ff84f1213ced0ce3603c90d7b17c43e) )
+	// 7e not populated
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 )
+	// no PROMs on PCB
+ROM_END
+
 
 void cb2001_state::init_smaller_proms()
 {
@@ -1841,3 +1857,4 @@ GAME( 1998, tripjack07,   tripjack,  scherrymp, scherrymp, cb2001_state, init_sm
 GAME( 1995, crzybell,     0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "Crazy Bell (V1.2D)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, nmondop,      0,         cb2001,    cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna",                  "New Mondo Plus (V0.6I)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, pdouble8 ,    0,         scherrym,  cb2001,    cb2001_state, init_smaller_proms, ROT0, "Dyna & MK Electronics", "Premium Double Eight (V5.3FA)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, bsbonanza,    0,         scherrym,  cb2001,    cb2001_state, empty_init,         ROT0, "Dyna",                  "Bonus Spin Bonanza (V1.1G)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

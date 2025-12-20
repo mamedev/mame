@@ -922,19 +922,19 @@
 		<!-- ROW 1 -->
 		<!-- Drum Pad 13 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="360" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x10">
+		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x80">
 			<bounds x="235" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-13"><bounds x="240" y="285" width="480" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drum Pad 14 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="360" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x20">
+		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x80">
 			<bounds x="825" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-14"><bounds x="830" y="285" width="460" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 15 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="360" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x40">
+		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x80">
 			<bounds x="1415" y="375" width="460" height="460" />
 		</element>
 		<element ref="drum-label-15"><bounds x="1420" y="285" width="460" height="75" /><color red="0" green="0" blue="0" /></element>
@@ -947,13 +947,13 @@
 		<!-- ROW 2 -->
 		<!-- Drumpad 9 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="950" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x10">
+		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x40">
 			<bounds x="235" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-9"><bounds x="240" y="875" width="480" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 10 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="950" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x20">
+		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x40">
 			<bounds x="825" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-10"><bounds x="830" y="875" width="460" height="75" /><color red="0" green="0" blue="0" /></element>
@@ -965,14 +965,14 @@
 		<element ref="drum-label-11"><bounds x="1420" y="875" width="460" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 12 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="950" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x80">
+		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x40">
 			<bounds x="2005" y="965" width="460" height="460" />
 		</element>
 		<element ref="drum-label-12"><bounds x="2010" y="875" width="470" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- ROW 3 -->
 		<!-- Drumpad 5 -->
 		<element ref="drumpad-black-outline1"><bounds x="220" y="1540" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x10">
+		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x20">
 			<bounds x="235" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-5"><bounds x="240" y="1465" width="470" height="75" /><color red="0" green="0" blue="0" /></element>
@@ -984,13 +984,13 @@
 		<element ref="drum-label-6"><bounds x="830" y="1465" width="460" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 7 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="1540" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x40">
+		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x20">
 			<bounds x="1415" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-7"><bounds x="1420" y="1465" width="470" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 8 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="1540" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x80">
+		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x20">
 			<bounds x="2005" y="1555" width="460" height="460" />
 		</element>
 		<element ref="drum-label-8"><bounds x="2010" y="1465" width="470" height="75" /><color red="0" green="0" blue="0" /></element>
@@ -1003,19 +1003,19 @@
 		<element ref="drum-label-1"><bounds x="240" y="2055" width="470" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 2 -->
 		<element ref="drumpad-black-outline1"><bounds x="810" y="2130" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x20">
+		<element ref="drumpad-grey1" inputtag="PB2" inputmask="0x10">
 			<bounds x="825" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-2"><bounds x="830" y="2055" width="460" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 3 -->
 		<element ref="drumpad-black-outline1"><bounds x="1400" y="2130" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x40">
+		<element ref="drumpad-grey1" inputtag="PB1" inputmask="0x10">
 			<bounds x="1415" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-3"><bounds x="1420" y="2055" width="460" height="75" /><color red="0" green="0" blue="0" /></element>
 		<!-- Drumpad 4 -->
 		<element ref="drumpad-black-outline1"><bounds x="1990" y="2130" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
-		<element ref="drumpad-grey1" inputtag="PB3" inputmask="0x80">
+		<element ref="drumpad-grey1" inputtag="PB0" inputmask="0x10">
 			<bounds x="2005" y="2145" width="460" height="460" />
 		</element>
 		<element ref="drum-label-4"><bounds x="2010" y="2055" width="470" height="75" /><color red="0" green="0" blue="0" /></element>

@@ -1,0 +1,1255 @@
+<?xml version="1.0"?>
+<!-- license:CC0-1.0 -->
+<mamelayout version="2">
+
+<!-- Layout for AKAI MPC2000XL Drum Sampler/Sequencer Machine (1994)
+     by Guru (https://gurudumps.otenko.com/)-->
+
+	<element name="script_warning" defstate="1">
+		<text state="1" string="TO CONTROL SLIDERS/KNOBS WITH MOUSE ENABLE LAYOUT HELPER PLUGIN">
+			<color red="1" green="0" blue="0"/></text></element>
+
+	<!-- Knob Elements -->
+	<element name="knob"><disk></disk></element>
+	<element name="knob-position"><rect></rect></element>
+	<element name="rect"><rect></rect></element>
+	<element name="line"><rect></rect></element>
+	<element name="knobdots">
+		<image><data><![CDATA[
+		<svg width="500" height="500" viewBox="0 0 500 500">
+		<g fill="black" stroke="black" stroke-width="5" transform="translate(250, 250)">
+		<circle transform="rotate(0)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(30)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(60)" cx="200" cy="0" r="12"/>
+		<circle transform="rotate(120)" cx="200" cy="0" r="12"/>
+		<circle transform="rotate(150)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(180)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(210)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(240)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(270)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(300)" cx="200" cy="0" r="7"/>
+		<circle transform="rotate(330)" cx="200" cy="0" r="7"/>
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="dataknob">
+		<image><data><![CDATA[
+		<svg width="800" height="800" viewBox="0 0 800 800" overflow="visible">
+		<defs>
+			<radialGradient id="brownConcave" cx="50%" cy="50%" r="75%" fx="40%" fy="40%">
+			<stop offset="0%" stop-color="#7a6c5f" />
+			<stop offset="65%" stop-color="#413836" />
+			<stop offset="100%" stop-color="#2b231f" />
+			</radialGradient>
+		</defs>
+		<g transform="rotate(-15 400 400)">
+			<circle cx="400" cy="400" r="400" fill="black" stroke="none" stroke-width=".5" />
+			<circle cx="400" cy="400" r="380" fill="#514846" stroke="#514846" stroke-width="10" />
+			<circle cx="400" cy="400" r="360" fill="#968a7f" stroke="#968a7f" stroke-width="8" />
+			<circle cx="400" cy="400" r="350" fill="#665e59" stroke="#665e59" stroke-width="8" />
+			<g transform="translate(400, 400)" stroke="#968a7f" stroke-width="6">
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(0)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(30)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(60)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(120)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(150)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(180)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(210)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(240)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(270)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(300)" />
+				<line x1="280" y1="0" x2="340" y2="0" transform="rotate(330)" />
+			</g>
+			<g transform="translate(400, 400)" stroke="#333" stroke-width="6">
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(0)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(30)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(60)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(120)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(150)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(180)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(210)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(240)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(270)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(300)" />
+				<line x1="280" y1="6" x2="340" y2="6" transform="rotate(330)" />
+			</g>
+			<circle cx="400" cy="400" r="238" fill="#968a7f" stroke="#968a7f" stroke-width="5" />
+			<circle cx="400" cy="400" r="230" fill="#413836" stroke="#413836" stroke-width="5" />
+			<circle cx="400" cy="400" r="200" fill="#665e59" stroke="#665e59" stroke-width="5" />
+			<circle cx="400" cy="580" r="130" fill="black" stroke="black" stroke-width="5" />
+			<circle cx="400" cy="580" r="120" fill="#968a7f" stroke="#968a7f" stroke-width="5" />
+			<circle cx="400" cy="580" r="115" fill="url(#brownConcave)" stroke="none" />
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="dataentry_knob">
+		<simplecounter maxstate="100" digits="3"><color red="0.517" green="0.517" blue="0.517"/></simplecounter>
+	</element>
+
+	<!-- MPC Logo (simple lines) -->
+	<element name="text-mpc">
+		<image><data><![CDATA[
+		<svg width="400" height="100" viewBox="0 0 500 100" stroke="black" stroke-width="3">
+		<g transform="scale(1.7,1)">
+			<line x1="20" y1="80" x2="20" y2="20" />
+			<line x1="20" y1="20" x2="50" y2="20" />
+			<line x1="50" y1="20" x2="50" y2="80" />
+			<line x1="35" y1="20" x2="35" y2="80" />
+			<line x1="60" y1="80" x2="60" y2="20" />
+			<line x1="60" y1="20" x2="80" y2="20" />
+			<line x1="80" y1="20" x2="80" y2="50" />
+			<line x1="60" y1="50" x2="80" y2="50" />
+			<line x1="90" y1="20" x2="110" y2="20" />
+			<line x1="90" y1="20" x2="90" y2="80" />
+			<line x1="90" y1="80" x2="110" y2="80" />
+			<line x1="120" y1="20" x2="140" y2="20" />
+			<line x1="140" y1="20" x2="140" y2="50" />
+			<line x1="120" y1="50" x2="140" y2="50" />
+			<line x1="120" y1="50" x2="120" y2="80" />
+			<line x1="120" y1="80" x2="140" y2="80" />
+			<line x1="150" y1="20" x2="170" y2="20" />
+			<line x1="170" y1="20" x2="170" y2="80" />
+			<line x1="150" y1="80" x2="170" y2="80" />
+			<line x1="150" y1="20" x2="150" y2="80" />
+			<line x1="180" y1="20" x2="200" y2="20" />
+			<line x1="200" y1="20" x2="200" y2="80" />
+			<line x1="180" y1="80" x2="200" y2="80" />
+			<line x1="180" y1="20" x2="180" y2="80" />
+			<line x1="210" y1="20" x2="230" y2="20" />
+			<line x1="230" y1="20" x2="230" y2="80" />
+			<line x1="210" y1="80" x2="230" y2="80" />
+			<line x1="210" y1="20" x2="210" y2="80" />
+			<line x1="238" y1="20" x2="259" y2="80" />
+			<line x1="238" y1="80" x2="259" y2="20" />
+			<line x1="269.5" y1="20" x2="269.5" y2="80" />
+			<line x1="269.5" y1="80" x2="290.5" y2="80" />
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+
+	<!-- AKAI Text (optimised) using free Novo font converted to SVG (layout system doesn't support multiple truetype fonts) -->
+	<element name="text-akai-novo">
+		<image><data><![CDATA[
+		<svg width: 300px; height: auto; >
+			<path fill-rule="evenodd" clip-rule="evenodd" fill="#a0222c" d="M13.92,0.06c0.88,0,1.76,0,2.64,0
+				c0.159,0.124,0.132,0.302,0.133,0.469c0.003,1.249,0.001,2.498,0.001,3.783c0.227-0.195,0.384-0.419,0.572-0.611
+				c1.127-1.148,2.27-2.281,3.407-3.417c0.111-0.112,0.263-0.14,0.386-0.224c1,0,2,0,3,0c0.083,0.2-0.08,0.293-0.186,0.4
+				c-0.814,0.826-1.637,1.643-2.457,2.461c-0.453,0.452-0.898,0.911-1.36,1.354c-0.182,0.175-0.187,0.306-0.03,0.505
+				c0.816,1.032,1.64,2.059,2.46,3.088c0.44,0.555,0.878,1.11,1.316,1.667c0.261,0.331,0.285,0.332,0.452-0.042
+				c0.663-1.485,1.313-2.977,1.975-4.463c0.592-1.332,1.182-2.665,1.779-3.994c0.098-0.219,0.186-0.442,0.292-0.657
+				c0.063-0.129,0.138-0.241,0.258-0.32c1.1,0,2.199,0,3.3,0c0.174,0.079,0.272,0.22,0.347,0.391
+				c0.792,1.808,1.596,3.611,2.405,5.411c0.576,1.282,1.139,2.57,1.714,3.853c0.06,0.132,0.135,0.274,0.034,0.425
+				c-0.96,0-1.92,0-2.88,0c-0.168-0.073-0.246-0.212-0.312-0.379c-0.2-0.511-0.393-1.024-0.584-1.539
+				c-0.09-0.241-0.228-0.349-0.487-0.347c-1.238,0.005-2.477,0.005-3.715,0c-0.261-0.002-0.398,0.105-0.487,0.347
+				c-0.191,0.515-0.385,1.028-0.585,1.539C27.246,9.928,27.168,10.066,27,10.14c-1.98,0-3.96,0-5.94,0
+				c-0.386-0.123-0.547-0.48-0.771-0.763c-0.812-1.024-1.614-2.055-2.42-3.083c-0.111-0.142-0.225-0.188-0.384-0.092
+				c-0.034,0.021,0.01-0.003-0.026,0.015c-0.765,0.356-0.765,0.356-0.765,1.207c0,0.769,0.001,1.538-0.001,2.307
+				c0,0.15,0.006,0.304-0.133,0.409c-0.88,0-1.76,0-2.64,0c-0.158-0.123-0.136-0.302-0.137-0.469
+				c-0.007-0.959-0.003-1.918-0.003-2.877c0-2.059-0.003-4.117,0.002-6.175C13.783,0.426,13.737,0.212,13.92,0.06z"/>
+			<path fill-rule="evenodd" clip-rule="evenodd" fill="#a0222c" d="M2.94,10.14c-0.901,0-1.802,0.002-2.702-0.003
+				c-0.057-0.001-0.155,0.072-0.178-0.057c0.185-0.943,0.677-1.766,1.047-2.634C1.841,5.729,2.62,4.031,3.374,2.322
+				C3.66,1.673,3.943,1.023,4.242,0.38C4.303,0.25,4.378,0.138,4.5,0.06c1.1,0,2.2,0,3.3,0c0.174,0.079,0.272,0.22,0.348,0.391
+				c0.792,1.808,1.596,3.611,2.404,5.411c0.576,1.282,1.139,2.57,1.714,3.853c0.06,0.132,0.134,0.274,0.034,0.425
+				c-0.96,0-1.92,0-2.88,0c-0.167-0.073-0.246-0.212-0.311-0.379c-0.2-0.511-0.393-1.024-0.584-1.539
+				C8.436,7.98,8.298,7.873,8.038,7.875c-1.238,0.005-2.477,0.005-3.715,0C4.063,7.873,3.925,7.98,3.835,8.222
+				C3.644,8.736,3.451,9.25,3.251,9.761C3.186,9.928,3.108,10.066,2.94,10.14z"/>
+			<path fill-rule="evenodd" clip-rule="evenodd" fill="#a0222c" d="M36.9,10.14c0-0.329,0.005-0.658-0.002-0.987
+				c-0.004-0.157,0.03-0.237,0.207-0.292c0.406-0.125,0.795-0.305,1.2-0.438c0.134-0.045,0.157-0.1,0.157-0.224
+				c-0.004-2.066-0.004-4.132,0-6.198c0-0.124-0.023-0.179-0.157-0.223c-0.404-0.133-0.794-0.313-1.2-0.438
+				c-0.177-0.054-0.211-0.134-0.207-0.291C36.905,0.719,36.9,0.39,36.9,0.06c1.861,0,3.724,0.005,5.586-0.007
+				c0.215-0.001,0.25,0.056,0.239,0.251c-0.02,0.318-0.006,0.637-0.006,0.956c-0.064,0.132-0.167,0.212-0.306,0.267
+				c-0.232,0.091-0.471,0.167-0.703,0.257c-0.382,0.147-0.41,0.187-0.412,0.591c-0.003,0.769-0.001,1.538-0.001,2.306
+				c0,1.048-0.002,2.097,0.001,3.145c0.002,0.404,0.03,0.444,0.412,0.592c0.232,0.089,0.471,0.165,0.703,0.257
+				c0.139,0.055,0.241,0.134,0.306,0.267c0,0.34-0.009,0.68,0.005,1.02c0.005,0.15-0.034,0.185-0.185,0.184
+				C40.66,10.138,38.78,10.14,36.9,10.14z"/>
+			<path stroke-width="0.5" stroke="#a0222c" fill="#dedbd8" d="M30.254,1.653c0.507,1.472,1.115,2.851,1.64,4.275
+				c-1.091,0-2.173,0-3.272,0C29.164,4.508,29.701,3.102,30.254,1.653z"/>
+			<path stroke-width="0.5" stroke="#a0222c" fill="#dedbd8" d="M6.193,1.655c0.51,1.47,1.114,2.852,1.642,4.272
+				c-1.093,0-2.175,0-3.274,0C5.104,4.505,5.642,3.099,6.193,1.655z"/>
+		</svg>
+		]]></data></image>
+	</element>
+
+	<element name="screen-bezel">
+		<image><data><![CDATA[
+		<svg width="2580" height="950">
+			<rect x="0" y="0" width="2580" height="950" rx="30" ry="30" fill="black" stroke="black" stroke-width=".2" />
+			<rect x="20" y="20" width="2540" height="910" rx="30" ry="30" fill="#645b56" stroke="#645b56" stroke-width=".2" />
+			<path stroke-width="0.5" stroke="#362f36" fill="#362f36"
+				d="M50,20 H2530 A 30 30 0 0 1 2560,50 V120 H20 V50 A 30 30 0 0 1 50,20 Z"/>
+			<path stroke-width="0.5" stroke="#362f36" fill="#362f36"
+				d="M20,900 V820 H2560 V900 A 30 30 0 0 1 2530,930 H50 A 30 30 0 0 1 20,900 Z"/>
+			<line x1="20" y1="115" x2="2560" y2="115" stroke="#867972" stroke-width="10"/>
+			<line x1="20" y1="817" x2="2560" y2="817" stroke="#867972" stroke-width="10"/>
+			<line x1="250" y1="195" x2="250" y2="795" stroke="#867972" stroke-width="10"/>
+			<line x1="250" y1="190" x2="2320" y2="190" stroke="#867972" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+
+	<!-- Cursor Module -->
+	<element name="cursoroutline">
+		<image><data><![CDATA[
+		<svg width="110" height="80">
+			<rect x="0" y="0" width="110" height="80" rx="6" ry="6" fill="black" stroke="black" stroke-width=".2"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursorup">
+		<image state="0"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M0,0 H38 V2 L32,25 H6 L0,2 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="0.5" y1="2" x2="37.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="5" y1="19" x2="33" y2="19" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M5,19 H33 L32,25 H6 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M12,11 L18.5,7 L25,11" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M0,0 H38 V2 L32,25 H6 L0,2 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="0.5" y1="2" x2="37.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="5" y1="19" x2="33" y2="19" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M5,19 H33 L32,25 H6 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M12,11 L18.5,7 L25,11" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursordown">
+		<image state="0"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M6,0 H32 L38,23 V25 H0 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="0.5" y1="23" x2="37.5" y2="23" stroke="#fffbea" stroke-width="1"/>
+			<path d="M5,6 H33 L32,0 H6 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M12,14 L18.5,18 L25,14" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M6,0 H32 L38,23 V25 H0 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="0.5" y1="23" x2="37.5" y2="23" stroke="#fffbea" stroke-width="1"/>
+			<line x1="5" y1="6" x2="33" y2="6" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M5,6 H33 L32,0 H6 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M12,14 L18.5,18 L25,14" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursorleft">
+		<image state="0"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M3,0 H16 V2 L21,25 L16,48 V50 H3 A3,3 0 0,1 0,47 V3 A3,3 0 0,1 3,0 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="2" y1="2" x2="15.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="2" y1="48" x2="15.5" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<line x1="15.5" y1="2" x2="15.5" y2="48" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M15.5,2 V48 L20,25 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M10,19 L6,25 L10,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M3,0 H16 V2 L21,25 L16,48 V50 H3 A3,3 0 0,1 0,47 V3 A3,3 0 0,1 3,0 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="2" y1="2" x2="15.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="2" y1="48" x2="15.5" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<line x1="15.5" y1="2" x2="15.5" y2="48" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M15.5,2 V48 L20,25 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M10,19 L6,25 L10,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursorright">
+		<image state="0"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M6,0 H19 A3,3 0 0,1 22,3 V47 A3,3 0 0,1 19,50 H6 V48 L1,25 L6,2 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="6.5" y1="2" x2="20" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="6.5" y1="48" x2="20" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<path d="M6.5,2 V48 L1,25 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M12,19 L16,25 L12,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M6,0 H19 A3,3 0 0,1 22,3 V47 A3,3 0 0,1 19,50 H6 V48 L1,25 L6,2 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="6.5" y1="2" x2="20" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="6.5" y1="48" x2="20" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<path d="M6.5,2 V48 L1,25 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M12,19 L16,25 L12,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<group name="cursormodule">
+		<bounds x="0" y="0" width="520" height="410" />
+		<element ref="cursoroutline"><bounds x="0" y="0" width="520" height="387" /></element>
+		<element ref="cursorup" inputtag="Y5" inputmask="0x40"><bounds x="141" y="10" width="251" height="211" /></element>
+		<element ref="cursordown" inputtag="Y2" inputmask="0x40"><bounds x="141" y="199" width="251" height="211" /></element>
+		<element ref="cursorleft" inputtag="Y4" inputmask="0x40"><bounds x="13" y="10" width="190" height="400" /></element>
+		<element ref="cursorright" inputtag="Y3" inputmask="0x40"><bounds x="346" y="10" width="190" height="400" /></element>
+	</group>
+
+	<!-- Round LED -->
+	<element name="led" defstate="0"><disk></disk></element>
+
+	<!-- All Texts -->
+	<element name="text-drum1"><text align="3" string="PAD 1 " /></element>
+	<element name="text-drum2"><text align="3" string="PAD 2 " /></element>
+	<element name="text-drum3"><text align="3" string="PAD 3 " /></element>
+	<element name="text-drum4"><text align="3" string="PAD 4 " /></element>
+	<element name="text-drum5"><text align="3" string="PAD 5 " /></element>
+	<element name="text-drum6"><text align="3" string="PAD 6 " /></element>
+	<element name="text-drum7"><text align="3" string="PAD 7 " /></element>
+	<element name="text-drum8"><text align="3" string="PAD 8 " /></element>
+	<element name="text-drum9"><text align="3" string="PAD 9 " /></element>
+	<element name="text-drum10"><text align="3" string="PAD 10" /></element>
+	<element name="text-drum11"><text align="3" string="PAD 11" /></element>
+	<element name="text-drum12"><text align="3" string="PAD 12" /></element>
+	<element name="text-drum13"><text align="3" string="PAD 13" /></element>
+	<element name="text-drum14"><text align="3" string="PAD 14" /></element>
+	<element name="text-drum15"><text align="3" string="PAD 15" /></element>
+	<element name="text-drum16"><text align="3" string="PAD 16" /></element>
+	<element name="text-drums"><text align="3" string="DRUMS" /></element>
+	<element name="text-ab"><text align="3" string="AB" /></element>
+	<element name="text-cd"><text align="3" string="CD" /></element>
+	<element name="text-ef"><text align="3" string="EF" /></element>
+	<element name="text-gh"><text align="3" string="GH" /></element>
+	<element name="text-ij"><text align="3" string="IJ" /></element>
+	<element name="text-kl"><text align="3" string="KL" /></element>
+	<element name="text-mn"><text align="3" string="MN" /></element>
+	<element name="text-op"><text align="3" string="OP" /></element>
+	<element name="text-qr"><text align="3" string="QR" /></element>
+	<element name="text-st"><text align="3" string="ST" /></element>
+	<element name="text-uv"><text align="3" string="UV" /></element>
+	<element name="text-wx"><text align="3" string="WX" /></element>
+	<element name="text-yz"><text align="3" string="YZ" /></element>
+	<element name="text-amphash"><text align="3" string="&amp;#" /></element>
+	<element name="text-minusexcl"><text align="3" string="-!" /></element>
+	<element name="text-brackets"><text align="3" string="()" /></element>
+	<element name="text-space"><text align="3" string="SPACE" /></element>
+	<element name="text-aa"><text align="3" string="A/a" /></element>
+	<element name="text-0"><text align="3" string="0" /></element>
+	<element name="text-1"><text align="3" string="1" /></element>
+	<element name="text-2"><text align="3" string="2" /></element>
+	<element name="text-3"><text align="3" string="3" /></element>
+	<element name="text-4"><text align="3" string="4" /></element>
+	<element name="text-5"><text align="3" string="5" /></element>
+	<element name="text-6"><text align="3" string="6" /></element>
+	<element name="text-7"><text align="3" string="7" /></element>
+	<element name="text-8"><text align="3" string="8" /></element>
+	<element name="text-9"><text align="3" string="9" /></element>
+	<element name="text-enter"><text align="3" string="ENTER" /></element>
+	<element name="text-shift"><text align="3" string="SHIFT" /></element>
+	<element name="text-padbank"><text align="3" string="PAD BANK" /></element>
+	<element name="text-padbanka"><text align="3" string="A" /></element>
+	<element name="text-padbankb"><text align="3" string="B" /></element>
+	<element name="text-padbankc"><text align="3" string="C" /></element>
+	<element name="text-padbankd"><text align="3" string="D" /></element>
+	<element name="text-fulllevel"><text align="3" string="FULL LEVEL" /></element>
+	<element name="text-16levels"><text align="3" string="16 LEVELS" /></element>
+	<element name="text-after"><text align="3" string="AFTER" /></element>
+	<element name="text-nextseq"><text align="3" string="NEXT SEQ" /></element>
+	<element name="text-trackmute"><text align="3" string="TRACK MUTE" /></element>
+	<element name="text-undoseq"><text align="3" string="UNDO SEQ" /></element>
+	<element name="text-erase"><text align="3" string="ERASE" /></element>
+	<element name="text-rec"><text align="3" string="REC" /></element>
+	<element name="text-taptempo"><text align="3" string="TAP TEMPO" /></element>
+	<element name="text-noterepeat"><text align="3" string="NOTE REPEAT" /></element>
+	<element name="text-openwindow"><text align="3" string="OPEN WINDOW" /></element>
+	<element name="text-mainscreen"><text align="3" string="MAIN SCREEN" /></element>
+	<element name="text-mainvolume"><text align="3" string="MAIN VOLUME" /></element>
+	<element name="text-recgain"><text align="3" string="REC GAIN" /></element>
+	<element name="text-variation1"><text align="3" string="NOTE" /></element>
+	<element name="text-variation2"><text align="3" string="VARIATION" /></element>
+	<element name="text-over"><text align="3" string="OVER" /></element>
+	<element name="text-dub"><text align="3" string="DUB" /></element>
+	<element name="text-stepback"><text align="3" string="&lt;" /></element>
+	<element name="text-stepfwd"><text align="3" string="&gt;" /></element>
+	<element name="text-goto"><text align="3" string="GOTO" /></element>
+	<element name="text-ffwd"><text align="3" string="&gt;&gt;" /></element>
+	<element name="text-frew"><text align="3" string="&lt;&lt;" /></element>
+	<element name="text-bar"><text align="3" string="BAR" /></element>
+	<element name="text-step"><text align="3" string="STEP" /></element>
+	<element name="text-stop"><text align="3" string="STOP" /></element>
+	<element name="text-play"><text align="3" string="PLAY" /></element>
+	<element name="text-start"><text align="3" string="START" /></element>
+	<element name="text-end"><text align="3" string="END" /></element>
+	<element name="text-locate"><text align="3" string="LOCATE" /></element>
+	<element name="text-eventleft1"><text align="3" string="|" /></element>
+	<element name="text-eventleft2"><text align="3" string="&lt;" /></element>
+	<element name="text-eventright1"><text align="3" string="&gt;" /></element>
+	<element name="text-eventright2"><text align="3" string="|" /></element>
+	<element name="text-event"><text align="3" string="EVENT" /></element>
+	<element name="text-professional"><text align="3" string="professional" /></element>
+	<element name="text-midi"><text align="3" string="MIDI PRODUCTION CENTER" /></element>
+	<element name="text-integrated"><text align="3" string="INTEGRATED RHYTHM MACHINE 16 BIT DRUM SAMPLER / MIDI SEQUENCER" /></element>
+	<element name="text-fkeys"><text align="3" string="F1      F2      F3      F4      F5      F6" /></element>
+	<element name="text-softkey1"><text align="3" string="F1" /></element>
+	<element name="text-softkey2"><text align="3" string="F2" /></element>
+	<element name="text-softkey3"><text align="3" string="F3" /></element>
+	<element name="text-softkey4"><text align="3" string="F4" /></element>
+	<element name="text-softkey5"><text align="3" string="F5" /></element>
+	<element name="text-softkey6"><text align="3" string="F6" /></element>
+	<element name="text-cursor"><text align="3" string="CURSOR" /></element>
+	<element name="text-data"><text align="3" string="DATA" /></element>
+	<element name="text-min"><text align="3" string="MIN" /></element>
+	<element name="text-max"><text align="3" string="MAX" /></element>
+	<element name="text-digit"><text align="3" string="&lt; DIGIT &gt;" /></element>
+	<element name="text-assign"><text align="3" string="ASSIGN" /></element>
+	<element name="text-mixer"><text align="3" string="MIXER" /></element>
+	<element name="text-other"><text align="3" string="OTHER" /></element>
+	<element name="text-midisync"><text align="3" string="MIDI/SYNC" /></element>
+	<element name="text-sample"><text align="3" string="SAMPLE" /></element>
+	<element name="text-trim"><text align="3" string="TRIM" /></element>
+	<element name="text-program"><text align="3" string="PROGRAM" /></element>
+	<element name="text-song"><text align="3" string="SONG" /></element>
+	<element name="text-misc."><text align="3" string="MISC." /></element>
+	<element name="text-load"><text align="3" string="LOAD" /></element>
+	<element name="text-save"><text align="3" string="SAVE" /></element>
+
+	<!-- Variation Slider -->
+	<element name="transparent"><rect><color red="0" green="0" blue="0" alpha="0"/></rect></element>
+	<element name="sliderwell"><rect><color red="0" green="0" blue="0"/></rect></element>
+	<element name="variation_knob">
+		<rect><bounds x="0" y="0" width="216" height="455"/><color red="0" green="0" blue="0"/></rect>
+		<rect><bounds x="8" y="25" width="200" height="200"/><color red="0.872" green="0.817" blue="0.700"/></rect>
+		<rect><bounds x="8" y="235" width="200" height="200"/><color red="0.872" green="0.817" blue="0.700"/></rect>
+		<rect><bounds x="8" y="25" width="40" height="410"/><color red="0.823" green="0.772" blue="0.658"/></rect>
+		<rect><bounds x="165" y="25" width="40" height="410"/><color red="0.823" green="0.772" blue="0.658"/></rect>
+		<rect><bounds x="41" y="25" width="6" height="410"/><color red="0.9" green="0.91" blue="0.92"/></rect>
+		<rect><bounds x="165" y="25" width="7" height="410"/><color red="0.9" green="0.91" blue="0.92"/></rect>
+		<rect><bounds x="8" y="205" width="200" height="50"/><color red="0" green="0" blue="0.8"/></rect>
+	</element>
+	<group name="variationscale">
+		<element ref="line"><bounds x="100" y="38" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="115" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="192" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="269" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="346" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="423" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="500" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="577" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="654" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="731" width="100" height="10"/></element>
+		<element ref="line"><bounds x="100" y="808" width="100" height="10"/></element>
+	</group>
+	<group name="slider">
+		<element ref="sliderwell"><bounds x="11" y="53" width="16" height="116"/></element>
+	</group>
+	<group name="variationslider">
+		<bounds x="0" y="0" width="400" height="1000"/>
+		<element ref="sliderwell"><bounds x="130" y="0" width="50" height="820"/></element>
+		<element ref="transparent" id="variation_area">
+			<bounds x="130" y="0" width="50" height="820"/>
+		</element>
+		<element ref="variation_knob" id="variation_knob">
+			<animate inputtag="VARIATION" inputmask="0xff"/>
+			<bounds state="100" x="17" y="0"   width="270" height="149"/>
+			<bounds state="0"   x="17" y="679" width="270" height="149"/>
+		</element>
+	</group>
+	<element name="variation-header-line-vertical"><rect><bounds x="0" y="0" width="10" height="1000" /><color red="0.5" green="0.5" blue="0.5" /></rect></element>
+	<group name="variationheader">
+	<bounds x="0" y="0" width="610" height="1705" />
+		<element ref="line"><bounds x="0" y="60" width="145" height="10" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-variation1"><bounds x="230" y="5" width="150" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-variation2"><bounds x="160" y="60" width="290" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="line"><bounds x="465" y="60" width="145" height="10" /><color red="0" green="0" blue="0" /></element>
+		<element ref="variation-header-line-vertical"><bounds x="0"   y="60" width="10" height="1650" /><color red="0" green="0" blue="0" /></element>
+		<element ref="variation-header-line-vertical"><bounds x="605" y="60" width="10" height="1650" /><color red="0" green="0" blue="0" /></element>
+		<element ref="line"><bounds x="0" y="1705" width="610" height="10" /><color red="0" green="0" blue="0" /></element>
+	</group>
+
+	<!-- Define Buttons -->
+	<element name="button-black-outlinesq">
+		<image><data><![CDATA[
+			<svg width="265" height="215">
+			  <rect x="0" y="0" width="265" height="215" rx="20" ry="20" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-black-outline">
+		<image><data><![CDATA[
+			<svg width="215" height="110">
+			  <rect x="0" y="0" width="215" height="110" rx="20" ry="20" fill="rgb(0,0,0)" stroke="rgb(255,0,0)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-white" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="185" height="106">
+			  <rect x="0" y="0" width="185" height="106" rx="10" ry="10" fill="rgb(235,241,242)" stroke="rgb(235,241,242)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="185" height="106">
+			  <rect x="0" y="0" width="185" height="106" rx="10" ry="10" fill="rgb(225,231,232)" stroke="rgb(225,231,232)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-whitesq" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="245" height="195">
+			  <rect x="0" y="0" width="245" height="195" rx="10" ry="10" fill="rgb(235,241,242)" stroke="rgb(235,241,242)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="245" height="195">
+			  <rect x="0" y="0" width="245" height="195" rx="10" ry="10" fill="rgb(225,231,232)" stroke="rgb(225,231,232)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-redsq" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="245" height="195">
+			  <rect x="0" y="0" width="245" height="195" rx="10" ry="10" fill="rgb(226,76,80)" stroke="rgb(226,76,80)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="245" height="195">
+			  <rect x="0" y="0" width="245" height="195" rx="10" ry="10" fill="rgb(216,66,70)" stroke="rgb(216,66,70)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-blue" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="185" height="106">
+			  <rect x="0" y="0" width="185" height="106" rx="10" ry="10" fill="rgb(23,68,144)" stroke="rgb(23,68,144)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="185" height="106">
+			  <rect x="0" y="0" width="185" height="106" rx="10" ry="10" fill="rgb(0,42,118)" stroke="rgb(223,228,197)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-orange" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="185" height="106">
+			  <rect x="0" y="0" width="185" height="106" rx="10" ry="10" fill="rgb(233,152,47)" stroke="rgb(233,152,47)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="185" height="106"">
+			  <rect x="0" y="0" width="185" height="106" rx="10" ry="10" fill="rgb(223,142,37)" stroke="rgb(223,142,37)" stroke-width="0.1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!-- Clickable Buttons -->
+	<group name="button-fulllevel">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y7" inputmask="0x04">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-fulllevel"><bounds x="65" y="0" width="270" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led8" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-16levels">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y7" inputmask="0x02">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-16levels"><bounds x="65" y="0" width="240" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led15" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-nextseq">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y6" inputmask="0x02">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-nextseq"><bounds x="87" y="0" width="225" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led12" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-trackmute">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y6" inputmask="0x04">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-trackmute"><bounds x="40" y="0" width="300" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led11" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-padbanka">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y6" inputmask="0x08">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-padbanka"><bounds x="170" y="5" width="40" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led13" /><color state="0" red="0" green="0.4" blue="0" /><color state="1" red="0" green="1.0" blue="0" /></element>
+	</group>
+	<group name="button-padbankb">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y6" inputmask="0x10">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-padbankb"><bounds x="171" y="5" width="40" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led10" /><color state="0" red="0" green="0.4" blue="0" /><color state="1" red="0" green="1.0" blue="0" /></element>
+	</group>
+	<group name="button-padbankc">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y7" inputmask="0x10">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-padbankc"><bounds x="170" y="5" width="40" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led14" /><color state="0" red="0" green="0.4" blue="0" /><color state="1" red="0" green="1.0" blue="0" /></element>
+	</group>
+	<group name="button-padbankd">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y7" inputmask="0x08">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-padbankd"><bounds x="168" y="5" width="40" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led9" /><color state="0" red="0" green="0.4" blue="0" /><color state="1" red="0" green="1.0" blue="0" /></element>
+	</group>
+	<group name="button-mainscreen">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y4" inputmask="0x04">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-mainscreen"><bounds x="40" y="45" width="326" height="60" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-openwindow">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-orange" inputtag="Y5" inputmask="0x04">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-openwindow"><bounds x="20" y="45" width="350" height="60" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-after">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y2" inputmask="0x10">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-after"><bounds x="113" y="5" width="155" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led0" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-undoseq">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y4" inputmask="0x10">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-undoseq"><bounds x="73" y="5" width="240" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="175" y="75" width="30" height="30" /><animate name="led2" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-erase">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y5" inputmask="0x10">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-erase"><bounds x="118" y="45" width="147" height="60" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-stepback">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y0" inputmask="0x20">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-stepback"><bounds x="148" y="55" width="100" height="75" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-stepfwd">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y1" inputmask="0x20">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-stepfwd"><bounds x="148" y="55" width="100" height="75" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-goto">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y2" inputmask="0x20">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-goto"><bounds x="120" y="65" width="148" height="60" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-frew">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y1" inputmask="0x40">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-frew"><bounds x="128" y="55" width="115" height="75" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-ffwd">
+	<bounds x="0" y="0" width="400" height="246" />
+		<element ref="button-black-outline"><bounds x="82.5" y="140" width="215" height="110" /></element>
+		<element ref="button-white" inputtag="Y3" inputmask="0x80">
+			<bounds x="91.0" y="150" width="195" height="90" /></element>
+		<element ref="text-ffwd"><bounds x="143" y="55" width="115" height="75" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-taptempo">
+	<bounds x="0" y="0" width="460" height="246" />
+		<element ref="button-black-outlinesq"><bounds x="82.5" y="145" width="265" height="215" /></element>
+		<element ref="button-whitesq" inputtag="Y3" inputmask="0x10">
+			<bounds x="92.5" y="154" width="245" height="192" /></element>
+		<element ref="text-taptempo"><bounds x="80" y="0" width="265" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-noterepeat"><bounds x="60" y="57" width="313" height="60" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-rec">
+	<bounds x="0" y="0" width="460" height="246" />
+		<element ref="button-black-outlinesq"><bounds x="82.5" y="145" width="265" height="215" /></element>
+		<element ref="button-redsq" inputtag="Y3" inputmask="0x20">
+			<bounds x="92.5" y="154" width="245" height="192" /></element>
+		<element ref="text-rec"><bounds x="183" y="45" width="100" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="137" y="58" width="30" height="30" /><animate name="led1" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-overdub">
+	<bounds x="0" y="0" width="460" height="246" />
+		<element ref="button-black-outlinesq"><bounds x="82.5" y="145" width="265" height="215" /></element>
+		<element ref="button-redsq" inputtag="Y4" inputmask="0x20">
+			<bounds x="92.5" y="154" width="245" height="192" /></element>
+		<element ref="text-over"><bounds x="185" y="20" width="125" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-dub"><bounds x="203" y="70" width="100" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="137" y="58" width="30" height="30" /><animate name="led4" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-stop">
+	<bounds x="0" y="0" width="460" height="246" />
+		<element ref="button-black-outlinesq"><bounds x="82.5" y="145" width="265" height="215" /></element>
+		<element ref="button-whitesq" inputtag="Y5" inputmask="0x20">
+			<bounds x="92.5" y="154" width="245" height="192" /></element>
+		<element ref="text-stop"><bounds x="155" y="45" width="123" height="60" /><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-play">
+	<bounds x="0" y="0" width="460" height="246" />
+		<element ref="button-black-outlinesq"><bounds x="82.5" y="145" width="265" height="215" /></element>
+		<element ref="button-whitesq" inputtag="Y0" inputmask="0x40">
+			<bounds x="92.5" y="154" width="245" height="192" /></element>
+		<element ref="text-play"><bounds x="185" y="45" width="119" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="137" y="58" width="30" height="30" /><animate name="led3" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+	</group>
+	<group name="button-playstart">
+	<bounds x="0" y="0" width="460" height="246" />
+		<element ref="button-black-outlinesq"><bounds x="82.5" y="145" width="265" height="215" /></element>
+		<element ref="button-whitesq" inputtag="Y4" inputmask="0x80">
+			<bounds x="92.5" y="154" width="245" height="192" /></element>
+		<element ref="text-play"><bounds x="161" y="20" width="117" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-start"><bounds x="145" y="70" width="151" height="60" /><color red="0" green="0" blue="0" /></element>
+	</group>
+
+	<!-- Data Entry Buttons -->
+	<group name="dataentry-buttons">
+	<bounds x="0" y="0" width="800" height="705" />
+		<element ref="button-black-outline"><bounds x="110" y="205" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y5" inputmask="0x08">
+			<bounds x="120" y="215" width="130" height="55" /></element>
+		<element ref="text-7"><bounds x="165" y="160" width="40" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="110" y="284" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-mixer"><bounds x="140" y="287" width="100" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="435" y="205" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y0" inputmask="0x08">
+			<bounds x="445" y="215" width="130" height="55" /></element>
+		<element ref="text-8"><bounds x="495" y="160" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="435" y="284" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-other"><bounds x="465" y="287" width="100" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="760" y="205" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y0" inputmask="0x04">
+			<bounds x="770" y="215" width="130" height="55" /></element>
+		<element ref="text-9"><bounds x="820" y="160" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="760" y="284" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-midisync"><bounds x="768" y="287" width="140" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="110" y="387" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y4" inputmask="0x08">
+			<bounds x="120" y="397" width="130" height="55" /></element>
+		<element ref="text-4"><bounds x="165" y="342" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="110" y="466" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-sample"><bounds x="123" y="469" width="130" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="435" y="387" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y3" inputmask="0x08">
+			<bounds x="445" y="397" width="130" height="55" /></element>
+		<element ref="text-5"><bounds x="495" y="342" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="435" y="466" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-trim"><bounds x="463" y="469" width="100" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="760" y="387" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y3" inputmask="0x04">
+			<bounds x="770" y="397" width="130" height="55" /></element>
+		<element ref="text-6"><bounds x="820" y="342" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="760" y="466" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-program"><bounds x="767" y="469" width="140" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="110" y="569" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y2" inputmask="0x08">
+			<bounds x="120" y="579" width="130" height="55" /></element>
+		<element ref="text-1"><bounds x="170" y="524" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="110" y="648" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-song"><bounds x="138" y="652" width="95" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="435" y="569" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y1" inputmask="0x08">
+			<bounds x="445" y="579" width="130" height="55" /></element>
+		<element ref="text-2"><bounds x="500" y="524" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="435" y="648" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-misc."><bounds x="466" y="652" width="100" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="760" y="569" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y2" inputmask="0x04">
+			<bounds x="770" y="579" width="130" height="55" /></element>
+		<element ref="text-3"><bounds x="825" y="524" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="760" y="648" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-load"><bounds x="788" y="652" width="95" height="34" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="110" y="751" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y0" inputmask="0x10">
+			<bounds x="120" y="761" width="130" height="55" /></element>
+		<element ref="text-shift"><bounds x="130" y="706" width="120" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="435" y="751" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-blue" inputtag="Y1" inputmask="0x10">
+			<bounds x="445" y="761" width="130" height="55" /></element>
+		<element ref="text-0"><bounds x="500" y="706" width="30" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="760" y="751" width="150" height="75" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y1" inputmask="0x04">
+			<bounds x="770" y="761" width="130" height="55" /></element>
+		<element ref="text-enter"><bounds x="780" y="706" width="120" height="40" /><color red="0" green="0" blue="0" /></element>
+		<element ref="rect"><bounds x="760" y="830" width="150" height="35" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-save"><bounds x="788" y="831" width="100" height="34" /><color red="0" green="0" blue="0" /></element>
+	</group>
+
+	<!-- Soft Keys -->
+	<group name="softkey-buttons">
+		<element ref="button-black-outline"><bounds x="0" y="105" width="180" height="90" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y0" inputmask="0x02">
+			<bounds x="10" y="115" width="160" height="70" /></element>
+		<element ref="rect"><bounds x="30" y="0" width="130" height="55" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-softkey1"><bounds x="55" y="0" width="80" height="55" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="253" y="105" width="180" height="90" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y1" inputmask="0x02">
+			<bounds x="263" y="115" width="160" height="70" /></element>
+		<element ref="rect"><bounds x="283" y="0" width="130" height="55" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-softkey2"><bounds x="308" y="0" width="80" height="55" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="506" y="105" width="180" height="90" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y2" inputmask="0x02">
+			<bounds x="516" y="115" width="160" height="70" /></element>
+		<element ref="rect"><bounds x="536" y="0" width="130" height="55" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-softkey3"><bounds x="561" y="0" width="80" height="55" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="759" y="105" width="180" height="90" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y3" inputmask="0x02">
+			<bounds x="769" y="115" width="160" height="70" /></element>
+		<element ref="rect"><bounds x="789" y="0" width="130" height="55" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-softkey4"><bounds x="814" y="0" width="80" height="55" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="1012" y="105" width="180" height="90" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y4" inputmask="0x02">
+			<bounds x="1022" y="115" width="160" height="70" /></element>
+		<element ref="rect"><bounds x="1042" y="0" width="130" height="55" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-softkey5"><bounds x="1067" y="0" width="80" height="55" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-black-outline"><bounds x="1265" y="105" width="180" height="90" /><color red="0" green="0" blue="0" /></element>
+		<element ref="button-white" inputtag="Y5" inputmask="0x02">
+			<bounds x="1275" y="115" width="160" height="70" /></element>
+		<element ref="rect"><bounds x="1295" y="0" width="130" height="55" /><color red="0.6" green="0.6" blue="0.6" /></element>
+		<element ref="text-softkey6"><bounds x="1320" y="0" width="80" height="55" /><color red="0" green="0" blue="0" /></element>
+	</group>
+
+	<!-- Drum Pads -->
+	<element name="drumpad-grey" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="460" height="460">
+			  <rect state="0" x="0" y="0" width="460" height="460" rx="25" ry="25" fill="rgb(128,128,128)" stroke="rgb(128,128,128)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="460" height="460">
+			  <rect state="0" x="0" y="0" width="460" height="460" rx="25" ry="25" fill="rgb(102,102,102)" stroke="rgb(102,102,102)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="drumpad-black-outline">
+		<image><data><![CDATA[
+			<svg width="490" height="490">
+			  <rect x="0" y="0" width="490" height="490" rx="40" ry="40" fill="rgb(0,0,0)" stroke="rgb(0,0,0)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<group name="drumpads">
+		<element ref="drumpad-black-outline"><bounds x="220" y="2130" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB3" inputmask="0x10">
+			<bounds x="235" y="2145" width="460" height="460" /></element>
+		<element ref="text-drum1"><bounds x="235" y="2055" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-ab"><bounds x="630" y="2070" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="810" y="2130" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB3" inputmask="0x20">
+			<bounds x="825" y="2145" width="460" height="460" /></element>
+		<element ref="text-drum2"><bounds x="825" y="2055" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-cd"><bounds x="1220" y="2070" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1400" y="2130" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB3" inputmask="0x40">
+			<bounds x="1415" y="2145" width="460" height="460" /></element>
+		<element ref="text-drum3"><bounds x="1415" y="2055" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-ef"><bounds x="1810" y="2070" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1990" y="2130" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB3" inputmask="0x80">
+			<bounds x="2005" y="2145" width="460" height="460" /></element>
+		<element ref="text-drum4"><bounds x="2005" y="2055" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-gh"><bounds x="2400" y="2070" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="220" y="1540" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB2" inputmask="0x10">
+			<bounds x="235" y="1555" width="460" height="460" /></element>
+		<element ref="text-drum5"><bounds x="235" y="1465" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-ij"><bounds x="630" y="1480" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="810" y="1540" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB2" inputmask="0x20">
+			<bounds x="825" y="1555" width="460" height="460" /></element>
+		<element ref="text-drum6"><bounds x="825" y="1465" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-kl"><bounds x="1220" y="1480" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1400" y="1540" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB2" inputmask="0x40">
+			<bounds x="1415" y="1555" width="460" height="460" /></element>
+		<element ref="text-drum7"><bounds x="1415" y="1465" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-mn"><bounds x="1810" y="1480" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1990" y="1540" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB2" inputmask="0x80">
+			<bounds x="2005" y="1555" width="460" height="460" /></element>
+		<element ref="text-drum8"><bounds x="2005" y="1465" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-op"><bounds x="2400" y="1480" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="220" y="950" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB1" inputmask="0x10">
+			<bounds x="235" y="965" width="460" height="460" /></element>
+		<element ref="text-drum9"><bounds x="235" y="875" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-qr"><bounds x="630" y="890" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="810" y="950" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB1" inputmask="0x20">
+			<bounds x="825" y="965" width="460" height="460" /></element>
+		<element ref="text-drum10"><bounds x="825" y="875" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-st"><bounds x="1220" y="890" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1400" y="950" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB1" inputmask="0x40">
+			<bounds x="1415" y="965" width="460" height="460" /></element>
+		<element ref="text-drum11"><bounds x="1415" y="875" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-uv"><bounds x="1810" y="890" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1990" y="950" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB1" inputmask="0x80">
+			<bounds x="2005" y="965" width="460" height="460" /></element>
+		<element ref="text-drum12"><bounds x="2005" y="875" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-wx"><bounds x="2400" y="890" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="220" y="360" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB0" inputmask="0x10">
+			<bounds x="235" y="375" width="460" height="460" /></element>
+		<element ref="text-drum13"><bounds x="235" y="285" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-yz"><bounds x="630" y="300" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="810" y="360" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB0" inputmask="0x20">
+			<bounds x="825" y="375" width="460" height="460" /></element>
+		<element ref="text-drum14"><bounds x="825" y="285" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-amphash"><bounds x="1220" y="300" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1400" y="360" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB0" inputmask="0x40">
+			<bounds x="1415" y="375" width="460" height="460" /></element>
+		<element ref="text-drum15"><bounds x="1415" y="285" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-minusexcl"><bounds x="1810" y="300" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="drumpad-black-outline"><bounds x="1990" y="360" width="490" height="490" /><color red="0" green="0" blue="0" /></element>
+		<element ref="drumpad-grey" inputtag="PB0" inputmask="0x80">
+			<bounds x="2005" y="375" width="460" height="460" /></element>
+		<element ref="text-drum16"><bounds x="2005" y="285" width="170" height="60" /><color red="0" green="0" blue="0" /></element>
+		<element ref="text-brackets"><bounds x="2400" y="290" width="70" height="60" /><color red="1" green="1" blue="1" /></element>
+	</group>
+
+	<!-- Box / Screen -->
+	<element name="box-topedge">
+		<image><data><![CDATA[
+		<svg width="6000" height="180">
+			<path stroke-width="0.5" stroke="#d2d1c8" fill="#d2d1c8"
+				d="M70,0 H5930 L6000,180 H0 Z"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<group name="emulated-screen"><screen index="0"><bounds x="0" y="0" width="240" height="64" /></screen></group>
+
+	<!-- Knobs -->
+	<group name="recordknob">
+		<bounds x="0" y="0" width="740" height="740" />
+		<element ref="text-recgain"><bounds x="112" y="230" width="235" height="65"  /><color red="0" green="0" blue="0" /></element>
+		<element ref="knobdots"><bounds  x="20" y="265" width="435" height="420"     /></element>
+		<element ref="knob"><bounds        x="92" y="335" width="290" height="290"  /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob"><bounds        x="107" y="350" width="260" height="260" /><color red="0.7" green="0.7" blue="0.7" /></element>
+		<element ref="knob"><bounds        x="137" y="382" width="196" height="196" /><color red="0.5" green="0.5" blue="0.5" /></element>
+		<element ref="knob"><bounds        x="147" y="388" width="180" height="180" /><color red="0.764" green="0.376" blue="0.302" /></element>
+	<element ref="knob-position"><bounds   x="216" y="310" width="40" height="180"  /><color red="0.5" green="0.5" blue="0.5" /></element>
+	<element ref="knob-position"><bounds   x="219" y="315" width="30" height="190"  /><color red="0.664" green="0.276" blue="0.202" /></element>
+	</group>
+	<group name="volumeknob">
+		<bounds x="0" y="0" width="740" height="740" />
+		<element ref="text-mainvolume"><bounds x="57" y="230" width="375" height="65"  /><color red="0" green="0" blue="0" /></element>
+		<element ref="knobdots"><bounds  x="20" y="265" width="435" height="420"     /></element>
+		<element ref="knob"><bounds        x="92" y="335" width="290" height="290"  /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob"><bounds        x="107" y="350" width="260" height="260" /><color red="0.7" green="0.7" blue="0.7" /></element>
+		<element ref="knob"><bounds        x="137" y="382" width="196" height="196" /><color red="0.5" green="0.5" blue="0.5" /></element>
+		<element ref="knob"><bounds        x="147" y="388" width="180" height="180" /><color red="0.88" green="0.9" blue="0.778" /></element>
+	<element ref="knob-position"><bounds   x="212" y="310" width="40" height="180"  /><color red="0.5" green="0.5" blue="0.5" /></element>
+	<element ref="knob-position"><bounds   x="219" y="315" width="30" height="190"  /><color red="0.78" green="0.8" blue="0.678" /></element>
+	</group>
+
+	<!-- Show Everything -->
+	<view name="Default Layout">
+
+	<!-- Box and Screen -->
+	<element ref="box-topedge"><bounds x="0" y="0" width="6000" height="180" /></element>
+	<element ref="rect"><bounds x="0" y="180" width="6000" height="4146" /><color red="0.87" green="0.858" blue="0.847"/></element>
+	<collection name="script warning">
+		<element ref="script_warning" id="warning"><bounds x="2700" y="40" width="3500" height="100"/><color red="1" green="0" blue="0" /></element>
+	</collection>
+	<element ref="screen-bezel"><bounds x="380" y="80" width="2580" height="950" /></element>
+	<element ref="rect"><bounds x="635" y="275" width="2060" height="595" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-integrated"><bounds x="950" y="310" width="1440" height="50" /><color red="1" green="1" blue="1" /></element>
+	<element ref="text-fkeys"><bounds x="1050" y="780" width="1235" height="50" /><color red="1" green="1" blue="1" /></element>
+	<group ref="emulated-screen"><bounds x="940" y="370" width="1450" height="370" /></group>
+	<element ref="text-akai-novo"><bounds x="3330" y="278" width="750" height="191" /></element>
+	<element ref="text-professional"><bounds x="3555" y="460" width="520" height="120" /><color red="0.627" green="0.133" blue="0.172" /></element>
+	<element ref="text-mpc"><bounds x="4265" y="245" width="1620" height="190" /></element>
+	<element ref="text-midi"><bounds x="4350" y="475" width="1530" height="90" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="4355" y="440" width="765" height="20" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="5120" y="440" width="760" height="20" /><color red="0.627" green="0.133" blue="0.172" /></element>
+
+	<!-- Buttons -->
+	<element ref="rect"><bounds x="3305" y="1600" width="2630" height="2480" /><color red="0.545" green="0.639" blue="0.639"/></element>
+	<element ref="line"><bounds x="3473" y="1650" width="1025" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-drums"><bounds x="4530" y="1625" width="190" height="60" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="4740" y="1650" width="1025" height="10" /><color red="0" green="0" blue="0" /></element>
+	<group ref="drumpads"><bounds x="3530" y="1690" width="2180" height="2245" /></group>
+	<element ref="rect"><bounds x="295" y="2231" width="275" height="190" /><color red="0.6" green="0.6" blue="0.6" /></element>
+	<group ref="dataentry-buttons"><bounds x="225" y="1370" width="910" height="865" /></group>
+	<group ref="softkey-buttons"><bounds x="940" y="1155" width="1445" height="195" /></group>
+	<element ref="rect"><bounds x="3305" y="675" width="2630" height="860" /><color red="0.545" green="0.639" blue="0.639"/></element>
+	<element ref="rect"><bounds x="3445" y="800" width="790" height="250" /><color red="0.87" green="0.858" blue="0.847"/></element>
+	<group ref="button-fulllevel"><bounds x="3455" y="850" width="400" height="250" /></group>
+	<element ref="text-aa"><bounds x="3605" y="1110" width="90" height="60" /><color red="1" green="1" blue="1" /></element>
+	<group ref="button-16levels"><bounds x="3845" y="850" width="400" height="250" /></group>
+	<element ref="text-space"><bounds x="3960" y="1110" width="150" height="60" /><color red="1" green="1" blue="1" /></element>
+	<element ref="rect"><bounds x="3445" y="1190" width="790" height="250" /><color red="0.87" green="0.858" blue="0.847"/></element>
+	<group ref="button-nextseq"><bounds x="3455" y="1240" width="400" height="250" /></group>
+	<group ref="button-trackmute"><bounds x="3845" y="1240" width="400" height="250" /></group>
+	<element ref="line"><bounds x="4315" y="1230" width="573" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-padbank"><bounds x="4900" y="1200" width="225" height="60" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="5135" y="1230" width="565" height="10" /><color red="0" green="0" blue="0" /></element>
+	<group ref="button-padbanka"><bounds x="4240" y="1240" width="400" height="250" /></group>
+	<group ref="button-padbankb"><bounds x="4630" y="1240" width="400" height="250" /></group>
+	<group ref="button-padbankc"><bounds x="5015" y="1240" width="400" height="250" /></group>
+	<group ref="button-padbankd"><bounds x="5405" y="1240" width="400" height="250" /></group>
+	<group ref="button-after"><bounds x="250" y="2637" width="400" height="250" /></group>
+	<element ref="rect"><bounds x="355" y="2906" width="169" height="45" /><color red="0.6" green="0.6" blue="0.6" /></element>
+	<element ref="text-assign"><bounds x="368" y="2904" width="153" height="45" /><color red="0" green="0" blue="0" /></element>
+	<group ref="button-undoseq"><bounds x="805" y="3035" width="400" height="250" /></group>
+	<group ref="button-erase"><bounds x="1170" y="3035" width="400" height="250" /></group>
+	<element ref="line"><bounds x="895" y="3400" width="720" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-locate"><bounds x="1623" y="3370" width="205" height="60" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="1842" y="3400" width="720" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-step"><bounds x="1126" y="3433" width="125" height="60" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-bar"><bounds x="2218" y="3433" width="105" height="60" /><color red="0" green="0" blue="0" /></element>
+	<group ref="button-stepback"><bounds x="805" y="3365" width="400" height="250" /></group>
+	<group ref="button-stepfwd"><bounds x="1170" y="3365" width="400" height="250" /></group>
+	<group ref="button-goto"><bounds x="1535" y="3365" width="400" height="250" /></group>
+	<group ref="button-frew"><bounds x="1900" y="3365" width="400" height="250" /></group>
+	<group ref="button-ffwd"><bounds x="2265" y="3365" width="400" height="250" /></group>
+	<element ref="rect"><bounds x="905" y="3640" width="190" height="50" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-eventleft1"><bounds x="962" y="3633" width="15" height="50" /><color red="1" green="1" blue="1" /></element>
+	<element ref="text-eventleft2"><bounds x="965" y="3631" width="80" height="55" /><color red="1" green="1" blue="1" /></element>
+	<element ref="line"><bounds x="1070" y="3660" width="40" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-event"><bounds x="1120" y="3640" width="120" height="45" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="1245" y="3660" width="40" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="rect"><bounds x="1265" y="3640" width="190" height="50" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-eventright1"><bounds x="1325" y="3631" width="80" height="55" /><color red="1" green="1" blue="1" /></element>
+	<element ref="text-eventright2"><bounds x="1375" y="3633" width="15" height="50" /><color red="1" green="1" blue="1" /></element>
+	<element ref="line"><bounds x="1450" y="3660" width="240" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="1685" y="3635" width="10" height="35" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="1760" y="3635" width="10" height="35" /><color red="0" green="0" blue="0" /></element>
+	<element ref="line"><bounds x="1760" y="3660" width="240" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="rect"><bounds x="1995" y="3640" width="190" height="50" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-start"><bounds x="2025" y="3640" width="130" height="45" /><color red="1" green="1" blue="1" /></element>
+	<element ref="line"><bounds x="2170" y="3660" width="200" height="10" /><color red="0" green="0" blue="0" /></element>
+	<element ref="rect"><bounds x="2360" y="3640" width="190" height="50" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-end"><bounds x="2415" y="3640" width="85" height="45" /><color red="1" green="1" blue="1" /></element>
+	<group ref="button-taptempo"><bounds x="965" y="2592" width="460" height="235" /></group>
+	<group ref="button-mainscreen"><bounds x="1602" y="1446" width="400" height="250" /></group>
+	<group ref="button-openwindow"><bounds x="2197" y="1446" width="400" height="250" /></group>
+	<group ref="button-rec"><bounds x="790" y="3740" width="460" height="235" /></group>
+	<group ref="button-overdub"><bounds x="1155" y="3740" width="460" height="235" /></group>
+	<group ref="button-stop"><bounds x="1518" y="3740" width="460" height="235" /></group>
+	<group ref="button-play"><bounds x="1880" y="3740" width="460" height="235" /></group>
+	<group ref="button-playstart"><bounds x="2245" y="3740" width="460" height="235" /></group>
+
+	<!-- Knobs -->
+	<group ref="recordknob"><bounds x="4575" y="480" width="750" height="750" /></group>
+	<element ref="text-min"><bounds x="4655" y="1125" width="75" height="34" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-max"><bounds x="4915" y="1125" width="75" height="34" /><color red="0" green="0" blue="0" /></element>
+	<group ref="volumeknob"><bounds x="5155" y="480" width="750" height="750" /></group>
+	<element ref="text-min"><bounds x="5235" y="1125" width="75" height="34" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-max"><bounds x="5495" y="1125" width="75" height="34" /><color red="0" green="0" blue="0" /></element>
+	<group ref="variationheader"><bounds x="180" y="2513" width="520" height="1552"/></group>
+	<group ref="variationscale"><bounds x="270" y="3207" width="120" height="685"/><color red="0" green="0" blue="0" /></group>
+	<group ref="variationscale"><bounds x="495" y="3207" width="120" height="685"/><color red="0" green="0" blue="0" /></group>
+	<group ref="variationslider"><bounds x="290" y="3135" width="400" height="1000"/></group>
+	<element ref="text-data"><bounds x="2023" y="1760" width="131" height="65" /><color red="0" green="0" blue="0" /></element>
+	<element ref="dataknob" ><bounds x="1690" y="1855" width="800" height="800"/></element>
+	<element ref="dataentry_knob" id="dataentry_knob" inputtag="DATAENTRY" inputmask="0xffff" inputraw="yes">
+		<bounds x="2015" y="2190" width="150" height="100"/></element>
+
+	<!-- Cursor Module -->
+	<element ref="text-cursor"><bounds x="1978" y="2775" width="230" height="65" /><color red="0" green="0" blue="0" /></element>
+	<group ref="cursormodule"><bounds x="1830" y="2864" width="520" height="410" /></group>
+	<element ref="rect"><bounds x="1965" y="3264" width="244" height="45" /><color red="0.6" green="0.6" blue="0.6" /></element>
+	<element ref="text-digit"><bounds x="1983" y="3263" width="213" height="45" /><color red="0" green="0" blue="0" /></element>
+
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Default Layout"]
+				install_slider_callbacks(view)
+				add_simplecounter_knob(view, "dataentry_knob", "DATAENTRY", 1.5)
+				add_vertical_slider(view, "variation_area", "variation_knob", "VARIATION")
+				view.items["warning"]:set_state(0)
+			end)
+
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
+		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+			table.insert(widgets, {
+				clickarea = get_layout_item(view, clickarea_id),
+				field     = get_port_field(port_name),
+				is_knob   = true,
+				scale     = scale })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			if field == nil then
+				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				return nil
+			end
+			return field
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				pointers[id] = nil
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_y = y,
+							start_value = widgets[i].field.user_value }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's Y
+			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+			widget.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function forget_pointers()
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
+
+</mamelayout>
+

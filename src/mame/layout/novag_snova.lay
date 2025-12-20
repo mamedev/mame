@@ -373,14 +373,14 @@ authors:hap
 
 		<repeat count="8">
 			<param name="i" start="0" increment="1" />
-			<param name="x" start="8" increment="10" />
+			<param name="x" start="15" increment="10" />
 
-			<element ref="text_c0~i~"><bounds x="~x~" y="10" width="14" height="2.15" /></element>
-			<element ref="text_g0~i~"><bounds x="~x~" y="17" width="14" height="2.15" /></element>
-			<element ref="text_c1~i~"><bounds x="~x~" y="21.0" width="14" height="2.15" /></element>
-			<element ref="text_g1~i~"><bounds x="~x~" y="27.8" width="14" height="2.15" /></element>
+			<element ref="text_c0~i~"><bounds xc="~x~" y="10" width="8.5" height="2.15" /></element>
+			<element ref="text_g0~i~"><bounds xc="~x~" y="17" width="8.5" height="2.15" /></element>
+			<element ref="text_c1~i~"><bounds xc="~x~" y="21.0" width="14" height="2.15" /></element>
+			<element ref="text_g1~i~"><bounds xc="~x~" y="27.8" width="14" height="2.15" /></element>
 		</repeat>
-		<element ref="text_c06a"><bounds x="68" y="12" width="14" height="2.15" /></element>
+		<element ref="text_c06a"><bounds xc="75" y="12" width="9" height="2.15" /></element>
 
 		<repeat count="8">
 			<param name="x" start="10" increment="10" />

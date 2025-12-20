@@ -70,13 +70,13 @@ void taito_en_device::device_start()
 
 void taito_en_device::device_reset()
 {
-	/* Sound cpu program loads to 0xc00000 so we use a bank */
+	// sound cpu program loads to 0xc00000 so we use a bank
 	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
 	for (int i = 0; i < 3; i++)
 		m_cpubank[i]->set_entry(i % max);
 
 	uint16_t *ROM = (uint16_t *)m_osrom->base();
-	std::copy(&ROM[0x80000], &ROM[0x80004], &m_osram[0]); /* Stack and Reset vectors */
+	std::copy(&ROM[0x80000], &ROM[0x80004], &m_osram[0]); // stack and Reset vectors
 }
 
 
@@ -88,7 +88,7 @@ void taito_en_device::device_reset()
 
 void taito_en_device::en_es5505_bank_w(offs_t offset, uint16_t data)
 {
-	/* mask out unused bits */
+	// mask out unused bits
 	m_otisbank[offset] = data;
 	m_calculated_otisbank[offset] = (m_otisbank[offset] & m_bankmask) << 20;
 }
@@ -147,14 +147,14 @@ void taito_en_device::en_otis_map(address_map &map)
 
 void taito_en_device::mb87078_gain_changed(offs_t offset, uint8_t data)
 {
-	if (offset > 1)
+	if (offset >= 2)
 	{
-		// TODO : ES5505 Volume control is correct?
-		m_ensoniq->set_output_gain(offset & 1, data / 32.0);
-		m_ensoniq->set_output_gain(2|(offset & 1), data / 32.0);
-		m_ensoniq->set_output_gain(4|(offset & 1), data / 32.0);
-		m_ensoniq->set_output_gain(6|(offset & 1), data / 32.0);
-		m_pump->set_output_gain(offset & 1, data / 32.0);
+		// TODO: ES5505 Volume control is correct?
+		for (int i = 0; i < 4; i++)
+			m_ensoniq->set_output_gain((offset & 1) | (i * 2), data / 32.0);
+
+		for (int i = 0; i < 2; i++)
+			m_pump->set_output_gain((offset & 1) | (i * 2), data / 32.0);
 	}
 }
 
@@ -220,16 +220,16 @@ void taito_en_device::duart_output(uint8_t data)
 
 void taito_en_device::device_add_mconfig(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_audiocpu, XTAL(30'476'180) / 2);
+	// basic machine hardware
+	M68000(config, m_audiocpu, 30.47618_MHz_XTAL / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taito_en_device::en_sound_map);
 	m_audiocpu->set_addrmap(m68000_device::AS_CPU_SPACE, &taito_en_device::fc7_map);
 
-	ES5510(config, m_esp, XTAL(10'000'000)); // from Gun Buster schematics
+	ES5510(config, m_esp, 10_MHz_XTAL); // from Gun Buster schematics
 	m_esp->set_disable();
 
-	MC68681(config, m_duart68681, XTAL(16'000'000) / 4);
-	m_duart68681->set_clocks(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8);
+	MC68681(config, m_duart68681, 16_MHz_XTAL / 4);
+	m_duart68681->set_clocks(16_MHz_XTAL / 2 / 8, 16_MHz_XTAL / 2 / 16, 16_MHz_XTAL / 2 / 16, 16_MHz_XTAL / 2 / 8);
 	m_duart68681->irq_cb().set_inputline(m_audiocpu, M68K_IRQ_6);
 	m_duart68681->outport_cb().set(FUNC(taito_en_device::duart_output));
 
@@ -238,13 +238,15 @@ void taito_en_device::device_add_mconfig(machine_config &config)
 
 	MB8421(config, "dpram", 0); // host accesses this from the other side
 
-	/* sound hardware */
-	ESQ_5505_5510_PUMP(config, m_pump, XTAL(30'476'180) / (2 * 16 * 32));
+	// sound hardware
+	ESQ_5505_5510_PUMP(config, m_pump, 30.47618_MHz_XTAL / (2 * 16 * 32));
 	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, *this, 0.5, 0);
 	m_pump->add_route(1, *this, 0.5, 1);
+	m_pump->add_route(2, *this, 0.5, 0);
+	m_pump->add_route(3, *this, 0.5, 1);
 
-	ES5505(config, m_ensoniq, XTAL(30'476'180) / 2);
+	ES5505(config, m_ensoniq, 30.47618_MHz_XTAL / 2);
 	m_ensoniq->sample_rate_changed().set(FUNC(taito_en_device::es5505_clock_changed));
 	m_ensoniq->set_addrmap(0, &taito_en_device::en_otis_map);
 	m_ensoniq->set_addrmap(1, &taito_en_device::en_otis_map);

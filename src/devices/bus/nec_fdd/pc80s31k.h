@@ -68,6 +68,7 @@ protected:
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void fdc_io(address_map &map) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void drive_mode_w(u8 data);

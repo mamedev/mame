@@ -63609,6 +63609,91 @@ Missing subchannel Q LibCrypt protection
 		</part>
 	</software>
 
+	<software name="xenaeu" cloneof="xena">
+		<!-- http://redump.org/disc/495/
+		<rom name="Xena - Warrior Princess (Europe).cue" size="98" crc="ae47d108" sha1="584c14f66a7b8d4bcd20e62d3f398085267090a3"/>
+		<rom name="Xena - Warrior Princess (Europe).bin" size="323089536" crc="fa261fdd" sha1="fc941396e2d66dbdeab50a3b46a29c504df46a9d"/>
+		-->
+		<description>Xena - Warrior Princess (Europe)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02265"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="xena - warrior princess (europe)" sha1="905363eed4e63e7abc0c5332eb76a0f9833047e3"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xenaeup" cloneof="xena">
+		<!-- http://redump.org/disc/73771/
+		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).cue" size="118" crc="4c3ef6c5" sha1="e550abafa3a232a2251c4a30b8178f88eadccdd3"/>
+		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).bin" size="323089536" crc="c62a1aed" sha1="b08008b525572a1881721841b23e9e9173c13f4f"/>
+		-->
+		<description>Xena - Warrior Princess (Europe, prototype 19990819)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02265"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="xena - warrior princess (europe) (beta) (1999-08-19)" sha1="7402e2d8ffbd5385665a39f9ca5765d2566a733d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xenafr" cloneof="xena">
+		<!-- http://redump.org/disc/27698/
+		<rom name="Xena - Warrior Princess (France).cue" size="98" crc="884f600d" sha1="fc8d25f2ed23a9288d293f15650da750b6f04fbe"/>
+		<rom name="Xena - Warrior Princess (France).bin" size="322247520" crc="f0e624a4" sha1="c90d7746d4c04475b08396fc19123bed486223cf"/>
+		-->
+		<description>Xena - Warrior Princess (France)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02266"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="xena - warrior princess (france)" sha1="88bae561994b64c321130b6e014d73b8c95075cd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xenage" cloneof="xena">
+		<!-- http://redump.org/disc/3102/
+		<rom name="Xena - Warrior Princess (Germany).cue" size="99" crc="1ac61d44" sha1="22ac767a0e7acae3cf7cae83bc78fe91e550ebc9"/>
+		<rom name="Xena - Warrior Princess (Germany).bin" size="322322784" crc="3864ac15" sha1="fbaccb4a05f261b0357dd79ee4f6ee105c161e7f"/>
+		-->
+		<description>Xena - Warrior Princess (Germany)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02267"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="xena - warrior princess (germany)" sha1="fa99dca29d58cb8ba63bd92c61bd733ecf663c46"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xenasp" cloneof="xena">
+		<!-- http://redump.org/disc/27846/
+		<rom name="Xena - Warrior Princess (Spain).cue" size="95" crc="6a1b3aee" sha1="db8298341cf382f1b0f0c8eec91f8c3af7112ba6"/>
+		<rom name="Xena - Warrior Princess (Spain).bin" size="322647360" crc="ae926547" sha1="c29377d3a8a1de78a536461c4b9803fbccad48cb"/>
+		-->
+		<description>Xena - Warrior Princess (Spain)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLES-02268"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="xena - warrior princess (spain)" sha1="b161ef9a8fdf12c063691b0c43b8e06c905599fa"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Non-redump PAL (Europe) -->
 
 	<!-- boot OK -->
@@ -64483,6 +64568,22 @@ use an alternate design found on the demo disk... It might be possible to enable
 		</part>
 	</software>
 
+	<software name="xenap" cloneof="xena">
+		<!-- Original images (Hidden Palace)
+		<rom name="PSX - Xena Warrior Princess 8-11-99 Beta 2.cue" size="106" crc="9246d5ab" sha1="a814b889c39b124ebaf5b36df552bda29188e3f4"/>
+		<rom name="PSX - Xena Warrior Princess 8-11-99 Beta 2.img" size="322790832" crc="8b374bab" sha1="7ed87334f2012441df585e603bffd28033530a8c"/>
+		-->
+		<description>Xena - Warrior Princess (USA, prototype 19990811)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SLUS-00977"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="psx - xena warrior princess 8-11-99 beta 2" sha1="7ac1ad84655b85a77b3c615781061c632790d6cd"/>
+			</diskarea>
+		</part>
+	</software>
 
 <!-- Demo discs -->
 

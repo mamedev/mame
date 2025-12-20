@@ -10,8 +10,8 @@
 #include "bus/rs232/rs232.h"
 
 class aws_keyboard_device : public device_t,
-                            public device_buffered_serial_interface<8U>,
-                            public device_rs232_port_interface
+							public device_buffered_serial_interface<8U>,
+							public device_rs232_port_interface
 {
 public:
 	aws_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

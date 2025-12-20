@@ -85,8 +85,8 @@ public:
 		m_inputs(*this, "IN%u", 0)
 	{ }
 
-	void beaminv(machine_config &config);
-	void ctainv(machine_config &config);
+	void beaminv(machine_config &config) ATTR_COLD;
+	void ctainv(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -387,6 +387,17 @@ ROM_START( ctainv )
 	ROM_LOAD( "6.bin", 0x2000, 0x0400, CRC(06dcb63c) SHA1(4d5260b3785e2c215dd0b3c9f8457cf4a557a452) )
 ROM_END
 
+
+ROM_START( worldinv ) // SHARP Z-80 OCT.78-WV PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.e1", 0x0000, 0x0400, CRC(f42045ab) SHA1(8af905682a98fef66b4c9f088c4104744dcf665f) )
+	ROM_LOAD( "1.e2", 0x0400, 0x0400, CRC(c0a20b43) SHA1(c425895ac7bad9a39d7ff101569ce4d4ca1048a8) )
+	ROM_LOAD( "2.e3", 0x0800, 0x0400, CRC(f0517aa5) SHA1(caae221ff75b96659d6c814bfd7a6996597b0c41) )
+	ROM_LOAD( "3.e5", 0x0c00, 0x0400, CRC(07e32db9) SHA1(9f497f599f521d81822f9e18a7c7683787328020) )
+	ROM_LOAD( "4.e6", 0x1000, 0x0400, CRC(3eebf757) SHA1(990eebda80ec52b7e3a36912c6e9230cd97f9f25) )
+	ROM_LOAD( "5.e7", 0x1400, 0x0400, CRC(1c4f4ef6) SHA1(838b59d6f757732ad5f053df7912903557ada0c4) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -401,3 +412,4 @@ GAMEL( 1979, beaminv,   0,       beaminv, beaminv,  beaminv_state, empty_init, R
 GAMEL( 1979, pacominv,  beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation",         "Pacom Invader (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_pacominv ) // bootleg?
 GAMEL( 1979, pacominva, beaminv, beaminv, pacominv, beaminv_state, empty_init, ROT270, "Pacom Corporation",         "Pacom Invader (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_pacominv ) // "
 GAMEL( 19??, ctainv,    beaminv, ctainv,  ctainv,   beaminv_state, empty_init, ROT270, "bootleg (CTA Corporation)", "CTA Invader",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_ctainv )
+GAMEL( 19??, worldinv,  beaminv, beaminv, ctainv,   beaminv_state, empty_init, ROT270, "bootleg (World Vending)",   "World Invader",         MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_beaminv )

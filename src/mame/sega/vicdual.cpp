@@ -13,6 +13,7 @@
         * Space Attack / Head On
         * Head On
         * Head On 2
+		* Head On 2 (Slimline)
         * Invinco / Head On 2
         * N-Sub
         * Samurai
@@ -1535,6 +1536,7 @@ void vicdual_state::sspaceat(machine_config &config)
 /*************************************
  *
  *  Head On 2
+ *  Head On 2 (Sega Slimline)
  *  Digger
  *
  *************************************/
@@ -1630,6 +1632,53 @@ static INPUT_PORTS_START( headon2 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::coin_status_r))
 
 	PORT_COIN_DEFAULT
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( headon2sl )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_COCKTAIL
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x001>))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON1)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::fake_lives_r<0x002>))  /* Nintendo THO boards cannot use this*/
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(vicdual_state::coin_status_r))
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_COIN_DEFAULT
+	
+	PORT_START("FAKE_LIVES.0")
+	PORT_DIPNAME( 0x03, 0x01, "Lives" )   PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x02, "5 (Duplicate)" ) /* Duplicate Value - Each switch set adds a life */
+	PORT_DIPSETTING(    0x03, "6" )
 INPUT_PORTS_END
 
 
@@ -1739,6 +1788,7 @@ void vicdual_state::headon2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	headon_audio(config);
 }
+
 
 void vicdual_state::headon2bw(machine_config &config)
 {
@@ -4232,6 +4282,27 @@ ROM_START( headon2 )
 	ROM_LOAD( "316-0206.u65", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    // control PROM
 ROM_END
 
+// Head On 2 - Sega Slimline (VIC Dual PCB Set)
+// Head On Part 2 - Nintendo Table (Nintendo THO PCB Set)
+ROM_START( headon2sl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-170.u33",   0x0000, 0x0400, CRC(C108625D) SHA1(b6e255b819a001a0147f2ddf5f78689e0491da88) )
+	ROM_LOAD( "epr-171.u32",   0x0400, 0x0400, CRC(05814307) SHA1(c94798f71096beb9a9291f0f37f906f35305c815) )
+	ROM_LOAD( "epr-172.u31",   0x0800, 0x0400, CRC(77108D24) SHA1(87974956e386c5cc2ffa9b14f31a0eec12b238a6) )
+	ROM_LOAD( "epr-173.u30",   0x0c00, 0x0400, CRC(3D711E00) SHA1(06c10be4dd6b9ac454c2907c501a038554ef0dc8) )
+	ROM_LOAD( "epr-174.u29",   0x1000, 0x0400, CRC(89F98392) SHA1(51104ebf15bf8a1a003a068ea1136bd1a085824e) )
+	ROM_LOAD( "epr-175.u28",   0x1400, 0x0400, CRC(FD9034C5) SHA1(149017997f9db9d304bbe5acc32f9c93adff052d) )
+	ROM_LOAD( "epr-176.u27",   0x1800, 0x0400, CRC(319D3465) SHA1(56f3108a3ba38eb94b8b59f4aac52ab9a921292d) )
+	ROM_LOAD( "epr-177.u26",   0x1c00, 0x0400, CRC(F43A9846) SHA1(29bb6527eca00d84390e005d24d17753ce2c79bc) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "316-0138.u49", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+
+	ROM_REGION( 0x0040, "user1", 0 )    // timing PROMs
+	ROM_LOAD( "316-0043.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )    // control PROM
+	ROM_LOAD( "316-0042.u15", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    // sequence PROM
+ROM_END
+
 
 /*
     Car 2 (Headon 2)
@@ -5182,6 +5253,7 @@ GAME( 1979, bumba,      headon,   headons,   headons,   vicdual_state,   empty_i
 GAME( 1979, colision,   headon,   headons,   headons,   vicdual_state,   empty_init, ROT0,   "bootleg (ASSA)",          "Colision (bootleg of Head On)",                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,   empty_init, ROT0,   "Sega",                    "Head On 2",                                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state,  empty_init, ROT0,   "bootleg (Sidam)",         "Head On 2 (Sidam bootleg)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headon2sl,  headon2,  headonn,   headon2sl, vicdual_state,   empty_init, ROT270, "Sega",                    "Head On 2 (Sega Slimline)",                              MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,   empty_init, ROT0,   "bootleg (RZ Bologna)",    "Car 2 (bootleg of Head On 2)",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
 GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 1)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Head On 2 (set 2)",                            MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
