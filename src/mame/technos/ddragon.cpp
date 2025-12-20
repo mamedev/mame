@@ -1707,6 +1707,81 @@ ROM_START( ddragon6809a )
 	ROM_LOAD( "pal16r6.2f",        0x00000, 0x104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 ROM_END
 
+/*
+  Double Dragon
+  Single bootleg board from Argentina
+
+  PCB etched 10-07-87
+
+  CPU:
+  3x EF68B09EP
+
+  RAM:
+  2x TMM2016BP (1-1)
+  7x AM2148/49 (3-2-2)
+  1x TMM2064
+
+  Audio:
+  2x YM2203
+  2x OKI 5205
+  2x Y3014
+  1x TDA2002 (8W audio amplifier)
+
+  Other:
+  1x 3.579545 MHz crystal
+  2x unreadable crystals
+  2x 8 DIP switches banks
+  1x Jamma edge connector
+
+*/
+ROM_START( ddragon6809b )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "20.7e",   0x08000, 0x08000, CRC(5002d27d) SHA1(719dabbd5bf38a647a09296daba76b3e928f3d7b) ) // lot of differences
+	ROM_LOAD( "19.7g",   0x10000, 0x08000, CRC(398e950d) SHA1(b090f0ef9cc616c507a7ab3f80413dd0dc4d3655) ) // banked at 0x4000-0x8000, 4 bytes different
+	ROM_LOAD( "18.7h",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) // banked at 0x4000-0x8000
+	ROM_LOAD( "17.7i",   0x20000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) // banked at 0x4000-0x8000, removed copyright
+
+	ROM_REGION( 0x8000, "sub", 0 ) // sprite CPU
+	ROM_LOAD( "21.7d",   0x00000, 0x8000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "16.7n",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
+
+	// all the gfx roms are scrambled on this set
+	ROM_REGION( 0x08000, "chars", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x08000, "enc_chars", 0 )
+	ROM_LOAD( "13.5f",   0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "1.1t",         0x00000, 0x10000, CRC(5e810a6d) SHA1(5eba3e982b271bc284ca333429cd0b3759c9c8d1) )
+	ROM_LOAD( "2.1r",         0x10000, 0x10000, CRC(7300b785) SHA1(6d3b72bd7208e2bd790517a753c9d5192c88d20f) )
+	ROM_LOAD( "3.1q",         0x20000, 0x10000, CRC(19405de8) SHA1(ac1aa40478b92af5ccdde89812be78b7c9f7d20d) )
+	ROM_LOAD( "4.1p",         0x30000, 0x10000, CRC(4b10defd) SHA1(fb43eba7c8a7f77f0fdd6253d51b40b0e64598f5) )
+	ROM_LOAD( "5.1n",         0x40000, 0x10000, CRC(5b1bb493) SHA1(dd947d7d381af5952acece4b2cefc9fc4847ec68) )
+	ROM_LOAD( "6.1m",         0x50000, 0x10000, CRC(e8a2d2e7) SHA1(abc871e57a5280728b9f90625fb91011b848a4d8) )
+	ROM_LOAD( "7.1l",         0x60000, 0x10000, CRC(8010fcca) SHA1(9401c41088776beea91c32aaff8eb2fbe92b5e37) )
+	ROM_LOAD( "8.1j",         0x70000, 0x10000, CRC(bfa4da27) SHA1(68a649aec43e18dc79b4690c1dff2e2a6fc0065a) )
+
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "9.2e",         0x00000, 0x10000, CRC(736eff0f) SHA1(ae2ec2d5c8ab1db579a08256d874426dc5d889c6) )
+	ROM_LOAD( "10.2d",        0x10000, 0x10000, CRC(a670d088) SHA1(27e7b49645753dd039f104c3e0a7e6513a98710d) )
+	ROM_LOAD( "11.2c",        0x20000, 0x10000, CRC(4171b70d) SHA1(dc300c9bca6481417e97ad03c973e47389f261c1) )
+	ROM_LOAD( "12.2a",        0x30000, 0x10000, CRC(5f6a6d6f) SHA1(7d546a226cda81c28e7ccfb4c5daebc65072198d) )
+
+	ROM_REGION( 0x10000, "adpcm1", 0 ) // yes these really are smaller than the original game..
+	ROM_LOAD( "14.7q",        0x00000, 0x08000, CRC(678f8657) SHA1(2652fdc6719d2c889ca87802f6e2cefae59fc2eb) )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 )
+	ROM_LOAD( "15.7o",        0x00000, 0x08000, CRC(10f21dea) SHA1(739cf649f91490384297a81a2cc9855acb58a1c0) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "27s21.5o",        0x00000, 0x100, CRC(673f68c3) SHA1(9381453e8f868d80b6069264509a339e20e2b6b1) )
+	ROM_LOAD( "27s21.5p",        0x00000, 0x100, CRC(2dc270f2) SHA1(9f124ab2c98680bcc249218ee0de09ba49c09a84) )
+	ROM_LOAD( "27s29.6g",        0x00000, 0x200, CRC(095fb461) SHA1(7fd213fd8b8bbe30334523ccf06d4606c67b472e) )
+	ROM_LOAD( "82s129.4h",       0x00000, 0x100, CRC(7683cadd) SHA1(ff6fecf273c1d8812814cacc72fb71642ec32b6d) )
+ROM_END
+
 
 ROM_START( ddragon2 )
 	ROM_REGION( 0x30000, "maincpu", 0 )
@@ -2275,6 +2350,7 @@ GAME( 1987, ddragonbl,    ddragon,  ddragonbl,   ddragon,  ddragon_state,  init_
 GAME( 1987, ddragonbla,   ddragon,  ddragonbla,  ddragon,  ddragon_state,  init_ddragon,     ROT0, "bootleg",                               "Double Dragon (bootleg with MC6803)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ddragon6809,  ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 1)", MACHINE_NOT_WORKING )
 GAME( 1987, ddragon6809a, ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 2)", MACHINE_NOT_WORKING )
+GAME( 1987, ddragon6809b, ddragon,  ddragon6809, ddragon,  ddragon_state,  init_ddragon6809, ROT0, "bootleg",                               "Double Dragon (bootleg with 3xM6809, set 3)", MACHINE_NOT_WORKING )
 
 GAME( 1988, ddragon2,     0,        ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (World)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,    ddragon2, ddragon2,    ddragon2, ddragon_state,  init_ddragon2,    ROT0, "Technos Japan", "Double Dragon II: The Revenge (US)",          MACHINE_SUPPORTS_SAVE )
