@@ -10901,7 +10901,7 @@ The game freezes when loading (after the intro)
 		<rom name="Dukes of Hazzard, The - Racing for Home (USA) (Alt).cue" size="117" crc="f76cdf96" sha1="e414f046ecb7e91d34de359a56da091a91a05f83"/>
 		<rom name="Dukes of Hazzard, The - Racing for Home (USA) (Alt).bin" size="705520032" crc="ed7af634" sha1="7dedf3061cd65e29e993da5a8b71977e373f47c6"/>
 		-->
-		<description>The Dukes of Hazzard - Racing for Home (USA, Alt)</description>
+		<description>The Dukes of Hazzard - Racing for Home (USA, alt)</description>
 		<year>1999</year>
 		<publisher>SouthPeak Interactive</publisher>
 		<info name="serial" value="SLUS-00859GH"/>
@@ -13908,7 +13908,7 @@ The game freezes when loading (after the intro)
 		<rom name="Madden NFL 98 (USA) (Alt).cue" size="91" crc="aebfe5d4" sha1="5cf5426730cb98a84318035406fe45a49b539771"/>
 		<rom name="Madden NFL 98 (USA) (Alt).bin" size="689143056" crc="5595848f" sha1="54a531e1144e7443f2374476853f131c8b0a9540"/>
 		-->
-		<description>Madden NFL 98 (USA, Alt)</description>
+		<description>Madden NFL 98 (USA, alt)</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SLUS-00516"/>

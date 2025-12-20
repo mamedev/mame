@@ -1297,7 +1297,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 		</part>
 	</software>
 
-	<!-- Redump shows us that this Alt simply is a disc with a different write offset than "airforcd". -->
+	<!-- Redump shows us that this alt simply is a disc with a different write offset than "airforcd". -->
 	<software name="airforcd1" cloneof="airforcd" supported="no">
 		<!--
 		<rom name="Airforce Delta v1.000 (1999)(Konami)(NTSC)(US)[!][2S T-9501NAF].gdi" size="946" md5="5807915c07432be55a653540267d302e" sha1="7672f6cd3fac974ef8a2acca42327257780eb0a8"/>
@@ -2207,7 +2207,7 @@ Optional [BBA] support
 
 	<!--
 	<software name="aggonsent1" cloneof="aggonsenbb" supported="no">
-	    <description>Atsumare! Guru Guru Onsen - Taikenban (Japan, Alt)</description>
+	    <description>Atsumare! Guru Guru Onsen - Taikenban (Japan, alt)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7187"/>
@@ -6084,7 +6084,7 @@ Hangs at "Produced by Sega", [GDROM READY] keeps reading LBA=$afbe with REQ_ERRO
 Black screen [GDROM READY] (fixed)
 No [PVR] renders/black screen on FMV and title screen (sound plays, setup [fb_r_ctrl] [fb_w_ctrl] [fb_w_linestride] to 0)
 ]]></notes>
-		<info name="serial" value="T-46502M, T-46552M (Alt. Audio CD)"/>
+		<info name="serial" value="T-46502M, T-46552M (alt. Audio CD)"/>
 		<info name="release" value="20011025"/>
 		<info name="alt_title" value="ディヴァイン ラヴ 初回限定版"/>
 		<info name="ring_code" value="T-46501M-0772   1MM1   C   19 (Game), T-46502M   1MM1   C   19 (Audio CD)"/>
@@ -11179,7 +11179,7 @@ Software for [modem], throws an error requiring a Dream Passport
 
 	<!--
 	<software name="dyndeka2t1" cloneof="dynamcop" supported="no">
-	    <description>Dynamite Deka 2 - Taikenban (Japan, Alt)</description>
+	    <description>Dynamite Deka 2 - Taikenban (Japan, alt)</description>
 	    <year>1999</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="610-7150"/>
@@ -12215,7 +12215,7 @@ Punts to BIOS at start of loading [GDROM READY] (fixed)
 	<!-- It is unknown what (if any) difference this has to the T-46605D-80 release. -->
 	<!--
 	<software name="eviltwin1" cloneof="eviltwin" supported="no">
-	    <description>Evil Twin: Cyprien's Chronicles (Euro, Alt)</description>
+	    <description>Evil Twin: Cyprien's Chronicles (Euro, alt)</description>
 	    <year>2002</year>
 	    <publisher>Bigben Interactive</publisher>
 	    <info name="serial" value="T-46605D-71"/>
@@ -20689,7 +20689,7 @@ Built on Windows CE, requires [MMU] support
 
 	<!--
 	<software name="webtvssl1" cloneof="webtv" supported="no">
-	    <description>Microsoft WebTV Setsuzoku Kit - 128bit SSL Taiouban (Japan, Alt)</description>
+	    <description>Microsoft WebTV Setsuzoku Kit - 128bit SSL Taiouban (Japan, alt)</description>
 	    <year>1999</year>
 	    <publisher>WebTV Networks</publisher>
 	    <info name="serial" value="610-7391"/>

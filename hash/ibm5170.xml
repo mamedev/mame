@@ -6894,7 +6894,7 @@ https://admin.pci-ids.ucw.cz/read/PC/10ec/8139/1429d010
 	</software>
 
 	<software name="nokiamona" cloneof="nokiamon" supported="no">
-		<description>Nokia Monitor Setup for Windows 95 (Alt)</description>
+		<description>Nokia Monitor Setup for Windows 95 (alt)</description>
 		<year>1995</year>
 		<publisher>Nokia</publisher>
 		<notes><![CDATA[

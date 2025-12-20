@@ -230,9 +230,12 @@ and why some of the dumps below have weird size?
 	</software>
 
 	<software name="pooyana" cloneof="pooyan">
-		<description>Pooyan (Alt)Modified version cooperating with 64kB RAM</description>
+		<description>Pooyan (alt)</description>
 		<year>1982</year>
 		<publisher>Konami</publisher>
+		<notes><![CDATA[
+Modified version cooperating with 64kB RAM
+]]></notes>
 		<info name="serial" value="11" />
 		<info name="alt_title" value="プーヤン" />
 		<part name="cart" interface="m5_cart">

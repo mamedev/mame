@@ -164,7 +164,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam011a" cloneof="assam011" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 01.1 (Alt 2)</description>
+		<description>Audio Magic Vol 01.1 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -176,7 +176,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam011b" cloneof="assam011" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 01.1 (Alt)</description>
+		<description>Audio Magic Vol 01.1 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -200,7 +200,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam020a" cloneof="assam020" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 02.0 (Alt 2)</description>
+		<description>Audio Magic Vol 02.0 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -212,7 +212,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam020b" cloneof="assam020" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 02.0 (Alt)</description>
+		<description>Audio Magic Vol 02.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -236,7 +236,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam030a" cloneof="assam030" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 03.0 (Alt)</description>
+		<description>Audio Magic Vol 03.0 (alt)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -287,7 +287,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam050a" cloneof="assam050" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 05.0 (Alt)</description>
+		<description>Audio Magic Vol 05.0 (alt)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19931103" />
@@ -326,7 +326,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam07a" cloneof="assam07" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 07 (Alt)</description>
+		<description>Audio Magic Vol 07 (alt)</description>
 		<year>1994</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19940520" />
@@ -352,7 +352,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam08a" cloneof="assam08" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 08 (Alt)</description>
+		<description>Audio Magic Vol 08 (alt)</description>
 		<year>1994</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19940726" />
@@ -390,7 +390,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam10a" cloneof="assam10" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 10 (Alt)</description>
+		<description>Audio Magic Vol 10 (alt)</description>
 		<year>1994</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19940817" />
@@ -451,7 +451,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assam14a" cloneof="assam14" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Audio Magic Vol 14 (Alt)</description>
+		<description>Audio Magic Vol 14 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -487,7 +487,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assbts1a" cloneof="assbts1" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Back to Skool 1 (Alt)</description>
+		<description>Back to Skool 1 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -535,7 +535,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asscnc2a" cloneof="asscnc2" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Crunch-N-Copy Utils II (Alt 2)</description>
+		<description>Crunch-N-Copy Utils II (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -547,7 +547,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asscnc2b" cloneof="asscnc2" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Crunch-N-Copy Utils II (Alt 3)</description>
+		<description>Crunch-N-Copy Utils II (alt 3)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -559,7 +559,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asscnc2c" cloneof="asscnc2" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Crunch-N-Copy Utils II (Alt)</description>
+		<description>Crunch-N-Copy Utils II (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -595,7 +595,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assdskcpa" cloneof="assdskcp" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Disk Copiers (Alt)</description>
+		<description>Disk Copiers (alt)</description>
 		<year>1991</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -620,7 +620,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asshl010a" cloneof="asshl010" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Disk Helper Vol 01.0 (Alt)</description>
+		<description>Disk Helper Vol 01.0 (alt)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19931119" />
@@ -646,7 +646,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asshl020a" cloneof="asshl020" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Disk Helper Vol 02.0 (Alt)</description>
+		<description>Disk Helper Vol 02.0 (alt)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19931218" />
@@ -659,7 +659,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asshl030" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Disk Helper Vol 03.0 (Alt) [WB]</description>
+		<description>Disk Helper Vol 03.0 (alt) [WB]</description>
 		<year>1994</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19940926" />
@@ -709,7 +709,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asshl050a" cloneof="asshl050" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Disk Helper Vol 05.0 (Alt)</description>
+		<description>Disk Helper Vol 05.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -733,7 +733,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asshl060a" cloneof="asshl060" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Disk Helper Vol 06.0 (Alt)</description>
+		<description>Disk Helper Vol 06.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -757,7 +757,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asshl070a" cloneof="asshl070" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Disk Helper Vol 07.0 (Alt)</description>
+		<description>Disk Helper Vol 07.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -891,7 +891,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assicon1a" cloneof="assicon1" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Magic Icons Vol 1.0 (Alt)</description>
+		<description>Magic Icons Vol 1.0 (alt)</description>
 		<year>1994</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19940208" />
@@ -966,7 +966,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmpr10a" cloneof="assmpr10" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Print Vol 1.0 (Alt 2)</description>
+		<description>Multi Print Vol 1.0 (alt 2)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19931105" />
@@ -979,7 +979,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmpr10b" cloneof="assmpr10" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Print Vol 1.0 (Alt)</description>
+		<description>Multi Print Vol 1.0 (alt)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19931105" />
@@ -1043,7 +1043,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmpr40a" cloneof="assmpr40" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Print Vol 4.0 (Alt)</description>
+		<description>Multi Print Vol 4.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1079,7 +1079,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmv010a" cloneof="assmv010" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Vision Vol 01.0 (Alt 2)</description>
+		<description>Multi Vision Vol 01.0 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1091,7 +1091,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmv010b" cloneof="assmv010" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Vision Vol 01.0 (Alt)</description>
+		<description>Multi Vision Vol 01.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1165,7 +1165,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmv060a" cloneof="assmv060" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Vision Vol 06.0 (Alt 2)</description>
+		<description>Multi Vision Vol 06.0 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1177,7 +1177,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmv060b" cloneof="assmv060" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Vision Vol 06.0 (Alt 3)</description>
+		<description>Multi Vision Vol 06.0 (alt 3)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1189,7 +1189,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmv060c" cloneof="assmv060" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Vision Vol 06.0 (Alt)</description>
+		<description>Multi Vision Vol 06.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1213,7 +1213,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assmv070a" cloneof="assmv070" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Multi Vision Vol 07.0 (Alt)</description>
+		<description>Multi Vision Vol 07.0 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1297,7 +1297,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assoff3a" cloneof="assoff3" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Office Helper Vol 3 (Alt)</description>
+		<description>Office Helper Vol 3 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1321,7 +1321,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assoff4a" cloneof="assoff4" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Office Helper Vol 4 (Alt)</description>
+		<description>Office Helper Vol 4 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1345,7 +1345,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd001a" cloneof="asspd001" supported="no">
-		<description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Alt)</description>
+		<description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1381,7 +1381,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd002" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (Alt 2)</description>
+		<description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1393,7 +1393,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd002a" cloneof="asspd002" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (Alt)</description>
+		<description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1429,7 +1429,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd003" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 003 (Megaball, Drip) (Alt 2)</description>
+		<description>PD Games Volume 003 (Megaball, Drip) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1441,7 +1441,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd003a" cloneof="asspd003" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 003 (Megaball, Drip) (Alt)</description>
+		<description>PD Games Volume 003 (Megaball, Drip) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1477,7 +1477,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd004" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (Alt 2)</description>
+		<description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1489,7 +1489,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd004a" cloneof="asspd004" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (Alt)</description>
+		<description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1525,7 +1525,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd005" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (Alt 2)</description>
+		<description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1537,7 +1537,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd005a" cloneof="asspd005" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (Alt)</description>
+		<description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1573,7 +1573,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd006" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (Alt 2)</description>
+		<description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1585,7 +1585,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd006a" cloneof="asspd006" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (Alt)</description>
+		<description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1621,7 +1621,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd007" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (Alt 2)</description>
+		<description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1633,7 +1633,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd007a" cloneof="asspd007" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (Alt)</description>
+		<description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1669,7 +1669,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd008" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (Alt 2)</description>
+		<description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1681,7 +1681,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd008a" cloneof="asspd008" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (Alt)</description>
+		<description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1717,7 +1717,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd009" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (Alt 2)</description>
+		<description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1729,7 +1729,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd009a" cloneof="asspd009" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (Alt)</description>
+		<description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1766,7 +1766,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd010" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (Alt 2)</description>
+		<description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1778,7 +1778,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd010a" cloneof="asspd010" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (Alt)</description>
+		<description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1814,7 +1814,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd011" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 011 (Alt 2)</description>
+		<description>PD Games Volume 011 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1826,7 +1826,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd011a" cloneof="asspd011" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 011 (Alt)</description>
+		<description>PD Games Volume 011 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1862,7 +1862,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd012" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 012 (Alt 2)</description>
+		<description>PD Games Volume 012 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1874,7 +1874,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd012a" cloneof="asspd012" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 012 (Alt)</description>
+		<description>PD Games Volume 012 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1910,7 +1910,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd013" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 013 (Alt 2)</description>
+		<description>PD Games Volume 013 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1922,7 +1922,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd013a" cloneof="asspd013" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 013 (Alt)</description>
+		<description>PD Games Volume 013 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1958,7 +1958,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd014" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 014 (Alt 2)</description>
+		<description>PD Games Volume 014 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1970,7 +1970,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd014a" cloneof="asspd014" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 014 (Alt)</description>
+		<description>PD Games Volume 014 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2006,7 +2006,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd015" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 015 (Alt 2)</description>
+		<description>PD Games Volume 015 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2018,7 +2018,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd015a" cloneof="asspd015" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 015 (Alt)</description>
+		<description>PD Games Volume 015 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2054,7 +2054,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd016" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 016 (Alt)</description>
+		<description>PD Games Volume 016 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2090,7 +2090,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd017" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 017 (Alt 2)</description>
+		<description>PD Games Volume 017 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2102,7 +2102,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd017a" cloneof="asspd017" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 017 (Alt)</description>
+		<description>PD Games Volume 017 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2138,7 +2138,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd018" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 018 (Alt 2)</description>
+		<description>PD Games Volume 018 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2150,7 +2150,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd018a" cloneof="asspd018" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 018 (Alt)</description>
+		<description>PD Games Volume 018 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2186,7 +2186,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd019" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 019 (Alt 2)</description>
+		<description>PD Games Volume 019 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2198,7 +2198,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd019a" cloneof="asspd019" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 019 (Alt)</description>
+		<description>PD Games Volume 019 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2234,7 +2234,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd020" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 020 (Alt 2)</description>
+		<description>PD Games Volume 020 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2246,7 +2246,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd020a" cloneof="asspd020" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 020 (Alt)</description>
+		<description>PD Games Volume 020 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2282,7 +2282,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd021" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 021 (Alt)</description>
+		<description>PD Games Volume 021 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2318,7 +2318,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd022" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 022 (Alt)</description>
+		<description>PD Games Volume 022 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2354,7 +2354,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd023" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 023 (Alt)</description>
+		<description>PD Games Volume 023 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2426,7 +2426,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd025" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 025 (Alt)</description>
+		<description>PD Games Volume 025 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2474,7 +2474,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd026" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 026 (Alt)</description>
+		<description>PD Games Volume 026 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2510,7 +2510,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd027" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 027 (Alt)</description>
+		<description>PD Games Volume 027 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2546,7 +2546,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd028" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 028 (Alt)</description>
+		<description>PD Games Volume 028 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2630,7 +2630,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd030" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 030 (Alt 2)</description>
+		<description>PD Games Volume 030 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2642,7 +2642,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd030a" cloneof="asspd030" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 030 (Alt)</description>
+		<description>PD Games Volume 030 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2678,7 +2678,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd031" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 031 (Alt)</description>
+		<description>PD Games Volume 031 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2714,7 +2714,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd032" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 032 (Alt)</description>
+		<description>PD Games Volume 032 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2750,7 +2750,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd033" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 033 (Alt)</description>
+		<description>PD Games Volume 033 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2870,7 +2870,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd036" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 036 (Alt)</description>
+		<description>PD Games Volume 036 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2906,7 +2906,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd037" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 037 (Alt)</description>
+		<description>PD Games Volume 037 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2942,7 +2942,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd038" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 038 (Alt)</description>
+		<description>PD Games Volume 038 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -2978,7 +2978,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd039" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 039 (Alt)</description>
+		<description>PD Games Volume 039 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3014,7 +3014,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd040" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 040 (Alt)</description>
+		<description>PD Games Volume 040 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3050,7 +3050,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd041" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 041 (Alt)</description>
+		<description>PD Games Volume 041 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3086,7 +3086,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd042" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 042 (Alt)</description>
+		<description>PD Games Volume 042 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3122,7 +3122,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd043" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 043 (Alt)</description>
+		<description>PD Games Volume 043 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3158,7 +3158,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd044" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 044 (Alt)</description>
+		<description>PD Games Volume 044 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3194,7 +3194,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd045" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 045 (Alt)</description>
+		<description>PD Games Volume 045 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3230,7 +3230,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd046" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 046 (Alt)</description>
+		<description>PD Games Volume 046 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3278,7 +3278,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd047" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 047 (Alt)</description>
+		<description>PD Games Volume 047 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3314,7 +3314,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd048" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 048 (Alt)</description>
+		<description>PD Games Volume 048 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3350,7 +3350,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd049" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 049 (Alt)</description>
+		<description>PD Games Volume 049 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3386,7 +3386,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd050" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 050 (Alt)</description>
+		<description>PD Games Volume 050 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3471,7 +3471,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd053" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 053 (Alt)</description>
+		<description>PD Games Volume 053 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3507,7 +3507,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd054" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 054 (Alt)</description>
+		<description>PD Games Volume 054 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3543,7 +3543,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd055" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 055 (Alt)</description>
+		<description>PD Games Volume 055 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3579,7 +3579,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd056" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 056 (Alt)</description>
+		<description>PD Games Volume 056 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3639,7 +3639,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd058" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 058 (Alt)</description>
+		<description>PD Games Volume 058 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3675,7 +3675,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd059" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 059 (Alt)</description>
+		<description>PD Games Volume 059 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3711,7 +3711,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd060" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 060 (Alt)</description>
+		<description>PD Games Volume 060 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3759,7 +3759,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd062" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 062 (Alt)</description>
+		<description>PD Games Volume 062 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -3867,7 +3867,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd066" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 066 (Alt)</description>
+		<description>PD Games Volume 066 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4023,7 +4023,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd072" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 072 (Alt)</description>
+		<description>PD Games Volume 072 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4083,7 +4083,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd074" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 074 (Alt)</description>
+		<description>PD Games Volume 074 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4119,7 +4119,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd075" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 075 (Alt)</description>
+		<description>PD Games Volume 075 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4155,7 +4155,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd076" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 076 (Alt)</description>
+		<description>PD Games Volume 076 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4191,7 +4191,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd077" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 077 (Alt)</description>
+		<description>PD Games Volume 077 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4227,7 +4227,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd078" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 078 (Alt)</description>
+		<description>PD Games Volume 078 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4263,7 +4263,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd079" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 079 (Alt)</description>
+		<description>PD Games Volume 079 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4299,7 +4299,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd080" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 080 (Alt)</description>
+		<description>PD Games Volume 080 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4335,7 +4335,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd081" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 081 (Alt)</description>
+		<description>PD Games Volume 081 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4371,7 +4371,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd082" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 082 (Alt)</description>
+		<description>PD Games Volume 082 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4407,7 +4407,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd083" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 083 (Alt)</description>
+		<description>PD Games Volume 083 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4443,7 +4443,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd084" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 084 (Alt)</description>
+		<description>PD Games Volume 084 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4479,7 +4479,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd085" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 085 (Alt)</description>
+		<description>PD Games Volume 085 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4515,7 +4515,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd086" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 086 (Alt)</description>
+		<description>PD Games Volume 086 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4551,7 +4551,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd087" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 087 (Alt)</description>
+		<description>PD Games Volume 087 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4587,7 +4587,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd088" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 088 (Alt)</description>
+		<description>PD Games Volume 088 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4623,7 +4623,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd089" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 089 (Alt)</description>
+		<description>PD Games Volume 089 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4659,7 +4659,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd090" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 090 (Alt)</description>
+		<description>PD Games Volume 090 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4695,7 +4695,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd091" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 091 (Alt)</description>
+		<description>PD Games Volume 091 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4731,7 +4731,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd092" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 092 (Alt)</description>
+		<description>PD Games Volume 092 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4767,7 +4767,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd093" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 093 (Alt)</description>
+		<description>PD Games Volume 093 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4803,7 +4803,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd094" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 094 (Alt)</description>
+		<description>PD Games Volume 094 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4863,7 +4863,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd096" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 096 (Alt)</description>
+		<description>PD Games Volume 096 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4899,7 +4899,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd097" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 097 (Alt)</description>
+		<description>PD Games Volume 097 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4935,7 +4935,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd098" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 098 (Alt)</description>
+		<description>PD Games Volume 098 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4971,7 +4971,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd099" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 099 (Alt)</description>
+		<description>PD Games Volume 099 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5007,7 +5007,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd100" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 100 (Alt)</description>
+		<description>PD Games Volume 100 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5043,7 +5043,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd101" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 101 (Alt)</description>
+		<description>PD Games Volume 101 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5079,7 +5079,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd102" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 102 (Alt)</description>
+		<description>PD Games Volume 102 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5115,7 +5115,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd103" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 103 (Alt)</description>
+		<description>PD Games Volume 103 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5151,7 +5151,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd104" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 104 (Alt)</description>
+		<description>PD Games Volume 104 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5187,7 +5187,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd105" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 105 (Alt)</description>
+		<description>PD Games Volume 105 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5223,7 +5223,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd106" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 106 (Alt)</description>
+		<description>PD Games Volume 106 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5283,7 +5283,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd108" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 108 (Alt)</description>
+		<description>PD Games Volume 108 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5319,7 +5319,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd109" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 109 (Alt)</description>
+		<description>PD Games Volume 109 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5355,7 +5355,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd110" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 110 (Alt)</description>
+		<description>PD Games Volume 110 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5391,7 +5391,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd111" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 111 (Alt)</description>
+		<description>PD Games Volume 111 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5427,7 +5427,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd112" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 112 (Alt)</description>
+		<description>PD Games Volume 112 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5463,7 +5463,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd113" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 113 (Alt)</description>
+		<description>PD Games Volume 113 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5499,7 +5499,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd114" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 114 (Alt)</description>
+		<description>PD Games Volume 114 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5535,7 +5535,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd115" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 115 (Alt)</description>
+		<description>PD Games Volume 115 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5571,7 +5571,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd116" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 116 (Alt)</description>
+		<description>PD Games Volume 116 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5607,7 +5607,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd117" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 117 (Alt)</description>
+		<description>PD Games Volume 117 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5643,7 +5643,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd118" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 118 (Alt)</description>
+		<description>PD Games Volume 118 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5679,7 +5679,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd119" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 119 (Alt)</description>
+		<description>PD Games Volume 119 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5715,7 +5715,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd120" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 120 (Alt)</description>
+		<description>PD Games Volume 120 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5751,7 +5751,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd121" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 121 (Alt)</description>
+		<description>PD Games Volume 121 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5787,7 +5787,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd122" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 122 (Alt)</description>
+		<description>PD Games Volume 122 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5823,7 +5823,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd123" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 123 (Alt)</description>
+		<description>PD Games Volume 123 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5859,7 +5859,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd124" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 124 (Alt)</description>
+		<description>PD Games Volume 124 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5895,7 +5895,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd125" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 125 (Alt)</description>
+		<description>PD Games Volume 125 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5931,7 +5931,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd126" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 126 (Alt)</description>
+		<description>PD Games Volume 126 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -5967,7 +5967,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd127" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 127 (Alt)</description>
+		<description>PD Games Volume 127 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6003,7 +6003,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd128" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 128 (Alt)</description>
+		<description>PD Games Volume 128 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6063,7 +6063,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd130" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 130 (Alt)</description>
+		<description>PD Games Volume 130 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6099,7 +6099,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd131" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 131 (Alt)</description>
+		<description>PD Games Volume 131 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6135,7 +6135,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd132" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 132 (Alt)</description>
+		<description>PD Games Volume 132 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6171,7 +6171,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd133" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 133 (Alt)</description>
+		<description>PD Games Volume 133 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6207,7 +6207,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd134" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 134 (Alt)</description>
+		<description>PD Games Volume 134 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6243,7 +6243,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd135" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 135 (Alt)</description>
+		<description>PD Games Volume 135 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6279,7 +6279,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd136" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 136 (Alt)</description>
+		<description>PD Games Volume 136 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6315,7 +6315,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd137" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 137 (Alt)</description>
+		<description>PD Games Volume 137 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6351,7 +6351,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd138" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 138 (Alt)</description>
+		<description>PD Games Volume 138 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6387,7 +6387,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd139" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 139 (Alt)</description>
+		<description>PD Games Volume 139 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6423,7 +6423,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd140" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 140 (Alt)</description>
+		<description>PD Games Volume 140 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -6459,7 +6459,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd141" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 141 (Alt)</description>
+		<description>PD Games Volume 141 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7311,7 +7311,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd176" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 176 (Alt)</description>
+		<description>PD Games Volume 176 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7347,7 +7347,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd177" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 177 (Alt 2)</description>
+		<description>PD Games Volume 177 (alt 2)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7359,7 +7359,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd177a" cloneof="asspd177" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 177 (Alt)</description>
+		<description>PD Games Volume 177 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7911,7 +7911,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd200" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 200 (Alt)</description>
+		<description>PD Games Volume 200 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -7947,7 +7947,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd201" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 201 (Alt)</description>
+		<description>PD Games Volume 201 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8019,7 +8019,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd203" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 203 (Alt)</description>
+		<description>PD Games Volume 203 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8043,7 +8043,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd204" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 204 (Alt)</description>
+		<description>PD Games Volume 204 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8067,7 +8067,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd205" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 205 (Alt)</description>
+		<description>PD Games Volume 205 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8091,7 +8091,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd206" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 206 (Alt)</description>
+		<description>PD Games Volume 206 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8115,7 +8115,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd207" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 207 (Alt)</description>
+		<description>PD Games Volume 207 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8139,7 +8139,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd208" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 208 (Alt)</description>
+		<description>PD Games Volume 208 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8163,7 +8163,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd209" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 209 (Alt)</description>
+		<description>PD Games Volume 209 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8187,7 +8187,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd210" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 210 (Alt)</description>
+		<description>PD Games Volume 210 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8235,7 +8235,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd212" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 212 (Alt)</description>
+		<description>PD Games Volume 212 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8259,7 +8259,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd213" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 213 (Alt)</description>
+		<description>PD Games Volume 213 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8283,7 +8283,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd214" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 214 (Alt)</description>
+		<description>PD Games Volume 214 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8307,7 +8307,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd215" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 215 (Alt)</description>
+		<description>PD Games Volume 215 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8355,7 +8355,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd217" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 217 (Alt)</description>
+		<description>PD Games Volume 217 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8379,7 +8379,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd218" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 218 (Alt)</description>
+		<description>PD Games Volume 218 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8403,7 +8403,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd219" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 219 (Alt)</description>
+		<description>PD Games Volume 219 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -8427,7 +8427,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asspd220" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>PD Games Volume 220 (Alt)</description>
+		<description>PD Games Volume 220 (alt)</description>
 		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9327,7 +9327,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="rassrms1a" cloneof="assrms1" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>R.M.S Special Music Vol 1 (Alt)</description>
+		<description>R.M.S Special Music Vol 1 (alt)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9351,7 +9351,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="assrms2a" cloneof="assrms2" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>R.M.S Special Music Vol 2 (Alt)</description>
+		<description>R.M.S Special Music Vol 2 (alt)</description>
 		<year>1993</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -9402,7 +9402,7 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 	</software>
 
 	<software name="asswb2uta" cloneof="asswb2ut" supported="no"> <!-- TOSEC 2012-12-28 -->
-		<description>Workbench 2-3 Utils Vol 1.0 (Alt)</description>
+		<description>Workbench 2-3 Utils Vol 1.0 (alt)</description>
 		<year>1994</year>
 		<publisher>The Assassins</publisher>
 		<info name="release" value="19940123" />
