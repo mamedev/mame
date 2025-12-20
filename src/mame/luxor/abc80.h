@@ -63,6 +63,7 @@
 #define KEYBOARD_TAG        "keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
 #define SN74S263_TAG        "h2"
+#define ABCBUS_TAG 			"bus"
 
 class abc80_state : public driver_device
 {
@@ -118,9 +119,6 @@ protected:
 	void draw_character(bitmap_rgb32 &bitmap, int y, int sx, bool dv, u8 hsync_data);
 	virtual offs_t get_videoram_addr();
 	virtual u8 read_videoram(offs_t offset) { return m_video_ram[offset]; }
-
-	virtual u8 read(offs_t offset);
-	virtual void write(offs_t offset, u8 data);
 
 	void vco_voltage_w(int state);
 
@@ -212,9 +210,6 @@ public:
 protected:
 	void abc80l_mem(address_map &map) ATTR_COLD;
 
-	virtual u8 read(offs_t offset) override;
-	virtual void write(offs_t offset, u8 data) override;
-
 	required_memory_region m_rom_5000;
 	memory_share_creator<uint8_t> m_ram;
 };
@@ -227,6 +222,8 @@ class tkn80_state : public abc80_state
 public:
 	tkn80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		abc80_state(mconfig, type, tag),
+		m_view_rom0(*this, "rom0"),
+		m_view_rom2(*this, "rom2"),
 		m_rom_e(*this, "tkn80"),
 		m_char_ram(*this, "char_ram", 0x800, ENDIANNESS_LITTLE),
 		m_config(*this, "CONFIG"),
@@ -246,21 +243,21 @@ protected:
 	virtual u8 read_videoram(offs_t offset) override { return m_char_ram[offset]; };
 
 	void set_screen_params(void);
-
-	virtual u8 read(offs_t offset) override;
-	virtual void write(offs_t offset, u8 data) override;
+	void set_80(bool state);
 
 	uint8_t in3_r();
 	uint8_t in4_r();
 
+	void tkn80_mem(address_map &map) ATTR_COLD;
 	void tkn80_io(address_map &map) ATTR_COLD;
 
+	memory_view m_view_rom0;
+	memory_view m_view_rom2;
 	required_memory_region m_rom_e;
 	memory_share_creator<uint8_t> m_char_ram;
 	required_ioport m_config;
 
 	bool m_80;
-	offs_t m_rom_offset;
 };
 
 
