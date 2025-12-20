@@ -1233,9 +1233,11 @@ static int parse_options(int argc, char *argv[], options *opts)
 				goto usage;
 
 		} else if(pending_base) {
-		// base PC
+			// base PC
+			u32 basepc_dword = 0;
 			if(parse_number(curarg, "%x", &opts->basepc) != 1)
 				goto usage;
+			opts->basepc = basepc_dword;
 			pending_base = false;
 
 		} else if(pending_arch) {
