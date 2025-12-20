@@ -65,7 +65,7 @@ void cuttherope_state::cuttherope(machine_config &config)
 }
 
 
-ROM_START(cuttherope)
+ROM_START(cutrope)
 	ROM_REGION32_LE(0x582020, "bios", 0)
 	ROM_LOAD("be0118.bin", 0x000000, 0x582020, BAD_DUMP CRC(c6b94784) SHA1(f689d45309f2b6825f660623414bcb2ca118c6b1)) // BIOS update from Internet, not dumped from the actual machine
 
@@ -79,4 +79,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2016, cuttherope, 0, cuttherope, cuttherope, cuttherope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(2016, cutrope, 0, cuttherope, cuttherope, cuttherope_state, empty_init, ROT90, "ICE", "Cut The Rope", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

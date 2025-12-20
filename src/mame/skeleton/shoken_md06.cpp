@@ -199,7 +199,7 @@ ROM_START( petitlot )
 	ROM_LOAD( "md06_ver4_1.ic6", 0x00000, 0x10000, CRC(ebc81f10) SHA1(28ac52aeadfbf792da95c01b16fb88f7a5eb1d4e) ) // 1xxxxxxxxxxxxxxx = 0xff
 ROM_END
 
-ROM_START( polarstar2 )
+ROM_START( polstar2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "polarstar2_mk04_ver.4.5.ic8", 0x00000, 0x20000, CRC(13a7b9dc) SHA1(64aa5591aa676cbb9e00327ac62209b6854c4416) )
 
@@ -210,4 +210,4 @@ ROM_END
 } // anonymous namespace
 
 GAME( 2001, petitlot,   0, petitlot,  petitlot,  shoken_md06_state, empty_init, ROT0, "Shoken", "Petit Lot (ver. 4.1)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 2004, polarstar2, 0, polarstar, polarstar, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2004, polstar2,   0, polarstar, polarstar, shoken_md06_state, empty_init, ROT0, "Shoken", "Polar Star 2 (ver. 4.5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

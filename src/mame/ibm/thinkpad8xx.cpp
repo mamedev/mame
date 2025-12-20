@@ -85,7 +85,7 @@ void thinkpad8xx_state::thinkpad850(machine_config &config)
 }
 
 
-ROM_START(thinkpad850)
+ROM_START(tpad850)
 	ROM_DEFAULT_BIOS("v101")
 	ROM_SYSTEM_BIOS( 0, "v100", "v1.00 (91G0610, 07-03-1995)" )
 	ROM_SYSTEM_BIOS( 1, "v101", "v1.01 (91G1671, 09-10-1996)" )
@@ -100,5 +100,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR, NAME,        PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
-COMP( 1996, thinkpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR, NAME,    PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
+COMP( 1996, tpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
