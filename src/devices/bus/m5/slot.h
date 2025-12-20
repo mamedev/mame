@@ -39,7 +39,7 @@ public:
 	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
 	virtual void write_ram(offs_t offset, uint8_t data) {}
 
-	void rom_alloc(uint32_t size, const char *tag);
+	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
 	uint8_t* get_ram_base() { return m_ram.empty() ? nullptr : &m_ram[0]; }
@@ -94,31 +94,30 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
-	device_m5_cart_interface* get_loaded_cart() const noexcept { return m_cart; }
 
 	uint32_t get_rom_size() const noexcept
 	{
-		auto* cart = get_loaded_cart();
+		auto* cart = this->get_card_device();
 		return cart ? cart->get_rom_size() : 0;
 	}
 
 
 	uint32_t get_ram_size() const noexcept
 	{
-		auto* cart = get_loaded_cart();
+		auto* cart = this->get_card_device();
 		return cart ? cart->get_ram_size() : 0;
 	}
 
 
 	uint8_t* get_rom_base() const noexcept
 	{
-		auto* cart = get_loaded_cart();
+		auto* cart = this->get_card_device();
 		return cart ? cart->get_rom_base() : nullptr;
 	}
 
 	uint8_t* get_ram_base() const noexcept
 	{
-		auto* cart = get_loaded_cart();
+		auto* cart = this->get_card_device();
 		return cart ? cart->get_ram_base() : nullptr;
 	}
 

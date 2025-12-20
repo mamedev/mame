@@ -268,7 +268,7 @@ license:CC0-1.0
 	<software name="ssf" supported="yes">
 		<description>Solar System Forces</description>
 		<year>1983</year>
-		<publisher>&lt;Brainhill Ltd. Tokyo Japan&gt;</publisher>
+		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
 		<info name="alt_title" value="太陽系艦隊"/>
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
@@ -296,7 +296,7 @@ license:CC0-1.0
 	<software name="ssfom" supported="yes">
 		<description>Solar System Forces - Operation Maul</description>
 		<year>1983</year>
-		<publisher>&lt;Brainhill Ltd. Tokyo Japan&gt;</publisher>
+		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
 		<info name="alt_title" value="太陽系艦隊3 オペレーションモール"/>
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>
@@ -310,7 +310,7 @@ license:CC0-1.0
 	<software name="ssfvm" supported="yes">
 		<description>Solar System Forces - Victory of Mars</description>
 		<year>1983</year>
-		<publisher>&lt;Brainhill Ltd. Tokyo Japan&gt;</publisher>
+		<publisher>Brainhill Ltd. Tokyo Japan</publisher>
 		<info name="alt_title" value="太陽系艦隊2 火星軌道上の勝利"/>
 		<info name="usage" value="Mount together with &quot;BASIC-G&quot; and load with CHAIN"/>
 		<sharedfeat name="requirement" value="m5_cart:basicg"/>

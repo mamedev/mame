@@ -44,11 +44,11 @@ device_m5_cart_interface::~device_m5_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_m5_cart_interface::rom_alloc(uint32_t size, const char *tag)
+void device_m5_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
-		m_rom = device().machine().memory().region_alloc(std::string(tag).append(":rom"), size, 1, ENDIANNESS_LITTLE)->base();
+		m_rom = device().machine().memory().region_alloc(device().subtag("rom"), size, 1, ENDIANNESS_LITTLE)->base();
 		m_rom_size = size;
 	}
 }
@@ -175,7 +175,7 @@ std::pair<std::error_condition, std::string> m5_cart_slot_device::call_load()
 			}
 			else
 			{
-				m_cart->rom_alloc(size, tag());
+				m_cart->rom_alloc(size);
 				fread(m_cart->get_rom_base(), size);
 			}
 		}

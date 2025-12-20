@@ -16,9 +16,7 @@
 	https://dlabi.cz/data/imgs/schemata/PCB-schema-FD-5-A2-Zeravsky.png
 	https://dlabi.cz/data/imgs/schemata/PCB-schema-FD-5-A4half.png
 
-****************************************************************************/
-
-/***************************************************************************
+***************************************************************************
 
 TODO:
 
@@ -30,44 +28,6 @@ TODO:
 
     - brno mod: add support for lzr floppy disc format
 	- brno mod: add support of 16kb carts
-
-
-
-
-CHANGELOG:
-
-30.11.2025
-	- replaced named banks with arrays
-	- cleaned up redundant memory regions
-	- added FD-5 floppies
-	- fixed all roms in software list to proper checksums and sizes
-
-	- brno mod: fixed in console version lost data on RAMDISK after soft reset
-
-07.11.2025
-	- fd5 floppy emulation works but only with rom hack
-	- updated Sord m5 www links
-	- added fd5 utility disk to software list - not original dump, made from program listings
-	- added support of optional sram in Basic-F and Basic-G cartridges. Works only if shortname(softlist) is used
-	- marked 32/64KB RAM expansions EM-5, 64KBI, 64KBF, 64KRX as supported in sofwarelist
-	- reenabled and refactored memory banking
-
-	- brno mod: switched to rom including basic-i
-	- brno mod: reenabled and refactored memory banking 
-
-10.02.2016
-    - fixed bug: crash if rom card was only cart
-    - fixed bug: when em-5 selected monitor rom wasn't paged in
-    - brno mod: spin motor on upon restart
-    - brno mod: windowed boot as default rom
-    - brno mod: fixed bug: tape command in menu now works
-
-05.02.2016
-    - added BRNO modification - 1024kB Ramdisk + CP/M support
-    - 32/64KB RAM expansions EM-5, 64KBI, 64KBF, 64KRX
-    - since now own version of rom and slot handlers
-    - 2 slots for carts
-
 
 ******************************************************************************
 
@@ -318,13 +278,15 @@ Few other notes:
 #include "formats/m5_dsk.h"
 #include "formats/sord_cas.h"
 
-#define FD5_DEBUG 1
-#define BRNO_DEBUG 1
-#define VERBOSE 0
+
+#define FD5_DEBUG (1 << 1U)
+#define BRNO_DEBUG (1 << 2U)
+#define VERBOSE (0)
+//#define VERBOSE (FD5_DEBUG | BRNO_DEBUG)
 
 #include "logmacro.h"
 
-#define FDC_MOTOR_TIMEOUT 3
+static constexpr int FDC_MOTOR_TIMEOUT = 3;
 
 namespace {
 
@@ -573,7 +535,7 @@ void m5_state::mem64KBI_w(offs_t offset, u8 data) //out 0x6c
 	m_ram_mode = BIT(data, 0);
 
 	//if 32kb only mode don't map top ram
-	if (m_ram_mode && (m_DIPS->read() & 4) != 4)
+	if (m_ram_mode && !BIT(m_DIPS->read(), 4))
 		m_rom_view.select(2); // 64kb RAM
 	else
 
@@ -588,69 +550,112 @@ void m5_state::mem64KBI_w(offs_t offset, u8 data) //out 0x6c
 
 void m5_state::mem64KBF_w(u8 data) //out 0x30
 {
-	if (m_ram_type != MEM64KBF) return;
+	if (m_ram_type != MEM64KBF)
+		return;
 
 	if (m_ram_mode == data)
 		return;
 
 	m_ram_mode = data;
 
-	switch(m_ram_mode)
+	switch (m_ram_mode)
 	{
 		case 0:
+		{
 			for (int i = 0; i < 4; i++)
 			{
-				m_bankr[i]->set_entry(1); m_bankw[i]->set_entry(1);
+				m_bankr[i]->set_entry(1);
+				m_bankw[i]->set_entry(1);
 			}
-			m_bankr[4]->set_entry(0); m_bankw[4]->set_entry(0);
-			m_bankr[5]->set_entry(0); m_bankw[5]->set_entry(0);
+			m_bankr[4]->set_entry(0);
+			m_bankw[4]->set_entry(0);
+			m_bankr[5]->set_entry(0);
+			m_bankw[5]->set_entry(0);
+
 			break;
+		}
 		case 1:
+		{
 			for (int i = 0; i < 6; i++)
 			{
-				m_bankr[i]->set_entry(0); m_bankw[i]->set_entry(0);
+				m_bankr[i]->set_entry(0);
+				m_bankw[i]->set_entry(0);
 			}
 			break;
+		}
 		case 2:
-			m_bankr[0]->set_entry(1); m_bankw[0]->set_entry(0);
+		{
+			m_bankr[0]->set_entry(1);
+			m_bankw[0]->set_entry(0);
 			for (int i = 1; i < 4; i++)
 			{
-				m_bankr[i]->set_entry(0); m_bankw[i]->set_entry(0);
+				m_bankr[i]->set_entry(0);
+				m_bankw[i]->set_entry(0);
 			}
 			break;
+		}
 		case 3:
+		{
 			for (int i = 0; i < 4; i++)
 			{
-				m_bankr[i]->set_entry(0); m_bankw[i]->set_entry(1);
+				m_bankr[i]->set_entry(0);
+				m_bankw[i]->set_entry(1);
 			}
-			m_bankr[4]->set_entry(0); m_bankw[4]->set_entry(0);
-			m_bankr[5]->set_entry(0); m_bankw[5]->set_entry(0);
+			m_bankr[4]->set_entry(0);
+			m_bankw[4]->set_entry(0);
+			m_bankr[5]->set_entry(0);
+			m_bankw[5]->set_entry(0);
 			break;
+		}
 		case 4:
-			m_bankr[0]->set_entry(0); m_bankw[0]->set_entry(1);
-			m_bankr[1]->set_entry(0); m_bankw[1]->set_entry(1);
+		{
+			m_bankr[0]->set_entry(0);
+			m_bankw[0]->set_entry(1);
+			m_bankr[1]->set_entry(0);
+			m_bankw[1]->set_entry(1);
 			for (int i = 2; i < 4; i++)
-				m_bankr[i]->set_entry(0), m_bankw[i]->set_entry(0);
-			break;
-		case 5:
-			for	(int i = 0; i < 4; i++)
 			{
-				m_bankr[i]->set_entry(1); m_bankw[i]->set_entry(0);
+				m_bankr[i]->set_entry(0);
+				m_bankw[i]->set_entry(0);
 			}
-			m_bankr[4]->set_entry(0); m_bankw[4]->set_entry(0);
-			m_bankr[5]->set_entry(0); m_bankw[5]->set_entry(0);
 			break;
-		case 6: //replace Basic-F with pluged other rom cart
-			m_bankr[0]->set_entry(1); m_bankw[0]->set_entry(0);
-			m_bankr[1]->set_entry(2); m_bankw[1]->set_entry(0);
-			m_bankr[2]->set_entry(2); m_bankw[2]->set_entry(0);
-			m_bankr[3]->set_entry(2); m_bankw[3]->set_entry(0);
-			m_bankr[4]->set_entry(0); m_bankw[4]->set_entry(0);
-			m_bankr[5]->set_entry(0); m_bankw[5]->set_entry(0);
+		}
+		case 5:
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				m_bankr[i]->set_entry(1);
+				m_bankw[i]->set_entry(0);
+			}
+			m_bankr[4]->set_entry(0);
+			m_bankw[4]->set_entry(0);
+			m_bankr[5]->set_entry(0);
+			m_bankw[5]->set_entry(0);
 			break;
-		case 7: //reserve whole address space for other hardware
+		}
+		//replace Basic-F with pluged other rom cart
+		case 6:
+		{
+			m_bankr[0]->set_entry(1);
+			m_bankw[0]->set_entry(0);
+			m_bankr[1]->set_entry(2);
+			m_bankw[1]->set_entry(0);
+			m_bankr[2]->set_entry(2);
+			m_bankw[2]->set_entry(0);
+			m_bankr[3]->set_entry(2);
+			m_bankw[3]->set_entry(0);
+			m_bankr[4]->set_entry(0);
+			m_bankw[4]->set_entry(0);
+			m_bankr[5]->set_entry(0);
+			m_bankw[5]->set_entry(0);
+			break;
+		}
+		//reserve whole address space for other hardware
+		case 7:
+		{
 			m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0xffff);
 			break;
+		}
 	}
 
 	logerror("64KBF RAM mode set to %d\n", m_ram_mode);
@@ -671,7 +676,7 @@ void m5_state::mem64KRX_w(offs_t offset, u8 data) //out 0x7f
 	m_bankr[1]->set_entry(BIT(m_ram_mode, 1));
 	m_bankr[2]->set_entry(BIT(m_ram_mode, 2));
 
-	if ((m_DIPS->read() & 0x01))
+	if (BIT(m_DIPS->read(),1))
 	{
 		m_bankr[4]->set_entry(BIT(m_ram_mode, 4));
 		m_bankr[5]->set_entry(BIT(m_ram_mode, 5));
@@ -745,14 +750,14 @@ void m5_state::m5_io(address_map &map)
 	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0x20, 0x20).mirror(0x0f).w("sgc", FUNC(sn76489a_device::write));
-	map(0x30, 0x30).mirror(0x00).portr("Y0").w(FUNC(m5_state::mem64KBF_w)); // 64KBF paging
-	map(0x31, 0x31).mirror(0x00).portr("Y1");
-	map(0x32, 0x32).mirror(0x00).portr("Y2");
-	map(0x33, 0x33).mirror(0x00).portr("Y3");
-	map(0x34, 0x34).mirror(0x00).portr("Y4");
-	map(0x35, 0x35).mirror(0x00).portr("Y5");
-	map(0x36, 0x36).mirror(0x00).portr("Y6");
-	map(0x37, 0x37).mirror(0x00).portr("JOY");
+	map(0x30, 0x30).mirror(0x08).portr("Y0").w(FUNC(m5_state::mem64KBF_w)); // 64KBF paging
+	map(0x31, 0x31).mirror(0x08).portr("Y1");
+	map(0x32, 0x32).mirror(0x08).portr("Y2");
+	map(0x33, 0x33).mirror(0x08).portr("Y3");
+	map(0x34, 0x34).mirror(0x08).portr("Y4");
+	map(0x35, 0x35).mirror(0x08).portr("Y5");
+	map(0x36, 0x36).mirror(0x08).portr("Y6");
+	map(0x37, 0x37).mirror(0x08).portr("JOY");
 	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x50, 0x50).mirror(0x0f).rw(FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
 //  map(0x60, 0x63) SIO
@@ -902,7 +907,7 @@ INPUT_PORTS_END
 // 0x70
 u8 m5_state::ppi_pa_r()
 {
-		return m_fd5_data;
+	return m_fd5_data;
 }
 
 void m5_state::ppi_pa_w(u8 data)
@@ -930,14 +935,10 @@ void m5_state::ppi_pb_w(u8 data)
 
 	if (!BIT(data, 6))
 	{
-		if (FD5_DEBUG) LOG("%04X: Out (71h), %02X. Resetting FD5 CPU\n", m_maincpu->pc() - 2, data);
+		LOGMASKED(FD5_DEBUG, "%04X: Out (71h), %02X. Resetting FD5 CPU\n", m_maincpu->pc() - 2, data);
 	}
 
 	m_fd5cpu->set_input_line(INPUT_LINE_NMI, !BIT(data,6));
-	
-	
-	
-
 	
 }
 
@@ -1076,7 +1077,7 @@ void m5_state::fd5_ctrl_w(u8 data)
 
 	//spin up motor only if it isn't spinning already
 	if (state) {
-		if (FD5_DEBUG) LOG("FD5 Motor ON\n");
+		LOGMASKED(FD5_DEBUG, "FD5 Motor ON\n");
 		m_floppy0->mon_w(0); //motor on
 	}
 	//add more time before switching off
@@ -1087,7 +1088,7 @@ void m5_state::fd5_ctrl_w(u8 data)
 
 TIMER_CALLBACK_MEMBER(m5_state::FDC_MOTOR_TIMEOUT_cb)
 {
-	if (FD5_DEBUG) LOG("FD5 Motor OFF\n");
+	LOGMASKED(FD5_DEBUG, "FD5 Motor OFF\n");
 	m_floppy0->mon_w(1); //timeout -> turn motor off
 }
 
@@ -1098,7 +1099,7 @@ TIMER_CALLBACK_MEMBER(m5_state::FDC_MOTOR_TIMEOUT_cb)
 
 void m5_state::fd5_tc_w(u8 data)
 {
-	if (FD5_DEBUG) LOG("TC Pulse\n");
+	LOGMASKED(FD5_DEBUG, "TC Pulse\n");
 	m_fdc->tc_w(true);
 	m_fdc->tc_w(false);
 }
@@ -1224,7 +1225,7 @@ void brno_state::mmu_w(offs_t offset, u8 data)
 	u8 rambank = ~data;
 	m_rammap[ramcpu] = rambank;
 
-	if (BRNO_DEBUG) logerror("RAMdisk page change(CPURAM<=BANK): &%X000<=%02X at %s\n", ramcpu, rambank, machine().describe_context());
+	LOGMASKED(BRNO_DEBUG, "RAMdisk page change(CPURAM<=BANK): &%X000<=%02X at %s\n", ramcpu, rambank, machine().describe_context());
 }
 
 void brno_state::romsel_w(u8 data) //out 6b
@@ -1237,14 +1238,14 @@ void brno_state::romsel_w(u8 data) //out 6b
 	else if (data == 0)
 		m_rom12_view.select(0);
 
-	if (BRNO_DEBUG) logerror("CASEN change: out (&6b),%x\n",data);
+	LOGMASKED(BRNO_DEBUG, "CASEN change: out (&6b),%x\n",data);
 }
 
 void brno_state::ramen_w(u8 data) //out 6c
 {
 	// 0=rom+sord ram enabled, rest is ramdisk; 1=rom+sord ram disabled (only ramdisk visible)
 	m_rom_view.select((data & 1) ? 1 : 0);
-	if (BRNO_DEBUG) logerror("RAMEN change: out (&6c),%x\n",data);
+	LOGMASKED(BRNO_DEBUG, "RAMEN change: out (&6c),%x\n",data);
 }
 
 u8 brno_state::cartrom_r(offs_t offset) { return m_romcart ? m_romcart->read_rom(offset) : 0xff; }
@@ -1355,13 +1356,22 @@ void m5_state::machine_reset()
 	// but some owners bypassed this by shorting some lines on the motherboard and Sord power up and starts cassette loading
 	if (m_ramcart == nullptr && m_romcart == nullptr)
 	{
-		program.unmap_write(0x0000, 0x1fff);
-		program.unmap_readwrite(0x2000, 0x6fff); //if you uncomment this line Sord starts cassette loading but it is not correct on vanilla Sord m5. see above comment
-		program.unmap_readwrite(0x8000, 0xffff);
-		return;
+		//TODO: implement switch to enable this hack
+		bool hack = false;
+		if (hack)
+		{
+			program.install_rom(0x0000, 0x1fff, memregion("monitor")->base());
+			program.unmap_write(0x0000, 0x1fff);
+			program.unmap_readwrite(0x2000, 0x6fff);
+			program.unmap_readwrite(0x8000, 0xffff);
+			return;
+		}
+		else
+			fatalerror("No cartridge inserted. M5 cannot run.");
 	}
 
-	if (m_romcart) {
+	if (m_romcart)
+	{
 		romcart_rom_size = m_romcart->get_rom_size();
 		romcart_rom_base = m_romcart->get_rom_base();
 	}
@@ -1394,11 +1404,12 @@ void m5_state::machine_reset()
 			{
 				m_rom_view.select(1);
 				//if AUTOSTART is on then page out cart and start tape loading
-				bool autostart = (m_DIPS->read() & 2) == 2;
-				bool ram32k_only = (m_DIPS->read() & 4) == 4;
+				bool autostart = BIT(m_DIPS->read(), 2);
+				bool ram32k_only = BIT(m_DIPS->read(), 4);
 				if (m_romcart)
 				{	//if not autostart map needed banks to rom cart, rest to ram
-					for (int i = 1; i < 4; ++i) {
+					for (int i = 1; i < 4; ++i)
+					{
 						if ((i - 1) * 0x2000 < romcart_rom_size - 1 && !autostart)
 						{
 							m_bankr[i]->set_base(romcart_rom_base + (i - 1) * 0x2000);
@@ -1420,52 +1431,66 @@ void m5_state::machine_reset()
 
 				}
 				// ram entries
-				for (int i = 0; i < 5; i++) {
+				for (int i = 0; i < 5; i++)
+				{
 					m_bankr[i]->configure_entry(0, ramcart_ram_base + i * 0x2000);
 					m_bankw[i]->configure_entry(0, ramcart_ram_base + i * 0x2000);
 				}
-				m_bankr[5]->configure_entry(0, ramcart_ram_base + 0xc000); m_bankw[5]->configure_entry(0, ramcart_ram_base + 0xc000);
+				m_bankr[5]->configure_entry(0, ramcart_ram_base + 0xc000);
+				m_bankw[5]->configure_entry(0, ramcart_ram_base + 0xc000);
 
 				// rom entries
-				m_bankr[0]->configure_entry(1, memregion("monitor")->base());	m_bankw[0]->configure_entry(1, m_ignore_writes.get());
-				m_bankr[1]->configure_entry(1, ramcart_rom_base);				m_bankw[1]->configure_entry(1, m_ignore_writes.get());
-				m_bankr[2]->configure_entry(1, ramcart_rom_base + 0x2000);		m_bankw[2]->configure_entry(1, m_ignore_writes.get());
-				m_bankr[3]->configure_entry(1, ramcart_rom_base + 0x4000);		m_bankw[3]->configure_entry(1, m_ignore_writes.get());
+				m_bankr[0]->configure_entry(1, memregion("monitor")->base());
+				m_bankw[0]->configure_entry(1, m_ignore_writes.get());
+				m_bankr[1]->configure_entry(1, ramcart_rom_base);
+				m_bankw[1]->configure_entry(1, m_ignore_writes.get());
+				m_bankr[2]->configure_entry(1, ramcart_rom_base + 0x2000);
+				m_bankw[2]->configure_entry(1, m_ignore_writes.get());
+				m_bankr[3]->configure_entry(1, ramcart_rom_base + 0x4000);
+				m_bankw[3]->configure_entry(1, m_ignore_writes.get());
 	
 				m_rom_view.select(0);
 
 				for (int i = 0; i < 4; i++)
 				{
-					m_bankr[i]->set_entry(1); m_bankw[i]->set_entry(1);
+					m_bankr[i]->set_entry(1);
+					m_bankw[i]->set_entry(1);
 				}
-				m_bankr[4]->set_entry(0); m_bankw[4]->set_entry(0);
-				m_bankr[5]->set_entry(0); m_bankw[5]->set_entry(0);
+				m_bankr[4]->set_entry(0);
+				m_bankw[4]->set_entry(0);
+				m_bankr[5]->set_entry(0);
+				m_bankw[5]->set_entry(0);
 
 				break;
 			}
 			case MEM64KRX:
 			{
 				// ram entries
-				for (int i = 0; i < 5; i++) {
+				for (int i = 0; i < 5; i++)
+				{
 					m_bankr[i]->configure_entry(0, ramcart_ram_base + i * 0x2000);
 					m_bankw[i]->configure_entry(0, ramcart_ram_base + i * 0x2000);
 				}
-				m_bankr[5]->configure_entry(0, ramcart_ram_base + 0xc000); m_bankw[5]->configure_entry(0, ramcart_ram_base + 0xc000);
+				m_bankr[5]->configure_entry(0, ramcart_ram_base + 0xc000);
+				m_bankw[5]->configure_entry(0, ramcart_ram_base + 0xc000);
 
 				// rom entries
-				m_bankr[0]->configure_entry(1, memregion("monitor")->base()); m_bankw[0]->configure_entry(1, m_ignore_writes.get());
-				for (int i = 1; i < 5; i++) {
+				m_bankr[0]->configure_entry(1, memregion("monitor")->base());
+				m_bankw[0]->configure_entry(1, m_ignore_writes.get());
+				for (int i = 1; i < 5; i++)
+				{
 					m_bankr[i]->configure_entry(1, ramcart_rom_base + (i - 1) * 0x2000);
 					m_bankw[i]->configure_entry(1, m_ignore_writes.get());
 				}
-				m_bankr[5]->configure_entry(1, ramcart_rom_base + 0xa000); m_bankw[5]->configure_entry(1, m_ignore_writes.get());
+				m_bankr[5]->configure_entry(1, ramcart_rom_base + 0xa000);
+				m_bankw[5]->configure_entry(1, m_ignore_writes.get());
 
 				// MSX ROM
 				m_bankr[4]->configure_entry(2, ramcart_rom_base + 0xe000);
 				m_bankr[5]->configure_entry(2, ramcart_rom_base + 0x12000);
 
 				//select BASICs or MSX
-				if ((m_DIPS->read() & 0x01))
+				if (BIT(m_DIPS->read(), 1))
 				{
 					//BASIC-G and BASIC-F
 					entry = 1;
@@ -1479,12 +1504,18 @@ void m5_state::machine_reset()
 				m_rom_view.select(0);
 
 				// it seem no matter RAM/ROM selected writes allways go to ram
-				m_bankr[0]->set_entry(1);		m_bankw[0]->set_entry(0);
-				m_bankr[1]->set_entry(1);		m_bankw[1]->set_entry(0);
-				m_bankr[2]->set_entry(1);		m_bankw[2]->set_entry(0);
-				m_bankr[3]->set_entry(0);		m_bankw[3]->set_entry(0);
-				m_bankr[4]->set_entry(entry);	m_bankw[4]->set_entry(0);
-				m_bankr[5]->set_entry(entry);	m_bankw[5]->set_entry(0);
+				m_bankr[0]->set_entry(1);
+				m_bankw[0]->set_entry(0);
+				m_bankr[1]->set_entry(1);
+				m_bankw[1]->set_entry(0);
+				m_bankr[2]->set_entry(1);
+				m_bankw[2]->set_entry(0);
+				m_bankr[3]->set_entry(0);
+				m_bankw[3]->set_entry(0);
+				m_bankr[4]->set_entry(entry);
+				m_bankw[4]->set_entry(0);
+				m_bankr[5]->set_entry(entry);
+				m_bankw[5]->set_entry(0);
 				break;
 			}
 			default:
@@ -1493,14 +1524,16 @@ void m5_state::machine_reset()
 	}
 	else
 		//ram cart wasn't found so if rom cart present install it
-		if (m_romcart)
-		{
-			//BASIC-G and BASIC-F carts may have builtin ram so map it here;
-			romcart_ram_base = m_romcart->get_ram_base();
-			romcart_ram_size = m_romcart->get_ram_size();
+			if (m_romcart)
+			{
+				//BASIC-G and BASIC-F carts may have builtin ram so map it here;
+				romcart_ram_base = m_romcart->get_ram_base();
+				romcart_ram_size = m_romcart->get_ram_size();
 
-				if (romcart_ram_base) {
-					if (romcart_ram_size > 0) {
+				if (romcart_ram_base)
+				{
+					if (romcart_ram_size > 0)
+					{
 						uint32_t map_start = 0x8000;
 						uint32_t map_end = 0x8000 + romcart_ram_size - 1;
 						if (map_end > 0xffff) map_end = 0xffff;
@@ -1509,13 +1542,12 @@ void m5_state::machine_reset()
 					else program.unmap_readwrite(0x8000, 0xffff);
 				}
 				else program.unmap_readwrite(0x8000, 0xffff);
-			//}
 
-			program.install_rom(0x0000, 0x1fff, memregion("monitor")->base());
-			program.unmap_write(0x0000, 0x1fff);
-			program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_romcart, FUNC(m5_cart_slot_device::read_rom)));
-			program.unmap_write(0x2000, 0x6fff);
-		}
+				program.install_rom(0x0000, 0x1fff, memregion("monitor")->base());
+				program.unmap_write(0x0000, 0x1fff);
+				program.install_read_handler(0x2000, 0x6fff, read8sm_delegate(*m_romcart, FUNC(m5_cart_slot_device::read_rom)));
+				program.unmap_write(0x2000, 0x6fff);
+			}
 	m_ram_mode = 0;
 }
 
@@ -1689,7 +1721,7 @@ void brno_state::brno(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// RAM disk (maximum is 1024kB 256x 4kB banks)
-	RAM(config, m_ram).set_default_size("1M").set_extra_options("256K,768K,1M");
+	RAM(config, m_ram).set_default_size("512K").set_extra_options("256K,768K,1M");
 
 	i8251_device &sio(I8251(config, "sio", 10.738635_MHz_XTAL / 3));
 	sio.txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
