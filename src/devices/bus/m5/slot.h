@@ -42,11 +42,14 @@ public:
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
 	uint8_t* get_rom_base() { return m_rom; }
-	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint8_t* get_ram_base() { return m_ram.empty() ? nullptr : &m_ram[0]; }
 	uint32_t get_rom_size() { return m_rom_size; }
 	uint32_t get_ram_size() { return m_ram.size(); }
+	void set_rom_size(uint32_t size) { m_rom_size = size; }
+	void set_rom_base(uint8_t* ptr) { m_rom = ptr; }
 
 	void save_ram() { device().save_item(NAME(m_ram)); }
+
 
 protected:
 	device_m5_cart_interface(const machine_config &mconfig, device_t &device);
@@ -91,14 +94,33 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
-	device_m5_cart_interface* get_loaded_card() const noexcept { return m_cart; }
+	device_m5_cart_interface* get_loaded_cart() const noexcept { return m_cart; }
 
 	uint32_t get_rom_size() const noexcept
 	{
-		auto* card = get_loaded_card();
-		return card ? card->get_rom_size() : 0;
+		auto* cart = get_loaded_cart();
+		return cart ? cart->get_rom_size() : 0;
 	}
 
+
+	uint32_t get_ram_size() const noexcept
+	{
+		auto* cart = get_loaded_cart();
+		return cart ? cart->get_ram_size() : 0;
+	}
+
+
+	uint8_t* get_rom_base() const noexcept
+	{
+		auto* cart = get_loaded_cart();
+		return cart ? cart->get_rom_base() : nullptr;
+	}
+
+	uint8_t* get_ram_base() const noexcept
+	{
+		auto* cart = get_loaded_cart();
+		return cart ? cart->get_ram_base() : nullptr;
+	}
 
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
 
@@ -119,12 +141,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(M5_CART_SLOT, m5_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define M5SLOT_ROM_REGION_TAG ":cart:rom"
 
 #endif // MAME_BUS_M5_SLOT_H
