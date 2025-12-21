@@ -6,7 +6,7 @@
      by Guru (https://gurudumps.otenko.com/)-->
 
 	<element name="script_warning" defstate="1">
-		<text state="1" string="TO CONTROL SLIDERS/KNOBS WITH MOUSE ENABLE LAYOUT HELPER PLUGIN">
+		<text state="1" string="FOR MOUSE-CONTROLLED SLIDERS/KNOBS ENABLE LAYOUT HELPER PLUGIN">
 			<color red="1" green="0" blue="0"/></text></element>
 
 	<!-- Knob Elements -->
@@ -722,7 +722,7 @@
 		<element ref="button-whitesq" inputtag="Y0" inputmask="0x40">
 			<bounds x="92.5" y="154" width="245" height="192" /></element>
 		<element ref="text-play"><bounds x="185" y="45" width="119" height="60" /><color red="0" green="0" blue="0" /></element>
-		<element ref="led"><bounds x="137" y="58" width="30" height="30" /><animate name="led3" /><color state="0" red="0.4" green="0" blue="0" /><color state="1" red="1.0" green="0" blue="0" /></element>
+		<element ref="led"><bounds x="137" y="58" width="30" height="30" /><animate name="led3" /><color state="0" red="0" green="0.4" blue="0" /><color state="1" red="0" green="1" blue="0" /></element>
 	</group>
 	<group name="button-playstart">
 	<bounds x="0" y="0" width="460" height="246" />
@@ -988,7 +988,7 @@
 	<element ref="box-topedge"><bounds x="0" y="0" width="6000" height="180" /></element>
 	<element ref="rect"><bounds x="0" y="180" width="6000" height="4146" /><color red="0.87" green="0.858" blue="0.847"/></element>
 	<collection name="script warning">
-		<element ref="script_warning" id="warning"><bounds x="2700" y="40" width="3500" height="100"/><color red="1" green="0" blue="0" /></element>
+		<element ref="script_warning" id="warning"><bounds x="3000" y="40" width="2900" height="100"/><color red="1" green="0" blue="0" /></element>
 	</collection>
 	<element ref="screen-bezel"><bounds x="380" y="80" width="2580" height="950" /></element>
 	<element ref="rect"><bounds x="635" y="275" width="2060" height="595" /><color red="0" green="0" blue="0" /></element>
