@@ -16,8 +16,10 @@
 #include "video/huc6270.h"
 #include "video/huc6271.h"
 #include "video/huc6272.h"
+
 #include "screen.h"
 #include "speaker.h"
+#include "softlist_dev.h"
 
 
 namespace {
@@ -450,8 +452,6 @@ void pcfx_state::pcfx(machine_config &config)
 
 	HUC6271(config, "huc6271", XTAL(21'477'272));
 
-	SOFTWARE_LIST(config, "cd_list").set_original("pcfx");
-
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
@@ -461,6 +461,9 @@ void pcfx_state::pcfx(machine_config &config)
 	huc6230.vca_callback().set("huc6272", FUNC(huc6272_device::cdda_update));
 	huc6230.add_route(0, "speaker", 1.0, 0);
 	huc6230.add_route(1, "speaker", 1.0, 1);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("pcfx");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 
@@ -474,7 +477,7 @@ ROM_START( pcfx )
 	ROM_REGION32_LE( 0x100000, "scsi_rom", ROMREGION_ERASEFF )
 	// TODO: "PC-FX EXTIO Boot", really belongs to FX-SCSI PC-FX expansion board
 	// r/w to I/O $600000 SCSI if ROM enabled in both memory and I/O areas,
-	// allows PC-FX to act as a CD drive for a PC-98 host ...
+	// allows PC-FX to act as a CD drive for a PC-98 host.
 	ROM_LOAD( "fx-scsi.rom", 0x00000, 0x80000, CRC(f3e60e5e) SHA1(65482a23ac5c10a6095aee1db5824cca54ead6e5) )
 	ROM_RELOAD( 0x80000, 0x80000 )
 ROM_END
