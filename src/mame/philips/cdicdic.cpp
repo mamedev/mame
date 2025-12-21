@@ -46,14 +46,6 @@ TODO:
 
 namespace {
 
-constexpr int16_t clip_int16(int32_t sample)
-{
-	return int16_t(std::clamp<int32_t>(sample, -32768, 32767));
-}
-
-} // anonymous namespace
-
-
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CD-i CDIC")
 
