@@ -212,7 +212,7 @@ int z80ctc_device::z80daisy_irq_ack()
 			LOG("CTC IRQAck ch%d\n", ch);
 
 			// clear interrupt, switch to the IEO state, and update the IRQs
-			channel.m_int_state = Z80_DAISY_IEO;
+			channel_int_state_w(ch, Z80_DAISY_IEO);
 			interrupt_check();
 			return m_vector + ch * 2;
 		}
@@ -241,7 +241,7 @@ void z80ctc_device::z80daisy_irq_reti()
 			LOG("CTC IRQReti ch%d\n", ch);
 
 			// clear the IEO state and update the IRQs
-			channel.m_int_state &= ~Z80_DAISY_IEO;
+			channel_int_state_w(ch, channel.m_int_state & ~Z80_DAISY_IEO);
 			interrupt_check();
 			return;
 		}

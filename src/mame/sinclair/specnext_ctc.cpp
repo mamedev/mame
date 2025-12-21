@@ -15,15 +15,29 @@ DEFINE_DEVICE_TYPE(SPECNEXT_CTC, specnext_ctc_device, "specnext_ctc", "Spectrum 
 
 specnext_ctc_device::specnext_ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: z80ctc_device(mconfig, SPECNEXT_CTC, tag, owner, clock)
+	, m_int_cb(*this)
 {
 }
 
 int specnext_ctc_device::z80daisy_irq_ack()
 {
-	int const channel = (z80ctc_device::z80daisy_irq_ack() - m_vector) / 2;
-	return ((channel > 0) || (channel_int_state(0) == Z80_DAISY_IEO))
-		? (m_vector + ((channel + 3) << 1))
-		: 0xff;
+	m_ch_idx = 4;
+	z80ctc_device::z80daisy_irq_ack();
+	if (m_ch_idx < 4)
+	{
+		m_int_cb(ASSERT_LINE);
+		return m_vector + ((3 + m_ch_idx) << 1);
+	}
+	else
+		return 0xff;
+}
+
+void specnext_ctc_device::z80daisy_irq_reti()
+{
+	m_ch_idx = 4;
+	z80ctc_device::z80daisy_irq_reti();
+	if (m_ch_idx < 4)
+		m_int_cb(CLEAR_LINE);
 }
 
 void specnext_ctc_device::ctrl_int_w(u8 ch_mask)
@@ -50,4 +64,23 @@ u8 specnext_ctc_device::ctrl_int_r()
 	}
 
 	return int_mode;
+}
+
+void specnext_ctc_device::channel_int_state_w(int ch, u8 state)
+{
+	m_ch_idx = ch;
+	z80ctc_device::channel_int_state_w(ch, state);
+}
+
+u8 specnext_ctc_device::int_channel_r()
+{
+	assert(m_ch_idx < 4);
+	return m_ch_idx;
+}
+
+void specnext_ctc_device::device_start()
+{
+	z80ctc_device::device_start();
+
+	save_item(NAME(m_ch_idx));
 }
