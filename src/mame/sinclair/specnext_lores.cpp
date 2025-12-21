@@ -80,8 +80,8 @@ void specnext_lores_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, co
 			{
 				for (u8 i = 0; (i < 4 - off4) && ((hpos + i) <= clip.right()); ++i)
 				{
-					*(pix + i) = pen;
-					*(prio + i) |= pcode;
+					pix[i] = pen;
+					prio[i] |= pcode;
 				}
 			}
 			if (off4)
