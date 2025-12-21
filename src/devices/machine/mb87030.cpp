@@ -41,7 +41,6 @@ mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, 
 	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_irq_handler(*this),
 	m_dreq_handler(*this),
-	m_bsy_handler(*this),
 	m_irq_state(false)
 {
 
@@ -511,7 +510,6 @@ void mb87030_device::device_start()
 void mb87030_device::scsi_ctrl_changed()
 {
 	const auto value = scsi_bus->ctrl_r();
-	m_bsy_handler((value & S_BSY) ? ASSERT_LINE : CLEAR_LINE);
 	LOG("%s: %02x\n", __FUNCTION__, value);
 	if (m_delay_timer->remaining() == attotime::never)
 		step(false);

@@ -17,7 +17,6 @@ public:
 
 	auto out_irq_callback() { return m_irq_handler.bind(); }
 	auto out_dreq_callback() { return m_dreq_handler.bind(); }
-	auto out_bsy_callback() { return m_bsy_handler.bind(); }
 
 	uint8_t bdid_r();
 	uint8_t sctl_r();
@@ -181,7 +180,6 @@ private:
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_dreq_handler;
-	devcb_write_line m_bsy_handler;
 
 	TIMER_CALLBACK_MEMBER(delay_timeout);
 	TIMER_CALLBACK_MEMBER(timeout);
