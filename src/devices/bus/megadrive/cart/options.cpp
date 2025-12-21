@@ -15,7 +15,7 @@
 #include "multigame.h"
 #include "rockworld.h"
 #include "rom.h"
-#include "seganet.h"
+#include "segach.h"
 #include "sfteam.h"
 #include "sram.h"
 #include "smb.h"
@@ -53,10 +53,11 @@ char const *const MD_JCART_SAMPRAS      = "rom_jcart_sampras";
 char const *const MD_JCART_SSKID        = "rom_jcart";
 char const *const MD_JCART_MICROMAC2    = "rom_codemast";
 char const *const MD_JCART_MICROMAC96   = "rom_mm96";
-char const *const MD_SEGANET            = "seganet";
+char const *const MD_SEGACH_JP          = "segach_jp";
 char const *const MD_TECTOY_SPORTS      = "tectoy_sports";
 char const *const MD_3IN1_FWT           = "3in1fwt";
-char const *const MC_PIRATE             = "rom_mcpir"; // TODO: rename, what even MC stands for?
+// MC: MultiCart
+char const *const MC_PIRATE             = "rom_mcpir";
 char const *const MC_18KIN1             = "18kin1";
 char const *const MC_GOLDM250           = "goldm250";
 char const *const UNL_XINQIG            = "rom_xinqig";
@@ -94,7 +95,7 @@ char const *const UNL_CHINF3            = "rom_chinf3";
 char const *const UNL_SMW64             = "rom_smw64";
 char const *const UNL_ROCKWORLD         = "rockworld";
 char const *const UNL_ROCKHEAVEN        = "rockheaven";
-char const *const HB_PSOLAR             = "rom_stm95"; // TODO: rename
+char const *const HB_PSOLAR             = "rom_stm95"; // TODO: rename string
 
 char const *const ACTION_REPLAY         = "ar";
 
@@ -138,8 +139,10 @@ void megadrive_cart_options(device_slot_interface &device)
 	device.option_add_internal(slotoptions::MD_TECTOY_SPORTS, MEGADRIVE_TECTOY_SPORTS);
 	device.option_add_internal(slotoptions::MD_3IN1_FWT,      MEGADRIVE_3IN1FWT);
 
-	// menu based multigames
-	device.option_add_internal(slotoptions::MD_SEGANET,   MEGADRIVE_SEGANET);
+	// Sega Channel
+	device.option_add_internal(slotoptions::MD_SEGACH_JP,   MEGADRIVE_SEGACH_JP);
+
+	// menu based multigames (pirate)
 	device.option_add_internal(slotoptions::MC_PIRATE,    MEGADRIVE_MCPIRATE);
 	device.option_add_internal(slotoptions::MC_18KIN1,    MEGADRIVE_18KIN1);
 	device.option_add_internal(slotoptions::MC_GOLDM250,  MEGADRIVE_GOLDM250);

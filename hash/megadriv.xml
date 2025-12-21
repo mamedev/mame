@@ -19359,7 +19359,7 @@ Patches protection checks, original uses Squirrel King cart scheme
 Missing [CART] handler (works in teradrive)
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="seganet"/>
+			<feature name="slot" value="segach_jp"/>
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
 				<rom name="game no kanzume otokuyou (jpn).bin" size="3145728" crc="cdad7e6b" sha1="31c66bd13abf4ae8271c09ec5286a0ee0289dbbc"/>
 			</dataarea>
