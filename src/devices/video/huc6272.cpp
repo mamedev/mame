@@ -2,31 +2,31 @@
 // copyright-holders:Wilbert Pol, Angelo Salese
 /**************************************************************************************************
 
-    Hudson/NEC HuC6272 "King" device
+Hudson/NEC HuC6272 "King" device
 
-    TODO:
-    - Use NSCSI instead of legacy one;
-    \- SEL acknowledges with 0x84, bit 7 controller type is unknown at this time
-       (bit 2 should select the CD drive);
-    - Convert base mapping to address_map;
-    - Convert I/O to space address, and make it honor mem_mask;
-    - subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
-      \- Fails detection of PC-FX discs, detects as normal audio CDs;
-      \- During POST it tries an unhandled 0x44 "Read Header";
-      \- Derivative design of PCE drive, which in turn is a derivative of PC-8801-30 (cd drive)
-         and PC-8801-31 (interface);
-    - Implement video routines drawing and interface:
-      \- BIOS main menu draws BG0 only as backdrop of the PCE VDCs with 16M mode (5);
-      \- (check Photo CD, Audio CD & backup RAM screens);
-    - Implement video mixing with other PCFX chips;
-    - Implement microprogram (layer timings, sort of Sega Saturn VRAM cycle patterns);
-    - Implement Rainbow transfers (NEC logo on POST);
-    - Verify ADPCM transfers;
+TODO:
+- Use NSCSI instead of legacy one;
+\- SEL acknowledges with 0x84, bit 7 controller type is unknown at this time
+  (bit 2 should select the CD drive);
+- Convert base mapping to address_map;
+- Convert I/O to space address, and make it honor mem_mask;
+- subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
+  \- Fails detection of PC-FX discs, detects as normal audio CDs;
+  \- During POST it tries an unhandled 0x44 "Read Header";
+  \- Derivative design of PCE drive, which in turn is a derivative of PC-8801-30 (cd drive)
+     and PC-8801-31 (interface);
+- Implement video routines drawing and interface:
+  \- BIOS main menu draws BG0 only as backdrop of the PCE VDCs with 16M mode (5);
+  \- (check Photo CD, Audio CD & backup RAM screens);
+- Implement video mixing with other PCFX chips;
+- Implement microprogram (layer timings, sort of Sega Saturn VRAM cycle patterns);
+- Implement Rainbow transfers (NEC logo on POST);
+- Verify ADPCM transfers;
 
-    ADPCM related patents:
-    - https://patents.google.com/patent/US5692099
-    - https://patents.google.com/patent/US6453286
-    - https://patents.google.com/patent/US5548655A
+ADPCM related patents:
+- https://patents.google.com/patent/US5692099
+- https://patents.google.com/patent/US6453286
+- https://patents.google.com/patent/US5548655A
 
 **************************************************************************************************/
 
@@ -44,11 +44,134 @@
 // device type definition
 DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\"")
 
+huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, HUC6272, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_huc6271(*this, finder_base::DUMMY_TAG)
+	, m_cdda_l(*this, "cdda_l")
+	, m_cdda_r(*this, "cdda_r")
+	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
+	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this))
+	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
+	, m_microprg_ram(*this, "microprg_ram")
+	, m_kram_page0(*this, "kram_page0")
+	, m_kram_page1(*this, "kram_page1")
+	, m_scsibus(*this, "scsi")
+	, m_scsi_data_in(*this, "scsi_data_in")
+	, m_scsi_data_out(*this, "scsi_data_out")
+	, m_scsi_ctrl_in(*this, "scsi_ctrl_in")
+	, m_scsi_cmd_in(*this, "scsi_cmd_in")
+	, m_irq_changed_cb(*this)
+{
+}
+
+void huc6272_device::cdrom_config(device_t *device)
+{
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^cdda_l", 1.0);
+	cdda->add_route(1, "^^cdda_r", 1.0);
+}
+
+void huc6272_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, m_cdda_l).front_left();
+	SPEAKER(config, m_cdda_r).front_right();
+
+	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
+	scsibus.set_data_input_buffer("scsi_data_in");
+	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
+	scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
+	scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit5));
+	scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit4));
+	scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
+	scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
+	scsibus.sel_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
+
+	scsibus.rst_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit7));
+	scsibus.ack_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit4));
+	scsibus.sel_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit2));
+	scsibus.atn_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit1));
+	scsibus.bsy_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit0));
+
+	output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
+	scsibus.set_output_latch(scsiout);
+
+	INPUT_BUFFER(config, "scsi_cmd_in");
+	INPUT_BUFFER(config, "scsi_ctrl_in");
+	INPUT_BUFFER(config, "scsi_data_in");
+
+	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+	scsibus.slot(1).set_option_machine_config("cdrom", cdrom_config);
+}
+
+void huc6272_device::device_start()
+{
+	save_item(NAME(m_register));
+	save_item(NAME(m_kram_addr_r));
+	save_item(NAME(m_kram_inc_r));
+	save_item(NAME(m_kram_page_r));
+	save_item(NAME(m_kram_addr_w));
+	save_item(NAME(m_kram_inc_w));
+	save_item(NAME(m_kram_page_w));
+	save_item(NAME(m_page_setting));
+
+	save_item(STRUCT_MEMBER(m_bg, bat_address));
+	save_item(STRUCT_MEMBER(m_bg, cg_address));
+	save_item(STRUCT_MEMBER(m_bg, mode));
+	save_item(STRUCT_MEMBER(m_bg, height));
+	save_item(STRUCT_MEMBER(m_bg, width));
+	save_item(STRUCT_MEMBER(m_bg, xscroll));
+	save_item(STRUCT_MEMBER(m_bg, yscroll));
+	save_item(STRUCT_MEMBER(m_bg, priority));
+
+	save_item(NAME(m_bg0sub.bat_address));
+	save_item(NAME(m_bg0sub.cg_address));
+	save_item(NAME(m_bg0sub.height));
+	save_item(NAME(m_bg0sub.width));
+
+	save_item(NAME(m_micro_prg.index));
+	save_item(NAME(m_micro_prg.ctrl));
+
+	save_item(NAME(m_adpcm.rate));
+	save_item(NAME(m_adpcm.status));
+	save_item(NAME(m_adpcm.interrupt));
+	for (int adpcm = 0; adpcm < 2; adpcm++)
+	{
+		save_item(NAME(m_adpcm.playing[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.control[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.start[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.end[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.imm[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.input[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.nibble[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.pos[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.addr[adpcm]), adpcm);
+	}
+}
+
+
+void huc6272_device::device_reset()
+{
+}
+
+device_memory_interface::space_config_vector huc6272_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_space_config),
+		std::make_pair(AS_DATA,    &m_data_space_config),
+		std::make_pair(AS_IO,      &m_io_space_config)
+	};
+}
+
 void huc6272_device::microprg_map(address_map &map)
 {
 	if (!has_configured_map(0))
 		map(0x00, 0x0f).ram().share("microprg_ram");
 }
+
+//**************************************************************************
+//  Memory maps
+//**************************************************************************
 
 void huc6272_device::kram_map(address_map &map)
 {
@@ -126,135 +249,11 @@ void huc6272_device::io_map(address_map &map)
 	map(0x5e, 0x5e).w(FUNC(huc6272_device::adpcm_imm_address_w<1>));
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  huc6272_device - constructor
-//-------------------------------------------------
-
-huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HUC6272, tag, owner, clock)
-	, device_memory_interface(mconfig, *this)
-	, m_huc6271(*this, finder_base::DUMMY_TAG)
-	, m_cdda_l(*this, "cdda_l")
-	, m_cdda_r(*this, "cdda_r")
-	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
-	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this))
-	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
-	, m_microprg_ram(*this, "microprg_ram")
-	, m_kram_page0(*this, "kram_page0")
-	, m_kram_page1(*this, "kram_page1")
-	, m_scsibus(*this, "scsi")
-	, m_scsi_data_in(*this, "scsi_data_in")
-	, m_scsi_data_out(*this, "scsi_data_out")
-	, m_scsi_ctrl_in(*this, "scsi_ctrl_in")
-	, m_scsi_cmd_in(*this, "scsi_cmd_in")
-	, m_irq_changed_cb(*this)
-{
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void huc6272_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void huc6272_device::device_start()
-{
-	save_item(NAME(m_register));
-	save_item(NAME(m_kram_addr_r));
-	save_item(NAME(m_kram_inc_r));
-	save_item(NAME(m_kram_page_r));
-	save_item(NAME(m_kram_addr_w));
-	save_item(NAME(m_kram_inc_w));
-	save_item(NAME(m_kram_page_w));
-	save_item(NAME(m_page_setting));
-
-	save_item(STRUCT_MEMBER(m_bg, bat_address));
-	save_item(STRUCT_MEMBER(m_bg, cg_address));
-	save_item(STRUCT_MEMBER(m_bg, mode));
-	save_item(STRUCT_MEMBER(m_bg, height));
-	save_item(STRUCT_MEMBER(m_bg, width));
-	save_item(STRUCT_MEMBER(m_bg, xscroll));
-	save_item(STRUCT_MEMBER(m_bg, yscroll));
-	save_item(STRUCT_MEMBER(m_bg, priority));
-
-	save_item(NAME(m_bg0sub.bat_address));
-	save_item(NAME(m_bg0sub.cg_address));
-	save_item(NAME(m_bg0sub.height));
-	save_item(NAME(m_bg0sub.width));
-
-	save_item(NAME(m_micro_prg.index));
-	save_item(NAME(m_micro_prg.ctrl));
-
-	save_item(NAME(m_adpcm.rate));
-	save_item(NAME(m_adpcm.status));
-	save_item(NAME(m_adpcm.interrupt));
-	for (int adpcm = 0; adpcm < 2; adpcm++)
-	{
-		save_item(NAME(m_adpcm.playing[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.control[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.start[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.end[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.imm[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.input[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.nibble[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.pos[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.addr[adpcm]), adpcm);
-	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void huc6272_device::device_reset()
-{
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector huc6272_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_space_config),
-		std::make_pair(AS_DATA,    &m_data_space_config),
-		std::make_pair(AS_IO,      &m_io_space_config)
-	};
-}
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  read_dword - read a dword at the given address
-//-------------------------------------------------
 
 inline uint32_t huc6272_device::read_dword(offs_t address)
 {
 	return space(AS_DATA).read_dword(address << 2);
 }
-
-
-//-------------------------------------------------
-//  write_dword - write a dword at the given address
-//-------------------------------------------------
 
 inline void huc6272_device::write_dword(offs_t address, uint32_t data)
 {
@@ -709,45 +708,3 @@ void huc6272_device::interrupt_update()
 		m_irq_changed_cb(CLEAR_LINE);
 }
 
-void huc6272_device::cdrom_config(device_t *device)
-{
-	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^cdda_l", 1.0);
-	cdda->add_route(1, "^^cdda_r", 1.0);
-}
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void huc6272_device::device_add_mconfig(machine_config &config)
-{
-	SPEAKER(config, m_cdda_l).front_left();
-	SPEAKER(config, m_cdda_r).front_right();
-
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_data_input_buffer("scsi_data_in");
-	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
-	scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
-	scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit5));
-	scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit4));
-	scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
-	scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
-	scsibus.sel_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
-
-	scsibus.rst_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit7));
-	scsibus.ack_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit4));
-	scsibus.sel_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit2));
-	scsibus.atn_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit1));
-	scsibus.bsy_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit0));
-
-	output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
-	scsibus.set_output_latch(scsiout);
-
-	INPUT_BUFFER(config, "scsi_cmd_in");
-	INPUT_BUFFER(config, "scsi_ctrl_in");
-	INPUT_BUFFER(config, "scsi_data_in");
-
-	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsibus.slot(1).set_option_machine_config("cdrom", cdrom_config);
-}
