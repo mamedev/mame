@@ -13,24 +13,14 @@
 
 namespace fs {
 
-void fsblk_vec_t::blk_t::internal_write(u32 offset, const u8 *src, u32 size)
+const u8 *fsblk_vec_t::blk_t::rodata() const
 {
-	std::copy_n(src, size, m_data + offset);
+	return m_data;
 }
 
-void fsblk_vec_t::blk_t::internal_fill(u32 offset, u8 data, u32 size)
+u8 *fsblk_vec_t::blk_t::data()
 {
-	std::fill_n(m_data + offset, size, data);
-}
-
-void fsblk_vec_t::blk_t::internal_read(u32 offset, u8 *dst, u32 size) const
-{
-	std::copy_n(m_data + offset, size, dst);
-}
-
-bool fsblk_vec_t::blk_t::internal_eqmem(u32 offset, const u8 *src, u32 size) const
-{
-	return std::equal(src, src + size, m_data + offset);
+	return m_data;
 }
 
 u32 fsblk_vec_t::block_count() const

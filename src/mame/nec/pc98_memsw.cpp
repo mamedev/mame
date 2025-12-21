@@ -11,7 +11,7 @@
     Running the MON command under BASIC allows the user to change these
     settings.
     ssw -> for displaying current settings on screen;
-    ssw#<cr> -> to change the given # (new hex number after striking enter)
+    ssw# -> to change the given #
 
     List of settings, parenthesis for default if not zero
     SW1 $A3FE2

@@ -17,7 +17,6 @@
 #include "strformat.h"
 
 #include <array>
-#include <numeric>
 #include <optional>
 #include <set>
 #include <string_view>
@@ -60,8 +59,8 @@ public:
 	public:
 		block_iterator(const impl &fs, u32 first_sector, u32 sector_count);
 		bool next();
-		void append_data(std::vector<u8> &vec) const;
-		hplif_dirent get_dirent(int file_index) const;
+		const void *data() const;
+		const std::array<hplif_dirent, 8> &dirent_data() const;
 		u8 size() const;
 
 	private:
@@ -78,14 +77,13 @@ public:
 	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 
 private:
 	fsblk_t::block_t::ptr read_sector(u32 starting_sector) const;
 	std::optional<hplif_dirent> dirent_from_path(const std::vector<std::string> &path) const;
 	void iterate_directory_entries(const std::function<bool(const hplif_dirent &dirent)> &callback) const;
-	static util::arbitrary_datetime decode_datetime(const hplif_time &time);
-	static meta_data metadata_from_dirent(const hplif_dirent &dirent);
+	util::arbitrary_datetime decode_datetime(const hplif_time *time) const;
+	meta_data metadata_from_dirent(const hplif_dirent &dirent) const;
 	std::error_condition format(const meta_data &meta) override;
 };
 
@@ -254,14 +252,11 @@ impl::impl(fsblk_t &blockdev)
 meta_data impl::volume_metadata()
 {
 	auto block = read_sector(0);
-	std::string disk_name = block->rstr(2, 6);
-
-	hplif_time time;
-	block->read(36, reinterpret_cast<u8 *>(&time), sizeof(hplif_time));
+	std::string_view disk_name = block->rstr(2, 6);
 
 	meta_data results;
 	results.set(meta_name::name, strtrimright_hplif(disk_name));
-	results.set(meta_name::creation_date, decode_datetime(time));
+	results.set(meta_name::creation_date, decode_datetime(reinterpret_cast<const hplif_time *>(block->rodata() + 36)));
 	return results;
 }
 
@@ -287,7 +282,7 @@ std::pair<std::error_condition, meta_data> impl::metadata(const std::vector<std:
 std::pair<std::error_condition, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
 {
 	std::vector<dir_entry> results;
-	auto callback = [&results](const hplif_dirent &ent)
+	auto callback = [this, &results](const hplif_dirent &ent)
 	{
 		results.emplace_back(dir_entry_type::file, metadata_from_dirent(ent));
 		return false;
@@ -319,40 +314,9 @@ std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vect
 	result.reserve(sector_count * 256 + 32);
 	block_iterator iter(*this, big_endianize_int32(dirent->m_starting_sector), sector_count);
 	while (iter.next())
-		iter.append_data(result);
+		result.insert(result.end(), (const u8 *)iter.data(), (const u8 *)iter.data() + 256);
 
 	return std::make_pair(std::error_condition(), std::move(result));
-}
-
-
-//-------------------------------------------------
-//  impl::enum_blocks
-//-------------------------------------------------
-
-std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> impl::enum_blocks(const std::vector<std::string> &path)
-{
-	if (path.empty())
-	{
-		// count the directory entries
-		u32 count = 0;
-		iterate_directory_entries([&count](const hplif_dirent &dirent) { count++; return false; });
-
-		fsblk_t::block_t::ptr block = m_blockdev.get(0);
-		std::vector<u32> dir_sectors(std::min(count / 8 + 1, block->r32b(16)));
-		std::iota(dir_sectors.begin(), dir_sectors.end(), block->r32b(8));
-		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(dir_sectors));
-	}
-	else
-	{
-		// find the file
-		std::optional<hplif_dirent> dirent = dirent_from_path(path);
-		if (!dirent)
-			return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
-
-		std::vector<u32> sectors(big_endianize_int32(dirent->m_sector_count));
-		std::iota(sectors.begin(), sectors.end(), big_endianize_int32(dirent->m_starting_sector));
-		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(sectors));
-	}
 }
 
 
@@ -405,10 +369,8 @@ void impl::iterate_directory_entries(const std::function<bool(const hplif_dirent
 
 	while (iter.next())
 	{
-		for (int file_index = 0; file_index < 8; file_index++)
+		for (const hplif_dirent &ent : iter.dirent_data())
 		{
-			hplif_dirent ent = iter.get_dirent(file_index);
-
 			if (ent.m_file_type == 0xffff)
 			{
 				return;
@@ -427,17 +389,17 @@ void impl::iterate_directory_entries(const std::function<bool(const hplif_dirent
 //  impl::decode_datetime
 //-------------------------------------------------
 
-util::arbitrary_datetime impl::decode_datetime(const hplif_time &time)
+util::arbitrary_datetime impl::decode_datetime(const hplif_time *time) const
 {
 	util::arbitrary_datetime result;
 	memset(&result, 0, sizeof(result));
 
-	result.year         = bcd_2_dec(time.year) + 1900;
-	result.month        = bcd_2_dec(time.month);
-	result.day_of_month = bcd_2_dec(time.day);
-	result.hour         = bcd_2_dec(time.hour);
-	result.minute       = bcd_2_dec(time.minute);
-	result.second       = bcd_2_dec(time.second);
+	result.year         = bcd_2_dec(time->year) + 1900;
+	result.month        = bcd_2_dec(time->month);
+	result.day_of_month = bcd_2_dec(time->day);
+	result.hour         = bcd_2_dec(time->hour);
+	result.minute       = bcd_2_dec(time->minute);
+	result.second       = bcd_2_dec(time->second);
 	return result;
 }
 
@@ -445,7 +407,7 @@ util::arbitrary_datetime impl::decode_datetime(const hplif_time &time)
 //  impl::metadata_from_dirent
 //-------------------------------------------------
 
-meta_data impl::metadata_from_dirent(const hplif_dirent &dirent)
+meta_data impl::metadata_from_dirent(const hplif_dirent &dirent) const
 {
 	std::string file_type = util::string_format("0x%04X", big_endianize_int16(dirent.m_file_type));
 
@@ -454,7 +416,7 @@ meta_data impl::metadata_from_dirent(const hplif_dirent &dirent)
 	result.set(meta_name::name, strtrimright_hplif(dirent.m_file_name));
 	result.set(meta_name::file_type, std::move(file_type));
 	result.set(meta_name::length, big_endianize_int32(dirent.m_sector_count) * 256);
-	result.set(meta_name::modification_date, decode_datetime(dirent.m_time));
+	result.set(meta_name::modification_date, decode_datetime(&dirent.m_time));
 	return result;
 }
 
@@ -494,15 +456,13 @@ bool impl::block_iterator::next()
 
 
 //-------------------------------------------------
-//  impl::block_iterator::append_data
+//  impl::block_iterator::data
 //-------------------------------------------------
 
-void impl::block_iterator::append_data(std::vector<u8> &vec) const
+const void *impl::block_iterator::data() const
 {
-	vec.resize(vec.size() + 256);
-	m_block->read(0, &*(vec.end() - 256), 256);
+	return m_block->rodata();
 }
-
 
 //-------------------------------------------------
 //  impl::format
@@ -528,14 +488,12 @@ std::error_condition impl::format(const meta_data &meta)
 }
 
 //-------------------------------------------------
-//  impl::block_iterator::get_dirent
+//  impl::block_iterator::dirent_data
 //-------------------------------------------------
 
-impl::hplif_dirent impl::block_iterator::get_dirent(int file_index) const
+const std::array<impl::hplif_dirent, 8> &impl::block_iterator::dirent_data() const
 {
-	impl::hplif_dirent ent;
-	m_block->read(file_index * 32, reinterpret_cast<u8 *>(&ent), 32);
-	return ent;
+	return *reinterpret_cast<const std::array<impl::hplif_dirent, 8> *>(m_block->rodata());
 }
 
 } // anonymous namespace

@@ -6,10 +6,7 @@
  */
 
 #include "emu.h"
-
 #include "corestr.h"
-#include "endianness.h"
-
 
 //#define sc45helperlog printf
 #define sc45helperlog machine.logerror
@@ -140,8 +137,8 @@ sc4inputinfo sc4inputs[32][16];
 
 bool compare_input_code(running_machine &machine, int addr)
 {
-	uint16_t *src = &machine.root_device().memregion( "maincpu" )->as_u16();
-	uint16_t *rom = &src[addr];
+	uint16_t *src = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint16_t* rom = &src[addr];
 
 
 	if ((rom[0] != 0x48e7) || (rom[1] != 0x3020) || (rom[2] != 0x322f) || (rom[3] != 0x0010) || (rom[4] != 0x227c))
@@ -169,8 +166,8 @@ int find_input_strings(running_machine &machine)
 	uint32_t startblock = 0;
 	uint32_t endblock = 0;
 
-	uint16_t *rom = &machine.root_device().memregion( "maincpu" )->as_u16();
-	auto rom8 = util::big_endian_cast<u8>(rom);
+	uint16_t *rom = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *rom8 = machine.root_device().memregion( "maincpu" )->base();
 
 	for (int i=0;i<(0x100000-0x40)/2;i++)
 	{
@@ -200,7 +197,7 @@ int find_input_strings(running_machine &machine)
 
 					for (int k = stringaddr; k < stringaddr + 6; k++)
 					{
-						uint8_t chr = rom8[k];
+						uint8_t chr = rom8[k^1];
 
 						if ((chr == 0xff) || (chr == 0x00))
 						{
@@ -447,8 +444,8 @@ int find_lamp_strings(running_machine &machine)
 
 
 
-	uint16_t *rom = &machine.root_device().memregion( "maincpu" )->as_u16();
-	auto rom8 = util::big_endian_cast<u8>(rom);
+	uint16_t *rom = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *rom8 = machine.root_device().memregion( "maincpu" )->base();
 
 //  sc45helperlog("------------ LAMPS -----------------\n");
 
@@ -468,7 +465,7 @@ int find_lamp_strings(running_machine &machine)
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
 			{
-				uint8_t chr = rom8[k];
+				uint8_t chr = rom8[k^1];
 
 				if ((chr == 0xff) || (chr == 0x00))
 				{
@@ -815,11 +812,19 @@ int find_reel_strings(running_machine &machine)
 
 	endblock =   startblock + 4 * (total_reel_symbols);
 
+
+
 	if (startblock == -1)
 		return 0;
 
-	uint16_t *rom = &machine.root_device().memregion( "maincpu" )->as_u16();
-	auto rom8 = util::big_endian_cast<u8>(rom);
+
+
+
+
+	uint16_t *rom = (uint16_t*)machine.root_device().memregion( "maincpu" )->base();
+	uint8_t *rom8 = machine.root_device().memregion( "maincpu" )->base();
+
+
 
 	sc45helperlog("------------ LAYOUT -----------------\n");
 
@@ -855,7 +860,7 @@ int find_reel_strings(running_machine &machine)
 
 			for (int k = stringaddr; k < stringaddr + 10; k++)
 			{
-				uint8_t chr = rom8[k];
+				uint8_t chr = rom8[k^1];
 
 				if ((chr == 0xff) || (chr == 0x00))
 				{

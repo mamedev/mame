@@ -262,7 +262,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="aknamezoa" cloneof="aknamezo">
-		<description>Aknamező (alt)</description>
+		<description>Aknamező (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -298,7 +298,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="alien8a" cloneof="alien8">
-		<description>Alien 8 (alt)</description>
+		<description>Alien 8 (Alt)</description>
 		<year>1985</year>
 		<publisher>'a' Studio</publisher>
 
@@ -310,7 +310,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="alien8b" cloneof="alien8">
-		<description>Alien 8 (alt 2)</description>
+		<description>Alien 8 (Alt 2)</description>
 		<year>1985</year>
 		<publisher>'a' Studio</publisher>
 
@@ -322,7 +322,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="alien8c" cloneof="alien8">
-		<description>Alien 8 (alt 3)</description>
+		<description>Alien 8 (Alt 3)</description>
 		<year>1985</year>
 		<publisher>'a' Studio</publisher>
 
@@ -346,7 +346,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="amobaa" cloneof="amoba">
-		<description>Amőba (alt)</description>
+		<description>Amőba (Alt)</description>
 		<year>198?</year>
 		<publisher>Videoton</publisher>
 
@@ -526,7 +526,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="attoresa" cloneof="attores">
-		<description>Áttörés (alt)</description>
+		<description>Áttörés (Alt)</description>
 		<year>198?</year>
 		<publisher>Bit &amp; Guy</publisher>
 
@@ -538,7 +538,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="attoresb" cloneof="attores">
-		<description>Áttörés (alt 2)</description>
+		<description>Áttörés (Alt 2)</description>
 		<year>198?</year>
 		<publisher>Bit &amp; Guy</publisher>
 
@@ -586,7 +586,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="awaria" cloneof="awari">
-		<description>Awari (alt)</description>
+		<description>Awari (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -682,7 +682,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="bananfala" cloneof="bananfal">
-		<description>Banánfaló (alt)</description>
+		<description>Banánfaló (Alt)</description>
 		<year>198?</year>
 		<publisher>Berysoft</publisher>
 
@@ -694,7 +694,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="bananfalb" cloneof="bananfal">
-		<description>Banánfaló (alt 2)</description>
+		<description>Banánfaló (Alt 2)</description>
 		<year>198?</year>
 		<publisher>Berysoft</publisher>
 
@@ -718,7 +718,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="banyasza" cloneof="banyasz">
-		<description>Bányász (alt)</description>
+		<description>Bányász (Alt)</description>
 		<year>198?</year>
 		<publisher>Novotrade</publisher>
 
@@ -838,7 +838,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="bekajatea" cloneof="bekajate">
-		<description>Béka-játék (alt)</description>
+		<description>Béka-játék (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -850,7 +850,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="bekajateb" cloneof="bekajate">
-		<description>Béka-játék (alt 2)</description>
+		<description>Béka-játék (Alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -874,7 +874,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="bekaa" cloneof="beka">
-		<description>Béka (alt)</description>
+		<description>Béka (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -886,7 +886,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="bekab" cloneof="beka">
-		<description>Béka (alt 2)</description>
+		<description>Béka (Alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -946,7 +946,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="bioritmua" cloneof="bioritmu">
-		<description>Bioritmus (alt)</description>
+		<description>Bioritmus (Alt)</description>
 		<year>1986</year>
 		<publisher>Unisoft GMK</publisher>
 
@@ -1030,7 +1030,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="boba" cloneof="bob">
-		<description>Bob (alt)</description>
+		<description>Bob (Alt)</description>
 		<year>198?</year>
 		<publisher>Mamut Soft</publisher>
 
@@ -1510,7 +1510,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="colorisa" cloneof="coloris">
-		<description>Coloris (alt)</description>
+		<description>Coloris (Alt)</description>
 		<year>198?</year>
 		<publisher>Béla Csatlós</publisher>
 
@@ -1558,7 +1558,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="commandoa" cloneof="commando">
-		<description>Commando (alt)</description>
+		<description>Commando (Alt)</description>
 		<year>1989</year>
 		<publisher>Berysoft</publisher>
 
@@ -1642,7 +1642,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="kangarooa" cloneof="kangaroo">
-		<description>Crazy Kangaroo (alt)</description>
+		<description>Crazy Kangaroo (Alt)</description>
 		<year>1986</year>
 		<publisher>Videoton</publisher>
 
@@ -1654,7 +1654,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="kangaroob" cloneof="kangaroo">
-		<description>Crazy Kangaroo (alt 2)</description>
+		<description>Crazy Kangaroo (Alt 2)</description>
 		<year>1986</year>
 		<publisher>Videoton</publisher>
 
@@ -1714,7 +1714,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="csavargaa" cloneof="csavarga">
-		<description>Csavargás a gombák birodalmában (alt)</description>
+		<description>Csavargás a gombák birodalmában (Alt)</description>
 		<year>1988</year>
 		<publisher>Green Soft</publisher>
 
@@ -1786,7 +1786,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="cyrus2ena" cloneof="cyrus2">
-		<description>Cyrus 2 (English, alt)</description>
+		<description>Cyrus 2 (English, Alt)</description>
 		<year>1985</year>
 		<publisher>Intelligent Chess Software</publisher>
 
@@ -1810,7 +1810,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="damaa" cloneof="dama">
-		<description>Dáma (alt)</description>
+		<description>Dáma (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1966,7 +1966,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="demokaz5a" cloneof="demokaz5">
-		<description>Demo Kazetta 05 - Betűkészítő, Bombázó (alt)</description>
+		<description>Demo Kazetta 05 - Betűkészítő, Bombázó (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2050,7 +2050,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="digipoka" cloneof="digipok">
-		<description>Digipók (alt)</description>
+		<description>Digipók (Alt)</description>
 		<year>1987</year>
 		<publisher>Bit &amp; Guy</publisher>
 
@@ -2122,7 +2122,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="dominoa" cloneof="domino">
-		<description>Dominó (alt)</description>
+		<description>Dominó (Alt)</description>
 		<year>198?</year>
 		<publisher>Agilar</publisher>
 
@@ -2158,7 +2158,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="dkonga" cloneof="dkong">
-		<description>Donkey Kong (alt)</description>
+		<description>Donkey Kong (Alt)</description>
 		<year>198?</year>
 		<publisher>Béla Takács</publisher>
 
@@ -2314,7 +2314,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="elitea" cloneof="elite">
-		<description>Elite (alt)</description>
+		<description>Elite (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2434,7 +2434,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="europaa" cloneof="europa">
-		<description>Keresd a Térképen - Európa (alt)</description>
+		<description>Keresd a Térképen - Európa (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2458,7 +2458,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="expedicia" cloneof="expedici">
-		<description>Expedíció (alt)</description>
+		<description>Expedíció (Alt)</description>
 		<year>1989</year>
 		<publisher>Berysoft</publisher>
 
@@ -2518,7 +2518,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="family2a" cloneof="family2">
-		<description>Family 2 (alt)</description>
+		<description>Family 2 (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2530,7 +2530,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="family2b" cloneof="family2">
-		<description>Family 2 (alt 2)</description>
+		<description>Family 2 (Alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2830,7 +2830,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="flippera" cloneof="flipper">
-		<description>Flipper (alt)</description>
+		<description>Flipper (Alt)</description>
 		<year>1987</year>
 		<publisher>Andromeda</publisher>
 
@@ -2842,7 +2842,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="flipperb" cloneof="flipper">
-		<description>Flipper (alt 2)</description>
+		<description>Flipper (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Andromeda</publisher>
 
@@ -3070,7 +3070,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="galaxya" cloneof="galaxy">
-		<description>Galaxy (alt)</description>
+		<description>Galaxy (Alt)</description>
 		<year>1991</year>
 		<publisher>Béla Csatlós</publisher>
 
@@ -3082,7 +3082,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="galaxyb" cloneof="galaxy">
-		<description>Galaxy (alt 2)</description>
+		<description>Galaxy (Alt 2)</description>
 		<year>1991</year>
 		<publisher>Béla Csatlós</publisher>
 
@@ -3130,7 +3130,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="geoa" cloneof="geo">
-		<description>Geo (alt)</description>
+		<description>Geo (Alt)</description>
 		<year>1987</year>
 		<publisher>Videoton</publisher>
 
@@ -3142,7 +3142,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="geob" cloneof="geo">
-		<description>Geo (alt 2)</description>
+		<description>Geo (Alt 2)</description>
 		<year>1987</year>
 		<publisher>Videoton</publisher>
 
@@ -3166,7 +3166,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="geomtrana" cloneof="geomtran">
-		<description>Geometriai Transzformációk (alt)</description>
+		<description>Geometriai Transzformációk (Alt)</description>
 		<year>1988</year>
 		<publisher>Novotrade - Octasoft</publisher>
 
@@ -3298,7 +3298,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="gombocfaa" cloneof="gombocfa">
-		<description>Gombócfaló (alt)</description>
+		<description>Gombócfaló (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -3634,7 +3634,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="harcaflka" cloneof="harcaflk">
-		<description>Harc a Föld Körül (alt)</description>
+		<description>Harc a Föld Körül (Alt)</description>
 		<year>198?</year>
 		<publisher>Novotrade</publisher>
 
@@ -3838,7 +3838,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="ikplusza" cloneof="ikplusz">
-		<description>Interkarate+ (alt)</description>
+		<description>Interkarate+ (Alt)</description>
 		<year>1989</year>
 		<publisher>Tom</publisher>
 
@@ -4210,7 +4210,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="kigyosjaa" cloneof="kigyosja">
-		<description>Kigyós Játék (alt)</description>
+		<description>Kigyós Játék (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -4306,7 +4306,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="kiserteta" cloneof="kisertet">
-		<description>Kísértetkastély (alt)</description>
+		<description>Kísértetkastély (Alt)</description>
 		<year>1989</year>
 		<publisher>Attila Canjavec</publisher>
 
@@ -4318,7 +4318,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="kisertetb" cloneof="kisertet">
-		<description>Kísértetkastély (alt 2)</description>
+		<description>Kísértetkastély (Alt 2)</description>
 		<year>1989</year>
 		<publisher>Attila Canjavec</publisher>
 
@@ -4606,7 +4606,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="knightlra" cloneof="knightlr">
-		<description>Knight Lore (alt)</description>
+		<description>Knight Lore (Alt)</description>
 		<year>1985</year>
 		<publisher>'a' Studio</publisher>
 
@@ -4762,7 +4762,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="kroka" cloneof="krok">
-		<description>Krok (alt)</description>
+		<description>Krok (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -4930,7 +4930,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="laddmana" cloneof="laddman">
-		<description>Ladderman (alt)</description>
+		<description>Ladderman (Alt)</description>
 		<year>1989</year>
 		<publisher>Berysoft</publisher>
 
@@ -4990,7 +4990,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="ledea" cloneof="lede">
-		<description>Le Dé (alt)</description>
+		<description>Le Dé (Alt)</description>
 		<year>198?</year>
 		<publisher>Cápasoft</publisher>
 
@@ -5062,7 +5062,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="letraa" cloneof="letra">
-		<description>Létra (alt)</description>
+		<description>Létra (Alt)</description>
 		<year>198?</year>
 		<publisher>Novotrade</publisher>
 
@@ -5194,7 +5194,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="logosza" cloneof="logosz">
-		<description>Logo (alt)</description>
+		<description>Logo (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -5278,7 +5278,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="loversena" cloneof="loversen">
-		<description>Lóverseny (alt)</description>
+		<description>Lóverseny (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -5374,7 +5374,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="magicbala" cloneof="magicbal">
-		<description>Magic Ball (alt)</description>
+		<description>Magic Ball (Alt)</description>
 		<year>1989</year>
 		<publisher>'a' Studio</publisher>
 
@@ -5470,7 +5470,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="mariolaba" cloneof="mariolab">
-		<description>Márió a Labirintusban (alt)</description>
+		<description>Márió a Labirintusban (Alt)</description>
 		<year>198?</year>
 		<publisher>Béla Takács</publisher>
 
@@ -5506,7 +5506,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="marsa" cloneof="mars">
-		<description>Mars (alt)</description>
+		<description>Mars (Alt)</description>
 		<year>1988</year>
 		<publisher>Gigasoft</publisher>
 
@@ -5698,7 +5698,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="memoa" cloneof="memo">
-		<description>Memo (alt)</description>
+		<description>Memo (Alt)</description>
 		<year>1986</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -5974,7 +5974,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="mozdonya" cloneof="mozdony">
-		<description>Mozdony (alt)</description>
+		<description>Mozdony (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -5998,7 +5998,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="mozgooa" cloneof="mozgoo">
-		<description>Mozgó O (alt)</description>
+		<description>Mozgó O (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -6046,7 +6046,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="mralexa" cloneof="mralex">
-		<description>Mr. Alex (alt)</description>
+		<description>Mr. Alex (Alt)</description>
 		<year>1985</year>
 		<publisher>Videoton</publisher>
 
@@ -6058,7 +6058,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="mralexb" cloneof="mralex">
-		<description>Mr. Alex (alt 2)</description>
+		<description>Mr. Alex (Alt 2)</description>
 		<year>1985</year>
 		<publisher>Videoton</publisher>
 
@@ -6214,7 +6214,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="ninjaa" cloneof="ninja">
-		<description>Ninja (alt)</description>
+		<description>Ninja (Alt)</description>
 		<year>198?</year>
 		<publisher>Béla Takács</publisher>
 
@@ -6502,7 +6502,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="othelloa" cloneof="othello">
-		<description>Othello (alt)</description>
+		<description>Othello (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -6562,7 +6562,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="pacifica" cloneof="pacific">
-		<description>Pacific (alt)</description>
+		<description>Pacific (Alt)</description>
 		<year>1987</year>
 		<publisher>Zsolt Dobrovics</publisher>
 
@@ -6586,7 +6586,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="packmana" cloneof="packman">
-		<description>Pack Man (alt)</description>
+		<description>Pack Man (Alt)</description>
 		<year>198?</year>
 		<publisher>'a' Studio</publisher>
 
@@ -6658,7 +6658,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="parbaja" cloneof="parbaj">
-		<description>Párbaj (alt)</description>
+		<description>Párbaj (Alt)</description>
 		<year>1991</year>
 		<publisher>STV</publisher>
 
@@ -6946,7 +6946,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="piktora" cloneof="piktor">
-		<description>Piktor (alt)</description>
+		<description>Piktor (Alt)</description>
 		<year>1987</year>
 		<publisher>B.B. Soft</publisher>
 
@@ -7078,7 +7078,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="poklakoma" cloneof="poklakom">
-		<description>Póklakoma (alt)</description>
+		<description>Póklakoma (Alt)</description>
 		<year>1987</year>
 		<publisher>Novotrade</publisher>
 
@@ -7210,7 +7210,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="raceacea" cloneof="raceace">
-		<description>Race Ace (alt)</description>
+		<description>Race Ace (Alt)</description>
 		<year>1990</year>
 		<publisher>Zsolt Szigeti</publisher>
 
@@ -7402,7 +7402,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="repulesa" cloneof="repules">
-		<description>Repülés szimulátor BASIC-ül (alt)</description>
+		<description>Repülés szimulátor BASIC-ül (Alt)</description>
 		<year>1987</year>
 		<publisher>SPLTD</publisher>
 
@@ -7414,7 +7414,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="repulesb" cloneof="repules">
-		<description>Repülés szimulátor BASIC-ül (alt 2)</description>
+		<description>Repülés szimulátor BASIC-ül (Alt 2)</description>
 		<year>1987</year>
 		<publisher>SPLTD</publisher>
 
@@ -7426,7 +7426,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="repulesc" cloneof="repules">
-		<description>Repülés szimulátor BASIC-ül (alt 3)</description>
+		<description>Repülés szimulátor BASIC-ül (Alt 3)</description>
 		<year>1987</year>
 		<publisher>SPLTD</publisher>
 
@@ -7570,7 +7570,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="rondoa" cloneof="rondo">
-		<description>Rondo (alt)</description>
+		<description>Rondo (Alt)</description>
 		<year>1988</year>
 		<publisher>Ubisoft</publisher>
 
@@ -7642,7 +7642,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="sajtvajoa" cloneof="sajtvajo">
-		<description>Sajtvájó (alt)</description>
+		<description>Sajtvájó (Alt)</description>
 		<year>1991</year>
 		<publisher>STV</publisher>
 
@@ -7678,7 +7678,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="samuraja" cloneof="samuraj">
-		<description>Samuraj (alt)</description>
+		<description>Samuraj (Alt)</description>
 		<year>198?</year>
 		<publisher>Béla Takács</publisher>
 
@@ -7726,7 +7726,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="satirozaa" cloneof="satiroza">
-		<description>Satírozás (alt)</description>
+		<description>Satírozás (Alt)</description>
 		<year>1991</year>
 		<publisher>STV</publisher>
 
@@ -7882,7 +7882,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="spacesapa" cloneof="spacesap">
-		<description>Space Sapper (alt)</description>
+		<description>Space Sapper (Alt)</description>
 		<year>1987</year>
 		<publisher>Novotrade</publisher>
 
@@ -7930,7 +7930,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="sphericaa" cloneof="spherica">
-		<description>Spherical (alt)</description>
+		<description>Spherical (Alt)</description>
 		<year>198?</year>
 		<publisher>C.S. Software</publisher>
 
@@ -8206,7 +8206,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="submarina" cloneof="submarin">
-		<description>Submarine (alt)</description>
+		<description>Submarine (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -8290,7 +8290,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="szankovea" cloneof="szankove">
-		<description>Szánkóverseny (alt)</description>
+		<description>Szánkóverseny (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -8566,7 +8566,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="szorzasa" cloneof="szorzas">
-		<description>Szorzás (alt)</description>
+		<description>Szorzás (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -8698,7 +8698,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="telex1a" cloneof="telex1">
-		<description>Telex - 1500 szó magyarul 1 (alt)</description>
+		<description>Telex - 1500 szó magyarul 1 (Alt)</description>
 		<year>1988</year>
 		<publisher>Novotrade - Octasoft</publisher>
 
@@ -8722,7 +8722,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="telex2a" cloneof="telex2">
-		<description>Telex - 1500 szó magyarul 2 (alt)</description>
+		<description>Telex - 1500 szó magyarul 2 (Alt)</description>
 		<year>1988</year>
 		<publisher>Novotrade - Octasoft</publisher>
 
@@ -8746,7 +8746,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="tenbricka" cloneof="tenbrick">
-		<description>Ten Brick (alt)</description>
+		<description>Ten Brick (Alt)</description>
 		<year>198?</year>
 		<publisher>Cápasoft</publisher>
 
@@ -8842,7 +8842,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="tomjerrya" cloneof="tomjerry">
-		<description>Tom és Jerry (alt)</description>
+		<description>Tom és Jerry (Alt)</description>
 		<year>198?</year>
 		<publisher>Gigasoft</publisher>
 
@@ -8854,7 +8854,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="tomjerryb" cloneof="tomjerry">
-		<description>Tom és Jerry (alt 2)</description>
+		<description>Tom és Jerry (Alt 2)</description>
 		<year>198?</year>
 		<publisher>Gigasoft</publisher>
 
@@ -8902,7 +8902,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="torokinda" cloneof="torokind">
-		<description>Török Induló (alt)</description>
+		<description>Török Induló (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -8962,7 +8962,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="torpedoua" cloneof="torpedou">
-		<description>Torpedó (Unisoft, alt)</description>
+		<description>Torpedó (Unisoft, Alt)</description>
 		<year>1986</year>
 		<publisher>Unisoft GMK</publisher>
 
@@ -9010,7 +9010,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="towera" cloneof="tower">
-		<description>Tower (alt)</description>
+		<description>Tower (Alt)</description>
 		<year>198?</year>
 		<publisher>Berysoft</publisher>
 
@@ -9082,7 +9082,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="startreka" cloneof="startrek">
-		<description>Star Trek (alt, Newer?)</description>
+		<description>Star Trek (Alt, Newer?)</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -9142,7 +9142,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="turboruda" cloneof="turborud">
-		<description>Turbó Rudi (alt)</description>
+		<description>Turbó Rudi (Alt)</description>
 		<year>1987</year>
 		<publisher>'a' Studio</publisher>
 
@@ -9166,7 +9166,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="tvballa" cloneof="tvball">
-		<description>TV Ball (alt)</description>
+		<description>TV Ball (Alt)</description>
 		<year>1988</year>
 		<publisher>'a' Studio</publisher>
 
@@ -9214,7 +9214,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="tvcass14a" cloneof="tvcass14">
-		<description>TVC-Assembler v1.4 (alt)</description>
+		<description>TVC-Assembler v1.4 (Alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -9322,7 +9322,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="tvpokerna" cloneof="tvpokern">
-		<description>TV-Póker (Novotrade, alt)</description>
+		<description>TV-Póker (Novotrade, Alt)</description>
 		<year>198?</year>
 		<publisher>Novotrade</publisher>
 
@@ -9442,7 +9442,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="unicuma" cloneof="unicum">
-		<description>Unicum (alt)</description>
+		<description>Unicum (Alt)</description>
 		<year>1988</year>
 		<publisher>Red-Green-Blue Software - Compi System</publisher>
 
@@ -9454,7 +9454,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="unicumb" cloneof="unicum">
-		<description>Unicum (alt 2)</description>
+		<description>Unicum (Alt 2)</description>
 		<year>1988</year>
 		<publisher>Red-Green-Blue Software - Compi System</publisher>
 
@@ -9574,7 +9574,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="varaka" cloneof="varak">
-		<description>Várak (alt)</description>
+		<description>Várak (Alt)</description>
 		<year>198?</year>
 		<publisher>Zoltan Halasz</publisher>
 
@@ -9598,7 +9598,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="varazseca" cloneof="varazsec">
-		<description>Varázsecset (alt)</description>
+		<description>Varázsecset (Alt)</description>
 		<year>1988</year>
 		<publisher>Novotrade</publisher>
 
@@ -9610,7 +9610,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="varazsecb" cloneof="varazsec">
-		<description>Varázsecset (alt 2)</description>
+		<description>Varázsecset (Alt 2)</description>
 		<year>1988</year>
 		<publisher>Novotrade</publisher>
 
@@ -9814,7 +9814,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="volleybaa" cloneof="volleyba">
-		<description>Volleyball (alt)</description>
+		<description>Volleyball (Alt)</description>
 		<year>1990</year>
 		<publisher>Berysoft</publisher>
 
@@ -9838,7 +9838,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="vtbridzsa" cloneof="vtbridzs">
-		<description>VT Bridzs (alt)</description>
+		<description>VT Bridzs (Alt)</description>
 		<year>198?</year>
 		<publisher>Videoton</publisher>
 
@@ -9850,7 +9850,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="vtbridzsb" cloneof="vtbridzs">
-		<description>VT Bridzs (alt 2)</description>
+		<description>VT Bridzs (Alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -9911,7 +9911,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="wimbledoa" cloneof="wimbledo">
-		<description>Wimbledon (alt)</description>
+		<description>Wimbledon (Alt)</description>
 		<year>198?</year>
 		<publisher>Software in LUX</publisher>
 
@@ -9983,7 +9983,7 @@ If the program doesn't automatically start, start it with RUN
 	</software>
 
 	<software name="zenezenea" cloneof="zenezene">
-		<description>Zene-Zene-Zene (alt Colors)</description>
+		<description>Zene-Zene-Zene (Alt Colors)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -10083,7 +10083,7 @@ If the program doesn't automatically start, start it with RUN
 
 
     <software name="astrobla" cloneof="astrobl">
-        <description>Astro Blaster (alt)</description>
+        <description>Astro Blaster (Alt)</description>
         <year>1991</year>
         <publisher>STV</publisher>
 
@@ -10095,7 +10095,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="bobb" cloneof="bob">
-        <description>Bob (alt 2)</description>
+        <description>Bob (Alt 2)</description>
         <year>198?</year>
         <publisher>Mamut Soft</publisher>
 
@@ -10107,7 +10107,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="bobc" cloneof="bob">
-        <description>Bob (alt 3)</description>
+        <description>Bob (Alt 3)</description>
         <year>198?</year>
         <publisher>Mamut Soft</publisher>
 
@@ -10119,7 +10119,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="bombazoa" cloneof="bombazo">
-        <description>Az Utolso Bombazo (alt)</description>
+        <description>Az Utolso Bombazo (Alt)</description>
         <year>198?</year>
         <publisher>&lt;unknown&gt;</publisher>
 
@@ -10143,7 +10143,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="centipeda" cloneof="centiped">
-        <description>Centipede (alt)</description>
+        <description>Centipede (Alt)</description>
         <year>198?</year>
         <publisher>STV</publisher>
 
@@ -10155,7 +10155,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="crackeda" cloneof="cracked">
-        <description>Crack Ed (alt)</description>
+        <description>Crack Ed (Alt)</description>
         <year>198?</year>
         <publisher>&lt;unknown&gt;</publisher>
 
@@ -10167,7 +10167,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="cyrus2a" cloneof="cyrus2">
-        <description>Cyrus 2 (alt)</description>
+        <description>Cyrus 2 (Alt)</description>
         <year>1985</year>
         <publisher>Intelligent Chess Software</publisher>
 
@@ -10179,7 +10179,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="dobgepa" cloneof="dobgep">
-        <description>Dobgép (alt)</description>
+        <description>Dobgép (Alt)</description>
         <year>198?</year>
         <publisher>STV</publisher>
 
@@ -10203,7 +10203,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="invazioa" cloneof="invazio">
-        <description>Invázió (alt)</description>
+        <description>Invázió (Alt)</description>
         <year>198?</year>
         <publisher>STV</publisher>
 
@@ -10227,7 +10227,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="jancsia" cloneof="jancsi">
-        <description>Jancsi a Várban (alt)</description>
+        <description>Jancsi a Várban (Alt)</description>
         <year>1986</year>
         <publisher>STV</publisher>
 
@@ -10239,7 +10239,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="kardhalaa" cloneof="kardhala">
-        <description>Kardhalak és Kincsek (alt)</description>
+        <description>Kardhalak és Kincsek (Alt)</description>
         <year>198?</year>
         <publisher>&lt;unknown&gt;</publisher>
 
@@ -10263,7 +10263,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="keljfelja" cloneof="keljfelj">
-        <description>Keljfeljancsi (alt)</description>
+        <description>Keljfeljancsi (Alt)</description>
         <year>198?</year>
         <publisher>STV</publisher>
 
@@ -10275,7 +10275,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="kismozdoa" cloneof="kismozdo">
-        <description>Kismozdony (alt)</description>
+        <description>Kismozdony (Alt)</description>
         <year>198?</year>
         <publisher>STV</publisher>
 
@@ -10287,7 +10287,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="labirinta" cloneof="labirint">
-        <description>Labirintus (alt)</description>
+        <description>Labirintus (Alt)</description>
         <year>198?</year>
         <publisher>&lt;unknown&gt;</publisher>
 
@@ -10299,7 +10299,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="linaa" cloneof="lina">
-        <description>Lina (alt)</description>
+        <description>Lina (Alt)</description>
         <year>198?</year>
         <publisher>STV</publisher>
 
@@ -10335,7 +10335,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="ordogmota" cloneof="ordogmot">
-        <description>Ördögmotor (alt)</description>
+        <description>Ördögmotor (Alt)</description>
         <year>1990</year>
         <publisher>STV</publisher>
 
@@ -10347,7 +10347,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="oszkara" cloneof="oszkar">
-        <description>Oszkár a Lovag (alt)</description>
+        <description>Oszkár a Lovag (Alt)</description>
         <year>198?</year>
         <publisher>STV</publisher>
 
@@ -10359,7 +10359,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="panika" cloneof="panik">
-        <description>Pánik (alt)</description>
+        <description>Pánik (Alt)</description>
         <year>1991</year>
         <publisher>STV</publisher>
 
@@ -10371,7 +10371,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="parbajb" cloneof="parbaj">
-        <description>Párbaj (alt 2)</description>
+        <description>Párbaj (Alt 2)</description>
         <year>1991</year>
         <publisher>STV</publisher>
 
@@ -10383,7 +10383,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="peepshowa" cloneof="peepshow">
-        <description>Peep Show (alt)</description>
+        <description>Peep Show (Alt)</description>
         <year>1984</year>
         <publisher>STV</publisher>
 
@@ -10395,7 +10395,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="poseidona" cloneof="poseidon">
-        <description>Poseidon Kincse (alt)</description>
+        <description>Poseidon Kincse (Alt)</description>
         <year>1989</year>
         <publisher>Novotrade</publisher>
 
@@ -10407,7 +10407,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="raceaceb" cloneof="raceace">
-        <description>Race Ace (alt 2)</description>
+        <description>Race Ace (Alt 2)</description>
         <year>1990</year>
         <publisher>Zsolt Szigeti</publisher>
 
@@ -10431,7 +10431,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="sajtvajob" cloneof="sajtvajo">
-        <description>Sajtvájó (alt 2)</description>
+        <description>Sajtvájó (Alt 2)</description>
         <year>1991</year>
         <publisher>STV</publisher>
 
@@ -10443,7 +10443,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="satirozab" cloneof="satiroza">
-        <description>Satírozás (alt 2)</description>
+        <description>Satírozás (Alt 2)</description>
         <year>1991</year>
         <publisher>STV</publisher>
 
@@ -10467,7 +10467,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="spacesapb" cloneof="spacesap">
-        <description>Space Sapper (alt 2)</description>
+        <description>Space Sapper (Alt 2)</description>
         <year>1987</year>
         <publisher>Novotrade</publisher>
 
@@ -10491,7 +10491,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="turbojaca" cloneof="turbojac">
-        <description>Turbo Jack (alt)</description>
+        <description>Turbo Jack (Alt)</description>
         <year>1991</year>
         <publisher>STV</publisher>
 
@@ -10503,7 +10503,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="ufoa">
-        <description>UFO (alt)</description>
+        <description>UFO (Alt)</description>
         <year>1985</year>
         <publisher>STV</publisher>
 
@@ -10551,7 +10551,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="vidzenea" cloneof="vidzene">
-        <description>Videoton Zene (alt)</description>
+        <description>Videoton Zene (Alt)</description>
         <year>198?</year>
         <publisher>JozsiSoft</publisher>
 
@@ -10563,7 +10563,7 @@ If the program doesn't automatically start, start it with RUN
     </software>
 
     <software name="viliabana" cloneof="viliaban">
-        <description>Vili a Bányász (alt)</description>
+        <description>Vili a Bányász (Alt)</description>
         <year>1991</year>
         <publisher>STV</publisher>
 

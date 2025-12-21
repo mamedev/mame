@@ -48,7 +48,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
-	virtual void reset_from_bus() override;
+	virtual bool take_c800() override;
 
 private:
 	bool m_bEnabled;
@@ -208,11 +208,6 @@ void a2bus_transwarp_device::device_start()
 
 void a2bus_transwarp_device::device_reset()
 {
-	reset_from_bus();
-}
-
-void a2bus_transwarp_device::reset_from_bus()
-{
 	m_bEnabled = true;
 	m_bReadA2ROM = false;
 	raise_slot_dma();
@@ -333,6 +328,11 @@ void a2bus_transwarp_device::dma_w(offs_t offset, uint8_t data)
 	}
 
 	slot_dma_write(offset, data);
+}
+
+bool a2bus_transwarp_device::take_c800()
+{
+	return false;
 }
 
 void a2bus_transwarp_device::hit_slot(int slot)

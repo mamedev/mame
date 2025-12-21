@@ -95,11 +95,6 @@ void a2bus_iwm_device::device_reset()
 {
 }
 
-void a2bus_iwm_device::reset_from_bus()
-{
-	m_iwm->reset();
-}
-
 /*-------------------------------------------------
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/

@@ -34,7 +34,6 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(update_queue);
-	void update_input_buffer();
 
 	required_device<bitbanger_device> m_stream;
 
@@ -52,7 +51,6 @@ private:
 	int m_rts;
 	int m_dtr;
 	int m_xoff;
-	bool m_cr;
 };
 
 DECLARE_DEVICE_TYPE(NULL_MODEM, null_modem_device)

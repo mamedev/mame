@@ -119,11 +119,6 @@ void a2bus_ace2x00_device::device_reset()
 	m_rom = device().machine().root_device().memregion("maincpu")->base();
 }
 
-void a2bus_ace2x00_slot6_device::reset_from_bus()
-{
-	m_iwm->reset();
-}
-
 uint8_t a2bus_ace2x00_device::read_cnxx(uint8_t offset)
 {
 	switch (slotno())
@@ -153,7 +148,7 @@ void a2bus_ace2x00_device::write_c800(uint16_t offset, uint8_t data)
 {
 }
 
-bool a2bus_ace2x00_device::take_c800() const
+bool a2bus_ace2x00_device::take_c800()
 {
 	switch (slotno())
 	{

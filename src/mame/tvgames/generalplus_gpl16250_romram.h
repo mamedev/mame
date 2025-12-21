@@ -6,10 +6,10 @@
 #pragma once
 
 #include "generalplus_gpl16250.h"
-
-#include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
 #include "machine/generalplus_gpl162xx_soc.h"
+#include "generalplus_gpl16250_m.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -23,27 +23,29 @@ public:
 	{
 	}
 
-	void gpl16250_romram(machine_config &config) ATTR_COLD;
+	void gpl16250_romram(machine_config &config);
 
-	void init_wrlshunt() ATTR_COLD;
-	void init_ths() ATTR_COLD;
+	void init_wrlshunt();
+	void init_ths();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	std::vector<uint16_t> m_sdram;
+
 	virtual uint16_t porta_r() override;
 	virtual void porta_w(uint16_t data) override;
 
-	std::vector<uint16_t> m_sdram;
-
 private:
+
+
+	//required_shared_ptr<u16> m_mainram;
+
 	virtual uint16_t cs0_r(offs_t offset) override;
 	virtual void cs0_w(offs_t offset, uint16_t data) override;
 	virtual uint16_t cs1_r(offs_t offset) override;
 	virtual void cs1_w(offs_t offset, uint16_t data) override;
-
-	//required_shared_ptr<u16> m_mainram;
 
 	int m_romwords_mask = 0;
 };
@@ -57,10 +59,13 @@ public:
 	}
 
 protected:
+	//virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t porta_r() override;
 	virtual uint16_t portb_r() override;
+
+private:
 };
 
 class lazertag_game_state : public jak_s500_game_state
@@ -72,7 +77,10 @@ public:
 	}
 
 protected:
+	//virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
 };
 
 
@@ -117,8 +125,13 @@ public:
 	}
 
 protected:
+
 	virtual void machine_reset() override ATTR_COLD;
+
+private:
 };
 
 
+
 #endif // MAME_TVGAMES_GENERALPLUS_GPL16250_ROMRAM_H
+

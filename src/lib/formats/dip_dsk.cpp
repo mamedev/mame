@@ -82,8 +82,7 @@ bool dip_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[i].size        = ssize;
 				sects[i].actual_size = bps;
 				sects[i].deleted     = false;
-				sects[i].bad_data_crc = false;
-				sects[i].bad_addr_crc = false;
+				sects[i].bad_crc     = false;
 				sects[i].data        = sect_data + i * bps;
 			}
 

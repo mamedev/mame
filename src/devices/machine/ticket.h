@@ -14,6 +14,14 @@
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DECLARE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device)
+DECLARE_DEVICE_TYPE(HOPPER, hopper_device)
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -31,7 +39,7 @@ public:
 	ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~ticket_dispenser_device();
 
-	// configuration
+	// inline configuration helpers
 	void set_period(const attotime &period) { m_period = period; }
 	auto dispense_handler() { return m_dispense_handler.bind(); }
 
@@ -42,9 +50,9 @@ public:
 protected:
 	ticket_dispenser_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// device_t implementation
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_output_state);
 
@@ -52,15 +60,12 @@ protected:
 	attotime m_period;
 	bool m_hopper_type;
 
-	required_ioport m_io_test;
-	devcb_write_line m_dispense_handler;
-	output_finder<> m_output;
-	emu_timer *m_timer;
-
 	bool m_status;
 	bool m_power;
+	emu_timer *m_timer;
+	output_finder<> m_output;
+	devcb_write_line m_dispense_handler;
 };
-
 
 class hopper_device : public ticket_dispenser_device
 {
@@ -73,13 +78,5 @@ public:
 	}
 	hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DECLARE_DEVICE_TYPE(TICKET_DISPENSER, ticket_dispenser_device)
-DECLARE_DEVICE_TYPE(HOPPER, hopper_device)
 
 #endif // MAME_MACHINE_TICKET_H

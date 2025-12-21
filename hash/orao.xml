@@ -524,7 +524,7 @@ To Do: sort out the duplicate 'spaceinv' and 'crtanje' programs.
 	</software>
 
 	<software name="crtanje2" supported="no">
-		<description>Crtanje (alt)</description>
+		<description>Crtanje (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />
@@ -644,7 +644,7 @@ To Do: sort out the duplicate 'spaceinv' and 'crtanje' programs.
 	</software>
 
 	<software name="spaceinv2">
-		<description>Space Invaders (alt)</description>
+		<description>Space Invaders (Alt)</description>
 		<year>19??</year>
 		<publisher>PEL Soft</publisher>
 		<info name="usage" value="BC then LMEM&quot;&quot;, then Play." />

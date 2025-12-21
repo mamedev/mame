@@ -42,7 +42,7 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
-	virtual void reset_from_bus() override;
+	virtual bool take_c800() override { return false; }
 
 	uint8_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint8_t data);

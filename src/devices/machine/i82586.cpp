@@ -603,7 +603,7 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 		// fetch aligned words from the source
 		while (offset + 1 < length)
 		{
-			put_u16le(&buf[offset], m_space->read_word(src + offset));
+			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
 			offset += 2;
 		}
 
@@ -620,12 +620,15 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 		switch (src & 3)
 		{
 		case 1:
-			put_u24le(&buf[offset], m_space->read_dword(src + offset, 0xffffff));
-			offset += 3;
+			buf[offset] = m_space->read_byte(src + offset);
+			offset++;
+
+			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
+			offset += 2;
 			break;
 
 		case 2:
-			put_u16le(&buf[offset], m_space->read_word(src + offset));
+			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
 			offset += 2;
 			break;
 
@@ -638,7 +641,7 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 		// fetch aligned dwords from the source
 		while (offset + 3 < length)
 		{
-			put_u32le(&buf[offset], m_space->read_dword(src + offset));
+			*(u32 *)&buf[offset] = m_space->read_dword(src + offset);
 			offset += 4;
 		}
 
@@ -651,13 +654,15 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 			break;
 
 		case 2:
-			put_u16le(&buf[offset], m_space->read_word(src + offset));
+			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
 			offset += 2;
 			break;
 
 		case 3:
-			put_u24le(&buf[offset], m_space->read_dword(src + offset, 0xffffff));
-			offset += 3;
+			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
+			offset += 2;
+			buf[offset] = m_space->read_byte(src + offset);
+			offset++;
 			break;
 		}
 		break;
@@ -683,7 +688,7 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 		// store aligned words to the destination
 		while (offset + 1 < length)
 		{
-			m_space->write_word(dst + offset, get_u16le(&buf[offset]));
+			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
 			offset += 2;
 		}
 
@@ -700,12 +705,14 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 		switch (dst & 3)
 		{
 		case 1:
-			m_space->write_dword(dst + offset, get_u24le(&buf[offset]), 0xffffff);
-			offset += 3;
+			m_space->write_byte(dst + offset, buf[offset]);
+			offset++;
+			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
+			offset += 2;
 			break;
 
 		case 2:
-			m_space->write_word(dst + offset, get_u16le(&buf[offset]));
+			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
 			offset += 2;
 			break;
 
@@ -718,7 +725,7 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 		// store aligned dwords to the destination
 		while (offset + 3 < length)
 		{
-			m_space->write_dword(dst + offset, get_u32le(&buf[offset]));
+			m_space->write_dword(dst + offset, *(u32 *)&buf[offset]);
 			offset += 4;
 		}
 
@@ -731,13 +738,15 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 			break;
 
 		case 2:
-			m_space->write_word(dst + offset, get_u16le(&buf[offset]));
+			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
 			offset += 2;
 			break;
 
 		case 3:
-			m_space->write_dword(dst + offset, get_u24le(&buf[offset]), 0xffffff);
-			offset += 3;
+			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
+			offset += 2;
+			m_space->write_byte(dst + offset, buf[offset]);
+			offset++;
 			break;
 		}
 		break;
@@ -1034,7 +1043,7 @@ bool i82586_device::cu_dump()
 	memcpy(&buf[0x0c], &get_mac()[0], 6);
 
 	// hash register
-	put_u64le(&buf[0x24], m_mac_multi);
+	*(u64 *)&buf[0x24] = m_mac_multi;
 
 	// store dump buffer
 	dump_address = m_scb_base + m_space->read_word(m_cba + 6);
@@ -1077,7 +1086,7 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
 		LOGMASKED(LOG_FRAMES, "ru_execute crc error computed 0x%08x stored 0x%08x\n",
-			compute_crc(buf, length - 4, cfg_crc16()), get_u32le(&buf[length - 4]));
+			compute_crc(buf, length - 4, cfg_crc16()), *(u32 *)&buf[length - 4]);
 
 		// increment crc error count
 		m_space->write_word(m_scb_address + 8, m_space->read_word(m_scb_address + 8) + 1);
@@ -1700,7 +1709,7 @@ bool i82596_device::cu_dump()
 		memcpy(&buf[0x0c], &get_mac()[0], 6);
 
 		// hash register
-		put_u64le(&buf[0x24], m_mac_multi);
+		*(u64 *)&buf[0x24] = m_mac_multi;
 	}
 	else
 	{
@@ -1711,7 +1720,7 @@ bool i82596_device::cu_dump()
 		memcpy(&buf[0x0e], &get_mac()[0], 6);
 
 		// hash register
-		put_u64le(&buf[0x26], m_mac_multi);
+		*(u64 *)&buf[0x26] = m_mac_multi;
 	}
 
 	// store dump buffer
@@ -1790,7 +1799,7 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
 		LOGMASKED(LOG_FRAMES, "ru_execute crc error computed 0x%08x stored 0x%08x\n",
-			compute_crc(buf, length - 4, cfg_crc16()), get_u32le(&buf[length - 4]));
+			compute_crc(buf, length - 4, cfg_crc16()), *(u32 *)&buf[length - 4]);
 
 		// increment crc error count
 		if (mode() == MODE_82586)

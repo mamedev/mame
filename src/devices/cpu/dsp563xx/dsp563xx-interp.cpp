@@ -16,17 +16,11 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 2: { // abs a
-		u64 d = get_a();
-		if(d & 0x80000000000000) {
-		set_a((-d) & 0xffffffffffffff);
-		}
+		unhandled("abs a");
 		break;
 		}
 	case 3: { // abs b
-		u64 d = get_b();
-		if(d & 0x80000000000000) {
-		set_b((-d) & 0xffffffffffffff);
-		}
+		unhandled("abs b");
 		break;
 		}
 	case 4: { // adc x,a
@@ -46,87 +40,59 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 8: { // add b,a
-		u64 d = get_a();
-		u64 s = get_b();
-		set_a(do_add56(util::sext(s, 56), d));
+		unhandled("add b,a");
 		break;
 		}
-	case 9: { // add a,b
-		u64 d = get_b();
-		u64 s = get_a();
-		set_b(do_add56(util::sext(s, 56), d));
+	case 9: { // add b,b
+		unhandled("add b,b");
 		break;
 		}
 	case 10: { // add x,a
-		u64 d = get_a();
-		u64 s = get_x();
-		set_a(do_add56(util::sext(s, 48), d));
+		unhandled("add x,a");
 		break;
 		}
 	case 11: { // add x,b
-		u64 d = get_b();
-		u64 s = get_x();
-		set_b(do_add56(util::sext(s, 48), d));
+		unhandled("add x,b");
 		break;
 		}
 	case 12: { // add y,a
-		u64 d = get_a();
-		u64 s = get_y();
-		set_a(do_add56(util::sext(s, 48), d));
+		unhandled("add y,a");
 		break;
 		}
 	case 13: { // add y,b
-		u64 d = get_b();
-		u64 s = get_y();
-		set_b(do_add56(util::sext(s, 48), d));
+		unhandled("add y,b");
 		break;
 		}
 	case 14: { // add x0,a
-		u64 d = get_a();
-		u32 s = get_x0();
-		set_a(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add x0,a");
 		break;
 		}
 	case 15: { // add x0,b
-		u64 d = get_b();
-		u32 s = get_x0();
-		set_b(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add x0,b");
 		break;
 		}
 	case 16: { // add y0,a
-		u64 d = get_a();
-		u32 s = get_y0();
-		set_a(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add y0,a");
 		break;
 		}
 	case 17: { // add y0,b
-		u64 d = get_b();
-		u32 s = get_y0();
-		set_b(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add y0,b");
 		break;
 		}
 	case 18: { // add x1,a
-		u64 d = get_a();
-		u32 s = get_x1();
-		set_a(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add x1,a");
 		break;
 		}
 	case 19: { // add x1,b
-		u64 d = get_b();
-		u32 s = get_x1();
-		set_b(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add x1,b");
 		break;
 		}
 	case 20: { // add y1,a
-		u64 d = get_a();
-		u32 s = get_y1();
-		set_a(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add y1,a");
 		break;
 		}
 	case 21: { // add y1,b
-		u64 d = get_b();
-		u32 s = get_y1();
-		set_b(do_add56(util::sext(u64(s) << 24, 48), d));
+		unhandled("add y1,b");
 		break;
 		}
 	case 22: { // addl b,a
@@ -146,127 +112,51 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 26: { // and x0,a
-		u32 d_1 = get_a1();
-		u32 s = get_x0();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("and x0,a");
 		break;
 		}
 	case 27: { // and x0,b
-		u32 d_1 = get_b1();
-		u32 s = get_x0();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("and x0,b");
 		break;
 		}
 	case 28: { // and y0,a
-		u32 d_1 = get_a1();
-		u32 s = get_y0();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("and y0,a");
 		break;
 		}
 	case 29: { // and y0,b
-		u32 d_1 = get_b1();
-		u32 s = get_y0();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("and y0,b");
 		break;
 		}
 	case 30: { // and x1,a
-		u32 d_1 = get_a1();
-		u32 s = get_x1();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("and x1,a");
 		break;
 		}
 	case 31: { // and x1,b
-		u32 d_1 = get_b1();
-		u32 s = get_x1();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("and x1,b");
 		break;
 		}
 	case 32: { // and y1,a
-		u32 d_1 = get_a1();
-		u32 s = get_y1();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("and y1,a");
 		break;
 		}
 	case 33: { // and y1,b
-		u32 d_1 = get_b1();
-		u32 s = get_y1();
-		u32 r = d_1 & s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("and y1,b");
 		break;
 		}
 	case 34: { // asl a
-		u64 d = get_a();
-		set_a(do_asl56(1, d));
+		unhandled("asl a");
 		break;
 		}
 	case 35: { // asl b
-		u64 d = get_b();
-		set_b(do_asl56(1, d));
+		unhandled("asl b");
 		break;
 		}
 	case 36: { // asr a
-		u64 d = get_a();
-		set_a(do_asr56(1, d));
+		unhandled("asr a");
 		break;
 		}
 	case 37: { // asr b
-		u64 d = get_b();
-		set_b(do_asr56(1, d));
+		unhandled("asr b");
 		break;
 		}
 	case 38: { // clr a
@@ -280,63 +170,43 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 40: { // cmp b,a
-		u64 s = get_b();
-		u64 d = get_a();
-		(void)do_sub56(util::sext(s, 56), d);
+		unhandled("cmp b,a");
 		break;
 		}
-	case 41: { // cmp a,b
-		u64 s = get_a();
-		u64 d = get_b();
-		(void)do_sub56(util::sext(s, 56), d);
+	case 41: { // cmp b,b
+		unhandled("cmp b,b");
 		break;
 		}
 	case 42: { // cmp x0,a
-		u32 s = get_x0();
-		u64 d = get_a();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp x0,a");
 		break;
 		}
 	case 43: { // cmp x0,b
-		u32 s = get_x0();
-		u64 d = get_b();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp x0,b");
 		break;
 		}
 	case 44: { // cmp y0,a
-		u32 s = get_y0();
-		u64 d = get_a();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp y0,a");
 		break;
 		}
 	case 45: { // cmp y0,b
-		u32 s = get_y0();
-		u64 d = get_b();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp y0,b");
 		break;
 		}
 	case 46: { // cmp x1,a
-		u32 s = get_x1();
-		u64 d = get_a();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp x1,a");
 		break;
 		}
 	case 47: { // cmp x1,b
-		u32 s = get_x1();
-		u64 d = get_b();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp x1,b");
 		break;
 		}
 	case 48: { // cmp y1,a
-		u32 s = get_y1();
-		u64 d = get_a();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp y1,a");
 		break;
 		}
 	case 49: { // cmp y1,b
-		u32 s = get_y1();
-		u64 d = get_b();
-		(void)do_sub56(util::sext(u64(s) << 24, 48), d);
+		unhandled("cmp y1,b");
 		break;
 		}
 	case 50: { // cmpm b,a
@@ -380,107 +250,35 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 60: { // eor x0,a
-		u32 d_1 = get_a1();
-		u32 s = get_x0();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("eor x0,a");
 		break;
 		}
 	case 61: { // eor x0,b
-		u32 d_1 = get_b1();
-		u32 s = get_x0();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("eor x0,b");
 		break;
 		}
 	case 62: { // eor y0,a
-		u32 d_1 = get_a1();
-		u32 s = get_y0();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("eor y0,a");
 		break;
 		}
 	case 63: { // eor y0,b
-		u32 d_1 = get_b1();
-		u32 s = get_y0();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("eor y0,b");
 		break;
 		}
 	case 64: { // eor x1,a
-		u32 d_1 = get_a1();
-		u32 s = get_x1();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("eor x1,a");
 		break;
 		}
 	case 65: { // eor x1,b
-		u32 d_1 = get_b1();
-		u32 s = get_x1();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("eor x1,b");
 		break;
 		}
 	case 66: { // eor y1,a
-		u32 d_1 = get_a1();
-		u32 s = get_y1();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("eor y1,a");
 		break;
 		}
 	case 67: { // eor y1,b
-		u32 d_1 = get_b1();
-		u32 s = get_y1();
-		u32 r = d_1 ^ s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("eor y1,b");
 		break;
 		}
 	case 68: { // lsl a
@@ -1036,107 +834,35 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 206: { // or x0,a
-		u32 d_1 = get_a1();
-		u32 s = get_x0();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("or x0,a");
 		break;
 		}
 	case 207: { // or x0,b
-		u32 d_1 = get_b1();
-		u32 s = get_x0();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("or x0,b");
 		break;
 		}
 	case 208: { // or y0,a
-		u32 d_1 = get_a1();
-		u32 s = get_y0();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("or y0,a");
 		break;
 		}
 	case 209: { // or y0,b
-		u32 d_1 = get_b1();
-		u32 s = get_y0();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("or y0,b");
 		break;
 		}
 	case 210: { // or x1,a
-		u32 d_1 = get_a1();
-		u32 s = get_x1();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("or x1,a");
 		break;
 		}
 	case 211: { // or x1,b
-		u32 d_1 = get_b1();
-		u32 s = get_x1();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("or x1,b");
 		break;
 		}
 	case 212: { // or y1,a
-		u32 d_1 = get_a1();
-		u32 s = get_y1();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("or y1,a");
 		break;
 		}
 	case 213: { // or y1,b
-		u32 d_1 = get_b1();
-		u32 s = get_y1();
-		u32 r = d_1 | s;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("or y1,b");
 		break;
 		}
 	case 214: { // rnd a
@@ -1180,87 +906,59 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 224: { // sub b,a
-		u64 d = get_a();
-		u64 s = get_b();
-		set_a(do_sub56(util::sext(s, 56), d));
+		unhandled("sub b,a");
 		break;
 		}
-	case 225: { // sub a,b
-		u64 d = get_b();
-		u64 s = get_a();
-		set_b(do_sub56(util::sext(s, 56), d));
+	case 225: { // sub b,b
+		unhandled("sub b,b");
 		break;
 		}
 	case 226: { // sub x,a
-		u64 d = get_a();
-		u64 s = get_x();
-		set_a(do_sub56(util::sext(s, 48), d));
+		unhandled("sub x,a");
 		break;
 		}
 	case 227: { // sub x,b
-		u64 d = get_b();
-		u64 s = get_x();
-		set_b(do_sub56(util::sext(s, 48), d));
+		unhandled("sub x,b");
 		break;
 		}
 	case 228: { // sub y,a
-		u64 d = get_a();
-		u64 s = get_y();
-		set_a(do_sub56(util::sext(s, 48), d));
+		unhandled("sub y,a");
 		break;
 		}
 	case 229: { // sub y,b
-		u64 d = get_b();
-		u64 s = get_y();
-		set_b(do_sub56(util::sext(s, 48), d));
+		unhandled("sub y,b");
 		break;
 		}
 	case 230: { // sub x0,a
-		u64 d = get_a();
-		u32 s = get_x0();
-		set_a(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub x0,a");
 		break;
 		}
 	case 231: { // sub x0,b
-		u64 d = get_b();
-		u32 s = get_x0();
-		set_b(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub x0,b");
 		break;
 		}
 	case 232: { // sub y0,a
-		u64 d = get_a();
-		u32 s = get_y0();
-		set_a(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub y0,a");
 		break;
 		}
 	case 233: { // sub y0,b
-		u64 d = get_b();
-		u32 s = get_y0();
-		set_b(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub y0,b");
 		break;
 		}
 	case 234: { // sub x1,a
-		u64 d = get_a();
-		u32 s = get_x1();
-		set_a(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub x1,a");
 		break;
 		}
 	case 235: { // sub x1,b
-		u64 d = get_b();
-		u32 s = get_x1();
-		set_b(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub x1,b");
 		break;
 		}
 	case 236: { // sub y1,a
-		u64 d = get_a();
-		u32 s = get_y1();
-		set_a(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub y1,a");
 		break;
 		}
 	case 237: { // sub y1,b
-		u64 d = get_b();
-		u32 s = get_y1();
-		set_b(do_sub56(util::sext(u64(s) << 24, 48), d));
+		unhandled("sub y1,b");
 		break;
 		}
 	case 238: { // subl b,a
@@ -1320,13 +1018,11 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 252: { // tst a
-		u64 d = get_a();
-		do_tst56(d);
+		unhandled("tst a");
 		break;
 		}
 	case 253: { // tst b
-		u64 d = get_b();
-		do_tst56(d);
+		unhandled("tst b");
 		break;
 		}
 	}
@@ -2438,2900 +2134,1430 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 223: { // y:(r)-n,x0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 224: { // y:(r)+n,x0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 225: { // y:(r)-,x0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 226: { // y:(r)+,x0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 227: { // y:(r),x0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 228: { // y:(r+n),x0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 229: { // y:-(r),x0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 230: { // x:(r)-n,x1
+	case 223: { // x:(r)-n,x1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 231: { // x:(r)+n,x1
+	case 224: { // x:(r)+n,x1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 232: { // x:(r)-,x1
+	case 225: { // x:(r)-,x1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 233: { // x:(r)+,x1
+	case 226: { // x:(r)+,x1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 234: { // x:(r),x1
+	case 227: { // x:(r),x1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 235: { // x:(r+n),x1
+	case 228: { // x:(r+n),x1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 236: { // x:-(r),x1
+	case 229: { // x:-(r),x1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 237: { // y:(r)-n,x1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 238: { // y:(r)+n,x1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 239: { // y:(r)-,x1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 240: { // y:(r)+,x1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 241: { // y:(r),x1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 242: { // y:(r+n),x1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 243: { // y:-(r),x1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 244: { // x:(r)-n,y0
+	case 230: { // x:(r)-n,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 245: { // x:(r)+n,y0
+	case 231: { // x:(r)+n,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 246: { // x:(r)-,y0
+	case 232: { // x:(r)-,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 247: { // x:(r)+,y0
+	case 233: { // x:(r)+,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 248: { // x:(r),y0
+	case 234: { // x:(r),y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 249: { // x:(r+n),y0
+	case 235: { // x:(r+n),y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 250: { // x:-(r),y0
+	case 236: { // x:-(r),y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 251: { // y:(r)-n,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 252: { // y:(r)+n,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 253: { // y:(r)-,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 254: { // y:(r)+,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 255: { // y:(r),y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 256: { // y:(r+n),y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 257: { // y:-(r),y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 258: { // x:(r)-n,y1
+	case 237: { // x:(r)-n,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 259: { // x:(r)+n,y1
+	case 238: { // x:(r)+n,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 260: { // x:(r)-,y1
+	case 239: { // x:(r)-,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 261: { // x:(r)+,y1
+	case 240: { // x:(r)+,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 262: { // x:(r),y1
+	case 241: { // x:(r),y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 263: { // x:(r+n),y1
+	case 242: { // x:(r+n),y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 264: { // x:-(r),y1
+	case 243: { // x:-(r),y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 265: { // y:(r)-n,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 266: { // y:(r)+n,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 267: { // y:(r)-,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 268: { // y:(r)+,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 269: { // y:(r),y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 270: { // y:(r+n),y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 271: { // y:-(r),y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 272: { // x:(r)-n,a0
+	case 244: { // x:(r)-n,a0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 273: { // x:(r)+n,a0
+	case 245: { // x:(r)+n,a0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 274: { // x:(r)-,a0
+	case 246: { // x:(r)-,a0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 275: { // x:(r)+,a0
+	case 247: { // x:(r)+,a0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 276: { // x:(r),a0
+	case 248: { // x:(r),a0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 277: { // x:(r+n),a0
+	case 249: { // x:(r+n),a0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 278: { // x:-(r),a0
+	case 250: { // x:-(r),a0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 279: { // y:(r)-n,a0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 280: { // y:(r)+n,a0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 281: { // y:(r)-,a0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 282: { // y:(r)+,a0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 283: { // y:(r),a0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 284: { // y:(r+n),a0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 285: { // y:-(r),a0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 286: { // x:(r)-n,b0
+	case 251: { // x:(r)-n,b0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 287: { // x:(r)+n,b0
+	case 252: { // x:(r)+n,b0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 288: { // x:(r)-,b0
+	case 253: { // x:(r)-,b0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 289: { // x:(r)+,b0
+	case 254: { // x:(r)+,b0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 290: { // x:(r),b0
+	case 255: { // x:(r),b0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 291: { // x:(r+n),b0
+	case 256: { // x:(r+n),b0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 292: { // x:-(r),b0
+	case 257: { // x:-(r),b0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 293: { // y:(r)-n,b0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 294: { // y:(r)+n,b0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 295: { // y:(r)-,b0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 296: { // y:(r)+,b0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 297: { // y:(r),b0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 298: { // y:(r+n),b0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 299: { // y:-(r),b0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 300: { // x:(r)-n,a2
+	case 258: { // x:(r)-n,a2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 301: { // x:(r)+n,a2
+	case 259: { // x:(r)+n,a2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 302: { // x:(r)-,a2
+	case 260: { // x:(r)-,a2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 303: { // x:(r)+,a2
+	case 261: { // x:(r)+,a2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 304: { // x:(r),a2
+	case 262: { // x:(r),a2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 305: { // x:(r+n),a2
+	case 263: { // x:(r+n),a2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 306: { // x:-(r),a2
+	case 264: { // x:-(r),a2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 307: { // y:(r)-n,a2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 308: { // y:(r)+n,a2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 309: { // y:(r)-,a2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 310: { // y:(r)+,a2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 311: { // y:(r),a2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 312: { // y:(r+n),a2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 313: { // y:-(r),a2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 314: { // x:(r)-n,b2
+	case 265: { // x:(r)-n,b2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 315: { // x:(r)+n,b2
+	case 266: { // x:(r)+n,b2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 316: { // x:(r)-,b2
+	case 267: { // x:(r)-,b2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 317: { // x:(r)+,b2
+	case 268: { // x:(r)+,b2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 318: { // x:(r),b2
+	case 269: { // x:(r),b2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 319: { // x:(r+n),b2
+	case 270: { // x:(r+n),b2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 320: { // x:-(r),b2
+	case 271: { // x:-(r),b2
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 321: { // y:(r)-n,b2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 322: { // y:(r)+n,b2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 323: { // y:(r)-,b2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 324: { // y:(r)+,b2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 325: { // y:(r),b2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 326: { // y:(r+n),b2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 327: { // y:-(r),b2
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 328: { // x:(r)-n,a1
+	case 272: { // x:(r)-n,a1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 329: { // x:(r)+n,a1
+	case 273: { // x:(r)+n,a1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 330: { // x:(r)-,a1
+	case 274: { // x:(r)-,a1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 331: { // x:(r)+,a1
+	case 275: { // x:(r)+,a1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 332: { // x:(r),a1
+	case 276: { // x:(r),a1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 333: { // x:(r+n),a1
+	case 277: { // x:(r+n),a1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 334: { // x:-(r),a1
+	case 278: { // x:-(r),a1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 335: { // y:(r)-n,a1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 336: { // y:(r)+n,a1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 337: { // y:(r)-,a1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 338: { // y:(r)+,a1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 339: { // y:(r),a1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 340: { // y:(r+n),a1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 341: { // y:-(r),a1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 342: { // x:(r)-n,b1
+	case 279: { // x:(r)-n,b1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 343: { // x:(r)+n,b1
+	case 280: { // x:(r)+n,b1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 344: { // x:(r)-,b1
+	case 281: { // x:(r)-,b1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 345: { // x:(r)+,b1
+	case 282: { // x:(r)+,b1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 346: { // x:(r),b1
+	case 283: { // x:(r),b1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 347: { // x:(r+n),b1
+	case 284: { // x:(r+n),b1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 348: { // x:-(r),b1
+	case 285: { // x:-(r),b1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 349: { // y:(r)-n,b1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 350: { // y:(r)+n,b1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 351: { // y:(r)-,b1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 352: { // y:(r)+,b1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 353: { // y:(r),b1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 354: { // y:(r+n),b1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 355: { // y:-(r),b1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 356: { // x:(r)-n,a
+	case 286: { // x:(r)-n,a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 357: { // x:(r)+n,a
+	case 287: { // x:(r)+n,a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 358: { // x:(r)-,a
+	case 288: { // x:(r)-,a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 359: { // x:(r)+,a
+	case 289: { // x:(r)+,a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 360: { // x:(r),a
+	case 290: { // x:(r),a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 361: { // x:(r+n),a
+	case 291: { // x:(r+n),a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 362: { // x:-(r),a
+	case 292: { // x:-(r),a
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 363: { // y:(r)-n,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 364: { // y:(r)+n,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 365: { // y:(r)-,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 366: { // y:(r)+,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 367: { // y:(r),a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 368: { // y:(r+n),a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 369: { // y:-(r),a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 370: { // x:(r)-n,b
+	case 293: { // x:(r)-n,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 371: { // x:(r)+n,b
+	case 294: { // x:(r)+n,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 372: { // x:(r)-,b
+	case 295: { // x:(r)-,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 373: { // x:(r)+,b
+	case 296: { // x:(r)+,b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 374: { // x:(r),b
+	case 297: { // x:(r),b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 375: { // x:(r+n),b
+	case 298: { // x:(r+n),b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 376: { // x:-(r),b
+	case 299: { // x:-(r),b
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 377: { // y:(r)-n,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 378: { // y:(r)+n,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 379: { // y:(r)-,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 380: { // y:(r)+,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 381: { // y:(r),b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 382: { // y:(r+n),b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 383: { // y:-(r),b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 384: { // x:(r)-n,r
+	case 300: { // x:(r)-n,r
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 385: { // x:(r)+n,r
+	case 301: { // x:(r)+n,r
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 386: { // x:(r)-,r
+	case 302: { // x:(r)-,r
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 387: { // x:(r)+,r
+	case 303: { // x:(r)+,r
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 388: { // x:(r),r
+	case 304: { // x:(r),r
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 389: { // x:(r+n),r
+	case 305: { // x:(r+n),r
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 390: { // x:-(r),r
+	case 306: { // x:-(r),r
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 391: { // y:(r)-n,r
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 392: { // y:(r)+n,r
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 393: { // y:(r)-,r
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 394: { // y:(r)+,r
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 395: { // y:(r),r
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 396: { // y:(r+n),r
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 397: { // y:-(r),r
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 398: { // x:(r)-n,n
+	case 307: { // x:(r)-n,n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 399: { // x:(r)+n,n
+	case 308: { // x:(r)+n,n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 400: { // x:(r)-,n
+	case 309: { // x:(r)-,n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 401: { // x:(r)+,n
+	case 310: { // x:(r)+,n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 402: { // x:(r),n
+	case 311: { // x:(r),n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 403: { // x:(r+n),n
+	case 312: { // x:(r+n),n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 404: { // x:-(r),n
+	case 313: { // x:-(r),n
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		m_tmp1 = m_x.read_dword(ea);
 		break;
 		}
-	case 405: { // y:(r)-n,n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 406: { // y:(r)+n,n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 407: { // y:(r)-,n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 408: { // y:(r)+,n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 409: { // y:(r),n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 410: { // y:(r+n),n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 411: { // y:-(r),n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_y.read_dword(ea);
-		break;
-		}
-	case 412: { // x0,x:(r)-n
+	case 314: { // x0,x:(r)-n
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 413: { // x0,x:(r)+n
+	case 315: { // x0,x:(r)+n
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 414: { // x0,x:(r)-
+	case 316: { // x0,x:(r)-
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 415: { // x0,x:(r)+
+	case 317: { // x0,x:(r)+
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 416: { // x0,x:(r)
+	case 318: { // x0,x:(r)
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 417: { // x0,x:(r+n)
+	case 319: { // x0,x:(r+n)
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 418: { // x0,x:-(r)
+	case 320: { // x0,x:-(r)
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 419: { // x0,y:(r)-n
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 420: { // x0,y:(r)+n
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 421: { // x0,y:(r)-
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 422: { // x0,y:(r)+
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 423: { // x0,y:(r)
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 424: { // x0,y:(r+n)
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 425: { // x0,y:-(r)
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 426: { // x1,x:(r)-n
+	case 321: { // x1,x:(r)-n
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 427: { // x1,x:(r)+n
+	case 322: { // x1,x:(r)+n
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 428: { // x1,x:(r)-
+	case 323: { // x1,x:(r)-
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 429: { // x1,x:(r)+
+	case 324: { // x1,x:(r)+
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 430: { // x1,x:(r)
+	case 325: { // x1,x:(r)
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 431: { // x1,x:(r+n)
+	case 326: { // x1,x:(r+n)
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 432: { // x1,x:-(r)
+	case 327: { // x1,x:-(r)
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 433: { // x1,y:(r)-n
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 434: { // x1,y:(r)+n
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 435: { // x1,y:(r)-
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 436: { // x1,y:(r)+
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 437: { // x1,y:(r)
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 438: { // x1,y:(r+n)
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 439: { // x1,y:-(r)
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 440: { // y0,x:(r)-n
+	case 328: { // y0,x:(r)-n
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 441: { // y0,x:(r)+n
+	case 329: { // y0,x:(r)+n
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 442: { // y0,x:(r)-
+	case 330: { // y0,x:(r)-
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 443: { // y0,x:(r)+
+	case 331: { // y0,x:(r)+
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 444: { // y0,x:(r)
+	case 332: { // y0,x:(r)
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 445: { // y0,x:(r+n)
+	case 333: { // y0,x:(r+n)
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 446: { // y0,x:-(r)
+	case 334: { // y0,x:-(r)
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 447: { // y0,y:(r)-n
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 448: { // y0,y:(r)+n
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 449: { // y0,y:(r)-
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 450: { // y0,y:(r)+
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 451: { // y0,y:(r)
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 452: { // y0,y:(r+n)
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 453: { // y0,y:-(r)
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 454: { // y1,x:(r)-n
+	case 335: { // y1,x:(r)-n
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 455: { // y1,x:(r)+n
+	case 336: { // y1,x:(r)+n
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 456: { // y1,x:(r)-
+	case 337: { // y1,x:(r)-
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 457: { // y1,x:(r)+
+	case 338: { // y1,x:(r)+
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 458: { // y1,x:(r)
+	case 339: { // y1,x:(r)
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 459: { // y1,x:(r+n)
+	case 340: { // y1,x:(r+n)
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 460: { // y1,x:-(r)
+	case 341: { // y1,x:-(r)
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 461: { // y1,y:(r)-n
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 462: { // y1,y:(r)+n
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 463: { // y1,y:(r)-
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 464: { // y1,y:(r)+
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 465: { // y1,y:(r)
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 466: { // y1,y:(r+n)
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 467: { // y1,y:-(r)
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 468: { // a0,x:(r)-n
+	case 342: { // a0,x:(r)-n
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 469: { // a0,x:(r)+n
+	case 343: { // a0,x:(r)+n
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 470: { // a0,x:(r)-
+	case 344: { // a0,x:(r)-
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 471: { // a0,x:(r)+
+	case 345: { // a0,x:(r)+
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 472: { // a0,x:(r)
+	case 346: { // a0,x:(r)
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 473: { // a0,x:(r+n)
+	case 347: { // a0,x:(r+n)
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 474: { // a0,x:-(r)
+	case 348: { // a0,x:-(r)
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 475: { // a0,y:(r)-n
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 476: { // a0,y:(r)+n
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 477: { // a0,y:(r)-
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 478: { // a0,y:(r)+
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 479: { // a0,y:(r)
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 480: { // a0,y:(r+n)
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 481: { // a0,y:-(r)
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 482: { // b0,x:(r)-n
+	case 349: { // b0,x:(r)-n
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 483: { // b0,x:(r)+n
+	case 350: { // b0,x:(r)+n
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 484: { // b0,x:(r)-
+	case 351: { // b0,x:(r)-
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 485: { // b0,x:(r)+
+	case 352: { // b0,x:(r)+
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 486: { // b0,x:(r)
+	case 353: { // b0,x:(r)
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 487: { // b0,x:(r+n)
+	case 354: { // b0,x:(r+n)
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 488: { // b0,x:-(r)
+	case 355: { // b0,x:-(r)
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 489: { // b0,y:(r)-n
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 490: { // b0,y:(r)+n
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 491: { // b0,y:(r)-
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 492: { // b0,y:(r)+
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 493: { // b0,y:(r)
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 494: { // b0,y:(r+n)
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 495: { // b0,y:-(r)
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 496: { // a2,x:(r)-n
+	case 356: { // a2,x:(r)-n
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 497: { // a2,x:(r)+n
+	case 357: { // a2,x:(r)+n
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 498: { // a2,x:(r)-
+	case 358: { // a2,x:(r)-
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 499: { // a2,x:(r)+
+	case 359: { // a2,x:(r)+
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 500: { // a2,x:(r)
+	case 360: { // a2,x:(r)
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 501: { // a2,x:(r+n)
+	case 361: { // a2,x:(r+n)
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 502: { // a2,x:-(r)
+	case 362: { // a2,x:-(r)
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 503: { // a2,y:(r)-n
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 504: { // a2,y:(r)+n
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 505: { // a2,y:(r)-
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 506: { // a2,y:(r)+
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 507: { // a2,y:(r)
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 508: { // a2,y:(r+n)
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 509: { // a2,y:-(r)
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 510: { // b2,x:(r)-n
+	case 363: { // b2,x:(r)-n
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 511: { // b2,x:(r)+n
+	case 364: { // b2,x:(r)+n
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 512: { // b2,x:(r)-
+	case 365: { // b2,x:(r)-
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 513: { // b2,x:(r)+
+	case 366: { // b2,x:(r)+
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 514: { // b2,x:(r)
+	case 367: { // b2,x:(r)
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 515: { // b2,x:(r+n)
+	case 368: { // b2,x:(r+n)
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 516: { // b2,x:-(r)
+	case 369: { // b2,x:-(r)
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 517: { // b2,y:(r)-n
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 518: { // b2,y:(r)+n
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 519: { // b2,y:(r)-
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 520: { // b2,y:(r)+
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 521: { // b2,y:(r)
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 522: { // b2,y:(r+n)
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 523: { // b2,y:-(r)
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 524: { // a1,x:(r)-n
+	case 370: { // a1,x:(r)-n
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 525: { // a1,x:(r)+n
+	case 371: { // a1,x:(r)+n
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 526: { // a1,x:(r)-
+	case 372: { // a1,x:(r)-
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 527: { // a1,x:(r)+
+	case 373: { // a1,x:(r)+
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 528: { // a1,x:(r)
+	case 374: { // a1,x:(r)
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 529: { // a1,x:(r+n)
+	case 375: { // a1,x:(r+n)
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 530: { // a1,x:-(r)
+	case 376: { // a1,x:-(r)
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 531: { // a1,y:(r)-n
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 532: { // a1,y:(r)+n
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 533: { // a1,y:(r)-
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 534: { // a1,y:(r)+
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 535: { // a1,y:(r)
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 536: { // a1,y:(r+n)
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 537: { // a1,y:-(r)
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 538: { // b1,x:(r)-n
+	case 377: { // b1,x:(r)-n
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 539: { // b1,x:(r)+n
+	case 378: { // b1,x:(r)+n
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 540: { // b1,x:(r)-
+	case 379: { // b1,x:(r)-
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 541: { // b1,x:(r)+
+	case 380: { // b1,x:(r)+
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 542: { // b1,x:(r)
+	case 381: { // b1,x:(r)
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 543: { // b1,x:(r+n)
+	case 382: { // b1,x:(r+n)
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 544: { // b1,x:-(r)
+	case 383: { // b1,x:-(r)
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 545: { // b1,y:(r)-n
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 546: { // b1,y:(r)+n
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 547: { // b1,y:(r)-
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 548: { // b1,y:(r)+
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 549: { // b1,y:(r)
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 550: { // b1,y:(r+n)
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 551: { // b1,y:-(r)
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 552: { // a,x:(r)-n
+	case 384: { // a,x:(r)-n
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 553: { // a,x:(r)+n
+	case 385: { // a,x:(r)+n
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 554: { // a,x:(r)-
+	case 386: { // a,x:(r)-
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 555: { // a,x:(r)+
+	case 387: { // a,x:(r)+
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 556: { // a,x:(r)
+	case 388: { // a,x:(r)
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 557: { // a,x:(r+n)
+	case 389: { // a,x:(r+n)
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 558: { // a,x:-(r)
+	case 390: { // a,x:-(r)
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 559: { // a,y:(r)-n
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 560: { // a,y:(r)+n
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 561: { // a,y:(r)-
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 562: { // a,y:(r)+
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 563: { // a,y:(r)
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 564: { // a,y:(r+n)
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 565: { // a,y:-(r)
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 566: { // b,x:(r)-n
+	case 391: { // b,x:(r)-n
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 567: { // b,x:(r)+n
+	case 392: { // b,x:(r)+n
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 568: { // b,x:(r)-
+	case 393: { // b,x:(r)-
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 569: { // b,x:(r)+
+	case 394: { // b,x:(r)+
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 570: { // b,x:(r)
+	case 395: { // b,x:(r)
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 571: { // b,x:(r+n)
+	case 396: { // b,x:(r+n)
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 572: { // b,x:-(r)
+	case 397: { // b,x:-(r)
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 573: { // b,y:(r)-n
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 574: { // b,y:(r)+n
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 575: { // b,y:(r)-
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 576: { // b,y:(r)+
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 577: { // b,y:(r)
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 578: { // b,y:(r+n)
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 579: { // b,y:-(r)
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 580: { // r,x:(r)-n
+	case 398: { // r,x:(r)-n
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 581: { // r,x:(r)+n
+	case 399: { // r,x:(r)+n
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 582: { // r,x:(r)-
+	case 400: { // r,x:(r)-
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 583: { // r,x:(r)+
+	case 401: { // r,x:(r)+
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 584: { // r,x:(r)
+	case 402: { // r,x:(r)
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 585: { // r,x:(r+n)
+	case 403: { // r,x:(r+n)
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 586: { // r,x:-(r)
+	case 404: { // r,x:-(r)
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 587: { // r,y:(r)-n
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 588: { // r,y:(r)+n
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 589: { // r,y:(r)-
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 590: { // r,y:(r)+
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 591: { // r,y:(r)
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 592: { // r,y:(r+n)
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 593: { // r,y:-(r)
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 594: { // n,x:(r)-n
+	case 405: { // n,x:(r)-n
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 595: { // n,x:(r)+n
+	case 406: { // n,x:(r)+n
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 596: { // n,x:(r)-
+	case 407: { // n,x:(r)-
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 597: { // n,x:(r)+
+	case 408: { // n,x:(r)+
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 598: { // n,x:(r)
+	case 409: { // n,x:(r)
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 599: { // n,x:(r+n)
+	case 410: { // n,x:(r+n)
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 600: { // n,x:-(r)
+	case 411: { // n,x:-(r)
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 601: { // n,y:(r)-n
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 602: { // n,y:(r)+n
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 603: { // n,y:(r)-
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 604: { // n,y:(r)+
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 605: { // n,y:(r)
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 606: { // n,y:(r+n)
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 607: { // n,y:-(r)
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 608: { // x:[abs],x0
+	case 412: { // x:[abs],x0
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 609: { // y:[abs],x0
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 610: { // x:[abs],x1
+	case 413: { // x:[abs],x1
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 611: { // y:[abs],x1
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 612: { // x:[abs],y0
+	case 414: { // x:[abs],y0
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 613: { // y:[abs],y0
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 614: { // x:[abs],y1
+	case 415: { // x:[abs],y1
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 615: { // y:[abs],y1
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 616: { // x:[abs],a0
+	case 416: { // x:[abs],a0
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 617: { // y:[abs],a0
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 618: { // x:[abs],b0
+	case 417: { // x:[abs],b0
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 619: { // y:[abs],b0
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 620: { // x:[abs],a2
+	case 418: { // x:[abs],a2
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 621: { // y:[abs],a2
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 622: { // x:[abs],b2
+	case 419: { // x:[abs],b2
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 623: { // y:[abs],b2
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 624: { // x:[abs],a1
+	case 420: { // x:[abs],a1
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 625: { // y:[abs],a1
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 626: { // x:[abs],b1
+	case 421: { // x:[abs],b1
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 627: { // y:[abs],b1
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 628: { // x:[abs],a
+	case 422: { // x:[abs],a
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 629: { // y:[abs],a
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 630: { // x:[abs],b
+	case 423: { // x:[abs],b
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 631: { // y:[abs],b
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 632: { // x:[abs],r
+	case 424: { // x:[abs],r
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 633: { // y:[abs],r
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 634: { // x:[abs],n
+	case 425: { // x:[abs],n
 		u32 abs = exv;
 		m_tmp1 = m_x.read_dword(abs);
 		break;
 		}
-	case 635: { // y:[abs],n
-		u32 abs = exv;
-		m_tmp1 = m_y.read_dword(abs);
-		break;
-		}
-	case 636: { // x0,x:[abs]
+	case 426: { // x0,x:[abs]
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 637: { // x0,y:[abs]
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 638: { // x1,x:[abs]
+	case 427: { // x1,x:[abs]
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 639: { // x1,y:[abs]
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 640: { // y0,x:[abs]
+	case 428: { // y0,x:[abs]
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 641: { // y0,y:[abs]
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 642: { // y1,x:[abs]
+	case 429: { // y1,x:[abs]
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 643: { // y1,y:[abs]
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 644: { // a0,x:[abs]
+	case 430: { // a0,x:[abs]
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 645: { // a0,y:[abs]
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 646: { // b0,x:[abs]
+	case 431: { // b0,x:[abs]
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 647: { // b0,y:[abs]
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 648: { // a2,x:[abs]
+	case 432: { // a2,x:[abs]
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 649: { // a2,y:[abs]
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 650: { // b2,x:[abs]
+	case 433: { // b2,x:[abs]
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 651: { // b2,y:[abs]
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 652: { // a1,x:[abs]
+	case 434: { // a1,x:[abs]
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 653: { // a1,y:[abs]
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 654: { // b1,x:[abs]
+	case 435: { // b1,x:[abs]
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 655: { // b1,y:[abs]
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 656: { // a,x:[abs]
+	case 436: { // a,x:[abs]
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 657: { // a,y:[abs]
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 658: { // b,x:[abs]
+	case 437: { // b,x:[abs]
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 659: { // b,y:[abs]
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 660: { // r,x:[abs]
+	case 438: { // r,x:[abs]
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 661: { // r,y:[abs]
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 662: { // n,x:[abs]
+	case 439: { // n,x:[abs]
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 663: { // n,y:[abs]
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
+	case 440: { // #[i],x0
 		break;
 		}
-	case 664: { // #[i],x0
+	case 441: { // #[i],x1
 		break;
 		}
-	case 665: { // #[i],x1
+	case 442: { // #[i],y0
 		break;
 		}
-	case 666: { // #[i],y0
+	case 443: { // #[i],y1
 		break;
 		}
-	case 667: { // #[i],y1
+	case 444: { // #[i],a0
 		break;
 		}
-	case 668: { // #[i],a0
+	case 445: { // #[i],b0
 		break;
 		}
-	case 669: { // #[i],b0
+	case 446: { // #[i],a2
 		break;
 		}
-	case 670: { // #[i],a2
+	case 447: { // #[i],b2
 		break;
 		}
-	case 671: { // #[i],b2
+	case 448: { // #[i],a1
 		break;
 		}
-	case 672: { // #[i],a1
+	case 449: { // #[i],b1
 		break;
 		}
-	case 673: { // #[i],b1
+	case 450: { // #[i],a
 		break;
 		}
-	case 674: { // #[i],a
+	case 451: { // #[i],b
 		break;
 		}
-	case 675: { // #[i],b
+	case 452: { // #[i],r
 		break;
 		}
-	case 676: { // #[i],r
+	case 453: { // #[i],n
 		break;
 		}
-	case 677: { // #[i],n
-		break;
-		}
-	case 678: { // #[i],x0
-		break;
-		}
-	case 679: { // #[i],x1
-		break;
-		}
-	case 680: { // #[i],y0
-		break;
-		}
-	case 681: { // #[i],y1
-		break;
-		}
-	case 682: { // #[i],a0
-		break;
-		}
-	case 683: { // #[i],b0
-		break;
-		}
-	case 684: { // #[i],a2
-		break;
-		}
-	case 685: { // #[i],b2
-		break;
-		}
-	case 686: { // #[i],a1
-		break;
-		}
-	case 687: { // #[i],b1
-		break;
-		}
-	case 688: { // #[i],a
-		break;
-		}
-	case 689: { // #[i],b
-		break;
-		}
-	case 690: { // #[i],r
-		break;
-		}
-	case 691: { // #[i],n
-		break;
-		}
-	case 692: { // x:[aa],x0
+	case 454: { // x:[aa],x0
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 693: { // y:[aa],x0
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 694: { // x:[aa],x1
+	case 455: { // x:[aa],x1
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 695: { // y:[aa],x1
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 696: { // x:[aa],y0
+	case 456: { // x:[aa],y0
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 697: { // y:[aa],y0
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 698: { // x:[aa],y1
+	case 457: { // x:[aa],y1
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 699: { // y:[aa],y1
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 700: { // x:[aa],a0
+	case 458: { // x:[aa],a0
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 701: { // y:[aa],a0
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 702: { // x:[aa],b0
+	case 459: { // x:[aa],b0
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 703: { // y:[aa],b0
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 704: { // x:[aa],a2
+	case 460: { // x:[aa],a2
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 705: { // y:[aa],a2
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 706: { // x:[aa],b2
+	case 461: { // x:[aa],b2
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 707: { // y:[aa],b2
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 708: { // x:[aa],a1
+	case 462: { // x:[aa],a1
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 709: { // y:[aa],a1
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 710: { // x:[aa],b1
+	case 463: { // x:[aa],b1
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 711: { // y:[aa],b1
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 712: { // x:[aa],a
+	case 464: { // x:[aa],a
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 713: { // y:[aa],a
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 714: { // x:[aa],b
+	case 465: { // x:[aa],b
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 715: { // y:[aa],b
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 716: { // x:[aa],r
+	case 466: { // x:[aa],r
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 717: { // y:[aa],r
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 718: { // x:[aa],n
+	case 467: { // x:[aa],n
 		u32 aa = BIT(opcode, 8, 6);
 		m_tmp1 = m_x.read_dword(aa);
 		break;
 		}
-	case 719: { // y:[aa],n
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_y.read_dword(aa);
-		break;
-		}
-	case 720: { // x0,x:[aa]
+	case 468: { // x0,x:[aa]
 		u32 s = get_x0();
 		m_tmp1 = s;
 		break;
 		}
-	case 721: { // x0,y:[aa]
-		u32 s = get_x0();
-		m_tmp1 = s;
-		break;
-		}
-	case 722: { // x1,x:[aa]
+	case 469: { // x1,x:[aa]
 		u32 s = get_x1();
 		m_tmp1 = s;
 		break;
 		}
-	case 723: { // x1,y:[aa]
-		u32 s = get_x1();
-		m_tmp1 = s;
-		break;
-		}
-	case 724: { // y0,x:[aa]
+	case 470: { // y0,x:[aa]
 		u32 s = get_y0();
 		m_tmp1 = s;
 		break;
 		}
-	case 725: { // y0,y:[aa]
-		u32 s = get_y0();
-		m_tmp1 = s;
-		break;
-		}
-	case 726: { // y1,x:[aa]
+	case 471: { // y1,x:[aa]
 		u32 s = get_y1();
 		m_tmp1 = s;
 		break;
 		}
-	case 727: { // y1,y:[aa]
-		u32 s = get_y1();
-		m_tmp1 = s;
-		break;
-		}
-	case 728: { // a0,x:[aa]
+	case 472: { // a0,x:[aa]
 		u32 s = get_a0();
 		m_tmp1 = s;
 		break;
 		}
-	case 729: { // a0,y:[aa]
-		u32 s = get_a0();
-		m_tmp1 = s;
-		break;
-		}
-	case 730: { // b0,x:[aa]
+	case 473: { // b0,x:[aa]
 		u32 s = get_b0();
 		m_tmp1 = s;
 		break;
 		}
-	case 731: { // b0,y:[aa]
-		u32 s = get_b0();
-		m_tmp1 = s;
-		break;
-		}
-	case 732: { // a2,x:[aa]
+	case 474: { // a2,x:[aa]
 		u32 s = get_a2();
 		m_tmp1 = s;
 		break;
 		}
-	case 733: { // a2,y:[aa]
-		u32 s = get_a2();
-		m_tmp1 = s;
-		break;
-		}
-	case 734: { // b2,x:[aa]
+	case 475: { // b2,x:[aa]
 		u32 s = get_b2();
 		m_tmp1 = s;
 		break;
 		}
-	case 735: { // b2,y:[aa]
-		u32 s = get_b2();
-		m_tmp1 = s;
-		break;
-		}
-	case 736: { // a1,x:[aa]
+	case 476: { // a1,x:[aa]
 		u32 s = get_a1();
 		m_tmp1 = s;
 		break;
 		}
-	case 737: { // a1,y:[aa]
-		u32 s = get_a1();
-		m_tmp1 = s;
-		break;
-		}
-	case 738: { // b1,x:[aa]
+	case 477: { // b1,x:[aa]
 		u32 s = get_b1();
 		m_tmp1 = s;
 		break;
 		}
-	case 739: { // b1,y:[aa]
-		u32 s = get_b1();
-		m_tmp1 = s;
-		break;
-		}
-	case 740: { // a,x:[aa]
+	case 478: { // a,x:[aa]
 		u32 s_h = get_ah();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 741: { // a,y:[aa]
-		u32 s_h = get_ah();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 742: { // b,x:[aa]
+	case 479: { // b,x:[aa]
 		u32 s_h = get_bh();
 		m_tmp1 = s_h;
 		break;
 		}
-	case 743: { // b,y:[aa]
-		u32 s_h = get_bh();
-		m_tmp1 = s_h;
-		break;
-		}
-	case 744: { // r,x:[aa]
+	case 480: { // r,x:[aa]
 		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 745: { // r,y:[aa]
-		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 746: { // n,x:[aa]
+	case 481: { // n,x:[aa]
 		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
 		m_tmp1 = s;
 		break;
 		}
-	case 747: { // n,y:[aa]
-		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
-		m_tmp1 = s;
-		break;
-		}
-	case 748: { // x:(r)-n,x0 a,y0
+	case 482: { // x:(r)-n,x0 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5340,7 +3566,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 749: { // x:(r)+n,x0 a,y0
+	case 483: { // x:(r)+n,x0 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5349,7 +3575,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 750: { // x:(r)-,x0 a,y0
+	case 484: { // x:(r)-,x0 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5358,7 +3584,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 751: { // x:(r)+,x0 a,y0
+	case 485: { // x:(r)+,x0 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5367,7 +3593,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 752: { // x:(r),x0 a,y0
+	case 486: { // x:(r),x0 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -5375,7 +3601,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 753: { // x:(r+n),x0 a,y0
+	case 487: { // x:(r+n),x0 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -5383,7 +3609,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 754: { // x:-(r),x0 a,y0
+	case 488: { // x:-(r),x0 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5392,7 +3618,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 755: { // x:(r)-n,x0 a,y1
+	case 489: { // x:(r)-n,x0 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5401,7 +3627,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 756: { // x:(r)+n,x0 a,y1
+	case 490: { // x:(r)+n,x0 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5410,7 +3636,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 757: { // x:(r)-,x0 a,y1
+	case 491: { // x:(r)-,x0 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5419,7 +3645,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 758: { // x:(r)+,x0 a,y1
+	case 492: { // x:(r)+,x0 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5428,7 +3654,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 759: { // x:(r),x0 a,y1
+	case 493: { // x:(r),x0 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -5436,7 +3662,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 760: { // x:(r+n),x0 a,y1
+	case 494: { // x:(r+n),x0 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -5444,7 +3670,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 761: { // x:-(r),x0 a,y1
+	case 495: { // x:-(r),x0 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5453,7 +3679,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 762: { // x:(r)-n,x0 b,y0
+	case 496: { // x:(r)-n,x0 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5462,7 +3688,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 763: { // x:(r)+n,x0 b,y0
+	case 497: { // x:(r)+n,x0 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5471,7 +3697,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 764: { // x:(r)-,x0 b,y0
+	case 498: { // x:(r)-,x0 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5480,7 +3706,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 765: { // x:(r)+,x0 b,y0
+	case 499: { // x:(r)+,x0 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5489,7 +3715,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 766: { // x:(r),x0 b,y0
+	case 500: { // x:(r),x0 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -5497,7 +3723,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 767: { // x:(r+n),x0 b,y0
+	case 501: { // x:(r+n),x0 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -5505,7 +3731,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 768: { // x:-(r),x0 b,y0
+	case 502: { // x:-(r),x0 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5514,7 +3740,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 769: { // x:(r)-n,x0 b,y1
+	case 503: { // x:(r)-n,x0 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5523,7 +3749,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 770: { // x:(r)+n,x0 b,y1
+	case 504: { // x:(r)+n,x0 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5532,7 +3758,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 771: { // x:(r)-,x0 b,y1
+	case 505: { // x:(r)-,x0 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5541,7 +3767,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 772: { // x:(r)+,x0 b,y1
+	case 506: { // x:(r)+,x0 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5550,7 +3776,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 773: { // x:(r),x0 b,y1
+	case 507: { // x:(r),x0 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -5558,7 +3784,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 774: { // x:(r+n),x0 b,y1
+	case 508: { // x:(r+n),x0 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -5566,7 +3792,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 775: { // x:-(r),x0 b,y1
+	case 509: { // x:-(r),x0 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5575,7 +3801,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 776: { // x:(r)-n,x1 a,y0
+	case 510: { // x:(r)-n,x1 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5584,7 +3810,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 777: { // x:(r)+n,x1 a,y0
+	case 511: { // x:(r)+n,x1 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5593,7 +3819,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 778: { // x:(r)-,x1 a,y0
+	case 512: { // x:(r)-,x1 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5602,7 +3828,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 779: { // x:(r)+,x1 a,y0
+	case 513: { // x:(r)+,x1 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5611,7 +3837,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 780: { // x:(r),x1 a,y0
+	case 514: { // x:(r),x1 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -5619,7 +3845,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 781: { // x:(r+n),x1 a,y0
+	case 515: { // x:(r+n),x1 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -5627,7 +3853,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 782: { // x:-(r),x1 a,y0
+	case 516: { // x:-(r),x1 a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5636,7 +3862,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 783: { // x:(r)-n,x1 a,y1
+	case 517: { // x:(r)-n,x1 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5645,7 +3871,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 784: { // x:(r)+n,x1 a,y1
+	case 518: { // x:(r)+n,x1 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5654,7 +3880,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 785: { // x:(r)-,x1 a,y1
+	case 519: { // x:(r)-,x1 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5663,7 +3889,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 786: { // x:(r)+,x1 a,y1
+	case 520: { // x:(r)+,x1 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5672,7 +3898,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 787: { // x:(r),x1 a,y1
+	case 521: { // x:(r),x1 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -5680,7 +3906,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 788: { // x:(r+n),x1 a,y1
+	case 522: { // x:(r+n),x1 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -5688,7 +3914,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 789: { // x:-(r),x1 a,y1
+	case 523: { // x:-(r),x1 a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5697,7 +3923,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 790: { // x:(r)-n,x1 b,y0
+	case 524: { // x:(r)-n,x1 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5706,7 +3932,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 791: { // x:(r)+n,x1 b,y0
+	case 525: { // x:(r)+n,x1 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5715,7 +3941,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 792: { // x:(r)-,x1 b,y0
+	case 526: { // x:(r)-,x1 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5724,7 +3950,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 793: { // x:(r)+,x1 b,y0
+	case 527: { // x:(r)+,x1 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5733,7 +3959,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 794: { // x:(r),x1 b,y0
+	case 528: { // x:(r),x1 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -5741,7 +3967,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 795: { // x:(r+n),x1 b,y0
+	case 529: { // x:(r+n),x1 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -5749,7 +3975,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 796: { // x:-(r),x1 b,y0
+	case 530: { // x:-(r),x1 b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5758,7 +3984,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 797: { // x:(r)-n,x1 b,y1
+	case 531: { // x:(r)-n,x1 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5767,7 +3993,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 798: { // x:(r)+n,x1 b,y1
+	case 532: { // x:(r)+n,x1 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5776,7 +4002,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 799: { // x:(r)-,x1 b,y1
+	case 533: { // x:(r)-,x1 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5785,7 +4011,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 800: { // x:(r)+,x1 b,y1
+	case 534: { // x:(r)+,x1 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5794,7 +4020,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 801: { // x:(r),x1 b,y1
+	case 535: { // x:(r),x1 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -5802,7 +4028,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 802: { // x:(r+n),x1 b,y1
+	case 536: { // x:(r+n),x1 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -5810,7 +4036,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 803: { // x:-(r),x1 b,y1
+	case 537: { // x:-(r),x1 b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5819,7 +4045,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 804: { // x:(r)-n,a a,y0
+	case 538: { // x:(r)-n,a a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5828,7 +4054,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 805: { // x:(r)+n,a a,y0
+	case 539: { // x:(r)+n,a a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5837,7 +4063,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 806: { // x:(r)-,a a,y0
+	case 540: { // x:(r)-,a a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5846,7 +4072,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 807: { // x:(r)+,a a,y0
+	case 541: { // x:(r)+,a a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5855,7 +4081,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 808: { // x:(r),a a,y0
+	case 542: { // x:(r),a a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -5863,7 +4089,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 809: { // x:(r+n),a a,y0
+	case 543: { // x:(r+n),a a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -5871,7 +4097,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 810: { // x:-(r),a a,y0
+	case 544: { // x:-(r),a a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5880,7 +4106,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 811: { // x:(r)-n,a a,y1
+	case 545: { // x:(r)-n,a a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5889,7 +4115,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 812: { // x:(r)+n,a a,y1
+	case 546: { // x:(r)+n,a a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5898,7 +4124,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 813: { // x:(r)-,a a,y1
+	case 547: { // x:(r)-,a a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5907,7 +4133,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 814: { // x:(r)+,a a,y1
+	case 548: { // x:(r)+,a a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5916,7 +4142,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 815: { // x:(r),a a,y1
+	case 549: { // x:(r),a a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -5924,7 +4150,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 816: { // x:(r+n),a a,y1
+	case 550: { // x:(r+n),a a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -5932,7 +4158,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 817: { // x:-(r),a a,y1
+	case 551: { // x:-(r),a a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -5941,7 +4167,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 818: { // x:(r)-n,a b,y0
+	case 552: { // x:(r)-n,a b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -5950,7 +4176,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 819: { // x:(r)+n,a b,y0
+	case 553: { // x:(r)+n,a b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -5959,7 +4185,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 820: { // x:(r)-,a b,y0
+	case 554: { // x:(r)-,a b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -5968,7 +4194,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 821: { // x:(r)+,a b,y0
+	case 555: { // x:(r)+,a b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -5977,7 +4203,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 822: { // x:(r),a b,y0
+	case 556: { // x:(r),a b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -5985,7 +4211,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 823: { // x:(r+n),a b,y0
+	case 557: { // x:(r+n),a b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -5993,7 +4219,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 824: { // x:-(r),a b,y0
+	case 558: { // x:-(r),a b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -6002,7 +4228,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 825: { // x:(r)-n,a b,y1
+	case 559: { // x:(r)-n,a b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -6011,7 +4237,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 826: { // x:(r)+n,a b,y1
+	case 560: { // x:(r)+n,a b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -6020,7 +4246,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 827: { // x:(r)-,a b,y1
+	case 561: { // x:(r)-,a b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -6029,7 +4255,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 828: { // x:(r)+,a b,y1
+	case 562: { // x:(r)+,a b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -6038,7 +4264,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 829: { // x:(r),a b,y1
+	case 563: { // x:(r),a b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -6046,7 +4272,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 830: { // x:(r+n),a b,y1
+	case 564: { // x:(r+n),a b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -6054,7 +4280,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 831: { // x:-(r),a b,y1
+	case 565: { // x:-(r),a b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -6063,7 +4289,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 832: { // x:(r)-n,b a,y0
+	case 566: { // x:(r)-n,b a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -6072,7 +4298,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 833: { // x:(r)+n,b a,y0
+	case 567: { // x:(r)+n,b a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -6081,7 +4307,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 834: { // x:(r)-,b a,y0
+	case 568: { // x:(r)-,b a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -6090,7 +4316,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 835: { // x:(r)+,b a,y0
+	case 569: { // x:(r)+,b a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -6099,7 +4325,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 836: { // x:(r),b a,y0
+	case 570: { // x:(r),b a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -6107,7 +4333,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 837: { // x:(r+n),b a,y0
+	case 571: { // x:(r+n),b a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -6115,7 +4341,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 838: { // x:-(r),b a,y0
+	case 572: { // x:-(r),b a,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -6124,7 +4350,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 839: { // x:(r)-n,b a,y1
+	case 573: { // x:(r)-n,b a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -6133,7 +4359,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 840: { // x:(r)+n,b a,y1
+	case 574: { // x:(r)+n,b a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -6142,7 +4368,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 841: { // x:(r)-,b a,y1
+	case 575: { // x:(r)-,b a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -6151,7 +4377,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 842: { // x:(r)+,b a,y1
+	case 576: { // x:(r)+,b a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -6160,7 +4386,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 843: { // x:(r),b a,y1
+	case 577: { // x:(r),b a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_ah();
@@ -6168,7 +4394,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 844: { // x:(r+n),b a,y1
+	case 578: { // x:(r+n),b a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_ah();
@@ -6176,7 +4402,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 845: { // x:-(r),b a,y1
+	case 579: { // x:-(r),b a,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -6185,7 +4411,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 846: { // x:(r)-n,b b,y0
+	case 580: { // x:(r)-n,b b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -6194,7 +4420,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 847: { // x:(r)+n,b b,y0
+	case 581: { // x:(r)+n,b b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -6203,7 +4429,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 848: { // x:(r)-,b b,y0
+	case 582: { // x:(r)-,b b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -6212,7 +4438,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 849: { // x:(r)+,b b,y0
+	case 583: { // x:(r)+,b b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -6221,7 +4447,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 850: { // x:(r),b b,y0
+	case 584: { // x:(r),b b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -6229,7 +4455,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 851: { // x:(r+n),b b,y0
+	case 585: { // x:(r+n),b b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -6237,7 +4463,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 852: { // x:-(r),b b,y0
+	case 586: { // x:-(r),b b,y0
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -6246,7 +4472,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 853: { // x:(r)-n,b b,y1
+	case 587: { // x:(r)-n,b b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
@@ -6255,7 +4481,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 854: { // x:(r)+n,b b,y1
+	case 588: { // x:(r)+n,b b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
@@ -6264,7 +4490,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 855: { // x:(r)-,b b,y1
+	case 589: { // x:(r)-,b b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
@@ -6273,7 +4499,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 856: { // x:(r)+,b b,y1
+	case 590: { // x:(r)+,b b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
@@ -6282,7 +4508,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 857: { // x:(r),b b,y1
+	case 591: { // x:(r),b b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 s2_h = get_bh();
@@ -6290,7 +4516,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 858: { // x:(r+n),b b,y1
+	case 592: { // x:(r+n),b b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 s2_h = get_bh();
@@ -6298,7 +4524,7 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 859: { // x:-(r),b b,y1
+	case 593: { // x:-(r),b b,y1
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
@@ -6307,1172 +4533,2642 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 860: { // x0,x:(r)-n a,y0
+	case 594: { // x0,x:(r)-n a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 861: { // x0,x:(r)+n a,y0
+	case 595: { // x0,x:(r)+n a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 862: { // x0,x:(r)- a,y0
+	case 596: { // x0,x:(r)- a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 863: { // x0,x:(r)+ a,y0
+	case 597: { // x0,x:(r)+ a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 864: { // x0,x:(r) a,y0
+	case 598: { // x0,x:(r) a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 865: { // x0,x:(r+n) a,y0
+	case 599: { // x0,x:(r+n) a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 866: { // x0,x:-(r) a,y0
+	case 600: { // x0,x:-(r) a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 867: { // x0,x:(r)-n a,y1
+	case 601: { // x0,x:(r)-n a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 868: { // x0,x:(r)+n a,y1
+	case 602: { // x0,x:(r)+n a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 869: { // x0,x:(r)- a,y1
+	case 603: { // x0,x:(r)- a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 870: { // x0,x:(r)+ a,y1
+	case 604: { // x0,x:(r)+ a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 871: { // x0,x:(r) a,y1
+	case 605: { // x0,x:(r) a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 872: { // x0,x:(r+n) a,y1
+	case 606: { // x0,x:(r+n) a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 873: { // x0,x:-(r) a,y1
+	case 607: { // x0,x:-(r) a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 874: { // x0,x:(r)-n b,y0
+	case 608: { // x0,x:(r)-n b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 875: { // x0,x:(r)+n b,y0
+	case 609: { // x0,x:(r)+n b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 876: { // x0,x:(r)- b,y0
+	case 610: { // x0,x:(r)- b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 877: { // x0,x:(r)+ b,y0
+	case 611: { // x0,x:(r)+ b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 878: { // x0,x:(r) b,y0
+	case 612: { // x0,x:(r) b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 879: { // x0,x:(r+n) b,y0
+	case 613: { // x0,x:(r+n) b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 880: { // x0,x:-(r) b,y0
+	case 614: { // x0,x:-(r) b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 881: { // x0,x:(r)-n b,y1
+	case 615: { // x0,x:(r)-n b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 882: { // x0,x:(r)+n b,y1
+	case 616: { // x0,x:(r)+n b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 883: { // x0,x:(r)- b,y1
+	case 617: { // x0,x:(r)- b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 884: { // x0,x:(r)+ b,y1
+	case 618: { // x0,x:(r)+ b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 885: { // x0,x:(r) b,y1
+	case 619: { // x0,x:(r) b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 886: { // x0,x:(r+n) b,y1
+	case 620: { // x0,x:(r+n) b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 887: { // x0,x:-(r) b,y1
+	case 621: { // x0,x:-(r) b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 888: { // x1,x:(r)-n a,y0
+	case 622: { // x1,x:(r)-n a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 889: { // x1,x:(r)+n a,y0
+	case 623: { // x1,x:(r)+n a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 890: { // x1,x:(r)- a,y0
+	case 624: { // x1,x:(r)- a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 891: { // x1,x:(r)+ a,y0
+	case 625: { // x1,x:(r)+ a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 892: { // x1,x:(r) a,y0
+	case 626: { // x1,x:(r) a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 893: { // x1,x:(r+n) a,y0
+	case 627: { // x1,x:(r+n) a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 894: { // x1,x:-(r) a,y0
+	case 628: { // x1,x:-(r) a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 895: { // x1,x:(r)-n a,y1
+	case 629: { // x1,x:(r)-n a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 896: { // x1,x:(r)+n a,y1
+	case 630: { // x1,x:(r)+n a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 897: { // x1,x:(r)- a,y1
+	case 631: { // x1,x:(r)- a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 898: { // x1,x:(r)+ a,y1
+	case 632: { // x1,x:(r)+ a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 899: { // x1,x:(r) a,y1
+	case 633: { // x1,x:(r) a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 900: { // x1,x:(r+n) a,y1
+	case 634: { // x1,x:(r+n) a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 901: { // x1,x:-(r) a,y1
+	case 635: { // x1,x:-(r) a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 902: { // x1,x:(r)-n b,y0
+	case 636: { // x1,x:(r)-n b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 903: { // x1,x:(r)+n b,y0
+	case 637: { // x1,x:(r)+n b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 904: { // x1,x:(r)- b,y0
+	case 638: { // x1,x:(r)- b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 905: { // x1,x:(r)+ b,y0
+	case 639: { // x1,x:(r)+ b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 906: { // x1,x:(r) b,y0
+	case 640: { // x1,x:(r) b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 907: { // x1,x:(r+n) b,y0
+	case 641: { // x1,x:(r+n) b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 908: { // x1,x:-(r) b,y0
+	case 642: { // x1,x:-(r) b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 909: { // x1,x:(r)-n b,y1
+	case 643: { // x1,x:(r)-n b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 910: { // x1,x:(r)+n b,y1
+	case 644: { // x1,x:(r)+n b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 911: { // x1,x:(r)- b,y1
+	case 645: { // x1,x:(r)- b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 912: { // x1,x:(r)+ b,y1
+	case 646: { // x1,x:(r)+ b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 913: { // x1,x:(r) b,y1
+	case 647: { // x1,x:(r) b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 914: { // x1,x:(r+n) b,y1
+	case 648: { // x1,x:(r+n) b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 915: { // x1,x:-(r) b,y1
+	case 649: { // x1,x:-(r) b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 916: { // a,x:(r)-n a,y0
+	case 650: { // a,x:(r)-n a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 917: { // a,x:(r)+n a,y0
+	case 651: { // a,x:(r)+n a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 918: { // a,x:(r)- a,y0
+	case 652: { // a,x:(r)- a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 919: { // a,x:(r)+ a,y0
+	case 653: { // a,x:(r)+ a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 920: { // a,x:(r) a,y0
+	case 654: { // a,x:(r) a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 921: { // a,x:(r+n) a,y0
+	case 655: { // a,x:(r+n) a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 922: { // a,x:-(r) a,y0
+	case 656: { // a,x:-(r) a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 923: { // a,x:(r)-n a,y1
+	case 657: { // a,x:(r)-n a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 924: { // a,x:(r)+n a,y1
+	case 658: { // a,x:(r)+n a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 925: { // a,x:(r)- a,y1
+	case 659: { // a,x:(r)- a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 926: { // a,x:(r)+ a,y1
+	case 660: { // a,x:(r)+ a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 927: { // a,x:(r) a,y1
+	case 661: { // a,x:(r) a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 928: { // a,x:(r+n) a,y1
+	case 662: { // a,x:(r+n) a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 929: { // a,x:-(r) a,y1
+	case 663: { // a,x:-(r) a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 930: { // a,x:(r)-n b,y0
+	case 664: { // a,x:(r)-n b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 931: { // a,x:(r)+n b,y0
+	case 665: { // a,x:(r)+n b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 932: { // a,x:(r)- b,y0
+	case 666: { // a,x:(r)- b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 933: { // a,x:(r)+ b,y0
+	case 667: { // a,x:(r)+ b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 934: { // a,x:(r) b,y0
+	case 668: { // a,x:(r) b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 935: { // a,x:(r+n) b,y0
+	case 669: { // a,x:(r+n) b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 936: { // a,x:-(r) b,y0
+	case 670: { // a,x:-(r) b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 937: { // a,x:(r)-n b,y1
+	case 671: { // a,x:(r)-n b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 938: { // a,x:(r)+n b,y1
+	case 672: { // a,x:(r)+n b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 939: { // a,x:(r)- b,y1
+	case 673: { // a,x:(r)- b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 940: { // a,x:(r)+ b,y1
+	case 674: { // a,x:(r)+ b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 941: { // a,x:(r) b,y1
+	case 675: { // a,x:(r) b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 942: { // a,x:(r+n) b,y1
+	case 676: { // a,x:(r+n) b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 943: { // a,x:-(r) b,y1
+	case 677: { // a,x:-(r) b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 944: { // b,x:(r)-n a,y0
+	case 678: { // b,x:(r)-n a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 945: { // b,x:(r)+n a,y0
+	case 679: { // b,x:(r)+n a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 946: { // b,x:(r)- a,y0
+	case 680: { // b,x:(r)- a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 947: { // b,x:(r)+ a,y0
+	case 681: { // b,x:(r)+ a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 948: { // b,x:(r) a,y0
+	case 682: { // b,x:(r) a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 949: { // b,x:(r+n) a,y0
+	case 683: { // b,x:(r+n) a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 950: { // b,x:-(r) a,y0
+	case 684: { // b,x:-(r) a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 951: { // b,x:(r)-n a,y1
+	case 685: { // b,x:(r)-n a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 952: { // b,x:(r)+n a,y1
+	case 686: { // b,x:(r)+n a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 953: { // b,x:(r)- a,y1
+	case 687: { // b,x:(r)- a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 954: { // b,x:(r)+ a,y1
+	case 688: { // b,x:(r)+ a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 955: { // b,x:(r) a,y1
+	case 689: { // b,x:(r) a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 956: { // b,x:(r+n) a,y1
+	case 690: { // b,x:(r+n) a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 957: { // b,x:-(r) a,y1
+	case 691: { // b,x:-(r) a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 958: { // b,x:(r)-n b,y0
+	case 692: { // b,x:(r)-n b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 959: { // b,x:(r)+n b,y0
+	case 693: { // b,x:(r)+n b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 960: { // b,x:(r)- b,y0
+	case 694: { // b,x:(r)- b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 961: { // b,x:(r)+ b,y0
+	case 695: { // b,x:(r)+ b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 962: { // b,x:(r) b,y0
+	case 696: { // b,x:(r) b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 963: { // b,x:(r+n) b,y0
+	case 697: { // b,x:(r+n) b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 964: { // b,x:-(r) b,y0
+	case 698: { // b,x:-(r) b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 965: { // b,x:(r)-n b,y1
+	case 699: { // b,x:(r)-n b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 966: { // b,x:(r)+n b,y1
+	case 700: { // b,x:(r)+n b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 967: { // b,x:(r)- b,y1
+	case 701: { // b,x:(r)- b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 968: { // b,x:(r)+ b,y1
+	case 702: { // b,x:(r)+ b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 969: { // b,x:(r) b,y1
+	case 703: { // b,x:(r) b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 970: { // b,x:(r+n) b,y1
+	case 704: { // b,x:(r+n) b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 971: { // b,x:-(r) b,y1
+	case 705: { // b,x:-(r) b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 972: { // x:[abs],x0 a,y0
+	case 706: { // x:[abs],x0 a,y0
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 973: { // x:[abs],x0 a,y1
+	case 707: { // x:[abs],x0 a,y1
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 974: { // x:[abs],x0 b,y0
+	case 708: { // x:[abs],x0 b,y0
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 975: { // x:[abs],x0 b,y1
+	case 709: { // x:[abs],x0 b,y1
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 976: { // x:[abs],x1 a,y0
+	case 710: { // x:[abs],x1 a,y0
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 977: { // x:[abs],x1 a,y1
+	case 711: { // x:[abs],x1 a,y1
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 978: { // x:[abs],x1 b,y0
+	case 712: { // x:[abs],x1 b,y0
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 979: { // x:[abs],x1 b,y1
+	case 713: { // x:[abs],x1 b,y1
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 980: { // x:[abs],a a,y0
+	case 714: { // x:[abs],a a,y0
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 981: { // x:[abs],a a,y1
+	case 715: { // x:[abs],a a,y1
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 982: { // x:[abs],a b,y0
+	case 716: { // x:[abs],a b,y0
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 983: { // x:[abs],a b,y1
+	case 717: { // x:[abs],a b,y1
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 984: { // x:[abs],b a,y0
+	case 718: { // x:[abs],b a,y0
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 985: { // x:[abs],b a,y1
+	case 719: { // x:[abs],b a,y1
 		u32 abs = exv;
 		u32 s2_h = get_ah();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 986: { // x:[abs],b b,y0
+	case 720: { // x:[abs],b b,y0
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 987: { // x:[abs],b b,y1
+	case 721: { // x:[abs],b b,y1
 		u32 abs = exv;
 		u32 s2_h = get_bh();
 		m_tmp1 = m_x.read_dword(abs);
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 988: { // x0,x:[abs] a,y0
+	case 722: { // x0,x:[abs] a,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 989: { // x0,x:[abs] a,y1
+	case 723: { // x0,x:[abs] a,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 990: { // x0,x:[abs] b,y0
+	case 724: { // x0,x:[abs] b,y0
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 991: { // x0,x:[abs] b,y1
+	case 725: { // x0,x:[abs] b,y1
 		u32 s1 = get_x0();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 992: { // x1,x:[abs] a,y0
+	case 726: { // x1,x:[abs] a,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 993: { // x1,x:[abs] a,y1
+	case 727: { // x1,x:[abs] a,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 994: { // x1,x:[abs] b,y0
+	case 728: { // x1,x:[abs] b,y0
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 995: { // x1,x:[abs] b,y1
+	case 729: { // x1,x:[abs] b,y1
 		u32 s1 = get_x1();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 996: { // a,x:[abs] a,y0
+	case 730: { // a,x:[abs] a,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 997: { // a,x:[abs] a,y1
+	case 731: { // a,x:[abs] a,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 998: { // a,x:[abs] b,y0
+	case 732: { // a,x:[abs] b,y0
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 999: { // a,x:[abs] b,y1
+	case 733: { // a,x:[abs] b,y1
 		u32 s1_h = get_ah();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 1000: { // b,x:[abs] a,y0
+	case 734: { // b,x:[abs] a,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 1001: { // b,x:[abs] a,y1
+	case 735: { // b,x:[abs] a,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_ah();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 1002: { // b,x:[abs] b,y0
+	case 736: { // b,x:[abs] b,y0
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 1003: { // b,x:[abs] b,y1
+	case 737: { // b,x:[abs] b,y1
 		u32 s1_h = get_bh();
 		u32 s2_h = get_bh();
 		m_tmp1 = s1_h;
 		m_tmp2 = s2_h;
 		break;
 		}
-	case 1004: { // #[i],x0 a,y0
+	case 738: { // #[i],x0 a,y0
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1005: { // #[i],x0 a,y1
+	case 739: { // #[i],x0 a,y1
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1006: { // #[i],x0 b,y0
+	case 740: { // #[i],x0 b,y0
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1007: { // #[i],x0 b,y1
+	case 741: { // #[i],x0 b,y1
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1008: { // #[i],x1 a,y0
+	case 742: { // #[i],x1 a,y0
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1009: { // #[i],x1 a,y1
+	case 743: { // #[i],x1 a,y1
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1010: { // #[i],x1 b,y0
+	case 744: { // #[i],x1 b,y0
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1011: { // #[i],x1 b,y1
+	case 745: { // #[i],x1 b,y1
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1012: { // #[i],a a,y0
+	case 746: { // #[i],a a,y0
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1013: { // #[i],a a,y1
+	case 747: { // #[i],a a,y1
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1014: { // #[i],a b,y0
+	case 748: { // #[i],a b,y0
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1015: { // #[i],a b,y1
+	case 749: { // #[i],a b,y1
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1016: { // #[i],b a,y0
+	case 750: { // #[i],b a,y0
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1017: { // #[i],b a,y1
+	case 751: { // #[i],b a,y1
 		u32 s2_h = get_ah();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1018: { // #[i],b b,y0
+	case 752: { // #[i],b b,y0
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1019: { // #[i],b b,y1
+	case 753: { // #[i],b b,y1
 		u32 s2_h = get_bh();
 		m_tmp1 = s2_h;
 		break;
 		}
-	case 1020: { // a,x:(r)-n x0,a
-		m_tmp1 = get_ah();
+	case 754: { // a,x:(r)-n x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1021: { // a,x:(r)+n x0,a
-		m_tmp1 = get_ah();
+	case 755: { // a,x:(r)+n x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1022: { // a,x:(r)- x0,a
-		m_tmp1 = get_ah();
+	case 756: { // a,x:(r)- x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1023: { // a,x:(r)+ x0,a
-		m_tmp1 = get_ah();
+	case 757: { // a,x:(r)+ x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1024: { // a,x:(r) x0,a
-		m_tmp1 = get_ah();
+	case 758: { // a,x:(r) x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1025: { // a,x:(r+n) x0,a
-		m_tmp1 = get_ah();
+	case 759: { // a,x:(r+n) x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1026: { // a,x:-(r) x0,a
-		m_tmp1 = get_ah();
+	case 760: { // a,x:-(r) x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1027: { // b,x:(r)-n x0,b
+	case 761: { // b,x:(r)-n x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1028: { // b,x:(r)+n x0,b
+	case 762: { // b,x:(r)+n x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1029: { // b,x:(r)- x0,b
+	case 763: { // b,x:(r)- x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1030: { // b,x:(r)+ x0,b
+	case 764: { // b,x:(r)+ x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1031: { // b,x:(r) x0,b
+	case 765: { // b,x:(r) x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1032: { // b,x:(r+n) x0,b
+	case 766: { // b,x:(r+n) x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1033: { // b,x:-(r) x0,b
+	case 767: { // b,x:-(r) x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1034: { // a,x:[abs] x0,a
-		m_tmp1 = get_ah();
+	case 768: { // a,x:[abs] x0,a
+		m_tmp1 = get_a();
 		m_tmp2 = get_x0();
 		break;
 		}
-	case 1035: { // b,x:[abs] x0,b
+	case 769: { // b,x:[abs] x0,b
 		m_tmp1 = get_bh();
 		m_tmp2 = get_x0();
+		break;
+		}
+	case 770: { // y:(r)-n,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 771: { // y:(r)+n,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 772: { // y:(r)-,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 773: { // y:(r)+,x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 774: { // y:(r),x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 775: { // y:(r+n),x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 776: { // y:-(r),x0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 777: { // y:(r)-n,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 778: { // y:(r)+n,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 779: { // y:(r)-,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 780: { // y:(r)+,x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 781: { // y:(r),x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 782: { // y:(r+n),x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 783: { // y:-(r),x1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 784: { // y:(r)-n,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 785: { // y:(r)+n,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 786: { // y:(r)-,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 787: { // y:(r)+,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 788: { // y:(r),y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 789: { // y:(r+n),y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 790: { // y:-(r),y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 791: { // y:(r)-n,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 792: { // y:(r)+n,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 793: { // y:(r)-,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 794: { // y:(r)+,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 795: { // y:(r),y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 796: { // y:(r+n),y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 797: { // y:-(r),y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 798: { // y:(r)-n,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 799: { // y:(r)+n,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 800: { // y:(r)-,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 801: { // y:(r)+,a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 802: { // y:(r),a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 803: { // y:(r+n),a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 804: { // y:-(r),a0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 805: { // y:(r)-n,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 806: { // y:(r)+n,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 807: { // y:(r)-,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 808: { // y:(r)+,b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 809: { // y:(r),b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 810: { // y:(r+n),b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 811: { // y:-(r),b0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 812: { // y:(r)-n,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 813: { // y:(r)+n,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 814: { // y:(r)-,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 815: { // y:(r)+,a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 816: { // y:(r),a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 817: { // y:(r+n),a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 818: { // y:-(r),a2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 819: { // y:(r)-n,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 820: { // y:(r)+n,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 821: { // y:(r)-,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 822: { // y:(r)+,b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 823: { // y:(r),b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 824: { // y:(r+n),b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 825: { // y:-(r),b2
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 826: { // y:(r)-n,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 827: { // y:(r)+n,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 828: { // y:(r)-,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 829: { // y:(r)+,a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 830: { // y:(r),a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 831: { // y:(r+n),a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 832: { // y:-(r),a1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 833: { // y:(r)-n,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 834: { // y:(r)+n,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 835: { // y:(r)-,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 836: { // y:(r)+,b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 837: { // y:(r),b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 838: { // y:(r+n),b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 839: { // y:-(r),b1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 840: { // y:(r)-n,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 841: { // y:(r)+n,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 842: { // y:(r)-,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 843: { // y:(r)+,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 844: { // y:(r),a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 845: { // y:(r+n),a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 846: { // y:-(r),a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 847: { // y:(r)-n,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 848: { // y:(r)+n,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 849: { // y:(r)-,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 850: { // y:(r)+,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 851: { // y:(r),b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 852: { // y:(r+n),b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 853: { // y:-(r),b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 854: { // y:(r)-n,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 855: { // y:(r)+n,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 856: { // y:(r)-,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 857: { // y:(r)+,r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 858: { // y:(r),r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 859: { // y:(r+n),r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 860: { // y:-(r),r
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 861: { // y:(r)-n,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 862: { // y:(r)+n,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 863: { // y:(r)-,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 864: { // y:(r)+,n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 865: { // y:(r),n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 866: { // y:(r+n),n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 867: { // y:-(r),n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_tmp1 = m_y.read_dword(ea);
+		break;
+		}
+	case 868: { // x0,y:(r)-n
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 869: { // x0,y:(r)+n
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 870: { // x0,y:(r)-
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 871: { // x0,y:(r)+
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 872: { // x0,y:(r)
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 873: { // x0,y:(r+n)
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 874: { // x0,y:-(r)
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 875: { // x1,y:(r)-n
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 876: { // x1,y:(r)+n
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 877: { // x1,y:(r)-
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 878: { // x1,y:(r)+
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 879: { // x1,y:(r)
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 880: { // x1,y:(r+n)
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 881: { // x1,y:-(r)
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 882: { // y0,y:(r)-n
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 883: { // y0,y:(r)+n
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 884: { // y0,y:(r)-
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 885: { // y0,y:(r)+
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 886: { // y0,y:(r)
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 887: { // y0,y:(r+n)
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 888: { // y0,y:-(r)
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 889: { // y1,y:(r)-n
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 890: { // y1,y:(r)+n
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 891: { // y1,y:(r)-
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 892: { // y1,y:(r)+
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 893: { // y1,y:(r)
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 894: { // y1,y:(r+n)
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 895: { // y1,y:-(r)
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 896: { // a0,y:(r)-n
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 897: { // a0,y:(r)+n
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 898: { // a0,y:(r)-
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 899: { // a0,y:(r)+
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 900: { // a0,y:(r)
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 901: { // a0,y:(r+n)
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 902: { // a0,y:-(r)
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 903: { // b0,y:(r)-n
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 904: { // b0,y:(r)+n
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 905: { // b0,y:(r)-
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 906: { // b0,y:(r)+
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 907: { // b0,y:(r)
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 908: { // b0,y:(r+n)
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 909: { // b0,y:-(r)
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 910: { // a2,y:(r)-n
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 911: { // a2,y:(r)+n
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 912: { // a2,y:(r)-
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 913: { // a2,y:(r)+
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 914: { // a2,y:(r)
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 915: { // a2,y:(r+n)
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 916: { // a2,y:-(r)
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 917: { // b2,y:(r)-n
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 918: { // b2,y:(r)+n
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 919: { // b2,y:(r)-
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 920: { // b2,y:(r)+
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 921: { // b2,y:(r)
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 922: { // b2,y:(r+n)
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 923: { // b2,y:-(r)
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 924: { // a1,y:(r)-n
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 925: { // a1,y:(r)+n
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 926: { // a1,y:(r)-
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 927: { // a1,y:(r)+
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 928: { // a1,y:(r)
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 929: { // a1,y:(r+n)
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 930: { // a1,y:-(r)
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 931: { // b1,y:(r)-n
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 932: { // b1,y:(r)+n
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 933: { // b1,y:(r)-
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 934: { // b1,y:(r)+
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 935: { // b1,y:(r)
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 936: { // b1,y:(r+n)
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 937: { // b1,y:-(r)
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 938: { // a,y:(r)-n
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 939: { // a,y:(r)+n
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 940: { // a,y:(r)-
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 941: { // a,y:(r)+
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 942: { // a,y:(r)
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 943: { // a,y:(r+n)
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 944: { // a,y:-(r)
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 945: { // b,y:(r)-n
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 946: { // b,y:(r)+n
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 947: { // b,y:(r)-
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 948: { // b,y:(r)+
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 949: { // b,y:(r)
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 950: { // b,y:(r+n)
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 951: { // b,y:-(r)
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 952: { // r,y:(r)-n
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 953: { // r,y:(r)+n
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 954: { // r,y:(r)-
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 955: { // r,y:(r)+
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 956: { // r,y:(r)
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 957: { // r,y:(r+n)
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 958: { // r,y:-(r)
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 959: { // n,y:(r)-n
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 960: { // n,y:(r)+n
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 961: { // n,y:(r)-
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 962: { // n,y:(r)+
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 963: { // n,y:(r)
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 964: { // n,y:(r+n)
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 965: { // n,y:-(r)
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 966: { // y:[abs],x0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 967: { // y:[abs],x1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 968: { // y:[abs],y0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 969: { // y:[abs],y1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 970: { // y:[abs],a0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 971: { // y:[abs],b0
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 972: { // y:[abs],a2
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 973: { // y:[abs],b2
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 974: { // y:[abs],a1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 975: { // y:[abs],b1
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 976: { // y:[abs],a
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 977: { // y:[abs],b
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 978: { // y:[abs],r
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 979: { // y:[abs],n
+		u32 abs = exv;
+		m_tmp1 = m_y.read_dword(abs);
+		break;
+		}
+	case 980: { // x0,y:[abs]
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 981: { // x1,y:[abs]
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 982: { // y0,y:[abs]
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 983: { // y1,y:[abs]
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 984: { // a0,y:[abs]
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 985: { // b0,y:[abs]
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 986: { // a2,y:[abs]
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 987: { // b2,y:[abs]
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 988: { // a1,y:[abs]
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 989: { // b1,y:[abs]
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 990: { // a,y:[abs]
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 991: { // b,y:[abs]
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 992: { // r,y:[abs]
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 993: { // n,y:[abs]
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 994: { // #[i],x0
+		break;
+		}
+	case 995: { // #[i],x1
+		break;
+		}
+	case 996: { // #[i],y0
+		break;
+		}
+	case 997: { // #[i],y1
+		break;
+		}
+	case 998: { // #[i],a0
+		break;
+		}
+	case 999: { // #[i],b0
+		break;
+		}
+	case 1000: { // #[i],a2
+		break;
+		}
+	case 1001: { // #[i],b2
+		break;
+		}
+	case 1002: { // #[i],a1
+		break;
+		}
+	case 1003: { // #[i],b1
+		break;
+		}
+	case 1004: { // #[i],a
+		break;
+		}
+	case 1005: { // #[i],b
+		break;
+		}
+	case 1006: { // #[i],r
+		break;
+		}
+	case 1007: { // #[i],n
+		break;
+		}
+	case 1008: { // y:[aa],x0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1009: { // y:[aa],x1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1010: { // y:[aa],y0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1011: { // y:[aa],y1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1012: { // y:[aa],a0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1013: { // y:[aa],b0
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1014: { // y:[aa],a2
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1015: { // y:[aa],b2
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1016: { // y:[aa],a1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1017: { // y:[aa],b1
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1018: { // y:[aa],a
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1019: { // y:[aa],b
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1020: { // y:[aa],r
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1021: { // y:[aa],n
+		u32 aa = BIT(opcode, 8, 6);
+		m_tmp1 = m_y.read_dword(aa);
+		break;
+		}
+	case 1022: { // x0,y:[aa]
+		u32 s = get_x0();
+		m_tmp1 = s;
+		break;
+		}
+	case 1023: { // x1,y:[aa]
+		u32 s = get_x1();
+		m_tmp1 = s;
+		break;
+		}
+	case 1024: { // y0,y:[aa]
+		u32 s = get_y0();
+		m_tmp1 = s;
+		break;
+		}
+	case 1025: { // y1,y:[aa]
+		u32 s = get_y1();
+		m_tmp1 = s;
+		break;
+		}
+	case 1026: { // a0,y:[aa]
+		u32 s = get_a0();
+		m_tmp1 = s;
+		break;
+		}
+	case 1027: { // b0,y:[aa]
+		u32 s = get_b0();
+		m_tmp1 = s;
+		break;
+		}
+	case 1028: { // a2,y:[aa]
+		u32 s = get_a2();
+		m_tmp1 = s;
+		break;
+		}
+	case 1029: { // b2,y:[aa]
+		u32 s = get_b2();
+		m_tmp1 = s;
+		break;
+		}
+	case 1030: { // a1,y:[aa]
+		u32 s = get_a1();
+		m_tmp1 = s;
+		break;
+		}
+	case 1031: { // b1,y:[aa]
+		u32 s = get_b1();
+		m_tmp1 = s;
+		break;
+		}
+	case 1032: { // a,y:[aa]
+		u32 s_h = get_ah();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 1033: { // b,y:[aa]
+		u32 s_h = get_bh();
+		m_tmp1 = s_h;
+		break;
+		}
+	case 1034: { // r,y:[aa]
+		u32 s = get_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
+		break;
+		}
+	case 1035: { // n,y:[aa]
+		u32 s = get_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7);
+		m_tmp1 = s;
 		break;
 		}
 	case 1036: { // a,x0 y:(r)-n,y0
@@ -9620,963 +9316,579 @@ void dsp563xx_device::execute_pre_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 1324: { // l:(r)-n,a10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,a10");
 		break;
 		}
 	case 1325: { // l:(r)+n,a10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,a10");
 		break;
 		}
 	case 1326: { // l:(r)-,a10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,a10");
 		break;
 		}
 	case 1327: { // l:(r)+,a10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,a10");
 		break;
 		}
 	case 1328: { // l:(r),a10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),a10");
 		break;
 		}
 	case 1329: { // l:(r+n),a10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),a10");
 		break;
 		}
 	case 1330: { // l:-(r),a10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),a10");
 		break;
 		}
 	case 1331: { // l:(r)-n,b10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,b10");
 		break;
 		}
 	case 1332: { // l:(r)+n,b10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,b10");
 		break;
 		}
 	case 1333: { // l:(r)-,b10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,b10");
 		break;
 		}
 	case 1334: { // l:(r)+,b10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,b10");
 		break;
 		}
 	case 1335: { // l:(r),b10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),b10");
 		break;
 		}
 	case 1336: { // l:(r+n),b10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),b10");
 		break;
 		}
 	case 1337: { // l:-(r),b10
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),b10");
 		break;
 		}
 	case 1338: { // l:(r)-n,x
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,x");
 		break;
 		}
 	case 1339: { // l:(r)+n,x
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,x");
 		break;
 		}
 	case 1340: { // l:(r)-,x
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,x");
 		break;
 		}
 	case 1341: { // l:(r)+,x
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,x");
 		break;
 		}
 	case 1342: { // l:(r),x
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),x");
 		break;
 		}
 	case 1343: { // l:(r+n),x
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),x");
 		break;
 		}
 	case 1344: { // l:-(r),x
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),x");
 		break;
 		}
 	case 1345: { // l:(r)-n,y
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,y");
 		break;
 		}
 	case 1346: { // l:(r)+n,y
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,y");
 		break;
 		}
 	case 1347: { // l:(r)-,y
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,y");
 		break;
 		}
 	case 1348: { // l:(r)+,y
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,y");
 		break;
 		}
 	case 1349: { // l:(r),y
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),y");
 		break;
 		}
 	case 1350: { // l:(r+n),y
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),y");
 		break;
 		}
 	case 1351: { // l:-(r),y
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),y");
 		break;
 		}
 	case 1352: { // l:(r)-n,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,a");
 		break;
 		}
 	case 1353: { // l:(r)+n,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,a");
 		break;
 		}
 	case 1354: { // l:(r)-,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,a");
 		break;
 		}
 	case 1355: { // l:(r)+,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,a");
 		break;
 		}
 	case 1356: { // l:(r),a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),a");
 		break;
 		}
 	case 1357: { // l:(r+n),a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),a");
 		break;
 		}
 	case 1358: { // l:-(r),a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),a");
 		break;
 		}
 	case 1359: { // l:(r)-n,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,b");
 		break;
 		}
 	case 1360: { // l:(r)+n,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,b");
 		break;
 		}
 	case 1361: { // l:(r)-,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,b");
 		break;
 		}
 	case 1362: { // l:(r)+,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,b");
 		break;
 		}
 	case 1363: { // l:(r),b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),b");
 		break;
 		}
 	case 1364: { // l:(r+n),b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),b");
 		break;
 		}
 	case 1365: { // l:-(r),b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),b");
 		break;
 		}
 	case 1366: { // l:(r)-n,ab
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,ab");
 		break;
 		}
 	case 1367: { // l:(r)+n,ab
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,ab");
 		break;
 		}
 	case 1368: { // l:(r)-,ab
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,ab");
 		break;
 		}
 	case 1369: { // l:(r)+,ab
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,ab");
 		break;
 		}
 	case 1370: { // l:(r),ab
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),ab");
 		break;
 		}
 	case 1371: { // l:(r+n),ab
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),ab");
 		break;
 		}
 	case 1372: { // l:-(r),ab
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),ab");
 		break;
 		}
 	case 1373: { // l:(r)-n,ba
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-n,ba");
 		break;
 		}
 	case 1374: { // l:(r)+n,ba
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+n,ba");
 		break;
 		}
 	case 1375: { // l:(r)-,ba
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)-,ba");
 		break;
 		}
 	case 1376: { // l:(r)+,ba
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r)+,ba");
 		break;
 		}
 	case 1377: { // l:(r),ba
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r),ba");
 		break;
 		}
 	case 1378: { // l:(r+n),ba
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:(r+n),ba");
 		break;
 		}
 	case 1379: { // l:-(r),ba
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_tmp1 = m_x.read_dword(ea);
-		m_tmp2 = m_y.read_dword(ea);
+		unhandled("l:-(r),ba");
 		break;
 		}
 	case 1380: { // l:[abs],a10
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],a10");
 		break;
 		}
 	case 1381: { // l:[abs],b10
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],b10");
 		break;
 		}
 	case 1382: { // l:[abs],x
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],x");
 		break;
 		}
 	case 1383: { // l:[abs],y
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],y");
 		break;
 		}
 	case 1384: { // l:[abs],a
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],a");
 		break;
 		}
 	case 1385: { // l:[abs],b
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],b");
 		break;
 		}
 	case 1386: { // l:[abs],ab
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],ab");
 		break;
 		}
 	case 1387: { // l:[abs],ba
-		u32 abs = exv;
-		m_tmp1 = m_x.read_dword(abs);
-		m_tmp2 = m_y.read_dword(abs);
+		unhandled("l:[abs],ba");
 		break;
 		}
 	case 1388: { // l:[aa],a10
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],a10");
 		break;
 		}
 	case 1389: { // l:[aa],b10
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],b10");
 		break;
 		}
 	case 1390: { // l:[aa],x
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],x");
 		break;
 		}
 	case 1391: { // l:[aa],y
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],y");
 		break;
 		}
 	case 1392: { // l:[aa],a
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],a");
 		break;
 		}
 	case 1393: { // l:[aa],b
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],b");
 		break;
 		}
 	case 1394: { // l:[aa],ab
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],ab");
 		break;
 		}
 	case 1395: { // l:[aa],ba
-		u32 aa = BIT(opcode, 8, 6);
-		m_tmp1 = m_x.read_dword(aa);
-		m_tmp2 = m_y.read_dword(aa);
+		unhandled("l:[aa],ba");
 		break;
 		}
 	case 1396: { // a10,l:(r)-n
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:(r)-n");
 		break;
 		}
 	case 1397: { // a10,l:(r)+n
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:(r)+n");
 		break;
 		}
 	case 1398: { // a10,l:(r)-
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:(r)-");
 		break;
 		}
 	case 1399: { // a10,l:(r)+
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:(r)+");
 		break;
 		}
 	case 1400: { // a10,l:(r)
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:(r)");
 		break;
 		}
 	case 1401: { // a10,l:(r+n)
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:(r+n)");
 		break;
 		}
 	case 1402: { // a10,l:-(r)
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:-(r)");
 		break;
 		}
 	case 1403: { // b10,l:(r)-n
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:(r)-n");
 		break;
 		}
 	case 1404: { // b10,l:(r)+n
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:(r)+n");
 		break;
 		}
 	case 1405: { // b10,l:(r)-
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:(r)-");
 		break;
 		}
 	case 1406: { // b10,l:(r)+
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:(r)+");
 		break;
 		}
 	case 1407: { // b10,l:(r)
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:(r)");
 		break;
 		}
 	case 1408: { // b10,l:(r+n)
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:(r+n)");
 		break;
 		}
 	case 1409: { // b10,l:-(r)
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:-(r)");
 		break;
 		}
 	case 1410: { // x,l:(r)-n
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:(r)-n");
 		break;
 		}
 	case 1411: { // x,l:(r)+n
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:(r)+n");
 		break;
 		}
 	case 1412: { // x,l:(r)-
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:(r)-");
 		break;
 		}
 	case 1413: { // x,l:(r)+
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:(r)+");
 		break;
 		}
 	case 1414: { // x,l:(r)
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:(r)");
 		break;
 		}
 	case 1415: { // x,l:(r+n)
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:(r+n)");
 		break;
 		}
 	case 1416: { // x,l:-(r)
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:-(r)");
 		break;
 		}
 	case 1417: { // y,l:(r)-n
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:(r)-n");
 		break;
 		}
 	case 1418: { // y,l:(r)+n
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:(r)+n");
 		break;
 		}
 	case 1419: { // y,l:(r)-
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:(r)-");
 		break;
 		}
 	case 1420: { // y,l:(r)+
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:(r)+");
 		break;
 		}
 	case 1421: { // y,l:(r)
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:(r)");
 		break;
 		}
 	case 1422: { // y,l:(r+n)
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:(r+n)");
 		break;
 		}
 	case 1423: { // y,l:-(r)
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:-(r)");
 		break;
 		}
 	case 1424: { // a,l:(r)-n
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:(r)-n");
 		break;
 		}
 	case 1425: { // a,l:(r)+n
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:(r)+n");
 		break;
 		}
 	case 1426: { // a,l:(r)-
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:(r)-");
 		break;
 		}
 	case 1427: { // a,l:(r)+
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:(r)+");
 		break;
 		}
 	case 1428: { // a,l:(r)
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:(r)");
 		break;
 		}
 	case 1429: { // a,l:(r+n)
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:(r+n)");
 		break;
 		}
 	case 1430: { // a,l:-(r)
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:-(r)");
 		break;
 		}
 	case 1431: { // b,l:(r)-n
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:(r)-n");
 		break;
 		}
 	case 1432: { // b,l:(r)+n
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:(r)+n");
 		break;
 		}
 	case 1433: { // b,l:(r)-
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:(r)-");
 		break;
 		}
 	case 1434: { // b,l:(r)+
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:(r)+");
 		break;
 		}
 	case 1435: { // b,l:(r)
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:(r)");
 		break;
 		}
 	case 1436: { // b,l:(r+n)
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:(r+n)");
 		break;
 		}
 	case 1437: { // b,l:-(r)
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:-(r)");
 		break;
 		}
 	case 1438: { // ab,l:(r)-n
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:(r)-n");
 		break;
 		}
 	case 1439: { // ab,l:(r)+n
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:(r)+n");
 		break;
 		}
 	case 1440: { // ab,l:(r)-
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:(r)-");
 		break;
 		}
 	case 1441: { // ab,l:(r)+
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:(r)+");
 		break;
 		}
 	case 1442: { // ab,l:(r)
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:(r)");
 		break;
 		}
 	case 1443: { // ab,l:(r+n)
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:(r+n)");
 		break;
 		}
 	case 1444: { // ab,l:-(r)
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:-(r)");
 		break;
 		}
 	case 1445: { // ba,l:(r)-n
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:(r)-n");
 		break;
 		}
 	case 1446: { // ba,l:(r)+n
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:(r)+n");
 		break;
 		}
 	case 1447: { // ba,l:(r)-
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:(r)-");
 		break;
 		}
 	case 1448: { // ba,l:(r)+
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:(r)+");
 		break;
 		}
 	case 1449: { // ba,l:(r)
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:(r)");
 		break;
 		}
 	case 1450: { // ba,l:(r+n)
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:(r+n)");
 		break;
 		}
 	case 1451: { // ba,l:-(r)
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:-(r)");
 		break;
 		}
 	case 1452: { // a10,l:[abs]
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:[abs]");
 		break;
 		}
 	case 1453: { // b10,l:[abs]
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:[abs]");
 		break;
 		}
 	case 1454: { // x,l:[abs]
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:[abs]");
 		break;
 		}
 	case 1455: { // y,l:[abs]
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:[abs]");
 		break;
 		}
 	case 1456: { // a,l:[abs]
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:[abs]");
 		break;
 		}
 	case 1457: { // b,l:[abs]
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:[abs]");
 		break;
 		}
 	case 1458: { // ab,l:[abs]
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:[abs]");
 		break;
 		}
 	case 1459: { // ba,l:[abs]
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:[abs]");
 		break;
 		}
 	case 1460: { // a10,l:[aa]
-		u64 s = get_a10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("a10,l:[aa]");
 		break;
 		}
 	case 1461: { // b10,l:[aa]
-		u64 s = get_b10();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("b10,l:[aa]");
 		break;
 		}
 	case 1462: { // x,l:[aa]
-		u64 s = get_x();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("x,l:[aa]");
 		break;
 		}
 	case 1463: { // y,l:[aa]
-		u64 s = get_y();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("y,l:[aa]");
 		break;
 		}
 	case 1464: { // a,l:[aa]
-		u64 s_l = get_al();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("a,l:[aa]");
 		break;
 		}
 	case 1465: { // b,l:[aa]
-		u64 s_l = get_bl();
-		m_tmp1 = s_l >> 24;
-		m_tmp2 = s_l & 0xffffff;
+		unhandled("b,l:[aa]");
 		break;
 		}
 	case 1466: { // ab,l:[aa]
-		u64 s = get_ab();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ab,l:[aa]");
 		break;
 		}
 	case 1467: { // ba,l:[aa]
-		u64 s = get_ba();
-		m_tmp1 = s >> 24;
-		m_tmp2 = s & 0xffffff;
+		unhandled("ba,l:[aa]");
 		break;
 		}
 	case 1468: { // x:(r)+n,x0 y:(rh)+n,y0
@@ -15709,4536 +15021,4536 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		set_x0(m_tmp1);
 		break;
 		}
-	case 223: { // y:(r)-n,x0
+	case 223: { // x:(r)-n,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 224: { // x:(r)+n,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 225: { // x:(r)-,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 226: { // x:(r)+,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 227: { // x:(r),x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 228: { // x:(r+n),x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 229: { // x:-(r),x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 230: { // x:(r)-n,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 231: { // x:(r)+n,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 232: { // x:(r)-,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 233: { // x:(r)+,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 234: { // x:(r),y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 235: { // x:(r+n),y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 236: { // x:-(r),y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 237: { // x:(r)-n,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 238: { // x:(r)+n,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 239: { // x:(r)-,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 240: { // x:(r)+,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 241: { // x:(r),y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 242: { // x:(r+n),y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 243: { // x:-(r),y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 244: { // x:(r)-n,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 245: { // x:(r)+n,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 246: { // x:(r)-,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 247: { // x:(r)+,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 248: { // x:(r),a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 249: { // x:(r+n),a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 250: { // x:-(r),a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 251: { // x:(r)-n,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 252: { // x:(r)+n,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 253: { // x:(r)-,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 254: { // x:(r)+,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 255: { // x:(r),b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 256: { // x:(r+n),b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 257: { // x:-(r),b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 258: { // x:(r)-n,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 259: { // x:(r)+n,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 260: { // x:(r)-,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 261: { // x:(r)+,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 262: { // x:(r),a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 263: { // x:(r+n),a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 264: { // x:-(r),a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 265: { // x:(r)-n,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 266: { // x:(r)+n,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 267: { // x:(r)-,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 268: { // x:(r)+,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 269: { // x:(r),b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 270: { // x:(r+n),b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 271: { // x:-(r),b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 272: { // x:(r)-n,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 273: { // x:(r)+n,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 274: { // x:(r)-,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 275: { // x:(r)+,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 276: { // x:(r),a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 277: { // x:(r+n),a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 278: { // x:-(r),a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 279: { // x:(r)-n,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 280: { // x:(r)+n,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 281: { // x:(r)-,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 282: { // x:(r)+,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 283: { // x:(r),b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 284: { // x:(r+n),b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 285: { // x:-(r),b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 286: { // x:(r)-n,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 287: { // x:(r)+n,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 288: { // x:(r)-,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 289: { // x:(r)+,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 290: { // x:(r),a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 291: { // x:(r+n),a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 292: { // x:-(r),a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 293: { // x:(r)-n,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 294: { // x:(r)+n,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 295: { // x:(r)-,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 296: { // x:(r)+,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 297: { // x:(r),b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 298: { // x:(r+n),b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 299: { // x:-(r),b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 300: { // x:(r)-n,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 301: { // x:(r)+n,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 302: { // x:(r)-,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 303: { // x:(r)+,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 304: { // x:(r),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 305: { // x:(r+n),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 306: { // x:-(r),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 307: { // x:(r)-n,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 308: { // x:(r)+n,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 309: { // x:(r)-,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 310: { // x:(r)+,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 311: { // x:(r),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 312: { // x:(r+n),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 313: { // x:-(r),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 314: { // x0,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 315: { // x0,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 316: { // x0,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 317: { // x0,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 318: { // x0,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 319: { // x0,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 320: { // x0,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 321: { // x1,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 322: { // x1,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 323: { // x1,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 324: { // x1,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 325: { // x1,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 326: { // x1,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 327: { // x1,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 328: { // y0,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 329: { // y0,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 330: { // y0,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 331: { // y0,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 332: { // y0,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 333: { // y0,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 334: { // y0,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 335: { // y1,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 336: { // y1,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 337: { // y1,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 338: { // y1,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 339: { // y1,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 340: { // y1,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 341: { // y1,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 342: { // a0,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 343: { // a0,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 344: { // a0,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 345: { // a0,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 346: { // a0,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 347: { // a0,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 348: { // a0,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 349: { // b0,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 350: { // b0,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 351: { // b0,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 352: { // b0,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 353: { // b0,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 354: { // b0,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 355: { // b0,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 356: { // a2,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 357: { // a2,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 358: { // a2,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 359: { // a2,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 360: { // a2,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 361: { // a2,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 362: { // a2,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 363: { // b2,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 364: { // b2,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 365: { // b2,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 366: { // b2,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 367: { // b2,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 368: { // b2,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 369: { // b2,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 370: { // a1,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 371: { // a1,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 372: { // a1,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 373: { // a1,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 374: { // a1,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 375: { // a1,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 376: { // a1,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 377: { // b1,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 378: { // b1,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 379: { // b1,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 380: { // b1,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 381: { // b1,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 382: { // b1,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 383: { // b1,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 384: { // a,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 385: { // a,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 386: { // a,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 387: { // a,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 388: { // a,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 389: { // a,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 390: { // a,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 391: { // b,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 392: { // b,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 393: { // b,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 394: { // b,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 395: { // b,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 396: { // b,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 397: { // b,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 398: { // r,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 399: { // r,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 400: { // r,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 401: { // r,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 402: { // r,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 403: { // r,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 404: { // r,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 405: { // n,x:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 406: { // n,x:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 407: { // n,x:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 408: { // n,x:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 409: { // n,x:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 410: { // n,x:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 411: { // n,x:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 412: { // x:[abs],x0
 		set_x0(m_tmp1);
 		break;
 		}
-	case 224: { // y:(r)+n,x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 225: { // y:(r)-,x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 226: { // y:(r)+,x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 227: { // y:(r),x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 228: { // y:(r+n),x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 229: { // y:-(r),x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 230: { // x:(r)-n,x1
+	case 413: { // x:[abs],x1
 		set_x1(m_tmp1);
 		break;
 		}
-	case 231: { // x:(r)+n,x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 232: { // x:(r)-,x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 233: { // x:(r)+,x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 234: { // x:(r),x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 235: { // x:(r+n),x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 236: { // x:-(r),x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 237: { // y:(r)-n,x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 238: { // y:(r)+n,x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 239: { // y:(r)-,x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 240: { // y:(r)+,x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 241: { // y:(r),x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 242: { // y:(r+n),x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 243: { // y:-(r),x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 244: { // x:(r)-n,y0
+	case 414: { // x:[abs],y0
 		set_y0(m_tmp1);
 		break;
 		}
-	case 245: { // x:(r)+n,y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 246: { // x:(r)-,y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 247: { // x:(r)+,y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 248: { // x:(r),y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 249: { // x:(r+n),y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 250: { // x:-(r),y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 251: { // y:(r)-n,y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 252: { // y:(r)+n,y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 253: { // y:(r)-,y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 254: { // y:(r)+,y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 255: { // y:(r),y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 256: { // y:(r+n),y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 257: { // y:-(r),y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 258: { // x:(r)-n,y1
+	case 415: { // x:[abs],y1
 		set_y1(m_tmp1);
 		break;
 		}
-	case 259: { // x:(r)+n,y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 260: { // x:(r)-,y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 261: { // x:(r)+,y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 262: { // x:(r),y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 263: { // x:(r+n),y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 264: { // x:-(r),y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 265: { // y:(r)-n,y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 266: { // y:(r)+n,y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 267: { // y:(r)-,y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 268: { // y:(r)+,y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 269: { // y:(r),y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 270: { // y:(r+n),y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 271: { // y:-(r),y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 272: { // x:(r)-n,a0
+	case 416: { // x:[abs],a0
 		set_a0(m_tmp1);
 		break;
 		}
-	case 273: { // x:(r)+n,a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 274: { // x:(r)-,a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 275: { // x:(r)+,a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 276: { // x:(r),a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 277: { // x:(r+n),a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 278: { // x:-(r),a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 279: { // y:(r)-n,a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 280: { // y:(r)+n,a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 281: { // y:(r)-,a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 282: { // y:(r)+,a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 283: { // y:(r),a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 284: { // y:(r+n),a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 285: { // y:-(r),a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 286: { // x:(r)-n,b0
+	case 417: { // x:[abs],b0
 		set_b0(m_tmp1);
 		break;
 		}
-	case 287: { // x:(r)+n,b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 288: { // x:(r)-,b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 289: { // x:(r)+,b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 290: { // x:(r),b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 291: { // x:(r+n),b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 292: { // x:-(r),b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 293: { // y:(r)-n,b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 294: { // y:(r)+n,b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 295: { // y:(r)-,b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 296: { // y:(r)+,b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 297: { // y:(r),b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 298: { // y:(r+n),b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 299: { // y:-(r),b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 300: { // x:(r)-n,a2
+	case 418: { // x:[abs],a2
 		set_a2(m_tmp1);
 		break;
 		}
-	case 301: { // x:(r)+n,a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 302: { // x:(r)-,a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 303: { // x:(r)+,a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 304: { // x:(r),a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 305: { // x:(r+n),a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 306: { // x:-(r),a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 307: { // y:(r)-n,a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 308: { // y:(r)+n,a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 309: { // y:(r)-,a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 310: { // y:(r)+,a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 311: { // y:(r),a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 312: { // y:(r+n),a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 313: { // y:-(r),a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 314: { // x:(r)-n,b2
+	case 419: { // x:[abs],b2
 		set_b2(m_tmp1);
 		break;
 		}
-	case 315: { // x:(r)+n,b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 316: { // x:(r)-,b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 317: { // x:(r)+,b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 318: { // x:(r),b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 319: { // x:(r+n),b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 320: { // x:-(r),b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 321: { // y:(r)-n,b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 322: { // y:(r)+n,b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 323: { // y:(r)-,b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 324: { // y:(r)+,b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 325: { // y:(r),b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 326: { // y:(r+n),b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 327: { // y:-(r),b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 328: { // x:(r)-n,a1
+	case 420: { // x:[abs],a1
 		set_a1(m_tmp1);
 		break;
 		}
-	case 329: { // x:(r)+n,a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 330: { // x:(r)-,a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 331: { // x:(r)+,a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 332: { // x:(r),a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 333: { // x:(r+n),a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 334: { // x:-(r),a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 335: { // y:(r)-n,a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 336: { // y:(r)+n,a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 337: { // y:(r)-,a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 338: { // y:(r)+,a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 339: { // y:(r),a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 340: { // y:(r+n),a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 341: { // y:-(r),a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 342: { // x:(r)-n,b1
+	case 421: { // x:[abs],b1
 		set_b1(m_tmp1);
 		break;
 		}
-	case 343: { // x:(r)+n,b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 344: { // x:(r)-,b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 345: { // x:(r)+,b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 346: { // x:(r),b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 347: { // x:(r+n),b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 348: { // x:-(r),b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 349: { // y:(r)-n,b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 350: { // y:(r)+n,b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 351: { // y:(r)-,b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 352: { // y:(r)+,b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 353: { // y:(r),b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 354: { // y:(r+n),b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 355: { // y:-(r),b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 356: { // x:(r)-n,a
+	case 422: { // x:[abs],a
 		set_ah(m_tmp1);
 		break;
 		}
-	case 357: { // x:(r)+n,a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 358: { // x:(r)-,a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 359: { // x:(r)+,a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 360: { // x:(r),a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 361: { // x:(r+n),a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 362: { // x:-(r),a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 363: { // y:(r)-n,a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 364: { // y:(r)+n,a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 365: { // y:(r)-,a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 366: { // y:(r)+,a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 367: { // y:(r),a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 368: { // y:(r+n),a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 369: { // y:-(r),a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 370: { // x:(r)-n,b
+	case 423: { // x:[abs],b
 		set_bh(m_tmp1);
 		break;
 		}
-	case 371: { // x:(r)+n,b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 372: { // x:(r)-,b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 373: { // x:(r)+,b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 374: { // x:(r),b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 375: { // x:(r+n),b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 376: { // x:-(r),b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 377: { // y:(r)-n,b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 378: { // y:(r)+n,b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 379: { // y:(r)-,b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 380: { // y:(r)+,b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 381: { // y:(r),b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 382: { // y:(r+n),b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 383: { // y:-(r),b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 384: { // x:(r)-n,r
+	case 424: { // x:[abs],r
 		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 385: { // x:(r)+n,r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 386: { // x:(r)-,r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 387: { // x:(r)+,r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 388: { // x:(r),r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 389: { // x:(r+n),r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 390: { // x:-(r),r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 391: { // y:(r)-n,r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 392: { // y:(r)+n,r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 393: { // y:(r)-,r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 394: { // y:(r)+,r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 395: { // y:(r),r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 396: { // y:(r+n),r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 397: { // y:-(r),r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 398: { // x:(r)-n,n
+	case 425: { // x:[abs],n
 		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 399: { // x:(r)+n,n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 400: { // x:(r)-,n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 401: { // x:(r)+,n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 402: { // x:(r),n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 403: { // x:(r+n),n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 404: { // x:-(r),n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 405: { // y:(r)-n,n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 406: { // y:(r)+n,n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 407: { // y:(r)-,n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 408: { // y:(r)+,n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 409: { // y:(r),n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 410: { // y:(r+n),n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 411: { // y:-(r),n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 412: { // x0,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 413: { // x0,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 414: { // x0,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 415: { // x0,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 416: { // x0,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 417: { // x0,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 418: { // x0,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 419: { // x0,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 420: { // x0,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 421: { // x0,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 422: { // x0,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 423: { // x0,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 424: { // x0,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 425: { // x0,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 426: { // x1,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 427: { // x1,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 428: { // x1,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 429: { // x1,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 430: { // x1,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 431: { // x1,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 432: { // x1,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 433: { // x1,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 434: { // x1,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 435: { // x1,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 436: { // x1,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 437: { // x1,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 438: { // x1,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 439: { // x1,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 440: { // y0,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 441: { // y0,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 442: { // y0,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 443: { // y0,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 444: { // y0,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 445: { // y0,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 446: { // y0,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 447: { // y0,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 448: { // y0,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 449: { // y0,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 450: { // y0,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 451: { // y0,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 452: { // y0,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 453: { // y0,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 454: { // y1,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 455: { // y1,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 456: { // y1,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 457: { // y1,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 458: { // y1,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 459: { // y1,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 460: { // y1,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 461: { // y1,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 462: { // y1,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 463: { // y1,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 464: { // y1,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 465: { // y1,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 466: { // y1,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 467: { // y1,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 468: { // a0,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 469: { // a0,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 470: { // a0,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 471: { // a0,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 472: { // a0,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 473: { // a0,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 474: { // a0,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 475: { // a0,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 476: { // a0,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 477: { // a0,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 478: { // a0,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 479: { // a0,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 480: { // a0,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 481: { // a0,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 482: { // b0,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 483: { // b0,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 484: { // b0,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 485: { // b0,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 486: { // b0,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 487: { // b0,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 488: { // b0,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 489: { // b0,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 490: { // b0,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 491: { // b0,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 492: { // b0,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 493: { // b0,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 494: { // b0,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 495: { // b0,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 496: { // a2,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 497: { // a2,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 498: { // a2,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 499: { // a2,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 500: { // a2,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 501: { // a2,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 502: { // a2,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 503: { // a2,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 504: { // a2,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 505: { // a2,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 506: { // a2,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 507: { // a2,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 508: { // a2,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 509: { // a2,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 510: { // b2,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 511: { // b2,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 512: { // b2,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 513: { // b2,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 514: { // b2,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 515: { // b2,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 516: { // b2,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 517: { // b2,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 518: { // b2,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 519: { // b2,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 520: { // b2,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 521: { // b2,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 522: { // b2,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 523: { // b2,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 524: { // a1,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 525: { // a1,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 526: { // a1,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 527: { // a1,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 528: { // a1,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 529: { // a1,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 530: { // a1,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 531: { // a1,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 532: { // a1,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 533: { // a1,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 534: { // a1,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 535: { // a1,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 536: { // a1,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 537: { // a1,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 538: { // b1,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 539: { // b1,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 540: { // b1,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 541: { // b1,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 542: { // b1,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 543: { // b1,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 544: { // b1,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 545: { // b1,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 546: { // b1,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 547: { // b1,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 548: { // b1,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 549: { // b1,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 550: { // b1,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 551: { // b1,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 552: { // a,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 553: { // a,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 554: { // a,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 555: { // a,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 556: { // a,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 557: { // a,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 558: { // a,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 559: { // a,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 560: { // a,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 561: { // a,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 562: { // a,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 563: { // a,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 564: { // a,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 565: { // a,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 566: { // b,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 567: { // b,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 568: { // b,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 569: { // b,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 570: { // b,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 571: { // b,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 572: { // b,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 573: { // b,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 574: { // b,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 575: { // b,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 576: { // b,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 577: { // b,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 578: { // b,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 579: { // b,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 580: { // r,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 581: { // r,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 582: { // r,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 583: { // r,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 584: { // r,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 585: { // r,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 586: { // r,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 587: { // r,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 588: { // r,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 589: { // r,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 590: { // r,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 591: { // r,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 592: { // r,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 593: { // r,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 594: { // n,x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 595: { // n,x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 596: { // n,x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 597: { // n,x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 598: { // n,x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 599: { // n,x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 600: { // n,x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 601: { // n,y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 602: { // n,y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 603: { // n,y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 604: { // n,y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 605: { // n,y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 606: { // n,y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 607: { // n,y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_y.write_dword(ea, m_tmp1);
-		break;
-		}
-	case 608: { // x:[abs],x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 609: { // y:[abs],x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 610: { // x:[abs],x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 611: { // y:[abs],x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 612: { // x:[abs],y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 613: { // y:[abs],y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 614: { // x:[abs],y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 615: { // y:[abs],y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 616: { // x:[abs],a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 617: { // y:[abs],a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 618: { // x:[abs],b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 619: { // y:[abs],b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 620: { // x:[abs],a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 621: { // y:[abs],a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 622: { // x:[abs],b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 623: { // y:[abs],b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 624: { // x:[abs],a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 625: { // y:[abs],a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 626: { // x:[abs],b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 627: { // y:[abs],b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 628: { // x:[abs],a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 629: { // y:[abs],a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 630: { // x:[abs],b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 631: { // y:[abs],b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 632: { // x:[abs],r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 633: { // y:[abs],r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 634: { // x:[abs],n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 635: { // y:[abs],n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 636: { // x0,x:[abs]
+	case 426: { // x0,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 637: { // x0,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 638: { // x1,x:[abs]
+	case 427: { // x1,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 639: { // x1,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 640: { // y0,x:[abs]
+	case 428: { // y0,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 641: { // y0,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 642: { // y1,x:[abs]
+	case 429: { // y1,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 643: { // y1,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 644: { // a0,x:[abs]
+	case 430: { // a0,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 645: { // a0,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 646: { // b0,x:[abs]
+	case 431: { // b0,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 647: { // b0,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 648: { // a2,x:[abs]
+	case 432: { // a2,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 649: { // a2,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 650: { // b2,x:[abs]
+	case 433: { // b2,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 651: { // b2,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 652: { // a1,x:[abs]
+	case 434: { // a1,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 653: { // a1,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 654: { // b1,x:[abs]
+	case 435: { // b1,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 655: { // b1,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 656: { // a,x:[abs]
+	case 436: { // a,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 657: { // a,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 658: { // b,x:[abs]
+	case 437: { // b,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 659: { // b,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 660: { // r,x:[abs]
+	case 438: { // r,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 661: { // r,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 662: { // n,x:[abs]
+	case 439: { // n,x:[abs]
 		u32 abs = exv;
 		m_x.write_dword(abs, m_tmp1);
 		break;
 		}
-	case 663: { // n,y:[abs]
-		u32 abs = exv;
-		m_y.write_dword(abs, m_tmp1);
-		break;
-		}
-	case 664: { // #[i],x0
+	case 440: { // #[i],x0
 		u32 i = exv;
 		set_x0(i);
 		break;
 		}
-	case 665: { // #[i],x1
+	case 441: { // #[i],x1
 		u32 i = exv;
 		set_x1(i);
 		break;
 		}
-	case 666: { // #[i],y0
+	case 442: { // #[i],y0
 		u32 i = exv;
 		set_y0(i);
 		break;
 		}
-	case 667: { // #[i],y1
+	case 443: { // #[i],y1
 		u32 i = exv;
 		set_y1(i);
 		break;
 		}
-	case 668: { // #[i],a0
+	case 444: { // #[i],a0
 		u32 i = exv;
 		set_a0(i);
 		break;
 		}
-	case 669: { // #[i],b0
+	case 445: { // #[i],b0
 		u32 i = exv;
 		set_b0(i);
 		break;
 		}
-	case 670: { // #[i],a2
+	case 446: { // #[i],a2
 		u32 i = exv;
 		set_a2(i);
 		break;
 		}
-	case 671: { // #[i],b2
+	case 447: { // #[i],b2
 		u32 i = exv;
 		set_b2(i);
 		break;
 		}
-	case 672: { // #[i],a1
+	case 448: { // #[i],a1
 		u32 i = exv;
 		set_a1(i);
 		break;
 		}
-	case 673: { // #[i],b1
+	case 449: { // #[i],b1
 		u32 i = exv;
 		set_b1(i);
 		break;
 		}
-	case 674: { // #[i],a
+	case 450: { // #[i],a
 		u32 i = exv;
 		set_ah(i);
 		break;
 		}
-	case 675: { // #[i],b
+	case 451: { // #[i],b
 		u32 i = exv;
 		set_bh(i);
 		break;
 		}
-	case 676: { // #[i],r
+	case 452: { // #[i],r
 		u32 i = exv;
 		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 677: { // #[i],n
+	case 453: { // #[i],n
 		u32 i = exv;
 		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 678: { // #[i],x0
+	case 454: { // x:[aa],x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 455: { // x:[aa],x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 456: { // x:[aa],y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 457: { // x:[aa],y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 458: { // x:[aa],a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 459: { // x:[aa],b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 460: { // x:[aa],a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 461: { // x:[aa],b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 462: { // x:[aa],a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 463: { // x:[aa],b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 464: { // x:[aa],a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 465: { // x:[aa],b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 466: { // x:[aa],r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 467: { // x:[aa],n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 468: { // x0,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 469: { // x1,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 470: { // y0,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 471: { // y1,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 472: { // a0,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 473: { // b0,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 474: { // a2,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 475: { // b2,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 476: { // a1,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 477: { // b1,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 478: { // a,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 479: { // b,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 480: { // r,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 481: { // n,x:[aa]
+		u32 aa = BIT(opcode, 8, 6);
+		m_x.write_dword(aa, m_tmp1);
+		break;
+		}
+	case 482: { // x:(r)-n,x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 483: { // x:(r)+n,x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 484: { // x:(r)-,x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 485: { // x:(r)+,x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 486: { // x:(r),x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 487: { // x:(r+n),x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 488: { // x:-(r),x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 489: { // x:(r)-n,x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 490: { // x:(r)+n,x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 491: { // x:(r)-,x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 492: { // x:(r)+,x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 493: { // x:(r),x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 494: { // x:(r+n),x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 495: { // x:-(r),x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 496: { // x:(r)-n,x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 497: { // x:(r)+n,x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 498: { // x:(r)-,x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 499: { // x:(r)+,x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 500: { // x:(r),x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 501: { // x:(r+n),x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 502: { // x:-(r),x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 503: { // x:(r)-n,x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 504: { // x:(r)+n,x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 505: { // x:(r)-,x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 506: { // x:(r)+,x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 507: { // x:(r),x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 508: { // x:(r+n),x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 509: { // x:-(r),x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 510: { // x:(r)-n,x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 511: { // x:(r)+n,x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 512: { // x:(r)-,x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 513: { // x:(r)+,x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 514: { // x:(r),x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 515: { // x:(r+n),x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 516: { // x:-(r),x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 517: { // x:(r)-n,x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 518: { // x:(r)+n,x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 519: { // x:(r)-,x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 520: { // x:(r)+,x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 521: { // x:(r),x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 522: { // x:(r+n),x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 523: { // x:-(r),x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 524: { // x:(r)-n,x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 525: { // x:(r)+n,x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 526: { // x:(r)-,x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 527: { // x:(r)+,x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 528: { // x:(r),x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 529: { // x:(r+n),x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 530: { // x:-(r),x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 531: { // x:(r)-n,x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 532: { // x:(r)+n,x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 533: { // x:(r)-,x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 534: { // x:(r)+,x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 535: { // x:(r),x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 536: { // x:(r+n),x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 537: { // x:-(r),x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 538: { // x:(r)-n,a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 539: { // x:(r)+n,a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 540: { // x:(r)-,a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 541: { // x:(r)+,a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 542: { // x:(r),a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 543: { // x:(r+n),a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 544: { // x:-(r),a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 545: { // x:(r)-n,a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 546: { // x:(r)+n,a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 547: { // x:(r)-,a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 548: { // x:(r)+,a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 549: { // x:(r),a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 550: { // x:(r+n),a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 551: { // x:-(r),a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 552: { // x:(r)-n,a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 553: { // x:(r)+n,a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 554: { // x:(r)-,a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 555: { // x:(r)+,a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 556: { // x:(r),a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 557: { // x:(r+n),a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 558: { // x:-(r),a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 559: { // x:(r)-n,a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 560: { // x:(r)+n,a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 561: { // x:(r)-,a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 562: { // x:(r)+,a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 563: { // x:(r),a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 564: { // x:(r+n),a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 565: { // x:-(r),a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 566: { // x:(r)-n,b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 567: { // x:(r)+n,b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 568: { // x:(r)-,b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 569: { // x:(r)+,b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 570: { // x:(r),b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 571: { // x:(r+n),b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 572: { // x:-(r),b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 573: { // x:(r)-n,b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 574: { // x:(r)+n,b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 575: { // x:(r)-,b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 576: { // x:(r)+,b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 577: { // x:(r),b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 578: { // x:(r+n),b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 579: { // x:-(r),b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 580: { // x:(r)-n,b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 581: { // x:(r)+n,b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 582: { // x:(r)-,b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 583: { // x:(r)+,b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 584: { // x:(r),b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 585: { // x:(r+n),b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 586: { // x:-(r),b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 587: { // x:(r)-n,b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 588: { // x:(r)+n,b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 589: { // x:(r)-,b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 590: { // x:(r)+,b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 591: { // x:(r),b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 592: { // x:(r+n),b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 593: { // x:-(r),b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 594: { // x0,x:(r)-n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 595: { // x0,x:(r)+n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 596: { // x0,x:(r)- a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 597: { // x0,x:(r)+ a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 598: { // x0,x:(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 599: { // x0,x:(r+n) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 600: { // x0,x:-(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 601: { // x0,x:(r)-n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 602: { // x0,x:(r)+n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 603: { // x0,x:(r)- a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 604: { // x0,x:(r)+ a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 605: { // x0,x:(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 606: { // x0,x:(r+n) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 607: { // x0,x:-(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 608: { // x0,x:(r)-n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 609: { // x0,x:(r)+n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 610: { // x0,x:(r)- b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 611: { // x0,x:(r)+ b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 612: { // x0,x:(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 613: { // x0,x:(r+n) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 614: { // x0,x:-(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 615: { // x0,x:(r)-n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 616: { // x0,x:(r)+n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 617: { // x0,x:(r)- b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 618: { // x0,x:(r)+ b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 619: { // x0,x:(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 620: { // x0,x:(r+n) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 621: { // x0,x:-(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 622: { // x1,x:(r)-n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 623: { // x1,x:(r)+n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 624: { // x1,x:(r)- a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 625: { // x1,x:(r)+ a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 626: { // x1,x:(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 627: { // x1,x:(r+n) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 628: { // x1,x:-(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 629: { // x1,x:(r)-n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 630: { // x1,x:(r)+n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 631: { // x1,x:(r)- a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 632: { // x1,x:(r)+ a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 633: { // x1,x:(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 634: { // x1,x:(r+n) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 635: { // x1,x:-(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 636: { // x1,x:(r)-n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 637: { // x1,x:(r)+n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 638: { // x1,x:(r)- b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 639: { // x1,x:(r)+ b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 640: { // x1,x:(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 641: { // x1,x:(r+n) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 642: { // x1,x:-(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 643: { // x1,x:(r)-n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 644: { // x1,x:(r)+n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 645: { // x1,x:(r)- b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 646: { // x1,x:(r)+ b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 647: { // x1,x:(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 648: { // x1,x:(r+n) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 649: { // x1,x:-(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 650: { // a,x:(r)-n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 651: { // a,x:(r)+n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 652: { // a,x:(r)- a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 653: { // a,x:(r)+ a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 654: { // a,x:(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 655: { // a,x:(r+n) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 656: { // a,x:-(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 657: { // a,x:(r)-n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 658: { // a,x:(r)+n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 659: { // a,x:(r)- a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 660: { // a,x:(r)+ a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 661: { // a,x:(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 662: { // a,x:(r+n) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 663: { // a,x:-(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 664: { // a,x:(r)-n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 665: { // a,x:(r)+n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 666: { // a,x:(r)- b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 667: { // a,x:(r)+ b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 668: { // a,x:(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 669: { // a,x:(r+n) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 670: { // a,x:-(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 671: { // a,x:(r)-n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 672: { // a,x:(r)+n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 673: { // a,x:(r)- b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 674: { // a,x:(r)+ b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 675: { // a,x:(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 676: { // a,x:(r+n) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 677: { // a,x:-(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 678: { // b,x:(r)-n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 679: { // b,x:(r)+n a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 680: { // b,x:(r)- a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 681: { // b,x:(r)+ a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 682: { // b,x:(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 683: { // b,x:(r+n) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 684: { // b,x:-(r) a,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 685: { // b,x:(r)-n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 686: { // b,x:(r)+n a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 687: { // b,x:(r)- a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 688: { // b,x:(r)+ a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 689: { // b,x:(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 690: { // b,x:(r+n) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 691: { // b,x:-(r) a,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 692: { // b,x:(r)-n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 693: { // b,x:(r)+n b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 694: { // b,x:(r)- b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 695: { // b,x:(r)+ b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 696: { // b,x:(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 697: { // b,x:(r+n) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 698: { // b,x:-(r) b,y0
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 699: { // b,x:(r)-n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 700: { // b,x:(r)+n b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 701: { // b,x:(r)- b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 702: { // b,x:(r)+ b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 703: { // b,x:(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 704: { // b,x:(r+n) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 705: { // b,x:-(r) b,y1
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 706: { // x:[abs],x0 a,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 707: { // x:[abs],x0 a,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 708: { // x:[abs],x0 b,y0
+		set_x0(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 709: { // x:[abs],x0 b,y1
+		set_x0(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 710: { // x:[abs],x1 a,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 711: { // x:[abs],x1 a,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 712: { // x:[abs],x1 b,y0
+		set_x1(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 713: { // x:[abs],x1 b,y1
+		set_x1(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 714: { // x:[abs],a a,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 715: { // x:[abs],a a,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 716: { // x:[abs],a b,y0
+		set_ah(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 717: { // x:[abs],a b,y1
+		set_ah(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 718: { // x:[abs],b a,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 719: { // x:[abs],b a,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 720: { // x:[abs],b b,y0
+		set_bh(m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 721: { // x:[abs],b b,y1
+		set_bh(m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 722: { // x0,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 723: { // x0,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 724: { // x0,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 725: { // x0,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 726: { // x1,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 727: { // x1,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 728: { // x1,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 729: { // x1,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 730: { // a,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 731: { // a,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 732: { // a,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 733: { // a,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 734: { // b,x:[abs] a,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 735: { // b,x:[abs] a,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 736: { // b,x:[abs] b,y0
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y0(m_tmp2);
+		break;
+		}
+	case 737: { // b,x:[abs] b,y1
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_y1(m_tmp2);
+		break;
+		}
+	case 738: { // #[i],x0 a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x0(i);
+		break;
+		}
+	case 739: { // #[i],x0 a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x0(i);
+		break;
+		}
+	case 740: { // #[i],x0 b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x0(i);
+		break;
+		}
+	case 741: { // #[i],x0 b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x0(i);
+		break;
+		}
+	case 742: { // #[i],x1 a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x1(i);
+		break;
+		}
+	case 743: { // #[i],x1 a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x1(i);
+		break;
+		}
+	case 744: { // #[i],x1 b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_x1(i);
+		break;
+		}
+	case 745: { // #[i],x1 b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_x1(i);
+		break;
+		}
+	case 746: { // #[i],a a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_ah(i);
+		break;
+		}
+	case 747: { // #[i],a a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_ah(i);
+		break;
+		}
+	case 748: { // #[i],a b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_ah(i);
+		break;
+		}
+	case 749: { // #[i],a b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_ah(i);
+		break;
+		}
+	case 750: { // #[i],b a,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_bh(i);
+		break;
+		}
+	case 751: { // #[i],b a,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_bh(i);
+		break;
+		}
+	case 752: { // #[i],b b,y0
+		u32 i = exv;
+		set_y0(m_tmp1);
+		set_bh(i);
+		break;
+		}
+	case 753: { // #[i],b b,y1
+		u32 i = exv;
+		set_y1(m_tmp1);
+		set_bh(i);
+		break;
+		}
+	case 754: { // a,x:(r)-n x0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 755: { // a,x:(r)+n x0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 756: { // a,x:(r)- x0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 757: { // a,x:(r)+ x0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 758: { // a,x:(r) x0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 759: { // a,x:(r+n) x0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 760: { // a,x:-(r) x0,a
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 761: { // b,x:(r)-n x0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 762: { // b,x:(r)+n x0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 763: { // b,x:(r)- x0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 764: { // b,x:(r)+ x0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 765: { // b,x:(r) x0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 766: { // b,x:(r+n) x0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 767: { // b,x:-(r) x0,b
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_x.write_dword(ea, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 768: { // a,x:[abs] x0,a
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_a(m_tmp2);
+		break;
+		}
+	case 769: { // b,x:[abs] x0,b
+		u32 abs = exv;
+		m_x.write_dword(abs, m_tmp1);
+		set_bh(m_tmp2);
+		break;
+		}
+	case 770: { // y:(r)-n,x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 771: { // y:(r)+n,x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 772: { // y:(r)-,x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 773: { // y:(r)+,x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 774: { // y:(r),x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 775: { // y:(r+n),x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 776: { // y:-(r),x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 777: { // y:(r)-n,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 778: { // y:(r)+n,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 779: { // y:(r)-,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 780: { // y:(r)+,x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 781: { // y:(r),x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 782: { // y:(r+n),x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 783: { // y:-(r),x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 784: { // y:(r)-n,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 785: { // y:(r)+n,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 786: { // y:(r)-,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 787: { // y:(r)+,y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 788: { // y:(r),y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 789: { // y:(r+n),y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 790: { // y:-(r),y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 791: { // y:(r)-n,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 792: { // y:(r)+n,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 793: { // y:(r)-,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 794: { // y:(r)+,y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 795: { // y:(r),y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 796: { // y:(r+n),y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 797: { // y:-(r),y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 798: { // y:(r)-n,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 799: { // y:(r)+n,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 800: { // y:(r)-,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 801: { // y:(r)+,a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 802: { // y:(r),a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 803: { // y:(r+n),a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 804: { // y:-(r),a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 805: { // y:(r)-n,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 806: { // y:(r)+n,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 807: { // y:(r)-,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 808: { // y:(r)+,b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 809: { // y:(r),b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 810: { // y:(r+n),b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 811: { // y:-(r),b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 812: { // y:(r)-n,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 813: { // y:(r)+n,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 814: { // y:(r)-,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 815: { // y:(r)+,a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 816: { // y:(r),a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 817: { // y:(r+n),a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 818: { // y:-(r),a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 819: { // y:(r)-n,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 820: { // y:(r)+n,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 821: { // y:(r)-,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 822: { // y:(r)+,b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 823: { // y:(r),b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 824: { // y:(r+n),b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 825: { // y:-(r),b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 826: { // y:(r)-n,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 827: { // y:(r)+n,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 828: { // y:(r)-,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 829: { // y:(r)+,a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 830: { // y:(r),a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 831: { // y:(r+n),a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 832: { // y:-(r),a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 833: { // y:(r)-n,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 834: { // y:(r)+n,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 835: { // y:(r)-,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 836: { // y:(r)+,b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 837: { // y:(r),b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 838: { // y:(r+n),b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 839: { // y:-(r),b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 840: { // y:(r)-n,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 841: { // y:(r)+n,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 842: { // y:(r)-,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 843: { // y:(r)+,a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 844: { // y:(r),a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 845: { // y:(r+n),a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 846: { // y:-(r),a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 847: { // y:(r)-n,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 848: { // y:(r)+n,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 849: { // y:(r)-,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 850: { // y:(r)+,b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 851: { // y:(r),b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 852: { // y:(r+n),b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 853: { // y:-(r),b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 854: { // y:(r)-n,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 855: { // y:(r)+n,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 856: { // y:(r)-,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 857: { // y:(r)+,r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 858: { // y:(r),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 859: { // y:(r+n),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 860: { // y:-(r),r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 861: { // y:(r)-n,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 862: { // y:(r)+n,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 863: { // y:(r)-,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 864: { // y:(r)+,n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 865: { // y:(r),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 866: { // y:(r+n),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 867: { // y:-(r),n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 868: { // x0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 869: { // x0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 870: { // x0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 871: { // x0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 872: { // x0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 873: { // x0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 874: { // x0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 875: { // x1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 876: { // x1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 877: { // x1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 878: { // x1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 879: { // x1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 880: { // x1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 881: { // x1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 882: { // y0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 883: { // y0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 884: { // y0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 885: { // y0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 886: { // y0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 887: { // y0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 888: { // y0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 889: { // y1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 890: { // y1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 891: { // y1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 892: { // y1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 893: { // y1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 894: { // y1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 895: { // y1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 896: { // a0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 897: { // a0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 898: { // a0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 899: { // a0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 900: { // a0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 901: { // a0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 902: { // a0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 903: { // b0,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 904: { // b0,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 905: { // b0,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 906: { // b0,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 907: { // b0,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 908: { // b0,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 909: { // b0,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 910: { // a2,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 911: { // a2,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 912: { // a2,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 913: { // a2,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 914: { // a2,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 915: { // a2,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 916: { // a2,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 917: { // b2,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 918: { // b2,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 919: { // b2,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 920: { // b2,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 921: { // b2,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 922: { // b2,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 923: { // b2,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 924: { // a1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 925: { // a1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 926: { // a1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 927: { // a1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 928: { // a1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 929: { // a1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 930: { // a1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 931: { // b1,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 932: { // b1,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 933: { // b1,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 934: { // b1,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 935: { // b1,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 936: { // b1,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 937: { // b1,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 938: { // a,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 939: { // a,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 940: { // a,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 941: { // a,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 942: { // a,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 943: { // a,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 944: { // a,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 945: { // b,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 946: { // b,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 947: { // b,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 948: { // b,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 949: { // b,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 950: { // b,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 951: { // b,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 952: { // r,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 953: { // r,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 954: { // r,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 955: { // r,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 956: { // r,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 957: { // r,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 958: { // r,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 959: { // n,y:(r)-n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 960: { // n,y:(r)+n
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 961: { // n,y:(r)-
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, -1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 962: { // n,y:(r)+
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		add_r(ea_r, 1);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 963: { // n,y:(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 964: { // n,y:(r+n)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 965: { // n,y:-(r)
+		int ea_r = BIT(opcode, 8, 6) & 7;
+		add_r(ea_r, -1);
+		u32 ea = get_r(ea_r);
+		m_y.write_dword(ea, m_tmp1);
+		break;
+		}
+	case 966: { // y:[abs],x0
+		set_x0(m_tmp1);
+		break;
+		}
+	case 967: { // y:[abs],x1
+		set_x1(m_tmp1);
+		break;
+		}
+	case 968: { // y:[abs],y0
+		set_y0(m_tmp1);
+		break;
+		}
+	case 969: { // y:[abs],y1
+		set_y1(m_tmp1);
+		break;
+		}
+	case 970: { // y:[abs],a0
+		set_a0(m_tmp1);
+		break;
+		}
+	case 971: { // y:[abs],b0
+		set_b0(m_tmp1);
+		break;
+		}
+	case 972: { // y:[abs],a2
+		set_a2(m_tmp1);
+		break;
+		}
+	case 973: { // y:[abs],b2
+		set_b2(m_tmp1);
+		break;
+		}
+	case 974: { // y:[abs],a1
+		set_a1(m_tmp1);
+		break;
+		}
+	case 975: { // y:[abs],b1
+		set_b1(m_tmp1);
+		break;
+		}
+	case 976: { // y:[abs],a
+		set_ah(m_tmp1);
+		break;
+		}
+	case 977: { // y:[abs],b
+		set_bh(m_tmp1);
+		break;
+		}
+	case 978: { // y:[abs],r
+		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 979: { // y:[abs],n
+		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
+		break;
+		}
+	case 980: { // x0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 981: { // x1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 982: { // y0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 983: { // y1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 984: { // a0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 985: { // b0,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 986: { // a2,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 987: { // b2,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 988: { // a1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 989: { // b1,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 990: { // a,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 991: { // b,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 992: { // r,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 993: { // n,y:[abs]
+		u32 abs = exv;
+		m_y.write_dword(abs, m_tmp1);
+		break;
+		}
+	case 994: { // #[i],x0
 		u32 i = exv;
 		set_x0(i);
 		break;
 		}
-	case 679: { // #[i],x1
+	case 995: { // #[i],x1
 		u32 i = exv;
 		set_x1(i);
 		break;
 		}
-	case 680: { // #[i],y0
+	case 996: { // #[i],y0
 		u32 i = exv;
 		set_y0(i);
 		break;
 		}
-	case 681: { // #[i],y1
+	case 997: { // #[i],y1
 		u32 i = exv;
 		set_y1(i);
 		break;
 		}
-	case 682: { // #[i],a0
+	case 998: { // #[i],a0
 		u32 i = exv;
 		set_a0(i);
 		break;
 		}
-	case 683: { // #[i],b0
+	case 999: { // #[i],b0
 		u32 i = exv;
 		set_b0(i);
 		break;
 		}
-	case 684: { // #[i],a2
+	case 1000: { // #[i],a2
 		u32 i = exv;
 		set_a2(i);
 		break;
 		}
-	case 685: { // #[i],b2
+	case 1001: { // #[i],b2
 		u32 i = exv;
 		set_b2(i);
 		break;
 		}
-	case 686: { // #[i],a1
+	case 1002: { // #[i],a1
 		u32 i = exv;
 		set_a1(i);
 		break;
 		}
-	case 687: { // #[i],b1
+	case 1003: { // #[i],b1
 		u32 i = exv;
 		set_b1(i);
 		break;
 		}
-	case 688: { // #[i],a
+	case 1004: { // #[i],a
 		u32 i = exv;
 		set_ah(i);
 		break;
 		}
-	case 689: { // #[i],b
+	case 1005: { // #[i],b
 		u32 i = exv;
 		set_bh(i);
 		break;
 		}
-	case 690: { // #[i],r
+	case 1006: { // #[i],r
 		u32 i = exv;
 		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 691: { // #[i],n
+	case 1007: { // #[i],n
 		u32 i = exv;
 		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, i);
 		break;
 		}
-	case 692: { // x:[aa],x0
+	case 1008: { // y:[aa],x0
 		set_x0(m_tmp1);
 		break;
 		}
-	case 693: { // y:[aa],x0
-		set_x0(m_tmp1);
-		break;
-		}
-	case 694: { // x:[aa],x1
+	case 1009: { // y:[aa],x1
 		set_x1(m_tmp1);
 		break;
 		}
-	case 695: { // y:[aa],x1
-		set_x1(m_tmp1);
-		break;
-		}
-	case 696: { // x:[aa],y0
+	case 1010: { // y:[aa],y0
 		set_y0(m_tmp1);
 		break;
 		}
-	case 697: { // y:[aa],y0
-		set_y0(m_tmp1);
-		break;
-		}
-	case 698: { // x:[aa],y1
+	case 1011: { // y:[aa],y1
 		set_y1(m_tmp1);
 		break;
 		}
-	case 699: { // y:[aa],y1
-		set_y1(m_tmp1);
-		break;
-		}
-	case 700: { // x:[aa],a0
+	case 1012: { // y:[aa],a0
 		set_a0(m_tmp1);
 		break;
 		}
-	case 701: { // y:[aa],a0
-		set_a0(m_tmp1);
-		break;
-		}
-	case 702: { // x:[aa],b0
+	case 1013: { // y:[aa],b0
 		set_b0(m_tmp1);
 		break;
 		}
-	case 703: { // y:[aa],b0
-		set_b0(m_tmp1);
-		break;
-		}
-	case 704: { // x:[aa],a2
+	case 1014: { // y:[aa],a2
 		set_a2(m_tmp1);
 		break;
 		}
-	case 705: { // y:[aa],a2
-		set_a2(m_tmp1);
-		break;
-		}
-	case 706: { // x:[aa],b2
+	case 1015: { // y:[aa],b2
 		set_b2(m_tmp1);
 		break;
 		}
-	case 707: { // y:[aa],b2
-		set_b2(m_tmp1);
-		break;
-		}
-	case 708: { // x:[aa],a1
+	case 1016: { // y:[aa],a1
 		set_a1(m_tmp1);
 		break;
 		}
-	case 709: { // y:[aa],a1
-		set_a1(m_tmp1);
-		break;
-		}
-	case 710: { // x:[aa],b1
+	case 1017: { // y:[aa],b1
 		set_b1(m_tmp1);
 		break;
 		}
-	case 711: { // y:[aa],b1
-		set_b1(m_tmp1);
-		break;
-		}
-	case 712: { // x:[aa],a
+	case 1018: { // y:[aa],a
 		set_ah(m_tmp1);
 		break;
 		}
-	case 713: { // y:[aa],a
-		set_ah(m_tmp1);
-		break;
-		}
-	case 714: { // x:[aa],b
+	case 1019: { // y:[aa],b
 		set_bh(m_tmp1);
 		break;
 		}
-	case 715: { // y:[aa],b
-		set_bh(m_tmp1);
-		break;
-		}
-	case 716: { // x:[aa],r
+	case 1020: { // y:[aa],r
 		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 717: { // y:[aa],r
-		set_r(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 718: { // x:[aa],n
+	case 1021: { // y:[aa],n
 		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
 		break;
 		}
-	case 719: { // y:[aa],n
-		set_n(bitswap<5>(opcode, 21, 20, 18, 17, 16) & 7, m_tmp1);
-		break;
-		}
-	case 720: { // x0,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 721: { // x0,y:[aa]
+	case 1022: { // x0,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 722: { // x1,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 723: { // x1,y:[aa]
+	case 1023: { // x1,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 724: { // y0,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 725: { // y0,y:[aa]
+	case 1024: { // y0,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 726: { // y1,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 727: { // y1,y:[aa]
+	case 1025: { // y1,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 728: { // a0,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 729: { // a0,y:[aa]
+	case 1026: { // a0,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 730: { // b0,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 731: { // b0,y:[aa]
+	case 1027: { // b0,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 732: { // a2,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 733: { // a2,y:[aa]
+	case 1028: { // a2,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 734: { // b2,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 735: { // b2,y:[aa]
+	case 1029: { // b2,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 736: { // a1,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 737: { // a1,y:[aa]
+	case 1030: { // a1,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 738: { // b1,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 739: { // b1,y:[aa]
+	case 1031: { // b1,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 740: { // a,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 741: { // a,y:[aa]
+	case 1032: { // a,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 742: { // b,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 743: { // b,y:[aa]
+	case 1033: { // b,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 744: { // r,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 745: { // r,y:[aa]
+	case 1034: { // r,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
 		break;
 		}
-	case 746: { // n,x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 747: { // n,y:[aa]
+	case 1035: { // n,y:[aa]
 		u32 aa = BIT(opcode, 8, 6);
 		m_y.write_dword(aa, m_tmp1);
-		break;
-		}
-	case 748: { // x:(r)-n,x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 749: { // x:(r)+n,x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 750: { // x:(r)-,x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 751: { // x:(r)+,x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 752: { // x:(r),x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 753: { // x:(r+n),x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 754: { // x:-(r),x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 755: { // x:(r)-n,x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 756: { // x:(r)+n,x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 757: { // x:(r)-,x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 758: { // x:(r)+,x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 759: { // x:(r),x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 760: { // x:(r+n),x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 761: { // x:-(r),x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 762: { // x:(r)-n,x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 763: { // x:(r)+n,x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 764: { // x:(r)-,x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 765: { // x:(r)+,x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 766: { // x:(r),x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 767: { // x:(r+n),x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 768: { // x:-(r),x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 769: { // x:(r)-n,x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 770: { // x:(r)+n,x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 771: { // x:(r)-,x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 772: { // x:(r)+,x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 773: { // x:(r),x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 774: { // x:(r+n),x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 775: { // x:-(r),x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 776: { // x:(r)-n,x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 777: { // x:(r)+n,x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 778: { // x:(r)-,x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 779: { // x:(r)+,x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 780: { // x:(r),x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 781: { // x:(r+n),x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 782: { // x:-(r),x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 783: { // x:(r)-n,x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 784: { // x:(r)+n,x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 785: { // x:(r)-,x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 786: { // x:(r)+,x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 787: { // x:(r),x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 788: { // x:(r+n),x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 789: { // x:-(r),x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 790: { // x:(r)-n,x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 791: { // x:(r)+n,x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 792: { // x:(r)-,x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 793: { // x:(r)+,x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 794: { // x:(r),x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 795: { // x:(r+n),x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 796: { // x:-(r),x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 797: { // x:(r)-n,x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 798: { // x:(r)+n,x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 799: { // x:(r)-,x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 800: { // x:(r)+,x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 801: { // x:(r),x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 802: { // x:(r+n),x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 803: { // x:-(r),x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 804: { // x:(r)-n,a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 805: { // x:(r)+n,a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 806: { // x:(r)-,a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 807: { // x:(r)+,a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 808: { // x:(r),a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 809: { // x:(r+n),a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 810: { // x:-(r),a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 811: { // x:(r)-n,a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 812: { // x:(r)+n,a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 813: { // x:(r)-,a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 814: { // x:(r)+,a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 815: { // x:(r),a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 816: { // x:(r+n),a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 817: { // x:-(r),a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 818: { // x:(r)-n,a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 819: { // x:(r)+n,a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 820: { // x:(r)-,a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 821: { // x:(r)+,a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 822: { // x:(r),a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 823: { // x:(r+n),a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 824: { // x:-(r),a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 825: { // x:(r)-n,a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 826: { // x:(r)+n,a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 827: { // x:(r)-,a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 828: { // x:(r)+,a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 829: { // x:(r),a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 830: { // x:(r+n),a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 831: { // x:-(r),a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 832: { // x:(r)-n,b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 833: { // x:(r)+n,b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 834: { // x:(r)-,b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 835: { // x:(r)+,b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 836: { // x:(r),b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 837: { // x:(r+n),b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 838: { // x:-(r),b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 839: { // x:(r)-n,b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 840: { // x:(r)+n,b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 841: { // x:(r)-,b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 842: { // x:(r)+,b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 843: { // x:(r),b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 844: { // x:(r+n),b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 845: { // x:-(r),b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 846: { // x:(r)-n,b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 847: { // x:(r)+n,b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 848: { // x:(r)-,b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 849: { // x:(r)+,b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 850: { // x:(r),b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 851: { // x:(r+n),b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 852: { // x:-(r),b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 853: { // x:(r)-n,b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 854: { // x:(r)+n,b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 855: { // x:(r)-,b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 856: { // x:(r)+,b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 857: { // x:(r),b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 858: { // x:(r+n),b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 859: { // x:-(r),b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 860: { // x0,x:(r)-n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 861: { // x0,x:(r)+n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 862: { // x0,x:(r)- a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 863: { // x0,x:(r)+ a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 864: { // x0,x:(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 865: { // x0,x:(r+n) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 866: { // x0,x:-(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 867: { // x0,x:(r)-n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 868: { // x0,x:(r)+n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 869: { // x0,x:(r)- a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 870: { // x0,x:(r)+ a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 871: { // x0,x:(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 872: { // x0,x:(r+n) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 873: { // x0,x:-(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 874: { // x0,x:(r)-n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 875: { // x0,x:(r)+n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 876: { // x0,x:(r)- b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 877: { // x0,x:(r)+ b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 878: { // x0,x:(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 879: { // x0,x:(r+n) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 880: { // x0,x:-(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 881: { // x0,x:(r)-n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 882: { // x0,x:(r)+n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 883: { // x0,x:(r)- b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 884: { // x0,x:(r)+ b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 885: { // x0,x:(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 886: { // x0,x:(r+n) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 887: { // x0,x:-(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 888: { // x1,x:(r)-n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 889: { // x1,x:(r)+n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 890: { // x1,x:(r)- a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 891: { // x1,x:(r)+ a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 892: { // x1,x:(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 893: { // x1,x:(r+n) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 894: { // x1,x:-(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 895: { // x1,x:(r)-n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 896: { // x1,x:(r)+n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 897: { // x1,x:(r)- a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 898: { // x1,x:(r)+ a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 899: { // x1,x:(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 900: { // x1,x:(r+n) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 901: { // x1,x:-(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 902: { // x1,x:(r)-n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 903: { // x1,x:(r)+n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 904: { // x1,x:(r)- b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 905: { // x1,x:(r)+ b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 906: { // x1,x:(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 907: { // x1,x:(r+n) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 908: { // x1,x:-(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 909: { // x1,x:(r)-n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 910: { // x1,x:(r)+n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 911: { // x1,x:(r)- b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 912: { // x1,x:(r)+ b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 913: { // x1,x:(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 914: { // x1,x:(r+n) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 915: { // x1,x:-(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 916: { // a,x:(r)-n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 917: { // a,x:(r)+n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 918: { // a,x:(r)- a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 919: { // a,x:(r)+ a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 920: { // a,x:(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 921: { // a,x:(r+n) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 922: { // a,x:-(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 923: { // a,x:(r)-n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 924: { // a,x:(r)+n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 925: { // a,x:(r)- a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 926: { // a,x:(r)+ a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 927: { // a,x:(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 928: { // a,x:(r+n) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 929: { // a,x:-(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 930: { // a,x:(r)-n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 931: { // a,x:(r)+n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 932: { // a,x:(r)- b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 933: { // a,x:(r)+ b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 934: { // a,x:(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 935: { // a,x:(r+n) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 936: { // a,x:-(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 937: { // a,x:(r)-n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 938: { // a,x:(r)+n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 939: { // a,x:(r)- b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 940: { // a,x:(r)+ b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 941: { // a,x:(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 942: { // a,x:(r+n) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 943: { // a,x:-(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 944: { // b,x:(r)-n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 945: { // b,x:(r)+n a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 946: { // b,x:(r)- a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 947: { // b,x:(r)+ a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 948: { // b,x:(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 949: { // b,x:(r+n) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 950: { // b,x:-(r) a,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 951: { // b,x:(r)-n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 952: { // b,x:(r)+n a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 953: { // b,x:(r)- a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 954: { // b,x:(r)+ a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 955: { // b,x:(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 956: { // b,x:(r+n) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 957: { // b,x:-(r) a,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 958: { // b,x:(r)-n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 959: { // b,x:(r)+n b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 960: { // b,x:(r)- b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 961: { // b,x:(r)+ b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 962: { // b,x:(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 963: { // b,x:(r+n) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 964: { // b,x:-(r) b,y0
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 965: { // b,x:(r)-n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 966: { // b,x:(r)+n b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 967: { // b,x:(r)- b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 968: { // b,x:(r)+ b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 969: { // b,x:(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 970: { // b,x:(r+n) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 971: { // b,x:-(r) b,y1
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 972: { // x:[abs],x0 a,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 973: { // x:[abs],x0 a,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 974: { // x:[abs],x0 b,y0
-		set_x0(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 975: { // x:[abs],x0 b,y1
-		set_x0(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 976: { // x:[abs],x1 a,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 977: { // x:[abs],x1 a,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 978: { // x:[abs],x1 b,y0
-		set_x1(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 979: { // x:[abs],x1 b,y1
-		set_x1(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 980: { // x:[abs],a a,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 981: { // x:[abs],a a,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 982: { // x:[abs],a b,y0
-		set_ah(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 983: { // x:[abs],a b,y1
-		set_ah(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 984: { // x:[abs],b a,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 985: { // x:[abs],b a,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 986: { // x:[abs],b b,y0
-		set_bh(m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 987: { // x:[abs],b b,y1
-		set_bh(m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 988: { // x0,x:[abs] a,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 989: { // x0,x:[abs] a,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 990: { // x0,x:[abs] b,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 991: { // x0,x:[abs] b,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 992: { // x1,x:[abs] a,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 993: { // x1,x:[abs] a,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 994: { // x1,x:[abs] b,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 995: { // x1,x:[abs] b,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 996: { // a,x:[abs] a,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 997: { // a,x:[abs] a,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 998: { // a,x:[abs] b,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 999: { // a,x:[abs] b,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 1000: { // b,x:[abs] a,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 1001: { // b,x:[abs] a,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 1002: { // b,x:[abs] b,y0
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y0(m_tmp2);
-		break;
-		}
-	case 1003: { // b,x:[abs] b,y1
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_y1(m_tmp2);
-		break;
-		}
-	case 1004: { // #[i],x0 a,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_x0(i);
-		break;
-		}
-	case 1005: { // #[i],x0 a,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_x0(i);
-		break;
-		}
-	case 1006: { // #[i],x0 b,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_x0(i);
-		break;
-		}
-	case 1007: { // #[i],x0 b,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_x0(i);
-		break;
-		}
-	case 1008: { // #[i],x1 a,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_x1(i);
-		break;
-		}
-	case 1009: { // #[i],x1 a,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_x1(i);
-		break;
-		}
-	case 1010: { // #[i],x1 b,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_x1(i);
-		break;
-		}
-	case 1011: { // #[i],x1 b,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_x1(i);
-		break;
-		}
-	case 1012: { // #[i],a a,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_ah(i);
-		break;
-		}
-	case 1013: { // #[i],a a,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_ah(i);
-		break;
-		}
-	case 1014: { // #[i],a b,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_ah(i);
-		break;
-		}
-	case 1015: { // #[i],a b,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_ah(i);
-		break;
-		}
-	case 1016: { // #[i],b a,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_bh(i);
-		break;
-		}
-	case 1017: { // #[i],b a,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_bh(i);
-		break;
-		}
-	case 1018: { // #[i],b b,y0
-		u32 i = exv;
-		set_y0(m_tmp1);
-		set_bh(i);
-		break;
-		}
-	case 1019: { // #[i],b b,y1
-		u32 i = exv;
-		set_y1(m_tmp1);
-		set_bh(i);
-		break;
-		}
-	case 1020: { // a,x:(r)-n x0,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1021: { // a,x:(r)+n x0,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1022: { // a,x:(r)- x0,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1023: { // a,x:(r)+ x0,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1024: { // a,x:(r) x0,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1025: { // a,x:(r+n) x0,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1026: { // a,x:-(r) x0,a
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1027: { // b,x:(r)-n x0,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_bh(m_tmp2);
-		break;
-		}
-	case 1028: { // b,x:(r)+n x0,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_bh(m_tmp2);
-		break;
-		}
-	case 1029: { // b,x:(r)- x0,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		set_bh(m_tmp2);
-		break;
-		}
-	case 1030: { // b,x:(r)+ x0,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		set_bh(m_tmp2);
-		break;
-		}
-	case 1031: { // b,x:(r) x0,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_bh(m_tmp2);
-		break;
-		}
-	case 1032: { // b,x:(r+n) x0,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		set_bh(m_tmp2);
-		break;
-		}
-	case 1033: { // b,x:-(r) x0,b
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		set_bh(m_tmp2);
-		break;
-		}
-	case 1034: { // a,x:[abs] x0,a
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_ah(m_tmp2);
-		break;
-		}
-	case 1035: { // b,x:[abs] x0,b
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		set_bh(m_tmp2);
 		break;
 		}
 	case 1036: { // a,x0 y:(r)-n,y0
@@ -22058,819 +21370,579 @@ void dsp563xx_device::execute_post_move(u16 kmove, u32 opcode, u32 exv)
 		break;
 		}
 	case 1324: { // l:(r)-n,a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,a10");
 		break;
 		}
 	case 1325: { // l:(r)+n,a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,a10");
 		break;
 		}
 	case 1326: { // l:(r)-,a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,a10");
 		break;
 		}
 	case 1327: { // l:(r)+,a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,a10");
 		break;
 		}
 	case 1328: { // l:(r),a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),a10");
 		break;
 		}
 	case 1329: { // l:(r+n),a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),a10");
 		break;
 		}
 	case 1330: { // l:-(r),a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),a10");
 		break;
 		}
 	case 1331: { // l:(r)-n,b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,b10");
 		break;
 		}
 	case 1332: { // l:(r)+n,b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,b10");
 		break;
 		}
 	case 1333: { // l:(r)-,b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,b10");
 		break;
 		}
 	case 1334: { // l:(r)+,b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,b10");
 		break;
 		}
 	case 1335: { // l:(r),b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),b10");
 		break;
 		}
 	case 1336: { // l:(r+n),b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),b10");
 		break;
 		}
 	case 1337: { // l:-(r),b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),b10");
 		break;
 		}
 	case 1338: { // l:(r)-n,x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,x");
 		break;
 		}
 	case 1339: { // l:(r)+n,x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,x");
 		break;
 		}
 	case 1340: { // l:(r)-,x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,x");
 		break;
 		}
 	case 1341: { // l:(r)+,x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,x");
 		break;
 		}
 	case 1342: { // l:(r),x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),x");
 		break;
 		}
 	case 1343: { // l:(r+n),x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),x");
 		break;
 		}
 	case 1344: { // l:-(r),x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),x");
 		break;
 		}
 	case 1345: { // l:(r)-n,y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,y");
 		break;
 		}
 	case 1346: { // l:(r)+n,y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,y");
 		break;
 		}
 	case 1347: { // l:(r)-,y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,y");
 		break;
 		}
 	case 1348: { // l:(r)+,y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,y");
 		break;
 		}
 	case 1349: { // l:(r),y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),y");
 		break;
 		}
 	case 1350: { // l:(r+n),y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),y");
 		break;
 		}
 	case 1351: { // l:-(r),y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),y");
 		break;
 		}
 	case 1352: { // l:(r)-n,a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,a");
 		break;
 		}
 	case 1353: { // l:(r)+n,a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,a");
 		break;
 		}
 	case 1354: { // l:(r)-,a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,a");
 		break;
 		}
 	case 1355: { // l:(r)+,a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,a");
 		break;
 		}
 	case 1356: { // l:(r),a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),a");
 		break;
 		}
 	case 1357: { // l:(r+n),a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),a");
 		break;
 		}
 	case 1358: { // l:-(r),a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),a");
 		break;
 		}
 	case 1359: { // l:(r)-n,b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,b");
 		break;
 		}
 	case 1360: { // l:(r)+n,b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,b");
 		break;
 		}
 	case 1361: { // l:(r)-,b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,b");
 		break;
 		}
 	case 1362: { // l:(r)+,b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,b");
 		break;
 		}
 	case 1363: { // l:(r),b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),b");
 		break;
 		}
 	case 1364: { // l:(r+n),b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),b");
 		break;
 		}
 	case 1365: { // l:-(r),b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),b");
 		break;
 		}
 	case 1366: { // l:(r)-n,ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,ab");
 		break;
 		}
 	case 1367: { // l:(r)+n,ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,ab");
 		break;
 		}
 	case 1368: { // l:(r)-,ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,ab");
 		break;
 		}
 	case 1369: { // l:(r)+,ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,ab");
 		break;
 		}
 	case 1370: { // l:(r),ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),ab");
 		break;
 		}
 	case 1371: { // l:(r+n),ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),ab");
 		break;
 		}
 	case 1372: { // l:-(r),ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),ab");
 		break;
 		}
 	case 1373: { // l:(r)-n,ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-n,ba");
 		break;
 		}
 	case 1374: { // l:(r)+n,ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+n,ba");
 		break;
 		}
 	case 1375: { // l:(r)-,ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)-,ba");
 		break;
 		}
 	case 1376: { // l:(r)+,ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r)+,ba");
 		break;
 		}
 	case 1377: { // l:(r),ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r),ba");
 		break;
 		}
 	case 1378: { // l:(r+n),ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:(r+n),ba");
 		break;
 		}
 	case 1379: { // l:-(r),ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:-(r),ba");
 		break;
 		}
 	case 1380: { // l:[abs],a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],a10");
 		break;
 		}
 	case 1381: { // l:[abs],b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],b10");
 		break;
 		}
 	case 1382: { // l:[abs],x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],x");
 		break;
 		}
 	case 1383: { // l:[abs],y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],y");
 		break;
 		}
 	case 1384: { // l:[abs],a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],a");
 		break;
 		}
 	case 1385: { // l:[abs],b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],b");
 		break;
 		}
 	case 1386: { // l:[abs],ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],ab");
 		break;
 		}
 	case 1387: { // l:[abs],ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[abs],ba");
 		break;
 		}
 	case 1388: { // l:[aa],a10
-		set_a10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],a10");
 		break;
 		}
 	case 1389: { // l:[aa],b10
-		set_b10(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],b10");
 		break;
 		}
 	case 1390: { // l:[aa],x
-		set_x(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],x");
 		break;
 		}
 	case 1391: { // l:[aa],y
-		set_y(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],y");
 		break;
 		}
 	case 1392: { // l:[aa],a
-		set_al(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],a");
 		break;
 		}
 	case 1393: { // l:[aa],b
-		set_bl(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],b");
 		break;
 		}
 	case 1394: { // l:[aa],ab
-		set_ab(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],ab");
 		break;
 		}
 	case 1395: { // l:[aa],ba
-		set_ba(m_tmp1 << 24 | m_tmp2);
+		unhandled("l:[aa],ba");
 		break;
 		}
 	case 1396: { // a10,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a10,l:(r)-n");
 		break;
 		}
 	case 1397: { // a10,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a10,l:(r)+n");
 		break;
 		}
 	case 1398: { // a10,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a10,l:(r)-");
 		break;
 		}
 	case 1399: { // a10,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a10,l:(r)+");
 		break;
 		}
 	case 1400: { // a10,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a10,l:(r)");
 		break;
 		}
 	case 1401: { // a10,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a10,l:(r+n)");
 		break;
 		}
 	case 1402: { // a10,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a10,l:-(r)");
 		break;
 		}
 	case 1403: { // b10,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b10,l:(r)-n");
 		break;
 		}
 	case 1404: { // b10,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b10,l:(r)+n");
 		break;
 		}
 	case 1405: { // b10,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b10,l:(r)-");
 		break;
 		}
 	case 1406: { // b10,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b10,l:(r)+");
 		break;
 		}
 	case 1407: { // b10,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b10,l:(r)");
 		break;
 		}
 	case 1408: { // b10,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b10,l:(r+n)");
 		break;
 		}
 	case 1409: { // b10,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b10,l:-(r)");
 		break;
 		}
 	case 1410: { // x,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("x,l:(r)-n");
 		break;
 		}
 	case 1411: { // x,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("x,l:(r)+n");
 		break;
 		}
 	case 1412: { // x,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("x,l:(r)-");
 		break;
 		}
 	case 1413: { // x,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("x,l:(r)+");
 		break;
 		}
 	case 1414: { // x,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("x,l:(r)");
 		break;
 		}
 	case 1415: { // x,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("x,l:(r+n)");
 		break;
 		}
 	case 1416: { // x,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("x,l:-(r)");
 		break;
 		}
 	case 1417: { // y,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("y,l:(r)-n");
 		break;
 		}
 	case 1418: { // y,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("y,l:(r)+n");
 		break;
 		}
 	case 1419: { // y,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("y,l:(r)-");
 		break;
 		}
 	case 1420: { // y,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("y,l:(r)+");
 		break;
 		}
 	case 1421: { // y,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("y,l:(r)");
 		break;
 		}
 	case 1422: { // y,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("y,l:(r+n)");
 		break;
 		}
 	case 1423: { // y,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("y,l:-(r)");
 		break;
 		}
 	case 1424: { // a,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a,l:(r)-n");
 		break;
 		}
 	case 1425: { // a,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a,l:(r)+n");
 		break;
 		}
 	case 1426: { // a,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a,l:(r)-");
 		break;
 		}
 	case 1427: { // a,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a,l:(r)+");
 		break;
 		}
 	case 1428: { // a,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a,l:(r)");
 		break;
 		}
 	case 1429: { // a,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a,l:(r+n)");
 		break;
 		}
 	case 1430: { // a,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("a,l:-(r)");
 		break;
 		}
 	case 1431: { // b,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b,l:(r)-n");
 		break;
 		}
 	case 1432: { // b,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b,l:(r)+n");
 		break;
 		}
 	case 1433: { // b,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b,l:(r)-");
 		break;
 		}
 	case 1434: { // b,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b,l:(r)+");
 		break;
 		}
 	case 1435: { // b,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b,l:(r)");
 		break;
 		}
 	case 1436: { // b,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b,l:(r+n)");
 		break;
 		}
 	case 1437: { // b,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("b,l:-(r)");
 		break;
 		}
 	case 1438: { // ab,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ab,l:(r)-n");
 		break;
 		}
 	case 1439: { // ab,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ab,l:(r)+n");
 		break;
 		}
 	case 1440: { // ab,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ab,l:(r)-");
 		break;
 		}
 	case 1441: { // ab,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ab,l:(r)+");
 		break;
 		}
 	case 1442: { // ab,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ab,l:(r)");
 		break;
 		}
 	case 1443: { // ab,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ab,l:(r+n)");
 		break;
 		}
 	case 1444: { // ab,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ab,l:-(r)");
 		break;
 		}
 	case 1445: { // ba,l:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ba,l:(r)-n");
 		break;
 		}
 	case 1446: { // ba,l:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ba,l:(r)+n");
 		break;
 		}
 	case 1447: { // ba,l:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ba,l:(r)-");
 		break;
 		}
 	case 1448: { // ba,l:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ba,l:(r)+");
 		break;
 		}
 	case 1449: { // ba,l:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ba,l:(r)");
 		break;
 		}
 	case 1450: { // ba,l:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ba,l:(r+n)");
 		break;
 		}
 	case 1451: { // ba,l:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_x.write_dword(ea, m_tmp1);
-		m_y.write_dword(ea, m_tmp2);
+		unhandled("ba,l:-(r)");
 		break;
 		}
 	case 1452: { // a10,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("a10,l:[abs]");
 		break;
 		}
 	case 1453: { // b10,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("b10,l:[abs]");
 		break;
 		}
 	case 1454: { // x,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("x,l:[abs]");
 		break;
 		}
 	case 1455: { // y,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("y,l:[abs]");
 		break;
 		}
 	case 1456: { // a,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("a,l:[abs]");
 		break;
 		}
 	case 1457: { // b,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("b,l:[abs]");
 		break;
 		}
 	case 1458: { // ab,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("ab,l:[abs]");
 		break;
 		}
 	case 1459: { // ba,l:[abs]
-		u32 abs = exv;
-		m_x.write_dword(abs, m_tmp1);
-		m_y.write_dword(abs, m_tmp2);
+		unhandled("ba,l:[abs]");
 		break;
 		}
 	case 1460: { // a10,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("a10,l:[aa]");
 		break;
 		}
 	case 1461: { // b10,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("b10,l:[aa]");
 		break;
 		}
 	case 1462: { // x,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("x,l:[aa]");
 		break;
 		}
 	case 1463: { // y,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("y,l:[aa]");
 		break;
 		}
 	case 1464: { // a,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("a,l:[aa]");
 		break;
 		}
 	case 1465: { // b,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("b,l:[aa]");
 		break;
 		}
 	case 1466: { // ab,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("ab,l:[aa]");
 		break;
 		}
 	case 1467: { // ba,l:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_x.write_dword(aa, m_tmp1);
-		m_y.write_dword(aa, m_tmp2);
+		unhandled("ba,l:[aa]");
 		break;
 		}
 	case 1468: { // x:(r)+n,x0 y:(rh)+n,y0
@@ -27110,1025 +26182,637 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 2: { // move x:(r+[o]),x0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_x0(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),x0");
 		break;
 		}
 	case 3: { // move x:(r+[o]),x1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_x1(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),x1");
 		break;
 		}
 	case 4: { // move x:(r+[o]),y0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_y0(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),y0");
 		break;
 		}
 	case 5: { // move x:(r+[o]),y1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_y1(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),y1");
 		break;
 		}
 	case 6: { // move x:(r+[o]),a0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_a0(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),a0");
 		break;
 		}
 	case 7: { // move x:(r+[o]),b0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_b0(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),b0");
 		break;
 		}
 	case 8: { // move x:(r+[o]),a2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_a2(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),a2");
 		break;
 		}
 	case 9: { // move x:(r+[o]),b2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_b2(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),b2");
 		break;
 		}
 	case 10: { // move x:(r+[o]),a1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_a1(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),a1");
 		break;
 		}
 	case 11: { // move x:(r+[o]),b1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_b1(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),b1");
 		break;
 		}
 	case 12: { // move x:(r+[o]),a
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ah(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),a");
 		break;
 		}
 	case 13: { // move x:(r+[o]),b
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_bh(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),b");
 		break;
 		}
 	case 14: { // move x:(r+[o]),r
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_r(BIT(opcode, 0, 6) & 7, m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),r");
 		break;
 		}
 	case 15: { // move x:(r+[o]),n
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_n(BIT(opcode, 0, 6) & 7, m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),n");
 		break;
 		}
 	case 16: { // move x:(r+[o]),m
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_m(BIT(opcode, 0, 6) & 7, m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),m");
 		break;
 		}
 	case 17: { // move x:(r+[o]),ep
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ep(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),ep");
 		break;
 		}
 	case 18: { // move x:(r+[o]),vba
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_vba(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),vba");
 		break;
 		}
 	case 19: { // move x:(r+[o]),sc
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sc(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),sc");
 		break;
 		}
 	case 20: { // move x:(r+[o]),sz
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sz(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),sz");
 		break;
 		}
 	case 21: { // move x:(r+[o]),sr
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sr(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),sr");
 		break;
 		}
 	case 22: { // move x:(r+[o]),omr
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_omr(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),omr");
 		break;
 		}
 	case 23: { // move x:(r+[o]),sp
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sp(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),sp");
 		break;
 		}
 	case 24: { // move x:(r+[o]),ssh
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ssh(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),ssh");
 		break;
 		}
 	case 25: { // move x:(r+[o]),ssl
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ssl(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),ssl");
 		break;
 		}
 	case 26: { // move x:(r+[o]),la
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_la(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),la");
 		break;
 		}
 	case 27: { // move x:(r+[o]),lc
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_lc(m_x.read_dword(r + o));
+		unhandled("move x:(r+[o]),lc");
 		break;
 		}
-	case 28: { // move y:(r+[o]),x0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_x0(m_y.read_dword(r + o));
+	case 28: { // move x0,x:(r+[o])
+		unhandled("move x0,x:(r+[o])");
 		break;
 		}
-	case 29: { // move y:(r+[o]),x1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_x1(m_y.read_dword(r + o));
+	case 29: { // move x1,x:(r+[o])
+		unhandled("move x1,x:(r+[o])");
 		break;
 		}
-	case 30: { // move y:(r+[o]),y0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_y0(m_y.read_dword(r + o));
+	case 30: { // move y0,x:(r+[o])
+		unhandled("move y0,x:(r+[o])");
 		break;
 		}
-	case 31: { // move y:(r+[o]),y1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_y1(m_y.read_dword(r + o));
+	case 31: { // move y1,x:(r+[o])
+		unhandled("move y1,x:(r+[o])");
 		break;
 		}
-	case 32: { // move y:(r+[o]),a0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_a0(m_y.read_dword(r + o));
+	case 32: { // move a0,x:(r+[o])
+		unhandled("move a0,x:(r+[o])");
 		break;
 		}
-	case 33: { // move y:(r+[o]),b0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_b0(m_y.read_dword(r + o));
+	case 33: { // move b0,x:(r+[o])
+		unhandled("move b0,x:(r+[o])");
 		break;
 		}
-	case 34: { // move y:(r+[o]),a2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_a2(m_y.read_dword(r + o));
+	case 34: { // move a2,x:(r+[o])
+		unhandled("move a2,x:(r+[o])");
 		break;
 		}
-	case 35: { // move y:(r+[o]),b2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_b2(m_y.read_dword(r + o));
+	case 35: { // move b2,x:(r+[o])
+		unhandled("move b2,x:(r+[o])");
 		break;
 		}
-	case 36: { // move y:(r+[o]),a1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_a1(m_y.read_dword(r + o));
+	case 36: { // move a1,x:(r+[o])
+		unhandled("move a1,x:(r+[o])");
 		break;
 		}
-	case 37: { // move y:(r+[o]),b1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_b1(m_y.read_dword(r + o));
+	case 37: { // move b1,x:(r+[o])
+		unhandled("move b1,x:(r+[o])");
 		break;
 		}
-	case 38: { // move y:(r+[o]),a
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ah(m_y.read_dword(r + o));
+	case 38: { // move a,x:(r+[o])
+		unhandled("move a,x:(r+[o])");
 		break;
 		}
-	case 39: { // move y:(r+[o]),b
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_bh(m_y.read_dword(r + o));
+	case 39: { // move b,x:(r+[o])
+		unhandled("move b,x:(r+[o])");
 		break;
 		}
-	case 40: { // move y:(r+[o]),r
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_r(BIT(opcode, 0, 6) & 7, m_y.read_dword(r + o));
+	case 40: { // move r,x:(r+[o])
+		unhandled("move r,x:(r+[o])");
 		break;
 		}
-	case 41: { // move y:(r+[o]),n
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_n(BIT(opcode, 0, 6) & 7, m_y.read_dword(r + o));
+	case 41: { // move n,x:(r+[o])
+		unhandled("move n,x:(r+[o])");
 		break;
 		}
-	case 42: { // move y:(r+[o]),m
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_m(BIT(opcode, 0, 6) & 7, m_y.read_dword(r + o));
+	case 42: { // move m,x:(r+[o])
+		unhandled("move m,x:(r+[o])");
 		break;
 		}
-	case 43: { // move y:(r+[o]),ep
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ep(m_y.read_dword(r + o));
+	case 43: { // move ep,x:(r+[o])
+		unhandled("move ep,x:(r+[o])");
 		break;
 		}
-	case 44: { // move y:(r+[o]),vba
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_vba(m_y.read_dword(r + o));
+	case 44: { // move vba,x:(r+[o])
+		unhandled("move vba,x:(r+[o])");
 		break;
 		}
-	case 45: { // move y:(r+[o]),sc
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sc(m_y.read_dword(r + o));
+	case 45: { // move sc,x:(r+[o])
+		unhandled("move sc,x:(r+[o])");
 		break;
 		}
-	case 46: { // move y:(r+[o]),sz
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sz(m_y.read_dword(r + o));
+	case 46: { // move sz,x:(r+[o])
+		unhandled("move sz,x:(r+[o])");
 		break;
 		}
-	case 47: { // move y:(r+[o]),sr
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sr(m_y.read_dword(r + o));
+	case 47: { // move sr,x:(r+[o])
+		unhandled("move sr,x:(r+[o])");
 		break;
 		}
-	case 48: { // move y:(r+[o]),omr
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_omr(m_y.read_dword(r + o));
+	case 48: { // move omr,x:(r+[o])
+		unhandled("move omr,x:(r+[o])");
 		break;
 		}
-	case 49: { // move y:(r+[o]),sp
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_sp(m_y.read_dword(r + o));
+	case 49: { // move sp,x:(r+[o])
+		unhandled("move sp,x:(r+[o])");
 		break;
 		}
-	case 50: { // move y:(r+[o]),ssh
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ssh(m_y.read_dword(r + o));
+	case 50: { // move ssh,x:(r+[o])
+		unhandled("move ssh,x:(r+[o])");
 		break;
 		}
-	case 51: { // move y:(r+[o]),ssl
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_ssl(m_y.read_dword(r + o));
+	case 51: { // move ssl,x:(r+[o])
+		unhandled("move ssl,x:(r+[o])");
 		break;
 		}
-	case 52: { // move y:(r+[o]),la
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_la(m_y.read_dword(r + o));
+	case 52: { // move la,x:(r+[o])
+		unhandled("move la,x:(r+[o])");
 		break;
 		}
-	case 53: { // move y:(r+[o]),lc
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		set_lc(m_y.read_dword(r + o));
+	case 53: { // move lc,x:(r+[o])
+		unhandled("move lc,x:(r+[o])");
 		break;
 		}
-	case 54: { // move x0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_x0();
-		m_x.write_dword(r + o, s);
+	case 54: { // move x:(r+[o]),x0
+		unhandled("move x:(r+[o]),x0");
 		break;
 		}
-	case 55: { // move x1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_x1();
-		m_x.write_dword(r + o, s);
+	case 55: { // move x:(r+[o]),x1
+		unhandled("move x:(r+[o]),x1");
 		break;
 		}
-	case 56: { // move y0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_y0();
-		m_x.write_dword(r + o, s);
+	case 56: { // move x:(r+[o]),y0
+		unhandled("move x:(r+[o]),y0");
 		break;
 		}
-	case 57: { // move y1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_y1();
-		m_x.write_dword(r + o, s);
+	case 57: { // move x:(r+[o]),y1
+		unhandled("move x:(r+[o]),y1");
 		break;
 		}
-	case 58: { // move a0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_a0();
-		m_x.write_dword(r + o, s);
+	case 58: { // move x:(r+[o]),a0
+		unhandled("move x:(r+[o]),a0");
 		break;
 		}
-	case 59: { // move b0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_b0();
-		m_x.write_dword(r + o, s);
+	case 59: { // move x:(r+[o]),b0
+		unhandled("move x:(r+[o]),b0");
 		break;
 		}
-	case 60: { // move a2,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_a2();
-		m_x.write_dword(r + o, s);
+	case 60: { // move x:(r+[o]),a2
+		unhandled("move x:(r+[o]),a2");
 		break;
 		}
-	case 61: { // move b2,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_b2();
-		m_x.write_dword(r + o, s);
+	case 61: { // move x:(r+[o]),b2
+		unhandled("move x:(r+[o]),b2");
 		break;
 		}
-	case 62: { // move a1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_a1();
-		m_x.write_dword(r + o, s);
+	case 62: { // move x:(r+[o]),a1
+		unhandled("move x:(r+[o]),a1");
 		break;
 		}
-	case 63: { // move b1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_b1();
-		m_x.write_dword(r + o, s);
+	case 63: { // move x:(r+[o]),b1
+		unhandled("move x:(r+[o]),b1");
 		break;
 		}
-	case 64: { // move a,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s_h = get_ah();
-		m_x.write_dword(r + o, s_h);
+	case 64: { // move x:(r+[o]),a
+		unhandled("move x:(r+[o]),a");
 		break;
 		}
-	case 65: { // move b,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s_h = get_bh();
-		m_x.write_dword(r + o, s_h);
+	case 65: { // move x:(r+[o]),b
+		unhandled("move x:(r+[o]),b");
 		break;
 		}
-	case 66: { // move r,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_r(BIT(opcode, 0, 6) & 7);
-		m_x.write_dword(r + o, s);
+	case 66: { // move x0,x:(r+[o])
+		unhandled("move x0,x:(r+[o])");
 		break;
 		}
-	case 67: { // move n,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_n(BIT(opcode, 0, 6) & 7);
-		m_x.write_dword(r + o, s);
+	case 67: { // move x1,x:(r+[o])
+		unhandled("move x1,x:(r+[o])");
 		break;
 		}
-	case 68: { // move m,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_m(BIT(opcode, 0, 6) & 7);
-		m_x.write_dword(r + o, s);
+	case 68: { // move y0,x:(r+[o])
+		unhandled("move y0,x:(r+[o])");
 		break;
 		}
-	case 69: { // move ep,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_ep();
-		m_x.write_dword(r + o, s);
+	case 69: { // move y1,x:(r+[o])
+		unhandled("move y1,x:(r+[o])");
 		break;
 		}
-	case 70: { // move vba,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_vba();
-		m_x.write_dword(r + o, s);
+	case 70: { // move a0,x:(r+[o])
+		unhandled("move a0,x:(r+[o])");
 		break;
 		}
-	case 71: { // move sc,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sc();
-		m_x.write_dword(r + o, s);
+	case 71: { // move b0,x:(r+[o])
+		unhandled("move b0,x:(r+[o])");
 		break;
 		}
-	case 72: { // move sz,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sz();
-		m_x.write_dword(r + o, s);
+	case 72: { // move a2,x:(r+[o])
+		unhandled("move a2,x:(r+[o])");
 		break;
 		}
-	case 73: { // move sr,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sr();
-		m_x.write_dword(r + o, s);
+	case 73: { // move b2,x:(r+[o])
+		unhandled("move b2,x:(r+[o])");
 		break;
 		}
-	case 74: { // move omr,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_omr();
-		m_x.write_dword(r + o, s);
+	case 74: { // move a1,x:(r+[o])
+		unhandled("move a1,x:(r+[o])");
 		break;
 		}
-	case 75: { // move sp,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sp();
-		m_x.write_dword(r + o, s);
+	case 75: { // move b1,x:(r+[o])
+		unhandled("move b1,x:(r+[o])");
 		break;
 		}
-	case 76: { // move ssh,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_ssh();
-		m_x.write_dword(r + o, s);
+	case 76: { // move a,x:(r+[o])
+		unhandled("move a,x:(r+[o])");
 		break;
 		}
-	case 77: { // move ssl,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_ssl();
-		m_x.write_dword(r + o, s);
+	case 77: { // move b,x:(r+[o])
+		unhandled("move b,x:(r+[o])");
 		break;
 		}
-	case 78: { // move la,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_la();
-		m_x.write_dword(r + o, s);
+	case 78: { // move y:(r+[o]),x0
+		unhandled("move y:(r+[o]),x0");
 		break;
 		}
-	case 79: { // move lc,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_lc();
-		m_x.write_dword(r + o, s);
+	case 79: { // move y:(r+[o]),x1
+		unhandled("move y:(r+[o]),x1");
 		break;
 		}
-	case 80: { // move x0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_x0();
-		m_y.write_dword(r + o, s);
+	case 80: { // move y:(r+[o]),y0
+		unhandled("move y:(r+[o]),y0");
 		break;
 		}
-	case 81: { // move x1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_x1();
-		m_y.write_dword(r + o, s);
+	case 81: { // move y:(r+[o]),y1
+		unhandled("move y:(r+[o]),y1");
 		break;
 		}
-	case 82: { // move y0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_y0();
-		m_y.write_dword(r + o, s);
+	case 82: { // move y:(r+[o]),a0
+		unhandled("move y:(r+[o]),a0");
 		break;
 		}
-	case 83: { // move y1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_y1();
-		m_y.write_dword(r + o, s);
+	case 83: { // move y:(r+[o]),b0
+		unhandled("move y:(r+[o]),b0");
 		break;
 		}
-	case 84: { // move a0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_a0();
-		m_y.write_dword(r + o, s);
+	case 84: { // move y:(r+[o]),a2
+		unhandled("move y:(r+[o]),a2");
 		break;
 		}
-	case 85: { // move b0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_b0();
-		m_y.write_dword(r + o, s);
+	case 85: { // move y:(r+[o]),b2
+		unhandled("move y:(r+[o]),b2");
 		break;
 		}
-	case 86: { // move a2,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_a2();
-		m_y.write_dword(r + o, s);
+	case 86: { // move y:(r+[o]),a1
+		unhandled("move y:(r+[o]),a1");
 		break;
 		}
-	case 87: { // move b2,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_b2();
-		m_y.write_dword(r + o, s);
+	case 87: { // move y:(r+[o]),b1
+		unhandled("move y:(r+[o]),b1");
 		break;
 		}
-	case 88: { // move a1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_a1();
-		m_y.write_dword(r + o, s);
+	case 88: { // move y:(r+[o]),a
+		unhandled("move y:(r+[o]),a");
 		break;
 		}
-	case 89: { // move b1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_b1();
-		m_y.write_dword(r + o, s);
+	case 89: { // move y:(r+[o]),b
+		unhandled("move y:(r+[o]),b");
 		break;
 		}
-	case 90: { // move a,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s_h = get_ah();
-		m_y.write_dword(r + o, s_h);
+	case 90: { // move y:(r+[o]),r
+		unhandled("move y:(r+[o]),r");
 		break;
 		}
-	case 91: { // move b,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s_h = get_bh();
-		m_y.write_dword(r + o, s_h);
+	case 91: { // move y:(r+[o]),n
+		unhandled("move y:(r+[o]),n");
 		break;
 		}
-	case 92: { // move r,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_r(BIT(opcode, 0, 6) & 7);
-		m_y.write_dword(r + o, s);
+	case 92: { // move y:(r+[o]),m
+		unhandled("move y:(r+[o]),m");
 		break;
 		}
-	case 93: { // move n,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_n(BIT(opcode, 0, 6) & 7);
-		m_y.write_dword(r + o, s);
+	case 93: { // move y:(r+[o]),ep
+		unhandled("move y:(r+[o]),ep");
 		break;
 		}
-	case 94: { // move m,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_m(BIT(opcode, 0, 6) & 7);
-		m_y.write_dword(r + o, s);
+	case 94: { // move y:(r+[o]),vba
+		unhandled("move y:(r+[o]),vba");
 		break;
 		}
-	case 95: { // move ep,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_ep();
-		m_y.write_dword(r + o, s);
+	case 95: { // move y:(r+[o]),sc
+		unhandled("move y:(r+[o]),sc");
 		break;
 		}
-	case 96: { // move vba,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_vba();
-		m_y.write_dword(r + o, s);
+	case 96: { // move y:(r+[o]),sz
+		unhandled("move y:(r+[o]),sz");
 		break;
 		}
-	case 97: { // move sc,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sc();
-		m_y.write_dword(r + o, s);
+	case 97: { // move y:(r+[o]),sr
+		unhandled("move y:(r+[o]),sr");
 		break;
 		}
-	case 98: { // move sz,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sz();
-		m_y.write_dword(r + o, s);
+	case 98: { // move y:(r+[o]),omr
+		unhandled("move y:(r+[o]),omr");
 		break;
 		}
-	case 99: { // move sr,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sr();
-		m_y.write_dword(r + o, s);
+	case 99: { // move y:(r+[o]),sp
+		unhandled("move y:(r+[o]),sp");
 		break;
 		}
-	case 100: { // move omr,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_omr();
-		m_y.write_dword(r + o, s);
+	case 100: { // move y:(r+[o]),ssh
+		unhandled("move y:(r+[o]),ssh");
 		break;
 		}
-	case 101: { // move sp,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_sp();
-		m_y.write_dword(r + o, s);
+	case 101: { // move y:(r+[o]),ssl
+		unhandled("move y:(r+[o]),ssl");
 		break;
 		}
-	case 102: { // move ssh,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_ssh();
-		m_y.write_dword(r + o, s);
+	case 102: { // move y:(r+[o]),la
+		unhandled("move y:(r+[o]),la");
 		break;
 		}
-	case 103: { // move ssl,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_ssl();
-		m_y.write_dword(r + o, s);
+	case 103: { // move y:(r+[o]),lc
+		unhandled("move y:(r+[o]),lc");
 		break;
 		}
-	case 104: { // move la,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_la();
-		m_y.write_dword(r + o, s);
+	case 104: { // move x0,y:(r+[o])
+		unhandled("move x0,y:(r+[o])");
 		break;
 		}
-	case 105: { // move lc,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = exv;
-		u32 s = get_lc();
-		m_y.write_dword(r + o, s);
+	case 105: { // move x1,y:(r+[o])
+		unhandled("move x1,y:(r+[o])");
 		break;
 		}
-	case 106: { // move x:(r+[o]),x0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_x0(m_x.read_dword(r + o));
+	case 106: { // move y0,y:(r+[o])
+		unhandled("move y0,y:(r+[o])");
 		break;
 		}
-	case 107: { // move x:(r+[o]),x1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_x1(m_x.read_dword(r + o));
+	case 107: { // move y1,y:(r+[o])
+		unhandled("move y1,y:(r+[o])");
 		break;
 		}
-	case 108: { // move x:(r+[o]),y0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_y0(m_x.read_dword(r + o));
+	case 108: { // move a0,y:(r+[o])
+		unhandled("move a0,y:(r+[o])");
 		break;
 		}
-	case 109: { // move x:(r+[o]),y1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_y1(m_x.read_dword(r + o));
+	case 109: { // move b0,y:(r+[o])
+		unhandled("move b0,y:(r+[o])");
 		break;
 		}
-	case 110: { // move x:(r+[o]),a0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_a0(m_x.read_dword(r + o));
+	case 110: { // move a2,y:(r+[o])
+		unhandled("move a2,y:(r+[o])");
 		break;
 		}
-	case 111: { // move x:(r+[o]),b0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_b0(m_x.read_dword(r + o));
+	case 111: { // move b2,y:(r+[o])
+		unhandled("move b2,y:(r+[o])");
 		break;
 		}
-	case 112: { // move x:(r+[o]),a2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_a2(m_x.read_dword(r + o));
+	case 112: { // move a1,y:(r+[o])
+		unhandled("move a1,y:(r+[o])");
 		break;
 		}
-	case 113: { // move x:(r+[o]),b2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_b2(m_x.read_dword(r + o));
+	case 113: { // move b1,y:(r+[o])
+		unhandled("move b1,y:(r+[o])");
 		break;
 		}
-	case 114: { // move x:(r+[o]),a1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_a1(m_x.read_dword(r + o));
+	case 114: { // move a,y:(r+[o])
+		unhandled("move a,y:(r+[o])");
 		break;
 		}
-	case 115: { // move x:(r+[o]),b1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_b1(m_x.read_dword(r + o));
+	case 115: { // move b,y:(r+[o])
+		unhandled("move b,y:(r+[o])");
 		break;
 		}
-	case 116: { // move x:(r+[o]),a
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_ah(m_x.read_dword(r + o));
+	case 116: { // move r,y:(r+[o])
+		unhandled("move r,y:(r+[o])");
 		break;
 		}
-	case 117: { // move x:(r+[o]),b
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_bh(m_x.read_dword(r + o));
+	case 117: { // move n,y:(r+[o])
+		unhandled("move n,y:(r+[o])");
 		break;
 		}
-	case 118: { // move y:(r+[o]),x0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_x0(m_y.read_dword(r + o));
+	case 118: { // move m,y:(r+[o])
+		unhandled("move m,y:(r+[o])");
 		break;
 		}
-	case 119: { // move y:(r+[o]),x1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_x1(m_y.read_dword(r + o));
+	case 119: { // move ep,y:(r+[o])
+		unhandled("move ep,y:(r+[o])");
 		break;
 		}
-	case 120: { // move y:(r+[o]),y0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_y0(m_y.read_dword(r + o));
+	case 120: { // move vba,y:(r+[o])
+		unhandled("move vba,y:(r+[o])");
 		break;
 		}
-	case 121: { // move y:(r+[o]),y1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_y1(m_y.read_dword(r + o));
+	case 121: { // move sc,y:(r+[o])
+		unhandled("move sc,y:(r+[o])");
 		break;
 		}
-	case 122: { // move y:(r+[o]),a0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_a0(m_y.read_dword(r + o));
+	case 122: { // move sz,y:(r+[o])
+		unhandled("move sz,y:(r+[o])");
 		break;
 		}
-	case 123: { // move y:(r+[o]),b0
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_b0(m_y.read_dword(r + o));
+	case 123: { // move sr,y:(r+[o])
+		unhandled("move sr,y:(r+[o])");
 		break;
 		}
-	case 124: { // move y:(r+[o]),a2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_a2(m_y.read_dword(r + o));
+	case 124: { // move omr,y:(r+[o])
+		unhandled("move omr,y:(r+[o])");
 		break;
 		}
-	case 125: { // move y:(r+[o]),b2
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_b2(m_y.read_dword(r + o));
+	case 125: { // move sp,y:(r+[o])
+		unhandled("move sp,y:(r+[o])");
 		break;
 		}
-	case 126: { // move y:(r+[o]),a1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_a1(m_y.read_dword(r + o));
+	case 126: { // move ssh,y:(r+[o])
+		unhandled("move ssh,y:(r+[o])");
 		break;
 		}
-	case 127: { // move y:(r+[o]),b1
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_b1(m_y.read_dword(r + o));
+	case 127: { // move ssl,y:(r+[o])
+		unhandled("move ssl,y:(r+[o])");
 		break;
 		}
-	case 128: { // move y:(r+[o]),a
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_ah(m_y.read_dword(r + o));
+	case 128: { // move la,y:(r+[o])
+		unhandled("move la,y:(r+[o])");
 		break;
 		}
-	case 129: { // move y:(r+[o]),b
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		set_bh(m_y.read_dword(r + o));
+	case 129: { // move lc,y:(r+[o])
+		unhandled("move lc,y:(r+[o])");
 		break;
 		}
-	case 130: { // move x0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_x0();
-		m_x.write_dword(r + o, s);
+	case 130: { // move y:(r+[o]),x0
+		unhandled("move y:(r+[o]),x0");
 		break;
 		}
-	case 131: { // move x1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_x1();
-		m_x.write_dword(r + o, s);
+	case 131: { // move y:(r+[o]),x1
+		unhandled("move y:(r+[o]),x1");
 		break;
 		}
-	case 132: { // move y0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_y0();
-		m_x.write_dword(r + o, s);
+	case 132: { // move y:(r+[o]),y0
+		unhandled("move y:(r+[o]),y0");
 		break;
 		}
-	case 133: { // move y1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_y1();
-		m_x.write_dword(r + o, s);
+	case 133: { // move y:(r+[o]),y1
+		unhandled("move y:(r+[o]),y1");
 		break;
 		}
-	case 134: { // move a0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_a0();
-		m_x.write_dword(r + o, s);
+	case 134: { // move y:(r+[o]),a0
+		unhandled("move y:(r+[o]),a0");
 		break;
 		}
-	case 135: { // move b0,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_b0();
-		m_x.write_dword(r + o, s);
+	case 135: { // move y:(r+[o]),b0
+		unhandled("move y:(r+[o]),b0");
 		break;
 		}
-	case 136: { // move a2,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_a2();
-		m_x.write_dword(r + o, s);
+	case 136: { // move y:(r+[o]),a2
+		unhandled("move y:(r+[o]),a2");
 		break;
 		}
-	case 137: { // move b2,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_b2();
-		m_x.write_dword(r + o, s);
+	case 137: { // move y:(r+[o]),b2
+		unhandled("move y:(r+[o]),b2");
 		break;
 		}
-	case 138: { // move a1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_a1();
-		m_x.write_dword(r + o, s);
+	case 138: { // move y:(r+[o]),a1
+		unhandled("move y:(r+[o]),a1");
 		break;
 		}
-	case 139: { // move b1,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_b1();
-		m_x.write_dword(r + o, s);
+	case 139: { // move y:(r+[o]),b1
+		unhandled("move y:(r+[o]),b1");
 		break;
 		}
-	case 140: { // move a,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s_h = get_ah();
-		m_x.write_dword(r + o, s_h);
+	case 140: { // move y:(r+[o]),a
+		unhandled("move y:(r+[o]),a");
 		break;
 		}
-	case 141: { // move b,x:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s_h = get_bh();
-		m_x.write_dword(r + o, s_h);
+	case 141: { // move y:(r+[o]),b
+		unhandled("move y:(r+[o]),b");
 		break;
 		}
 	case 142: { // move x0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_x0();
-		m_y.write_dword(r + o, s);
+		unhandled("move x0,y:(r+[o])");
 		break;
 		}
 	case 143: { // move x1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_x1();
-		m_y.write_dword(r + o, s);
+		unhandled("move x1,y:(r+[o])");
 		break;
 		}
 	case 144: { // move y0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_y0();
-		m_y.write_dword(r + o, s);
+		unhandled("move y0,y:(r+[o])");
 		break;
 		}
 	case 145: { // move y1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_y1();
-		m_y.write_dword(r + o, s);
+		unhandled("move y1,y:(r+[o])");
 		break;
 		}
 	case 146: { // move a0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_a0();
-		m_y.write_dword(r + o, s);
+		unhandled("move a0,y:(r+[o])");
 		break;
 		}
 	case 147: { // move b0,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_b0();
-		m_y.write_dword(r + o, s);
+		unhandled("move b0,y:(r+[o])");
 		break;
 		}
 	case 148: { // move a2,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_a2();
-		m_y.write_dword(r + o, s);
+		unhandled("move a2,y:(r+[o])");
 		break;
 		}
 	case 149: { // move b2,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_b2();
-		m_y.write_dword(r + o, s);
+		unhandled("move b2,y:(r+[o])");
 		break;
 		}
 	case 150: { // move a1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_a1();
-		m_y.write_dword(r + o, s);
+		unhandled("move a1,y:(r+[o])");
 		break;
 		}
 	case 151: { // move b1,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s = get_b1();
-		m_y.write_dword(r + o, s);
+		unhandled("move b1,y:(r+[o])");
 		break;
 		}
 	case 152: { // move a,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s_h = get_ah();
-		m_y.write_dword(r + o, s_h);
+		unhandled("move a,y:(r+[o])");
 		break;
 		}
 	case 153: { // move b,y:(r+[o])
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 16, 15, 14, 13, 12, 11, 6), 7);
-		u32 s_h = get_bh();
-		m_y.write_dword(r + o, s_h);
+		unhandled("move b,y:(r+[o])");
 		break;
 		}
 	case 154: { // add #[i],a
-		u64 d = get_a();
-		u32 i = BIT(opcode, 8, 6);
-		set_a(do_add56(u64(i) << 24, d));
+		unhandled("add #[i],a");
 		break;
 		}
 	case 155: { // add #[i],b
-		u64 d = get_b();
-		u32 i = BIT(opcode, 8, 6);
-		set_b(do_add56(u64(i) << 24, d));
+		unhandled("add #[i],b");
 		break;
 		}
 	case 156: { // add #[i],a
-		u64 d = get_a();
-		u32 i = exv;
-		set_a(do_add56(util::sext(u64(i) << 24, 48), d));
+		unhandled("add #[i],a");
 		break;
 		}
 	case 157: { // add #[i],b
-		u64 d = get_b();
-		u32 i = exv;
-		set_b(do_add56(util::sext(u64(i) << 24, 48), d));
+		unhandled("add #[i],b");
 		break;
 		}
 	case 158: { // and #[i],a
 		u32 d_1 = get_a1();
 		u32 i = BIT(opcode, 8, 6);
-		u32 r = d_1 & i;
+		u64 r = d_1 & i;
 		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
 		if(!r) {
 		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
+		} else if(BIT(m_ccr, 23)) {
 		m_ccr = m_ccr | CCR_N;
 		}
 		set_a1(r);
@@ -28137,11 +26821,11 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 159: { // and #[i],b
 		u32 d_1 = get_b1();
 		u32 i = BIT(opcode, 8, 6);
-		u32 r = d_1 & i;
+		u64 r = d_1 & i;
 		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
 		if(!r) {
 		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
+		} else if(BIT(m_ccr, 23)) {
 		m_ccr = m_ccr | CCR_N;
 		}
 		set_b1(r);
@@ -28150,11 +26834,11 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 160: { // and #[i],a
 		u32 d_1 = get_a1();
 		u32 i = exv;
-		u32 r = d_1 & i;
+		u64 r = d_1 & i;
 		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
 		if(!r) {
 		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
+		} else if(BIT(m_ccr, 23)) {
 		m_ccr = m_ccr | CCR_N;
 		}
 		set_a1(r);
@@ -28163,11 +26847,11 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 	case 161: { // and #[i],b
 		u32 d_1 = get_b1();
 		u32 i = exv;
-		u32 r = d_1 & i;
+		u64 r = d_1 & i;
 		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
 		if(!r) {
 		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
+		} else if(BIT(m_ccr, 23)) {
 		m_ccr = m_ccr | CCR_N;
 		}
 		set_b1(r);
@@ -28198,339 +26882,247 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 166: { // asl #[i],a,a
-		u32 i = BIT(opcode, 1, 6);
-		u64 s2 = get_a();
-		set_a(do_asl56(i, s2));
+		unhandled("asl #[i],a,a");
 		break;
 		}
 	case 167: { // asl #[i],a,b
-		u32 i = BIT(opcode, 1, 6);
-		u64 s2 = get_a();
-		set_b(do_asl56(i, s2));
+		unhandled("asl #[i],a,b");
 		break;
 		}
 	case 168: { // asl #[i],b,a
-		u32 i = BIT(opcode, 1, 6);
-		u64 s2 = get_b();
-		set_a(do_asl56(i, s2));
+		unhandled("asl #[i],b,a");
 		break;
 		}
 	case 169: { // asl #[i],b,b
-		u32 i = BIT(opcode, 1, 6);
-		u64 s2 = get_b();
-		set_b(do_asl56(i, s2));
+		unhandled("asl #[i],b,b");
 		break;
 		}
 	case 170: { // asl a1,a,a
-		u32 s1 = get_a1();
-		u64 s2 = get_a();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl a1,a,a");
 		break;
 		}
 	case 171: { // asl a1,a,b
-		u32 s1 = get_a1();
-		u64 s2 = get_a();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl a1,a,b");
 		break;
 		}
 	case 172: { // asl b1,a,a
-		u32 s1 = get_b1();
-		u64 s2 = get_a();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl b1,a,a");
 		break;
 		}
 	case 173: { // asl b1,a,b
-		u32 s1 = get_b1();
-		u64 s2 = get_a();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl b1,a,b");
 		break;
 		}
 	case 174: { // asl x0,a,a
-		u32 s1 = get_x0();
-		u64 s2 = get_a();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl x0,a,a");
 		break;
 		}
 	case 175: { // asl x0,a,b
-		u32 s1 = get_x0();
-		u64 s2 = get_a();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl x0,a,b");
 		break;
 		}
 	case 176: { // asl y0,a,a
-		u32 s1 = get_y0();
-		u64 s2 = get_a();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl y0,a,a");
 		break;
 		}
 	case 177: { // asl y0,a,b
-		u32 s1 = get_y0();
-		u64 s2 = get_a();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl y0,a,b");
 		break;
 		}
 	case 178: { // asl x1,a,a
-		u32 s1 = get_x1();
-		u64 s2 = get_a();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl x1,a,a");
 		break;
 		}
 	case 179: { // asl x1,a,b
-		u32 s1 = get_x1();
-		u64 s2 = get_a();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl x1,a,b");
 		break;
 		}
 	case 180: { // asl y1,a,a
-		u32 s1 = get_y1();
-		u64 s2 = get_a();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl y1,a,a");
 		break;
 		}
 	case 181: { // asl y1,a,b
-		u32 s1 = get_y1();
-		u64 s2 = get_a();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl y1,a,b");
 		break;
 		}
 	case 182: { // asl a1,b,a
-		u32 s1 = get_a1();
-		u64 s2 = get_b();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl a1,b,a");
 		break;
 		}
 	case 183: { // asl a1,b,b
-		u32 s1 = get_a1();
-		u64 s2 = get_b();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl a1,b,b");
 		break;
 		}
 	case 184: { // asl b1,b,a
-		u32 s1 = get_b1();
-		u64 s2 = get_b();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl b1,b,a");
 		break;
 		}
 	case 185: { // asl b1,b,b
-		u32 s1 = get_b1();
-		u64 s2 = get_b();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl b1,b,b");
 		break;
 		}
 	case 186: { // asl x0,b,a
-		u32 s1 = get_x0();
-		u64 s2 = get_b();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl x0,b,a");
 		break;
 		}
 	case 187: { // asl x0,b,b
-		u32 s1 = get_x0();
-		u64 s2 = get_b();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl x0,b,b");
 		break;
 		}
 	case 188: { // asl y0,b,a
-		u32 s1 = get_y0();
-		u64 s2 = get_b();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl y0,b,a");
 		break;
 		}
 	case 189: { // asl y0,b,b
-		u32 s1 = get_y0();
-		u64 s2 = get_b();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl y0,b,b");
 		break;
 		}
 	case 190: { // asl x1,b,a
-		u32 s1 = get_x1();
-		u64 s2 = get_b();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl x1,b,a");
 		break;
 		}
 	case 191: { // asl x1,b,b
-		u32 s1 = get_x1();
-		u64 s2 = get_b();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl x1,b,b");
 		break;
 		}
 	case 192: { // asl y1,b,a
-		u32 s1 = get_y1();
-		u64 s2 = get_b();
-		set_a(do_asl56(s1, s2));
+		unhandled("asl y1,b,a");
 		break;
 		}
 	case 193: { // asl y1,b,b
-		u32 s1 = get_y1();
-		u64 s2 = get_b();
-		set_b(do_asl56(s1, s2));
+		unhandled("asl y1,b,b");
 		break;
 		}
 	case 194: { // asr #[i],a,a
-		u32 i = BIT(opcode, 1, 6);
 		u64 s2 = get_a();
-		set_a(do_asr56(i, s2));
+		u32 i = BIT(opcode, 1, 6);
+		u64 s = s2;
+		u8 n = i;
+		m_ccr = (m_ccr & ~(CCR_V|CCR_C)) | (n != 0 && BIT(s, n) ? CCR_C : 0);
+		set_a(util::sext(s, BIT(m_emr, 1) ? 40 : 56) >> n);
 		break;
 		}
 	case 195: { // asr #[i],a,b
-		u32 i = BIT(opcode, 1, 6);
 		u64 s2 = get_a();
-		set_b(do_asr56(i, s2));
+		u32 i = BIT(opcode, 1, 6);
+		u64 s = s2;
+		u8 n = i;
+		m_ccr = (m_ccr & ~(CCR_V|CCR_C)) | (n != 0 && BIT(s, n) ? CCR_C : 0);
+		set_b(util::sext(s, BIT(m_emr, 1) ? 40 : 56) >> n);
 		break;
 		}
 	case 196: { // asr #[i],b,a
-		u32 i = BIT(opcode, 1, 6);
 		u64 s2 = get_b();
-		set_a(do_asr56(i, s2));
+		u32 i = BIT(opcode, 1, 6);
+		u64 s = s2;
+		u8 n = i;
+		m_ccr = (m_ccr & ~(CCR_V|CCR_C)) | (n != 0 && BIT(s, n) ? CCR_C : 0);
+		set_a(util::sext(s, BIT(m_emr, 1) ? 40 : 56) >> n);
 		break;
 		}
 	case 197: { // asr #[i],b,b
-		u32 i = BIT(opcode, 1, 6);
 		u64 s2 = get_b();
-		set_b(do_asr56(i, s2));
+		u32 i = BIT(opcode, 1, 6);
+		u64 s = s2;
+		u8 n = i;
+		m_ccr = (m_ccr & ~(CCR_V|CCR_C)) | (n != 0 && BIT(s, n) ? CCR_C : 0);
+		set_b(util::sext(s, BIT(m_emr, 1) ? 40 : 56) >> n);
 		break;
 		}
 	case 198: { // asr a1,a,a
-		u32 s1 = get_a1();
-		u64 s2 = get_a();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr a1,a,a");
 		break;
 		}
 	case 199: { // asr a1,a,b
-		u32 s1 = get_a1();
-		u64 s2 = get_a();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr a1,a,b");
 		break;
 		}
 	case 200: { // asr b1,a,a
-		u32 s1 = get_b1();
-		u64 s2 = get_a();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr b1,a,a");
 		break;
 		}
 	case 201: { // asr b1,a,b
-		u32 s1 = get_b1();
-		u64 s2 = get_a();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr b1,a,b");
 		break;
 		}
 	case 202: { // asr x0,a,a
-		u32 s1 = get_x0();
-		u64 s2 = get_a();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr x0,a,a");
 		break;
 		}
 	case 203: { // asr x0,a,b
-		u32 s1 = get_x0();
-		u64 s2 = get_a();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr x0,a,b");
 		break;
 		}
 	case 204: { // asr y0,a,a
-		u32 s1 = get_y0();
-		u64 s2 = get_a();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr y0,a,a");
 		break;
 		}
 	case 205: { // asr y0,a,b
-		u32 s1 = get_y0();
-		u64 s2 = get_a();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr y0,a,b");
 		break;
 		}
 	case 206: { // asr x1,a,a
-		u32 s1 = get_x1();
-		u64 s2 = get_a();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr x1,a,a");
 		break;
 		}
 	case 207: { // asr x1,a,b
-		u32 s1 = get_x1();
-		u64 s2 = get_a();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr x1,a,b");
 		break;
 		}
 	case 208: { // asr y1,a,a
-		u32 s1 = get_y1();
-		u64 s2 = get_a();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr y1,a,a");
 		break;
 		}
 	case 209: { // asr y1,a,b
-		u32 s1 = get_y1();
-		u64 s2 = get_a();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr y1,a,b");
 		break;
 		}
 	case 210: { // asr a1,b,a
-		u32 s1 = get_a1();
-		u64 s2 = get_b();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr a1,b,a");
 		break;
 		}
 	case 211: { // asr a1,b,b
-		u32 s1 = get_a1();
-		u64 s2 = get_b();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr a1,b,b");
 		break;
 		}
 	case 212: { // asr b1,b,a
-		u32 s1 = get_b1();
-		u64 s2 = get_b();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr b1,b,a");
 		break;
 		}
 	case 213: { // asr b1,b,b
-		u32 s1 = get_b1();
-		u64 s2 = get_b();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr b1,b,b");
 		break;
 		}
 	case 214: { // asr x0,b,a
-		u32 s1 = get_x0();
-		u64 s2 = get_b();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr x0,b,a");
 		break;
 		}
 	case 215: { // asr x0,b,b
-		u32 s1 = get_x0();
-		u64 s2 = get_b();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr x0,b,b");
 		break;
 		}
 	case 216: { // asr y0,b,a
-		u32 s1 = get_y0();
-		u64 s2 = get_b();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr y0,b,a");
 		break;
 		}
 	case 217: { // asr y0,b,b
-		u32 s1 = get_y0();
-		u64 s2 = get_b();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr y0,b,b");
 		break;
 		}
 	case 218: { // asr x1,b,a
-		u32 s1 = get_x1();
-		u64 s2 = get_b();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr x1,b,a");
 		break;
 		}
 	case 219: { // asr x1,b,b
-		u32 s1 = get_x1();
-		u64 s2 = get_b();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr x1,b,b");
 		break;
 		}
 	case 220: { // asr y1,b,a
-		u32 s1 = get_y1();
-		u64 s2 = get_b();
-		set_a(do_asr56(s1, s2));
+		unhandled("asr y1,b,a");
 		break;
 		}
 	case 221: { // asr y1,b,b
-		u32 s1 = get_y1();
-		u64 s2 = get_b();
-		set_b(do_asr56(s1, s2));
+		unhandled("asr y1,b,b");
 		break;
 		}
 	case 222: { // bcc [x]
@@ -28918,651 +27510,195 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 270: { // bchg #[n],x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],x:(r)-n");
 		break;
 		}
 	case 271: { // bchg #[n],y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],y:(r)-n");
 		break;
 		}
 	case 272: { // bchg #[n],x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],x:(r)+n");
 		break;
 		}
 	case 273: { // bchg #[n],y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],y:(r)+n");
 		break;
 		}
 	case 274: { // bchg #[n],x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],x:(r)-");
 		break;
 		}
 	case 275: { // bchg #[n],y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],y:(r)-");
 		break;
 		}
 	case 276: { // bchg #[n],x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],x:(r)+");
 		break;
 		}
 	case 277: { // bchg #[n],y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],y:(r)+");
 		break;
 		}
 	case 278: { // bchg #[n],x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],x:(r)");
 		break;
 		}
 	case 279: { // bchg #[n],y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],y:(r)");
 		break;
 		}
 	case 280: { // bchg #[n],x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],x:(r+n)");
 		break;
 		}
 	case 281: { // bchg #[n],y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],y:(r+n)");
 		break;
 		}
 	case 282: { // bchg #[n],x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],x:-(r)");
 		break;
 		}
 	case 283: { // bchg #[n],y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(ea);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(ea, t ^ m);
+		unhandled("bchg #[n],y:-(r)");
 		break;
 		}
 	case 284: { // bchg #[n],x:[abs]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(abs);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(abs, t ^ m);
+		unhandled("bchg #[n],x:[abs]");
 		break;
 		}
 	case 285: { // bchg #[n],y:[abs]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(abs);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(abs, t ^ m);
+		unhandled("bchg #[n],y:[abs]");
 		break;
 		}
 	case 286: { // bchg #[n],x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(aa);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(aa, t ^ m);
+		unhandled("bchg #[n],x:[aa]");
 		break;
 		}
 	case 287: { // bchg #[n],y:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(aa);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(aa, t ^ m);
+		unhandled("bchg #[n],y:[aa]");
 		break;
 		}
 	case 288: { // bchg #[n],x:[pp]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(pp);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(pp, t ^ m);
+		unhandled("bchg #[n],x:[pp]");
 		break;
 		}
 	case 289: { // bchg #[n],y:[pp]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(pp);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(pp, t ^ m);
+		unhandled("bchg #[n],y:[pp]");
 		break;
 		}
 	case 290: { // bchg #[n],x:[qq]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(qq);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_x.write_dword(qq, t ^ m);
+		unhandled("bchg #[n],x:[qq]");
 		break;
 		}
 	case 291: { // bchg #[n],y:[qq]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(qq);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		m_y.write_dword(qq, t ^ m);
+		unhandled("bchg #[n],y:[qq]");
 		break;
 		}
 	case 292: { // bchg #[n],x0
-		u32 d = get_x0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_x0(t ^ m);
+		unhandled("bchg #[n],x0");
 		break;
 		}
 	case 293: { // bchg #[n],x1
-		u32 d = get_x1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_x1(t ^ m);
+		unhandled("bchg #[n],x1");
 		break;
 		}
 	case 294: { // bchg #[n],y0
-		u32 d = get_y0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_y0(t ^ m);
+		unhandled("bchg #[n],y0");
 		break;
 		}
 	case 295: { // bchg #[n],y1
-		u32 d = get_y1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_y1(t ^ m);
+		unhandled("bchg #[n],y1");
 		break;
 		}
 	case 296: { // bchg #[n],a0
-		u32 d = get_a0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_a0(t ^ m);
+		unhandled("bchg #[n],a0");
 		break;
 		}
 	case 297: { // bchg #[n],b0
-		u32 d = get_b0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_b0(t ^ m);
+		unhandled("bchg #[n],b0");
 		break;
 		}
 	case 298: { // bchg #[n],a2
-		u32 d = get_a2();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_a2(t ^ m);
+		unhandled("bchg #[n],a2");
 		break;
 		}
 	case 299: { // bchg #[n],b2
-		u32 d = get_b2();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_b2(t ^ m);
+		unhandled("bchg #[n],b2");
 		break;
 		}
 	case 300: { // bchg #[n],a1
-		u32 d = get_a1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_a1(t ^ m);
+		unhandled("bchg #[n],a1");
 		break;
 		}
 	case 301: { // bchg #[n],b1
-		u32 d = get_b1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_b1(t ^ m);
+		unhandled("bchg #[n],b1");
 		break;
 		}
 	case 302: { // bchg #[n],a
-		u32 d_h = get_ah();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d_h;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_ah(t ^ m);
+		unhandled("bchg #[n],a");
 		break;
 		}
 	case 303: { // bchg #[n],b
-		u32 d_h = get_bh();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d_h;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_bh(t ^ m);
+		unhandled("bchg #[n],b");
 		break;
 		}
 	case 304: { // bchg #[n],r
-		u32 d = get_r(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_r(BIT(opcode, 8, 6) & 7, t ^ m);
+		unhandled("bchg #[n],r");
 		break;
 		}
 	case 305: { // bchg #[n],n
-		u32 d = get_n(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_n(BIT(opcode, 8, 6) & 7, t ^ m);
+		unhandled("bchg #[n],n");
 		break;
 		}
 	case 306: { // bchg #[n],m
-		u32 d = get_m(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_m(BIT(opcode, 8, 6) & 7, t ^ m);
+		unhandled("bchg #[n],m");
 		break;
 		}
 	case 307: { // bchg #[n],ep
-		u32 d = get_ep();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_ep(t ^ m);
+		unhandled("bchg #[n],ep");
 		break;
 		}
 	case 308: { // bchg #[n],vba
-		u32 d = get_vba();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_vba(t ^ m);
+		unhandled("bchg #[n],vba");
 		break;
 		}
 	case 309: { // bchg #[n],sc
-		u32 d = get_sc();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_sc(t ^ m);
+		unhandled("bchg #[n],sc");
 		break;
 		}
 	case 310: { // bchg #[n],sz
-		u32 d = get_sz();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_sz(t ^ m);
+		unhandled("bchg #[n],sz");
 		break;
 		}
 	case 311: { // bchg #[n],sr
-		u32 d = get_sr();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_sr(t ^ m);
+		unhandled("bchg #[n],sr");
 		break;
 		}
 	case 312: { // bchg #[n],omr
-		u32 d = get_omr();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_omr(t ^ m);
+		unhandled("bchg #[n],omr");
 		break;
 		}
 	case 313: { // bchg #[n],sp
-		u32 d = get_sp();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_sp(t ^ m);
+		unhandled("bchg #[n],sp");
 		break;
 		}
 	case 314: { // bchg #[n],ssh
-		u32 d = get_ssh();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_ssh(t ^ m);
+		unhandled("bchg #[n],ssh");
 		break;
 		}
 	case 315: { // bchg #[n],ssl
-		u32 d = get_ssl();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_ssl(t ^ m);
+		unhandled("bchg #[n],ssl");
 		break;
 		}
 	case 316: { // bchg #[n],la
-		u32 d = get_la();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_la(t ^ m);
+		unhandled("bchg #[n],la");
 		break;
 		}
 	case 317: { // bchg #[n],lc
-		u32 d = get_lc();
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		}
-		set_lc(t ^ m);
+		unhandled("bchg #[n],lc");
 		break;
 		}
 	case 318: { // bclr #[n],x:(r)-n
@@ -29798,29 +27934,11 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 334: { // bclr #[n],x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(aa);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		m_x.write_dword(aa, t & ~m);
-		} else {
-		m_ccr &= ~CCR_C;
-		}
+		unhandled("bclr #[n],x:[aa]");
 		break;
 		}
 	case 335: { // bclr #[n],y:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(aa);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		m_y.write_dword(aa, t & ~m);
-		} else {
-		m_ccr &= ~CCR_C;
-		}
+		unhandled("bclr #[n],y:[aa]");
 		break;
 		}
 	case 336: { // bclr #[n],x:[pp]
@@ -29882,10 +28000,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_x0(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_x0(t & ~m);
 		break;
 		}
 	case 341: { // bclr #[n],x1
@@ -29895,10 +28013,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_x1(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_x1(t & ~m);
 		break;
 		}
 	case 342: { // bclr #[n],y0
@@ -29908,10 +28026,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_y0(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_y0(t & ~m);
 		break;
 		}
 	case 343: { // bclr #[n],y1
@@ -29921,10 +28039,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_y1(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_y1(t & ~m);
 		break;
 		}
 	case 344: { // bclr #[n],a0
@@ -29934,10 +28052,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_a0(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_a0(t & ~m);
 		break;
 		}
 	case 345: { // bclr #[n],b0
@@ -29947,10 +28065,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_b0(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_b0(t & ~m);
 		break;
 		}
 	case 346: { // bclr #[n],a2
@@ -29960,10 +28078,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_a2(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_a2(t & ~m);
 		break;
 		}
 	case 347: { // bclr #[n],b2
@@ -29973,10 +28091,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_b2(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_b2(t & ~m);
 		break;
 		}
 	case 348: { // bclr #[n],a1
@@ -29986,10 +28104,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_a1(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_a1(t & ~m);
 		break;
 		}
 	case 349: { // bclr #[n],b1
@@ -29999,36 +28117,36 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_b1(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_b1(t & ~m);
 		break;
 		}
 	case 350: { // bclr #[n],a
-		u32 d_h = get_ah();
+		u64 d = get_a();
 		u32 n = BIT(opcode, 0, 5);
-		u32 t = d_h;
+		u32 t = d;
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_a(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_ah(t & ~m);
 		break;
 		}
 	case 351: { // bclr #[n],b
-		u32 d_h = get_bh();
+		u64 d = get_b();
 		u32 n = BIT(opcode, 0, 5);
-		u32 t = d_h;
+		u32 t = d;
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_b(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_bh(t & ~m);
 		break;
 		}
 	case 352: { // bclr #[n],r
@@ -30038,10 +28156,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_r(BIT(opcode, 8, 6) & 7, t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_r(BIT(opcode, 8, 6) & 7, t & ~m);
 		break;
 		}
 	case 353: { // bclr #[n],n
@@ -30051,10 +28169,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_n(BIT(opcode, 8, 6) & 7, t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_n(BIT(opcode, 8, 6) & 7, t & ~m);
 		break;
 		}
 	case 354: { // bclr #[n],m
@@ -30064,10 +28182,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_m(BIT(opcode, 8, 6) & 7, t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_m(BIT(opcode, 8, 6) & 7, t & ~m);
 		break;
 		}
 	case 355: { // bclr #[n],ep
@@ -30077,10 +28195,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_ep(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_ep(t & ~m);
 		break;
 		}
 	case 356: { // bclr #[n],vba
@@ -30090,10 +28208,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_vba(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_vba(t & ~m);
 		break;
 		}
 	case 357: { // bclr #[n],sc
@@ -30103,10 +28221,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_sc(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_sc(t & ~m);
 		break;
 		}
 	case 358: { // bclr #[n],sz
@@ -30116,10 +28234,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_sz(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_sz(t & ~m);
 		break;
 		}
 	case 359: { // bclr #[n],sr
@@ -30129,10 +28247,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_sr(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_sr(t & ~m);
 		break;
 		}
 	case 360: { // bclr #[n],omr
@@ -30142,10 +28260,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_omr(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_omr(t & ~m);
 		break;
 		}
 	case 361: { // bclr #[n],sp
@@ -30155,10 +28273,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_sp(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_sp(t & ~m);
 		break;
 		}
 	case 362: { // bclr #[n],ssh
@@ -30168,10 +28286,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_ssh(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_ssh(t & ~m);
 		break;
 		}
 	case 363: { // bclr #[n],ssl
@@ -30181,10 +28299,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_ssl(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_ssl(t & ~m);
 		break;
 		}
 	case 364: { // bclr #[n],la
@@ -30194,10 +28312,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_la(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_la(t & ~m);
 		break;
 		}
 	case 365: { // bclr #[n],lc
@@ -30207,10 +28325,10 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
+		set_lc(t & ~m);
 		} else {
 		m_ccr &= ~CCR_C;
 		}
-		set_lc(t & ~m);
 		break;
 		}
 	case 366: { // bra [x]
@@ -30229,203 +28347,91 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 369: { // brclr #[n],x:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:(r)-n,[x]");
 		break;
 		}
 	case 370: { // brclr #[n],y:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:(r)-n,[x]");
 		break;
 		}
 	case 371: { // brclr #[n],x:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:(r)+n,[x]");
 		break;
 		}
 	case 372: { // brclr #[n],y:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:(r)+n,[x]");
 		break;
 		}
 	case 373: { // brclr #[n],x:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:(r)-,[x]");
 		break;
 		}
 	case 374: { // brclr #[n],y:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:(r)-,[x]");
 		break;
 		}
 	case 375: { // brclr #[n],x:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:(r)+,[x]");
 		break;
 		}
 	case 376: { // brclr #[n],y:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:(r)+,[x]");
 		break;
 		}
 	case 377: { // brclr #[n],x:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:(r),[x]");
 		break;
 		}
 	case 378: { // brclr #[n],y:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:(r),[x]");
 		break;
 		}
 	case 379: { // brclr #[n],x:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:(r+n),[x]");
 		break;
 		}
 	case 380: { // brclr #[n],y:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:(r+n),[x]");
 		break;
 		}
 	case 381: { // brclr #[n],x:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:-(r),[x]");
 		break;
 		}
 	case 382: { // brclr #[n],y:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:-(r),[x]");
 		break;
 		}
 	case 383: { // brclr #[n],x:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(abs), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:[abs],[x]");
 		break;
 		}
 	case 384: { // brclr #[n],y:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(abs), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:[abs],[x]");
 		break;
 		}
 	case 385: { // brclr #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(aa), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:[aa],[x]");
 		break;
 		}
 	case 386: { // brclr #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(aa), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:[aa],[x]");
 		break;
 		}
 	case 387: { // brclr #[n],x:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(pp), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:[pp],[x]");
 		break;
 		}
 	case 388: { // brclr #[n],y:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(pp), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:[pp],[x]");
 		break;
 		}
 	case 389: { // brclr #[n],x:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(qq), n))
-		m_npc = x;
+		unhandled("brclr #[n],x:[qq],[x]");
 		break;
 		}
 	case 390: { // brclr #[n],y:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(qq), n))
-		m_npc = x;
+		unhandled("brclr #[n],y:[qq],[x]");
 		break;
 		}
 	case 391: { // brclr #[n],x0,[x]
@@ -30637,411 +28643,155 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 417: { // brkcc
-		bool cc = test_cc();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkcc");
 		break;
 		}
 	case 418: { // brkge
-		bool cc = test_ge();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkge");
 		break;
 		}
 	case 419: { // brkne
-		bool cc = test_ne();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkne");
 		break;
 		}
 	case 420: { // brkpl
-		bool cc = test_pl();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkpl");
 		break;
 		}
 	case 421: { // brknn
-		bool cc = test_nn();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brknn");
 		break;
 		}
 	case 422: { // brkec
-		bool cc = test_ec();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkec");
 		break;
 		}
 	case 423: { // brklc
-		u32 cc = get_lc();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brklc");
 		break;
 		}
 	case 424: { // brkgt
-		bool cc = test_gt();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkgt");
 		break;
 		}
 	case 425: { // brkcs
-		bool cc = test_cs();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkcs");
 		break;
 		}
 	case 426: { // brklt
-		bool cc = test_lt();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brklt");
 		break;
 		}
 	case 427: { // brkeq
-		bool cc = test_eq();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkeq");
 		break;
 		}
 	case 428: { // brkmi
-		bool cc = test_mi();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkmi");
 		break;
 		}
 	case 429: { // brknr
-		bool cc = test_nr();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brknr");
 		break;
 		}
 	case 430: { // brkes
-		bool cc = test_es();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkes");
 		break;
 		}
 	case 431: { // brkls
-		bool cc = test_ls();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkls");
 		break;
 		}
 	case 432: { // brkle
-		bool cc = test_le();
-		if(cc) {
-		m_npc = get_la()+1;
-		m_mr = (m_mr & ~MR_LF) | ((get_ssl() >> 8) & MR_LF);
-		m_emr = (m_emr & ~EMR_FV) | ((get_ssl() >> 16) & EMR_FV);
-		dec_sp();
-		set_la(get_ssh());
-		set_lc(get_ssl());
-		dec_sp();
-		}
+		unhandled("brkle");
 		break;
 		}
 	case 433: { // brset #[n],x:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],x:(r)-n,[x]");
 		break;
 		}
 	case 434: { // brset #[n],y:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],y:(r)-n,[x]");
 		break;
 		}
 	case 435: { // brset #[n],x:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],x:(r)+n,[x]");
 		break;
 		}
 	case 436: { // brset #[n],y:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],y:(r)+n,[x]");
 		break;
 		}
 	case 437: { // brset #[n],x:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],x:(r)-,[x]");
 		break;
 		}
 	case 438: { // brset #[n],y:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],y:(r)-,[x]");
 		break;
 		}
 	case 439: { // brset #[n],x:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],x:(r)+,[x]");
 		break;
 		}
 	case 440: { // brset #[n],y:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],y:(r)+,[x]");
 		break;
 		}
 	case 441: { // brset #[n],x:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],x:(r),[x]");
 		break;
 		}
 	case 442: { // brset #[n],y:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],y:(r),[x]");
 		break;
 		}
 	case 443: { // brset #[n],x:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],x:(r+n),[x]");
 		break;
 		}
 	case 444: { // brset #[n],y:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],y:(r+n),[x]");
 		break;
 		}
 	case 445: { // brset #[n],x:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],x:-(r),[x]");
 		break;
 		}
 	case 446: { // brset #[n],y:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("brset #[n],y:-(r),[x]");
 		break;
 		}
 	case 447: { // brset #[n],x:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(abs), n))
-		m_npc = x;
+		unhandled("brset #[n],x:[abs],[x]");
 		break;
 		}
 	case 448: { // brset #[n],y:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(abs), n))
-		m_npc = x;
+		unhandled("brset #[n],y:[abs],[x]");
 		break;
 		}
 	case 449: { // brset #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(aa), n))
-		m_npc = x;
+		unhandled("brset #[n],x:[aa],[x]");
 		break;
 		}
 	case 450: { // brset #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(aa), n))
-		m_npc = x;
+		unhandled("brset #[n],y:[aa],[x]");
 		break;
 		}
 	case 451: { // brset #[n],x:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(pp), n))
-		m_npc = x;
+		unhandled("brset #[n],x:[pp],[x]");
 		break;
 		}
 	case 452: { // brset #[n],y:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(pp), n))
-		m_npc = x;
+		unhandled("brset #[n],y:[pp],[x]");
 		break;
 		}
 	case 453: { // brset #[n],x:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(qq), n))
-		m_npc = x;
+		unhandled("brset #[n],x:[qq],[x]");
 		break;
 		}
 	case 454: { // brset #[n],y:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(qq), n))
-		m_npc = x;
+		unhandled("brset #[n],y:[qq],[x]");
 		break;
 		}
 	case 455: { // brset #[n],x0,[x]
@@ -31253,819 +29003,283 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 481: { // bscc [x]
-		bool cc = test_cc();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bscc [x]");
 		break;
 		}
 	case 482: { // bsge [x]
-		bool cc = test_ge();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsge [x]");
 		break;
 		}
 	case 483: { // bsne [x]
-		bool cc = test_ne();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsne [x]");
 		break;
 		}
 	case 484: { // bspl [x]
-		bool cc = test_pl();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bspl [x]");
 		break;
 		}
 	case 485: { // bsnn [x]
-		bool cc = test_nn();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsnn [x]");
 		break;
 		}
 	case 486: { // bsec [x]
-		bool cc = test_ec();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsec [x]");
 		break;
 		}
 	case 487: { // bslc [x]
-		u32 cc = get_lc();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bslc [x]");
 		break;
 		}
 	case 488: { // bsgt [x]
-		bool cc = test_gt();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsgt [x]");
 		break;
 		}
 	case 489: { // bscs [x]
-		bool cc = test_cs();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bscs [x]");
 		break;
 		}
 	case 490: { // bslt [x]
-		bool cc = test_lt();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bslt [x]");
 		break;
 		}
 	case 491: { // bseq [x]
-		bool cc = test_eq();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bseq [x]");
 		break;
 		}
 	case 492: { // bsmi [x]
-		bool cc = test_mi();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsmi [x]");
 		break;
 		}
 	case 493: { // bsnr [x]
-		bool cc = test_nr();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsnr [x]");
 		break;
 		}
 	case 494: { // bses [x]
-		bool cc = test_es();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bses [x]");
 		break;
 		}
 	case 495: { // bsls [x]
-		bool cc = test_ls();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsls [x]");
 		break;
 		}
 	case 496: { // bsle [x]
-		bool cc = test_le();
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsle [x]");
 		break;
 		}
 	case 497: { // bscc [x]
-		bool cc = test_cc();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bscc [x]");
 		break;
 		}
 	case 498: { // bsge [x]
-		bool cc = test_ge();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsge [x]");
 		break;
 		}
 	case 499: { // bsne [x]
-		bool cc = test_ne();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsne [x]");
 		break;
 		}
 	case 500: { // bspl [x]
-		bool cc = test_pl();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bspl [x]");
 		break;
 		}
 	case 501: { // bsnn [x]
-		bool cc = test_nn();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsnn [x]");
 		break;
 		}
 	case 502: { // bsec [x]
-		bool cc = test_ec();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsec [x]");
 		break;
 		}
 	case 503: { // bslc [x]
-		u32 cc = get_lc();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bslc [x]");
 		break;
 		}
 	case 504: { // bsgt [x]
-		bool cc = test_gt();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsgt [x]");
 		break;
 		}
 	case 505: { // bscs [x]
-		bool cc = test_cs();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bscs [x]");
 		break;
 		}
 	case 506: { // bslt [x]
-		bool cc = test_lt();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bslt [x]");
 		break;
 		}
 	case 507: { // bseq [x]
-		bool cc = test_eq();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bseq [x]");
 		break;
 		}
 	case 508: { // bsmi [x]
-		bool cc = test_mi();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsmi [x]");
 		break;
 		}
 	case 509: { // bsnr [x]
-		bool cc = test_nr();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsnr [x]");
 		break;
 		}
 	case 510: { // bses [x]
-		bool cc = test_es();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bses [x]");
 		break;
 		}
 	case 511: { // bsls [x]
-		bool cc = test_ls();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsls [x]");
 		break;
 		}
 	case 512: { // bsle [x]
-		bool cc = test_le();
-		u32 x = (m_pc + util::sext(bitswap<9>(opcode, 9, 8, 7, 6, 4, 3, 2, 1, 0), 9)) & 0xffffff;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsle [x]");
 		break;
 		}
 	case 513: { // bscc r
-		bool cc = test_cc();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bscc r");
 		break;
 		}
 	case 514: { // bsge r
-		bool cc = test_ge();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsge r");
 		break;
 		}
 	case 515: { // bsne r
-		bool cc = test_ne();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsne r");
 		break;
 		}
 	case 516: { // bspl r
-		bool cc = test_pl();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bspl r");
 		break;
 		}
 	case 517: { // bsnn r
-		bool cc = test_nn();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsnn r");
 		break;
 		}
 	case 518: { // bsec r
-		bool cc = test_ec();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsec r");
 		break;
 		}
 	case 519: { // bslc r
-		u32 cc = get_lc();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bslc r");
 		break;
 		}
 	case 520: { // bsgt r
-		bool cc = test_gt();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsgt r");
 		break;
 		}
 	case 521: { // bscs r
-		bool cc = test_cs();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bscs r");
 		break;
 		}
 	case 522: { // bslt r
-		bool cc = test_lt();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bslt r");
 		break;
 		}
 	case 523: { // bseq r
-		bool cc = test_eq();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bseq r");
 		break;
 		}
 	case 524: { // bsmi r
-		bool cc = test_mi();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsmi r");
 		break;
 		}
 	case 525: { // bsnr r
-		bool cc = test_nr();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsnr r");
 		break;
 		}
 	case 526: { // bses r
-		bool cc = test_es();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bses r");
 		break;
 		}
 	case 527: { // bsls r
-		bool cc = test_ls();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsls r");
 		break;
 		}
 	case 528: { // bsle r
-		bool cc = test_le();
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = m_pc + r;
-		}
+		unhandled("bsle r");
 		break;
 		}
 	case 529: { // bsclr #[n],x:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:(r)-n,[x]");
 		break;
 		}
 	case 530: { // bsclr #[n],y:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:(r)-n,[x]");
 		break;
 		}
 	case 531: { // bsclr #[n],x:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:(r)+n,[x]");
 		break;
 		}
 	case 532: { // bsclr #[n],y:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:(r)+n,[x]");
 		break;
 		}
 	case 533: { // bsclr #[n],x:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:(r)-,[x]");
 		break;
 		}
 	case 534: { // bsclr #[n],y:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:(r)-,[x]");
 		break;
 		}
 	case 535: { // bsclr #[n],x:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:(r)+,[x]");
 		break;
 		}
 	case 536: { // bsclr #[n],y:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:(r)+,[x]");
 		break;
 		}
 	case 537: { // bsclr #[n],x:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:(r),[x]");
 		break;
 		}
 	case 538: { // bsclr #[n],y:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:(r),[x]");
 		break;
 		}
 	case 539: { // bsclr #[n],x:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:(r+n),[x]");
 		break;
 		}
 	case 540: { // bsclr #[n],y:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:(r+n),[x]");
 		break;
 		}
 	case 541: { // bsclr #[n],x:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:-(r),[x]");
 		break;
 		}
 	case 542: { // bsclr #[n],y:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:-(r),[x]");
 		break;
 		}
 	case 543: { // bsclr #[n],x:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(abs), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:[abs],[x]");
 		break;
 		}
 	case 544: { // bsclr #[n],y:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(abs), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:[abs],[x]");
 		break;
 		}
 	case 545: { // bsclr #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:[aa],[x]");
 		break;
 		}
 	case 546: { // bsclr #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:[aa],[x]");
 		break;
 		}
 	case 547: { // bsclr #[n],x:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:[pp],[x]");
 		break;
 		}
 	case 548: { // bsclr #[n],y:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:[pp],[x]");
 		break;
 		}
 	case 549: { // bsclr #[n],x:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_x.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],x:[qq],[x]");
 		break;
 		}
 	case 550: { // bsclr #[n],y:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(!BIT(m_y.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsclr #[n],y:[qq],[x]");
 		break;
 		}
 	case 551: { // bsclr #[n],x0,[x]
@@ -32613,29 +29827,11 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 593: { // bset #[n],x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_x.read_dword(aa);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		m_x.write_dword(aa, t | m);
-		}
+		unhandled("bset #[n],x:[aa]");
 		break;
 		}
 	case 594: { // bset #[n],y:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 t = m_y.read_dword(aa);
-		u32 m = 1 << n;
-		if(t & m) {
-		m_ccr |= CCR_C;
-		} else {
-		m_ccr &= ~CCR_C;
-		m_y.write_dword(aa, t | m);
-		}
+		unhandled("bset #[n],y:[aa]");
 		break;
 		}
 	case 595: { // bset #[n],x:[pp]
@@ -32699,8 +29895,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_x0(t | m);
+		}
 		break;
 		}
 	case 600: { // bset #[n],x1
@@ -32712,8 +29908,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_x1(t | m);
+		}
 		break;
 		}
 	case 601: { // bset #[n],y0
@@ -32725,8 +29921,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_y0(t | m);
+		}
 		break;
 		}
 	case 602: { // bset #[n],y1
@@ -32738,8 +29934,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_y1(t | m);
+		}
 		break;
 		}
 	case 603: { // bset #[n],a0
@@ -32751,8 +29947,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_a0(t | m);
+		}
 		break;
 		}
 	case 604: { // bset #[n],b0
@@ -32764,8 +29960,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_b0(t | m);
+		}
 		break;
 		}
 	case 605: { // bset #[n],a2
@@ -32777,8 +29973,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_a2(t | m);
+		}
 		break;
 		}
 	case 606: { // bset #[n],b2
@@ -32790,8 +29986,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_b2(t | m);
+		}
 		break;
 		}
 	case 607: { // bset #[n],a1
@@ -32803,8 +29999,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_a1(t | m);
+		}
 		break;
 		}
 	case 608: { // bset #[n],b1
@@ -32816,34 +30012,34 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_b1(t | m);
+		}
 		break;
 		}
 	case 609: { // bset #[n],a
-		u32 d_h = get_ah();
+		u64 d = get_a();
 		u32 n = BIT(opcode, 0, 5);
-		u32 t = d_h;
+		u32 t = d;
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
+		set_a(t | m);
 		}
-		set_ah(t | m);
 		break;
 		}
 	case 610: { // bset #[n],b
-		u32 d_h = get_bh();
+		u64 d = get_b();
 		u32 n = BIT(opcode, 0, 5);
-		u32 t = d_h;
+		u32 t = d;
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
+		set_b(t | m);
 		}
-		set_bh(t | m);
 		break;
 		}
 	case 611: { // bset #[n],r
@@ -32855,8 +30051,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_r(BIT(opcode, 8, 6) & 7, t | m);
+		}
 		break;
 		}
 	case 612: { // bset #[n],n
@@ -32868,8 +30064,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_n(BIT(opcode, 8, 6) & 7, t | m);
+		}
 		break;
 		}
 	case 613: { // bset #[n],m
@@ -32881,8 +30077,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_m(BIT(opcode, 8, 6) & 7, t | m);
+		}
 		break;
 		}
 	case 614: { // bset #[n],ep
@@ -32894,8 +30090,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_ep(t | m);
+		}
 		break;
 		}
 	case 615: { // bset #[n],vba
@@ -32907,8 +30103,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_vba(t | m);
+		}
 		break;
 		}
 	case 616: { // bset #[n],sc
@@ -32920,8 +30116,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_sc(t | m);
+		}
 		break;
 		}
 	case 617: { // bset #[n],sz
@@ -32933,8 +30129,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_sz(t | m);
+		}
 		break;
 		}
 	case 618: { // bset #[n],sr
@@ -32946,8 +30142,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_sr(t | m);
+		}
 		break;
 		}
 	case 619: { // bset #[n],omr
@@ -32959,8 +30155,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_omr(t | m);
+		}
 		break;
 		}
 	case 620: { // bset #[n],sp
@@ -32972,8 +30168,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_sp(t | m);
+		}
 		break;
 		}
 	case 621: { // bset #[n],ssh
@@ -32985,8 +30181,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_ssh(t | m);
+		}
 		break;
 		}
 	case 622: { // bset #[n],ssl
@@ -32998,8 +30194,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_ssl(t | m);
+		}
 		break;
 		}
 	case 623: { // bset #[n],la
@@ -33011,8 +30207,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_la(t | m);
+		}
 		break;
 		}
 	case 624: { // bset #[n],lc
@@ -33024,8 +30220,8 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		m_ccr |= CCR_C;
 		} else {
 		m_ccr &= ~CCR_C;
-		}
 		set_lc(t | m);
+		}
 		break;
 		}
 	case 625: { // bsr [x]
@@ -33053,291 +30249,91 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 628: { // bsset #[n],x:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:(r)-n,[x]");
 		break;
 		}
 	case 629: { // bsset #[n],y:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:(r)-n,[x]");
 		break;
 		}
 	case 630: { // bsset #[n],x:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:(r)+n,[x]");
 		break;
 		}
 	case 631: { // bsset #[n],y:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:(r)+n,[x]");
 		break;
 		}
 	case 632: { // bsset #[n],x:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:(r)-,[x]");
 		break;
 		}
 	case 633: { // bsset #[n],y:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:(r)-,[x]");
 		break;
 		}
 	case 634: { // bsset #[n],x:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:(r)+,[x]");
 		break;
 		}
 	case 635: { // bsset #[n],y:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:(r)+,[x]");
 		break;
 		}
 	case 636: { // bsset #[n],x:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:(r),[x]");
 		break;
 		}
 	case 637: { // bsset #[n],y:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:(r),[x]");
 		break;
 		}
 	case 638: { // bsset #[n],x:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:(r+n),[x]");
 		break;
 		}
 	case 639: { // bsset #[n],y:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:(r+n),[x]");
 		break;
 		}
 	case 640: { // bsset #[n],x:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:-(r),[x]");
 		break;
 		}
 	case 641: { // bsset #[n],y:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:-(r),[x]");
 		break;
 		}
 	case 642: { // bsset #[n],x:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(abs), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:[abs],[x]");
 		break;
 		}
 	case 643: { // bsset #[n],y:[abs],[x]
-		u32 abs = exv;
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(abs), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:[abs],[x]");
 		break;
 		}
 	case 644: { // bsset #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:[aa],[x]");
 		break;
 		}
 	case 645: { // bsset #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:[aa],[x]");
 		break;
 		}
 	case 646: { // bsset #[n],x:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:[pp],[x]");
 		break;
 		}
 	case 647: { // bsset #[n],y:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:[pp],[x]");
 		break;
 		}
 	case 648: { // bsset #[n],x:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_x.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],x:[qq],[x]");
 		break;
 		}
 	case 649: { // bsset #[n],y:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = (m_pc+exv) & 0xffffff;
-		if(BIT(m_y.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("bsset #[n],y:[qq],[x]");
 		break;
 		}
 	case 650: { // bsset #[n],x0,[x]
@@ -34253,27 +31249,19 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 728: { // cmp #[i],a
-		u32 i = BIT(opcode, 8, 6);
-		u64 d = get_a();
-		(void)do_sub56(u64(i) << 24, d);
+		unhandled("cmp #[i],a");
 		break;
 		}
 	case 729: { // cmp #[i],b
-		u32 i = BIT(opcode, 8, 6);
-		u64 d = get_b();
-		(void)do_sub56(u64(i) << 24, d);
+		unhandled("cmp #[i],b");
 		break;
 		}
 	case 730: { // cmp #[i],a
-		u32 i = exv;
-		u64 d = get_a();
-		(void)do_sub56(util::sext(u64(i) << 24, 48), d);
+		unhandled("cmp #[i],a");
 		break;
 		}
 	case 731: { // cmp #[i],b
-		u32 i = exv;
-		u64 d = get_b();
-		(void)do_sub56(util::sext(u64(i) << 24, 48), d);
+		unhandled("cmp #[i],b");
 		break;
 		}
 	case 732: { // cmpu b,a
@@ -36079,55 +33067,19 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1048: { // eor #[i],a
-		u32 d_1 = get_a1();
-		u32 i = BIT(opcode, 8, 6);
-		u32 r = d_1 ^ i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("eor #[i],a");
 		break;
 		}
 	case 1049: { // eor #[i],b
-		u32 d_1 = get_b1();
-		u32 i = BIT(opcode, 8, 6);
-		u32 r = d_1 ^ i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("eor #[i],b");
 		break;
 		}
 	case 1050: { // eor #[i],a
-		u32 d_1 = get_a1();
-		u32 i = exv;
-		u32 r = d_1 ^ i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("eor #[i],a");
 		break;
 		}
 	case 1051: { // eor #[i],b
-		u32 d_1 = get_b1();
-		u32 i = exv;
-		u32 r = d_1 ^ i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("eor #[i],b");
 		break;
 		}
 	case 1052: { // extract a1,a,d
@@ -36463,1347 +33415,579 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1135: { // jcc [x]
-		bool cc = test_cc();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jcc [x]");
 		break;
 		}
 	case 1136: { // jge [x]
-		bool cc = test_ge();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jge [x]");
 		break;
 		}
 	case 1137: { // jne [x]
-		bool cc = test_ne();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jne [x]");
 		break;
 		}
 	case 1138: { // jpl [x]
-		bool cc = test_pl();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jpl [x]");
 		break;
 		}
 	case 1139: { // jnn [x]
-		bool cc = test_nn();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jnn [x]");
 		break;
 		}
 	case 1140: { // jec [x]
-		bool cc = test_ec();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jec [x]");
 		break;
 		}
 	case 1141: { // jlc [x]
-		u32 cc = get_lc();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jlc [x]");
 		break;
 		}
 	case 1142: { // jgt [x]
-		bool cc = test_gt();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jgt [x]");
 		break;
 		}
 	case 1143: { // jcs [x]
-		bool cc = test_cs();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jcs [x]");
 		break;
 		}
 	case 1144: { // jlt [x]
-		bool cc = test_lt();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jlt [x]");
 		break;
 		}
 	case 1145: { // jeq [x]
-		bool cc = test_eq();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jeq [x]");
 		break;
 		}
 	case 1146: { // jmi [x]
-		bool cc = test_mi();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jmi [x]");
 		break;
 		}
 	case 1147: { // jnr [x]
-		bool cc = test_nr();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jnr [x]");
 		break;
 		}
 	case 1148: { // jes [x]
-		bool cc = test_es();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jes [x]");
 		break;
 		}
 	case 1149: { // jls [x]
-		bool cc = test_ls();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jls [x]");
 		break;
 		}
 	case 1150: { // jle [x]
-		bool cc = test_le();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		m_npc = x;
-		}
+		unhandled("jle [x]");
 		break;
 		}
 	case 1151: { // jcc (r)-n
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcc (r)-n");
 		break;
 		}
 	case 1152: { // jge (r)-n
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jge (r)-n");
 		break;
 		}
 	case 1153: { // jne (r)-n
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jne (r)-n");
 		break;
 		}
 	case 1154: { // jpl (r)-n
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jpl (r)-n");
 		break;
 		}
 	case 1155: { // jnn (r)-n
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnn (r)-n");
 		break;
 		}
 	case 1156: { // jec (r)-n
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jec (r)-n");
 		break;
 		}
 	case 1157: { // jlc (r)-n
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlc (r)-n");
 		break;
 		}
 	case 1158: { // jgt (r)-n
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jgt (r)-n");
 		break;
 		}
 	case 1159: { // jcs (r)-n
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcs (r)-n");
 		break;
 		}
 	case 1160: { // jlt (r)-n
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlt (r)-n");
 		break;
 		}
 	case 1161: { // jeq (r)-n
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jeq (r)-n");
 		break;
 		}
 	case 1162: { // jmi (r)-n
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jmi (r)-n");
 		break;
 		}
 	case 1163: { // jnr (r)-n
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnr (r)-n");
 		break;
 		}
 	case 1164: { // jes (r)-n
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jes (r)-n");
 		break;
 		}
 	case 1165: { // jls (r)-n
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jls (r)-n");
 		break;
 		}
 	case 1166: { // jle (r)-n
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jle (r)-n");
 		break;
 		}
 	case 1167: { // jcc (r)+n
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcc (r)+n");
 		break;
 		}
 	case 1168: { // jge (r)+n
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jge (r)+n");
 		break;
 		}
 	case 1169: { // jne (r)+n
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jne (r)+n");
 		break;
 		}
 	case 1170: { // jpl (r)+n
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jpl (r)+n");
 		break;
 		}
 	case 1171: { // jnn (r)+n
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnn (r)+n");
 		break;
 		}
 	case 1172: { // jec (r)+n
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jec (r)+n");
 		break;
 		}
 	case 1173: { // jlc (r)+n
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlc (r)+n");
 		break;
 		}
 	case 1174: { // jgt (r)+n
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jgt (r)+n");
 		break;
 		}
 	case 1175: { // jcs (r)+n
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcs (r)+n");
 		break;
 		}
 	case 1176: { // jlt (r)+n
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlt (r)+n");
 		break;
 		}
 	case 1177: { // jeq (r)+n
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jeq (r)+n");
 		break;
 		}
 	case 1178: { // jmi (r)+n
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jmi (r)+n");
 		break;
 		}
 	case 1179: { // jnr (r)+n
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnr (r)+n");
 		break;
 		}
 	case 1180: { // jes (r)+n
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jes (r)+n");
 		break;
 		}
 	case 1181: { // jls (r)+n
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jls (r)+n");
 		break;
 		}
 	case 1182: { // jle (r)+n
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jle (r)+n");
 		break;
 		}
 	case 1183: { // jcc (r)-
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcc (r)-");
 		break;
 		}
 	case 1184: { // jge (r)-
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jge (r)-");
 		break;
 		}
 	case 1185: { // jne (r)-
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jne (r)-");
 		break;
 		}
 	case 1186: { // jpl (r)-
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jpl (r)-");
 		break;
 		}
 	case 1187: { // jnn (r)-
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnn (r)-");
 		break;
 		}
 	case 1188: { // jec (r)-
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jec (r)-");
 		break;
 		}
 	case 1189: { // jlc (r)-
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlc (r)-");
 		break;
 		}
 	case 1190: { // jgt (r)-
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jgt (r)-");
 		break;
 		}
 	case 1191: { // jcs (r)-
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcs (r)-");
 		break;
 		}
 	case 1192: { // jlt (r)-
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlt (r)-");
 		break;
 		}
 	case 1193: { // jeq (r)-
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jeq (r)-");
 		break;
 		}
 	case 1194: { // jmi (r)-
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jmi (r)-");
 		break;
 		}
 	case 1195: { // jnr (r)-
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnr (r)-");
 		break;
 		}
 	case 1196: { // jes (r)-
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jes (r)-");
 		break;
 		}
 	case 1197: { // jls (r)-
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jls (r)-");
 		break;
 		}
 	case 1198: { // jle (r)-
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jle (r)-");
 		break;
 		}
 	case 1199: { // jcc (r)+
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcc (r)+");
 		break;
 		}
 	case 1200: { // jge (r)+
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jge (r)+");
 		break;
 		}
 	case 1201: { // jne (r)+
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jne (r)+");
 		break;
 		}
 	case 1202: { // jpl (r)+
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jpl (r)+");
 		break;
 		}
 	case 1203: { // jnn (r)+
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnn (r)+");
 		break;
 		}
 	case 1204: { // jec (r)+
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jec (r)+");
 		break;
 		}
 	case 1205: { // jlc (r)+
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlc (r)+");
 		break;
 		}
 	case 1206: { // jgt (r)+
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jgt (r)+");
 		break;
 		}
 	case 1207: { // jcs (r)+
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcs (r)+");
 		break;
 		}
 	case 1208: { // jlt (r)+
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlt (r)+");
 		break;
 		}
 	case 1209: { // jeq (r)+
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jeq (r)+");
 		break;
 		}
 	case 1210: { // jmi (r)+
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jmi (r)+");
 		break;
 		}
 	case 1211: { // jnr (r)+
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnr (r)+");
 		break;
 		}
 	case 1212: { // jes (r)+
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jes (r)+");
 		break;
 		}
 	case 1213: { // jls (r)+
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jls (r)+");
 		break;
 		}
 	case 1214: { // jle (r)+
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jle (r)+");
 		break;
 		}
 	case 1215: { // jcc (r)
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcc (r)");
 		break;
 		}
 	case 1216: { // jge (r)
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jge (r)");
 		break;
 		}
 	case 1217: { // jne (r)
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jne (r)");
 		break;
 		}
 	case 1218: { // jpl (r)
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jpl (r)");
 		break;
 		}
 	case 1219: { // jnn (r)
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnn (r)");
 		break;
 		}
 	case 1220: { // jec (r)
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jec (r)");
 		break;
 		}
 	case 1221: { // jlc (r)
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlc (r)");
 		break;
 		}
 	case 1222: { // jgt (r)
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jgt (r)");
 		break;
 		}
 	case 1223: { // jcs (r)
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcs (r)");
 		break;
 		}
 	case 1224: { // jlt (r)
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlt (r)");
 		break;
 		}
 	case 1225: { // jeq (r)
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jeq (r)");
 		break;
 		}
 	case 1226: { // jmi (r)
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jmi (r)");
 		break;
 		}
 	case 1227: { // jnr (r)
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnr (r)");
 		break;
 		}
 	case 1228: { // jes (r)
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jes (r)");
 		break;
 		}
 	case 1229: { // jls (r)
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jls (r)");
 		break;
 		}
 	case 1230: { // jle (r)
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jle (r)");
 		break;
 		}
 	case 1231: { // jcc (r+n)
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcc (r+n)");
 		break;
 		}
 	case 1232: { // jge (r+n)
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jge (r+n)");
 		break;
 		}
 	case 1233: { // jne (r+n)
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jne (r+n)");
 		break;
 		}
 	case 1234: { // jpl (r+n)
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jpl (r+n)");
 		break;
 		}
 	case 1235: { // jnn (r+n)
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnn (r+n)");
 		break;
 		}
 	case 1236: { // jec (r+n)
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jec (r+n)");
 		break;
 		}
 	case 1237: { // jlc (r+n)
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlc (r+n)");
 		break;
 		}
 	case 1238: { // jgt (r+n)
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jgt (r+n)");
 		break;
 		}
 	case 1239: { // jcs (r+n)
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcs (r+n)");
 		break;
 		}
 	case 1240: { // jlt (r+n)
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlt (r+n)");
 		break;
 		}
 	case 1241: { // jeq (r+n)
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jeq (r+n)");
 		break;
 		}
 	case 1242: { // jmi (r+n)
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jmi (r+n)");
 		break;
 		}
 	case 1243: { // jnr (r+n)
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnr (r+n)");
 		break;
 		}
 	case 1244: { // jes (r+n)
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jes (r+n)");
 		break;
 		}
 	case 1245: { // jls (r+n)
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jls (r+n)");
 		break;
 		}
 	case 1246: { // jle (r+n)
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jle (r+n)");
 		break;
 		}
 	case 1247: { // jcc -(r)
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcc -(r)");
 		break;
 		}
 	case 1248: { // jge -(r)
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jge -(r)");
 		break;
 		}
 	case 1249: { // jne -(r)
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jne -(r)");
 		break;
 		}
 	case 1250: { // jpl -(r)
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jpl -(r)");
 		break;
 		}
 	case 1251: { // jnn -(r)
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnn -(r)");
 		break;
 		}
 	case 1252: { // jec -(r)
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jec -(r)");
 		break;
 		}
 	case 1253: { // jlc -(r)
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlc -(r)");
 		break;
 		}
 	case 1254: { // jgt -(r)
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jgt -(r)");
 		break;
 		}
 	case 1255: { // jcs -(r)
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jcs -(r)");
 		break;
 		}
 	case 1256: { // jlt -(r)
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jlt -(r)");
 		break;
 		}
 	case 1257: { // jeq -(r)
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jeq -(r)");
 		break;
 		}
 	case 1258: { // jmi -(r)
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jmi -(r)");
 		break;
 		}
 	case 1259: { // jnr -(r)
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jnr -(r)");
 		break;
 		}
 	case 1260: { // jes -(r)
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jes -(r)");
 		break;
 		}
 	case 1261: { // jls -(r)
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jls -(r)");
 		break;
 		}
 	case 1262: { // jle -(r)
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		m_npc = ea;
-		}
+		unhandled("jle -(r)");
 		break;
 		}
 	case 1263: { // jcc [abs]
-		bool cc = test_cc();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jcc [abs]");
 		break;
 		}
 	case 1264: { // jge [abs]
-		bool cc = test_ge();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jge [abs]");
 		break;
 		}
 	case 1265: { // jne [abs]
-		bool cc = test_ne();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jne [abs]");
 		break;
 		}
 	case 1266: { // jpl [abs]
-		bool cc = test_pl();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jpl [abs]");
 		break;
 		}
 	case 1267: { // jnn [abs]
-		bool cc = test_nn();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jnn [abs]");
 		break;
 		}
 	case 1268: { // jec [abs]
-		bool cc = test_ec();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jec [abs]");
 		break;
 		}
 	case 1269: { // jlc [abs]
-		u32 cc = get_lc();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jlc [abs]");
 		break;
 		}
 	case 1270: { // jgt [abs]
-		bool cc = test_gt();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jgt [abs]");
 		break;
 		}
 	case 1271: { // jcs [abs]
-		bool cc = test_cs();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jcs [abs]");
 		break;
 		}
 	case 1272: { // jlt [abs]
-		bool cc = test_lt();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jlt [abs]");
 		break;
 		}
 	case 1273: { // jeq [abs]
-		bool cc = test_eq();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jeq [abs]");
 		break;
 		}
 	case 1274: { // jmi [abs]
-		bool cc = test_mi();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jmi [abs]");
 		break;
 		}
 	case 1275: { // jnr [abs]
-		bool cc = test_nr();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jnr [abs]");
 		break;
 		}
 	case 1276: { // jes [abs]
-		bool cc = test_es();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jes [abs]");
 		break;
 		}
 	case 1277: { // jls [abs]
-		bool cc = test_ls();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jls [abs]");
 		break;
 		}
 	case 1278: { // jle [abs]
-		bool cc = test_le();
-		u32 abs = exv;
-		if(cc) {
-		m_npc = abs;
-		}
+		unhandled("jle [abs]");
 		break;
 		}
 	case 1279: { // jclr #[n],x:(r)-n,[x]
@@ -37943,19 +34127,11 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1293: { // jclr #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(aa), n))
-		m_npc = x;
+		unhandled("jclr #[n],x:[aa],[x]");
 		break;
 		}
 	case 1294: { // jclr #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(aa), n))
-		m_npc = x;
+		unhandled("jclr #[n],y:[aa],[x]");
 		break;
 		}
 	case 1295: { // jclr #[n],x:[pp],[x]
@@ -38071,18 +34247,18 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1309: { // jclr #[n],a,[x]
-		u32 s_h = get_ah();
+		u64 s = get_a();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
-		if(!BIT(s_h, n))
+		if(!BIT(s, n))
 		m_npc = x;
 		break;
 		}
 	case 1310: { // jclr #[n],b,[x]
-		u32 s_h = get_bh();
+		u64 s = get_b();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
-		if(!BIT(s_h, n))
+		if(!BIT(s, n))
 		m_npc = x;
 		break;
 		}
@@ -38256,2507 +34432,827 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1334: { // jscc [x]
-		bool cc = test_cc();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jscc [x]");
 		break;
 		}
 	case 1335: { // jsge [x]
-		bool cc = test_ge();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsge [x]");
 		break;
 		}
 	case 1336: { // jsne [x]
-		bool cc = test_ne();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsne [x]");
 		break;
 		}
 	case 1337: { // jspl [x]
-		bool cc = test_pl();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jspl [x]");
 		break;
 		}
 	case 1338: { // jsnn [x]
-		bool cc = test_nn();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsnn [x]");
 		break;
 		}
 	case 1339: { // jsec [x]
-		bool cc = test_ec();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsec [x]");
 		break;
 		}
 	case 1340: { // jslc [x]
-		u32 cc = get_lc();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jslc [x]");
 		break;
 		}
 	case 1341: { // jsgt [x]
-		bool cc = test_gt();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsgt [x]");
 		break;
 		}
 	case 1342: { // jscs [x]
-		bool cc = test_cs();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jscs [x]");
 		break;
 		}
 	case 1343: { // jslt [x]
-		bool cc = test_lt();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jslt [x]");
 		break;
 		}
 	case 1344: { // jseq [x]
-		bool cc = test_eq();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jseq [x]");
 		break;
 		}
 	case 1345: { // jsmi [x]
-		bool cc = test_mi();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsmi [x]");
 		break;
 		}
 	case 1346: { // jsnr [x]
-		bool cc = test_nr();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsnr [x]");
 		break;
 		}
 	case 1347: { // jses [x]
-		bool cc = test_es();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jses [x]");
 		break;
 		}
 	case 1348: { // jsls [x]
-		bool cc = test_ls();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsls [x]");
 		break;
 		}
 	case 1349: { // jsle [x]
-		bool cc = test_le();
-		u32 x = BIT(opcode, 0, 12);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsle [x]");
 		break;
 		}
 	case 1350: { // jscc (r)-n
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscc (r)-n");
 		break;
 		}
 	case 1351: { // jsge (r)-n
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsge (r)-n");
 		break;
 		}
 	case 1352: { // jsne (r)-n
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsne (r)-n");
 		break;
 		}
 	case 1353: { // jspl (r)-n
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jspl (r)-n");
 		break;
 		}
 	case 1354: { // jsnn (r)-n
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnn (r)-n");
 		break;
 		}
 	case 1355: { // jsec (r)-n
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsec (r)-n");
 		break;
 		}
 	case 1356: { // jslc (r)-n
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslc (r)-n");
 		break;
 		}
 	case 1357: { // jsgt (r)-n
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsgt (r)-n");
 		break;
 		}
 	case 1358: { // jscs (r)-n
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscs (r)-n");
 		break;
 		}
 	case 1359: { // jslt (r)-n
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslt (r)-n");
 		break;
 		}
 	case 1360: { // jseq (r)-n
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jseq (r)-n");
 		break;
 		}
 	case 1361: { // jsmi (r)-n
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsmi (r)-n");
 		break;
 		}
 	case 1362: { // jsnr (r)-n
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnr (r)-n");
 		break;
 		}
 	case 1363: { // jses (r)-n
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jses (r)-n");
 		break;
 		}
 	case 1364: { // jsls (r)-n
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsls (r)-n");
 		break;
 		}
 	case 1365: { // jsle (r)-n
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsle (r)-n");
 		break;
 		}
 	case 1366: { // jscc (r)+n
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscc (r)+n");
 		break;
 		}
 	case 1367: { // jsge (r)+n
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsge (r)+n");
 		break;
 		}
 	case 1368: { // jsne (r)+n
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsne (r)+n");
 		break;
 		}
 	case 1369: { // jspl (r)+n
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jspl (r)+n");
 		break;
 		}
 	case 1370: { // jsnn (r)+n
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnn (r)+n");
 		break;
 		}
 	case 1371: { // jsec (r)+n
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsec (r)+n");
 		break;
 		}
 	case 1372: { // jslc (r)+n
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslc (r)+n");
 		break;
 		}
 	case 1373: { // jsgt (r)+n
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsgt (r)+n");
 		break;
 		}
 	case 1374: { // jscs (r)+n
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscs (r)+n");
 		break;
 		}
 	case 1375: { // jslt (r)+n
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslt (r)+n");
 		break;
 		}
 	case 1376: { // jseq (r)+n
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jseq (r)+n");
 		break;
 		}
 	case 1377: { // jsmi (r)+n
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsmi (r)+n");
 		break;
 		}
 	case 1378: { // jsnr (r)+n
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnr (r)+n");
 		break;
 		}
 	case 1379: { // jses (r)+n
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jses (r)+n");
 		break;
 		}
 	case 1380: { // jsls (r)+n
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsls (r)+n");
 		break;
 		}
 	case 1381: { // jsle (r)+n
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsle (r)+n");
 		break;
 		}
 	case 1382: { // jscc (r)-
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscc (r)-");
 		break;
 		}
 	case 1383: { // jsge (r)-
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsge (r)-");
 		break;
 		}
 	case 1384: { // jsne (r)-
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsne (r)-");
 		break;
 		}
 	case 1385: { // jspl (r)-
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jspl (r)-");
 		break;
 		}
 	case 1386: { // jsnn (r)-
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnn (r)-");
 		break;
 		}
 	case 1387: { // jsec (r)-
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsec (r)-");
 		break;
 		}
 	case 1388: { // jslc (r)-
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslc (r)-");
 		break;
 		}
 	case 1389: { // jsgt (r)-
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsgt (r)-");
 		break;
 		}
 	case 1390: { // jscs (r)-
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscs (r)-");
 		break;
 		}
 	case 1391: { // jslt (r)-
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslt (r)-");
 		break;
 		}
 	case 1392: { // jseq (r)-
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jseq (r)-");
 		break;
 		}
 	case 1393: { // jsmi (r)-
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsmi (r)-");
 		break;
 		}
 	case 1394: { // jsnr (r)-
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnr (r)-");
 		break;
 		}
 	case 1395: { // jses (r)-
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jses (r)-");
 		break;
 		}
 	case 1396: { // jsls (r)-
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsls (r)-");
 		break;
 		}
 	case 1397: { // jsle (r)-
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsle (r)-");
 		break;
 		}
 	case 1398: { // jscc (r)+
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscc (r)+");
 		break;
 		}
 	case 1399: { // jsge (r)+
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsge (r)+");
 		break;
 		}
 	case 1400: { // jsne (r)+
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsne (r)+");
 		break;
 		}
 	case 1401: { // jspl (r)+
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jspl (r)+");
 		break;
 		}
 	case 1402: { // jsnn (r)+
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnn (r)+");
 		break;
 		}
 	case 1403: { // jsec (r)+
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsec (r)+");
 		break;
 		}
 	case 1404: { // jslc (r)+
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslc (r)+");
 		break;
 		}
 	case 1405: { // jsgt (r)+
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsgt (r)+");
 		break;
 		}
 	case 1406: { // jscs (r)+
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscs (r)+");
 		break;
 		}
 	case 1407: { // jslt (r)+
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslt (r)+");
 		break;
 		}
 	case 1408: { // jseq (r)+
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jseq (r)+");
 		break;
 		}
 	case 1409: { // jsmi (r)+
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsmi (r)+");
 		break;
 		}
 	case 1410: { // jsnr (r)+
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnr (r)+");
 		break;
 		}
 	case 1411: { // jses (r)+
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jses (r)+");
 		break;
 		}
 	case 1412: { // jsls (r)+
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsls (r)+");
 		break;
 		}
 	case 1413: { // jsle (r)+
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsle (r)+");
 		break;
 		}
 	case 1414: { // jscc (r)
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscc (r)");
 		break;
 		}
 	case 1415: { // jsge (r)
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsge (r)");
 		break;
 		}
 	case 1416: { // jsne (r)
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsne (r)");
 		break;
 		}
 	case 1417: { // jspl (r)
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jspl (r)");
 		break;
 		}
 	case 1418: { // jsnn (r)
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnn (r)");
 		break;
 		}
 	case 1419: { // jsec (r)
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsec (r)");
 		break;
 		}
 	case 1420: { // jslc (r)
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslc (r)");
 		break;
 		}
 	case 1421: { // jsgt (r)
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsgt (r)");
 		break;
 		}
 	case 1422: { // jscs (r)
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscs (r)");
 		break;
 		}
 	case 1423: { // jslt (r)
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslt (r)");
 		break;
 		}
 	case 1424: { // jseq (r)
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jseq (r)");
 		break;
 		}
 	case 1425: { // jsmi (r)
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsmi (r)");
 		break;
 		}
 	case 1426: { // jsnr (r)
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnr (r)");
 		break;
 		}
 	case 1427: { // jses (r)
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jses (r)");
 		break;
 		}
 	case 1428: { // jsls (r)
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsls (r)");
 		break;
 		}
 	case 1429: { // jsle (r)
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsle (r)");
 		break;
 		}
 	case 1430: { // jscc (r+n)
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscc (r+n)");
 		break;
 		}
 	case 1431: { // jsge (r+n)
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsge (r+n)");
 		break;
 		}
 	case 1432: { // jsne (r+n)
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsne (r+n)");
 		break;
 		}
 	case 1433: { // jspl (r+n)
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jspl (r+n)");
 		break;
 		}
 	case 1434: { // jsnn (r+n)
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnn (r+n)");
 		break;
 		}
 	case 1435: { // jsec (r+n)
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsec (r+n)");
 		break;
 		}
 	case 1436: { // jslc (r+n)
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslc (r+n)");
 		break;
 		}
 	case 1437: { // jsgt (r+n)
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsgt (r+n)");
 		break;
 		}
 	case 1438: { // jscs (r+n)
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscs (r+n)");
 		break;
 		}
 	case 1439: { // jslt (r+n)
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslt (r+n)");
 		break;
 		}
 	case 1440: { // jseq (r+n)
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jseq (r+n)");
 		break;
 		}
 	case 1441: { // jsmi (r+n)
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsmi (r+n)");
 		break;
 		}
 	case 1442: { // jsnr (r+n)
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnr (r+n)");
 		break;
 		}
 	case 1443: { // jses (r+n)
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jses (r+n)");
 		break;
 		}
 	case 1444: { // jsls (r+n)
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsls (r+n)");
 		break;
 		}
 	case 1445: { // jsle (r+n)
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsle (r+n)");
 		break;
 		}
 	case 1446: { // jscc -(r)
-		bool cc = test_cc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscc -(r)");
 		break;
 		}
 	case 1447: { // jsge -(r)
-		bool cc = test_ge();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsge -(r)");
 		break;
 		}
 	case 1448: { // jsne -(r)
-		bool cc = test_ne();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsne -(r)");
 		break;
 		}
 	case 1449: { // jspl -(r)
-		bool cc = test_pl();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jspl -(r)");
 		break;
 		}
 	case 1450: { // jsnn -(r)
-		bool cc = test_nn();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnn -(r)");
 		break;
 		}
 	case 1451: { // jsec -(r)
-		bool cc = test_ec();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsec -(r)");
 		break;
 		}
 	case 1452: { // jslc -(r)
-		u32 cc = get_lc();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslc -(r)");
 		break;
 		}
 	case 1453: { // jsgt -(r)
-		bool cc = test_gt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsgt -(r)");
 		break;
 		}
 	case 1454: { // jscs -(r)
-		bool cc = test_cs();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jscs -(r)");
 		break;
 		}
 	case 1455: { // jslt -(r)
-		bool cc = test_lt();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jslt -(r)");
 		break;
 		}
 	case 1456: { // jseq -(r)
-		bool cc = test_eq();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jseq -(r)");
 		break;
 		}
 	case 1457: { // jsmi -(r)
-		bool cc = test_mi();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsmi -(r)");
 		break;
 		}
 	case 1458: { // jsnr -(r)
-		bool cc = test_nr();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsnr -(r)");
 		break;
 		}
 	case 1459: { // jses -(r)
-		bool cc = test_es();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jses -(r)");
 		break;
 		}
 	case 1460: { // jsls -(r)
-		bool cc = test_ls();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsls -(r)");
 		break;
 		}
 	case 1461: { // jsle -(r)
-		bool cc = test_le();
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = ea;
-		}
+		unhandled("jsle -(r)");
 		break;
 		}
 	case 1462: { // jscc [abs]
-		bool cc = test_cc();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jscc [abs]");
 		break;
 		}
 	case 1463: { // jsge [abs]
-		bool cc = test_ge();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsge [abs]");
 		break;
 		}
 	case 1464: { // jsne [abs]
-		bool cc = test_ne();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsne [abs]");
 		break;
 		}
 	case 1465: { // jspl [abs]
-		bool cc = test_pl();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jspl [abs]");
 		break;
 		}
 	case 1466: { // jsnn [abs]
-		bool cc = test_nn();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsnn [abs]");
 		break;
 		}
 	case 1467: { // jsec [abs]
-		bool cc = test_ec();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsec [abs]");
 		break;
 		}
 	case 1468: { // jslc [abs]
-		u32 cc = get_lc();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jslc [abs]");
 		break;
 		}
 	case 1469: { // jsgt [abs]
-		bool cc = test_gt();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsgt [abs]");
 		break;
 		}
 	case 1470: { // jscs [abs]
-		bool cc = test_cs();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jscs [abs]");
 		break;
 		}
 	case 1471: { // jslt [abs]
-		bool cc = test_lt();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jslt [abs]");
 		break;
 		}
 	case 1472: { // jseq [abs]
-		bool cc = test_eq();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jseq [abs]");
 		break;
 		}
 	case 1473: { // jsmi [abs]
-		bool cc = test_mi();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsmi [abs]");
 		break;
 		}
 	case 1474: { // jsnr [abs]
-		bool cc = test_nr();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsnr [abs]");
 		break;
 		}
 	case 1475: { // jses [abs]
-		bool cc = test_es();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jses [abs]");
 		break;
 		}
 	case 1476: { // jsls [abs]
-		bool cc = test_ls();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsls [abs]");
 		break;
 		}
 	case 1477: { // jsle [abs]
-		bool cc = test_le();
-		u32 abs = exv;
-		if(cc) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = abs;
-		}
+		unhandled("jsle [abs]");
 		break;
 		}
 	case 1478: { // jsclr #[n],x:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:(r)-n,[x]");
 		break;
 		}
 	case 1479: { // jsclr #[n],y:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:(r)-n,[x]");
 		break;
 		}
 	case 1480: { // jsclr #[n],x:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:(r)+n,[x]");
 		break;
 		}
 	case 1481: { // jsclr #[n],y:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:(r)+n,[x]");
 		break;
 		}
 	case 1482: { // jsclr #[n],x:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:(r)-,[x]");
 		break;
 		}
 	case 1483: { // jsclr #[n],y:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:(r)-,[x]");
 		break;
 		}
 	case 1484: { // jsclr #[n],x:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:(r)+,[x]");
 		break;
 		}
 	case 1485: { // jsclr #[n],y:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:(r)+,[x]");
 		break;
 		}
 	case 1486: { // jsclr #[n],x:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:(r),[x]");
 		break;
 		}
 	case 1487: { // jsclr #[n],y:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:(r),[x]");
 		break;
 		}
 	case 1488: { // jsclr #[n],x:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:(r+n),[x]");
 		break;
 		}
 	case 1489: { // jsclr #[n],y:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:(r+n),[x]");
 		break;
 		}
 	case 1490: { // jsclr #[n],x:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:-(r),[x]");
 		break;
 		}
 	case 1491: { // jsclr #[n],y:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:-(r),[x]");
 		break;
 		}
 	case 1492: { // jsclr #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:[aa],[x]");
 		break;
 		}
 	case 1493: { // jsclr #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:[aa],[x]");
 		break;
 		}
 	case 1494: { // jsclr #[n],x:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:[pp],[x]");
 		break;
 		}
 	case 1495: { // jsclr #[n],y:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:[pp],[x]");
 		break;
 		}
 	case 1496: { // jsclr #[n],x:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_x.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x:[qq],[x]");
 		break;
 		}
 	case 1497: { // jsclr #[n],y:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(m_y.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y:[qq],[x]");
 		break;
 		}
 	case 1498: { // jsclr #[n],x0,[x]
-		u32 s = get_x0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x0,[x]");
 		break;
 		}
 	case 1499: { // jsclr #[n],x1,[x]
-		u32 s = get_x1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],x1,[x]");
 		break;
 		}
 	case 1500: { // jsclr #[n],y0,[x]
-		u32 s = get_y0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y0,[x]");
 		break;
 		}
 	case 1501: { // jsclr #[n],y1,[x]
-		u32 s = get_y1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],y1,[x]");
 		break;
 		}
 	case 1502: { // jsclr #[n],a0,[x]
-		u32 s = get_a0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],a0,[x]");
 		break;
 		}
 	case 1503: { // jsclr #[n],b0,[x]
-		u32 s = get_b0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],b0,[x]");
 		break;
 		}
 	case 1504: { // jsclr #[n],a2,[x]
-		u32 s = get_a2();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],a2,[x]");
 		break;
 		}
 	case 1505: { // jsclr #[n],b2,[x]
-		u32 s = get_b2();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],b2,[x]");
 		break;
 		}
 	case 1506: { // jsclr #[n],a1,[x]
-		u32 s = get_a1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],a1,[x]");
 		break;
 		}
 	case 1507: { // jsclr #[n],b1,[x]
-		u32 s = get_b1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],b1,[x]");
 		break;
 		}
 	case 1508: { // jsclr #[n],a,[x]
-		u32 s_h = get_ah();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s_h, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],a,[x]");
 		break;
 		}
 	case 1509: { // jsclr #[n],b,[x]
-		u32 s_h = get_bh();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s_h, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],b,[x]");
 		break;
 		}
 	case 1510: { // jsclr #[n],r,[x]
-		u32 s = get_r(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],r,[x]");
 		break;
 		}
 	case 1511: { // jsclr #[n],n,[x]
-		u32 s = get_n(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],n,[x]");
 		break;
 		}
 	case 1512: { // jsclr #[n],m,[x]
-		u32 s = get_m(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],m,[x]");
 		break;
 		}
 	case 1513: { // jsclr #[n],ep,[x]
-		u32 s = get_ep();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],ep,[x]");
 		break;
 		}
 	case 1514: { // jsclr #[n],vba,[x]
-		u32 s = get_vba();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],vba,[x]");
 		break;
 		}
 	case 1515: { // jsclr #[n],sc,[x]
-		u32 s = get_sc();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],sc,[x]");
 		break;
 		}
 	case 1516: { // jsclr #[n],sz,[x]
-		u32 s = get_sz();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],sz,[x]");
 		break;
 		}
 	case 1517: { // jsclr #[n],sr,[x]
-		u32 s = get_sr();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],sr,[x]");
 		break;
 		}
 	case 1518: { // jsclr #[n],omr,[x]
-		u32 s = get_omr();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],omr,[x]");
 		break;
 		}
 	case 1519: { // jsclr #[n],sp,[x]
-		u32 s = get_sp();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],sp,[x]");
 		break;
 		}
 	case 1520: { // jsclr #[n],ssh,[x]
-		u32 s = get_ssh();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],ssh,[x]");
 		break;
 		}
 	case 1521: { // jsclr #[n],ssl,[x]
-		u32 s = get_ssl();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],ssl,[x]");
 		break;
 		}
 	case 1522: { // jsclr #[n],la,[x]
-		u32 s = get_la();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],la,[x]");
 		break;
 		}
 	case 1523: { // jsclr #[n],lc,[x]
-		u32 s = get_lc();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(!BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsclr #[n],lc,[x]");
 		break;
 		}
 	case 1524: { // jset #[n],x:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],x:(r)-n,[x]");
 		break;
 		}
 	case 1525: { // jset #[n],y:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],y:(r)-n,[x]");
 		break;
 		}
 	case 1526: { // jset #[n],x:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],x:(r)+n,[x]");
 		break;
 		}
 	case 1527: { // jset #[n],y:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],y:(r)+n,[x]");
 		break;
 		}
 	case 1528: { // jset #[n],x:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],x:(r)-,[x]");
 		break;
 		}
 	case 1529: { // jset #[n],y:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],y:(r)-,[x]");
 		break;
 		}
 	case 1530: { // jset #[n],x:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],x:(r)+,[x]");
 		break;
 		}
 	case 1531: { // jset #[n],y:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],y:(r)+,[x]");
 		break;
 		}
 	case 1532: { // jset #[n],x:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],x:(r),[x]");
 		break;
 		}
 	case 1533: { // jset #[n],y:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],y:(r),[x]");
 		break;
 		}
 	case 1534: { // jset #[n],x:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],x:(r+n),[x]");
 		break;
 		}
 	case 1535: { // jset #[n],y:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],y:(r+n),[x]");
 		break;
 		}
 	case 1536: { // jset #[n],x:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],x:-(r),[x]");
 		break;
 		}
 	case 1537: { // jset #[n],y:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n))
-		m_npc = x;
+		unhandled("jset #[n],y:-(r),[x]");
 		break;
 		}
 	case 1538: { // jset #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(aa), n))
-		m_npc = x;
+		unhandled("jset #[n],x:[aa],[x]");
 		break;
 		}
 	case 1539: { // jset #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(aa), n))
-		m_npc = x;
+		unhandled("jset #[n],y:[aa],[x]");
 		break;
 		}
 	case 1540: { // jset #[n],x:[pp],[x]
@@ -40872,18 +35368,18 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1554: { // jset #[n],a,[x]
-		u32 s_h = get_ah();
+		u64 s = get_a();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
-		if(BIT(s_h, n))
+		if(BIT(s, n))
 		m_npc = x;
 		break;
 		}
 	case 1555: { // jset #[n],b,[x]
-		u32 s_h = get_bh();
+		u64 s = get_b();
 		u32 n = BIT(opcode, 0, 5);
 		u32 x = exv;
-		if(BIT(s_h, n))
+		if(BIT(s, n))
 		m_npc = x;
 		break;
 		}
@@ -41084,579 +35580,187 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1579: { // jsset #[n],x:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:(r)-n,[x]");
 		break;
 		}
 	case 1580: { // jsset #[n],y:(r)-n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:(r)-n,[x]");
 		break;
 		}
 	case 1581: { // jsset #[n],x:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:(r)+n,[x]");
 		break;
 		}
 	case 1582: { // jsset #[n],y:(r)+n,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:(r)+n,[x]");
 		break;
 		}
 	case 1583: { // jsset #[n],x:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:(r)-,[x]");
 		break;
 		}
 	case 1584: { // jsset #[n],y:(r)-,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:(r)-,[x]");
 		break;
 		}
 	case 1585: { // jsset #[n],x:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:(r)+,[x]");
 		break;
 		}
 	case 1586: { // jsset #[n],y:(r)+,[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:(r)+,[x]");
 		break;
 		}
 	case 1587: { // jsset #[n],x:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:(r),[x]");
 		break;
 		}
 	case 1588: { // jsset #[n],y:(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:(r),[x]");
 		break;
 		}
 	case 1589: { // jsset #[n],x:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:(r+n),[x]");
 		break;
 		}
 	case 1590: { // jsset #[n],y:(r+n),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:(r+n),[x]");
 		break;
 		}
 	case 1591: { // jsset #[n],x:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:-(r),[x]");
 		break;
 		}
 	case 1592: { // jsset #[n],y:-(r),[x]
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(ea), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:-(r),[x]");
 		break;
 		}
 	case 1593: { // jsset #[n],x:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:[aa],[x]");
 		break;
 		}
 	case 1594: { // jsset #[n],y:[aa],[x]
-		u32 aa = BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(aa), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:[aa],[x]");
 		break;
 		}
 	case 1595: { // jsset #[n],x:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:[pp],[x]");
 		break;
 		}
 	case 1596: { // jsset #[n],y:[pp],[x]
-		u32 pp = 0xffffc0 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(pp), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:[pp],[x]");
 		break;
 		}
 	case 1597: { // jsset #[n],x:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_x.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x:[qq],[x]");
 		break;
 		}
 	case 1598: { // jsset #[n],y:[qq],[x]
-		u32 qq = 0xffff80 + BIT(opcode, 8, 6);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(m_y.read_dword(qq), n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y:[qq],[x]");
 		break;
 		}
 	case 1599: { // jsset #[n],x0,[x]
-		u32 s = get_x0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x0,[x]");
 		break;
 		}
 	case 1600: { // jsset #[n],x1,[x]
-		u32 s = get_x1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],x1,[x]");
 		break;
 		}
 	case 1601: { // jsset #[n],y0,[x]
-		u32 s = get_y0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y0,[x]");
 		break;
 		}
 	case 1602: { // jsset #[n],y1,[x]
-		u32 s = get_y1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],y1,[x]");
 		break;
 		}
 	case 1603: { // jsset #[n],a0,[x]
-		u32 s = get_a0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],a0,[x]");
 		break;
 		}
 	case 1604: { // jsset #[n],b0,[x]
-		u32 s = get_b0();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],b0,[x]");
 		break;
 		}
 	case 1605: { // jsset #[n],a2,[x]
-		u32 s = get_a2();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],a2,[x]");
 		break;
 		}
 	case 1606: { // jsset #[n],b2,[x]
-		u32 s = get_b2();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],b2,[x]");
 		break;
 		}
 	case 1607: { // jsset #[n],a1,[x]
-		u32 s = get_a1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],a1,[x]");
 		break;
 		}
 	case 1608: { // jsset #[n],b1,[x]
-		u32 s = get_b1();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],b1,[x]");
 		break;
 		}
 	case 1609: { // jsset #[n],a,[x]
-		u32 s_h = get_ah();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s_h, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],a,[x]");
 		break;
 		}
 	case 1610: { // jsset #[n],b,[x]
-		u32 s_h = get_bh();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s_h, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],b,[x]");
 		break;
 		}
 	case 1611: { // jsset #[n],r,[x]
-		u32 s = get_r(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],r,[x]");
 		break;
 		}
 	case 1612: { // jsset #[n],n,[x]
-		u32 s = get_n(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],n,[x]");
 		break;
 		}
 	case 1613: { // jsset #[n],m,[x]
-		u32 s = get_m(BIT(opcode, 8, 6) & 7);
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],m,[x]");
 		break;
 		}
 	case 1614: { // jsset #[n],ep,[x]
-		u32 s = get_ep();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],ep,[x]");
 		break;
 		}
 	case 1615: { // jsset #[n],vba,[x]
-		u32 s = get_vba();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],vba,[x]");
 		break;
 		}
 	case 1616: { // jsset #[n],sc,[x]
-		u32 s = get_sc();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],sc,[x]");
 		break;
 		}
 	case 1617: { // jsset #[n],sz,[x]
-		u32 s = get_sz();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],sz,[x]");
 		break;
 		}
 	case 1618: { // jsset #[n],sr,[x]
-		u32 s = get_sr();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],sr,[x]");
 		break;
 		}
 	case 1619: { // jsset #[n],omr,[x]
-		u32 s = get_omr();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],omr,[x]");
 		break;
 		}
 	case 1620: { // jsset #[n],sp,[x]
-		u32 s = get_sp();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],sp,[x]");
 		break;
 		}
 	case 1621: { // jsset #[n],ssh,[x]
-		u32 s = get_ssh();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],ssh,[x]");
 		break;
 		}
 	case 1622: { // jsset #[n],ssl,[x]
-		u32 s = get_ssl();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],ssl,[x]");
 		break;
 		}
 	case 1623: { // jsset #[n],la,[x]
-		u32 s = get_la();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],la,[x]");
 		break;
 		}
 	case 1624: { // jsset #[n],lc,[x]
-		u32 s = get_lc();
-		u32 n = BIT(opcode, 0, 5);
-		u32 x = exv;
-		if(BIT(s, n)) {
-		inc_sp();
-		set_ssh(m_npc);
-		set_ssl(get_sr());
-		m_npc = x;
-		}
+		unhandled("jsset #[n],lc,[x]");
 		break;
 		}
 	case 1625: { // lra r,x0
@@ -42108,407 +36212,235 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1681: { // lua (r)-n,x0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_x0(ea);
+		unhandled("lua (r)-n,x0");
 		break;
 		}
 	case 1682: { // lua (r)-n,x1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_x1(ea);
+		unhandled("lua (r)-n,x1");
 		break;
 		}
 	case 1683: { // lua (r)-n,y0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_y0(ea);
+		unhandled("lua (r)-n,y0");
 		break;
 		}
 	case 1684: { // lua (r)-n,y1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_y1(ea);
+		unhandled("lua (r)-n,y1");
 		break;
 		}
 	case 1685: { // lua (r)-n,a0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_a0(ea);
+		unhandled("lua (r)-n,a0");
 		break;
 		}
 	case 1686: { // lua (r)-n,b0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_b0(ea);
+		unhandled("lua (r)-n,b0");
 		break;
 		}
 	case 1687: { // lua (r)-n,a2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_a2(ea);
+		unhandled("lua (r)-n,a2");
 		break;
 		}
 	case 1688: { // lua (r)-n,b2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_b2(ea);
+		unhandled("lua (r)-n,b2");
 		break;
 		}
 	case 1689: { // lua (r)-n,a1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_a1(ea);
+		unhandled("lua (r)-n,a1");
 		break;
 		}
 	case 1690: { // lua (r)-n,b1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_b1(ea);
+		unhandled("lua (r)-n,b1");
 		break;
 		}
 	case 1691: { // lua (r)-n,a
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_ah(ea);
+		unhandled("lua (r)-n,a");
 		break;
 		}
 	case 1692: { // lua (r)-n,b
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_bh(ea);
+		unhandled("lua (r)-n,b");
 		break;
 		}
 	case 1693: { // lua (r)-n,r
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_r(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)-n,r");
 		break;
 		}
 	case 1694: { // lua (r)-n,n
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		set_n(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)-n,n");
 		break;
 		}
 	case 1695: { // lua (r)+n,x0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_x0(ea);
+		unhandled("lua (r)+n,x0");
 		break;
 		}
 	case 1696: { // lua (r)+n,x1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_x1(ea);
+		unhandled("lua (r)+n,x1");
 		break;
 		}
 	case 1697: { // lua (r)+n,y0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_y0(ea);
+		unhandled("lua (r)+n,y0");
 		break;
 		}
 	case 1698: { // lua (r)+n,y1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_y1(ea);
+		unhandled("lua (r)+n,y1");
 		break;
 		}
 	case 1699: { // lua (r)+n,a0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_a0(ea);
+		unhandled("lua (r)+n,a0");
 		break;
 		}
 	case 1700: { // lua (r)+n,b0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_b0(ea);
+		unhandled("lua (r)+n,b0");
 		break;
 		}
 	case 1701: { // lua (r)+n,a2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_a2(ea);
+		unhandled("lua (r)+n,a2");
 		break;
 		}
 	case 1702: { // lua (r)+n,b2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_b2(ea);
+		unhandled("lua (r)+n,b2");
 		break;
 		}
 	case 1703: { // lua (r)+n,a1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_a1(ea);
+		unhandled("lua (r)+n,a1");
 		break;
 		}
 	case 1704: { // lua (r)+n,b1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_b1(ea);
+		unhandled("lua (r)+n,b1");
 		break;
 		}
 	case 1705: { // lua (r)+n,a
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_ah(ea);
+		unhandled("lua (r)+n,a");
 		break;
 		}
 	case 1706: { // lua (r)+n,b
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_bh(ea);
+		unhandled("lua (r)+n,b");
 		break;
 		}
 	case 1707: { // lua (r)+n,r
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_r(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)+n,r");
 		break;
 		}
 	case 1708: { // lua (r)+n,n
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		set_n(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)+n,n");
 		break;
 		}
 	case 1709: { // lua (r)-,x0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_x0(ea);
+		unhandled("lua (r)-,x0");
 		break;
 		}
 	case 1710: { // lua (r)-,x1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_x1(ea);
+		unhandled("lua (r)-,x1");
 		break;
 		}
 	case 1711: { // lua (r)-,y0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_y0(ea);
+		unhandled("lua (r)-,y0");
 		break;
 		}
 	case 1712: { // lua (r)-,y1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_y1(ea);
+		unhandled("lua (r)-,y1");
 		break;
 		}
 	case 1713: { // lua (r)-,a0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_a0(ea);
+		unhandled("lua (r)-,a0");
 		break;
 		}
 	case 1714: { // lua (r)-,b0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_b0(ea);
+		unhandled("lua (r)-,b0");
 		break;
 		}
 	case 1715: { // lua (r)-,a2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_a2(ea);
+		unhandled("lua (r)-,a2");
 		break;
 		}
 	case 1716: { // lua (r)-,b2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_b2(ea);
+		unhandled("lua (r)-,b2");
 		break;
 		}
 	case 1717: { // lua (r)-,a1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_a1(ea);
+		unhandled("lua (r)-,a1");
 		break;
 		}
 	case 1718: { // lua (r)-,b1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_b1(ea);
+		unhandled("lua (r)-,b1");
 		break;
 		}
 	case 1719: { // lua (r)-,a
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_ah(ea);
+		unhandled("lua (r)-,a");
 		break;
 		}
 	case 1720: { // lua (r)-,b
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_bh(ea);
+		unhandled("lua (r)-,b");
 		break;
 		}
 	case 1721: { // lua (r)-,r
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_r(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)-,r");
 		break;
 		}
 	case 1722: { // lua (r)-,n
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		set_n(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)-,n");
 		break;
 		}
 	case 1723: { // lua (r)+,x0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_x0(ea);
+		unhandled("lua (r)+,x0");
 		break;
 		}
 	case 1724: { // lua (r)+,x1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_x1(ea);
+		unhandled("lua (r)+,x1");
 		break;
 		}
 	case 1725: { // lua (r)+,y0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_y0(ea);
+		unhandled("lua (r)+,y0");
 		break;
 		}
 	case 1726: { // lua (r)+,y1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_y1(ea);
+		unhandled("lua (r)+,y1");
 		break;
 		}
 	case 1727: { // lua (r)+,a0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_a0(ea);
+		unhandled("lua (r)+,a0");
 		break;
 		}
 	case 1728: { // lua (r)+,b0
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_b0(ea);
+		unhandled("lua (r)+,b0");
 		break;
 		}
 	case 1729: { // lua (r)+,a2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_a2(ea);
+		unhandled("lua (r)+,a2");
 		break;
 		}
 	case 1730: { // lua (r)+,b2
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_b2(ea);
+		unhandled("lua (r)+,b2");
 		break;
 		}
 	case 1731: { // lua (r)+,a1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_a1(ea);
+		unhandled("lua (r)+,a1");
 		break;
 		}
 	case 1732: { // lua (r)+,b1
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_b1(ea);
+		unhandled("lua (r)+,b1");
 		break;
 		}
 	case 1733: { // lua (r)+,a
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_ah(ea);
+		unhandled("lua (r)+,a");
 		break;
 		}
 	case 1734: { // lua (r)+,b
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_bh(ea);
+		unhandled("lua (r)+,b");
 		break;
 		}
 	case 1735: { // lua (r)+,r
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_r(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)+,r");
 		break;
 		}
 	case 1736: { // lua (r)+,n
-		int ea_r = BIT(opcode, 8, 5) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		set_n(BIT(opcode, 0, 5) & 7, ea);
+		unhandled("lua (r)+,n");
 		break;
 		}
 	case 1737: { // lua (r+[o]),r
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 13, 12, 11, 7, 6, 5, 4), 7);
-		set_r(BIT(opcode, 0, 4) & 7, r + o);
+		unhandled("lua (r+[o]),r");
 		break;
 		}
 	case 1738: { // lua (r+[o]),n
-		u32 r = get_r(BIT(opcode, 8, 3) & 7);
-		u32 o = util::sext(bitswap<7>(opcode, 13, 12, 11, 7, 6, 5, 4), 7);
-		set_n(BIT(opcode, 0, 4) & 7, r + o);
+		unhandled("lua (r+[o]),n");
 		break;
 		}
 	case 1739: { // mac +y1,#[i],a
@@ -45932,147 +39864,99 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 2315: { // movec m,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
-		m_x.write_dword(abs, s1);
+		unhandled("movec m,x:[abs]");
 		break;
 		}
 	case 2316: { // movec ep,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_ep();
-		m_x.write_dword(abs, s1);
+		unhandled("movec ep,x:[abs]");
 		break;
 		}
 	case 2317: { // movec vba,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_vba();
-		m_x.write_dword(abs, s1);
+		unhandled("movec vba,x:[abs]");
 		break;
 		}
 	case 2318: { // movec sc,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sc();
-		m_x.write_dword(abs, s1);
+		unhandled("movec sc,x:[abs]");
 		break;
 		}
 	case 2319: { // movec sz,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sz();
-		m_x.write_dword(abs, s1);
+		unhandled("movec sz,x:[abs]");
 		break;
 		}
 	case 2320: { // movec sr,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sr();
-		m_x.write_dword(abs, s1);
+		unhandled("movec sr,x:[abs]");
 		break;
 		}
 	case 2321: { // movec omr,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_omr();
-		m_x.write_dword(abs, s1);
+		unhandled("movec omr,x:[abs]");
 		break;
 		}
 	case 2322: { // movec sp,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sp();
-		m_x.write_dword(abs, s1);
+		unhandled("movec sp,x:[abs]");
 		break;
 		}
 	case 2323: { // movec ssh,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_ssh();
-		m_x.write_dword(abs, s1);
+		unhandled("movec ssh,x:[abs]");
 		break;
 		}
 	case 2324: { // movec ssl,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_ssl();
-		m_x.write_dword(abs, s1);
+		unhandled("movec ssl,x:[abs]");
 		break;
 		}
 	case 2325: { // movec la,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_la();
-		m_x.write_dword(abs, s1);
+		unhandled("movec la,x:[abs]");
 		break;
 		}
 	case 2326: { // movec lc,x:[abs]
-		u32 abs = exv;
-		u32 s1 = get_lc();
-		m_x.write_dword(abs, s1);
+		unhandled("movec lc,x:[abs]");
 		break;
 		}
 	case 2327: { // movec m,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
-		m_y.write_dword(abs, s1);
+		unhandled("movec m,y:[abs]");
 		break;
 		}
 	case 2328: { // movec ep,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_ep();
-		m_y.write_dword(abs, s1);
+		unhandled("movec ep,y:[abs]");
 		break;
 		}
 	case 2329: { // movec vba,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_vba();
-		m_y.write_dword(abs, s1);
+		unhandled("movec vba,y:[abs]");
 		break;
 		}
 	case 2330: { // movec sc,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sc();
-		m_y.write_dword(abs, s1);
+		unhandled("movec sc,y:[abs]");
 		break;
 		}
 	case 2331: { // movec sz,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sz();
-		m_y.write_dword(abs, s1);
+		unhandled("movec sz,y:[abs]");
 		break;
 		}
 	case 2332: { // movec sr,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sr();
-		m_y.write_dword(abs, s1);
+		unhandled("movec sr,y:[abs]");
 		break;
 		}
 	case 2333: { // movec omr,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_omr();
-		m_y.write_dword(abs, s1);
+		unhandled("movec omr,y:[abs]");
 		break;
 		}
 	case 2334: { // movec sp,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_sp();
-		m_y.write_dword(abs, s1);
+		unhandled("movec sp,y:[abs]");
 		break;
 		}
 	case 2335: { // movec ssh,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_ssh();
-		m_y.write_dword(abs, s1);
+		unhandled("movec ssh,y:[abs]");
 		break;
 		}
 	case 2336: { // movec ssl,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_ssl();
-		m_y.write_dword(abs, s1);
+		unhandled("movec ssl,y:[abs]");
 		break;
 		}
 	case 2337: { // movec la,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_la();
-		m_y.write_dword(abs, s1);
+		unhandled("movec la,y:[abs]");
 		break;
 		}
 	case 2338: { // movec lc,y:[abs]
-		u32 abs = exv;
-		u32 s1 = get_lc();
-		m_y.write_dword(abs, s1);
+		unhandled("movec lc,y:[abs]");
 		break;
 		}
 	case 2339: { // movec x:[aa],m
@@ -56150,55 +50034,19 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 4101: { // or #[i],a
-		u32 d_1 = get_a1();
-		u32 i = BIT(opcode, 8, 6);
-		u32 r = d_1 | i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("or #[i],a");
 		break;
 		}
 	case 4102: { // or #[i],b
-		u32 d_1 = get_b1();
-		u32 i = BIT(opcode, 8, 6);
-		u32 r = d_1 | i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("or #[i],b");
 		break;
 		}
 	case 4103: { // or #[i],a
-		u32 d_1 = get_a1();
-		u32 i = exv;
-		u32 r = d_1 | i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_a1(r);
+		unhandled("or #[i],a");
 		break;
 		}
 	case 4104: { // or #[i],b
-		u32 d_1 = get_b1();
-		u32 i = exv;
-		u32 r = d_1 | i;
-		m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
-		if(!r) {
-		m_ccr = m_ccr | CCR_Z;
-		} else if(BIT(r, 23)) {
-		m_ccr = m_ccr | CCR_N;
-		}
-		set_b1(r);
+		unhandled("or #[i],b");
 		break;
 		}
 	case 4105: { // ori #[i],mr
@@ -56310,328 +50158,175 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 4130: { // rep x:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(ea));
-		m_rep = true;
+		unhandled("rep x:(r)-n");
 		break;
 		}
 	case 4131: { // rep y:(r)-n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -m_n[ea_r]);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(ea));
-		m_rep = true;
+		unhandled("rep y:(r)-n");
 		break;
 		}
 	case 4132: { // rep x:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(ea));
-		m_rep = true;
+		unhandled("rep x:(r)+n");
 		break;
 		}
 	case 4133: { // rep y:(r)+n
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, m_n[ea_r]);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(ea));
-		m_rep = true;
+		unhandled("rep y:(r)+n");
 		break;
 		}
 	case 4134: { // rep x:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(ea));
-		m_rep = true;
+		unhandled("rep x:(r)-");
 		break;
 		}
 	case 4135: { // rep y:(r)-
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, -1);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(ea));
-		m_rep = true;
+		unhandled("rep y:(r)-");
 		break;
 		}
 	case 4136: { // rep x:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(ea));
-		m_rep = true;
+		unhandled("rep x:(r)+");
 		break;
 		}
 	case 4137: { // rep y:(r)+
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		add_r(ea_r, 1);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(ea));
-		m_rep = true;
+		unhandled("rep y:(r)+");
 		break;
 		}
 	case 4138: { // rep x:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(ea));
-		m_rep = true;
+		unhandled("rep x:(r)");
 		break;
 		}
 	case 4139: { // rep y:(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = get_r(ea_r);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(ea));
-		m_rep = true;
+		unhandled("rep y:(r)");
 		break;
 		}
 	case 4140: { // rep x:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(ea));
-		m_rep = true;
+		unhandled("rep x:(r+n)");
 		break;
 		}
 	case 4141: { // rep y:(r+n)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(ea));
-		m_rep = true;
+		unhandled("rep y:(r+n)");
 		break;
 		}
 	case 4142: { // rep x:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(ea));
-		m_rep = true;
+		unhandled("rep x:-(r)");
 		break;
 		}
 	case 4143: { // rep y:-(r)
-		int ea_r = BIT(opcode, 8, 6) & 7;
-		add_r(ea_r, -1);
-		u32 ea = get_r(ea_r);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(ea));
-		m_rep = true;
+		unhandled("rep y:-(r)");
 		break;
 		}
 	case 4144: { // rep x:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_temp_lc = get_lc();
-		set_lc(m_x.read_dword(aa));
-		m_rep = true;
+		unhandled("rep x:[aa]");
 		break;
 		}
 	case 4145: { // rep y:[aa]
-		u32 aa = BIT(opcode, 8, 6);
-		m_temp_lc = get_lc();
-		set_lc(m_y.read_dword(aa));
-		m_rep = true;
+		unhandled("rep y:[aa]");
 		break;
 		}
 	case 4146: { // rep #[i]
-		u32 i = bitswap<12>(opcode, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
-		m_temp_lc = get_lc();
-		set_lc(i);
-		m_rep = true;
+		unhandled("rep #[i]");
 		break;
 		}
 	case 4147: { // rep x0
-		u32 s = get_x0();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep x0");
 		break;
 		}
 	case 4148: { // rep x1
-		u32 s = get_x1();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep x1");
 		break;
 		}
 	case 4149: { // rep y0
-		u32 s = get_y0();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep y0");
 		break;
 		}
 	case 4150: { // rep y1
-		u32 s = get_y1();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep y1");
 		break;
 		}
 	case 4151: { // rep a0
-		u32 s = get_a0();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep a0");
 		break;
 		}
 	case 4152: { // rep b0
-		u32 s = get_b0();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep b0");
 		break;
 		}
 	case 4153: { // rep a2
-		u32 s = get_a2();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep a2");
 		break;
 		}
 	case 4154: { // rep b2
-		u32 s = get_b2();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep b2");
 		break;
 		}
 	case 4155: { // rep a1
-		u32 s = get_a1();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep a1");
 		break;
 		}
 	case 4156: { // rep b1
-		u32 s = get_b1();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep b1");
 		break;
 		}
 	case 4157: { // rep a
-		u32 s_h = get_ah();
-		m_temp_lc = get_lc();
-		set_lc(s_h);
-		m_rep = true;
+		unhandled("rep a");
 		break;
 		}
 	case 4158: { // rep b
-		u32 s_h = get_bh();
-		m_temp_lc = get_lc();
-		set_lc(s_h);
-		m_rep = true;
+		unhandled("rep b");
 		break;
 		}
 	case 4159: { // rep r
-		u32 s = get_r(BIT(opcode, 8, 6) & 7);
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep r");
 		break;
 		}
 	case 4160: { // rep n
-		u32 s = get_n(BIT(opcode, 8, 6) & 7);
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep n");
 		break;
 		}
 	case 4161: { // rep m
-		u32 s = get_m(BIT(opcode, 8, 6) & 7);
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep m");
 		break;
 		}
 	case 4162: { // rep ep
-		u32 s = get_ep();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep ep");
 		break;
 		}
 	case 4163: { // rep vba
-		u32 s = get_vba();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep vba");
 		break;
 		}
 	case 4164: { // rep sc
-		u32 s = get_sc();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep sc");
 		break;
 		}
 	case 4165: { // rep sz
-		u32 s = get_sz();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep sz");
 		break;
 		}
 	case 4166: { // rep sr
-		u32 s = get_sr();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep sr");
 		break;
 		}
 	case 4167: { // rep omr
-		u32 s = get_omr();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep omr");
 		break;
 		}
 	case 4168: { // rep sp
-		u32 s = get_sp();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep sp");
 		break;
 		}
 	case 4169: { // rep ssh
-		u32 s = get_ssh();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep ssh");
 		break;
 		}
 	case 4170: { // rep ssl
-		u32 s = get_ssl();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep ssl");
 		break;
 		}
 	case 4171: { // rep la
-		u32 s = get_la();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep la");
 		break;
 		}
 	case 4172: { // rep lc
-		u32 s = get_lc();
-		m_temp_lc = get_lc();
-		set_lc(s);
-		m_rep = true;
+		unhandled("rep lc");
 		break;
 		}
 	case 4173: { // reset
@@ -56655,3035 +50350,1363 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 4177: { // sub #[i],a
-		u64 d = get_a();
-		u32 i = BIT(opcode, 8, 6);
-		set_a(do_sub56(u64(i) << 24, d));
+		unhandled("sub #[i],a");
 		break;
 		}
 	case 4178: { // sub #[i],b
-		u64 d = get_b();
-		u32 i = BIT(opcode, 8, 6);
-		set_b(do_sub56(u64(i) << 24, d));
+		unhandled("sub #[i],b");
 		break;
 		}
 	case 4179: { // sub #[i],a
-		u64 d = get_a();
-		u32 i = exv;
-		set_a(do_sub56(util::sext(u64(i) << 24, 48), d));
+		unhandled("sub #[i],a");
 		break;
 		}
 	case 4180: { // sub #[i],b
-		u64 d = get_b();
-		u32 i = exv;
-		set_b(do_sub56(util::sext(u64(i) << 24, 48), d));
+		unhandled("sub #[i],b");
 		break;
 		}
 	case 4181: { // tcc b,a
-		bool cc = test_cc();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcc b,a");
 		break;
 		}
 	case 4182: { // tcc b,b
-		bool cc = test_cc();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcc b,b");
 		break;
 		}
 	case 4183: { // tcc x0,a
-		bool cc = test_cc();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcc x0,a");
 		break;
 		}
 	case 4184: { // tcc x0,b
-		bool cc = test_cc();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcc x0,b");
 		break;
 		}
 	case 4185: { // tcc y0,a
-		bool cc = test_cc();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcc y0,a");
 		break;
 		}
 	case 4186: { // tcc y0,b
-		bool cc = test_cc();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcc y0,b");
 		break;
 		}
 	case 4187: { // tcc x1,a
-		bool cc = test_cc();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcc x1,a");
 		break;
 		}
 	case 4188: { // tcc x1,b
-		bool cc = test_cc();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcc x1,b");
 		break;
 		}
 	case 4189: { // tcc y1,a
-		bool cc = test_cc();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcc y1,a");
 		break;
 		}
 	case 4190: { // tcc y1,b
-		bool cc = test_cc();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcc y1,b");
 		break;
 		}
 	case 4191: { // tge b,a
-		bool cc = test_ge();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tge b,a");
 		break;
 		}
 	case 4192: { // tge b,b
-		bool cc = test_ge();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tge b,b");
 		break;
 		}
 	case 4193: { // tge x0,a
-		bool cc = test_ge();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tge x0,a");
 		break;
 		}
 	case 4194: { // tge x0,b
-		bool cc = test_ge();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tge x0,b");
 		break;
 		}
 	case 4195: { // tge y0,a
-		bool cc = test_ge();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tge y0,a");
 		break;
 		}
 	case 4196: { // tge y0,b
-		bool cc = test_ge();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tge y0,b");
 		break;
 		}
 	case 4197: { // tge x1,a
-		bool cc = test_ge();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tge x1,a");
 		break;
 		}
 	case 4198: { // tge x1,b
-		bool cc = test_ge();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tge x1,b");
 		break;
 		}
 	case 4199: { // tge y1,a
-		bool cc = test_ge();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tge y1,a");
 		break;
 		}
 	case 4200: { // tge y1,b
-		bool cc = test_ge();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tge y1,b");
 		break;
 		}
 	case 4201: { // tne b,a
-		bool cc = test_ne();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tne b,a");
 		break;
 		}
 	case 4202: { // tne b,b
-		bool cc = test_ne();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tne b,b");
 		break;
 		}
 	case 4203: { // tne x0,a
-		bool cc = test_ne();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tne x0,a");
 		break;
 		}
 	case 4204: { // tne x0,b
-		bool cc = test_ne();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tne x0,b");
 		break;
 		}
 	case 4205: { // tne y0,a
-		bool cc = test_ne();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tne y0,a");
 		break;
 		}
 	case 4206: { // tne y0,b
-		bool cc = test_ne();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tne y0,b");
 		break;
 		}
 	case 4207: { // tne x1,a
-		bool cc = test_ne();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tne x1,a");
 		break;
 		}
 	case 4208: { // tne x1,b
-		bool cc = test_ne();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tne x1,b");
 		break;
 		}
 	case 4209: { // tne y1,a
-		bool cc = test_ne();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tne y1,a");
 		break;
 		}
 	case 4210: { // tne y1,b
-		bool cc = test_ne();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tne y1,b");
 		break;
 		}
 	case 4211: { // tpl b,a
-		bool cc = test_pl();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tpl b,a");
 		break;
 		}
 	case 4212: { // tpl b,b
-		bool cc = test_pl();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tpl b,b");
 		break;
 		}
 	case 4213: { // tpl x0,a
-		bool cc = test_pl();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tpl x0,a");
 		break;
 		}
 	case 4214: { // tpl x0,b
-		bool cc = test_pl();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tpl x0,b");
 		break;
 		}
 	case 4215: { // tpl y0,a
-		bool cc = test_pl();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tpl y0,a");
 		break;
 		}
 	case 4216: { // tpl y0,b
-		bool cc = test_pl();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tpl y0,b");
 		break;
 		}
 	case 4217: { // tpl x1,a
-		bool cc = test_pl();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tpl x1,a");
 		break;
 		}
 	case 4218: { // tpl x1,b
-		bool cc = test_pl();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tpl x1,b");
 		break;
 		}
 	case 4219: { // tpl y1,a
-		bool cc = test_pl();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tpl y1,a");
 		break;
 		}
 	case 4220: { // tpl y1,b
-		bool cc = test_pl();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tpl y1,b");
 		break;
 		}
 	case 4221: { // tnn b,a
-		bool cc = test_nn();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnn b,a");
 		break;
 		}
 	case 4222: { // tnn b,b
-		bool cc = test_nn();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnn b,b");
 		break;
 		}
 	case 4223: { // tnn x0,a
-		bool cc = test_nn();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnn x0,a");
 		break;
 		}
 	case 4224: { // tnn x0,b
-		bool cc = test_nn();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnn x0,b");
 		break;
 		}
 	case 4225: { // tnn y0,a
-		bool cc = test_nn();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnn y0,a");
 		break;
 		}
 	case 4226: { // tnn y0,b
-		bool cc = test_nn();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnn y0,b");
 		break;
 		}
 	case 4227: { // tnn x1,a
-		bool cc = test_nn();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnn x1,a");
 		break;
 		}
 	case 4228: { // tnn x1,b
-		bool cc = test_nn();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnn x1,b");
 		break;
 		}
 	case 4229: { // tnn y1,a
-		bool cc = test_nn();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnn y1,a");
 		break;
 		}
 	case 4230: { // tnn y1,b
-		bool cc = test_nn();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnn y1,b");
 		break;
 		}
 	case 4231: { // tec b,a
-		bool cc = test_ec();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tec b,a");
 		break;
 		}
 	case 4232: { // tec b,b
-		bool cc = test_ec();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tec b,b");
 		break;
 		}
 	case 4233: { // tec x0,a
-		bool cc = test_ec();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tec x0,a");
 		break;
 		}
 	case 4234: { // tec x0,b
-		bool cc = test_ec();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tec x0,b");
 		break;
 		}
 	case 4235: { // tec y0,a
-		bool cc = test_ec();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tec y0,a");
 		break;
 		}
 	case 4236: { // tec y0,b
-		bool cc = test_ec();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tec y0,b");
 		break;
 		}
 	case 4237: { // tec x1,a
-		bool cc = test_ec();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tec x1,a");
 		break;
 		}
 	case 4238: { // tec x1,b
-		bool cc = test_ec();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tec x1,b");
 		break;
 		}
 	case 4239: { // tec y1,a
-		bool cc = test_ec();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tec y1,a");
 		break;
 		}
 	case 4240: { // tec y1,b
-		bool cc = test_ec();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tec y1,b");
 		break;
 		}
 	case 4241: { // tlc b,a
-		u32 cc = get_lc();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlc b,a");
 		break;
 		}
 	case 4242: { // tlc b,b
-		u32 cc = get_lc();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlc b,b");
 		break;
 		}
 	case 4243: { // tlc x0,a
-		u32 cc = get_lc();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlc x0,a");
 		break;
 		}
 	case 4244: { // tlc x0,b
-		u32 cc = get_lc();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlc x0,b");
 		break;
 		}
 	case 4245: { // tlc y0,a
-		u32 cc = get_lc();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlc y0,a");
 		break;
 		}
 	case 4246: { // tlc y0,b
-		u32 cc = get_lc();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlc y0,b");
 		break;
 		}
 	case 4247: { // tlc x1,a
-		u32 cc = get_lc();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlc x1,a");
 		break;
 		}
 	case 4248: { // tlc x1,b
-		u32 cc = get_lc();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlc x1,b");
 		break;
 		}
 	case 4249: { // tlc y1,a
-		u32 cc = get_lc();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlc y1,a");
 		break;
 		}
 	case 4250: { // tlc y1,b
-		u32 cc = get_lc();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlc y1,b");
 		break;
 		}
 	case 4251: { // tgt b,a
-		bool cc = test_gt();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tgt b,a");
 		break;
 		}
 	case 4252: { // tgt b,b
-		bool cc = test_gt();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tgt b,b");
 		break;
 		}
 	case 4253: { // tgt x0,a
-		bool cc = test_gt();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tgt x0,a");
 		break;
 		}
 	case 4254: { // tgt x0,b
-		bool cc = test_gt();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tgt x0,b");
 		break;
 		}
 	case 4255: { // tgt y0,a
-		bool cc = test_gt();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tgt y0,a");
 		break;
 		}
 	case 4256: { // tgt y0,b
-		bool cc = test_gt();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tgt y0,b");
 		break;
 		}
 	case 4257: { // tgt x1,a
-		bool cc = test_gt();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tgt x1,a");
 		break;
 		}
 	case 4258: { // tgt x1,b
-		bool cc = test_gt();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tgt x1,b");
 		break;
 		}
 	case 4259: { // tgt y1,a
-		bool cc = test_gt();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tgt y1,a");
 		break;
 		}
 	case 4260: { // tgt y1,b
-		bool cc = test_gt();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tgt y1,b");
 		break;
 		}
 	case 4261: { // tcs b,a
-		bool cc = test_cs();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcs b,a");
 		break;
 		}
 	case 4262: { // tcs b,b
-		bool cc = test_cs();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcs b,b");
 		break;
 		}
 	case 4263: { // tcs x0,a
-		bool cc = test_cs();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcs x0,a");
 		break;
 		}
 	case 4264: { // tcs x0,b
-		bool cc = test_cs();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcs x0,b");
 		break;
 		}
 	case 4265: { // tcs y0,a
-		bool cc = test_cs();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcs y0,a");
 		break;
 		}
 	case 4266: { // tcs y0,b
-		bool cc = test_cs();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcs y0,b");
 		break;
 		}
 	case 4267: { // tcs x1,a
-		bool cc = test_cs();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcs x1,a");
 		break;
 		}
 	case 4268: { // tcs x1,b
-		bool cc = test_cs();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcs x1,b");
 		break;
 		}
 	case 4269: { // tcs y1,a
-		bool cc = test_cs();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tcs y1,a");
 		break;
 		}
 	case 4270: { // tcs y1,b
-		bool cc = test_cs();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tcs y1,b");
 		break;
 		}
 	case 4271: { // tlt b,a
-		bool cc = test_lt();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlt b,a");
 		break;
 		}
 	case 4272: { // tlt b,b
-		bool cc = test_lt();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlt b,b");
 		break;
 		}
 	case 4273: { // tlt x0,a
-		bool cc = test_lt();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlt x0,a");
 		break;
 		}
 	case 4274: { // tlt x0,b
-		bool cc = test_lt();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlt x0,b");
 		break;
 		}
 	case 4275: { // tlt y0,a
-		bool cc = test_lt();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlt y0,a");
 		break;
 		}
 	case 4276: { // tlt y0,b
-		bool cc = test_lt();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlt y0,b");
 		break;
 		}
 	case 4277: { // tlt x1,a
-		bool cc = test_lt();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlt x1,a");
 		break;
 		}
 	case 4278: { // tlt x1,b
-		bool cc = test_lt();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlt x1,b");
 		break;
 		}
 	case 4279: { // tlt y1,a
-		bool cc = test_lt();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tlt y1,a");
 		break;
 		}
 	case 4280: { // tlt y1,b
-		bool cc = test_lt();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tlt y1,b");
 		break;
 		}
 	case 4281: { // teq b,a
-		bool cc = test_eq();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("teq b,a");
 		break;
 		}
 	case 4282: { // teq b,b
-		bool cc = test_eq();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("teq b,b");
 		break;
 		}
 	case 4283: { // teq x0,a
-		bool cc = test_eq();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("teq x0,a");
 		break;
 		}
 	case 4284: { // teq x0,b
-		bool cc = test_eq();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("teq x0,b");
 		break;
 		}
 	case 4285: { // teq y0,a
-		bool cc = test_eq();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("teq y0,a");
 		break;
 		}
 	case 4286: { // teq y0,b
-		bool cc = test_eq();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("teq y0,b");
 		break;
 		}
 	case 4287: { // teq x1,a
-		bool cc = test_eq();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("teq x1,a");
 		break;
 		}
 	case 4288: { // teq x1,b
-		bool cc = test_eq();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("teq x1,b");
 		break;
 		}
 	case 4289: { // teq y1,a
-		bool cc = test_eq();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("teq y1,a");
 		break;
 		}
 	case 4290: { // teq y1,b
-		bool cc = test_eq();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("teq y1,b");
 		break;
 		}
 	case 4291: { // tmi b,a
-		bool cc = test_mi();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tmi b,a");
 		break;
 		}
 	case 4292: { // tmi b,b
-		bool cc = test_mi();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tmi b,b");
 		break;
 		}
 	case 4293: { // tmi x0,a
-		bool cc = test_mi();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tmi x0,a");
 		break;
 		}
 	case 4294: { // tmi x0,b
-		bool cc = test_mi();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tmi x0,b");
 		break;
 		}
 	case 4295: { // tmi y0,a
-		bool cc = test_mi();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tmi y0,a");
 		break;
 		}
 	case 4296: { // tmi y0,b
-		bool cc = test_mi();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tmi y0,b");
 		break;
 		}
 	case 4297: { // tmi x1,a
-		bool cc = test_mi();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tmi x1,a");
 		break;
 		}
 	case 4298: { // tmi x1,b
-		bool cc = test_mi();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tmi x1,b");
 		break;
 		}
 	case 4299: { // tmi y1,a
-		bool cc = test_mi();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tmi y1,a");
 		break;
 		}
 	case 4300: { // tmi y1,b
-		bool cc = test_mi();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tmi y1,b");
 		break;
 		}
 	case 4301: { // tnr b,a
-		bool cc = test_nr();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnr b,a");
 		break;
 		}
 	case 4302: { // tnr b,b
-		bool cc = test_nr();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnr b,b");
 		break;
 		}
 	case 4303: { // tnr x0,a
-		bool cc = test_nr();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnr x0,a");
 		break;
 		}
 	case 4304: { // tnr x0,b
-		bool cc = test_nr();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnr x0,b");
 		break;
 		}
 	case 4305: { // tnr y0,a
-		bool cc = test_nr();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnr y0,a");
 		break;
 		}
 	case 4306: { // tnr y0,b
-		bool cc = test_nr();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnr y0,b");
 		break;
 		}
 	case 4307: { // tnr x1,a
-		bool cc = test_nr();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnr x1,a");
 		break;
 		}
 	case 4308: { // tnr x1,b
-		bool cc = test_nr();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnr x1,b");
 		break;
 		}
 	case 4309: { // tnr y1,a
-		bool cc = test_nr();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tnr y1,a");
 		break;
 		}
 	case 4310: { // tnr y1,b
-		bool cc = test_nr();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tnr y1,b");
 		break;
 		}
 	case 4311: { // tes b,a
-		bool cc = test_es();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tes b,a");
 		break;
 		}
 	case 4312: { // tes b,b
-		bool cc = test_es();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tes b,b");
 		break;
 		}
 	case 4313: { // tes x0,a
-		bool cc = test_es();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tes x0,a");
 		break;
 		}
 	case 4314: { // tes x0,b
-		bool cc = test_es();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tes x0,b");
 		break;
 		}
 	case 4315: { // tes y0,a
-		bool cc = test_es();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tes y0,a");
 		break;
 		}
 	case 4316: { // tes y0,b
-		bool cc = test_es();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tes y0,b");
 		break;
 		}
 	case 4317: { // tes x1,a
-		bool cc = test_es();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tes x1,a");
 		break;
 		}
 	case 4318: { // tes x1,b
-		bool cc = test_es();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tes x1,b");
 		break;
 		}
 	case 4319: { // tes y1,a
-		bool cc = test_es();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tes y1,a");
 		break;
 		}
 	case 4320: { // tes y1,b
-		bool cc = test_es();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tes y1,b");
 		break;
 		}
 	case 4321: { // tls b,a
-		bool cc = test_ls();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tls b,a");
 		break;
 		}
 	case 4322: { // tls b,b
-		bool cc = test_ls();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tls b,b");
 		break;
 		}
 	case 4323: { // tls x0,a
-		bool cc = test_ls();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tls x0,a");
 		break;
 		}
 	case 4324: { // tls x0,b
-		bool cc = test_ls();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tls x0,b");
 		break;
 		}
 	case 4325: { // tls y0,a
-		bool cc = test_ls();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tls y0,a");
 		break;
 		}
 	case 4326: { // tls y0,b
-		bool cc = test_ls();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tls y0,b");
 		break;
 		}
 	case 4327: { // tls x1,a
-		bool cc = test_ls();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tls x1,a");
 		break;
 		}
 	case 4328: { // tls x1,b
-		bool cc = test_ls();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tls x1,b");
 		break;
 		}
 	case 4329: { // tls y1,a
-		bool cc = test_ls();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tls y1,a");
 		break;
 		}
 	case 4330: { // tls y1,b
-		bool cc = test_ls();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tls y1,b");
 		break;
 		}
 	case 4331: { // tle b,a
-		bool cc = test_le();
-		u64 s1 = get_b();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tle b,a");
 		break;
 		}
 	case 4332: { // tle b,b
-		bool cc = test_le();
-		u64 s1 = get_b();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tle b,b");
 		break;
 		}
 	case 4333: { // tle x0,a
-		bool cc = test_le();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tle x0,a");
 		break;
 		}
 	case 4334: { // tle x0,b
-		bool cc = test_le();
-		u32 s1 = get_x0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tle x0,b");
 		break;
 		}
 	case 4335: { // tle y0,a
-		bool cc = test_le();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tle y0,a");
 		break;
 		}
 	case 4336: { // tle y0,b
-		bool cc = test_le();
-		u32 s1 = get_y0();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tle y0,b");
 		break;
 		}
 	case 4337: { // tle x1,a
-		bool cc = test_le();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tle x1,a");
 		break;
 		}
 	case 4338: { // tle x1,b
-		bool cc = test_le();
-		u32 s1 = get_x1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tle x1,b");
 		break;
 		}
 	case 4339: { // tle y1,a
-		bool cc = test_le();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_a(s1);
-		}
+		unhandled("tle y1,a");
 		break;
 		}
 	case 4340: { // tle y1,b
-		bool cc = test_le();
-		u32 s1 = get_y1();
-		if(cc) {
-		set_b(s1);
-		}
+		unhandled("tle y1,b");
 		break;
 		}
 	case 4341: { // tcc b,a r,r
-		bool cc = test_cc();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc b,a r,r");
 		break;
 		}
 	case 4342: { // tcc b,b r,r
-		bool cc = test_cc();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc b,b r,r");
 		break;
 		}
 	case 4343: { // tcc x0,a r,r
-		bool cc = test_cc();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc x0,a r,r");
 		break;
 		}
 	case 4344: { // tcc x0,b r,r
-		bool cc = test_cc();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc x0,b r,r");
 		break;
 		}
 	case 4345: { // tcc y0,a r,r
-		bool cc = test_cc();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc y0,a r,r");
 		break;
 		}
 	case 4346: { // tcc y0,b r,r
-		bool cc = test_cc();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc y0,b r,r");
 		break;
 		}
 	case 4347: { // tcc x1,a r,r
-		bool cc = test_cc();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc x1,a r,r");
 		break;
 		}
 	case 4348: { // tcc x1,b r,r
-		bool cc = test_cc();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc x1,b r,r");
 		break;
 		}
 	case 4349: { // tcc y1,a r,r
-		bool cc = test_cc();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc y1,a r,r");
 		break;
 		}
 	case 4350: { // tcc y1,b r,r
-		bool cc = test_cc();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc y1,b r,r");
 		break;
 		}
 	case 4351: { // tge b,a r,r
-		bool cc = test_ge();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge b,a r,r");
 		break;
 		}
 	case 4352: { // tge b,b r,r
-		bool cc = test_ge();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge b,b r,r");
 		break;
 		}
 	case 4353: { // tge x0,a r,r
-		bool cc = test_ge();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge x0,a r,r");
 		break;
 		}
 	case 4354: { // tge x0,b r,r
-		bool cc = test_ge();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge x0,b r,r");
 		break;
 		}
 	case 4355: { // tge y0,a r,r
-		bool cc = test_ge();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge y0,a r,r");
 		break;
 		}
 	case 4356: { // tge y0,b r,r
-		bool cc = test_ge();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge y0,b r,r");
 		break;
 		}
 	case 4357: { // tge x1,a r,r
-		bool cc = test_ge();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge x1,a r,r");
 		break;
 		}
 	case 4358: { // tge x1,b r,r
-		bool cc = test_ge();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge x1,b r,r");
 		break;
 		}
 	case 4359: { // tge y1,a r,r
-		bool cc = test_ge();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge y1,a r,r");
 		break;
 		}
 	case 4360: { // tge y1,b r,r
-		bool cc = test_ge();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge y1,b r,r");
 		break;
 		}
 	case 4361: { // tne b,a r,r
-		bool cc = test_ne();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne b,a r,r");
 		break;
 		}
 	case 4362: { // tne b,b r,r
-		bool cc = test_ne();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne b,b r,r");
 		break;
 		}
 	case 4363: { // tne x0,a r,r
-		bool cc = test_ne();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne x0,a r,r");
 		break;
 		}
 	case 4364: { // tne x0,b r,r
-		bool cc = test_ne();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne x0,b r,r");
 		break;
 		}
 	case 4365: { // tne y0,a r,r
-		bool cc = test_ne();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne y0,a r,r");
 		break;
 		}
 	case 4366: { // tne y0,b r,r
-		bool cc = test_ne();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne y0,b r,r");
 		break;
 		}
 	case 4367: { // tne x1,a r,r
-		bool cc = test_ne();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne x1,a r,r");
 		break;
 		}
 	case 4368: { // tne x1,b r,r
-		bool cc = test_ne();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne x1,b r,r");
 		break;
 		}
 	case 4369: { // tne y1,a r,r
-		bool cc = test_ne();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne y1,a r,r");
 		break;
 		}
 	case 4370: { // tne y1,b r,r
-		bool cc = test_ne();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne y1,b r,r");
 		break;
 		}
 	case 4371: { // tpl b,a r,r
-		bool cc = test_pl();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl b,a r,r");
 		break;
 		}
 	case 4372: { // tpl b,b r,r
-		bool cc = test_pl();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl b,b r,r");
 		break;
 		}
 	case 4373: { // tpl x0,a r,r
-		bool cc = test_pl();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl x0,a r,r");
 		break;
 		}
 	case 4374: { // tpl x0,b r,r
-		bool cc = test_pl();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl x0,b r,r");
 		break;
 		}
 	case 4375: { // tpl y0,a r,r
-		bool cc = test_pl();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl y0,a r,r");
 		break;
 		}
 	case 4376: { // tpl y0,b r,r
-		bool cc = test_pl();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl y0,b r,r");
 		break;
 		}
 	case 4377: { // tpl x1,a r,r
-		bool cc = test_pl();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl x1,a r,r");
 		break;
 		}
 	case 4378: { // tpl x1,b r,r
-		bool cc = test_pl();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl x1,b r,r");
 		break;
 		}
 	case 4379: { // tpl y1,a r,r
-		bool cc = test_pl();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl y1,a r,r");
 		break;
 		}
 	case 4380: { // tpl y1,b r,r
-		bool cc = test_pl();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl y1,b r,r");
 		break;
 		}
 	case 4381: { // tnn b,a r,r
-		bool cc = test_nn();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn b,a r,r");
 		break;
 		}
 	case 4382: { // tnn b,b r,r
-		bool cc = test_nn();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn b,b r,r");
 		break;
 		}
 	case 4383: { // tnn x0,a r,r
-		bool cc = test_nn();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn x0,a r,r");
 		break;
 		}
 	case 4384: { // tnn x0,b r,r
-		bool cc = test_nn();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn x0,b r,r");
 		break;
 		}
 	case 4385: { // tnn y0,a r,r
-		bool cc = test_nn();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn y0,a r,r");
 		break;
 		}
 	case 4386: { // tnn y0,b r,r
-		bool cc = test_nn();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn y0,b r,r");
 		break;
 		}
 	case 4387: { // tnn x1,a r,r
-		bool cc = test_nn();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn x1,a r,r");
 		break;
 		}
 	case 4388: { // tnn x1,b r,r
-		bool cc = test_nn();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn x1,b r,r");
 		break;
 		}
 	case 4389: { // tnn y1,a r,r
-		bool cc = test_nn();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn y1,a r,r");
 		break;
 		}
 	case 4390: { // tnn y1,b r,r
-		bool cc = test_nn();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn y1,b r,r");
 		break;
 		}
 	case 4391: { // tec b,a r,r
-		bool cc = test_ec();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec b,a r,r");
 		break;
 		}
 	case 4392: { // tec b,b r,r
-		bool cc = test_ec();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec b,b r,r");
 		break;
 		}
 	case 4393: { // tec x0,a r,r
-		bool cc = test_ec();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec x0,a r,r");
 		break;
 		}
 	case 4394: { // tec x0,b r,r
-		bool cc = test_ec();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec x0,b r,r");
 		break;
 		}
 	case 4395: { // tec y0,a r,r
-		bool cc = test_ec();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec y0,a r,r");
 		break;
 		}
 	case 4396: { // tec y0,b r,r
-		bool cc = test_ec();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec y0,b r,r");
 		break;
 		}
 	case 4397: { // tec x1,a r,r
-		bool cc = test_ec();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec x1,a r,r");
 		break;
 		}
 	case 4398: { // tec x1,b r,r
-		bool cc = test_ec();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec x1,b r,r");
 		break;
 		}
 	case 4399: { // tec y1,a r,r
-		bool cc = test_ec();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec y1,a r,r");
 		break;
 		}
 	case 4400: { // tec y1,b r,r
-		bool cc = test_ec();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec y1,b r,r");
 		break;
 		}
 	case 4401: { // tlc b,a r,r
-		u32 cc = get_lc();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc b,a r,r");
 		break;
 		}
 	case 4402: { // tlc b,b r,r
-		u32 cc = get_lc();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc b,b r,r");
 		break;
 		}
 	case 4403: { // tlc x0,a r,r
-		u32 cc = get_lc();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc x0,a r,r");
 		break;
 		}
 	case 4404: { // tlc x0,b r,r
-		u32 cc = get_lc();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc x0,b r,r");
 		break;
 		}
 	case 4405: { // tlc y0,a r,r
-		u32 cc = get_lc();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc y0,a r,r");
 		break;
 		}
 	case 4406: { // tlc y0,b r,r
-		u32 cc = get_lc();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc y0,b r,r");
 		break;
 		}
 	case 4407: { // tlc x1,a r,r
-		u32 cc = get_lc();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc x1,a r,r");
 		break;
 		}
 	case 4408: { // tlc x1,b r,r
-		u32 cc = get_lc();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc x1,b r,r");
 		break;
 		}
 	case 4409: { // tlc y1,a r,r
-		u32 cc = get_lc();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc y1,a r,r");
 		break;
 		}
 	case 4410: { // tlc y1,b r,r
-		u32 cc = get_lc();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc y1,b r,r");
 		break;
 		}
 	case 4411: { // tgt b,a r,r
-		bool cc = test_gt();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt b,a r,r");
 		break;
 		}
 	case 4412: { // tgt b,b r,r
-		bool cc = test_gt();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt b,b r,r");
 		break;
 		}
 	case 4413: { // tgt x0,a r,r
-		bool cc = test_gt();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt x0,a r,r");
 		break;
 		}
 	case 4414: { // tgt x0,b r,r
-		bool cc = test_gt();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt x0,b r,r");
 		break;
 		}
 	case 4415: { // tgt y0,a r,r
-		bool cc = test_gt();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt y0,a r,r");
 		break;
 		}
 	case 4416: { // tgt y0,b r,r
-		bool cc = test_gt();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt y0,b r,r");
 		break;
 		}
 	case 4417: { // tgt x1,a r,r
-		bool cc = test_gt();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt x1,a r,r");
 		break;
 		}
 	case 4418: { // tgt x1,b r,r
-		bool cc = test_gt();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt x1,b r,r");
 		break;
 		}
 	case 4419: { // tgt y1,a r,r
-		bool cc = test_gt();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt y1,a r,r");
 		break;
 		}
 	case 4420: { // tgt y1,b r,r
-		bool cc = test_gt();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt y1,b r,r");
 		break;
 		}
 	case 4421: { // tcs b,a r,r
-		bool cc = test_cs();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs b,a r,r");
 		break;
 		}
 	case 4422: { // tcs b,b r,r
-		bool cc = test_cs();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs b,b r,r");
 		break;
 		}
 	case 4423: { // tcs x0,a r,r
-		bool cc = test_cs();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs x0,a r,r");
 		break;
 		}
 	case 4424: { // tcs x0,b r,r
-		bool cc = test_cs();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs x0,b r,r");
 		break;
 		}
 	case 4425: { // tcs y0,a r,r
-		bool cc = test_cs();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs y0,a r,r");
 		break;
 		}
 	case 4426: { // tcs y0,b r,r
-		bool cc = test_cs();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs y0,b r,r");
 		break;
 		}
 	case 4427: { // tcs x1,a r,r
-		bool cc = test_cs();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs x1,a r,r");
 		break;
 		}
 	case 4428: { // tcs x1,b r,r
-		bool cc = test_cs();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs x1,b r,r");
 		break;
 		}
 	case 4429: { // tcs y1,a r,r
-		bool cc = test_cs();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs y1,a r,r");
 		break;
 		}
 	case 4430: { // tcs y1,b r,r
-		bool cc = test_cs();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs y1,b r,r");
 		break;
 		}
 	case 4431: { // tlt b,a r,r
-		bool cc = test_lt();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt b,a r,r");
 		break;
 		}
 	case 4432: { // tlt b,b r,r
-		bool cc = test_lt();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt b,b r,r");
 		break;
 		}
 	case 4433: { // tlt x0,a r,r
-		bool cc = test_lt();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt x0,a r,r");
 		break;
 		}
 	case 4434: { // tlt x0,b r,r
-		bool cc = test_lt();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt x0,b r,r");
 		break;
 		}
 	case 4435: { // tlt y0,a r,r
-		bool cc = test_lt();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt y0,a r,r");
 		break;
 		}
 	case 4436: { // tlt y0,b r,r
-		bool cc = test_lt();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt y0,b r,r");
 		break;
 		}
 	case 4437: { // tlt x1,a r,r
-		bool cc = test_lt();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt x1,a r,r");
 		break;
 		}
 	case 4438: { // tlt x1,b r,r
-		bool cc = test_lt();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt x1,b r,r");
 		break;
 		}
 	case 4439: { // tlt y1,a r,r
-		bool cc = test_lt();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt y1,a r,r");
 		break;
 		}
 	case 4440: { // tlt y1,b r,r
-		bool cc = test_lt();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt y1,b r,r");
 		break;
 		}
 	case 4441: { // teq b,a r,r
-		bool cc = test_eq();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq b,a r,r");
 		break;
 		}
 	case 4442: { // teq b,b r,r
-		bool cc = test_eq();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq b,b r,r");
 		break;
 		}
 	case 4443: { // teq x0,a r,r
-		bool cc = test_eq();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq x0,a r,r");
 		break;
 		}
 	case 4444: { // teq x0,b r,r
-		bool cc = test_eq();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq x0,b r,r");
 		break;
 		}
 	case 4445: { // teq y0,a r,r
-		bool cc = test_eq();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq y0,a r,r");
 		break;
 		}
 	case 4446: { // teq y0,b r,r
-		bool cc = test_eq();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq y0,b r,r");
 		break;
 		}
 	case 4447: { // teq x1,a r,r
-		bool cc = test_eq();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq x1,a r,r");
 		break;
 		}
 	case 4448: { // teq x1,b r,r
-		bool cc = test_eq();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq x1,b r,r");
 		break;
 		}
 	case 4449: { // teq y1,a r,r
-		bool cc = test_eq();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq y1,a r,r");
 		break;
 		}
 	case 4450: { // teq y1,b r,r
-		bool cc = test_eq();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq y1,b r,r");
 		break;
 		}
 	case 4451: { // tmi b,a r,r
-		bool cc = test_mi();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi b,a r,r");
 		break;
 		}
 	case 4452: { // tmi b,b r,r
-		bool cc = test_mi();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi b,b r,r");
 		break;
 		}
 	case 4453: { // tmi x0,a r,r
-		bool cc = test_mi();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi x0,a r,r");
 		break;
 		}
 	case 4454: { // tmi x0,b r,r
-		bool cc = test_mi();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi x0,b r,r");
 		break;
 		}
 	case 4455: { // tmi y0,a r,r
-		bool cc = test_mi();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi y0,a r,r");
 		break;
 		}
 	case 4456: { // tmi y0,b r,r
-		bool cc = test_mi();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi y0,b r,r");
 		break;
 		}
 	case 4457: { // tmi x1,a r,r
-		bool cc = test_mi();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi x1,a r,r");
 		break;
 		}
 	case 4458: { // tmi x1,b r,r
-		bool cc = test_mi();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi x1,b r,r");
 		break;
 		}
 	case 4459: { // tmi y1,a r,r
-		bool cc = test_mi();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi y1,a r,r");
 		break;
 		}
 	case 4460: { // tmi y1,b r,r
-		bool cc = test_mi();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi y1,b r,r");
 		break;
 		}
 	case 4461: { // tnr b,a r,r
-		bool cc = test_nr();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr b,a r,r");
 		break;
 		}
 	case 4462: { // tnr b,b r,r
-		bool cc = test_nr();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr b,b r,r");
 		break;
 		}
 	case 4463: { // tnr x0,a r,r
-		bool cc = test_nr();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr x0,a r,r");
 		break;
 		}
 	case 4464: { // tnr x0,b r,r
-		bool cc = test_nr();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr x0,b r,r");
 		break;
 		}
 	case 4465: { // tnr y0,a r,r
-		bool cc = test_nr();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr y0,a r,r");
 		break;
 		}
 	case 4466: { // tnr y0,b r,r
-		bool cc = test_nr();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr y0,b r,r");
 		break;
 		}
 	case 4467: { // tnr x1,a r,r
-		bool cc = test_nr();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr x1,a r,r");
 		break;
 		}
 	case 4468: { // tnr x1,b r,r
-		bool cc = test_nr();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr x1,b r,r");
 		break;
 		}
 	case 4469: { // tnr y1,a r,r
-		bool cc = test_nr();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr y1,a r,r");
 		break;
 		}
 	case 4470: { // tnr y1,b r,r
-		bool cc = test_nr();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr y1,b r,r");
 		break;
 		}
 	case 4471: { // tes b,a r,r
-		bool cc = test_es();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes b,a r,r");
 		break;
 		}
 	case 4472: { // tes b,b r,r
-		bool cc = test_es();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes b,b r,r");
 		break;
 		}
 	case 4473: { // tes x0,a r,r
-		bool cc = test_es();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes x0,a r,r");
 		break;
 		}
 	case 4474: { // tes x0,b r,r
-		bool cc = test_es();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes x0,b r,r");
 		break;
 		}
 	case 4475: { // tes y0,a r,r
-		bool cc = test_es();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes y0,a r,r");
 		break;
 		}
 	case 4476: { // tes y0,b r,r
-		bool cc = test_es();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes y0,b r,r");
 		break;
 		}
 	case 4477: { // tes x1,a r,r
-		bool cc = test_es();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes x1,a r,r");
 		break;
 		}
 	case 4478: { // tes x1,b r,r
-		bool cc = test_es();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes x1,b r,r");
 		break;
 		}
 	case 4479: { // tes y1,a r,r
-		bool cc = test_es();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes y1,a r,r");
 		break;
 		}
 	case 4480: { // tes y1,b r,r
-		bool cc = test_es();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes y1,b r,r");
 		break;
 		}
 	case 4481: { // tls b,a r,r
-		bool cc = test_ls();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls b,a r,r");
 		break;
 		}
 	case 4482: { // tls b,b r,r
-		bool cc = test_ls();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls b,b r,r");
 		break;
 		}
 	case 4483: { // tls x0,a r,r
-		bool cc = test_ls();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls x0,a r,r");
 		break;
 		}
 	case 4484: { // tls x0,b r,r
-		bool cc = test_ls();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls x0,b r,r");
 		break;
 		}
 	case 4485: { // tls y0,a r,r
-		bool cc = test_ls();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls y0,a r,r");
 		break;
 		}
 	case 4486: { // tls y0,b r,r
-		bool cc = test_ls();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls y0,b r,r");
 		break;
 		}
 	case 4487: { // tls x1,a r,r
-		bool cc = test_ls();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls x1,a r,r");
 		break;
 		}
 	case 4488: { // tls x1,b r,r
-		bool cc = test_ls();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls x1,b r,r");
 		break;
 		}
 	case 4489: { // tls y1,a r,r
-		bool cc = test_ls();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls y1,a r,r");
 		break;
 		}
 	case 4490: { // tls y1,b r,r
-		bool cc = test_ls();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls y1,b r,r");
 		break;
 		}
 	case 4491: { // tle b,a r,r
-		bool cc = test_le();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle b,a r,r");
 		break;
 		}
 	case 4492: { // tle b,b r,r
-		bool cc = test_le();
-		u64 s1 = get_b();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle b,b r,r");
 		break;
 		}
 	case 4493: { // tle x0,a r,r
-		bool cc = test_le();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle x0,a r,r");
 		break;
 		}
 	case 4494: { // tle x0,b r,r
-		bool cc = test_le();
-		u32 s1 = get_x0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle x0,b r,r");
 		break;
 		}
 	case 4495: { // tle y0,a r,r
-		bool cc = test_le();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle y0,a r,r");
 		break;
 		}
 	case 4496: { // tle y0,b r,r
-		bool cc = test_le();
-		u32 s1 = get_y0();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle y0,b r,r");
 		break;
 		}
 	case 4497: { // tle x1,a r,r
-		bool cc = test_le();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle x1,a r,r");
 		break;
 		}
 	case 4498: { // tle x1,b r,r
-		bool cc = test_le();
-		u32 s1 = get_x1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle x1,b r,r");
 		break;
 		}
 	case 4499: { // tle y1,a r,r
-		bool cc = test_le();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_a(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle y1,a r,r");
 		break;
 		}
 	case 4500: { // tle y1,b r,r
-		bool cc = test_le();
-		u32 s1 = get_y1();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_b(s1);
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle y1,b r,r");
 		break;
 		}
 	case 4501: { // tcc r,r
-		bool cc = test_cc();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcc r,r");
 		break;
 		}
 	case 4502: { // tge r,r
-		bool cc = test_ge();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tge r,r");
 		break;
 		}
 	case 4503: { // tne r,r
-		bool cc = test_ne();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tne r,r");
 		break;
 		}
 	case 4504: { // tpl r,r
-		bool cc = test_pl();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tpl r,r");
 		break;
 		}
 	case 4505: { // tnn r,r
-		bool cc = test_nn();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnn r,r");
 		break;
 		}
 	case 4506: { // tec r,r
-		bool cc = test_ec();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tec r,r");
 		break;
 		}
 	case 4507: { // tlc r,r
-		u32 cc = get_lc();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlc r,r");
 		break;
 		}
 	case 4508: { // tgt r,r
-		bool cc = test_gt();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tgt r,r");
 		break;
 		}
 	case 4509: { // tcs r,r
-		bool cc = test_cs();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tcs r,r");
 		break;
 		}
 	case 4510: { // tlt r,r
-		bool cc = test_lt();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tlt r,r");
 		break;
 		}
 	case 4511: { // teq r,r
-		bool cc = test_eq();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("teq r,r");
 		break;
 		}
 	case 4512: { // tmi r,r
-		bool cc = test_mi();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tmi r,r");
 		break;
 		}
 	case 4513: { // tnr r,r
-		bool cc = test_nr();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tnr r,r");
 		break;
 		}
 	case 4514: { // tes r,r
-		bool cc = test_es();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tes r,r");
 		break;
 		}
 	case 4515: { // tls r,r
-		bool cc = test_ls();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tls r,r");
 		break;
 		}
 	case 4516: { // tle r,r
-		bool cc = test_le();
-		u32 s2 = get_r(BIT(opcode, 8, 3) & 7);
-		if(cc) {
-		set_r(BIT(opcode, 0, 3) & 7, s2);
-		}
+		unhandled("tle r,r");
 		break;
 		}
 	case 4517: { // trap

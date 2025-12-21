@@ -3176,7 +3176,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="fraka" cloneof="frak">
-		<description>Frak! (alternative)</description>
+		<description>Frak! (Alternative)</description>
 		<year>198?</year>
 		<publisher>Alternative</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -3521,7 +3521,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="ggoochcra" cloneof="ggoochcr">
-		<description>Graham Gooch's Test Cricket (alternative)</description>
+		<description>Graham Gooch's Test Cricket (Alternative)</description>
 		<year>198?</year>
 		<publisher>Alternative</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -7868,7 +7868,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="zalagaa" cloneof="zalaga">
-		<description>Zalaga (alternative)</description>
+		<description>Zalaga (Alternative)</description>
 		<year>198?</year>
 		<publisher>Alternative</publisher>
 		<part name="cass" interface="bbc_cass">

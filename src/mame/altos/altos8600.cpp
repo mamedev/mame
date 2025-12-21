@@ -3,19 +3,18 @@
 // 20MB HDD image CHS 512,5,17
 
 #include "emu.h"
-#include "acs8600_ics.h"
-
-#include "bus/rs232/rs232.h"
-#include "cpu/i8089/i8089.h"
 #include "cpu/i86/i86.h"
-#include "imagedev/floppy.h"
-#include "imagedev/harddriv.h"
-#include "machine/i8255.h"
+#include "cpu/i8089/i8089.h"
+#include "machine/ram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ram.h"
-#include "machine/wd_fdc.h"
+#include "machine/i8255.h"
 #include "machine/z80sio.h"
+#include "machine/wd_fdc.h"
+#include "acs8600_ics.h"
+#include "imagedev/floppy.h"
+#include "imagedev/harddriv.h"
+#include "bus/rs232/rs232.h"
 
 
 namespace {
@@ -536,7 +535,7 @@ u16 altos8600_state::xlate_r(offs_t offset, u16 mem_mask, int permbit)
 		seterr(offset, mem_mask, 0x800);
 	else if(m_user && !BIT(flags, permbit))
 		seterr(offset, mem_mask, 1 << permbit);
-	return m_ram->pointer<u16>()[(page << 11) | (offset & 0x7ff)];
+	return ((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)];
 
 }
 
@@ -558,7 +557,7 @@ void altos8600_state::xlate_w(offs_t offset, u16 data, u16 mem_mask, int permbit
 		seterr(offset, mem_mask, 1 << permbit);
 	else if(m_user && BIT(flags, 3) && ((offset & 0x7ff) < 64))
 		seterr(offset, mem_mask, 8);
-	COMBINE_DATA(m_ram->pointer<u16>() + ((page << 11) | (offset & 0x7ff)));
+	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
 	m_mmuflags[offset >> 11] |= 4;
 }
 
@@ -630,7 +629,7 @@ u16 altos8600_state::dmacram_r(offs_t offset, u16 mem_mask)
 		return m_bios->as_u16(offset & 0xfff);
 	if(!BIT(flags, 10))
 		seterr(offset, mem_mask, 0x400);
-	return m_ram->pointer<u16>()[(page << 11) | (offset & 0x7ff)];
+	return ((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)];
 
 }
 
@@ -643,7 +642,7 @@ void altos8600_state::dmacram_w(offs_t offset, u16 data, u16 mem_mask)
 		seterr(offset, mem_mask, 0x40);
 		return;
 	}
-	COMBINE_DATA(m_ram->pointer<u16>() + ((page << 11) | (offset & 0x7ff)));
+	COMBINE_DATA(&((u16 *)(m_ram->pointer()))[(page << 11) | (offset & 0x7ff)]);
 	m_mmuflags[offset >> 11] |= 4;
 }
 

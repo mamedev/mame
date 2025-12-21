@@ -951,8 +951,7 @@ bool td0_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			sects[i].sector      = hs[2];
 			sects[i].size        = hs[3];
 			sects[i].deleted     = (hs[4] & 4) == 4;
-			sects[i].bad_data_crc = (hs[4] & 2) == 2;
-			sects[i].bad_addr_crc = false;
+			sects[i].bad_crc     = (hs[4] & 2) == 2;
 
 			if(hs[4] & 0x30)
 				size = 0;

@@ -61,12 +61,13 @@ public:
 class i82443bx_bridge_device : public pci_bridge_device
 {
 public:
-	/*template <typename T> i82443bx_bridge_device(
+	/*template <typename T> sis630_bridge_device(
 	    const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
 	    T &&gui_tag
-	) : i82443bx_bridge_device(mconfig, tag, owner, clock)
+	) : sis630_bridge_device(mconfig, tag, owner, clock)
 	{
-	    set_ids_bridge(0x80867191, 0x00);
+	    // either 0001 or 6001 as device ID
+	    set_ids_bridge(0x10396001, 0x00);
 	    //set_multifunction_device(true);
 	    //m_vga.set_tag(std::forward<T>(gui_tag));
 	}*/

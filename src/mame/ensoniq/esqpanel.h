@@ -34,10 +34,6 @@ public:
 	void xmit_char(uint8_t data);
 	virtual void set_analog_value(offs_t offset, uint16_t value);
 	virtual void set_button(uint8_t button, bool pressed);
-	virtual void key_down(uint8_t key, uint8_t velocity);
-	virtual void key_pressure(uint8_t key, uint8_t pressure);
-	virtual void key_up(uint8_t key);
-	virtual void set_floppy_active(bool floppy_active) { }
 
 protected:
 	// construction/destruction
@@ -112,10 +108,7 @@ public:
 	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, int panel_type = UNKNOWN, uint32_t clock = 0);
 
 	DECLARE_INPUT_CHANGED_MEMBER(button_change);
-	DECLARE_INPUT_CHANGED_MEMBER(patch_select_change);
 	DECLARE_INPUT_CHANGED_MEMBER(analog_value_change);
-	DECLARE_INPUT_CHANGED_MEMBER(key_change);
-	void set_floppy_active(bool floppy_active) override;
 
 	void set_family_member(int family_member);
 
@@ -156,8 +149,6 @@ private:
 	required_ioport m_buttons_32;
 	required_ioport m_analog_data_entry;
 	required_ioport m_analog_volume;
-
-	bool m_floppy_active = false;
 
 	TIMER_CALLBACK_MEMBER(update_blink);
 	void update_lights();

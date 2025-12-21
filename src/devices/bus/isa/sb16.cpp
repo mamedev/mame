@@ -4,15 +4,7 @@
 // Soundblaster 16 - LLE
 //
 // The mcu does host communication and control of the dma-dac unit
-/*
- * TODO:
- * - UART is connected to MIDI port, mixer, adc
- * - jagdead: Gus utterances randomly drifts (enables both DMA controls)
- * - tentacle: misses voice playback quite often (voice mixing?)
- * - guimo: acts weird with sound detail and frequency (really a PIT bug?)
- * - Move DSP code out, for bus/pc98_cbus/sb16_ct2720
- *
- */
+// TODO: UART is connected to MIDI port, mixer, adc
 
 #include "emu.h"
 #include "sb16.h"
@@ -96,7 +88,6 @@ void sb16_lle_device::p1_w(uint8_t data)
 uint8_t sb16_lle_device::p2_r()
 {
 	return 0;
-	// return (m_timer->period() == attotime::never) << 4;
 }
 
 void sb16_lle_device::p2_w(uint8_t data)
@@ -107,16 +98,14 @@ void sb16_lle_device::p2_w(uint8_t data)
 	 * bit2 -
 	 * bit3 -
 	 * bit4 - clock running?
-	 * bit5 - prescaler or clock input source (checked around PC=af1, guimo on low sound detail)
+	 * bit5 - ?
 	 * bit6 - ?
 	 * bit7 - ?
 	*/
 }
 
-void sb16_lle_device::control_timer()
+void sb16_lle_device::control_timer(bool start)
 {
-	const bool start = !BIT(m_ctrl8, 1) || !BIT(m_ctrl16, 1) || BIT(m_mode, 1);
-
 	if(start && m_freq)
 	{
 		double rate = ((46.61512_MHz_XTAL).dvalue()/1024/256) * m_freq;
@@ -129,7 +118,8 @@ void sb16_lle_device::control_timer()
 void sb16_lle_device::rate_w(uint8_t data)
 {
 	m_freq = data;
-	control_timer();
+	if(!(m_ctrl8 & 2) || !(m_ctrl16 & 2))
+		control_timer(true);
 }
 
 uint8_t sb16_lle_device::dma8_r()
@@ -167,13 +157,13 @@ uint8_t sb16_lle_device::ctrl8_r()
 void sb16_lle_device::ctrl8_w(uint8_t data)
 {
 	/* port 0x08
-	 * bit0 - DMA resume? (resuming from pause in tentacle)
+	 * bit0 - ?
 	 * bit1 - stop transfer
 	 * bit2 - load counter
 	 * bit3 -
 	 * bit4 -
 	 * bit5 -
-	 * bit6 - DMA pause? (wolf3d, entering pause in tentacle)
+	 * bit6 - ? (wolf3d)
 	 * bit7 - toggle for 8bit irq
 	*/
 	if(data & 4)
@@ -184,36 +174,23 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 		m_dma8_cnt ++;
 		m_dma8_done = false;
 	}
+	if(!(data & 2) || !(m_ctrl16 & 2))
+		control_timer(true);
 	if(data & 2)
 	{
 		m_isa->drq1_w(0);
-		//if(m_ctrl16 & 2)
-		//	control_timer(false);
+		if(m_ctrl16 & 2)
+			control_timer(false);
 	}
-	// wolf3d disagrees with drq high here (will be short by 1 sample, cfr. MT09316)
-	//else
-	//  m_isa->drq1_w(1);
-
-//  if (data & 0x40)
-//  {
-//      printf("DMA pause? %02x\n", data);
-//      //m_isa->drq1_w(0);
-//      control_timer(false);
-//  }
-//  else if (data & 1)
-//  {
-//      printf("DMA resume? %02x\n", data);
-//      //m_isa->drq1_w(1);
-//      control_timer(true);
-//  }
+	else
+		m_isa->drq1_w(1);
 
 	if(data & 0x80)
 	{
 		m_irq8 = true;
-		m_irqs->in_w<0>(ASSERT_LINE);
+		m_isa->irq5_w(ASSERT_LINE);
 	}
 	m_ctrl8 = data;
-	control_timer();
 }
 
 uint8_t sb16_lle_device::ctrl16_r()
@@ -241,24 +218,23 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 		m_dma16_cnt ++;
 		m_dma16_done = false;
 	}
-	//if(!(data & 2) || !(m_ctrl8 & 2))
-	//	control_timer(true);
+	if(!(data & 2) || !(m_ctrl8 & 2))
+		control_timer(true);
 	if(data & 2)
 	{
 		m_isa->drq5_w(0);
-		//if(m_ctrl8 & 2)
-		//	control_timer(false);
+		if(m_ctrl8 & 2)
+			control_timer(false);
 	}
-	//else
-	//  m_isa->drq5_w(1);
+	else
+		m_isa->drq5_w(1);
 
 	if(data & 0x80)
 	{
 		m_irq16 = true;
-		m_irqs->in_w<1>(ASSERT_LINE);
+		m_isa->irq5_w(ASSERT_LINE);
 	}
 	m_ctrl16 = data;
-	control_timer();
 }
 
 uint8_t sb16_lle_device::dac_fifo_ctrl_r()
@@ -325,7 +301,7 @@ void sb16_lle_device::mode_w(uint8_t data)
 {
 	/* port 0x04
 	 * bit0 - 1 -- dac 16, adc 8; 0 -- adc 16, dac 8
-	 * bit1 - output silence (required for fwmigolf for card detection)
+	 * bit1 - int every sample
 	 * bit2 - int dma complete
 	 * bit3 -
 	 * bit4 - 8 bit signed
@@ -334,7 +310,6 @@ void sb16_lle_device::mode_w(uint8_t data)
 	 * bit7 - 16 bit mono
 	*/
 	m_mode = data;
-	control_timer();
 }
 
 uint8_t sb16_lle_device::dma8_ready_r()
@@ -369,22 +344,12 @@ uint8_t sb16_lle_device::adc_data_ready_r()
 
 uint8_t sb16_lle_device::dma8_cnt_lo_r()
 {
-	u8 res = m_dma8_cnt;
-	if (!(BIT(m_mode, 6)))
-		res <<= 1;
-	res --;
-
-	return res & 0xff;
+	return m_dma8_cnt & 0xff;
 }
 
 uint8_t sb16_lle_device::dma8_cnt_hi_r()
 {
-	u8 res = m_dma8_cnt;
-	if (!(BIT(m_mode, 6)))
-		res <<= 1;
-	res --;
-
-	return res >> 8;
+	return m_dma8_cnt >> 8;
 }
 
 void sb16_lle_device::dma8_len_lo_w(uint8_t data)
@@ -423,8 +388,7 @@ void sb16_lle_device::sb16_data(address_map &map)
 	map(0x0004, 0x0004).mirror(0xff00).rw(FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
 	map(0x0005, 0x0005).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
 	map(0x0006, 0x0006).mirror(0xff00).r(FUNC(sb16_lle_device::dma_stat_r));
-	// unknown, readback status of stereo f/f? (doom)
-	map(0x0007, 0x0007).mirror(0xff00).lr8(NAME([] () { return 0; }));
+//  map(0x0007, 0x0007) // unknown, readback status of stereo f/f?
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
 	map(0x0009, 0x0009).mirror(0xff00).w(FUNC(sb16_lle_device::rate_w));
 	map(0x000A, 0x000A).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_lo_r));
@@ -449,14 +413,11 @@ void sb16_lle_device::sb16_data(address_map &map)
 
 void sb16_lle_device::host_io(address_map &map)
 {
-	map(0x00, 0x03).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
-	map(0x04, 0x05).rw(m_mixer, FUNC(ct1745_mixer_device::read), FUNC(ct1745_mixer_device::write));
-	map(0x06, 0x07).w(FUNC(sb16_lle_device::dsp_reset_w));
-	map(0x08, 0x09).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
-	map(0x0a, 0x0b).r(FUNC(sb16_lle_device::host_data_r));
-	map(0x0c, 0x0d).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
-	map(0x0e, 0x0f).r(FUNC(sb16_lle_device::dsp_rbuf_status_r));
-//  map(0x10, 0x13) CD-ROM interface
+	map(0x4, 0x5).rw(m_mixer, FUNC(ct1745_mixer_device::read), FUNC(ct1745_mixer_device::write));
+	map(0x6, 0x7).w(FUNC(sb16_lle_device::dsp_reset_w));
+	map(0xa, 0xb).r(FUNC(sb16_lle_device::host_data_r));
+	map(0xc, 0xd).rw(FUNC(sb16_lle_device::dsp_wbuf_status_r), FUNC(sb16_lle_device::host_cmd_w));
+	map(0xe, 0xf).r(FUNC(sb16_lle_device::dsp_rbuf_status_r));
 }
 
 const tiny_rom_entry *sb16_lle_device::device_rom_region() const
@@ -472,12 +433,11 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 	m_cpu->port_out_cb<1>().set(FUNC(sb16_lle_device::p1_w));
 	m_cpu->port_in_cb<2>().set(FUNC(sb16_lle_device::p2_r));
 	m_cpu->port_out_cb<2>().set(FUNC(sb16_lle_device::p2_w));
-	m_cpu->port_in_cb<3>().set_constant(0xff); // spammy
 
 	SPEAKER(config, "speaker", 2).front();
 
 	CT1745(config, m_mixer);
-	m_mixer->set_fm_tag(m_opl3);
+	m_mixer->set_fm_tag("ymf262");
 	m_mixer->set_ldac_tag(m_ldac);
 	m_mixer->set_rdac_tag(m_rdac);
 	m_mixer->add_route(0, "speaker", 1.0, 0);
@@ -486,17 +446,14 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 		return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
 	});
 
-	// TODO: PnP line
-	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) {m_isa->irq5_w(state ? ASSERT_LINE : CLEAR_LINE); });
-
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 0); // unknown DAC
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 1); // unknown DAC
 
-	YMF262(config, m_opl3, XTAL(14'318'181));
-	m_opl3->add_route(0, m_mixer, 1.00, 0);
-	m_opl3->add_route(1, m_mixer, 1.00, 1);
-	m_opl3->add_route(2, m_mixer, 1.00, 0);
-	m_opl3->add_route(3, m_mixer, 1.00, 1);
+	ymf262_device &ymf262(YMF262(config, "ymf262", XTAL(14'318'181)));
+	ymf262.add_route(0, m_mixer, 1.00, 0);
+	ymf262.add_route(1, m_mixer, 1.00, 1);
+	ymf262.add_route(2, m_mixer, 1.00, 0);
+	ymf262.add_route(3, m_mixer, 1.00, 1);
 
 	PC_JOY(config, m_joy);
 }
@@ -559,7 +516,6 @@ uint8_t sb16_lle_device::dack_r(int line)
 
 void sb16_lle_device::dack_w(int line, uint8_t data)
 {
-//  printf("dack_w %02x -> [%02x] FIFO (%02x ~ %02x) ctrl %02x cnt %04x mode %02x\n", m_ctrl8, data, m_dac_fifo_head, m_dac_fifo_tail, m_dac_fifo_ctrl, m_dma8_cnt, m_mode);
 	if(m_ctrl8 & 2)
 		return;
 
@@ -637,8 +593,6 @@ uint16_t sb16_lle_device::dack16_r(int line)
 
 void sb16_lle_device::dack16_w(int line, uint16_t data)
 {
-//  printf("dack16_w %02x -> [%02x] FIFO (%02x ~ %02x) ctrl %02x cnt %04x mode %02x\n", m_ctrl16, data, m_dac_fifo_head, m_dac_fifo_tail, m_dac_fifo_ctrl, m_dma16_cnt, m_mode);
-
 	if(m_ctrl16 & 2)
 		return;
 
@@ -694,18 +648,14 @@ uint8_t sb16_lle_device::dsp_rbuf_status_r(offs_t offset)
 		if(!machine().side_effects_disabled())
 		{
 			m_irq16 = false;
-			m_irqs->in_w<1>(CLEAR_LINE);
+			m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
 		}
 		return 0xff;
 	}
-	// reading here clears both irqs
-	// sideline boot init with mode = 0x65 (16-bit) then just uses mode = 0x64 (8-bit) in-game.
 	if(!machine().side_effects_disabled())
 	{
 		m_irq8 = false;
-		m_irq16 = false;
-		m_irqs->in_w<0>(CLEAR_LINE);
-		m_irqs->in_w<1>(CLEAR_LINE);
+		m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
 	}
 	return m_data_out << 7;
 }
@@ -715,21 +665,16 @@ uint8_t sb16_lle_device::mpu401_r(offs_t offset)
 {
 	uint8_t res;
 
-	if (!machine().side_effects_disabled())
-	{
-		m_irq_midi = false;
-		m_irqs->in_w<2>(CLEAR_LINE);
-	}
+	m_irq_midi = false;
+	m_isa->irq5_w((m_irq8 || m_irq16 || m_irq_midi) ? ASSERT_LINE : CLEAR_LINE);
 	if(offset == 0) // data
 	{
 		res = m_mpu_byte;
-		if (!machine().side_effects_disabled())
-			m_mpu_byte = 0xff;
+		m_mpu_byte = 0xff;
 	}
 	else // status
 	{
-		// bit 7 queue empty (DSR), bit 6 DRR (Data Receive Ready?)
-		res = ((m_mpu_byte != 0xff) ? 0 : 0x80) | 0x3f;
+		res = ((m_mpu_byte != 0xff)?0:0x80) | 0x3f; // bit 7 queue empty (DSR), bit 6 DRR (Data Receive Ready?)
 	}
 
 	return res;
@@ -748,8 +693,8 @@ void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 		switch(data)
 		{
 			case 0xff: // reset
+				m_isa->irq5_w(ASSERT_LINE);
 				m_irq_midi = true;
-				m_irqs->in_w<2>(ASSERT_LINE);
 				m_mpu_byte = 0xfe;
 				break;
 		}
@@ -760,11 +705,9 @@ void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SB16, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
-	m_opl3(*this, "opl3"),
 	m_mixer(*this, "mixer"),
 	m_ldac(*this, "ldac"),
 	m_rdac(*this, "rdac"),
-	m_irqs(*this, "irqs"),
 	m_joy(*this, "pc_joy"),
 	m_cpu(*this, "sb16_cpu"), m_data_in(false), m_in_byte(0), m_data_out(false), m_out_byte(0), m_freq(0), m_mode(0), m_dac_fifo_ctrl(0), m_adc_fifo_ctrl(0), m_ctrl8(0), m_ctrl16(0), m_mpu_byte(0),
 	m_dma8_len(0), m_dma16_len(0), m_dma8_cnt(0), m_dma16_cnt(0), m_adc_fifo_head(0), m_adc_fifo_tail(0), m_dac_fifo_head(0), m_dac_fifo_tail(0), m_adc_r(false), m_dac_r(false), m_adc_h(false),
@@ -782,8 +725,15 @@ void sb16_lle_device::device_start()
 		rom[i] = rom[i] ^ xor_table[i & 0x3f];
 
 
+	ymf262_device &ymf262 = *subdevice<ymf262_device>("ymf262");
 	set_isa_device();
 
+	m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
+	m_isa->install_device(0x0220, 0x022f, *this, &sb16_lle_device::host_io);
+	m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_w)));
+	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
+	m_isa->install_device(0x0220, 0x0223, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
+	m_isa->install_device(0x0228, 0x0229, read8sm_delegate(ymf262, FUNC(ymf262_device::read)), write8sm_delegate(ymf262, FUNC(ymf262_device::write)));
 	m_isa->set_dma_channel(1, this, false);
 	m_isa->set_dma_channel(5, this, false);
 	m_timer = timer_alloc(FUNC(sb16_lle_device::timer_tick), this);
@@ -808,35 +758,16 @@ void sb16_lle_device::device_reset()
 	m_dac_r = m_adc_r = false;
 	m_dac_h = m_adc_h = false;
 	m_irq8 = m_irq16 = m_irq_midi = false;
-	m_irqs->in_w<0>(0);
-	m_irqs->in_w<1>(0);
-	m_irqs->in_w<2>(0);
 	m_dma8_done = m_dma16_done = false;
-	remap(AS_IO, 0, 0xffff);
 }
-
-void sb16_lle_device::remap(int space_id, offs_t start, offs_t end)
-{
-	if (space_id == AS_IO)
-	{
-		m_isa->install_device(0x0200, 0x0207, read8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_r)), write8smo_delegate(*subdevice<pc_joy_device>("pc_joy"), FUNC(pc_joy_device::joy_port_w)));
-		m_isa->install_device(0x0220, 0x023f, *this, &sb16_lle_device::host_io);
-		m_isa->install_device(0x0330, 0x0331, read8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_r)), write8sm_delegate(*this, FUNC(sb16_lle_device::mpu401_w)));
-		m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*m_opl3, FUNC(ymf262_device::read)), write8sm_delegate(*m_opl3, FUNC(ymf262_device::write)));
-	}
-}
-
 
 TIMER_CALLBACK_MEMBER(sb16_lle_device::timer_tick)
 {
 	uint16_t dacl = 0, dacr = 0, adcl = 0, adcr = 0;
-	//printf("mode %02x ctrl8 %02x ctrl16 %02x\n", m_mode, m_ctrl8, m_ctrl16);
-
-	if(BIT(m_mode, 1))
+	if(m_mode & 2)
 	{
 		// it might be possible to run the adc though dma simultaneously but the rom doesn't appear to permit it
-		// Update: fwmigolf uses this for card detection
-		//if(!(m_ctrl8 & 2))
+		if(!(m_ctrl8 & 2))
 			m_cpu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 		return;
 	}

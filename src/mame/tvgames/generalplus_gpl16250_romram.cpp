@@ -306,8 +306,6 @@ void wrlshunt_game_state::cs1_w(offs_t offset, uint16_t data)
 
 void wrlshunt_game_state::machine_start()
 {
-	gcm394_game_state::machine_start();
-
 	m_romwords_mask = (memregion("maincpu")->bytes()/2)-1;
 	save_item(NAME(m_sdram));
 }
@@ -315,9 +313,11 @@ void wrlshunt_game_state::machine_start()
 void wrlshunt_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
+	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(1);
+	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 void wrlshunt_game_state::init_wrlshunt()
@@ -394,9 +394,11 @@ uint16_t jak_s500_game_state::portb_r()
 void jak_s500_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
+	m_maincpu->set_cs_space(m_memory->get_program());
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
+	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 
@@ -423,6 +425,8 @@ void jak_pf_game_state::machine_reset()
 void jak_prft_game_state::machine_reset()
 {
 	jak_s500_game_state::machine_reset();
+	//m_maincpu->set_alt_tile_addressing_hack(0);
+	m_maincpu->set_alt_extrasprite_hack(1);
 }
 
 

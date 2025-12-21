@@ -439,13 +439,6 @@ void gms_2layers_state::eeprom_w(uint16_t data)
 			}
 			m_eeprom_command = data;
 		}
-		// additional commands checked by jinpaish
-		else if (data == 0x7a)
-			m_eeprom_data[0] = ~m_eeprom_data[0] | m_eeprom_data[2];
-		else if (data == 0x6a)
-			m_eeprom_data[0] = m_eeprom_data[0] & m_eeprom_data[2];
-		else if (data == 0x00)
-			m_eeprom_command = 0;
 		else
 			logerror("%s: Unknown EEPROM command %02X\n", machine().describe_context(), data);
 	}
@@ -3405,7 +3398,7 @@ ROM_END
 
 void gms_2layers_state::init_rbspm()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// 0x REPAIR
 	rom[0x00520 / 2] = 0x600a;
@@ -3423,7 +3416,7 @@ void gms_2layers_state::init_ssanguoj()
 
 void gms_2layers_state::init_sball2k1()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x14f6c / 2] = 0x4e71; // U135 ERROR
 	rom[0x14f6e / 2] = 0x4e71; // U135 ERROR
@@ -3434,7 +3427,7 @@ void gms_2layers_state::init_sball2k1()
 
 void gms_3layers_state::init_baile()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// U135 ERROR
 	rom[0xb494 / 2] = 0x6000;
@@ -3446,7 +3439,7 @@ void gms_3layers_state::init_baile()
 
 void gms_3layers_state::init_jinpaish()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// U135 ERROR
 	rom[0x319f0 / 2] = 0x4e71;
@@ -3465,7 +3458,7 @@ void gms_3layers_state::init_jinpaish()
 
 void gms_3layers_state::init_sc2in1()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// U135 ERROR
 	rom[0x45f46 / 2] = 0x4e71;
@@ -3482,7 +3475,7 @@ void gms_3layers_state::init_sc2in1()
 
 void gms_3layers_state::init_yyhm()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	// REPAIR ERROR
 	rom[0x9a2 / 2] = 0x6000;
@@ -3496,7 +3489,7 @@ void gms_3layers_state::init_yyhm()
 
 void gms_2layers_state::init_super555()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x46f54 / 2] = 0x6000; // loops endlessly after ROM / RAM test
 	rom[0x4782e / 2] = 0x6000; // 0x0A U135 ERROR
@@ -3504,7 +3497,7 @@ void gms_2layers_state::init_super555()
 
 void gms_2layers_state::init_ballch()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x1225e / 2] = 0x6000; // U64 U136 ERROR
 	rom[0x122b4 / 2] = 0x6000; // "
@@ -3513,7 +3506,7 @@ void gms_2layers_state::init_ballch()
 
 void gms_2layers_state::init_cots()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x1868e / 2] = 0x6000; // U64 U136 ERROR
 	rom[0x198f6 / 2] = 0x62fe; // "
@@ -3526,7 +3519,7 @@ void gms_2layers_state::init_cots()
 
 void gms_2layers_state::init_sscs()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x1c06 / 2] = 0x6008; // loops endlessly later on
 	rom[0x32b2 / 2] = 0x6000; // loops endlessly after ROM / RAM test
@@ -3542,7 +3535,7 @@ void gms_2layers_state::init_sscs()
 
 void gms_2layers_state::init_sscs0118()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x1af6 / 2] = 0x6008; // loops endlessly later on
 	rom[0x3d22 / 2] = 0x6000; // loops endlessly after ROM / RAM test
@@ -3560,7 +3553,7 @@ void gms_2layers_state::init_sscs0118()
 
 void gms_2layers_state::init_cjdlz()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x00518 / 2] = 0x4e71; // 0xD REPAIR
 	rom[0x0c628 / 2] = 0x6000; // 0x99 REPAIR
@@ -3574,7 +3567,7 @@ void gms_2layers_state::init_cjdlz()
 
 void gms_2layers_state::init_smwc()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x00518 / 2] = 0x4e71; // 0xD REPAIR
 	rom[0x0a348 / 2] = 0x6000; // 0x99 REPAIR
@@ -3590,7 +3583,7 @@ void gms_2layers_state::init_smwc()
 
 void gms_2layers_state::init_hgly()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x0feda / 2] = 0x6004; // U35 ERROR
 	rom[0x10128 / 2] = 0x6004; // U36 ERROR
@@ -3600,7 +3593,7 @@ void gms_2layers_state::init_hgly()
 
 void gms_2layers_state::init_tbss()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x11b8 / 2] = 0x6000;
 	rom[0x12c2 / 2] = 0x6000;
@@ -3614,7 +3607,7 @@ void gms_2layers_state::init_tbss()
 
 void gms_2layers_state::init_sglc()
 {
-	uint16_t *rom = &memregion("maincpu")->as_u16();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x129a2 / 2] = 0x4e71;
 }

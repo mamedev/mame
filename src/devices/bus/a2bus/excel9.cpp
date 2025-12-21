@@ -104,11 +104,6 @@ void a2bus_excel9_device::device_start()
 
 void a2bus_excel9_device::device_reset()
 {
-	reset_from_bus();
-}
-
-void a2bus_excel9_device::reset_from_bus()
-{
 	m_bEnabled = true;
 	m_romenable = true;
 	m_enable_flipflop = false;

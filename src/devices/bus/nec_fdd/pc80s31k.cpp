@@ -159,7 +159,6 @@ Used as a communication protocol flags
 //#define VERBOSE 1
 #include "logmacro.h"
 
-//#include "formats/hxchfe_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 #include "formats/xdf_dsk.h"
 
@@ -209,8 +208,6 @@ ROM_START( pc80s31 )
 	ROM_SYSTEM_BIOS( 1,  "mk2fr",   "mkIIFR disk BIOS" )
 	ROMX_LOAD( "mk2fr_disk.rom", 0x0000, 0x0800, CRC(2163b304) SHA1(80da2dee49d4307f00895a129a5cfeff00cf5321), ROM_BIOS(1) )
 
-	// HACK: twosid_r mentioned in header note
-	// cfr. pc8001mk2_flop:gamepc
 	ROM_FILL( 0x7df, 1, 0x00 )
 	ROM_FILL( 0x7e0, 1, 0x00 )
 ROM_END
@@ -253,10 +250,9 @@ void pc80s31_device::fdc_io(address_map &map)
 
 static void pc88_floppies(device_slot_interface &device)
 {
-	device.option_add("525sd", FLOPPY_525_SD);
-	device.option_add("525dd", TEAC_FD_55F);
-	device.option_add("525hd", FLOPPY_525_HD);
+	// TODO: definitely not correct for base device
 	// TODO: eventually needs inheriting for pc88va3 (2TD with 9.3 MB capacity)
+	device.option_add("525hd", FLOPPY_525_HD);
 }
 
 IRQ_CALLBACK_MEMBER(pc80s31_device::irq_cb)
@@ -264,14 +260,12 @@ IRQ_CALLBACK_MEMBER(pc80s31_device::irq_cb)
 	return m_irq_vector;
 }
 
+// need FDI and XDF for PC-88VA
 static void pc88_floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-	// need FDI and XDF for PC-88VA
 	fr.add(FLOPPY_XDF_FORMAT);
 	fr.add(FLOPPY_PC98FDI_FORMAT);
-	// eventually ...
-//	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 void pc80s31_device::device_add_mconfig(machine_config &config)
@@ -288,7 +282,7 @@ void pc80s31_device::device_add_mconfig(machine_config &config)
 
 	for (auto &floppy : m_floppy)
 	{
-		FLOPPY_CONNECTOR(config, floppy, pc88_floppies, "525sd", pc88_floppy_formats);
+		FLOPPY_CONNECTOR(config, floppy, pc88_floppies, "525hd", pc88_floppy_formats);
 		floppy->enable_sound(true);
 	}
 
@@ -462,16 +456,6 @@ const tiny_rom_entry *pc80s31k_device::device_rom_region() const
 	return ROM_NAME( pc80s31k );
 }
 
-void pc80s31k_device::device_add_mconfig(machine_config &config)
-{
-	pc80s31_device::device_add_mconfig(config);
-
-	for (auto &floppy : m_floppy)
-	{
-		floppy->set_default_option("525hd");
-	}
-}
-
 void pc80s31k_device::drive_mode_w(uint8_t data)
 {
 	// TODO: fix implementation
@@ -556,7 +540,6 @@ void pc88va2_fd_if_device::device_reset()
 //  m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 	m_xtmask = false;
 	m_dmae = false;
-	m_fdc->set_unscaled_clock(4'792'320);
 }
 
 void pc88va2_fd_if_device::host_io(address_map &map)
@@ -578,11 +561,9 @@ TIMER_CALLBACK_MEMBER(pc88va2_fd_if_device::fdc_timer_cb)
 {
 	if(m_xtmask)
 	{
-		m_write_irq(0);
 		m_write_irq(1);
+//      m_write_irq(0);
 	}
-
-	m_fdc_timer->adjust(attotime::from_msec(100));
 }
 
 void pc88va2_fd_if_device::fdc_update_ready(floppy_image_device *, int)
@@ -650,9 +631,7 @@ void pc88va2_fd_if_device::host_drive_rate_w(u8 data)
 	//m_fdd[0]->get_device()->ds_w(!BIT(data, 4));
 	//m_fdd[1]->get_device()->ds_w(!BIT(data, 4));
 
-	// TODO: needs source xtal for 4.8 MHz, does it bump Z80 clock too?
-	// 8 MHz just uses MASTER_CLOCK
-	m_fdc->set_unscaled_clock(clk ? 7'987'200 : 4'792'320);
+	// TODO: is this correct? sounds more like a controller clock change, while TD1/TD0 should do the rate change
 	m_fdc->set_rate(clk ? 500000 : 250000);
 }
 
@@ -741,7 +720,7 @@ u8 pc88va2_fd_if_device::host_ready_r()
 {
 	// TODO: easy to implement, but no SW accesses it so far
 	if (!machine().side_effects_disabled())
-		popmessage("host_ready_r: Unhandled read $1b6");
+		logerror("Unhandled read $1b6!\n");
 
 	return 0;
 }

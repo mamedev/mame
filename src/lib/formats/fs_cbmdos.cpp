@@ -21,7 +21,7 @@ Current limitations:
 #include "fsblk.h"
 
 #include "corestr.h"
-#include "coretmpl.h"
+#include "multibyte.h"
 #include "strformat.h"
 
 #include <array>
@@ -65,8 +65,8 @@ public:
 	public:
 		block_iterator(const impl &fs, u8 first_track, u8 first_sector);
 		bool next();
-		void append_data(std::vector<u8> &vec) const;
-		cbmdos_dirent get_dirent(int file_index) const;
+		const void *data() const;
+		const std::array<cbmdos_dirent, SECTOR_DIRECTORY_COUNT> &dirent_data() const;
 		u8 size() const;
 		u8 track() const { return m_track; }
 		u8 sector() const { return m_sector; }
@@ -88,7 +88,6 @@ public:
 	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
@@ -127,8 +126,8 @@ private:
 
 	fsblk_t::block_t::ptr read_sector(int track, int sector) const;
 	std::optional<cbmdos_dirent> dirent_from_path(const std::vector<std::string> &path) const;
-	std::error_condition iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
-	std::error_condition iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
+	void iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
+	void iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
 	meta_data metadata_from_dirent(const cbmdos_dirent &dirent) const;
 	bool is_valid_filename(const std::string &filename) const;
 	std::pair<std::error_condition, u8> claim_track_sector(u8 track) const;
@@ -223,8 +222,6 @@ std::vector<meta_description> fs::cbmdos_image::volume_meta_description() const
 {
 	std::vector<meta_description> results;
 	results.emplace_back(meta_name::name, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 16; }, "Volume name, up to 16 characters");
-	results.emplace_back(meta_name::disk_id, "ZX", false, [](const meta_value &m) { return m.as_string().size() <= 2; }, "Disk ID, 2 characters");
-	results.emplace_back(meta_name::os_version, "2A", true, [](const meta_value &m) { return m.as_string().size() <= 2; }, "OS version and format type");
 	return results;
 }
 
@@ -308,14 +305,10 @@ impl::impl(fsblk_t &blockdev)
 meta_data impl::volume_metadata()
 {
 	auto bam_block = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	std::string disk_name = bam_block->rstr(0x90, 16);
-	std::string disk_id = bam_block->rstr(0xa2, 2);
-	std::string os_version = bam_block->rstr(0xa5, 2);
+	std::string_view disk_name = bam_block->rstr(0x90, 16);
 
 	meta_data results;
 	results.set(meta_name::name, strtrimright_cbm(disk_name));
-	results.set(meta_name::disk_id, strtrimright_cbm(disk_id));
-	results.set(meta_name::os_version, strtrimright_cbm(os_version));
 	return results;
 }
 
@@ -346,8 +339,8 @@ std::pair<std::error_condition, std::vector<dir_entry>> impl::directory_contents
 		results.emplace_back(dir_entry_type::file, metadata_from_dirent(ent));
 		return false;
 	};
-	std::error_condition err = iterate_directory_entries(callback);
-	return std::make_pair(err != error::not_found ? err : std::error_condition(), std::move(results));
+	iterate_directory_entries(callback);
+	return std::make_pair(std::error_condition(), std::move(results));
 }
 
 
@@ -362,39 +355,13 @@ std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vect
 	if (!dirent)
 		return std::make_pair(error::not_found, std::vector<u8>());
 
-	// and get the data (TODO: perform two-level scan for REL files)
+	// and get the data
 	std::vector<u8> result;
 	block_iterator iter(*this, dirent->m_file_first_track, dirent->m_file_first_sector);
 	while (iter.next())
-		iter.append_data(result);
+		result.insert(result.end(), (const u8 *)iter.data(), (const u8 *)iter.data() + iter.size());
 
-	return std::make_pair(iter.track() != CHAIN_END ? error::circular_reference : std::error_condition(), std::move(result));
-}
-
-
-//-------------------------------------------------
-//  impl::enum_blocks
-//-------------------------------------------------
-
-std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> impl::enum_blocks(const std::vector<std::string> &path)
-{
-	std::optional<cbmdos_dirent> dirent;
-	if (!path.empty())
-	{
-		dirent = dirent_from_path(path);
-		if (!dirent)
-			return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
-	}
-
-	// TODO: list allocation blocks for REL files
-	std::vector<u32> blocks;
-	block_iterator iter(*this, path.empty() ? DIRECTORY_TRACK : dirent->m_file_first_track, path.empty() ? FIRST_DIRECTORY_SECTOR : dirent->m_file_first_sector);
-	while (iter.next())
-	{
-		// typical file allocation patterns are more random than s_track_sector_map, so just encode track and sector in decimal
-		blocks.push_back(iter.track() * 100 + iter.sector());
-	}
-	return std::make_tuple(iter.track() != CHAIN_END ? error::circular_reference : std::error_condition(), std::vector<u32>(), std::move(blocks));
+	return std::make_pair(std::error_condition(), std::move(result));
 }
 
 
@@ -420,9 +387,7 @@ std::error_condition impl::file_create(const std::vector<std::string> &path, con
 		}
 		return found;
 	};
-	std::error_condition direrr = iterate_all_directory_entries(callback);
-	if (direrr && direrr != error::not_found)
-		return direrr;
+	iterate_all_directory_entries(callback);
 
 	if (!result)
 	{
@@ -490,9 +455,7 @@ std::error_condition impl::file_write(const std::vector<std::string> &path, cons
 		}
 		return found;
 	};
-	std::error_condition err = iterate_directory_entries(callback);
-	if (err)
-		return err;
+	iterate_directory_entries(callback);
 
 	if (!result)
 		return error::not_found;
@@ -693,7 +656,7 @@ std::optional<impl::cbmdos_dirent> impl::dirent_from_path(const std::vector<std:
 			result = dirent;
 		return found;
 	};
-	std::ignore = iterate_directory_entries(callback);
+	iterate_directory_entries(callback);
 	return result;
 }
 
@@ -702,37 +665,37 @@ std::optional<impl::cbmdos_dirent> impl::dirent_from_path(const std::vector<std:
 //  impl::iterate_directory_entries
 //-------------------------------------------------
 
-std::error_condition impl::iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
+void impl::iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
 {
 	block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
 	while (iter.next())
 	{
+		auto entries = iter.dirent_data();
+
 		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++)
 		{
-			cbmdos_dirent entry = iter.get_dirent(file_index);
-			if (entry.m_file_type != 0x00)
+			if (entries[file_index].m_file_type != 0x00)
 			{
-				if (callback(iter.track(), iter.sector(), file_index, entry))
-					return std::error_condition();
+				if (callback(iter.track(), iter.sector(), file_index, entries[file_index]))
+					return;
 			}
 		}
 	}
-	return iter.track() != CHAIN_END ? error::circular_reference : error::not_found;
 }
 
-std::error_condition impl::iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
+void impl::iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const
 {
 	block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
 	while (iter.next())
 	{
+		auto entries = iter.dirent_data();
+
 		for (int file_index = 0; file_index < SECTOR_DIRECTORY_COUNT; file_index++)
 		{
-			cbmdos_dirent entry = iter.get_dirent(file_index);
-			if (callback(iter.track(), iter.sector(), file_index, entry))
-				return std::error_condition();
+			if (callback(iter.track(), iter.sector(), file_index, entries[file_index]))
+				return;
 		}
 	}
-	return iter.track() != CHAIN_END ? error::circular_reference : error::not_found;
 }
 
 //-------------------------------------------------
@@ -827,26 +790,22 @@ bool impl::block_iterator::next()
 
 
 //-------------------------------------------------
-//  impl::block_iterator::append_data
+//  impl::block_iterator::data
 //-------------------------------------------------
 
-void impl::block_iterator::append_data(std::vector<u8> &vec) const
+const void *impl::block_iterator::data() const
 {
-	const u8 size = this->size();
-	vec.resize(vec.size() + size);
-	m_block->read(2, &*(vec.end() - size), size);
+	return m_block->rodata() + 2;
 }
 
 
 //-------------------------------------------------
-//  impl::block_iterator::get_dirent
+//  impl::block_iterator::dirent_data
 //-------------------------------------------------
 
-impl::cbmdos_dirent impl::block_iterator::get_dirent(int file_index) const
+const std::array<impl::cbmdos_dirent, impl::SECTOR_DIRECTORY_COUNT> &impl::block_iterator::dirent_data() const
 {
-	cbmdos_dirent entry;
-	m_block->read(sizeof(cbmdos_dirent) * file_index, reinterpret_cast<u8 *>(&entry), sizeof(cbmdos_dirent));
-	return entry;
+	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, SECTOR_DIRECTORY_COUNT> *>(m_block->rodata());
 }
 
 

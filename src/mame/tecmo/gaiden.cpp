@@ -24,21 +24,18 @@ see the input_ports definition below for details on the input bits
 
 write:
 07a002-07a003 sprite layer Y offset
-07a100-07a101 text   layer X scroll offset
 07a104-07a105 text   layer Y scroll
 07a108-07a109 text   layer Y scroll offset
 07a10c-07a10d text   layer X scroll
-07a200-07a201 front  layer X scroll offset
 07a204-07a205 front  layer Y scroll
 07a208-07a209 front  layer Y scroll offset
 07a20c-07a20d front  layer X scroll
-07a300-07a301 back   layer X scroll offset
 07a304-07a305 back   layer Y scroll
 07a308-07a309 back   layer Y scroll offset
 07a30c-07a30d back   layer X scroll
 
 unknown writes during boot sequence and/or game start:
-07a000, 07a004, 07a006, 07a110, 07a210, 07a310
+07a000, 07a004, 07a006, 07a100, 07a110, 07a200, 07a210, 07a300, 07a310
 
 Notes:
 - The sprite Y size control is slightly different from gaiden/wildfang to
@@ -214,6 +211,12 @@ protected:
 	bitmap_ind16 m_tile_bitmap_tx;
 
 	// live
+	uint16_t m_bg_scroll_x = 0;
+	uint16_t m_bg_scroll_y = 0;
+	uint16_t m_fg_scroll_x = 0;
+	uint16_t m_fg_scroll_y = 0;
+	int8_t m_bg_offset_y = 0;
+	int8_t m_fg_offset_y = 0;
 	int8_t m_spr_offset_y = 0;
 
 	// configuration
@@ -271,16 +274,17 @@ protected:
 	void gaiden_map(address_map &map) ATTR_COLD;
 
 private:
+	uint16_t m_tx_scroll_x = 0;
+	uint16_t m_tx_scroll_y = 0;
+	int8_t m_tx_offset_y = 0;
+
 	void irq_ack_w(uint16_t data);
 
 	void flip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void txscrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void txscrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void txoffsetx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void txoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void fgoffsetx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fgoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void bgoffsetx_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void bgoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sproffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -459,6 +463,10 @@ void gaiden_state::video_start()
 //  m_foreground->set_transparent_pen(0);
 	m_text_layer->set_transparent_pen(0);
 
+	m_background->set_scrolldy(0, 33);
+	m_foreground->set_scrolldy(0, 33);
+	m_text_layer->set_scrolldy(0, 33);
+
 	// set up sprites
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 }
@@ -514,62 +522,65 @@ void gaiden_state::flip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void gaiden_state::txscrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_text_layer->set_scrollx(0, data & 0xff);
+	COMBINE_DATA(&m_tx_scroll_x);
+	m_text_layer->set_scrollx(0, m_tx_scroll_x);
 }
 
 void gaiden_state::txscrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_text_layer->set_scrolly(0, data & 0x1ff);
+	COMBINE_DATA(&m_tx_scroll_y);
+	m_text_layer->set_scrolly(0, (m_tx_scroll_y - m_tx_offset_y) & 0xffff);
 }
 
 void drgnbowl_state::fgscrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_foreground->set_scrollx(0, data & 0x3ff);
+	COMBINE_DATA(&m_fg_scroll_x);
+	m_foreground->set_scrollx(0, m_fg_scroll_x);
 }
 
 void drgnbowl_state::fgscrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_foreground->set_scrolly(0, data & 0x1ff);
+	COMBINE_DATA(&m_fg_scroll_y);
+	m_foreground->set_scrolly(0, (m_fg_scroll_y - m_fg_offset_y) & 0xffff);
 }
 
 void drgnbowl_state::bgscrollx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_background->set_scrollx(0, data & 0x3ff);
+	COMBINE_DATA(&m_bg_scroll_x);
+	m_background->set_scrollx(0, m_bg_scroll_x);
 }
 
 void drgnbowl_state::bgscrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_background->set_scrolly(0, data & 0x1ff);
-}
-
-void gaiden_state::txoffsetx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_text_layer->set_scrolldx(0xb2 - (data & 0xff), 0x4d - (data & 0xff));
+	COMBINE_DATA(&m_bg_scroll_y);
+	m_background->set_scrolly(0, (m_bg_scroll_y - m_bg_offset_y) & 0xffff);
 }
 
 void gaiden_state::txoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_text_layer->set_scrolldy(data & 0xff, 0xff - (data & 0xff));
-}
-
-void gaiden_state::fgoffsetx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_foreground->set_scrolldx(0x3b2 - (data & 0x3ff), 0x14d - (data & 0x3ff));
+	if (ACCESSING_BITS_0_7)
+	{
+		m_tx_offset_y = data;
+		m_text_layer->set_scrolly(0, (m_tx_scroll_y - m_tx_offset_y) & 0xffff);
+	}
 }
 
 void gaiden_state::fgoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_foreground->set_scrolldy(0x20 - (data & 0x1ff), 0x2ff - (data & 0x1ff));
-}
-
-void gaiden_state::bgoffsetx_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_background->set_scrolldx(0x3b2 - (data & 0x3ff), 0x14d - (data & 0x3ff));
+	if (ACCESSING_BITS_0_7)
+	{
+		m_fg_offset_y = data;
+		m_foreground->set_scrolly(0, (m_fg_scroll_y - m_fg_offset_y) & 0xffff);
+	}
 }
 
 void gaiden_state::bgoffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_background->set_scrolldy(0x20 - (data & 0x1ff), 0x2ff - (data & 0x1ff));
+	if (ACCESSING_BITS_0_7)
+	{
+		m_bg_offset_y = data;
+		m_background->set_scrolly(0, (m_bg_scroll_y - m_bg_offset_y) & 0xffff);
+	}
 }
 
 void gaiden_state::sproffsety_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -870,11 +881,20 @@ static const int raiga_jumppoints_other[0x100] =
 
 void drgnbowl_state::machine_reset()
 {
+	m_bg_scroll_x = 0;
+	m_bg_scroll_y = 0;
+	m_fg_scroll_x = 0;
+	m_fg_scroll_y = 0;
+	m_fg_offset_y = 0;
+	m_bg_offset_y = 0;
 }
 
 void gaiden_state::machine_reset()
 {
 	drgnbowl_state::machine_reset();
+	m_tx_scroll_x = 0;
+	m_tx_scroll_y = 0;
+	m_tx_offset_y = 0;
 	m_spr_offset_y = 0;
 }
 
@@ -894,11 +914,20 @@ void raiga_state::machine_reset()
 
 void drgnbowl_state::machine_start()
 {
+	save_item(NAME(m_bg_scroll_x));
+	save_item(NAME(m_bg_scroll_y));
+	save_item(NAME(m_fg_scroll_x));
+	save_item(NAME(m_fg_scroll_y));
+	save_item(NAME(m_fg_offset_y));
+	save_item(NAME(m_bg_offset_y));
 }
 
 void gaiden_state::machine_start()
 {
 	drgnbowl_state::machine_start();
+	save_item(NAME(m_tx_scroll_x));
+	save_item(NAME(m_tx_scroll_y));
+	save_item(NAME(m_tx_offset_y));
 	save_item(NAME(m_spr_offset_y));
 }
 
@@ -984,15 +1013,12 @@ void gaiden_state::gaiden_map(address_map &map)
 	map(0x07a000, 0x07a001).portr("SYSTEM");
 	map(0x07a002, 0x07a003).portr("P1_P2").w(FUNC(gaiden_state::sproffsety_w));
 	map(0x07a004, 0x07a005).portr("DSW");
-	map(0x07a100, 0x07a101).w(FUNC(gaiden_state::txoffsetx_w));
 	map(0x07a104, 0x07a105).w(FUNC(gaiden_state::txscrolly_w));
 	map(0x07a108, 0x07a109).w(FUNC(gaiden_state::txoffsety_w));
 	map(0x07a10c, 0x07a10d).w(FUNC(gaiden_state::txscrollx_w));
-	map(0x07a200, 0x07a201).w(FUNC(gaiden_state::fgoffsetx_w));
 	map(0x07a204, 0x07a205).w(FUNC(gaiden_state::fgscrolly_w));
 	map(0x07a208, 0x07a209).w(FUNC(gaiden_state::fgoffsety_w));
 	map(0x07a20c, 0x07a20d).w(FUNC(gaiden_state::fgscrollx_w));
-	map(0x07a300, 0x07a301).w(FUNC(gaiden_state::bgoffsetx_w));
 	map(0x07a304, 0x07a305).w(FUNC(gaiden_state::bgscrolly_w));
 	map(0x07a308, 0x07a309).w(FUNC(gaiden_state::bgoffsety_w));
 	map(0x07a30c, 0x07a30d).w(FUNC(gaiden_state::bgscrollx_w));

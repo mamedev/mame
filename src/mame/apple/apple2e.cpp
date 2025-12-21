@@ -62,10 +62,6 @@
      On models with localized keyboards, it switches between US QWERTY
      and the local keyboard layout and character set.
 
-     Early IIcs have no 1.8432 MHz XTAL for the ACIAs, which instead use the
-     master clock divided by 8 (~1.789 MHz), producing baud rates 2.9% slower
-     than nominal.  This was fixed before the UniDisk ROM revision was released.
-
     IIc (UniDisk 3.5): IIc with ROM doubled to 32K and the ROMSWITCH register
          added to page between the original 16K ROM and the new added 16K.  The
          extra firmware space was dedicated to implementing the Protocol Converter,
@@ -872,7 +868,7 @@ void apple2e_state::memexp_w(offs_t offset, u8 data)
 			break;
 
 		case 3:
-//          printf("Write %02x to RAM[%x]\n", data, m_exp_liveptr);
+//            printf("Write %02x to RAM[%x]\n", data, m_liveptr);
 			if (m_exp_liveptr <= m_exp_addrmask)
 			{
 				m_exp_ram[m_exp_liveptr] = data;
@@ -916,7 +912,7 @@ void apple2e_state::machine_start()
 	m_inh_bank = 0;
 
 	m_migpage = 0;
-	memset(m_migram, 0, sizeof(m_migram));
+	memset(m_migram, 0, 0x200);
 
 	// expansion RAM size
 	if (m_ram_size > (128*1024))
@@ -1282,8 +1278,6 @@ void apple2e_state::machine_reset()
 	}
 
 	m_exp_bankhior = 0xf0;
-	memset(m_exp_regs, 0, sizeof(m_exp_regs));
-	m_exp_wptr = m_exp_liveptr = 0;
 
 	// sync up the banking with the variables.
 	lcrom_update();
@@ -1352,7 +1346,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	// update character selection
 	if (m_kbd_lang_sel)
 	{
-		const u8 charset_id = m_kbd_lang_sel->read() & 0x0f;
+		u8 charset_id = m_kbd_lang_sel->read() & 0x0f;
 		if (m_video->get_iie_langsw() != charset_id)
 		{
 			m_video->set_iie_langsw(charset_id);
@@ -1988,8 +1982,7 @@ void apple2e_state::do_io(int offset)
 
 u8 apple2e_state::c000_r(offs_t offset)
 {
-	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
-	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
 	{
@@ -2142,7 +2135,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 			break;
 	}
 
-	return uFloatingBus;
+	return read_floatingbus();
 }
 
 u8 apple2e_state::c000_iic_r(offs_t offset)
@@ -2274,9 +2267,14 @@ void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 
 u8 apple2e_state::laserprn_busy_r()
 {
-	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	u8 retval = read_floatingbus() & 0x7f;
 
-	return (m_centronics_busy ? 0x80 : 0) | uFloatingBus7;
+	if (m_centronics_busy)
+	{
+		retval |= 0x80;
+	}
+
+	return retval;
 }
 
 void apple2e_state::laserprn_w(u8 data)
@@ -2614,7 +2612,7 @@ void apple2e_state::update_iic_mouse()
 
 u8 apple2e_state::laser_mouse_r(offs_t offset)
 {
-	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{
@@ -3601,7 +3599,7 @@ void apple2e_state::ay3600_data_ready_w(int state)
 
 		if (m_kbd_lang_sel)
 		{
-			const u8 kbd_layout_id = (m_kbd_lang_sel->read() & 0xf0) >> 4;
+			u8 kbd_layout_id = (m_kbd_lang_sel->read() & 0xf0) >> 4;
 			trans += kbd_layout_id * 0x400; // go to second half of the ROM (DVORAK on US IIc/IIe models) or beyond
 		}
 
@@ -5039,7 +5037,7 @@ void apple2e_state::apple2c(machine_config &config)
 	config.device_remove("sl7");
 
 	MOS6551(config, m_acia1, 0);
-	m_acia1->set_xtal(1.8432_MHz_XTAL);
+	m_acia1->set_xtal(XTAL(14'318'181) / 8); // ~1.789 MHz
 	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
 
@@ -5630,7 +5628,7 @@ ROM_START(tk3000)
 	ROM_LOAD( "tk3000.f4f6",  0x000000, 0x004000, CRC(5b1e8ab2) SHA1(f163e5753c18ff0e812a448e8da406f102600edf) )
 
 	ROM_REGION(0x2000, "kbdcpu", 0)
-	ROM_LOAD( "tk3000.e13",   0x000000, 0x002000, BAD_DUMP CRC(f9b860d3) SHA1(6a127f1458f43a00199d3dde94569b8928f05a53) ) // seems underdumped; PCB photos show a 16Kx8 ROM here (27128)
+	ROM_LOAD( "tk3000.e13",   0x000000, 0x002000, CRC(f9b860d3) SHA1(6a127f1458f43a00199d3dde94569b8928f05a53) )
 
 	ROM_REGION(0x800, "keyboard", ROMREGION_ERASE00)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM

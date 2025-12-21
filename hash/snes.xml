@@ -27098,7 +27098,6 @@ more investigation needed...
 		</part>
 	</software>
 
-	<!-- TODO: none of the Super Game Boy should be softlisted. -->
 	<software name="sgboyj" cloneof="sgboy">
 		<description>Super Game Boy (Japan)</description>
 		<year>1994</year>
@@ -27127,8 +27126,7 @@ more investigation needed...
 	</software>
 
 	<software name="sgboyj1" cloneof="sgboy">
-		<!-- Alternate hardware -->
-		<description>Super Game Boy (Japan, alt)</description>
+		<description>Super Game Boy (Japan, alt)</description> <!-- Alternate hardware -->
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-SGB" />

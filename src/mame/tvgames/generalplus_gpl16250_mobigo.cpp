@@ -20,11 +20,10 @@
 #include "generalplus_gpl16250_nand.h"
 #include "generalplus_gpl16250_romram.h"
 
-#include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
-
-#include "screen.h"
+#include "bus/generic/carts.h"
 #include "softlist_dev.h"
+#include "screen.h"
 
 
 namespace {
@@ -37,11 +36,11 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void mobigo2(machine_config &config) ATTR_COLD;
+	void mobigo2(machine_config &config);
 
 protected:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	required_device<generic_slot_device> m_cart;
 };
 
@@ -53,12 +52,12 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void mobigo(machine_config &config) ATTR_COLD;
-	void init_mobigo() ATTR_COLD;
+	void mobigo(machine_config &config);
+	void init_mobigo();
 
 protected:
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	required_device<generic_slot_device> m_cart;
 };
 
@@ -102,8 +101,6 @@ void mobigo_state::mobigo(machine_config &config)
 
 void mobigo2_state::mobigo2(machine_config &config)
 {
-	set_addrmap(0, &mobigo2_state::cs_map_base);
-
 	GPAC800(config, m_maincpu, 96000000/2, m_screen);  // Doesn't have GPnandnand header in NAND tho, so non-standard bootloader
 	m_maincpu->porta_in().set(FUNC(mobigo2_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(mobigo2_state::portb_r));
@@ -118,6 +115,8 @@ void mobigo2_state::mobigo2(machine_config &config)
 	m_maincpu->set_cs_config_callback(FUNC(mobigo2_state::cs_callback));
 
 	m_maincpu->nand_read_callback().set(FUNC(mobigo2_state::read_nand));
+
+	FULL_MEMORY(config, m_memory).set_map(&mobigo2_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

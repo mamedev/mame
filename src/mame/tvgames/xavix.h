@@ -69,8 +69,7 @@ public:
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
 		m_anport(*this, "anport"),
-		m_math(*this, "math"),
-		m_default_audio_tempo_override(0x80)
+		m_math(*this, "math")
 	{
 		m_video_hres_multiplier = 1;
 	}
@@ -99,7 +98,7 @@ public:
 	void xavix_43mhz(machine_config &config);
 
 	void init_xavix();
-	void init_xavix_slowenv();
+	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
 
 	uint8_t sound_current_page() const;
 
@@ -190,6 +189,8 @@ protected:
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	address_space* m_cpuspace = nullptr;
+
+	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
 
 	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
 
@@ -391,10 +392,8 @@ protected:
 	uint8_t timer_freq_r();
 	void timer_freq_w(uint8_t data);
 	uint8_t timer_curval_r();
-	void timer_start();
 	uint8_t m_timer_control = 0;
 	uint8_t m_timer_freq = 0;
-	uint8_t m_timer_currentval = 0;
 	TIMER_CALLBACK_MEMBER(freq_timer_done);
 	emu_timer *m_freq_timer = nullptr;
 
@@ -411,7 +410,6 @@ protected:
 	uint8_t tmap1_regs_r(offs_t offset);
 	uint8_t tmap2_regs_r(offs_t offset);
 
-	uint8_t spriteregs_r();
 	void spriteregs_w(uint8_t data);
 
 	uint8_t pal_ntsc_r();
@@ -579,10 +577,8 @@ protected:
 
 	bool m_disable_memory_bypass = false;
 	bool m_disable_sprite_yflip = false;
-	bool m_disable_sprite_xflip = false;
 	bool m_disable_tile_regs_flip = false;
 	int m_video_hres_multiplier;
-	uint8_t m_default_audio_tempo_override; // hack, used to init the sound hardware tempo registers
 };
 
 class xavix_guru_state : public xavix_state
@@ -606,6 +602,7 @@ public:
 	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag)
 		, m_xavix2002io(*this, "xavix2002io")
+		, m_allow_superxavix_extra_rom_sprites(true)
 		, m_sx_crtc_1(*this, "sx_crtc_1")
 		, m_sx_crtc_2(*this, "sx_crtc_2")
 		, m_sx_plt_loc(*this, "sx_plt_loc")
@@ -634,6 +631,8 @@ protected:
 	required_device<xavix2002_io_device> m_xavix2002io;
 
 	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
+
+	bool m_allow_superxavix_extra_rom_sprites; // config does not need saving
 
 	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
 	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
@@ -714,6 +713,8 @@ private:
 
 	optional_region_ptr<uint8_t> m_extra;
 	required_ioport_array<3> m_exio;
+
+	bool m_use_superxavix_extra; // does not need saving
 };
 
 
