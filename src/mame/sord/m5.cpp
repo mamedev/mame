@@ -535,7 +535,7 @@ void m5_state::mem64KBI_w(offs_t offset, u8 data) //out 0x6c
 	m_ram_mode = BIT(data, 0);
 
 	//if 32kb only mode don't map top ram
-	if (m_ram_mode && !BIT(m_DIPS->read(), 4))
+	if (m_ram_mode && !BIT(m_DIPS->read(), 2))
 		m_rom_view.select(2); // 64kb RAM
 	else
 
@@ -676,7 +676,7 @@ void m5_state::mem64KRX_w(offs_t offset, u8 data) //out 0x7f
 	m_bankr[1]->set_entry(BIT(m_ram_mode, 1));
 	m_bankr[2]->set_entry(BIT(m_ram_mode, 2));
 
-	if (BIT(m_DIPS->read(),1))
+	if (BIT(m_DIPS->read(),0))
 	{
 		m_bankr[4]->set_entry(BIT(m_ram_mode, 4));
 		m_bankr[5]->set_entry(BIT(m_ram_mode, 5));
@@ -727,9 +727,6 @@ void m5_state::m5_mem(address_map &map)
 	m_rom_view[1](0x0000, 0xffff).rw(FUNC(m5_state::cart_window_r),
 		FUNC(m5_state::cart_window_w));
 	m_rom_view[1](0x0000, 0x1fff).rom().region("monitor", 0x0000).unmapw(); // monitor rom
-	m_rom_view[1](0x2000, 0x3fff).bankr(m_bankr[1]); // cart rom
-	m_rom_view[1](0x4000, 0x5fff).bankr(m_bankr[2]); // cart rom
-	m_rom_view[1](0x6000, 0x6fff).bankr(m_bankr[3]); // cart rom
 	m_rom_view[1](0x7000, 0x7fff).ram().share("ram");
 
 	// for RAM only mode
@@ -1403,21 +1400,20 @@ void m5_state::machine_reset()
 			case MEM64KBI:
 			{
 				m_rom_view.select(1);
-				//if AUTOSTART is on then page out cart and start tape loading
-				bool autostart = BIT(m_DIPS->read(), 2);
-				bool ram32k_only = BIT(m_DIPS->read(), 4);
-				if (m_romcart)
-				{	//if not autostart map needed banks to rom cart, rest to ram
-					for (int i = 1; i < 4; ++i)
-					{
-						if ((i - 1) * 0x2000 < romcart_rom_size - 1 && !autostart)
-						{
-							m_bankr[i]->set_base(romcart_rom_base + (i - 1) * 0x2000);
-						}
-						else if (ram32k_only) m_bankr[i]->set_base(m_ignore_writes.get());
-						 else m_bankr[i]->set_base(ramcart_ram_base + (i - 1) * 0x2000);
-					}
+
+				bool autostart = BIT(m_DIPS->read(), 1);
+				bool ram32k_only = BIT(m_DIPS->read(), 2);
+
+				if (m_romcart && !autostart)
+				{
+					m_rom_view[1].install_read_bank(0x2000, 0x2000 + romcart_rom_size - 1, m_bankr[1]);
+					m_rom_view[1].unmap_write(0x2000, 0x2000 + romcart_rom_size - 1);
+					m_bankr[1]->configure_entry(1, romcart_rom_base + 0x0000);
+					m_bankr[1]->set_entry(1);
 				}
+
+				if (ram32k_only)
+					m_rom_view[1].unmap_readwrite(0x2000 + romcart_rom_size, 0x6fff);
 
 				break;
 			}
@@ -1428,7 +1424,6 @@ void m5_state::machine_reset()
 					//replace 64Kbf Basic-F with rom cart, works only with mode 6
 					for (int i = 1; i < 4; i++)
 						m_bankr[i]->configure_entry(2, romcart_rom_base + (i - 1) * 0x2000);
-
 				}
 				// ram entries
 				for (int i = 0; i < 5; i++)
@@ -1490,7 +1485,7 @@ void m5_state::machine_reset()
 				m_bankr[5]->configure_entry(2, ramcart_rom_base + 0x12000);
 
 				//select BASICs or MSX
-				if (BIT(m_DIPS->read(), 1))
+				if (BIT(m_DIPS->read(), 0))
 				{
 					//BASIC-G and BASIC-F
 					entry = 1;
