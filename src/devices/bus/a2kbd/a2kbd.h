@@ -49,15 +49,15 @@ public:
 	auto mode_callback() { return m_mode_callback.bind(); }
 
 	// shift and control key inputs (modification)
-	inline int shift_r();
-	inline int control_r();
+	int shift_r();
+	int control_r();
 
 	// outputs to keyboard (modification)
-	inline void ack_w(int state);
-	inline void an3_w(int state);
+	void ack_w(int state);
+	void an3_w(int state);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -86,11 +86,11 @@ protected:
 	// construction/destruction
 	device_a2kbd_interface(const machine_config &mconfig, device_t &device);
 
-	// input overrides
+	// dedicated inputs from keyboard
 	virtual int shift_r() { return 0; }
 	virtual int control_r() { return 0; }
 
-	// optional output overrides
+	// optional outputs to keyboard
 	virtual void ack_w(int state) { }
 	virtual void an3_w(int state) { }
 
@@ -110,25 +110,25 @@ DECLARE_DEVICE_TYPE(A2KBD_CONNECTOR, a2kbd_connector_device)
 //  INLINE FUNCTIONS
 //**************************************************************************
 
-int a2kbd_connector_device::shift_r()
+inline int a2kbd_connector_device::shift_r()
 {
 	// Poll shift key(s) (0 = pressed, 1 = not pressed)
 	return (m_intf != nullptr) ? m_intf->shift_r() : 0;
 }
 
-int a2kbd_connector_device::control_r()
+inline int a2kbd_connector_device::control_r()
 {
 	// Poll control key(s) (0 = pressed, 1 = not pressed)
 	return (m_intf != nullptr) ? m_intf->control_r() : 1;
 }
 
-void a2kbd_connector_device::ack_w(int state)
+inline void a2kbd_connector_device::ack_w(int state)
 {
 	if (m_intf != nullptr)
 		m_intf->ack_w(state);
 }
 
-void a2kbd_connector_device::an3_w(int state)
+inline void a2kbd_connector_device::an3_w(int state)
 {
 	if (m_intf != nullptr)
 		m_intf->an3_w(state);

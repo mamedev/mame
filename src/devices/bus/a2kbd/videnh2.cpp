@@ -50,7 +50,7 @@
     these modifications active, macro definitions may be initiated
     by typing Ctrl-Shift-Rept; Rept alone terminates a macro.
 
-    This device emulation does not includes the lowercase character
+    This device emulation does not include the lowercase character
     ROM also supplied with the Enhancer ][ (which may not be needed by
     users of key filter programs or 80-column cards such as the Videx
     VideoTerm) or the suggested patches to CAPTST and RDKEY in the
@@ -98,7 +98,7 @@ protected:
 	virtual int control_r() override;
 
 	// memory map
-	virtual void mem_map(address_map &map);
+	virtual void mem_map(address_map &map) ATTR_COLD;
 
 	// memory-mapped I/O handlers
 	void keyout_w(u8 data);
@@ -129,7 +129,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// memory map
-	virtual void mem_map(address_map &map) override;
+	virtual void mem_map(address_map &map) override ATTR_COLD;
 };
 
 videnh2_device::videnh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
