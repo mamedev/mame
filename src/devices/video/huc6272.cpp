@@ -22,6 +22,10 @@ TODO:
 - Implement microprogram (layer timings, sort of Sega Saturn VRAM cycle patterns);
 - Implement Rainbow transfers (NEC logo on POST);
 - Verify ADPCM transfers;
+- Verify CD-DA hookup;
+
+Notes:
+- save pcfx_king.dmp,0:huc6272:kram,0x80000 to dump KRAM contents
 
 ADPCM related patents:
 - https://patents.google.com/patent/US5692099
@@ -51,7 +55,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	, m_cdda_l(*this, "cdda_l")
 	, m_cdda_r(*this, "cdda_r")
 	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
-	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this))
+	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, -2, address_map_constructor(FUNC(huc6272_device::kram_map), this))
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
 	, m_microprg_ram(*this, "microprg_ram")
 	, m_kram_page0(*this, "kram_page0")
@@ -152,6 +156,20 @@ void huc6272_device::device_start()
 
 void huc6272_device::device_reset()
 {
+	for (int i = 0; i < 4; i++)
+	{
+		m_bg[i].bat_address = 0;
+		m_bg[i].cg_address = 0;
+		m_bg[i].height = 1;
+		m_bg[i].width = 1;
+		m_bg[i].mode = 0;
+		m_bg[i].priority = 0;
+	}
+
+	m_bg0sub.bat_address = 0;
+	m_bg0sub.cg_address = 0;
+	m_bg0sub.height = 1;
+	m_bg0sub.width = 1;
 }
 
 device_memory_interface::space_config_vector huc6272_device::memory_space_config() const
@@ -177,8 +195,8 @@ void huc6272_device::kram_map(address_map &map)
 {
 	if (!has_configured_map(1))
 	{
-		map(0x000000, 0x0fffff).ram().share("kram_page0");
-		map(0x100000, 0x1fffff).ram().share("kram_page1");
+		map(0x000000, 0x03ffff).ram().share("kram_page0");
+		map(0x040000, 0x07ffff).ram().share("kram_page1");
 	}
 }
 
@@ -249,16 +267,6 @@ void huc6272_device::io_map(address_map &map)
 	map(0x5e, 0x5e).w(FUNC(huc6272_device::adpcm_imm_address_w<1>));
 }
 
-
-inline uint32_t huc6272_device::read_dword(offs_t address)
-{
-	return space(AS_DATA).read_dword(address << 2);
-}
-
-inline void huc6272_device::write_dword(offs_t address, uint32_t data)
-{
-	space(AS_DATA).write_dword(address << 2, data);
-}
 
 void huc6272_device::write_microprg_data(offs_t address, uint16_t data)
 {
@@ -402,10 +410,11 @@ void huc6272_device::kram_write_address_w(offs_t offset, u32 data, u32 mem_mask)
 	m_kram_page_w = BIT(m_kram_write_reg, 31);
 }
 
-u32 huc6272_device::kram_read_data_r(offs_t offset)
+// TODO: is this really 32-bit access?
+// writes in 16-bit units audio/photo CD submenus
+u32 huc6272_device::kram_read_data_r(offs_t offset, u32 mem_mask)
 {
-	// TODO: is this always 32-bit?
-	u32 res = read_dword((m_kram_addr_r)|(m_kram_page_r<<18));
+	u32 res = space(AS_DATA).read_dword(((m_kram_addr_r) | (m_kram_page_r << 18)) << 0, mem_mask);
 	m_kram_addr_r += (m_kram_inc_r & 0x200)
 		? ((m_kram_inc_r & 0x1ff) - 0x200)
 		: (m_kram_inc_r & 0x1ff);
@@ -414,9 +423,10 @@ u32 huc6272_device::kram_read_data_r(offs_t offset)
 
 void huc6272_device::kram_write_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	write_dword(
-		(m_kram_addr_w) | (m_kram_page_w<<18),
-		data
+	space(AS_DATA).write_dword(
+		((m_kram_addr_w) | (m_kram_page_w << 18)) << 0,
+		data,
+		mem_mask
 	);
 	m_kram_addr_w += (m_kram_inc_w & 0x200)
 		? ((m_kram_inc_w & 0x1ff) - 0x200)
@@ -446,6 +456,7 @@ void huc6272_device::kram_page_setup_w(offs_t offset, u32 data, u32 mem_mask)
  * ---- ---- xxxx ---- BG1 mode setting
  * ---- ---- ---- xxxx BG0 mode setting
  *
+ * 0000 - <unused>
  * 0001 - 4 color palette
  * 0010 - 16 color palette
  * 0011 - 256 color palette
@@ -454,20 +465,20 @@ void huc6272_device::kram_page_setup_w(offs_t offset, u32 data, u32 mem_mask)
  * 1001 - 4 color palette block mode
  * 1010 - 16 color palette block mode
  * 1011 - 256 color palette block mode
- * others - unused/invalid
+ * others - <invalid>
  */
 void huc6272_device::bg_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		for(int i = 0; i < 2; i++)
-			m_bg[i].mode = (data >> i*4) & 0x0f;
+			m_bg[i].mode = (data >> i * 4) & 0x0f;
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		for(int i = 2; i < 4; i++)
-			m_bg[i].mode = (data >> i*4) & 0x0f;
+			m_bg[i].mode = (data >> i * 4) & 0x0f;
 	}
 }
 
@@ -491,7 +502,7 @@ void huc6272_device::bg_priority_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_15)
 	{
 		for(int i = 0; i < 4; i++)
-			m_bg[i].priority = (data >> i*3) & 0x07;
+			m_bg[i].priority = (data >> i * 3) & 0x07;
 	}
 }
 
@@ -643,7 +654,9 @@ uint8_t huc6272_device::adpcm_update(int chan)
 
 		if (m_adpcm.nibble[chan] == 0)
 		{
-			m_adpcm.input[chan] = read_dword(((m_page_setting & 0x1000) << 6) | m_adpcm.addr[chan]);
+			m_adpcm.input[chan] = space(AS_DATA).read_dword(
+				((m_page_setting & 0x1000) << 6) | (m_adpcm.addr[chan]) << 0, 0xffffffff
+			);
 			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
 			if (m_adpcm.addr[chan] == m_adpcm.imm[chan])
 			{
@@ -695,16 +708,12 @@ uint8_t huc6272_device::adpcm_update_1()
 void huc6272_device::cdda_update(offs_t offset, uint8_t data)
 {
 	if (offset)
-		m_cdda_r->set_input_gain(0, float(data) / 63.0);
+		m_cdda_r->set_input_gain(0, float(data & 0x3f) / 63.0);
 	else
-		m_cdda_l->set_input_gain(0, float(data) / 63.0);
+		m_cdda_l->set_input_gain(0, float(data & 0x3f) / 63.0);
 }
 
 void huc6272_device::interrupt_update()
 {
-	if (m_adpcm.interrupt)
-		m_irq_changed_cb(ASSERT_LINE);
-	else
-		m_irq_changed_cb(CLEAR_LINE);
+	m_irq_changed_cb(m_adpcm.interrupt ? ASSERT_LINE : CLEAR_LINE);
 }
-
