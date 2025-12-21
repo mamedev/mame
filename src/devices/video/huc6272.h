@@ -106,8 +106,6 @@ private:
 	/* Callback for when the irq line may have changed (mandatory) */
 	devcb_write_line    m_irq_changed_cb;
 
-	uint32_t read_dword(offs_t address);
-	void write_dword(offs_t address, uint32_t data);
 	void write_microprg_data(offs_t address, uint16_t data);
 
 	uint8_t adpcm_update(int chan);
@@ -144,7 +142,7 @@ private:
 	u32 kram_write_address_r(offs_t offset);
 	void kram_write_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	u32 kram_read_data_r(offs_t offset);
+	u32 kram_read_data_r(offs_t offset, u32 mem_mask = ~0);
 	void kram_write_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	u32 kram_page_setup_r(offs_t offset);
