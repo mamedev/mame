@@ -151,6 +151,8 @@ license:CC0-1.0
 	80-234005(FR) - Octonauts (InnoTab Max Compatible)
 
 	Not all games are compatible with InnoTab Max [unlike V.Smile Motion, can play any V.Smile game], but there are games that are only suitable for InnoTab older models.
+
+	English game cartridges are not compatible with the Spanish version of Storio 2. German and French Storio 2 cartridges are compatible.
 	-->
 	
 	<software name="mickeychuk" supported="no">
