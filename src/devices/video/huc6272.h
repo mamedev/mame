@@ -1,10 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Angelo Salese
-/***************************************************************************
-
-    Hudson/NEC HuC6272 "King" device
-
-***************************************************************************/
 
 #ifndef MAME_VIDEO_HUC6272_H
 #define MAME_VIDEO_HUC6272_H
@@ -16,12 +11,6 @@
 #include "video/huc6271.h"
 #include "speaker.h"
 
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> huc6272_device
 
 class huc6272_device :  public device_t,
 						public device_memory_interface
@@ -47,8 +36,6 @@ public:
 	static void cdrom_config(device_t *device);
 
 protected:
-	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
