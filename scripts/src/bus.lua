@@ -3313,6 +3313,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/a2kbd/a2kbd.h,BUSES["A2KBD"] = true
+---------------------------------------------------
+
+if (BUSES["A2KBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/a2kbd/a2kbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/a2kbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/kb200.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/kb200.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/nkbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/nkbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/tk10.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/tk10.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/videnh2.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/videnh2.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/nscsi/cd.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/devices.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/hd.h,BUSES["NSCSI"] = true

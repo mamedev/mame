@@ -865,6 +865,7 @@ am64
 apple2
 apple2jp
 apple2p
+apple2pe
 basis108
 craft2p
 dodo
@@ -879,7 +880,6 @@ prav8m
 space84
 uniap2en
 uniap2pt
-uniap2ti
 
 @source:apple/apple2e.cpp
 ace2200
