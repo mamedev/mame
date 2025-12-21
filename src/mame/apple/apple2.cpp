@@ -9,6 +9,7 @@
     Special thanks to the Apple II Documentation Project/Antoine Vignau and Peter Ferrie.
 
 II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB possible.
+    (Later motherboard revisions only support multiples of 16 KB.)
     8K of ROM at $E000-$FFFF, empty sockets for $D000-$D7FF and $D800-$DFFF.
     Programmer's Aid #1 was sold by Apple for $D000-$D7FF, some third-party ROMs
     were also available.
@@ -25,7 +26,7 @@ II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB p
     slot 6, input the command 6^P (where ^P stands for control-P).  The monitor
     command ^B will enter BASIC directly.
 
-II Plus:
+II Plus: RAM options reduced to 16/32/48 KB.
     ROM expanded to 12KB from $D000-$FFFF containing Applesoft BASIC and
     the Autostart Monitor.  Applesoft is a licensed version of Microsoft's
     6502 BASIC as also found in Commodore and many other computers.
