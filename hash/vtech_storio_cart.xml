@@ -60,8 +60,8 @@ license:CC0-1.0
 	       | 80-281003(UK)   | Mickey Mouse Clubhouse
 	  XX   | 80-281004(GER)  | Micky Maus Wunderhaus
 	       | 80-281005(FR)   | La Maison de Mickey
-	       | 80-281022(SP)   | La casa de Mickey Mouse
-	       | 80-281023(NL)   | Mickey Mouse Clubhouse
+	       | 80-281022(SP)   | La casa de Mickey Mouse (aka La Casa de Mickey Mouse: Mickey Juega al escondite)
+	       | 80-281023(NL)   | Mickey Mouse Clubhouse (aka Mickey Mouse Clubhouse - Mickey zoekt en vindt!)
 	  XX   | 80-281100(US)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
 	       | 80-281103(UK)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
 	       | 80-281104(GER)  | Disney Princess - Eine besondere Überraschung für Belle / Das Geburtstagsgeschenk
@@ -100,7 +100,7 @@ license:CC0-1.0
 	       | 80-282003(UK)   | Winnie the Pooh
 	       | 80-282004(GER)  | Winnie Puuh
 	       | 80-282005(FR)   | Winnie l'ourson
-	       | 80-282022(SP)   | Winnie the Pooh (Found in Spain product catalog, may not have been released)
+	       | 80-282022(SP)   | Winnie the Pooh (Found in Spain product catalog, may not have been released) (German, French, British and Dutch versions play OK on Spanish system)
 	       | 80-282023(NL)   | Winnie de Poeh
 	       | 80-282100(US)   | Super Why! - Attack of the Eraser
 	       | 80-282200(US)   | Madagascar 3 - Europe's Most Wanted
@@ -124,22 +124,29 @@ license:CC0-1.0
 
 	       All items have been confirmed via physical photographs, product code searches, and online shopping sites, with the exception of 
 	       Winnie Puuh (Spain) which was listed in a Spanish product catalog and may have not been released.
-
+	
 	       Storio 1 carts come in boxes with an orange stripe in front. Storio carts with a blue stripe in front are only compatible with Storio 2 and later systems.
 
 	-->
-
+	<-- 
+	Scooby Doo and a Mummy Too!
+	Activities: Read the story, Game Time and Dictionary
+	-->	
 	<software name="scoobys" supported="no">
-		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain)</description>
+		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain) (Storio 2 Compatible)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-280422(SP)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-280422 - scooby-doo-scooby-doo y la momia (SP).bin" size="0x4200000" crc="cd1ee924" sha1="83e561af5910dc547829d54c84fbef60350f4f54" />
 			</dataarea>
 		</part>
 	</software>
-
+	<-- 
+	Dora and the 3 Little Pigs
+	Activities: Read the Story, Game Time and Dictionary
+	-->	
 	<software name="dora3pig" supported="no">
 		<description>Dora and the 3 Little Pigs (USA)</description>
 		<year>2010</year>
@@ -153,17 +160,20 @@ license:CC0-1.0
 	</software>
 
 	<software name="dora3pigg" cloneof="dora3pig" supported="no">
-		<description>Dora und die drei Schweinchen (Germany)</description>
+		<description>Dora und die drei Schweinchen (Germany) (Storio 2 Compatible)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-280904(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-280904 - Dora und die drei Schweinchen (GER).bin" size="0x4200000" crc="34f85a56" sha1="93b27d5c2a5b9e23470a3cb48099e3aa1f36bde6" />
 			</dataarea>
 		</part>
 	</software>
-	
-	<!-- also known as Mickey Mouse Clubhouse: Mickey Go Seek -->
+	<-- 
+	Mickey Mouse Clubhouse: Mickey Go Seek
+	Activities: Read the story, Game Time and Dictionary
+	-->	
 	<software name="mmclub" supported="no">
 		<description>Mickey Mouse Clubhouse (USA)</description>
 		<year>2010</year>
@@ -179,7 +189,7 @@ license:CC0-1.0
 	<!-- this cartridge looked identical to the above, but contained a normal flash chip instead of an OTP device
 	     the data structure is very different, and doesn't start with the FAT16 filesystem?
 	     does the system BIOS detect different cartridge types and handle them in different ways? -->
-	<!-- also known as Mickey Mouse Clubhouse: Mickey Go Seek -->
+
 	<software name="mmcluba" cloneof="mmclub" supported="no">
 		<description>Mickey Mouse Clubhouse (USA, flash chip)</description>
 		<year>2010</year>
@@ -195,20 +205,26 @@ license:CC0-1.0
 
 
 	<software name="mmclubg" cloneof="mmclub" supported="no">
-		<description>Micky Maus Wunderhaus (Germany)</description>
+		<description>Micky Maus Wunderhaus (Germany) (Storio 2 Compatible)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-281004(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-281004 - Micky Maus Wunderhaus (GER).bin" size="0x4200000" crc="036fc056" sha1="28f5b7c13eaceadeca5f4e8ec8b1ef2f2d85d1ba" />
 			</dataarea>
 		</part>
 	</software>
-
+	<-- 
+	SpongeBob
+	Activities: Read the Story, Game Time and Dictionary
+	English version undumped
+	-->	
 	<software name="spongebobg" supported="no">
-		<description>SpongeBob Schwammkopf - Ein Schwamm will nach oben (Germany)</description>
+		<description>SpongeBob Schwammkopf - Ein Schwamm will nach oben (Germany) (Storio 2 Compatible)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-281404(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-281404 - SpongeBob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" />
@@ -217,15 +233,21 @@ license:CC0-1.0
 	</software>
 
 	<software name="tangledg" supported="no">
-		<description>Rapunzel - Neu verföhnt (Germany)</description>
-		<year>20??</year>
+		<description>Rapunzel - Neu verföhnt (Germany) (Storio 2 Compatible)</description>
+		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-281504(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-281504 - Rapunzel - Neu verfohnt (GER).bin" size="0x4200000" crc="70fd0039" sha1="85823b4fcbcb3ff644154c3c0f3f3bd962846e50" />
 			</dataarea>
 		</part>
 	</software>
+	
+	<-- 
+	Disney-Pixar Cars 2
+	Activities: Read the story, Game Time, Fun Dictionary, Minigames and Prize Room. 
+	-->
 
 	<software name="cars2" supported="no">
 		<description>Cars 2 (USA)</description>
@@ -238,7 +260,10 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<-- 
+	Hello Kitty
+	Activities: Read the Story, Game Time, Minigames, Gift Room, and Dictionary
+	-->	
 	<software name="hkitty" supported="no">
 		<description>Hello Kitty's Surprise (USA)</description>
 		<year>2012</year>
@@ -250,7 +275,10 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<-- 
+	Disney Princess
+	Activities: Read the Story, Game Time and Dictionary
+	-->	
 	<software name="dprinc" supported="no">
 		<description>Disney Princess - A Gift From The Heart &amp; Belle's Special Treat (USA)</description>
 		<year>2010</year>
