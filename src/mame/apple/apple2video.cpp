@@ -438,6 +438,16 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 			code |= (m_GS_langsel >> 5) * 0x100;
 		}
 	}
+	else if (Model == model::IVEL_ULTRA)
+	{
+		// this model doesn't seem to support flashing characters
+		if (code < 0x80)
+			invert_mask ^= 0x7f;
+
+		// YU/ASCII select
+		if (m_an2)
+			code |= 0x100;
+	}
 	else    // original II and II Plus
 	{
 		if ((code >= 0x40) && (code <= 0x7f))
@@ -451,7 +461,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				invert_mask ^= 0x7f;
 			}
 		}
-		else if (code < 0x40 && Model != model::IVEL_ULTRA) // inverse: flip FG and BG
+		else if (code < 0x40) // inverse: flip FG and BG
 		{
 			invert_mask ^= 0x7f;
 		}
@@ -464,7 +474,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 
 	/* look up the character data */
 	unsigned bits = m_char_ptr[code * 8 + row];
-	bits = (Model == model::IVEL_ULTRA) ? (bits >> 1) : (bits & 0x7f);
+	bits = (Invert && !Flip) ? (bits >> 1) : (bits & 0x7f);
 	bits ^= invert_mask;
 	return Flip ? reverse_7_bits[bits] : bits;
 }
@@ -610,6 +620,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
+// explicit instantiations
 template void a2_video_device::text_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -621,6 +632,7 @@ template void a2_video_device::text_update<a2_video_device::model::IIE, false, f
 template void a2_video_device::text_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
@@ -1037,6 +1049,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+// explicit instantiations
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1048,6 +1061,7 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, fa
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")
