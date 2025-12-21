@@ -163,8 +163,8 @@ authors:hap
 		<element ref="static_blue"><bounds x="23.35" y="1.2" width="10.6" height="10.7" /></element>
 		<element ref="static_blue2"><bounds x="23.55" y="1.4" width="10.2" height="10.3" /></element>
 
-		<element ref="text_l1"><bounds x="23.15" y="13.1" width="11" height="1.2" /></element>
-		<element ref="text_l2"><bounds x="22.15" y="14.3" width="13" height="1.2" /></element>
+		<element ref="text_l1"><bounds x="22.65" y="13.1" width="12" height="1.2" /></element>
+		<element ref="text_l2"><bounds x="22.65" y="14.3" width="12" height="1.2" /></element>
 
 		<element ref="static_black2"><bounds x="24.15" y="2.1" width="9" height="9" /></element>
 		<element ref="static_cyan1"><bounds x="24.35" y="2.3" width="2.7333" height="2.7333" /></element>
@@ -215,11 +215,11 @@ authors:hap
 		<element ref="static_cyan1"><bounds x="35.35" y="9.7" width="2.65" height="2.65" /></element>
 		<element ref="static_cyan1"><bounds x="35.35" y="12.55" width="2.65" height="2.65" /></element>
 
-		<element ref="text_br1"><bounds x="35.36" y="4.875" width="2.63" height="0.9" /></element>
-		<element ref="text_br2"><bounds x="35.36" y="7.725" width="2.63" height="0.9" /></element>
-		<element ref="text_br31"><bounds x="35.36" y="10.125" width="2.63" height="0.9" /></element>
-		<element ref="text_br32"><bounds x="35.36" y="11.025" width="2.63" height="0.9" /></element>
-		<element ref="text_br4"><bounds x="35.36" y="13.425" width="2.63" height="0.9" /></element>
+		<element ref="text_br1"><bounds x="35.45" y="4.875" width="2.45" height="0.9" /></element>
+		<element ref="text_br2"><bounds x="35.45" y="7.725" width="2.45" height="0.9" /></element>
+		<element ref="text_br31"><bounds x="35.45" y="10.125" width="2.45" height="0.9" /></element>
+		<element ref="text_br32"><bounds x="35.45" y="11.025" width="2.45" height="0.9" /></element>
+		<element ref="text_br4"><bounds x="35.45" y="13.425" width="2.45" height="0.9" /></element>
 
 		<element ref="hl" inputtag="IN.3" inputmask="0x08"><bounds x="19.3" y="4" width="2.65" height="2.65" /><color alpha="0.15" /></element>
 		<element ref="hl" inputtag="IN.3" inputmask="0x04"><bounds x="19.3" y="6.85" width="2.65" height="2.65" /><color alpha="0.15" /></element>

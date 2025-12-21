@@ -5773,6 +5773,7 @@ void crszone_state::mips_map(address_map &map)
 	map(0x16000000, 0x1600ffff).ram().share("nvram"); // Backup RAM
 	map(0x16200000, 0x16203fff).ram(); // C422 RAM
 	map(0x16400000, 0x1640000f).rw(FUNC(crszone_state::c422_r), FUNC(crszone_state::c422_w)); // C422 registers
+	map(0x16400002, 0x16400003).w(FUNC(crszone_state::c422_irq_w));
 	map(0x16800000, 0x1681dfff).ram().w(FUNC(crszone_state::textchar_w)).share("charram"); // Text CGRAM (C361)
 	map(0x1681e000, 0x1681ffff).ram().w(FUNC(crszone_state::textram_w)).share("textram"); // Text VRAM (C361)
 

@@ -589,7 +589,9 @@ void ppu_vt32_device::m_newvid_1d_w(u8 data) { logerror("%s: m_newvid_1d_w %02x\
 
 void ppu_vt32_device::draw_background(u8 *line_priority)
 {
-	if ((get_newvid_1c() == 0x2e) || (get_newvid_1c() == 0x0a))
+	// fingerd also uses 6d for the first song, which doesn't work with this code
+	// maybe changes how extended attribute is used?
+	if ((get_newvid_1c() == 0x2e) || (get_newvid_1c() == 0x0a) || (get_newvid_1c() == 0x6e))
 	{
 		// strange custom mode, feels more like a vt369 mode
 		// tiles use 16x16x8 packed data

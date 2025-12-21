@@ -145,6 +145,8 @@ Notes:
 
 #include "speaker.h"
 
+#include "endianness.h"
+
 #include <algorithm>
 
 
@@ -727,45 +729,44 @@ loop.  Also it seems that bit 0x40000000 is the PIC reset.
 
 void crystal_state::init_crysking()
 {
-	uint16_t *rom = (uint16_t*) memregion("flash")->base();
+	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
 
 	//patch the data feed by the protection
 
-	rom[WORD_XOR_LE(0x7bb6 / 2)] = 0xdf01;
-	rom[WORD_XOR_LE(0x7bb8 / 2)] = 0x9c00;
+	rom[0x7bb6 / 2] = 0xdf01;
+	rom[0x7bb8 / 2] = 0x9c00;
 
-	rom[WORD_XOR_LE(0x976a / 2)] = 0x901c;
-	rom[WORD_XOR_LE(0x976c / 2)] = 0x9001;
+	rom[0x976a / 2] = 0x901c;
+	rom[0x976c / 2] = 0x9001;
 
-	rom[WORD_XOR_LE(0x8096 / 2)] = 0x90fc;
-	rom[WORD_XOR_LE(0x8098 / 2)] = 0x9001;
+	rom[0x8096 / 2] = 0x90fc;
+	rom[0x8098 / 2] = 0x9001;
 
-	rom[WORD_XOR_LE(0x8a52 / 2)] = 0x4000;    //NOP
-	rom[WORD_XOR_LE(0x8a54 / 2)] = 0x403c;    //NOP
+	rom[0x8a52 / 2] = 0x4000;    //NOP
+	rom[0x8a54 / 2] = 0x403c;    //NOP
 }
 
 void crystal_state::init_evosocc()
 {
-	uint16_t *rom = (uint16_t*) memregion("flash")->base();
-	rom += 0x1000000 * 2 / 2;
+	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]) + (0x1000000 * 2 / 2);
 
-	rom[WORD_XOR_LE(0x97388e / 2)] = 0x90fc;  //PUSH R2..R7
-	rom[WORD_XOR_LE(0x973890 / 2)] = 0x9001;  //PUSH R0
+	rom[0x97388e / 2] = 0x90fc;  //PUSH R2..R7
+	rom[0x973890 / 2] = 0x9001;  //PUSH R0
 
-	rom[WORD_XOR_LE(0x971058 / 2)] = 0x907c;  //PUSH R2..R6
-	rom[WORD_XOR_LE(0x971060 / 2)] = 0x9001; //PUSH R0
+	rom[0x971058 / 2] = 0x907c;  //PUSH R2..R6
+	rom[0x971060 / 2] = 0x9001; //PUSH R0
 
-	rom[WORD_XOR_LE(0x978036 / 2)] = 0x900c;  //PUSH R2-R3
-	rom[WORD_XOR_LE(0x978038 / 2)] = 0x8303;  //LD    (%SP,0xC),R3
+	rom[0x978036 / 2] = 0x900c;  //PUSH R2-R3
+	rom[0x978038 / 2] = 0x8303;  //LD    (%SP,0xC),R3
 
-	rom[WORD_XOR_LE(0x974ed0 / 2)] = 0x90fc;  //PUSH R7-R6-R5-R4-R3-R2
-	rom[WORD_XOR_LE(0x974ed2 / 2)] = 0x9001;  //PUSH R0
+	rom[0x974ed0 / 2] = 0x90fc;  //PUSH R7-R6-R5-R4-R3-R2
+	rom[0x974ed2 / 2] = 0x9001;  //PUSH R0
 }
 
 void crystal_state::init_topbladv()
 {
 	// patches based on analysis of PIC dump
-	uint16_t *rom = (uint16_t*) memregion("flash")->base();
+	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
 	/*
 	    PIC Protection data:
 	    - RAM ADDR - --PATCH--
@@ -775,24 +776,24 @@ void crystal_state::init_topbladv()
 	    00 e0 03 02 01 90 00 92
 	*/
 
-	rom[WORD_XOR_LE(0x12d7a / 2)] = 0x90fc; //PUSH R7-R6-R5-R4-R3-R2
-	rom[WORD_XOR_LE(0x12d7c / 2)] = 0x9001; //PUSH R0
+	rom[0x12d7a / 2] = 0x90fc; //PUSH R7-R6-R5-R4-R3-R2
+	rom[0x12d7c / 2] = 0x9001; //PUSH R0
 
-	rom[WORD_XOR_LE(0x18880 / 2)] = 0x9004; //PUSH R2
-	rom[WORD_XOR_LE(0x18882 / 2)] = 0x9001; //PUSH R0
+	rom[0x18880 / 2] = 0x9004; //PUSH R2
+	rom[0x18882 / 2] = 0x9001; //PUSH R0
 
-	rom[WORD_XOR_LE(0x2fe18 / 2)] = 0x9001; //PUSH R0
-	rom[WORD_XOR_LE(0x2fe1a / 2)] = 0x9200; //PUSH SR
+	rom[0x2fe18 / 2] = 0x9001; //PUSH R0
+	rom[0x2fe1a / 2] = 0x9200; //PUSH SR
 
-	rom[WORD_XOR_LE(0x2ed44 / 2)] = 0xdfe9; //CALL 0x3cf00
-	rom[WORD_XOR_LE(0x2ed46 / 2)] = 0xc3c2; //MOV %SR0,%DR1
+	rom[0x2ed44 / 2] = 0xdfe9; //CALL 0x3cf00
+	rom[0x2ed46 / 2] = 0xc3c2; //MOV %SR0,%DR1
 
 }
 
 void crystal_state::init_officeye()
 {
 	// patches based on analysis of PIC dump
-	uint16_t *rom = (uint16_t*) memregion("flash")->base();
+	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
 
 	/*
 	    PIC Protection data:
@@ -803,45 +804,45 @@ void crystal_state::init_officeye()
 	    3a c1 01 02 1c 90 01 90
 	*/
 
-	rom[WORD_XOR_LE(0x9c9e / 2)] = 0x901c;  //PUSH R4-R3-R2
-	rom[WORD_XOR_LE(0x9ca0 / 2)] = 0x9001;  //PUSH R0
+	rom[0x9c9e / 2] = 0x901c;  //PUSH R4-R3-R2
+	rom[0x9ca0 / 2] = 0x9001;  //PUSH R0
 
-	rom[WORD_XOR_LE(0x9ee4 / 2)] = 0x907c;  //PUSH R6-R5-R4-R3-R2
-	rom[WORD_XOR_LE(0x9ee6 / 2)] = 0x9001;  //PUSH R0
+	rom[0x9ee4 / 2] = 0x907c;  //PUSH R6-R5-R4-R3-R2
+	rom[0x9ee6 / 2] = 0x9001;  //PUSH R0
 
-	rom[WORD_XOR_LE(0x4b2e0 / 2)] = 0x9004; //PUSH R2
-	rom[WORD_XOR_LE(0x4b2e2 / 2)] = 0x9001; //PUSH R0
+	rom[0x4b2e0 / 2] = 0x9004; //PUSH R2
+	rom[0x4b2e2 / 2] = 0x9001; //PUSH R0
 
-	rom[WORD_XOR_LE(0xdace / 2)] = 0x901c;  //PUSH R4-R3-R2
-	rom[WORD_XOR_LE(0xdad0 / 2)] = 0x9001;  //PUSH R0
+	rom[0xdace / 2] = 0x901c;  //PUSH R4-R3-R2
+	rom[0xdad0 / 2] = 0x9001;  //PUSH R0
 }
 
 void crystal_state::init_donghaer()
 {
-	uint16_t *rom = (uint16_t*)memregion("flash")->base();
+	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
 
-	rom[WORD_XOR_LE(0x037a2 / 2)] = 0x9004; // PUSH %R2
-	rom[WORD_XOR_LE(0x037a4 / 2)] = 0x8202; // LD   (%SP,0x8),%R2
+	rom[0x037a2 / 2] = 0x9004; // PUSH %R2
+	rom[0x037a4 / 2] = 0x8202; // LD   (%SP,0x8),%R2
 
-	rom[WORD_XOR_LE(0x03834 / 2)] = 0x9001; // PUSH %R0
-	rom[WORD_XOR_LE(0x03836 / 2)] = 0x9200; // PUSH %SR
+	rom[0x03834 / 2] = 0x9001; // PUSH %R0
+	rom[0x03836 / 2] = 0x9200; // PUSH %SR
 
-	rom[WORD_XOR_LE(0x0ac9e / 2)] = 0x9004; // PUSH %R2
-	rom[WORD_XOR_LE(0x0aca0 / 2)] = 0x4081; // LERI 0x81
+	rom[0x0ac9e / 2] = 0x9004; // PUSH %R2
+	rom[0x0aca0 / 2] = 0x4081; // LERI 0x81
 
-	rom[WORD_XOR_LE(0x19c70 / 2)] = 0x900c; // PUSH %R2-%R3
-	rom[WORD_XOR_LE(0x19c72 / 2)] = 0x9001; // PUSH %R0
+	rom[0x19c70 / 2] = 0x900c; // PUSH %R2-%R3
+	rom[0x19c72 / 2] = 0x9001; // PUSH %R0
 }
 
 void crystal_state::init_maldaiza()
 {
-	uint16_t *rom = (uint16_t*)memregion("flash")->base();
-	rom[WORD_XOR_LE(0x09b12 / 2)] = 0x9004; // PUSH %R2
-	rom[WORD_XOR_LE(0x09b14 / 2)] = 0x8202; // LD   (%SP,0x8),%R2
+	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
+	rom[0x09b12 / 2] = 0x9004; // PUSH %R2
+	rom[0x09b14 / 2] = 0x8202; // LD   (%SP,0x8),%R2
 	// ...
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )

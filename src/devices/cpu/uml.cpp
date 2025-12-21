@@ -56,60 +56,60 @@ using namespace uml;
 //**************************************************************************
 
 // opcode validation condition/flag valid bitmasks
-constexpr u8 OPFLAGS_NONE   = FLAGS_NONE;
-constexpr u8 OPFLAGS_C      = FLAG_C;
-constexpr u8 OPFLAGS_Z      = FLAG_Z;
-constexpr u8 OPFLAGS_SZ     = FLAG_S | FLAG_Z;
-constexpr u8 OPFLAGS_SZC    = FLAG_S | FLAG_Z | FLAG_C;
-constexpr u8 OPFLAGS_SZV    = FLAG_S | FLAG_Z | FLAG_V;
-constexpr u8 OPFLAGS_SZVC   = FLAG_S | FLAG_Z | FLAG_V | FLAG_C;
-constexpr u8 OPFLAGS_UZC    = FLAG_U | FLAG_Z | FLAG_C;
-constexpr u8 OPFLAGS_ALL    = FLAGS_ALL;
-constexpr u8 OPFLAGS_P1     = 0x81;
-constexpr u8 OPFLAGS_P2     = 0x82;
-constexpr u8 OPFLAGS_P3     = 0x83;
-constexpr u8 OPFLAGS_P4     = 0x84;
+constexpr u8  OPFLAGS_NONE   = FLAGS_NONE;
+constexpr u8  OPFLAGS_C      = FLAG_C;
+constexpr u8  OPFLAGS_Z      = FLAG_Z;
+constexpr u8  OPFLAGS_SZ     = FLAG_S | FLAG_Z;
+constexpr u8  OPFLAGS_SZC    = FLAG_S | FLAG_Z | FLAG_C;
+constexpr u8  OPFLAGS_SZV    = FLAG_S | FLAG_Z | FLAG_V;
+constexpr u8  OPFLAGS_SZVC   = FLAG_S | FLAG_Z | FLAG_V | FLAG_C;
+constexpr u8  OPFLAGS_UZC    = FLAG_U | FLAG_Z | FLAG_C;
+constexpr u8  OPFLAGS_ALL    = FLAGS_ALL;
+constexpr u8  OPFLAGS_P1     = 0x81;
+constexpr u8  OPFLAGS_P2     = 0x82;
+constexpr u8  OPFLAGS_P3     = 0x83;
+constexpr u8  OPFLAGS_P4     = 0x84;
 
 // parameter input/output states
-#define PIO_IN          0x01
-#define PIO_OUT         0x02
-#define PIO_INOUT       (PIO_IN | PIO_OUT)
+constexpr u8  PIO_IN         = 0x01;
+constexpr u8  PIO_OUT        = 0x02;
+constexpr u8  PIO_INOUT      = (PIO_IN | PIO_OUT);
 
 // parameter sizes
-#define PSIZE_4         SIZE_DWORD
-#define PSIZE_8         SIZE_QWORD
-#define PSIZE_OP        0x80
-#define PSIZE_P1        0x81
-#define PSIZE_P2        0x82
-#define PSIZE_P3        0x83
-#define PSIZE_P4        0x84
+constexpr u8  PSIZE_4        = SIZE_DWORD;
+constexpr u8  PSIZE_8        = SIZE_QWORD;
+constexpr u8  PSIZE_OP       = 0x80;
+constexpr u8  PSIZE_P1       = 0x81;
+constexpr u8  PSIZE_P2       = 0x82;
+constexpr u8  PSIZE_P3       = 0x83;
+constexpr u8  PSIZE_P4       = 0x84;
 
 // basic parameter types
-#define PTYPES_NONE     0
-#define PTYPES_IMM      (1 << parameter::PTYPE_IMMEDIATE)
-#define PTYPES_IREG     (1 << parameter::PTYPE_INT_REGISTER)
-#define PTYPES_FREG     (1 << parameter::PTYPE_FLOAT_REGISTER)
-#define PTYPES_MVAR     (1 << parameter::PTYPE_MAPVAR)
-#define PTYPES_MEM      (1 << parameter::PTYPE_MEMORY)
-#define PTYPES_SIZE     (1 << parameter::PTYPE_SIZE)
-#define PTYPES_SCSIZE   (1 << parameter::PTYPE_SIZE_SCALE)
-#define PTYPES_SPSIZE   (1 << parameter::PTYPE_SIZE_SPACE)
-#define PTYPES_HANDLE   (1 << parameter::PTYPE_CODE_HANDLE)
-#define PTYPES_LABEL    (1 << parameter::PTYPE_CODE_LABEL)
-#define PTYPES_CFUNC    (1 << parameter::PTYPE_C_FUNCTION)
-#define PTYPES_ROUND    (1 << parameter::PTYPE_ROUNDING)
-#define PTYPES_STR      (1 << parameter::PTYPE_STRING)
+constexpr u16 PTYPES_NONE    = 0;
+constexpr u16 PTYPES_IMM     = (1 << parameter::PTYPE_IMMEDIATE);
+constexpr u16 PTYPES_IREG    = (1 << parameter::PTYPE_INT_REGISTER);
+constexpr u16 PTYPES_FREG    = (1 << parameter::PTYPE_FLOAT_REGISTER);
+constexpr u16 PTYPES_MVAR    = (1 << parameter::PTYPE_MAPVAR);
+constexpr u16 PTYPES_MEM     = (1 << parameter::PTYPE_MEMORY);
+constexpr u16 PTYPES_SIZE    = (1 << parameter::PTYPE_SIZE);
+constexpr u16 PTYPES_SCSIZE  = (1 << parameter::PTYPE_SIZE_SCALE);
+constexpr u16 PTYPES_SPSIZE  = (1 << parameter::PTYPE_SIZE_SPACE);
+constexpr u16 PTYPES_HANDLE  = (1 << parameter::PTYPE_CODE_HANDLE);
+constexpr u16 PTYPES_LABEL   = (1 << parameter::PTYPE_CODE_LABEL);
+constexpr u16 PTYPES_CFUNC   = (1 << parameter::PTYPE_C_FUNCTION);
+constexpr u16 PTYPES_ROUND   = (1 << parameter::PTYPE_ROUNDING);
+constexpr u16 PTYPES_STR     = (1 << parameter::PTYPE_STRING);
 
 // special parameter types
-#define PTYPES_PTR      (PTYPES_MEM | 0x1000)
-#define PTYPES_STATE    (PTYPES_MEM | 0x2000)
+constexpr u16 PTYPES_PTR     = (PTYPES_MEM | 0x1000);
+constexpr u16 PTYPES_STATE   = (PTYPES_MEM | 0x2000);
 
 // combinations of types
-#define PTYPES_IRM      (PTYPES_IREG | PTYPES_MEM)
-#define PTYPES_FRM      (PTYPES_FREG | PTYPES_MEM)
-#define PTYPES_IMV      (PTYPES_IMM | PTYPES_MVAR)
-#define PTYPES_IANY     (PTYPES_IRM | PTYPES_IMV)
-#define PTYPES_FANY     (PTYPES_FRM)
+constexpr u16 PTYPES_IRM     = (PTYPES_IREG | PTYPES_MEM);
+constexpr u16 PTYPES_FRM     = (PTYPES_FREG | PTYPES_MEM);
+constexpr u16 PTYPES_IMV     = (PTYPES_IMM | PTYPES_MVAR);
+constexpr u16 PTYPES_IANY    = (PTYPES_IRM | PTYPES_IMV);
+constexpr u16 PTYPES_FANY    = (PTYPES_FRM);
 
 
 
@@ -171,6 +171,8 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO1(SET,     "!set",     4|8, true,  NONE, NONE, NONE, PINFO(OUT, OP, IRM)) // Get the state of the specified condition (e.g. calling UML_SET with COND_NZ will return 0 if the condition is not met and 1 if the condition is met)
 	OPINFO2(MOV,     "!mov",     4|8, true,  NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO3(SEXT,    "!sext",    4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, P3, IANY), PINFO(IN, OP, SIZE))
+	OPINFO4(BFXU,    "!bfxu",    4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
+	OPINFO4(BFXS,    "!bfxs",    4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO4(ROLAND,  "!roland",  4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Rotate left + AND (see drcbec.cpp for implementation)
 	OPINFO4(ROLINS,  "!rolins",  4|8, false, NONE, SZ,   ALL,  PINFO(INOUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY)) // Rotate left + OR (see drcbec.cpp for implementation)
 	OPINFO3(ADD,     "!add",     4|8, false, NONE, SZVC, ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
@@ -449,6 +451,114 @@ public:
 		}
 	}
 
+	static void bfxu(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+		truncate_immediate(inst, 3, bits - 1);
+
+		if (inst.param(2).is_immediate() && inst.param(3).is_immediate())
+		{
+			auto const field = util::make_bitmask<u64>(inst.param(3).immediate());
+
+			if (inst.param(1).is_immediate())
+			{
+				// constant result, convert to MOV or a logic operation
+				auto const rot = inst.param(2).immediate();
+
+				if (size == 4)
+					convert_to_mov_immediate(inst, rotr_32(inst.param(1).immediate(), rot) & field);
+				else
+					convert_to_mov_immediate(inst, rotr_64(inst.param(1).immediate(), rot) & field);
+			}
+			else if (inst.param(2).is_immediate_value(0))
+			{
+				// no shift, convert to AND
+				inst.m_opcode = OP_AND;
+				inst.m_param[2] = field;
+				inst.m_numparams = 3;
+			}
+			else if ((inst.param(2).immediate() + inst.param(3).immediate()) == bits)
+			{
+				// equivalent to right shift
+				inst.m_opcode = OP_SHR;
+				inst.m_numparams = 3;
+			}
+		}
+		else if (inst.param(3).is_immediate_value(0))
+		{
+			// undefined behaviour - just generate zero
+			convert_to_mov_immediate(inst, 0);
+		}
+	}
+
+	static void bfxs(instruction &inst)
+	{
+		auto const size = inst.size();
+		auto const bits = size << 3;
+		u64 const mask = size_mask(inst);
+		assert((size == 4) || (size == 8));
+
+		// truncate immediates to instruction size
+		truncate_immediate(inst, 1, mask);
+		truncate_immediate(inst, 2, bits - 1);
+		truncate_immediate(inst, 3, bits - 1);
+
+		if (inst.param(2).is_immediate() && inst.param(3).is_immediate())
+		{
+			if (inst.param(1).is_immediate())
+			{
+				// constant result, convert to MOV or a logic operation
+				auto const rot = inst.param(2).immediate() + inst.param(3).immediate();
+				auto const shift = -s64(inst.param(3).immediate()) & (bits - 1);
+
+				if (size == 4)
+					convert_to_mov_immediate(inst, u32(s32(rotr_32(inst.param(1).immediate(), rot)) >> shift));
+				else
+					convert_to_mov_immediate(inst, u64(s64(rotr_64(inst.param(1).immediate(), rot)) >> shift));
+			}
+			else if (inst.param(2).is_immediate_value(0))
+			{
+				// no shift, convert to SEXT if possible
+				switch (inst.param(3).immediate())
+				{
+				case 8:
+					inst.m_opcode = OP_SEXT;
+					inst.m_param[2] = parameter::make_size(SIZE_BYTE);
+					inst.m_numparams = 3;
+					break;
+				case 16:
+					inst.m_opcode = OP_SEXT;
+					inst.m_param[2] = parameter::make_size(SIZE_WORD);
+					inst.m_numparams = 3;
+					break;
+				case 32:
+					inst.m_opcode = OP_SEXT;
+					inst.m_param[2] = parameter::make_size(SIZE_DWORD);
+					inst.m_numparams = 3;
+					break;
+				}
+			}
+			else if ((inst.param(2).immediate() + inst.param(3).immediate()) == bits)
+			{
+				// equivalent to right shift
+				inst.m_opcode = OP_SAR;
+				inst.m_numparams = 3;
+			}
+		}
+		else if (inst.param(3).is_immediate_value(0))
+		{
+			// undefined behaviour - just generate zero
+			convert_to_mov_immediate(inst, 0);
+		}
+	}
+
 	static void roland(instruction &inst)
 	{
 		auto const size = inst.size();
@@ -474,9 +584,9 @@ public:
 			// only mask is variable, convert to AND
 			inst.m_opcode = OP_AND;
 			if (size == 4)
-				inst.m_param[1] = parameter(rotl_32(inst.param(1).immediate(), inst.param(2).immediate()));
+				inst.m_param[1] = rotl_32(inst.param(1).immediate(), inst.param(2).immediate());
 			else
-				inst.m_param[1] = parameter(rotl_64(inst.param(1).immediate(), inst.param(2).immediate()));
+				inst.m_param[1] = rotl_64(inst.param(1).immediate(), inst.param(2).immediate());
 			inst.m_param[2] = inst.param(3);
 			inst.m_numparams = 3;
 		}
@@ -505,6 +615,13 @@ public:
 			inst.m_opcode = OP_SHR;
 			inst.m_numparams = 3;
 			inst.m_param[2] = bits - inst.param(2).immediate();
+		}
+		else if (inst.param(2).is_immediate() && inst.param(3).is_immediate() && !(inst.param(3).immediate() & (inst.param(3).immediate() + 1)))
+		{
+			// extract right-aligned field, convert to BFXU
+			inst.m_opcode = OP_BFXU;
+			inst.m_param[2] = bits - inst.param(2).immediate();
+			inst.m_param[3] = 64 - count_leading_zeros_64(inst.param(3).immediate());
 		}
 	}
 
@@ -1322,6 +1439,8 @@ void uml::instruction::simplify()
 		case OP_SET:    simplify_op::set(*this);                      break;
 		case OP_MOV:    simplify_op::mov(*this);                      break;
 		case OP_SEXT:   simplify_op::sext(*this);                     break;
+		case OP_BFXU:   simplify_op::bfxu(*this);                     break;
+		case OP_BFXS:   simplify_op::bfxs(*this);                     break;
 		case OP_ROLAND: simplify_op::roland(*this);                   break;
 		case OP_ROLINS: simplify_op::rolins(*this);                   break;
 		case OP_ADD:    simplify_op::add(*this);                      break;

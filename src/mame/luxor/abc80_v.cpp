@@ -24,13 +24,45 @@ void tkn80_state::set_screen_params(void)
 	}
 }
 
+void tkn80_state::set_80(bool state)
+{
+	u8 config = m_config->read();
+	int view = BIT(config, 2) + 1;
+
+	/*
+
+	    TKN 000-3ff -> ZA3506 000-3ff (9913/10042)
+	    TKN 400-7ff -> ZA3507 000-3ff (9913/10042)
+	    TKN 800-cff -> ZA3506 000-3ff (11273)
+	    TKN c00-FFF -> ZA3507 000-3ff (11273)
+
+	*/
+
+	if (state)
+	{
+		m_80 = true;
+
+		m_view_rom0.select(view);
+		m_view_rom2.select(view);
+		
+		set_screen_params();
+	}
+	else
+	{
+		m_80 = false;
+
+		m_view_rom0.select(0);
+		m_view_rom2.select(0);
+
+		set_screen_params();
+	}
+}
+
 uint8_t tkn80_state::in3_r()
 {
 	if (!machine().side_effects_disabled() && m_80)
 	{
-		m_80 = false;
-
-		set_screen_params();
+		set_80(false);
 	}
 
 	return 0xff;
@@ -40,9 +72,7 @@ uint8_t tkn80_state::in4_r()
 {
 	if (!machine().side_effects_disabled() && !m_80)
 	{
-		m_80 = true;
-
-		set_screen_params();
+		set_80(true);
 	}
 
 	return 0xff;
@@ -287,7 +317,7 @@ void tkn80_state::video_reset()
 	u8 config = m_config->read();
 
 	m_80 = BIT(config, 0);
-	set_screen_params();
+	set_80(m_80);
 
 	m_blink = 1;
 	m_blink_timer->enable(BIT(config, 1));

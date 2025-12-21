@@ -27,8 +27,10 @@
 
 #include "emu.h"
 #include "atarig42.h"
+
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+
 #include "emupal.h"
 #include "speaker.h"
 
@@ -932,7 +934,7 @@ void atarig42_0x200_state::init_roadriot()
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_w)));
-	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
+	m_sloop_base = &memregion("maincpu")->as_u16();
 
 	/*
 	Road Riot color MUX
@@ -967,13 +969,13 @@ void atarig42_0x400_state::init_guardian()
 {
 	m_playfield_base = 0x000;
 
-	/* it looks like they jsr to $80000 as some kind of protection */
-	/* put an RTS there so we don't die */
-	*(uint16_t *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
+	// it looks like they jsr to $80000 as some kind of protection
+	// put an RTS there so we don't die
+	memregion("maincpu")->as_u16(0x80000 / 2) = 0x4e75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.install_readwrite_handler(0x000000, 0x07ffff, read16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_r)), write16sm_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_w)));
-	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
+	m_sloop_base = &memregion("maincpu")->as_u16();
 
 	/*
 	Guardians color MUX

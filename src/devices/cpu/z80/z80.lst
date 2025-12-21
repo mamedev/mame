@@ -185,11 +185,12 @@ macro   retn
 
 macro   z80n:retn
 	m_out_retn_seen_cb(1);
-	@pop
 	if (m_stackless) {
+		SP += 2; //@pop
 		m_pc.b.l = m_in_nextreg_cb(0xc2);
 		m_pc.b.h = m_in_nextreg_cb(0xc3);
 	} else {
+		@pop
 		PC = TDAT;
 	}
 	LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2);
@@ -898,6 +899,23 @@ macro   take_nmi
 	WZ = PC;
 	set_service_attention<SA_NMI_PENDING, 0>();
 
+macro   z80n:take_nmi
+	leave_halt();
+	m_iff1 = 0;
+	m_r++;
+	+ 5
+	if (m_stackless) {
+		SP -= 2;
+		m_out_nextreg_cb(0xc2, m_pc.b.l);
+		m_out_nextreg_cb(0xc3, m_pc.b.h);
+	} else {
+		@wm16_sp PC
+		;
+	}
+	PC = 0x0066;
+	WZ = PC;
+	set_service_attention<SA_NMI_PENDING, 0>();
+
 macro   irqfetch
 {
 	// fetch the IRQ vector
@@ -984,18 +1002,6 @@ macro   take_interrupt
 
 macro   check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
-		@take_nmi
-	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
-		@take_interrupt
-	}
-
-macro   z80n:check_interrupts
-	if (get_service_attention<SA_NMI_PENDING>()) {
-		if (m_stackless) {
-			// on take_nmi
-			m_out_nextreg_cb(0xc2, m_pc.b.l);
-			m_out_nextreg_cb(0xc3, m_pc.b.h);
-		}
 		@take_nmi
 	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		@take_interrupt

@@ -297,6 +297,9 @@ void macportable_state::scc_w(offs_t offset, u16 data)
 
 u16 macportable_state::iwm_r(offs_t offset, u16 mem_mask)
 {
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
+
 	u16 result = m_swim->read((offset >> 8) & 0xf);
 	return (result << 8) | result;
 }
@@ -307,6 +310,9 @@ void macportable_state::iwm_w(offs_t offset, u16 data, u16 mem_mask)
 		m_swim->write((offset >> 8) & 0xf, data & 0xff);
 	else
 		m_swim->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 u16 macportable_state::autovector_r(offs_t offset)
@@ -458,10 +464,10 @@ void macportable_state::field_interrupts()
 
 void macportable_state::machine_start()
 {
-	m_ram_ptr = (u16*)m_ram->pointer();
+	m_ram_ptr = m_ram->pointer<u16>();
 	m_ram_size = m_ram->size()>>1;
 	m_ram_mask = m_ram_size - 1;
-	m_rom_ptr = (u16*)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u16();
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_cycles = -50;
 

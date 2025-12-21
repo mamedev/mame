@@ -212,20 +212,18 @@ void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	gfx_element *gfx1 = m_gfxdecode->gfx(1);
 	gfx_element *gfx2 = m_gfxdecode->gfx(2);
 
-	uint8_t const *sr = m_spriterambank ? m_spriteram[1] : m_spriteram[0];
+	uint8_t const *sr = m_spriteram[m_spriterambank];
 
 	for (int offs = 0; offs <= m_spriteram[0].bytes() - 5; offs += 5)
 	{
-		int sx = 32 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
+		int sx = 40 + 1 + sr[offs + 3] - ((sr[offs + 4] & 0x01) << 8);
 		int sy = sr[offs + 2];
 		int flipx = sr[offs + 4] & 0x20;
 		int flipy = sr[offs + 4] & 0x40;
 		int code = sr[offs] + ((sr[offs + 1] & 0x0f) << 8);
 		int const color = ((sr[offs + 1] & 0xf0) >> 4);
-
-//      (sr[offs + 4] & 0x02) is used, meaning unknown
-
 		int const size = sr[offs + 4] & 0x1c;
+		//(sr[offs + 4] & 0x02) is used, meaning unknown
 
 		if (size >= 0x10)
 		{
@@ -290,7 +288,7 @@ uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap->mark_all_dirty();
 	m_fg_tilemap->mark_all_dirty();
 
-	m_bg_tilemap->set_scrollx(0, *m_scroll - 32);
+	m_bg_tilemap->set_scrollx(0, *m_scroll - 40);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
@@ -301,16 +299,16 @@ uint32_t finalizr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	if (flip_screen())
 	{
-		clip.min_x = visarea.max_x - 31;
+		clip.min_x = visarea.max_x - 39;
 		clip.max_x = visarea.max_x;
 	}
 	else
 	{
 		clip.min_x = visarea.min_x;
-		clip.max_x = visarea.min_x + 31;
+		clip.max_x = visarea.min_x + 39;
 	}
 
-	m_fg_tilemap->draw(screen, bitmap, clip, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, clip & cliprect, 0, 0);
 
 	return 0;
 }
@@ -329,22 +327,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::scanline)
 void finalizr_state::videoctrl_w(uint8_t data)
 {
 	m_charbank = data & 3;
-	m_spriterambank = data & 8;
+	m_spriterambank = BIT(data, 3);
 	// other bits unknown
 }
 
 void finalizr_state::coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 void finalizr_state::flipscreen_w(uint8_t data)
 {
-	m_nmi_enable = data & 0x01;
-	m_irq_enable = data & 0x02;
+	m_nmi_enable = BIT(data, 0);
+	m_irq_enable = BIT(data, 1);
 
-	flip_screen_set(~data & 0x08);
+	flip_screen_set(BIT(data, 3));
 }
 
 void finalizr_state::sound_irq_w(uint8_t data)
@@ -453,9 +451,9 @@ static INPUT_PORTS_START( finalizr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Controls ) )         PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
@@ -521,10 +519,7 @@ void finalizr_state::finalizr(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(36*8, 32*8);
-	screen.set_visarea(1*8, 35*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 288, 264, 16, 240);
 	screen.set_screen_update(FUNC(finalizr_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -538,7 +533,7 @@ void finalizr_state::finalizr(machine_config &config)
 
 	SN76489A(config, "snsnd", 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "speaker", 0.75);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.325); // unknown DAC
 }
 
 void finalizr_state::finalizrb(machine_config &config)

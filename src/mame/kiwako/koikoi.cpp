@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina, David Haywood
+// copyright-holders: Tomasz Slanina, David Haywood
+
 /***************************************************************************
 
 Koi Koi Part 2
@@ -9,7 +10,8 @@ driver by
  David Haywood
 
 TODO:
-- map missing inputs (temp mapped to z-x-left shift)
+- map missing inputs for koikoip2 (temp mapped to z-x-left shift)
+- koikoi needs different inputs implementation (possibly just needs its own input_tab[])
 - is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen) (this seems fixed now -AS)
 - colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently. Reference: https://www.youtube.com/watch?v=inc4tyuh4qk
 
@@ -40,8 +42,10 @@ to prevent disabling inputs.
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -50,8 +54,6 @@ to prevent disabling inputs.
 
 namespace {
 
-#define KOIKOI_CRYSTAL 15468000
-
 static constexpr int input_tab[] = { 0x22, 0x64, 0x44, 0x68, 0x30, 0x50, 0x70, 0x48, 0x28, 0x21, 0x41, 0x82, 0x81, 0x42 };
 
 class koikoi_state : public driver_device
@@ -59,40 +61,45 @@ class koikoi_state : public driver_device
 public:
 	koikoi_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_videoram(*this, "videoram"),
+		m_ioram(*this, "ioram", 0x08, ENDIANNESS_LITTLE),
+		m_in(*this, "IN%u", 0)
 	{ }
 
-	void koikoi(machine_config &config);
+	void koikoi(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
-	/* memory pointers */
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	required_shared_ptr<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_ioram;
 
-	/* video-related */
-	tilemap_t  *m_tmap = nullptr;
+	required_ioport_array<2> m_in;
 
-	/* misc */
-	int m_inputcnt = 0;
-	int m_inputval = 0;
-	int m_inputlen = 0;
-	int m_ioram[8]{};
+	tilemap_t *m_tmap = nullptr;
+
+	int8_t m_inputcnt = 0;
+	uint8_t m_inputval = 0;
+	uint8_t m_inputlen = 0;
+
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	uint8_t input_r();
 	void unknown_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	void koikoi_palette(palette_device &palette) const;
-	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	void koikoi_io_map(address_map &map) ATTR_COLD;
-	void koikoi_map(address_map &map) ATTR_COLD;
+	void palette_init(palette_device &palette) const ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -104,14 +111,14 @@ private:
 
 TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 {
-	int code  = m_videoram[tile_index] | ((m_videoram[tile_index + 0x400] & 0x40) << 2);
-	int color = (m_videoram[tile_index + 0x400] & 0x1f);
-	int flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	int const code  = m_videoram[tile_index] | ((m_videoram[tile_index + 0x400] & 0x40) << 2);
+	int const color = (m_videoram[tile_index + 0x400] & 0x1f);
+	int const flip  = (m_videoram[tile_index + 0x400] & 0x80) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 
 	tileinfo.set(0, code, color, flip);
 }
 
-void koikoi_state::koikoi_palette(palette_device &palette) const
+void koikoi_state::palette_init(palette_device &palette) const
 {
 	uint8_t const *color_prom = memregion("proms")->base();
 
@@ -157,7 +164,7 @@ void koikoi_state::video_start()
 	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koikoi_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-uint32_t koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t koikoi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tmap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -182,8 +189,8 @@ uint8_t koikoi_state::input_r()
 
 	if (!m_inputcnt)
 	{
-		int key = ioport("IN1")->read();
-		int keyval = 0; //we must return 0 (0x2 in 2nd read) to clear 4 bit at $6600 and allow next read
+		int key = m_in[1]->read();
+		int keyval = 0; // we must return 0 (0x2 in 2nd read) to clear 4 bit at $6600 and allow next read
 
 		if (key)
 		{
@@ -198,28 +205,28 @@ uint8_t koikoi_state::input_r()
 		m_inputlen = input_tab[keyval] >> 5;
 	}
 
-	if (m_inputlen == ++m_inputcnt) //return expected value
+	if (m_inputlen == ++m_inputcnt) // return expected value
 	{
 		return m_inputval ^ 0xff;
 	}
 
-	if (m_inputcnt > 4) //end of cycle
+	if (m_inputcnt > 4) // end of cycle
 	{
 		m_inputcnt = -1;
 	}
 
-	return 0xff; //return 0^0xff
+	return 0xff; //return 0 ^ 0xff
 }
 
 void koikoi_state::unknown_w(uint8_t data)
 {
-	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
+	// XOR'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
 
 uint8_t koikoi_state::io_r(offs_t offset)
 {
 	if (!offset)
-		return ioport("IN0")->read() ^ m_ioram[4]; //coin
+		return m_in[0]->read() ^ m_ioram[4]; // coin
 
 	return 0;
 }
@@ -227,7 +234,7 @@ uint8_t koikoi_state::io_r(offs_t offset)
 void koikoi_state::io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 7 && data == 0)
-		m_inputcnt = 0; //reset read cycle counter
+		m_inputcnt = 0; // reset read cycle counter
 
 	m_ioram[offset] = data;
 }
@@ -238,19 +245,19 @@ void koikoi_state::io_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void koikoi_state::koikoi_map(address_map &map)
+void koikoi_state::program_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x6000, 0x67ff).ram();
-	map(0x7000, 0x77ff).ram().w(FUNC(koikoi_state::vram_w)).share("videoram");
+	map(0x7000, 0x77ff).ram().w(FUNC(koikoi_state::vram_w)).share(m_videoram);
 	map(0x8000, 0x8000).portr("DSW");
 	map(0x9000, 0x9007).rw(FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
 }
 
-void koikoi_state::koikoi_io_map(address_map &map)
+void koikoi_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x02, 0x02).nopw(); //watchdog
+	map(0x02, 0x02).nopw(); // watchdog
 	map(0x03, 0x03).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x06, 0x07).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
@@ -315,20 +322,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout tilelayout =
-{
-	8, 8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-
 static GFXDECODE_START( gfx_koikoi )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, tilelayout,      0, 32 )
+	GFXDECODE_ENTRY( "tiles", 0x0000, gfx_8x8x3_planar, 0, 32 )
 GFXDECODE_END
 
 
@@ -343,46 +338,41 @@ void koikoi_state::machine_start()
 	save_item(NAME(m_inputcnt));
 	save_item(NAME(m_inputval));
 	save_item(NAME(m_inputlen));
-	save_item(NAME(m_ioram));
 }
 
 void koikoi_state::machine_reset()
 {
-	int i;
-
 	m_inputcnt = -1;
 	m_inputval = 0;
 	m_inputlen = 0;
-
-	for (i = 0; i < 8; i++)
-		m_ioram[i] = 0;
 }
+
 
 void koikoi_state::koikoi(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, KOIKOI_CRYSTAL/4);   /* ?? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &koikoi_state::koikoi_map);
-	m_maincpu->set_addrmap(AS_IO, &koikoi_state::koikoi_io_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 15.468_MHz_XTAL / 4); // divider unverified
+	m_maincpu->set_addrmap(AS_PROGRAM, &koikoi_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &koikoi_state::io_map);
 
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_screen_update(FUNC(koikoi_state::screen_update_koikoi));
+	screen.set_screen_update(FUNC(koikoi_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_koikoi);
-	PALETTE(config, "palette", FUNC(koikoi_state::koikoi_palette), 8 * 32, 16);
+	PALETTE(config, "palette", FUNC(koikoi_state::palette_init), 8 * 32, 16);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", KOIKOI_CRYSTAL/8));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 15.468_MHz_XTAL / 8)); // divider unverified
 	aysnd.port_b_read_callback().set(FUNC(koikoi_state::input_r));
 	aysnd.port_a_write_callback().set(FUNC(koikoi_state::unknown_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.10);
@@ -395,20 +385,20 @@ void koikoi_state::koikoi(machine_config &config)
  *
  *************************************/
 
-ROM_START( koikoi )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* code */
+ROM_START( koikoip2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic56", 0x0000, 0x1000, CRC(bdc68f9d) SHA1(c45fbc95abb37f750acc1d9f3b35ad0f41af097d) )
 	ROM_LOAD( "ic55", 0x1000, 0x1000, CRC(fe09248a) SHA1(c192795678068e387bd406f5cd1c5aba5f5ef66a) )
 	ROM_LOAD( "ic54", 0x2000, 0x1000, CRC(925fc57c) SHA1(4c79df92b6617fe84e61359c8e6e3b907b138777) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x3000, "tiles", 0 )
 	ROM_LOAD( "ic33", 0x0000, 0x1000, CRC(9e4d563b) SHA1(63664dcffc2eb198a161c73131b95a66b2067424) )
 	ROM_LOAD( "ic26", 0x1000, 0x1000, CRC(79cb1e93) SHA1(4d08b3d88727b437673f7a51d47396f19bbc3caa) )
 	ROM_LOAD( "ic18", 0x2000, 0x1000, CRC(c209362d) SHA1(0620c19fe72e8407db0f487b6413c5d45ac8046c) )
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "prom.x",    0x000, 0x020,  NO_DUMP )
-	/* hand crafted color table */
+	// hand crafted color table
 	ROM_FILL( 0x00, 1, 0x18 )
 	ROM_FILL( 0x01, 1, 0xff )
 	ROM_FILL( 0x02, 1, 0x06 )
@@ -435,6 +425,46 @@ ROM_START( koikoi )
 	ROM_LOAD( "pal16r8a_red.ic10",     0x0800, 0x0104, CRC(027ad661) SHA1(fa5aafe6deb3a9865498152b92dd3776ea10a51d) )
 ROM_END
 
+ROM_START( koikoi ) // TODO: is this a bootleg?
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic56", 0x0000, 0x1000, CRC(52cad277) SHA1(9c9b9add4be021e289049e9f72a2f67ac150b355) )
+	ROM_LOAD( "ic55", 0x1000, 0x1000, CRC(d171dd19) SHA1(91bb98633fc06fb3b0d226af25500c0835033aff) )
+	ROM_LOAD( "ic54", 0x2000, 0x1000, CRC(b2b90632) SHA1(f662b58114f399fd01ffbf05a532c3b1aa618273) )
+
+	ROM_REGION( 0x3000, "tiles", 0 )
+	ROM_LOAD( "ka.ic33", 0x0000, 0x1000, CRC(181fb265) SHA1(6ce31af8699c3304cfe6c47435dcdab0cb7a2ed8) )
+	ROM_LOAD( "kb.ic26", 0x1000, 0x1000, CRC(6b416ee1) SHA1(039f5155128d38fd9b46914452596b2838690dd9) )
+	ROM_LOAD( "kc.ic18", 0x2000, 0x1000, CRC(016d9b11) SHA1(0cf9d3c3d1678c3b59230212c1a135a50cbca3cd) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "prom.x",    0x000, 0x020,  NO_DUMP ) // TODO: couldn't find it on PCB pic, does it really exist?
+	// TODO: hand crafted color table, taken from koikoip2
+	ROM_FILL( 0x00, 1, 0x18 )
+	ROM_FILL( 0x01, 1, 0xff )
+	ROM_FILL( 0x02, 1, 0x06 )
+	ROM_FILL( 0x03, 1, 0x3f )
+	ROM_FILL( 0x04, 1, 0xb6 )
+	ROM_FILL( 0x05, 1, 0x10 )
+	ROM_FILL( 0x06, 1, 0x2f )
+	ROM_FILL( 0x07, 1, 0x04 )
+	ROM_FILL( 0x08, 1, 0x8b )
+	ROM_FILL( 0x09, 1, 0x3f )
+	ROM_FILL( 0x0a, 1, 0x07 )
+	ROM_FILL( 0x0b, 1, 0x00 ) // unused
+	ROM_FILL( 0x0c, 1, 0x2f )
+	ROM_FILL( 0x0d, 1, 0xff )
+	ROM_FILL( 0x0e, 1, 0x00 )
+	ROM_FILL( 0x0f, 1, 0x0b )
+	ROM_LOAD( "prom.ic23", 0x020, 0x100,  CRC(de68cb19) SHA1(f23990cdf228cc79d66d5f75f88bccee0e5e5877) )
+
+	ROM_REGION( 0x0a00, "plds", 0 ) // dumped for koikoip2, may or may not be correct
+	ROM_LOAD( "pal16r8-10_pink.ic9",   0x0000, 0x0104, BAD_DUMP CRC(9f8fdb95) SHA1(cdcdb1a6baef18961cf6c75fba0c3aba47f3edbb) )
+	ROM_LOAD( "pal16r8-10_green.ic15", 0x0200, 0x0104, BAD_DUMP CRC(da7b8b95) SHA1(a4eb12f2365ff2b6057e4a2e225e8f879a961d45) )
+	ROM_LOAD( "pal16r8a_yellow.ic8",   0x0400, 0x0104, BAD_DUMP CRC(7d8da540) SHA1(28925d1fb4ef670e9c9d24860b67fdff8791c6a9) )
+	ROM_LOAD( "pal16r8a_brown.ic11",   0x0600, 0x0104, BAD_DUMP CRC(fff46363) SHA1(97f673c862e9d5b12cac283000a779c465c76828) )
+	ROM_LOAD( "pal16r8a_red.ic10",     0x0800, 0x0104, BAD_DUMP CRC(027ad661) SHA1(fa5aafe6deb3a9865498152b92dd3776ea10a51d) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -444,4 +474,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, koikoi, 0, koikoi, koikoi, koikoi_state, empty_init, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, koikoip2, 0, koikoi, koikoi, koikoi_state, empty_init, ROT270, "Kiwako",                       "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, koikoi,   0, koikoi, koikoi, koikoi_state, empty_init, ROT270, "Chubukiko / Best Data System", "Koi Koi",        MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

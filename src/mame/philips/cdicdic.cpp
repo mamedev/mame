@@ -27,6 +27,8 @@ TODO:
 #include "cdrom.h"
 #include "sound/cdda.h"
 
+#include <algorithm>
+
 #define LOG_DECODES     (1U << 1)
 #define LOG_SAMPLES     (1U << 2)
 #define LOG_COMMANDS    (1U << 3)
@@ -40,6 +42,17 @@ TODO:
 
 #define VERBOSE         (0)
 #include "logmacro.h"
+
+
+namespace {
+
+constexpr int16_t clip_int16(int32_t sample)
+{
+	return int16_t(std::clamp<int32_t>(sample, -32768, 32767));
+}
+
+} // anonymous namespace
+
 
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CD-i CDIC")
@@ -272,15 +285,15 @@ inline void rotate_samples(int16_t val, int16_t& a, int16_t& b, int16_t& output)
 
 void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t& sample0, int16_t& sample1, int16_t& out_buffer)
 {
-	const int16_t* filter = s_xa_filter_coef[(param >> 4) & 3]; // High bits are reserved.
-	uint8_t range = (param & 0xf);
-	if (range > 12) range = 12; // Should be at most 8. Some decoders set 13..15 to 9.
+	const int16_t *const filter = s_xa_filter_coef[(param >> 4) & 3]; // High bits are reserved.
+	const uint8_t range = std::min<uint8_t>(param & 0xf, 12); // Should be at most 8. Some decoders set 13..15 to 9.
 
-	int32_t sample32 = (int32_t)sample; // Work in 32-bit, clamp to avoid peaking audio.
-	sample32 = (sample32 >> range) + (((int32_t)filter[0] * sample0 + (int32_t)filter[1] * sample1 + 128) >> 8);
+	int32_t sample32 = sample; // Work in 32-bit, clamp to avoid peaking audio.
+	sample32 = (sample32 >> range) + ((int32_t(filter[0]) * sample0 + int32_t(filter[1]) * sample1 + 128) >> 8);
 
 	sample = clip_int16(sample32);
-	rotate_samples(sample, sample0, sample1, out_buffer);
+	sample1 = std::exchange(sample0, sample);
+	out_buffer = sample;
 }
 
 void cdicdic_device::decode_8bit_xa_unit(int channel, uint8_t param, const uint8_t *data, int16_t *out_buffer)

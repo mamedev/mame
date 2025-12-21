@@ -124,14 +124,14 @@ sonora_device::sonora_device(const machine_config &mconfig, const char *tag, dev
 
 void sonora_device::device_start()
 {
-	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
+	m_vram = std::make_unique<u64 []>(0x100000 / sizeof(u64));
 
 	m_stream = stream_alloc(8, 2, 22257, STREAM_SYNCHRONOUS);
 
 	m_6015_timer = timer_alloc(FUNC(sonora_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 
-	save_pointer(NAME(m_vram), 0x100000/sizeof(u32));
+	save_pointer(NAME(m_vram), 0x100000/sizeof(u64));
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_via2_interrupt));
 	save_item(NAME(m_scc_interrupt));
@@ -148,7 +148,7 @@ void sonora_device::device_start()
 
 void sonora_device::device_reset()
 {
-	m_video->set_vram_base((const u64 *)&m_vram[0]);
+	m_video->set_vram_base(&m_vram[0]);
 	m_video->set_vram_offset(0);
 	m_video->set_32bit();
 
@@ -410,11 +410,11 @@ void sonora_device::devsel_w(uint8_t devsel)
 
 u32 sonora_device::vram_r(offs_t offset)
 {
-	return m_vram[offset];
+	return reinterpret_cast<u32 const *>(m_vram.get())[offset];
 }
 
 void sonora_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA(&m_vram[offset]);
+	COMBINE_DATA(&reinterpret_cast<u32 *>(m_vram.get())[offset]);
 }
 

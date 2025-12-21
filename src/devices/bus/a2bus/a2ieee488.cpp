@@ -108,6 +108,9 @@ protected:
 
 	virtual u8 read_cnxx(u8 offset) override { return m_rom[offset]; };
 	virtual uint8_t read_c800(uint16_t offset) override { return m_rom[offset]; }
+	virtual bool take_c800() const override { return true; }
+
+	virtual void reset_from_bus() override;
 
 private:
 	required_device<ieee488_device> m_ieee;
@@ -174,6 +177,11 @@ uint8_t a2bus_ieee488_device::read_c0nx(uint8_t offset)
 void a2bus_ieee488_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	m_tms9914->write(offset & 0x07, data);
+}
+
+void a2bus_ieee488_device::reset_from_bus()
+{
+	m_tms9914->reset();
 }
 
 ROM_START(a2ieee488)

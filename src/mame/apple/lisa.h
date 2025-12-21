@@ -169,8 +169,8 @@ private:
 	required_device<screen_device> m_screen;
 
 	emu_timer *m_cops_cmd_timer = nullptr;
-	uint8_t *m_ram_ptr = nullptr;
-	uint8_t *m_rom_ptr = nullptr;
+	uint16_t *m_ram_ptr = nullptr;
+	uint16_t *m_rom_ptr = nullptr;
 	uint8_t *m_videoROM_ptr = nullptr;
 	int m_setup = 0;
 	int m_seg = 0;

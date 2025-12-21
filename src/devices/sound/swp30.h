@@ -31,7 +31,7 @@ private:
 	std::string gconst(offs_t address) const;
 	std::string goffset(offs_t address) const;
 
-	static inline void append(std::string &r, const std::string &e);
+	static void append(std::string &r, const std::string &e);
 };
 
 class swp30_device : public cpu_device, public device_sound_interface, public swp30_disassembler::info
@@ -174,12 +174,12 @@ private:
 		void keyon();
 		s32 step(s32 input);
 
-		template<u32 filter> u16 a0_r() const;
-		template<u32 filter> u16 a1_r() const;
-		template<u32 filter> u16 b1_r() const;
-		template<u32 filter> void a0_w(u16 data);
-		template<u32 filter> void a1_w(u16 data);
-		template<u32 filter> void b1_w(u16 data);
+		template<u32 Filter> u16 a0_r() const;
+		template<u32 Filter> u16 a1_r() const;
+		template<u32 Filter> u16 b1_r() const;
+		template<u32 Filter> void a0_w(u16 data);
+		template<u32 Filter> void a1_w(u16 data);
+		template<u32 Filter> void b1_w(u16 data);
 	};
 
 	struct envelope_block {
@@ -291,10 +291,10 @@ private:
 
 		u16 prg_address_r();
 		void prg_address_w(u16 data);
-		template<int sel> u16 prg_r();
-		template<int sel> void prg_w(u16 data);
-		template<int sel> u16 map_r();
-		template<int sel> void map_w(u16 data);
+		template<int Sel> u16 prg_r();
+		template<int Sel> void prg_w(u16 data);
+		template<int Sel> u16 map_r();
+		template<int Sel> void map_w(u16 data);
 		u16 const_r(offs_t offset);
 		void const_w(offs_t offset, u16 data);
 		u16 offset_r(offs_t offset);
@@ -391,12 +391,12 @@ private:
 
 
 	// IIR1 block trampolines
-	template<u32 filter> u16 a0_r(offs_t offset);
-	template<u32 filter> u16 a1_r(offs_t offset);
-	template<u32 filter> u16 b1_r(offs_t offset);
-	template<u32 filter> void a0_w(offs_t offset, u16 data);
-	template<u32 filter> void a1_w(offs_t offset, u16 data);
-	template<u32 filter> void b1_w(offs_t offset, u16 data);
+	template<u32 Filter> u16 a0_r(offs_t offset);
+	template<u32 Filter> u16 a1_r(offs_t offset);
+	template<u32 Filter> u16 b1_r(offs_t offset);
+	template<u32 Filter> void a0_w(offs_t offset, u16 data);
+	template<u32 Filter> void a1_w(offs_t offset, u16 data);
+	template<u32 Filter> void b1_w(offs_t offset, u16 data);
 
 	// Envelope block trampolines
 	u16 attack_r(offs_t offset);
@@ -416,50 +416,50 @@ private:
 	u16 internal_adr_r();
 	void internal_adr_w(u16 data);
 	u16 internal_r();
-	template<int sel> u16 route_r(offs_t offset);
-	template<int sel> void route_w(offs_t offset, u16 data);
-	template<int sel> u16 vol_r(offs_t offset);
-	template<int sel> void vol_w(offs_t offset, u16 data);
+	template<int Sel> u16 route_r(offs_t offset);
+	template<int Sel> void route_w(offs_t offset, u16 data);
+	template<int Sel> u16 vol_r(offs_t offset);
+	template<int Sel> void vol_w(offs_t offset, u16 data);
 
 	static s32 volume_apply(s32 level, s32 sample);
 
 	static s32 mixer_att(s32 sample, s32 att);
 
 	// Control registers
-	template<int sel> u16 keyon_mask_r();
-	template<int sel> void keyon_mask_w(u16 data);
+	template<int Sel> u16 keyon_mask_r();
+	template<int Sel> void keyon_mask_w(u16 data);
 	u16 keyon_r();
 	void keyon_w(u16);
 	u16 meg_prg_address_r();
 	void meg_prg_address_w(u16 data);
 	void meg_lfo_commit_w(u16);
-	template<int sel> u16 meg_prg_r();
-	template<int sel> void meg_prg_w(u16 data);
-	template<int sel> u16 meg_map_r();
-	template<int sel> void meg_map_w(u16 data);
-	template<int sel> void wave_adr_w(u16 data);
-	template<int sel> u16 wave_adr_r();
-	template<int sel> void wave_size_w(u16 data);
-	template<int sel> u16 wave_size_r();
+	template<int Sel> u16 meg_prg_r();
+	template<int Sel> void meg_prg_w(u16 data);
+	template<int Sel> u16 meg_map_r();
+	template<int Sel> void meg_map_w(u16 data);
+	template<int Sel> void wave_adr_w(u16 data);
+	template<int Sel> u16 wave_adr_r();
+	template<int Sel> void wave_size_w(u16 data);
+	template<int Sel> u16 wave_size_r();
 	void wave_access_w(u16 data);
 	u16 wave_access_r();
 	u16 wave_busy_r();
-	template<int sel> u16 wave_val_r();
-	template<int sel> void wave_val_w(u16 data);
+	template<int Sel> u16 wave_val_r();
+	template<int Sel> void wave_val_w(u16 data);
 	void revram_enable_w(u16 data);
 	void revram_clear_w(u16 data);
 	u16 revram_status_r();
-	template<int sel> void revram_adr_w(u16 data);
-	template<int sel> void revram_data_w(u16 data);
-	template<int sel> u16 revram_data_r();
+	template<int Sel> void revram_adr_w(u16 data);
+	template<int Sel> void revram_data_w(u16 data);
+	template<int Sel> u16 revram_data_r();
 
 	// MEG registers
-	template<int sel> u16 meg_const_r(offs_t offset);
-	template<int sel> void meg_const_w(offs_t offset, u16 data);
-	template<int sel> u16 meg_offset_r(offs_t offset);
-	template<int sel> void meg_offset_w(offs_t offset, u16 data);
-	template<int sel> u16 meg_lfo_r(offs_t offset);
-	template<int sel> void meg_lfo_w(offs_t offset, u16 data);
+	template<int Sel> u16 meg_const_r(offs_t offset);
+	template<int Sel> void meg_const_w(offs_t offset, u16 data);
+	template<int Sel> u16 meg_offset_r(offs_t offset);
+	template<int Sel> void meg_offset_w(offs_t offset, u16 data);
+	template<int Sel> u16 meg_lfo_r(offs_t offset);
+	template<int Sel> void meg_lfo_w(offs_t offset, u16 data);
 
 	void meg_prg_map(address_map &map) ATTR_COLD;
 	u64 meg_prg_map_r(offs_t address);

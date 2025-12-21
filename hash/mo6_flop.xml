@@ -67,7 +67,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in to_flop.xml -->
 	<software name="bactmgta" cloneof="bactmgt">
-		<description>Bactron &amp; MGT (Alt)</description>
+		<description>Bactron &amp; MGT (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -309,7 +309,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in to_flop.xml -->
 	<software name="20kavanta" cloneof="20kavant">
-		<description>20000 Avant J.C. (Alt)</description>
+		<description>20000 Avant J.C. (alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -362,7 +362,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in to_flop.xml -->
 	<software name="crepuscua" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (Alt)</description>
+		<description>Le Crepuscule du Naja (alt)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -441,7 +441,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in to_flop.xml -->
 	<software name="menacarca" cloneof="menacarc">
-		<description>Menace sur l'Arctique (Alt)</description>
+		<description>Menace sur l'Arctique (alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -481,7 +481,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 
 	<!-- can also be found in to_flop.xml -->
 	<software name="quada" cloneof="quad">
-		<description>Quad (Alt)</description>
+		<description>Quad (alt)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>

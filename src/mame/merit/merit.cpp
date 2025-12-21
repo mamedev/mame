@@ -2503,6 +2503,45 @@ ROM_START( trvwz4 )
 	ROM_LOAD( "dec003.u13", 0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
 ROM_END
 
+/*
+NOTE: The program ROM for the set below was printed as 6221-22 U5-0, however the 22 was crossed out and 11 was hand written
+      in its place.  Also an A was added for a stated version of 6221-11 U5-0A, but when checked internally it matched the
+      previously dumped 6221-10 U5-0A ROM from the parent set.
+
+NOTE: Only the Strange But True question ROMs changed, it's unknown if the below set adds content, corrects answers or is
+      the original released set.
+*/
+ROM_START( trvwz4a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6221-10_u5-0a.u5", 0x0000, 0x8000, CRC(18425486) SHA1(53a223790f32c39abc098f58b42753844b628d54) ) // 6221-10 U5-0A 01/13/86
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "triv_1_u39.u39", 0x0000, 0x2000, CRC(f8a5f5fb) SHA1(a511e1a2b5e887ef00dc919e9e664ccec2d36cfa) )
+	ROM_LOAD( "triv_1_u38.u38", 0x2000, 0x2000, CRC(27621e52) SHA1(a7e88d329e2e774fef9bd8c5cefb4d8f1cfcba4c) )
+	ROM_LOAD( "triv_1_u37.u37", 0x4000, 0x2000, CRC(f739b5dc) SHA1(fbf469b7f4cab50e06ec2def9344e3b9801a275e) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "triv_1_u40e.u40", 0x0000, 0x2000, CRC(0430c239) SHA1(058b936789526b2a366ad87105703059ce2f3b48) ) // hand written E over D
+
+	ROM_REGION( 0xa0000, "questions", ROMREGION_ERASEFF )
+	ROM_LOAD( "spo-005_01", 0x08000, 0x8000, CRC(5fe0c6a3) SHA1(17bdb5262ce4edf5f022f075537f6161e1397b46) ) // Question ROMs have a different label format
+	ROM_LOAD( "spo-005_02", 0x18000, 0x8000, CRC(3f3390e0) SHA1(50bd7b79268438584bb0f497ab0055b4d4864590) )
+	ROM_LOAD( "ent-005_01", 0x28000, 0x8000, CRC(1b317149) SHA1(94e882e9cc041ac8f292136c1ce2d21340ac5e7f) )
+	ROM_LOAD( "ent-005_02", 0x38000, 0x8000, CRC(43d51697) SHA1(7af3f16f9519184ae63d8818bbc52a2ba897f275) )
+	ROM_LOAD( "sbt-005_01", 0x48000, 0x8000, CRC(40a3c1c7) SHA1(62bb7adf1aefa8e6b4fe3e9b52ac4638bcca477a) ) // unique Strange But True question ROMs
+	ROM_LOAD( "sbt-005_02", 0x58000, 0x8000, CRC(4c8f3a53) SHA1(3463bd7875da8127a3ac3cb03042c4f9d646e38e) ) // unique Strange But True question ROMs
+	ROM_LOAD( "rnp-005_01", 0x68000, 0x8000, CRC(fee2d0b0) SHA1(9c9abec4ce693fc2d3976f3d499213c2ce67c197) )
+	ROM_LOAD( "rnp-005_02", 0x78000, 0x8000, CRC(e54fc4bc) SHA1(4607974ed2bf83c475396fc1cbb1e09ad084ace8) )
+	ROM_LOAD( "sex-005_01", 0x88000, 0x8000, CRC(976352b0) SHA1(5f89caca410704ba8a90da3167ba18e45fb21d43) )
+	ROM_LOAD( "sex-005_02", 0x98000, 0x8000, CRC(5f148bc9) SHA1(2fd2cf819c2f395dcffad59857b3533fe3cce60b) )
+
+	ROM_REGION( 0x0100, "prom", 0 ) // BPROM on Question ROM board used as KEY to decode questions
+	ROM_LOAD( "sc-005", 0x00000, 0x0100, CRC(288ba0bd) SHA1(64868d80eca246b81da784441b3706c372c4e0f7) ) // 74S287 (==N82S129N) BPROM
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "dec003.u13", 0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
+ROM_END
+
 ROM_START( trvwz4v )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6221-13_u5-0b.u5", 0x0000, 0x8000, CRC(bc23a1ab) SHA1(b9601f316e373c568c5b208de417617094046559) ) // 6221-13 U5-0B 03/17/86
@@ -3108,6 +3147,7 @@ GAME( 1985, trvwz3b,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_
 GAME( 1985, trvwz3v,    trvwz3,   trvwhiz,  trivia,   merit_quiz_state,   empty_init,   ROT90, "Merit", "Trivia ? Whiz Edition 3 (6221-04, U5-0E, Vertical)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, trvwz4,     0,        trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT0,  "Merit", "Trivia ? Whiz Edition 4 (6221-10, U5-0A)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, trvwz4a,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT0,  "Merit", "Trivia ? Whiz Edition 4 (6221-10, U5-0A, Alt Strange But True trivia)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvwz4v,    trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz Edition 4 (6221-13, U5-0B, Vertical)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1985, trvwz4va,   trvwz4,   trvwhziv, trvwhziv, merit_quiz_state,   init_key<5>,  ROT90, "Merit", "Trivia ? Whiz Edition 4 (6221-13, U5-0B, Vertical, Alt Sex trivia)", MACHINE_SUPPORTS_SAVE )
 

@@ -276,7 +276,7 @@ void bfm_sc5_state::sc5_map(address_map &map)
 	map(0x40000000, 0x4000ffff).ram();
 
 	// peripherals
-//	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//  map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 INPUT_PORTS_START( bfm_sc5 )
