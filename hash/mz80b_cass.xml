@@ -51,7 +51,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	</software>
 
 	<software name="sb5520a" cloneof="sb5520" supported="yes">
-		<description>BASIC SB-5520 (Alt)</description>
+		<description>BASIC SB-5520 (alt)</description>
 		<year>1981</year>
 		<publisher>Sharp</publisher>
 		<info name="usage" value="IPL" />
@@ -187,7 +187,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	</software>
 
 	<software name="puckpucka" cloneof="puckpuck" supported="yes">
-		<description>Puck &amp; Puck (Alt)</description>
+		<description>Puck &amp; Puck (alt)</description>
 		<year>19??</year>
 		<publisher>K. Kuromusha</publisher>
 		<info name="usage" value="IPL" />
@@ -254,7 +254,7 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 	</software>
 
 	<software name="vosquea" cloneof="vosque" supported="yes">
-		<description>Vosque (Alt)</description>
+		<description>Vosque (alt)</description>
 		<year>19??</year>
 		<!-- TODO: from title, check spelling on tape cover -->
 		<publisher>d.B Soft</publisher>
