@@ -56,6 +56,7 @@ void specnext_copper_device::copper_en_w(u8 data)
 			break;
 		case 0b01:
 			LOGCTRL("RESET\n");
+			//TODO suspected starts immediately - m_timer->adjust(attotime::zero);
 			m_timer->adjust(m_in_until_pos_cb(0x0000));
 			break;
 		case 0b10:

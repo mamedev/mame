@@ -113,7 +113,7 @@ protected:
 	virtual void z80daisy_irq_reti() override;
 
 	// internal helpers
-	u8 channel_int_state(int ch) const noexcept { return m_channel[ch]->m_int_state; }
+	virtual void channel_int_state_w(int ch, u8 state) { m_channel[ch]->m_int_state = state; }
 	u8 channel_mode(int ch) const noexcept { return m_channel[ch]->m_mode; }
 	void interrupt_check();
 

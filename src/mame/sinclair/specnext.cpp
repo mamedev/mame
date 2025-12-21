@@ -44,18 +44,20 @@
 #include "speaker.h"
 
 
-#define LOG_IO     (1U << 1)
-#define LOG_MEM    (1U << 2)
-#define LOG_COPPER (1U << 3)
-#define LOG_INT    (1U << 4)
+#define LOG_IO      (1U << 1)
+#define LOG_MEM     (1U << 2)
+#define LOG_COPPER  (1U << 3)
+#define LOG_INT     (1U << 4)
+#define LOG_INT_VVV (1U << 5)
 
-//#define VERBOSE ( LOG_GENERAL /*| LOG_IO | LOG_MEM | LOG_COPPER*/ | LOG_INT )
+//#define VERBOSE ( LOG_GENERAL /*| LOG_IO | LOG_MEM | LOG_COPPER */ | LOG_INT_VVV | LOG_INT )
 #include "logmacro.h"
 
-#define LOGIO(...)     LOGMASKED(LOG_IO,     __VA_ARGS__)
-#define LOGMEM(...)    LOGMASKED(LOG_MEM,    __VA_ARGS__)
-#define LOGCOPPER(...) LOGMASKED(LOG_COPPER, __VA_ARGS__)
-#define LOGINT(...)    LOGMASKED(LOG_INT,    __VA_ARGS__)
+#define LOGIO(...)      LOGMASKED(LOG_IO,      __VA_ARGS__)
+#define LOGMEM(...)     LOGMASKED(LOG_MEM,     __VA_ARGS__)
+#define LOGCOPPER(...)  LOGMASKED(LOG_COPPER,  __VA_ARGS__)
+#define LOGINT(...)     LOGMASKED(LOG_INT,     __VA_ARGS__)
+#define LOGINTVVV(...)  LOGMASKED(LOG_INT_VVV, __VA_ARGS__)
 
 namespace {
 
@@ -68,6 +70,7 @@ constexpr u8 INT_PRIORITY_CTC      = 3; // 3-10 reserved for 8 chanels, only 4 u
 constexpr u8 INT_PRIORITY_ULA      = 11;
 constexpr u8 INT_PRIORITY_UART0_TX = 12;
 constexpr u8 INT_PRIORITY_UART1_TX = 13;
+constexpr u8 INT_PRIORITY_NMI      = 15;
 
 
 struct video_timings_info {
@@ -156,6 +159,7 @@ protected:
 
 	u8 do_m1(offs_t offset);
 	void do_mf_nmi();
+	void nmi();
 	void leave_nmi(int state);
 	void map_fetch(address_map &map) ATTR_COLD;
 	void map_mem(address_map &map) ATTR_COLD;
@@ -168,6 +172,7 @@ protected:
 	u8 dma_r(bool dma_mode);
 	void dma_w(bool dma_mode, u8 data);
 	u8 dma_mreq_r(offs_t offset);
+	void update_dma_delay();
 	u8 spi_data_r();
 	void spi_data_w(u8 data);
 	void spi_miso_w(u8 data);
@@ -199,14 +204,17 @@ private:
 	static const u8 G_VIDEO_INC = 0b11;
 	static const u16 UTM_FALLBACK_PEN = 0x800;
 
+	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
 	INTERRUPT_GEN_MEMBER(specnext_interrupt);
 	TIMER_CALLBACK_MEMBER(line_irq_on);
-	void ctc_irq_on(int state);
+	void ctc_int_w(int state);
 	INTERRUPT_GEN_MEMBER(line_interrupt);
 	TIMER_CALLBACK_MEMBER(spi_clock);
 	void line_irq_adjust();
-	template <unsigned DeviceId> void int_w(int state);
+	template <unsigned DeviceId> void im2_irq_w(int state);
+	template <unsigned DeviceId> void int_w(int state) { int_ch_w<DeviceId>(state, 0); };
+	template <unsigned DeviceId> void int_ch_w(int state, u8 channel);
 
 	u8 g_machine_id() { return m_io_issue->read() ? MACHINE_NEXT : MACHINE_TBBLUE; }
 	u8 g_board_issue() { return m_io_issue->read(); }
@@ -285,7 +293,7 @@ private:
 	bool nr_8f_mapping_mode_pentagon_1024() const { return m_nr_8f_mapping_mode == 0b11; }
 	bool nr_8f_mapping_mode_pentagon_1024_en() const { return nr_8f_mapping_mode_pentagon_1024() && BIT(~m_port_eff7_data, 2); }
 
-	void nr_c0_im2_vector_w(u8 data) { m_nr_c0_im2_vector = data; m_ctc->write(0, m_nr_c0_im2_vector << 5); }
+	void nr_c0_im2_vector_w(bool mode_im2, u8 vector);
 
 	u32 internal_port_enable() const;
 	bool port_ff_io_en() const { return BIT(internal_port_enable(), 0); }
@@ -383,6 +391,9 @@ private:
 	u8 m_nr_register;
 	u8 m_port_e3_reg;
 	bool m_divmmc_delayed_check;
+	bool m_copper_req;
+	u8 m_copper_nr_reg;
+	u8 m_copper_nr_dat;
 
 	u8 m_sram_rom;
 	bool m_sram_rom3;
@@ -928,7 +939,7 @@ void specnext_state::update_video_mode()
 	rectangle visarea = m_video_output_hdmi
 			? rectangle(m_video_timings.hdmi_xmin << 1, (m_video_timings.hdmi_xmax << 1) | 1, m_video_timings.hdmi_ymin, m_video_timings.hdmi_ymax)
 			: m_clip320x256;
-	// The visarea can't overlap with screen last vpos. Posssibly related to https://github.com/mamedev/mame/pull/9945
+	// The visarea can't overlap with screen last vpos. Possibly related to https://github.com/mamedev/mame/pull/9945
 	visarea.max_y = std::min(visarea.max_y, height - 2);
 
 	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
@@ -940,7 +951,7 @@ void specnext_state::update_video_mode()
 
 	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
 	m_eff_nr_05_5060 = m_nr_05_5060;
-	LOG("%s@%dHz\n", machine_name, m_nr_05_5060 ? 60 : 50);
+	LOG("%s %dHz\n", machine_name, m_nr_05_5060 ? 60 : 50);
 }
 
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1418,6 +1429,16 @@ u8 specnext_state::dma_mreq_r(offs_t offset)
 	return m_program.read_byte(offset);
 }
 
+void specnext_state::update_dma_delay()
+{
+	if (m_nr_c0_int_mode_pulse_0_im2_1)
+	{
+		const u16 dma_int_mask = (m_nr_cc_dma_int_en_0_7 << INT_PRIORITY_NMI) | ((m_nr_cc_dma_int_en_0_10 & 1) << INT_PRIORITY_ULA)
+			| (m_nr_cd_dma_int_en_1 << INT_PRIORITY_CTC) | ((m_nr_cc_dma_int_en_0_10 >> 1) << INT_PRIORITY_LINE);
+		m_dma->dma_delay_w((dma_int_mask & m_im2_int_status) ? 1 : 0);
+	}
+}
+
 u8 specnext_state::reg_r(offs_t nr_register)
 {
 	u8 port_253b_dat;
@@ -1854,9 +1875,22 @@ u8 specnext_state::reg_r(offs_t nr_register)
 
 void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 {
+	if (m_copper_req)
+	{
+		if (nr_wr_reg == 0x02)
+		{
+			LOGINTVVV("Copper write: reg=%02x data=%02x\n", nr_wr_reg, nr_wr_dat);
+			m_copper_nr_reg = nr_wr_reg;
+			m_copper_nr_dat = nr_wr_dat;
+			return;
+		}
+		m_copper_req = false;
+	}
+
 	switch (nr_wr_reg)
 	{
 	case 0x02:
+		LOGINTVVV("[RESET] %02x\n", nr_wr_dat);
 		nr_02_w(nr_wr_dat);
 		break;
 	case 0x03:
@@ -2425,10 +2459,9 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_bb_divmmc_ep_1 = nr_wr_dat;
 		break;
 	case 0xc0:
-		nr_c0_im2_vector_w(BIT(nr_wr_dat, 5, 3));
+		nr_c0_im2_vector_w(BIT(nr_wr_dat, 0), BIT(nr_wr_dat, 5, 3));
 		m_nr_c0_stackless_nmi = BIT(nr_wr_dat, 3);
 		m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
-		m_nr_c0_int_mode_pulse_0_im2_1 = BIT(nr_wr_dat, 0);
 		LOGINT("[Interrupt Control] Vector: %02x; HW IM2: %d\n", m_nr_c0_im2_vector << 5, m_nr_c0_int_mode_pulse_0_im2_1);
 		break;
 	case 0xc2:
@@ -2504,12 +2537,20 @@ void specnext_state::nr_02_w(u8 nr_wr_dat)
 		if (m_nr_06_button_drive_nmi_en)
 		{
 			m_nr_02_generate_divmmc_nmi = 1;
-			m_maincpu->nmi();
+			nmi();
 		}
 	}
 	else
 	{
 		m_nr_02_generate_divmmc_nmi = 0;
+	}
+
+	const u16 mask = 1 << INT_PRIORITY_NMI;
+	if (!m_nr_02_generate_mf_nmi && !m_nr_02_generate_divmmc_nmi && (m_im2_int_status & mask))
+	{
+		m_maincpu->nmi(CLEAR_LINE);
+		m_im2_int_status &= ~mask;
+		update_dma_delay();
 	}
 
 	if (BIT(nr_wr_dat, 1)) // hard reset
@@ -2552,45 +2593,73 @@ void specnext_state::nr_1a_ula_clip_y2_w(u8 data)
 	m_lores->clip_y2_w(ula_clip_y2_0);
 }
 
+void specnext_state::nr_c0_im2_vector_w(bool mode_im2, u8 vector)
+{
+	m_nr_c0_int_mode_pulse_0_im2_1 = mode_im2;
+	m_nr_c0_im2_vector = vector;
+
+	const u8 vector_base = mode_im2 ? m_nr_c0_im2_vector << 5 : 0xff;
+	m_im2_line->vector_w(vector_base | (INT_PRIORITY_LINE << 1));
+	m_ctc->vector_w(vector_base);
+	m_im2_ula->vector_w(vector_base | (INT_PRIORITY_ULA << 1));
+
+	m_im2_int_status &= 1 << INT_PRIORITY_NMI;
+	update_dma_delay();
+}
+
 static const z80_daisy_config z80_daisy_chain[] =
 {
 	{ "im2_line" },
+	// { "uart_rx" },
 	{ "ctc" },
 	{ "im2_ula" },
-	//{ "dma" },
+	// { "uart_tx" },
 	{ nullptr }
 };
 
+TIMER_CALLBACK_MEMBER(specnext_state::irq_off)
+{
+	assert(m_nr_c0_int_mode_pulse_0_im2_1 == 0);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
 TIMER_CALLBACK_MEMBER(specnext_state::irq_on)
 {
-	m_im2_ula->int_w((m_nr_02_bus_reset || !m_nr_c0_int_mode_pulse_0_im2_1) ? 0xff : ((m_nr_c0_im2_vector << 5) | (INT_PRIORITY_ULA << 1)));
+	LOGINTVVV("<Frame IRQ>\n");
+	m_im2_ula->irq_w();
 }
 
 TIMER_CALLBACK_MEMBER(specnext_state::line_irq_on)
 {
 	m_screen->update_now();
-	m_im2_line->int_w((m_nr_02_bus_reset || !m_nr_c0_int_mode_pulse_0_im2_1) ? 0xff : ((m_nr_c0_im2_vector << 5) | (INT_PRIORITY_LINE << 1)));
+	LOGINTVVV("<Line IRQ>\n");
+	m_im2_line->irq_w();
 }
 
-void specnext_state::ctc_irq_on(int state)
+template <unsigned DeviceId> void specnext_state::im2_irq_w(int state)
 {
-	specnext_state::int_w<INT_PRIORITY_CTC>(state); // TODO + chanel
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
+	if (state && m_nr_c0_int_mode_pulse_0_im2_1 == 0)
+		m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
 
-template <unsigned DeviceId> void specnext_state::int_w(int state)
+void specnext_state::ctc_int_w(int state)
 {
+	const u8 ch = m_ctc->int_channel_r();
+	assert(ch < 4);
+	int_ch_w<INT_PRIORITY_CTC>(state, ch);
+}
+
+template <unsigned DeviceId> void specnext_state::int_ch_w(int state, u8 channel)
+{
+	int old = m_im2_int_status;
 	if (state)
-	{
-		if (!m_im2_int_status)
-			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_im2_int_status |= (1 << DeviceId);
-	}
+		m_im2_int_status |= (1 << (DeviceId + channel));
 	else
-	{
-		m_im2_int_status &= ~(1 << DeviceId);
-		if (!m_im2_int_status)
-			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	}
+		m_im2_int_status &= ~(1 << (DeviceId + channel));
+	LOGINTVVV("INT %04x %s%04x -> %04x\n", old, state ? "+" : "-", 1 << (DeviceId + channel), m_im2_int_status);
+
+	update_dma_delay();
 }
 
 INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
@@ -2650,17 +2719,28 @@ INPUT_CHANGED_MEMBER(specnext_state::on_divmmc_nmi)
 {
 	m_nr_02_generate_divmmc_nmi = newval & 1;
 	if (m_nr_06_button_drive_nmi_en && m_nr_02_generate_divmmc_nmi)
-		m_maincpu->nmi();
+		nmi();
 }
 
 void specnext_state::do_mf_nmi()
 {
 	if (m_nr_06_button_m1_nmi_en && m_nr_02_generate_mf_nmi)
 	{
-		m_maincpu->nmi();
+		nmi();
 		m_mf->button_w(1);
 		m_mf->clock_w();
 		m_mf->button_w(0);
+	}
+}
+
+void specnext_state::nmi()
+{
+	const u16 mask = 1 << INT_PRIORITY_NMI;
+	if (~m_im2_int_status & mask)
+	{
+		m_maincpu->nmi(ASSERT_LINE);
+		m_im2_int_status |= mask;
+		update_dma_delay();
 	}
 }
 
@@ -2669,8 +2749,12 @@ void specnext_state::leave_nmi(int state)
 	m_mf->cpu_retn_seen_w(1);
 	m_mf->clock_w();
 
+	m_divmmc->retn_seen_w(1);
+	m_divmmc->clock_w();
+
 	m_mf->cpu_retn_seen_w(0);
 	m_mf->clock_w();
+
 	bank_update(0, 2);
 }
 
@@ -2710,19 +2794,28 @@ void specnext_state::map_fetch(address_map &map)
 {
 	map(0x0000, 0xffff).lr8(NAME([this](offs_t offset)
 	{
-		if (m_divmmc_delayed_check && !machine().side_effects_disabled())
+		if (!machine().side_effects_disabled())
 		{
-			/* Happens after RW cycles (before next M1 fetch).
-			Fell like side effects check must be ignored here,
-			because doesn't matter who reset this lines and such
-			approach gives better experience in debugger UI. */
-			do_m1(offset);
-			m_divmmc_delayed_check = 0;
-
-			// do_m1 performs read from m_program with waits, we need to take it back
-			if (!machine().side_effects_disabled() && (m_nr_07_cpu_speed == 0b11))
+			if (m_divmmc_delayed_check)
 			{
-				m_maincpu->adjust_icount(1);
+				/* Happens after RW cycles (before next M1 fetch).
+				Fell like side effects check must be ignored here,
+				because doesn't matter who reset this lines and such
+				approach gives better experience in debugger UI. */
+				do_m1(offset);
+				m_divmmc_delayed_check = 0;
+
+				// do_m1 performs read from m_program with waits, we need to take it back
+				if (m_nr_07_cpu_speed == 0b11)
+				{
+					m_maincpu->adjust_icount(1);
+				}
+			}
+
+			if (m_copper_req)
+			{
+				m_copper_req = 0;
+				reg_w(m_copper_nr_reg, m_copper_nr_dat);
 			}
 		}
 
@@ -3174,6 +3267,9 @@ void specnext_state::machine_start()
 	save_item(NAME(m_nr_register));
 	save_item(NAME(m_port_e3_reg));
 	save_item(NAME(m_divmmc_delayed_check));
+	save_item(NAME(m_copper_req));
+	save_item(NAME(m_copper_nr_reg));
+	save_item(NAME(m_copper_nr_dat));
 	save_item(NAME(m_sram_rom));
 	save_item(NAME(m_sram_rom3));
 	save_item(NAME(m_sram_alt_128_n));
@@ -3571,9 +3667,9 @@ void specnext_state::machine_reset()
 	port_ff3b_ulap_en_w(0);
 	m_nr_register = 0x24;
 	//copper_requester_d  = 0;
-	//copper_req  = 0;
-	//copper_nr_reg  = 0x00;
-	//copper_nr_dat  = 0x00;
+	m_copper_req = 0;
+	m_copper_nr_reg = 0x00;
+	m_copper_nr_dat = 0x00;
 	//cpu_requester_d  = 0;
 	//cpu_req  = 0;
 	//cpu_nr_reg  = 0x00;
@@ -3727,10 +3823,9 @@ void specnext_state::machine_reset()
 	m_nr_ba_divmmc_ep_timing_0 = 0x00;
 	m_nr_bb_divmmc_ep_1 = 0xcd;
 
-	nr_c0_im2_vector_w(0x00);
+	nr_c0_im2_vector_w(0, 0x00);
 	m_nr_c0_stackless_nmi = 0;
 	m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
-	m_nr_c0_int_mode_pulse_0_im2_1 = 0;
 
 	m_nr_c4_int_en_0_expbus = 1;
 
@@ -3816,17 +3911,20 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
-	SPECNEXT_IM2(config, m_im2_line, 28_MHz_XTAL / 8);
-	m_im2_line->intr_callback().set(FUNC(specnext_state::int_w<INT_PRIORITY_LINE>));
+	SPECNEXT_IM2(config, m_im2_line);
+	m_im2_line->irq_callback().set(FUNC(specnext_state::im2_irq_w<INT_PRIORITY_LINE>));
+	m_im2_line->int_callback().set(FUNC(specnext_state::int_w<INT_PRIORITY_LINE>));
 
-	SPECNEXT_IM2(config, m_im2_ula, 28_MHz_XTAL / 8);
-	m_im2_ula->intr_callback().set(FUNC(specnext_state::int_w<INT_PRIORITY_ULA>));
+	SPECNEXT_IM2(config, m_im2_ula);
+	m_im2_ula->irq_callback().set(FUNC(specnext_state::im2_irq_w<INT_PRIORITY_ULA>));
+	m_im2_ula->int_callback().set(FUNC(specnext_state::int_w<INT_PRIORITY_ULA>));
 
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<1>().set(m_ctc, FUNC(z80ctc_device::trg2));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
-	m_ctc->intr_callback().set(FUNC(specnext_state::ctc_irq_on));
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->int_callback().set(FUNC(specnext_state::ctc_int_w));
 
 	SPECNEXT_DMA(config, m_dma, 28_MHz_XTAL / 8);
 	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
@@ -3887,7 +3985,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
-	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
+	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_copper_req = 1; m_next_regs.write_byte(offset, data); });
 	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
 
 	SOFTWARE_LIST(config, "sd_list").set_original("specnext_sd");
@@ -3901,9 +3999,13 @@ ROM_START(tbblue)
 
 	ROM_SYSTEM_BIOS(0, "boot", "BootROM")
 	ROMX_LOAD( "bootrom.fa55357d.bin", 0x0000, 0x2000, CRC(ccbd55ba) SHA1(8b3c2a301f486904d1c74929b94845a7731bf230), ROM_BIOS(0))
-
 	ROM_SYSTEM_BIOS(1, "bootab", "BootROM - AntiBrick")
 	ROMX_LOAD( "bootrom-ab.cfffa702.bin", 0x0000, 0x2000, CRC(1d16e9d4) SHA1(6f9c8771e5a9ef5a6b52a31b2e65f0698f0f5cfa), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "boot30204", "BootROM 2025")
+	ROMX_LOAD( "bootrom.30204.bin", 0x0000, 0x2000, CRC(b777bf92) SHA1(13c674c61093bf4b256dcf553e44372026113791), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "bootab30204", "BootROM - AntiBrick 2025")
+	ROMX_LOAD( "bootrom-ab.30204.bin", 0x0000, 0x2000, CRC(1af560b7) SHA1(7c427f86da82c5f4119c203d8d9585e17bc4e1c7), ROM_BIOS(3))
 ROM_END
 
 } // Anonymous namespace
