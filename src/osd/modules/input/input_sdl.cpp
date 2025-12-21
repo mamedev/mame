@@ -578,7 +578,8 @@ public:
 		switch (event.type)
 		{
 		case SDL_EVENT_KEY_DOWN:
-			if (event.key.which == m_keyboard_id)
+			// TODO: when we add proper multi-keyboard support
+			if (1) //event.key.which == m_keyboard_id)
 			{
 				if (event.key.scancode == SDL_SCANCODE_CAPSLOCK)
 					m_capslock_pressed = std::chrono::steady_clock::now();
@@ -2216,19 +2217,15 @@ public:
 		// TODO: Multiple keyboard/mouse support is Windows-only in SDL 3.2; this will expand to Linux Wayland
 		// in SDL 3.4.  X11 will return all of the available keyboards but only return keypresses for the system
 		// composite device #0 unless SDL is specially compiled (which its not in distro packages).
-		// On macOS only the system keyboard is supported, but it's ID 1 instead of 0.
-#ifdef SDLMAME_MACOSX
-		const SDL_KeyboardID syskbd = (SDL_KeyboardID)1;
-#else
-		const SDL_KeyboardID syskbd = (SDL_KeyboardID)0;
-#endif
+		// On macOS only the system keyboard is supported, but it's ID 1.
 		auto &devinfo = create_device<sdl_keyboard_device>(
 			DEVICE_CLASS_KEYBOARD,
 			"System keyboard",
 			"System keyboard",
-			(SDL_KeyboardID &)syskbd,
+			keyboards[0],
 			*m_key_trans_table);
 		osd_printf_verbose("Keyboard: Registered %s\n", devinfo.name());
+
 		SDL_free(keyboards);
 
 		osd_printf_verbose("Keyboard: End initialization\n");
