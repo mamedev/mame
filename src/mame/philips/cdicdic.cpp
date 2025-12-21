@@ -267,7 +267,7 @@ static inline int16_t clip_int16(int32_t sample) {
 inline void rotate_samples(int16_t val, int16_t& a, int16_t& b, int16_t& output) {
 	b = a;
 	a = val;
-	output = a;
+	output = val;
 }
 
 void cdicdic_device::decode_xa_unit(const uint8_t param, int16_t sample, int16_t& sample0, int16_t& sample1, int16_t& out_buffer)
@@ -355,8 +355,9 @@ void cdicdic_device::play_cdda_sector(const uint8_t *data)
 	m_dmadac[0]->set_volume(0x100);
 	m_dmadac[1]->set_volume(0x100);
 
-	int16_t samples[2][2352/4];
-	for (uint16_t i = 0; i < 2352/4; i++)
+	const int16_t num_samples = SECTOR_SIZE / 4;
+	int16_t samples[2][num_samples];
+	for (uint16_t i = 0; i < num_samples; i++)
 	{
 		samples[0][i] = (int16_t)((data[(i * 4) + 1] << 8) | data[(i * 4) + 0]);
 		samples[1][i] = (int16_t)((data[(i * 4) + 3] << 8) | data[(i * 4) + 2]);
@@ -364,8 +365,8 @@ void cdicdic_device::play_cdda_sector(const uint8_t *data)
 		m_samples[1][i] = samples[1][i];
 	}
 
-	m_dmadac[0]->transfer(0, 1, 1, SECTOR_SIZE / 4, &m_samples[0][0]);
-	m_dmadac[1]->transfer(0, 1, 1, SECTOR_SIZE / 4, &m_samples[1][0]);
+	m_dmadac[0]->transfer(0, 1, 1, num_samples, &m_samples[0][0]);
+	m_dmadac[1]->transfer(0, 1, 1, num_samples, &m_samples[1][0]);
 }
 
 void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data)
