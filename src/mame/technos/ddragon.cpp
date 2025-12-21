@@ -1728,8 +1728,9 @@ ROM_END
   1x TDA2002 (8W audio amplifier)
 
   Other:
-  1x 3.579545 MHz crystal
-  2x unreadable crystals
+  1x 24.576 MHz crystal
+  1x 20.000 MHz crystal
+  1x 3.579545 MHz crystal (for audio)
   2x 8 DIP switches banks
   1x Jamma edge connector
 
