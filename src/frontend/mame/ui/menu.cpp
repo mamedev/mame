@@ -144,6 +144,12 @@ void menu::global_state::stack_push(std::unique_ptr<menu> &&menu)
 		}
 	}
 	m_stack->machine().ui_input().reset();
+
+	// Pause game while menu pop-up
+	if (m_ui.machine().options().pause_game_on_menu())
+	{
+		m_ui.machine().pause();
+	}
 }
 
 
@@ -179,6 +185,12 @@ void menu::global_state::stack_pop()
 			}
 		}
 		m_free->machine().ui_input().reset();
+
+		// Resume game while menu pop-down
+		if (m_ui.machine().options().pause_game_on_menu() && !m_stack)
+		{
+			m_ui.machine().resume();
+		}
 	}
 }
 
@@ -273,6 +285,12 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 				}
 			}
 
+			// Resume game while menu's hidden
+			if (m_ui.machine().options().pause_game_on_menu())
+			{
+				m_ui.machine().resume();
+			}
+
 			// forget about pointers while menus aren't handling events
 			m_current_pointer = -1;
 			m_pointer_type = ui_event::pointer::UNKNOWN;
@@ -282,6 +300,12 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 			m_pointer_hit = false;
 
 			return mame_ui_manager::HANDLER_CANCEL;
+		}
+
+		// Pause game while menu's shown
+		if (m_ui.machine().options().pause_game_on_menu())
+		{
+			m_ui.machine().pause();
 		}
 
 		// if the menu is still active, draw it, otherwise try again
