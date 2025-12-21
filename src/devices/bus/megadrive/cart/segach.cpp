@@ -7,27 +7,31 @@ Sega Channel Game no Kanzume "digest" RAM cart, developed by CRI
 https://segaretro.org/Game_no_Kanzume_Otokuyou
 
 TODO:
-- some unknowns, needs PCB picture
+- some unknowns, needs PCB picture;
+- Scientific Atlanta Sega Channel cart also derives from SSF but has it's own mapper scheme
+  cfr. SCTOOLS/MENUTEST/HARDWARE.I in Sega Channel Jan 1996 dev CD dump.
+  The SCI-ATL ASIC also contains an unspecified TCU device (or that's behind the RF shield?),
+  in word status/data pair, where status direction is at bit 15 (1) read (0) write
 
 **************************************************************************************************/
 
 #include "emu.h"
-#include "seganet.h"
+#include "segach.h"
 
 #include "bus/generic/slot.h"
 
-DEFINE_DEVICE_TYPE(MEGADRIVE_SEGANET, megadrive_seganet_device, "megadrive_seganet", "Megadrive Seganet Game no Kanzume RAM cart")
+DEFINE_DEVICE_TYPE(MEGADRIVE_SEGACH_JP, megadrive_segach_jp_device, "megadrive_segach_jp", "Megadrive Sega Channel Game no Kanzume RAM cart")
 
 
-megadrive_seganet_device::megadrive_seganet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MEGADRIVE_SEGANET, tag, owner, clock)
+megadrive_segach_jp_device::megadrive_segach_jp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MEGADRIVE_SEGACH_JP, tag, owner, clock)
 	, device_megadrive_cart_interface( mconfig, *this )
 	, m_rom(*this, "rom")
 	, m_ram_view(*this, "ram_view")
 {
 }
 
-void megadrive_seganet_device::device_start()
+void megadrive_segach_jp_device::device_start()
 {
 	memory_region *const romregion(cart_rom_region());
 	device_generic_cart_interface::map_non_power_of_two(
@@ -39,12 +43,12 @@ void megadrive_seganet_device::device_start()
 	m_ram.resize(0x40'000 / 2);
 }
 
-void megadrive_seganet_device::device_reset()
+void megadrive_segach_jp_device::device_reset()
 {
 	m_ram_view.disable();
 }
 
-void megadrive_seganet_device::cart_map(address_map &map)
+void megadrive_segach_jp_device::cart_map(address_map &map)
 {
 	map(0x00'0000, 0x2f'ffff).bankr(m_rom);
 	// NOTE: menu system writes extra couple writes at $40000,
@@ -58,7 +62,7 @@ void megadrive_seganet_device::cart_map(address_map &map)
 	);
 }
 
-void megadrive_seganet_device::time_io_map(address_map &map)
+void megadrive_segach_jp_device::time_io_map(address_map &map)
 {
 //  map(0x01, 0x01) unknown, used in tandem with 0xf1 writes, ram bank select?
 	map(0xf1, 0xf1).lw8(
@@ -70,7 +74,7 @@ void megadrive_seganet_device::time_io_map(address_map &map)
 				m_ram_view.select(0);
 			// bit 0: write protect as per SSF2 mapper?
 			if (data & 0xfd)
-				popmessage("megadrive_seganet: unhandled $f1 write %02x", data);
+				popmessage("megadrive_segach_jp: unhandled $f1 write %02x", data);
 		})
 	);
 }
