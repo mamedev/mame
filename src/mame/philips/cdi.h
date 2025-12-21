@@ -21,6 +21,7 @@ class cdi_state : public driver_device
 public:
 	cdi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cdic(*this, "cdic")
 		, m_maincpu(*this, "maincpu")
 		, m_main_rom(*this, "maincpu")
 		, m_lcd(*this, "lcd")
@@ -28,7 +29,6 @@ public:
 		, m_plane_ram(*this, "plane%u", 0U)
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
-		, m_cdic(*this, "cdic")
 		, m_cdrom(*this, "cdrom")
 		, m_mcd212(*this, "mcd212")
 		, m_dmadac(*this, "dac%u", 1U)
@@ -39,6 +39,7 @@ public:
 	void cdimono2(machine_config &config);
 	void cdi910(machine_config &config);
 
+	optional_device<cdicdic_device> m_cdic;
 protected:
 	enum servo_portc_bit_t
 	{
@@ -54,7 +55,6 @@ protected:
 	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
 	optional_device<m68hc05c8_device> m_servo;
 	optional_device<m68hc05c8_device> m_slave;
-	optional_device<cdicdic_device> m_cdic;
 	required_device<cdrom_image_device> m_cdrom;
 	required_device<mcd212_device> m_mcd212;
 
