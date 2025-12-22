@@ -259,7 +259,6 @@ double cem3394_device::filter(double input, double cutoff)
 		m_filter_out[0] *= scale;
 		m_filter_out[1] *= scale;
 	}
-
 	return output;
 }
 
