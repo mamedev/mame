@@ -691,7 +691,7 @@ void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
 	map(0x420000, 0x42003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
 	map(0x440000, 0x44ffff).r(FUNC(namcos2_state::c116_r)).w(m_c116, FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x460000, 0x460fff).mirror(0x00f000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
-	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
+	map(0x480000, 0x483fff).m(m_sci, FUNC(namco_c139_device::data_map));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
 
@@ -1707,7 +1707,8 @@ void namcos2_state::configure_common_standard(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci, 0U);
+	m_sci->irq_cb().set(FUNC(namcos2_state::sci_int_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MAIN_OSC_CLOCK/8, 384, 0*8, 36*8, 264, 0*8, 28*8);
@@ -1748,6 +1749,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 		// TODO: should be when video registers are updated (and/or latched) but that makes things worse
 		m_screen->update_partial(m_update_to_line_before_posirq ? param - 1 : param);
 	}
+}
+
+void namcos2_state::sci_int_w(int state)
+{
+	m_master_intc->sci_irq_trigger();
+	m_slave_intc->sci_irq_trigger();
 }
 
 void namcos2_state::configure_c123tmap_standard(machine_config &config)
