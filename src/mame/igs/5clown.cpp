@@ -28,6 +28,7 @@
 
   *** Hardware notes ***
 
+  IGS PCB N0.T0057-2
 
   - CPU:  2x Rockwell R6502P.   (u16, u42)
   - CRTC: 1x GoldStar GM68B45S. (u10)
@@ -192,7 +193,7 @@
   - Checksums.
 
   The checksum routine starts at $FE1D
-  Once checksumed the whole range, compares the result with a harcoded value.
+  Once checksummed the whole range, compares the result with a hard-coded value.
   If match, jumps to a subroutine that prints "ROM x ERR".
   If doesn't match, prints "ROM x OK"
 
@@ -210,7 +211,7 @@
   Game Settings
   -------------
 
-  From a datasheet. Seems to be unaccurate...
+  From a datasheet. Seems to be inaccurate...
 
 
   DIP Switches Settings:
@@ -454,21 +455,20 @@
 *******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 
 namespace {
-
-#define MASTER_CLOCK    XTAL(10'000'000)
-
 
 class _5clown_state : public driver_device
 {
@@ -481,13 +481,14 @@ public:
 		m_palette(*this, "palette"),
 		m_gfxbanks(*this, "gfxbanks"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
+		m_colorram(*this, "colorram"),
+		m_in(*this, "IN0-%u", 0U)
 	{
 	}
 
-	void fclown(machine_config &config);
+	void fclown(machine_config &config) ATTR_COLD;
 
-	void init_fclown();
+	void init_fclown() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -502,11 +503,13 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
+	required_ioport_array<4> m_in;
+
 	uint8_t m_main_latch_d800 = 0;
 	uint8_t m_snd_latch_0800 = 0;
 	uint8_t m_snd_latch_0a02 = 0;
 	uint8_t m_ay8910_addr = 0;
-	int m_mux_data = 0;
+	uint8_t m_mux_data = 0;
 
 	void cpu_c048_w(uint8_t data);
 	void cpu_d800_w(uint8_t data);
@@ -519,12 +522,12 @@ private:
 	void trigsnd_w(uint8_t data);
 	uint8_t pia0_b_r();
 	uint8_t pia1_b_r();
-	void fclown_ay8910_w(offs_t offset, u8 data);
+	void ay8910_w(offs_t offset, u8 data);
 	MC6845_UPDATE_ROW(update_row);
-	void _5clown_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 
-	void fcaudio_map(address_map &map) ATTR_COLD;
-	void fclown_map(address_map &map) ATTR_COLD;
+	void audio_program_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
 };
 
 void _5clown_state::machine_start()
@@ -563,11 +566,11 @@ MC6845_UPDATE_ROW(_5clown_state::update_row)
 
 	for (int x = 0; x < x_count; x++)
 	{
-		int tile_index = (x + ma) & (m_videoram.length() - 1);
-		int attr = m_colorram[tile_index];
-		int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];    /* bit 8 for extended char set */
-		int bank = (attr & 0x02) >> 1;                                                  /* bit 1 switch the gfx banks */
-		int color = (attr & 0x3c) >> 2 | ((attr & 0x80) >> 3);                          /* bits 2-3-4-5-7 for color */
+		const int tile_index = (x + ma) & (m_videoram.length() - 1);
+		const int attr = m_colorram[tile_index];
+		const int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];    // bit 8 for extended char set
+		const int bank = (attr & 0x02) >> 1;                                                  // bit 1 switch the gfx banks
+		const int color = (attr & 0x3c) >> 2 | ((attr & 0x80) >> 3);                          // bits 2-3-4-5-7 for color
 
 		const uint8_t plane2 = bank ? m_gfxbanks[code << 3 | ra | 0x6000] : 0;
 		const uint8_t plane1 = bank ? m_gfxbanks[code << 3 | ra | 0x5000] : 0;
@@ -579,7 +582,7 @@ MC6845_UPDATE_ROW(_5clown_state::update_row)
 }
 
 
-void _5clown_state::_5clown_palette(palette_device &palette) const
+void _5clown_state::palette_init(palette_device &palette) const
 {
 	/*
 	    7654 3210
@@ -590,9 +593,10 @@ void _5clown_state::_5clown_palette(palette_device &palette) const
 	    xxxx ----   unused.
 	*/
 
-	/* 0000KBGR */
+	// 0000KBGR
 
 	uint8_t const *const color_prom = memregion("proms")->base();
+
 	if (!color_prom)
 		return;
 
@@ -626,12 +630,12 @@ void _5clown_state::_5clown_palette(palette_device &palette) const
 */
 uint8_t _5clown_state::mux_port_r()
 {
-	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
+	switch (m_mux_data & 0xf0)     // bits 4-7
 	{
-		case 0x10: return ioport("IN0-0")->read();
-		case 0x20: return ioport("IN0-1")->read();
-		case 0x40: return ioport("IN0-2")->read();
-		case 0x80: return ioport("IN0-3")->read();
+		case 0x10: return m_in[0]->read();
+		case 0x20: return m_in[1]->read();
+		case 0x40: return m_in[2]->read();
+		case 0x80: return m_in[3]->read();
 	}
 
 	return 0xff;
@@ -640,7 +644,7 @@ uint8_t _5clown_state::mux_port_r()
 
 void _5clown_state::mux_w(uint8_t data)
 {
-	m_mux_data = data ^ 0xff;   /* Inverted */
+	m_mux_data = data ^ 0xff;   // Inverted
 }
 
 
@@ -655,10 +659,10 @@ void _5clown_state::counters_w(uint8_t data)
     -x-- ----   Unknown (increments at start).
     x--- ----   Unknown (increments at start).
 */
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);  /* Key In */
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);  /* Payout */
-	machine().bookkeeping().coin_counter_w(2, data & 0x40);  /* unknown */
-	machine().bookkeeping().coin_counter_w(3, data & 0x80);  /* unknown */
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // Key In
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Payout
+	machine().bookkeeping().coin_counter_w(2, data & 0x40);  // unknown
+	machine().bookkeeping().coin_counter_w(3, data & 0x80);  // unknown
 
 }
 
@@ -669,7 +673,7 @@ void _5clown_state::trigsnd_w(uint8_t data)
 
 	Writes 0x07 & 0x0F each time a sound is triggered through $D800 */
 
-	if ( (data & 0x0f) == 0x07 )
+	if ((data & 0x0f) == 0x07)
 	{
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
 	}
@@ -683,14 +687,14 @@ void _5clown_state::trigsnd_w(uint8_t data)
 
 uint8_t _5clown_state::pia0_b_r()
 {
-	/* often read the port */
+	// often read port
 	return 0x00;
 }
 
 uint8_t _5clown_state::pia1_b_r()
 {
-	/* constantly read the port */
-	return 0x00;    /* bit 2 shouldn't be active to allow work the key out system */
+	// constantly read port
+	return 0x00;    // bit 2 shouldn't be active to allow work the key out system
 }
 
 
@@ -713,7 +717,7 @@ void _5clown_state::cpu_d800_w(uint8_t data)
 *  AY3-8910 R/W Handlers        *
 ********************************/
 
-void _5clown_state::fclown_ay8910_w(offs_t offset, u8 data)
+void _5clown_state::ay8910_w(offs_t offset, u8 data)
 {
 	m_ay8910->address_w(offset);
 	m_ay8910->data_w(data);
@@ -741,13 +745,13 @@ void _5clown_state::snd_800_w(uint8_t data)
 
 	if (m_snd_latch_0a02 == 0x00)
 	{
-		fclown_ay8910_w(m_ay8910_addr, m_snd_latch_0800);
+		ay8910_w(m_ay8910_addr, m_snd_latch_0800);
 	}
 }
 
 void _5clown_state::snd_a02_w(uint8_t data)
 {
-	m_snd_latch_0a02 = data & 0xff;
+	m_snd_latch_0a02 = data;
 	logerror("Sound: Write to $0A02: %02x\n", m_snd_latch_0a02);
 }
 
@@ -756,7 +760,7 @@ void _5clown_state::snd_a02_w(uint8_t data)
 * Memory map information *
 *************************/
 
-void _5clown_state::fclown_map(address_map &map)
+void _5clown_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
@@ -765,16 +769,16 @@ void _5clown_state::fclown_map(address_map &map)
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x13ff).ram().share(m_videoram);   // Init'ed at $2042
 	map(0x1800, 0x1bff).ram().share(m_colorram);   // Init'ed at $2054
-	map(0x2000, 0x7fff).rom();                     // ROM space
+	map(0x2000, 0x7fff).rom();
 
 	map(0xc048, 0xc048).w(FUNC(_5clown_state::cpu_c048_w));
 	map(0xd800, 0xd800).w(FUNC(_5clown_state::cpu_d800_w));
 
-	map(0xc400, 0xc400).portr("SW1");              // DIP Switches bank
-	map(0xcc00, 0xcc00).portr("SW2");              // DIP Switches bank
-	map(0xd400, 0xd400).portr("SW3");              // Second DIP Switches bank
+	map(0xc400, 0xc400).portr("SW1");
+	map(0xcc00, 0xcc00).portr("SW2");
+	map(0xd400, 0xd400).portr("SW3");
 
-	map(0xe000, 0xffff).rom();                     // ROM space
+	map(0xe000, 0xffff).rom();
 }
 
 /*
@@ -832,7 +836,7 @@ void _5clown_state::fclown_map(address_map &map)
 
 */
 
-void _5clown_state::fcaudio_map(address_map &map)
+void _5clown_state::audio_program_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0x0800, 0x0800).w(FUNC(_5clown_state::snd_800_w));
@@ -840,7 +844,7 @@ void _5clown_state::fcaudio_map(address_map &map)
 	map(0x0c04, 0x0c04).w("oki6295", FUNC(okim6295_device::write));
 	map(0x0c06, 0x0c06).r("oki6295", FUNC(okim6295_device::read));
 	map(0x0e06, 0x0e06).r(FUNC(_5clown_state::snd_e06_r));
-	map(0xe000, 0xffff).rom();                 /* ROM space */
+	map(0xe000, 0xffff).rom();
 }
 
 
@@ -849,13 +853,13 @@ void _5clown_state::fcaudio_map(address_map &map)
 *************************/
 
 static INPUT_PORTS_START( fclown )
-	/* Multiplexed - 4x5bits */
+	// Multiplexed - 4x5bits
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Record")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* cancel */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        // cancel
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -932,7 +936,7 @@ static INPUT_PORTS_START( fclown )
 	PORT_DIPNAME( 0x08, 0x08, "SW2-08 (CC00)" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "SW2-10 (CC00) System Boot" ) /* Should be turned ON to boot */
+	PORT_DIPNAME( 0x10, 0x00, "SW2-10 (CC00) System Boot" ) // Should be turned ON to boot
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Key In (value)" )
@@ -955,12 +959,12 @@ static INPUT_PORTS_START( fclown )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x10, "Min/Max Bet" )       PORT_DIPLOCATION("SW3:4,5") /* Always 1-40 on screen */
+	PORT_DIPNAME( 0x18, 0x10, "Min/Max Bet" )       PORT_DIPLOCATION("SW3:4,5") // Always 1-40 on screen
 	PORT_DIPSETTING(    0x00, "Min:10; Max:80" )
 	PORT_DIPSETTING(    0x08, "Min:10; Max:50" )
 	PORT_DIPSETTING(    0x10, "Min:05; Max:40" )
 	PORT_DIPSETTING(    0x18, "Min:05; Max:10" )
-	PORT_DIPNAME( 0x60, 0x40, "Key In (screen)" )   PORT_DIPLOCATION("SW3:6,7") /* Only on screen */
+	PORT_DIPNAME( 0x60, 0x40, "Key In (screen)" )   PORT_DIPLOCATION("SW3:6,7") // Only on screen
 	PORT_DIPSETTING(    0x60, "20" )
 	PORT_DIPSETTING(    0x40, "100" )
 	PORT_DIPSETTING(    0x20, "120" )
@@ -970,7 +974,7 @@ static INPUT_PORTS_START( fclown )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SW4")
-	/* only bits 4-6-7 are connected here and were routed to SW4 1-4 */
+	// only bits 4-6-7 are connected here and were routed to SW4 1-4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -999,7 +1003,7 @@ static const gfx_layout tilelayout =
 	8, 8,
 	RGN_FRAC(1,3),
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    // bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -1021,12 +1025,12 @@ GFXDECODE_END
 
 void _5clown_state::fclown(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, MASTER_CLOCK/8);  /* guess, seems ok */
-	m_maincpu->set_addrmap(AS_PROGRAM, &_5clown_state::fclown_map);
+	// basic machine hardware
+	M6502(config, m_maincpu, 10_MHz_XTAL / 8); // guess, seems ok
+	m_maincpu->set_addrmap(AS_PROGRAM, &_5clown_state::main_program_map);
 
-	M6502(config, m_audiocpu, MASTER_CLOCK/8); /* guess, seems ok */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &_5clown_state::fcaudio_map);
+	M6502(config, m_audiocpu, 10_MHz_XTAL / 8); // guess, seems ok
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_5clown_state::audio_program_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1041,27 +1045,27 @@ void _5clown_state::fclown(machine_config &config)
 	pia1.writepa_handler().set(FUNC(_5clown_state::trigsnd_w));
 	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK/2, 320, 0, 256, 312, 0, 256);
+	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_fclown);
-	PALETTE(config, m_palette, FUNC(_5clown_state::_5clown_palette), 256);
+	PALETTE(config, m_palette, FUNC(_5clown_state::palette_init), 256);
 
-	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	mc6845_device &crtc(MC6845(config, "crtc", 10_MHz_XTAL / 16)); // guess
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	crtc.set_update_row_callback(FUNC(_5clown_state::update_row));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910, MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.00);        /* guess, seems ok */
+	AY8910(config, m_ay8910, 10_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.00); // guess, seems ok
 
-	OKIM6295(config, "oki6295", MASTER_CLOCK/12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.20);    /* guess, seems ok; pin7 guessed, seems ok */
+	OKIM6295(config, "oki6295", 10_MHz_XTAL / 12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.20); // guess, seems ok; pin7 guessed, seems ok
 }
 
 
@@ -1071,6 +1075,8 @@ void _5clown_state::fclown(machine_config &config)
 
 ROM_START( 5clown )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	// also seen on another PCB with 0x23 instead of 0x21 at 0x76 (probably one of the two is corrupted)
+	// on the second PCB the program ROM had an hand-written 'SBAR POKER' label
 	ROM_LOAD( "4.u2",       0x2000, 0x8000, CRC(96e3e8ab) SHA1(fec20b9a8bde5306162f8288cdc9580f445cadf5) )
 	ROM_COPY( "maincpu",    0x8000, 0xe000, 0x2000 )
 
@@ -1086,7 +1092,7 @@ ROM_START( 5clown )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0x00 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x00 ) // filling the remaining bitplanes
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -1096,7 +1102,6 @@ ROM_START( 5clown )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dm74s287an.u32", 0x0000, 0x0100, CRC(2d207266) SHA1(374b4830a0a8ed3001cf0df16daa8dffee503cbe) )
-
 ROM_END
 
 
@@ -1118,7 +1123,7 @@ ROM_START( 5clowna )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0x00 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x00 ) // filling the remaining bitplanes
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -1128,7 +1133,6 @@ ROM_START( 5clowna )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dm74s287an.u32", 0x0000, 0x0100, CRC(2d207266) SHA1(374b4830a0a8ed3001cf0df16daa8dffee503cbe) )
-
 ROM_END
 
 
@@ -1149,7 +1153,7 @@ ROM_START( 5clownsp )
 
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x2000, 0x00 ) /* filling the remaining bitplanes */
+	ROM_FILL(               0x0000, 0x2000, 0x00 ) // filling the remaining bitplanes
 	ROM_COPY( "gfxbanks",   0x7000, 0x2000, 0x1000 )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
@@ -1159,7 +1163,6 @@ ROM_START( 5clownsp )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "dm74s287an.u32", 0x0000, 0x0100, CRC(2d207266) SHA1(374b4830a0a8ed3001cf0df16daa8dffee503cbe) )
-
 ROM_END
 
 
@@ -1169,50 +1172,50 @@ ROM_END
 
 void _5clown_state::init_fclown()
 {
-	/* Decrypting main program */
+	// Decrypting main program
 	uint8_t *src = memregion( "maincpu" )->base();
 
 	for (int x = 0x0000; x < 0x10000; x++)
 	{
-		src[x] = src[x] ^ 0x20;     /* Decrypting byte */
+		src[x] = src[x] ^ 0x20; // Decrypting byte
 	}
 
 
-	/* Decrypting GFX by segments */
+	// Decrypting GFX by segments
 	uint8_t *gfx1_src = memregion( "gfx1" )->base();
 	uint8_t *gfx2_src = memregion( "gfx2" )->base();
 
 	for (int x = 0x2000; x < 0x3000; x++)
 	{
-		gfx1_src[x] = gfx1_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 7000-7fff */
+		gfx1_src[x] = gfx1_src[x] ^ 0x22;   // Decrypting bulk GFX segment 7000-7fff
 		m_gfxbanks[0x7000 - 0x2000 + x] ^= 0x22;
 	}
 
 	for (int x = 0x0000; x < 0x1000; x++)
 	{
-		gfx2_src[x] = gfx2_src[x] ^ 0x3f;   /* Decrypting bulk GFX segment 6000-6fff */
+		gfx2_src[x] = gfx2_src[x] ^ 0x3f;   // Decrypting bulk GFX segment 6000-6fff
 		m_gfxbanks[0x6000 - 0x0000 + x] ^= 0x3f;
 	}
 
 	for (int x = 0x2000; x < 0x3000; x++)
 	{
-		gfx2_src[x] = gfx2_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 4000-4fff */
+		gfx2_src[x] = gfx2_src[x] ^ 0x22;   // Decrypting bulk GFX segment 4000-4fff
 		m_gfxbanks[0x4000 - 0x2000 + x] ^= 0x22;
 	}
 
 
-	/* Decrypting sound samples */
+	// Decrypting sound samples
 	uint8_t *samples_src = memregion( "oki6295" )->base();
 	for (int x = 0x0000; x < 0x10000; x++)
 	{
-		if (samples_src[x] & 0x02)                      /* If bit 1 is active... */
+		if (samples_src[x] & 0x02)                      // If bit 1 is active...
 		{
-			samples_src[x] = samples_src[x] ^ 0x02;     /* Then bit 1 XOR'ed */
+			samples_src[x] = samples_src[x] ^ 0x02;     // Then bit 1 XOR'ed
 		}
 
 		else
 		{
-			samples_src[x] = samples_src[x] ^ 0x12;     /* Otherwise bit 1 & 5 XOR'ed */
+			samples_src[x] = samples_src[x] ^ 0x12;     // Otherwise bit 1 & 5 XOR'ed
 		}
 	}
 }
