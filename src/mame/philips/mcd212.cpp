@@ -526,7 +526,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	if (tp_ctrl == TCR_ALWAYS || !icm || !vsr)
 	{
 		std::fill_n(pixels, get_screen_width(), s_4bpp_color[0]);
-		std::fill_n(transparent, get_screen_width(), true);
+		std::fill_n(transparent, get_screen_width(), (tp_ctrl == TCR_ALWAYS));
 		return;
 	}
 
