@@ -43,8 +43,8 @@ authors:hap
 	<element name="text_g"><text string="G"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_h"><text string="H"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
-	<element name="text_depth"><text string="Depth Search"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_mate"><text string="Mate Announcement"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_depth"><text string="D e p t h   S e a r c h"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_mate"><text string="M a t e   A n n o u n c e m e n t"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_l1">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
@@ -394,7 +394,7 @@ authors:hap
 <!-- default view -->
 
 	<group name="default">
-		<bounds left="-19" right="116" top="-0.5" bottom="88.5" />
+		<bounds left="-19" right="115.5" top="-0.5" bottom="88.5" />
 
 		<element ref="cblack"><bounds x="2.5" y="2.5" width="80.5" height="81" /></element>
 		<group ref="sb_board"><bounds x="3" y="3" width="80" height="80" /></group>
@@ -403,11 +403,11 @@ authors:hap
 		<!-- left side labels -->
 		<element ref="white"><bounds x="-5.5" y="5.833" width="2.2" height="30.333" /></element>
 		<element ref="blackb"><bounds x="-5.166" y="6.166" width="2.2" height="29.666" /></element>
-		<element ref="text_depth"><bounds x="-4.5" y="5.833" width="2" height="30.333" /><orientation rotate="90" /></element>
+		<element ref="text_depth"><bounds x="-4.6" y="7.5" width="2" height="27" /><orientation rotate="90" /></element>
 
 		<element ref="white"><bounds x="-5.5" y="47.833" width="4" height="30.333" /></element>
 		<element ref="blackb"><bounds x="-5.166" y="48.166" width="4" height="29.666" /></element>
-		<element ref="text_mate"><bounds x="-4.5" y="47.833" width="2" height="30.333" /><orientation rotate="90" /></element>
+		<element ref="text_mate"><bounds x="-4.6" y="49.5" width="2" height="27" /><orientation rotate="90" /></element>
 
 		<group ref="sb_ui"><bounds x="-17.5" y="3" width="10" height="80" /></group>
 
@@ -535,39 +535,39 @@ authors:hap
 		<element ref="hlb" inputtag="IN.7" inputmask="0x01"><bounds x="97" y="76" width="6" height="4" /><color alpha="0.15" /></element>
 
 		<!-- right side leds -->
-		<element ref="black"><bounds x="107" y="2.5" width="1" height="81" /></element>
+		<element ref="black"><bounds x="107" y="2.5" width="0.5" height="81" /></element>
 
-		<element ref="text_rg0"><bounds x="107" y="5.7" width="10" height="1.5" /></element>
-		<element ref="text_rg1"><bounds x="107" y="15.7" width="10" height="1.5" /></element>
-		<element ref="text_rg2"><bounds x="107" y="25.7" width="10" height="1.5" /></element>
-		<element ref="text_rg3"><bounds x="107" y="35.7" width="10" height="1.5" /></element>
-		<element ref="text_rg4"><bounds x="107" y="45.7" width="10" height="1.5" /></element>
-		<element ref="text_rg5"><bounds x="107" y="55.7" width="10" height="1.5" /></element>
-		<element ref="text_rg6"><bounds x="107" y="65.7" width="10" height="1.5" /></element>
-		<element ref="text_rg7"><bounds x="107" y="75.7" width="10" height="1.5" /></element>
+		<element ref="text_rg0"><bounds x="106.5" y="5.7" width="10" height="1.5" /></element>
+		<element ref="text_rg1"><bounds x="106.5" y="15.7" width="10" height="1.5" /></element>
+		<element ref="text_rg2"><bounds x="106.5" y="25.7" width="10" height="1.5" /></element>
+		<element ref="text_rg3"><bounds x="106.5" y="35.7" width="10" height="1.5" /></element>
+		<element ref="text_rg4"><bounds x="106.5" y="45.7" width="10" height="1.5" /></element>
+		<element ref="text_rg5"><bounds x="106.5" y="55.7" width="10" height="1.5" /></element>
+		<element ref="text_rg6"><bounds x="106.5" y="65.7" width="10" height="1.5" /></element>
+		<element ref="text_rg7"><bounds x="106.5" y="75.7" width="10" height="1.5" /></element>
 
-		<element ref="text_p1"><bounds x="111" y="8.5"  width="2" height="2" /></element>
-		<element ref="text_p2"><bounds x="111" y="18.5" width="2" height="2" /></element>
-		<element ref="text_p3"><bounds x="111" y="28.5" width="2" height="2" /></element>
-		<element ref="text_p4"><bounds x="111" y="38.5" width="2" height="2" /></element>
-		<element ref="text_p5"><bounds x="111" y="48.5" width="2" height="2" /></element>
-		<element ref="text_p6"><bounds x="111" y="58.5" width="2" height="2" /></element>
+		<element ref="text_p1"><bounds x="110.5" y="8.5"  width="2" height="2" /></element>
+		<element ref="text_p2"><bounds x="110.5" y="18.5" width="2" height="2" /></element>
+		<element ref="text_p3"><bounds x="110.5" y="28.5" width="2" height="2" /></element>
+		<element ref="text_p4"><bounds x="110.5" y="38.5" width="2" height="2" /></element>
+		<element ref="text_p5"><bounds x="110.5" y="48.5" width="2" height="2" /></element>
+		<element ref="text_p6"><bounds x="110.5" y="58.5" width="2" height="2" /></element>
 
-		<element name="0.0" ref="ledg"><bounds x="111" y="7.5" width="2" height="1" /></element>
-		<element name="0.1" ref="ledg"><bounds x="111" y="17.5" width="2" height="1" /></element>
-		<element name="0.2" ref="ledg"><bounds x="111" y="27.5" width="2" height="1" /></element>
-		<element name="0.3" ref="ledg"><bounds x="111" y="37.5" width="2" height="1" /></element>
-		<element name="0.4" ref="ledg"><bounds x="111" y="47.5" width="2" height="1" /></element>
-		<element name="0.5" ref="ledg"><bounds x="111" y="57.5" width="2" height="1" /></element>
-		<element name="0.6" ref="ledg"><bounds x="111" y="67.5" width="2" height="1" /></element>
-		<element name="0.7" ref="ledg"><bounds x="111" y="77.5" width="2" height="1" /></element>
+		<element name="0.0" ref="ledg"><bounds x="110.5" y="7.5" width="2" height="1" /></element>
+		<element name="0.1" ref="ledg"><bounds x="110.5" y="17.5" width="2" height="1" /></element>
+		<element name="0.2" ref="ledg"><bounds x="110.5" y="27.5" width="2" height="1" /></element>
+		<element name="0.3" ref="ledg"><bounds x="110.5" y="37.5" width="2" height="1" /></element>
+		<element name="0.4" ref="ledg"><bounds x="110.5" y="47.5" width="2" height="1" /></element>
+		<element name="0.5" ref="ledg"><bounds x="110.5" y="57.5" width="2" height="1" /></element>
+		<element name="0.6" ref="ledg"><bounds x="110.5" y="67.5" width="2" height="1" /></element>
+		<element name="0.7" ref="ledg"><bounds x="110.5" y="77.5" width="2" height="1" /></element>
 	</group>
 
 
 <!-- programmable openings keypad overlay sheet -->
 
 	<group name="overlay">
-		<bounds left="-19" right="116" top="-0.5" bottom="88.5" />
+		<bounds left="-19" right="115.5" top="-0.5" bottom="88.5" />
 
 		<group ref="default"><bounds left="-19" right="116" top="-0.5" bottom="88.5" /></group>
 
@@ -612,13 +612,13 @@ authors:hap
 <!-- build screen -->
 
 	<view name="Internal Layout (Default)">
-		<bounds left="-19" right="116" top="-0.5" bottom="88.5" />
-		<group ref="default"><bounds left="-19" right="116" top="-0.5" bottom="88.5" /></group>
+		<bounds left="-19" right="115.5" top="-0.5" bottom="88.5" />
+		<group ref="default"><bounds left="-19" right="115.5" top="-0.5" bottom="88.5" /></group>
 	</view>
 
 	<view name="Internal Layout (P.O. Overlay)">
-		<bounds left="-19" right="116" top="-0.5" bottom="88.5" />
-		<group ref="overlay"><bounds left="-19" right="116" top="-0.5" bottom="88.5" /></group>
+		<bounds left="-19" right="115.5" top="-0.5" bottom="88.5" />
+		<group ref="overlay"><bounds left="-19" right="115.5" top="-0.5" bottom="88.5" /></group>
 	</view>
 
 </mamelayout>
