@@ -433,20 +433,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="blzpdls">
-		<description>Blazing Paddles (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2014-08-20"/>
-		<info name="usage" value="Works with Apple II Mouse Card in slot 4: -sl4 mouse" />
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="blazing paddles (4am crack).dsk" size="143360" crc="db4aa57d" sha1="152cc04080e100822bf919879232d175c64e9610" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="btime">
 		<description>BurgerTime (cleanly cracked)</description>
 		<year>1982</year>
@@ -1370,19 +1356,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="alphseq">
-		<description>Alphabetization Sequence (cleanly cracked)</description>
-		<year>1980</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="alphabetization sequence (4am crack).dsk" size="143360" crc="fa88a171" sha1="fbb98ef8dd1cea5fa94b238ee4e7e5b5ca59f774" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alphblue">
 		<description>Alphabetizing - Blue Level (cleanly cracked)</description>
 		<year>1983</year>
@@ -2162,19 +2135,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="chsntcom">
-		<description>Challenge Sentence Combining (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing Company</publisher>
-		<info name="release" value="2017-04-22"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="challenge sentence combining (4am crack).dsk" size="143360" crc="ac771b9f" sha1="6b03e7dc7889064d68f2a172952c9b4edcd3e845" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chmpbase">
 		<description>Championship Baseball (cleanly cracked)</description>
 		<year>1986</year>
@@ -2257,102 +2217,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="143360">
 				<rom name="cloze thinking (4am crack) disk 4.dsk" size="143360" crc="188ccbaf" sha1="de956f529bdafe4716b181a97acecad7adfce3cc" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clozeplslvlc">
-		<description>Cloze-Plus Level C (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level c (4am crack) disk 1.dsk" size="143360" crc="bbc05b82" sha1="2528765e405d880575f80d75f29a313c638a32e9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level c (4am crack) disk 2.dsk" size="143360" crc="3212d424" sha1="1be9c3078ea25bb2b2b6f6685eed7dcf9203bf36" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level c (4am crack) disk 3.dsk" size="143360" crc="e0a96a5a" sha1="b8a903e5242dbfe052e024d19fc48779712831f4" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level c (4am crack) disk 4.dsk" size="143360" crc="0965e196" sha1="8acd0ed0f6e0673e1454e7f42dbb78cf8230adb6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clozeplslvld">
-		<description>Cloze-Plus Level D (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level d (4am crack) disk 1.dsk" size="143360" crc="98c4164e" sha1="1006f03d8bbb53c9e33fdcece77528468fd7dca3" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level d (4am crack) disk 2.dsk" size="143360" crc="b2794b32" sha1="65218239901d4029fa2ca33a46614ebb5234f607" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level d (4am crack) disk 3.dsk" size="143360" crc="3abfc44a" sha1="439c0e8917388d9a7cc3e3cd02abe7e48423080e" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level d (4am crack) disk 4.dsk" size="143360" crc="8416bb90" sha1="b3335e463071bc8e1194bdacc866b7d6e1c19868" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="clozeplslvle">
-		<description>Cloze-Plus Level E (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level e (4am crack) disk 1.dsk" size="143360" crc="74f58bdf" sha1="86e4c2d6a6213388bbda3e0843efb3464a4671bb" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level e (4am crack) disk 2.dsk" size="143360" crc="38bce5b3" sha1="437f7c8df4af1087f39351d3b891f4b2e041ff84" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level e (4am crack) disk 3.dsk" size="143360" crc="fb04ebf6" sha1="4f4a2dddd90703be5fc016a2d211c6b95ee0c009" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="143360">
-				<rom name="cloze-plus level e (4am crack) disk 4.dsk" size="143360" crc="dc2744b5" sha1="ed7629b3edc287553e453c63fc9941a61bdd4941" />
 			</dataarea>
 		</part>
 	</software>
@@ -4311,19 +4175,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="4wordlft">
-		<description>FourWord and WordLift (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="fourword and wordlift (4am crack).dsk" size="143360" crc="1cf9f2be" sha1="c261d104cadd5bf9420110eb96a3d869b08a7769" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fracactn">
 		<description>Fraction Action (cleanly cracked)</description>
 		<year>1984</year>
@@ -5245,32 +5096,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mhmnyms1">
-		<description>Homonyms I (Milliken) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="homonyms i (4am crack).dsk" size="143360" crc="8a55c096" sha1="68f4be124db8cf02d5c020e8c3861997b8dde236" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mhmnyms2">
-		<description>Homonyms II and Confusing Pairs (Milliken) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="homonyms ii and confusing pairs (4am crack).dsk" size="143360" crc="b8f652db" sha1="48b1ad2a26910bc0ee0873892e39199b214f6cc5" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="icdemons">
 		<description>Ice Demons (cleanly cracked)</description>
 		<year>1982</year>
@@ -5443,19 +5268,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="investigating plant growth (4am crack).dsk" size="143360" crc="369cea9c" sha1="a410a357add6dbfdd14fee6a9da68fe2b66d3065" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="islbeta">
-		<description>Islands of Beta (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2019-01-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="islands of beta (4am crack).dsk" size="143360" crc="42f5e0dc" sha1="20e4d10b4b51aef9d2d2a8d6a4e6284cb5dd71b1" />
 			</dataarea>
 		</part>
 	</software>
@@ -5784,19 +5596,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="lane mastodon (4am crack) side b.dsk" size="143360" crc="0f354ea3" sha1="7a754137596b741a89f0a198f7c78264436c7c87" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lodgamma">
-		<description>Lantern of D'Gamma (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2019-01-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="lantern of d'gamma (4am crack).dsk" size="143360" crc="21812e21" sha1="9f923f1934ca6c0433cf973a006ac34d10ce9da0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6197,266 +5996,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="math item banks 1-13 (4am crack).dsk" size="143360" crc="3546870e" sha1="37c1426e47854db07de2976831d59d90dded54e4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqad">
-		<description>Math Sequences - Addition (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - addition (4am crack).dsk" size="143360" crc="61c134a2" sha1="54051b3f143b85f9fe4de1dee3319bedacdb987c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqad84">
-		<description>Math Sequences - Addition (1984 Version) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - addition 1984 (4am crack).dsk" size="143360" crc="f04d7515" sha1="2e7e198879b3e26f82a7c9f0bf12df689d3afa38" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqdc">
-		<description>Math Sequences - Decimals (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - decimals (4am crack).dsk" size="143360" crc="779a55bc" sha1="6ff1314b2b18ba568988c69dc333c21ffd718402" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqdv">
-		<description>Math Sequences - Division (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - division (4am crack).dsk" size="143360" crc="22e2f5c9" sha1="0004f9ab857ba431c93105c94cf49bfa0ed873a9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqeq">
-		<description>Math Sequences - Equations (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - equations (4am crack).dsk" size="143360" crc="2bd62c97" sha1="d17fb69e5720a31bd90f7d513e063c7f2f433bbe" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqfr">
-		<description>Math Sequences - Fractions (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - fractions (4am crack).dsk" size="143360" crc="9c78035a" sha1="5624140e2781658e83011d1a7f6d4eccf9183c42" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqin">
-		<description>Math Sequences - Integers (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - integers (4am crack).dsk" size="143360" crc="6e34b980" sha1="194651f4499515e7c96cc40565f500a73d885d07" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqla">
-		<description>Math Sequences - Laws of Arithmetic (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - laws of arithmetic (4am crack).dsk" size="143360" crc="d4dab30a" sha1="eed4913249993059fcc1f7048e6abbf736f52392" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthsequt">
-		<description>Math Sequences - Management Utilities (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-06-30"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - management utilities (4am crack).dsk" size="143360" crc="631bccd3" sha1="370929174aadb4ff55a31c6a201bac1ff51d35a0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqmf">
-		<description>Math Sequences - Measurement Formulas (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - measurement formulas (4am crack).dsk" size="143360" crc="9b64b157" sha1="eb98ca975c1fd5e064791aa1b7c9f3a16ea336f3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqml">
-		<description>Math Sequences - Multiplication (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - multiplication (4am crack).dsk" size="143360" crc="0ec1575e" sha1="edd7e983883bbb851e0b91a6ec4c8f467176c23c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqml80">
-		<description>Math Sequences - Multiplication (1980 Version) (cleanly cracked)</description>
-		<year>1980</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-10-15"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - multiplication 1980 (4am crack).dsk" size="143360" crc="7ec155e9" sha1="ee0b47cd098f2e0061ec4f8e4e1236cc4eb7d69f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqnr">
-		<description>Math Sequences - Number Readiness (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - number readiness (4am crack).dsk" size="143360" crc="3b24099c" sha1="43455de33fd3faa10bd34cf28cc7b05ad3069f1a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqnr80">
-		<description>Math Sequences - Number Readiness (1980 Version) (cleanly cracked)</description>
-		<year>1980</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-10-15"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - number readiness 1980 (4am crack).dsk" size="143360" crc="464f1c9a" sha1="8a81077d3c2a809fdaaeb54f073fad87b9e1a158" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqpr">
-		<description>Math Sequences - Percents (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - percents (4am crack).dsk" size="143360" crc="f6864e40" sha1="ac25cf5c44fb45b115d03b9551cd7720ef7d8482" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqt1">
-		<description>Math Sequences - Pre- and Post Tests I (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - pre- and post tests i (4am crack).dsk" size="143360" crc="e9437f1a" sha1="4637b43316dfa45b7156a5a832e6ff0a8a367458" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqt2">
-		<description>Math Sequences - Pre- and Post-Tests II (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - pre- and post-tests ii (4am crack).dsk" size="143360" crc="c27aa0be" sha1="003ceaa025c41a1ad9e05c6b065848a7bb8f2b31" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqsb">
-		<description>Math Sequences - Subtraction (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - subtraction (4am crack).dsk" size="143360" crc="6479dd22" sha1="41cb61063079327540b7466243ad99591f4f1a58" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqw1">
-		<description>Math Sequences - Worksheet Generator (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - worksheet generator (4am crack).dsk" size="143360" crc="7e4673c1" sha1="e03f74de49e7730889b66be9ee714820c38b02b8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mthseqw2">
-		<description>Math Sequences - Worksheet Generator II (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math sequences - worksheet generator ii (4am crack).dsk" size="143360" crc="3612ce07" sha1="29e4414936b10e35c7a2d2dd56c2c48e0cc7f594" />
 			</dataarea>
 		</part>
 	</software>
@@ -7271,19 +6810,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="micro habitats (4am crack).dsk" size="143360" crc="2964da2c" sha1="e3173b735cb5c695cab142c01bacc7851ed7ecf5" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="miclbasb">
-		<description>Micro League Baseball (cleanly cracked)</description>
-		<year>1980</year>
-		<publisher>Stoneware</publisher>
-		<info name="release" value="2017-11-26"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="micro league baseball (4am crack).dsk" size="143360" crc="ee6237b4" sha1="e77be478ca53962269d875b9742dda50475272e9" />
 			</dataarea>
 		</part>
 	</software>
@@ -8305,19 +7831,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="poprspl">
-		<description>Pop 'R Spell (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-23"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pop 'r spell (4am crack).dsk" size="143360" crc="e80dcff9" sha1="313d9292b25c753cce1ad161b591fe2d58fde908" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="portal">
 		<description>Portal (cleanly cracked)</description>
 		<year>1986</year>
@@ -8433,32 +7946,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="project space station (imperfect 4am crack) side b.dsk" size="143360" crc="76d95fcc" sha1="45b7a4b3a8e44975f66e8bdc89e566d9ec6976bc" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mkpnoun1">
-		<description>Pronouns I (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pronouns i (4am crack).dsk" size="143360" crc="3cc45067" sha1="955fb2b826aeaef997788326906167fa8c57b6d2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mkpnoun2">
-		<description>Pronouns II (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pronouns ii (4am crack).dsk" size="143360" crc="97c171bc" sha1="588e5e0bff9c0268e39875d119daa71186284182" />
 			</dataarea>
 		</part>
 	</software>
@@ -9725,19 +9212,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="vidvegas">
-		<description>Video Vegas (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2014-08-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="video vegas (4am crack).dsk" size="143360" crc="c974bad2" sha1="c2c48f3f9f90d72be489021f5805c1d72c0f834c" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ribbit">
 		<description>Ribbit (cleanly cracked)</description>
 		<year>1982</year>
@@ -10068,19 +9542,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tangrams">
-		<description>Tangrams Puzzler (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2014-09-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="tangrams puzzler (4am crack).dsk" size="143360" crc="1e6b80a7" sha1="39c3d1cf3013c610aed92a128eeaee1016fe62bf" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tplogo12">
 		<description>Terrapin Logo (version 1.2) (cleanly cracked)</description>
 		<year>????</year>
@@ -10274,86 +9735,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="victory road (4am crack) side b.dsk" size="143360" crc="e218419a" sha1="d408cb9f268f09e04eb512b8fa50315f5f0788b4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrtwkshp">
-		<description>The Writing Workshop (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2015-04-24"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 - The Writing Workshop - The Milliken Word Processor program disk"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - the milliken word processor (4am crack).dsk" size="143360" crc="9a29b623" sha1="6e5c4d417758e916b5b9507bd6b28116bdf67914" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 - Brainstorming"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - brainstorming (4am crack).dsk" size="143360" crc="2102b96c" sha1="047d47956e08635fc032c9da1a66ebc72ea2d7af" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3 - Branching"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - branching (4am crack).dsk" size="143360" crc="f3233777" sha1="e4e57bf7e12e1c835191cad9d62ef6d07ebe5d37" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4 - File cabinet diskette 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - file cabinet diskette 1 (4am crack).dsk" size="143360" crc="4da0bcec" sha1="df9cccce413bd3fe08820b3a9ef09d0b412fdd16" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5 - File cabinet diskette 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - file cabinet diskette 2 (4am crack).dsk" size="143360" crc="3700754a" sha1="4b21258c377a7feb76292d0031a3346e3aeb3f4a" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6 - Help files"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - help files (4am crack).dsk" size="143360" crc="f3ca5af0" sha1="e33c63021ce2cec4d3544e00aa5cb5c6c196ac3a" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 7 - Mechanics checker I"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - mechanics checker i (4am crack).dsk" size="143360" crc="6eac1784" sha1="c77824c4f988ff58e9b0586175387ee98c1284f8" />
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 8 - Mechanics checker II"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - mechanics checker ii (4am crack).dsk" size="143360" crc="a1d5508b" sha1="840002439b25de8bdb4d441dc920b0a3e6a47215" />
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 9 - Nutshelling"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - nutshelling (4am crack).dsk" size="143360" crc="df26fd60" sha1="5700056a4ca3af02c88b3845b0e2adfa11b7fe51" />
-			</dataarea>
-		</part>
-		<part name="flop10" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 10 - Proofreader"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - proofreader (4am crack).dsk" size="143360" crc="e31ab3bc" sha1="e78c31f854aceb0561f38c6c4898c142694a4f9c" />
-			</dataarea>
-		</part>
-		<part name="flop11" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 11 - Spelling checker I"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - spelling checker i (4am crack).dsk" size="143360" crc="6fcf4320" sha1="4438c7228ef45a55dd26a453f9510472b4cd6c92" />
-			</dataarea>
-		</part>
-		<part name="flop12" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 12 - Spelling checker II word list"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the writing workshop - spelling checker ii word list (4am crack).dsk" size="143360" crc="f5d8349c" sha1="6f637da5b1710a7c07ce7d586ff5f309b142d1f9" />
 			</dataarea>
 		</part>
 	</software>
@@ -10612,19 +9993,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the boars' store (4am crack) side b.dsk" size="143360" crc="f52a5ebf" sha1="217c1934802bfd78e962960d80aaae4ef62f6531" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jrgchaos">
-		<description>The Jar Game and Chaos (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2015-08-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the jar game and chaos (4am crack).dsk" size="143360" crc="5eb0eebc" sha1="4add93afb555bb62c363e36667a2c714b0a200d0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12456,19 +11824,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="milwrdpr">
-		<description>The Milliken Word Processor (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-04-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the milliken word processor (4am crack).dsk" size="143360" crc="ae22419c" sha1="8860baa9ec434d3db5f070518e621e60f05e6e2a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="spvbce87">
 		<description>Spanish Verb Concepts and Exercises (1987 Version) (cleanly cracked)</description>
 		<year>1987</year>
@@ -12707,156 +12062,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="grtnmbch">
-		<description>The Great Number Chase (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-09"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the great number chase (4am crack).dsk" size="143360" crc="fee3b698" sha1="595701b7a0907388e5d4ed313b22c451c554e8df" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathbp">
-		<description>WordMath: Basic Problems (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - basic problems (4am crack).dsk" size="143360" crc="e154f2f4" sha1="ac97d01ba03a1e4e7eb559e07cb85478b451c95c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathfr">
-		<description>WordMath: Forward Order, Reverse Order (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - forward order, reverse order (4am crack).dsk" size="143360" crc="3afd9e0f" sha1="cdd6ffe186d4b27a27538f50c7a4022998eafe67" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathen">
-		<description>WordMath: Extra Numbers (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - extra numbers (4am crack).dsk" size="143360" crc="feb0151a" sha1="e0b05bc4af79411178bd9dbd4a2d712f99199c52" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathhn">
-		<description>WordMath: Hidden Numbers (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - hidden numbers (4am crack).dsk" size="143360" crc="e6810b3c" sha1="5e1202fb522930ed23f345bb46d475c0199a911c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathkw">
-		<description>WordMath: Key Words (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - key words (4am crack).dsk" size="143360" crc="ce3292bd" sha1="862f48adb9e668857dd22a0ed250ee744e807b4d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathdic">
-		<description>WordMath: Dictionary (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - dictionary (4am crack).dsk" size="143360" crc="684c6ea9" sha1="fe6f30e2359ddc63214a1576eafe41b2327a302c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathmp">
-		<description>WordMath: Mixed Practice (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - mixed practice (4am crack).dsk" size="143360" crc="eeaa349b" sha1="66ecdb703a53d8e4fdd3d9b60861243556a4b282" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathamp">
-		<description>WordMath: Advanced Mixed Practice (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-29"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - advanced mixed practice (4am crack).dsk" size="143360" crc="24b4561f" sha1="9b210e3b0224d751b0f2f504718d2e8bca5a1ce4" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wmathas">
-		<description>WordMath: Addition and Subtraction (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-05-30"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - addition and subtraction (4am crack) disk 1.dsk" size="143360" crc="f3a10039" sha1="e8cd0cbbda84cd17df5bb40f5c06dfdf10f8b413" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="wordmath - addition and subtraction (4am crack) disk 2.dsk" size="143360" crc="beee6a7d" sha1="ab76d08f9ddf4b7f47943cbfe8402e40e40463c0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="grtstrce">
-		<description>The Great States Race (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-06-01"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the great states race (4am crack).dsk" size="143360" crc="115bbef9" sha1="0346205f3deca1708d603e1a37f86237c805535a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="slrrdmrc">
 		<description>Solar Reading: Mercury (cleanly cracked)</description>
 		<year>1984</year>
@@ -12977,38 +12182,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="solar reading flight 1 - blast off (4am crack).dsk" size="143360" crc="ab72129b" sha1="7d1f8ce0191cfcd23101e5308313b2dc60fb1f4a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spellsys">
-		<description>The Spelling System (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-06-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the spelling system (4am crack) disk 1.dsk" size="143360" crc="48af390c" sha1="9c998daf41fa1521c215533f1a84f0eccef5b2f4" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the spelling system (4am crack) disk 2.dsk" size="143360" crc="ebe3032d" sha1="a1c95dd428ded01f7250d6a553300f94dfe5f664" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the spelling system (4am crack) disk 3.dsk" size="143360" crc="64c6faa7" sha1="68a5af2542566893d1a445aa72a21377f5e92f79" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the spelling system (4am crack) disk 4.dsk" size="143360" crc="09b21175" sha1="872911f7027e6b163681def235ecfceaf8e71377" />
 			</dataarea>
 		</part>
 	</software>
@@ -13207,32 +12380,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="soko-ban (imperfect 4am crack) side b.dsk" size="143360" crc="acb083a6" sha1="75c60df2bedafb294448f5b1fe085b8a509bbf52" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mpverbs1">
-		<description>Verbs I (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="verbs i (4am crack).dsk" size="143360" crc="17567a89" sha1="e94671bb5deb483a7a96fa6a8de1bce217191446" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mpverbs2">
-		<description>Verbs II (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2017-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="verbs ii (4am crack).dsk" size="143360" crc="1a62490b" sha1="f3c22dcf7e319f2b5a5f1966a4862fdce1058d38" />
 			</dataarea>
 		</part>
 	</software>
@@ -14647,19 +13794,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="advalpha">
-		<description>Adventure Alpha (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2019-01-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="adventure alpha (4am crack).dsk" size="143360" crc="d4b3830a" sha1="99523eb5184a87f825912bd56b4cd52a36a0e964" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="trkcoyr2">
 		<description>Trickster Coyote (Revision 2) (cleanly cracked)</description>
 		<year>1984</year>
@@ -15504,19 +14638,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="leadshtr">
-		<description>Leadsheeter (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Passport Designs, Inc</publisher>
-		<info name="release" value="2019-11-16"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="leadsheeter (4am and san inc crack).dsk" size="143360" crc="1f890162" sha1="d91cc98035f67461d92490f9a1d7912d00823bfc" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="emp3arma">
 		<description>Empire III: Armageddon (version 1.1) (cleanly cracked)</description>
 		<year>1984</year>
@@ -15526,58 +14647,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="empire iii- armageddon (4am crack).dsk" size="143360" crc="6c34d005" sha1="a4339f7b2323d3a13afa0657e8e6a6ded66280ef"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pwritr12">
-		<description>PolyWriter (version 1.2) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Passport Designs, Inc</publisher>
-		<info name="release" value="2019-11-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="polywriter v1.2 (4am and san inc crack).dsk" size="143360" crc="10770914" sha1="c8ee9a53070adf453876392cbc8814c8bb087b8d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pwritu12">
-		<description>PolyWriter Utilities (version 1.2) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Passport Designs, Inc</publisher>
-		<info name="release" value="2019-11-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="polywriter utilities v1.2 (4am and san inc crack).dsk" size="143360" crc="708766bd" sha1="8cf89cc33b6e70c45328edc08d1f17929350d941"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="midi8p12">
-		<description>MIDI/8 Plus for MPU-401 (version 1.2) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Passport Designs, Inc</publisher>
-		<info name="release" value="2019-11-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="midi-8 plus (4am and san inc crack).dsk" size="143360" crc="39bf6550" sha1="7babdcdc5a3f778d0d3715565d466112dfa007c3"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="korg800m">
-		<description>Korg 800 4-Track MIDI Sequencer (version 1.0) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Passport Designs, Inc</publisher>
-		<info name="release" value="2019-11-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="korg-800 4 track midi sequencer (4am and san inc crack).dsk" size="143360" crc="64b0622c" sha1="0a51b1ee8f9dec7e0f5120f9f21abf1d1d53257c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15707,19 +14776,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="life science (4am crack).dsk" size="143360" crc="98d4717e" sha1="5f649d6d7f5cbbf2cdccfeeb1f05314df062fe4d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="midi4r5">
-		<description>MIDI/4 (Revision 5) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Passport Designs, Inc</publisher>
-		<info name="release" value="2020-01-06"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="midi-4 (4am and san inc crack).dsk" size="143360" crc="14b0ad62" sha1="9e9eb73bd28412c2176c8b6d6b7fbe14b3a2f65e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16020,84 +15076,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hom1r2">
-		<description>Homonyms I (Revision 2) (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2020-05-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="homonyms i rev. 2 (4am crack).dsk" size="143360" crc="9681d4b6" sha1="1deb93a2be7d78d848c4def9bb319b0ab2bffbda"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hom2r2">
-		<description>Homonyms II (Revision 2) (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2020-05-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="homonyms ii rev. 2 (4am crack).dsk" size="143360" crc="cd7c8e9e" sha1="3bfa0f7a7156845eb1b7392c7fa09756ae50ad4f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pron1r2">
-		<description>Pronouns I (Revision 2) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2020-05-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pronouns i rev. 2 (4am crack).dsk" size="143360" crc="85d199a0" sha1="b4dd139c4f17825a13f5dd762b7bf1a242e59481"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pron2r2">
-		<description>Pronouns II (Revision 2) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2020-05-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pronouns ii rev. 2 (4am crack).dsk" size="143360" crc="e73e4fcb" sha1="b675fac3a52944031b1fa51e884b9e52496ed35c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="verb1r2">
-		<description>Verbs I (Revision 2) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2020-05-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="verbs i rev. 2 (4am crack).dsk" size="143360" crc="b0c2705f" sha1="a6b36da980cb96e8421bb1492d0d115bf528e38a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mpvrb2r2">
-		<description>Verbs II (Revision 2) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2020-05-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="verbs ii rev. 2 (4am crack).dsk" size="143360" crc="6a23f644" sha1="ea1bfa8af5aefea3f67265a068aa090fdb146cb8"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mcemny10">
 		<description>MECC-A816 Electronic Money (version 1.0) (cleanly cracked)</description>
 		<year>1983</year>
@@ -16140,19 +15118,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Student disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="dinosaur construction kit- tyrannosaurus rex (4am crack) disk 2 - student disk.dsk" size="143360" crc="a08310fc" sha1="08afd032f761fdabc21c37a88e67072847587c42"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mpsntcmb">
-		<description>Sentence Combining (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2020-05-27"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="sentence combining i (4am crack).dsk" size="143360" crc="cc058220" sha1="fde07885d295948016480de75409593bf64e417d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20491,20 +19456,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="popnsplr2">
-		<description>Pop 'R Spell (Rev 2) (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Milliken Publishing</publisher>
-		<info name="release" value="2021-09-09"/>
-		<!-- "Pop 'R Spell and Pop 'R Spell Challenge" is a 1983 educational game developed and distributed by Milliken Publishing. This is an undated revision that fixes an off-by-1 error. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pop 'r spell and pop 'r spell challenge rev. 2 (4am crack).dsk" size="143360" crc="bfd30521" sha1="842e89724fa646efb0eae1dd2ab67125800ebc7f"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="serendip">
 		<description>Serendipity (cleanly cracked)</description>
 		<year>1983</year>
@@ -21303,76 +20254,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pixitv01331">
-		<description>Pixit (version 01331) (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-07-03"/>
-		<!-- "Pixit" is a 1983 graphics program developed by Michael Darooge, Edward McCullough, and Kimberly Evans, and distributed by Baudville. This is version 01331. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="pixit v01331 (4am crack).dsk" size="143360" crc="92c24ed0" sha1="f75659cb387ecd096b7de38f17e88358b4de72d2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blzpdls0">
-		<description>Blazing Paddles (Revision 0) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-07-03"/>
-		<!-- "Blazing Paddles" is a 1984 graphics program developed by Michael Darooge, Edward McCullough, and David Walker, and distributed by Baudville. Unlike all other known versions, this version has no visible version number, suggesting the earliest release. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="blazing paddles rev. 0 (4am crack).dsk" size="143360" crc="180c3a29" sha1="94c9e3c97fff3d19dacfe1b82ad954a757cf1e1a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rainydg">
-		<description>Rainy Day Games (version 13501) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-06-29"/>
-		<!-- "Rainy Day Games" is a 1985 set of card games developed and distributed by Baudville. This is version 13501. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="rainy day games (4am crack).dsk" size="143360" crc="50b78018" sha1="2d03e73d475f3ab54ec98b2e22dc7b04fa7a52d5"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="skicrazd">
-		<description>Ski Crazed (version 28701) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-06-29"/>
-		<!-- "Ski Crazed" is a 1987 sports game developed by Jason Rubin and Andy Gavin, and distributed by Baudville. This is version 28701. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="ski crazed v28701 (4am crack).dsk" size="143360" crc="abec2de2" sha1="8cf6c8abcb4203b6629580f5d6ff3ad4bf62a2fc"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vidveg">
-		<description>Video Vegas (version 12511) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-06-29"/>
-		<!-- "Video Vegas" is a 1985 sports game developed and distributed by Baudville. This is version 12511. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="video vegas v12511 (4am crack).dsk" size="143360" crc="d820d4e7" sha1="73f75859cd31983166f3a4afffb7aed1795fd7f1"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="trkcoy84">
 		<description>Trickster Coyote (version 1984) (cleanly cracked)</description>
 		<year>1984</year>
@@ -21383,41 +20264,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="trickster coyote 1984 (4am crack).dsk" size="143360" crc="4f1ccb00" sha1="6324dde10b57442caa8b4c0bf2572ddd9a52360b"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blzpad04421">
-		<description>Blazing Paddles (version 04421) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-06-30"/>
-		<!-- "Blazing Paddles" is a 1984 graphics program developed by Michael Darooge, Edward McCullough, and David Walker, and distributed by Baudville. This is version 04421. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="blazing paddles v04421 (4am crack).dsk" size="143360" crc="799282c4" sha1="5a0603178bf47f4f67c28206b910ea3af413b2d5"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="prin15531">
-		<description>Prince (version 15531) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-07-03"/>
-		<!-- "Prince" is a 1985 graphics program developed by Joel Novak, Ken Steiner, Michael Darooge, Bob Svihovec, and Bryan Koeff, and distributed by Baudville. This is version 15531. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="prince v15531 (4am crack) side a.dsk" size="143360" crc="076b4c37" sha1="17642c6dde2665450c39a3b629faa5e1e097c2ea"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="prince v15531 (4am crack) side b.dsk" size="143360" crc="ef036e55" sha1="9d51c9cf230414c3d004dd72c79aa25d68139da3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21433,27 +20279,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="german- vocabulary for shopping use (4am crack).dsk" size="143360" crc="dab6f45e" sha1="dd4cd31e137a315f3674a0f675117d3ba28a8ba2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="prin15521">
-		<description>Prince (version 15521) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Baudville</publisher>
-		<info name="release" value="2022-06-30"/>
-		<!-- "Prince" is a 1985 graphics program developed by Joel Novak, Ken Steiner, Michael Darooge, Bob Svihovec, and Bryan Koeff, and distributed by Baudville. This is version 15521, displayed during boot. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="prince v15521 (4am crack) side a.dsk" size="143360" crc="e6553b4f" sha1="e299c1b148446d9519dcabe766bc19ff5ef92635"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="prince v15521 (4am crack) side b.dsk" size="143360" crc="ef036e55" sha1="9d51c9cf230414c3d004dd72c79aa25d68139da3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22403,6 +21228,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="advalpha">
+		<description>Adventure Alpha (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-01-19 -->
+		<!-- educational adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adventure alpha (4am crack).dsk" size="143360" crc="d4b3830a" sha1="99523eb5184a87f825912bd56b4cd52a36a0e964" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advconst">
 		<description>Adventure Construction Set (4am and san inc crack)</description>
 		<year>1985</year>
@@ -22770,7 +21611,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="algactn">
-		<description>Algebra Action (4am crack)</description>
+		<description>Algebra Action: Courseware for Algebra I (4am crack)</description>
 		<year>1986</year>
 		<publisher>Houghton Mifflin</publisher>
 		<info name="developer" value="Prentice Associates" />
@@ -23247,9 +22088,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="alcfacflr1" cloneof="alcfacfl">
-		<description>Aliencounter and Face Flash (revision 1) (4am crack)</description>
+		<description>Aliencounter &amp; Face Flash (revision 1) (4am crack)</description>
 		<year>1982</year>
-		<publisher>Milliken Publishing</publisher>
+		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 1" />
@@ -23264,7 +22105,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="alcfacfl">
-		<description>Aliencounter and Face Flash (revision 2) (4am crack)</description>
+		<description>Aliencounter &amp; Face Flash (revision 2) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
@@ -23435,6 +22276,21 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="alphabetical order (4am crack).dsk" size="143360" crc="5fcc2314" sha1="767c342b711c9befa6fe67906179578864513773" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphseq">
+		<description>Alphabetization Sequence (4am crack)</description>
+		<year>1980</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alphabetization sequence (4am crack).dsk" size="143360" crc="fa88a171" sha1="fbb98ef8dd1cea5fa94b238ee4e7e5b5ca59f774" />
 			</dataarea>
 		</part>
 	</software>
@@ -25491,7 +24347,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bbugconcr1" cloneof="bbugconc">
-		<description>Battling Bugs and Concentraction (revision 1) (4am crack)</description>
+		<description>Battling Bugs &amp; Concentraction (revision 1) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
@@ -25508,7 +24364,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bbugconc">
-		<description>Battling Bugs and Concentraction (revision 2) (4am crack)</description>
+		<description>Battling Bugs &amp; Concentraction (revision 2) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
@@ -25891,6 +24747,69 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="black belt rev. 2 (4am crack).dsk" size="143360" crc="a3bb954d" sha1="f8e798a3729ef40ca2e2b550082fd5f52b061764" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blzpdlsr0" cloneof="blzpdls">
+		<description>Blazing Paddles (revision 0) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 0" />
+		<!-- No version number is displayed during boot, which suggests it is the first version. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl4_default" value="mouse" />
+		<!-- Dump released: 2022-07-03 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="blazing paddles rev. 0 (4am crack).dsk" size="143360" crc="180c3a29" sha1="94c9e3c97fff3d19dacfe1b82ad954a757cf1e1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blzpdls04421" cloneof="blzpdls">
+		<description>Blazing Paddles (version 04421) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="04421" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="04421" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl4_default" value="mouse" />
+		<!-- Dump released: 2022-06-30 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="blazing paddles v04421 (4am crack).dsk" size="143360" crc="799282c4" sha1="5a0603178bf47f4f67c28206b910ea3af413b2d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blzpdls">
+		<description>Blazing Paddles (version 04431) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="04431" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="04431" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl4_default" value="mouse" />
+		<!-- Dump released: 2014-08-20 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="blazing paddles (4am crack).dsk" size="143360" crc="db4aa57d" sha1="152cc04080e100822bf919879232d175c64e9610" />
 			</dataarea>
 		</part>
 	</software>
@@ -27339,6 +26258,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="chsntcom">
+		<description>Challenge Sentence Combining (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="IOTA" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-22 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="challenge sentence combining (4am crack).dsk" size="143360" crc="ac771b9f" sha1="6b03e7dc7889064d68f2a172952c9b4edcd3e845" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chmpgolf">
 		<description>Championship Golf (4am crack)</description>
 		<year>1982</year>
@@ -27941,6 +26876,108 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="clozeplc">
+		<description>Cloze-Plus: Level C (4am crack)</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level c (4am crack) disk 1.dsk" size="143360" crc="bbc05b82" sha1="2528765e405d880575f80d75f29a313c638a32e9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level c (4am crack) disk 2.dsk" size="143360" crc="3212d424" sha1="1be9c3078ea25bb2b2b6f6685eed7dcf9203bf36" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level c (4am crack) disk 3.dsk" size="143360" crc="e0a96a5a" sha1="b8a903e5242dbfe052e024d19fc48779712831f4" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level c (4am crack) disk 4.dsk" size="143360" crc="0965e196" sha1="8acd0ed0f6e0673e1454e7f42dbb78cf8230adb6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clozepld">
+		<description>Cloze-Plus: Level D (4am crack)</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level d (4am crack) disk 1.dsk" size="143360" crc="98c4164e" sha1="1006f03d8bbb53c9e33fdcece77528468fd7dca3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level d (4am crack) disk 2.dsk" size="143360" crc="b2794b32" sha1="65218239901d4029fa2ca33a46614ebb5234f607" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level d (4am crack) disk 3.dsk" size="143360" crc="3abfc44a" sha1="439c0e8917388d9a7cc3e3cd02abe7e48423080e" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level d (4am crack) disk 4.dsk" size="143360" crc="8416bb90" sha1="b3335e463071bc8e1194bdacc866b7d6e1c19868" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clozeple">
+		<description>Cloze-Plus: Level E (4am crack)</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level e (4am crack) disk 1.dsk" size="143360" crc="74f58bdf" sha1="86e4c2d6a6213388bbda3e0843efb3464a4671bb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level e (4am crack) disk 2.dsk" size="143360" crc="38bce5b3" sha1="437f7c8df4af1087f39351d3b891f4b2e041ff84" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level e (4am crack) disk 3.dsk" size="143360" crc="fb04ebf6" sha1="4f4a2dddd90703be5fc016a2d211c6b95ee0c009" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="cloze-plus level e (4am crack) disk 4.dsk" size="143360" crc="dc2744b5" sha1="ed7629b3edc287553e453c63fc9941a61bdd4941" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="clzreadc">
 		<description>Clozed Reading Comprehension (4am crack)</description>
 		<year>1985</year>
@@ -28222,6 +27259,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="143360">
 				<rom name="compound words and contractions 1987-09-15 (4am crack) disk 3.dsk" size="143360" crc="198a2b5d" sha1="b4a50e14aa4378e836b897bac16a1873b33435bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comppple2">
+		<description>Comprehension Power Program: Level E-2 (4am crack)</description>
+		<year>1981</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="Milliken Publishing Company" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2025-10-12 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="comprehension power program - level e-2 (4am crack).dsk" size="143360" crc="81bc41ca" sha1="bc38f07ff5ce59552ec65ac6ff767c472f7ff550" />
 			</dataarea>
 		</part>
 	</software>
@@ -33459,6 +32512,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="4wordlft">
+		<description>FourWord &amp; WordLift (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="David E. Metzener" />
+		<info name="programmer" value="Martin Butherus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fourword and wordlift (4am crack).dsk" size="143360" crc="1cf9f2be" sha1="c261d104cadd5bf9420110eb96a3d869b08a7769" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fracfctry">
 		<description>Fraction Factory (4am crack)</description>
 		<year>1983</year>
@@ -33744,11 +32814,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="frnzflfl">
-		<description>Frenzy and Flip Flop (4am crack)</description>
+		<description>Frenzy &amp; Flip Flop (4am crack)</description>
 		<year>1981</year>
 		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-08-18 -->
 		<!-- educational program -->
@@ -34823,7 +33893,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="golfccbar">
-		<description>Golf Classic and Compubar (4am crack)</description>
+		<description>Golf Classic &amp; Compubar (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
@@ -35310,7 +34380,8 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Baudville</publisher>
 		<info name="developer" value="Baudville" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="partno" value="11601" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="11601" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-04-07 -->
@@ -35327,7 +34398,8 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Baudville</publisher>
 		<info name="developer" value="Baudville" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="partno" value="11611" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="11611" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2023-03-25 -->
@@ -35340,7 +34412,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gulparrg">
-		<description>Gulp!! and Arrow Graphics (4am crack)</description>
+		<description>Gulp!! &amp; Arrow Graphics (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
@@ -35356,7 +34428,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gulpfrnz">
-		<description>Gulp!! and Frenzy (4am crack)</description>
+		<description>Gulp!! &amp; Frenzy (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing Company</publisher>
 		<info name="programmer" value="William H. Kraus" />
@@ -36071,6 +35143,76 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="homonyms v01.19.89 (4am crack) disk 2.dsk" size="143360" crc="05423e27" sha1="56bbd84231363aacf8c109e0a8f068c99436b5a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhmnyms1r1" cloneof="mhmnyms1">
+		<description>Homonyms I (revision 1) (4am crack)</description>
+		<year>1981</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms i (4am crack).dsk" size="143360" crc="8a55c096" sha1="68f4be124db8cf02d5c020e8c3861997b8dde236" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhmnyms1">
+		<description>Homonyms I (revision 2) (4am crack)</description>
+		<year>1981</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Revised edition features bug fixes and updated copy protection. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms i rev. 2 (4am crack).dsk" size="143360" crc="9681d4b6" sha1="1deb93a2be7d78d848c4def9bb319b0ab2bffbda"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhmnyms2r1" cloneof="mhmnyms2">
+		<description>Homonyms II and Confusing Pairs (revision 1) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms ii and confusing pairs (4am crack).dsk" size="143360" crc="b8f652db" sha1="48b1ad2a26910bc0ee0873892e39199b214f6cc5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mhmnyms2">
+		<description>Homonyms II and Confusing Pairs (revision 2) (4am crack)</description>
+		<year>1981</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Revised edition features bug fixes and updated copy protection. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="homonyms ii rev. 2 (4am crack).dsk" size="143360" crc="cd7c8e9e" sha1="3bfa0f7a7156845eb1b7392c7fa09756ae50ad4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37897,6 +37039,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="korg8004m">
+		<description>Korg 800 4-Track MIDI Sequencer (version 1.0) (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2019-11-19 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="korg-800 4 track midi sequencer (4am and san inc crack).dsk" size="143360" crc="64b0622c" sha1="0a51b1ee8f9dec7e0f5120f9f21abf1d1d53257c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="krift">
 		<description>Koronis Rift (4am crack)</description>
 		<year>1985</year>
@@ -38099,6 +37259,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="lodgamma">
+		<description>Lantern of D'Gamma (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="Martin Butherus" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-01-25 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="lantern of d'gamma (4am crack).dsk" size="143360" crc="21812e21" sha1="9f923f1934ca6c0433cf973a006ac34d10ce9da0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lsrbounc">
 		<description>Laser Bounce (4am crack)</description>
 		<year>1982</year>
@@ -38277,6 +37453,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="learning with leeper (4am crack).dsk" size="143360" crc="92a7da91" sha1="3935075e64f16d1ec312e17bbeca0e5f22c4cda7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leadshtr">
+		<description>Leadsheeter (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="author" value="Phil Farrand" />
+		<info name="programmer" value="Dave Kusek" />
+		<info name="programmer" value="John Borowicz" />
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-11-16 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="leadsheeter (4am and san inc crack).dsk" size="143360" crc="1f890162" sha1="d91cc98035f67461d92490f9a1d7912d00823bfc" />
 			</dataarea>
 		</part>
 	</software>
@@ -40436,7 +39631,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
 	<software name="mathbltpl16" cloneof="mathbltpl">
 		<description>Math Blaster Plus! (version 1.6) (4am crack)</description>
 		<year>1987</year>
@@ -40671,14 +39865,14 @@ license:CC0-1.0
 		<description>Math Marvels (4am crack)</description>
 		<year>1984</year>
 		<publisher>Houghton Mifflin</publisher>
-		<info name="programmer" value="Doug Supeq" />
+		<info name="programmer" value="Doug Super" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2015-10-16 -->
+		<!-- Dump released: 2015-10-16. Redumped: 2025-12-18 to fix data corruption found on original. -->
 		<!-- educational game -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="math marvels (4am crack).dsk" size="143360" crc="9bb48616" sha1="8f68bef75ed73a41148c075a7fdcb215b9cd4f01" />
+				<rom name="math marvels (4am crack).dsk" size="143360" crc="19b4d089" sha1="7fe40710c8ac435f674742d75549c4b0d6b21e1b" />
 			</dataarea>
 		</part>
 	</software>
@@ -40687,7 +39881,7 @@ license:CC0-1.0
 		<description>Math Masters (4am crack)</description>
 		<year>1984</year>
 		<publisher>Houghton Mifflin</publisher>
-		<info name="programmer" value="Doug Supeq" />
+		<info name="programmer" value="Doug Super" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-01-12 -->
@@ -40733,6 +39927,332 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="math rabbit 1.1 (4am crack).dsk" size="143360" crc="53cd9a2f" sha1="98bac9b9218515116c97182b11337183db93a031" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msadd84" cloneof="msadd">
+		<description>Math Sequences: Addition (version 1984) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1984" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - addition 1984 (4am crack).dsk" size="143360" crc="f04d7515" sha1="2e7e198879b3e26f82a7c9f0bf12df689d3afa38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msadd">
+		<description>Math Sequences: Addition (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - addition (4am crack).dsk" size="143360" crc="61c134a2" sha1="54051b3f143b85f9fe4de1dee3319bedacdb987c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdec">
+		<description>Math Sequences: Decimals (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - decimals (4am crack).dsk" size="143360" crc="779a55bc" sha1="6ff1314b2b18ba568988c69dc333c21ffd718402" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdiv">
+		<description>Math Sequences: Division (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - division (4am crack).dsk" size="143360" crc="22e2f5c9" sha1="0004f9ab857ba431c93105c94cf49bfa0ed873a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msequat">
+		<description>Math Sequences: Equations (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - equations (4am crack).dsk" size="143360" crc="2bd62c97" sha1="d17fb69e5720a31bd90f7d513e063c7f2f433bbe" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msfract">
+		<description>Math Sequences: Fractions (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - fractions (4am crack).dsk" size="143360" crc="9c78035a" sha1="5624140e2781658e83011d1a7f6d4eccf9183c42" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msint">
+		<description>Math Sequences: Integers (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - integers (4am crack).dsk" size="143360" crc="6e34b980" sha1="194651f4499515e7c96cc40565f500a73d885d07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslawarit">
+		<description>Math Sequences: Laws of Arithmetic (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - laws of arithmetic (4am crack).dsk" size="143360" crc="d4dab30a" sha1="eed4913249993059fcc1f7048e6abbf736f52392" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msmanutil">
+		<description>Math Sequences: Management Utilities (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<!-- Bootable utility disk for Math Sequences series -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-06-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - management utilities (4am crack).dsk" size="143360" crc="631bccd3" sha1="370929174aadb4ff55a31c6a201bac1ff51d35a0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msmeasfm">
+		<description>Math Sequences: Measurement Formulas (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - measurement formulas (4am crack).dsk" size="143360" crc="9b64b157" sha1="eb98ca975c1fd5e064791aa1b7c9f3a16ea336f3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msmult80" cloneof="msmult">
+		<description>Math Sequences: Multiplication (version 1980) (4am crack)</description>
+		<year>1980</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1984" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-15 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - multiplication 1980 (4am crack).dsk" size="143360" crc="7ec155e9" sha1="ee0b47cd098f2e0061ec4f8e4e1236cc4eb7d69f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msmult">
+		<description>Math Sequences: Multiplication (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - multiplication (4am crack).dsk" size="143360" crc="0ec1575e" sha1="edd7e983883bbb851e0b91a6ec4c8f467176c23c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnumread80" cloneof="msnumread" >
+		<description>Math Sequences: Number Readiness (version 1980) (4am crack)</description>
+		<year>1980</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1980" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-15 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - number readiness 1980 (4am crack).dsk" size="143360" crc="464f1c9a" sha1="8a81077d3c2a809fdaaeb54f073fad87b9e1a158" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msnumread">
+		<description>Math Sequences: Number Readiness (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - number readiness (4am crack).dsk" size="143360" crc="3b24099c" sha1="43455de33fd3faa10bd34cf28cc7b05ad3069f1a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msperc84" cloneof="msperc">
+		<description>Math Sequences: Percents (version 1984) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1984" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-05 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences- percents 1984 (4am crack).dsk" size="143360" crc="b5529abc" sha1="e0dff1c1d30e56799c4dec682925b5d3b8670489" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msperc">
+		<description>Math Sequences: Percents (version 1985) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="1985" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - percents (4am crack).dsk" size="143360" crc="f6864e40" sha1="ac25cf5c44fb45b115d03b9551cd7720ef7d8482" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msprept1">
+		<description>Math Sequences: Pre- and Post Tests I (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Number Readiness, Addition, Subtraction, Multiplication, Division, Laws of Arithmetic, Integers -->
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - pre- and post tests i (4am crack).dsk" size="143360" crc="e9437f1a" sha1="4637b43316dfa45b7156a5a832e6ff0a8a367458" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msprept2">
+		<description>Math Sequences: Pre- and Post-Tests II (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Fractions, Decimals, Percents, Equations, Measurement Formulas -->
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - pre- and post-tests ii (4am crack).dsk" size="143360" crc="c27aa0be" sha1="003ceaa025c41a1ad9e05c6b065848a7bb8f2b31" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mssub">
+		<description>Math Sequences: Subtraction (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - subtraction (4am crack).dsk" size="143360" crc="6479dd22" sha1="41cb61063079327540b7466243ad99591f4f1a58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mswsgen1">
+		<description>Math Sequences: Worksheet Generator I (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - worksheet generator (4am crack).dsk" size="143360" crc="7e4673c1" sha1="e03f74de49e7730889b66be9ee714820c38b02b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mswsgen2">
+		<description>Math Sequences: Worksheet Generator II (4am crack)</description>
+		<year>1986</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math sequences - worksheet generator ii (4am crack).dsk" size="143360" crc="3612ce07" sha1="29e4414936b10e35c7a2d2dd56c2c48e0cc7f594" />
 			</dataarea>
 		</part>
 	</software>
@@ -41103,7 +40623,7 @@ license:CC0-1.0
 	<software name="matactl4">
 		<description>Mathematics Activities Courseware Level 4 (4am crack)</description>
 		<year>1983</year>
-		<publisher>Houghton-Mifflin</publisher>
+		<publisher>Houghton Mifflin</publisher>
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-09-18 -->
@@ -41120,7 +40640,7 @@ license:CC0-1.0
 	<software name="matactl6">
 		<description>Mathematics Activities Courseware Level 6 (4am crack)</description>
 		<year>1983</year>
-		<publisher>Houghton-Mifflin</publisher>
+		<publisher>Houghton Mifflin</publisher>
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-09-18 -->
@@ -41962,6 +41482,23 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Recipe"/>
 			<dataarea name="flop" size="143360">
 				<rom name="micro barmate (softsmith) (4am and san inc crack) disk 2 - recipe disk.dsk" size="143360" crc="fda44cc2" sha1="545380d53bad9a38197992c07b31a5697c3bf066"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlbbs">
+		<description>Micro League Baseball (Stoneware) (4am crack)</description>
+		<year>1980</year>
+		<publisher>Stoneware</publisher>
+		<info name="programmer" value="Arthur Wells, Jr." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- This is a different game than Micro League Baseball by Micro League Sports Association. -->
+		<!-- Dump released: 2017-11-26 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="micro league baseball (4am crack).dsk" size="143360" crc="ee6237b4" sha1="e77be478ca53962269d875b9742dda50475272e9" />
 			</dataarea>
 		</part>
 	</software>
@@ -43074,6 +42611,78 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 Side B - the learning machine" />
 			<dataarea name="flop" size="143360">
 				<rom name="microzine 27 (4am crack) disk 2 side b.dsk" size="143360" crc="0eef531f" sha1="edfedfe58247cad9da28dbfbf6f0fe07c9608a68" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi4">
+		<description>MIDI/4 (revision 5) (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 5" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2020-01-06 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="midi-4 (4am and san inc crack).dsk" size="143360" crc="14b0ad62" sha1="9e9eb73bd28412c2176c8b6d6b7fbe14b3a2f65e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi4pe">
+		<description>MIDI/4 Plus Enhanced Edition (version 1.1) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2025-11-30 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="midi-4 plus enhanced edition v1.1 (4am crack).dsk" size="143360" crc="4da1c9b4" sha1="2e245f46a551cd4e3dd47c20944c13e006f8b1f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi8p">
+		<description>MIDI/8 Plus (version 1.2) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2024-12-07 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="midi-8 plus v1.2 (4am and san inc crack).dsk" size="143360" crc="c8caa285" sha1="e8ef2427f2ce2c9f928191b75486dd73f9fbbe44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi8p401">
+		<description>MIDI/8 Plus for MPU-401 (version 1.2) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2019-11-18 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="midi-8 plus (4am and san inc crack).dsk" size="143360" crc="39bf6550" sha1="7babdcdc5a3f778d0d3715565d466112dfa007c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46451,6 +46060,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pixit">
+		<description>Pixit (version 01331) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="01331" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="Kimberly Evans" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="01331" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-07-03 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pixit v01331 (4am crack).dsk" size="143360" crc="92c24ed0" sha1="f75659cb387ecd096b7de38f17e88358b4de72d2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="placeval">
 		<description>Place Value: Ones, Tens, and Hundreds (4am crack)</description>
 		<year>1986</year>
@@ -46582,6 +46211,79 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a820 polls and politics v1.0 (4am crack).dsk" size="143360" crc="1835797f" sha1="ca580b411b23fbeb1614b63c43672093dd4cb002" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polywr">
+		<description>PolyWriter (version 1.2) (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<info name="alt_title" value="Polywriter 401" />
+		<!-- After the titlescreen, it is branded for the MPU-401 -->
+		<info name="author" value="Phil Farrand" />
+		<info name="programmer" value="Dave Kusek" />
+		<info name="programmer" value="John Borowicz" />
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-11-18 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="polywriter v1.2 (4am and san inc crack).dsk" size="143360" crc="10770914" sha1="c8ee9a53070adf453876392cbc8814c8bb087b8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polywru">
+		<description>PolyWriter Utilities (version 1.2) (4am and san inc crack)</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-11-18 -->
+		<!-- audio utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="polywriter utilities v1.2 (4am and san inc crack).dsk" size="143360" crc="708766bd" sha1="8cf89cc33b6e70c45328edc08d1f17929350d941"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poprsplr1" cloneof="poprspl">
+		<description>Pop 'R Spell &amp; Pop 'R Spell Challenge (revision 1) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="Milliken Publishing Company" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-23 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pop 'r spell (4am crack).dsk" size="143360" crc="e80dcff9" sha1="313d9292b25c753cce1ad161b591fe2d58fde908" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poprspl">
+		<description>Pop 'R Spell &amp; Pop 'R Spell Challenge (revision 2) (4am crack)</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="Milliken Publishing Company" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Updated revision fixes an off-by-1 error. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-09-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pop 'r spell and pop 'r spell challenge rev. 2 (4am crack).dsk" size="143360" crc="bfd30521" sha1="842e89724fa646efb0eae1dd2ab67125800ebc7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47135,36 +46837,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="priwordm">
-		<description>Primary WordMath (4am crack)</description>
-		<year>1986</year>
-		<publisher>Milliken Publishing Company</publisher>
-		<info name="programmer" value="J. Coffland" />
-		<info name="programmer" value="S. Baldwin" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2023-03-26 -->
-		<!-- educational program -->
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="143360">
-				<rom name="primary wordmath (4am crack) disk 1.dsk" size="143360" crc="2aba34b2" sha1="7fdf60692e4d76b542f0111f2520016a7ed12951" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="143360">
-				<rom name="primary wordmath (4am crack) disk 2.dsk" size="143360" crc="9de1cf0e" sha1="fc60419a948da439d7c9b8a6516dfab38b9b8958" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="143360">
-				<rom name="primary wordmath (4am crack) disk 3.dsk" size="143360" crc="065e4c68" sha1="da675aded7b07140cebc53c885edf0d5503a6e32" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="primduck">
 		<description>Prime Ducks (4am crack)</description>
 		<year>1984</year>
@@ -47200,6 +46872,64 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a123 prime numbers v1.0 (4am crack).dsk" size="143360" crc="f0ceda44" sha1="b6a650ab7b8e2719df6b26dcde8f4d4af3827a09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prince15521" cloneof="prince">
+		<description>Prince (version 15521) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="15521" />
+		<info name="programmer" value="Joel Novak" />
+		<info name="programmer" value="Ken Steiner" />
+		<info name="programmer" value="Michael Darooge" />
+		<info name="programmer" value="Bob Svihovec" />
+		<info name="programmer" value="Bryan Koeff" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="15521" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-06-30 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15521 (4am crack) side a.dsk" size="143360" crc="e6553b4f" sha1="e299c1b148446d9519dcabe766bc19ff5ef92635"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15521 (4am crack) side b.dsk" size="143360" crc="ef036e55" sha1="9d51c9cf230414c3d004dd72c79aa25d68139da3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prince">
+		<description>Prince (version 15531) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="15531" />
+		<info name="programmer" value="Joel Novak" />
+		<info name="programmer" value="Ken Steiner" />
+		<info name="programmer" value="Michael Darooge" />
+		<info name="programmer" value="Bob Svihovec" />
+		<info name="programmer" value="Bryan Koeff" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="15531" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-07-03 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15531 (4am crack) side a.dsk" size="143360" crc="076b4c37" sha1="17642c6dde2665450c39a3b629faa5e1e097c2ea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="prince v15531 (4am crack) side b.dsk" size="143360" crc="ef036e55" sha1="9d51c9cf230414c3d004dd72c79aa25d68139da3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47420,6 +47150,72 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="projectile and circular motion (4am crack).dsk" size="143360" crc="4074b3dd" sha1="95e35ca175c0f02221a9f2a9d413bbcc40e11c42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpronoun1r1" cloneof="mpronoun1">
+		<description>Pronouns I (revision 1) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pronouns i (4am crack).dsk" size="143360" crc="3cc45067" sha1="955fb2b826aeaef997788326906167fa8c57b6d2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpronoun1">
+		<description>Pronouns I (revision 2) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- This revision fixes bugs and has an updated copy protection. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pronouns i rev. 2 (4am crack).dsk" size="143360" crc="85d199a0" sha1="b4dd139c4f17825a13f5dd762b7bf1a242e59481"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpronoun2r1" cloneof="mpronoun2">
+		<description>Pronouns II (revision 1) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pronouns ii (4am crack).dsk" size="143360" crc="97c171bc" sha1="588e5e0bff9c0268e39875d119daa71186284182" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpronoun2">
+		<description>Pronouns II (revision 2) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- This revision fixes bugs and has an updated copy protection. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pronouns ii rev. 2 (4am crack).dsk" size="143360" crc="e73e4fcb" sha1="b675fac3a52944031b1fa51e884b9e52496ed35c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -48138,6 +47934,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="rainbow painter (4am crack).dsk" size="143360" crc="b888cdc1" sha1="243cb545ccdb3961bdd35d9cbd407f818792b2c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainydg">
+		<description>Rainy Day Games (version 13501) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="David Walker" />
+		<info name="developer" value="Baudville" />
+		<info name="partno" value="13501" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="13501" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-06-29 -->
+		<!-- card game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rainy day games (4am crack).dsk" size="143360" crc="50b78018" sha1="2d03e73d475f3ab54ec98b2e22dc7b04fa7a52d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50892,6 +50707,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mpsntcmb">
+		<description>Sentence Combining (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="IOTA" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-27 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="sentence combining i (4am crack).dsk" size="143360" crc="cc058220" sha1="fde07885d295948016480de75409593bf64e417d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sentdiag">
 		<description>Sentence Diagramming (4am crack)</description>
 		<year>1985</year>
@@ -51333,6 +51164,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="skicrzed">
+		<description>Ski Crazed (version 28701) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="JAM Software" />
+		<info name="partno" value="28701" />
+		<info name="programmer" value="Jason Rubin" />
+		<info name="programmer" value="Andy Gavin" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="28701" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-06-29 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ski crazed v28701 (4am crack).dsk" size="143360" crc="abec2de2" sha1="8cf6c8abcb4203b6629580f5d6ff3ad4bf62a2fc"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sbsocst6">
 		<description>Skill Builder: Social Studies - Grade 6 (4am crack)</description>
 		<year>1986</year>
@@ -51695,7 +51546,7 @@ license:CC0-1.0
 		<description>Sound Ideas: Consonants (4am crack)</description>
 		<year>1986</year>
 		<publisher>Houghton Mifflin</publisher>
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-02-15 -->
 		<!-- educational program -->
@@ -54787,8 +54638,9 @@ license:CC0-1.0
 		<description>Take 1 (version 06401) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Baudville</publisher>
-		<info name="programmer" value="Maurizio Barbatano" />
-		<info name="programmer" value="Michael Darooge" />
+		<info name="author" value="Maurizio Barbatano" />
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="06401" />
 		<info name="programmer" value="Edward McCullough" />
 		<info name="programmer" value="David Walker" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
@@ -54807,8 +54659,9 @@ license:CC0-1.0
 		<description>Take 1 (version 06431) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Baudville</publisher>
-		<info name="programmer" value="Maurizio Barbatano" />
-		<info name="programmer" value="Michael Darooge" />
+		<info name="author" value="Maurizio Barbatano" />
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="06431" />
 		<info name="programmer" value="Edward McCullough" />
 		<info name="programmer" value="David Walker" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
@@ -54827,8 +54680,9 @@ license:CC0-1.0
 		<description>Take 1 (version 06451) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Baudville</publisher>
-		<info name="programmer" value="Maurizio Barbatano" />
-		<info name="programmer" value="Michael Darooge" />
+		<info name="author" value="Maurizio Barbatano" />
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="06451" />
 		<info name="programmer" value="Edward McCullough" />
 		<info name="programmer" value="David Walker" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
@@ -55098,6 +54952,22 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 3 - Lands beyond"/>
 			<dataarea name="flop" size="143360">
 				<rom name="talisman (4am crack) disk 3 - lands beyond.dsk" size="143360" crc="214ff3b5" sha1="0ddcfbd830e431988e96c19382a247bb232931e1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tangrams">
+		<description>Tangrams Puzzler (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="Ken Coates" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-09-18 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="tangrams puzzler (4am crack).dsk" size="143360" crc="1e6b80a7" sha1="39c3d1cf3013c610aed92a128eeaee1016fe62bf" />
 			</dataarea>
 		</part>
 	</software>
@@ -56761,6 +56631,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="grtnmbch">
+		<description>The Great Number Chase (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="Eric Soldan" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the great number chase (4am crack).dsk" size="143360" crc="fee3b698" sha1="595701b7a0907388e5d4ed313b22c451c554e8df" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grtstrce">
+		<description>The Great States Race (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="Ronald Peacock" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-06-01 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the great states race (4am crack).dsk" size="143360" crc="115bbef9" sha1="0346205f3deca1708d603e1a37f86237c805535a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="grunfren">
 		<description>The Gruneberg Linkword Language Course: French (4am crack)</description>
 		<year>1985</year>
@@ -56933,6 +56835,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="islbeta">
+		<description>The Islands of Beta (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-01-25 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="islands of beta (4am crack).dsk" size="143360" crc="42f5e0dc" sha1="20e4d10b4b51aef9d2d2a8d6a4e6284cb5dd71b1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jarchaos">
+		<description>The Jar Game &amp; Chaos (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-08-02 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the jar game and chaos (4am crack).dsk" size="143360" crc="5eb0eebc" sha1="4add93afb555bb62c363e36667a2c714b0a200d0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingrule">
 		<description>The King's Rule: Mathematics and Discovery (4am crack)</description>
 		<year>1984</year>
@@ -57091,6 +57025,24 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the memory machine (4am crack).dsk" size="143360" crc="94e804b2" sha1="50fa0b471bd2e029c24ec5b6dc38814b6c4a0526" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="milwrdpr">
+		<description>The Milliken Word Processor (4am crack)</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="IOTA" />
+		<info name="programmer" value="John A. Oberschelp" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- A later version of this program is part of the "The Writing Workshop".  This version is dated 1984 and has a simpler protection. -->
+		<!-- Dump released: 2017-04-18 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the milliken word processor (4am crack).dsk" size="143360" crc="ae22419c" sha1="8860baa9ec434d3db5f070518e621e60f05e6e2a" />
 			</dataarea>
 		</part>
 	</software>
@@ -58027,6 +57979,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spellsys">
+		<description>The Spelling System (4am crack)</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="IOTA" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-06-25 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spelling system (4am crack) disk 1.dsk" size="143360" crc="48af390c" sha1="9c998daf41fa1521c215533f1a84f0eccef5b2f4" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spelling system (4am crack) disk 2.dsk" size="143360" crc="ebe3032d" sha1="a1c95dd428ded01f7250d6a553300f94dfe5f664" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spelling system (4am crack) disk 3.dsk" size="143360" crc="64c6faa7" sha1="68a5af2542566893d1a445aa72a21377f5e92f79" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spelling system (4am crack) disk 4.dsk" size="143360" crc="09b21175" sha1="872911f7027e6b163681def235ecfceaf8e71377" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tsnbaseb">
 		<description>The Sporting News: Baseball (4am crack)</description>
 		<year>1988</year>
@@ -58720,6 +58707,90 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the world's greatest football game (4am crack) side b.dsk" size="143360" crc="28f24cf1" sha1="806945532dd7af1b037aefb56ea2f3a06fa312fc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrtwkshp">
+		<description>The Writing Workshop (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="IOTA" />
+		<info name="programmer" value="John A. Oberschelp" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-04-24 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - The Writing Workshop - The Milliken Word Processor program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - the milliken word processor (4am crack).dsk" size="143360" crc="9a29b623" sha1="6e5c4d417758e916b5b9507bd6b28116bdf67914" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Brainstorming"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - brainstorming (4am crack).dsk" size="143360" crc="2102b96c" sha1="047d47956e08635fc032c9da1a66ebc72ea2d7af" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Branching"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - branching (4am crack).dsk" size="143360" crc="f3233777" sha1="e4e57bf7e12e1c835191cad9d62ef6d07ebe5d37" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - File cabinet diskette 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - file cabinet diskette 1 (4am crack).dsk" size="143360" crc="4da0bcec" sha1="df9cccce413bd3fe08820b3a9ef09d0b412fdd16" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 - File cabinet diskette 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - file cabinet diskette 2 (4am crack).dsk" size="143360" crc="3700754a" sha1="4b21258c377a7feb76292d0031a3346e3aeb3f4a" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6 - Help files"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - help files (4am crack).dsk" size="143360" crc="f3ca5af0" sha1="e33c63021ce2cec4d3544e00aa5cb5c6c196ac3a" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 7 - Mechanics checker I"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - mechanics checker i (4am crack).dsk" size="143360" crc="6eac1784" sha1="c77824c4f988ff58e9b0586175387ee98c1284f8" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 8 - Mechanics checker II"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - mechanics checker ii (4am crack).dsk" size="143360" crc="a1d5508b" sha1="840002439b25de8bdb4d441dc920b0a3e6a47215" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 9 - Nutshelling"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - nutshelling (4am crack).dsk" size="143360" crc="df26fd60" sha1="5700056a4ca3af02c88b3845b0e2adfa11b7fe51" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 10 - Proofreader"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - proofreader (4am crack).dsk" size="143360" crc="e31ab3bc" sha1="e78c31f854aceb0561f38c6c4898c142694a4f9c" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 11 - Spelling checker I"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - spelling checker i (4am crack).dsk" size="143360" crc="6fcf4320" sha1="4438c7228ef45a55dd26a453f9510472b4cd6c92" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 12 - Spelling checker II word list"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the writing workshop - spelling checker ii word list (4am crack).dsk" size="143360" crc="f5d8349c" sha1="6f637da5b1710a7c07ce7d586ff5f309b142d1f9" />
 			</dataarea>
 		</part>
 	</software>
@@ -60966,6 +61037,76 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mverbs1r1" cloneof="mverbs1">
+		<description>Verbs I (Milliken) (revision 1) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-18 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verbs i (4am crack).dsk" size="143360" crc="17567a89" sha1="e94671bb5deb483a7a96fa6a8de1bce217191446" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mverbs1">
+		<description>Verbs I (Milliken) (revision 2) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- This revision fixes bugs and has an updated copy protection. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verbs i rev. 2 (4am crack).dsk" size="143360" crc="b0c2705f" sha1="a6b36da980cb96e8421bb1492d0d115bf528e38a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mverbs2r2" cloneof="mverbs2">
+		<description>Verbs II (Milliken) (revision 1) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verbs ii (4am crack).dsk" size="143360" crc="1a62490b" sha1="f3c22dcf7e319f2b5a5f1966a4862fdce1058d38" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mverbs2">
+		<description>Verbs II (Milliken) (revision 2) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="M.D. Roblyer, Ph.D." />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- This revision fixes bugs and has an updated copy protection. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-05-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="verbs ii rev. 2 (4am crack).dsk" size="143360" crc="6a23f644" sha1="ea1bfa8af5aefea3f67265a068aa090fdb146cb8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vidttlsh">
 		<description>Video Title Shop (4am crack)</description>
 		<year>1987</year>
@@ -60979,6 +61120,40 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="video title shop (4am crack).dsk" size="143360" crc="cb1c722d" sha1="c1f535df153838d6278b7f291170162067e5223c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidvegas12501" cloneof="vidvegas">
+		<description>Video Vegas (version 12501) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="12501" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="12501" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-08-20 -->
+		<!-- card game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="video vegas (4am crack).dsk" size="143360" crc="c974bad2" sha1="c2c48f3f9f90d72be489021f5805c1d72c0f834c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidvegas">
+		<description>Video Vegas (version 12511) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="12511" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="12511" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-06-29 -->
+		<!-- card game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="video vegas v12511 (4am crack).dsk" size="143360" crc="d820d4e7" sha1="73f75859cd31983166f3a4afffb7aed1795fd7f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62414,6 +62589,207 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="word attack plus spanish 800k (4am crack).2mg" size="819264" crc="4f92acb4" sha1="12421999bb00b54c8ae825dd9ee43e55de0c9a4e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmaddsub">
+		<description>WordMath: Addition and Subtraction (4am crack)</description>
+		<year>1986</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- This appears to be the same as WordMath: Primary Math, but missing the third disk with Drills 5, 6 -->
+		<!-- Dump released: 2017-05-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Lessons 1, 2 (Add, Sub)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - addition and subtraction (4am crack) disk 1.dsk" size="143360" crc="f3a10039" sha1="e8cd0cbbda84cd17df5bb40f5c06dfdf10f8b413" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Lessons 3, 4 (Add, Sub)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - addition and subtraction (4am crack) disk 2.dsk" size="143360" crc="beee6a7d" sha1="ab76d08f9ddf4b7f47943cbfe8402e40e40463c0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmadvmixp">
+		<description>WordMath: Advanced Mixed Practice (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-29 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - advanced mixed practice (4am crack).dsk" size="143360" crc="24b4561f" sha1="9b210e3b0224d751b0f2f504718d2e8bca5a1ce4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmbasprob">
+		<description>WordMath: Basic Problems (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - basic problems (4am crack).dsk" size="143360" crc="e154f2f4" sha1="ac97d01ba03a1e4e7eb559e07cb85478b451c95c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmdiction">
+		<description>WordMath: Dictionary (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-29 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - dictionary (4am crack).dsk" size="143360" crc="684c6ea9" sha1="fe6f30e2359ddc63214a1576eafe41b2327a302c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmextnum">
+		<description>WordMath: Extra Numbers (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - extra numbers (4am crack).dsk" size="143360" crc="feb0151a" sha1="e0b05bc4af79411178bd9dbd4a2d712f99199c52" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmfordrord">
+		<description>WordMath: Forward Order-Reverse Order (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - forward order, reverse order (4am crack).dsk" size="143360" crc="3afd9e0f" sha1="cdd6ffe186d4b27a27538f50c7a4022998eafe67" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmhidnum">
+		<description>WordMath: Hidden Numbers (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-29 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - hidden numbers (4am crack).dsk" size="143360" crc="e6810b3c" sha1="5e1202fb522930ed23f345bb46d475c0199a911c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmkeywords">
+		<description>WordMath: Key Words (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - key words (4am crack).dsk" size="143360" crc="ce3292bd" sha1="862f48adb9e668857dd22a0ed250ee744e807b4d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmathmp">
+		<description>WordMath: Mixed Practice (4am crack)</description>
+		<year>1985</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="programmer" value="T. Froman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-05-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordmath - mixed practice (4am crack).dsk" size="143360" crc="eeaa349b" sha1="66ecdb703a53d8e4fdd3d9b60861243556a4b282" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmprimath">
+		<description>WordMath: Primary Math (4am crack)</description>
+		<year>1986</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="alt_title" value="Primary WordMath"/>
+		<info name="programmer" value="J. Coffland" />
+		<info name="programmer" value="S. Baldwin" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- This appears to be WordMath: Addition and Subtraction, but with a the third disk with Lessons 5, 6 on multiplication / division. -->
+		<!-- Dump released: 2023-03-26 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Lessons 1, 2 (Add / Sub)" />
+			<dataarea name="flop" size="143360">
+				<rom name="primary wordmath (4am crack) disk 1.dsk" size="143360" crc="2aba34b2" sha1="7fdf60692e4d76b542f0111f2520016a7ed12951" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Lessons 3, 4 (Add / Sub)" />
+			<dataarea name="flop" size="143360">
+				<rom name="primary wordmath (4am crack) disk 2.dsk" size="143360" crc="9de1cf0e" sha1="fc60419a948da439d7c9b8a6516dfab38b9b8958" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Lessons 5, 6 (Mult / Div)" />
+			<dataarea name="flop" size="143360">
+				<rom name="primary wordmath (4am crack) disk 3.dsk" size="143360" crc="065e4c68" sha1="da675aded7b07140cebc53c885edf0d5503a6e32" />
 			</dataarea>
 		</part>
 	</software>
