@@ -3176,9 +3176,9 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="fraka" cloneof="frak">
-		<description>Frak! (Alternative)</description>
+		<description>Frak! (Alternative Software)</description>
 		<year>198?</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="24221">
 				<rom name="frakv11_e.uef" size="24221" crc="f1330371" sha1="7d8c89dcd98bc0a74ea72b479ee1da0ea4de5595"/>
@@ -3521,9 +3521,13 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="ggoochcra" cloneof="ggoochcr">
+<<<<<<< HEAD
 		<description>Graham Gooch's Test Cricket (Alternative)</description>
+=======
+		<description>Graham Gooch's Test Cricket (Alternative Software)</description>
+>>>>>>> f18a25f7f46 (hash: deambiguate Alternative Software releases)
 		<year>198?</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="18383">
 				<rom name="grahamgoochmatchcricket-arr_e.uef" size="18383" crc="11762a0b" sha1="24feb73957b628c2617e792e7eca19cc45706a19"/>
@@ -7868,9 +7872,9 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="zalagaa" cloneof="zalaga">
-		<description>Zalaga (Alternative)</description>
+		<description>Zalaga (Alternative Software)</description>
 		<year>198?</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="20293">
 				<rom name="zalaga-alrr_e.uef" size="20293" crc="99ae102c" sha1="b933fcda2f10e846235bc21aabc7e030599e4a9f"/>
