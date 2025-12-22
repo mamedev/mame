@@ -36502,9 +36502,10 @@ Unemulated [Sega Mega Modem] and printer features
 		<year>1994</year>
 		<publisher>Scientific Atlanta</publisher>
 		<notes><![CDATA[
-Black screen, needs [Sega Channel adapter] peripheral
+Black screen, needs [Sega Channel adapter] peripheral (goes a bit more in teradrive)
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="segach_us"/>
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="sega channel (usa).bin" size="262144" crc="bc79b6ed" sha1="23a32e7709fc78b1b217a9d4bf2556117d7b431a"/>
 			</dataarea>
@@ -36517,6 +36518,7 @@ Black screen, needs [Sega Channel adapter] peripheral
 		<publisher>Scientific Atlanta</publisher>
 		<notes><![CDATA[
 Black screen, needs [Sega Channel adapter] peripheral
+Different HW than the other set
 ]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
