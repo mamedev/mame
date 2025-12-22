@@ -4,7 +4,7 @@
 license:CC0-1.0
 -->
 <softwarelist name="s3000_cdrom" description="Akai S2000 and S3000 series CD-ROMs">
-	<software name="cdsndlib1">
+	<software name="cdsndlib1" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 1: Complete S3000 and CD3000 Sound Library</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
@@ -15,7 +15,7 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	<software name="cdsndlib2">
+	<software name="cdsndlib2" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 2: Complete S1000/S1100 Library</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
@@ -26,7 +26,7 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	<software name="cdsndlib3">
+	<software name="cdsndlib3" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 3: Drum Kit Collection</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
@@ -37,7 +37,7 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	<software name="cdsndlib4">
+	<software name="cdsndlib4" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 4: Rhythm Loop Collection</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
@@ -48,7 +48,7 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	<software name="cdsndlib5">
+	<software name="cdsndlib5" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 5: Percussion Collection</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
@@ -59,7 +59,7 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	<software name="cdsndlib6">
+	<software name="cdsndlib6" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 6: Sound Effects Collection</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
@@ -70,7 +70,7 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	<software name="cdsndlib7">
+	<software name="cdsndlib7" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 7: New Keyboard Collection</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
@@ -81,7 +81,7 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	<software name="cdsndlib8">
+	<software name="cdsndlib8" supported="yes">
 		<description>Akai CD-ROM Sound Library Volume 8: General MIDI Sets</description>
 		<year>1993</year>
 		<publisher>Akai</publisher>
