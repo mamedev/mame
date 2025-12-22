@@ -8271,7 +8271,7 @@ Cannot login on ct486. Kernel panics on pcipc.
 		<year>1997</year>
 		<publisher>Apple</publisher>
 		<notes><![CDATA[
-Cannot login on ct486. Kernel panics on pcipc.
+Ends with “Workspace Manager Error” and cannot login.
 ]]></notes>
 		<info name="langauge" value="English" />
 		<info name="langauge" value="French" />
