@@ -36522,6 +36522,9 @@ diamond2
 @source:novag/emerclp.cpp
 emerclp
 
+@source:novag/gomoku.cpp
+ngomoku
+
 @source:novag/mentor16.cpp
 mentor16
 
