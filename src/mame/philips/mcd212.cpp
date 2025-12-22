@@ -1137,7 +1137,8 @@ void mcd212_device::device_reset()
 	m_ica_height = 32;
 	m_total_height = 312;
 	m_blink_time = 0;
-	for (int i = 0; i < 312; i++)
+	for (int i = 0; i < m_total_height; i++)
+	{
 		std::fill_n(m_interlace_field[i], 768, 0);
 	}
 
