@@ -1144,7 +1144,7 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_audio_format_sectors = 0;
 				m_audio_sector_counter = 1;
 				m_decoding_audio_map = true;
-				std::fill_n(&m_xa_last[0], 4, 0);
+				std::fill_n(m_xa_last, 4, 0);
 			}
 			break;
 
@@ -1316,6 +1316,7 @@ void cdicdic_device::device_start()
 	save_item(NAME(m_decoding_audio_map));
 	save_item(NAME(m_decode_addr));
 
+	save_item(NAME(m_atten));
 	save_item(NAME(m_xa_last));
 
 	m_audio_timer = timer_alloc(FUNC(cdicdic_device::audio_tick), this);
@@ -1363,7 +1364,8 @@ void cdicdic_device::device_reset()
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);
 
-	std::fill_n(&m_xa_last[0], 4, 0);
+	std::fill_n(m_atten, 4, 0);
+	std::fill_n(m_xa_last, 4, 0);
 }
 
 void cdicdic_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
