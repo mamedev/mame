@@ -3521,11 +3521,7 @@ Model B-compatible cassette images are now listed exclusively in bbc_cass.xml, r
 	</software>
 
 	<software name="ggoochcra" cloneof="ggoochcr">
-<<<<<<< HEAD
-		<description>Graham Gooch's Test Cricket (Alternative)</description>
-=======
 		<description>Graham Gooch's Test Cricket (Alternative Software)</description>
->>>>>>> f18a25f7f46 (hash: deambiguate Alternative Software releases)
 		<year>198?</year>
 		<publisher>Alternative Software</publisher>
 		<part name="cass" interface="bbc_cass">
