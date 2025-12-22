@@ -360,8 +360,8 @@ void mcd212_device::process_ica()
 				return;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR (ICA)
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				addr = (cmd & 0x0007ffff) / 2;
 				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
+				addr = (cmd & 0x0007ffff) / 2;
 				break;
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
@@ -1139,6 +1139,7 @@ void mcd212_device::device_reset()
 	m_blink_time = 0;
 	for (int i = 0; i < 312; i++)
 		std::fill_n(m_interlace_field[i], 768, 0);
+	}
 
 	m_int_callback(CLEAR_LINE);
 
