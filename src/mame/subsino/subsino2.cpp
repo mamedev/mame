@@ -4270,7 +4270,7 @@ ROM_START( blushark )
 	ROM_LOAD( "gal16v8d.u31", 0x000, 0x117, NO_DUMP )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
-	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(581f6bfb) SHA1(2b6e9e4800e22913474551c5c70b66933003c12f) BAD_DUMP ) // handcrafted to pass protection check
+	ROM_LOAD( "ds1971.q3", 0x00, 0x28, CRC(c59a888e) SHA1(780b31bb06be6d4ce6ec3e99d871077c3e081315) )
 ROM_END
 
 ROM_START( goldenti )

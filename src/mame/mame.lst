@@ -20618,6 +20618,11 @@ specfrceo
 rhnation
 zoofari
 
+@source:igs/5clown.cpp
+5clown
+5clowna
+5clownsp
+
 @source:igs/cabaret.cpp
 cabaret
 double8l
@@ -29120,11 +29125,6 @@ unkpacgd
 unksig
 unksiga
 unksigb
-
-@source:misc/5clown.cpp
-5clown
-5clowna
-5clownsp
 
 @source:misc/a1supply.cpp
 tv21
