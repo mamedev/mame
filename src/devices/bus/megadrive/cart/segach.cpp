@@ -144,7 +144,7 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 {
 	// TCU STATUS
 	map(0x04, 0x05).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) {
+		NAME([] (offs_t offset, u16 mem_mask) {
 			// status for something
 			return 0xf;
 		}),
