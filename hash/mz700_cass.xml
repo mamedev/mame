@@ -1052,7 +1052,7 @@ Easidata (English Version)
 	<software name="blizzard" supported="yes">
 		<description>Blizzard</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="23681">
 				<rom name="blizzard.mzt" size="23681" crc="bf76135c" sha1="d29d5299e70e5a07ee32155750623b0dc8ec6053"/>
@@ -1153,7 +1153,7 @@ Easidata (English Version)
 	</software>
 	
 	<software name="carrier2a" cloneof="carrier2" supported="yes">
-		<description>Carrier ][ (Joystick version)</description>
+		<description>Carrier ][ (joystick version)</description>
 		<year>1984</year>
 		<publisher>BBG Software</publisher>
 		<part name="cass" interface="mz_cass">
@@ -1415,7 +1415,7 @@ Easidata (English Version)
 	<software name="drop" supported="yes">
 		<description>The Drop</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="25089">
 				<rom name="drop.mzt" size="25089" crc="793f3b50" sha1="ff8cff42ec94762cd897851232daf4187c8287bc"/>
@@ -1532,7 +1532,7 @@ Easidata (English Version)
 	<software name="galaxoid" supported="yes">
 		<description>Galaxoids</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="9602">
 				<rom name="galaxoids.mzt" size="9602" crc="43116eb6" sha1="45c6ce35bdbe117d9a9039f29c9eb9ee0d038c99"/>
@@ -2066,6 +2066,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<!-- Requires PCG to display correctly -->
 	<software name="moty" supported="partial">
 		<description>Moty</description>
 		<year>1985</year>
@@ -2080,7 +2081,7 @@ Easidata (English Version)
 	<software name="mrfixit" supported="yes">
 		<description>Mr Fixit</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="38124">
 				<rom name="mr fixit.mzt" size="38124" crc="83a56cb6" sha1="d04663bd37f60763e8619886f52299934b7576a0"/>
@@ -2142,6 +2143,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<!-- Requires PCG to display correctly -->
 	<software name="nakamoto" supported="partial">
 		<description>Nakamoto</description>
 		<year>19??</year>
@@ -2708,7 +2710,7 @@ Easidata (English Version)
 	<software name="tetris" supported="yes">
 		<description>Tetris!</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="17013">
 				<rom name="tetris.mzt" size="17013" crc="e0a4ae3c" sha1="2bc76126f45b44ee70d6f809e76adf4fcc0b3fa7"/>
@@ -2837,6 +2839,7 @@ Easidata (English Version)
 		</part>
 	</software>
 
+	<!-- Requires PCG to display correctly -->
 	<software name="wooky" supported="partial">
 		<description>Wooky</description>
 		<year>19??</year>

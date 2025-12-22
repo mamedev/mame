@@ -30,7 +30,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 	<software name="appleman" supported="yes">
 		<description>Appleman</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="20749">
 				<rom name="appleman.mzt" size="20749" crc="a10f4777" sha1="87edaf080ceffb3d5316bd83361fe95d2a8ae87b"/>
@@ -81,7 +81,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 	<software name="building" supported="yes">
 		<description>Building Hopper</description>
 		<year>1983</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="42368">
 				<rom name="building.mzf" size="42368" crc="fa79fff0" sha1="4d3c845519f3acf2f062da0888d564e468453408"/>
@@ -148,7 +148,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 	<software name="galao" supported="yes">
 		<description>Galao</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="20177">
 				<rom name="galao.mzt" size="20177" crc="fad2a016" sha1="d3e334f7155fbe031a859128bd3b7fb3d08f92a4"/>
@@ -157,9 +157,9 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 	</software>
 
 	<software name="galaoa" cloneof="galao" supported="yes">
-		<description>Galao (Joystick version)</description>
+		<description>Galao (joystick version)</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="20177">
 				<rom name="galao joy.mzt" size="20177" crc="85bedb36" sha1="ee6c57736274aadb56d97b371901e360c5601956"/>
@@ -348,7 +348,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 	<software name="penguin" supported="yes">
 		<description>Penguin</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="13697">
 				<rom name="penguin.mzt" size="13697" crc="a2b50de3" sha1="571d5d626b97aec039766c422e4256e6579fef8d"/>
@@ -370,7 +370,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 	<software name="pinball" supported="yes">
 		<description>Pinball</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="24856">
 				<rom name="pinball.mzt" size="24856" crc="ddac61c9" sha1="90976ddbdec6759f42db791f14484dcd112bac70"/>
