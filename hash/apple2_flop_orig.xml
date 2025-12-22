@@ -2649,21 +2649,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="skicrzed">
-		<description>Ski Crazed (version 28701)</description>
-		<year>1987</year>
-		<publisher>Baudville</publisher>
-		<info name="usage" value="Requires a 64K Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-05-25 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234775">
-				<rom name="ski crazed.woz" size="234775" crc="92531d10" sha1="9fb8ad412976644fa03814229e1b84196ca8fcaf" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="thief">
 		<description>Thief</description>
 		<year>1981</year>
@@ -3709,21 +3694,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="vidvegas">
-		<description>Video Vegas (version 12501)</description>
-		<year>1985</year>
-		<publisher>Baudville</publisher>
-		<info name="usage" value="Requires a 48K Apple ][ or later." />
-		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2019-10-25 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234702">
-				<rom name="video vegas.woz" size="234702" crc="f47a8783" sha1="2b8e0f911b4a98f0b0f009e2508c4e0a348736bd" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="phmdrock">
 		<description>Physics of Model Rocketry</description>
 		<year>1987</year>
@@ -3919,22 +3889,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="228112">
 				<rom name="gammon gambler.woz" size="228112" crc="a159448f" sha1="50cb697901df21be816e82a0d46c24e9a3eb98b3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blmurder">
-		<description>Bloody Murder</description>
-		<year>1979</year>
-		<publisher>Stoneware</publisher>
-		<info name="author" value="Arthur Wells, Jr." />
-		<info name="usage" value="Requires an Apple ][ with 48K and Integer BASIC in ROM." />
-		<sharedfeat name="compatibility" value="A2" />
-		<!-- Dump released: 2019-11-12 -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="234791">
-				<rom name="bloody murder.woz" size="234791" crc="647975ac" sha1="f6e5ad2dc64dd040f10d861c2c7c7af9268130ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -5295,22 +5249,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234766">
 				<rom name="the latin hangman side b.woz" size="234766" crc="1a30bfd6" sha1="ca7b7df68a89a3ab87d34ead7ca2fbb47c38ba15" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="816pnt31">
-		<description>816/Paint (version 3.1)</description>
-		<year>1987</year>
-		<publisher>Baudville</publisher>
-		<info name="usage" value="Requires a 128K Apple //e or later." />
-		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2020-04-11 -->
-		<!-- This is the 5.25-inch disk part of version 3.1. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="228110">
-				<rom name="816 paint v3.1.woz" size="228110" crc="5348048a" sha1="b8673692b4f3d4e8d2281dc58c48c2facd28a6f2" />
 			</dataarea>
 		</part>
 	</software>
@@ -13017,6 +12955,40 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="4tracked">
+		<description>4-Track Editor for Soundchaser Computer Music System</description>
+		<year>1983</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later and the Soundchaser Computer Music System." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="4-track editor for soundchaser.woz" size="234789" crc="535a3091" sha1="876160d44841cb676d2019b1336ed698b653c12a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="816paint">
+		<description>816/Paint (version 3.1 #24721)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="24721" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<info name="version" value="3.1" />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-04-11 -->
+		<!-- This is the 5.25-inch disk part of version 3.1. -->
+		<!-- graphics utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228110">
+				<rom name="816 paint v3.1.woz" size="228110" crc="5348048a" sha1="b8673692b4f3d4e8d2281dc58c48c2facd28a6f2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="scruples">
 		<description>A Question of Scruples</description>
 		<year>1988</year>
@@ -13647,20 +13619,53 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="algv1v13s">
-		<description>Algebra Volume 1 (version 1.3, 31-DEC-81) (Softsmith)</description>
-		<year>1981</year>
-		<publisher>Softsmith</publisher>
-		<info name="developer" value="Edu-Ware Services" />
-		<info name="original_publisher" value="Edu-Ware Services" />
-		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value="1.3, 31-DEC-81" />
+	<software name="algactn">
+		<description>Algebra Action: Courseware for Algebra I</description>
+		<year>1986</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="developer" value="Prentice Associates" />
+		<info name="usage" value="Requires an 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2021-06-26 -->
-		<!-- educational game -->
+		<!-- Dump released: 2024-11-30 -->
+		<!-- educational program -->
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="241426">
-				<rom name="algebra volume i v1.3 (softsmith).woz" size="241426" crc="9b6d74af" sha1="60d0733e272296c0b301614d47031619b946c545" />
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="234774">
+				<rom name="algebra action disk 1.woz" size="234774" crc="f0da4eea" sha1="98db85d035a7bef178b23a68d9cd39d9a80a68b3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="234774">
+				<rom name="algebra action disk 2.woz" size="234774" crc="c5c2e25c" sha1="fe8d78d5def4e210b98e94bf2afcdfdeb9731bad" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="234774">
+				<rom name="algebra action disk 3.woz" size="234774" crc="d19c2431" sha1="356a3e51e5d7da252bde758cf1019bf0d59d2563" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="234774">
+				<rom name="algebra action disk 4.woz" size="234774" crc="7d40acba" sha1="8c40cc0080977fc7f2b4a11ae4911aa6644b403d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algplotp">
+		<description>Algebra Plotter Plus</description>
+		<year>1990</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="programmer" value="David L. Myers" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234773">
+				<rom name="algebra plotter plus.woz" size="234773" crc="d0042db1" sha1="a01f425a4fe0c17782f123c1476ad25455f9dcc5" />
 			</dataarea>
 		</part>
 	</software>
@@ -13686,6 +13691,24 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 1 Side B"/>
 			<dataarea name="flop" size="235547">
 				<rom name="algebra shop - disk 1, side b.woz" size="235547" crc="58b54d48" sha1="c327fd58ffcb53faabc66f6f546ea2a6cd7a57ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algv1v13s">
+		<description>Algebra Volume 1 (version 1.3, 31-DEC-81) (Softsmith)</description>
+		<year>1981</year>
+		<publisher>Softsmith</publisher>
+		<info name="developer" value="Edu-Ware Services" />
+		<info name="original_publisher" value="Edu-Ware Services" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3, 31-DEC-81" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-06-26 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241426">
+				<rom name="algebra volume i v1.3 (softsmith).woz" size="241426" crc="9b6d74af" sha1="60d0733e272296c0b301614d47031619b946c545" />
 			</dataarea>
 		</part>
 	</software>
@@ -13855,6 +13878,57 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="101963">
 				<rom name="alien typhoon.woz" size="101963" crc="5f8ca7f0" sha1="ace78dc02257b9e09fcf962bf2e5caa9cf5ae55c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcfacflr1" cloneof="alcfacfl">
+		<description>Aliencounter &amp; Face Flash (revision 1)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234848">
+				<rom name="aliencounter and face flash rev. 1.woz" size="234848" crc="1bfb666e" sha1="a6df199ff6617f67b5c24b913099a16f949cbd39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcfacflr2" cloneof="alcfacfl">
+		<description>Aliencounter &amp; Face Flash (revision 2)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="aliencounter and face flash rev. 2.woz" size="234795" crc="17b92195" sha1="a10de7fdcde7b0d6074f61c7a0f6f6c8732901d7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcfacfl">
+		<description>Aliencounter &amp; Face Flash (revision 3)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234795">
+				<rom name="aliencounter and face flash rev. 3.woz" size="234795" crc="33176cf1" sha1="2c285ae5daf98a96aed875248ba1a129f94c6558" />
 			</dataarea>
 		</part>
 	</software>
@@ -14785,6 +14859,38 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="armekicks">
+		<description>Arithmekicks</description>
+		<year>1984</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="programmer" value="Doug Super" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="arithmekicks.woz" size="234763" crc="f90fd977" sha1="b34564d6eb1cd60d5717f902190ec3b76829dbd9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armetick">
+		<description>Arithmetickle</description>
+		<year>1984</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="programmer" value="Doug Super" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234764">
+				<rom name="arithmetickle.woz" size="234764" crc="b6a7bfca" sha1="ca7de286e86ce39f05372abc0a5d977cf394f4ab" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="arizmix10_525" cloneof="arizmix">
 		<description>Arizona Mix (A-335 version 1.0)</description>
 		<year>1993</year>
@@ -15090,6 +15196,91 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234759">
 				<rom name="averages 1988.woz" size="234759" crc="e519f327" sha1="1fc5f4f6a051df0b8d2bbf0662bcdd68e7a91349" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awardmakp">
+		<description>Award Maker Plus (version 23611)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="partno" value="23611" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="23611" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-02-18 -->
+		<!-- graphics utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A Side 1 - Program" />
+			<dataarea name="flop" size="234784">
+				<rom name="award maker plus v23611 disk a, side 1- program.woz" size="234784" crc="3fe1bda9" sha1="069a0305fe0a574b5306cfa75a9a9785f54a5aa7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A Side 2 - Award library" />
+			<dataarea name="flop" size="234790">
+				<rom name="award maker plus v23611 disk a, side 2- award library.woz" size="234790" crc="671b4fee" sha1="b54dafd57691dfae81f0efc361cdf3fdc93b11e5" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B Side 1 - Award library" />
+			<dataarea name="flop" size="234790">
+				<rom name="award maker plus v23611 disk b, side 1- award library.woz" size="234790" crc="67b7873e" sha1="ff8dc7c93661fc385faa1c8a840a9d1002c47dc2" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B Side 2 - Award library" />
+			<dataarea name="flop" size="234790">
+				<rom name="award maker plus v23611 disk b, side 2- award library.woz" size="234790" crc="c9af9884" sha1="d69f538825e793f0258839a73a00b07963869334" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C Side 1 - Sports award library" />
+			<dataarea name="flop" size="234797">
+				<rom name="award maker plus v23611 disk c, side 1- sports award library.woz" size="234797" crc="a5b9a990" sha1="0d85c18f0cd083dd2440e7bf2d8e989f0b392498" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C Side 2 - Sports award library" />
+			<dataarea name="flop" size="234797">
+				<rom name="award maker plus v23611 disk c, side 2- sports award library.woz" size="234797" crc="f744f379" sha1="a789655a31ad361194f72072a71cae18c173326c" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D Side 1 - Sports award library" />
+			<dataarea name="flop" size="234797">
+				<rom name="award maker plus v23611 disk d, side 1- sports award library.woz" size="234797" crc="806d7358" sha1="085272bb25aed570698c519e4d425ed75c2c3854" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D Side 2 - Sports award library" />
+			<dataarea name="flop" size="234797">
+				<rom name="award maker plus v23611 disk d, side 2- sports award library.woz" size="234797" crc="e2fda40f" sha1="7b5cf779d45d9e19b796b182e9ae879b0d50a164" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk M Side 1 - Education award library" />
+			<dataarea name="flop" size="234800">
+				<rom name="award maker plus v23611 disk m, side 1- education award library.woz" size="234800" crc="a6e3c927" sha1="e9654049fdfd7e89d2bb6c3e729d057d1c93ca3c" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk M Side 2 - Education award library" />
+			<dataarea name="flop" size="234800">
+				<rom name="award maker plus v23611 disk m, side 2- education award library.woz" size="234800" crc="53a83f60" sha1="b725b5ab8dc02dc6b2be2ec5b0dacf50efeb397d" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Disk N Side 1 - Education award library" />
+			<dataarea name="flop" size="234800">
+				<rom name="award maker plus v23611 disk n, side 1- education award library.woz" size="234800" crc="db1bcad4" sha1="20ab4d663de3556343f7b5d89346d189b788ec94" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Disk N Side 2 - Education award library" />
+			<dataarea name="flop" size="234800">
+				<rom name="award maker plus v23611 disk n, side 2- education award library.woz" size="234800" crc="5418b0d1" sha1="2a52b86ba00a0db0d9ef4636847a4b512e9b96f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -15665,6 +15856,49 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bbugconcr1" cloneof="bbugconc">
+		<description>Battling Bugs &amp; Concentraction (revision 1)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - 13-sector" />
+			<feature name="sl6_default" value="diskiing13" />
+			<dataarea name="flop" size="234818">
+				<rom name="battling bugs and concentraction rev. 1 side a - 13-sector version.woz" size="234818" crc="88be8e96" sha1="2ca074b96e9b9e30bd0397b60a818c5af2209489" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - 16-sector" />
+			<feature name="sl6_default" value="diskiing" />
+			<dataarea name="flop" size="234818">
+				<rom name="battling bugs and concentraction rev. 1 side b - 16-sector version.woz" size="234818" crc="b59a3765" sha1="1742871f52f71fb74cc0f7c4e3751478a2ae62a7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbugconc">
+		<description>Battling Bugs &amp; Concentraction (revision 2)</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234800">
+				<rom name="battling bugs and concentraction rev. 2.woz" size="234800" crc="5c8d74f9" sha1="73ed8e099405e1776ca026e6ed83101e50fed6c5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bcqft">
 		<description>BC's Quest for Tires</description>
 		<year>1983</year>
@@ -16144,6 +16378,69 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="blzpdlsr0" cloneof="blzpdls">
+		<description>Blazing Paddles (revision 0)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 0" />
+		<!-- This is the first release, identifiable by the lack of any visible version number during boot. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl4_default" value="mouse" />
+		<!-- Dump released: 2025-01-26 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234744">
+				<rom name="blazing paddles.woz" size="234744" crc="fa140412" sha1="e2576e80c2f834eac07f9ba9bf75133132fe32ec" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blzpdls04421" cloneof="blzpdls">
+		<description>Blazing Paddles (version 04421)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="04421" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="04421" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl4_default" value="mouse" />
+		<!-- Dump released: 2025-01-26 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234774">
+				<rom name="blazing paddles v04421.woz" size="234774" crc="58593d08" sha1="102de9f7a1ab31a6753fadb2993a82deae5fc1bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blzpdls">
+		<description>Blazing Paddles (version 04431)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="04431" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="04431" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl4_default" value="mouse" />
+		<!-- Dump released: 2025-01-26 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234754">
+				<rom name="blazing paddles v04431.woz" size="234754" crc="70de3e58" sha1="a9e1f66cb00be73a2497ecd6142510ee96eda9ba" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blkfndrs">
 		<description>Blockers and Finders</description>
 		<year>1987</year>
@@ -16157,6 +16454,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234807">
 				<rom name="blockers and finders.woz" size="234807" crc="10a1d4fd" sha1="7242b9035e77e14ff47597682f32968b119e72cc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blmurder">
+		<description>Bloody Murder</description>
+		<year>1979</year>
+		<publisher>Stoneware</publisher>
+		<info name="author" value="Arthur Wells, Jr." />
+		<info name="usage" value="Requires an Apple ][ with 48K and Integer BASIC in ROM." />
+		<sharedfeat name="compatibility" value="A2" />
+		<!-- Dump released: 2019-11-12 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="bloody murder.woz" size="234791" crc="647975ac" sha1="f6e5ad2dc64dd040f10d861c2c7c7af9268130ff" />
 			</dataarea>
 		</part>
 	</software>
@@ -20246,7 +20559,7 @@ license:CC0-1.0
 		<info name="programmer" value="David Wong" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later. Use the 2 'master' scenario disks to make playable scenario disks." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
-		<!-- Dump released: 2025-01-22 -->
+		<!-- Dump released: 2025-01-21 -->
 		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A - Program" />
@@ -21501,6 +21814,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="engmlab">
+		<description>English MicroLab: Assessment of English Skills (version A1)</description>
+		<year>1985</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="programmer" value="Arthur H. Bell" />
+		<info name="programmer" value="Sharon R. Anderson" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="A1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-30 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234787">
+				<rom name="english microlab.woz" size="234787" crc="51183bfa" sha1="cef91a30d7455d19c84cab7a2286f9b317c0c71d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="equat183" cloneof="equat1">
 		<description>Equations I (version 1983)</description>
 		<year>1983</year>
@@ -22433,6 +22764,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="4wordlft">
+		<description>FourWord &amp; WordLift</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="David E. Metzener" />
+		<info name="programmer" value="Martin Butherus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234831">
+				<rom name="fourword and wordlift.woz" size="234831" crc="bbdcae85" sha1="b8e921df86c65d961a0efc38135950e7c1f80e14" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fracwprb">
 		<description>Fraction Word Problems</description>
 		<year>1983</year>
@@ -22497,6 +22845,31 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234798">
 				<rom name="freddy's puzzling adventures.woz" size="234798" crc="b3652802" sha1="b6b7efcc66ef623f9fa1be18536bf9c25430f804" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frnzflfl">
+		<description>Frenzy &amp; Flip Flop</description>
+		<year>1981</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - 13-sector" />
+			<feature name="sl6_default" value="diskiing13" />
+			<dataarea name="flop" size="234796">
+				<rom name="frenzy and flip flop side a - 13-sector version.woz" size="234796" crc="80ef3ae7" sha1="e4b2a6eead4918092d4e2904d5d78dac3b7f3e2b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - 16-sector" />
+			<feature name="sl6_default" value="diskiing" />
+			<dataarea name="flop" size="234796">
+				<rom name="frenzy and flip flop side b - 16-sector version.woz" size="234796" crc="4726a5d2" sha1="82dd884732104e61f369c5277426b1362a3f4745" />
 			</dataarea>
 		</part>
 	</software>
@@ -23269,6 +23642,31 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="golfccbar">
+		<description>Golf Classic &amp; Compubar</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - 13-sector" />
+			<feature name="sl6_default" value="diskiing13" />
+			<dataarea name="flop" size="234801">
+				<rom name="golf classic and compubar side a - 13-sector version.woz" size="234801" crc="f5da8ccd" sha1="2d2569e51ca3c2920dba755b5e5f5f0a1fb426a1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - 16-sector" />
+			<feature name="sl6_default" value="diskiing" />
+			<dataarea name="flop" size="234801">
+				<rom name="golf classic and compubar side b - 16-sector version.woz" size="234801" crc="292c2f72" sha1="b51bfd7194ffbdba1b768d46f36fdabe91086788" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gramgrem">
 		<description>Grammar Gremlins (version 05.01.87) (800K 3.5")</description>
 		<year>1987</year>
@@ -23489,6 +23887,83 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="55038">
 				<rom name="guardian (softsmith).woz" size="55038" crc="77e204fb" sha1="29e8735d031f61c6da64901284627ec636b1b35a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guitarwiz11601" cloneof="guitarwiz">
+		<description>Guitar Wizard (version 11601)</description>
+		<year>1986</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="partno" value="11601" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="11601" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-04-07 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234787">
+				<rom name="guitar wizard v11601.woz" size="234787" crc="96c08944" sha1="72fd16fac2ecee869385ab09cbbe85d79f3530e9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guitarwiz">
+		<description>Guitar Wizard (version 11611)</description>
+		<year>1986</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="partno" value="11611" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="11611" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2023-03-25 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234787">
+				<rom name="guitar wizard v11611.woz" size="234787" crc="8f6cf10f" sha1="ddacac3c10065b218a18c3ec11a4d5ffa6260b22" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gulparrg">
+		<description>Gulp!! &amp; Arrow Graphics</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - 13-sector" />
+			<feature name="sl6_default" value="diskiing13" />
+			<dataarea name="flop" size="234783">
+				<rom name="gulp and arrow graphics side a - 13-sector version.woz" size="234783" crc="8a3e0f5e" sha1="8c5a3a04e72dbbd847777e093c1753d52bae0cde" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - 16-sector" />
+			<feature name="sl6_default" value="diskiing" />
+			<dataarea name="flop" size="234801">
+				<rom name="gulp and arrow graphics side b - 16-sector version.woz" size="234801" crc="22a18274" sha1="e5bdf7279cb7fc947be33b73ba0dcaa68cb23c89" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gulpfrnz">
+		<description>Gulp!! &amp; Frenzy</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234759">
+				<rom name="gulp and frenzy.woz" size="234759" crc="a40251ac" sha1="6fb6870c224d29c954c9d91f1eaec43204539a5c" />
 			</dataarea>
 		</part>
 	</software>
@@ -25336,6 +25811,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="korg8004m">
+		<description>Korg 800 4-Track MIDI Sequencer (version 1.0)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234793">
+				<rom name="korg-800 4-track midi sequencer v1.0.woz" size="234793" crc="1f5e1449" sha1="3a460e5115352aa1e09540f485313ce1b3cff586" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="krift">
 		<description>Koronis Rift</description>
 		<year>1985</year>
@@ -25600,6 +26093,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="121599">
 				<rom name="lazer silk (softsmith).woz" size="121599" crc="adfeab84" sha1="802b6dc2fee04f3aabb6deb1664a4f27c58eef19" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leadshtr">
+		<description>Leadsheeter</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="author" value="Phil Farrand" />
+		<info name="programmer" value="Dave Kusek" />
+		<info name="programmer" value="John Borowicz" />
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234724">
+				<rom name="leadsheeter.woz" size="234724" crc="24983d63" sha1="87bd1ece2870c485202f12c226371a3ddafea92c" />
 			</dataarea>
 		</part>
 	</software>
@@ -26737,6 +27249,44 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mstrtrks">
+		<description>Master Tracks (version 1.8)</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="programmer" value="Phil Stone" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.8" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241454">
+				<rom name="master tracks v1.8.woz" size="241454" crc="e0c144e6" sha1="e2a9be5400126613760690d293ff643641fe7d44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masttrpro">
+		<description>Master Tracks Pro (version 1.2)</description>
+		<year>1987</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="programmer" value="Phil Stone" />
+		<info name="usage" value="Requires a 128K enhanced Apple //e or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234797">
+				<rom name="master tracks pro v1.2.woz" size="234797" crc="e43e90ad" sha1="25b9d623d318fb6d798e92b9127f4c8536295348" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mmerlyad">
 		<description>Mastering Math Series 1: Early Addition (A-788 version 1.3)</description>
 		<year>1983</year>
@@ -27072,6 +27622,38 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234768">
 				<rom name="math man.woz" size="234768" crc="cb865fc4" sha1="5f99c6a876b63c81aa17eabaf79d54ac87a66dc3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthmrvls">
+		<description>Math Marvels</description>
+		<year>1984</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="programmer" value="Doug Super" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2024-11-30 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="math marvels.woz" size="234763" crc="c410b069" sha1="9b27f63eba00ad1cfa5022b89852ac8d144d9f36" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthmstrs">
+		<description>Math Masters</description>
+		<year>1984</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="programmer" value="Doug Super" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2024-11-30 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="math masters.woz" size="234763" crc="be91c141" sha1="7aa4694953243d4c56c4d08ab3803e80e64e735e" />
 			</dataarea>
 		</part>
 	</software>
@@ -27777,6 +28359,103 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Recipe" />
 			<dataarea name="flop" size="234800">
 				<rom name="micro barmate (softsmith) disk 2 - recipe disk.woz" size="234800" crc="d8d18e90" sha1="7a1791e80a23558fa6490510163ec8029f42aa6b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlbbmlr1" cloneof="mlbbml">
+		<description>Micro League Baseball (Micro League Sports Association) (revision 1)</description>
+		<year>1984</year>
+		<publisher>Micro League Sports Association</publisher>
+		<info name="programmer" value="John I. Graybill" />
+		<info name="programmer" value="Mark &quot;Adam&quot; Baum" />
+		<info name="programmer" value="Stephen L. Cox" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="revision 1" />
+		<!-- This is a different game than Micro League Baseball by Stoneware. -->
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-03 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241504">
+				<rom name="micro league baseball rev. 1.woz" size="241504" crc="b9c6dff2" sha1="4be5dd87e35abeb0f14037cbaad93de1041cb2f9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlbbmlr2" cloneof="mlbbml">
+		<description>Micro League Baseball (Micro League Sports Association) (revision 2)</description>
+		<year>1984</year>
+		<publisher>Micro League Sports Association</publisher>
+		<info name="programmer" value="John I. Graybill" />
+		<info name="programmer" value="Mark &quot;Adam&quot; Baum" />
+		<info name="programmer" value="Stephen L. Cox" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="revision 2" />
+		<!-- This is a different game than Micro League Baseball by Stoneware. -->
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-03 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241521">
+				<rom name="micro league baseball rev. 2.woz" size="241521" crc="0de67855" sha1="cc44f3c086d2090960a69539ac48f76eca2a9fe6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlbbml">
+		<description>Micro League Baseball (Micro League Sports Association) (revision 3)</description>
+		<year>1984</year>
+		<publisher>Micro League Sports Association</publisher>
+		<info name="programmer" value="John I. Graybill" />
+		<info name="programmer" value="Mark &quot;Adam&quot; Baum" />
+		<info name="programmer" value="Stephen L. Cox" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="revision 3" />
+		<!-- This is a different game than Micro League Baseball by Stoneware. -->
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-03 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241521">
+				<rom name="micro league baseball rev. 3.woz" size="241521" crc="a27f0fae" sha1="0d87ed2649e34a5a1d0cacddd7c60c8277e92ccd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlbbbssc">
+		<description>Micro League Baseball: Box Score / Stats Compiler Disk</description>
+		<year>1986</year>
+		<publisher>Micro League Sports Association</publisher>
+		<info name="programmer" value="James A. Dorsman" />
+		<info name="programmer" value="Stephen L. Cox" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<!-- Add-on program for Micro League Baseball (sold separately). -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-11 -->
+		<!-- sports game add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241519">
+				<rom name="micro league baseball box score-stat compiler disk.woz" size="241519" crc="9e0569c6" sha1="8e1ccfb703fb9e67a5e19b29c78f3b90a8886643" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlbbgmo">
+		<description>Micro League Baseball: General Manager / Owner Disk</description>
+		<year>1985</year>
+		<publisher>Micro League Sports Association</publisher>
+		<info name="programmer" value="James A. Dorsman" />
+		<info name="programmer" value="Mark &quot;Adam&quot; Baum" />
+		<info name="programmer" value="Stephen L. Cox" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<!-- Add-on program for Micro League Baseball (sold separately). -->
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-07-23 -->
+		<!-- sports game add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234899">
+				<rom name="micro league baseball general manager-owner disk.woz" size="234899" crc="0f58fce6" sha1="91e7b5b166eb138d705c4d39733d14177dc68b9b" />
 			</dataarea>
 		</part>
 	</software>
@@ -29968,6 +30647,60 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 Side 2 - p.s. write back" />
 			<dataarea name="flop" size="235156">
 				<rom name="microzine jr. no. 10 - disk 2, side 2- p.s. write back.woz" size="235156" crc="7a23b43c" sha1="456465d26252fea66a0bcca9c54bd379c84ec1d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi4">
+		<description>MIDI/4 (revision 5)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 5" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234771">
+				<rom name="midi-4 rev. 5.woz" size="234771" crc="8e887d19" sha1="cea449b6de13b965a58a2f8a7a79f23663fade3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi8p">
+		<description>MIDI/8 Plus (version 1.2)</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234789">
+				<rom name="midi-8 plus v1.2.woz" size="234789" crc="1dcb5816" sha1="6ef26bb5c5adc32ccb7bbf2b84637ca9d0e00012" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi8p401">
+		<description>MIDI/8 Plus for MPU-401 (version 1.2)</description>
+		<year>1985</year>
+		<publisher>Passport Designs</publisher>
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<sharedfeat name="sl2_default" value="midi" />
+		<!-- Dump released: 2025-03-17 -->
+		<!-- sound utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234785">
+				<rom name="midi-8 plus for mpu-401 v1.2.woz" size="234785" crc="d1bc7097" sha1="5d5c5fe2bac36abae3bcbda2b9925012816a2675" />
 			</dataarea>
 		</part>
 	</software>
@@ -32497,6 +33230,94 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="pixitr0" cloneof="pixit">
+		<description>Pixit (revision 0)</description>
+		<year>1983</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="Kimberly Evans" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="revision 0" />
+		<!-- This is the first release, identifiable by the lack of any visible version number during boot. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234732">
+				<rom name="pixit.woz" size="234732" crc="ec6fe3df" sha1="412fda4fc10db6975faf642748da0771919b2682" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pixit">
+		<description>Pixit (version 01331)</description>
+		<year>1983</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="01331" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="Kimberly Evans" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="01331" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234762">
+				<rom name="pixit v01331.woz" size="234762" crc="7269fc3b" sha1="a36056af261f954db84f1c34f9761076493d7a50" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pixitsl1">
+		<description>Pixit Shape Library #1: Shapes &amp; Fonts</description>
+		<year>1983</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- graphics program add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234830">
+				<rom name="pixit shape library 1.woz" size="234830" crc="8564760b" sha1="d0020d3d7e753c770177fa311e0cb2eb4b194bf9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pixitsl2">
+		<description>Pixit Shape Library #2: Science</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- graphics program add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234779">
+				<rom name="pixit shape library 2- science.woz" size="234779" crc="ddfc7672" sha1="6b9aabc3192efb0cd706903b421816a1cb4fdc07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pixitsl3">
+		<description>Pixit Shape Library #3: Kid Stuff</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- graphics program add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234808">
+				<rom name="pixit shape library 3- kid stuff.woz" size="234808" crc="dbfbffa4" sha1="46b391dfa180f74140d06172ce88a7f566c215ba" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pltanimc">
 		<description>Plant and Animal Cells</description>
 		<year>1986</year>
@@ -32631,6 +33452,44 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="polywr">
+		<description>PolyWriter (version 1.2)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<info name="alt_title" value="Polywriter 401" />
+		<!-- After the titlescreen, it is branded for the MPU-401 -->
+		<info name="author" value="Phil Farrand" />
+		<info name="programmer" value="Dave Kusek" />
+		<info name="programmer" value="John Borowicz" />
+		<info name="programmer" value="John Melcher" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-02-22 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234810">
+				<rom name="polywriter v1.2.woz" size="234810" crc="d5b9b4d1" sha1="b3a7418084e652b4ed24d67c97b840496ea0bbb0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poprspl">
+		<description>Pop 'R Spell &amp; Pop 'R Spell Challenge</description>
+		<year>1983</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="developer" value="Milliken Publishing Company" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234770">
+				<rom name="pop 'r spell and pop 'r spell challenge.woz" size="234770" crc="2a3be6a6" sha1="1fd7fdc84eb67fd3ea47fb9cf788589ee2fa6940" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poster">
 		<description>Poster</description>
 		<year>1984</year>
@@ -32710,6 +33569,64 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="234796">
 				<rom name="press your luck side b.woz" size="234796" crc="7f400b08" sha1="0f45957be53ff84c9e43ae854d8997c9e8569194" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prince15521" cloneof="prince">
+		<description>Prince (version 15521)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="15521" />
+		<info name="programmer" value="Joel Novak" />
+		<info name="programmer" value="Ken Steiner" />
+		<info name="programmer" value="Michael Darooge" />
+		<info name="programmer" value="Bob Svihovec" />
+		<info name="programmer" value="Bryan Koeff" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="15521" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234781">
+				<rom name="prince v15521 side a.woz" size="234781" crc="33fbb6e9" sha1="b528fcaa2e93bfe6657de0aaa84cc8dbaa616d61" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234781">
+				<rom name="prince v15521 side b.woz" size="234781" crc="06c2141e" sha1="cdf3b23df58fc82eb8664090c51a0b7bdfa12af5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prince">
+		<description>Prince (version 15531)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="15531" />
+		<info name="programmer" value="Joel Novak" />
+		<info name="programmer" value="Ken Steiner" />
+		<info name="programmer" value="Michael Darooge" />
+		<info name="programmer" value="Bob Svihovec" />
+		<info name="programmer" value="Bryan Koeff" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="15531" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234781">
+				<rom name="prince v15531 side a.woz" size="234781" crc="60c4b451" sha1="10fd4738216049ecb377bc2546f3cd5c638fb4fd" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234781">
+				<rom name="prince v15531 side b.woz" size="234781" crc="610940bf" sha1="641f2d1251433b6c5739e415184b22a60e4bbb1c" />
 			</dataarea>
 		</part>
 	</software>
@@ -33155,6 +34072,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233497">
 				<rom name="rad warrior.woz" size="233497" crc="d60e8944" sha1="6636e38a149e48d7a4ba20321cb0c92abdf0eb0d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainydg">
+		<description>Rainy Day Games (version 13501)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="David Walker" />
+		<info name="developer" value="Baudville" />
+		<info name="partno" value="13501" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="13501" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-28 -->
+		<!-- card game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="rainy day games v13501.woz" size="234778" crc="dcfd972c" sha1="1c84b6131a5e89b400bfce7f8f114e6557367c8f" />
 			</dataarea>
 		</part>
 	</software>
@@ -35487,6 +36423,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="skicrzed">
+		<description>Ski Crazed (version 28701)</description>
+		<year>1987</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="JAM Software" />
+		<info name="partno" value="28701" />
+		<info name="programmer" value="Jason Rubin" />
+		<info name="programmer" value="Andy Gavin" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="28701" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-05-25 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="ski crazed.woz" size="234775" crc="92531d10" sha1="9fb8ad412976644fa03814229e1b84196ca8fcaf" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="skyfox">
 		<description>Skyfox</description>
 		<year>1984</year>
@@ -36167,7 +37123,7 @@ license:CC0-1.0
 		<info name="programmer" value="Gordon Eastman" />
 		<info name="usage" value="Requires a 48K Apple ][, Apple ][+, or unenhanced Apple //e.  Does not run on later modes due to copy protection." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E" />
-		<!-- Dump released: 2025-01-04 -->
+		<!-- Dump released: 2024-12-06 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="307967">
@@ -37432,6 +38388,121 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234767">
 				<rom name="symbols and sets 1988.woz" size="234767" crc="20f37ec2" sha1="f86bfd73e547686e74e5cd92a98b6824414808cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="take106431" cloneof="take1">
+		<description>Take 1 (version 06431)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Maurizio Barbatano" />
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="06431" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="06431" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2022-07-06 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="take 1 v06431.woz" size="234763" crc="cd217a33" sha1="b94f01a7e68ca9b2d2d826c4f4a061001d10b003" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="take1">
+		<description>Take 1 (version 06451)</description>
+		<year>1984</year>
+		<publisher>Baudville</publisher>
+		<info name="author" value="Maurizio Barbatano" />
+		<info name="author" value="Michael Darooge" />
+		<info name="partno" value="06451" />
+		<info name="programmer" value="Edward McCullough" />
+		<info name="programmer" value="David Walker" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="06451" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-08-20 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234763">
+				<rom name="take 1 v06451.woz" size="234763" crc="cd710df8" sha1="bb0b2cd4f9a58e90ba8cae3544c387c67c5a1a4c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="take1al1">
+		<description>Take 1 Animation Library #1: Actors &amp; Actions</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-30 -->
+		<!-- graphics program add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="take 1 animation library 1- actors &amp; actions.woz" size="234821" crc="c24a52fd" sha1="85f8cf30813a128c11caada6773f9e3ec1551bba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="take1al2">
+		<description>Take 1 Animation Library #2: Heroes &amp; Villians</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-30 -->
+		<!-- graphics program add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234822">
+				<rom name="take 1 animation library 2- heroes &amp; villains.woz" size="234822" crc="9be604e0" sha1="6fdaeef2fa77b90fc460b909394146a63fd190a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="take1al3">
+		<description>Take 1 Animation Library #3: Business</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-30 -->
+		<!-- graphics program add-on -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="234813">
+				<rom name="take 1 animation library 3- business side a.woz" size="234813" crc="87d1937c" sha1="6a1fec8dba637a42502cfca55433c35e1f6dd6c7" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="234813">
+				<rom name="take 1 animation library 3- business side b.woz" size="234813" crc="002969eb" sha1="936907888477c33c1230986bc8bb2ae3f0fa41b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="take1ptkit">
+		<description>Take 1 Programmer's Toolkit (version 10601-0000)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="developer" value="Baudville" />
+		<info name="partno" value="10601" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="10601-0000" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-01-30 -->
+		<!-- graphics utility -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234814">
+				<rom name="take 1 programmer's toolkit.woz" size="234814" crc="0dc8120b" sha1="beab1d5450b97574450d05d2096b15e704eef668" />
 			</dataarea>
 		</part>
 	</software>
@@ -39444,6 +40515,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="jarchaos">
+		<description>The Jar Game &amp; Chaos</description>
+		<year>1982</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="William H. Kraus" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234780">
+				<rom name="the jar game and chaos.woz" size="234780" crc="c68f64ef" sha1="95e8e8421949dfb7c92583308e7ab43336a2d670" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingrule">
 		<description>The King's Rule: Mathematics and Discovery</description>
 		<year>1984</year>
@@ -41135,6 +42222,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="tranbase">
+		<description>Tranquility Base</description>
+		<year>1979</year>
+		<publisher>Stoneware</publisher>
+		<info name="programmer" value="Bill Budge" />
+		<info name="usage" value="Requires a 32K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2025-11-15 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234817">
+				<rom name="tranquility base.woz" size="234817" crc="271dc5e8" sha1="044904322e394f5daf551acf80224758e57b4ff4" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="trantran">
 		<description>Transportation Transformation (800K 3.5")</description>
 		<year>1991</year>
@@ -42075,6 +43178,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234775">
 				<rom name="video title shop.woz" size="234775" crc="cd30f1dc" sha1="5471b1bc795cbb29238d6833ee8c7f790a136451" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidvegas12501">
+		<description>Video Vegas (version 12501)</description>
+		<year>1985</year>
+		<publisher>Baudville</publisher>
+		<info name="partno" value="12501" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="12501" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-10-25 -->
+		<!-- card game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234702">
+				<rom name="video vegas.woz" size="234702" crc="f47a8783" sha1="2b8e0f911b4a98f0b0f009e2508c4e0a348736bd" />
 			</dataarea>
 		</part>
 	</software>
@@ -43468,6 +44588,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1329013">
 				<rom name="word attack plus spanish 800k.woz" size="1329013" crc="fc7872de" sha1="ee9e91738a9a2ac6790750490c8948c09e8ccb02" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wordmspl">
+		<description>Word Machine &amp; Word Machine with Spelling List</description>
+		<year>1984</year>
+		<publisher>Milliken Publishing Company</publisher>
+		<info name="programmer" value="John W. Ratcliff" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-12-09 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234832">
+				<rom name="word machine and word machine with spelling list.woz" size="234832" crc="3cba5adb" sha1="7e3ed0734bb8323d094bda7d46a4cc495740c3cc" />
 			</dataarea>
 		</part>
 	</software>
