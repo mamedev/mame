@@ -43,6 +43,7 @@ namespace bus::megadrive::slotoptions {
 	extern char const *const MD_JCART_MICROMAC2;
 	extern char const *const MD_JCART_MICROMAC96;
 	extern char const *const MD_SEGACH_JP;
+	extern char const *const MD_SEGACH_US;
 	extern char const *const MD_SONIC3;
 	extern char const *const MD_SSF2;
 	extern char const *const MD_SRAM;

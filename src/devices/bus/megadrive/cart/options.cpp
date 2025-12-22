@@ -54,6 +54,7 @@ char const *const MD_JCART_SSKID        = "rom_jcart";
 char const *const MD_JCART_MICROMAC2    = "rom_codemast";
 char const *const MD_JCART_MICROMAC96   = "rom_mm96";
 char const *const MD_SEGACH_JP          = "segach_jp";
+char const *const MD_SEGACH_US          = "segach_us";
 char const *const MD_TECTOY_SPORTS      = "tectoy_sports";
 char const *const MD_3IN1_FWT           = "3in1fwt";
 // MC: MultiCart
@@ -141,6 +142,7 @@ void megadrive_cart_options(device_slot_interface &device)
 
 	// Sega Channel
 	device.option_add_internal(slotoptions::MD_SEGACH_JP,   MEGADRIVE_SEGACH_JP);
+	device.option_add_internal(slotoptions::MD_SEGACH_US,   MEGADRIVE_SEGACH_US);
 
 	// menu based multigames (pirate)
 	device.option_add_internal(slotoptions::MC_PIRATE,    MEGADRIVE_MCPIRATE);
