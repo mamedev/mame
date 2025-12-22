@@ -29180,7 +29180,19 @@ ROM_END
   Custom Hardware Notes:
 
   The hardware uses 1-wire Dallas iButton DS1994L-F5 instead of the W4 3-wires
-  Dallas DS2401.
+  Dallas DS2401. The format to store the serial is similar to the W4 Dallas DS2401,
+  but the bytes are stored in reverse order.
+
+  Example:
+
+  Serial:     00 00 00 69 A1 C9
+  ROM:     C0 FF FF FF 96 5E 36 01
+           -- ----------------- --
+            |         |          |
+            |         |          '-- 8-bits for family (01 = standard ibutton)
+            |         '------------- 48-bits for serial (XOR'ed with 0xff)
+            '----------------------- 8-bits for CRC (polynomial of X^8 + X^5 + X^4 + 1)
+
 
   To initialize the game the first time, enter BOOKS/STATS/SETUP (Key 0),
   and advance through the menus with RESET key (key R). When finish press
@@ -29188,10 +29200,7 @@ ROM_END
 
   ---
 
-  GFX Bank 1 (chars and BG graphics) is colors-accurate.
-  GFX Bank 2 needs some work...
-
-  There is a window that should shows the bonus graphics.
+  There is a window that shows the bonus graphics.
   This graphic icon is taken from Bank 2, and is the "representative"
   for the chosen gfx set.
 
@@ -29205,11 +29214,6 @@ ROM_END
   Reels GFX 4: E7-E8-E9-EA-EB-EC-ED-EE-EF-F0
 
   ...and written 0x10 at B0C0-B0FF.
-
-
-  The taiwanese hardware needs better decoded reels graphics ROMs,
-  The chars/text graphics are properly decodes, but texts strings
-  look bad in the game.
 
 
 *******************************************************************************************/
