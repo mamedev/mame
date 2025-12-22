@@ -552,7 +552,7 @@ static INPUT_PORTS_START( brkthru )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))   // used only by the self test
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // used only by the self test
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
@@ -589,10 +589,8 @@ static INPUT_PORTS_START( brkthru )
 	PORT_DIPSETTING(    0x04, "10000/20000 Points" )
 	PORT_DIPSETTING(    0x0c, "20000/30000 Points" )
 	PORT_DIPSETTING(    0x08, "20000/40000 Points" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5") // Manual says ALWAYS OFF
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	// SW2:7,8 ALWAYS OFF according to the manual
+	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	// SW2:6,7,8: can't be read by software, see FLIP for SW2:6, and SW2:7,8 are ALWAYS OFF according to the manual
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
@@ -603,15 +601,17 @@ static INPUT_PORTS_START( brkthru )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( brkthruj )
+static INPUT_PORTS_START( brkthruu )
 	PORT_INCLUDE( brkthru )
 
 	PORT_MODIFY("DSW2_COIN")
-	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5") // Manual says ALWAYS OFF
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( brkthrut )
-	PORT_INCLUDE( brkthru )
+	PORT_INCLUDE( brkthruu )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
@@ -630,14 +630,14 @@ static INPUT_PORTS_START( darwin )
 	PORT_INCLUDE( brkthru )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )   // Manual says must be OFF
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" ) // Manual says must be OFF
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )   // Manual says must be OFF
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" ) // Manual says must be OFF
 
 	PORT_MODIFY("DSW2_COIN")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
@@ -651,11 +651,7 @@ static INPUT_PORTS_START( darwin )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	// SW2:5,7,8 ALWAYS OFF according to the manual
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" ) // Manual says must be OFF
 INPUT_PORTS_END
 
 
@@ -1077,9 +1073,9 @@ ROM_END
  *************************************/
 
 GAME( 1986, brkthru,   0,       brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Break Thru (World)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruu,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruu,  brkthru, brkthru, brkthruu, brkthru_state, empty_init, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyoukou Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1986, brkthrut,  brkthru, brkthru, brkthrut, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, darwin,    0,       darwin,  darwin,   brkthru_state, empty_init, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )
