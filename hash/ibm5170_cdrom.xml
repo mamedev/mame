@@ -4065,7 +4065,6 @@ https://mametesters.org/view.php?id=9334
 		<description>Full Tilt! 2 Pinball (version 1.0)</description>
 		<year>1996</year>
 		<publisher>Maxis</publisher>
-		<info name="developer" value="Cinematronics" />
 		<info name="release" value="19961031" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
