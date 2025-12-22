@@ -45,9 +45,6 @@ static constexpr double TRIANGLE_VOLUME = SAWTOOTH_VOLUME * 1.27f;
 // external input is unknown but let's make it the same as the pulse
 static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
 
-// filter volume when self-oscillating unknown, using PULSE_VOLUME arbitrarily
-static constexpr double FILTER_OSC_VOLUME = PULSE_VOLUME;
-
 
 // waveform generation parameters
 #define ENABLE_PULSE        1
@@ -159,7 +156,6 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 	m_filter_frequency(1300),
 	m_filter_modulation(0),
 	m_filter_resonance(0),
-	m_filter_osc_position(0),
 	m_filter_in{0},
 	m_filter_out{0},
 	m_pulse_width(0),
@@ -224,7 +220,12 @@ double cem3394_device::filter(double input, double cutoff)
 	double outscale = 1.0;
 	double res = m_filter_resonance;
 	if (res > 0.99)
-		res = 0.99, outscale = 0.5;
+	{
+		// Don't clamp if there is no input, to allow self-oscillation to occur.
+		if (m_wave_select)
+			res = 0.99;
+		outscale = 0.5;
+	}
 
 	// core filter implementation
 	double g = tan(M_PI * cutoff * m_inv_sample_rate);
@@ -258,6 +259,7 @@ double cem3394_device::filter(double input, double cutoff)
 		m_filter_out[0] *= scale;
 		m_filter_out[1] *= scale;
 	}
+
 	return output;
 }
 
@@ -424,31 +426,10 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 		if (ENABLE_EXTERNAL && BIT(input_mask, AUDIO_INPUT))
 			result += EXTERNAL_VOLUME * m_mixer_external * stream.get(AUDIO_INPUT, sampindex);
 
-		if (FILTER_TYPE)
-		{
-			// compute the modulated filter frequency and apply the filter
-			// modulation tracks the VCO triangle
-			const double filter_freq = m_filter_frequency * (1 + m_filter_modulation * triangle);
-			// need to call filter() and advance the filter's state, even if we don't use the result
-			const double filter_result = filter(result, filter_freq);
-
-			// advance the position of the oscillator used when the filter is self-oscillating
-			m_filter_osc_position += filter_freq * m_inv_sample_rate;
-			if (m_filter_osc_position >= 1.0)
-				m_filter_osc_position -= floor(m_filter_osc_position);
-
-			if (!m_wave_select && m_filter_resonance >= 1.0)
-			{
-				// when no waveform is selected and the filter is configured to self-oscilate,
-				// use a sine wave oscillator.
-				const double angle = 2 * M_PI * m_filter_osc_position - M_PI;
-				result = FILTER_OSC_VOLUME * sin(angle);
-			}
-			else
-			{
-				result = filter_result;
-			}
-		}
+		// compute the modulated filter frequency and apply the filter
+		// modulation tracks the VCO triangle
+		double filter_freq = m_filter_frequency * (1 + m_filter_modulation * triangle);
+		result = filter(result, filter_freq);
 
 		// apply AC coupling
 		if (ENABLE_AC_COUPLING)
@@ -485,7 +466,6 @@ void cem3394_device::device_start()
 	save_item(NAME(m_filter_frequency));
 	save_item(NAME(m_filter_modulation));
 	save_item(NAME(m_filter_resonance));
-	save_item(NAME(m_filter_osc_position));
 	save_item(NAME(m_filter_in));
 	save_item(NAME(m_filter_out));
 
