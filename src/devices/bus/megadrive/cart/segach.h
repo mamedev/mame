@@ -48,6 +48,8 @@ private:
 	memory_bank_creator m_rom;
 	std::vector<u16> m_ram;
 
+	std::array<u8, 0x10> m_nvm;
+
 	address_space_config m_space_tcu_config;
 
 	u16 m_tcu_index, m_tcu_dir;

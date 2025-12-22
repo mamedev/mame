@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Angelo Salese
+// copyright-holders: Angelo Salese, superctr
 /**************************************************************************************************
 
 Sega Channel Game no Kanzume "digest" RAM cart, developed by CRI
@@ -88,10 +88,19 @@ void megadrive_segach_jp_device::time_io_map(address_map &map)
  *
  * https://segaretro.org/Sega_Channel#Photo_gallery
  *
+ * Eventually times out with error 0008 at the title screen.
+ *
  * Various combinations hold at boot calls different menus:
  * - START+A: parental control
  * - START+C: language select
+ * - START+B allows access to a diagnostics menu if a special
+ *   device is connected to controller port 2 that shorts
+ *   bit 0 and 6. For segachnl, you can bypass this
+ *   by noping out everything from $a61a to $a670 (or doing
+ *   the same thing with breakpoints in the debugger).
  *
+ * The BIOS also listens to controller port 2 in serial mode
+ * for a diagnostics mode.
  */
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_SEGACH_US, megadrive_segach_us_device, "megadrive_segach_us", "Megadrive Sega Channel US cart")
@@ -101,7 +110,7 @@ megadrive_segach_us_device::megadrive_segach_us_device(const machine_config &mco
 	, device_megadrive_cart_interface( mconfig, *this )
 	, device_memory_interface( mconfig, *this )
 	, m_rom(*this, "rom")
-	, m_space_tcu_config("tcu_io", ENDIANNESS_BIG, 16, 9, 0, address_map_constructor(FUNC(megadrive_segach_us_device::tcu_map), this))
+	, m_space_tcu_config("tcu_io", ENDIANNESS_BIG, 8, 9, 0, address_map_constructor(FUNC(megadrive_segach_us_device::tcu_map), this))
 {
 }
 
@@ -115,6 +124,7 @@ void megadrive_segach_us_device::device_start()
 				m_rom->configure_entry(0, &base[0]);
 			});
 	m_ram.resize(0x40'0000 / 2);
+	m_nvm.fill(0);
 }
 
 void megadrive_segach_us_device::device_reset()
@@ -145,33 +155,38 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 	// TCU STATUS
 	map(0x04, 0x05).lrw16(
 		NAME([] (offs_t offset, u16 mem_mask) {
-			// status for something
-			return 0xf;
+			// bit 0: PLL locked
+			// bit 1: will cause error 0001 if set
+			// bit 15: TCU is busy
+			return 1;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			// assume always 16-bit access
 			// 1: set for read, 0: set for write
 			m_tcu_dir = BIT(data, 15);
 			m_tcu_index = data & 0x1ff;
 		})
 	);
 	// TCU DATA
-	map(0x06, 0x07).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
+	map(0x07, 0x07).lrw8(
+		NAME([this] (offs_t offset) -> u16 {
 			if (!m_tcu_dir && !machine().side_effects_disabled())
 			{
 				logerror("Attempting to read with TCU DIR unset\n");
 				return 0xffff;
 			}
-			return space(0).read_word(m_tcu_index, mem_mask);
+			u16 data = space(0).read_byte(m_tcu_index);
+			if (!machine().side_effects_disabled())
+				m_tcu_index = (m_tcu_index + 1) & 0x1ff;
+			return data;
 		}),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+		NAME([this] (offs_t offset, u16 data) {
 			if (m_tcu_dir)
 			{
 				logerror("Attempting to write with TCU DIR set\n");
 				return;
 			}
-			space(0).write_word(m_tcu_index, data, mem_mask);
+			space(0).write_byte(m_tcu_index, data);
+			m_tcu_index = (m_tcu_index + 1) & 0x1ff;
 		})
 	);
 //  map(0x10, 0x11) fixit start address
@@ -180,8 +195,8 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 //  map(0x22, 0x23) game id
 //  map(0x24, 0x25) pkt match address
 //  map(0x26, 0x27) current spacket
-//  map(0x30, 0x31) gen status
-//  map(0x32, 0x33) gen control
+//  map(0x30, 0x31) general status
+//  map(0x32, 0x33) general control
 //  map(0x34, 0x35) error counter
 //  map(0x40, 0x41) CRC input
 //  map(0x42, 0x43) CRC low out
@@ -191,22 +206,53 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 
 void megadrive_segach_us_device::tcu_map(address_map &map)
 {
-//  map(0x000, 0x000) AUTH map
-//  map(0x010, 0x010) free map
-//  map(0x020, 0x020) p2play
-//  map(0x023, 0x023) p2pservid
-//  map(0x0a0, 0x0a0) transdata
-//  map(0x0b1, 0x0b2) gametime
-//  map(0x0b3, 0x0b3) resetcond
-//  map(0x0b4, 0x0b4) dayofweek
+//  map(0x000, 0x00f) authorization map
+	map(0x000, 0x00f).lr8(
+		NAME([] () -> u8 {
+			// this is a bitmap containing which service IDs are
+			// authorized to play on the adapter.
+			return 0xff;
+		}));
+//  map(0x010, 0x01f) free map
+	map(0x010, 0x01f).lr8(
+		NAME([] () -> u8 {
+			// this is a bitmap containing which service IDs are
+			// free to play on any adapter. only checked if the
+			// authorization bit was 0.
+			return 0xff;
+		}));
+//  map(0x020, 0x020) pay-to-play
+//  map(0x023, 0x023) pay-to-play service ID
+//  map(0x0a0, 0x0a0) transaction data
+//  map(0x0b1, 0x0b2) game time remaining
+//  map(0x0b3, 0x0b3) reset condition
+//  map(0x0b4, 0x0b4) day of week
 //  map(0x0b5, 0x0b5) week
-//  map(0x0b6, 0x0b6) todtimout
-//  map(0x0b7, 0x0b7) authbyte
+//  map(0x0b6, 0x0b6) time of day timeout
+//  map(0x0b7, 0x0b7) authorization byte
+	map(0x0b7, 0x0b7).lr8(
+		NAME([] () -> u8 {
+			// bit 7 is set if the cable company has authorized the adapter
+			return 0x80; // 0x00..0x04 if unauthorized
+		}));
 //  map(0x0b8, 0x0b8) checksum
-//  map(0x0b9, 0x0b9) PLL config
+//  map(0x0b9, 0x0b9) PLL type
+	map(0x0b9, 0x0b9).lr8(
+		NAME([] () -> u8 {
+			return 0x81; // mitsubishi/philips
+			// return 0x87; // rohm
+		}));
 //  map(0x0ba, 0x0bd) PLL data
-//  map(0x0c0, 0x0c1) password
-//  map(0x0c2, 0x0c2) chanbitmap
+//  map(0x0c0, 0x0c1) parental control password
+//  map(0x0c2, 0x0c2) channel bitmap
+	map(0x0c2, 0x0ca).lr8(
+		NAME([this] (offs_t offset) -> u8 {
+			// this is a bitmap with the corresponding bit set when the TCU
+			// detects a channel
+			logerror("TCU channel bitmap read offset %02x\n", offset);
+			//return 0x00; // No signal :(
+			return 0xFF; // Signal everywhere :D
+		}));
 //  map(0x0cb, 0x0cb) parental control level
 //  map(0x0cc, 0x0cc) initialized
 //  map(0x0cd, 0x0ce) random seed, (d?)word
@@ -214,12 +260,22 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x0e0, 0x0e0) station
 //  map(0x0e1, 0x0e1) slot
 //  map(0x0e2, 0x0e2) service ID
-//  map(0x0e3, 0x0e3) filter code
+//  map(0x0e3, 0x0e4) filter code
 //  map(0x0e5, 0x0e5) channel number
 //  map(0x0f3, 0x0f6) unit addr
+
+//  map(0x1e0, 0x1ff) mini NVRAM?
+//  the following are hard coded for now:
 //  map(0x1e0, 0x1e0) language
 //  map(0x1e1, 0x1e1) help communications port
 //  map(0x1e2, 0x1e2) menu lptr
 //  map(0x1e6, 0x1e6) tuner type (0) TD1A (1) TD1B
-//  map(0x1e1, 0x1ff) mini NVRAM?
+	map(0x1e0, 0x1ff).lrw8(
+		NAME([this] (offs_t offset, u16 mem_mask) -> u8 {
+			return m_nvm[offset & 0x0f];
+		}),
+		NAME([this] (offs_t offset, u8 data, u16 mem_mask) {
+			m_nvm[offset & 0x0f] = data;
+		})
+	);
 }
