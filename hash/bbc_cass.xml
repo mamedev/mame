@@ -9067,9 +9067,9 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="mineshafa" cloneof="mineshaf">
-		<description>Mineshaft (Alternative)</description>
+		<description>Mineshaft (Alternative Software)</description>
 		<year>1990</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<sharedfeat name="compatibility" value="B,M"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11986">

@@ -10786,7 +10786,7 @@ Software for [modem], throws an error requiring a Dream Passport
 	<!-- Bundled together with Dreamcast consoles. -->
 	<!--
 	<software name="dreamkey2a" cloneof="dreamkey3" supported="no">
-	    <description>DreamKey Version 2.0 (Fra, Ger, Spa, UK)</description>
+	    <description>DreamKey Version 2.0 (France, Germany, Spain, UK)</description>
 	    <year>2000</year>
 	    <publisher>Sega</publisher>
 	    <info name="serial" value="832-0053-50"/>
@@ -13281,7 +13281,7 @@ Hangs on SNK logo
 
 	<!--
 	<software name="fforce2fd" cloneof="fforce2" supported="no">
-	    <description>Fighting Force 2 (Fra, Ned)</description>
+	    <description>Fighting Force 2 (France, Netherlands)</description>
 	    <year>1999</year>
 	    <publisher>Eidos Interactive</publisher>
 	    <info name="serial" value="T-36802D-59"/>
