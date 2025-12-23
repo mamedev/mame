@@ -134,10 +134,11 @@ Hangs when accessing first diamond shaped portal
 ]]></notes>
 		<info name="alt_title" value="未来" />
 		<info name="release" value="198611xx" />
-		<info name="usage" value="Intended for pc9801u and pc9801uv only" />
+		<info name="usage" value="Intended for pc9801u and pc9801uv only. Press STOP key during intro to start a new game" />
 		<part name="flop1" interface="floppy_3_5">
+			<!-- baddump: non-factory default save, starts in planet 3 -->
 			<dataarea name="flop" size="6280416">
-				<rom name="mirai.mfi" size="6280416" crc="8594cbfe" sha1="563dd1b4a39d51059b6b014e9ca532a632cdfe67" offset="0" />
+				<rom name="mirai.mfi" size="6280416" crc="8594cbfe" sha1="563dd1b4a39d51059b6b014e9ca532a632cdfe67" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
