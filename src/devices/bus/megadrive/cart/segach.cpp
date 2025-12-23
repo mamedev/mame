@@ -339,12 +339,12 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x0c0, 0x0c1) parental control password
 	map(0x0c0, 0x0c1).lrw8(
 		NAME([this] (offs_t offset) -> u8 {
-			logerror("Read parental control password %d: %02x\n", offset, m_nvm[0xc0 + offset]);
+			logerror("TCU: read parental control password %d: %02x\n", offset, m_nvm[0xc0 + offset]);
 			return m_nvm[0xc0 + offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_nvm[0xc0 + offset] = data;
-			logerror("Set parental control password %d: %02x\n", offset, data);
+			logerror("TCU: write parental control password %d: %02x\n", offset, data);
 			m_nvm[0xcb] = data;
 		})
 	);
@@ -353,18 +353,18 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 		NAME([this] (offs_t offset) -> u8 {
 			// this is a bitmap with the corresponding bit set when the TCU
 			// detects a channel
-			logerror("TCU channel bitmap read offset %02x\n", offset);
+			logerror("TCU: read channel bitmap read offset %02x\n", offset);
 			//return 0x00; // No signal :(
 			return 0xFF; // Signal everywhere :D
 		}));
 //  map(0x0cb, 0x0cb) parental control level
 	map(0x0cb, 0x0cb).lrw8(
 		NAME([this] (offs_t offset) -> u8 {
-			logerror("Read parental control level: %02x\n", m_nvm[0xcb]);
+			logerror("TCU: read parental control level: %02x\n", m_nvm[0xcb]);
 			return m_nvm[0xcb];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			logerror("Set parental control level: %02x\n", data);
+			logerror("TCU: write parental control level: %02x\n", data);
 			m_nvm[0xcb] = data;
 		})
 	);
@@ -372,10 +372,27 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x0cd, 0x0ce) random seed, (d?)word
 //  map(0x0cf, 0x0cf) next DRAM test block
 //  map(0x0e0, 0x0e0) station
+	map(0x0e0, 0x0e0).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("TCU: write station ID: %02x\n", data);
+			// set the "logical channel"
+			m_nvm[0xe5] = data / 2;
+		})
+	);
 //  map(0x0e1, 0x0e1) slot
 //  map(0x0e2, 0x0e2) service ID
 //  map(0x0e3, 0x0e4) filter code
 //  map(0x0e5, 0x0e5) channel number
+	map(0x0e5, 0x0e5).lr8(
+		// after setting the station ID, the BIOS wants the "logical channel" to match
+		// the station and it will keep tuning to find it, eventually timing out
+		// if it isn't correct
+		NAME([this] (offs_t offset) {
+			logerror("TCU: read channel number: %02x\n", m_nvm[0xe5]);
+			return m_nvm[0xe5];
+		})
+	);
+
 //  map(0x0f3, 0x0f6) unit addr
 
 //  map(0x1e0, 0x1ff) mini NVRAM?
