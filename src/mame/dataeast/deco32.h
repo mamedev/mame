@@ -187,7 +187,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<deco_ace_device> m_deco_ace;
-	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
+	bitmap_ind16 m_tilemap_alpha_bitmap;
 
 	void tilemap_color_bank_w(u8 data);
 	void sprite1_color_bank_w(u8 data);
@@ -202,7 +202,6 @@ protected:
 	void nslasher_map(address_map &map) ATTR_COLD;
 
 	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
-
 };
 
 // tattass

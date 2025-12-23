@@ -121,7 +121,7 @@ void nslasher_state::video_start()
 {
 	const int width = m_screen->width();
 	const int height = m_screen->height();
-	m_tilemap_alpha_bitmap = std::make_unique<bitmap_ind16>(width, height);
+	m_tilemap_alpha_bitmap.allocate(width, height);
 	for (int chip = 0; chip < 2; chip++)
 	{
 		m_sprgen[chip]->alloc_sprite_bitmap();
@@ -332,7 +332,7 @@ void nslasher_state::mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		const u16* sprite0 = &sprite0_mix_bitmap.pix(y);
 		const u16* sprite1 = &sprite1_mix_bitmap.pix(y);
-		const u16* alphaTilemap = &m_tilemap_alpha_bitmap->pix(y);
+		const u16* alphaTilemap = &m_tilemap_alpha_bitmap.pix(y);
 		const u8* tilemapPri = &screen.priority().pix(y);
 		u32* destLine = &bitmap.pix(y);
 
@@ -485,7 +485,7 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 	m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram16_buffered[1].get(), 0x800);
 
 	/* Render alpha-blended tilemap to separate buffer for proper mixing */
-	m_tilemap_alpha_bitmap->fill(0, cliprect);
+	m_tilemap_alpha_bitmap.fill(0, cliprect);
 
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
@@ -500,7 +500,7 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 		{
 			m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[1]->tilemap_1_draw(screen, *m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_deco_tilegen[1]->tilemap_1_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
 				m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		}
@@ -508,7 +508,7 @@ u32 nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &
 		{
 			m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[0]->tilemap_2_draw(screen, *m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_deco_tilegen[0]->tilemap_2_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
 				m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		}
@@ -536,7 +536,7 @@ void tattass_state::mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, con
 	{
 		const u16* sprite0 = &sprite0_mix_bitmap.pix(y);
 		const u16* sprite1 = &sprite1_mix_bitmap.pix(y);
-		const u16* alphaTilemap = &m_tilemap_alpha_bitmap->pix(y);
+		const u16* alphaTilemap = &m_tilemap_alpha_bitmap.pix(y);
 		const u8* tilemapPri = &screen.priority().pix(y);
 		u32* destLine = &bitmap.pix(y);
 
@@ -687,7 +687,7 @@ u32 tattass_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bi
 	m_sprgen[1]->draw_sprites(bitmap, cliprect, m_spriteram16_buffered[1].get(), 0x800);
 
 	/* Render alpha-blended tilemap to separate buffer for proper mixing */
-	m_tilemap_alpha_bitmap->fill(0, cliprect);
+	m_tilemap_alpha_bitmap.fill(0, cliprect);
 
 	/* Draw playfields & sprites */
 	if (m_pri & 2)
@@ -702,7 +702,7 @@ u32 tattass_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bi
 		{
 			m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[1]->tilemap_1_draw(screen, *m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_deco_tilegen[1]->tilemap_1_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
 				m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 		}
@@ -710,7 +710,7 @@ u32 tattass_state::screen_update_tattass(screen_device &screen, bitmap_rgb32 &bi
 		{
 			m_deco_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				m_deco_tilegen[0]->tilemap_2_draw(screen, *m_tilemap_alpha_bitmap, cliprect, 0, 4);
+				m_deco_tilegen[0]->tilemap_2_draw(screen, m_tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
 				m_deco_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
 		}
