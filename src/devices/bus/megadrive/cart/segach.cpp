@@ -618,9 +618,7 @@ void megadrive_segach_us_device::crc_write(u16 data)
 		if (input_bit == crc_msb) {
 			crc = crc << 1;
 		} else {
-			crc = crc ^ 0x02608EDB;
-			crc = crc << 1;
-			crc = crc | 1;
+			crc = (crc << 1) ^ 0x04C11DB7;
 		}
 	}
 	m_crc = crc;
@@ -628,13 +626,6 @@ void megadrive_segach_us_device::crc_write(u16 data)
 
 u32 megadrive_segach_us_device::crc_read() const
 {
-	// TODO: i'm sure there's already a macro for this
-	u32 crc = m_crc;
-	u32 reversed_crc = 0;
-	for (int i = 0; i < 32; i++) {
-		if (crc & (1 << i)) {
-			reversed_crc |= (0x80000000 >> i);
-		}
-	}
-	return reversed_crc;
+	return bitswap<32>(m_crc, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+			16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31);
 }
