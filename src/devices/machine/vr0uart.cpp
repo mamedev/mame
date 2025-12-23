@@ -32,9 +32,9 @@ DEFINE_DEVICE_TYPE(VRENDER0_UART, vr0uart_device, "vr0uart", "MagicEyes VRender0
 //  vr0uart_device - constructor
 //-------------------------------------------------
 
-vr0uart_device::vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, VRENDER0_UART, tag, owner, clock),
-	  device_serial_interface(mconfig, *this)
+vr0uart_device::vr0uart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, VRENDER0_UART, tag, owner, clock),
+	device_serial_interface(mconfig, *this)
 {
 }
 
@@ -86,7 +86,7 @@ inline u32 vr0uart_device::calculate_baud_rate()
 
 void vr0uart_device::update_serial_config()
 {
-	static const parity_t parity_modes[4] = { PARITY_NONE, PARITY_NONE, PARITY_EVEN, PARITY_ODD };
+	constexpr parity_t parity_modes[4] = { PARITY_NONE, PARITY_NONE, PARITY_EVEN, PARITY_ODD };
 
 	const u8 word_length = BIT(m_ucon, 0) ? 8 : 7;
 	const parity_t parity_mode = parity_modes[(m_ucon & 0xc) >> 2];
