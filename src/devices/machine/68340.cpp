@@ -138,7 +138,7 @@ uint16_t m68340_cpu_device::m68340_internal_base_r(offs_t offset, uint16_t mem_m
 	}
 	else
 	{
-		return -1;
+		return m_internal->unmap();
 	}
 }
 
@@ -277,6 +277,7 @@ void m68340_cpu_device::device_start()
 	m_m68340_base = 0x00000000;
 
 	m_internal = &space(AS_PROGRAM);
+	m_internal->unmap_value_high();
 }
 
 
