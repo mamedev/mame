@@ -1,17 +1,8 @@
 // license: BSD-3-Clause
-// copyright-holders: Angelo Salese, superctr
+// copyright-holders: Angelo Salese, superctr, Nathan Misner
 /**************************************************************************************************
 
-Sega Channel Game no Kanzume "digest" RAM cart, developed by CRI
-
-https://segaretro.org/Game_no_Kanzume_Otokuyou
-
-TODO:
-- some unknowns, needs PCB picture;
-- Scientific Atlanta Sega Channel cart also derives from SSF but has it's own mapper scheme
-  cfr. SCTOOLS/MENUTEST/HARDWARE.I in Sega Channel Jan 1996 dev CD dump.
-  The SCI-ATL ASIC also contains an unspecified TCU device (or that's behind the RF shield?),
-  in word status/data pair, where status direction is at bit 15 (1) read (0) write
+Sega Channel
 
 **************************************************************************************************/
 
@@ -19,11 +10,17 @@ TODO:
 
 #include "emu.h"
 #include "segach.h"
+#include "segach_img.h"
 
 #include "bus/generic/slot.h"
 
 /*
- * Game no Kanzume digest cart
+ * Sega Channel Game no Kanzume "digest" RAM cart, developed by CRI
+ *
+ * https://segaretro.org/Game_no_Kanzume_Otokuyou
+ *
+ * TODO:
+ * - some unknowns, needs PCB picture;
  */
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_SEGACH_JP, megadrive_segach_jp_device, "megadrive_segach_jp", "Megadrive Sega Channel Game no Kanzume RAM cart")
@@ -90,6 +87,9 @@ void megadrive_segach_jp_device::time_io_map(address_map &map)
  *
  * https://segaretro.org/Sega_Channel#Photo_gallery
  *
+ * Use -quik to load a broadcast IMG file, for example DOM0816.IMG
+ * If no IMG is loaded, simulates no signal (you will get error 0005)
+ *
  * Various combinations hold at boot calls different menus:
  * - START+A: parental control
  * - START+C: language select
@@ -128,7 +128,7 @@ void megadrive_segach_us_device::device_add_mconfig(machine_config &config)
 	TIMER(config, "packet_timer", 0).configure_periodic(FUNC(megadrive_segach_us_device::send_packets),
 			attotime::from_hz((12*128072) / 2880));
 
-	QUICKLOAD(config, "packets", "img").set_load_callback(FUNC(megadrive_segach_us_device::quickload_cb));
+	QUICKLOAD(config, "packet_stream", "img").set_load_callback(FUNC(megadrive_segach_us_device::quickload_cb));
 }
 
 void megadrive_segach_us_device::device_start()
@@ -143,9 +143,8 @@ void megadrive_segach_us_device::device_start()
 	m_dram.resize(0x40'0000 / 2);
 	m_sram.resize(0x2000);
 	m_nvm.fill(0);
-	//load_packets();
 
-	m_broadcast_packet = 0;
+	m_broadcast_count = 0;
 
 	m_game_id = 0;
 	m_curr_packet = 0;
@@ -404,7 +403,7 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 			// this is a bitmap with the corresponding bit set when the TCU
 			// detects a channel
 			logerror("TCU: read channel bitmap read offset %02x\n", offset);
-			if (m_packet.size())
+			if (m_broadcast.size())
 				return 0xFF; // Signal everywhere :D
 			else
 				return 0x00; // No signal :(
@@ -467,84 +466,121 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 	);
 }
 
-#if 0
-void megadrive_segach_us_device::load_packets()
-{
-	static const char* filename = "dom0816.bin";
-	if (std::ifstream packet_stream{filename, std::ios::binary | std::ios::ate})
-	{
-		size_t num_pipes = packet_stream.tellg() / (256 * 10);
-		size_t num_packets = num_pipes * 10;
-		m_packet.resize(num_packets);
-		packet_stream.seekg(0);
-		for (size_t curr_packet = 0; curr_packet < num_packets; curr_packet++)
-		{
-#pragma pack(push, 1)
-			struct {
-				u16 file_id;
-				u16 service_id;
-				u32 game_time;
-				u16 address;
-				u16 data[246 / 2];
-			} converted_packet;
-#pragma pack(pop)
-			if (packet_stream.read((char*) &converted_packet, 256))
-			{
-				m_packet[curr_packet].file_id = converted_packet.file_id;
-				m_packet[curr_packet].service_id = converted_packet.service_id;
-				m_packet[curr_packet].game_time = converted_packet.game_time;
-				m_packet[curr_packet].address = converted_packet.address;
-				std::copy_n(&converted_packet.data[0], 246/2, &m_packet[curr_packet].data[0]);
-			}
-		}
-		logerror("packets loaded: %d, pipes: %d\n", num_packets, num_pipes);
-	}
-	else
-	{
-		logerror("packet stream could not be loaded\n");
-	}
-}
-#endif
 QUICKLOAD_LOAD_MEMBER(megadrive_segach_us_device::quickload_cb)
 {
+	auto helper = megadrive_segach_us_img();
+
 	// Load packets stream
-	//static const char* filename = "dom0816.bin";
-	size_t num_pipes = image.length() / (256 * 10);
-	size_t num_packets = num_pipes * 10;
-	m_packet.resize(num_packets);
-	for (size_t curr_packet = 0; curr_packet < num_packets; curr_packet++)
+	size_t num_frames = image.length() / helper.FRAME_LEN;
+	m_broadcast.resize(num_frames);
+
+	struct game_file {
+		int time;
+		int time_buf;
+		int time_bit;
+	};
+	std::map<u16, game_file> files;
+
+	// first pass: get gametime bits
+	for (size_t frame = 0; frame < num_frames; frame++)
 	{
-#pragma pack(push, 1)
-		struct {
-			u16 file_id;
-			u16 service_id;
-			u32 game_time;
-			u16 address;
-			u16 data[246 / 2];
-		} converted_packet;
-#pragma pack(pop)
-		if (image.fread((char*) &converted_packet, 256))
+		u8 data[helper.FRAME_LEN];
+		image.fread(&data[0], helper.FRAME_LEN);
+
+		std::array<std::array<u8, helper.PACKET_LEN>, 10> pipes;
+		helper.deweave(pipes, data);
+		for (auto& pipe : pipes)
 		{
-			m_packet[curr_packet].file_id = converted_packet.file_id;
-			m_packet[curr_packet].service_id = converted_packet.service_id;
-			m_packet[curr_packet].game_time = converted_packet.game_time;
-			m_packet[curr_packet].address = converted_packet.address;
-			std::copy_n(&converted_packet.data[0], 246/2, &m_packet[curr_packet].data[0]);
+			helper.deinterleave(pipe);
+
+			u16 file_id = 0;
+			helper.or_bits(&pipe[0], 39, (u8*) &file_id, 14);
+			file_id = bitswap<14>(file_id, 0,1,2,3,4,5,6,7,8,9,10,11,12,13);
+
+			u8 game_time_sync = 0;
+			helper.or_bits(&pipe[0], 30, (uint8_t *)&game_time_sync, 1);
+			u8 game_time_bit = 0;
+			helper.or_bits(&pipe[0], 31, (uint8_t *)&game_time_bit, 1);
+
+			if (!files.count(file_id))
+			{
+				game_file new_file;
+				new_file.time = 0;
+				new_file.time_buf = 0;
+				new_file.time_bit = 0;
+				files[file_id] = new_file;
+			}
+			auto& file = files[file_id];
+
+			if (game_time_sync) {
+				file.time = file.time_buf * 20;
+				file.time_buf = 0;
+				file.time_bit = 15;
+			}
+			if (file.time_bit >= 0) {
+				file.time_buf |= game_time_bit << file.time_bit;
+				file.time_bit--;
+			}
 		}
 	}
-	logerror("packets loaded: %d, pipes: %d\n", num_packets, num_pipes);
+
+	// second pass: copy everything else
+	image.fseek(0, SEEK_SET);
+	for (size_t frame = 0; frame < num_frames; frame++)
+	{
+		u8 data[helper.FRAME_LEN];
+		image.fread(&data[0], helper.FRAME_LEN);
+
+		std::array<std::array<u8, helper.PACKET_LEN>, 10> pipes;
+		helper.deweave(pipes, data);
+
+		size_t pipe_num = 0;
+		for (auto& pipe : pipes)
+		{
+			helper.deinterleave(pipe);
+			u8 data[helper.PACKET_DATA_LEN];
+
+			u16 file_id = 0;
+			helper.or_bits(&pipe[0], 39, (u8*) &file_id, 14);
+			file_id = bitswap<14>(file_id, 0,1,2,3,4,5,6,7,8,9,10,11,12,13);
+
+			u8 service_id = 0;
+			helper.or_bits(&pipe[0], 32, (u8*) &service_id, 7);
+			service_id = bitswap<7>(service_id, 0,1,2,3,4,5,6);
+
+			u16 address = 0;
+			helper.or_bits(&pipe[0], 53, (u8*) &address, 15);
+			address = bitswap<15>(address, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14);
+
+			helper.get_data(&pipe[0], &data[0]);
+
+			auto& packet = m_broadcast[frame][pipe_num];
+			packet.file_id = file_id;
+			packet.service_id = service_id;
+			packet.game_time = files[file_id].time;
+			packet.address = address;
+
+			for (size_t word_pos = 0; word_pos < helper.PACKET_DATA_LEN / 2; word_pos ++)
+			{
+				size_t byte_pos = word_pos * 2;
+				packet.data[word_pos] = (data[byte_pos] << 8) | data[byte_pos + 1];
+			}
+			pipe_num++;
+		}
+	}
+
+	logerror("broadcast frames loaded: %d\n", num_frames);
 	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
 {
-	if (m_packet.size())
+	if (m_broadcast.size())
 	{
 		//logerror("current packet = %d\n", m_broadcast_packet);
 		for (int pipe = 0; pipe < 10; pipe++)
 		{
-			auto& packet = m_packet[m_broadcast_packet];
-			m_broadcast_packet = (m_broadcast_packet + 1) % m_packet.size();
+			auto& packet = m_broadcast[m_broadcast_count][pipe];
 			if ((m_gen_control & 0x0002) && packet.file_id == m_game_id)
 			{
 				// the adapter can probably not read all pipes at a time
@@ -569,6 +605,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
 				}
 			}
 		}
+		m_broadcast_count = (m_broadcast_count + 1) % m_broadcast.size();
 	}
 }
 

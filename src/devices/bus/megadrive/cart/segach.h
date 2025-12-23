@@ -28,6 +28,7 @@ protected:
 	std::vector<u16> m_ram;
 };
 
+
 class megadrive_segach_us_device : public device_t,
 								   public device_megadrive_cart_interface,
 								   public device_memory_interface
@@ -74,7 +75,7 @@ private:
 	memory_bank_creator m_rom;
 	std::vector<u16> m_dram;
 	std::vector<u8> m_sram;
-	std::vector<packet> m_packet;
+	std::vector<std::array<packet, 10>> m_broadcast;
 	std::array<u8, 0x200> m_nvm;
 
 	address_space_config m_space_tcu_config;
@@ -83,7 +84,7 @@ private:
 	memory_view m_game_view;
 	memory_view m_game_sram_view;
 
-	size_t m_broadcast_packet;
+	size_t m_broadcast_count;
 
 	u16 m_game_id;
 	u16 m_curr_packet, m_packet_match;
