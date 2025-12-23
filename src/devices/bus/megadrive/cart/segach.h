@@ -49,6 +49,10 @@ protected:
 	void load_packets();
 	TIMER_DEVICE_CALLBACK_MEMBER(send_packets);
 
+	void sram_enable_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 sram_r(offs_t offset);
+	void sram_w(offs_t offset, u16 data, u16 mem_mask);
+
 	void crc_write(u16 data);
 	u32 crc_read() const;
 
@@ -65,11 +69,16 @@ private:
 	required_device<timer_device> m_packet_timer;
 
 	memory_bank_creator m_rom;
-	std::vector<u16> m_ram;
+	std::vector<u16> m_dram;
+	std::vector<u8> m_sram;
 	std::vector<packet> m_packet;
 	std::array<u8, 0x200> m_nvm;
 
 	address_space_config m_space_tcu_config;
+
+	memory_view m_sram_view;
+	memory_view m_game_view;
+	memory_view m_game_sram_view;
 
 	size_t m_broadcast_packet;
 

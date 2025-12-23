@@ -90,8 +90,6 @@ void megadrive_segach_jp_device::time_io_map(address_map &map)
  *
  * https://segaretro.org/Sega_Channel#Photo_gallery
  *
- * Eventually times out with error 0008 at the title screen.
- *
  * Various combinations hold at boot calls different menus:
  * - START+A: parental control
  * - START+C: language select
@@ -103,6 +101,9 @@ void megadrive_segach_jp_device::time_io_map(address_map &map)
  *
  * The BIOS also listens to controller port 2 in serial mode
  * for a diagnostics mode.
+ *
+ * TODO: Menu button located on the adapter
+ *       (causes it to reset to the BIOS rather the game)
  */
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_SEGACH_US, megadrive_segach_us_device, "megadrive_segach_us", "Megadrive Sega Channel US cart")
@@ -114,6 +115,9 @@ megadrive_segach_us_device::megadrive_segach_us_device(const machine_config &mco
 	, m_packet_timer(*this, "packet_timer")
 	, m_rom(*this, "rom")
 	, m_space_tcu_config("tcu_io", ENDIANNESS_BIG, 8, 9, 0, address_map_constructor(FUNC(megadrive_segach_us_device::tcu_map), this))
+	, m_sram_view(*this, "sram_view")
+	, m_game_view(*this, "game_view")
+	, m_game_sram_view(*this, "game_sram_view")
 {
 }
 
@@ -134,7 +138,8 @@ void megadrive_segach_us_device::device_start()
 			{
 				m_rom->configure_entry(0, &base[0]);
 			});
-	m_ram.resize(0x40'0000 / 2);
+	m_dram.resize(0x40'0000 / 2);
+	m_sram.resize(0x2000);
 	m_nvm.fill(0);
 	load_packets();
 
@@ -158,16 +163,56 @@ device_memory_interface::space_config_vector megadrive_segach_us_device::memory_
 	};
 }
 
+void megadrive_segach_us_device::sram_enable_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// the BIOS wants to switch in SRAM by writing bit 0...
+	logerror("sram enable: %04x", data);
+	if (data & 3)
+	{
+		m_sram_view.select(0);
+		m_game_sram_view.select(0);
+	}
+	else
+	{
+		m_sram_view.disable();
+		m_game_sram_view.disable();
+	}
+}
+
+u16 megadrive_segach_us_device::sram_r(offs_t offset)
+{
+	const u32 sram_offset = offset & 0x1fff;
+	return 0xff00 | m_sram[sram_offset];
+}
+
+void megadrive_segach_us_device::sram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		const u32 sram_offset = offset & 0x1fff;
+		m_sram[sram_offset] = data & 0xff;
+	}
+}
+
 void megadrive_segach_us_device::cart_map(address_map &map)
 {
-	map(0x00'0000, 0x03'ffff).bankr(m_rom);
-	// TODO: SRAM overlay at 0x20'0000 (length 0x8000)
+	map(0x00'0000, 0x0f'ffff).bankr(m_rom);
 
-	// TODO: banked?
+	// TODO: SSF banking
 	map(0x10'0000, 0x4f'ffff).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) { return m_ram[offset]; }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ram[offset]); })
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_dram[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_dram[offset]); })
 	);
+	map(0x20'0000, 0x3f'ffff).view(m_sram_view);
+	m_sram_view[0](0x20'0000, 0x3f'ffff).rw(FUNC(megadrive_segach_us_device::sram_r), FUNC(megadrive_segach_us_device::sram_w));
+
+	map(0x00'0000, 0x3f'ffff).view(m_game_view);
+	m_game_view[0](0x00'0000, 0x3f'ffff).lr16(
+		// TODO: would need to confirm on real adapter if DRAM is locked in game mode.
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_dram[offset]; })
+	);
+	m_game_view[0](0x20'0000, 0x3f'ffff).view(m_game_sram_view);
+	m_game_sram_view[0](0x20'0000, 0x3f'ffff).rw(FUNC(megadrive_segach_us_device::sram_r), FUNC(megadrive_segach_us_device::sram_w));
 }
 
 void megadrive_segach_us_device::time_io_map(address_map &map)
@@ -269,44 +314,49 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 				logerror("console reset\n");
 			if (data & 0x02)
 				logerror("start download\n");
-			if (data & 0x4)
+			if (data & 0x04)
 				m_packet_match = 0x7fff; // side effect?
 			if (data & 0x10)
 				m_crc = 0;
+			if ((data & 0x09) == 0x09)
+			{
+				// boot game
+				m_game_view.select(0);
+				// HACK: should assert /VRES on connector causing 68k soft reset.
+				machine().root_device().reset();
+			}
 		})
 	);
 //  map(0x34, 0x35) error counter
-//  map(0x40, 0x41) CRC input
-	map(0x40, 0x41).lw16(
+	map(0x40, 0x41).lw16( // CRC input
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			crc_write(data);
 		})
 	);
-//  map(0x42, 0x43) CRC low out
-	map(0x42, 0x43).lr16(
+	map(0x42, 0x43).lr16( // CRC low out
 		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
 			return crc_read() & 0xffff;
 		})
 	);
-//  map(0x44, 0x45) CRC high out
-	map(0x44, 0x45).lr16(
+	map(0x44, 0x45).lr16( // CRC high out
 		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
 			return crc_read() >> 16;
 		})
 	);
+	map(0xf0, 0xf1).w(FUNC(megadrive_segach_us_device::sram_enable_w));
 //  map(0xf0, 0xff) SSF style bankswitch?
 }
 
 void megadrive_segach_us_device::tcu_map(address_map &map)
 {
-//  map(0x000, 0x00f) authorization map
+//  map(0x000, 0x00f) authorized service map
 	map(0x000, 0x00f).lr8(
 		NAME([] () -> u8 {
 			// this is a bitmap containing which service IDs are
 			// authorized to play on the adapter.
 			return 0xff;
 		}));
-//  map(0x010, 0x01f) free map
+//  map(0x010, 0x01f) free service map
 	map(0x010, 0x01f).lr8(
 		NAME([] () -> u8 {
 			// this is a bitmap containing which service IDs are
@@ -336,8 +386,7 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 			// return 0x87; // rohm
 		}));
 //  map(0x0ba, 0x0bd) PLL data
-//  map(0x0c0, 0x0c1) parental control password
-	map(0x0c0, 0x0c1).lrw8(
+	map(0x0c0, 0x0c1).lrw8( // parental control password
 		NAME([this] (offs_t offset) -> u8 {
 			logerror("TCU: read parental control password %d: %02x\n", offset, m_nvm[0xc0 + offset]);
 			return m_nvm[0xc0 + offset];
@@ -348,8 +397,7 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 			m_nvm[0xcb] = data;
 		})
 	);
-//  map(0x0c2, 0x0c2) channel bitmap
-	map(0x0c2, 0x0ca).lr8(
+	map(0x0c2, 0x0ca).lr8( // channel bitmap
 		NAME([this] (offs_t offset) -> u8 {
 			// this is a bitmap with the corresponding bit set when the TCU
 			// detects a channel
@@ -357,8 +405,7 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 			//return 0x00; // No signal :(
 			return 0xFF; // Signal everywhere :D
 		}));
-//  map(0x0cb, 0x0cb) parental control level
-	map(0x0cb, 0x0cb).lrw8(
+	map(0x0cb, 0x0cb).lrw8( // parental control level
 		NAME([this] (offs_t offset) -> u8 {
 			logerror("TCU: read parental control level: %02x\n", m_nvm[0xcb]);
 			return m_nvm[0xcb];
@@ -371,12 +418,12 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x0cc, 0x0cc) initialized
 //  map(0x0cd, 0x0ce) random seed, (d?)word
 //  map(0x0cf, 0x0cf) next DRAM test block
-//  map(0x0e0, 0x0e0) station
+//  map(0x0e0, 0x0e0) station ID
 	map(0x0e0, 0x0e0).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			logerror("TCU: write station ID: %02x\n", data);
 			// set the "logical channel"
-			m_nvm[0xe5] = data / 2;
+			m_nvm[0xe5] = data;
 		})
 	);
 //  map(0x0e1, 0x0e1) slot
@@ -384,12 +431,17 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x0e3, 0x0e4) filter code
 //  map(0x0e5, 0x0e5) channel number
 	map(0x0e5, 0x0e5).lr8(
-		// after setting the station ID, the BIOS wants the "logical channel" to match
-		// the station and it will keep tuning to find it, eventually timing out
-		// if it isn't correct
+		// After setting the station ID, the BIOS wants the "logical channel" to match
+		// a certain value and it will keep tuning to find it, eventually timing out
+		// if it isn't correct.
+		// Rather than trying to calculate what the "logical channel" is,
+		// I'm just bruteforcing a solution here...
 		NAME([this] (offs_t offset) {
+			uint8_t data = m_nvm[0xe5];
 			logerror("TCU: read channel number: %02x\n", m_nvm[0xe5]);
-			return m_nvm[0xe5];
+			if (!machine().side_effects_disabled())
+				m_nvm[0xe5] = (data + 1) % 16;
+			return data;
 		})
 	);
 
@@ -457,20 +509,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
 		{
 			auto& packet = m_packet[m_broadcast_packet];
 			m_broadcast_packet = (m_broadcast_packet + 1) % m_packet.size();
-			//if (packet.file_id == 0)
-				//logerror("%d received menu on pipe %d, address %04x...\n", m_broadcast_packet - 1, pipe, packet.address);
-			//if (m_gen_control & 0x0002)
-				//logerror("broadcast %d, wanted game id %d, got %d...\n", m_broadcast_packet, m_game_id, packet.file_id);
 			if ((m_gen_control & 0x0002) && packet.file_id == m_game_id)
 			{
 				// the adapter can probably not read all pipes at a time
 				// the menu is broadcast on two pipes with offset addresses,
 				// so skip the copy to prevent confusing the receiver.
-				// b09a4
 				if (packet.file_id == 0 && pipe != 0)
 					continue;
 				m_curr_packet = packet.address;
-				//logerror("current packet = %d (%d)\n", m_curr_packet, m_broadcast_packet);
 				if (m_curr_packet == m_packet_match)
 				{
 					logerror("download complete\n");
@@ -481,11 +527,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
 				{
 					size_t dram_address = m_curr_packet * (246 / 2);
 					for (int data_i = 0; data_i < (246 / 2); data_i++)
-					{
-						if (dram_address == 0xb09a4 / 2)
-							logerror("%04x %04x (%d)\n", packet.address, packet.data[data_i], m_broadcast_packet - 1);
-						m_ram[(dram_address++) & 0x1fffff] = packet.data[data_i];
-					}
+						m_dram[(dram_address++) & 0x1fffff] = packet.data[data_i];
 					if (m_curr_packet < m_packet_match)
 						m_packet_match = m_curr_packet;
 				}
