@@ -10,7 +10,8 @@ King) was distributed by Yorter Electronics for the local market. It's the same
 hardware as model 866. The newer model 9300 is also presumed to be the same.
 
 NOTE: If internal artwork Chinese text is not visible (either fontprovider or OS
-doesn't support font fallback), manually set the -artfont option to a CJK font.
+doesn't support character substitution), manually set the -artfont option to a
+CJK font.
 
 Hardware notes:
 - PCB label: 100054

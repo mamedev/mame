@@ -31,8 +31,8 @@ public:
 	void set_pix_raw_shift(u32 raw_shift) { m_pix_raw_shift = raw_shift; }
 	void set_pri_raw_shift(u32 raw_shift) { m_pri_raw_shift = raw_shift; }
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, u16* spriteram, u16 size);
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, u16* spriteram, u16 size);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size);
+	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size);
 
 	void alloc_sprite_bitmap();
 	bitmap_ind16 &get_sprite_temp_bitmap() { assert(m_sprite_bitmap.valid()); return m_sprite_bitmap; }
@@ -45,7 +45,7 @@ protected:
 
 private:
 	template <class T>
-	void draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16* spriteram, u16 size);
+	void draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16 *spriteram, u16 size);
 
 	pri_cb_delegate     m_pri_cb;
 	gfxbank_cb_delegate m_gfxbank_cb;

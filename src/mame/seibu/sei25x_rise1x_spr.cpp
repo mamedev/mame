@@ -24,10 +24,11 @@
 
 #include "emu.h"
 #include "sei25x_rise1x_spr.h"
+
 #include "screen.h"
 
 
-DEFINE_DEVICE_TYPE(SEI25X_RISE1X, sei25x_rise1x_device, "sei25x_rise1x", "Seibu Kaihatsu SEI251/SEI252/RISE10/RISE11 Sprite generator")
+DEFINE_DEVICE_TYPE(SEI25X_RISE1X, sei25x_rise1x_device, "sei25x_rise1x", "Seibu Kaihatsu SEI251/SEI252/RISE10/RISE11 sprite generator")
 
 sei25x_rise1x_device::sei25x_rise1x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -87,7 +88,7 @@ Unmarked bits are unused/unknown.
 
 */
 template <class T>
-void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16* spriteram, u16 size)
+void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16 *spriteram, u16 size)
 {
 	if (m_sprite_bitmap.valid() && !m_pri_cb.isnull())
 		fatalerror("m_sprite_bitmap && m_pri_cb is invalid");
@@ -183,12 +184,12 @@ void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangl
 	}
 }
 
-void sei25x_rise1x_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, u16* spriteram, u16 size)
+void sei25x_rise1x_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size)
 {
 	draw(screen, bitmap, cliprect, spriteram, size);
 }
 
-void sei25x_rise1x_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, u16* spriteram, u16 size)
+void sei25x_rise1x_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size)
 {
 	draw(screen, bitmap, cliprect, spriteram, size);
 }
