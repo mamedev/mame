@@ -557,7 +557,7 @@ led16segsc
     segments are drawn at low intensity (0x20/0xff).
 simplecounter
     Displays the numeric value of the element’s state in the specified colour,
-    using the artowrk fong.  The value is formatted in decimal notation.  A
+    using the artwork font.  The value is formatted in decimal notation.  A
     ``digits`` attribute may be supplied to specify the minimum number of digits
     to display.  If present, the ``digits`` attribute must be a positive
     integer; if absent, a minimum of two digits will be displayed.  A
