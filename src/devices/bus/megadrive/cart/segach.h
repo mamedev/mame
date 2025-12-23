@@ -49,6 +49,9 @@ protected:
 	void load_packets();
 	TIMER_DEVICE_CALLBACK_MEMBER(send_packets);
 
+	void crc_write(u16 data);
+	u32 crc_read() const;
+
 private:
 	struct packet
 	{
@@ -68,12 +71,13 @@ private:
 
 	address_space_config m_space_tcu_config;
 
-	u16 m_broadcast_packet;
+	size_t m_broadcast_packet;
 
 	u16 m_game_id;
 	u16 m_curr_packet, m_packet_match;
 
 	u16 m_gen_control, m_gen_status;
+	u32 m_crc;
 
 	u16 m_tcu_index, m_tcu_dir;
 };

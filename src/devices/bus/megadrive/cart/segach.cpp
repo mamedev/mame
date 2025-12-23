@@ -269,13 +269,28 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 			if (data & 0x02)
 				logerror("start download\n");
 			if (data & 0x04)
-				logerror("CRC reset\n");
+				m_crc = 0;
 		})
 	);
 //  map(0x34, 0x35) error counter
 //  map(0x40, 0x41) CRC input
+	map(0x40, 0x41).lw16(
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			crc_write(data);
+		})
+	);
 //  map(0x42, 0x43) CRC low out
+	map(0x42, 0x43).lr16(
+		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
+			return crc_read() & 0xffff;
+		})
+	);
 //  map(0x44, 0x45) CRC high out
+	map(0x44, 0x45).lr16(
+		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
+			return crc_read() >> 16;
+		})
+	);
 //  map(0xf0, 0xff) SSF style bankswitch?
 }
 
@@ -400,10 +415,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
 		for (int pipe = 0; pipe < 10; pipe++)
 		{
 			auto& packet = m_packet[m_broadcast_packet];
+			m_broadcast_packet = (m_broadcast_packet + 1) % m_packet.size();
+			//if (packet.file_id == 0)
+				//logerror("%d received menu on pipe %d, address %04x...\n", m_broadcast_packet - 1, pipe, packet.address);
 			//if (m_gen_control & 0x0002)
 				//logerror("broadcast %d, wanted game id %d, got %d...\n", m_broadcast_packet, m_game_id, packet.file_id);
 			if ((m_gen_control & 0x0002) && packet.file_id == m_game_id)
 			{
+				// the adapter can probably not read all pipes at a time
+				// the menu is broadcast on two pipes with offset addresses,
+				// so skip the copy to prevent confusing the receiver.
+				// b09a4
+				if (packet.file_id == 0 && pipe != 0)
+					continue;
 				m_curr_packet = packet.address;
 				//logerror("current packet = %d (%d)\n", m_curr_packet, m_broadcast_packet);
 				if (m_curr_packet == m_packet_match)
@@ -416,14 +440,45 @@ TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
 				{
 					size_t dram_address = m_curr_packet * (246 / 2);
 					for (int data_i = 0; data_i < (246 / 2); data_i++)
+					{
+						if (dram_address == 0xb09a4 / 2)
+							logerror("%04x %04x (%d)\n", packet.address, packet.data[data_i], m_broadcast_packet - 1);
 						m_ram[(dram_address++) & 0x1fffff] = packet.data[data_i];
+					}
 					if (m_curr_packet < m_packet_match)
 						m_packet_match = m_curr_packet;
 				}
 			}
-			m_broadcast_packet = (m_broadcast_packet + 1) % m_packet.size();
 		}
 	}
 }
 
+void megadrive_segach_us_device::crc_write(u16 data)
+{
+	u32 crc = m_crc;
+	for (int i = 0; i < 16; i++) {
+		int input_bit = (data & (0x8000 >> i)) ? 1 : 0;
+		int crc_msb = (crc & 0x80000000) ? 1 : 0;
+		if (input_bit == crc_msb) {
+			crc = crc << 1;
+		} else {
+			crc = crc ^ 0x02608EDB;
+			crc = crc << 1;
+			crc = crc | 1;
+		}
+	}
+	m_crc = crc;
+}
 
+u32 megadrive_segach_us_device::crc_read() const
+{
+	// TODO: i'm sure there's already a macro for this
+	u32 crc = m_crc;
+	uint32_t reversed_crc = 0;
+	for (int i = 0; i < 32; i++) {
+		if (crc & (1 << i)) {
+			reversed_crc |= (0x80000000 >> i);
+		}
+	}
+	return reversed_crc;
+}
