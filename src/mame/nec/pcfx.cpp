@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
+#include "machine/pcfx_intc.h"
 #include "sound/huc6230.h"
 #include "video/huc6261.h"
 #include "video/huc6270.h"
@@ -24,8 +25,10 @@
 
 namespace {
 
-// TODO: should really inherit from a common pcfx_motherboard_device
+// TODO: should really compose everything as devices
 // - pcfxga needs to be exposed as a ISA16 and C-Bus boards, it's not a real stand-alone driver.
+// - FX-SCSI requires either a specific NSCSI target with enough boilerplate comms (i.e. no video),
+//   or multiple instances of MAME being capable to communicate via bitbanger.
 class pcfx_state : public driver_device
 {
 public:
@@ -33,6 +36,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_huc6261(*this, "huc6261"),
+		m_intc(*this, "intc"),
 		m_pads(*this, "P%u", 1U) { }
 
 	void pcfx(machine_config &config);
@@ -44,30 +48,15 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint16_t irq_read(offs_t offset);
-	void irq_write(offs_t offset, uint16_t data);
 	uint16_t pad_r(offs_t offset);
 	void pad_w(offs_t offset, uint16_t data);
 	[[maybe_unused]] uint8_t extio_r(offs_t offset);
 	[[maybe_unused]] void extio_w(offs_t offset, uint8_t data);
 
-	[[maybe_unused]] void irq8_w(int state);
-	[[maybe_unused]] void irq9_w(int state);
-	[[maybe_unused]] void irq10_w(int state);
-	[[maybe_unused]] void irq11_w(int state);
-	void irq12_w(int state);
-	void irq13_w(int state);
-	void irq14_w(int state);
-	[[maybe_unused]] void irq15_w(int state);
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 
 	void pcfx_io(address_map &map) ATTR_COLD;
 	void pcfx_mem(address_map &map) ATTR_COLD;
-
-	// Interrupt controller (component unknown)
-	uint16_t m_irq_mask = 0;
-	uint16_t m_irq_pending = 0;
-	uint8_t m_irq_priority[8]{};
 
 	struct pcfx_pad_t
 	{
@@ -79,12 +68,12 @@ private:
 	pcfx_pad_t m_pad;
 	emu_timer *m_pad_timers[2];
 
-	inline void check_irqs();
-	inline void set_irq_line(int line, int state);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
+	required_device<pcfx_intc_device> m_intc;
 	required_ioport_array<2> m_pads;
+
+	void int_w(offs_t line, u8 state);
 };
 
 
@@ -125,7 +114,7 @@ uint16_t pcfx_state::pad_r(offs_t offset)
 		if(((offset<<1) & 0x02) == 0)
 		{
 			m_pad.status[port_type] &= ~8; // clear latch on LSB read according to docs
-			set_irq_line(11, 0);
+			m_intc->irq11_w(CLEAR_LINE);
 		}
 	}
 
@@ -138,8 +127,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	m_pad.latch[Pad] = m_pads[Pad]->read();
 	m_pad.status[Pad] |= 8;
 	m_pad.ctrl[Pad] &= ~1; // ack TX line
-	// TODO: pad IRQ
-	set_irq_line(11, 1);
+	m_intc->irq11_w(ASSERT_LINE);
 }
 
 void pcfx_state::pad_w(offs_t offset, uint16_t data)
@@ -190,10 +178,12 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
 //  map(0x00000C80, 0x00000C83).noprw(); // backup RAM control
-	map(0x00000E00, 0x00000EFF).rw(FUNC(pcfx_state::irq_read), FUNC(pcfx_state::irq_write)).umask32(0x0000ffff);    /* Interrupt controller */
+	map(0x00000E00, 0x00000EFF).rw(m_intc, FUNC(pcfx_intc_device::read), FUNC(pcfx_intc_device::write)).umask32(0x0000ffff);
 //  map(0x00000F00, 0x00000FFF).noprw(); // Timer
+//	map(0x00500000, 0x005000FF) Aurora mirror
 //  map(0x00600000, 0x006FFFFF).r(FUNC(pcfx_state::scsi_ctrl_r)); // SCSI control for EXTIO
 //  map(0x00700000, 0x007FFFFF).rom().region("scsi_rom", 0); // EXTIO ROM area
+	map(0x00700000, 0x007FFFFF).lr8(NAME([] () { return 0; })); // suppress logging
 	map(0x80500000, 0x805000FF).noprw(); // pcfxga Kubota/Hudson HuC6273 "Aurora" 3d controller
 }
 
@@ -226,176 +216,6 @@ static INPUT_PORTS_START( pcfx )
 	PORT_BIT( 0x0fffffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-uint16_t pcfx_state::irq_read(offs_t offset)
-{
-	uint16_t data = 0;
-
-	switch( offset )
-	{
-		// Interrupts pending
-		// Same bit order as mask
-		case 0x00/4:
-			data = m_irq_pending;
-			break;
-
-		// Interrupt mask
-		case 0x40/4:
-			data = m_irq_mask;
-			break;
-
-		// Interrupt priority 0
-		case 0x80/4:
-			data = m_irq_priority[4] | ( m_irq_priority[5] << 3 ) | ( m_irq_priority[6] << 6 ) | ( m_irq_priority[7] << 9 );
-			break;
-
-		// Interrupt priority 1
-		case 0xC0/4:
-			data = m_irq_priority[0] | ( m_irq_priority[1] << 3 ) | ( m_irq_priority[2] << 6 ) | ( m_irq_priority[3] << 9 );
-			break;
-	}
-
-	return data;
-}
-
-
-void pcfx_state::irq_write(offs_t offset, uint16_t data)
-{
-	switch( offset )
-	{
-		// Interrupts pending
-		case 0x00/4:
-			logerror("irq_write: Attempt to write to irq pending register\n");
-			break;
-
-		// Interrupt mask
-		// --------x------- Mask interrupt level 8  (Unknown)
-		// ---------x------ Mask interrupt level 9  (Timer)
-		// ----------x----- Mask interrupt level 10 (Unknown)
-		// -----------x---- Mask interrupt level 11 (Pad)
-		// ------------x--- Mask interrupt level 12 (HuC6270-A)
-		// -------------x-- Mask interrupt level 13 (HuC6272)
-		// --------------x- Mask interrupt level 14 (HuC6270-B)
-		// ---------------x Mask interrupt level 15 (HuC6273)
-		// 0 - allow, 1 - ignore interrupt
-		case 0x40/4:
-			m_irq_mask = data;
-			check_irqs();
-			break;
-
-		// Interrupt priority 0
-		// ----xxx--------- Priority level interrupt 12
-		// -------xxx------ Priority level interrupt 13
-		// ----------xxx--- Priority level interrupt 14
-		// -------------xxx Priority level interrupt 15
-		case 0x80/4:
-			m_irq_priority[7] = ( data >> 0 ) & 0x07;
-			m_irq_priority[6] = ( data >> 3 ) & 0x07;
-			m_irq_priority[5] = ( data >> 6 ) & 0x07;
-			m_irq_priority[4] = ( data >> 9 ) & 0x07;
-			check_irqs();
-			break;
-
-		// Interrupt priority 1
-		// ----xxx--------- Priority level interrupt 8
-		// -------xxx------ Priority level interrupt 9
-		// ----------xxx--- Priority level interrupt 10
-		// -------------xxx Priority level interrupt 11
-		case 0xC0/4:
-			m_irq_priority[3] = ( data >> 0 ) & 0x07;
-			m_irq_priority[2] = ( data >> 3 ) & 0x07;
-			m_irq_priority[1] = ( data >> 6 ) & 0x07;
-			m_irq_priority[0] = ( data >> 9 ) & 0x07;
-			check_irqs();
-			break;
-	}
-}
-
-
-inline void pcfx_state::check_irqs()
-{
-	uint16_t active_irqs = m_irq_pending & ~m_irq_mask;
-	int highest_prio = -1;
-
-	for (auto & elem : m_irq_priority)
-	{
-		if ( active_irqs & 0x80 )
-		{
-			if ( elem >= highest_prio )
-			{
-				highest_prio = elem;
-			}
-		}
-		active_irqs <<= 1;
-	}
-
-	if ( highest_prio >= 0 )
-	{
-		m_maincpu->set_input_line(8 + highest_prio, ASSERT_LINE );
-	}
-	else
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE );
-	}
-}
-
-
-inline void pcfx_state::set_irq_line(int line, int state)
-{
-	if ( state )
-	{
-//printf("Setting irq line %d\n", line);
-		m_irq_pending |= ( 1 << ( 15 - line ) );
-	}
-	else
-	{
-//printf("Clearing irq line %d\n", line);
-		m_irq_pending &= ~( 1 << ( 15 - line ) );
-	}
-	check_irqs();
-}
-
-void pcfx_state::irq8_w(int state)
-{
-	set_irq_line(8, state);
-}
-
-void pcfx_state::irq9_w(int state)
-{
-	set_irq_line(9, state);
-}
-
-void pcfx_state::irq10_w(int state)
-{
-	set_irq_line(10, state);
-}
-
-void pcfx_state::irq11_w(int state)
-{
-	set_irq_line(11, state);
-}
-
-void pcfx_state::irq12_w(int state)
-{
-	set_irq_line(12, state);
-}
-
-void pcfx_state::irq13_w(int state)
-{
-	set_irq_line(13, state);
-}
-
-void pcfx_state::irq14_w(int state)
-{
-	set_irq_line(14, state);
-}
-
-void pcfx_state::irq15_w(int state)
-{
-	set_irq_line(15, state);
-}
-
-
 void pcfx_state::machine_start()
 {
 	for (int i = 0; i < 2; i++)
@@ -411,8 +231,6 @@ void pcfx_state::machine_start()
 
 void pcfx_state::machine_reset()
 {
-	m_irq_mask = 0xFF;
-	m_irq_pending = 0;
 }
 
 
@@ -422,6 +240,11 @@ uint32_t pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
+void pcfx_state::int_w(offs_t line, u8 state)
+{
+	m_maincpu->set_input_line(line, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 void pcfx_state::pcfx(machine_config &config)
 {
@@ -429,17 +252,20 @@ void pcfx_state::pcfx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcfx_state::pcfx_mem);
 	m_maincpu->set_addrmap(AS_IO, &pcfx_state::pcfx_io);
 
+	PCFX_INTC(config, m_intc, 0);
+	m_intc->int_cb().set(FUNC(pcfx_state::int_w));
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(pcfx_state::screen_update));
 	screen.set_raw(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242);
 
 	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", 0));
 	huc6270_a.set_vram_size(0x20000);
-	huc6270_a.irq().set(FUNC(pcfx_state::irq12_w));
+	huc6270_a.irq().set(m_intc, FUNC(pcfx_intc_device::irq12_w));
 
 	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", 0));
 	huc6270_b.set_vram_size(0x20000);
-	huc6270_b.irq().set(FUNC(pcfx_state::irq14_w));
+	huc6270_b.irq().set(m_intc, FUNC(pcfx_intc_device::irq14_w));
 
 	HUC6261(config, m_huc6261, XTAL(21'477'272));
 	m_huc6261->set_vdc1_tag("huc6270_a");
@@ -447,7 +273,7 @@ void pcfx_state::pcfx(machine_config &config)
 	m_huc6261->set_king_tag("huc6272");
 
 	huc6272_device &huc6272(HUC6272(config, "huc6272", XTAL(21'477'272)));
-	huc6272.irq_changed_callback().set(FUNC(pcfx_state::irq13_w));
+	huc6272.irq_changed_callback().set(m_intc, FUNC(pcfx_intc_device::irq13_w));
 	huc6272.set_rainbow_tag("huc6271");
 
 	HUC6271(config, "huc6271", XTAL(21'477'272));

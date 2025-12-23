@@ -2937,6 +2937,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pcfx_intc.h,MACHINES["PCFX_INTC"] = true
+---------------------------------------------------
+
+if (MACHINES["PCFX_INTC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pcfx_intc.cpp",
+		MAME_DIR .. "src/devices/machine/pcfx_intc.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pckeybrd.h,MACHINES["PCKEYBRD"] = true
 ---------------------------------------------------
 

@@ -154,6 +154,7 @@ private:
 
 	void microprogram_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void microprogram_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 microprogram_control_r(offs_t offset);
 	void microprogram_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	template <unsigned N> void bg_bat_w(offs_t offset, u32 data, u32 mem_mask = ~0);

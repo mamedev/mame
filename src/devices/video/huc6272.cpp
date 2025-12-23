@@ -230,7 +230,7 @@ void huc6272_device::io_map(address_map &map)
 	map(0x12, 0x12).w(FUNC(huc6272_device::bg_priority_w));
 	map(0x13, 0x13).w(FUNC(huc6272_device::microprogram_address_w));
 	map(0x14, 0x14).w(FUNC(huc6272_device::microprogram_data_w));
-	map(0x15, 0x15).w(FUNC(huc6272_device::microprogram_control_w));
+	map(0x15, 0x15).rw(FUNC(huc6272_device::microprogram_control_r), FUNC(huc6272_device::microprogram_control_w));
 //  map(0x16, 0x16) wrap-around enable
 
 	map(0x20, 0x20).w(FUNC(huc6272_device::bg_bat_w<0>));
@@ -265,6 +265,8 @@ void huc6272_device::io_map(address_map &map)
 	map(0x5c, 0x5c).w(FUNC(huc6272_device::adpcm_start_address_w<1>));
 	map(0x5d, 0x5d).w(FUNC(huc6272_device::adpcm_end_address_w<1>));
 	map(0x5e, 0x5e).w(FUNC(huc6272_device::adpcm_imm_address_w<1>));
+
+//	map(0x61, 0x61) KRAM mode (undocumented, used by backup RAM menu)
 }
 
 
@@ -520,6 +522,11 @@ void huc6272_device::microprogram_data_w(offs_t offset, u32 data, u32 mem_mask)
 		m_micro_prg.index ++;
 		m_micro_prg.index &= 0xf;
 	}
+}
+
+u8 huc6272_device::microprogram_control_r(offs_t offset)
+{
+	return m_micro_prg.ctrl;
 }
 
 void huc6272_device::microprogram_control_w(offs_t offset, u32 data, u32 mem_mask)
