@@ -2482,7 +2482,7 @@ protected:
 	// overrides
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		auto font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc(machine.options().artwork_font());
 		draw_text(*font, dest, bounds, m_string, m_textalign, color(state));
 	}
 
@@ -3063,7 +3063,7 @@ protected:
 
 	virtual void draw_aligned(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state) override
 	{
-		auto font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc(machine.options().artwork_font());
 		draw_text(*font, dest, bounds, string_format("%0*d", m_digits, state), m_textalign, color(state));
 	}
 
@@ -3157,7 +3157,7 @@ protected:
 
 		int ourheight = bounds.height();
 
-		auto font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc(machine.options().artwork_font());
 		for (int fruit = 0;fruit<m_numstops;fruit++)
 		{
 			int basey;
@@ -3306,7 +3306,7 @@ private:
 
 		int ourwidth = bounds.width();
 
-		auto font = machine.render().font_alloc("default");
+		auto font = machine.render().font_alloc(machine.options().artwork_font());
 		for (int fruit = 0;fruit<m_numstops;fruit++)
 		{
 			int basex;

@@ -17,6 +17,10 @@ TODO:
 For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
 this driver were authored by Ulf Rathsman.
 
+B&P (Blitz- und Problemlösungs-Modul, initially called Blitz-Modul) 2025 version
+is a free update by one of the people who worked on the original version. It adds
+some new features, and supports the HG240 module.
+
 The MM II program was also licensed to Daimler-Benz, who gave away several custom
 chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
 see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
@@ -48,10 +52,6 @@ module combined with the TK20 TurboKit. For more information, see:
 http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm (mistakenly claims it's MM V)
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
-
-B&P (Blitz- und Problemlösungs-Modul, initially called Blitz-Modul) 2025 version
-is a free update by one of the people who worked on the original version. It adds
-some new features, and supports the HG240 module.
 
 ================================================================================
 

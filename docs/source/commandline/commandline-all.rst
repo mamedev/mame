@@ -2591,7 +2591,7 @@ Core Artwork Options
 
 .. _mame-commandline-fallbackartwork:
 
-**-fallback_artwork**
+**-fallback_artwork** *<artwork name>*
 
     Specifies fallback artwork if no external artwork or internal driver layout
     is defined. If external artwork for the system is present or a layout is
@@ -2606,10 +2606,9 @@ Core Artwork Options
          ``horizontal.ini`` and ``vertical.ini`` to specify different
          fallback artwork choices for horizontal and vertical systems.
 
-
 .. _mame-commandline-overrideartwork:
 
-**-override_artwork**
+**-override_artwork** *<artwork name>*
 
     Specifies override artwork for external artwork and internal driver layout.
 
@@ -2618,6 +2617,21 @@ Core Artwork Options
 
             mame galaga -override_artwork puckman
 
+.. _mame-commandline-artworkfont:
+
+**-artwork_font** / **-artfont** *<fontname>*
+
+    Specifies the name of a font file to use for artwork text elements.  The
+    details are the same as the :ref:`uifont option <mame-commandline-uifont>`.
+
+    Be aware that picking a very wide font such as ``Courier New`` can result
+    in text alignment issues with artwork that was designed with a smaller font
+    such as ``Tahoma`` (the default on Windows).
+
+    Example:
+        .. code-block:: bash
+
+            mame starwbc -artwork_font "Comic Sans MS"
 
 .. _mame-commandline-screenoptions:
 
@@ -4008,6 +4022,9 @@ Core Misc Options
     cannot be found or cannot be loaded, the system will fall back to its
     built-in UI font. On some platforms *fontname* can be a system font name
     instead of a BDF font file.
+
+    Note that not all fonts support Non Latin script or special glyphs like
+    arrow symbols, and will show squares or questionmarks instead.
 
     The default is ``default`` (use the OSD-determined default font).
 
