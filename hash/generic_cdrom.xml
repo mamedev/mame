@@ -86,6 +86,78 @@ pc98: requires a graphic accelerator for setting the intended resolution
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/28673/ -->
+	<!-- Source: http://redump.org/disc/28675/ -->
+	<software name="idanthol">
+		<description>id Anthology (rev 1)</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
+		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
+CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
+CD-ROM 3: "Quake" (see "ibm5170_cdrom:quake" -- identical disc to the standalone 1.06 release)
+CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D" (Macintosh)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="compatiblity" value="IBM5170,MC68040,PPC601,PPC603,PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Vintage"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 1) (Vintage)" sha1="f2e0dcc8252d0b11cc770452f6513fc1d2653452" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="DOOM"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 2) (Doom) (Rev 1)" sha1="0cc44f09c53368ac0a5360db9b16d5d1ddf4380b" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="Mac Wolf3D &amp; DOOM"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 4) (Mac)" sha1="d9c3e998e17fa56fcb5abbdd0a924de78dacb2e8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/28673/ -->
+	<!-- Source: http://redump.org/disc/28674/ -->
+	<software name="idanthola" cloneof= "idanthol">
+		<description>id Anthology</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+CD-ROM 1: "Catacomb 3-D", "Commander Keen: Invasion of the Vorticons", "Commander Keen: Goodbye Galaxy", "Commander Keen: Aliens Ate My Babysitter!", "Commander Keen: Keen Dreams",
+		  "Dangerous Dave", "Hover Tank 3D", "Rescue Rover", "Rescue Rover 2", "Shadow Knights", "Slordax: The Unknown Enemy", "Spear of Destiny", "The Catacomb", "Wolfenstein 3D"
+CD-ROM 2: "DOOM II: Hell on Earth", "Final DOOM", "Master Levels for DOOM II", "The Ultimate DOOM"
+CD-ROM 3: "Quake" (see "ibm5170_cdrom:quake" -- identical disc to the standalone 1.06 release)
+CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenstein 3D" (Macintosh)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="compatiblity" value="IBM5170,MC68040,PPC601,PPC603,PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Vintage"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 1) (Vintage)" sha1="f2e0dcc8252d0b11cc770452f6513fc1d2653452" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="DOOM"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 2) (Doom)" sha1="b32a547d78a19d2e0a47fdfc64e270b2ecfa000e" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<feature name="part_id" value="Mac Wolf3D &amp; DOOM"/>
+			<diskarea name="cdrom">
+				<disk name="id Anthology (USA) (Disc 4) (Mac)" sha1="d9c3e998e17fa56fcb5abbdd0a924de78dacb2e8" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95 -->
 	<!-- Pentium class 60 MHz minimum -->
 	<!-- Japanese version of Hunter Hunted -->
