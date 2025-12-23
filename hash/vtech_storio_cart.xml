@@ -133,7 +133,7 @@ license:CC0-1.0
 
 	-->
 	
-	<-- 
+	<!-- 
 	Scooby Doo and a Mummy Too!
 	Activities: Read the story, Game Time and Dictionary
 	-->	
@@ -150,7 +150,7 @@ license:CC0-1.0
 		</part>
 	</software>
 		
-	<-- 
+	<!-- 
 	Dora and the 3 Little Pigs
 	Activities: Read the Story, Game Time and Dictionary
 	-->	
@@ -179,7 +179,7 @@ license:CC0-1.0
 		</part>
 	</software>
 		
-	<-- 
+	<!-- 
 	Mickey Mouse Clubhouse: Mickey Go Seek
 	Activities: Read the story, Game Time and Dictionary
 	-->	
@@ -226,7 +226,7 @@ license:CC0-1.0
 		</part>
 	</software>
 		
-	<-- 
+	<!-- 
 	Nickelodeon SpongeBob SquarePants: Model Sponge
 	Activities: Read the Story, Game Time and Dictionary
 	English version undumped
@@ -256,13 +256,13 @@ license:CC0-1.0
 		</part>
 	</software>
 	
-	<-- 
+	<!-- 
 	Disney-Pixar Cars 2
 	Activities: Read the story, Game Time, Dictionary, Minigames and Prize Room. 
 	-->
 
 	<software name="cars2" supported="no">
-		<description>Cars 2 (USA)</description>
+		<description>Disney/Pixar Cars 2 (USA)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-281900(US)"/>
@@ -273,7 +273,7 @@ license:CC0-1.0
 		</part>
 	</software>
 		
-	<-- 
+	<!-- 
 	Hello Kitty
 	Activities: Read the Story, Game Time, Minigames, Gift Room, and Dictionary
 	-->	
@@ -290,7 +290,7 @@ license:CC0-1.0
 		</part>
 	</software>
 		
-	<-- 
+	<!-- 
 	Disney Princess
 	Activities: Read the Story, Game Time and Dictionary
 	-->	
