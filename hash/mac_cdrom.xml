@@ -30,20 +30,6 @@ PPC750 - PowerPC 750 (G3) CPU
 		</part>
 	</software>
 
-	<!-- Chex Quest duplicated in ibm5170_cdrom.xml -->
-	<software name="chexquest">
-		<description>Chex Quest</description>
-		<year>1996</year>
-		<publisher>General Mills</publisher>
-		<!-- TODO: macpwr180c: QuickTime video hiccups -->
-		<info name="developer" value="Digital Café" />
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="chex quest" sha1="c90476cc54dfee86bf358c2eb06091ac5859d63a" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="hexen">
 		<description>Hexen: Beyond Heretic</description>
 		<year>1995</year>
@@ -193,19 +179,6 @@ PPC750 - PowerPC 750 (G3) CPU
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mac81" sha1="cd3d8a45c20b271c27f80d957559071f525759f7"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Mac OS 7.0.1-9.x -->
-	<software name="mfma_addsub">
-		<description>My First Math Adventure: Adding and Subtracting</description>
-		<year>1998</year>
-		<publisher>Global Software Publishing</publisher>
-		<info name="developer" value="Dorling Kindersley" />
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
 			</diskarea>
 		</part>
 	</software>

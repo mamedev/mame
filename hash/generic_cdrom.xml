@@ -31,6 +31,20 @@ pc98: InstallShield is painfully slow unless floppy is inserted
 		</part>
 	</software>
 
+	<!-- DOS, Windows 95, and Macintosh -->
+	<software name="chexquest">
+		<description>Chex Quest</description>
+		<year>1996</year>
+		<publisher>General Mills</publisher>
+		<info name="developer" value="Digital Café" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68040,PPC601,PPC603,PPC604" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="chex quest" sha1="c90476cc54dfee86bf358c2eb06091ac5859d63a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 95 -->
 	<!-- Very slow on 486 -->
 	<!-- TODO: has transparency issues on main menu -->
@@ -121,6 +135,20 @@ pc98: [PC-9801-86] joystick port doesn't work (does it need specifically a -118?
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95/NT4 and Macintosh-->
+	<software name="mfma_addsub">
+		<description>My First Math Adventure: Adding and Subtracting</description>
+		<year>1998</year>
+		<publisher>Global Software Publishing</publisher>
+		<info name="developer" value="Dorling Kindersley" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68040" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
 			</diskarea>
 		</part>
 	</software>

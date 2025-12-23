@@ -1209,6 +1209,7 @@ void macpdm_state::macpdm(machine_config &config)
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("PPC601");
+	SOFTWARE_LIST(config, "mac_cd_list").set_original("generic_cdrom").set_filter("PPC601");
 
 	SWIM3(config, m_fdc, IO_CLOCK);
 	m_fdc->irq_cb().set(FUNC(macpdm_state::fdc_irq));

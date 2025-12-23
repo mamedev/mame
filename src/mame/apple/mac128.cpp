@@ -1279,6 +1279,7 @@ void mac128_state::macplus(machine_config &config)
 	subdevice<software_list_device>("flop35_list")->set_filter("MC68000,macplus");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd").set_filter("MC68000,macplus");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68000,macplus");
+	SOFTWARE_LIST(config, "mac_cd_list").set_original("generic_cdrom").set_filter("MC68000,macplus");
 
 	/* internal ram */
 	m_ram->set_default_size("4M");

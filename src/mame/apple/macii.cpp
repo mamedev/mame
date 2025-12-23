@@ -983,6 +983,7 @@ void macii_state::macii(machine_config &config)
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd").set_filter("MC68020");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
+	SOFTWARE_LIST(config, "mac_cd_list").set_original("generic_cdrom").set_filter("MC68020");
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);

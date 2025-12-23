@@ -2236,19 +2236,6 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- Chex Quest duplicated in mac_cdrom.xml -->
-	<software name="chexquest">
-		<description>Chex Quest</description>
-		<year>1996</year>
-		<publisher>General Mills</publisher>
-		<info name="developer" value="Digital Café" />
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="chex quest" sha1="c90476cc54dfee86bf358c2eb06091ac5859d63a" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- DOS -->
 	<!-- TODO: hangs with SB16 -->
 	<software name="chillman" supported="partial">
@@ -5228,19 +5215,6 @@ Unemulated [Capcom pad]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mega_man_x_(usa)" sha1="9d3f47b36019642ca52b5f43b18f84a0ee1b4fd9"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 95/NT4 -->
-	<software name="mfma_addsub">
-		<description>My First Math Adventure: Adding and Subtracting</description>
-		<year>1998</year>
-		<publisher>Global Software Publishing</publisher>
-		<info name="developer" value="Dorling Kindersley" />
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
 			</diskarea>
 		</part>
 	</software>

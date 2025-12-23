@@ -489,6 +489,7 @@ void maciifx_state::maciifx(machine_config &config)
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+	SOFTWARE_LIST(config, "mac_cd_list").set_original("generic_cdrom").set_filter("MC68030,MC68030_32");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");

@@ -374,6 +374,7 @@ void maclc_state::maclc_base(machine_config &config)
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020,MC68020_32");
+	SOFTWARE_LIST(config, "mac_cd_list").set_original("generic_cdrom").set_filter("MC68020,MC68020_32");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
@@ -467,6 +468,7 @@ void maclc_state::maclc2(machine_config &config)
 	m_v8->set_baseram_is_4M(true);
 
 	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+	SOFTWARE_LIST(config.replace(), "mac_cd_list").set_original("generic_cdrom").set_filter("MC68030,MC68030_32");
 }
 
 void maclc_state::maccclas(machine_config &config)
@@ -515,6 +517,7 @@ void maclc_state::maccclas(machine_config &config)
 	m_v8->set_baseram_is_4M(true);
 
 	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+	SOFTWARE_LIST(config.replace(), "mac_cd_list").set_original("generic_cdrom").set_filter("MC68030,MC68030_32");
 }
 
 void maclc_state::mactv(machine_config &config)
@@ -561,6 +564,7 @@ void maclc_state::mactv(machine_config &config)
 	m_v8->set_baseram_is_4M(true);
 
 	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+	SOFTWARE_LIST(config.replace(), "mac_cd_list").set_original("generic_cdrom").set_filter("MC68030,MC68030_32");
 }
 
 void maclc_state::macclas2(machine_config &config)
@@ -590,6 +594,7 @@ void maclc_state::macclas2(machine_config &config)
 	m_v8->set_baseram_is_4M(true);
 
 	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+	SOFTWARE_LIST(config.replace(), "mac_cd_list").set_original("generic_cdrom").set_filter("MC68030,MC68030_32");
 }
 
 ROM_START(maclc)

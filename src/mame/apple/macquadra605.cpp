@@ -244,6 +244,7 @@ void quadra605_state::macqd605(machine_config &config)
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
+	SOFTWARE_LIST(config, "mac_cd_list").set_original("generic_cdrom").set_filter("MC68040");
 }
 
 void quadra605_state::maclc475(machine_config &config)

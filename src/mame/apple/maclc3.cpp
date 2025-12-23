@@ -294,6 +294,7 @@ void macvail_state::maclc3_base(machine_config &config)
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68030,MC68030_32");
+	SOFTWARE_LIST(config, "mac_cd_list").set_original("generic_cdrom").set_filter("MC68030,MC68030_32");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 
 	SCC85C30(config, m_scc, C7M);
