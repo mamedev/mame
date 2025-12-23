@@ -39,8 +39,6 @@ protected:
 		, m_sprite_bpp(sprite_bpp)
 	{ }
 
-	virtual void video_start() override ATTR_COLD;
-
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u32> m_mainram;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -59,6 +57,8 @@ protected:
 	u32 m_video_dma_address = 0;
 	u16 m_layer_enable = 0;
 	u8 m_alpha_table[0x2000]{};
+
+	virtual void video_start() override ATTR_COLD;
 
 	void palette_dma_start_w(u32 data);
 	void sprite_dma_start_w(u16 data);
@@ -114,8 +114,6 @@ public:
 	void init_rfjet2kc() ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
-
 	required_device<gfxdecode_device> m_gfxdecode;
 	memory_share_creator<u32> m_tilemap_ram;
 
@@ -135,6 +133,8 @@ protected:
 	u32 m_midl_layer_d14 = 0;
 	u32 m_fore_layer_d14 = 0;
 	u32 m_bg_fore_layer_position = 0;
+
+	virtual void video_start() override ATTR_COLD;
 
 	void tile_decrypt_key_w(u16 data);
 	void layer_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
