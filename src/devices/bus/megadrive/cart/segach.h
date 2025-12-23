@@ -8,6 +8,7 @@
 
 #include "slot.h"
 #include "machine/timer.h"
+#include "imagedev/snapquik.h"
 
 class megadrive_segach_jp_device : public device_t,
 								   public device_megadrive_cart_interface
@@ -33,6 +34,8 @@ class megadrive_segach_us_device : public device_t,
 {
 public:
 	megadrive_segach_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	virtual void cart_map(address_map &map) override ATTR_COLD;
 	virtual void time_io_map(address_map &map) override ATTR_COLD;

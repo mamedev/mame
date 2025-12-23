@@ -127,6 +127,8 @@ void megadrive_segach_us_device::device_add_mconfig(machine_config &config)
 	// assuming 12Mbps download rate
 	TIMER(config, "packet_timer", 0).configure_periodic(FUNC(megadrive_segach_us_device::send_packets),
 			attotime::from_hz((12*128072) / 2880));
+
+	QUICKLOAD(config, "packets", "img").set_load_callback(FUNC(megadrive_segach_us_device::quickload_cb));
 }
 
 void megadrive_segach_us_device::device_start()
@@ -141,7 +143,7 @@ void megadrive_segach_us_device::device_start()
 	m_dram.resize(0x40'0000 / 2);
 	m_sram.resize(0x2000);
 	m_nvm.fill(0);
-	load_packets();
+	//load_packets();
 
 	m_broadcast_packet = 0;
 
@@ -298,12 +300,12 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 	);
 	map(0x32, 0x33).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
-			// bit 0: reset console
+			// bit 0: reset console? (could also be bit 3)
 			// bit 1: download enable
-			// bit 2: download reset?
-			// bit 3: switch BIOS/game view
+			// bit 2: packet match counter reset
+			// bit 3: switch BIOS/game view (could also be bit 0)
 			// bit 4: reset CRC
-			// bit 5: enable fixit buffer?
+			// bit 5: enable fixit buffer
 			// bit 8: memory configuration, set if 3MB detected?
 			return m_gen_control;
 		}),
@@ -402,8 +404,10 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 			// this is a bitmap with the corresponding bit set when the TCU
 			// detects a channel
 			logerror("TCU: read channel bitmap read offset %02x\n", offset);
-			//return 0x00; // No signal :(
-			return 0xFF; // Signal everywhere :D
+			if (m_packet.size())
+				return 0xFF; // Signal everywhere :D
+			else
+				return 0x00; // No signal :(
 		}));
 	map(0x0cb, 0x0cb).lrw8( // parental control level
 		NAME([this] (offs_t offset) -> u8 {
@@ -463,6 +467,7 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 	);
 }
 
+#if 0
 void megadrive_segach_us_device::load_packets()
 {
 	static const char* filename = "dom0816.bin";
@@ -498,6 +503,37 @@ void megadrive_segach_us_device::load_packets()
 	{
 		logerror("packet stream could not be loaded\n");
 	}
+}
+#endif
+QUICKLOAD_LOAD_MEMBER(megadrive_segach_us_device::quickload_cb)
+{
+	// Load packets stream
+	//static const char* filename = "dom0816.bin";
+	size_t num_pipes = image.length() / (256 * 10);
+	size_t num_packets = num_pipes * 10;
+	m_packet.resize(num_packets);
+	for (size_t curr_packet = 0; curr_packet < num_packets; curr_packet++)
+	{
+#pragma pack(push, 1)
+		struct {
+			u16 file_id;
+			u16 service_id;
+			u32 game_time;
+			u16 address;
+			u16 data[246 / 2];
+		} converted_packet;
+#pragma pack(pop)
+		if (image.fread((char*) &converted_packet, 256))
+		{
+			m_packet[curr_packet].file_id = converted_packet.file_id;
+			m_packet[curr_packet].service_id = converted_packet.service_id;
+			m_packet[curr_packet].game_time = converted_packet.game_time;
+			m_packet[curr_packet].address = converted_packet.address;
+			std::copy_n(&converted_packet.data[0], 246/2, &m_packet[curr_packet].data[0]);
+		}
+	}
+	logerror("packets loaded: %d, pipes: %d\n", num_packets, num_pipes);
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
@@ -540,8 +576,8 @@ void megadrive_segach_us_device::crc_write(u16 data)
 {
 	u32 crc = m_crc;
 	for (int i = 0; i < 16; i++) {
-		int input_bit = (data & (0x8000 >> i)) ? 1 : 0;
-		int crc_msb = (crc & 0x80000000) ? 1 : 0;
+		u32 input_bit = (data & (0x8000 >> i)) ? 1 : 0;
+		u32 crc_msb = (crc & 0x80000000) ? 1 : 0;
 		if (input_bit == crc_msb) {
 			crc = crc << 1;
 		} else {
@@ -557,7 +593,7 @@ u32 megadrive_segach_us_device::crc_read() const
 {
 	// TODO: i'm sure there's already a macro for this
 	u32 crc = m_crc;
-	uint32_t reversed_crc = 0;
+	u32 reversed_crc = 0;
 	for (int i = 0; i < 32; i++) {
 		if (crc & (1 << i)) {
 			reversed_crc |= (0x80000000 >> i);
