@@ -58,7 +58,7 @@ class namco_de_pcbstack_device : public device_t
 {
 public:
 	// construction/destruction
-	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void configure_c148_standard(machine_config &config);
 
@@ -85,34 +85,35 @@ private:
 	required_device<screen_device> m_screen;
 	required_memory_bank m_audiobank;
 	required_region_ptr<u16> m_c140_region;
-	required_shared_ptr<uint8_t> m_dpram;
+	required_shared_ptr<u8> m_dpram;
 	required_device<namcos21_3d_device> m_namcos21_3d;
 	required_device<namcos21_dsp_device> m_namcos21_dsp;
 
-	uint16_t m_video_enable;
+	u16 m_video_enable = 0;
 
-	uint16_t video_enable_r();
-	void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	u16 video_enable_r();
+	void video_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	uint16_t dpram_word_r(offs_t offset);
-	void dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint8_t dpram_byte_r(offs_t offset);
-	void dpram_byte_w(offs_t offset, uint8_t data);
+	u16 dpram_word_r(offs_t offset);
+	void dpram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 dpram_byte_r(offs_t offset);
+	void dpram_byte_w(offs_t offset, u8 data);
 
-	void eeprom_w(offs_t offset, uint8_t data);
-	uint8_t eeprom_r(offs_t offset);
+	void eeprom_w(offs_t offset, u8 data);
+	u8 eeprom_r(offs_t offset);
 
-	void sound_bankselect_w(uint8_t data);
+	void sound_bankselect_w(u8 data);
 
-	void sound_reset_w(uint8_t data);
-	void system_reset_w(uint8_t data);
+	void sound_reset_w(u8 data);
+	void system_reset_w(u8 data);
 	void reset_all_subcpus(int state);
 
-	std::unique_ptr<uint8_t[]> m_eeprom;
+	std::unique_ptr<u8[]> m_eeprom;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void configure_c68_namcos21(machine_config &config);
 
@@ -128,7 +129,7 @@ private:
 DEFINE_DEVICE_TYPE(NAMCO_DE_PCB, namco_de_pcbstack_device, "namco_de_pcb", "Namco Driver's Eyes PCB stack")
 
 
-namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+namco_de_pcbstack_device::namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCO_DE_PCB, tag, owner, clock),
 	m_maincpu(*this, "maincpu"),
 	m_audiocpu(*this, "audiocpu"),
@@ -197,7 +198,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	m_c355spr->set_palette(m_palette);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr->set_palxor(0xf); // reverse mapping
+	m_c355spr->set_mix_callback(FUNC(namco_de_pcbstack_device::sprite_mix_callback));
 	m_c355spr->set_color_base(0x1000);
 	m_c355spr->set_external_prifill(true);
 
@@ -213,47 +214,70 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 }
 
 
-uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+bool namco_de_pcbstack_device::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
 {
-	//uint8_t *videoram = m_gpu_videoram.get();
+	if (srcpri == pri)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			switch (src & 0xff)
+			{
+			case 0:
+				dest = 0x4000 | (dest & 0x1fff);
+				break;
+			case 1:
+				dest = 0x6000 | (dest & 0x1fff);
+				break;
+			default:
+				dest = colbase + (src ^ 0xf00);
+				break;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+u32 namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	//u8 *videoram = m_gpu_videoram.get();
 	int pivot = 3;
-	int pri;
-	bitmap.fill(0xff, cliprect );
+	bitmap.fill(0xff, cliprect);
 	screen.priority().fill(0, cliprect);
 	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
-	m_c355spr->draw(screen, bitmap, cliprect, 2 );
-	m_c355spr->draw(screen, bitmap, cliprect, 14 );   //driver's eyes
+	m_c355spr->draw(screen, bitmap, cliprect, 2);
+	m_c355spr->draw(screen, bitmap, cliprect, 14);   //driver's eyes
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
 
-	m_c355spr->draw(screen, bitmap, cliprect, 0 );
-	m_c355spr->draw(screen, bitmap, cliprect, 1 );
+	m_c355spr->draw(screen, bitmap, cliprect, 0);
+	m_c355spr->draw(screen, bitmap, cliprect, 1);
 
 	m_namcos21_3d->copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
 
-	for (pri = pivot; pri < 8; pri++)
+	for (int pri = pivot; pri < 8; pri++)
 	{
 		m_c355spr->draw(screen, bitmap, cliprect, pri);
 	}
 
-	m_c355spr->draw(screen, bitmap, cliprect, 15 );   //driver's eyes
+	m_c355spr->draw(screen, bitmap, cliprect, 15);   //driver's eyes
 
 	return 0;
 
 }
 
-uint16_t namco_de_pcbstack_device::video_enable_r()
+u16 namco_de_pcbstack_device::video_enable_r()
 {
 	return m_video_enable;
 }
 
-void namco_de_pcbstack_device::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namco_de_pcbstack_device::video_enable_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA( &m_video_enable ); /* 0x40 = enable */
-	if( m_video_enable!=0 && m_video_enable!=0x40 )
+	if (m_video_enable != 0 && m_video_enable != 0x40 )
 	{
-		logerror( "unexpected video_enable_w=0x%x\n", m_video_enable );
+		logerror("%s: unexpected video_enable_w=0x%x\n", machine().describe_context(), m_video_enable);
 	}
 }
 
@@ -261,25 +285,25 @@ void namco_de_pcbstack_device::video_enable_w(offs_t offset, uint16_t data, uint
 
 /* dual port ram memory handlers */
 
-uint16_t namco_de_pcbstack_device::dpram_word_r(offs_t offset)
+u16 namco_de_pcbstack_device::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-void namco_de_pcbstack_device::dpram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namco_de_pcbstack_device::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if( ACCESSING_BITS_0_7 )
+	if (ACCESSING_BITS_0_7)
 	{
 		m_dpram[offset] = data&0xff;
 	}
 }
 
-uint8_t namco_de_pcbstack_device::dpram_byte_r(offs_t offset)
+u8 namco_de_pcbstack_device::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-void namco_de_pcbstack_device::dpram_byte_w(offs_t offset, uint8_t data)
+void namco_de_pcbstack_device::dpram_byte_w(offs_t offset, u8 data)
 {
 	m_dpram[offset] = data;
 }
@@ -382,12 +406,12 @@ void namco_de_pcbstack_device::driveyes_slave_map(address_map &map)
 	map(0x1c0000, 0x1fffff).m(m_slave_intc, FUNC(namco_c148_device::map));
 }
 
-void namco_de_pcbstack_device::sound_bankselect_w(uint8_t data)
+void namco_de_pcbstack_device::sound_bankselect_w(u8 data)
 {
 	m_audiobank->set_entry(data>>4);
 }
 
-void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
+void namco_de_pcbstack_device::sound_reset_w(u8 data)
 {
 	if (data & 0x01)
 	{
@@ -402,7 +426,7 @@ void namco_de_pcbstack_device::sound_reset_w(uint8_t data)
 	}
 }
 
-void namco_de_pcbstack_device::system_reset_w(uint8_t data)
+void namco_de_pcbstack_device::system_reset_w(u8 data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -416,12 +440,12 @@ void namco_de_pcbstack_device::reset_all_subcpus(int state)
 	m_c68->ext_reset(state);
 }
 
-void namco_de_pcbstack_device::eeprom_w(offs_t offset, uint8_t data)
+void namco_de_pcbstack_device::eeprom_w(offs_t offset, u8 data)
 {
 	m_eeprom[offset] = data;
 }
 
-uint8_t namco_de_pcbstack_device::eeprom_r(offs_t offset)
+u8 namco_de_pcbstack_device::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -432,7 +456,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namco_de_pcbstack_device::screen_scanline)
 	int scanline = param;
 //  int cur_posirq = get_posirq_scanline()*2;
 
-	if(scanline == 240*2)
+	if (scanline == 240*2)
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
@@ -453,10 +477,10 @@ void namco_de_pcbstack_device::configure_c148_standard(machine_config &config)
 
 void namco_de_pcbstack_device::device_start()
 {
-	m_eeprom = std::make_unique<uint8_t[]>(0x2000);
+	m_eeprom = std::make_unique<u8[]>(0x2000);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
 
-	uint32_t max = memregion("audiocpu")->bytes() / 0x4000;
+	u32 max = memregion("audiocpu")->bytes() / 0x4000;
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 

@@ -133,7 +133,6 @@ void nslasher_state::video_start()
 
 void dragngun_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_temp_render_bitmap);
 	deco32_state::allocate_rowscroll(0x4000/4, 0x2000/4, 0x4000/4, 0x2000/4);
 	deco32_state::allocate_buffered_palette();
 	save_item(NAME(m_sprite_ctrl));
@@ -231,6 +230,21 @@ int dragngun_state::sprite_priority_callback(int priority)
 	return priority;
 }
 
+bool dragngun_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+{
+	// TODO: proper priority handling
+	if (srcpri >= destpri)
+	{
+		if ((src & 0xf) != 0xf)
+		{
+			dest = colbase + src;
+			destpri = srcpri;
+			return true;
+		}
+	}
+	return false;
+}
+
 
 u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -255,8 +269,8 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	if (cliprect.bottom() == 247)
 	{
 		rectangle clip(cliprect.left(), cliprect.right(), 8, 247);
-
-		m_sprgenzoom->draw_dg(screen, bitmap, clip, screen.priority(), m_temp_render_bitmap);
+		m_sprgenzoom->clear_screen_bitmap(clip);
+		m_sprgenzoom->draw_dg(screen, bitmap, clip);
 	}
 
 	return 0;

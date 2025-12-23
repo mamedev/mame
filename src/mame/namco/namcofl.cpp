@@ -223,8 +223,8 @@ private:
 	required_device<namco_c355spr_device> m_c355spr;
 	required_device<m37710_cpu_device> m_mcu;
 
-	required_shared_ptr<uint32_t> m_workram;
-	required_shared_ptr<uint32_t> m_shareram;
+	required_shared_ptr<u32> m_workram;
+	required_shared_ptr<u32> m_shareram;
 	memory_view m_mainbank;
 
 	required_ioport m_in0;
@@ -238,51 +238,73 @@ private:
 	emu_timer *m_raster_interrupt_timer = nullptr;
 	emu_timer *m_vblank_interrupt_timer = nullptr;
 	emu_timer *m_network_interrupt_timer = nullptr;
-	uint8_t m_mcu_port6 = 0;
-	uint32_t m_sprbank = 0;
+	u8 m_mcu_port6 = 0;
+	u32 m_sprbank = 0;
 
 	static constexpr int m_irq_type[] = { I960_IRQ0, I960_IRQ1, I960_IRQ2, I960_IRQ3 };
 
-	uint32_t unk1_r();
-	uint8_t network_r(offs_t offset);
-	uint32_t sysreg_r();
-	void sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void c116_w(offs_t offset, uint8_t data);
-	uint16_t mcu_shared_r(offs_t offset);
-	void mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t port6_r();
-	void port6_w(uint8_t data);
-	uint8_t port7_r();
-	uint8_t dac6_r();
-	void spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 unk1_r();
+	u8 network_r(offs_t offset);
+	u32 sysreg_r();
+	void sysreg_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void c116_w(offs_t offset, u8 data);
+	u16 mcu_shared_r(offs_t offset);
+	void mcu_shared_w(offs_t offset, u16 data, u16 mem_mask);
+	u8 port6_r();
+	void port6_w(u8 data);
+	u8 port7_r();
+	u8 dac6_r();
+	void spritebank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	int objcode2tile(int code);
-	void tilemap_cb(uint16_t code, int &tile, int &mask);
-	void roz_cb(uint16_t code, int &tile, int &mask, int which);
+	void tilemap_cb(u16 code, int &tile, int &mask);
+	void roz_cb(u16 code, int &tile, int &mask, int which);
 	void namcoc75_am(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 };
 
 
-void namcofl_state::tilemap_cb(uint16_t code, int &tile, int &mask)
+void namcofl_state::tilemap_cb(u16 code, int &tile, int &mask)
 {
 	tile = code;
 	mask = code;
 }
 
-void namcofl_state::roz_cb(uint16_t code, int &tile, int &mask, int which)
+void namcofl_state::roz_cb(u16 code, int &tile, int &mask, int which)
 {
 	tile = code;
 	mask = code;
 }
 
+bool namcofl_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+{
+	if (srcpri >= destpri)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			if (src == 0xffe)
+			{
+				dest |= 0x800;
+			}
+			else
+			{
+				dest = colbase + src;
+			}
+			destpri = srcpri;
+			return true;
+		}
+	}
+	return false;
+}
 
-uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+u32 namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// compute window for custom screen blanking
 	rectangle clip;
@@ -296,17 +318,17 @@ uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	clip &= cliprect;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 
 	for (int pri = 0; pri < 16; pri++)
 	{
-		m_c169roz->draw(screen, bitmap, clip, pri);
+		m_c169roz->draw(screen, bitmap, clip, pri, pri, 0);
 		if ((pri & 1) == 0)
 		{
-			m_c123tmap->draw(screen, bitmap, clip, pri >> 1);
+			m_c123tmap->draw(screen, bitmap, clip, pri >> 1, pri, 0);
 		}
-
-		m_c355spr->draw(screen, bitmap, clip, pri);
 	}
+	m_c355spr->draw(screen, bitmap, clip);
 
 	return 0;
 }
@@ -315,7 +337,7 @@ uint32_t namcofl_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //        groups of sprites.  I am unsure how to differentiate those groups
 //        at this time however.
 
-void namcofl_state::spritebank_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void namcofl_state::spritebank_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_sprbank);
 }
@@ -329,12 +351,12 @@ int namcofl_state::objcode2tile(int code)
 }
 
 
-uint32_t namcofl_state::unk1_r()
+u32 namcofl_state::unk1_r()
 {
 	return 0xffffffff;
 }
 
-uint8_t namcofl_state::network_r(offs_t offset)
+u8 namcofl_state::network_r(offs_t offset)
 {
 	if (offset == 1)
 		return 0x7d;
@@ -342,12 +364,12 @@ uint8_t namcofl_state::network_r(offs_t offset)
 	return 0xff;
 }
 
-uint32_t namcofl_state::sysreg_r()
+u32 namcofl_state::sysreg_r()
 {
 	return 0;
 }
 
-void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void namcofl_state::sysreg_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
@@ -363,13 +385,13 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
-void namcofl_state::c116_w(offs_t offset, uint8_t data)
+void namcofl_state::c116_w(offs_t offset, u8 data)
 {
 	m_c116->write(offset, data);
 
 	if ((offset & 0x180e) == 0x180a)
 	{
-		const uint16_t triggerscanline = m_c116->get_reg(5) - (32+1);
+		const u16 triggerscanline = m_c116->get_reg(5) - (32+1);
 		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(triggerscanline));
 	}
 }
@@ -400,7 +422,7 @@ void namcofl_state::main_map(address_map &map)
 }
 
 
-void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void namcofl_state::mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -413,9 +435,9 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 #endif
 
 	if (BIT(offset, 0))
-		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~(uint32_t(mem_mask) << 16)) | ((data & mem_mask) << 16);
+		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~(u32(mem_mask) << 16)) | ((data & mem_mask) << 16);
 	else
-		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~uint32_t(mem_mask)) | (data & mem_mask);
+		m_shareram[offset >> 1] = (m_shareram[offset >> 1] & ~u32(mem_mask)) | (data & mem_mask);
 
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && BIT(data, 7))
@@ -424,7 +446,7 @@ void namcofl_state::mcu_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 }
 
-uint16_t namcofl_state::mcu_shared_r(offs_t offset)
+u16 namcofl_state::mcu_shared_r(offs_t offset)
 {
 	if (BIT(offset, 0))
 		return m_shareram[offset >> 1] >> 16;
@@ -432,17 +454,17 @@ uint16_t namcofl_state::mcu_shared_r(offs_t offset)
 		return m_shareram[offset >> 1];
 }
 
-uint8_t namcofl_state::port6_r()
+u8 namcofl_state::port6_r()
 {
 	return m_mcu_port6;
 }
 
-void namcofl_state::port6_w(uint8_t data)
+void namcofl_state::port6_w(u8 data)
 {
 	m_mcu_port6 = data;
 }
 
-uint8_t namcofl_state::port7_r()
+u8 namcofl_state::port7_r()
 {
 	switch (m_mcu_port6 & 0xf0)
 	{
@@ -465,7 +487,7 @@ uint8_t namcofl_state::port7_r()
 	return 0xff;
 }
 
-uint8_t namcofl_state::dac6_r()
+u8 namcofl_state::dac6_r()
 {
 	return m_brake.read_safe(0xff);
 }
@@ -705,7 +727,7 @@ void namcofl_state::namcofl(machine_config &config)
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0, 0);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&namcofl_state::objcode2tile, this));
-	m_c355spr->set_palxor(0x0);
+	m_c355spr->set_mix_callback(FUNC(namcofl_state::sprite_mix_callback));
 	m_c355spr->set_color_base(0);
 	m_c355spr->set_buffer(1);
 
