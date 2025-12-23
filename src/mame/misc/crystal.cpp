@@ -24,6 +24,7 @@
     Additional work and refactoring by Angelo Salese
 
     TODO:
+	- Move flash memory implementation into machine/intelfsh.cpp
     - provide NVRAM defaults where applicable;
     - add an actual reset button (helps with inp record/playback);
     - donghaer: needs "raster effect" for 2 players mode split screen, but no
@@ -164,7 +165,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
 		m_ds1302(*this, "rtc"),
-		m_eeprom(*this, "eeprom"),
 		m_dsw(*this, "DSW"),
 		m_system(*this, "SYSTEM"),
 		m_lamps(*this, "lamp%u", 1U)
@@ -187,96 +187,95 @@ protected:
 
 private:
 	// memory pointers
-	required_shared_ptr<uint32_t> m_workram;
-	optional_shared_ptr<uint32_t> m_reset_patch;
-	optional_region_ptr<uint32_t> m_flash;
+	required_shared_ptr<u32> m_workram;
+	required_shared_ptr<u32> m_reset_patch;
+	required_region_ptr<u32> m_flash;
 
-	optional_memory_bank m_mainbank;
+	required_memory_bank m_mainbank;
 
 	// devices
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ds1302_device> m_ds1302;
-	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	required_ioport m_dsw;
 	required_ioport m_system;
 
 	output_finder<16> m_lamps;
 
-	std::unique_ptr<uint8_t[]> m_dummy_region;
+	std::unique_ptr<u8[]> m_dummy_region;
 
-	uint32_t    m_bank;
-	uint32_t    m_maxbank;
-	uint32_t    m_flashcmd;
-	uint32_t    m_pio;
+	u32 m_bank = 0;
+	u32 m_maxbank = 0;
+	u32 m_flashcmd = 0xff;
+	u32 m_pio = 0;
 
-	uint32_t system_input_r();
-	void banksw_w(uint32_t data);
+	u32 system_input_r();
+	void banksw_w(u32 data);
 	void lamps_w(offs_t offset, u8 data);
-	uint32_t flashcmd_r();
-	void flashcmd_w(uint32_t data);
-	void coin_counters_w(uint8_t data);
+	u32 flashcmd_r();
+	void flashcmd_w(u32 data);
+	void coin_counters_w(u8 data);
 
 	void patchreset();
-	void crystal_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
 	// PIO
-	uint32_t pioldat_r();
-	void pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t pioedat_r();
+	u32 pioldat_r();
+	void pioldat_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 pioedat_r();
 };
 
 
-uint32_t crystal_state::system_input_r()
+u32 crystal_state::system_input_r()
 {
 	return (m_system->read() << 16) | (m_dsw->read()) | 0xff00ff00;
 }
 
-void crystal_state::banksw_w(uint32_t data)
+void crystal_state::banksw_w(u32 data)
 {
 	m_bank = (data >> 1) & 7;
 	m_mainbank->set_entry(m_bank);
 }
 
-void crystal_state::lamps_w(offs_t offset, uint8_t data)
+void crystal_state::lamps_w(offs_t offset, u8 data)
 {
 	for (unsigned i = 0; 8 > i; ++i)
 		m_lamps[(offset << 3) | i] = BIT(data, i);
 }
 
-uint32_t crystal_state::pioldat_r()
+u32 crystal_state::pioldat_r()
 {
 	return m_pio;
 }
 
 // PIO Latched output DATa Register
-void crystal_state::pioldat_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void crystal_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	const uint32_t RST = BIT(data, 24);
-	const uint32_t CLK = BIT(data, 25);
-	const uint32_t DAT = BIT(data, 28);
+	const u32 rst = BIT(data, 24);
+	const u32 clk = BIT(data, 25);
+	const u32 dat = BIT(data, 28);
 
-	m_ds1302->ce_w(RST);
-	m_ds1302->io_w(DAT);
-	m_ds1302->sclk_w(CLK);
+	m_ds1302->ce_w(rst);
+	m_ds1302->io_w(dat);
+	m_ds1302->sclk_w(clk);
 
 	COMBINE_DATA(&m_pio);
 }
 
 // PIO External DATa Register
-uint32_t crystal_state::pioedat_r()
+u32 crystal_state::pioedat_r()
 {
 	return m_ds1302->io_r() << 28;
 }
 
-uint32_t crystal_state::flashcmd_r()
+u32 crystal_state::flashcmd_r()
 {
 	if ((m_flashcmd & 0xff) == 0xff)
 	{
 		if (m_bank < m_maxbank)
 		{
-			uint32_t *ptr = (uint32_t*)(m_mainbank->base());
+			u32 *ptr = (u32*)(m_mainbank->base());
 			return ptr[0];
 		}
 		else
@@ -292,12 +291,12 @@ uint32_t crystal_state::flashcmd_r()
 	return 0;
 }
 
-void crystal_state::flashcmd_w(uint32_t data)
+void crystal_state::flashcmd_w(u32 data)
 {
 	m_flashcmd = data;
 }
 
-void crystal_state::coin_counters_w(uint8_t data)
+void crystal_state::coin_counters_w(u8 data)
 {
 	// Both signals are sent when setting is "1 shooter"
 	// Only evosocc and crysking allow the user to change this setting.
@@ -305,7 +304,7 @@ void crystal_state::coin_counters_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
-void crystal_state::crystal_mem(address_map &map)
+void crystal_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).rom().nopw();
 
@@ -323,14 +322,14 @@ void crystal_state::crystal_mem(address_map &map)
 	map(0x01802008, 0x0180200b).r(FUNC(crystal_state::pioedat_r));
 
 	// mirror is accessed by donghaer on later levels
-	map(0x02000000, 0x027fffff).mirror(0x00800000).ram().share("workram");
+	map(0x02000000, 0x027fffff).mirror(0x00800000).ram().share(m_workram);
 
 	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 
-	map(0x05000000, 0x05ffffff).bankr("mainbank");
+	map(0x05000000, 0x05ffffff).bankr(m_mainbank);
 	map(0x05000000, 0x05000003).rw(FUNC(crystal_state::flashcmd_r), FUNC(crystal_state::flashcmd_w));
 
-	map(0x44414f4c, 0x44414f7f).ram().share("reset_patch");
+	map(0x44414f4c, 0x44414f7f).ram().share(m_reset_patch);
 }
 
 void crystal_state::patchreset()
@@ -362,7 +361,7 @@ loop:
 
 
 #if 1
-	static const uint32_t patch[] =
+	static const u32 patch[] =
 	{
 		0x40c0ea01,
 		0xe906400a,
@@ -374,7 +373,7 @@ loop:
 
 	memcpy(m_reset_patch, patch, sizeof(patch));
 #else
-	static const uint8_t patch[] =
+	static const u8 patch[] =
 	{
 		0x01,0xea,0xc0,0x40,0x0a,0x40,0x06,0xe9,
 		0x20,0x2a,0xc0,0x40,0x0a,0x40,0x06,0xe9,
@@ -394,12 +393,12 @@ void crystal_state::machine_start()
 	if (m_mainbank)
 	{
 		m_maxbank = m_flash ? (m_flash.bytes() / 0x1000000) : 0;
-		m_dummy_region = std::make_unique<uint8_t []>(0x1000000);
+		m_dummy_region = std::make_unique<u8 []>(0x1000000);
 		std::fill_n(&m_dummy_region[0], 0x1000000, 0xff); // 0xff filled at unmapped area
-		uint8_t *rom = (m_flash) ? (uint8_t *)&m_flash[0] : &m_dummy_region[0];
+		u8 *rom = (m_flash) ? (u8 *)&m_flash[0] : &m_dummy_region[0];
 		for (int i = 0; i < 8; i++)
 		{
-			if ((i < m_maxbank))
+			if (i < m_maxbank)
 				m_mainbank->configure_entry(i, rom + i * 0x1000000);
 			else
 				m_mainbank->configure_entry(i, m_dummy_region.get());
@@ -424,8 +423,8 @@ INPUT_CHANGED_MEMBER(crystal_state::coin_inserted)
 {
 	if (oldval)
 	{
-		uint8_t coin_chute = (uint8_t)(uintptr_t)param & 1;
-		m_vr0soc->IntReq(coin_chute ? 19 : 12);
+		const u8 coin_chute = (u8)(uintptr_t)param & 1;
+		m_vr0soc->int_req(coin_chute ? 19 : 12);
 	}
 }
 
@@ -595,14 +594,14 @@ INPUT_PORTS_END
 void crystal_state::crystal(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : dynamic via PLL
-	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::crystal_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 6); // TODO : dynamic via PLL
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
-	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, se3208_device::SE3208_INT);
 
 	DS1302(config, m_ds1302, 32.768_kHz_XTAL);
 
@@ -729,7 +728,7 @@ loop.  Also it seems that bit 0x40000000 is the PIC reset.
 
 void crystal_state::init_crysking()
 {
-	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
+	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
 
 	//patch the data feed by the protection
 
@@ -748,7 +747,7 @@ void crystal_state::init_crysking()
 
 void crystal_state::init_evosocc()
 {
-	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]) + (0x1000000 * 2 / 2);
+	auto rom = util::little_endian_cast<u16>(&m_flash[0]) + (0x1000000 * 2 / 2);
 
 	rom[0x97388e / 2] = 0x90fc;  //PUSH R2..R7
 	rom[0x973890 / 2] = 0x9001;  //PUSH R0
@@ -766,7 +765,7 @@ void crystal_state::init_evosocc()
 void crystal_state::init_topbladv()
 {
 	// patches based on analysis of PIC dump
-	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
+	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
 	/*
 	    PIC Protection data:
 	    - RAM ADDR - --PATCH--
@@ -793,7 +792,7 @@ void crystal_state::init_topbladv()
 void crystal_state::init_officeye()
 {
 	// patches based on analysis of PIC dump
-	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
+	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
 
 	/*
 	    PIC Protection data:
@@ -819,7 +818,7 @@ void crystal_state::init_officeye()
 
 void crystal_state::init_donghaer()
 {
-	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
+	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
 
 	rom[0x037a2 / 2] = 0x9004; // PUSH %R2
 	rom[0x037a4 / 2] = 0x8202; // LD   (%SP,0x8),%R2
@@ -836,7 +835,7 @@ void crystal_state::init_donghaer()
 
 void crystal_state::init_maldaiza()
 {
-	auto rom = util::little_endian_cast<uint16_t>(&m_flash[0]);
+	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
 	rom[0x09b12 / 2] = 0x9004; // PUSH %R2
 	rom[0x09b14 / 2] = 0x8202; // LD   (%SP,0x8),%R2
 	// ...
