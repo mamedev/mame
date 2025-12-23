@@ -4046,10 +4046,13 @@ https://mametesters.org/view.php?id=9334
 
 	<!-- Windows 3.1/95 -->
 	<!-- http://redump.org/disc/15320 -->
-	<software name="fulltiltoem2" cloneof="fulltilt">
+	<software name="fulltiltoem2" cloneof="fulltilt" supported="partial">
 		<description>Full Tilt! Pinball (version 1.1) (Thrustmaster OEM)</description>
 		<year>1996</year>
 		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Unsupported optional Thrustmaster Wizzard Pinball controller
+]]></notes>
 		<info name="developer" value="Cinematronics" />
 		<info name="release" value="19960930" />
 		<part name="cdrom" interface="cdrom">
