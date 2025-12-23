@@ -398,7 +398,7 @@ void crystal_state::machine_start()
 		u8 *rom = (m_flash) ? (u8 *)&m_flash[0] : &m_dummy_region[0];
 		for (int i = 0; i < 8; i++)
 		{
-			if ((i < m_maxbank))
+			if (i < m_maxbank)
 				m_mainbank->configure_entry(i, rom + i * 0x1000000);
 			else
 				m_mainbank->configure_entry(i, m_dummy_region.get());
