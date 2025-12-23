@@ -847,15 +847,15 @@ authors:hap
 			<param name="yl" start="12.4" increment="10" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_bl~i~a"><bounds x="20.8" y="~ya~" width="10" height="1.8" /></element>
-			<element ref="text_bl~i~b"><bounds x="20.8" y="~yb~" width="10" height="1.8" /></element>
-			<element ref="text_bl~i~c"><bounds x="20.8" y="~yc~" width="10" height="1.8" /></element>
-			<element ref="text_bl~i~d"><bounds x="20.8" y="~yd~" width="10" height="1.8" /></element>
+			<element ref="text_bl~i~a"><bounds x="20.8" y="~ya~" width="8" height="1.8" /></element>
+			<element ref="text_bl~i~b"><bounds x="20.8" y="~yb~" width="8" height="1.8" /></element>
+			<element ref="text_bl~i~c"><bounds x="20.8" y="~yc~" width="8" height="1.8" /></element>
+			<element ref="text_bl~i~d"><bounds x="20.8" y="~yd~" width="8" height="1.8" /></element>
 			<element ref="black"><bounds x="20.7" yc="~yl~" width="7.5" height="0.2" /></element>
 		</repeat>
 
-		<element ref="text_bl9"><bounds x="20.8" yc="90.1" width="10" height="1.8" /></element>
-		<element ref="text_bl10"><bounds x="20.8" yc="100.1" width="10" height="1.8" /></element>
+		<element ref="text_bl9"><bounds x="20.8" yc="90.1" width="8" height="1.8" /></element>
+		<element ref="text_bl10"><bounds x="20.8" yc="100.1" width="8" height="1.8" /></element>
 	</group>
 
 
