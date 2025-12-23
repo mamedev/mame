@@ -18,149 +18,105 @@
 
   http://www.thebattles.net/bondwell/
 
-  http://www.vintage-computer.com/bondwell2.shtml
-
-  http://www2.okisemi.com/site/productscatalog/displaydrivers/availabledocuments/Intro-7090.html
-
 ***************************************************************************/
 
 #include "emu.h"
-#include "bw2.h"
+
+#include "bus/bw2/exp.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "formats/bw2_dsk.h"
+#include "imagedev/floppy.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "video/msm6255.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 
+#define Z80_TAG         "ic1"
+#define I8255A_TAG      "ic4"
+#define WD2797_TAG      "ic5"
+#define MSM6255_TAG     "ic49"
+#define CENTRONICS_TAG  "centronics"
+#define RS232_TAG       "rs232"
+#define SCREEN_TAG      "screen"
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
+namespace {
 
-enum
+class bw2_state : public driver_device
 {
-	RAM1 = 0,
-	VRAM,
-	RAM2,
-	RAM3,
-	RAM4,
-	RAM5,
-	RAM6,
-	ROM
+public:
+	bw2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_uart(*this, "ic7"),
+		m_fdc(*this, WD2797_TAG),
+		m_lcdc(*this, MSM6255_TAG),
+		m_pit(*this, "ic6"),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_exp(*this, "exp"),
+		m_floppy0(*this, WD2797_TAG":0"),
+		m_floppy1(*this, WD2797_TAG":1"),
+		m_floppy(nullptr),
+		m_rom(*this, Z80_TAG),
+		m_y(*this, "Y%u", 0),
+		m_view(*this, "ram"),
+		m_video_ram(*this, "videoram")
+	{ }
+
+	void bw2(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<i8251_device> m_uart;
+	required_device<wd2797_device> m_fdc;
+	required_device<msm6255_device> m_lcdc;
+	required_device<pit8253_device> m_pit;
+	required_device<centronics_device> m_centronics;
+	required_device<bw2_expansion_slot_device> m_exp;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	floppy_image_device *m_floppy;
+	required_memory_region m_rom;
+	required_ioport_array<10> m_y;
+	memory_view m_view;
+
+	void ppi_pa_w(u8 data);
+	u8 ppi_pb_r();
+	void ppi_pc_w(u8 data);
+	u8 ppi_pc_r();
+
+	void mtron_w(int state);
+
+	void fdc_drq_w(int state);
+	static void floppy_formats(format_registration &fr);
+
+	// keyboard state
+	u8 m_kb = 0;
+
+	// floppy state
+	int m_mtron = 0;
+	int m_mfdbk = 0;
+
+	// video state
+	optional_shared_ptr<u8> m_video_ram;
+	void bw2_palette(palette_device &palette) const;
+
+	void write_centronics_busy(int state) { m_centronics_busy = state; }
+	int m_centronics_busy;
+	
+	void bw2_io(address_map &map) ATTR_COLD;
+	void bw2_mem(address_map &map) ATTR_COLD;
+	void lcdc_map(address_map &map) ATTR_COLD;
 };
-
-#define HAS_KB_OF_RAM(_kb) \
-	(m_ram->size() >= (_kb * 1024))
-
-
-//**************************************************************************
-//  ADDRESS DECODING
-//**************************************************************************
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t bw2_state::read(offs_t offset)
-{
-	int rom = 1, vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
-
-	uint8_t data = 0xff;
-
-	switch (m_bank)
-	{
-	case RAM1: ram1 = 0; break;
-	case VRAM: vram = 0; break;
-	case RAM2: ram2 = 0; break;
-	case RAM3: ram3 = 0; break;
-	case RAM4: ram4 = 0; break;
-	case RAM5: ram5 = 0; break;
-	case RAM6: ram6 = 0; break;
-	case ROM: rom = 0; break;
-	}
-
-	if (offset < 0x8000)
-	{
-		if (!rom)
-			data = m_rom->base()[offset & 0x3fff];
-
-		if (!vram)
-			data = m_video_ram[offset & 0x3fff];
-
-		if (!ram1)
-			data = m_ram->pointer()[offset];
-
-		if (!ram2 && HAS_KB_OF_RAM(96))
-			data = m_ram->pointer()[0x10000 | offset];
-
-		if (!ram3 && HAS_KB_OF_RAM(128))
-			data = m_ram->pointer()[0x18000 | offset];
-
-		if (!ram4 && HAS_KB_OF_RAM(160))
-			data = m_ram->pointer()[0x20000 | offset];
-
-		if (!ram5 && HAS_KB_OF_RAM(192))
-			data = m_ram->pointer()[0x28000 | offset];
-
-		if (!ram6 && HAS_KB_OF_RAM(224))
-			data = m_ram->pointer()[0x30000 | offset];
-	}
-	else
-	{
-		data = m_ram->pointer()[offset];
-	}
-
-	return m_exp->cd_r(offset, data, ram2, ram3, ram4, ram5, ram6);
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void bw2_state::write(offs_t offset, uint8_t data)
-{
-	int vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
-
-	switch (m_bank)
-	{
-	case RAM1: ram1 = 0; break;
-	case VRAM: vram = 0; break;
-	case RAM2: ram2 = 0; break;
-	case RAM3: ram3 = 0; break;
-	case RAM4: ram4 = 0; break;
-	case RAM5: ram5 = 0; break;
-	case RAM6: ram6 = 0; break;
-	}
-
-	if (offset < 0x8000)
-	{
-		if (!vram)
-			m_video_ram[offset & 0x3fff] = data;
-
-		if (!ram1)
-			m_ram->pointer()[offset] = data;
-
-		if (!ram2 && HAS_KB_OF_RAM(96))
-			m_ram->pointer()[0x10000 | offset] = data;
-
-		if (!ram3 && HAS_KB_OF_RAM(128))
-			m_ram->pointer()[0x18000 | offset] = data;
-
-		if (!ram4 && HAS_KB_OF_RAM(160))
-			m_ram->pointer()[0x20000 | offset] = data;
-
-		if (!ram5 && HAS_KB_OF_RAM(192))
-			m_ram->pointer()[0x28000 | offset] = data;
-
-		if (!ram6 && HAS_KB_OF_RAM(224))
-			m_ram->pointer()[0x30000 | offset] = data;
-	}
-	else
-	{
-		m_ram->pointer()[offset] = data;
-	}
-
-	m_exp->cd_w(offset, data, ram2, ram3, ram4, ram5, ram6);
-}
 
 
 
@@ -175,7 +131,16 @@ void bw2_state::write(offs_t offset, uint8_t data)
 void bw2_state::bw2_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(bw2_state::read), FUNC(bw2_state::write));
+	map(0x0000, 0x7fff).view(m_view);
+	m_view[0](0x0000, 0x7fff).ram();
+	m_view[1](0x0000, 0x3fff).mirror(0x4000).ram().share(m_video_ram);
+	m_view[2](0x0000, 0x7fff).noprw();
+	m_view[3](0x0000, 0x7fff).noprw();
+	m_view[4](0x0000, 0x7fff).noprw();
+	m_view[5](0x0000, 0x7fff).noprw();
+	m_view[6](0x0000, 0x7fff).noprw();
+	m_view[7](0x0000, 0x0fff).mirror(0x7000).rom().region(Z80_TAG, 0);
+	map(0x8000, 0xffff).ram();
 }
 
 
@@ -205,7 +170,7 @@ void bw2_state::bw2_io(address_map &map)
 void bw2_state::lcdc_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x3fff).ram().share("videoram");
+	map(0x0000, 0x3fff).ram().share(m_video_ram);
 }
 
 
@@ -361,16 +326,11 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-void bw2_state::write_centronics_busy(int state)
-{
-	m_centronics_busy = state;
-}
-
 //-------------------------------------------------
 //  I8255A interface
 //-------------------------------------------------
 
-void bw2_state::ppi_pa_w(uint8_t data)
+void bw2_state::ppi_pa_w(u8 data)
 {
 	/*
 
@@ -396,11 +356,14 @@ void bw2_state::ppi_pa_w(uint8_t data)
 	m_fdc->set_floppy(m_floppy);
 	if (m_floppy) m_floppy->mon_w(m_mtron);
 
+	// RS-232 select
+	m_exp->rs232_select(BIT(data, 6));
+
 	// centronics strobe
 	m_centronics->write_strobe(BIT(data, 7));
 }
 
-uint8_t bw2_state::ppi_pb_r()
+u8 bw2_state::ppi_pb_r()
 {
 	/*
 
@@ -415,7 +378,7 @@ uint8_t bw2_state::ppi_pb_r()
 
 	*/
 
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	if (m_kb < 10)
 	{
@@ -425,7 +388,7 @@ uint8_t bw2_state::ppi_pb_r()
 	return data;
 }
 
-void bw2_state::ppi_pc_w(uint8_t data)
+void bw2_state::ppi_pc_w(u8 data)
 {
 	/*
 
@@ -436,13 +399,20 @@ void bw2_state::ppi_pc_w(uint8_t data)
 
 	*/
 
-	m_bank = data & 0x07;
+	int bank = data & 0x07;
+	m_view.select(bank);
+
+	m_exp->ram_select(bank);
 }
 
-uint8_t bw2_state::ppi_pc_r()
+u8 bw2_state::ppi_pc_r()
 {
 	/*
 
+		PC0     +5V
+		PC1     +5V
+		PC2     +5V
+		PC3     Not connected
 	    PC4     BUSY from centronics printer
 	    PC5     M/FDBK motor feedback
 	    PC6     RLSD Carrier detect from RS232
@@ -450,7 +420,7 @@ uint8_t bw2_state::ppi_pc_r()
 
 	*/
 
-	uint8_t data = m_bank;
+	u8 data = 0x07;
 
 	// centronics busy
 	data |= m_centronics_busy << 4;
@@ -528,7 +498,6 @@ void bw2_state::machine_start()
 {
 	// register for state saving
 	save_item(NAME(m_kb));
-	save_item(NAME(m_bank));
 	save_item(NAME(m_mtron));
 	save_item(NAME(m_mfdbk));
 	save_item(NAME(m_centronics_busy));
@@ -600,15 +569,14 @@ void bw2_state::bw2(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_fdc->drq_wr_callback().set(FUNC(bw2_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, WD2797_TAG":1", bw2_floppies, nullptr, bw2_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":1", bw2_floppies, nullptr, bw2_state::floppy_formats).enable_sound(true);
+
 	BW2_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, bw2_expansion_cards, nullptr);
+	m_exp->set_memspace(Z80_TAG, AS_PROGRAM);
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("bw2");
-
-	// internal ram
-	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");
 }
 
 
@@ -629,6 +597,8 @@ ROM_START( bw2 )
 	ROM_SYSTEM_BIOS( 1, "v20", "BW 2 v2.0" )
 	ROMX_LOAD( "bw2-20.ic8", 0x0000, 0x1000, CRC(86f36471) SHA1(a3e2ba4edd50ff8424bb0675bdbb3b9f13c04c9d), ROM_BIOS(1) )
 ROM_END
+
+} // anonymous namespace
 
 
 
