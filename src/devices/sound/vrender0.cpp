@@ -352,7 +352,7 @@ void vr0sound_device::ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 		m_texcache_ctrl = (m_ctrl & CTRL_TM) ? &m_texcache : &m_fbcache;
 		// refresh channel cache
-		for (auto & elem : m_channel)
+		for (auto &elem : m_channel)
 		{
 			if (elem.modes & MODE_TEXTURE)
 				elem.cache = m_texcache_ctrl;
@@ -455,7 +455,7 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 			cur_saddr = (cur_saddr & 0xffff0000) | (data & 0x0000ffff);
 			break;
 		case 0x02/2:
-			cur_saddr = (cur_saddr & 0x0000ffff) | ((data << 16) & 0xffff0000);
+			cur_saddr = (cur_saddr & 0x0000ffff) | ((u32(data) << 16) & 0xffff0000);
 			break;
 		case 0x04/2:
 			env_vol = (env_vol & ~0xffff) | (data & 0xffff);
@@ -463,7 +463,7 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 		case 0x06/2:
 			ld = BIT(data, 12);
 			env_stage = (data & 0x0f00) >> 8;
-			env_vol = util::sext((env_vol & 0x00ffff) | ((data << 16) & 0xff0000), 24);
+			env_vol = util::sext((env_vol & 0x00ffff) | ((u32(data) << 16) & 0xff0000), 24);
 			break;
 		case 0x08/2:
 			ds_addr = data & 0xffff;
@@ -476,14 +476,14 @@ void vr0sound_device::channel_t::write(offs_t offset, u16 data, u16 mem_mask)
 			break;
 		case 0x0e/2:
 			l_chn_vol = (data & 0x7f00) >> 8;
-			loop_begin = (loop_begin & 0x00ffff) | ((data << 16) & 0x3f0000);
+			loop_begin = (loop_begin & 0x00ffff) | ((u32(data) << 16) & 0x3f0000);
 			break;
 		case 0x10/2:
 			loop_end = (loop_end & 0x3f0000) | (data & 0x00ffff);
 			break;
 		case 0x12/2:
 			r_chn_vol = (data & 0x7f00) >> 8;
-			loop_end = (loop_end & 0x00ffff) | ((data << 16) & 0x3f0000);
+			loop_end = (loop_end & 0x00ffff) | ((u32(data) << 16) & 0x3f0000);
 			break;
 		case 0x14/2:
 		case 0x16/2:
@@ -525,18 +525,18 @@ void vr0sound_device::render_audio(sound_stream &stream)
 			if (channel.modes & MODE_ULAW)       //u-law
 			{
 				sample = channel.cache->read_byte(channel.cur_saddr >> 9);
-				sample = (s16)ulaw_to_16[sample & 0xff];
+				sample = s16(ulaw_to_16[sample & 0xff]);
 			}
 			else
 			{
 				if (channel.modes & MODE_8BIT)   //8bit
 				{
 					sample = channel.cache->read_byte(channel.cur_saddr >> 9);
-					sample = (s16)(((s8)(sample & 0xff)) << 8);
+					sample = s16(s8(sample & 0xff) << 8);
 				}
 				else                //16bit
 				{
-					sample = (s16)(channel.cache->read_word((channel.cur_saddr >> 9) & ~1));
+					sample = s16(channel.cache->read_word((channel.cur_saddr >> 9) & ~1));
 				}
 			}
 
