@@ -111,7 +111,7 @@ public:
 		m_mainbank(*this, "mainbank"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
-//      m_nvram(*this, "nvram"),
+		//m_nvram(*this, "nvram"),
 		m_ds1302(*this, "rtc"),
 		m_eeprom(*this, "eeprom"),
 		m_prot_data(*this, "pic_data"),
@@ -185,7 +185,7 @@ u32 menghong_state::flashcmd_r()
 	{
 		if (m_bank < m_maxbank)
 		{
-			u32 *ptr = (u32*)(m_mainbank->base());
+			u32 *ptr = (u32 *)(m_mainbank->base());
 			return ptr[0];
 		}
 		else
@@ -268,7 +268,7 @@ void menghong_state::crzyddz2_shared_w(offs_t offset, u8 data)
 				// at PC=0x2011f9a, expecting a value of 0x7ebe otherwise locks up
 				// after Sealy logo. Every single value is added to the routine and left
 				// shifted by 1 (including the two values above)
-				for(int i = 0; i < 0x3f; i++)
+				for (int i = 0; i < 0x3f; i++)
 					m_sharedram[i + 0x652] = 0xff;
 				m_sharedram[0x691] = 0x9b;
 				break;
@@ -316,8 +316,10 @@ u32 menghong_state::key_r()
 
 	u8 data = 0x3f;
 	for (int i = 0; i < m_keys.size(); ++i)
+	{
 		if (!BIT(mux, i))
 			data = m_keys[i]->read();
+	}
 
 /*
 crzyddz2    in      out
