@@ -30,11 +30,67 @@
 
 DEFINE_DEVICE_TYPE(VIDEO_VRENDER0, vr0video_device, "vr0video", "MagicEyes VRender0 Video Engine")
 
-vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vr0video_device::vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VIDEO_VRENDER0, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_draw_image{
+		{
+			&vr0video_device::draw_quad<4, false, 0>,
+			&vr0video_device::draw_quad<8, false, 0>,
+			&vr0video_device::draw_quad<16, false, 0>,
+			&vr0video_device::draw_quad<16, false, 0>,
+			&vr0video_device::draw_quad<4, false, 1>,
+			&vr0video_device::draw_quad<8, false, 1>,
+			&vr0video_device::draw_quad<16, false, 1>,
+			&vr0video_device::draw_quad<16, false, 1>,
+			&vr0video_device::draw_quad<4, false, 2>,
+			&vr0video_device::draw_quad<8, false, 2>,
+			&vr0video_device::draw_quad<16, false, 2>,
+			&vr0video_device::draw_quad<16, false, 2>,
+			&vr0video_device::draw_quad<4, false, 3>,
+			&vr0video_device::draw_quad<8, false, 3>,
+			&vr0video_device::draw_quad<16, false, 3>,
+			&vr0video_device::draw_quad<16, false, 3>
+		},
+		{
+			&vr0video_device::draw_quad<4, true, 0>,
+			&vr0video_device::draw_quad<8, true, 0>,
+			&vr0video_device::draw_quad<16, true, 0>,
+			&vr0video_device::draw_quad<16, true, 0>,
+			&vr0video_device::draw_quad<4, true, 1>,
+			&vr0video_device::draw_quad<8, true, 1>,
+			&vr0video_device::draw_quad<16, true, 1>,
+			&vr0video_device::draw_quad<16, true, 1>,
+			&vr0video_device::draw_quad<4, true, 2>,
+			&vr0video_device::draw_quad<8, true, 2>,
+			&vr0video_device::draw_quad<16, true, 2>,
+			&vr0video_device::draw_quad<16, true, 2>,
+			&vr0video_device::draw_quad<4, true, 3>,
+			&vr0video_device::draw_quad<8, true, 3>,
+			&vr0video_device::draw_quad<16, true, 3>,
+			&vr0video_device::draw_quad<16, true, 3>
+		}
+	}
+	, m_texture_config("texture", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Texture Memory Support
+	, m_frame_config("frame", ENDIANNESS_LITTLE, 16, 23) // 64 MBit (8 MB) Framebuffer Memory Support
 	, m_idleskip_cb(*this)
-
+	, m_internal_palette{0}
+	, m_last_pal_update(0xffffffff)
+	, m_render_state(render_state_info())
+	, m_queue_rear(0)
+	, m_queue_front(0)
+	, m_bank1_select(false)
+	, m_display_bank(0)
+	, m_draw_select(false)
+	, m_render_reset(false)
+	, m_render_start(false)
+	, m_dither_mode(0)
+	, m_flip_count(0)
+	, m_draw_dest(0)
+	, m_display_dest(0)
+	, m_flip_sync(false)
+	, m_pipeline_timer(nullptr)
 {
 }
 
@@ -50,27 +106,27 @@ void vr0video_device::regs_map(address_map &map)
 	map(0x00a6, 0x00a7).rw(FUNC(vr0video_device::flip_count_r), FUNC(vr0video_device::flip_count_w));
 }
 
-uint16_t vr0video_device::cmd_queue_front_r()
+u16 vr0video_device::cmd_queue_front_r()
 {
 	return m_queue_front & 0x7ff;
 }
 
-void vr0video_device::cmd_queue_front_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void vr0video_device::cmd_queue_front_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_queue_front);
 }
 
-uint16_t vr0video_device::cmd_queue_rear_r()
+u16 vr0video_device::cmd_queue_rear_r()
 {
 	return m_queue_rear & 0x7ff;
 }
 
-uint16_t vr0video_device::render_control_r()
+u16 vr0video_device::render_control_r()
 {
-	return (m_draw_select<<7) | (m_render_reset<<3) | (m_render_start<<2) | (m_dither_mode);
+	return (m_draw_select ? 0x80 : 0) | (m_render_reset ? 0x8 : 0) | (m_render_start ? 0x4 : 0) | m_dither_mode;
 }
 
-void vr0video_device::render_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void vr0video_device::render_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -81,37 +137,37 @@ void vr0video_device::render_control_w(offs_t offset, uint16_t data, uint16_t me
 
 		// initialize pipeline
 		// TODO: what happens if reset and start are both 1? Datasheet advises against it.
-		if (m_render_reset == true)
+		if (m_render_reset)
 			m_queue_front = m_queue_rear = 0;
 	}
 }
 
-uint16_t vr0video_device::display_bank_r()
+u16 vr0video_device::display_bank_r()
 {
 	return m_display_bank;
 }
 
-uint16_t vr0video_device::bank1_select_r()
+u16 vr0video_device::bank1_select_r()
 {
-	return (m_bank1_select)<<15;
+	return m_bank1_select ? 0x8000 : 0;
 }
 
-void vr0video_device::bank1_select_w(uint16_t data)
+void vr0video_device::bank1_select_w(u16 data)
 {
-	m_bank1_select = BIT(data,15);
+	m_bank1_select = BIT(data, 15);
 }
 
-uint16_t vr0video_device::flip_count_r()
+u16 vr0video_device::flip_count_r()
 {
 	m_idleskip_cb(m_flip_count != 0);
 	return m_flip_count;
 }
 
-void vr0video_device::flip_count_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void vr0video_device::flip_count_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int fc = (data) & 0xff;
+		int const fc = data & 0xff;
 		if (fc == 1)
 			m_flip_count++;
 		else if (fc == 0)
@@ -125,29 +181,34 @@ void vr0video_device::flip_count_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 void vr0video_device::device_start()
 {
-	save_item(NAME(m_InternalPalette));
-	save_item(NAME(m_LastPalUpdate));
+	// Find our direct access
+	space(AS_TEXTURE).cache(m_texcache);
+	space(AS_FRAME).cache(m_fbcache);
+	space(AS_FRAME).specific(m_fbmem);
 
-	save_item(NAME(m_RenderState.Tx));
-	save_item(NAME(m_RenderState.Ty));
-	save_item(NAME(m_RenderState.Txdx));
-	save_item(NAME(m_RenderState.Tydx));
-	save_item(NAME(m_RenderState.Txdy));
-	save_item(NAME(m_RenderState.Tydy));
-	save_item(NAME(m_RenderState.SrcAlphaColor));
-	save_item(NAME(m_RenderState.SrcBlend));
-	save_item(NAME(m_RenderState.DstAlphaColor));
-	save_item(NAME(m_RenderState.DstBlend));
-	save_item(NAME(m_RenderState.ShadeColor));
-	save_item(NAME(m_RenderState.TransColor));
-	save_item(NAME(m_RenderState.TileOffset));
-	save_item(NAME(m_RenderState.FontOffset));
-	save_item(NAME(m_RenderState.PalOffset));
-	save_item(NAME(m_RenderState.PaletteBank));
-	save_item(NAME(m_RenderState.TextureMode));
-	save_item(NAME(m_RenderState.PixelFormat));
-	save_item(NAME(m_RenderState.Width));
-	save_item(NAME(m_RenderState.Height));
+	save_item(NAME(m_internal_palette));
+	save_item(NAME(m_last_pal_update));
+
+	save_item(NAME(m_render_state.tx));
+	save_item(NAME(m_render_state.ty));
+	save_item(NAME(m_render_state.txdx));
+	save_item(NAME(m_render_state.tydx));
+	save_item(NAME(m_render_state.txdy));
+	save_item(NAME(m_render_state.tydy));
+	save_item(NAME(m_render_state.src_alpha_color));
+	save_item(NAME(m_render_state.src_blend));
+	save_item(NAME(m_render_state.dst_alpha_color));
+	save_item(NAME(m_render_state.dst_blend));
+	save_item(NAME(m_render_state.shade_color));
+	save_item(NAME(m_render_state.trans_color));
+	save_item(NAME(m_render_state.tile_offset));
+	save_item(NAME(m_render_state.font_offset));
+	save_item(NAME(m_render_state.pal_offset));
+	save_item(NAME(m_render_state.palette_bank));
+	save_item(NAME(m_render_state.texture_mode));
+	save_item(NAME(m_render_state.pixel_format));
+	save_item(NAME(m_render_state.Width));
+	save_item(NAME(m_render_state.Height));
 
 	save_item(NAME(m_flip_count));
 	save_item(NAME(m_queue_rear));
@@ -163,109 +224,78 @@ void vr0video_device::device_start()
 	m_pipeline_timer = timer_alloc(FUNC(vr0video_device::pipeline_cb), this);
 }
 
-void vr0video_device::set_areas(uint16_t *textureram, uint16_t *frameram)
-{
-	m_textureram = (uint8_t *)textureram;
-	m_packetram = textureram;
-	m_frameram = frameram;
-}
-
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
 void vr0video_device::device_reset()
 {
-	memset(m_InternalPalette, 0, sizeof(m_InternalPalette));
-	m_LastPalUpdate = 0xffffffff;
+	std::fill(std::begin(m_internal_palette), std::end(m_internal_palette), 0);
+	m_last_pal_update = 0xffffffff;
 
-	m_DisplayDest = m_DrawDest = m_frameram;
+	m_display_dest = m_draw_dest = 0;
 	// 1100 objects per second at ~80 MHz
-	m_pipeline_timer->adjust(attotime::from_hz(this->clock() /1100), 0, attotime::from_hz(this->clock() / 1100));
+	m_pipeline_timer->adjust(attotime::from_hz(this->clock() / 1100), 0, attotime::from_hz(this->clock() / 1100));
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector vr0video_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_TEXTURE, &m_texture_config),
+		std::make_pair(AS_FRAME, &m_frame_config)
+	};
 }
 
 /*****************************************************************************
  IMPLEMENTATION
  *****************************************************************************/
 
-struct QuadInfo
-{
-	uint16_t *Dest;
-	uint32_t Pitch;   //in UINT16s
-	uint32_t w,h;
-	uint32_t Tx;
-	uint32_t Ty;
-	uint32_t Txdx;
-	uint32_t Tydx;
-	uint32_t Txdy;
-	uint32_t Tydy;
-	uint16_t TWidth;
-	uint16_t THeight;
-	union _u
-	{
-		uint8_t *Imageb;
-		uint16_t *Imagew;
-	} u;
-	uint16_t *Tile;
-	uint16_t *Pal;
-	uint32_t TransColor;
-	uint32_t Shade;
-	uint8_t Clamp;
-	uint8_t Trans;
-	uint8_t SrcAlpha;
-	uint32_t SrcColor;
-	uint8_t DstAlpha;
-	uint32_t DstColor;
-};
+constexpr u32 RGB32(u8 r, u8 g, u8 b) { return (r << 16) | (g << 8) | (b << 0); }
+constexpr u16 RGB16(u8 r, u8 g, u8 b) { return ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3); }
 
-/*
-Pick a rare enough color to disable transparency (that way I save a cmp per loop to check
-if I must draw transparent or not. The palette build will take this color in account so
-no color in the palette will have this value
-*/
-#define NOTRANSCOLOR    0xecda
-
-#define RGB32(r,g,b) ((r << 16) | (g << 8) | (b << 0))
-#define RGB16(r,g,b) ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3)
-
-static inline uint16_t RGB32TO16(uint32_t rgb)
+constexpr u16 RGB32TO16(u32 rgb)
 {
 	return (((rgb >> (16 + 3)) & 0x1f) << 11) | (((rgb >> (8 + 2)) & 0x3f) << 5) | (((rgb >> (3)) & 0x1f) << 0);
 }
 
-#define EXTRACTR8(Src)  (((Src >> 11) << 3) & 0xff)
-#define EXTRACTG8(Src)  (((Src >>  5) << 2) & 0xff)
-#define EXTRACTB8(Src)  (((Src >>  0) << 3) & 0xff)
+constexpr u8 EXTRACTR8(u16 src) { return ((src >> 11) << 3) & 0xff; }
+constexpr u8 EXTRACTG8(u16 src) { return ((src >>  5) << 2) & 0xff; }
+constexpr u8 EXTRACTB8(u16 src) { return ((src >>  0) << 3) & 0xff; }
 
-static inline uint16_t Shade(uint16_t Src, uint32_t Shade)
+static inline u16 do_shade(u16 src, u32 shade)
 {
-	uint32_t scr = (EXTRACTR8(Src) * ((Shade >> 16) & 0xff)) >> 8;
-	uint32_t scg = (EXTRACTG8(Src) * ((Shade >>  8) & 0xff)) >> 8;
-	uint32_t scb = (EXTRACTB8(Src) * ((Shade >>  0) & 0xff)) >> 8;
+	u32 const scr = (EXTRACTR8(src) * ((shade >> 16) & 0xff)) >> 8;
+	u32 const scg = (EXTRACTG8(src) * ((shade >>  8) & 0xff)) >> 8;
+	u32 const scb = (EXTRACTB8(src) * ((shade >>  0) & 0xff)) >> 8;
 	return RGB16(scr, scg, scb);
 }
 
-static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
+u16 vr0video_device::do_alpha(quad_info &quad, u16 src, u16 dst)
 {
-	uint32_t scr = (EXTRACTR8(Src) * ((Quad->Shade >> 16) & 0xff)) >> 8;
-	uint32_t scg = (EXTRACTG8(Src) * ((Quad->Shade >>  8) & 0xff)) >> 8;
-	uint32_t scb = (EXTRACTB8(Src) * ((Quad->Shade >>  0) & 0xff)) >> 8;
-	uint32_t dcr = EXTRACTR8(Dst);
-	uint32_t dcg = EXTRACTG8(Dst);
-	uint32_t dcb = EXTRACTB8(Dst);
+	u32 const scr = EXTRACTR8(src);
+	u32 const scg = EXTRACTG8(src);
+	u32 const scb = EXTRACTB8(src);
+	u32 dcr = EXTRACTR8(dst);
+	u32 dcg = EXTRACTG8(dst);
+	u32 dcb = EXTRACTB8(dst);
 
-	uint32_t smulr, smulg, smulb;
-	uint32_t dmulr, dmulg, dmulb;
+	u32 smulr, smulg, smulb;
+	u32 dmulr, dmulg, dmulb;
 
-	switch (Quad->SrcAlpha & 0x1f)
+	switch (quad.src_alpha & 0x1f)
 	{
 		case 0x01:
 			smulr = smulg = smulb = 0;
 			break;
 		case 0x02:
-			smulr = (Quad->SrcColor >> 16) & 0xff;
-			smulg = (Quad->SrcColor >>  8) & 0xff;
-			smulb = (Quad->SrcColor >>  0) & 0xff;
+			smulr = (quad.src_color >> 16) & 0xff;
+			smulg = (quad.src_color >>  8) & 0xff;
+			smulb = (quad.src_color >>  0) & 0xff;
 			break;
 		case 0x04:
 			smulr = scr;
@@ -273,9 +303,9 @@ static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
 			smulb = scb;
 			break;
 		case 0x08:
-			smulr = (Quad->DstColor >> 16) & 0xff;
-			smulg = (Quad->DstColor >>  8) & 0xff;
-			smulb = (Quad->DstColor >>  0) & 0xff;
+			smulr = (quad.dst_color >> 16) & 0xff;
+			smulg = (quad.dst_color >>  8) & 0xff;
+			smulb = (quad.dst_color >>  0) & 0xff;
 			break;
 		case 0x10:
 			smulr = dcr;
@@ -287,22 +317,22 @@ static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
 			break;
 	}
 
-	if (Quad->SrcAlpha & 0x20)
+	if (BIT(quad.src_alpha, 5))
 	{
 		smulr = 0x100 - smulr;
 		smulg = 0x100 - smulg;
 		smulb = 0x100 - smulb;
 	}
 
-	switch (Quad->DstAlpha & 0x1f)
+	switch (quad.dst_alpha & 0x1f)
 	{
 		case 0x01:
 			dmulr = dmulg = dmulb = 0;
 			break;
 		case 0x02:
-			dmulr = (Quad->SrcColor >> 16) & 0xff;
-			dmulg = (Quad->SrcColor >>  8) & 0xff;
-			dmulb = (Quad->SrcColor >>  0) & 0xff;
+			dmulr = (quad.src_color >> 16) & 0xff;
+			dmulg = (quad.src_color >>  8) & 0xff;
+			dmulb = (quad.src_color >>  0) & 0xff;
 			break;
 		case 0x04:
 			dmulr = scr;
@@ -310,9 +340,9 @@ static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
 			dmulb = scb;
 			break;
 		case 0x08:
-			dmulr = (Quad->DstColor >> 16) & 0xff;
-			dmulg = (Quad->DstColor >>  8) & 0xff;
-			dmulb = (Quad->DstColor >>  0) & 0xff;
+			dmulr = (quad.dst_color >> 16) & 0xff;
+			dmulg = (quad.dst_color >>  8) & 0xff;
+			dmulb = (quad.dst_color >>  0) & 0xff;
 			break;
 		case 0x10:
 			dmulr = dcr;
@@ -324,13 +354,12 @@ static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
 			break;
 	}
 
-	if (Quad->DstAlpha&0x20)
+	if (BIT(quad.dst_alpha, 5))
 	{
 		dmulr = 0x100 - dmulr;
 		dmulg = 0x100 - dmulg;
 		dmulb = 0x100 - dmulb;
 	}
-
 
 	dcr = (scr * smulr + dcr * dmulr) >> 8;
 	if (dcr > 0xff)
@@ -347,392 +376,308 @@ static uint16_t Alpha(QuadInfo *Quad, uint16_t Src, uint16_t Dst)
 	return RGB16(dcr, dcg, dcb);
 }
 
-#define TILENAME(bpp, t, a) \
-static void DrawQuad##bpp##t##a(QuadInfo *Quad)
-
-//TRUST ON THE COMPILER OPTIMIZATIONS
-#define TILETEMPL(bpp, t, a) \
-TILENAME(bpp, t, a)\
-{\
-	uint32_t TransColor = Quad->Trans ? RGB32TO16(Quad->TransColor) : NOTRANSCOLOR;\
-	uint32_t x, y;\
-	uint16_t *line = Quad->Dest;\
-	uint32_t y_tx = Quad->Tx, y_ty = Quad->Ty;\
-	uint32_t x_tx, x_ty;\
-	uint32_t Maskw = Quad->TWidth - 1;\
-	uint32_t Maskh = Quad->THeight - 1;\
-	uint32_t W = Quad->TWidth >> 3;\
-\
-	for (y = 0; y < Quad->h; ++y)\
-	{\
-		uint16_t *pixel = line;\
-		x_tx = y_tx;\
-		x_ty = y_ty;\
-		for (x = 0; x < Quad->w; ++x)\
-		{\
-			uint32_t Offset;\
-			uint32_t tx = x_tx >> 9;\
-			uint32_t ty = x_ty >> 9;\
-			uint16_t Color;\
-			if (Quad->Clamp)\
-			{\
-				if (tx > Maskw)\
-					goto Clamped;\
-				if (ty > Maskh)\
-					goto Clamped;\
-			}\
-			else\
-			{\
-				tx &= Maskw;\
-				ty &= Maskh;\
-			}\
-\
-			if(t)\
-			{\
-				uint32_t Index=Quad->Tile[(ty>>3)*(W)+(tx>>3)];\
-				Offset=(Index<<6)+((ty&7)<<3)+(tx&7);\
-				if(Index==0) goto Clamped;\
-			}\
-			else\
-				Offset = ty * (Quad->TWidth) + tx;\
-\
-			if (bpp == 4)\
-			{\
-				uint8_t Texel = Quad->u.Imageb[Offset / 2];\
-				if (Offset & 1)\
-					Texel &= 0xf;\
-				else\
-					Texel = (Texel >> 4) & 0xf;\
-				Color = Quad->Pal[Texel];\
-			}\
-			else if (bpp == 8)\
-			{\
-				uint8_t Texel = Quad->u.Imageb[Offset];\
-				Color = Quad->Pal[Texel];\
-			}\
-			else if (bpp == 16)\
-			{\
-				Color = Quad->u.Imagew[Offset];\
-			}\
-			if (Color != TransColor)\
-			{\
-				if (a == 1)\
-					*pixel = Alpha(Quad, Color, *pixel);\
-				else if (a == 2)\
-					*pixel = Shade(Color, Quad->Shade);\
-				else\
-					*pixel = Color;\
-			}\
-			Clamped:\
-			++pixel;\
-			x_tx += Quad->Txdx;\
-			x_ty += Quad->Tydx;\
-		}\
-		line += Quad->Pitch;\
-		y_tx += Quad->Txdy;\
-		y_ty += Quad->Tydy;\
-	}\
-}
-TILETEMPL(16,0,0) TILETEMPL(16,0,1) TILETEMPL(16,0,2)
-TILETEMPL(16,1,0) TILETEMPL(16,1,1) TILETEMPL(16,1,2)
-
-TILETEMPL(8,0,0) TILETEMPL(8,0,1) TILETEMPL(8,0,2)
-TILETEMPL(8,1,0) TILETEMPL(8,1,1) TILETEMPL(8,1,2)
-
-TILETEMPL(4,0,0) TILETEMPL(4,0,1) TILETEMPL(4,0,2)
-TILETEMPL(4,1,0) TILETEMPL(4,1,1) TILETEMPL(4,1,2)
-
-#undef TILENAME
-#define TILENAME(bpp, t, a) \
-DrawQuad##bpp##t##a
-
-
-static void DrawQuadFill(QuadInfo *Quad)
+template <u8 Bpp, bool Tiled, u8 Blend>
+void vr0video_device::draw_quad(quad_info &quad)
 {
-	uint32_t x, y;
-	uint16_t *line = Quad->Dest;
-	uint16_t ShadeColor = RGB32TO16(Quad->Shade);
-	for (y = 0; y < Quad->h; ++y)
+	u32 const trans_color = quad.trans ? RGB32TO16(quad.trans_color) : NOTRANSCOLOR;
+	u32 const maskw = quad.twidth - 1;
+	u32 const maskh = quad.theight - 1;
+	u32 const w = quad.twidth >> 3;
+	for (int y = quad.dy, y_tx = quad.tx, y_ty = quad.ty; y <= quad.endy; y++, y_tx += quad.txdy, y_ty += quad.tydy)
 	{
-		uint16_t *pixel = line;
-		for (x = 0; x < Quad->w; ++x)
+		for (int x = quad.dx, x_tx = y_tx, x_ty = y_ty; x <= quad.endx; x++, x_tx += quad.txdx, x_ty += quad.tydx)
 		{
-			if (Quad->SrcAlpha)
-				*pixel = Alpha(Quad, Quad->Shade, *pixel);
+			u32 const fb_addr = quad.dest + get_fb_addr(x, y);
+			u32 tx = x_tx >> 9;
+			u32 ty = x_ty >> 9;
+			if (quad.clamp)
+			{
+				if ((tx > maskw) || (ty > maskh))
+					continue;
+			}
 			else
-				*pixel = ShadeColor;
-			++pixel;
+			{
+				tx &= maskw;
+				ty &= maskh;
+			}
+
+			u32 offset = 0;
+			if (Tiled)
+			{
+				u32 const index = m_texcache.read_word(quad.tile + (((ty >> 3) * w + (tx >> 3)) << 1));
+				if (index == 0)
+					continue;
+				offset = (index << 6) + ((ty & 7) << 3) + (tx & 7);
+			}
+			else
+				offset = (ty * quad.twidth) + tx;
+
+			u16 color = 0;
+			if (Bpp == 4)
+			{
+				const u8 texel = m_texcache.read_byte(quad.texaddr + (offset >> 1));
+				color = quad.pal[(texel >> (BIT(~offset, 0) << 2)) & 0xf];
+			}
+			else if (Bpp == 8)
+			{
+				const u8 texel = m_texcache.read_byte(quad.texaddr + offset);
+				color = quad.pal[texel];
+			}
+			else if (Bpp == 16)
+			{
+				color = m_texcache.read_word(quad.texaddr + (offset << 1));
+			}
+			if (color != trans_color)
+			{
+				u16 pixel = m_fbcache.read_word(fb_addr), prev_pixel = pixel;
+				if (BIT(Blend, 1))
+					color = do_shade(color, quad.shade);
+				if (BIT(Blend, 0))
+					pixel = do_alpha(quad, color, pixel);
+				else
+					pixel = color;
+				if (prev_pixel != pixel)
+					m_fbmem.write_word(fb_addr, pixel);
+			}
 		}
-		line += Quad->Pitch;
 	}
 }
 
-typedef void (*_DrawTemplate)(QuadInfo *);
-
-static const _DrawTemplate DrawImage[]=
+void vr0video_device::draw_quad_fill(quad_info &quad)
 {
-	TILENAME(4,0,0),
-	TILENAME(8,0,0),
-	TILENAME(16,0,0),
-	TILENAME(16,0,0),
-
-	TILENAME(4,0,1),
-	TILENAME(8,0,1),
-	TILENAME(16,0,1),
-	TILENAME(16,0,1),
-
-	TILENAME(4,0,2),
-	TILENAME(8,0,2),
-	TILENAME(16,0,2),
-	TILENAME(16,0,2),
-};
-
-static const _DrawTemplate DrawTile[]=
-{
-	TILENAME(4,1,0),
-	TILENAME(8,1,0),
-	TILENAME(16,1,0),
-	TILENAME(16,1,0),
-
-	TILENAME(4,1,1),
-	TILENAME(8,1,1),
-	TILENAME(16,1,1),
-	TILENAME(16,1,1),
-
-	TILENAME(4,1,2),
-	TILENAME(8,1,2),
-	TILENAME(16,1,2),
-	TILENAME(16,1,2),
-};
-
-//Returns true if the operation was a flip (sync or async)
-// TODO: async loading actually doesn't stop rendering but just flips the render bank
-int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr)
-{
-	uint16_t *Packet = m_packetram;
-	uint8_t *TEXTURE = m_textureram;
-
-	Packet += PacketPtr;
-
-	uint32_t Dx = Packet[1] & 0x3ff;
-	uint32_t Dy = Packet[2] & 0x1ff;
-	uint32_t Endx = Packet[3] & 0x3ff;
-	uint32_t Endy = Packet[4] & 0x1ff;
-	uint32_t Mode = 0;
-	uint16_t Packet0 = Packet[0];
-
-	if (Packet0 & 0x81) //Sync or ASync flip
+	u16 const shade_color = RGB32TO16(quad.shade);
+	for (u32 y = quad.dy; y <= quad.endy; y++)
 	{
-		m_LastPalUpdate = 0xffffffff;    //Force update palette next frame
-		return Packet0 & 0x81;
-	}
-
-	if (Packet0 & 0x200)
-	{
-		m_RenderState.Tx = Packet[5] | ((Packet[6] & 0x1f) << 16);
-		m_RenderState.Ty = Packet[7] | ((Packet[8] & 0x1f) << 16);
-	}
-	else
-	{
-		m_RenderState.Tx = 0;
-		m_RenderState.Ty = 0;
-	}
-	if (Packet0 & 0x400)
-	{
-		m_RenderState.Txdx = Packet[9]  | ((Packet[10] & 0x1f) << 16);
-		m_RenderState.Tydx = Packet[11] | ((Packet[12] & 0x1f) << 16);
-		m_RenderState.Txdy = Packet[13] | ((Packet[14] & 0x1f) << 16);
-		m_RenderState.Tydy = Packet[15] | ((Packet[16] & 0x1f) << 16);
-	}
-	else
-	{
-		m_RenderState.Txdx = 1 << 9;
-		m_RenderState.Tydx = 0;
-		m_RenderState.Txdy = 0;
-		m_RenderState.Tydy = 1 << 9;
-	}
-	if (Packet0 & 0x800)
-	{
-		m_RenderState.SrcAlphaColor = Packet[17] | ((Packet[18] & 0xff) << 16);
-		m_RenderState.SrcBlend = (Packet[18] >> 8)  & 0x3f;
-		m_RenderState.DstAlphaColor = Packet[19] | ((Packet[20] & 0xff) << 16);
-		m_RenderState.DstBlend = (Packet[20] >> 8) & 0x3f;
-	}
-	if (Packet0 & 0x1000)
-		m_RenderState.ShadeColor = Packet[21] | ((Packet[22] & 0xff) << 16);
-	if (Packet0 & 0x2000)
-		m_RenderState.TransColor = Packet[23] | ((Packet[24] & 0xff) << 16);
-	if (Packet0 & 0x4000)
-	{
-		m_RenderState.TileOffset = Packet[25];
-		m_RenderState.FontOffset = Packet[26];
-		m_RenderState.PalOffset = Packet[27] >> 3;
-		m_RenderState.PaletteBank = (Packet[28] >> 8) & 0xf;
-		m_RenderState.TextureMode = Packet[28] & 0x1000;
-		m_RenderState.PixelFormat = (Packet[28] >> 6) & 3;
-		m_RenderState.Width  = 8 << ((Packet[28] >> 0) & 0x7);
-		m_RenderState.Height = 8 << ((Packet[28] >> 3) & 0x7);
-	}
-
-	if (Packet0 & 0x40 && m_RenderState.PalOffset != m_LastPalUpdate)
-	{
-		uint32_t *Pal = (uint32_t*) (TEXTURE + 1024 * m_RenderState.PalOffset);
-		uint16_t Trans = RGB32TO16(m_RenderState.TransColor);
-		int i;
-		for (i = 0; i < 256; ++i)
+		for (u32 x = quad.dx; x <= quad.endx; x++)
 		{
-			uint32_t p = Pal[i];
-			uint16_t v = RGB32TO16(p);
+			u32 const fb_addr = quad.dest + get_fb_addr(x, y);
+			u16 pixel = m_fbcache.read_word(fb_addr), prev_pixel = pixel;
+			if (quad.src_alpha)
+				pixel = do_alpha(quad, shade_color, pixel);
+			else
+				pixel = shade_color;
+			if (prev_pixel != pixel)
+				m_fbmem.write_word(fb_addr, pixel);
+		}
+	}
+}
+
+// Returns true if the operation was a flip (sync or async)
+// TODO: async loading actually doesn't stop rendering but just flips the render bank
+int vr0video_device::process_packet(u32 packet_ptr)
+{
+	u32 const dx = get_packet(packet_ptr + 1) & 0x3ff;
+	u32 const dy = get_packet(packet_ptr + 2) & 0x1ff;
+	u32 const endx = get_packet(packet_ptr + 3) & 0x3ff;
+	u32 const endy = get_packet(packet_ptr + 4) & 0x1ff;
+	u8 blend_mode = 0;
+	u16 const packet_0 = get_packet(packet_ptr + 0);
+
+	if (packet_0 & 0x81) //Sync or ASync flip
+	{
+		m_last_pal_update = 0xffffffff;    //Force update palette next frame
+		return packet_0 & 0x81;
+	}
+
+	if (BIT(packet_0, 9))
+	{
+		m_render_state.tx = get_packet(packet_ptr + 5) | ((get_packet(packet_ptr + 6) & 0x1f) << 16);
+		m_render_state.ty = get_packet(packet_ptr + 7) | ((get_packet(packet_ptr + 8) & 0x1f) << 16);
+	}
+	else
+	{
+		m_render_state.tx = 0;
+		m_render_state.ty = 0;
+	}
+	if (BIT(packet_0, 10))
+	{
+		m_render_state.txdx = get_packet(packet_ptr + 9)  | ((get_packet(packet_ptr + 10) & 0x1f) << 16);
+		m_render_state.tydx = get_packet(packet_ptr + 11) | ((get_packet(packet_ptr + 12) & 0x1f) << 16);
+		m_render_state.txdy = get_packet(packet_ptr + 13) | ((get_packet(packet_ptr + 14) & 0x1f) << 16);
+		m_render_state.tydy = get_packet(packet_ptr + 15) | ((get_packet(packet_ptr + 16) & 0x1f) << 16);
+	}
+	else
+	{
+		m_render_state.txdx = 1 << 9;
+		m_render_state.tydx = 0;
+		m_render_state.txdy = 0;
+		m_render_state.tydy = 1 << 9;
+	}
+	if (BIT(packet_0, 11))
+	{
+		m_render_state.src_alpha_color = get_packet(packet_ptr + 17) | ((get_packet(packet_ptr + 18) & 0xff) << 16);
+		m_render_state.src_blend = (get_packet(packet_ptr + 18) >> 8)  & 0x3f;
+		m_render_state.dst_alpha_color = get_packet(packet_ptr + 19) | ((get_packet(packet_ptr + 20) & 0xff) << 16);
+		m_render_state.dst_blend = (get_packet(packet_ptr + 20) >> 8) & 0x3f;
+	}
+	if (BIT(packet_0, 12))
+		m_render_state.shade_color = get_packet(packet_ptr + 21) | ((get_packet(packet_ptr + 22) & 0xff) << 16);
+	if (BIT(packet_0, 13))
+		m_render_state.trans_color = get_packet(packet_ptr + 23) | ((get_packet(packet_ptr + 24) & 0xff) << 16);
+	if (BIT(packet_0, 14))
+	{
+		m_render_state.tile_offset = get_packet(packet_ptr + 25);
+		m_render_state.font_offset = get_packet(packet_ptr + 26);
+		m_render_state.pal_offset = get_packet(packet_ptr + 27) >> 3;
+		m_render_state.palette_bank = (get_packet(packet_ptr + 28) >> 8) & 0xf;
+		m_render_state.texture_mode = BIT(get_packet(packet_ptr + 28), 12);
+		m_render_state.pixel_format = (get_packet(packet_ptr + 28) >> 6) & 3;
+		m_render_state.Width  = 8 << ((get_packet(packet_ptr + 28) >> 0) & 0x7);
+		m_render_state.Height = 8 << ((get_packet(packet_ptr + 28) >> 3) & 0x7);
+	}
+
+	if (BIT(packet_0, 6) && m_render_state.pal_offset != m_last_pal_update)
+	{
+		u32 const pal = 1024 * m_render_state.pal_offset;
+		u16 const trans = RGB32TO16(m_render_state.trans_color);
+		for (int i = 0; i < 256; ++i)
+		{
+			u32 const p = m_texcache.read_dword(pal + (i << 2));
+			u16 v = RGB32TO16(p);
 			// TODO: this is most likely an artifact of not emulating the dither modes,
 			//       and it's wrong anyway: topbladv gameplay fighters sports a slighty visible square shadow block.
-			if ((v == Trans && p != m_RenderState.TransColor) || v == NOTRANSCOLOR)  //Error due to conversion. caused transparent
+			if ((v == trans && p != m_render_state.trans_color) || v == NOTRANSCOLOR)  //Error due to conversion. caused transparent
 			{
 				if ((v & 0x1f) != 0x1f)
 					v++;                                    //Make the color a bit different (blueish) so it's not
 				else
 					v--;
 			}
-			m_InternalPalette[i] = v;                        //made transparent by mistake
+			m_internal_palette[i] = v;                        //made transparent by mistake
 		}
-		m_LastPalUpdate = m_RenderState.PalOffset;
+		m_last_pal_update = m_render_state.pal_offset;
 	}
 
-	if (Packet0 & 0x100)
+	if (BIT(packet_0, 8))
 	{
-		QuadInfo Quad;
+		quad_info quad;
 
-		Quad.Pitch = 1024;
+//      assert(endx >= dx && endy >= dy);
 
-//      assert(Endx >= Dx && Endy >= Dy);
-
-		if (Packet0 & 2)
+		if (BIT(packet_0, 1))
 		{
-			Quad.SrcAlpha = m_RenderState.SrcBlend;
-			Quad.DstAlpha = m_RenderState.DstBlend;
-			Quad.SrcColor = m_RenderState.SrcAlphaColor;
-			Quad.DstColor = m_RenderState.DstAlphaColor;
-			Mode = 1;
+			quad.src_alpha = m_render_state.src_blend;
+			quad.dst_alpha = m_render_state.dst_blend;
+			quad.src_color = m_render_state.src_alpha_color;
+			quad.dst_color = m_render_state.dst_alpha_color;
+			blend_mode |= 1;
 		}
 		else
-			Quad.SrcAlpha = 0;
+			quad.src_alpha = 0;
 
-		Quad.w = 1 + Endx - Dx;
-		Quad.h = 1 + Endy - Dy;
+		quad.dx = dx;
+		quad.dy = dy;
+		quad.endx = endx;
+		quad.endy = endy;
 
-		Quad.Dest = m_DrawDest;
-		Quad.Dest = Quad.Dest + Dx + (Dy * Quad.Pitch);
+		quad.dest = m_draw_dest;
 
-		Quad.Tx = m_RenderState.Tx;
-		Quad.Ty = m_RenderState.Ty;
-		Quad.Txdx = m_RenderState.Txdx;
-		Quad.Tydx = m_RenderState.Tydx;
-		Quad.Txdy = m_RenderState.Txdy;
-		Quad.Tydy = m_RenderState.Tydy;
-		if (Packet0 & 0x10)
+		quad.tx = m_render_state.tx;
+		quad.ty = m_render_state.ty;
+		quad.txdx = m_render_state.txdx;
+		quad.tydx = m_render_state.tydx;
+		quad.txdy = m_render_state.txdy;
+		quad.tydy = m_render_state.tydy;
+		if (BIT(packet_0, 4))
 		{
-			Quad.Shade = m_RenderState.ShadeColor;
-			if (!Mode)      //Alpha includes Shade
-				Mode = 2;
+			quad.shade = m_render_state.shade_color;
+			blend_mode |= 2;
 			/*
 			//simulate shade with alphablend (SLOW!!!)
-			if (!Quad.SrcAlpha && (Packet0 & 0x8))
+			if (!quad.src_alpha && BIT(packet_0, 3))
 			{
-			    Quad.SrcAlpha = 0x21; //1
-			    Quad.DstAlpha = 0x01; //0
+			    quad.src_alpha = 0x21; //1
+			    quad.dst_alpha = 0x01; //0
 			}*/
 		}
 		else
-			Quad.Shade = RGB32(255,255,255);
-		Quad.TransColor = m_RenderState.TransColor;
-		Quad.TWidth = m_RenderState.Width;
-		Quad.THeight = m_RenderState.Height;
-		Quad.Trans = Packet0 & 4;
-		//Quad.Trans = 0;
-		Quad.Clamp = Packet0 & 0x20;
+			quad.shade = RGB32(255,255,255);
+		quad.trans_color = m_render_state.trans_color;
+		quad.twidth = m_render_state.Width;
+		quad.theight = m_render_state.Height;
+		quad.trans = BIT(packet_0, 2);
+		//quad.trans = false;
+		quad.clamp = BIT(packet_0, 5);
 
-		if (Packet0 & 0x8)  //Texture Enable
+		if (BIT(packet_0, 3))  //Texture Enable
 		{
-			Quad.u.Imageb = TEXTURE + 128 * m_RenderState.FontOffset;
-			Quad.Tile = (uint16_t*) (TEXTURE + 128 * m_RenderState.TileOffset);
-			if (!m_RenderState.PixelFormat)
-				Quad.Pal = m_InternalPalette + (m_RenderState.PaletteBank * 16);
+			quad.texaddr = 128 * m_render_state.font_offset;
+			quad.tile = 128 * m_render_state.tile_offset;
+			if (!m_render_state.pixel_format)
+				quad.pal = m_internal_palette + (m_render_state.palette_bank * 16);
 			else
-				Quad.Pal = m_InternalPalette;
+				quad.pal = m_internal_palette;
 
-			if (m_RenderState.TextureMode)   //Tiled
-				DrawTile[m_RenderState.PixelFormat + 4 * Mode](&Quad);
-			else
-				DrawImage[m_RenderState.PixelFormat + 4 * Mode](&Quad);
+			(this->*(m_draw_image[m_render_state.texture_mode ? 1 : 0][m_render_state.pixel_format + 4 * blend_mode]))(quad);
 		}
 		else
-			DrawQuadFill(&Quad);
+			draw_quad_fill(quad);
 	}
 	return 0;
 }
 
 TIMER_CALLBACK_MEMBER(vr0video_device::pipeline_cb)
 {
-	if (m_render_start == false)
+	if (!m_render_start)
 		return;
 
 	// bail out if we encountered a flip sync command
 	// pipeline waits until it receives a vblank signal
-	if (m_flip_sync == true)
+	if (m_flip_sync)
 		return;
 
 	if ((m_queue_rear & 0x7ff) == (m_queue_front & 0x7ff))
 		return;
 
-	int DoFlip = vrender0_ProcessPacket(m_queue_rear * 32);
-	m_queue_rear ++;
+	int const do_flip = process_packet(m_queue_rear * 32);
+	m_queue_rear++;
 	m_queue_rear &= 0x7ff;
-	if (DoFlip & 0x01)
+	if (BIT(do_flip, 0))
 		m_flip_sync = true;
 
-	if (DoFlip & 0x80)
+	if (BIT(do_flip, 7))
 	{
-		uint32_t B0 = 0x000000;
-		uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-		uint16_t *Front, *Back;
+		u32 const B0 = 0x000000;
+		u32 const B1 = m_bank1_select ? 0x400000 : 0x100000;
+		u32 front, back;
 
-		if (m_display_bank & 1)
+		if (BIT(m_display_bank, 0))
 		{
-			Front = (m_frameram + B1);
-			Back  = (m_frameram + B0);
+			front = B1;
+			back  = B0;
 		}
 		else
 		{
-			Front = (m_frameram + B0);
-			Back  = (m_frameram + B1);
+			front = B0;
+			back  = B1;
 		}
 
-		m_DrawDest = ((m_draw_select == true) ? Back : Front);
+		m_draw_dest = m_draw_select ? back : front;
 	}
-
 }
 
 void vr0video_device::execute_flipping()
 {
-	if (m_render_start == false)
+	if (!m_render_start)
 		return;
 
-	uint32_t B0 = 0x000000;
-	uint32_t B1 = (m_bank1_select == true ? 0x400000 : 0x100000)/2;
-	uint16_t *Front, *Back;
+	u32 const B0 = 0x000000;
+	u32 const B1 = m_bank1_select ? 0x400000 : 0x100000;
+	u32 front, back;
 
-	if (m_display_bank & 1)
+	if (BIT(m_display_bank, 0))
 	{
-		Front = (m_frameram + B1);
-		Back  = (m_frameram + B0);
+		front = B1;
+		back  = B0;
 	}
 	else
 	{
-		Front = (m_frameram + B0);
-		Back  = (m_frameram + B1);
+		front = B0;
+		back  = B1;
 	}
 
-	m_DrawDest = ((m_draw_select == true) ? Front : Back);
-	m_DisplayDest = Front;
+	m_draw_dest = m_draw_select ? front : back;
+	m_display_dest = front;
 
 	m_flip_sync = false;
 	if (m_flip_count)
@@ -742,13 +687,14 @@ void vr0video_device::execute_flipping()
 	}
 }
 
-uint32_t vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 vr0video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint32_t width = cliprect.width();
-
-	uint32_t const dx = cliprect.left();
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-		std::copy_n(&m_DisplayDest[(y * 1024) + dx], width, &bitmap.pix(y, dx));
+	{
+		u16 *const dest = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			dest[x] = m_fbcache.read_word(m_display_dest + get_fb_addr(x, y));
+	}
 
 	return 0;
 }
