@@ -15,6 +15,8 @@ TODO:
 
 **************************************************************************************************/
 
+#include <fstream>
+
 #include "emu.h"
 #include "segach.h"
 
@@ -109,9 +111,18 @@ megadrive_segach_us_device::megadrive_segach_us_device(const machine_config &mco
 	: device_t(mconfig, MEGADRIVE_SEGACH_US, tag, owner, clock)
 	, device_megadrive_cart_interface( mconfig, *this )
 	, device_memory_interface( mconfig, *this )
+	, m_packet_timer(*this, "packet_timer")
 	, m_rom(*this, "rom")
 	, m_space_tcu_config("tcu_io", ENDIANNESS_BIG, 8, 9, 0, address_map_constructor(FUNC(megadrive_segach_us_device::tcu_map), this))
 {
+}
+
+void megadrive_segach_us_device::device_add_mconfig(machine_config &config)
+{
+	// each broadcast frame has 10 packets and 288 bytes per packet
+	// assuming 12Mbps download rate
+	TIMER(config, "packet_timer", 0).configure_periodic(FUNC(megadrive_segach_us_device::send_packets),
+			attotime::from_hz((12*128072) / 2880));
 }
 
 void megadrive_segach_us_device::device_start()
@@ -125,6 +136,15 @@ void megadrive_segach_us_device::device_start()
 			});
 	m_ram.resize(0x40'0000 / 2);
 	m_nvm.fill(0);
+	load_packets();
+
+	m_broadcast_packet = 0;
+
+	m_game_id = 0;
+	m_curr_packet = 0;
+	m_packet_match = 0x7fff;
+	m_gen_control = 0;
+	m_gen_status = 0;
 }
 
 void megadrive_segach_us_device::device_reset()
@@ -192,11 +212,66 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 //  map(0x10, 0x11) fixit start address
 //  map(0x12, 0x13) fixit work bound
 //  map(0x20, 0x21) game timeout
-//  map(0x22, 0x23) game id
-//  map(0x24, 0x25) pkt match address
-//  map(0x26, 0x27) current spacket
-//  map(0x30, 0x31) general status
-//  map(0x32, 0x33) general control
+	map(0x22, 0x23).lrw16( // game id
+		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
+			return m_game_id;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			logerror("game_id: %04x\n", data);
+			m_game_id = data;
+		})
+	);
+	map(0x24, 0x25).lrw16( // pkt match address
+		NAME([this] (offs_t offset, u16 mem_mask) -> u16{
+			return m_packet_match;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			logerror("packet_match: %04x\n", data);
+			m_packet_match = data;
+		})
+	);
+	map(0x26, 0x27).lrw16( // current superpacket
+		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
+			return m_curr_packet;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			logerror("curr_packet: %04x\n", data);
+			m_curr_packet = data;
+		})
+	);
+	map(0x30, 0x31).lrw16( // general status
+		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
+			// bit 0: download complete
+			// bit 1-2: unknown status bits
+			// bit 12-15: ASIC version? causes BIOS to return error 1.
+			return m_gen_status;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			logerror("gen_status: %04x\n", data);
+			m_gen_status &= ~data;
+		})
+	);
+	map(0x32, 0x33).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
+			// bit 0: reset console
+			// bit 1: download enable
+			// bit 2: DRAM bus control?
+			// bit 3: switch BIOS/game view
+			// bit 4: reset CRC
+			// bit 5: enable fixit buffer?
+			return m_gen_control;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			logerror("gen_control: %04x\n", data);
+			m_gen_control = data & 0x2e;
+			if (data & 0x01)
+				logerror("console reset\n");
+			if (data & 0x02)
+				logerror("start download\n");
+			if (data & 0x04)
+				logerror("CRC reset\n");
+		})
+	);
 //  map(0x34, 0x35) error counter
 //  map(0x40, 0x41) CRC input
 //  map(0x42, 0x43) CRC low out
@@ -272,10 +347,83 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x1e6, 0x1e6) tuner type (0) TD1A (1) TD1B
 	map(0x1e0, 0x1ff).lrw8(
 		NAME([this] (offs_t offset, u16 mem_mask) -> u8 {
-			return m_nvm[offset & 0x0f];
+			return m_nvm[0x1e0 + (offset & 0x1f)];
 		}),
 		NAME([this] (offs_t offset, u8 data, u16 mem_mask) {
-			m_nvm[offset & 0x0f] = data;
+			m_nvm[0x1e0 + (offset & 0x1f)] = data;
 		})
 	);
 }
+
+void megadrive_segach_us_device::load_packets()
+{
+	static const char* filename = "dom0816.bin";
+	if (std::ifstream packet_stream{filename, std::ios::binary | std::ios::ate})
+	{
+		size_t num_pipes = packet_stream.tellg() / (256 * 10);
+		size_t num_packets = num_pipes * 10;
+		m_packet.resize(num_packets);
+		packet_stream.seekg(0);
+		for (size_t curr_packet = 0; curr_packet < num_packets; curr_packet++)
+		{
+#pragma pack(push, 1)
+			struct {
+				u16 file_id;
+				u16 service_id;
+				u32 game_time;
+				u16 address;
+				u16 data[246 / 2];
+			} converted_packet;
+#pragma pack(pop)
+			if (packet_stream.read((char*) &converted_packet, 256))
+			{
+				m_packet[curr_packet].file_id = converted_packet.file_id;
+				m_packet[curr_packet].service_id = converted_packet.service_id;
+				m_packet[curr_packet].game_time = converted_packet.game_time;
+				m_packet[curr_packet].address = converted_packet.address;
+				std::copy_n(&converted_packet.data[0], 246/2, &m_packet[curr_packet].data[0]);
+			}
+		}
+		logerror("packets loaded: %d, pipes: %d\n", num_packets, num_pipes);
+	}
+	else
+	{
+		logerror("packet stream could not be loaded\n");
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
+{
+	if (m_packet.size())
+	{
+		//logerror("current packet = %d\n", m_broadcast_packet);
+		for (int pipe = 0; pipe < 10; pipe++)
+		{
+			auto& packet = m_packet[m_broadcast_packet];
+			//if (m_gen_control & 0x0002)
+				//logerror("broadcast %d, wanted game id %d, got %d...\n", m_broadcast_packet, m_game_id, packet.file_id);
+			if ((m_gen_control & 0x0002) && packet.file_id == m_game_id)
+			{
+				m_curr_packet = packet.address;
+				//logerror("current packet = %d (%d)\n", m_curr_packet, m_broadcast_packet);
+				if (m_curr_packet == m_packet_match)
+				{
+					logerror("download complete\n");
+					m_gen_status |= 1;
+					m_gen_control &= ~(0x02);
+				}
+				else
+				{
+					size_t dram_address = m_curr_packet * (246 / 2);
+					for (int data_i = 0; data_i < (246 / 2); data_i++)
+						m_ram[(dram_address++) & 0x1fffff] = packet.data[data_i];
+					if (m_curr_packet < m_packet_match)
+						m_packet_match = m_curr_packet;
+				}
+			}
+			m_broadcast_packet = (m_broadcast_packet + 1) % m_packet.size();
+		}
+	}
+}
+
+
