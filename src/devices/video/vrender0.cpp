@@ -255,17 +255,17 @@ device_memory_interface::space_config_vector vr0video_device::memory_space_confi
  IMPLEMENTATION
  *****************************************************************************/
 
-static inline u32 RGB32(u8 r, u8 g, u8 b) { return (r << 16) | (g << 8) | (b << 0); }
-static inline u16 RGB16(u8 r, u8 g, u8 b) { return ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3); }
+constexpr u32 RGB32(u8 r, u8 g, u8 b) { return (r << 16) | (g << 8) | (b << 0); }
+constexpr u16 RGB16(u8 r, u8 g, u8 b) { return ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | ((b & 0xf8) >> 3); }
 
-static inline u16 RGB32TO16(u32 rgb)
+constexpr u16 RGB32TO16(u32 rgb)
 {
 	return (((rgb >> (16 + 3)) & 0x1f) << 11) | (((rgb >> (8 + 2)) & 0x3f) << 5) | (((rgb >> (3)) & 0x1f) << 0);
 }
 
-static inline u8 EXTRACTR8(u16 src) { return ((src >> 11) << 3) & 0xff; }
-static inline u8 EXTRACTG8(u16 src) { return ((src >>  5) << 2) & 0xff; }
-static inline u8 EXTRACTB8(u16 src) { return ((src >>  0) << 3) & 0xff; }
+constexpr u8 EXTRACTR8(u16 src) { return ((src >> 11) << 3) & 0xff; }
+constexpr u8 EXTRACTG8(u16 src) { return ((src >>  5) << 2) & 0xff; }
+constexpr u8 EXTRACTB8(u16 src) { return ((src >>  0) << 3) & 0xff; }
 
 static inline u16 do_shade(u16 src, u32 shade)
 {
@@ -608,7 +608,7 @@ int vr0video_device::process_packet(u32 packet_ptr)
 			else
 				quad.pal = m_internal_palette;
 
-			((this)->*(m_draw_image[m_render_state.texture_mode ? 1 : 0][m_render_state.pixel_format + 4 * blend_mode]))(quad);
+			(this->*(m_draw_image[m_render_state.texture_mode ? 1 : 0][m_render_state.pixel_format + 4 * blend_mode]))(quad);
 		}
 		else
 			draw_quad_fill(quad);
