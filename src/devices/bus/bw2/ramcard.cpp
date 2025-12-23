@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(BW2_RAMCARD, bw2_ramcard_device, "bw2_ramcard", "Bondwell 2 R
 //-------------------------------------------------
 
 ROM_START( bw2_ramcard )
-	ROM_REGION( 0x4000, "ramcard", 0 )
+	ROM_REGION( 0x4000, "rom", 0 )
 	ROM_LOAD( "ramcard-10.ic10", 0x0000, 0x4000, CRC(68cde1ba) SHA1(a776a27d64f7b857565594beb63aa2cd692dcf04) )
 ROM_END
 
@@ -47,13 +47,11 @@ const tiny_rom_entry *bw2_ramcard_device::device_rom_region() const
 //  bw2_ramcard_device - constructor
 //-------------------------------------------------
 
-bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BW2_RAMCARD, tag, owner, clock),
-		device_bw2_expansion_slot_interface(mconfig, *this),
-		m_rom(*this, "ramcard"),
-		m_ram(*this, "ram", 512*1024, ENDIANNESS_LITTLE),
-		m_en(0),
-		m_bank(0)
+bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BW2_RAMCARD, tag, owner, clock),
+	device_bw2_expansion_slot_interface(mconfig, *this),
+	m_rom(*this, "rom"),
+	m_ram(*this, "ram", 512*1024, ENDIANNESS_LITTLE)
 {
 }
 
@@ -78,52 +76,30 @@ void bw2_ramcard_device::device_reset()
 {
 	m_en = 0;
 	m_bank = 0;
+	ram_select();
 }
 
-
-//-------------------------------------------------
-//  bw2_cd_r - cartridge data read
-//-------------------------------------------------
-
-uint8_t bw2_ramcard_device::bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
-{
-	if (offset < 0x8000)
-	{
-		if (!ram2)
-		{
-			data = m_rom->base()[offset & 0x3fff];
-		}
-		else if (m_en && !ram5)
-		{
-			data = m_ram[(m_bank << 15) | offset];
-		}
-	}
-	return data;
-}
-
-
-//-------------------------------------------------
-//  bw2_cd_r - cartridge data write
-//-------------------------------------------------
-
-void bw2_ramcard_device::bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6)
-{
-	if (offset < 0x8000)
-	{
-		if (m_en && !ram5)
-		{
-			m_ram[(m_bank << 15) | offset] = data;
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  bw2_slot_w - slot write
-//-------------------------------------------------
-
-void bw2_ramcard_device::bw2_slot_w(offs_t offset, uint8_t data)
+void bw2_ramcard_device::slot_w(offs_t offset, uint8_t data)
 {
 	m_en = 1;
-	m_bank = data & 0x0f;
+	m_bank = data & 0xf;
+	ram_select();
+}
+
+void bw2_ramcard_device::ram_select()
+{
+	if (m_slot->ram2()) {
+		m_rom_tap = m_slot->memspace()->install_read_tap(0x0000, 0x3fff, 0x4000, "rom",
+			[this] (offs_t offset, u8 &data, u8) { data &= m_rom->base()[offset]; }, &m_rom_tap);
+	} else {
+		m_rom_tap.remove();
+	}
+
+	if (m_en && m_slot->ram5())	{
+		m_ram_tap = m_slot->memspace()->install_readwrite_tap(0x0000, 0x7fff, "ram",
+			[this] (offs_t offset, u8 &data, u8) { data &= m_ram[m_bank << 15 | offset]; },
+			[this] (offs_t offset, u8 &data, u8) { m_ram[m_bank << 15 | offset] = data; }, &m_ram_tap);
+	} else {
+		m_ram_tap.remove();
+	}
 }
