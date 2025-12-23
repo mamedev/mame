@@ -90,12 +90,12 @@ template <class T>
 void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16* spriteram, u16 size)
 {
 	if (m_sprite_bitmap.valid() && !m_pri_cb.isnull())
-		fatalerror("m_sprite_bitmap && m_pri_cb is invalid\n");
+		fatalerror("m_sprite_bitmap && m_pri_cb is invalid");
 
-	int start, end, inc;
 	if (m_sprite_bitmap.valid())
 		m_sprite_bitmap.fill(0xffff, cliprect);
 
+	int start, end, inc;
 	if (!m_pri_cb.isnull())
 	{
 		start = 0;
@@ -112,7 +112,7 @@ void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangl
 	for (int i = start; i != end; i += inc)
 	{
 		u32 code         = spriteram[i + 1];
-		// TODO: it needs at spi and feversoc?
+		// TODO: needed for spi and feversoc?
 		if ((code % gfx(0)->elements()) == 0)
 			continue;
 
@@ -153,11 +153,11 @@ void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangl
 					if (!m_pri_cb.isnull())
 					{
 						gfx(0)->prio_transpen(bitmap, cliprect,
-							code++,
-							color,
-							flipx, flipy,
-							sx, sy,
-							screen.priority(), pri_mask, m_transpen);
+								code++,
+								color,
+								flipx, flipy,
+								sx, sy,
+								screen.priority(), pri_mask, m_transpen);
 					}
 					else
 					{
@@ -172,11 +172,11 @@ void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangl
 				else
 				{
 					gfx(0)->transpen_raw(m_sprite_bitmap, cliprect,
-						code++,
-						color << m_pix_raw_shift,
-						flipx, flipy,
-						sx, sy,
-						m_transpen);
+							code++,
+							color << m_pix_raw_shift,
+							flipx, flipy,
+							sx, sy,
+							m_transpen);
 				}
 			}
 		}
