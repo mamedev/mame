@@ -255,20 +255,23 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 		NAME([this] (offs_t offset, u16 mem_mask) -> u16 {
 			// bit 0: reset console
 			// bit 1: download enable
-			// bit 2: DRAM bus control?
+			// bit 2: download reset?
 			// bit 3: switch BIOS/game view
 			// bit 4: reset CRC
 			// bit 5: enable fixit buffer?
+			// bit 8: memory configuration, set if 3MB detected?
 			return m_gen_control;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			logerror("gen_control: %04x\n", data);
-			m_gen_control = data & 0x2e;
+			m_gen_control = data & 0x12e;
 			if (data & 0x01)
 				logerror("console reset\n");
 			if (data & 0x02)
 				logerror("start download\n");
-			if (data & 0x04)
+			if (data & 0x4)
+				m_packet_match = 0x7fff; // side effect?
+			if (data & 0x10)
 				m_crc = 0;
 		})
 	);
@@ -334,6 +337,17 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 		}));
 //  map(0x0ba, 0x0bd) PLL data
 //  map(0x0c0, 0x0c1) parental control password
+	map(0x0c0, 0x0c1).lrw8(
+		NAME([this] (offs_t offset) -> u8 {
+			logerror("Read parental control password %d: %02x\n", offset, m_nvm[0xc0 + offset]);
+			return m_nvm[0xc0 + offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_nvm[0xc0 + offset] = data;
+			logerror("Set parental control password %d: %02x\n", offset, data);
+			m_nvm[0xcb] = data;
+		})
+	);
 //  map(0x0c2, 0x0c2) channel bitmap
 	map(0x0c2, 0x0ca).lr8(
 		NAME([this] (offs_t offset) -> u8 {
@@ -344,6 +358,16 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 			return 0xFF; // Signal everywhere :D
 		}));
 //  map(0x0cb, 0x0cb) parental control level
+	map(0x0cb, 0x0cb).lrw8(
+		NAME([this] (offs_t offset) -> u8 {
+			logerror("Read parental control level: %02x\n", m_nvm[0xcb]);
+			return m_nvm[0xcb];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			logerror("Set parental control level: %02x\n", data);
+			m_nvm[0xcb] = data;
+		})
+	);
 //  map(0x0cc, 0x0cc) initialized
 //  map(0x0cd, 0x0ce) random seed, (d?)word
 //  map(0x0cf, 0x0cf) next DRAM test block
@@ -361,11 +385,11 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x1e2, 0x1e2) menu lptr
 //  map(0x1e6, 0x1e6) tuner type (0) TD1A (1) TD1B
 	map(0x1e0, 0x1ff).lrw8(
-		NAME([this] (offs_t offset, u16 mem_mask) -> u8 {
-			return m_nvm[0x1e0 + (offset & 0x1f)];
+		NAME([this] (offs_t offset) -> u8 {
+			return m_nvm[0x1e0 + offset];
 		}),
-		NAME([this] (offs_t offset, u8 data, u16 mem_mask) {
-			m_nvm[0x1e0 + (offset & 0x1f)] = data;
+		NAME([this] (offs_t offset, u8 data) {
+			m_nvm[0x1e0 + offset] = data;
 		})
 	);
 }
