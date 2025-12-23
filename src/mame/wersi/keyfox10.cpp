@@ -52,9 +52,13 @@ private:
     u8 port2_r();
     u8 port3_r();
 
-    // SAM8905 DSP handlers
-    u8 sam8905_r(offs_t offset);
-    void sam8905_w(offs_t offset, u8 data);
+    // SAM8905 DSP handlers (SND at 0x8000, FX at 0xE000)
+    u8 sam_snd_r(offs_t offset);
+    void sam_snd_w(offs_t offset, u8 data);
+    u8 sam_fx_r(offs_t offset);
+    void sam_fx_w(offs_t offset, u8 data);
+    u8 sam8905_r(int chip, offs_t offset);
+    void sam8905_w(int chip, offs_t offset, u8 data);
 
     void midi_rxd_w(int state) { m_midi_rxd = state; }
 
@@ -107,7 +111,9 @@ void keyfox10_state::program_map(address_map &map)
 void keyfox10_state::data_map(address_map &map)
 {
     map(0x0000, 0x1fff).ram();  // 8KB RAM
-    map(0x8000, 0x800f).rw(FUNC(keyfox10_state::sam8905_r), FUNC(keyfox10_state::sam8905_w));  // SAM8905 DSP
+    map(0x2000, 0x69e4).rom().region("program", 0x2000);  // ROM mirror
+    map(0x8000, 0x8004).rw(FUNC(keyfox10_state::sam_snd_r), FUNC(keyfox10_state::sam_snd_w));  // SAM8905 SND
+    map(0xe000, 0xe004).rw(FUNC(keyfox10_state::sam_fx_r), FUNC(keyfox10_state::sam_fx_w));    // SAM8905 FX
 }
 
 u8 keyfox10_state::port0_r()
@@ -217,9 +223,13 @@ void keyfox10_state::disp_shift_clock()
         data_in, m_disp_sr[0], m_disp_sr[1], m_disp_sr[2]);
 }
 
-u8 keyfox10_state::sam8905_r(offs_t offset)
+u8 keyfox10_state::sam_snd_r(offs_t offset) { return sam8905_r(0, offset); }
+void keyfox10_state::sam_snd_w(offs_t offset, u8 data) { sam8905_w(0, offset, data); }
+u8 keyfox10_state::sam_fx_r(offs_t offset) { return sam8905_r(1, offset); }
+void keyfox10_state::sam_fx_w(offs_t offset, u8 data) { sam8905_w(1, offset, data); }
+
+u8 keyfox10_state::sam8905_r(int chip, offs_t offset)
 {
-    int chip = sam_chip_select();
     sam8905_state &sam = m_sam[chip];
     const char *chip_name = chip ? "FX" : "SND";
 
@@ -288,9 +298,8 @@ u8 keyfox10_state::sam8905_r(offs_t offset)
     return 0xff;
 }
 
-void keyfox10_state::sam8905_w(offs_t offset, u8 data)
+void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
 {
-    int chip = sam_chip_select();
     sam8905_state &sam = m_sam[chip];
     const char *chip_name = chip ? "FX" : "SND";
 
