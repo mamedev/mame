@@ -7877,9 +7877,15 @@ ROM_START( m4cjdlx )
 	M4CRZJWL_EXTRAS
 ROM_END
 
-// doesn't require inverted coins, runs, has Deluxe in the title
-GAME(199?, m4cjdlx,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>(R4, RT1, LPLB), mpu4,    mpu4mod4oki_machines_state, init_m4big,ROT0,"Barcrest","Crown Jewels Deluxe (Barcrest) (German) (MPU4) (CJG 0.4)",GAME_FLAGS )
+ROM_START( m4cjdlxb )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cjg.p1", 0x0000, 0x020000, CRC(3a8c163a) SHA1(397aa0f64e7699b92e6f46b44dfcb4455bc0b5fc) )    // Crown Jewels Deluxe (german)
+	M4CRZJWL_EXTRAS
+ROM_END
 
+// doesn't require inverted coins, runs, has Deluxe in the title
+GAME(1993, m4cjdlx,   0,          mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>(R4, RT1, LPLB), mpu4,    mpu4mod4oki_machines_state, init_m4big,ROT0,"Barcrest","Crown Jewels Deluxe (Barcrest) (German) (MPU4) (CJG 0.4, set 1)",GAME_FLAGS )
+GAME(1993, m4cjdlxb,  m4cjdlx,    mod4oki_cheatchr_pal<mpu4_characteriser_pal::m4lv_characteriser_prot>(R4, RT1, LPLB), mpu4,    mpu4mod4oki_machines_state, init_m4big,ROT0,"Barcrest","Crown Jewels Deluxe (Barcrest) (German) (MPU4) (CJG 0.4, set 2)",GAME_FLAGS )
 
 /*****************************************************************************************************************************************************************************
 *
