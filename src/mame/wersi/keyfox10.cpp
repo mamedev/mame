@@ -38,6 +38,18 @@ public:
         , m_rom(*this, "program")
     { }
 
+    ~keyfox10_state()
+    {
+        // Close GAL log
+        if (m_gal_log)
+        {
+            fclose(m_gal_log);
+            m_gal_log = nullptr;
+        }
+        // Dump SAM memory on exit
+        dump_sam_memory();
+    }
+
     void keyfox10(machine_config &config);
 
 private:
@@ -109,6 +121,9 @@ private:
     void log_gal_inputs(bool rd, bool wr, bool psen, u16 addr);
     FILE *m_gal_log = nullptr;
     u32 m_gal_seen[8] = {};  // Bitmap for 256 possible input combinations
+
+    // SAM8905 memory dump (called from destructor)
+    void dump_sam_memory() const;
 };
 
 void keyfox10_state::program_map(address_map &map)
@@ -505,6 +520,84 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_port3));
     save_item(NAME(m_midi_rxd));
     save_item(NAME(m_disp_sr));
+}
+
+void keyfox10_state::dump_sam_memory() const
+{
+    const char *chip_names[2] = {"snd", "fx"};
+
+    for (int chip = 0; chip < 2; chip++)
+    {
+        const sam8905_state &sam = m_sam[chip];
+        char filename[64];
+
+        // Dump D-RAM: 16 slots × 16 words × 19 bits
+        snprintf(filename, sizeof(filename), "sam_%s_dram.log", chip_names[chip]);
+        FILE *f = fopen(filename, "w");
+        if (f)
+        {
+            fprintf(f, "# SAM8905 %s D-RAM dump\n", chip == 0 ? "SND" : "FX");
+            fprintf(f, "# 16 slots × 16 words × 19 bits\n");
+            fprintf(f, "# Format: slot.word = value (hex/decimal)\n\n");
+
+            for (int slot = 0; slot < 16; slot++)
+            {
+                fprintf(f, "Slot %d:\n", slot);
+                for (int word = 0; word < 16; word++)
+                {
+                    int addr = slot * 16 + word;
+                    u32 val = sam.dram[addr];
+                    fprintf(f, "  [%02X] %2d.%02d = 0x%05X (%6d)\n",
+                        addr, slot, word, val, val);
+                }
+                fprintf(f, "\n");
+            }
+            fclose(f);
+        }
+
+        // Dump A-RAM: 8 slots × 32 words × 15 bits (44kHz mode)
+        // or 4 slots × 64 words (22kHz mode)
+        snprintf(filename, sizeof(filename), "sam_%s_aram.log", chip_names[chip]);
+        f = fopen(filename, "w");
+        if (f)
+        {
+            fprintf(f, "# SAM8905 %s A-RAM dump\n", chip == 0 ? "SND" : "FX");
+            fprintf(f, "# 44kHz mode: 8 slots × 32 words × 15 bits\n");
+            fprintf(f, "# 22kHz mode: 4 slots × 64 words × 15 bits\n");
+            fprintf(f, "# Format: slot.word = value (hex/decimal)\n\n");
+
+            // Show as 8 slots × 32 words (44kHz interpretation)
+            fprintf(f, "=== 44kHz mode (8 slots × 32 words) ===\n\n");
+            for (int slot = 0; slot < 8; slot++)
+            {
+                fprintf(f, "Slot %d:\n", slot);
+                for (int word = 0; word < 32; word++)
+                {
+                    int addr = slot * 32 + word;
+                    u16 val = sam.aram[addr];
+                    fprintf(f, "  [%02X] %d.%02d = 0x%04X (%5d)\n",
+                        addr, slot, word, val, val);
+                }
+                fprintf(f, "\n");
+            }
+
+            // Also show as 4 slots × 64 words (22kHz interpretation)
+            fprintf(f, "=== 22kHz mode (4 slots × 64 words) ===\n\n");
+            for (int slot = 0; slot < 4; slot++)
+            {
+                fprintf(f, "Slot %d:\n", slot);
+                for (int word = 0; word < 64; word++)
+                {
+                    int addr = slot * 64 + word;
+                    u16 val = sam.aram[addr];
+                    fprintf(f, "  [%02X] %d.%02d = 0x%04X (%5d)\n",
+                        addr, slot, word, val, val);
+                }
+                fprintf(f, "\n");
+            }
+            fclose(f);
+        }
+    }
 }
 
 static INPUT_PORTS_START(keyfox10)
