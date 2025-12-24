@@ -197,6 +197,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 void raiden2_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_tile_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
 	m_back_data = make_unique_clear<u16[]>(0x800/2);
 	m_fore_data = make_unique_clear<u16[]>(0x800/2);
@@ -256,39 +257,37 @@ u32 raiden2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (BIT(~m_tilemap_enable, 4))
 	{
-		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes());
+		m_spritegen->draw_raw(m_sprite_bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes());
 
-		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[0]);
+		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[0]);
 	}
 
 	if (BIT(~m_tilemap_enable, 0))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_background_layer);
 
 	if (BIT(~m_tilemap_enable, 4))
-		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[1]);
+		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[1]);
 
 	if (BIT(~m_tilemap_enable, 1))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_midground_layer);
 
 	if (BIT(~m_tilemap_enable, 4))
-		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[2]);
+		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[2]);
 
 	if (BIT(~m_tilemap_enable, 2))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_foreground_layer);
 
 	if (BIT(~m_tilemap_enable, 4))
-		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[3]);
+		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[3]);
 
 	if (BIT(~m_tilemap_enable, 3))
 		tilemap_draw_and_blend(screen, bitmap, cliprect, m_text_layer);
 
 	if (BIT(~m_tilemap_enable, 4))
-		blend_layer(bitmap, cliprect, m_spritegen->get_sprite_temp_bitmap(), m_cur_spri[4]);
+		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[4]);
 
 	if (machine().input().code_pressed_once(KEYCODE_Z))
 		if (m_raiden2cop) m_raiden2cop->dump_table();
 
 	return 0;
 }
-
-

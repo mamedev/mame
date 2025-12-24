@@ -152,7 +152,7 @@ uint32_t feversoc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(m_palette->pen(0), cliprect); //black pen
 
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_spriteram, m_spriteram.bytes());
+	m_spritegen->draw(bitmap, cliprect, m_spriteram, m_spriteram.bytes());
 
 	return 0;
 }

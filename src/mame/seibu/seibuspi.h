@@ -116,6 +116,7 @@ public:
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	memory_share_creator<u32> m_tilemap_ram;
+	bitmap_ind16 m_sprite_bitmap;
 
 	tilemap_t *m_text_layer = nullptr;
 	tilemap_t *m_back_layer = nullptr;
