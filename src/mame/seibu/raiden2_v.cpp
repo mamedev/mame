@@ -197,7 +197,6 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 void raiden2_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_tile_bitmap);
-	m_spritegen->alloc_sprite_bitmap();
 
 	m_back_data = make_unique_clear<u16[]>(0x800/2);
 	m_fore_data = make_unique_clear<u16[]>(0x800/2);
