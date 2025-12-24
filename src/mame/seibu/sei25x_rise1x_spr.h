@@ -30,11 +30,11 @@ public:
 	void set_transpen(u32 transpen) { m_transpen = transpen; }
 	void set_pix_raw_shift(u32 raw_shift) { m_pix_raw_shift = raw_shift; }
 	void set_pri_raw_shift(u32 raw_shift) { m_pri_raw_shift = raw_shift; }
+	void set_allocate_sprite_bitmap(bool allocate) { m_allocate_bitmap = allocate; }
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size);
 
-	void alloc_sprite_bitmap();
 	bitmap_ind16 &get_sprite_temp_bitmap() { assert(m_sprite_bitmap.valid()); return m_sprite_bitmap; }
 
 protected:
@@ -55,6 +55,7 @@ private:
 	u32 m_transpen;
 	u32 m_pix_raw_shift;
 	u32 m_pri_raw_shift;
+	bool m_allocate_bitmap;
 	bitmap_ind16 m_sprite_bitmap;
 };
 

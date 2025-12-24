@@ -562,7 +562,6 @@ void seibuspi_tilemap_state::video_start()
 {
 	seibuspi_base_state::video_start();
 
-	m_spritegen->alloc_sprite_bitmap();
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;

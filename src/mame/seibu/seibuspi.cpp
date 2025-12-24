@@ -1795,6 +1795,7 @@ void seibuspi_tilemap_state::base_video(machine_config &config)
 	m_spritegen->set_pix_raw_shift(6);
 	m_spritegen->set_pri_raw_shift(14);
 	m_spritegen->set_transpen(63);
+	m_spritegen->set_allocate_sprite_bitmap(true);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
 	crtc.decrypt_key_callback().set(FUNC(seibuspi_tilemap_state::tile_decrypt_key_w));

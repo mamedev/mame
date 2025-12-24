@@ -40,6 +40,7 @@ sei25x_rise1x_device::sei25x_rise1x_device(const machine_config &mconfig, device
 	, m_yoffset(0)
 	, m_transpen(0)
 	, m_pix_raw_shift(4)
+	, m_allocate_bitmap(false)
 {
 }
 
@@ -52,15 +53,13 @@ void sei25x_rise1x_device::device_start()
 {
 	m_pri_cb.resolve();
 	m_gfxbank_cb.resolve();
+
+	if (m_allocate_bitmap)
+		screen().register_screen_bitmap(m_sprite_bitmap);
 }
 
 void sei25x_rise1x_device::device_reset()
 {
-}
-
-void sei25x_rise1x_device::alloc_sprite_bitmap()
-{
-	screen().register_screen_bitmap(m_sprite_bitmap);
 }
 
 /*
