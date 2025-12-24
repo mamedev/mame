@@ -532,7 +532,7 @@ void vr0sound_device::render_audio(sound_stream &stream)
 				if (channel.modes & MODE_8BIT)   //8bit
 				{
 					sample = channel.cache->read_byte(channel.cur_saddr >> 9);
-					sample = s16(s8(sample & 0xff) << 8);
+					sample = s16((sample & 0xff) << 8);
 				}
 				else                //16bit
 				{

@@ -16,7 +16,7 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	typedef u32 (se3208_disassembler::*_OP)(u16 opcode, std::ostream &stream);
+	typedef u32 (se3208_disassembler::*OP)(u16 opcode, std::ostream &stream);
 
 	u32 INVALIDOP(u16 opcode, std::ostream &stream);
 	u32 LDB(u16 opcode, std::ostream &stream);
@@ -93,7 +93,7 @@ private:
 	u32 MVTC(u16 opcode, std::ostream &stream);
 	u32 MVFC(u16 opcode, std::ostream &stream);
 
-	_OP decode_op(u16 opcode);
+	OP decode_op(u16 opcode);
 
 	u32 PC;
 	u32 SR;
