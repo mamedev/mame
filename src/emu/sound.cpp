@@ -316,6 +316,9 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample
 	if(outputs == 0)
 		m_output_adaptive = false;
 
+	if(m_sample_rate && m_sample_rate < 1000)
+		fatalerror("Device %s requiring to create a stream with too low samplerate %d\n", device.tag(), m_sample_rate);
+
 	// create a name
 	m_name = m_device.name();
 	m_name += " '";
