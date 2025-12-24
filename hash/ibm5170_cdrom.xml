@@ -467,21 +467,6 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-	<!-- DOS / Mac -->
-	<!-- Has two Windows utilities, BREAK (cockpit art editor) and VFILM (shareware film editor) -->
-	<!-- Disc label: awplus -->
-	<software name="airwarpl">
-		<description>Air Warrior Plus (v1.16b)</description>
-		<year>1995</year>
-		<publisher>Kesmai Corporation</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="air warrior plus v1.16b (1995)(on-line)[pc-mac]" sha1="8e4e21b7ac87016874e13d1c9fa02969757cf4ad" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Windows 95 / 98 / ME / 2000 -->
 	<!-- Pentium II class 233 MHz -->
 	<software name="akimboj" supported="no">
@@ -2266,20 +2251,6 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- Windows & Macintosh -->
-	<!-- TODO: huge gfx issues -->
-	<software name="choroq" supported="no">
-		<description>Bakusou PC Choro Q (Japan)</description>
-		<year>1998</year>
-		<publisher>Takara / Inner Brain</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="choroq" sha1="485d19839da7c16d34ad4a5b929a7e60d174d1e6" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- DOS -->
 	<!-- TODO: fails reading file system -->
 	<software name="chronomst" supported="no">
@@ -2629,30 +2600,6 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Cool Croc Twins, The - Magic Boy (Netherlands)" sha1="fc20fc4bbc733a9f54046b70fde3b274206fd9c3" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- DOS -->
-	<!-- Multidisc collection featuring Around the World in 80 Days, Jungle Book and Peter Pan -->
-	<software name="creadcol">
-		<description>Creative Reader Collection</description>
-		<year>1995</year>
-		<publisher>Novotrade / Creative Wonders / EA Kids</publisher>
-
-		<part name="cdrom1" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="around the world in 80 days (1994)(creative wonders)" sha1="40ad859399b9433d6c4e711f7bc6d20898cc1a45" />
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jungle book, the (1995)(creative wonders)" sha1="1495eb5a4c074d27697d49a895c79d049d6fbcfe" />
-			</diskarea>
-		</part>
-		<part name="cdrom3" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="peter pan (1993)(creative wonders)[mac-pc]" sha1="24d299e26e578f937eef7e2eb849c6be67348e1b" />
 			</diskarea>
 		</part>
 	</software>
@@ -5184,19 +5131,6 @@ Unemulated [Capcom pad]
 		</part>
 	</software>
 
-	<!-- Windows 3.1, Windows 95, Macintosh -->
-	<!-- http://redump.org/disc/50161/ -->
-	<software name="fredfisk" supported="no">
-		<description>Freddi Fisk och fallet med de försvunna sjögräsfröna (Sweden)</description>
-		<year>1997</year>
-		<publisher>Levande Böcker</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="freddi fisk och fallet med de forsvunna sjograsfrona (sweden)" sha1="10c19256b8aca3d1b868a97a08670ba72bb9e257" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Source: http://redump.org/disc/94155/ -->
 	<!-- <rom name="Monkey Island Madness (USA) (Track 01).bin" size="145261872" crc="91cbf5b6" sha1="e5a90874005999494028ad10276f9fbc074e7848"/> -->
 	<!-- <rom name="Monkey Island Madness (USA) (Track 02).bin" size="21619584" crc="c779c5d8" sha1="6bd56e351245e19122eab656ee6fb211082f479e"/> -->
@@ -5334,24 +5268,6 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="970618_1330" sha1="29ea81c4760934194099fbd0c2a94239b487a400" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 3.1 / Mac LCIII -->
-	<software name="orgaslave">
-		<description>Orgaslave (Japan)</description>
-		<year>1996</year>
-		<publisher>Kuki</publisher>
-		<info name="alt_title" value="オルガスレイブ" />
-		<part name="cdrom1" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="cd1" sha1="60c4be022959c6b108c096780451ba102b488b00" />
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="cd2" sha1="11e9986c9b33aeee9cc42fc623f2909f9883ae49" />
 			</diskarea>
 		</part>
 	</software>
@@ -6128,21 +6044,6 @@ https://www.pcgamingwiki.com/wiki/Road_Rash
 		</part>
 	</software>
 
-	<!-- Windows 95 / Mac OS Japan AppleTalk 7.5 -->
-	<!-- Requires 16-bit True Color and 800x600 screen resolution -->
-	<software name="segata" supported="partial">
-		<description>Segata Sanshirou Choujin Densetsu (Japan)</description>
-		<year>1998</year>
-		<publisher>Sega</publisher>
-		<info name="alt_title" value="せがた三四郎超人伝説" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="segata" sha1="0d7a6d9a7143d0309d44c1356f68c15a05949257" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Windows 95 / NT 4 -->
 	<!-- High Color 16-bit -->
 	<software name="seraphim" supported="partial">
@@ -6171,20 +6072,6 @@ Bit of desync when Rosalind Chao starts talking at beginning of an attract cycle
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shanghai" sha1="1d3cd20e23a94c6d5568687da3fc56579e2b6a26" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 95 / Macintosh -->
-	<software name="silicon" supported="partial">
-		<description>Silicon Scream (Japan)</description>
-		<year>1995</year>
-		<publisher>JVC Advanced Media / NEC Interchannel / Off-World Communications</publisher>
-		<info name="alt_title" value="シリコンスクリーム" />
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="silicon" sha1="b20f8e685d17a0a4def35a5a11672e6779846b30" />
 			</diskarea>
 		</part>
 	</software>
@@ -7305,22 +7192,6 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="awesome adventures of victor vector &amp; yondo, the - the cyberplasm formula (1994)(sanctuary woods)" sha1="e359d345ec6657122b50f5904d5c4324c32a2658" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Windows 95/98/ME/XP and Mac OS supported -->
-	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
-	<software name="v16imagine" supported="partial">
-		<description>Viper -V16- Imagine (International)</description>
-		<year>2001</year>
-		<publisher>Sogna / Hobibox Europe</publisher>
-		<notes><![CDATA[
-Has [8514] icon glitch
-]]></notes>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="GX" sha1="5de4abf4a883a56ec389bb255d176b5a39a63420" />
 			</diskarea>
 		</part>
 	</software>
@@ -9058,22 +8929,6 @@ Anything beyond Windows 3.1 is untested
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="matroxmil1" sha1="f3d826066dafb3e9eb3a0a7f5eaabc97642dd714"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Win 3.1 / 95 -->
-	<!-- Mac OS with System 7.0 -->
-	<software name="muscan" supported="no">
-		<description>Mustek Power of Scanning</description>
-		<year>1997</year>
-		<publisher>Mustek</publisher>
-		<notes><![CDATA[
-Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
-]]></notes>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="mustek_scanner" sha1="5f708270ed5885c07a49fadc79ab3ffed420af52" />
 			</diskarea>
 		</part>
 	</software>
