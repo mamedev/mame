@@ -102,8 +102,8 @@ void megadrive_segach_jp_device::time_io_map(address_map &map)
  * The BIOS also listens to controller port 2 in serial mode
  * for a diagnostics mode.
  *
- * TODO: Menu button located on the adapter
- *       (causes it to reset to the BIOS rather the game)
+ * TODO: - Automatic reset timer (used for "Test Drive" demos)
+ *       - NVRAM
  */
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_SEGACH_US, megadrive_segach_us_device, "megadrive_segach_us", "Megadrive Sega Channel US cart")
@@ -129,6 +129,16 @@ void megadrive_segach_us_device::device_add_mconfig(machine_config &config)
 			attotime::from_hz((12*128072) / 2880));
 
 	QUICKLOAD(config, "packet_stream", "img").set_load_callback(FUNC(megadrive_segach_us_device::quickload_cb));
+}
+
+static INPUT_PORTS_START( megadrive_segach_us )
+	PORT_START("BUTTON")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Menu") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(megadrive_segach_us_device::menu_pressed), 0)
+INPUT_PORTS_END
+
+ioport_constructor megadrive_segach_us_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( megadrive_segach_us );
 }
 
 void megadrive_segach_us_device::device_start()
@@ -162,37 +172,6 @@ device_memory_interface::space_config_vector megadrive_segach_us_device::memory_
 	return space_config_vector{
 		std::make_pair(0, &m_space_tcu_config)
 	};
-}
-
-void megadrive_segach_us_device::sram_enable_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	// the BIOS wants to switch in SRAM by writing bit 0...
-	logerror("sram enable: %04x", data);
-	if (data & 3)
-	{
-		m_sram_view.select(0);
-		m_game_sram_view.select(0);
-	}
-	else
-	{
-		m_sram_view.disable();
-		m_game_sram_view.disable();
-	}
-}
-
-u16 megadrive_segach_us_device::sram_r(offs_t offset)
-{
-	const u32 sram_offset = offset & 0x1fff;
-	return 0xff00 | m_sram[sram_offset];
-}
-
-void megadrive_segach_us_device::sram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		const u32 sram_offset = offset & 0x1fff;
-		m_sram[sram_offset] = data & 0xff;
-	}
 }
 
 void megadrive_segach_us_device::cart_map(address_map &map)
@@ -350,15 +329,13 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 
 void megadrive_segach_us_device::tcu_map(address_map &map)
 {
-//  map(0x000, 0x00f) authorized service map
-	map(0x000, 0x00f).lr8(
+	map(0x000, 0x00f).lr8( // authorized service map
 		NAME([] () -> u8 {
 			// this is a bitmap containing which service IDs are
 			// authorized to play on the adapter.
 			return 0xff;
 		}));
-//  map(0x010, 0x01f) free service map
-	map(0x010, 0x01f).lr8(
+	map(0x010, 0x01f).lr8( // free service map
 		NAME([] () -> u8 {
 			// this is a bitmap containing which service IDs are
 			// free to play on any adapter. only checked if the
@@ -373,15 +350,13 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x0b4, 0x0b4) day of week
 //  map(0x0b5, 0x0b5) week
 //  map(0x0b6, 0x0b6) time of day timeout
-//  map(0x0b7, 0x0b7) authorization byte
-	map(0x0b7, 0x0b7).lr8(
+	map(0x0b7, 0x0b7).lr8( // authorization byte
 		NAME([] () -> u8 {
 			// bit 7 is set if the cable company has authorized the adapter
 			return 0x80; // 0x00..0x04 if unauthorized
 		}));
 //  map(0x0b8, 0x0b8) checksum
-//  map(0x0b9, 0x0b9) PLL type
-	map(0x0b9, 0x0b9).lr8(
+	map(0x0b9, 0x0b9).lr8( // PLL type
 		NAME([] () -> u8 {
 			return 0x81; // mitsubishi/philips
 			// return 0x87; // rohm
@@ -389,7 +364,8 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x0ba, 0x0bd) PLL data
 	map(0x0c0, 0x0c1).lrw8( // parental control password
 		NAME([this] (offs_t offset) -> u8 {
-			logerror("TCU: read parental control password %d: %02x\n", offset, m_nvm[0xc0 + offset]);
+			if (!machine().side_effects_disabled())
+				logerror("TCU: read parental control password %d: %02x\n", offset, m_nvm[0xc0 + offset]);
 			return m_nvm[0xc0 + offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -402,7 +378,8 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 		NAME([this] (offs_t offset) -> u8 {
 			// this is a bitmap with the corresponding bit set when the TCU
 			// detects a channel
-			logerror("TCU: read channel bitmap read offset %02x\n", offset);
+			if (!machine().side_effects_disabled())
+				logerror("TCU: read channel bitmap read offset %02x\n", offset);
 			if (m_broadcast.size())
 				return 0xFF; // Signal everywhere :D
 			else
@@ -410,7 +387,8 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 		}));
 	map(0x0cb, 0x0cb).lrw8( // parental control level
 		NAME([this] (offs_t offset) -> u8 {
-			logerror("TCU: read parental control level: %02x\n", m_nvm[0xcb]);
+			if (!machine().side_effects_disabled())
+				logerror("TCU: read parental control level: %02x\n", m_nvm[0xcb]);
 			return m_nvm[0xcb];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -420,6 +398,14 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 	);
 //  map(0x0cc, 0x0cc) initialized
 //  map(0x0cd, 0x0ce) random seed, (d?)word
+	map(0x0cd, 0x0ce).lrw8(
+		NAME([this] (offs_t offset) -> u8 {
+			return m_nvm[0xcd + offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_nvm[0xcd + offset] = data;
+		})
+	);
 //  map(0x0cf, 0x0cf) next DRAM test block
 //  map(0x0e0, 0x0e0) station ID
 	map(0x0e0, 0x0e0).lw8(
@@ -441,9 +427,11 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 		// I'm just bruteforcing a solution here...
 		NAME([this] (offs_t offset) {
 			uint8_t data = m_nvm[0xe5];
-			logerror("TCU: read channel number: %02x\n", m_nvm[0xe5]);
 			if (!machine().side_effects_disabled())
+			{
+				logerror("TCU: read channel number: %02x\n", m_nvm[0xe5]);
 				m_nvm[0xe5] = (data + 1) % 16;
+			}
 			return data;
 		})
 	);
@@ -609,6 +597,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(megadrive_segach_us_device::send_packets)
 	}
 }
 
+void megadrive_segach_us_device::sram_enable_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// the BIOS wants to switch in SRAM by writing bit 0...
+	logerror("sram enable: %04x", data);
+	if (data & 3)
+	{
+		m_sram_view.select(0);
+		m_game_sram_view.select(0);
+	}
+	else
+	{
+		m_sram_view.disable();
+		m_game_sram_view.disable();
+	}
+}
+
+u16 megadrive_segach_us_device::sram_r(offs_t offset)
+{
+	const u32 sram_offset = offset & 0x1fff;
+	return 0xff00 | m_sram[sram_offset];
+}
+
+void megadrive_segach_us_device::sram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		const u32 sram_offset = offset & 0x1fff;
+		m_sram[sram_offset] = data & 0xff;
+	}
+}
+
+
 void megadrive_segach_us_device::crc_write(u16 data)
 {
 	u32 crc = m_crc;
@@ -628,4 +648,15 @@ u32 megadrive_segach_us_device::crc_read() const
 {
 	return bitswap<32>(m_crc, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
 			16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31);
+}
+
+INPUT_CHANGED_MEMBER( megadrive_segach_us_device::menu_pressed )
+{
+	if (newval)
+	{
+		// boot BIOS.
+		m_game_view.disable();
+		// HACK: should assert /VRES on connector causing 68k soft reset.
+		machine().root_device().reset();
+	}
 }
