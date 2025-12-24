@@ -1063,7 +1063,6 @@ void raiden2_state::base_video(machine_config &config)
 	m_spritegen->set_pix_raw_shift(4);
 	m_spritegen->set_pri_raw_shift(14);
 	m_spritegen->set_transpen(15);
-	m_spritegen->set_allocate_sprite_bitmap(true);
 }
 
 void raiden2_state::raiden2(machine_config &config)

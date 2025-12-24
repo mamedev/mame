@@ -40,7 +40,6 @@ sei25x_rise1x_device::sei25x_rise1x_device(const machine_config &mconfig, device
 	, m_yoffset(0)
 	, m_transpen(0)
 	, m_pix_raw_shift(4)
-	, m_allocate_bitmap(false)
 {
 }
 
@@ -53,12 +52,6 @@ void sei25x_rise1x_device::device_start()
 {
 	m_pri_cb.resolve();
 	m_gfxbank_cb.resolve();
-
-	if (m_allocate_bitmap && !m_pri_cb.isnull())
-		fatalerror("m_sprite_bitmap && m_pri_cb is invalid");
-
-	if (m_allocate_bitmap)
-		screen().register_screen_bitmap(m_sprite_bitmap);
 }
 
 void sei25x_rise1x_device::device_reset()
@@ -87,26 +80,9 @@ Unmarked bits are unused/unknown.
 
 ===============================================================
 */
-template <class T>
-void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16 *spriteram, u16 size)
+template <typename T, typename U>
+inline void sei25x_rise1x_device::draw_sprites(const u16 *spriteram, int start, int end, int inc, T &&set_pri_col, U &&plot)
 {
-	if (m_sprite_bitmap.valid())
-		m_sprite_bitmap.fill(0xffff, cliprect);
-
-	int start, end, inc;
-	if (!m_pri_cb.isnull())
-	{
-		start = 0;
-		end = (size / 2);
-		inc = 4;
-	}
-	else
-	{
-		start = (size / 2) - 4;
-		end = -4;
-		inc = -4;
-	}
-
 	for (int i = start; i != end; i += inc)
 	{
 		u32 code         = spriteram[i + 1];
@@ -130,12 +106,7 @@ void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangl
 		x += m_xoffset;
 		y += m_yoffset;
 
-		u32 pri_mask = 0;
-
-		if (!m_pri_cb.isnull())
-			pri_mask = m_pri_cb(pri);
-		else if (m_sprite_bitmap.valid())
-			color |= pri << (m_pri_raw_shift - m_pix_raw_shift); // for manual mixing
+		set_pri_col(pri, color);
 
 		if (!m_gfxbank_cb.isnull())
 			code = m_gfxbank_cb(code, ext);
@@ -146,44 +117,96 @@ void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangl
 			for (int ay = 0; ay < sizey; ay++)
 			{
 				const int sy = flipy ? (y + 16 * (sizey - ay - 1)) : (y + 16 * ay);
-				if (m_sprite_bitmap.valid())
-				{
-					gfx(0)->transpen_raw(m_sprite_bitmap, cliprect,
-							code++,
-							color << m_pix_raw_shift,
-							flipx, flipy,
-							sx, sy,
-							m_transpen);
-				}
-				else if (!m_pri_cb.isnull())
-				{
-					gfx(0)->prio_transpen(bitmap, cliprect,
-							code++,
-							color,
-							flipx, flipy,
-							sx, sy,
-							screen.priority(), pri_mask, m_transpen);
-				}
-				else
-				{
-					gfx(0)->transpen(bitmap, cliprect,
-							code++,
-							color,
-							flipx, flipy,
-							sx, sy,
-							m_transpen);
-				}
+				plot(code++, color, flipx, flipy, sx, sy);
 			}
 		}
 	}
 }
 
-void sei25x_rise1x_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size)
+void sei25x_rise1x_device::draw(bitmap_ind16 &bitmap, const rectangle cliprect, const u16 *spriteram, u16 size)
 {
-	draw(screen, bitmap, cliprect, spriteram, size);
+	draw_sprites(
+			spriteram, (size / 2) - 4, -4, -4,
+			[] (u8 pri, u32 &color) { },
+			[this, &bitmap, &cliprect] (u32 code, u32 color, bool flipx, bool flipy, s32 sx, s32 sy)
+			{
+				gfx(0)->transpen(bitmap, cliprect,
+						code,
+						color,
+						flipx, flipy,
+						sx, sy,
+						m_transpen);
+			});
 }
 
-void sei25x_rise1x_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, u16 *spriteram, u16 size)
+void sei25x_rise1x_device::draw(bitmap_rgb32 &bitmap, const rectangle cliprect, const u16 *spriteram, u16 size)
 {
-	draw(screen, bitmap, cliprect, spriteram, size);
+	draw_sprites(
+			spriteram, (size / 2) - 4, -4, -4,
+			[] (u8 pri, u32 &color) { },
+			[this, &bitmap, &cliprect] (u32 code, u32 color, bool flipx, bool flipy, s32 sx, s32 sy)
+			{
+				gfx(0)->transpen(bitmap, cliprect,
+						code,
+						color,
+						flipx, flipy,
+						sx, sy,
+						m_transpen);
+			});
+}
+
+void sei25x_rise1x_device::draw_prio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, const u16 *spriteram, u16 size)
+{
+	assert(!m_pri_cb.isnull());
+
+	u32 pri_mask;
+	draw_sprites(
+			spriteram, 0, size / 2, 4,
+			[this, &pri_mask] (u8 pri, u32 &color) { pri_mask = m_pri_cb(pri); },
+			[this, &screen, &bitmap, &cliprect, &pri_mask] (u32 code, u32 color, bool flipx, bool flipy, s32 sx, s32 sy)
+			{
+				gfx(0)->prio_transpen(bitmap, cliprect,
+						code,
+						color,
+						flipx, flipy,
+						sx, sy,
+						screen.priority(), pri_mask, m_transpen);
+			});
+}
+
+void sei25x_rise1x_device::draw_prio(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, const u16 *spriteram, u16 size)
+{
+	assert(!m_pri_cb.isnull());
+
+	u32 pri_mask;
+	draw_sprites(
+			spriteram, 0, size / 2, 4,
+			[this, &pri_mask] (u8 pri, u32 &color) { pri_mask = m_pri_cb(pri); },
+			[this, &screen, &bitmap, &cliprect, &pri_mask] (u32 code, u32 color, bool flipx, bool flipy, s32 sx, s32 sy)
+			{
+				gfx(0)->prio_transpen(bitmap, cliprect,
+						code,
+						color,
+						flipx, flipy,
+						sx, sy,
+						screen.priority(), pri_mask, m_transpen);
+			});
+}
+
+void sei25x_rise1x_device::draw_raw(bitmap_ind16 &bitmap, const rectangle cliprect, const u16 *spriteram, u16 size)
+{
+	// for manual mixing
+	bitmap.fill(0xffff, cliprect);
+	draw_sprites(
+			spriteram, (size / 2) - 4, -4, -4,
+			[this] (u8 pri, u32 &color) { color = (color << m_pix_raw_shift) | (u32(pri) << m_pri_raw_shift); },
+			[this, &bitmap, &cliprect] (u32 code, u32 color, bool flipx, bool flipy, s32 sx, s32 sy)
+			{
+				gfx(0)->transpen_raw(bitmap, cliprect,
+						code,
+						color,
+						flipx, flipy,
+						sx, sy,
+						m_transpen);
+			});
 }

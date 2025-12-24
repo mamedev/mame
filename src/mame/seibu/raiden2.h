@@ -104,6 +104,7 @@ protected:
 	const s32 *m_cur_spri = nullptr; // cfg
 
 	bitmap_ind16 m_tile_bitmap;
+	bitmap_ind16 m_sprite_bitmap;
 
 	void sprite_prot_x_w(u16 data);
 	void sprite_prot_y_w(u16 data);

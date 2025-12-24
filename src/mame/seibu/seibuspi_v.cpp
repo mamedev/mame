@@ -385,11 +385,10 @@ void seibuspi_tilemap_state::blend_sprite(bitmap_rgb32 &bitmap, const rectangle 
 	if (BIT(m_layer_enable, 4))
 		return;
 
-	bitmap_ind16 &sprite_bitmap = m_spritegen->get_sprite_temp_bitmap();
 	pri <<= 14;
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u16 *src = &sprite_bitmap.pix(y, cliprect.min_x);
+		const u16 *src = &m_sprite_bitmap.pix(y, cliprect.min_x);
 		u32 *dest = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
@@ -449,7 +448,7 @@ u32 seibuspi_tilemap_state::screen_update_spi(screen_device &screen, bitmap_rgb3
 	}
 
 	if (BIT(~m_layer_enable, 4))
-		m_spritegen->draw_sprites(screen, bitmap, cliprect, m_sprite_ram, m_sprite_ram.bytes());
+		m_spritegen->draw_raw(m_sprite_bitmap, cliprect, m_sprite_ram, m_sprite_ram.bytes());
 
 	if (m_layer_enable & 1)
 		bitmap.fill(0, cliprect);
@@ -490,7 +489,7 @@ u32 seibuspi_base_state::screen_update_sys386f(screen_device &screen, bitmap_rgb
 {
 	bitmap.fill(0, cliprect);
 
-	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_sprite_ram, m_sprite_ram.bytes());
+	m_spritegen->draw(bitmap, cliprect, m_sprite_ram, m_sprite_ram.bytes());
 
 	return 0;
 }
@@ -561,6 +560,8 @@ void seibuspi_base_state::video_start()
 void seibuspi_tilemap_state::video_start()
 {
 	seibuspi_base_state::video_start();
+
+	m_spritegen->screen().register_screen_bitmap(m_sprite_bitmap);
 
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
