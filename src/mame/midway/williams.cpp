@@ -3584,25 +3584,6 @@ ROM_START( alienar )
 	ROM_LOAD( "aarom11",   0x0e000, 0x1000, CRC(ae3a270e) SHA1(867fff32062bc876390e8ca6bd7cedae47cd92c9) )
 	ROM_LOAD( "aarom12",   0x0f000, 0x1000, CRC(6be9f09e) SHA1(98821c9b94301c5fd6e7f5d9e4bc9c1bdbab53ec) )
 
-	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASE00 )
-ROM_END
-
-
-ROM_START( alienaru )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "aarom01",   0x00000, 0x1000, CRC(bb0c21be) SHA1(dbf122870adaa49cd99e2c1e9fa4b78fb74ef2c1) )
-	ROM_LOAD( "aarom02",   0x01000, 0x1000, CRC(165acd37) SHA1(12466c94bcf5a98f154a639ecc2e95d5193cbab2) )
-	ROM_LOAD( "aarom03",   0x02000, 0x1000, CRC(e5d51d92) SHA1(598c928499e977a30906319c97ffa1ef2b9395d1) )
-	ROM_LOAD( "aarom04",   0x03000, 0x1000, CRC(24f6feb8) SHA1(c1b7d764785b4edfe80a90ffdc52a67c8dbbfea5) )
-	ROM_LOAD( "aarom05",   0x04000, 0x1000, CRC(5b1ac59b) SHA1(9b312eb419e994a006fda2ae61c58c31f048bace) )
-	ROM_LOAD( "aarom06",   0x05000, 0x1000, CRC(da7195a2) SHA1(ef2c2750c504176fd6a11e8463278d97cac9a5c5) )
-	ROM_LOAD( "aarom07",   0x06000, 0x1000, CRC(f9812be4) SHA1(5f116345f09cd79790612672aa48ede63fc91f56) )
-	ROM_LOAD( "aarom08",   0x07000, 0x1000, CRC(cd7f3a87) SHA1(59577059308931139ecc036d06953660a148d91c) )
-	ROM_LOAD( "aarom09",   0x08000, 0x1000, CRC(e6ce77b4) SHA1(bd4354100067654d0ad2e590591582dbdfb845b6) )
-	ROM_LOAD( "aarom10",   0x0d000, 0x1000, CRC(6feb0314) SHA1(5cf30f097bc695cbd388cb408e78394926362a7b) )
-	ROM_LOAD( "aarom11",   0x0e000, 0x1000, CRC(ae3a270e) SHA1(867fff32062bc876390e8ca6bd7cedae47cd92c9) )
-	ROM_LOAD( "aarom12",   0x0f000, 0x1000, CRC(6be9f09e) SHA1(98821c9b94301c5fd6e7f5d9e4bc9c1bdbab53ec) )
-
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sg.snd",    0xf800, 0x0800, CRC(2fcf6c4d) SHA1(9c4334ac3ff15d94001b22fc367af40f9deb7d57) )
 
@@ -3994,7 +3975,6 @@ GAME( 1983, blasterkit, blaster,  blastkit,         blastkit, blaster_state,   e
 GAME( 1985, spdball,    0,        spdball,          spdball,  williams_state,  empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, alienar,    0,        alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, lottofun,   0,        lottofun,         lottofun, williams_state,  empty_init,    ROT0,   "HAR Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
