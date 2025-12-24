@@ -21,7 +21,7 @@ TODO:
 		<description>Air Warrior Plus (v1.16b)</description>
 		<year>1995</year>
 		<publisher>Kesmai Corporation</publisher>
-		<sharedfeat name="compatibility" value="IBM5170,MC68020" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68020,MC68030,MC68040" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="air warrior plus v1.16b (1995)(on-line)[pc-mac]" sha1="8e4e21b7ac87016874e13d1c9fa02969757cf4ad" />
@@ -102,7 +102,7 @@ pc98: InstallShield is painfully slow unless floppy is inserted
 		<description>Creative Reader Collection</description>
 		<year>1995</year>
 		<publisher>Novotrade / Creative Wonders / EA Kids</publisher>
-		<sharedfeat name="compatibility" value="IBM5170,MC68030" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68030,MC68040" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="around the world in 80 days (1994)(creative wonders)" sha1="40ad859399b9433d6c4e711f7bc6d20898cc1a45" />
@@ -351,7 +351,7 @@ Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
 		<year>1996</year>
 		<publisher>Kuki</publisher>
 		<info name="alt_title" value="オルガスレイブ" />
-		<sharedfeat name="compatibility" value="IBM5170,MC68030" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68030,MC68040" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cd1" sha1="60c4be022959c6b108c096780451ba102b488b00" />
@@ -385,7 +385,7 @@ Contains software drivers for a ScanExpress 6000SP Flatbed Scanner, SCSI i/f
 		<year>1995</year>
 		<publisher>JVC Advanced Media / NEC Interchannel / Off-World Communications</publisher>
 		<info name="alt_title" value="シリコンスクリーム" />
-		<sharedfeat name="compatibility" value="IBM5170,MC68020" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68020,MC68030,MC68040" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="silicon" sha1="b20f8e685d17a0a4def35a5a11672e6779846b30" />
