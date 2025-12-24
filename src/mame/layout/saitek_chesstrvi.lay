@@ -37,8 +37,7 @@ authors:hap
 	<element name="text_l08a"><text string="H" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l08b"><text string="8" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
-	<element name="text_l09a"><text string="LEVEL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_l09b"><text string="CS" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_l09a"><text string="LEVEL / CS"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l10a"><text string="FIND" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l10b"><text string="POSITION" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_l11a"><text string="ENTER" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -108,16 +107,15 @@ authors:hap
 		<element ref="white"><bounds x="29" y="32.55" width="1" height="1" /></element>
 		<element ref="blackb"><bounds x="29.15" y="32.7" width="0.7" height="0.7" /></element>
 
-		<element ref="text_l09a"><bounds x="0" y="37.7" width="3" height="0.8" /></element>
-		<element ref="text_l09b"><bounds x="2.6" y="37.6" width="3" height="0.5" /></element>
-		<element ref="text_l10a"><bounds x="4" y="37.35" width="4" height="0.8" /></element>
-		<element ref="text_l10b"><bounds x="4" y="38.15" width="4" height="0.8" /></element>
-		<element ref="text_l11a"><bounds x="8" y="37.35" width="4" height="0.8" /></element>
-		<element ref="text_l11b"><bounds x="8" y="38.15" width="4" height="0.8" /></element>
-		<element ref="text_l12a"><bounds x="12.5" y="37.35" width="4" height="0.8" /></element>
-		<element ref="text_l12b"><bounds x="12.5" y="38.15" width="4" height="0.8" /></element>
-		<element ref="text_l13a"><bounds x="16.7" y="37.35" width="4" height="0.8" /></element>
-		<element ref="text_l13b"><bounds x="16.7" y="38.15" width="4" height="0.8" /></element>
+		<element ref="text_l09a"><bounds x="-0.5" y="37.7" width="4" height="0.8" /></element>
+		<element ref="text_l10a"><bounds x="4" y="37.35" width="3.25" height="0.8" /></element>
+		<element ref="text_l10b"><bounds x="4" y="38.15" width="3.25" height="0.8" /></element>
+		<element ref="text_l11a"><bounds x="8" y="37.35" width="3.25" height="0.8" /></element>
+		<element ref="text_l11b"><bounds x="8" y="38.15" width="3.25" height="0.8" /></element>
+		<element ref="text_l12a"><bounds x="12.5" y="37.35" width="3.25" height="0.8" /></element>
+		<element ref="text_l12b"><bounds x="12.5" y="38.15" width="3.25" height="0.8" /></element>
+		<element ref="text_l13a"><bounds x="16.7" y="37.35" width="3.25" height="0.8" /></element>
+		<element ref="text_l13b"><bounds x="16.7" y="38.15" width="3.25" height="0.8" /></element>
 		<element ref="text_l14"><bounds x="20" y="37.7" width="3" height="0.8" /></element>
 		<element ref="text_l15"><bounds x="26" y="37.7" width="3" height="0.8" /></element>
 	</group>

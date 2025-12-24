@@ -447,22 +447,22 @@ authors:hap
 		<element ref="text_r71"><bounds x="92.5" y="43.15" width="3" height="1.5" /></element>
 		<element ref="text_r81"><bounds x="92.5" y="46.15" width="3" height="1.5" /></element>
 
-		<element ref="text_s1"><bounds x="97.8" y="21.15" width="10" height="1.5" /></element>
-		<element ref="text_s2"><bounds x="97.8" y="33.15" width="10" height="1.5" /></element>
-		<element ref="text_s3"><bounds x="97.8" y="36.15" width="10" height="1.5" /></element>
-		<element ref="text_s4"><bounds x="97.8" y="41.65" width="10" height="1.5" /></element>
+		<element ref="text_s1"><bounds x="97.8" y="21.15" width="9" height="1.5" /></element>
+		<element ref="text_s2"><bounds x="97.8" y="33.15" width="9" height="1.5" /></element>
+		<element ref="text_s3"><bounds x="97.8" y="36.15" width="9" height="1.5" /></element>
+		<element ref="text_s4"><bounds x="97.8" y="41.65" width="9" height="1.5" /></element>
 
 		<element ref="text_r12"><bounds x="87.5" y="13.15" width="7" height="1.5" /></element>
 		<element ref="text_r22"><bounds x="87.5" y="17.15" width="7" height="1.5" /></element>
 
-		<element ref="text_r32"><bounds x="97.8" y="22.65" width="10" height="1.5" /></element>
-		<element ref="text_r42"><bounds x="97.8" y="25.65" width="10" height="1.5" /></element>
-		<element ref="text_r52"><bounds x="97.8" y="28.65" width="10" height="1.5" /></element>
-		<element ref="text_r62"><bounds x="97.8" y="31.65" width="10" height="1.5" /></element>
-		<element ref="text_r72"><bounds x="97.8" y="34.65" width="10" height="1.5" /></element>
-		<element ref="text_r82"><bounds x="97.8" y="37.65" width="10" height="1.5" /></element>
-		<element ref="text_r92"><bounds x="97.8" y="43.15" width="10" height="1.5" /></element>
-		<element ref="text_ra2"><bounds x="97.8" y="46.15" width="10" height="1.5" /></element>
+		<element ref="text_r32"><bounds x="97.8" y="22.65" width="9" height="1.5" /></element>
+		<element ref="text_r42"><bounds x="97.8" y="25.65" width="9" height="1.5" /></element>
+		<element ref="text_r52"><bounds x="97.8" y="28.65" width="9" height="1.5" /></element>
+		<element ref="text_r62"><bounds x="97.8" y="31.65" width="9" height="1.5" /></element>
+		<element ref="text_r72"><bounds x="97.8" y="34.65" width="9" height="1.5" /></element>
+		<element ref="text_r82"><bounds x="97.8" y="37.65" width="9" height="1.5" /></element>
+		<element ref="text_r92"><bounds x="97.8" y="43.15" width="9" height="1.5" /></element>
+		<element ref="text_ra2"><bounds x="97.8" y="46.15" width="9" height="1.5" /></element>
 
 		<element ref="text_r13"><bounds x="93.5" y="51.65" width="10" height="1.5" /></element>
 		<element ref="text_r23"><bounds x="93.5" y="54.65" width="10" height="1.5" /></element>

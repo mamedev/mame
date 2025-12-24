@@ -194,7 +194,7 @@ authors:hap
 		<element name="motor_pos" ref="counter"><bounds x="27.6" y="112" width="10" height="4" /></element>
 		<element ref="text_m2"><bounds x="31.7" y="112" width="5" height="4" /></element>
 		<element name="motor_on" ref="mask">
-			<bounds x="1" y="111" width="38" height="6" />
+			<bounds x="0" y="111" width="39" height="6" />
 			<color alpha="0.75" />
 		</element>
 

@@ -118,12 +118,12 @@ authors:hap
 		<element ref="text_l2"><bounds x="8.5" y="8.05" width="7.5" height="1.2" /></element>
 		<element ref="text_l3"><bounds x="8.5" y="16.55" width="7.5" height="1.2" /></element>
 
-		<element ref="text_b1"> <bounds xc="10.0"  y="20.7" width="4" height="1.2" /></element>
-		<element ref="text_b2"> <bounds xc="14.36" y="20.7" width="4" height="1.2" /></element>
-		<element ref="text_b3"> <bounds xc="18.71" y="20.7" width="4" height="1.2" /></element>
-		<element ref="text_b9"> <bounds xc="10.0"  y="25.4" width="4" height="1.2" /></element>
-		<element ref="text_b10"><bounds xc="14.36" y="25.4" width="4" height="1.2" /></element>
-		<element ref="text_b11"><bounds xc="18.71" y="25.4" width="4" height="1.2" /></element>
+		<element ref="text_b1"> <bounds xc="10.0"  y="20.7" width="3.8" height="1.2" /></element>
+		<element ref="text_b2"> <bounds xc="14.36" y="20.7" width="3.8" height="1.2" /></element>
+		<element ref="text_b3"> <bounds xc="18.71" y="20.7" width="3.8" height="1.2" /></element>
+		<element ref="text_b9"> <bounds xc="10.0"  y="25.4" width="3.8" height="1.2" /></element>
+		<element ref="text_b10"><bounds xc="14.36" y="25.4" width="3.8" height="1.2" /></element>
+		<element ref="text_b11"><bounds xc="18.71" y="25.4" width="3.8" height="1.2" /></element>
 	</view>
 
 	<view name="Internal Layout (English)"> <!-- translated -->
@@ -134,12 +134,12 @@ authors:hap
 		<element ref="text_tl2"><bounds x="10.5" y="8.05" width="8" height="1.2" /></element>
 		<element ref="text_tl3"><bounds x="10.5" y="16.55" width="8" height="1.2" /></element>
 
-		<element ref="text_tb1"> <bounds xc="10.0"  y="20.7" width="4" height="1.2" /></element>
-		<element ref="text_tb2"> <bounds xc="14.36" y="20.7" width="4" height="1.2" /></element>
-		<element ref="text_tb3"> <bounds xc="18.71" y="20.7" width="4" height="1.2" /></element>
-		<element ref="text_tb9"> <bounds xc="10.0"  y="25.4" width="4" height="1.2" /></element>
-		<element ref="text_tb10"><bounds xc="14.36" y="25.4" width="4" height="1.2" /></element>
-		<element ref="text_tb11"><bounds xc="18.71" y="25.4" width="4" height="1.2" /></element>
+		<element ref="text_tb1"> <bounds xc="10.0"  y="20.7" width="3.8" height="1.2" /></element>
+		<element ref="text_tb2"> <bounds xc="14.36" y="20.7" width="3.8" height="1.2" /></element>
+		<element ref="text_tb3"> <bounds xc="18.71" y="20.7" width="3.8" height="1.2" /></element>
+		<element ref="text_tb9"> <bounds xc="10.0"  y="25.4" width="3.8" height="1.2" /></element>
+		<element ref="text_tb10"><bounds xc="14.36" y="25.4" width="3.8" height="1.2" /></element>
+		<element ref="text_tb11"><bounds xc="18.71" y="25.4" width="3.8" height="1.2" /></element>
 	</view>
 
 </mamelayout>

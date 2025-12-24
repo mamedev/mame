@@ -160,19 +160,19 @@ authors:hap
 		<element name="8.1" ref="led"><bounds x="0" y="80" width="3" height="3" /></element>
 		<element name="8.3" ref="led"><bounds x="0" y="120" width="3" height="3" /></element>
 
-		<element ref="text_z1"><bounds x="19" y="144" width="20" height="4" /></element>
-		<element ref="text_z2"><bounds x="44" y="159" width="20" height="4" /></element>
-		<element ref="text_z3"><bounds x="84" y="159" width="20" height="4" /></element>
-		<element ref="text_z4"><bounds x="109" y="144" width="20" height="4" /></element>
-		<element ref="text_z5"><bounds x="124" y="119" width="20" height="4" /></element>
-		<element ref="text_z6"><bounds x="124" y="79" width="20" height="4" /></element>
+		<element ref="text_z1"><bounds x="19" y="144" width="15" height="4" /></element>
+		<element ref="text_z2"><bounds x="44" y="159" width="15" height="4" /></element>
+		<element ref="text_z3"><bounds x="84" y="159" width="15" height="4" /></element>
+		<element ref="text_z4"><bounds x="109" y="144" width="10" height="4" /></element>
+		<element ref="text_z5"><bounds x="124" y="119" width="10" height="4" /></element>
+		<element ref="text_z6"><bounds x="124" y="79" width="10" height="4" /></element>
 
-		<element ref="text_z7"><bounds x="109" y="54" width="20" height="4" /></element>
-		<element ref="text_z8"><bounds x="84" y="39" width="20" height="4" /></element>
+		<element ref="text_z7"><bounds x="109" y="54" width="10" height="4" /></element>
+		<element ref="text_z8"><bounds x="84" y="39" width="15" height="4" /></element>
 		<element ref="text_z9"><bounds x="44" y="39" width="20" height="4" /></element>
-		<element ref="text_z10"><bounds x="19" y="54" width="20" height="4" /></element>
-		<element ref="text_z11"><bounds x="4" y="79" width="20" height="4" /></element>
-		<element ref="text_z12"><bounds x="4" y="119" width="20" height="4" /></element>
+		<element ref="text_z10"><bounds x="19" y="54" width="15" height="4" /></element>
+		<element ref="text_z11"><bounds x="4" y="79" width="15" height="4" /></element>
+		<element ref="text_z12"><bounds x="4" y="119" width="15" height="4" /></element>
 
 		<!-- buttons -->
 		<element ref="text_b1"><bounds x="46.5" y="93"  width="7" height="7" /></element>
