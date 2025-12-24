@@ -35,6 +35,7 @@ public:
         : driver_device(mconfig, type, tag)
         , m_maincpu(*this, "maincpu")
         , m_midi_out(*this, "mdout")
+        , m_rom(*this, "program")
     { }
 
     void keyfox10(machine_config &config);
@@ -118,11 +119,17 @@ void keyfox10_state::program_map(address_map &map)
 
 void keyfox10_state::data_map(address_map &map)
 {
-    // During MOVX read, ~RD is inverted to ROM A16, so data reads access ROM upper 64KB (0x10000+)
-    map(0x0000, 0x1fff).ram();  // 8KB RAM
-    map(0x2000, 0x7fff).rom().region("program", 0x12000);  // ROM data area (rhythm patterns, lookup tables)
-    map(0x8000, 0x8004).rw(FUNC(keyfox10_state::sam_snd_r), FUNC(keyfox10_state::sam_snd_w));  // SAM8905 SND
-    map(0xe000, 0xe004).rw(FUNC(keyfox10_state::sam_fx_r), FUNC(keyfox10_state::sam_fx_w));    // SAM8905 FX
+    // Memory map controlled by GAL16V8, depends on T1 (P3.5) state:
+    // T1=0: Full ROM data access (upper 64KB at 0x10000-0x1FFFF)
+    // T1=1: RAM + SAM chips
+    //
+    // During MOVX read, ~RD is inverted to ROM A16, so data reads access ROM upper 64KB
+    map(0x0000, 0x1fff).ram();  // 8KB RAM (active when T1=1 or for writes)
+    map(0x2000, 0x7fff).rom().region("program", 0x12000);  // ROM data (always accessible)
+    // 0x8000-0xDFFF: ROM data when T1=0, SAM SND at 0x8000-0x8007 when T1=1
+    map(0x8000, 0xdfff).rw(FUNC(keyfox10_state::sam_snd_r), FUNC(keyfox10_state::sam_snd_w));
+    // 0xE000-0xFFFF: ROM data when T1=0, SAM FX at 0xE000-0xE007 when T1=1
+    map(0xe000, 0xffff).rw(FUNC(keyfox10_state::sam_fx_r), FUNC(keyfox10_state::sam_fx_w));
 }
 
 u8 keyfox10_state::port0_r()
@@ -232,10 +239,51 @@ void keyfox10_state::disp_shift_clock()
         data_in, m_disp_sr[0], m_disp_sr[1], m_disp_sr[2]);
 }
 
-u8 keyfox10_state::sam_snd_r(offs_t offset) { return sam8905_r(0, offset); }
-void keyfox10_state::sam_snd_w(offs_t offset, u8 data) { sam8905_w(0, offset, data); }
-u8 keyfox10_state::sam_fx_r(offs_t offset) { return sam8905_r(1, offset); }
-void keyfox10_state::sam_fx_w(offs_t offset, u8 data) { sam8905_w(1, offset, data); }
+u8 keyfox10_state::sam_snd_r(offs_t offset)
+{
+    // T1=0: ROM data mode (0x8000-0xDFFF -> ROM 0x18000-0x1DFFF)
+    // T1=1: SAM SND chip access (only 0x8000-0x8007 active)
+    if (!BIT(m_port3, 5))  // T1=0: ROM data
+    {
+        u32 rom_offset = 0x18000 + offset;
+        return m_rom[rom_offset];
+    }
+    // T1=1: SAM chip (only first 8 bytes decoded)
+    if (offset < 8)
+        return sam8905_r(0, offset);
+    return 0xff;  // Unmapped
+}
+
+void keyfox10_state::sam_snd_w(offs_t offset, u8 data)
+{
+    // T1=0: ROM (writes ignored)
+    // T1=1: SAM SND chip access
+    if (BIT(m_port3, 5) && offset < 8)
+        sam8905_w(0, offset, data);
+}
+
+u8 keyfox10_state::sam_fx_r(offs_t offset)
+{
+    // T1=0: ROM data mode (0xE000-0xFFFF -> ROM 0x1E000-0x1FFFF)
+    // T1=1: SAM FX chip access (only 0xE000-0xE007 active)
+    if (!BIT(m_port3, 5))  // T1=0: ROM data
+    {
+        u32 rom_offset = 0x1E000 + offset;
+        return m_rom[rom_offset];
+    }
+    // T1=1: SAM chip (only first 8 bytes decoded)
+    if (offset < 8)
+        return sam8905_r(1, offset);
+    return 0xff;  // Unmapped
+}
+
+void keyfox10_state::sam_fx_w(offs_t offset, u8 data)
+{
+    // T1=0: ROM (writes ignored)
+    // T1=1: SAM FX chip access
+    if (BIT(m_port3, 5) && offset < 8)
+        sam8905_w(1, offset, data);
+}
 
 u8 keyfox10_state::sam8905_r(int chip, offs_t offset)
 {
