@@ -388,11 +388,11 @@ authors:hap
 		<element ref="text_l3"><bounds x="-5.8" y="32" width="5" height="2" /></element>
 		<element ref="text_l4"><bounds x="-5.8" y="42" width="5" height="2" /></element>
 
-		<element ref="text_l5"><bounds x="-2.8" y="47.25" width="2" height="11.5" /><orientation rotate="90" /></element>
-		<element ref="text_l61"><bounds x="-2.8" y="58.75" width="2" height="8.5" /><orientation rotate="90" /></element>
-		<element ref="text_l62"><bounds x="-4.81" y="58.0" width="2" height="10" /><orientation rotate="90" /></element>
-		<element ref="text_l71"><bounds x="-2.8" y="68.75" width="2" height="8.5" /><orientation rotate="90" /></element>
-		<element ref="text_l72"><bounds x="-4.81" y="68.0" width="2" height="10" /><orientation rotate="90" /></element>
+		<element ref="text_l5"><bounds x="-2.8" y="48.5" width="2" height="9" /><orientation rotate="90" /></element>
+		<element ref="text_l61"><bounds x="-2.8" y="58.5" width="2" height="9" /><orientation rotate="90" /></element>
+		<element ref="text_l62"><bounds x="-4.81" y="58.5" width="2" height="9" /><orientation rotate="90" /></element>
+		<element ref="text_l71"><bounds x="-2.8" y="68.5" width="2" height="9" /><orientation rotate="90" /></element>
+		<element ref="text_l72"><bounds x="-4.81" y="68.5" width="2" height="9" /><orientation rotate="90" /></element>
 
 		<element ref="blackl"><bounds x="-0.3" y="8.75" width="0.3" height="8.5" /></element>
 		<element ref="blackl"><bounds x="-0.3" y="18.75" width="0.3" height="8.5" /></element>

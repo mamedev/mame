@@ -66,7 +66,7 @@ authors:hap
 
 	<element name="text_scan">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-		<text string="card scanner"><color red="0.4" green="0.4" blue="0.4" /></text>
+		<text string=" card scanner "><color red="0.4" green="0.4" blue="0.4" /></text>
 	</element>
 
 	<element name="nothing" defstate="0">

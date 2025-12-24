@@ -54,9 +54,9 @@ authors:hap
 	</element>
 
 	<element name="text_p"><text string="P"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_1st"><text string="1st"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_1st"><text string="1st" align="1"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_2nd"><text string="2nd"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_3rd"><text string="3rd"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_3rd"><text string="3rd" align="2"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_foul"><text string="FOUL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_curve"><text string="CURVE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_ball"><text string="BALL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -84,8 +84,8 @@ authors:hap
 
 		<element ref="green"><bounds x="2" y="3" width="27" height="30" /></element>
 
-		<element ref="text_3rd"><bounds x="2.9" y="17.9" width="3" height="1.2" /></element>
-		<element ref="text_1st"><bounds x="25.1" y="17.9" width="3" height="1.2" /></element>
+		<element ref="text_3rd"><bounds x="3.2" y="17.9" width="1.8" height="1.2" /></element>
+		<element ref="text_1st"><bounds x="25.9" y="17.9" width="1.8" height="1.2" /></element>
 
 		<element ref="diamond_white"><bounds x="3" y="3.5" width="25" height="25" /></element>
 		<element ref="diamond_green"><bounds x="3" y="3.25" width="25" height="25" /></element>
