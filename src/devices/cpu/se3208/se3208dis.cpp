@@ -1125,7 +1125,7 @@ INST(MVFC)
 	return 0;
 }
 
-se3208_disassembler::_OP se3208_disassembler::decode_op(u16 opcode)
+se3208_disassembler::OP se3208_disassembler::decode_op(u16 opcode)
 {
 	switch (EXTRACT(opcode, 14, 15))
 	{

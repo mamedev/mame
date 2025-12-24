@@ -263,9 +263,9 @@ constexpr u16 RGB32TO16(u32 rgb)
 	return (((rgb >> (16 + 3)) & 0x1f) << 11) | (((rgb >> (8 + 2)) & 0x3f) << 5) | (((rgb >> (3)) & 0x1f) << 0);
 }
 
-constexpr u8 EXTRACTR8(u16 src) { return ((src >> 11) << 3) & 0xff; }
-constexpr u8 EXTRACTG8(u16 src) { return ((src >>  5) << 2) & 0xff; }
-constexpr u8 EXTRACTB8(u16 src) { return ((src >>  0) << 3) & 0xff; }
+constexpr u8 EXTRACTR8(u16 src) { return pal5bit(src >> 11); }
+constexpr u8 EXTRACTG8(u16 src) { return pal6bit(src >>  5); }
+constexpr u8 EXTRACTB8(u16 src) { return pal5bit(src >>  0); }
 
 static inline u16 do_shade(u16 src, u32 shade)
 {
