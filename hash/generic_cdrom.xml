@@ -169,7 +169,7 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="compatiblity" value="IBM5170,MC68040,PPC601,PPC603,PPC604" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Vintage"/>
 			<diskarea name="cdrom">
@@ -205,7 +205,7 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="compatiblity" value="IBM5170,MC68040,PPC601,PPC603,PPC604" />
+		<sharedfeat name="compatibility" value="IBM5170,MC68040,PPC601,PPC603,PPC604" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Vintage"/>
 			<diskarea name="cdrom">
