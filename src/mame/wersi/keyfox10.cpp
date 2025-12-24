@@ -64,6 +64,7 @@ private:
 
     required_device<i80c32_device> m_maincpu;
     required_device<midi_port_device> m_midi_out;
+    required_region_ptr<u8> m_rom;
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
@@ -100,6 +101,13 @@ private:
     u8 m_disp_sr[3] = {0xff, 0xff, 0xff};  // Shift registers (active low, init to all off)
 
     void disp_shift_clock();
+
+    // GAL16V8 input logger - captures inputs for hardware replay
+    // Inputs: ~RD, ~WR, ~PSEN, A13, A14, A15, T0, T1
+    virtual void machine_start() override ATTR_COLD;
+    void log_gal_inputs(bool rd, bool wr, bool psen, u16 addr);
+    FILE *m_gal_log = nullptr;
+    u32 m_gal_seen[8] = {};  // Bitmap for 256 possible input combinations
 };
 
 void keyfox10_state::program_map(address_map &map)
@@ -110,8 +118,9 @@ void keyfox10_state::program_map(address_map &map)
 
 void keyfox10_state::data_map(address_map &map)
 {
+    // During MOVX read, ~RD is inverted to ROM A16, so data reads access ROM upper 64KB (0x10000+)
     map(0x0000, 0x1fff).ram();  // 8KB RAM
-    map(0x2000, 0x69e4).rom().region("program", 0x2000);  // ROM mirror
+    map(0x2000, 0x7fff).rom().region("program", 0x12000);  // ROM data area (rhythm patterns, lookup tables)
     map(0x8000, 0x8004).rw(FUNC(keyfox10_state::sam_snd_r), FUNC(keyfox10_state::sam_snd_w));  // SAM8905 SND
     map(0xe000, 0xe004).rw(FUNC(keyfox10_state::sam_fx_r), FUNC(keyfox10_state::sam_fx_w));    // SAM8905 FX
 }
@@ -370,6 +379,84 @@ void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
                 chip_name, sam.addr, data, sam.dram[sam.addr % 256]);
         }
     }
+}
+
+void keyfox10_state::log_gal_inputs(bool rd, bool wr, bool psen, u16 addr)
+{
+    // Build GAL input byte:
+    // bit 0: ~RD   (IN1) - active low
+    // bit 1: ~WR   (IN2) - active low
+    // bit 2: ~PSEN (IN3) - active low
+    // bit 3: A13   (IN4)
+    // bit 4: A14   (IN5)
+    // bit 5: A15   (IN6)
+    // bit 6: T0    (IN7) - P3.4
+    // bit 7: T1    (IN8) - P3.5
+    // IN9, IN10 always LOW (not captured)
+
+    u8 inputs = 0;
+    inputs |= rd   ? 0x00 : 0x01;     // ~RD active low
+    inputs |= wr   ? 0x00 : 0x02;     // ~WR active low
+    inputs |= psen ? 0x00 : 0x04;     // ~PSEN active low
+    inputs |= BIT(addr, 13) << 3;     // A13
+    inputs |= BIT(addr, 14) << 4;     // A14
+    inputs |= BIT(addr, 15) << 5;     // A15
+    inputs |= BIT(m_port3, 4) << 6;   // T0
+    inputs |= BIT(m_port3, 5) << 7;   // T1
+
+    // Check if we've seen this combination before
+    if (!BIT(m_gal_seen[inputs >> 5], inputs & 0x1f))
+    {
+        m_gal_seen[inputs >> 5] |= 1U << (inputs & 0x1f);
+
+        // Log to file
+        if (m_gal_log)
+        {
+            const char *access_type = !psen ? "PSEN" : (!rd ? "RD" : "WR");
+            fprintf(m_gal_log, "%d %d %d %d %d %d %d %d | 0x%02X | %s 0x%04X\n",
+                BIT(inputs, 0), BIT(inputs, 1), BIT(inputs, 2),
+                BIT(inputs, 5), BIT(inputs, 4), BIT(inputs, 3),  // A15 A14 A13 order
+                BIT(inputs, 6), BIT(inputs, 7),
+                inputs, access_type, addr);
+            fflush(m_gal_log);
+        }
+    }
+}
+
+void keyfox10_state::machine_start()
+{
+    // Open GAL log file
+    m_gal_log = fopen("gal_inputs.log", "w");
+    if (m_gal_log)
+    {
+        fprintf(m_gal_log, "# Keyfox10 GAL16V8 input capture\n");
+        fprintf(m_gal_log, "# Format: ~RD ~WR ~PSEN A15 A14 A13 T0 T1 | hex | access\n");
+        fprintf(m_gal_log, "# 0=active, 1=inactive for active-low signals\n");
+    }
+
+    // Install memory taps to capture all accesses
+    m_maincpu->space(AS_PROGRAM).install_read_tap(0x0000, 0xffff, "gal_psen",
+        [this](offs_t offset, u8 &data, u8 mem_mask) {
+            log_gal_inputs(true, true, false, offset);  // PSEN active
+        });
+
+    m_maincpu->space(AS_DATA).install_read_tap(0x0000, 0xffff, "gal_rd",
+        [this](offs_t offset, u8 &data, u8 mem_mask) {
+            log_gal_inputs(false, true, true, offset);  // RD active
+        });
+
+    m_maincpu->space(AS_DATA).install_write_tap(0x0000, 0xffff, "gal_wr",
+        [this](offs_t offset, u8 &data, u8 mem_mask) {
+            log_gal_inputs(true, false, true, offset);  // WR active
+        });
+
+    // Save state
+    save_item(NAME(m_port0));
+    save_item(NAME(m_port1));
+    save_item(NAME(m_port2));
+    save_item(NAME(m_port3));
+    save_item(NAME(m_midi_rxd));
+    save_item(NAME(m_disp_sr));
 }
 
 static INPUT_PORTS_START(keyfox10)
