@@ -5,7 +5,7 @@
 
     Used by Seibu Kaihatsu at 1993 onward, these are has encryption function.
 
-    SEI25x and RISE1x has compatible sprite format, but RISE1x has
+    SEI25x and RISE1x have compatible sprite format, but RISE1x has
     expanded per-line sprite limit and different encryption method.
     Other chip differences are still unknown.
 
@@ -40,6 +40,7 @@ sei25x_rise1x_device::sei25x_rise1x_device(const machine_config &mconfig, device
 	, m_yoffset(0)
 	, m_transpen(0)
 	, m_pix_raw_shift(4)
+	, m_allocate_bitmap(false)
 {
 }
 
@@ -52,19 +53,19 @@ void sei25x_rise1x_device::device_start()
 {
 	m_pri_cb.resolve();
 	m_gfxbank_cb.resolve();
+
+	if (m_allocate_bitmap && !m_pri_cb.isnull())
+		fatalerror("m_sprite_bitmap && m_pri_cb is invalid");
+
+	if (m_allocate_bitmap)
+		screen().register_screen_bitmap(m_sprite_bitmap);
 }
 
 void sei25x_rise1x_device::device_reset()
 {
 }
 
-void sei25x_rise1x_device::alloc_sprite_bitmap()
-{
-	screen().register_screen_bitmap(m_sprite_bitmap);
-}
-
 /*
-
 ===============================================================
 
 Common sprite format (8 byte per sprites)
@@ -85,14 +86,10 @@ Offset Bit                 Description
 Unmarked bits are unused/unknown.
 
 ===============================================================
-
 */
 template <class T>
 void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangle cliprect, u16 *spriteram, u16 size)
 {
-	if (m_sprite_bitmap.valid() && !m_pri_cb.isnull())
-		fatalerror("m_sprite_bitmap && m_pri_cb is invalid");
-
 	if (m_sprite_bitmap.valid())
 		m_sprite_bitmap.fill(0xffff, cliprect);
 
@@ -149,32 +146,29 @@ void sei25x_rise1x_device::draw(screen_device &screen, T &bitmap, const rectangl
 			for (int ay = 0; ay < sizey; ay++)
 			{
 				const int sy = flipy ? (y + 16 * (sizey - ay - 1)) : (y + 16 * ay);
-				if (!m_sprite_bitmap.valid())
-				{
-					if (!m_pri_cb.isnull())
-					{
-						gfx(0)->prio_transpen(bitmap, cliprect,
-								code++,
-								color,
-								flipx, flipy,
-								sx, sy,
-								screen.priority(), pri_mask, m_transpen);
-					}
-					else
-					{
-						gfx(0)->transpen(bitmap, cliprect,
-							code++,
-							color,
-							flipx, flipy,
-							sx, sy,
-							m_transpen);
-					}
-				}
-				else
+				if (m_sprite_bitmap.valid())
 				{
 					gfx(0)->transpen_raw(m_sprite_bitmap, cliprect,
 							code++,
 							color << m_pix_raw_shift,
+							flipx, flipy,
+							sx, sy,
+							m_transpen);
+				}
+				else if (!m_pri_cb.isnull())
+				{
+					gfx(0)->prio_transpen(bitmap, cliprect,
+							code++,
+							color,
+							flipx, flipy,
+							sx, sy,
+							screen.priority(), pri_mask, m_transpen);
+				}
+				else
+				{
+					gfx(0)->transpen(bitmap, cliprect,
+							code++,
+							color,
 							flipx, flipy,
 							sx, sy,
 							m_transpen);
