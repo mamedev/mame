@@ -3,6 +3,28 @@
 
 // CPU die (epoxy blob) is an Elan EU3A12 (Elan "RISC II Series" quasi-PIC with 16-bit opcodes)
 
+/*
+
+VTech Laptops on Elan EU3A12 hardware
+
+Other known undumped international versions (and possibly on similar hardware):
+
+Genius Notebook
+Nitro Jams Notebook (US version of Musical Laptop)
+Nitro Jr. Notebook (without low battery screen)
+Nitro Jr. Notebook (with low battery splash)
+Genius Notebook (2005)
+Challenger Laptop (US version of Genius Notebook)
+Nitro Notebook (US version of Reader Laptop E)
+Nitro Web Notebook (US Web connected version of Reader Laptop E) 
+Manege Laptop (Dutch version of Reader Laptop E)
+Language Lab Laptop
+Cars 2: Lightning McQueen™ Learning Laptop
+Cars 2: Lightning McQueen Learn and Go
+Advance Xtra/Xtra Pink Notebook (UK version of Reader Laptop E, Advance Xtra is the blue variant, Xtra Pink Notebook is the pink variant and they all share the same ROM)
+
+*/
+
 #include "emu.h"
 #include "cpu/rii/riscii.h"
 #include "video/sed1520.h"
