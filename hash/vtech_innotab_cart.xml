@@ -14,16 +14,18 @@ license:CC0-1.0
 	Also known as "Storio 2 and Future versions" in Europe excluding UK
 	
 	Language:
-	********0 = US / Canada / Hong Kong
+	********0 = US / Canada / Hong Kong / Japan
 	********1 = Unused
+	*******13 = Denmark
 	********2 = Canadian English
 	*******22 = Spain / Mexico / Latin America
 	********3 = UK
 	*******23 = Netherlands
 	********4 = Germany
 	********5 = France / Canada (French)
-	********6 = Unused
-	********7 = Italy (Distributed by Hasbro)
+	*******26 = Russia
+	********6 = Portugal
+	********7 = Italy			Distributed by the company 'Hasbro'
 
 	80-136800(US) - InnoTab 2
 	80-146800(US) - InnoTab 2 Baby
