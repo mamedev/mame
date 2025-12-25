@@ -187,7 +187,7 @@ void pcfx_state::pcfx_io(address_map &map)
 {
 	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
 	map(0x00000100, 0x000001FF).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
-	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::regs)).umask32(0x0000ffff);   /* HuC6271 */
+	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::amap));   /* HuC6271 */
 	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
 	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
