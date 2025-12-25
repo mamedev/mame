@@ -383,6 +383,12 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		return;
 	}
 
+	if (coding & 0x40)
+	{
+		LOGMASKED(LOG_SECTORS, "Emphasis is not implemented (%02x), ignoring\n", coding);
+		// TODO: Emphasis is commonly used. Do not throw a fatal error.
+	}
+
 	int channels = 2;
 	//offs_t buffer_length = 1;
 	if (!(coding & CODING_STEREO))
