@@ -6998,6 +6998,23 @@ Driver for a laser [printer]
 		</part>
 	</software>
 
+	<software name="pcfxga" supported="no">
+		<!-- origin: archive.org -->
+		<description>PC-FXGA (ISA16 DOS/V version)</description>
+		<year>1996</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Install disk for [PC-FXGA]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="nec pc-fxga dos v.ima" size="1474560" crc="6bc96320" sha1="bd2d0450fbbe617f782418197b76f374d66bbd50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="rlt81398" supported="no">
 		<description>Realtek RTL8139-810X Fast Ethernet Adapter (Version 5.502.1231.2001)</description>
 		<year>2002</year>
@@ -13206,12 +13223,12 @@ Differences between clone/parent:
 
 	<!-- Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="doombbs" cloneof="doom">
+		<!-- origin: archive.org -->
 		<description>DOOM (v1.2, shareware for BBS SysOps)</description>
 		<year>1994</year>
 		<publisher>Sybex</publisher>
 		<info name="developer" value="id Software" />
 		<info name="version" value="v1.2" />
-		<!-- Origin: archive.org -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_number" value="0863-1"/>
 			<feature name="part_id" value="Disk 1 of 2"/>
@@ -19906,12 +19923,12 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="os2poker">
+		<!-- origin: archive.org -->
 		<description>OS/2 Poker</description>
 		<year>1994</year>
 		<publisher>Reed Software, Inc.</publisher>
 		<info name="version" value="1.00"/>
 		<part name="flop" interface="floppy_3_5">
-			<!-- Origin: archive.org -->
 			<dataarea name="flop" size="737280">
 				<rom name="OS2 Poker v1.0 (Reed Software, Inc.)(1994).img" size="737280" crc="0a1d5c1e" sha1="061009d2e9fdb83a5f3b6d3847b513899f47f4a6"/>
 			</dataarea>
@@ -19919,12 +19936,12 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="os2blackjack">
+		<!-- origin: archive.org -->
 		<description>OS/2 Black Jack</description>
 		<year>1994</year>
 		<publisher>Reed Software, Inc.</publisher>
 		<info name="version" value="1.00"/>
 		<part name="flop" interface="floppy_3_5">
-			<!-- Origin: archive.org -->
 			<dataarea name="flop" size="737280">
 				<rom name="OS2 Black Jack v1.0 (Reed Software, Inc.)(1994).img" size="737280" crc="80f10c19" sha1="3e8856d8b15d27d1a4d7a35af57e90e503dc8fad"/>
 			</dataarea>

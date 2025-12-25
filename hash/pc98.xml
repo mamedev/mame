@@ -70296,6 +70296,21 @@ Driver disks for [C-Bus] network cards
 		</part>
 	</software>
 
+	<software name="pcfxga" supported="no">
+		<description>PC-FXGA (C-Bus version)</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Install disk for [PC-FXGA]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="pc-fxga.fdi" size="1265664" crc="f2547992" sha1="1bcb715d02acfa89f75578bfa655b01db5726206" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superems" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Super EMS-98</description>
