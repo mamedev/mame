@@ -55,7 +55,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	, m_cdda_l(*this, "cdda_l")
 	, m_cdda_r(*this, "cdda_r")
 	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
-	, m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, -2, address_map_constructor(FUNC(huc6272_device::kram_map), this))
+	, m_data_space_config("kram", ENDIANNESS_LITTLE, 16, 19, -1, address_map_constructor(FUNC(huc6272_device::kram_map), this))
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
 	, m_microprg_ram(*this, "microprg_ram")
 	, m_kram_page0(*this, "kram_page0")
@@ -414,18 +414,22 @@ void huc6272_device::kram_write_address_w(offs_t offset, u32 data, u32 mem_mask)
 
 // TODO: is this really 32-bit access?
 // writes in 16-bit units audio/photo CD submenus
-u32 huc6272_device::kram_read_data_r(offs_t offset, u32 mem_mask)
+u16 huc6272_device::kram_read_data_r(offs_t offset, u16 mem_mask)
 {
-	u32 res = space(AS_DATA).read_dword(((m_kram_addr_r) | (m_kram_page_r << 18)) << 0, mem_mask);
-	m_kram_addr_r += (m_kram_inc_r & 0x200)
-		? ((m_kram_inc_r & 0x1ff) - 0x200)
-		: (m_kram_inc_r & 0x1ff);
+	u16 res = space(AS_DATA).read_word(((m_kram_addr_r) | (m_kram_page_r << 18)) << 0, mem_mask);
+	if (!machine().side_effects_disabled())
+	{
+		m_kram_addr_r += (m_kram_inc_r & 0x200)
+			? ((m_kram_inc_r & 0x1ff) - 0x200)
+			: (m_kram_inc_r & 0x1ff);
+		m_kram_addr_r &= 0x3ffff;
+	}
 	return res;
 }
 
-void huc6272_device::kram_write_data_w(offs_t offset, u32 data, u32 mem_mask)
+void huc6272_device::kram_write_data_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	space(AS_DATA).write_dword(
+	space(AS_DATA).write_word(
 		((m_kram_addr_w) | (m_kram_page_w << 18)) << 0,
 		data,
 		mem_mask
@@ -433,6 +437,7 @@ void huc6272_device::kram_write_data_w(offs_t offset, u32 data, u32 mem_mask)
 	m_kram_addr_w += (m_kram_inc_w & 0x200)
 		? ((m_kram_inc_w & 0x1ff) - 0x200)
 		: (m_kram_inc_w & 0x1ff);
+	m_kram_addr_w &= 0x3ffff;
 }
 
 /*
@@ -661,10 +666,9 @@ uint8_t huc6272_device::adpcm_update(int chan)
 
 		if (m_adpcm.nibble[chan] == 0)
 		{
-			m_adpcm.input[chan] = space(AS_DATA).read_dword(
-				((m_page_setting & 0x1000) << 6) | (m_adpcm.addr[chan]) << 0, 0xffffffff
-			);
-			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
+			const u32 offset = ((m_page_setting & 0x1000) << 6) | (m_adpcm.addr[chan] << 0);
+			m_adpcm.input[chan] = (space(AS_DATA).read_word(offset) << 0) | (space(AS_DATA).read_word(offset + 1)) << 16;
+			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 2) & 0x1ffff);
 			if (m_adpcm.addr[chan] == m_adpcm.imm[chan])
 			{
 				m_adpcm.status |= (1 << (chan*2+1));
