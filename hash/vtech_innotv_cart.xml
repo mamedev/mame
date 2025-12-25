@@ -6,7 +6,26 @@ license:CC0-1.0
 
 <!-- These contain FAT32 filesystems -->
 
-<!-- Grey coloured 'pack-in' cartridge contains no ROM, only 2 pins bridged -->
+<!-- Grey coloured 'pack-in' cartridge contains no ROM, only 2 pins bridged 
+
+The InnoTV can play:
+DC Super Friends
+Pixar Play
+Doc McStuffins (no, not the original InnoTab cartridge)
+Dora and Friends
+Finding Dory
+Frozen
+Miles from Tommorrow
+Paw Patrol
+Peppa Pig (See Doc McStuffins)
+Power Rangers: Dino Charge
+Sofia The First (see Doc McStuffins)
+The Lion Guard
+Ultimate Spider-Man (see Doc McStuffins and Sofia)
+
+Trolls (2016) and PJ Masks (2018) require InnoTab Max/Non-English European LeapFrog LeapPad Epic/Academy
+
+-->
 
 <softwarelist name="vtech_innotv_cart" description="VTech InnoTV / InnoTAB MAX cartridges">
 
