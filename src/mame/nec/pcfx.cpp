@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
+#include "machine/nvram.h"
 #include "machine/pcfx_intc.h"
 #include "sound/huc6230.h"
 #include "video/huc6261.h"
@@ -72,6 +73,9 @@ private:
 	required_device<huc6261_device> m_huc6261;
 	required_device<pcfx_intc_device> m_intc;
 	required_ioport_array<2> m_pads;
+	std::unique_ptr<u8[]> m_nvram_ptr;
+
+	u8 m_bram_control;
 
 	void int_w(offs_t line, u8 state);
 };
@@ -159,10 +163,21 @@ void pcfx_state::pad_w(offs_t offset, uint16_t data)
 
 void pcfx_state::pcfx_mem(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x00000000, 0x001FFFFF).ram();   /* RAM */
 //  map(0x80000000, 0x80FFFFFF).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
 //  map(0x80700000, 0x807FFFFF).rom().region("scsi_rom", 0); // EXTIO ROM area
-	map(0xE0000000, 0xE7FFFFFF).noprw();   /* BackUp RAM */
+	// internal backup control
+	map(0xE0000000, 0xE7FFFFFF).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_nvram_ptr[offset & 0x7fff];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (!BIT(m_bram_control, 0))
+				return;
+			m_nvram_ptr[offset & 0x7fff] = data;
+		})
+	).umask32(0x00ff00ff);
 	map(0xE8000000, 0xE9FFFFFF).noprw();   /* Extended BackUp RAM */
 //  map(0xF8000000, 0xF8000007).noprw();   /* PIO, needed by pcfxga for reading backup "RAM" from DOS/V host */
 	map(0xFFF00000, 0xFFFFFFFF).rom().region("ipl", 0);  /* ROM */
@@ -177,7 +192,15 @@ void pcfx_state::pcfx_io(address_map &map)
 	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
 	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
-//  map(0x00000C80, 0x00000C83).noprw(); // backup RAM control
+	map(0x00000C00, 0x00000C00).r("huc6270_a", FUNC(huc6270_device::get_ar));
+	map(0x00000C40, 0x00000C40).r("huc6270_b", FUNC(huc6270_device::get_ar));
+	map(0x00000C80, 0x00000C80).lrw8(
+		NAME([this] (offs_t offset) { return m_bram_control; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_bram_control = data & 3;
+			// TODO: bit 1 to FX-BMP
+		})
+	);
 	map(0x00000E00, 0x00000EFF).rw(m_intc, FUNC(pcfx_intc_device::read), FUNC(pcfx_intc_device::write)).umask32(0x0000ffff);
 //  map(0x00000F00, 0x00000FFF).noprw(); // Timer
 //	map(0x00500000, 0x005000FF) Aurora mirror
@@ -227,10 +250,17 @@ void pcfx_state::machine_start()
 
 	m_pad_timers[0] = timer_alloc(FUNC(pcfx_state::pad_func<0>), this);
 	m_pad_timers[1] = timer_alloc(FUNC(pcfx_state::pad_func<1>), this);
+
+	m_nvram_ptr = make_unique_clear<u8[]>(0x8000);
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram_ptr[0], 0x8000);
+
+	save_pointer(NAME(m_nvram_ptr), 0x8000);
+	save_item(NAME(m_bram_control));
 }
 
 void pcfx_state::machine_reset()
 {
+	m_bram_control = 0;
 }
 
 
@@ -254,6 +284,8 @@ void pcfx_state::pcfx(machine_config &config)
 
 	PCFX_INTC(config, m_intc, 0);
 	m_intc->int_cb().set(FUNC(pcfx_state::int_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(pcfx_state::screen_update));

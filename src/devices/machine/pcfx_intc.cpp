@@ -26,8 +26,10 @@ void pcfx_intc_device::device_start()
 
 void pcfx_intc_device::device_reset()
 {
-	m_irq_mask = m_irq_pending = 0;
+	m_irq_mask = 0xffff;
+	m_irq_pending = 0;
 	std::fill_n(m_irq_priority, 8, 0);
+	m_int_w(0, CLEAR_LINE );
 }
 
 u16 pcfx_intc_device::read(offs_t offset)
@@ -82,6 +84,7 @@ void pcfx_intc_device::write(offs_t offset, uint16_t data)
 		// 0 - allow, 1 - ignore interrupt
 		case 0x40/4:
 			m_irq_mask = data;
+			// m_irq_pending = ~data;
 			check_irqs();
 			break;
 
