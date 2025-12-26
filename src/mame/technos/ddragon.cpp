@@ -1792,13 +1792,13 @@ ROM_END
   2x MC68B09EP  (7a, 7c)    8-bit Microprocessor - main.
   1x EF68A09EP  (7m)        8-bit Microprocessor - sound.
   2x YM2203C    (7r, 7t)    FM Operator Type-N (OPM) - sound.
-  2x YM3014     (10q, 10r) 	D/A Converter (DAC) - sound.
+  2x YM3014     (10q, 10r)  D/A Converter (DAC) - sound.
   2x OKI M5205  (9s, 9t)    ADPCM Speech Syntesis IC - sound.
   2x LM324N     (11r, 11s)  Quad Operational Amplifier - sound.
   1x TDA2003    (10o)       Audio Amplifier - sound.
 
   1x oscillator  20.000 MHz (5t)
-  1x oscillator  24.000 MHz	(8a)
+  1x oscillator  24.000 MHz (8a)
 
   ROMs
   7x  TMM24256A  (2-8)
@@ -1859,13 +1859,14 @@ ROM_START( ddragon6809c )
 	ROM_LOAD( "19.2b",        0x20000, 0x10000, CRC(4171b70d) SHA1(dc300c9bca6481417e97ad03c973e47389f261c1) )  // identical to ddragon6809b
 	ROM_LOAD( "20.2a",        0x30000, 0x10000, CRC(5f6a6d6f) SHA1(7d546a226cda81c28e7ccfb4c5daebc65072198d) )  // identical to ddragon6809b
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )  // smaller than the original game, and using 2nd half of the 01.7o ROM
-	ROM_LOAD( "1.7o",         0x0000, 0x8000, CRC(9b490076) SHA1(ec962b0ab95c0679d0258a269dcc6896286231b4) )
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_REGION( 0x10000, "adpcm_rom", 0 )
+	ROM_LOAD( "1.7o",         0x0000, 0x10000, CRC(9b490076) SHA1(ec962b0ab95c0679d0258a269dcc6896286231b4) )
 
-	ROM_REGION( 0x10000, "adpcm2", 0 )  // smaller than the original game, and using 1st half of the 01.7o ROM
-	ROM_LOAD( "1.7o",         0x0000, 0x8000, CRC(9b490076) SHA1(ec962b0ab95c0679d0258a269dcc6896286231b4) )
-	ROM_IGNORE(                       0x8000 )
+	ROM_REGION( 0x10000, "adpcm1", 0 ) // smaller than the original game, and using 2nd half of the 01.7o ROM
+	ROM_COPY( "adpcm_rom",    0x8000, 0x0000, 0x8000 )
+
+	ROM_REGION( 0x10000, "adpcm2", 0 ) // smaller than the original game, and using 1st half of the 01.7o ROM
+	ROM_COPY( "adpcm_rom",    0x0000, 0x0000, 0x8000 )
 
 	ROM_REGION( 0x20000, "proms", 0 )
 	ROM_LOAD( "n82s129n_4.5o",  0x00000, 0x100, CRC(673f68c3) SHA1(9381453e8f868d80b6069264509a339e20e2b6b1) )  // identical to ddragon6809b
