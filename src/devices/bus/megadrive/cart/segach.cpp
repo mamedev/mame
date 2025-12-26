@@ -99,11 +99,15 @@ void megadrive_segach_jp_device::time_io_map(address_map &map)
  *   by noping out everything from $a61a to $a670 (or doing
  *   the same thing with breakpoints in the debugger).
  *
+ * Holding A, B and/or C at Sega Channel loading logo screen will color cycle GFXs
+ *
  * The BIOS also listens to controller port 2 in serial mode
  * for a diagnostics mode.
  *
- * TODO: - Automatic reset timer (used for "Test Drive" demos)
- *       - NVRAM
+ * TODO:
+ * - Automatic reset timer (used for "Test Drive" demos)
+ * - NVRAM
+ *
  */
 
 DEFINE_DEVICE_TYPE(MEGADRIVE_SEGACH_US, megadrive_segach_us_device, "megadrive_segach_us", "Megadrive Sega Channel US cart")
@@ -133,7 +137,7 @@ void megadrive_segach_us_device::device_add_mconfig(machine_config &config)
 
 static INPUT_PORTS_START( megadrive_segach_us )
 	PORT_START("BUTTON")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Menu") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(megadrive_segach_us_device::menu_pressed), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Menu") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(megadrive_segach_us_device::menu_pressed), 0)
 INPUT_PORTS_END
 
 ioport_constructor megadrive_segach_us_device::device_input_ports() const
@@ -302,8 +306,8 @@ void megadrive_segach_us_device::time_io_map(address_map &map)
 			{
 				// boot game
 				m_game_view.select(0);
-				// HACK: should assert /VRES on connector causing 68k soft reset.
-				machine().root_device().reset();
+				m_slot->vres_w(1);
+				m_slot->vres_w(0);
 			}
 		})
 	);
@@ -477,7 +481,7 @@ QUICKLOAD_LOAD_MEMBER(megadrive_segach_us_device::quickload_cb)
 
 		std::array<std::array<u8, helper.PACKET_LEN>, 10> pipes;
 		helper.deweave(pipes, data);
-		for (auto& pipe : pipes)
+		for (auto &pipe : pipes)
 		{
 			helper.deinterleave(pipe);
 
@@ -498,14 +502,16 @@ QUICKLOAD_LOAD_MEMBER(megadrive_segach_us_device::quickload_cb)
 				new_file.time_bit = 0;
 				files[file_id] = new_file;
 			}
-			auto& file = files[file_id];
+			auto &file = files[file_id];
 
-			if (game_time_sync) {
+			if (game_time_sync)
+			{
 				file.time = file.time_buf * 20;
 				file.time_buf = 0;
 				file.time_bit = 15;
 			}
-			if (file.time_bit >= 0) {
+			if (file.time_bit >= 0)
+			{
 				file.time_buf |= game_time_bit << file.time_bit;
 				file.time_bit--;
 			}
@@ -632,12 +638,16 @@ void megadrive_segach_us_device::sram_w(offs_t offset, u16 data, u16 mem_mask)
 void megadrive_segach_us_device::crc_write(u16 data)
 {
 	u32 crc = m_crc;
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		u32 input_bit = (data & (0x8000 >> i)) ? 1 : 0;
 		u32 crc_msb = (crc & 0x80000000) ? 1 : 0;
-		if (input_bit == crc_msb) {
+		if (input_bit == crc_msb)
+		{
 			crc = crc << 1;
-		} else {
+		}
+		else
+		{
 			crc = (crc << 1) ^ 0x04C11DB7;
 		}
 	}
@@ -656,7 +666,7 @@ INPUT_CHANGED_MEMBER( megadrive_segach_us_device::menu_pressed )
 	{
 		// boot BIOS.
 		m_game_view.disable();
-		// HACK: should assert /VRES on connector causing 68k soft reset.
-		machine().root_device().reset();
+		m_slot->vres_w(1);
+		m_slot->vres_w(0);
 	}
 }
