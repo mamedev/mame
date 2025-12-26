@@ -8,7 +8,50 @@
 
     Other known undumped international versions:
     - Smart Start Elite (English version of Genius Junior Profi / Mis Primeras Lecciones)
-
+	Possibly on similar hardware:
+	- Animal Friends Toddler Laptop
+	- Bob the Builder Laptop
+	- Bluey - Game Time Laptop
+	- Cars - Lightning McQueen Learning Laptop
+	- Cars 2 - Mater Spy Mission Laptop
+	- Chuggington Traintastic Laptop
+	- Disney Planes - Learning Laptop
+	- Disney Cinderella - Carriage Laptop
+	- Disney Princess - Magic Wand Laptop
+	- Dora The Explorer - Carnival Time Laptop/Learning Laptop
+	- DORA - More to Explore Learning Laptop
+	-  Girl Fun PC
+	- Handy Manny's Construction Laptop
+	- Jake & The Neverland Pirates - Treasure Hunt Learning Laptop
+	- Laptop Deluxe
+	- Laptop Voyager
+	- Learning Laptop
+	- Little Smart Bigtop Laptop
+	- Little Smart Mouseland Laptop
+	- Little Einsteins - Blast-Off Learning Laptop
+	- Lil' SmartTop
+	- Marvel Super Hero Squad - Learning Laptop
+	- Mickey Mouse - Mousekadoer Laptop
+	- Non-Stop Girl
+	- Peppa Pig - Play Smart Laptop
+	- Play Smart Preschool Laptop
+	- Smart Start Learning Laptop
+	- Smartwave PC
+	- Sofia the First - Learning Laptop
+	- SpongeBob Laptop
+	- Thomas & Friends - Learn & Explore Laptop
+	- Tote & Go Laptop (2002)
+	- Tote & Go Laptop Plus
+	- Tote 'n' Go Laptop (2009)
+	- Tote & Go Laptop Web
+	- Tote & Go Laptop (2014)
+	- Toy Story 3 - Buzz Lightyear Star Command Laptop
+	- Two Smart Laptop
+	- Wall.E Learning Laptop
+	- Winnie the Pooh - Press 'n Play Laptop
+	- World Pad PC
+	- Yo Gabba Gabba Learning Laptop
+	
     TODO: identify CPU type (16-bit processor internally, but with 8-bit external bus?)
     It might be that the dumped ROMs contain no actual code, only graphics data and
     sound samples.
