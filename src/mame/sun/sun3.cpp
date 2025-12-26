@@ -346,7 +346,7 @@ uint32_t sun3_state::ram_r(offs_t offset)
 {
 	if (m_ecc[0] == 0x10c00000)
 	{
-		//printf("ECC testing, RAM read ofs %x\n", offset);
+		//printf("ECC testing, RAM read ofs %x\n", (uint32_t)offset);
 		m_ecc[1] &= 0x00ffffff;
 
 		if (m_ecc[2] == 0x01000000) // single-bit error test
@@ -368,7 +368,7 @@ uint32_t sun3_state::ram_r(offs_t offset)
 
 	if (!m_bInBusErr)
 	{
-		//printf("ram_r: bus error on timeout, access to invalid addr %08x, PC=%x\n", offset<<2, m_maincpu->pc());
+		//printf("ram_r: bus error on timeout, access to invalid addr %08x, PC=%x\n", (uint32_t)offset << 2, (uint32_t)m_maincpu->pc());
 		//fflush(stdout);
 		m_buserr = BE_TIMEOUT;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -441,7 +441,7 @@ void sun3_state::ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	if (!m_bInBusErr)
 	{
-		//printf("ram_w: bus error on timeout, access to invalid addr %08x, PC=%x\n", offset<<2, m_maincpu->pc());
+		//printf("ram_w: bus error on timeout, access to invalid addr %08x, PC=%x\n", (uint32_t)offset << 2, (uint32_t)m_maincpu->pc());
 		fflush(stdout);
 		m_buserr = BE_TIMEOUT;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
@@ -460,17 +460,17 @@ uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 		switch (offset >> 26)
 		{
 			case 0: // IDPROM
-				//printf("sun3: Read IDPROM at %x (mask %08x)\n", offset, mem_mask);
+				//printf("sun3: Read IDPROM at %x (mask %08x)\n", (uint32_t)offset, mem_mask);
 				return m_idprom_ptr[(offset*4)] << 24 | m_idprom_ptr[(offset*4)+1]<<16 | m_idprom_ptr[(offset*4)+2]<<8 | m_idprom_ptr[(offset*4)+3];
 
 			case 1: // page map
 				page = m_segmap[m_context & 7][(offset >> 15) & 0x7ff] << 4;
 				page += (offset >> 11) & 0xf;
-				//printf("sun3: Read page map at %x (entry %d)\n", offset<<1, page);
+				//printf("sun3: Read page map at %x (entry %d)\n", (uint32_t)offset << 1, page);
 				return m_pagemap[page];
 
 			case 2: // segment map
-				//printf("sun3: Read segment map at %x (entry %d, user ctx %d mask %x)\n", offset<<2, (offset & ~0x3c000000) >> 15, m_context & 7, mem_mask);
+				//printf("sun3: Read segment map at %x (entry %d, user ctx %d mask %x)\n", (uint32_t)offset << 2, (uint32_t)(offset & ~0x3c000000) >> 15, m_context & 7, mem_mask);
 				return m_segmap[m_context & 7][(offset >> 15) & 0x7ff]<<24;
 
 			case 3: // context reg
@@ -492,22 +492,22 @@ uint32_t sun3_state::tl_mmu_r(offs_t offset, uint32_t mem_mask)
 				return 0;
 
 			case 8: // cache tags
-				//printf("sun3: read cache tags @ %x, PC = %x\n", offset, m_maincpu->pc());
+				//printf("sun3: read cache tags @ %x, PC = %x\n", (uint32_t)offset, (uint32_t)m_maincpu->pc());
 				return m_cache_tags[(offset & 0x3fff) >> 2];
 
 			case 9: // cache data
-				//printf("sun3: read cache data @ %x, PC = %x\n", offset, m_maincpu->pc());
+				//printf("sun3: read cache data @ %x, PC = %x\n", (uint32_t)offset, (uint32_t)m_maincpu->pc());
 				return m_cache_data[(offset & 0x3fff)];
 
 			case 10: // flush cache
 				return 0xffffffff;
 
 			case 11: // block copy
-				printf("sun3: read block copy @ %x, PC = %x\n", offset, m_maincpu->pc());
+				printf("sun3: read block copy @ %x, PC = %x\n", (uint32_t)offset, (uint32_t)m_maincpu->pc());
 				return 0xffffffff;
 
 			case 15: // UART bypass
-				//printf("sun3: read UART bypass @ %x, PC = %x, mask = %08x\n", offset, m_maincpu->pc(), mem_mask);
+				//printf("sun3: read UART bypass @ %x, PC = %x, mask = %08x\n", (uint32_t)offset, (uint32_t)m_maincpu->pc(), mem_mask);
 				return 0xffffffff;
 		}
 	}
@@ -590,7 +590,7 @@ void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	//printf("sun3: Write %08x (FC %d, mask %08x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
+	//printf("sun3: Write %08x (FC %d, mask %08x, PC=%x) to %08x\n", data, fc, mem_mask, (uint32_t)m_maincpu->pc(), (uint32_t)offset << 1);
 
 	if (fc == 3)    // control space
 	{
@@ -603,17 +603,17 @@ void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			case 1: // page map  fefaf32
 				page = m_segmap[m_context & 7][(offset >> 15) & 0x7ff] << 4;
-				//printf("context = %d, segment = %d, PMEG = %d, add = %d\n", m_context & 7, (offset >> 15) & 0x7ff, page, (offset >> 11) & 0xf);
+				//printf("context = %d, segment = %d, PMEG = %d, add = %d\n", m_context & 7, (uint32_t)(offset >> 15) & 0x7ff, page, (uint32_t)(offset >> 11) & 0xf);
 				page += (offset >> 11) & 0xf;
 
-				//printf("sun3: Write %04x to page map at %x (entry %d), ", data, offset<<2, page);
+				//printf("sun3: Write %04x to page map at %x (entry %d), ", data, (uint32_t)offset << 2, page);
 				COMBINE_DATA(&m_pagemap[page]);
 
-				//printf("entry now %08x (adr %08x  PC=%x mask %x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 13, m_maincpu->pc(), mem_mask);
+				//printf("entry now %08x (adr %08x  PC=%x mask %x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 13, (uint32_t)m_maincpu->pc(), mem_mask);
 				return;
 
 			case 2: // segment map
-				//printf("sun3: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x mask %x)\n", (data>>24) & 0xff, offset<<2, (offset & ~0x3c000000)>>15, m_context & 7, m_maincpu->pc(), mem_mask);
+				//printf("sun3: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x mask %x)\n", (data>>24) & 0xff, (uint32_t)offset << 2, (uint32_t)(offset & ~0x3c000000) >> 15, m_context & 7, (uint32_t)m_maincpu->pc(), mem_mask);
 				m_segmap[m_context & 7][(offset >> 15) & 0x7ff] = (data>>24) & 0xff;
 				//printf("segment map[%d][%d] now %x\n", m_context & 7, (offset & ~0x3c000000) >> 15, m_segmap[m_context & 7][(offset & ~0x3c000000) >> 15] = (data>>24) & 0xff);
 				return;
@@ -624,7 +624,7 @@ void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				return;
 
 			case 4: // enable reg
-				//printf("sun3: Write %x to enable, PC=%x\n", data, m_maincpu->pc());
+				//printf("sun3: Write %x to enable, PC=%x\n", data, (uint32_t)m_maincpu->pc());
 				COMBINE_DATA(&m_enable);
 				return;
 
@@ -638,7 +638,7 @@ void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			case 7: // diagnostic reg
 				m_diag = data >> 24;
 				#if 0
-				printf("sun3: CPU LEDs to %02x (PC=%x) => ", ((data>>24) & 0xff) ^ 0xff, m_maincpu->pc());
+				printf("sun3: CPU LEDs to %02x (PC=%x) => ", ((data>>24) & 0xff) ^ 0xff, (uint32_t)m_maincpu->pc());
 				for (int i = 0; i < 8; i++)
 				{
 					if (m_diag & (1<<i))
@@ -655,12 +655,12 @@ void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				return;
 
 			case 8: // cache tags
-				//printf("sun3: %08x to cache tags @ %x, PC = %x, mask = %08x\n", data, offset, m_maincpu->pc(), mem_mask);
+				//printf("sun3: %08x to cache tags @ %x, PC = %x, mask = %08x\n", data, (uint32_t)offset, (uint32_t)m_maincpu->pc(), mem_mask);
 				m_cache_tags[(offset & 0x3fff) >> 2] = data;
 				return;
 
 			case 9: // cache data
-				//printf("sun3: %08x to cache data @ %x, PC = %x, mask = %08x\n", data, offset, m_maincpu->pc(), mem_mask);
+				//printf("sun3: %08x to cache data @ %x, PC = %x, mask = %08x\n", data, (uint32_t)offset, (uint32_t)m_maincpu->pc(), mem_mask);
 				m_cache_data[(offset & 0x3fff)] = data;
 				return;
 
@@ -668,11 +668,11 @@ void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				return;
 
 			case 11: // block copy
-				printf("sun3: %08x to block copy @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+				printf("sun3: %08x to block copy @ %x, PC = %x\n", data, (uint32_t)offset, (uint32_t)m_maincpu->pc());
 				return;
 
 			case 15: // UART bypass
-				//printf("sun3: %08x to UART bypass @ %x, PC = %x\n", data, offset, m_maincpu->pc());
+				//printf("sun3: %08x to UART bypass @ %x, PC = %x\n", data, (uint32_t)offset, (uint32_t)m_maincpu->pc());
 				return;
 			}
 	}
@@ -699,7 +699,7 @@ void sun3_state::tl_mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
-		//if (!machine().side_effects_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
+		//if (!machine().side_effects_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], (uint32_t)offset << 2);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{

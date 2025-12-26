@@ -549,14 +549,14 @@ void namcos11_state::rom8_w(offs_t offset, uint16_t data)
 
 void namcos11_state::rom8_64_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(2, "rom8_64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog(2, "rom8_64_upper_w( %08x, %08x, %08x )\n", (uint32_t)offset, data, mem_mask );
 
 	m_n_bankoffset = offset * 16;
 }
 
 void namcos11_state::rom8_64_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(2, "rom8_64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog(2, "rom8_64_w( %08x, %08x, %08x )\n", (uint32_t)offset, data, mem_mask );
 
 	// TODO: verify behaviour
 	m_bank[ offset ]->set_entry( ( ( ( ( data & 0xc0 ) >> 3 ) + ( data & 0x07 ) ) ^ m_n_bankoffset ) );
@@ -611,7 +611,7 @@ uint16_t namcos11_state::lightgun_r(offs_t offset, uint16_t mem_mask)
 		data = m_lightgun_io[3]->read() + 1;
 		break;
 	}
-	verboselog(2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog(2, "lightgun_r( %08x, %08x ) %08x\n", (uint32_t)offset, mem_mask, data );
 	return data;
 }
 

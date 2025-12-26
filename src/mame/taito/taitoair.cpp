@@ -346,7 +346,7 @@ void taitoair_state::sound_bankswitch_w(u8 data)
 */
 void taitoair_state::dma_regs_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	printf("%08x %04x\n",offset,data);
+	printf("%08x %04x\n", (u32)offset, data);
 
 	if (offset == 0 && ACCESSING_BITS_8_15)
 	{

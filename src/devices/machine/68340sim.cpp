@@ -50,46 +50,46 @@ uint16_t m68340_cpu_device::m68340_internal_sim_r(offs_t offset, uint16_t mem_ma
 	switch (offset * 2)
 	{
 		case m68340_sim::REG_MCR:
-			LOGSIM("- %08x %s %04x, (%04x) (MCR - Module Configuration Register) - not implemented\n", m_ppc, FUNCNAME, offset * 2, mem_mask);
+			LOGSIM("- %08x %s %04x, (%04x) (MCR - Module Configuration Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 			val = sim.m_mcr;
 			break;
 
 		case m68340_sim::REG_SYNCR:
-			LOGSIM("- %08x %s %04x, (%04x) (SYNCR - Clock Synthesizer Register) - not implemented\n", m_ppc, FUNCNAME, offset*2,mem_mask);
+			LOGSIM("- %08x %s %04x, (%04x) (SYNCR - Clock Synthesizer Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 			val = sim.m_syncr;
 			break;
 
 		case m68340_sim::REG_AVR_RSR: // Manual seems to say that AVR only autovectors externally triggered interrupts (INT1-INT7)
-			LOGSIM("- %08x %s %04x, (%04x) (AVR, RSR - Auto Vector Register, Reset Status Register) - not implemented\n", m_ppc, FUNCNAME, offset*2,mem_mask);
+			LOGSIM("- %08x %s %04x, (%04x) (AVR, RSR - Auto Vector Register, Reset Status Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 			val = sim.m_avr_rsr;
 			break;
 
 		case m68340_sim::REG_SWIV_SYPCR:
-			LOGSIM("- %08x %s %04x, (%04x) (SWIV_SYPCR - Software Interrupt Vector, System Protection Control Register) - not implemented\n", m_ppc, FUNCNAME, offset*2,mem_mask);
+			LOGSIM("- %08x %s %04x, (%04x) (SWIV_SYPCR - Software Interrupt Vector, System Protection Control Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 			val = sim.m_swiv_sypcr;
 			break;
 
 		case m68340_sim::REG_PICR:
-			LOGPIT("- %08x %s %04x, (%04x) (PICR - Periodic Interrupt Control Register) - not implemented\n", m_ppc, FUNCNAME, offset*2,mem_mask);
+			LOGPIT("- %08x %s %04x, (%04x) (PICR - Periodic Interrupt Control Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 			val = sim.m_picr;
 			break;
 
 		case m68340_sim::REG_PITR:
-			LOGPIT("- %08x %s %04x, (%04x) (PITR - Periodic Interrupt Timer Register) - not implemented\n", m_ppc, FUNCNAME, offset*2,mem_mask);
+			LOGPIT("- %08x %s %04x, (%04x) (PITR - Periodic Interrupt Timer Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 			val = sim.m_pitr;
 			break;
 
 		case m68340_sim::REG_SWSR:
-			LOGSIM("- %08x %s %04x, (%04x) (SWSR - Software Service) - not implemented\n", m_ppc, FUNCNAME, offset*2,mem_mask);
+			LOGSIM("- %08x %s %04x, (%04x) (SWSR - Software Service) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 			val = sim.m_swsr;
 			break;
 
 		default:
-			logerror("- %08x %s %04x, (%04x) (unsupported register)\n", m_ppc, FUNCNAME, offset * 2, mem_mask);
-			LOGSIM("- %08x %s %04x, (%04x) (unsupported register)\n", m_ppc, FUNCNAME, offset * 2, mem_mask);
+			logerror("- %08x %s %04x, (%04x) (unsupported register)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
+			LOGSIM("- %08x %s %04x, (%04x) (unsupported register)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, mem_mask);
 	}
 
-	LOGR(" * Reg %02x -> %02x - %s\n", offset * 2, val,
+	LOGR(" * Reg %02x -> %02x - %s\n", (uint32_t)offset * 2, val,
 		 ((offset * 2) >= 0x10 && (offset * 2) < 0x20) || (offset * 2) >= 0x60 ? "Error - should not happen" :
 		 std::array<char const *, 8> {{"MCR", "reserved", "SYNCR", "AVR/RSR", "SWIV/SYPCR", "PICR", "PITR", "SWSR"}}[(offset * 2) <= m68340_sim::REG_AVR_RSR ? offset : offset - 0x10 + 0x04]);
 
@@ -99,7 +99,7 @@ uint16_t m68340_cpu_device::m68340_internal_sim_r(offs_t offset, uint16_t mem_ma
 void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("\n%s\n", FUNCNAME);
-	LOGSETUP(" * Reg %02x <- %02x - %s\n", offset * 2, data,
+	LOGSETUP(" * Reg %02x <- %02x - %s\n", (uint32_t)offset * 2, data,
 		 ((offset * 2) >= 0x10 && (offset * 2) < 0x20) || (offset * 2) >= 0x60 ? "Error - should not happen" :
 		 std::array<char const *, 8> {{"MCR", "reserved", "SYNCR", "AVR/RSR", "SWIV/SYPCR", "PICR", "PITR", "SWSR"}}[(offset * 2) <= m68340_sim::REG_AVR_RSR ? offset : offset - 0x10 + 0x04]);
 
@@ -110,7 +110,7 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 	{
 		case m68340_sim::REG_MCR:
 			COMBINE_DATA(&sim.m_mcr);
-			LOGSIM("PC: %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", m_ppc, FUNCNAME, offset * 2, data, mem_mask);
+			LOGSIM("PC: %08x %s %04x, %04x (%04x) (MCR - Module Configuration Register)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 			LOGPIT("- FRZ1: Watchdog and PIT timer are %s\n", (data & m68340_sim::REG_MCR_FRZ1) == 0 ? "enabled" : "disabled");
 			LOGSIM("- FRZ0: The BUS monitor is %s\n", (data & m68340_sim::REG_MCR_FRZ0) == 0 ? "enabled" : "disabled");
 			LOGSIM("- FIRQ: Full Interrupt Request Mode %s\n", data & m68340_sim::REG_MCR_FIRQ ? "used on port B" : "suppressed, adding 4 chip select lines on Port B");
@@ -120,7 +120,7 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 			break;
 
 		case m68340_sim::REG_SYNCR:
-			LOGSIM("PC: %08x %s %04x, %04x (%04x) (SYNCR - Clock Synthesizer Register) - not implemented\n", m_ppc, FUNCNAME, offset * 2, data, mem_mask);
+			LOGSIM("PC: %08x %s %04x, %04x (%04x) (SYNCR - Clock Synthesizer Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 			COMBINE_DATA(&sim.m_syncr);
 			LOGSIM("- W    : VCO x %d\n", data & m68340_sim::REG_SYNCR_W ? 4 : 1);
 			LOGSIM("- X    : System clock / %d\n", data & m68340_sim::REG_SYNCR_X ? 1 : 2);
@@ -142,14 +142,14 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 			break;
 
 		case m68340_sim::REG_AVR_RSR:
-			LOGSIM("PC: %08x %s %04x, %04x (%04x) (AVR, RSR - Auto Vector Register, Reset Status Register)\n", m_ppc, FUNCNAME, offset * 2, data, mem_mask);
+			LOGSIM("PC: %08x %s %04x, %04x (%04x) (AVR, RSR - Auto Vector Register, Reset Status Register)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 			COMBINE_DATA(&sim.m_avr_rsr);
 			LOGSIM("- AVR: AV7-AV1 autovector bits:  %02x\n", ((data & m68340_sim::REG_AVR_VEC) >> 8) & 0xff);
 			LOGSIM("- RSR: Last reset type:  %02x - not implemented\n", (data & m68340_sim::REG_RSR_RESBITS) & 0xff);
 			break;
 
 		case m68340_sim::REG_SWIV_SYPCR:
-			LOGSIM("PC: %08x %s %04x, %04x (%04x) (SWIV_SYPCR - Software Interrupt Vector, System Protection Control Register) - not implemented\n", m_ppc, FUNCNAME, offset * 2, data, mem_mask);
+			LOGSIM("PC: %08x %s %04x, %04x (%04x) (SWIV_SYPCR - Software Interrupt Vector, System Protection Control Register) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 			COMBINE_DATA(&sim.m_swiv_sypcr);
 			LOGSIM("- SWIV: Software watchdog Interrupt Vector: %02x\n", ((data & m68340_sim::REG_SWIV_VEC) >> 8) & 0xff);
 			LOGSIM("- SWE : Software watchdog %s\n", (data & m68340_sim::REG_SYPCR_SWE) ? "enabled" : "disabled");
@@ -159,7 +159,7 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 			break;
 
 		case m68340_sim::REG_PICR:
-			LOGPIT("PC: %08x %s %04x, %04x (%04x) (PICR - Periodic Interrupt Control Register)\n", m_ppc, FUNCNAME, offset*2,data,mem_mask);
+			LOGPIT("PC: %08x %s %04x, %04x (%04x) (PICR - Periodic Interrupt Control Register)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 			COMBINE_DATA(&sim.m_picr);
 			LOGPIT("- PIRQL: Periodic Interrupt Level  %d%s\n", (data & m68340_sim::REG_PICR_PIRQL) >> 8, (data & m68340_sim::REG_PICR_PIRQL) == 0 ? " (disabled)" : "");
 			LOGPIT("- PIV  : Periodic Interrupt Vector %02x\n", (data & m68340_sim::REG_PICR_PIVEC));
@@ -167,7 +167,7 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 			break;
 
 		case m68340_sim::REG_PITR:
-			LOGPIT("PC: %08x %s %04x, %04x (%04x) (PITR - Periodic Interrupt Timer Register)\n", m_ppc, FUNCNAME, offset*2,data,mem_mask);
+			LOGPIT("PC: %08x %s %04x, %04x (%04x) (PITR - Periodic Interrupt Timer Register)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 			COMBINE_DATA(&sim.m_pitr);
 			LOGSIM("- SWP  : Software watchdog prescale factor is %d\n", (data & m68340_sim::REG_PITR_SWP) ? 512 : 1);
 			LOGPIT("- PTP  : Periodic timer prescale factor is %d\n", (data & m68340_sim::REG_PITR_PTP) ? 512 : 1);
@@ -183,11 +183,11 @@ void m68340_cpu_device::m68340_internal_sim_w(offs_t offset, uint16_t data, uint
 
 		case m68340_sim::REG_SWSR:
 			// basically watchdog, you must write an alternating pattern of 0x55 / 0xaa to keep the watchdog from resetting the system
-			//LOGSIM("- %08x %s %04x, %04x (%04x) (SWSR - Software Service)\n", m_ppc, FUNCNAME, offset*2,data,mem_mask);
+			//LOGSIM("- %08x %s %04x, %04x (%04x) (SWSR - Software Service)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 			break;
 
 		default:
-			LOGSIM("- %08x %s %04x, %04x (%04x) - not implemented\n", m_ppc, FUNCNAME, offset*2,data,mem_mask);
+			LOGSIM("- %08x %s %04x, %04x (%04x) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset * 2, data, mem_mask);
 
 	}
 }
@@ -204,7 +204,7 @@ uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 	switch (offset)
 	{
 		case m68340_sim::REG_PORTA:
-			LOGR("- %08x %s %04x (PORTA - Port A Data)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (PORTA - Port A Data)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			sim.m_porta &= sim.m_ddra;
 			// TODO: call callback
 
@@ -222,26 +222,26 @@ uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 			break;
 
 		case m68340_sim::REG_DDRA:
-			LOGR("- %08x %s %04x (DDRA - Port A Data Direction)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (DDRA - Port A Data Direction)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			val = sim.m_ddra;
 			break;
 
 		case m68340_sim::REG_PPARA1:
-			LOGR("- %08x %s %04x (PPRA1 - Port A Pin Assignment 1)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (PPRA1 - Port A Pin Assignment 1)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			val = sim.m_ppara1;
 			break;
 
 		case m68340_sim::REG_PPARA2:
-			LOGR("- %08x %s %04x (PPRA2 - Port A Pin Assignment 2) - not implemented\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (PPRA2 - Port A Pin Assignment 2) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			val = sim.m_ppara2;
 			break;
 
 		case m68340_sim::REG_PORTB1:
-			LOGR("- %08x %s %04x (PORTB1 - Port B Data 1)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (PORTB1 - Port B Data 1)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			// Fallthrough to mirror register
 			[[fallthrough]];
 		case m68340_sim::REG_PORTB:
-			LOGR("- %08x %s %04x (PORTB - Port B Data 0)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (PORTB - Port B Data 0)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			sim.m_portb &= sim.m_ddrb;
 			// TODO: call callback
 
@@ -259,21 +259,21 @@ uint8_t m68340_cpu_device::m68340_internal_sim_ports_r(offs_t offset)
 			break;
 
 		case m68340_sim::REG_DDRB:
-			LOGR("- %08x %s %04x (DDR - Port B Data Direction)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (DDR - Port B Data Direction)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			val = sim.m_ddrb;
 			break;
 
 		case m68340_sim::REG_PPARB:
-			LOGR("- %08x %s %04x (PPARB - Port B Pin Assignment)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (PPARB - Port B Pin Assignment)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			val = sim.m_pparb;
 			break;
 
 		default:
-			LOGR("- %08x %s %04x (ILLEGAL?)\n", m_ppc, FUNCNAME, offset);
-			logerror("%08x m68340_internal_sim_r %04x (ILLEGAL?)\n", m_ppc, FUNCNAME, offset);
+			LOGR("- %08x %s %04x (ILLEGAL?)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
+			logerror("%08x m68340_internal_sim_r %04x (ILLEGAL?)\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset);
 			break;
 	}
-	LOGR(" * Reg %02x -> %02x - %s\n", offset, val, std::array<char const *, 16>
+	LOGR(" * Reg %02x -> %02x - %s\n", (uint32_t)offset, val, std::array<char const *, 16>
 		 {{"", "PORTA", "", "DDRA", "", "PPARA1", "", "PPARA2", "", "PORTB","", "PORTB1", "", "DDRB", "", "PPARB"}}[offset - 0x10]);
 
 	return val;
@@ -286,12 +286,12 @@ void m68340_cpu_device::m68340_internal_sim_ports_w(offs_t offset, uint8_t data)
 	assert(m_m68340SIM);
 	m68340_sim &sim = *m_m68340SIM;
 
-	LOGSETUP(" * Reg %02x <- %02x - %s\n", offset, data, std::array<char const *, 8>
+	LOGSETUP(" * Reg %02x <- %02x - %s\n", (uint32_t)offset, data, std::array<char const *, 8>
 			 {{"PORTA", "DDRA", "PPRA1", "PPRA2", "PORTB", "PORTB1", "DDRB", "PPARB"}}[(offset - 0x10) / 2]);
 	switch (offset)
 	{
 		case m68340_sim::REG_PORTA:
-			LOGDATA("- %08x %04x, %02x (PORTA - Port A Data)\n", m_ppc, offset,data);
+			LOGDATA("- %08x %04x, %02x (PORTA - Port A Data)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			sim.m_porta = (data & sim.m_ddra & sim.m_ppara1);
 
 			// callback
@@ -299,26 +299,26 @@ void m68340_cpu_device::m68340_internal_sim_ports_w(offs_t offset, uint8_t data)
 			break;
 
 		case m68340_sim::REG_DDRA:
-			LOGPORTS("- %08x %04x, %02x (DDRA - Port A Data Direction)\n", m_ppc, offset,data);
+			LOGPORTS("- %08x %04x, %02x (DDRA - Port A Data Direction)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			sim.m_ddra = data;
 			break;
 
 		case m68340_sim::REG_PPARA1:
-			LOGPORTS("- %08x %04x, %02x (PPARA1 - Port A Pin Assignment 1)\n", m_ppc, offset,data);
+			LOGPORTS("- %08x %04x, %02x (PPARA1 - Port A Pin Assignment 1)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			sim.m_ppara1 = data;
 			break;
 
 		case m68340_sim::REG_PPARA2:
-			LOGPORTS("- %08x %04x, %02x (PPARA2 - Port A Pin Assignment 2)\n", m_ppc, offset,data);
+			LOGPORTS("- %08x %04x, %02x (PPARA2 - Port A Pin Assignment 2)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			sim.m_ppara2 = data;
 			break;
 
 		case m68340_sim::REG_PORTB1:
-			LOGDATA("- %08x %04x, %02x (PORTB1 - Port B Data - mirror)\n", m_ppc, offset,data);
+			LOGDATA("- %08x %04x, %02x (PORTB1 - Port B Data - mirror)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			// Falling through to mirrored register portb
 			[[fallthrough]];
 		case m68340_sim::REG_PORTB:
-			LOGDATA("- %08x %04x, %02x (PORTB - Port B Data)\n", m_ppc, offset,data);
+			LOGDATA("- %08x %04x, %02x (PORTB - Port B Data)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			sim.m_portb = (data & sim.m_ddrb & sim.m_pparb);
 
 			// callback
@@ -326,18 +326,18 @@ void m68340_cpu_device::m68340_internal_sim_ports_w(offs_t offset, uint8_t data)
 			break;
 
 		case m68340_sim::REG_DDRB:
-			LOGPORTS("- %08x %04x, %02x (DDR - Port B Data Direction)\n", m_ppc, offset,data);
+			LOGPORTS("- %08x %04x, %02x (DDR - Port B Data Direction)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			sim.m_ddrb = data;
 			break;
 
 		case m68340_sim::REG_PPARB:
-			LOGPORTS("- %08x %04x, %02x (PPARB - Port B Pin Assignment)\n", m_ppc, offset,data);
+			LOGPORTS("- %08x %04x, %02x (PPARB - Port B Pin Assignment)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			sim.m_pparb = data;
 			break;
 
 		default:
-			LOGPORTS("- %08x %s %04x, %02x (ILLEGAL?) - not implemented\n", m_ppc, FUNCNAME, offset,data);
-			logerror("%08x m68340_internal_sim_ports_w %04x, %02x (ILLEGAL?)\n", m_ppc, offset,data);
+			LOGPORTS("- %08x %s %04x, %02x (ILLEGAL?) - not implemented\n", (uint32_t)m_ppc, FUNCNAME, (uint32_t)offset, data);
+			logerror("%08x m68340_internal_sim_ports_w %04x, %02x (ILLEGAL?)\n", (uint32_t)m_ppc, (uint32_t)offset, data);
 			break;
 	}
 }
@@ -363,7 +363,7 @@ uint16_t m68340_cpu_device::m68340_internal_sim_cs_r(offs_t offset, uint16_t mem
 		case m68340_sim::REG_BA_CS3:  data = sim.m_ba[3];  break;
 
 		default:
-			logerror("%08x m68340_internal_sim_r %08x, (%08x)\n", m_ppc, offset*2,mem_mask);
+			logerror("%08x m68340_internal_sim_r %08x, (%08x)\n", (uint32_t)m_ppc, (uint32_t)offset * 2, mem_mask);
 	}
 
 	return (BIT(offset,0) ? data : (data >> 16)) & 0xffff;
@@ -379,12 +379,12 @@ void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint16_t data, u
 	{
 		if (BIT(offset, 0))
 		{
-			LOGCS("%08x (LSWORD) Base address CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("%08x (LSWORD) Base address CS%d %08x, %04x (%04x) ", (uint32_t)m_ppc, ((uint32_t)offset - 0x20) / 2, (uint32_t)offset * 2, data, mem_mask);
 			LOGCS("- Base: %04x BFC:%02x WP:%d FTE:%d NCS:%d Valid: %s\n", data & 0xff00, (data & 0xf0) >> 4, data & 0x08 ? 1 : 0, data & 0x04 ? 1 : 0, data & 0x02 ? 1 : 0, data & 0x01 ? "Yes" : "No");
 		}
 		else
 		{
-			LOGCS("%08x (MSWORD) Base address CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("%08x (MSWORD) Base address CS%d %08x, %04x (%04x) ", (uint32_t)m_ppc, ((uint32_t)offset - 0x20) / 2, (uint32_t)offset * 2, data, mem_mask);
 			LOGCS("- Base: %04x\n", data);
 		}
 	}
@@ -392,12 +392,12 @@ void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint16_t data, u
 	{
 		if (BIT(offset, 0))
 		{
-			LOGCS("%08x Address mask CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("%08x Address mask CS%d %08x, %04x (%04x) ", (uint32_t)m_ppc, ((uint32_t)offset - 0x20) / 2, (uint32_t)offset * 2, data, mem_mask);
 			LOGCS("- FCM:%02x DD:%d PS: %s\n", (data & 0xf0) >> 4, (data >> 2) & 0x03, std::array<char const *, 4>{{"Reserved", "16-Bit", "8-bit", "External DSACK response"}}[data & 0x03]);
 		}
 		else
 		{
-			LOGCS("%08x Address mask CS%d %08x, %04x (%04x) ", m_ppc, (offset - 0x20) / 2, offset * 2, data, mem_mask);
+			LOGCS("%08x Address mask CS%d %08x, %04x (%04x) ", (uint32_t)m_ppc, ((uint32_t)offset - 0x20) / 2, (uint32_t)offset * 2, data, mem_mask);
 			LOGCS("- Mask: %04x\n", data & 0xff00);
 		}
 	}
@@ -455,7 +455,7 @@ void m68340_cpu_device::m68340_internal_sim_cs_w(offs_t offset, uint16_t data, u
 			break;
 
 		default:
-			logerror("%08x m68340_internal_sim_cs_w %08x, %08x (%08x)\n", m_ppc, offset*2,data,mem_mask);
+			logerror("%08x m68340_internal_sim_cs_w %08x, %08x (%08x)\n", (uint32_t)m_ppc, (uint32_t)offset * 2, data, mem_mask);
 			break;
 	}
 }

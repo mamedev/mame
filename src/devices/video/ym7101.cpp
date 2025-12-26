@@ -439,7 +439,7 @@ void ym7101_device::vram_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_vram[offset]);
 	gfx(0)->mark_dirty(offset >> 4);
 
-	const u32 sprite_table = m_sprite_attribute_table >> 1;
+	const offs_t sprite_table = m_sprite_attribute_table >> 1;
 
 	// TODO: check akumajo Stage 6-3
 	// TODO: check segacd:snatcheru (H32, puts sprite_table at $fe00)

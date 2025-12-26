@@ -312,7 +312,7 @@ void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 	case 0xefe2:
 	case 0xefe3:
 		m_dongle->write(offset & 0x03, data);
-		printf("6702 %u %02x\n", offset & 0x03, data);
+		printf("6702 %u %02x\n", (uint8_t)offset & 0x03, data);
 		break;
 
 	case 0xeff0:

@@ -25,7 +25,7 @@ public:
 	virtual void slow_write(u16 data) override;
 
 	// ns32000_mmu_interface implementation
-	virtual translate_result translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs = false, bool suppress = false) override;
+	virtual translate_result translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool pfs = false, bool suppress = false) override;
 
 protected:
 	// device_t implementation

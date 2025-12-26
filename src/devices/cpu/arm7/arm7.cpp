@@ -2104,7 +2104,7 @@ void arm946es_cpu_device::RefreshITCM()
 	}
 }
 
-void arm946es_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
+void arm946es_cpu_device::arm7_cpu_write32(offs_t addr, uint32_t data)
 {
 	addr &= ~3;
 
@@ -2125,7 +2125,7 @@ void arm946es_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
 }
 
 
-void arm946es_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
+void arm946es_cpu_device::arm7_cpu_write16(offs_t addr, uint16_t data)
 {
 	addr &= ~1;
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
@@ -2144,7 +2144,7 @@ void arm946es_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
 	m_program->write_word(addr, data);
 }
 
-void arm946es_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
+void arm946es_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 {
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
 	{
@@ -2160,7 +2160,7 @@ void arm946es_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
 	m_program->write_byte(addr, data);
 }
 
-uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
+uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)
 {
 	uint32_t result;
 
@@ -2204,7 +2204,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 	return result;
 }
 
-uint32_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
+uint32_t arm946es_cpu_device::arm7_cpu_read16(offs_t addr)
 {
 	addr &= ~1;
 
@@ -2222,7 +2222,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
 	return m_program->read_word(addr);
 }
 
-uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)
+uint8_t arm946es_cpu_device::arm7_cpu_read8(offs_t addr)
 {
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
 	{
@@ -2308,7 +2308,7 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 /***************************************************************************
  * Default Memory Handlers
  ***************************************************************************/
-void arm7_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
+void arm7_cpu_device::arm7_cpu_write32(offs_t addr, uint32_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -2323,7 +2323,7 @@ void arm7_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
 }
 
 
-void arm7_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
+void arm7_cpu_device::arm7_cpu_write16(offs_t addr, uint16_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -2337,7 +2337,7 @@ void arm7_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
 	m_program->write_word(addr, data);
 }
 
-void arm7_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
+void arm7_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -2350,7 +2350,7 @@ void arm7_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
 	m_program->write_byte(addr, data);
 }
 
-uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
+uint32_t arm7_cpu_device::arm7_cpu_read32(offs_t addr)
 {
 	uint32_t result;
 
@@ -2374,7 +2374,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
 	return result;
 }
 
-uint32_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
+uint32_t arm7_cpu_device::arm7_cpu_read16(offs_t addr)
 {
 	uint32_t result;
 
@@ -2396,7 +2396,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
 	return result;
 }
 
-uint8_t arm7_cpu_device::arm7_cpu_read8(uint32_t addr)
+uint8_t arm7_cpu_device::arm7_cpu_read8(offs_t addr)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{

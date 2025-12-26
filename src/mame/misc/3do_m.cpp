@@ -621,8 +621,8 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 	case 0x05d0/4: case 0x05d4/4: case 0x05d8/4: case 0x05dc/4:
 	case 0x05e0/4: case 0x05e4/4: case 0x05e8/4: case 0x05ec/4:
 	case 0x05f0/4: case 0x05f4/4: case 0x05f8/4: case 0x05fc/4:
-		printf("%08x %08x\n",offset*4,data);
-		m_madam.dma[(offset/4) & 0x1f][offset & 0x03] = data;
+		printf("%08x %08x\n", (uint32_t)offset * 4, data);
+		m_madam.dma[(offset / 4) & 0x1f][offset & 0x03] = data;
 		return;
 
 	/* Hardware multiplier */

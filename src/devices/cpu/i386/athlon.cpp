@@ -407,7 +407,8 @@ void athlonxp_device::cache_clean()
 
 uint8_t athlonxp_device::READ8PL(uint32_t ea, uint8_t privilege)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	if(!translate_address(privilege,TR_READ,&address,&error))
 		PF_THROW(error);
@@ -421,7 +422,8 @@ uint8_t athlonxp_device::READ8PL(uint32_t ea, uint8_t privilege)
 uint16_t athlonxp_device::READ16PL(uint32_t ea, uint8_t privilege)
 {
 	uint16_t value;
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch (ea & 3)
 	{
@@ -462,7 +464,8 @@ uint16_t athlonxp_device::READ16PL(uint32_t ea, uint8_t privilege)
 uint32_t athlonxp_device::READ32PL(uint32_t ea, uint8_t privilege)
 {
 	uint32_t value;
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch (ea & 3)
 	{
@@ -507,7 +510,8 @@ uint32_t athlonxp_device::READ32PL(uint32_t ea, uint8_t privilege)
 uint64_t athlonxp_device::READ64PL(uint32_t ea, uint8_t privilege)
 {
 	uint64_t value;
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch (ea & 3)
 	{
@@ -551,7 +555,8 @@ uint64_t athlonxp_device::READ64PL(uint32_t ea, uint8_t privilege)
 
 void athlonxp_device::WRITE8PL(uint32_t ea, uint8_t privilege, uint8_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 	if(!translate_address(privilege,TR_WRITE,&address,&error))
 		PF_THROW(error);
 
@@ -563,7 +568,8 @@ void athlonxp_device::WRITE8PL(uint32_t ea, uint8_t privilege, uint8_t value)
 
 void athlonxp_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch(ea & 3)
 	{
@@ -600,7 +606,8 @@ void athlonxp_device::WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value)
 
 void athlonxp_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch(ea & 3)
 	{
@@ -641,7 +648,8 @@ void athlonxp_device::WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value)
 
 void athlonxp_device::WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value)
 {
-	uint32_t address = ea, error;
+	offs_t address = ea;
+	uint32_t error;
 
 	switch(ea & 3)
 	{

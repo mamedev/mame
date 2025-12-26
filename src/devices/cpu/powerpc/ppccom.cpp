@@ -1522,7 +1522,8 @@ void ppc_device::ppccom_get_dsisr()
 		intent = TR_READ;
 	}
 
-	m_core->param1 = ppccom_translate_address_internal(intent, false, m_core->param0);
+	offs_t address = m_core->param0;
+	m_core->param1 = ppccom_translate_address_internal(intent, false, address);
 }
 
 /*-------------------------------------------------
@@ -2860,7 +2861,7 @@ uint8_t ppc4xx_device::ppc4xx_spu_r(offs_t offset)
 			break;
 	}
 	if (PRINTF_SPU)
-		printf("spu_r(%d) = %02X\n", offset, result);
+		printf("spu_r(%d) = %02X\n", (uint32_t)offset, result);
 	return result;
 }
 
@@ -2874,7 +2875,7 @@ void ppc4xx_device::ppc4xx_spu_w(offs_t offset, uint8_t data)
 	uint8_t oldstate, newstate;
 
 	if (PRINTF_SPU)
-		printf("spu_w(%d) = %02X\n", offset, data);
+		printf("spu_w(%d) = %02X\n", (uint32_t)offset, data);
 	switch (offset)
 	{
 		/* clear error bits */

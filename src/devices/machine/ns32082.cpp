@@ -374,7 +374,7 @@ void ns32082_device::set_msr(u32 data)
 	m_msr = (m_msr & ~MSR_WM) | (data & MSR_WM);
 }
 
-ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool suppress)
+ns32082_device::translate_result ns32082_device::translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool pfs, bool suppress)
 {
 	// update program flow trace state
 	if (pfs && (m_msr & MSR_FT))
@@ -406,7 +406,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 	LOGMASKED(LOG_TRANSLATE, "translate address_space %d access_level %d page table 0x%08x address 0x%08x\n", address_space, access_level, ptb, address);
 
 	// read level 1 page table entry
-	u32 const pte1_address = ptb | ((address & VA_INDEX1) >> 14);
+	offs_t const pte1_address = ptb | ((address & VA_INDEX1) >> 14);
 	u32 const pte1 = space.read_dword(pte1_address);
 	LOGMASKED(LOG_TRANSLATE, "translate level 1 page table address 0x%06x entry 0x%08x\n", pte1_address, pte1);
 
@@ -448,7 +448,7 @@ ns32082_device::translate_result ns32082_device::translate(address_space &space,
 		space.write_word(pte1_address, u16(pte1 | PTE_R));
 
 	// read level 2 page table entry
-	u32 const pte2_address = ((pte1 & PTE_MS) >> 7) | (pte1 & PTE_PFN) | ((address & VA_INDEX2) >> 7);
+	offs_t const pte2_address = ((pte1 & PTE_MS) >> 7) | (pte1 & PTE_PFN) | ((address & VA_INDEX2) >> 7);
 	u32 const pte2 = space.read_dword(pte2_address);
 	LOGMASKED(LOG_TRANSLATE, "translate level 2 page table address 0x%06x entry 0x%08x\n", pte2_address, pte2);
 

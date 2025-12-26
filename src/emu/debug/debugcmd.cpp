@@ -612,7 +612,7 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 							address_space *tspace;
 							std::string s;
 
-							for (u32 address = u32(number), taddress; space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, taddress = address, tspace); address++)
+							for (offs_t address = offs_t(number), taddress; space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, taddress = address, tspace); address++)
 							{
 								u8 const data = tspace->read_byte(taddress);
 
@@ -4561,9 +4561,9 @@ void debugger_commands::execute_memdump(const std::vector<std::string_view> &par
 						for (memory_entry &entry : entries[mode])
 						{
 							if (octal)
-								fprintf(file, "%0*o - %0*o:", nc, entry.start, nc, entry.end);
+								fprintf(file, "%s", string_format("%0*o - %0*o:", nc, entry.start, nc, entry.end).c_str());
 							else
-								fprintf(file, "%0*x - %0*x:", nc, entry.start, nc, entry.end);
+								fprintf(file, "%s", string_format("%0*x - %0*x:", nc, entry.start, nc, entry.end).c_str());
 							for (const auto &c : entry.context)
 								if (c.disabled)
 									fprintf(file, " %s[off]", c.view->name().c_str());

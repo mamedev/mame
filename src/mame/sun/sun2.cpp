@@ -358,7 +358,7 @@ uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
 		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	if (!machine().side_effects_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
+	if (!machine().side_effects_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", (uint32_t)offset << 1, fc, mem_mask, (uint32_t)m_maincpu->pc(), (uint32_t)offset >> 15);
 
 	return 0xffff;
 }
@@ -384,7 +384,7 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 
 				case 5:
 					// XOR to match Table 2-1 in the 2/50 Field Service Manual
-					printf("sun2: CPU LEDs to %02x (PC=%x) => ", (data & 0xff) ^ 0xff, m_maincpu->pc());
+					printf("sun2: CPU LEDs to %02x (PC=%x) => ", (data & 0xff) ^ 0xff, (uint32_t)m_maincpu->pc());
 					m_diagreg = data & 0xff;
 					for (int i = 0; i < 8; i++)
 					{
@@ -488,7 +488,7 @@ void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem
 		if (!machine().side_effects_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
+	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, (uint32_t)m_maincpu->pc(), (uint32_t)offset << 1);
 }
 
 // BW2 video control

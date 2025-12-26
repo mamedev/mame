@@ -194,7 +194,7 @@ TIMER_CALLBACK_MEMBER(sun4_mmu_base_device::reset_off_tick)
 	m_cpu->set_input_line(SPARC_RESET, CLEAR_LINE);
 }
 
-uint32_t sun4_mmu_base_device::fetch_insn(const bool supervisor, const uint32_t offset)
+uint32_t sun4_mmu_base_device::fetch_insn(const bool supervisor, const offs_t offset)
 {
 	if (supervisor)
 		return insn_data_r<SUPER_INSN>(offset, 0xffffffff);
@@ -202,56 +202,56 @@ uint32_t sun4_mmu_base_device::fetch_insn(const bool supervisor, const uint32_t 
 		return insn_data_r<USER_INSN>(offset, 0xffffffff);
 }
 
-void sun4_mmu_base_device::segment_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::segment_flush_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do nothing for now
 	LOGMASKED(LOG_SEGMENT_FLUSH, "%s: segment_flush_w %08x & %08x: %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-void sun4_mmu_base_device::page_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::page_flush_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do nothing for now
 	LOGMASKED(LOG_PAGE_FLUSH, "%s: page_flush_w %08x & %08x: %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-void sun4_mmu_base_device::context_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::context_flush_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do nothing for now
 	LOGMASKED(LOG_CONTEXT_FLUSH, "%s: context_flush_w %08x & %08x: %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-void sun4_mmu_base_device::hw_segment_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::hw_segment_flush_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do nothing for now
 	LOGMASKED(LOG_SEGMENT_FLUSH, "%s: segment_flush_w %08x & %08x: %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-void sun4_mmu_base_device::hw_page_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::hw_page_flush_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do nothing for now
 	LOGMASKED(LOG_PAGE_FLUSH, "%s: page_flush_w %08x & %08x: %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-void sun4_mmu_base_device::hw_context_flush_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::hw_context_flush_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do nothing for now
 	LOGMASKED(LOG_CONTEXT_FLUSH, "%s: context_flush_w %08x & %08x: %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-void sun4_mmu_base_device::hw_flush_all_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::hw_flush_all_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Do nothing for now
 	LOGMASKED(LOG_ALL_FLUSH, "%s: hw_flush_all_w %08x = %08x: %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 }
 
-uint32_t sun4_mmu_base_device::context_reg_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::context_reg_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = m_context << (mem_mask == 0x00ff0000 ? 16 : 24);
 	LOGMASKED(LOG_CONTEXT, "%s: context_reg_r %08x & %08x: %08x\n", machine().describe_context(), offset << 2, mem_mask, data);
 	return data;
 }
 
-void sun4_mmu_base_device::context_reg_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::context_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_CONTEXT, "%s: context_reg_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 	m_context = data >> 24;
@@ -261,14 +261,14 @@ void sun4_mmu_base_device::context_reg_w(uint32_t offset, uint32_t data, uint32_
 	m_curr_segmap_masked = &m_segmap_masked[m_context_masked][0];
 }
 
-uint32_t sun4_mmu_base_device::system_enable_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::system_enable_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = m_system_enable << 24;
 	LOGMASKED(LOG_SYSTEM_ENABLE, "%s: system_enable_r %08x & %08x: %08x\n", machine().describe_context(), offset << 2, mem_mask, data);
 	return data;
 }
 
-void sun4_mmu_base_device::system_enable_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::system_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_SYSTEM_ENABLE, "%s: system_enable_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 	m_system_enable = data >> 24;
@@ -287,7 +287,7 @@ void sun4_mmu_base_device::system_enable_w(uint32_t offset, uint32_t data, uint3
 	}
 }
 
-uint32_t sun4_mmu_base_device::bus_error_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::bus_error_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = m_buserr[offset & 0xf];
 	LOGMASKED(LOG_BUSERROR, "%s: bus_error_r %08x & %08x: %08x\n", machine().describe_context(), 0x60000000 | (offset << 2), mem_mask, data);
@@ -295,7 +295,7 @@ uint32_t sun4_mmu_base_device::bus_error_r(uint32_t offset, uint32_t mem_mask)
 	return data;
 }
 
-void sun4_mmu_base_device::bus_error_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const uint32_t masked_offset = offset & 0xf;
 	LOGMASKED(LOG_BUSERROR, "%s: bus_error_w: %08x = %08x & %08x\n", machine().describe_context(), 0x60000000 | (offset << 2), data, mem_mask);
@@ -309,33 +309,33 @@ void sun4_mmu_base_device::bus_error_w(uint32_t offset, uint32_t data, uint32_t 
 		m_buserr[3] = (data & 0x3fffffff) | ((data & 0x20000000) << 1) | ((data & 0x20000000) << 2);
 }
 
-uint32_t sun4_mmu_base_device::cache_tag_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::cache_tag_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = m_cachetags[offset & m_cache_mask];
 	LOGMASKED(LOG_CACHE_TAGS, "%s: cache_tag_r %08x & %08x: %08x\n", machine().describe_context(), offset, mem_mask, data);
 	return data;
 }
 
-void sun4_mmu_base_device::cache_tag_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::cache_tag_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_CACHE_TAGS, "%s: cache_tag_w: %08x = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
 	m_cachetags[offset & m_cache_mask] = data & 0x03f8fffc;
 }
 
-uint32_t sun4_mmu_base_device::cache_data_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::cache_data_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t data = m_cachedata[offset & m_cache_mask];
 	LOGMASKED(LOG_CACHE_DATA, "%s: cache_data_r %08x & %08x: %08x\n", machine().describe_context(), offset, mem_mask, data);
 	return data;
 }
 
-void sun4_mmu_base_device::cache_data_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::cache_data_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_CACHE_DATA, "%s: cache_data_w: %08x = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
 	m_cachedata[offset & m_cache_mask] = data | (1 << 19);
 }
 
-uint32_t sun4_mmu_base_device::uart_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::uart_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0xffffffff;
 	switch (offset & 3)
@@ -357,7 +357,7 @@ uint32_t sun4_mmu_base_device::uart_r(uint32_t offset, uint32_t mem_mask)
 	return data;
 }
 
-void sun4_mmu_base_device::uart_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::uart_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_UART, "%s: uart_w: %08x = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
 	switch (offset & 3)
@@ -383,7 +383,7 @@ void sun4_mmu_base_device::uart_w(uint32_t offset, uint32_t data, uint32_t mem_m
 	}
 }
 
-uint32_t sun4_mmu_base_device::segment_map_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::segment_map_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	if (mem_mask == 0xffff0000)
@@ -398,7 +398,7 @@ uint32_t sun4_mmu_base_device::segment_map_r(uint32_t offset, uint32_t mem_mask)
 	return data;
 }
 
-void sun4_mmu_base_device::segment_map_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::segment_map_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_SEGMENT_MAP, "%s: segment_map_w: %08x = %08x & %08x\n", machine().describe_context(), offset << 2, data, mem_mask);
 
@@ -417,7 +417,7 @@ void sun4_mmu_base_device::segment_map_w(uint32_t offset, uint32_t data, uint32_
 	m_curr_segmap_masked[seg] = (segdata & m_pmeg_mask) << 6;
 }
 
-uint32_t sun4_mmu_base_device::page_map_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::page_map_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint32_t page = m_curr_segmap_masked[(offset >> 16) & 0xfff] | ((offset >> m_seg_entry_shift) & m_seg_entry_mask);
 	const uint32_t data = page_entry_to_uint(page);
@@ -425,7 +425,7 @@ uint32_t sun4_mmu_base_device::page_map_r(uint32_t offset, uint32_t mem_mask)
 	return data;
 }
 
-void sun4_mmu_base_device::page_map_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::page_map_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const uint32_t page = m_curr_segmap_masked[(offset >> 16) & 0xfff] | ((offset >> m_seg_entry_shift) & m_seg_entry_mask);
 	LOGMASKED(LOG_PAGE_MAP, "%s: page_map_w: %08x (%x) = %08x & %08x\n", machine().describe_context(), offset << 2, page, data, mem_mask);
@@ -433,7 +433,7 @@ void sun4_mmu_base_device::page_map_w(uint32_t offset, uint32_t data, uint32_t m
 	m_page_valid[page] = m_pagemap[page].valid;
 }
 
-void sun4_mmu_base_device::type0_timeout_r(const uint32_t offset)
+void sun4_mmu_base_device::type0_timeout_r(const offs_t offset)
 {
 	LOGMASKED(LOG_TYPE0_TIMEOUT, "%s: type0_timeout_r (%08x)\n", machine().describe_context(), offset << 2);
 	m_buserr[0] = 0x20; // read timeout
@@ -441,7 +441,7 @@ void sun4_mmu_base_device::type0_timeout_r(const uint32_t offset)
 	m_host->set_mae();
 }
 
-void sun4_mmu_base_device::type0_timeout_w(const uint32_t offset)
+void sun4_mmu_base_device::type0_timeout_w(const offs_t offset)
 {
 	LOGMASKED(LOG_TYPE0_TIMEOUT, "%s: type0_timeout_w (%08x)\n", machine().describe_context(), offset << 2);
 	m_buserr[0] = 0x8020; // write timeout
@@ -449,7 +449,7 @@ void sun4_mmu_base_device::type0_timeout_w(const uint32_t offset)
 	m_host->set_mae();
 }
 
-uint32_t sun4_mmu_base_device::type1_timeout_r(uint32_t offset)
+uint32_t sun4_mmu_base_device::type1_timeout_r(offs_t offset)
 {
 	LOGMASKED(LOG_TYPE1_TIMEOUT, "%s: type1_timeout_r (%08x)\n", machine().describe_context(), offset << 2);
 	m_buserr[2] = 0x20; // read timeout
@@ -457,14 +457,14 @@ uint32_t sun4_mmu_base_device::type1_timeout_r(uint32_t offset)
 	return 0;
 }
 
-void sun4_mmu_base_device::type1_timeout_w(uint32_t offset, uint32_t data)
+void sun4_mmu_base_device::type1_timeout_w(offs_t offset, uint32_t data)
 {
 	LOGMASKED(LOG_TYPE1_TIMEOUT, "%s: type1_timeout_w (%08x)\n", machine().describe_context(), offset << 2);
 	m_buserr[2] = 0x120; // write timeout
 	m_buserr[3] = m_type1_offset << 2;
 }
 
-uint32_t sun4_mmu_base_device::parity_r(uint32_t offset, uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::parity_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	if (offset == 0)
@@ -481,7 +481,7 @@ uint32_t sun4_mmu_base_device::parity_r(uint32_t offset, uint32_t mem_mask)
 	return data;
 }
 
-void sun4_mmu_base_device::parity_w(uint32_t offset, uint32_t data, uint32_t mem_mask)
+void sun4_mmu_base_device::parity_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -515,13 +515,13 @@ void sun4_mmu_base_device::merge_page_entry(uint32_t index, uint32_t data, uint3
 	pe.page = (new_value & m_page_entry_mask) << m_seg_entry_shift;
 }
 
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_INSN>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_INSN>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_DATA>(const uint32_t, const uint32_t);
-template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_DATA>(const uint32_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_INSN>(const offs_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_INSN>(const offs_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::USER_DATA>(const offs_t, const uint32_t);
+template uint32_t sun4_mmu_base_device::insn_data_r<sun4_mmu_base_device::SUPER_DATA>(const offs_t, const uint32_t);
 
 template <sun4_mmu_base_device::insn_data_mode MODE>
-uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t mem_mask)
+uint32_t sun4_mmu_base_device::insn_data_r(const offs_t offset, const uint32_t mem_mask)
 {
 	// supervisor program fetches in boot state are special
 	if (MODE == SUPER_INSN && m_fetch_bootrom)
@@ -597,13 +597,13 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 	}
 }
 
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_INSN>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_INSN>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_DATA>(const uint32_t, const uint32_t, const uint32_t);
-template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_DATA>(const uint32_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_INSN>(const offs_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_INSN>(const offs_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::USER_DATA>(const offs_t, const uint32_t, const uint32_t);
+template void sun4_mmu_base_device::insn_data_w<sun4_mmu_base_device::SUPER_DATA>(const offs_t, const uint32_t, const uint32_t);
 
 template <sun4_mmu_base_device::insn_data_mode MODE>
-void sun4_mmu_base_device::insn_data_w(const uint32_t offset, const uint32_t data, const uint32_t mem_mask)
+void sun4_mmu_base_device::insn_data_w(const offs_t offset, const uint32_t data, const uint32_t mem_mask)
 {
 	// it's translation time
 	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];// & m_pmeg_mask;

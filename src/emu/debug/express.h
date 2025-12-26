@@ -51,7 +51,7 @@ enum expression_space
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-using offs_t = u32;
+using offs_t = u64;
 
 // ======================> expression_error
 

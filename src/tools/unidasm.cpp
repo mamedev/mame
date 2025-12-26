@@ -10,7 +10,7 @@
 #include "coretmpl.h"
 #include "disasmintf.h"
 
-using offs_t = osd::u32;
+using offs_t = osd::u64;
 using util::BIT;
 
 #include "cpu/8x300/8x300dasm.h"
@@ -1233,9 +1233,11 @@ static int parse_options(int argc, char *argv[], options *opts)
 				goto usage;
 
 		} else if(pending_base) {
-		// base PC
-			if(parse_number(curarg, "%x", &opts->basepc) != 1)
+			// base PC
+			u32 basepc_dword = 0;
+			if(parse_number(curarg, "%x", &basepc_dword) != 1)
 				goto usage;
+			opts->basepc = basepc_dword;
 			pending_base = false;
 
 		} else if(pending_arch) {

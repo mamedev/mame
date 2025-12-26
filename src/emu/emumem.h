@@ -66,8 +66,8 @@ template<int Width, int AddrShift> class handler_entry_write_passthrough;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// offsets and addresses are 32-bit (for now...)
-using offs_t = u32;
+// offsets and addresses are 64-bit
+using offs_t = u64;
 
 // address map constructors are delegates that build up an address_map
 using address_map_constructor = named_delegate<void (address_map &)>;

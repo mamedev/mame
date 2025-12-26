@@ -52,7 +52,7 @@ struct pc_stack_entry
 //  drc_frontend - constructor
 //-------------------------------------------------
 
-drc_frontend::drc_frontend(device_t &cpu, u32 window_start, u32 window_end, u32 max_sequence)
+drc_frontend::drc_frontend(device_t &cpu, offs_t window_start, offs_t window_end, u32 max_sequence)
 	: m_window_start(window_start)
 	, m_window_end(window_end)
 	, m_max_sequence(max_sequence)

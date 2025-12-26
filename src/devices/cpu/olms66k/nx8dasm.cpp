@@ -190,7 +190,7 @@ nx8_500s_disassembler::nx8_500s_disassembler(const u16 &psw)
 {
 }
 
-offs_t nx8_500s_disassembler::opcode_alignment() const
+u32 nx8_500s_disassembler::opcode_alignment() const
 {
 	return 1;
 }

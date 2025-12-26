@@ -1329,13 +1329,13 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 
 				default:
 				{
-					printf("%s:compact_flash_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
+					printf("%s:compact_flash_r: IDE reg %02X\n", machine().describe_context().c_str(), (uint32_t)offset & 0xf);
 				}
 			}
 		}
 		else
 		{
-			int reg = offset;
+			uint32_t reg = (uint32_t)offset;
 
 			logerror("cf_r: %04X\n", reg);
 

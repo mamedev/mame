@@ -159,9 +159,9 @@ void sis630_host_device::memory_map(address_map &map)
 {
 }
 
-void sis630_host_device::map_shadowram(address_space *memory_space, uint32_t start_offs, uint32_t end_offs, bool read_enable, bool write_enable)
+void sis630_host_device::map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, bool read_enable, bool write_enable)
 {
-	LOGMAP("- 0x%08x-0x%08x ", start_offs, end_offs);
+	LOGMAP("- 0x%08x-0x%08x ", (uint32_t)start_offs, (uint32_t)end_offs);
 
 	switch(write_enable << 1 | read_enable)
 	{

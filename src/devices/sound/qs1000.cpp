@@ -358,7 +358,7 @@ void qs1000_device::wave_w(offs_t offset, uint8_t data)
 	m_stream->update();
 
 	if (LOGGING_ENABLED)
-		printf("QS1000 W[%x] %x\n", 0x200 + offset, data);
+		printf("QS1000 W[%x] %x\n", 0x200 + (uint16_t)offset, data);
 
 	switch (offset)
 	{

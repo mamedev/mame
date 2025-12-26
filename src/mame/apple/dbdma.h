@@ -21,8 +21,8 @@ public:
 
 	dbdma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	u32 dma_read(u32 offset);
-	void dma_write(u32 offset, u32 data);
+	u32 dma_read(offs_t offset);
+	void dma_write(offs_t offset, u32 data);
 
 	auto irq_callback() { return write_irq.bind(); }
 

@@ -161,7 +161,7 @@ u32 _39in1_state::cpld_r(offs_t offset)
 				case 0x4001a: return 0x75;
 				case 0x4001c: return 0x97;
 				case 0x4001e: return 0xb1;
-				default: printf("State 1 unknown offset %x\n", offset); break;
+				default: printf("State 1 unknown offset %x\n", (u32)offset); break;
 			}
 		}
 		else if (m_state == 2)                      // 29c0: 53 ac 0c 2b a2 07 e6 be 31

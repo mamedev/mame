@@ -945,7 +945,7 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
  *  Galileo DMA handler
  *
  *************************************/
-address_space* gt64xxx_device::dma_decode_address(uint32_t &addr)
+address_space* gt64xxx_device::dma_decode_address(offs_t &addr)
 {
 	for (size_t index = 0; index < proc_addr_bank::ADDR_NUM; ++index)
 	{

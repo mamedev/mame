@@ -1108,10 +1108,10 @@ void discrete_device::write(offs_t offset, uint8_t data)
 		if (node->interface(intf))
 				intf->input_write(0, data);
 		else
-			discrete_log("discrete_sound_w write to non-input NODE_%02d\n", offset-NODE_00);
+			discrete_log("discrete_sound_w write to non-input NODE_%02d\n", (uint8_t)offset-NODE_00);
 	}
 	else
 	{
-		discrete_log("discrete_sound_w write to non-existent NODE_%02d\n", offset-NODE_00);
+		discrete_log("discrete_sound_w write to non-existent NODE_%02d\n", (uint8_t)offset-NODE_00);
 	}
 }

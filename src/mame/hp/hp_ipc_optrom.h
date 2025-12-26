@@ -43,7 +43,7 @@ protected:
 	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
 private:
-	offs_t m_base;
+	u32 m_base;
 };
 
 // device type definition

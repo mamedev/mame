@@ -33,7 +33,7 @@ public:
 	using s16 = osd::s16;
 	using s32 = osd::s32;
 	using s64 = osd::s64;
-	using offs_t = u32;
+	using offs_t = u64;
 
 	// Disassembler constants for the return value
 	static constexpr u32 SUPPORTED       = 0x80000000;   // are disassembly flags supported?

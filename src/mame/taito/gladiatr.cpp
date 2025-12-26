@@ -536,7 +536,7 @@ void ppking_state::ppking_qx0_w(offs_t offset, u8 data)
 				break;
 
 			default:
-				printf("%02x %02x\n",offset,data);
+				printf("%02x %02x\n", (uint8_t)offset, data);
 				break;
 		}
 	}

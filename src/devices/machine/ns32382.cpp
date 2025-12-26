@@ -330,7 +330,7 @@ void ns32382_device::execute()
 		m_state = STATUS;
 }
 
-ns32382_device::translate_result ns32382_device::translate(address_space &space, unsigned st, u32 &address, bool user, bool write, bool pfs, bool debug)
+ns32382_device::translate_result ns32382_device::translate(address_space &space, unsigned st, offs_t &address, bool user, bool write, bool pfs, bool debug)
 {
 	// check translation required
 	if ((!(m_mcr & MCR_TU) && user) || (!(m_mcr & MCR_TS) && !user))
@@ -347,7 +347,7 @@ ns32382_device::translate_result ns32382_device::translate(address_space &space,
 		m_msr &= ~(MSR_STT | MSR_UST | MSR_DDT | MSR_TEX);
 
 	// read level 1 page table entry
-	u32 const pte1_address = m_ptb[address_space] | ((address & VA_INDEX1) >> 20);
+	offs_t const pte1_address = m_ptb[address_space] | ((address & VA_INDEX1) >> 20);
 	u32 const pte1 = space.read_dword(pte1_address);
 	LOGMASKED(LOG_TRANSLATE, "translate level 1 page table address 0x%06x entry 0x%08x\n", pte1_address, pte1);
 
@@ -386,7 +386,7 @@ ns32382_device::translate_result ns32382_device::translate(address_space &space,
 		space.write_dword(pte1_address, pte1 | PTE_R);
 
 	// read level 2 page table entry
-	u32 const pte2_address = (pte1 & PTE_PFN) | ((address & VA_INDEX2) >> 10);
+	offs_t const pte2_address = (pte1 & PTE_PFN) | ((address & VA_INDEX2) >> 10);
 	u32 const pte2 = space.read_dword(pte2_address);
 	LOGMASKED(LOG_TRANSLATE, "translate level 2 page table address 0x%06x entry 0x%08x\n", pte2_address, pte2);
 

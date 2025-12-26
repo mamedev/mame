@@ -410,7 +410,7 @@ void mc88200_device::cssp_w(u32 data)
 }
 
 // abbreviated, side-effect free address translation for debugger
-bool mc88200_device::translate(int intention, u32 &address, bool supervisor)
+bool mc88200_device::translate(int intention, offs_t &address, bool supervisor)
 {
 	// select area descriptor
 	u32 const apr = supervisor ? m_sapr : m_uapr;
@@ -460,7 +460,7 @@ bool mc88200_device::translate(int intention, u32 &address, bool supervisor)
 	return true;
 }
 
-std::optional<mc88200_device::translate_result> mc88200_device::translate(u32 virtual_address, bool supervisor, bool write)
+std::optional<mc88200_device::translate_result> mc88200_device::translate(offs_t virtual_address, bool supervisor, bool write)
 {
 	// select area descriptor
 	u32 const apr = supervisor ? m_sapr : m_uapr;
@@ -658,17 +658,17 @@ bool mc88200_device::cache_set::enabled(unsigned const line) const
 	return !BIT(status, 20 + line);
 }
 
-bool mc88200_device::cache_set::cache_line::match_segment(u32 const address) const
+bool mc88200_device::cache_set::cache_line::match_segment(offs_t const address) const
 {
 	return BIT(tag, 22, 10) == BIT(address, 22, 10);
 }
 
-bool mc88200_device::cache_set::cache_line::match_page(u32 const address) const
+bool mc88200_device::cache_set::cache_line::match_page(offs_t const address) const
 {
 	return BIT(tag, 12, 20) == BIT(address, 12, 20);
 }
 
-bool mc88200_device::cache_set::cache_line::load_line(mc88200_device &cmmu, u32 const address)
+bool mc88200_device::cache_set::cache_line::load_line(mc88200_device &cmmu, offs_t const address)
 {
 	for (unsigned i = 0; i < 4; i++)
 	{
@@ -683,7 +683,7 @@ bool mc88200_device::cache_set::cache_line::load_line(mc88200_device &cmmu, u32 
 	return true;
 }
 
-bool mc88200_device::cache_set::cache_line::copy_back(mc88200_device &cmmu, u32 const address, bool const flush)
+bool mc88200_device::cache_set::cache_line::copy_back(mc88200_device &cmmu, offs_t const address, bool const flush)
 {
 	for (unsigned i = 0; i < 4; i++)
 		if (!cmmu.mbus_write(address | i * 4, data[i], flush))
@@ -757,13 +757,13 @@ void mc88200_device::cache_flush(unsigned const start, unsigned const limit, mat
 	}
 }
 
-template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address, bool supervisor)
+template <typename T> std::optional<T> mc88200_device::read(offs_t virtual_address, bool supervisor)
 {
 	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, false);
 	if (!result.has_value())
 		return std::nullopt;
 
-	u32 const physical_address = result.value().address;
+	offs_t const physical_address = result.value().address;
 	if (!result.value().ci)
 	{
 		unsigned const s = BIT(physical_address, 4, 8);
@@ -830,13 +830,13 @@ template <typename T> std::optional<T> mc88200_device::read(u32 virtual_address,
 	return mbus_read<T>(physical_address);
 }
 
-template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bool supervisor)
+template <typename T> bool mc88200_device::write(offs_t virtual_address, T data, bool supervisor)
 {
 	std::optional<mc88200_device::translate_result> result = translate(virtual_address, supervisor, true);
 	if (!result.has_value())
 		return false;
 
-	u32 const physical_address = result.value().address;
+	offs_t const physical_address = result.value().address;
 	if (!result.value().ci)
 	{
 		unsigned const s = BIT(physical_address, 4, 8);
@@ -928,15 +928,15 @@ template <typename T> bool mc88200_device::write(u32 virtual_address, T data, bo
 	return mbus_write(result.value().address, data);
 }
 
-template std::optional<u8> mc88200_device::read(u32 virtual_address, bool supervisor);
-template std::optional<u16> mc88200_device::read(u32 virtual_address, bool supervisor);
-template std::optional<u32> mc88200_device::read(u32 virtual_address, bool supervisor);
+template std::optional<u8> mc88200_device::read(offs_t virtual_address, bool supervisor);
+template std::optional<u16> mc88200_device::read(offs_t virtual_address, bool supervisor);
+template std::optional<u32> mc88200_device::read(offs_t virtual_address, bool supervisor);
 
-template bool mc88200_device::write(u32 virtual_address, u8 data, bool supervisor);
-template bool mc88200_device::write(u32 virtual_address, u16 data, bool supervisor);
-template bool mc88200_device::write(u32 virtual_address, u32 data, bool supervisor);
+template bool mc88200_device::write(offs_t virtual_address, u8 data, bool supervisor);
+template bool mc88200_device::write(offs_t virtual_address, u16 data, bool supervisor);
+template bool mc88200_device::write(offs_t virtual_address, u32 data, bool supervisor);
 
-template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
+template <typename T> std::optional<T> mc88200_device::mbus_read(offs_t address)
 {
 	std::optional<T> data;
 
@@ -962,7 +962,7 @@ template <typename T> std::optional<T> mc88200_device::mbus_read(u32 address)
 	return data;
 }
 
-template <typename T> bool mc88200_device::mbus_write(u32 address, T data, bool flush)
+template <typename T> bool mc88200_device::mbus_write(offs_t address, T data, bool flush)
 {
 	m_bus_error = false;
 

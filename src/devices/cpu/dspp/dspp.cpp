@@ -2046,7 +2046,7 @@ uint32_t dspp_device::read_ext_control(offs_t offset)
 		}
 		default:
 		{
-			printf("DSPP: Unhandled external control read (%.4x)\n", offset << 2);
+			printf("DSPP: Unhandled external control read (%.4x)\n", (uint16_t)offset << 2);
 			break;
 		}
 	}
@@ -2281,7 +2281,7 @@ void dspp_device::write_ext_control(offs_t offset, uint32_t data)
 		}
 		default:
 		{
-			printf("DSPP: Unhandled external control write (%.4x with %.8x)\n", offset << 2, data);
+			printf("DSPP: Unhandled external control write (%.4x with %.8x)\n", (uint16_t)offset << 2, data);
 			break;
 		}
 	}

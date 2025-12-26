@@ -428,7 +428,7 @@ void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			if ( VDP1_LOG ) logerror( "VDP1: Draw forced termination register write: %08X %08X\n", offset*2, data );
 			break;
 		default:
-			printf("Warning: write to unknown VDP1 reg %08x %08x\n",offset*2,data);
+			printf("Warning: write to unknown VDP1 reg %08x %08x\n", (uint32_t)offset * 2,data);
 			break;
 	}
 

@@ -271,7 +271,7 @@ void cps1bl_5205_state::sf2b_layer_w(offs_t offset, uint16_t data)
 		m_cps_b_regs[m_layer_enable_reg / 2] = data;
 		break;
 	default:
-		printf("%X:%X ",offset,data);
+		logerror("%X:%X ", offset, data);
 	}
 }
 

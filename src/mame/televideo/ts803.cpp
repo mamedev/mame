@@ -278,7 +278,7 @@ void ts803_state::porta0_w(offs_t offset, uint8_t data)
 uint8_t ts803_state::port10_r(offs_t offset)
 {
 	offset += 0x10;
-	printf("Port read [%x]\n",offset);
+	printf("Port read [%x]\n", (uint8_t)offset);
 
 	return 0xff;
 }
@@ -316,7 +316,7 @@ void ts803_state::port10_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			printf("unknown port [%2.2x] write of [%2.2x]\n",offset,data);
+			printf("unknown port [%2.2x] write of [%2.2x]\n", (uint16_t)offset, data);
 			break;
 	}
 }
