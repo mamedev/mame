@@ -72,7 +72,7 @@ u32 metlhawk_state::sprite_pri_callback_ns2(u32 pri)
 
 u32 namcos2_state::sprite_pri_callback_ns2(u32 pri)
 {
-	// only low 3 bit is used
+	// only low 3 bits are used
 	return pri & 7;
 }
 
