@@ -18,9 +18,14 @@ JC-10011A
 
 
 TODO:
-- seems protected / to expect pre-programmed NVRAM?
-- while failing it currently shows 红心接龙, which is different to what it shows on
-  provided pics. Title selected via switch?
+- remove PPI1 port B hack;
+- correct IRQs (related to the above?);
+- second layer (uploads wrong data table?);
+- palette;
+- Oki banking;
+- what's the unknown ROM for?
+- switches;
+- counters / lamps
 */
 
 
@@ -115,63 +120,74 @@ uint32_t hominn_980924_state::screen_update(screen_device &screen, bitmap_rgb32 
 
 void hominn_980924_state::program_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom();
-	map(0x060000, 0x067fff).ram().share("nvram");
+	map(0x060000, 0x067fff).ram().share("nvram"); // second half only read at start?
 	map(0x080000, 0x080007).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x084000, 0x084007).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x088000, 0x088001).portr("SERVICE");
+	map(0x08c000, 0x08c001).nopw(); // counters ??
 	map(0x090001, 0x090001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	// map(0x09c001, 0x09c001); // ??
-	map(0x0a0000, 0x0a0fff).ram();
-	map(0x0c0000, 0x0c0fff).ram().w(FUNC(hominn_980924_state::charram_w)).share(m_charram);
-	// map(0x0e0001, 0x0e0001); // ??
+	map(0x0a0000, 0x0a0fff).ram().w(FUNC(hominn_980924_state::charram_w)).share(m_charram);
+	map(0x0c0000, 0x0c0fff).ram();
+	map(0x0e0000, 0x0e0001).nopw(); // lamps ??
 }
 
 
 static INPUT_PORTS_START( qxjl )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6") // title change
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -189,24 +205,24 @@ void hominn_980924_state::qxjl(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL); // TODO: XTAL could also be the 16 MHz one
 	m_maincpu->set_addrmap(AS_PROGRAM, &hominn_980924_state::program_map);
-	//m_maincpu->set_vblank_int("screen", FUNC(hominn_980924_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(hominn_980924_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// 82C255 (actual chip on PCB) is equivalent to two 8255s
 	i8255_device &ppi0(I8255(config, "ppi0"));
-	ppi0.in_pa_callback().set([this] () { LOGPORTS("%s: PPI0 port A in\n", machine().describe_context()); return uint8_t(0); });
-	ppi0.in_pb_callback().set([this] () { LOGPORTS("%s: PPI0 port B in\n", machine().describe_context()); return uint8_t(0); });
-	ppi0.in_pc_callback().set([this] () { LOGPORTS("%s: PPI0 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.in_pa_callback().set_ioport("P1");
+	ppi0.in_pb_callback().set_ioport("P2");
+	ppi0.in_pc_callback().set_ioport("DSW");
 	ppi0.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port A out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port B out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
 
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
-	ppi1.in_pa_callback().set([this] () { LOGPORTS("%s: PPI1 port A in\n", machine().describe_context()); return uint8_t(0); });
-	ppi1.in_pb_callback().set([this] () { LOGPORTS("%s: PPI1 port B in\n", machine().describe_context()); return uint8_t(0); });
-	ppi1.in_pc_callback().set([this] () { LOGPORTS("%s: PPI1 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi1.in_pa_callback().set([this] () { LOGPORTS("%s: PPI1 port A in\n", machine().describe_context()); return uint8_t(0xff); });
+	ppi1.in_pb_callback().set([this] () { LOGPORTS("%s: PPI1 port B in\n", machine().describe_context()); return (machine().rand() & 0x01) | 0xfe; }); // TODO: won't boot otherwise
+	ppi1.in_pc_callback().set([this] () { LOGPORTS("%s: PPI1 port C in\n", machine().describe_context()); return uint8_t(0xff); });
 	ppi1.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port A out %02x\n", machine().describe_context(), data); });
 	ppi1.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port B out %02x\n", machine().describe_context(), data); });
 	ppi1.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port C out %02x\n", machine().describe_context(), data); });
@@ -247,10 +263,6 @@ ROM_START( qxjl )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "6.u31", 0x00000, 0x80000, CRC(fad9be9f) SHA1(d58a51b09560edffebe52ec22080a29767273ed3) )
-
-	ROM_REGION( 0x8000, "nvram", ROMREGION_ERASE00 )
-	// ROM_FILL( 0x20b0, 0x02, 0x50 )
-	// ROM_FILL( 0x20b2, 0x02, 0x0a )
 ROM_END
 
 
@@ -264,7 +276,7 @@ void hominn_980924_state::init_qxjl()
 	memcpy(&buffer[0], rom, 0x40000);
 
 	for (int i = 0; i < 0x40000; i++)
-		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 8, 3, 15, 14, 13, 12, 10, 11, 9, 2, 7, 16, 5, 4, 17, 6, 1, 0)];
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 8, 3, 14, 13, 12, 15, 10, 11, 9, 2, 7, 16, 5, 4, 17, 6, 1, 0)];
 
 	for (int i = 0; i < 0x40000; i += 0x100)
 	{
@@ -324,4 +336,4 @@ void hominn_980924_state::init_qxjl()
 } // anonymous namespace
 
 
-GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, init_qxjl, ROT0, "Hom Inn", "Qianxi Jielong", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, init_qxjl, ROT0, "Hom Inn", "Qianxi Jielong", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
