@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Angelo Salese, superctr
+// copyright-holders: Angelo Salese, superctr, Nathan Misner
 
 #ifndef MAME_BUS_MEGADRIVE_CART_SEGACH_H
 #define MAME_BUS_MEGADRIVE_CART_SEGACH_H
