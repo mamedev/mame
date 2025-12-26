@@ -20,8 +20,8 @@ Namco System II
 
 u16 finallap_state::finallap_prot_r(offs_t offset)
 {
-	static const u16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
-	static const u16 table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
+	constexpr u16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
+	constexpr u16 table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
 	u16 data;
 
 	switch (offset)
@@ -86,7 +86,7 @@ void namcos2_base_state::machine_start()
 
 void gollygho_state::machine_start()
 {
-	namcos2_base_state::machine_start();
+	namcos2_state::machine_start();
 
 	// resolve outputs
 	m_out_digit.resolve();
