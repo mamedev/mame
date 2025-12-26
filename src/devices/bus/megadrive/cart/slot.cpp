@@ -74,6 +74,7 @@ megadrive_cart_slot_device::megadrive_cart_slot_device(const machine_config &mco
 	, m_cart(nullptr)
 	, m_space_mem_config("cart_mem", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor())
 	, m_space_io_config("time_io", ENDIANNESS_BIG, 16, 8, 0, address_map_constructor())
+	, m_vres_cb(*this)
 {
 }
 
