@@ -3322,7 +3322,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pcdos2ksv" cloneof="pcdos2k">
-		<description>IBM PC DOS 2000 (Sweden)</description>
+		<description>IBM PC DOS 2000 (Swedish)</description>
 		<year>1998</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="7.00, Revision 1" />
