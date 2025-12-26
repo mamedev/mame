@@ -52,11 +52,11 @@ struct roz_param
 	int wrap;
 };
 
-static inline void
-draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
+static inline void draw_roz_helper_block(
+	const struct roz_param *rozInfo, int destx, int desty,
 	int srcx, int srcy, int width, int height,
-	bitmap_ind16 &destbitmap, bitmap_ind8 &flagsbitmap,
-	bitmap_ind16 &srcbitmap, uint32_t size_mask)
+	bitmap_ind16 &destbitmap, bitmap_ind8 &destprimap, bitmap_ind8 &flagsbitmap,
+	bitmap_ind16 &srcbitmap, uint32_t size_mask, uint8_t prival, uint8_t primask)
 {
 	const int desty_end = desty + height;
 
@@ -64,7 +64,9 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 	const int end_incry = rozInfo->incyy - (width * rozInfo->incxy);
 
 	uint16_t *dest = &destbitmap.pix(desty, destx);
+	uint8_t *destpri = &destprimap.pix(desty, destx);
 	const int dest_rowinc = destbitmap.rowpixels() - width;
+	const int destpri_rowinc = destprimap.rowpixels() - width;
 
 	while (desty < desty_end)
 	{
@@ -87,6 +89,7 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 			if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
 			{
 				*dest = srcbitmap.pix(ypos, xpos) + rozInfo->color;
+				*destpri = (*destpri & primask) | prival;
 			}
 
 		L_SkipPixel:
@@ -94,21 +97,23 @@ draw_roz_helper_block(const struct roz_param *rozInfo, int destx, int desty,
 			srcx += rozInfo->incxx;
 			srcy += rozInfo->incxy;
 			dest++;
+			destpri++;
 		}
 		srcx += end_incrx;
 		srcy += end_incry;
 		dest += dest_rowinc;
+		destpri += destpri_rowinc;
 		desty++;
 	}
 }
 
-static void
-draw_roz_helper(
+static void draw_roz_helper(
 	screen_device &screen,
 	bitmap_ind16 &bitmap,
 	tilemap_t *tmap,
 	const rectangle &clip,
-	const struct roz_param *rozInfo)
+	const struct roz_param *rozInfo,
+	uint8_t prival, uint8_t primask)
 {
 	tmap->set_palette_offset(rozInfo->color);
 
@@ -141,9 +146,10 @@ draw_roz_helper(
 		    caches, it is used.
 		*/
 
-#define ROZ_BLOCK_SIZE 8
+		constexpr int ROZ_BLOCK_SIZE = 8;
 
 		const uint32_t size_mask = rozInfo->size - 1;
+		bitmap_ind8 &destprimap = screen.priority();
 		bitmap_ind16 &srcbitmap = tmap->pixmap();
 		bitmap_ind8 &flagsbitmap = tmap->flagsmap();
 		uint32_t srcx = (rozInfo->startx + (clip.min_x * rozInfo->incxx) +
@@ -176,7 +182,8 @@ draw_roz_helper(
 			for (int j = 0; j < column_block_count; j++)
 			{
 				draw_roz_helper_block(rozInfo, dx, desty, sx, sy, ROZ_BLOCK_SIZE,
-					ROZ_BLOCK_SIZE, bitmap, flagsbitmap, srcbitmap, size_mask);
+					ROZ_BLOCK_SIZE, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
+					prival, primask);
 				// Increment to the next block column
 				sx += row_block_size_incxx;
 				sy += row_block_size_incxy;
@@ -186,7 +193,8 @@ draw_roz_helper(
 			if (column_extra_count)
 			{
 				draw_roz_helper_block(rozInfo, dx, desty, sx, sy, column_extra_count,
-					ROZ_BLOCK_SIZE, bitmap, flagsbitmap, srcbitmap, size_mask);
+					ROZ_BLOCK_SIZE, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
+					prival, primask);
 			}
 			// Increment to the next row block
 			srcx += row_block_size_incyx;
@@ -200,7 +208,8 @@ draw_roz_helper(
 			for (int i = 0; i < column_block_count; i++)
 			{
 				draw_roz_helper_block(rozInfo, destx, desty, srcx, srcy, ROZ_BLOCK_SIZE,
-					row_extra_count, bitmap, flagsbitmap, srcbitmap, size_mask);
+					row_extra_count, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
+					prival, primask);
 				srcx += row_block_size_incxx;
 				srcy += row_block_size_incxy;
 				destx += ROZ_BLOCK_SIZE;
@@ -209,7 +218,8 @@ draw_roz_helper(
 			if (column_extra_count)
 			{
 				draw_roz_helper_block(rozInfo, destx, desty, srcx, srcy, column_extra_count,
-					row_extra_count, bitmap, flagsbitmap, srcbitmap, size_mask);
+					row_extra_count, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
+					prival, primask);
 			}
 		}
 	}
@@ -220,11 +230,11 @@ draw_roz_helper(
 			rozInfo->startx, rozInfo->starty,
 			rozInfo->incxx, rozInfo->incxy,
 			rozInfo->incyx, rozInfo->incyy,
-			rozInfo->wrap, 0, 0); // wrap, flags, pri
+			rozInfo->wrap, 0, prival, primask); // wrap, flags, pri
 	}
 }
 
-void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t gfx_ctrl)
+void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t gfx_ctrl, uint8_t prival, uint8_t primask)
 {
 	const int xoffset = 38, yoffset = 0;
 	struct roz_param rozParam;
@@ -271,7 +281,7 @@ void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, c
 	rozParam.incyx <<= 8;
 	rozParam.incyy <<= 8;
 
-	draw_roz_helper(screen, bitmap, m_tilemap_roz, cliprect, &rozParam);
+	draw_roz_helper(screen, bitmap, m_tilemap_roz, cliprect, &rozParam, prival, primask);
 }
 
 void namcos2_roz_device::rozram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
