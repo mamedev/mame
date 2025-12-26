@@ -50,7 +50,7 @@ TODO:
     - POSIRQ is off-by-one, but adjusting it makes other cases worse
       (because some layers are line-buffered and some aren't, and we need proper scroll/data latch times for each layer type?)
 
-The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
+The Namco System II board is a 5 CPU system (only 4 are emulated). The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
 number of custom ASICs to perform graphics operations, there is no
 documentation available for these parts.
@@ -563,25 +563,25 @@ C102 - Controls CPU access to ROZ Memory Area.
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define MAIN_OSC_CLOCK      XTAL(49'152'000)
-#define M68K_CPU_CLOCK      (MAIN_OSC_CLOCK / 4)        /* 12.288MHz clock for 68000 (Master & Slave) */
-#define M68B09_CPU_CLOCK    (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 68B09 sound CPU */
-#define C65_CPU_CLOCK       (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
-#define C68_CPU_CLOCK       (MAIN_OSC_CLOCK / 6)        /* 8.192MHz clock for 37450 I/O CPU */
-#define YM2151_SOUND_CLOCK  XTAL(3'579'545)             /* 3.579545MHz FM clock */
-#define C140_SOUND_CLOCK    (MAIN_OSC_CLOCK / 384 / 6)  /* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
+static constexpr XTAL MAIN_OSC_CLOCK     = XTAL(49'152'000);
+static constexpr XTAL M68K_CPU_CLOCK     = (MAIN_OSC_CLOCK / 4);        /* 12.288MHz clock for 68000 (Master & Slave) */
+static constexpr XTAL M68B09_CPU_CLOCK   = (MAIN_OSC_CLOCK / 24);       /* 2.048MHz clock for 68B09 sound CPU */
+static constexpr XTAL C65_CPU_CLOCK      = (MAIN_OSC_CLOCK / 24);       /* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
+static constexpr XTAL C68_CPU_CLOCK      = (MAIN_OSC_CLOCK / 6);        /* 8.192MHz clock for 37450 I/O CPU */
+static constexpr XTAL YM2151_SOUND_CLOCK = XTAL(3'579'545);             /* 3.579545MHz FM clock */
+static constexpr XTAL C140_SOUND_CLOCK   = (MAIN_OSC_CLOCK / 384 / 6);  /* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
 
 
 /*************************************************************/
 /* 68000/6809/63705 Shared memory area - DUAL PORT Memory    */
 /*************************************************************/
 
-u16 namcos2_state::dpram_word_r(offs_t offset)
+u16 namcos2_base_state::dpram_word_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-void namcos2_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
+void namcos2_base_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -599,7 +599,7 @@ void gollygho_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 		m_dpram[offset] = data & 0xff;
 
 		// TODO : This is a hack! should be output ports MCU side, not probing into DPRAM content
-		switch( offset )
+		switch (offset)
 		{
 			case 0xc0/2:
 			{
@@ -658,12 +658,12 @@ void gollygho_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-u8 namcos2_state::dpram_byte_r(offs_t offset)
+u8 namcos2_base_state::dpram_byte_r(offs_t offset)
 {
 	return m_dpram[offset];
 }
 
-void namcos2_state::dpram_byte_w(offs_t offset, u8 data)
+void namcos2_base_state::dpram_byte_w(offs_t offset, u8 data)
 {
 	m_dpram[offset] = data;
 }
@@ -684,13 +684,13 @@ void namcos2_state::dpram_byte_w(offs_t offset, u8 data)
     0xc00000 ONWARDS are unverified memory locations on the video board
 */
 
-void namcos2_state::namcos2_68k_default_cpu_board_am(address_map &map)
+void namcos2_base_state::namcos2_68k_default_cpu_board_am(address_map &map)
 {
 	map(0x200000, 0x3fffff).rom().region("data_rom", 0);
 	map(0x400000, 0x40ffff).mirror(0x010000).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
 	map(0x420000, 0x42003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
-	map(0x440000, 0x44ffff).r(FUNC(namcos2_state::c116_r)).w(m_c116, FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
-	map(0x460000, 0x460fff).mirror(0x00f000).rw(FUNC(namcos2_state::dpram_word_r), FUNC(namcos2_state::dpram_word_w));
+	map(0x440000, 0x44ffff).r(FUNC(namcos2_base_state::c116_r)).w(m_c116, FUNC(namco_c116_device::write)).umask16(0x00ff).cswidth(16);
+	map(0x460000, 0x460fff).mirror(0x00f000).rw(FUNC(namcos2_base_state::dpram_word_r), FUNC(namcos2_base_state::dpram_word_w));
 	map(0x480000, 0x483fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
 	map(0x4a0000, 0x4a000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
@@ -707,15 +707,15 @@ void namcos2_state::common_default_am(address_map &map)
 	map(0xd00000, 0xd0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
 }
 
-void namcos2_state::master_common_am(address_map &map)
+void namcos2_base_state::master_common_am(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x180000, 0x183fff).rw(FUNC(namcos2_state::eeprom_r), FUNC(namcos2_state::eeprom_w)).umask16(0x00ff);
+	map(0x180000, 0x183fff).rw(FUNC(namcos2_base_state::eeprom_r), FUNC(namcos2_base_state::eeprom_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1fffff).m(m_master_intc, FUNC(namco_c148_device::map));
 }
 
-void namcos2_state::slave_common_am(address_map &map)
+void namcos2_base_state::slave_common_am(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x13ffff).ram();
@@ -737,23 +737,23 @@ void namcos2_state::slave_default_am(address_map &map)
 
 /*************************************************************/
 
-void namcos2_state::common_finallap_am(address_map &map)
+void finallap_state::common_finallap_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
-	map(0x300000, 0x33ffff).r(FUNC(namcos2_state::namcos2_finallap_prot_r));
+	map(0x300000, 0x33ffff).r(FUNC(finallap_state::finallap_prot_r));
 	map(0x800000, 0x80ffff).ram().share(m_spriteram);
-	map(0x840000, 0x840001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w));
+	map(0x840000, 0x840001).rw(FUNC(finallap_state::gfx_ctrl_r), FUNC(finallap_state::gfx_ctrl_w));
 	map(0x880000, 0x89ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
 	map(0x8c0000, 0x8c0001).nopw();
 }
 
-void namcos2_state::master_finallap_am(address_map &map)
+void finallap_state::master_finallap_am(address_map &map)
 {
 	common_finallap_am(map);
 	master_common_am(map);
 }
 
-void namcos2_state::slave_finallap_am(address_map &map)
+void finallap_state::slave_finallap_am(address_map &map)
 {
 	common_finallap_am(map);
 	slave_common_am(map);
@@ -761,21 +761,21 @@ void namcos2_state::slave_finallap_am(address_map &map)
 
 /*************************************************************/
 
-void namcos2_state::common_sgunner_am(address_map &map)
+void sgunner_state::common_sgunner_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0x800000, 0x8141ff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w));
 	map(0x818000, 0x818001).nopw();
-	map(0xa00000, 0xa0000f).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
+	map(0xa00000, 0xa0000f).rw(FUNC(sgunner_state::namcos2_68k_key_r), FUNC(sgunner_state::namcos2_68k_key_w));
 }
 
-void namcos2_state::master_sgunner_am(address_map &map)
+void sgunner_state::master_sgunner_am(address_map &map)
 {
 	common_sgunner_am(map);
 	master_common_am(map);
 }
 
-void namcos2_state::slave_sgunner_am(address_map &map)
+void sgunner_state::slave_sgunner_am(address_map &map)
 {
 	common_sgunner_am(map);
 	slave_common_am(map);
@@ -783,22 +783,22 @@ void namcos2_state::slave_sgunner_am(address_map &map)
 
 /*************************************************************/
 
-void namcos2_state::common_metlhawk_am(address_map &map)
+void metlhawk_state::common_metlhawk_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0xc00000, 0xc03fff).ram().share(m_spriteram);
 	map(0xc40000, 0xc4ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
-	map(0xe00000, 0xe00001).rw(FUNC(namcos2_state::gfx_ctrl_r), FUNC(namcos2_state::gfx_ctrl_w)); /* ??? */
+	map(0xe00000, 0xe00001).rw(FUNC(metlhawk_state::gfx_ctrl_r), FUNC(metlhawk_state::gfx_ctrl_w)); /* ??? */
 }
 
-void namcos2_state::master_metlhawk_am(address_map &map)
+void metlhawk_state::master_metlhawk_am(address_map &map)
 {
 	common_metlhawk_am(map);
 	master_common_am(map);
 }
 
-void namcos2_state::slave_metlhawk_am(address_map &map)
+void metlhawk_state::slave_metlhawk_am(address_map &map)
 {
 	common_metlhawk_am(map);
 	slave_common_am(map);
@@ -806,7 +806,7 @@ void namcos2_state::slave_metlhawk_am(address_map &map)
 
 /*************************************************************/
 
-void namcos2_state::common_suzuka8h_am(address_map &map)
+void sgunner_state::common_suzuka8h_am(address_map &map)
 {
 	namcos2_68k_default_cpu_board_am(map);
 	map(0x800000, 0x8141ff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w));
@@ -815,43 +815,43 @@ void namcos2_state::common_suzuka8h_am(address_map &map)
 	map(0x840000, 0x840001).nopr();
 	map(0x900000, 0x900007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
-	map(0xf00000, 0xf00007).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
+	map(0xf00000, 0xf00007).rw(FUNC(sgunner_state::namcos2_68k_key_r), FUNC(sgunner_state::namcos2_68k_key_w));
 }
 
-void namcos2_state::common_suzuka8h_roz_am(address_map &map)
+void sgunner_state::common_suzuka8h_roz_am(address_map &map)
 {
 	map(0xc00000, 0xc0ffff).noprw(); // no ROZ hardware implemented in PCB
 	map(0xd00000, 0xd0001f).noprw(); // ^^
 }
 
-void namcos2_state::master_suzuka8h_am(address_map &map)
+void sgunner_state::master_suzuka8h_am(address_map &map)
 {
 	common_suzuka8h_am(map);
 	master_common_am(map);
 	common_suzuka8h_roz_am(map);
 }
 
-void namcos2_state::slave_suzuka8h_am(address_map &map)
+void sgunner_state::slave_suzuka8h_am(address_map &map)
 {
 	common_suzuka8h_am(map);
 	slave_common_am(map);
 	common_suzuka8h_roz_am(map);
 }
 
-void namcos2_state::common_luckywld_roz_am(address_map &map)
+void sgunner_state::common_luckywld_roz_am(address_map &map)
 {
 	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 }
 
-void namcos2_state::master_luckywld_am(address_map &map)
+void sgunner_state::master_luckywld_am(address_map &map)
 {
 	common_suzuka8h_am(map);
 	master_common_am(map);
 	common_luckywld_roz_am(map);
 }
 
-void namcos2_state::slave_luckywld_am(address_map &map)
+void sgunner_state::slave_luckywld_am(address_map &map)
 {
 	common_suzuka8h_am(map);
 	slave_common_am(map);
@@ -862,25 +862,25 @@ void namcos2_state::slave_luckywld_am(address_map &map)
 /* 6809 SOUND CPU Memory declarations                        */
 /*************************************************************/
 
-void namcos2_state::sound_default_am(address_map &map)
+void namcos2_base_state::sound_default_am(address_map &map)
 {
 	map(0x0000, 0x3fff).bankr("audiobank"); /* banked */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x5000, 0x51ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w));
 	map(0x6000, 0x61ff).mirror(0x0e00).rw(m_c140, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)); // mirrored
-	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namcos2_state::dpram_byte_r), FUNC(namcos2_state::dpram_byte_w)).share("dpram");
+	map(0x7000, 0x77ff).mirror(0x0800).rw(FUNC(namcos2_base_state::dpram_byte_r), FUNC(namcos2_base_state::dpram_byte_w)).share("dpram");
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xbfff).nopw(); /* Amplifier enable on 1st write */
-	map(0xc000, 0xc001).w(FUNC(namcos2_state::sound_bankselect_w));
+	map(0xc000, 0xc001).w(FUNC(namcos2_base_state::sound_bankselect_w));
 	map(0xd001, 0xd001).nopw(); /* Watchdog */
 	map(0xe000, 0xe000).nopw();
 	map(0xd000, 0xffff).rom().region("audiocpu", 0x01000);
 }
 
-void namcos2_state::c140_default_am(address_map &map)
+void namcos2_base_state::c140_default_am(address_map &map)
 {
 	map.global_mask(0x7fffff); // bit 23-24 not connected
-	map(0x000000, 0x7fffff).r(FUNC(namcos2_state::c140_rom_r));
+	map(0x000000, 0x7fffff).r(FUNC(namcos2_base_state::c140_rom_r));
 }
 
 /*************************************************************/
@@ -1632,24 +1632,24 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
-void namcos2_state::configure_c116_standard(machine_config &config)
+void namcos2_base_state::configure_c116_standard(machine_config &config)
 {
 	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 }
 
-void namcos2_state::configure_c148_standard(machine_config &config)
+void namcos2_base_state::configure_c148_standard(machine_config &config)
 {
 	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
 	m_master_intc->link_c148_device(m_slave_intc);
-	m_master_intc->out_ext1_callback().set(FUNC(namcos2_state::sound_reset_w));
-	m_master_intc->out_ext2_callback().set(FUNC(namcos2_state::system_reset_w));
+	m_master_intc->out_ext1_callback().set(FUNC(namcos2_base_state::sound_reset_w));
+	m_master_intc->out_ext2_callback().set(FUNC(namcos2_base_state::system_reset_w));
 
 	NAMCO_C148(config, m_slave_intc, 0, m_slave, false);
 	m_slave_intc->link_c148_device(m_master_intc);
 }
 
-void namcos2_state::configure_c65_standard(machine_config &config)
+void namcos2_base_state::configure_c65_standard(machine_config &config)
 {
 	NAMCOC65(config, m_c65, C65_CPU_CLOCK);
 	m_c65->in_pb_callback().set_ioport("MCUB");
@@ -1668,11 +1668,11 @@ void namcos2_state::configure_c65_standard(machine_config &config)
 	m_c65->an5_in_cb().set_ioport("AN5");
 	m_c65->an6_in_cb().set_ioport("AN6");
 	m_c65->an7_in_cb().set_ioport("AN7");
-	m_c65->dp_in_callback().set(FUNC(namcos2_state::dpram_byte_r));
-	m_c65->dp_out_callback().set(FUNC(namcos2_state::dpram_byte_w));
+	m_c65->dp_in_callback().set(FUNC(namcos2_base_state::dpram_byte_r));
+	m_c65->dp_out_callback().set(FUNC(namcos2_base_state::dpram_byte_w));
 }
 
-void namcos2_state::configure_c68_standard(machine_config &config)
+void namcos2_base_state::configure_c68_standard(machine_config &config)
 {
 	NAMCOC68(config, m_c68, C68_CPU_CLOCK);
 	m_c68->in_pb_callback().set_ioport("MCUB");
@@ -1691,19 +1691,19 @@ void namcos2_state::configure_c68_standard(machine_config &config)
 	m_c68->an5_in_cb().set_ioport("AN5");
 	m_c68->an6_in_cb().set_ioport("AN6");
 	m_c68->an7_in_cb().set_ioport("AN7");
-	m_c68->dp_in_callback().set(FUNC(namcos2_state::dpram_byte_r));
-	m_c68->dp_out_callback().set(FUNC(namcos2_state::dpram_byte_w));
+	m_c68->dp_in_callback().set(FUNC(namcos2_base_state::dpram_byte_r));
+	m_c68->dp_out_callback().set(FUNC(namcos2_base_state::dpram_byte_w));
 }
 
-void namcos2_state::configure_common_standard(machine_config &config)
+void namcos2_base_state::configure_common_standard(machine_config &config)
 {
 	M68000(config, m_maincpu, M68K_CPU_CLOCK); /* 12.288MHz (49.152MHz OSC/4) */
-	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_state::screen_scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(namcos2_base_state::screen_scanline), "screen", 0, 1);
 
 	M68000(config, m_slave, M68K_CPU_CLOCK); /*  12.288MHz (49.152MHz OSC/4) */
 
 	MC6809E(config, m_audiocpu, M68B09_CPU_CLOCK); /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
-	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
+	m_audiocpu->set_periodic_int(FUNC(namcos2_base_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1716,12 +1716,12 @@ void namcos2_state::configure_common_standard(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	C140(config, m_c140, C140_SOUND_CLOCK); /* 21.333kHz */
-	m_c140->set_addrmap(0, &namcos2_state::c140_default_am);
+	m_c140->set_addrmap(0, &namcos2_base_state::c140_default_am);
 	m_c140->int1_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 }
 
 // TODO: temp
-TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(namcos2_base_state::screen_scanline)
 {
 	const int scanline = param;
 	const int cur_posirq = get_pos_irq_scanline();
@@ -1750,15 +1750,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 	}
 }
 
-void namcos2_state::configure_c123tmap_standard(machine_config &config)
+void namcos2_base_state::configure_c123tmap_standard(machine_config &config)
 {
 	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_base_state::TilemapCB, this));
 	m_c123tmap->set_color_base(16*256);
 }
 
-void namcos2_state::configure_c169roz_standard(machine_config &config)
+void namcos2_base_state::configure_c169roz_standard(machine_config &config)
 {
 	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
@@ -1767,28 +1767,30 @@ void namcos2_state::configure_c169roz_standard(machine_config &config)
 	m_c169roz->set_color_base(0*256);
 }
 
-void namcos2_state::configure_c355spr_standard(machine_config &config)
+void sgunner_state::configure_c355spr_standard(machine_config &config)
 {
 	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
-	m_c355spr->set_mix_callback(FUNC(namcos2_state::sprite_mix_callback));
+	m_c355spr->set_mix_callback(FUNC(sgunner_state::sprite_mix_callback_c355));
 	m_c355spr->set_color_base(0);
 }
 
-void namcos2_state::configure_c45road_standard(machine_config &config)
+void namcos2_base_state::configure_c45road_standard(machine_config &config)
 {
 	NAMCO_C45_ROAD(config, m_c45_road);
 	m_c45_road->set_palette(m_c116);
 	m_c45_road->set_xoffset(-72);
 }
 
-void namcos2_state::configure_namcos2_sprite_standard(machine_config &config)
+void finallap_state::configure_namcos2_sprite_standard(machine_config &config)
 {
 	NAMCOS2_SPRITE(config, m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
 	m_ns2sprite->set_spriteram_tag("spriteram");
+	m_ns2sprite->set_priority_callback(FUNC(finallap_state::sprite_pri_callback_ns2));
+	m_ns2sprite->set_mix_callback(FUNC(finallap_state::sprite_mix_callback_ns2));
 }
 
 void namcos2_state::configure_namcos2_roz_standard(machine_config &config)
@@ -1866,21 +1868,21 @@ void namcos2_state::base3(machine_config &config)
 }
 
 
-void namcos2_state::finallap_noio(machine_config &config)
+void finallap_state::finallap_noio(machine_config &config)
 {
 	configure_common_standard(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_finallap_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &finallap_state::master_finallap_am);
 
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_finallap_am);
+	m_slave->set_addrmap(AS_PROGRAM, &finallap_state::slave_finallap_am);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &finallap_state::sound_default_am);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	configure_c148_standard(config);
 	configure_c116_standard(config);
 
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_finallap));
+	m_screen->set_screen_update(FUNC(finallap_state::screen_update_finallap));
 
 	configure_namcos2_sprite_standard(config);
 	configure_c123tmap_standard(config);
@@ -1892,22 +1894,24 @@ void namcos2_state::finallap_noio(machine_config &config)
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
-void namcos2_state::base_fl(machine_config &config)
+void finallap_state::base_fl(machine_config &config)
 {
 	finallap_noio(config);
 	configure_c65_standard(config);
 }
 
-void namcos2_state::finallap(machine_config &config)
+void finallap_state::finallap(machine_config &config)
 {
 	base_fl(config);
 
 	NAMCOS2_SPRITE_FINALLAP(config.replace(), m_ns2sprite, 0, m_c116, gfx_namcos2_spr);
 	m_ns2sprite->set_spriteram_tag("spriteram");
+	m_ns2sprite->set_priority_callback(FUNC(finallap_state::sprite_pri_callback_ns2));
+	m_ns2sprite->set_mix_callback(FUNC(finallap_state::sprite_mix_callback_ns2));
 }
 
 
-void namcos2_state::finallap_c68(machine_config &config)
+void finallap_state::finallap_c68(machine_config &config)
 {
 	finallap_noio(config);
 	configure_c68_standard(config);
@@ -1915,29 +1919,29 @@ void namcos2_state::finallap_c68(machine_config &config)
 
 
 // finalap2 has different mangle
-void namcos2_state::finalap2(machine_config &config)
+void finallap_state::finalap2(machine_config &config)
 {
 	base_fl(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&finallap_state::TilemapCB_finalap2, this));
 }
 
-void namcos2_state::finalap3(machine_config &config)
+void finallap_state::finalap3(machine_config &config)
 {
 	finallap_c68(config);
 
-	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB_finalap2, this));
+	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&finallap_state::TilemapCB_finalap2, this));
 }
 
 
-void namcos2_state::sgunner(machine_config &config)
+void sgunner_state::sgunner(machine_config &config)
 {
 	configure_common_standard(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_sgunner_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sgunner_state::master_sgunner_am);
 
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_sgunner_am);
+	m_slave->set_addrmap(AS_PROGRAM, &sgunner_state::slave_sgunner_am);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sgunner_state::sound_default_am);
 
 	configure_c65_standard(config);
 
@@ -1946,12 +1950,10 @@ void namcos2_state::sgunner(machine_config &config)
 	configure_c148_standard(config);
 	configure_c116_standard(config);
 
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
+	m_screen->set_screen_update(FUNC(sgunner_state::screen_update_sgunner));
 
 	configure_c355spr_standard(config);
 	configure_c123tmap_standard(config);
-
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	m_c140->add_route(0, "speaker", 0.75, 0);
 	m_c140->add_route(1, "speaker", 0.75, 1);
@@ -1959,14 +1961,14 @@ void namcos2_state::sgunner(machine_config &config)
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
-void namcos2_state::sgunner2(machine_config &config)
+void sgunner_state::sgunner2(machine_config &config)
 {
 	configure_common_standard(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_sgunner_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sgunner_state::master_sgunner_am);
 
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_sgunner_am);
+	m_slave->set_addrmap(AS_PROGRAM, &sgunner_state::slave_sgunner_am);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sgunner_state::sound_default_am);
 
 	configure_c68_standard(config);
 
@@ -1975,12 +1977,10 @@ void namcos2_state::sgunner2(machine_config &config)
 	configure_c148_standard(config);
 	configure_c116_standard(config);
 
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_sgunner));
+	m_screen->set_screen_update(FUNC(sgunner_state::screen_update_sgunner));
 
 	configure_c355spr_standard(config);
 	configure_c123tmap_standard(config);
-
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
 
 	m_c140->add_route(0, "speaker", 0.75, 0);
 	m_c140->add_route(1, "speaker", 0.75, 1);
@@ -1988,14 +1988,14 @@ void namcos2_state::sgunner2(machine_config &config)
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
-void namcos2_state::suzuka8h(machine_config &config)
+void sgunner_state::suzuka8h(machine_config &config)
 {
 	configure_common_standard(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_suzuka8h_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sgunner_state::master_suzuka8h_am);
 
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_suzuka8h_am);
+	m_slave->set_addrmap(AS_PROGRAM, &sgunner_state::slave_suzuka8h_am);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sgunner_state::sound_default_am);
 
 	configure_c68_standard(config);
 
@@ -2004,7 +2004,7 @@ void namcos2_state::suzuka8h(machine_config &config)
 	configure_c148_standard(config);
 	configure_c116_standard(config);
 
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_luckywld));
+	m_screen->set_screen_update(FUNC(sgunner_state::screen_update_luckywld));
 	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 
 	configure_c355spr_standard(config);
@@ -2013,34 +2013,32 @@ void namcos2_state::suzuka8h(machine_config &config)
 	configure_c123tmap_standard(config);
 	configure_c45road_standard(config);
 
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, luckywld)
-
 	m_c140->add_route(0, "speaker", 0.75, 0);
 	m_c140->add_route(1, "speaker", 0.75, 1);
 
 	YM2151(config, "ymsnd", YM2151_SOUND_CLOCK).add_route(0, "speaker", 0.80, 0).add_route(1, "speaker", 0.80, 1); /* 3.579545MHz */
 }
 
-void namcos2_state::luckywld(machine_config &config)
+void sgunner_state::luckywld(machine_config &config)
 {
 	suzuka8h(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_luckywld_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sgunner_state::master_luckywld_am);
 
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_luckywld_am);
+	m_slave->set_addrmap(AS_PROGRAM, &sgunner_state::slave_luckywld_am);
 
 	configure_c169roz_standard(config);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_luckywld, this));
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&sgunner_state::RozCB_luckywld, this));
 }
 
-void namcos2_state::metlhawk(machine_config &config)
+void metlhawk_state::metlhawk(machine_config &config)
 {
 	configure_common_standard(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &namcos2_state::master_metlhawk_am);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metlhawk_state::master_metlhawk_am);
 
-	m_slave->set_addrmap(AS_PROGRAM, &namcos2_state::slave_metlhawk_am);
+	m_slave->set_addrmap(AS_PROGRAM, &metlhawk_state::slave_metlhawk_am);
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &metlhawk_state::sound_default_am);
 
 	configure_c65_standard(config);
 
@@ -2049,16 +2047,16 @@ void namcos2_state::metlhawk(machine_config &config)
 	configure_c148_standard(config);
 	configure_c116_standard(config);
 
-	m_screen->set_screen_update(FUNC(namcos2_state::screen_update_metlhawk));
+	m_screen->set_screen_update(FUNC(metlhawk_state::screen_update_metlhawk));
 
 	NAMCOS2_SPRITE_METALHAWK(config, m_ns2sprite, 0, m_c116, gfx_metlhawk_spr);
 	m_ns2sprite->set_spriteram_tag("spriteram");
+	m_ns2sprite->set_priority_callback(FUNC(metlhawk_state::sprite_pri_callback_ns2));
+	m_ns2sprite->set_mix_callback(FUNC(metlhawk_state::sprite_mix_callback_ns2));
 
 	configure_c123tmap_standard(config);
 	configure_c169roz_standard(config);
-	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&namcos2_state::RozCB_metlhawk, this));
-
-	MCFG_VIDEO_START_OVERRIDE(namcos2_state, metlhawk)
+	m_c169roz->set_tile_callback(namco_c169roz_device::c169_tilemap_delegate(&metlhawk_state::RozCB_metlhawk, this));
 
 	m_c140->add_route(0, "speaker", 1.0, 0);
 	m_c140->add_route(1, "speaker", 1.0, 1);
@@ -2413,7 +2411,7 @@ ROM_START( cosmogng )
 	ROM_LOAD16_BYTE( "co2voi1.bin",  0x000000, 0x080000, CRC(5a301349) SHA1(e333ea5955a66ac8d7c94cd50047efaf6fa95b15) )
 	ROM_LOAD16_BYTE( "co2voi2.bin",  0x100000, 0x080000, CRC(a27cb45a) SHA1(08ccaaf43369e8358e31b213877829bdfd61479e) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -2459,7 +2457,7 @@ ROM_START( cosmogngj )
 	ROM_LOAD16_BYTE( "co1voi1.bin",  0x000000, 0x080000, CRC(b5ba8f15) SHA1(9e54b9ba1cd44353782adf337376dff9eec4e937) )
 	ROM_LOAD16_BYTE( "co1voi2.bin",  0x100000, 0x080000, CRC(b566b105) SHA1(b5530b0f3dea0135f28419044aee923d855f382c) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6n", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -3040,7 +3038,7 @@ ROM_START( finalap3 ) // this set displays MOTION (Ver. 3) in the test mode menu
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
@@ -3098,7 +3096,7 @@ ROM_START( finalap3a )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x20000, "unknown", 0 ) /* unknown rom */
@@ -3159,7 +3157,7 @@ ROM_START( finalap3j )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
@@ -3216,7 +3214,7 @@ ROM_START( finalap3jc )
 	ROM_LOAD16_BYTE( "flt_voi-1.3m",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "flt_voi-2.3l",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
@@ -3272,7 +3270,7 @@ ROM_START( finalap3bl ) // bootleg set
 	ROM_LOAD16_BYTE( "fltvoi1",  0x000000, 0x080000, CRC(4fc7c0ba) SHA1(bbfd1764fd79087bba5e6199e8916c28bed4d3f4) )
 	ROM_LOAD16_BYTE( "fltvoi2",  0x100000, 0x080000, CRC(409c62df) SHA1(0c2f088168f1f92f2f767ea47522c0e8f4a10265) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* zoom */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* zoom */
 	ROM_LOAD( "04544191.6r", 0, 0x2000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration and machine ID code that passes protection */
@@ -3829,7 +3827,7 @@ ROM_START( metlhawk )
 	ROM_LOAD16_BYTE( "mhvoi-1.bin",  0x000000, 0x080000, CRC(2723d137) SHA1(f67334f8e456ae9e6aee39f0cf5e73449838f37f) )
 	ROM_LOAD16_BYTE( "mhvoi-2.bin",  0x100000, 0x080000, CRC(dbc92d91) SHA1(a8c50f607d5283c8bd9688d2149b811e7ddb77dd) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "mh5762.7p",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x0500, "plds", 0 )
@@ -3897,7 +3895,7 @@ ROM_START( metlhawkj )
 	ROM_LOAD16_BYTE( "mhvoi-1.bin",  0x000000, 0x080000, CRC(2723d137) SHA1(f67334f8e456ae9e6aee39f0cf5e73449838f37f) )
 	ROM_LOAD16_BYTE( "mhvoi-2.bin",  0x100000, 0x080000, CRC(dbc92d91) SHA1(a8c50f607d5283c8bd9688d2149b811e7ddb77dd) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "mh5762.7p",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x0500, "plds", 0 )
@@ -4064,7 +4062,7 @@ ROM_START( ordyne )
 	ROM_LOAD16_BYTE( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD16_BYTE( "or_voi2.voice2",  0x100000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -4120,7 +4118,7 @@ ROM_START( ordyneje )
 	ROM_LOAD16_BYTE( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD16_BYTE( "or_voi2.voice2",  0x100000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -4176,7 +4174,7 @@ ROM_START( ordynej )
 	ROM_LOAD16_BYTE( "or_voi1.voice1",  0x000000, 0x080000, CRC(369e0bca) SHA1(2a921bb373dd043bd7b2a30e5e46ec3b8b3b5c8d) )
 	ROM_LOAD16_BYTE( "or_voi2.voice2",  0x100000, 0x080000, CRC(9f4cd7b5) SHA1(10941dd5ab3846c0cb2543655944eaec742f8f21) )
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* sprite zoom lookup table */
+	ROM_REGION( 0x2000, "zoomlut", 0 ) /* sprite zoom lookup table */
 	ROM_LOAD( "lh5762.6n",    0x00000,  0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 ROM_END
 
@@ -5138,7 +5136,7 @@ ROM_START( gollygho )
 	ROM_REGION16_BE( 0x200000, "data_rom", ROMREGION_ERASEFF ) /* Shared data roms */
 	/* All DAT ROM sockets unpopulated on PCB */
 
-	ROM_REGION16_BE( 0x2000, "user2", 0 ) /* sprite zoom */
+	ROM_REGION16_BE( 0x2000, "zoomlut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5184,7 +5182,7 @@ ROM_START( bubbletr ) /* All labels were hand written and included the rom size,
 	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) ) /* dated 4/24 */
 	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) ) /* dated 4/24 */
 
-	ROM_REGION16_BE( 0x2000, "user2", 0 ) /* sprite zoom */
+	ROM_REGION16_BE( 0x2000, "zoomlut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5230,7 +5228,7 @@ ROM_START( bubbletrj )
 	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) )
 	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) )
 
-	ROM_REGION16_BE( 0x2000, "user2", 0 ) /* sprite zoom */
+	ROM_REGION16_BE( 0x2000, "zoomlut", 0 ) /* sprite zoom */
 	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
@@ -5514,7 +5512,7 @@ void namcos2_state::init_dirtfoxj()
 	m_gametype = NAMCOS2_DIRT_FOX_JP;
 }
 
-void namcos2_state::init_finallap()
+void finallap_state::init_finallap()
 {
 	m_gametype = NAMCOS2_FINAL_LAP;
 
@@ -5522,7 +5520,7 @@ void namcos2_state::init_finallap()
 	m_finallap_prot_count = 0;
 }
 
-void namcos2_state::init_finalap2()
+void finallap_state::init_finalap2()
 {
 	m_gametype = NAMCOS2_FINAL_LAP_2;
 
@@ -5530,7 +5528,7 @@ void namcos2_state::init_finalap2()
 	m_finallap_prot_count = 0;
 }
 
-void namcos2_state::init_finalap3()
+void finallap_state::init_finalap3()
 {
 	m_gametype = NAMCOS2_FINAL_LAP_3;
 
@@ -5538,7 +5536,7 @@ void namcos2_state::init_finalap3()
 	m_finallap_prot_count = 0;
 }
 
-u16 namcos2_state::finalap3bl_prot_r()
+u16 finallap_state::finalap3bl_prot_r()
 {
 	// code at 0x3f22 expects this to be 0x4d00 or it sets a value in NVRAM which prevents booting
 	// address 0x180020 (0x10 in NVRAM) must also be 0x6b (machine ID code first byte) or the same will occur
@@ -5546,10 +5544,10 @@ u16 namcos2_state::finalap3bl_prot_r()
 	return 0x4d00;
 }
 
-void namcos2_state::init_finalap3bl()
+void finallap_state::init_finalap3bl()
 {
 	init_finalap3();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3ffff0, 0x3ffff1, read16smo_delegate(*this, FUNC(namcos2_state::finalap3bl_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3ffff0, 0x3ffff1, read16smo_delegate(*this, FUNC(finallap_state::finalap3bl_prot_r)));
 }
 
 void namcos2_state::init_finehour()
@@ -5557,7 +5555,7 @@ void namcos2_state::init_finehour()
 	m_gametype = NAMCOS2_FINEST_HOUR;
 }
 
-void namcos2_state::init_fourtrax()
+void finallap_state::init_fourtrax()
 {
 	m_gametype = NAMCOS2_FOUR_TRAX;
 }
@@ -5572,7 +5570,7 @@ void namcos2_state::init_marvland()
 	m_gametype = NAMCOS2_MARVEL_LAND;
 }
 
-void namcos2_state::init_metlhawk()
+void metlhawk_state::init_metlhawk()
 {
 	/* unscramble sprites */
 	u8 *data = memregion("sprite")->base();
@@ -5646,7 +5644,7 @@ void namcos2_state::init_rthun2j()
 	m_gametype = NAMCOS2_ROLLING_THUNDER_2;
 }
 
-void namcos2_state::init_sgunner2()
+void sgunner_state::init_sgunner2()
 {
 	m_gametype = NAMCOS2_STEEL_GUNNER_2;
 }
@@ -5671,12 +5669,12 @@ void namcos2_state::init_sws93()
 	m_gametype = NAMCOS2_SUPER_WSTADIUM_93;
 }
 
-void namcos2_state::init_suzuka8h()
+void sgunner_state::init_suzuka8h()
 {
 	m_gametype = NAMCOS2_SUZUKA_8_HOURS;
 }
 
-void namcos2_state::init_suzuk8h2()
+void sgunner_state::init_suzuk8h2()
 {
 	m_gametype = NAMCOS2_SUZUKA_8_HOURS_2;
 	m_update_to_line_before_posirq = true; // needed for tunnels, see 2nd attract demo
@@ -5687,19 +5685,19 @@ void namcos2_state::init_valkyrie()
 	m_gametype = NAMCOS2_VALKYRIE;
 }
 
-void namcos2_state::init_gollygho()
+void gollygho_state::init_gollygho()
 {
 	m_gametype = NAMCOS2_GOLLY_GHOST;
 }
 
-void namcos2_state::init_bubbletr()
+void gollygho_state::init_bubbletr()
 {
 	m_gametype = NAMCOS2_BUBBLE_TROUBLE;
 }
 
 
 
-void namcos2_state::init_luckywld()
+void sgunner_state::init_luckywld()
 {
 	u8 *data = (u8 *)memregion("c169roz:mask")->base();
 	for (int i = 0; i< 32 * 0x4000; i++)
@@ -5715,92 +5713,92 @@ void namcos2_state::init_luckywld()
 /* and metal hawk have the B version and dragon saber has the C version       */
 
 /*     YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,         INIT,          MONITOR,COMPANY, FULLNAME */
-GAMEL( 1987, finallap,   0,        finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapd,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapc,  finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapjc, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1987, finallapjb, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallap,   0,        finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev E)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapd,  finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev D)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapc,  finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapjc, finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1987, finallapjb, finallap, finallap, finallap, finallap_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
-GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assault,  ROT90,  "Namco", "Assault (Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj, ROT90,  "Namco", "Assault (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state, init_assaultp, ROT90,  "Namco", "Assault Plus (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, assault,    0,        base2,    assault,  namcos2_state,  init_assault,  ROT90,  "Namco", "Assault (Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state,  init_assaultj, ROT90,  "Namco", "Assault (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state,  init_assaultp, ROT90,  "Namco", "Assault Plus (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME(  1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, metlhawk,   0,        metlhawk, metlhawk, metlhawk_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, metlhawkj,  metlhawk, metlhawk, metlhawk, metlhawk_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1988, ordyne,     0,        base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (World)", MACHINE_SUPPORTS_SAVE )
-GAME(  1988, ordyneje,   ordyne,   base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", MACHINE_SUPPORTS_SAVE )
-GAME(  1988, ordynej,    ordyne,   base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, ordyne,     0,        base,     base,     namcos2_state,  init_ordyne,   ROT180, "Namco", "Ordyne (World)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, ordyneje,   ordyne,   base,     base,     namcos2_state,  init_ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, ordynej,    ordyne,   base,     base,     namcos2_state,  init_ordyne,   ROT180, "Namco", "Ordyne (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1988, mirninja,   0,        base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME(  1988, mirninjaa,  mirninja, base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, mirninja,   0,        base,     base,     namcos2_state,  init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, mirninjaa,  mirninja, base,     base,     namcos2_state,  init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1988, phelios,    0,        base2,    base,     namcos2_state, init_phelios,  ROT90,  "Namco", "Phelios", MACHINE_SUPPORTS_SAVE )
-GAME(  1988, pheliosj,   phelios,  base2,    base,     namcos2_state, init_phelios,  ROT90,  "Namco", "Phelios (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, phelios,    0,        base2,    base,     namcos2_state,  init_phelios,  ROT90,  "Namco", "Phelios", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, pheliosj,   phelios,  base2,    base,     namcos2_state,  init_phelios,  ROT90,  "Namco", "Phelios (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1989, dirtfoxj,   0,        base2,    dirtfox,  namcos2_state, init_dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1989, dirtfoxj,   0,        base2,    dirtfox,  namcos2_state,  init_dirtfoxj, ROT90,  "Namco", "Dirt Fox (Japan)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1989, fourtrax,   0,        base_fl,  fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco", "Four Trax (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1989, fourtraxj,  fourtrax, base_fl,  fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco", "Four Trax (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1989, fourtraxa,  fourtrax, base_fl,  fourtrax, namcos2_state, init_fourtrax, ROT0,   "Namco (Atari license?)", "Four Trax (US?, censored banners)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap ) // boards using the ROM code FX4 were produced for Atari? there's no US region warning or Atari copyright tho, modded version of the World code
+GAMEL( 1989, fourtrax,   0,        base_fl,  fourtrax, finallap_state, init_fourtrax, ROT0,   "Namco", "Four Trax (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1989, fourtraxj,  fourtrax, base_fl,  fourtrax, finallap_state, init_fourtrax, ROT0,   "Namco", "Four Trax (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1989, fourtraxa,  fourtrax, base_fl,  fourtrax, finallap_state, init_fourtrax, ROT0,   "Namco (Atari license?)", "Four Trax (US?, censored banners)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap ) // boards using the ROM code FX4 were produced for Atari? there's no US region warning or Atari copyright tho, modded version of the World code
 
-GAME(  1989, valkyrie,   0,        base3,    base,     namcos2_state, init_valkyrie, ROT90,  "Namco", "Valkyrie no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1989, valkyrie,   0,        base3,    base,     namcos2_state,  init_valkyrie, ROT90,  "Namco", "Valkyrie no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1989, finehour,   0,        base2,    base,     namcos2_state, init_finehour, ROT0,   "Namco", "Finest Hour (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1989, finehour,   0,        base2,    base,     namcos2_state,  init_finehour, ROT0,   "Namco", "Finest Hour (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1989, burnforc,   0,        base3,    base,     namcos2_state, init_burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", MACHINE_SUPPORTS_SAVE )
-GAME(  1989, burnforco,  burnforc, base3,    base,     namcos2_state, init_burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", MACHINE_SUPPORTS_SAVE )
+GAME(  1989, burnforc,   0,        base3,    base,     namcos2_state,  init_burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", MACHINE_SUPPORTS_SAVE )
+GAME(  1989, burnforco,  burnforc, base3,    base,     namcos2_state,  init_burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1989, marvland,   0,        base,     base,     namcos2_state, init_marvland, ROT0,   "Namco", "Marvel Land (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME(  1989, marvlandup, marvland, base,     base,     namcos2_state, init_marvland, ROT0,   "Namco", "Marvel Land (US, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or World as no WDUD logo. Game is incomplete and ends abruptly at World 3-4
+GAME(  1989, marvland,   0,        base,     base,     namcos2_state,  init_marvland, ROT0,   "Namco", "Marvel Land (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1989, marvlandup, marvland, base,     base,     namcos2_state,  init_marvland, ROT0,   "Namco", "Marvel Land (US, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or World as no WDUD logo. Game is incomplete and ends abruptly at World 3-4
 
-GAME(  1990, kyukaidk,   0,        base,     kyukaidk, namcos2_state, init_kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
-GAME(  1990, kyukaidko,  kyukaidk, base,     kyukaidk, namcos2_state, init_kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, old version)", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, kyukaidk,   0,        base,     kyukaidk, namcos2_state,  init_kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, kyukaidko,  kyukaidk, base,     kyukaidk, namcos2_state,  init_kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, old version)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1990, dsaber,     0,        base3,    base,     namcos2_state, init_dsaber,   ROT90,  "Namco", "Dragon Saber (World, DO2)", MACHINE_SUPPORTS_SAVE )
-GAME(  1990, dsabera,    dsaber,   base3,    base,     namcos2_state, init_dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", MACHINE_SUPPORTS_SAVE )
-GAME(  1990, dsaberj,    dsaber,   base3,    base,     namcos2_state, init_dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, dsaber,     0,        base3,    base,     namcos2_state,  init_dsaber,   ROT90,  "Namco", "Dragon Saber (World, DO2)", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, dsabera,    dsaber,   base3,    base,     namcos2_state,  init_dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, dsaberj,    dsaber,   base3,    base,     namcos2_state,  init_dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1990, finalap2,   0,        finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1990, finalap2j,  finalap2, finalap2, finallap, namcos2_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1990, finalap2,   0,        finalap2, finallap, finallap_state, init_finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1990, finalap2j,  finalap2, finalap2, finallap, finallap_state, init_finalap2, ROT0,   "Namco", "Final Lap 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
-GAME(  1990, gollygho,   0,        base,     gollygho, gollygho_state,init_gollygho, ROT180, "Namco", "Golly! Ghost!", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1990, gollygho,   0,        base,     gollygho, gollygho_state, init_gollygho, ROT180, "Namco", "Golly! Ghost!", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
-GAME(  1990, rthun2,     0,        base3,    base,     namcos2_state, init_rthun2,   ROT0,   "Namco", "Rolling Thunder 2", MACHINE_SUPPORTS_SAVE )
-GAME(  1990, rthun2j,    rthun2,   base3,    base,     namcos2_state, init_rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, rthun2,     0,        base3,    base,     namcos2_state,  init_rthun2,   ROT0,   "Namco", "Rolling Thunder 2", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, rthun2j,    rthun2,   base3,    base,     namcos2_state,  init_rthun2j,  ROT0,   "Namco", "Rolling Thunder 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1990, sgunner,    0,        sgunner,  sgunner,  namcos2_state, init_sgunner2, ROT0,   "Namco", "Steel Gunner (Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME(  1990, sgunnerj,   sgunner,  sgunner,  sgunner,  namcos2_state, init_sgunner2, ROT0,   "Namco", "Steel Gunner (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, sgunner,    0,        sgunner,  sgunner,  sgunner_state,  init_sgunner2, ROT0,   "Namco", "Steel Gunner (Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME(  1990, sgunnerj,   sgunner,  sgunner,  sgunner,  sgunner_state,  init_sgunner2, ROT0,   "Namco", "Steel Gunner (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // The C68 I/O MCU contains a 1991 copyright, so anything after this point is potentially using that instead of C65, games before this point can't be using it
 
-GAME(  1991, sgunner2,   0,        sgunner2, sgunner,  namcos2_state, init_sgunner2, ROT0,   "Namco", "Steel Gunner 2 (US)", MACHINE_SUPPORTS_SAVE )
-GAME(  1991, sgunner2j,  sgunner2, sgunner2, sgunner,  namcos2_state, init_sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME(  1991, sgunner2,   0,        sgunner2, sgunner,  sgunner_state,  init_sgunner2, ROT0,   "Namco", "Steel Gunner 2 (US)", MACHINE_SUPPORTS_SAVE )
+GAME(  1991, sgunner2j,  sgunner2, sgunner2, sgunner,  sgunner_state,  init_sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan, Rev A)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1991, cosmogng,   0,        base,     base,     namcos2_state, init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", MACHINE_SUPPORTS_SAVE )
-GAME(  1991, cosmogngj,  cosmogng, base,     base,     namcos2_state, init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1991, cosmogng,   0,        base,     base,     namcos2_state,  init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", MACHINE_SUPPORTS_SAVE )
+GAME(  1991, cosmogngj,  cosmogng, base,     base,     namcos2_state,  init_cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1992, bubbletr,   0,        base,     bubbletr, gollygho_state,init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (World, Rev B)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(  1992, bubbletrj,  bubbletr, base,     bubbletr, gollygho_state,init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, bubbletr,   0,        base,     bubbletr, gollygho_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (World, Rev B)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, bubbletrj,  bubbletr, base,     bubbletr, gollygho_state, init_bubbletr, ROT180, "Namco", "Bubble Trouble - Golly! Ghost! 2 (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
-GAMEL( 1992, finalap3,   0,        finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3j,  finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3jc, finalap3, finalap3, finalap3, namcos2_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
-GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, namcos2_state, init_finalap3bl,ROT0,  "Namco", "Final Lap 3 (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3,   0,        finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3a,  finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3j,  finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3jc, finalap3, finalap3, finalap3, finallap_state, init_finalap3, ROT0,   "Namco", "Final Lap 3 (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
+GAMEL( 1992, finalap3bl, finalap3, finalap3, finalap3, finallap_state, init_finalap3bl,ROT0,  "Namco", "Final Lap 3 (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_finallap )
 
-GAME(  1992, luckywld,   0,        luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild", MACHINE_SUPPORTS_SAVE )
-GAME(  1992, luckywldj,  luckywld, luckywld, luckywld, namcos2_state, init_luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1992, luckywld,   0,        luckywld, luckywld, sgunner_state,  init_luckywld, ROT0,   "Namco", "Lucky & Wild", MACHINE_SUPPORTS_SAVE )
+GAME(  1992, luckywldj,  luckywld, luckywld, luckywld, sgunner_state,  init_luckywld, ROT0,   "Namco", "Lucky & Wild (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1992, suzuka8h,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME(  1992, suzuka8hj,  suzuka8h, suzuka8h, suzuka,   namcos2_state, init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, suzuka8h,   0,        suzuka8h, suzuka,   sgunner_state,  init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (World, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1992, suzuka8hj,  suzuka8h, suzuka8h, suzuka,   sgunner_state,  init_suzuka8h, ROT0,   "Namco", "Suzuka 8 Hours (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
-GAME(  1992, sws,        0,        base_c68, base,     namcos2_state, init_sws,      ROT0,   "Namco", "Super World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1992, sws,        0,        base_c68, base,     namcos2_state,  init_sws,      ROT0,   "Namco", "Super World Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1992, sws92,      0,        base_c68, base,     namcos2_state, init_sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME(  1992, sws92g,     sws92,    base_c68, base,     namcos2_state, init_sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1992, sws92,      0,        base_c68, base,     namcos2_state,  init_sws92,    ROT0,   "Namco", "Super World Stadium '92 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1992, sws92g,     sws92,    base_c68, base,     namcos2_state,  init_sws92g,   ROT0,   "Namco", "Super World Stadium '92 Gekitouban (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1993, suzuk8h2,   0,        suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME(  1993, suzuk8h2j,  suzuk8h2, suzuka8h, suzuka,   namcos2_state, init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1993, suzuk8h2,   0,        suzuka8h, suzuka,   sgunner_state,  init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (World, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME(  1993, suzuk8h2j,  suzuk8h2, suzuka8h, suzuka,   sgunner_state,  init_suzuk8h2, ROT0,   "Namco", "Suzuka 8 Hours 2 (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 
-GAME(  1993, sws93,      0,        base_c68, base,     namcos2_state, init_sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", MACHINE_SUPPORTS_SAVE ) // this appears to have a subtitle, what is it?
+GAME(  1993, sws93,      0,        base_c68, base,     namcos2_state,  init_sws93,    ROT0,   "Namco", "Super World Stadium '93 (Japan)", MACHINE_SUPPORTS_SAVE ) // this appears to have a subtitle, what is it?
