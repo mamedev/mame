@@ -50,7 +50,7 @@ TODO:
     - POSIRQ is off-by-one, but adjusting it makes other cases worse
       (because some layers are line-buffered and some aren't, and we need proper scroll/data latch times for each layer type?)
 
-The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
+The Namco System II board is a 5 CPU system (only 4 are emulated). The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
 number of custom ASICs to perform graphics operations, there is no
 documentation available for these parts.
@@ -599,7 +599,7 @@ void gollygho_state::dpram_word_w(offs_t offset, u16 data, u16 mem_mask)
 		m_dpram[offset] = data & 0xff;
 
 		// TODO : This is a hack! should be output ports MCU side, not probing into DPRAM content
-		switch ( offset )
+		switch (offset)
 		{
 			case 0xc0/2:
 			{
