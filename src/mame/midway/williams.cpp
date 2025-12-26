@@ -3993,8 +3993,11 @@ GAME( 1983, blasterkit, blaster,  blastkit,         blastkit, blaster_state,   e
 
 GAME( 1985, spdball,    0,        spdball,          spdball,  williams_state,  empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, alienar,    0,        alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+// Do not merge the Alien Arena instances. There is a legal reason they both exist.
+// The parent is intentionally not using ROMs we don't have a license to distribute.
+// This was done so that the game could be distributed on mamedev.org. We can't distribute the original stargate sound ROM, so it's only playable without sound using the ROMs that can be distributed.
+GAME( 1985, alienar,    0,        alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena (without sound)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, lottofun,   0,        lottofun,         lottofun, williams_state,  empty_init,    ROT0,   "HAR Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 
