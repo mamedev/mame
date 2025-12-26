@@ -194,7 +194,7 @@ void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const
 
 void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int control)
 {
-	gfx_element *sgfx = gfx(0);
+	gfx_element *const sgfx = gfx(0);
 
 	const int offset = (control & 0x000f) * (128 * 4);
 	for (int loop = 127; loop >= 0; loop--)
@@ -238,7 +238,7 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			const int scaley = (sizey << 16) / (is_32 ? 0x20 : 0x10);
 			if (scalex && scaley)
 			{
-				const u32 primask = m_pri_cb((word3 & 0xf));
+				const u32 primask = m_pri_cb(word3 & 0xf);
 				const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
 				const u32 color  = (word3 >> 4) & 0x000f;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
@@ -252,16 +252,15 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 					sgfx->set_source_clip(0, 32, 0, 32);
 
 				zdrawgfxzoom(
-					screen,
-					bitmap,
-					cliprect,
-					sgfx,
-					sprn,
-					color,
-					flipx,flipy,
-					xpos,ypos,
-					scalex,scaley,
-					primask);
+						screen,
+						bitmap,
+						cliprect,
+						sgfx,
+						sprn, color,
+						flipx, flipy,
+						xpos, ypos,
+						scalex, scaley,
+						primask);
 			}
 		}
 	}
@@ -326,7 +325,7 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 			/* swap xy */
 			const int rgn = (flags & 0x0001);
 
-			gfx_element *sgfx = gfx(rgn);
+			gfx_element *const sgfx = gfx(rgn);
 
 			if (is_bigsprite)
 			{
@@ -344,15 +343,15 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 				sgfx->set_source_clip(BIT(tile, 0) ? 16 : 0, 16, BIT(tile, 1) ? 16 : 0, 16);
 
 			zdrawgfxzoom(
-				screen,
-				bitmap,
-				cliprect,
-				sgfx,
-				sprn, color,
-				flipx,flipy,
-				sx,sy,
-				scalex, scaley,
-				primask);
+					screen,
+					bitmap,
+					cliprect,
+					sgfx,
+					sprn, color,
+					flipx, flipy,
+					sx, sy,
+					scalex, scaley,
+					primask);
 		}
 	}
 } /* draw_sprites_metalhawk */
