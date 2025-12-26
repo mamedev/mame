@@ -15185,10 +15185,11 @@ sc6dndema
 sc6dndemb
 sc6dndemc
 
-@source:bfm/bfm_swp.cpp
+@source:bfm/bfm_cobra3.cpp
 c3_ppays
 c3_rtime
 c3_telly
+c3_tellyns
 c3_totp
 
 @source:bfm/bfmsys83.cpp
