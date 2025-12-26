@@ -5,14 +5,14 @@
 #include "emu.h"
 #include "namcos2.h"
 
-void namcos2_state::TilemapCB(u16 code, int &tile, int &mask)
+void namcos2_base_state::TilemapCB(u16 code, int &tile, int &mask)
 {
 	mask = code;
 	/* The order of bits needs to be corrected to index the right tile  14 15 11 12 13 */
 	tile = bitswap<16>(code, 13, 12, 11, 15, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-void namcos2_state::TilemapCB_finalap2(u16 code, int &tile, int &mask)
+void finallap_state::TilemapCB_finalap2(u16 code, int &tile, int &mask)
 {
 	mask = code;
 	tile = bitswap<15>(code, 13, 12, 11, 14, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
@@ -29,19 +29,19 @@ void namcos2_state::TilemapCB_finalap2(u16 code, int &tile, int &mask)
  * ---- ---- xxxx ---- always zero?
  * ---- ---- ---- xxxx sprite bank
  */
-u16 namcos2_state::gfx_ctrl_r()
+u16 metlhawk_state::gfx_ctrl_r()
 {
 	return m_gfx_ctrl;
 }
 
-void namcos2_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
+void metlhawk_state::gfx_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_gfx_ctrl);
 }
 
 /**************************************************************************/
 
-u8 namcos2_state::c116_r(offs_t offset)
+u8 namcos2_base_state::c116_r(offs_t offset)
 {
 	if ((offset & 0x1800) == 0x1800)
 	{
@@ -56,7 +56,7 @@ u8 namcos2_state::c116_r(offs_t offset)
 
 /**************************************************************************/
 
-void namcos2_state::create_shadow_table()
+void finallap_state::create_shadow_table()
 {
 	/* set table for sprite color == 0x0f */
 	for (int i = 0; i < 16 * 256; i++)
@@ -65,7 +65,41 @@ void namcos2_state::create_shadow_table()
 	}
 }
 
-bool namcos2_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
+u32 metlhawk_state::sprite_pri_callback_ns2(u32 pri)
+{
+	return pri;
+}
+
+u32 namcos2_state::sprite_pri_callback_ns2(u32 pri)
+{
+	// only low 3 bits are used
+	return pri & 7;
+}
+
+bool metlhawk_state::sprite_mix_callback_ns2(u16 &dest, u8 &destpri, u16 colbase, u16 src, u32 primask)
+{
+	if (destpri <= primask)
+	{
+		if ((src & 0xff) != 0xff)
+		{
+			if (src == 0xffe)
+			{
+				if (dest & 0x1000)
+					dest |= 0x800;
+				else
+					dest = m_c116->black_pen();
+			}
+			else
+			{
+				dest = colbase + src;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+bool sgunner_state::sprite_mix_callback_c355(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
 {
 	if (srcpri >= destpri)
 	{
@@ -88,14 +122,16 @@ bool namcos2_state::sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16
 
 /**************************************************************************/
 
-void namcos2_state::video_start()
+void finallap_state::video_start()
 {
+	metlhawk_state::video_start();
+
 	create_shadow_table();
 
 	save_item(NAME(m_gfx_ctrl));
 }
 
-void namcos2_state::apply_clip(rectangle &clip, const rectangle &cliprect)
+void namcos2_base_state::apply_clip(rectangle &clip, const rectangle &cliprect)
 {
 	clip.min_x = m_c116->get_reg(0) - 0x4a;
 	clip.max_x = m_c116->get_reg(1) - 0x4a - 1;
@@ -110,6 +146,7 @@ u32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	rectangle clip;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 	apply_clip(clip, cliprect);
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
@@ -117,49 +154,47 @@ u32 namcos2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	// (level 0 ROZ is actually used by stages 2, 3 and 4 at very least)
 	//bool roz_enable = ((m_gfx_ctrl & 0x7000) ? true : false);
 
-	for (int pri = 0; pri < 16; pri++)
+	for (int pri = 0; pri < 8; pri++)
 	{
-		if ((pri & 1) == 0)
-		{
-			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
+		m_c123tmap->draw(screen, bitmap, clip, pri, pri, 0);
 
-			//if (roz_enable)
+		//if (roz_enable)
+		{
+			if (((m_gfx_ctrl & 0x7000) >> 12) == pri)
 			{
-				if (((m_gfx_ctrl & 0x7000) >> 12) == pri / 2)
-				{
-					m_ns2roz->draw_roz(screen, bitmap, clip, m_gfx_ctrl);
-				}
+				m_ns2roz->draw_roz(screen, bitmap, clip, m_gfx_ctrl, pri, 0);
 			}
-			m_ns2sprite->draw_sprites(screen, bitmap, clip, pri / 2, m_gfx_ctrl);
 		}
 	}
+	m_ns2sprite->draw_sprites(screen, bitmap, clip, m_gfx_ctrl);
 	return 0;
 }
 
 /**************************************************************************/
 
-u32 namcos2_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 finallap_state::screen_update_finallap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 	apply_clip(clip, cliprect);
 
 	for (int pri = 0; pri < 16; pri++)
 	{
 		if ((pri & 1) == 0)
 		{
-			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
+			m_c123tmap->draw(screen, bitmap, clip, pri / 2, pri, 0);
 		}
-		m_c45_road->draw(screen, bitmap, clip, pri);
-		m_ns2sprite->draw_sprites(screen, bitmap, clip, pri, m_gfx_ctrl);
+		m_c45_road->draw(screen, bitmap, clip, pri, pri, 0);
 	}
+	m_ns2sprite->draw_sprites(screen, bitmap, clip, m_gfx_ctrl);
 	return 0;
 }
 
 /**************************************************************************/
 
-void namcos2_state::RozCB_luckywld(u16 code, int &tile, int &mask, int which)
+void sgunner_state::RozCB_luckywld(u16 code, int &tile, int &mask, int which)
 {
 	mask = code;
 
@@ -175,11 +210,7 @@ void namcos2_state::RozCB_luckywld(u16 code, int &tile, int &mask, int which)
 	tile = mangle;
 }
 
-void namcos2_state::video_start_luckywld()
-{
-}
-
-u32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sgunner_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 
@@ -204,11 +235,7 @@ u32 namcos2_state::screen_update_luckywld(screen_device &screen, bitmap_ind16 &b
 
 /**************************************************************************/
 
-void namcos2_state::video_start_sgunner()
-{
-}
-
-u32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 sgunner_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 
@@ -226,31 +253,28 @@ u32 namcos2_state::screen_update_sgunner(screen_device &screen, bitmap_ind16 &bi
 
 /**************************************************************************/
 
-void namcos2_state::RozCB_metlhawk(u16 code, int &tile, int &mask, int which)
+void metlhawk_state::RozCB_metlhawk(u16 code, int &tile, int &mask, int which)
 {
 	mask = code;
 	tile = bitswap<13>(code & 0x1fff, 11, 10, 9, 12, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-void namcos2_state::video_start_metlhawk()
-{
-}
-
-u32 namcos2_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 metlhawk_state::screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle clip;
 
 	bitmap.fill(m_c116->black_pen(), cliprect);
+	screen.priority().fill(0, cliprect);
 	apply_clip(clip, cliprect);
 
 	for (int pri = 0; pri < 16; pri++)
 	{
 		if ((pri & 1) == 0)
 		{
-			m_c123tmap->draw(screen, bitmap, clip, pri / 2);
+			m_c123tmap->draw(screen, bitmap, clip, pri / 2, pri, 0);
 		}
-		m_c169roz->draw(screen, bitmap, clip, pri);
-		m_ns2sprite->draw_sprites(screen, bitmap, clip, pri, 0);
+		m_c169roz->draw(screen, bitmap, clip, pri, pri, 0);
 	}
+	m_ns2sprite->draw_sprites(screen, bitmap, clip, 0);
 	return 0;
 }
