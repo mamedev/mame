@@ -12,8 +12,8 @@
 class namcos2_sprite_device : public device_t, public device_gfx_interface
 {
 public:
-	typedef device_delegate<u32 (u32 pri)> ns2_priority_delegate;
-	typedef device_delegate<bool (u16 &dest, u8 &destpri, u16 colbase, u16 src, u32 primask)> ns2_mix_delegate;
+	using ns2_priority_delegate = device_delegate<u32 (u32 pri)>;
+	using ns2_mix_delegate = device_delegate<bool (u16 &dest, u8 &destpri, u16 colbase, u16 src, u32 primask)>;
 
 	// construction/destruction
 	namcos2_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -34,7 +34,7 @@ public:
 protected:
 	namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// general
