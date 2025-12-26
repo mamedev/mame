@@ -12,19 +12,22 @@
 
 #pragma once
 
-#include "namco_c139.h"
-#include "namco_c148.h"
-#include "machine/timer.h"
-#include "sound/c140.h"
 #include "namco_c45road.h"
 #include "namco_c116.h"
+#include "namco_c123tmap.h"
+#include "namco_c139.h"
+#include "namco_c148.h"
+#include "namco_c169roz.h"
 #include "namco65.h"
 #include "namco68.h"
-#include "namco_c169roz.h"
-#include "namco_c355spr.h"
-#include "namco_c123tmap.h"
 #include "namcos2_sprite.h"
 #include "namcos2_roz.h"
+
+#include "namco_c355spr.h"
+
+#include "machine/timer.h"
+#include "sound/c140.h"
+
 #include "screen.h"
 
 /*********************************************/
@@ -213,7 +216,6 @@ public:
 		metlhawk_state(mconfig, type, tag)
 	{ }
 
-	void configure_namcos2_sprite_standard(machine_config &config) ATTR_COLD;
 	void finallap_noio(machine_config &config) ATTR_COLD;
 	void base_fl(machine_config &config) ATTR_COLD;
 	void finallap(machine_config &config) ATTR_COLD;
@@ -228,6 +230,8 @@ public:
 	void init_fourtrax() ATTR_COLD;
 
 protected:
+	void configure_namcos2_sprite_standard(machine_config &config) ATTR_COLD;
+
 	virtual void video_start() override ATTR_COLD;
 
 	u8 m_finallap_prot_count = 0;
@@ -256,7 +260,6 @@ public:
 		m_ns2roz(*this, "s2roz")
 	{ }
 
-	void configure_namcos2_roz_standard(machine_config &config) ATTR_COLD;
 	void assaultp(machine_config &config) ATTR_COLD;
 	void base2(machine_config &config) ATTR_COLD;
 	void base3(machine_config &config) ATTR_COLD;
@@ -288,6 +291,8 @@ public:
 	void init_rthun2() ATTR_COLD;
 
 protected:
+	void configure_namcos2_roz_standard(machine_config &config) ATTR_COLD;
+
 	virtual u32 sprite_pri_callback_ns2(u32 pri) override;
 
 private:
@@ -310,7 +315,6 @@ public:
 		m_c355spr(*this, "c355spr")
 	{ }
 
-	void configure_c355spr_standard(machine_config &config) ATTR_COLD;
 	void sgunner2(machine_config &config) ATTR_COLD;
 	void suzuka8h(machine_config &config) ATTR_COLD;
 	void luckywld(machine_config &config) ATTR_COLD;
@@ -323,6 +327,8 @@ public:
 
 protected:
 	required_device<namco_c355spr_device> m_c355spr;
+
+	void configure_c355spr_standard(machine_config &config) ATTR_COLD;
 
 	bool sprite_mix_callback_c355(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	u32 screen_update_luckywld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
