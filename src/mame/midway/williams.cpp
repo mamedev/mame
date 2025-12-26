@@ -3569,6 +3569,7 @@ ROM_START( spdball )
 ROM_END
 
 
+// contains only material developed by Duncan Brown (no sound CPU program)
 ROM_START( alienar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "aarom01",   0x00000, 0x1000, CRC(bb0c21be) SHA1(dbf122870adaa49cd99e2c1e9fa4b78fb74ef2c1) )
@@ -3588,6 +3589,7 @@ ROM_START( alienar )
 ROM_END
 
 
+// uses the original Williams Stargate sound CPU program
 ROM_START( alienaru )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "aarom01",   0x00000, 0x1000, CRC(bb0c21be) SHA1(dbf122870adaa49cd99e2c1e9fa4b78fb74ef2c1) )
