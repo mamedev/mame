@@ -40,8 +40,6 @@
 class i8256_device : public device_t, public device_serial_interface
 {
 public:
-	static constexpr flags_type emulation_flags() { return flags::NONE; }
-
 	i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto inta_callback()    { return m_in_inta_cb.bind(); }
