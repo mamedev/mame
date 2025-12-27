@@ -1180,7 +1180,8 @@ void cdicdic_device::init_disc_read(uint8_t disc_mode)
 	m_disc_command = m_command;
 	m_disc_mode = disc_mode;
 	m_curr_lba = lba_from_time();
-	m_disc_spinup_counter = 1;
+	// TODO: Spinup time should be a variable based on distance on disc.
+	m_disc_spinup_counter = 6; // Bugfix #14462: 6 or higher is required to prevent some softlocks.
 }
 
 void cdicdic_device::cancel_disc_read()
