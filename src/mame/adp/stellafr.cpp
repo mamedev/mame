@@ -90,17 +90,20 @@ Connectors:
 
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
+
+#include "stellafr.lh"
 
 //#define VERBOSE 1
 #include "logmacro.h"
-
-#include "stellafr.lh"
 
 namespace {
 
@@ -228,12 +231,16 @@ private:
 	uint8_t m_anz2;
 	uint8_t m_mux2;
 
+	bool m_outst;
+
 	uint8_t mux_r();
 	void mux_w(uint8_t data);
 	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ay8910_portb_w(uint8_t data);
 	void lamps_w(uint8_t row, uint16_t data);
+
+	void st_in(uint8_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
@@ -246,7 +253,6 @@ uint8_t stellafr_state::mux_r()
 	bool li = false;
 	bool emp = false;
 	bool ma = false;
-	bool st = false;
 	bool t = false; // main buttons in
 	bool t2 = false;
 	bool emp2 = false;
@@ -257,7 +263,7 @@ uint8_t stellafr_state::mux_r()
 	if (li)   data |= (1 << U10_OUTLI);
 	if (emp)  data |= (1 << U10_OUTEMP);
 	if (ma)   data |= (1 << U10_OUTMA);
-	if (st)   data |= (1 << U10_OUTST);
+	if (m_outst)   data |= (1 << U10_OUTST);
 	if (t)    data |= (1 << U10_OUTT);
 	if (t2)   data |= (1 << U10_OUTT2);
 	if (emp2) data |= (1 << U10_EMP2);
@@ -275,6 +281,11 @@ void stellafr_state::lamps_w(uint8_t row, uint16_t data)
 		bool lamp_value = BIT(data, i);
 		m_lamps[lamp_index] = lamp_value;
 	}
+}
+
+void stellafr_state::st_in(uint8_t data)
+{
+	m_outst = data;
 }
 
 void stellafr_state::mux_w(uint8_t data)
