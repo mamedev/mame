@@ -1,0 +1,881 @@
+<?xml version="1.0"?>
+<!-- license:CC0-1.0 -->
+<mamelayout version="2">
+
+<!-- Layout for AKAI CD3000i MIDI Digital Stereo CD-ROM Sampler Rack Unit (1993)
+     by Guru (https://gurudumps.otenko.com/)
+-->
+
+	<!-- All Texts -->
+	<element name="text-0z"><text align="3" string="0/Z" /></element>
+	<element name="text-1w"><text align="3" string="1/W" /></element>
+	<element name="text-2x"><text align="3" string="2/X" /></element>
+	<element name="text-3y"><text align="3" string="3/Y" /></element>
+	<element name="text-4t"><text align="3" string="4/T" /></element>
+	<element name="text-5u"><text align="3" string="5/U" /></element>
+	<element name="text-6v"><text align="3" string="6/V" /></element>
+	<element name="text-7q"><text align="3" string="7/Q" /></element>
+	<element name="text-8r"><text align="3" string="8/R" /></element>
+	<element name="text-9s"><text align="3" string="9/S" /></element>
+	<element name="text-compact"><text align="3" string="COMPACT" /></element>
+	<element name="text-cdromsampler"><text align="3" string="CD-ROM SAMPLE PLAYER" /></element>
+	<element name="text-close"><text align="3" string="CLOSE" /></element>
+	<element name="text-contrast1"><text align="3" string="DISPLAY" /></element>
+	<element name="text-contrast2"><text align="3" string="CONTRAST" /></element>
+	<element name="text-cursor"><text align="3" string="CURSOR" /></element>
+	<element name="text-data"><text align="3" string="DATA" /></element>
+	<element name="text-d"><text align="3" string="d" /></element>
+	<element name="text-diskm"><text align="3" string="DISK/M" /></element>
+	<element name="text-dot"><text align="3" string="." /></element>
+	<element name="text-isc"><text align="3" string="ISC" /></element>
+	<element name="text-edit"><text align="3" string="EDIT" /></element>
+	<element name="text-lf1"><text align="3" string="F1/A" /></element>
+	<element name="text-lf2"><text align="3" string="F2/B" /></element>
+	<element name="text-lf3"><text align="3" string="F3/C" /></element>
+	<element name="text-lf4"><text align="3" string="F4/D" /></element>
+	<element name="text-lf5"><text align="3" string="F5/E" /></element>
+	<element name="text-lf6"><text align="3" string="F6/F" /></element>
+	<element name="text-lf7"><text align="3" string="F7/G" /></element>
+	<element name="text-lf8"><text align="3" string="F8/H" /></element>
+	<element name="text-f1"><text align="3" string="F1" /></element>
+	<element name="text-f2"><text align="3" string="F2" /></element>
+	<element name="text-f3"><text align="3" string="F3" /></element>
+	<element name="text-f4"><text align="3" string="F4" /></element>
+	<element name="text-f5"><text align="3" string="F5" /></element>
+	<element name="text-f6"><text align="3" string="F6" /></element>
+	<element name="text-f7"><text align="3" string="F7" /></element>
+	<element name="text-f8"><text align="3" string="F8" /></element>
+	<element name="text-helpp"><text align="3" string="HELP/P" /></element>
+	<element name="text-jump"><text align="3" string="JUMP/" /></element>
+	<element name="text-leveln"><text align="3" string="LEVEL/N" /></element>
+	<element name="text-mainvolume"><text align="3" string="MAIN VOLUME" /></element>
+	<element name="text-mark"><text align="3" string="MARK/#" /></element>
+	<element name="text-max"><text align="3" string="MAX" /></element>
+	<element name="text-min"><text align="3" string="MIN" /></element>
+	<element name="text-midil"><text align="3" string="MIDI/L" /></element>
+	<element name="text-name"><text align="3" string="NAME" /></element>
+	<element name="text-off"><text align="3" string="OFF" /></element>
+	<element name="text-on"><text align="3" string="ON" /></element>
+	<element name="text-open"><text align="3" string="OPEN" /></element>
+	<element name="text-headphone"><text align="3" string="HEADPHONE" /></element>
+	<element name="text-play"><text align="3" string="ENT/PLAY" /></element>
+	<element name="text-power"><text align="3" string="POWER" /></element>
+	<element name="text-professional"><text align="3" string="professional" /></element>
+	<element name="text-progi"><text align="3" string="PROG/I" /></element>
+	<element name="text-progk"><text align="3" string="PROG/K" /></element>
+	<element name="text-samplej"><text align="3" string="SAMPLE/J" /></element>
+	<element name="text-screenfunction"><text align="3" string="SCREEN FUNCTION" /></element>
+	<element name="text-select"><text align="3" string="SELECT" /></element>
+	<element name="text-tune"><text align="3" string="TUNE" /></element>
+	<element name="text-utilityo"><text align="3" string="UTILITY/O" /></element>
+	<element name="text-plus">
+		<image><data><![CDATA[
+		<svg width="200" height="60" viewBox="-5 -5 200 100" stroke="black" stroke-width="6">
+			<line x1="0" y1="30" x2="36" y2="30" />
+			<line x1="18" y1="0" x2="18" y2="60" />
+			<line x1="45" y1="60" x2="60" y2="0" />
+			<line x1="75" y1="3" x2="120" y2="30" />
+			<line x1="120" y1="30" x2="75" y2="57" />
+			<line x1="75" y1="57" x2="75" y2="3" />
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="text-minus">
+		<image><data><![CDATA[
+		<svg width="200" height="60" viewBox="-5 -5 200 100" stroke="black" stroke-width="6">
+			<line x1="0" y1="30" x2="36" y2="30" />
+			<line x1="45" y1="57" x2="60" y2="0" />
+			<line x1="70" y1="30" x2="115" y2="3" />
+			<line x1="115" y1="3" x2="115" y2="57" />
+			<line x1="115" y1="57" x2="70" y2="30" />
+		</svg>
+		]]></data></image>
+	</element>
+
+	<!-- Model -->
+	<element name="text-cd3000i">
+		<image><data><![CDATA[
+		<svg width="400" height="100" viewBox="0 0 500 100" stroke="black" stroke-width="4">
+		<g transform="scale(1.7,1)">
+			<line x1="60" y1="20" x2="80" y2="20" />
+			<line x1="60" y1="20" x2="60" y2="80" />
+			<line x1="60" y1="80" x2="80" y2="80" />
+			<line x1="90" y1="20" x2="107" y2="20" />
+			<line x1="90" y1="20" x2="90" y2="80" />
+			<line x1="107" y1="20" x2="110" y2="35" />
+			<line x1="90" y1="80" x2="107" y2="80" />
+			<line x1="107" y1="80" x2="110" y2="65" />
+			<line x1="110" y1="65" x2="110" y2="35" />
+			<line x1="120" y1="20" x2="140" y2="20" />
+			<line x1="140" y1="20" x2="140" y2="50" />
+			<line x1="120" y1="50" x2="140" y2="50" />
+			<line x1="140" y1="50" x2="140" y2="80" />
+			<line x1="120" y1="80" x2="140" y2="80" />
+			<line x1="150" y1="20" x2="170" y2="20" />
+			<line x1="170" y1="20" x2="170" y2="80" />
+			<line x1="150" y1="80" x2="170" y2="80" />
+			<line x1="150" y1="20" x2="150" y2="80" />
+			<line x1="180" y1="20" x2="200" y2="20" />
+			<line x1="200" y1="20" x2="200" y2="80" />
+			<line x1="180" y1="80" x2="200" y2="80" />
+			<line x1="180" y1="20" x2="180" y2="80" />
+			<line x1="210" y1="20" x2="230" y2="20" />
+			<line x1="230" y1="20" x2="230" y2="80" />
+			<line x1="210" y1="80" x2="230" y2="80" />
+			<line x1="210" y1="20" x2="210" y2="80" />
+			<line x1="240" y1="80" x2="243" y2="40" />
+			<ellipse cx="244.3" cy="25.5" rx="2.5" ry="9" fill="black" stroke="none" />
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+
+	<!-- AKAI Text (optimize level 3) using free Novo font converted to SVG (layout system doesn't support multiple truetype fonts) -->
+	<element name="text-akainovo">
+		<image><data><![CDATA[
+		<svg width: 300px; height: auto;>
+		<g fill="#a0222c">
+		<path d="M8.5 11.6l-0.8 -2.7 -4.2 0 -0.8 2.7 -2.6 0 4.1 -11.6 3.0 0 4.1 11.6 -2.6 0zm-1.4 -4.8c-0.8,-2.5 -1.2,-3.9 -1.3,-4.2 -0.1,-0.3 -0.2,-0.6 -0.2,-0.8 -0.2,0.7 -0.7,2.3 -1.5,5.0l3.0 0z"/>
+		<path d="M21.0,11.6l-2.8,0l-3.0-4.9l-1.0.7l0,4.2l-2.5,0l0-11.6l2.5,0l0,5.3l.9-1.3l3.1-4.0l2.7,0l-4.1,5.1z"/>
+		<path d="M29.5 11.6l-0.8 -2.7 -4.2 0 -0.8 2.7 -2.6 0 4.1 -11.6 3.0 0 4.1 11.6 -2.6 0zm-1.4 -4.8c-0.8,-2.5 -1.2,-3.9 -1.3,-4.2 -0.1,-0.3 -0.2,-0.6 -0.2,-0.8 -0.2,0.7 -0.7,2.3 -1.5,5.0l3.0 0z"/>
+		<path d="M37.9,0.0 h-5.2 v1.4 h1.4 v8.5 h-1.4 v1.4 h5.2 v-1.4 h-1.4 v-8.5 h1.4 z"/>
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+
+	<!-- 3 1/2" FDD Module (BLACK) -->
+	<element name="floppyblack">
+	<image><data><![CDATA[
+	<svg width="1277" height="337" viewBox="0 0 1288 358">
+		<rect x="12" y="0" width="1277" height="347" fill="black" stroke="black" stroke-width=".5"/>
+		<rect x="22" y="12" width="1255" height="325" fill="#343136" stroke="#343136" stroke-width="5"/>
+		<rect x="92" y="102" width="1115" height="50" fill="black" stroke="black" stroke-width="5" rx="10" ry="10"/>
+		<rect x="52" y="42" width="1195" height="140" fill="none" stroke="#49444c" stroke-width="5" rx="20" ry="20"/>
+		<rect x="429.5" y="44" width="440" height="50" fill="#2f2e33" stroke="#2f2e33" stroke-width="5"/>
+		<rect x="429.5" y="212" width="440" height="90" fill="#49444c" stroke="#49444c" stroke-width="5"/>
+		<line x1="57" y1="47" x2="95" y2="100" stroke="#49444c" stroke-width="5"/>
+		<line x1="1242" y1="47" x2="1210" y2="100" stroke="#49444c" stroke-width="5"/>
+		<line x1="64" y1="182" x2="92" y2="153" stroke="#49444c" stroke-width="5"/>
+		<line x1="1241" y1="182" x2="1210" y2="150" stroke="#49444c" stroke-width="5"/>
+		<rect x="302" y="92" width="695" height="70" fill="black" stroke="black" stroke-width="5"/>
+		<rect x="262" y="242" width="100" height="50" fill="none" stroke="#49444c" stroke-width="5"/>
+		<line x1="264" y1="292" x2="362" y2="292" stroke="#49444c" stroke-width="5"/>
+		<rect x="907" y="227" width="190" height="75" fill="black" stroke="black" stroke-width="5" rx="10" ry="10"/>
+		<rect x="914" y="234" width="176" height="61" fill="#343136" stroke="#343136" stroke-width="5" rx="5" ry="5"/>
+		<line x1="920" y1="236" x2="1090" y2="236" stroke="#49444c" stroke-width="5"/>
+		<line x1="430" y1="41" x2="870" y2="41" stroke="#49444c" stroke-width="5"/>
+		<line x1="424" y1="182" x2="424" y2="305" stroke="#49444c" stroke-width="8"/>
+		<line x1="878" y1="182" x2="878" y2="305" stroke="#49444c" stroke-width="5"/>
+		<rect x="429.5" y="182" width="440" height="30" fill="#343136" stroke="#49444c" stroke-width="5"/>
+		<rect x="429.5" y="72" width="440" height="110" fill="black" stroke="black" stroke-width="5"/>
+		<line x1="428" y1="182" x2="428" y2="302" stroke="#2f2e33" stroke-width="5"/>
+		<line x1="869.5" y1="182" x2="869.5" y2="302" stroke="#2f2e33" stroke-width="5"/>
+		<line x1="432" y1="182" x2="428" y2="302" stroke="#2f2e33" stroke-width="5"/>
+		<line x1="865.5" y1="182" x2="869.5" y2="302" stroke="#2f2e33" stroke-width="5"/>
+		<line x1="436" y1="182" x2="428" y2="302" stroke="#2f2e33" stroke-width="5"/>
+		<line x1="861.5" y1="182" x2="869.5" y2="302" stroke="#2f2e33" stroke-width="5"/>
+		<line x1="428" y1="42" x2="428" y2="72" stroke="#2f2e33" stroke-width="5"/>
+		<line x1="869.5" y1="42" x2="869.5" y2="72" stroke="#2f2e33" stroke-width="5"/>
+	</svg>
+	]]></data></image>
+	</element>
+
+	<!-- CDROM Module (BLACK TRAY BEZEL ONLY) -->
+	<element name="cdromtraybezelblack">
+	<image><data><![CDATA[
+	<svg width="1860" height="550" viewBox="0 0 1861 551">
+		<rect x="100" y="33" width="1660" height="310" fill="#c6c8cc" stroke="none" stroke-width="5" rx="20" ry="20"/>
+		<rect x="128" y="58" width="1607" height="253" fill="black" stroke="none"/>
+		<rect x="143" y="73" width="1577" height="223" fill="#343136" stroke="none"/>
+		<path d="M120,33 h1617 a 20 20 0 0 1 20 20 v270" fill="none" stroke="#928f87" stroke-width="5"/>
+		<path d="M120,33 a 20 20 0 0 0 -20 20 V323 a 20 20 0 0 0 20 20 h1620 a 20 20 0 0 0 20 -20" fill="none" stroke="#e3e4e9" stroke-width="5"/>
+	</svg>
+	]]></data></image>
+	</element>
+
+	<!-- Power Switch (BLACK) -->
+	<element name="powerswitchblack">
+	<image><data><![CDATA[
+	<svg width="280" height="365" viewBox="0 0 285 370">
+		<rect x="0" y="0" width="280" height="365" fill="#242126" stroke="#242126" stroke-width="5" rx="30" ry="30"/>
+		<rect x="15" y="15" width="250" height="345" fill="#343136" stroke="#343136" stroke-width="5" rx="20" ry="20"/>
+		<line x1="18" y1="22" x2="255" y2="22" stroke="#726d75" stroke-width="7" />
+		<rect x="45" y="60" width="190" height="280" fill="black" stroke="black" stroke-width="15" rx="20" ry="20"/>
+		<rect x="60" y="65" width="160" height="235" fill="#343136" stroke="#343136" stroke-width="5" rx="18" ry="18"/>
+		<path d="M60,200 L52,320 A 18 18 0 0 0 70,338 H210 A 18 18 0 0 0 228,320 L220,200 Z" stroke="#49444c" stroke-width="5" fill="#49444c"/>
+		<path d="M53,310 L52,320 A 18 18 0 0 0 70,338 H210 A 18 18 0 0 0 228,320 L219,310 Z" stroke="#343136" stroke-width="5" fill="#343136"/>
+		<line x1="52" y1="310" x2="228" y2="310" stroke="#726d75" stroke-width="7" />
+		<ellipse cx="140" cy="110" rx="11" ry="11" fill="#f6f5f8" stroke="none" />
+		<line x1="70" y1="70" x2="210" y2="70" stroke="#726d75" stroke-width="7" />
+		<path d="M15,200 L10,310 H30 L35,200 Z" stroke="#49444c" stroke-width="5" fill="#49444c"/>
+		<line x1="10" y1="310" x2="30" y2="310" stroke="#726d75" stroke-width="7" />
+		<path d="M245,200 L245,310 H270 L265,200 Z" stroke="#49444c" stroke-width="5" fill="#49444c"/>
+		<line x1="245" y1="310" x2="270" y2="310" stroke="#726d75" stroke-width="7" />
+	</svg>
+	]]></data></image>
+	</element>
+
+	<!-- LEDs -->
+	<element name="fddled"><rect></rect></element>
+	<element name="cdled"><rect></rect></element>
+
+	]<!-- Basic Elements -->
+	<element name="line"><rect><color red="0" green="0" blue="0"/></rect></element>
+	<element name="vline"><rect><color red="0" green="0" blue="0"/></rect></element>
+
+	<!-- Slots with screws -->
+	<element name="slot1">
+		<image><data><![CDATA[
+		<svg width="130" height="104" viewBox="0 0 130 104">
+			<rect x="0" y="10" width="130" height="80" rx="40" ry="40" fill="black"/>
+			<ellipse cx="65" cy="52" rx="52" ry="52" fill="#6e6e6e"/>
+			<ellipse cx="65" cy="52" rx="45" ry="45" fill="#a9a9a9"/>
+			<ellipse cx="65" cy="52" rx="37" ry="37" fill="#b8b8b8"/>
+			<g>
+			<rect x="58" y="25" width="14" height="27" fill="black"/>
+			<rect x="58" y="52" width="14" height="27" fill="black"/>
+			<rect x="39" y="45" width="27" height="14" fill="black"/>
+			<rect x="65" y="45" width="27" height="14" fill="black"/>
+			<polygon points="65,42 78,52 65,62 52,52" fill="grey" transform="rotate(45 65 52)"/>
+			</g>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+	<element name="slot2">
+		<image><data><![CDATA[
+		<svg width="130" height="104" viewBox="0 0 130 104">
+			<rect x="0" y="10" width="130" height="80" rx="40" ry="40" fill="black"/>
+			<ellipse cx="65" cy="52" rx="52" ry="52" fill="#6e6e6e"/>
+			<ellipse cx="65" cy="52" rx="45" ry="45" fill="#a9a9a9"/>
+			<ellipse cx="65" cy="52" rx="37" ry="37" fill="#b8b8b8"/>
+			<g transform="rotate(15 65 52)">
+			<rect x="58" y="25" width="14" height="27" fill="black"/>
+			<rect x="58" y="52" width="14" height="27" fill="black"/>
+			<rect x="39" y="45" width="27" height="14" fill="black"/>
+			<rect x="65" y="45" width="27" height="14" fill="black"/>
+			<polygon points="65,42 78,52 65,62 52,52" fill="grey" transform="rotate(45 65 52)"/>
+			</g>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+	<element name="slot3">
+		<image><data><![CDATA[
+		<svg width="130" height="104" viewBox="0 0 130 104">
+		<rect x="0" y="10" width="130" height="80" rx="40" ry="40" fill="black"/>
+		<ellipse cx="65" cy="52" rx="52" ry="52" fill="#6e6e6e"/>
+		<ellipse cx="65" cy="52" rx="45" ry="45" fill="#a9a9a9"/>
+		<ellipse cx="65" cy="52" rx="37" ry="37" fill="#b8b8b8"/>
+		<g transform="rotate(45 65 52)">
+		<rect x="58" y="25" width="14" height="27" fill="black"/>
+		<rect x="58" y="52" width="14" height="27" fill="black"/>
+		<rect x="39" y="45" width="27" height="14" fill="black"/>
+		<rect x="65" y="45" width="27" height="14" fill="black"/>
+		<polygon points="65,42 78,52 65,62 52,52" fill="grey" transform="rotate(45 65 52)"/>
+		</g>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+
+	<!-- Cursor Module -->
+	<element name="cursoroutline">
+		<image><data><![CDATA[
+		<svg width="115" height="85">
+			<rect x="0" y="0" width="115" height="85" rx="7" ry="7" fill="black" stroke="black" stroke-width=".6"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursorup">
+		<image state="0"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M0,0 H38 V2 L32,25 H6 L0,2 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="0.5" y1="2" x2="37.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="5" y1="19" x2="33" y2="19" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M5,19 H33 L32,25 H6 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M12,11 L18.5,7 L25,11" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M0,0 H38 V2 L32,25 H6 L0,2 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="0.5" y1="2" x2="37.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="5" y1="19" x2="33" y2="19" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M5,19 H33 L32,25 H6 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M12,11 L18.5,7 L25,11" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursordown">
+		<image state="0"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M6,0 H32 L38,23 V25 H0 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="0.5" y1="23" x2="37.5" y2="23" stroke="#fffbea" stroke-width="1"/>
+			<path d="M5,6 H33 L32,0 H6 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M12,14 L18.5,18 L25,14" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="40" height="30">
+			<path d="M6,0 H32 L38,23 V25 H0 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="0.5" y1="23" x2="37.5" y2="23" stroke="#fffbea" stroke-width="1"/>
+			<line x1="5" y1="6" x2="33" y2="6" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M5,6 H33 L32,0 H6 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M12,14 L18.5,18 L25,14" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursorleft">
+		<image state="0"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M3,0 H16 V2 L21,25 L16,48 V50 H3 A3,3 0 0,1 0,47 V3 A3,3 0 0,1 3,0 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="2" y1="2" x2="15.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="2" y1="48" x2="15.5" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<line x1="15.5" y1="2" x2="15.5" y2="48" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M15.5,2 V48 L20.5,25 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M10,19 L6,25 L10,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M3,0 H16 V2 L21,25 L16,48 V50 H3 A3,3 0 0,1 0,47 V3 A3,3 0 0,1 3,0 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="2" y1="2" x2="15.5" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="2" y1="48" x2="15.5" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<line x1="15.5" y1="2" x2="15.5" y2="48" stroke="#c5ba9c" stroke-width="1"/>
+			<path d="M15.5,2 V48 L20,25 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M10,19 L6,25 L10,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="cursorright">
+		<image state="0"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M6,0 H19 A3,3 0 0,1 22,3 V47 A3,3 0 0,1 19,50 H6 V48 L1,25 L6,2 Z" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width=".2"/>
+			<line x1="6.5" y1="2" x2="20" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="6.5" y1="48" x2="20" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<path d="M6.5,2 V48 L1,25 Z" stroke="rgb(197,186,156)" fill="rgb(197,186,156)" stroke-width=".5"/>
+			<path d="M12,19 L16,25 L12,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg width="25" height="55">
+			<path d="M6,0 H19 A3,3 0 0,1 22,3 V47 A3,3 0 0,1 19,50 H6 V48 L1,25 L6,2 Z" fill="rgb(229,218,189)" stroke="rgb(229,218,189)" stroke-width=".2"/>
+			<line x1="6.5" y1="2" x2="20" y2="2" stroke="#fffbea" stroke-width="1"/>
+			<line x1="6.5" y1="48" x2="20" y2="48" stroke="#fffbea" stroke-width="1"/>
+			<path d="M6.5,2 V48 L1,25 Z" stroke="rgb(187,176,146)" fill="rgb(187,176,146)" stroke-width=".5"/>
+			<path d="M12,19 L16,25 L12,31" stroke="rgb(0,0,0)" stroke-width="1" fill="none"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<group name="cursormodule">
+		<bounds x="0" y="0" width="530" height="410" />
+		<element ref="cursoroutline"><bounds x="0" y="0" width="535" height="392" /></element>
+		<element ref="cursorleft" inputtag="C7" inputmask="0x10"><bounds x="13" y="15" width="190" height="400" /></element>
+		<element ref="cursorup" inputtag="C2" inputmask="0x10"><bounds x="150" y="15" width="251" height="211" /></element>
+		<element ref="cursordown" inputtag="C6" inputmask="0x10"><bounds x="148" y="200" width="251" height="211" /></element>
+		<element ref="cursorright" inputtag="C1" inputmask="0x10"><bounds x="351" y="15" width="190" height="400" /></element>
+	</group>
+
+	<!-- Buttons -->
+	<element name="rectbutton-white" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="145" height="76" viewBox="-1 -1 146 77">
+			  <rect x="0" y="0" width="145" height="76" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+				<rect x="8" y="8" width="129" height="60" rx="8" ry="8" fill="rgb(203,203,203)" stroke="rgb(203,203,203)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="145" height="76" viewBox="-1 -1 146 77">
+			  <rect x="0" y="0" width="145" height="76" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+			  <rect x="8" y="8" width="129" height="60" rx="8" ry="8" fill="rgb(193,193,193)" stroke="rgb(193,193,193)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="rectbutton-blue" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="145" height="76" viewBox="-1 -1 146 77">
+				<rect x="0" y="0" width="145" height="76" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+				<rect x="8" y="8" width="129" height="60" rx="8" ry="8" fill="rgb(135,165,193)" stroke="rgb(135,165,193)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="145" height="76" viewBox="-1 -1 146 77">
+			  <rect x="0" y="0" width="145" height="76" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+			  <rect x="8" y="8" width="129" height="60" rx="8" ry="8" fill="rgb(125,155,183)" stroke="rgb(125,155,183)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="squarebutton-white" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="145" height="107">
+				<rect x="0" y="0" width="145" height="107" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+				<rect x="8" y="8" width="129" height="91" rx="8" ry="8" fill="rgb(239,228,199)" stroke="rgb(239,228,199)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="145" height="107">
+				<rect x="0" y="0" width="145" height="107" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+				<rect x="8" y="8" width="129" height="91" rx="8" ry="8" fill="rgb(229,218,189)" stroke="rgb(239,228,199)" stroke-width="0.6"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="squarebutton-grey" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg width="145" height="107">
+				<rect x="0" y="0" width="145" height="107" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+				<rect x="8" y="8" width="129" height="91" rx="8" ry="8" fill="rgb(255,255,255)" stroke="rgb(255,255,255)" stroke-width="0.6" fill-opacity="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="145" height="107">
+				<rect x="0" y="0" width="145" height="107" rx="14" ry="14" fill="black" stroke="black" stroke-width="0.6"/>
+				<rect x="8" y="8" width="129" height="91" rx="8" ry="8" fill="rgb(245,245,245)" stroke="rgb(255,255,255)" stroke-width="0.6" fill-opacity="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!-- Knob Elements -->
+	<element name="knob"><disk></disk></element>
+	<element name="knob-position"><rect></rect></element>
+	<element name="rect"><rect></rect></element>
+	<element name="knobdots">
+		<image><data><![CDATA[
+		<svg width="500" height="500" viewBox="0 0 500 500">
+		<g fill="black" stroke="black" stroke-width="5" transform="translate(250, 250)">
+		<circle transform="rotate(0)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(30)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(60)" cx="200" cy="0" r="11"/>
+		<circle transform="rotate(120)" cx="200" cy="0" r="11"/>
+		<circle transform="rotate(150)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(180)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(210)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(240)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(270)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(300)" cx="200" cy="0" r="6"/>
+		<circle transform="rotate(330)" cx="200" cy="0" r="6"/>
+		</g>
+		</svg>
+		]]></data></image>
+	</element>
+	<group name="volumeknob">
+		<bounds x="0" y="0" width="740" height="740" />
+		<element ref="text-mainvolume"><bounds x="65" y="194" width="350" height="53"  /><color red="0" green="0" blue="0" /></element>
+		<element ref="knobdots"><bounds  x="20" y="265" width="435" height="420"     /></element>
+		<element ref="knob"><bounds        x="92" y="335" width="290" height="290"  /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob"><bounds        x="107" y="350" width="260" height="260" /><color red="0.7" green="0.7" blue="0.7" /></element>
+		<element ref="knob"><bounds        x="137" y="382" width="196" height="196" /><color red="0.5" green="0.5" blue="0.5" /></element>
+		<element ref="knob"><bounds        x="147" y="388" width="180" height="180" /><color red="0.88" green="0.9" blue="0.778" /></element>
+	<element ref="knob-position"><bounds   x="212" y="310" width="40" height="180"  /><color red="0.5" green="0.5" blue="0.5" /></element>
+	<element ref="knob-position"><bounds   x="219" y="315" width="30" height="190"  /><color red="0.78" green="0.8" blue="0.678" /></element>
+	</group>
+	<group name="contrastknob">
+		<bounds x="0" y="0" width="276" height="276" />
+		<element ref="knobdots"><bounds  x="0" y="0" width="276" height="276" /></element>
+		<element ref="knob"><bounds x="50" y="50" width="176" height="176" /><color red="0.0" green="0.0" blue="0.0" /></element>
+		<element ref="knob"><bounds x="59" y="59" width="160" height="160" /><color red="0.88" green="0.9" blue="0.778" /></element>
+		<element ref="knob-position"><bounds x="62" y="118" width="155" height="40" /><color red="0.5" green="0.5" blue="0.5" /></element>
+		<element ref="knob-position"><bounds x="56" y="123" width="152" height="30" /><color red="0.78" green="0.8" blue="0.678" /></element>
+	</group>
+
+	<!-- Bezel / Panel Elements -->
+	<element name="panel"><rect></rect></element>
+	<element name="fkeyboxgrey"><rect><color red="0.3" green="0.3" blue="0.3" /></rect></element>
+	<element name="fkeyboxblack"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="bezel">
+		<image><data><![CDATA[
+			<svg width="2500" height="600">
+			  <rect x="0" y="0" width="2500" height="600" rx="45" ry="45" fill="black" stroke="none" stroke-width="1" />
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="jack">
+		<disk><bounds x="0" y="0" width="140" height="140" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="7" y="7" width="126" height="126" /><color red="0.709" green="0.674" blue="0.611" /></disk>
+		<disk><bounds x="12.5" y="12.5" width="115" height="115" /><color red="0" green="0" blue="0" /></disk>
+		<disk><bounds x="15" y="15" width="110" height="110" /><color red="0.317" green="0.290" blue="0.227" /></disk>
+		<disk><bounds x="27.5" y="27.5" width="85" height="85" /><color red="0" green="0" blue="0" /></disk>
+	</element>
+
+	<!-- Screen Assembly -->
+	<group name="group-screen">
+		<bounds x="0" y="0" width="2500" height="600" />
+		<element ref="bezel"><bounds x="0" y="0" width="2500" height="600" /></element>
+		<screen index="0"><bounds x="205" y="99" width="2070" height="385" /></screen>
+		<repeat count="8">
+			<param name="gbox_x" start="250" increment="255"/>
+			<param name="gtext_x" start="315" increment="255"/>
+			<param name="gnum" start="1" increment="1"/>
+				<repeat count="1">
+					<element ref="fkeyboxgrey">
+					<bounds x="~gbox_x~" y ="525" width="200" height="30"/></element>
+					<element ref="text-f~gnum~">
+					<bounds x="~gtext_x~" y ="523" width="80" height="34"/><color red="1" green="1" blue="1" /></element>
+				</repeat>
+		</repeat>
+	</group>
+
+	<!-- Encoder Wheel -->
+	<element name="dataentry_bottom"><disk><color red="0" green="0" blue="0"/></disk></element>
+	<element name="dataentry_edge"><disk><color red="0.733" green="0.752" blue="0.780"/></disk></element>
+	<element name="dataentry_top"><disk><color red="0.803" green="0.831" blue="0.866"/></disk></element>
+	<element name="dataentry_outer"><disk><color red="0.952" green="0.952" blue="0.976"/></disk></element>
+	<element name="dataentry_knob">
+		<simplecounter maxstate="100" digits="3"><color red="0.505" green="0.458" blue="0.337"/></simplecounter>
+	</element>
+	<group name="select_data_knob">
+		<bounds x="0" y="0" width="440" height="540" />
+		<element ref="text-data"><bounds x="160" y="24" width="117" height="45" /><color red="0" green="0" blue="0" /></element>
+		<element ref="dataentry_bottom"><bounds x="0" y="100" width="440" height="440"/></element>
+		<element ref="dataentry_edge"><bounds x="15" y="115" width="410" height="410"/></element>
+		<element ref="dataentry_outer"><bounds x="40" y="140" width="360" height="360"/></element>
+		<element ref="dataentry_top"><bounds x="50" y="148" width="342" height="340"/></element>
+		<element ref="dataentry_knob" id="dataentry_knob" inputtag="DATAENTRY" inputmask="0xffff" inputraw="yes">
+			<bounds x="150" y="290" width="130" height="60"/>
+		</element>
+	</group>
+
+	<group name="text-compactdisc">
+	<bounds x="0" y="0" width="177" height="125" />
+	<element ref="text-d"><bounds x="0" y="0" width="45" height="125" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-isc"><bounds x="48" y="30" width="122" height="93" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-compact"><bounds x="52" y="15" width="130" height="35" /><color red="0.833" green="0.817" blue="0.739" /></element>
+	<element ref="text-d"><bounds x="5" y="0" width="45" height="122" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-isc"><bounds x="55" y="30" width="122" height="93" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-compact"><bounds x="57" y="15" width="130" height="35" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-d"><bounds x="0" y="8" width="45" height="125" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-isc"><bounds x="48" y="35" width="122" height="93" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-compact"><bounds x="52" y="20" width="130" height="35" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-d"><bounds x="5" y="7" width="45" height="125" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-isc"><bounds x="53" y="35" width="122" height="93" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-compact"><bounds x="55" y="20" width="130" height="35" /><color red="0.66" green="0.66" blue="0.66" /></element>
+	<element ref="text-d"><bounds x="5" y="5" width="45" height="122" /><color red="0.203" green="0.192" blue="0.211" /></element>
+	<element ref="text-isc"><bounds x="54" y="33" width="120" height="92" /><color red="0.203" green="0.192" blue="0.211" /></element>
+	<element ref="text-compact"><bounds x="55" y="19" width="127" height="31" /><color red="0.203" green="0.192" blue="0.211" /></element>
+	</group>
+
+	<!-- Show Everything -->
+	<view name="Default Layout">
+
+	<!-- Screen and Panel -->
+	<element ref="panel"><bounds x="0" y="0" width="6000" height="1650" /><color red="0.835" green="0.839" blue="0.854" /></element>
+	<group ref="group-screen"><bounds x="2280" y="180" width="1725" height="616" /></group>
+	<element ref="slot1"><bounds x="35" y="412" width="130" height="104" /></element>
+	<element ref="slot2"><bounds x="35" y="1127" width="130" height="104" /></element>
+	<element ref="slot2"><bounds x="5830" y="412" width="130" height="104" /></element>
+	<element ref="slot3"><bounds x="5830" y="1127" width="130" height="104" /></element>
+	<element ref="vline"><bounds x="300" y="0" width="10" height="1647" /></element>
+	<element ref="vline"><bounds x="5690" y="0" width="10" height="1647" /></element>
+	<element ref="jack"><bounds x="5345" y="1250" width="150" height="150" /></element>
+	<element ref="text-headphone"><bounds x="5296" y="1188" width="267" height="45" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-akainovo"><bounds x="435" y="110" width="305" height="80" /></element>
+	<element ref="text-professional"><bounds x="775" y="140" width="220" height="50" /><color red="0.627" green="0.133" blue="0.172" /></element>
+	<element ref="text-cdromsampler"><bounds x="2315" y="115" width="567" height="51.50" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-cd3000i"><bounds x="3165" y="75" width="960" height="100" /></element>
+	<element ref="text-screenfunction"><bounds x="2938" y="950" width="420" height="45" /><color red="0" green="0" blue="0" /></element>
+
+	<!-- Knobs -->
+	<group ref="volumeknob"><bounds x="5220" y="135" width="640" height="640" /></group>
+	<element ref="text-min"><bounds x="5278" y="685" width="70" height="30" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-max"><bounds x="5515" y="685" width="75" height="30" /><color red="0" green="0" blue="0" /></element>
+	<group ref="select_data_knob" clickthrough="no"><bounds x="4745" y="195" width="430" height="530" /></group>
+	<group ref="contrastknob"><bounds x="5332" y="905" width="202" height="202" /></group>
+	<element ref="text-contrast1"><bounds x="5343" y="832" width="172" height="45" /><color red="0" green="0.0" blue="0.0" /></element>
+	<element ref="text-contrast2"><bounds x="5310" y="872" width="235" height="45" /><color red="0" green="0.0" blue="0.0" /></element>
+
+	<!-- Floppy Drive -->
+	<element ref="floppyblack"><bounds x="792.5" y="1131.5" width="1277" height="337" /></element>
+	<element ref="fddled"><bounds x="1070" y="1373" width="70" height="25" /><animate name="drive_led" /><color state="0" red="0.437" green="0.249" blue="0" /><color state="1" red="1" green="0.674" blue="0.219" /></element>
+
+	<!-- CD Drive -->
+	<element ref="cdromtraybezelblack"><bounds x="330" y="330" width="1860" height="550" /></element>
+	<element ref="squarebutton-grey"><bounds x="1908" y="210" width="145" height="107" /><animate name="cd_led" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.933" green="0.588" blue="0.313" /></element>
+	<element ref="text-open"><bounds x="1768" y="222" width="106" height="40" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-close"><bounds x="1762" y="256" width="122" height="40" /><color red="0" green="0" blue="0" /></element>
+	<group ref="text-compactdisc"><bounds x="1136" y="447" width="220" height="135" /></group>
+
+	<!-- Power Switch -->
+	<element ref="powerswitchblack"><bounds x="455" y="1130" width="280" height="335" /></element>
+	<element ref="text-power"><bounds x="514" y="1015" width="162" height="50" /><color red="0.627" green="0.133" blue="0.172" /></element>
+	<element ref="text-on"><bounds x="570" y="1075" width="50" height="40" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-off"><bounds x="560" y="1480" width="70" height="40" /><color red="0" green="0" blue="0" /></element>
+
+	<!-- Buttons -->
+	<!-- Mark -->
+	<element ref="rectbutton-white" inputtag="C2" inputmask="0x04"><bounds x="4990" y="988" width="145" height="76" /></element>
+	<element ref="text-mark"><bounds x="4977" y="939" width="168" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Jump -->
+	<element ref="rectbutton-white" inputtag="C2" inputmask="0x08"><bounds x="4990" y="1125" width="145" height="76" /></element>
+	<element ref="text-jump"><bounds x="4995" y="1072" width="115" height="45" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-dot"><bounds x="5110" y="1033" width="35" height="80" /><color red="0" green="0" blue="0" /></element>
+	<!-- Name -->
+	<element ref="rectbutton-white" inputtag="C6" inputmask="0x04"><bounds x="4990" y="1260" width="145" height="76" /></element>
+	<element ref="text-name"><bounds x="5008" y="1210" width="115" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Play -->
+	<element ref="rectbutton-white" inputtag="C6" inputmask="0x08"><bounds x="4990" y="1400" width="145" height="76" /></element>
+	<element ref="text-play"><bounds x="4965" y="1347" width="205" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- F1 -->
+	<element ref="squarebutton-white" inputtag="C7" inputmask="0x02"><bounds x="2298" y="1120" width="145" height="107" /></element>
+	<!-- F2 -->
+	<element ref="squarebutton-white" inputtag="C6" inputmask="0x02"><bounds x="2520" y="1120" width="145" height="107" /></element>
+	<!-- F3 -->
+	<element ref="squarebutton-white" inputtag="C5" inputmask="0x02"><bounds x="2742" y="1120" width="145" height="107" /></element>
+	<!-- F4 -->
+	<element ref="squarebutton-white" inputtag="C4" inputmask="0x02"><bounds x="2964" y="1120" width="145" height="107" /></element>
+	<!-- F5 -->
+	<element ref="squarebutton-white" inputtag="C3" inputmask="0x02"><bounds x="3186" y="1120" width="145" height="107" /></element>
+	<!-- F6 -->
+	<element ref="squarebutton-white" inputtag="C2" inputmask="0x02"><bounds x="3408" y="1120" width="145" height="107" /></element>
+	<!-- F7 -->
+	<element ref="squarebutton-white" inputtag="C1" inputmask="0x02"><bounds x="3630" y="1120" width="145" height="107" /></element>
+	<!-- F8 -->
+	<element ref="squarebutton-white" inputtag="C0" inputmask="0x02"><bounds x="3852" y="1120" width="145" height="107" /></element>
+	<!-- F-Key Box+Text Labels -->
+	<repeat count="8">
+		<param name="box_x" start="2300" increment="222"/>
+		<param name="text_x" start="2320" increment="221.5"/>
+		<param name="num" start="1" increment="1"/>
+			<repeat count="1">
+				<element ref="fkeyboxblack">
+				<bounds x="~box_x~" y ="1063" width="138" height="40"/></element>
+				<element ref="text-lf~num~">
+				<bounds x="~text_x~" y ="1060" width="100" height="44"/></element>
+			</repeat>
+	</repeat>
+	<!-- Select Program -->
+	<element ref="squarebutton-grey" inputtag="C7" inputmask="0x01"><bounds x="2298" y="1360" width="145" height="107" /><animate name="led0" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-select"><bounds x="2295" y="1262" width="153" height="45" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-progi"><bounds x="2296" y="1302" width="150" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Edit Sample -->
+	<element ref="squarebutton-grey" inputtag="C6" inputmask="0x01"><bounds x="2520" y="1360" width="145" height="107" /><animate name="led1" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-edit"><bounds x="2543" y="1262" width="93" height="45" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-samplej"><bounds x="2498" y="1302" width="198" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Edit Program -->
+	<element ref="squarebutton-grey" inputtag="C5" inputmask="0x01"><bounds x="2742" y="1360" width="145" height="107" /><animate name="led2" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-edit"><bounds x="2762" y="1262" width="93" height="45" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-progk"><bounds x="2734" y="1302" width="152" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Midi -->
+	<element ref="squarebutton-grey" inputtag="C4" inputmask="0x01"><bounds x="2964" y="1360" width="145" height="107" /><animate name="led3" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-midil"><bounds x="2975" y="1287" width="125" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Disk -->
+	<element ref="squarebutton-grey" inputtag="C3" inputmask="0x01"><bounds x="3186" y="1360" width="145" height="107" /><animate name="led4" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-diskm"><bounds x="3186" y="1287" width="145" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Tune Level -->
+	<element ref="squarebutton-grey" inputtag="C2" inputmask="0x01"><bounds x="3408" y="1360" width="145" height="107" /><animate name="led5" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-tune"><bounds x="3428" y="1262" width="103" height="45" /><color red="0" green="0" blue="0" /></element>
+	<element ref="text-leveln"><bounds x="3398" y="1302" width="167" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Utility -->
+	<element ref="squarebutton-grey" inputtag="C1" inputmask="0x01"><bounds x="3630" y="1360" width="145" height="107" /><animate name="led6" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-utilityo"><bounds x="3609" y="1287" width="185" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Help -->
+	<element ref="squarebutton-grey" inputtag="C0" inputmask="0x01"><bounds x="3852" y="1360" width="145" height="107" /><animate name="led7" /><color state="0" red="0.862" green="0.862" blue="0.862" /><color state="1" red="0.980" green="0.345" blue="0.294" /></element>
+	<element ref="text-helpp"><bounds x="3856" y="1287" width="142" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 7/T -->
+	<element ref="rectbutton-blue" inputtag="C5" inputmask="0x04"><bounds x="4202" y="984" width="145" height="76" /></element>
+	<element ref="text-7q"><bounds x="4240" y="936" width="80" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 8/U -->
+	<element ref="rectbutton-blue" inputtag="C4" inputmask="0x04"><bounds x="4450" y="984" width="145" height="76" /></element>
+	<element ref="text-8r"><bounds x="4488" y="936" width="74" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 9/V -->
+	<element ref="rectbutton-blue" inputtag="C3" inputmask="0x04"><bounds x="4698" y="984" width="145" height="76" /></element>
+	<element ref="text-9s"><bounds x="4738" y="936" width="74" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 4/T -->
+	<element ref="rectbutton-blue" inputtag="C5" inputmask="0x08"><bounds x="4202" y="1124" width="145" height="76" /></element>
+	<element ref="text-4t"><bounds x="4240" y="1076" width="80" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 5/U -->
+	<element ref="rectbutton-blue" inputtag="C4" inputmask="0x08"><bounds x="4450" y="1124" width="145" height="76" /></element>
+	<element ref="text-5u"><bounds x="4488" y="1076" width="74" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 6/V -->
+	<element ref="rectbutton-blue" inputtag="C3" inputmask="0x08"><bounds x="4698" y="1124" width="145" height="76" /></element>
+	<element ref="text-6v"><bounds x="4738" y="1076" width="74" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 1/W -->
+	<element ref="rectbutton-blue" inputtag="C0" inputmask="0x04"><bounds x="4202" y="1264" width="145" height="76" /></element>
+	<element ref="text-1w"><bounds x="4240" y="1216" width="80" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 2/X -->
+	<element ref="rectbutton-blue" inputtag="C1" inputmask="0x04"><bounds x="4450" y="1264" width="145" height="76" /></element>
+	<element ref="text-2x"><bounds x="4488" y="1216" width="74" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 3/Y -->
+	<element ref="rectbutton-blue" inputtag="C7" inputmask="0x04"><bounds x="4698" y="1264" width="145" height="76" /></element>
+	<element ref="text-3y"><bounds x="4738" y="1216" width="74" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- 0/Z -->
+	<element ref="rectbutton-blue" inputtag="C0" inputmask="0x08"><bounds x="4202" y="1404" width="145" height="76" /></element>
+	<element ref="text-0z"><bounds x="4240" y="1356" width="80" height="45" /><color red="0" green="0" blue="0" /></element>
+	<!-- Minus -->
+	<element ref="rectbutton-blue" inputtag="C7" inputmask="0x08"><bounds x="4450" y="1404" width="145" height="76" /></element>
+	<element ref="text-minus"><bounds x="4455" y="1356" width="195" height="50" /></element>
+	<!-- Plus -->
+	<element ref="rectbutton-blue" inputtag="C1" inputmask="0x08"><bounds x="4698" y="1404" width="145" height="76" /></element>
+	<element ref="text-plus"><bounds x="4700" y="1356" width="195" height="50" /></element>
+
+	<!-- Cursor Module -->
+	<element ref="text-cursor"><bounds x="4333" y="302" width="185" height="45" /><color red="0" green="0" blue="0" /></element>
+	<group ref="cursormodule"><bounds x="4210" y="365" width="432" height="340" /></group>
+
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Default Layout"]
+				add_simplecounter_knob(view, "dataentry_knob", "DATAENTRY", 1.5)
+			end)
+
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
+		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+			table.insert(widgets, {
+				clickarea = get_layout_item(view, clickarea_id),
+				field     = get_port_field(port_name),
+				is_knob   = true,
+				scale     = scale })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			if field == nil then
+				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				return nil
+			end
+			return field
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				pointers[id] = nil
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_y = y,
+							start_value = widgets[i].field.user_value }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's Y
+			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+			widget.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function forget_pointers()
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
+
+</mamelayout>
