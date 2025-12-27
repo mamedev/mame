@@ -878,6 +878,7 @@ void atarisy1_state::reliefs1(machine_config &config)
 {
 	atarisy1(config);
 	add_speech(config);
+	//add_adc(config); // does this exist?
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy1_state::main_map_noslapstic);
 }
 
@@ -2548,10 +2549,8 @@ ROM_START( reliefs1 ) // LSI CART 2
 	ROM_LOAD( "rp-p3-6.c24.bin",  0x2b0000, 0x008000, CRC(f15426d3) SHA1(21e564973efde7e814a74aec8bfc56fd19492575) )  /* bank 6, plane 3 */
 
 	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
-	// these don't appear to give a correct mapping, are they bad, or do some boards use a different format?
-	// roadblstcg also has 2 PROMs we can't use that need looking at
-	ROM_LOAD( "rp-mem.bin",   0x000, 0x200, BAD_DUMP CRC(7219963b) SHA1(c4de5a135e99e592c22fcde126d1c1bb9bbb2286) )  /* remap */
-	ROM_LOAD( "rp-pal.bin",   0x200, 0x200, BAD_DUMP CRC(9542eb38) SHA1(d1b247b7a822f4c5144851987e12c32e949ce3fc) )  /* color */
+	ROM_LOAD( "mem.a7", 0x000000, 0x000200, NO_DUMP )
+	ROM_LOAD( "pal.a5", 0x000200, 0x000200, NO_DUMP )
 
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
 	MOTHERBOARD_PROMS
