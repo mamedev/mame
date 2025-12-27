@@ -8,7 +8,7 @@
     original mods on this driver by Luca Elia
 
     TODO:
-	- Move flash memory implementation into machine/intelfsh.cpp
+    - Move flash memory implementation into machine/intelfsh.cpp
     - touch panel, according to service mode can be generic, atouch or 3M
       (microtouch?). It interfaces thru UART0 port;
     - RTC (unknown type);

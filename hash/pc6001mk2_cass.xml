@@ -17,11 +17,11 @@ Any software requiring modes 1-4 should be listed in the pc6001_cass.xml softwar
 The Page value should be entered at the 'How Many Pages?' prompt in all versions of BASIC.
 
 Once in BASIC:
-If usage specifies BASIC: 
+If usage specifies BASIC:
 - Enter CLOAD then press ENTER.
 - Then enter RUN then ENTER once loading completes.
 
-If usage specifies MONITOR: 
+If usage specifies MONITOR:
 - Enter MON then press ENTER to enter the Monitor.
 - Type R-0 (- is entered automatically) then press ENTER.
 
@@ -32,7 +32,7 @@ If usage specifies MONITOR:
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
 		<publisher>ASCII</publisher>
-        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="ボコスカウォーズ"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="22293">
@@ -45,7 +45,7 @@ If usage specifies MONITOR:
 		<description>Cannon Ball</description>
 		<year>1983</year>
 		<publisher>Hudson Soft</publisher>
-        <info name="usage" value="Mode 5, Page 4, MONITOR" />
+		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="キャノンボール"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="10886">
@@ -58,7 +58,7 @@ If usage specifies MONITOR:
 		<description>Castle Excellent</description>
 		<year>19??</year>
 		<publisher>ASCII</publisher>
-        <info name="usage" value="Mode 5, Page 2, BASIC" />
+		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="キャッスルエクセレント"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="32980">
@@ -71,7 +71,7 @@ If usage specifies MONITOR:
 		<description>Chack 'n Pop</description>
 		<year>1984</year>
 		<publisher>Nidecom Carry</publisher>
-        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="ちゃっくんぽっぷ"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="46630">
@@ -85,7 +85,7 @@ If usage specifies MONITOR:
 		<year>19??</year>
 		<publisher>Comix</publisher>
 		<notes><![CDATA[Comix is a Koei spinoff]]></notes>
-        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="クリス愛の旅立ち"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="26017">
@@ -98,7 +98,7 @@ If usage specifies MONITOR:
 		<description>Daidasso</description>
 		<year>19??</year>
 		<publisher>Carry Lab</publisher>
-        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="大脱走"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="41712">
@@ -111,7 +111,7 @@ If usage specifies MONITOR:
 		<description>Dig Dug</description>
 		<year>19??</year>
 		<publisher>Namco</publisher>
-        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<info name="alt_title" value="ディグダグ"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="29546">
@@ -124,7 +124,7 @@ If usage specifies MONITOR:
 		<description>Dr. Slump Bubble Daisakusen</description>
 		<year>1984</year>
 		<publisher>Enix</publisher>
-        <info name="usage" value="Mode 5, Page 3, MONITOR" />
+		<info name="usage" value="Mode 5, Page 3, MONITOR" />
 		<info name="alt_title" value="スランプ バブル大作戦"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="28455">
@@ -137,7 +137,7 @@ If usage specifies MONITOR:
 		<description>Door Door Mk. II</description>
 		<year>1984</year>
 		<publisher>Enix</publisher>
-        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="ドアドアmk2"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="71593">
@@ -150,7 +150,7 @@ If usage specifies MONITOR:
 		<description>Flappy</description>
 		<year>1984</year>
 		<publisher>dB-SOFT</publisher>
-        <info name="usage" value="Mode 5, Page 2, BASIC" />
+		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="フラッピー"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="71422">
@@ -163,7 +163,7 @@ If usage specifies MONITOR:
 		<description>Hisya</description>
 		<year>19??</year>
 		<publisher>Carry Lab</publisher>
-        <info name="usage" value="Mode 5, Page 1, BASIC" />
+		<info name="usage" value="Mode 5, Page 1, BASIC" />
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="30124">
 				<rom name="hisya.cas" size="30124" crc="c3d88ac6" sha1="c6a857cf88f1205b4dfff00e063739752992a7fc"/>
@@ -175,7 +175,7 @@ If usage specifies MONITOR:
 		<description>Ice Block</description>
 		<year>19??</year>
 		<publisher>dB-SOFT</publisher>
-        <info name="usage" value="Mode 5, Page 2, BASIC" />
+		<info name="usage" value="Mode 5, Page 2, BASIC" />
 		<info name="alt_title" value="アイス・ブロック"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="28708">
@@ -188,7 +188,7 @@ If usage specifies MONITOR:
 		<description>Nuts &amp; Milk</description>
 		<year>1984</year>
 		<publisher>Hudson Soft</publisher>
-        <info name="usage" value="Mode 5, Page 2, MONITOR" />
+		<info name="usage" value="Mode 5, Page 2, MONITOR" />
 		<info name="alt_title" value="ナッツ&amp;ミルク"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="28846">
@@ -201,7 +201,7 @@ If usage specifies MONITOR:
 		<description>Pascom Tower</description>
 		<year>1984</year>
 		<publisher>MIA</publisher>
-        <info name="usage" value="Mode 5, Page 4, BASIC" />
+		<info name="usage" value="Mode 5, Page 4, BASIC" />
 		<info name="alt_title" value="パスコンタワー"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="46657">
@@ -214,7 +214,7 @@ If usage specifies MONITOR:
 		<description>Plazma Line</description>
 		<year>19??</year>
 		<publisher>Techno Soft</publisher>
-        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="プラズマライン"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="35744">
@@ -227,7 +227,7 @@ If usage specifies MONITOR:
 		<description>Punchball Mario</description>
 		<year>1983</year>
 		<publisher>Nintendo / Hudson Soft</publisher>
-        <info name="usage" value="Mode 5, Page 4, MONITOR" />
+		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="30669">
@@ -240,7 +240,7 @@ If usage specifies MONITOR:
 		<description>Thunder Force</description>
 		<year>1985</year>
 		<publisher>Techno Soft</publisher>
-        <info name="usage" value="Mode 5, Page 3, BASIC" />
+		<info name="usage" value="Mode 5, Page 3, BASIC" />
 		<info name="alt_title" value="サンダーフォース"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="35487">
@@ -253,7 +253,7 @@ If usage specifies MONITOR:
 		<description>Vegetable Crash</description>
 		<year>19??</year>
 		<publisher>Hudson Soft</publisher>
-        <info name="usage" value="Mode 5, Page 4, MONITOR" />
+		<info name="usage" value="Mode 5, Page 4, MONITOR" />
 		<info name="alt_title" value="ベジタブルクラッシュ"/>
 		<part name="cart" interface="pc6001_cass">
 			<dataarea name="rom" size="11027">

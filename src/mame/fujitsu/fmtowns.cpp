@@ -2669,7 +2669,7 @@ void towns_state::towns_base(machine_config &config)
 	CDROM(config, m_cdrom).set_interface("cdrom");
 	m_cdda->set_cdrom_tag(m_cdrom);
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
-//	SOFTWARE_LIST(config, "win_cd_list").set_original("generic_cdrom");
+//  SOFTWARE_LIST(config, "win_cd_list").set_original("generic_cdrom");
 
 	UPD71071(config, m_dma[0], 0);
 	m_dma[0]->set_cpu_tag("maincpu");

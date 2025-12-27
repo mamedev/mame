@@ -843,7 +843,7 @@ mac_S
 max
 	20001d < a=1 b=1 > a=1 b=1 ccr.c=0
 	20001d < a=2 b=1 > a=2 b=2 ccr.c=0
-    20001d < a=1 b=2 > a=1 b=2 ccr.c=1
+	20001d < a=1 b=2 > a=1 b=2 ccr.c=1
 	20001d < a=ff112233445566 b=ffffffffffffff > a=ff112233445566 b=ffffffffffffff ccr.c=1
 	20001d < a=ffffffffffffff b=00123456123456 > a=ffffffffffffff b=00123456123456 ccr.c=1
 	20001d < a=00123456123456 b=ffffffffffffff > a=00123456123456 b=00123456123456 ccr.c=0
@@ -851,7 +851,7 @@ max
 maxm
 	200015 < a=1 b=1 > a=1 b=1 ccr.c=0
 	200015 < a=2 b=1 > a=2 b=2 ccr.c=0
-    200015 < a=1 b=2 > a=1 b=2 ccr.c=1
+	200015 < a=1 b=2 > a=1 b=2 ccr.c=1
 	200015 < a=fffffffffffffe b=1 > a=fffffffffffffe b=fffffffffffffe ccr.c=0
 	200015 < a=fffffffffffffe b=fffffffffffffb > a=fffffffffffffe b=fffffffffffffb ccr.c=1
 	200015 < a=ff112233445566 b=ffffffffffffff > a=ff112233445566 b=ff112233445566 ccr.c=0

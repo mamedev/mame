@@ -776,7 +776,7 @@ static std::string blocks_to_string(const std::vector<u32> &blocks)
 					j++;
 				str += "-" + std::to_string(blocks[j]);
 				i = j;
-			}			
+			}
 		}
 	}
 	return str;

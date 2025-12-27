@@ -2863,7 +2863,7 @@ ROM_START( hyprdriv )
 	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
-	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )	
+	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 
@@ -2881,7 +2881,7 @@ ROM_START( hyprdriv131 )
 	DISK_IMAGE( "hyprdriv131", 0, SHA1(24473e702a1f38ff563cac0b85360d89929a685d) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
-	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )	
+	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
 

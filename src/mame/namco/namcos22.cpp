@@ -2816,7 +2816,7 @@ void namcos22_state::handle_driving_io()
 		m_shareram[0x034/2] = gas;
 		m_shareram[0x036/2] = brake;
 		handle_coinage(flags);
-		
+
 		// lamps, coin counters, and also leds for acedrive and victlap
 		const u16 outputs = (m_shareram[0x42 / 2] << 8) | (m_shareram[0x20 / 2] & 0xff);
 		for (int i = 0; i < 16; i++)

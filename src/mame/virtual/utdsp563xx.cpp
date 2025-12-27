@@ -53,9 +53,9 @@ u64 ut_debug_buffer::r64(offs_t pc) const
 class utdsp563xx_state : public driver_device
 {
 public:
-    utdsp563xx_state(const machine_config &mconfig, device_type type, const char *tag);
+	utdsp563xx_state(const machine_config &mconfig, device_type type, const char *tag);
 
-    void utdsp563xx(machine_config &config);
+	void utdsp563xx(machine_config &config);
 
 private:
 	enum { TESTS_PER_COLUMN = 28 };
@@ -104,7 +104,7 @@ private:
 	static const u32 code[];
 	static const reg regs[];
 
-    required_device<dsp56311_device> m_cpu;
+	required_device<dsp56311_device> m_cpu;
 	required_region_ptr<u16> m_font;
 	required_ioport m_control;
 
@@ -128,8 +128,8 @@ private:
 
 	bool m_initial_run;
 
-    virtual void machine_start() override ATTR_COLD;
-    virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void p_map(address_map &map) ATTR_COLD;
 
@@ -200,7 +200,7 @@ u32 utdsp563xx_state::done_r()
 		}
 		if(result == 1 && m_first_fail == -1)
 			m_first_fail = m_cur_block;
-		
+
 		m_test_success[testblocks[m_cur_block].m_testlist_start + m_cur_test] = result;
 		m_cur_test++;
 
@@ -327,7 +327,7 @@ void utdsp563xx_state::draw_main_test_list()
 	xprint(0, 0, "DSP563xx unit testing", 0, 6);
 	xprint(60, 0, util::string_format("%d blocks", m_blocks), 0, 6);
 	xprint(90, 0, util::string_format("%d tests", m_tests), 0, 6);
-	
+
 	for(int i=0; i != m_blocks; i++) {
 		auto [xo, yo] = test2pos(i);
 		bool sel = i == m_selected_block;
@@ -476,7 +476,7 @@ void utdsp563xx_state::draw_single_test()
 			col ++;
 		}
 	}
-	
+
 	xprint(0, 32, "Left/right to select test, Button 1 to machine().debug_break(), Button 2 to return to main list", 0, 3);
 }
 
@@ -594,7 +594,7 @@ void utdsp563xx_state::tick(int state)
 			} else
 				m_selected_block = m_selected_block/TESTS_PER_COLUMN*TESTS_PER_COLUMN;
 		}
-		
+
 		if(ctrl & 0x04) {
 			if((m_selected_block - TESTS_PER_COLUMN) >= 0)
 				m_selected_block -= TESTS_PER_COLUMN;
@@ -669,7 +669,7 @@ void utdsp563xx_state::trigger_test(bool stop)
 
 void utdsp563xx_state::utdsp563xx(machine_config &config)
 {
-    DSP56311(config, m_cpu, 66_MHz_XTAL);
+	DSP56311(config, m_cpu, 66_MHz_XTAL);
 	m_cpu->set_hard_omr(0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
