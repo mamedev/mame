@@ -161,15 +161,15 @@ void stella8085_state::io_4040_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
 	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x80, 0x81).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x90, 0x9f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x80, 0x81).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x90, 0x9f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 void stella8085_state::io_4087_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
-	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w));
 	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
