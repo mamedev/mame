@@ -4,11 +4,13 @@
 #include "emu.h"
 #include "cpu/mcs51/i80c52.h"
 #include "bus/midi/midi.h"
+#include "debugger.h"
 
 #define LOG_SERIAL (1U << 1)
 #define LOG_PORT   (1U << 2)
 #define LOG_SAM    (1U << 3)
-#define LOG_IO     (1U << 4)
+//#define LOG_IO     (1U << 4)
+#define LOG_IO     0
 #define VERBOSE (LOG_SERIAL | LOG_SAM | LOG_IO)
 #include "logmacro.h"
 
@@ -90,6 +92,15 @@ private:
     sam8905_state m_sam[2];
 
     int sam_chip_select() const { return BIT(m_port3, 5) ? 0 : 1; }
+
+    // Debug watches - set these values directly in code to enable
+    // D-RAM addr = slot*16 + word (e.g., 0x0F = slot 0 word 15)
+    // A-RAM addr = alg*32 + word (e.g., 0x00 = algorithm 0 word 0)
+    // Set to -1 to disable, or set address to watch
+    s16 m_sam_watch_dram = 0;  // D-RAM address to watch (0-255, -1=off)
+    s16 m_sam_watch_aram = 0;  // A-RAM address to watch (0-255, -1=off)
+    s32 m_rom_watch_addr = 0;  // ROM address to watch (0x10000-0x1FFFF, -1=off)
+    bool m_watch_break = false; // true = break to debugger on watch hit
 
     // P1 pin definitions:
     // P1.0: CLK_SW   (out) - switch scan clock
@@ -261,6 +272,13 @@ u8 keyfox10_state::sam_snd_r(offs_t offset)
     if (!BIT(m_port3, 5))  // T1=0: ROM data
     {
         u32 rom_offset = 0x18000 + offset;
+        if (m_rom_watch_addr >= 0) // && rom_offset == u32(m_rom_watch_addr))
+        {
+            logerror("ROM watch: PC=%04X read ROM[%05X] = %02X\n",
+                m_maincpu->pc(), rom_offset, m_rom[rom_offset]);
+            if (m_watch_break)
+                machine().debug_break();
+        }
         return m_rom[rom_offset];
     }
     // T1=1: SAM chip (only first 8 bytes decoded)
@@ -284,6 +302,13 @@ u8 keyfox10_state::sam_fx_r(offs_t offset)
     if (!BIT(m_port3, 5))  // T1=0: ROM data
     {
         u32 rom_offset = 0x1E000 + offset;
+        if (m_rom_watch_addr >= 0) // && rom_offset == u32(m_rom_watch_addr))
+        {
+            logerror("ROM watch: PC=%04X read ROM[%05X] = %02X\n",
+                m_maincpu->pc(), rom_offset, m_rom[rom_offset]);
+            if (m_watch_break)
+                machine().debug_break();
+        }
         return m_rom[rom_offset];
     }
     // T1=1: SAM chip (only first 8 bytes decoded)
@@ -415,8 +440,17 @@ void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
         {
             // MSB (bit 7 undefined, mask to 7 bits)
             sam.aram[sam.addr % 256] = (sam.aram[sam.addr % 256] & 0x00ff) | ((data & 0x7f) << 8);
-            LOGMASKED(LOG_SAM, "SAM[%s] A-RAM[0x%02X] write MSB = 0x%02X -> word = 0x%04X\n",
-                chip_name, sam.addr, data, sam.aram[sam.addr % 256]);
+            LOGMASKED(LOG_SAM, "SAM[%s] A-RAM[0x%02X] write MSB = 0x%02X -> word = 0x%04X PC=%04X\n",
+                chip_name, sam.addr, data, sam.aram[sam.addr % 256], m_maincpu->pc());
+            // Watch check
+            if (m_sam_watch_aram >= 0 && (sam.addr % 256) == u8(m_sam_watch_aram))
+            {
+                logerror("A-RAM watch: PC=%04X SAM[%s] A-RAM[%02X] = %04X (alg %d, word %d)\n",
+                    m_maincpu->pc(), chip_name, sam.addr, sam.aram[sam.addr % 256],
+                    sam.addr / 32, sam.addr % 32);
+                if (m_watch_break)
+                    machine().debug_break();
+            }
         }
     }
     else
@@ -440,6 +474,15 @@ void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
             sam.dram[sam.addr % 256] = (sam.dram[sam.addr % 256] & 0x00ffff) | ((data & 0x07) << 16);
             LOGMASKED(LOG_SAM, "SAM[%s] D-RAM[0x%02X] write MSB = 0x%02X -> word = 0x%05X\n",
                 chip_name, sam.addr, data, sam.dram[sam.addr % 256]);
+            // Watch check
+            if (m_sam_watch_dram >= 0) // && (sam.addr % 256) == u8(m_sam_watch_dram))
+            {
+                logerror("D-RAM watch: PC=%04X SAM[%s] D-RAM[%02X] = %05X (slot %d, word %d)\n",
+                    m_maincpu->pc(), chip_name, sam.addr, sam.dram[sam.addr % 256],
+                    sam.addr / 16, sam.addr % 16);
+                if (m_watch_break)
+                    machine().debug_break();
+            }
         }
     }
 }
