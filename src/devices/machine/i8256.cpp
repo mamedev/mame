@@ -271,9 +271,12 @@ void i8256_device::device_reset()
 
 uint8_t i8256_device::acknowledge()
 {
+	if (BIT(m_command3,I8256_CMD3_IAE) == 0)
+		return 0x00;
+
 	const uint8_t vector = m_current_interrupt_level;
 	m_out_int_cb(CLEAR_LINE);
-	m_current_interrupt_level = -1;
+	m_current_interrupt_level = 0;
 	if (BIT(m_command1,I8256_CMD1_8086)) // 8086 mode, TODO: only on second INTA
 		return 0x40 | vector;
 	else
