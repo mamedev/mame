@@ -12,7 +12,7 @@ license:CC0-1.0
 	<!-- pinout is identical to Storio cartridges -->
 	<!--
 	Also known as "Storio 2 and Future versions" in Europe excluding UK
-	
+
 	Language:
 	********0 = US / Canada / Hong Kong / Japan
 	********1 = Unused
@@ -25,7 +25,7 @@ license:CC0-1.0
 	********5 = France / Canada (French)
 	*******26 = Russia
 	********6 = Portugal
-	********7 = Italy			Distributed by the company 'Hasbro'
+	********7 = Italy           Distributed by the company 'Hasbro'
 
 	80-136800(US) - InnoTab 2
 	80-146800(US) - InnoTab 2 Baby
@@ -156,7 +156,7 @@ license:CC0-1.0
 
 	English game cartridges are not compatible with the Spanish version of Storio 2. German and French Storio 2 cartridges are compatible.
 	-->
-	
+
 	<software name="mickeychuk" supported="no">
 		<description>Mickey Mouse Clubhouse (UK) (InnoTab Max Compatible) (Blue cart)</description>
 		<year>2011</year>

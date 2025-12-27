@@ -73,7 +73,7 @@ public:
 		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"}),
-		m_lamps(*this, "lamp%u", 0U)		
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	/* Public for access by the rendering functions */
@@ -138,7 +138,7 @@ protected:
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_lightgun_ports;
 	output_finder<6> m_lamps;
-	
+
 	u32 m_timervals[4]{};
 	u32 m_timerorig[4]{};
 	int m_timerrun[4]{};

@@ -649,7 +649,7 @@ void luna88k2_state::luna88k2(machine_config &config)
 	m_cbus_root->int_cb<5>().set(FUNC(luna88k2_state::cbus_irq_w<5>));
 	m_cbus_root->int_cb<6>().set(FUNC(luna88k2_state::cbus_irq_w<6>));
 	// TODO: how it really handles INT41 vs. INT42?
-//	m_cbus_root->int_cb<7>().set(FUNC(luna88k2_state::cbus_irq_w<4?>)); // INT41
+//  m_cbus_root->int_cb<7>().set(FUNC(luna88k2_state::cbus_irq_w<4?>)); // INT41
 	// TODO: NMI & DRQ
 
 	PC98_CBUS_SLOT(config, "cbus:0", 0, m_cbus_root, luna88k2_cbus_devices, nullptr);

@@ -11,7 +11,7 @@
 
     Used in:
         seibu/raiden2.cpp
-		seibu/r2dx_v33.cpp
+        seibu/r2dx_v33.cpp
         seibu/seibuspi.cpp
         seibu/seibucats.cpp
         seibu/feversoc.cpp

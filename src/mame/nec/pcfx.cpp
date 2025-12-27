@@ -203,7 +203,7 @@ void pcfx_state::pcfx_io(address_map &map)
 	);
 	map(0x00000E00, 0x00000EFF).rw(m_intc, FUNC(pcfx_intc_device::read), FUNC(pcfx_intc_device::write)).umask32(0x0000ffff);
 //  map(0x00000F00, 0x00000FFF).noprw(); // Timer
-//	map(0x00500000, 0x005000FF) Aurora mirror
+//  map(0x00500000, 0x005000FF) Aurora mirror
 //  map(0x00600000, 0x006FFFFF).r(FUNC(pcfx_state::scsi_ctrl_r)); // SCSI control for EXTIO
 //  map(0x00700000, 0x007FFFFF).rom().region("scsi_rom", 0); // EXTIO ROM area
 	map(0x00700000, 0x007FFFFF).lr8(NAME([] () { return 0; })); // suppress logging

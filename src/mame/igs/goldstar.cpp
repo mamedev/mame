@@ -538,7 +538,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	DECLARE_MACHINE_START(cm99);
-		
+
 	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_jkrmast_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_pkrmast_fg_tile_info);
@@ -3391,11 +3391,11 @@ void cmaster_state::anhs_reel_reg_w(uint8_t data)
 void cmaster_state::bank_set_w(offs_t offset, uint8_t data)
 {
 	uint8_t sw = offset >> 8;
-	
-	// need to check a nvram value	
+
+	// need to check a nvram value
 	uint8_t *nvram_ptr = (uint8_t*)memshare("nvram")->ptr();
 	uint8_t val = nvram_ptr[0x700];
-	logerror("bank_set_w: offs:%04x - sw:%02x - 0xd700:%02x\n", offset, sw, val);  // nvram $d700	
+	logerror("bank_set_w: offs:%04x - sw:%02x - 0xd700:%02x\n", offset, sw, val);  // nvram $d700
 
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t var = rom[0xd700];
@@ -3416,7 +3416,7 @@ void cmaster_state::bank_set_w(offs_t offset, uint8_t data)
 		case 0x87 : membank("bank1")->set_entry(0); break;
 		case 0x89 : membank("bank1")->set_entry(1); break;
 	}
-	//8100 8230 8902, 8700 4100, 4432, 708, 38, 0, 4780, 843a, 4300, 843a 
+	//8100 8230 8902, 8700 4100, 4432, 708, 38, 0, 4780, 843a, 4300, 843a
 }
 
 
@@ -4004,8 +4004,8 @@ void cmaster_state::cm99_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0xcfff).rom();
-	
-	
+
+
 	map(0xd000, 0xd7ff).ram().share("nvram");
 	map(0xd800, 0xdfff).ram();
 
@@ -4022,9 +4022,9 @@ void cmaster_state::cm99_map(address_map &map)
 	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
 	map(0xfa80, 0xfbff).ram();
 	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
-	map(0xfc80, 0xffff).ram();	
-}	
-	
+	map(0xfc80, 0xffff).ram();
+}
+
 void cmaster_state::wcat3a_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom().nopw();
@@ -7209,35 +7209,35 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmast99 )
 /*
-	PORT_START("IN0")  // called "PLAYER" in input test
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Player: 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Player: 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Player: 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("Player: 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("Player: 5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Player: 6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("Player: 7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Player: 8")
+    PORT_START("IN0")  // called "PLAYER" in input test
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Player: 1")
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Player: 2")
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Player: 3")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("Player: 4")
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("Player: 5")
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Player: 6")
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("Player: 7")
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Player: 8")
 
-	PORT_START("IN1")  // called "COIN" in input test
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Coin: 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Coin: 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Coin: 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Coin: 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
+    PORT_START("IN1")  // called "COIN" in input test
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Coin: 1")
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Coin: 2")
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Coin: 3")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Coin: 4")
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
 
-	PORT_START("IN2")  // called "TEST" in input test
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Test: 1-Pad")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Test: 2-Pad")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Test: 3-Pad")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Test: 4-Pad")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Test: 5-Pad")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Test: 6-Pad")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings / Port Test")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats / Palette Test")
+    PORT_START("IN2")  // called "TEST" in input test
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Test: 1-Pad")
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Test: 2-Pad")
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Test: 3-Pad")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Test: 4-Pad")
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Test: 5-Pad")
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Test: 6-Pad")
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings / Port Test")
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats / Palette Test")
 */
 	PORT_INCLUDE( cmv4_player )
 
@@ -11310,7 +11310,7 @@ static INPUT_PORTS_START( nfb96 )
 	PORT_DIPSETTING( 0x04, "75%" ) PORT_CONDITION("DSW4", 0x02, EQUALS, 0x02)
 	PORT_DIPSETTING( 0x05, "80%" ) PORT_CONDITION("DSW4", 0x02, EQUALS, 0x02)
 	PORT_DIPSETTING( 0x06, "85%" ) PORT_CONDITION("DSW4", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING( 0x07, "90%" ) PORT_CONDITION("DSW4", 0x02, EQUALS, 0x02)	
+	PORT_DIPSETTING( 0x07, "90%" ) PORT_CONDITION("DSW4", 0x02, EQUALS, 0x02)
 	// --- Show Difficulty Levels (DSW4:2 = 0) ---
 	PORT_DIPNAME( 0x07, 0x03, "Game Level (Difficulty)" ) PORT_DIPLOCATION("DSW1:!1,!2,!3") PORT_CONDITION("DSW4", 0x02, NOTEQUALS, 0x02)
 	PORT_DIPSETTING( 0x00, "Level 8" ) PORT_CONDITION("DSW4", 0x02, NOTEQUALS, 0x02)
@@ -20450,7 +20450,7 @@ ROM_END
   Different bankswitching?
 
   bp 29f
-  
+
   ld b, $fc
   call $0bf6 --> disable the screen
   call $91d0 --> banked to $51d0?
@@ -20689,7 +20689,7 @@ ROM_END
   7b25: jr  z, $7b21
 
   *EDIT*
-  
+
   The game is not a bootleg. Runs in cmast99 hardware
   with a heavily protected daughterboard.
 
@@ -20772,7 +20772,7 @@ ROM_END
   Different bankswitching?
 
   bp 29f
-  
+
   ld b, $fc
   call $0bf6 --> disable the screen
   call $91d0 --> banked to $51d0?
@@ -27014,7 +27014,7 @@ ROM_END
 
 //  The Aladdin. Dyna, 1991
 //  V1.2U - PCB D9106
-ROM_START( aladdin ) 
+ROM_START( aladdin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "ald2_v1.2u_27c512.d15", 0x00000, 0x10000, CRC(66c638ca) SHA1(ac0e9af5cd7535e8a86573723851b987c4a80c63) )
 
@@ -27029,7 +27029,7 @@ ROM_END
 
 //  The Aladdin. Dyna, 1991
 //  V1.1A - PCB D9106
-ROM_START( aladdina ) 
+ROM_START( aladdina )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "ald2_v1.1a_27c512.d15", 0x00000, 0x10000, CRC(b13baf47) SHA1(2c45edca22add535a5cf367810ac26d84f7abd82) )
 
@@ -33087,8 +33087,8 @@ void wingco_state::init_flaming7()
           just patched to jump to $5D80 (jmp $6115)
           where the check is succesfull.
 */
-//	uint8_t *rom = memregion("maincpu")->base();
-//	rom[0x5d7a] = 0x05;
+//  uint8_t *rom = memregion("maincpu")->base();
+//  rom[0x5d7a] = 0x05;
 }
 
 /*
@@ -33106,8 +33106,8 @@ void wingco_state::init_flam7_tw()
           Just patched to jump to $60B9 (jmp $644E) where the check
           is successful.
 */
-//	uint8_t *rom = memregion("maincpu")->base();
-//	rom[0x60b3] = 0x05;
+//  uint8_t *rom = memregion("maincpu")->base();
+//  rom[0x60b3] = 0x05;
 }
 
 void wingco_state::init_special7()
@@ -33741,11 +33741,11 @@ GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99
 GAMEL( 1999, cmast99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, Cleco)",      MACHINE_NOT_WORKING,     layout_cmv4 )
 GAMEL( 1999, cmast99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, USA long PCB)", MACHINE_NOT_WORKING,   layout_cmv4 )
 GAMEL( 1999, cmast99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING, layout_cmv4 ) // different bankswitching? see the ROM load notes
-GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                     MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99 
-GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",            MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99b 
+GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                     MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99
+GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",            MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99b
 GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, Cleco)",              MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",       MACHINE_NOT_WORKING,     layout_cmv4 ) 
-GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",       MACHINE_NOT_WORKING,     layout_cmv4 ) // DB with MCU... see the ROM load notes 
+GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",       MACHINE_NOT_WORKING,     layout_cmv4 )
+GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",       MACHINE_NOT_WORKING,     layout_cmv4 ) // DB with MCU... see the ROM load notes
 GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING,     layout_cmv4 ) // different bankswitching? see the ROM load notes
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
 GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 1)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet

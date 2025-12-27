@@ -44751,19 +44751,19 @@ hand repaired copy protection, looks for deleted sector -8 and -9 on track 76
 		</part>
 	</software>
 
-    <software name="soapstry">
-        <description>Soapland Story</description>
-        <year>1987</year>
+	<software name="soapstry">
+		<description>Soapland Story</description>
+		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
-        <info name="alt_title" value="ソープランドストーリー" />
-        <info name="release" value="198709xx" />
+		<info name="alt_title" value="ソープランドストーリー" />
+		<info name="release" value="198709xx" />
 		<info name="usage" value="Boot in BASIC and set MEMSW SSW3 to 05 thru MON (will otherwise throw an overflow error at bootstrap)" />
-        <part name="flop1" interface="floppy_5_25">
-            <dataarea name="flop" size="1187040">
-                <rom name="soapland story.d88" size="1187040" crc="9dbb2392" sha1="21cd5846770f62c37a4b5118fad7bb2ad25d1f3a" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1187040">
+				<rom name="soapland story.d88" size="1187040" crc="9dbb2392" sha1="21cd5846770f62c37a4b5118fad7bb2ad25d1f3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="softhard">
 		<description>Soft de Hard na Monogatari</description>
