@@ -1907,7 +1907,7 @@ void pc9801vm_state::pc9801_ide(machine_config &config)
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc98_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("pc98_cd");
-	SOFTWARE_LIST(config, "win_cd_list").set_original("generic_cdrom");
+	SOFTWARE_LIST(config, "win_cd_list").set_original("generic_cdrom").set_filter("pc98");
 }
 
 void pc98_base_state::pc9801_serial(machine_config &config)
