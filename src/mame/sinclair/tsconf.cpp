@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
+// thanks-to:TS-Labs
 /***************************************************************************
 
 see: pentevo.cpp
