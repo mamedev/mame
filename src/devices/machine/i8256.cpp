@@ -249,6 +249,8 @@ void i8256_device::device_start()
 	save_item(NAME(m_sync16));
 	
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
+
+	memset(m_timers, 0, sizeof(m_timers));
 }
 
 void i8256_device::device_reset()
@@ -259,12 +261,8 @@ void i8256_device::device_reset()
 	m_mode = 0;
 	m_port1_control = 0;
 	m_interrupts = 0;
-
-	m_tx_buffer = 0;
-	m_rx_buffer = 0;
-	m_port1_int = 0;
-	m_port2_int = 0;
-	memset(m_timers, 0, sizeof(m_timers));
+	m_current_interrupt_level = 0;
+	m_out_int_cb(CLEAR_LINE);
 
 	m_status = 0x30; // TRE and TBE
 
