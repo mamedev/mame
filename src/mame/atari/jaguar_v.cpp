@@ -297,6 +297,9 @@ inline void jaguar_state::verify_host_cpu_irq()
 
 inline void jaguar_state::trigger_host_cpu_irq(int level)
 {
+	// NOTE: pending flag occurs only if irq is enabled
+	if (!BIT(m_gpu_regs[INT1], level))
+		return;
 	m_cpu_irq_state |= 1 << level;
 	verify_host_cpu_irq();
 }
@@ -747,8 +750,7 @@ TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 
 TIMER_CALLBACK_MEMBER(jaguar_state::pit_update)
 {
-	if (m_gpu_regs[INT1] & 0x8)
-		trigger_host_cpu_irq(3);
+	trigger_host_cpu_irq(3);
 	if (m_gpu_regs[PIT0] != 0)
 	{
 		attotime sample_period = attotime::from_ticks((1 + m_gpu_regs[PIT0]) * (1 + m_gpu_regs[PIT1]), m_gpu->clock() / 2);

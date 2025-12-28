@@ -108,6 +108,7 @@ Unreleased (possibly no prototypes exist):
 -->
 
 <softwarelist name="jaguar" description="Atari Jaguar cartridges">
+
 	<software name="aircars" supported="no">
 		<description>Air Cars</description>
 		<year>1997</year>
@@ -174,7 +175,9 @@ Access [cart] EEPROM
 		<year>2006</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
-"licensed by Atari" then black screen
+Heavy color issues
+Crashes by going in main menu again after pressing A button
+No sound
 ]]></notes>
 
 		<info name="serial" value="J9003E 800108-006"/>
@@ -246,7 +249,7 @@ Title screen has black dots of garbage on top (btanb)
 		<year>2000</year>
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
-Black screen
+Heavy GFX corruptions after 4 Play logo
 Access [cart] EEPROM
 ]]></notes>
 
@@ -263,7 +266,7 @@ Access [cart] EEPROM
 		<year>2002</year>
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
-Black screen
+Heavy GFX corruptions after 4 Play logo
 Access [cart] EEPROM
 ]]></notes>
 
@@ -494,7 +497,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
 		<notes><![CDATA[
-Gameplay backgrounds are missing or garbled
+Gameplay backgrounds are missing or garbled, bus hog on 68k irqs? (cfr. INT2)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -528,7 +531,7 @@ Access [cart] EEPROM (but game has passwords)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"licensed by Atari" then black screen
+"licensed by Atari" then black screen (INT2?)
 ]]></notes>
 
 		<info name="serial" value="J9106E 705106-002"/>

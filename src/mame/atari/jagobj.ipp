@@ -1070,7 +1070,7 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				LOGMASKED(LOG_OBJECTS, "stop   = %08X-%08X\n", objdata[0], objdata[1]);
 				if (interrupt)
 				{
-					// TODO: fball95 doesn't have a real handling for stop irq, causing the line to be always asserted, how to prevent?
+					// fball95 and zoop depends on this irq being masked (inside fn)
 //                  fprintf(stderr, "stop int=%d\n", interrupt);
 					trigger_host_cpu_irq(2);
 				}
