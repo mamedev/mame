@@ -24,7 +24,7 @@
 #include "osdepend.h"
 #include "strconv.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 // only for oslog callback
 #include <functional>
@@ -64,7 +64,7 @@ int sdl_entered_debugger;
 
 #if defined(SDLMAME_WIN32)
 /* gee */
-extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
+//extern "C" DECLSPEC void SDLCALL SDL_SetModuleHandle(void *hInst);
 #endif
 
 int main(int argc, char** argv)
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 
 #if defined(SDLMAME_ANDROID)
 	/* Enable standard application logging */
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
+	SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
 #endif
 
 	// FIXME: this should be done differently

@@ -17,7 +17,11 @@
 
 #include "strformat.h"
 
+#ifdef SDLMAME_SDL3
 #include <SDL3/SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 
 #include <string>
 
@@ -38,7 +42,13 @@ public:
 	virtual ~sdl_gl_context()
 	{
 		if (m_context)
+		{
+#ifdef SDLMAME_SDL3
 			SDL_GL_DestroyContext(m_context);
+#else
+			SDL_GL_DeleteContext(m_context);
+#endif
+		}
 	}
 
 	virtual explicit operator bool() const override
