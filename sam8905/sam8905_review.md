@@ -41,33 +41,32 @@ For D-RAM addressing (16 words per slot), 4 bits makes sense for the address.
 **Verdict**: Likely correct for D-RAM addressing, but verify against actual ROM usage.
 
 ### 2. **D-RAM Word 15 Format** - CRITICAL
-From programmer's guide (§4):
+From German hardware documentation:
 ```
-| 18-11 (X) | 10 (M) | 9 (I) | 8-6 (ALG) | 5-0 (X) |
+| 18-12 | 11 | 10-8 | 7 | 6-0 |
+|   ?   | I  | ALG  | M |  ?  |
 ```
+
+- **I** (bit 11): Idle - slot produces no sound when set
+- **ALG** (bits 10-8): Algorithm number (0-7)
+- **M** (bit 7): Interrupt mask - no interrupt when set
 
 Code at line 195-197:
 ```cpp
-if (BIT(param15, 7)) continue; // Idle bit
-uint8_t alg = param15 & 0x7F;
+if (BIT(param15, 7)) continue; // Idle bit - WRONG!
+uint8_t alg = param15 & 0x7F;  // WRONG!
 ```
 
 **Problems**:
-- Idle bit is at bit 9 (I), not bit 7
-- ALG is at bits 8-6, not bits 6-0
-- Interrupt mask (M) at bit 10 is not handled
-
-From Keyfox10 analysis (keyfox10_algorithm_analysis_old.md):
-```
-| 18-11 | 10 | 9 | 8  7  6 | 5  4  3 | 2  1  0 |
-|  ???  | M  | I |   ALG   |  MIXL   |  MIXR   |
-```
+- Idle bit is at bit 11, not bit 7
+- ALG is at bits 10-8, not bits 6-0
+- Code checks M (interrupt mask) as Idle
 
 **Fix needed**:
 ```cpp
-bool idle = BIT(param15, 9);      // I bit
+bool idle = BIT(param15, 11);         // I bit at 11
 if (idle) continue;
-uint8_t alg = (param15 >> 6) & 0x7;  // ALG bits 8-6
+uint8_t alg = (param15 >> 8) & 0x7;   // ALG bits 10-8
 ```
 
 ### 3. **Algorithm Addressing for 22.05kHz Mode** - CRITICAL
@@ -186,7 +185,7 @@ Code executes all 32 instructions without skipping reserved ones.
 
 ## Priority Fixes
 
-1. **HIGH**: Fix D-RAM word 15 bit positions (I at bit 9, ALG at bits 8-6)
+1. **HIGH**: Fix D-RAM word 15 bit positions (I at bit 11, ALG at bits 10-8, M at bit 7)
 2. **HIGH**: Add SSR mode support for 22.05kHz (Keyfox10 uses this)
 3. **MEDIUM**: Implement proper dB attenuation for MIXL/MIXR
 4. **LOW**: Skip reserved instruction slots 30-31 (or 62-63)

@@ -95,7 +95,7 @@ The other addresses of the D-RAM are not assigned to any specific information. H
 |       PHIREG         |              X               |
 ```
 
-**Typical micro-instructions: UA, WB, WPHI**
+**Typical micro-instructions: WA, WB, WPHI**
 
 - **PHI:** full phase of a period of a given waveform (unsigned integer)
 - **PHIWF:** Portion of phase recommended to access external waveforms (512 samples/period). Up to 12 bits can be used (4096 samples/period with the same frequency definition as the built-in sinus)
@@ -111,7 +111,7 @@ The other addresses of the D-RAM are not assigned to any specific information. H
 |                       DPHI                          |
 ```
 
-**Typical micro-instructions: UA, WB**
+**Typical micro-instructions: WA, WB**
 
 **DPHI:** Phase interval, signed integer, determines the basic frequency of a signal as follows (standardized to the built-in sinus):
 
@@ -132,7 +132,7 @@ Negative values of DPHI are mainly used for envelope applications (see later)
 | I  |I |R |I |SEL|Z |              X                |
 ```
 
-**Typical micro-instructions: UA WSP, WWF**
+**Typical micro-instructions: WA WSP, WWF**
 
 This format is mostly used in sampling applications, involving an external wave-form memory. Specific micro-instructions allow to selectively increment WAVE at the end of a period and to check if WAVE reaches FINALWAVE. Subsequent actions can be taken depending on the state of the E bit (END), like looping on a period or stopping the sampling process.
 
@@ -161,7 +161,7 @@ When the upper bit of wave is 1, the remaining 8 bits, together with the 12 uppe
 |           AMP            | X |MIXL|MIXR|              |
 ```
 
-**Typical micro-instructions: WXY, UXY USP, UA, WB**
+**Typical micro-instructions: WXY, WXY WSP, WA, WB**
 
 This format allows to define an amplitude and an optional left and right mix. The amplitude is coded on 12 bits and ranges from -1 to 1-2⁻¹¹.
 
@@ -213,7 +213,7 @@ The general micro-instruction format is then:
 
 ```
 { RM    }
-{ RADD  }   { MAD }  , <[UA] [UB] [UM] [UAF] [WPHI] [WXY] [clearB] [UACC] [USP] >
+{ RADD  }   { MAD }  , <[WA] [WB] [WM] [WWF] [WPHI] [WXY] [clearB] [WACC] [WSP] >
 { RP    }
 { RSP   }
 ```
@@ -241,7 +241,7 @@ WA WSP and WM WSP will be described later in detail.
 Normally, the result of an operation is available on the cycle following the loading of the operands. For example, the operation:
 
 ```
-RM  PHI,  <UA>
+RM  PHI,  <WA>
 ```
 
 can be immediately followed by
@@ -272,7 +272,7 @@ PHI=0                      ;assign phase to address 0 of RAM block
 DPHI=1                     ;assign phase angle (frequency) to address 1
 AMP=2                      ;assign amplitude and mix to address 2 (see format under §4)
 
-RM      PHI,    <UA,WPHI,WSP>      ;Areg=PHIreg=D-RAM(PHI) WFreg=100H (sinus)
+RM      PHI,    <WA,WPHI,WSP>      ;Areg=PHIreg=D-RAM(PHI) WFreg=100H (sinus)
 RM      DPHI,   <WB>               ;Breg=D-RAM(DPHI)
 RM      AMP,    <WXY,WSP>          ;X=sin(PHI) Y=AMP mix updated
 RADD    PHI,    <WM>               ;D-RAM(PHI)= Areg + Breg (PHI+DPHI)
@@ -293,7 +293,7 @@ DPHI=2                     ;assign phase angle to address 2
 AMP=3                      ;assign AMP and mix to address 3 (see format under §4)
 
 RM      WF,     <WWF>              ;WFreg=wave select
-RM      PHI,    <UA,WPHI>          ;Areg=PHIreg=D-RAM(PHI)
+RM      PHI,    <WA,WPHI>          ;Areg=PHIreg=D-RAM(PHI)
 RSP                                ;nops to ensure 7 cycles from WPHI to WXY
 RSP
 RSP
@@ -392,11 +392,11 @@ DPHI=2                     ;frequency
 AMP=3                      ;amplitude and mix
 
 RM      WF,     <WWF>              ;WFreg=WF
-RM      PHI,    <UA,WPHI>          ;Areg=PHIreg=PHI
+RM      PHI,    <WA,WPHI>          ;Areg=PHIreg=PHI
                                    ;Breg=DPHI
 RM      DPHI,   <WB>               ;PHI=PHI+DPHI
 RADD    PHI,    <WM>               ;Breg=WF, A set to 0 if no carry or
-RM      WF,     <WB,UA,WSP>        ;WF=finalWF, A set to 100H otherwise,
+RM      WF,     <WB,WA,WSP>        ;WF=finalWF, A set to 100H otherwise,
                                    ;CIrqst set if carry and WF=finalWF and
                                    ;end=1, INTMOD set.
 RADD    WF,     <WM,clearB>        ;Breg=0, WF=WF/0 or WF+1
@@ -420,14 +420,14 @@ PHI1=0                     ;phase of sinus
 DPHI1=1                    ;frequency of single period
 AMP=2                      ;amplitude and mix
 
-RM      PHI1,   <UA>               ;Areg=PHI2
+RM      PHI1,   <WA>               ;Areg=PHI2
 RM      DPHI2,  <WB>               ;Breg=DPHI2
 RADD    PHI2,   <WM>               ;PHI2=PHI2+DPHI2
-RM      K,      <UA, clearB, WSP>  ;Areg=Breg=0 clrrqst=1 if cy=1
+RM      K,      <WA, clearB, WSP>  ;Areg=Breg=0 clrrqst=1 if cy=1
 RADD    PHI1,   <WM,WSP>           ;clear PHI1 if clrrqst (once every period
                                    ;of PHI2)
 ; one shot period
-RM      PHI1,   <UA, WPHI, WSP>    ;Areg=PHIreg=PHI1 Clrrqst=1
+RM      PHI1,   <WA, WPHI, WSP>    ;Areg=PHIreg=PHI1 Clrrqst=1
 RM            , <WB>               ;Breg=DPHI1
 RADD    DPHI1,  <WB>               ;write to D-RAM only if carry=0
 RADD    PHI1,   <WM,WSP>           ;X=sin(PHI1) Y=amp Clrrqst=1
