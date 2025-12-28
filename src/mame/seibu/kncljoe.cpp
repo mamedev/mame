@@ -143,10 +143,9 @@ void kncljoe_state::palette(palette_device &palette) const
 		int bit0, bit1, bit2;
 
 		// red component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i + 0x300], 6);
-		bit2 = BIT(color_prom[i + 0x300], 7);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i + 0x300], 6);
+		bit1 = BIT(color_prom[i + 0x300], 7);
+		int const r = 0x52 * bit0 + 0xad * bit1;
 
 		// green component
 		bit0 = BIT(color_prom[i + 0x300], 3);
