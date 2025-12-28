@@ -1299,7 +1299,7 @@ void jaguar_cpu_device::io_common_map(address_map &map)
 void jaguargpu_cpu_device::io_map(address_map &map)
 {
 	jaguar_cpu_device::io_common_map(map);
-	map(0x0c, 0x0f).w(FUNC(jaguargpu_cpu_device::end_w));
+	map(0x0c, 0x0f).w(FUNC(jaguargpu_cpu_device::endian_w));
 	map(0x18, 0x1b).rw(FUNC(jaguargpu_cpu_device::hidata_r), FUNC(jaguargpu_cpu_device::hidata_w));
 }
 
@@ -1307,7 +1307,7 @@ void jaguargpu_cpu_device::io_map(address_map &map)
 void jaguardsp_cpu_device::io_map(address_map &map)
 {
 	jaguar_cpu_device::io_common_map(map);
-	map(0x0c, 0x0f).w(FUNC(jaguardsp_cpu_device::dsp_end_w));
+	map(0x0c, 0x0f).w(FUNC(jaguardsp_cpu_device::dsp_endian_w));
 	map(0x18, 0x1b).w(FUNC(jaguardsp_cpu_device::modulo_w));
 	map(0x20, 0x23).r(FUNC(jaguardsp_cpu_device::high_accum_r));
 }
@@ -1373,7 +1373,7 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
  * ---- ---x I/O endianness
  */
 // TODO: just log if anything farts for now, change to bit struct once we have something to test out
-void jaguar_cpu_device::end_w(offs_t offset, u32 data, u32 mem_mask)
+void jaguar_cpu_device::endian_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
 	// sburnout sets bit 1 == 0
@@ -1381,10 +1381,11 @@ void jaguar_cpu_device::end_w(offs_t offset, u32 data, u32 mem_mask)
 		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 }
 
-void jaguardsp_cpu_device::dsp_end_w(offs_t offset, u32 data, u32 mem_mask)
+void jaguardsp_cpu_device::dsp_endian_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
 	// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
+	// bretth sets 0x7e06 after dyna cam logo
 	if ((m_io_end & 0x5) != 0x5)
 		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 }
@@ -1471,7 +1472,7 @@ void jaguardsp_cpu_device::modulo_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 jaguardsp_cpu_device::high_accum_r()
 {
-	printf("%s: high 16-bit accumulator read\n", this->tag());
+	logerror("%s: high 16-bit accumulator read\n", this->tag());
 	return (m_accum >> 32) & 0xff;
 }
 
