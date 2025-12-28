@@ -170,6 +170,8 @@ auto mb87030_device::get_state_name(State state) const
 		return "TransferWaitDeassertREQ";
 	case State::TransferDeassertACK:
 		return "TransferDeassertACK";
+	case State::TransferWaitFifoEmpty:
+		return "TransferWaitFifoEmpty";
 	}
 	return "Unknown state";
 }
@@ -372,20 +374,14 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferWaitReq:
-		if (!m_tc && !(m_scmd & SCMD_TERM_MODE)) {
-			// transfer command completes only when fifo is empty
-			if (!m_fifo.empty())
-				break;
-
-			LOG("TransferWaitReq: tc == 0\n");
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_command_complete();
+		if (!(ctrl & S_REQ)) {
+			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 			break;
 		}
 
 		if (m_scsi_phase != (ctrl & S_PHASE_MASK)) {
 			LOG("SCSI phase change during transfer\n");
-			m_ints |= INTS_SERVICE_REQUIRED | INTS_COMMAND_COMPLETE;
+			m_ints |= INTS_SERVICE_REQUIRED;
 			m_ssts &= ~SSTS_SPC_BUSY;
 			scsi_bus->data_w(scsi_refid, 0);
 			update_ints();
@@ -393,8 +389,12 @@ void mb87030_device::step(bool timeout)
 			break;
 		}
 
-		if (!(ctrl & S_REQ)) {
-			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+		if (!m_tc && !(m_scmd & SCMD_TERM_MODE)) {
+			// This is a size 0 transfer, it only checks the phase in
+			// practice
+
+			scsi_bus->data_w(scsi_refid, 0);
+			scsi_command_complete();
 			break;
 		}
 
@@ -463,7 +463,10 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferDeassertACK:
 		m_tc--;
-		update_state(State::TransferWaitReq, 10);
+		if(m_tc)
+			update_state(State::TransferWaitReq, 10);
+		else
+			update_state(State::TransferWaitFifoEmpty, 10);
 		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 
 		// deassert ATN after last byte of message out phase
@@ -474,6 +477,12 @@ void mb87030_device::step(bool timeout)
 			scsi_set_ctrl(0, S_ACK);
 		break;
 
+	case State::TransferWaitFifoEmpty:
+		if (!m_fifo.empty())
+			break;
+		scsi_bus->data_w(scsi_refid, 0);
+		scsi_command_complete();
+		break;
 	}
 }
 

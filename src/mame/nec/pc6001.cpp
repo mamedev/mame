@@ -297,7 +297,7 @@ void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).rom().nopw();
-//  map(0x4000, 0x5fff) // mapped by the cartslot
+	map(0x4000, 0x5fff).r(m_cart, FUNC(generic_slot_device::read_rom));
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).ram().share("ram");
 }
@@ -1564,9 +1564,6 @@ void pc6001_state::machine_reset()
 	set_videoram_bank(0xc000);
 
 	default_cartridge_reset();
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
-
 	default_cassette_hack_reset();
 	irq_reset(3);
 	default_keyboard_hle_reset();

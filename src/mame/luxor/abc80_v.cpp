@@ -44,7 +44,7 @@ void tkn80_state::set_80(bool state)
 
 		m_view_rom0.select(view);
 		m_view_rom2.select(view);
-		
+
 		set_screen_params();
 	}
 	else

@@ -22,8 +22,8 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
-	- vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
-	         yet it should appear underneath tilemap A ("shoot to select") which does not
+    - vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
+             yet it should appear underneath tilemap A ("shoot to select") which does not
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -156,7 +156,7 @@ void model2_state::machine_start()
 	debug_init();
 
 	m_lamps.resolve();
-	
+
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intena));
 	save_item(NAME(m_coproctl));
@@ -1187,81 +1187,81 @@ u8 model2_state::lightgun_offscreen_r(offs_t offset)
 //**************************************************************************
 
 /*
-	Daytona
-	7-------  leader lamp
-	-6------  vr4 lamp
-	--5-----  vr3 lamp
-	---4----  vr2 lamp
-	----3---  vr1 lamp
-	-----2--  start lamp
-	------1-  coin counter 2
-	-------0  coin counter 1
+    Daytona
+    7-------  leader lamp
+    -6------  vr4 lamp
+    --5-----  vr3 lamp
+    ---4----  vr2 lamp
+    ----3---  vr1 lamp
+    -----2--  start lamp
+    ------1-  coin counter 2
+    -------0  coin counter 1
 
-	Desert
-	7-------  cannon motor
-	-6------  machine gun motor
-	--5-----  vr1 lamp
-	---4----  vr2 lamp
-	----3---  vr3 lamp
-	-----2--  start lamp
-	------1-  coin counter 2
-	-------0  coin counter 1
+    Desert
+    7-------  cannon motor
+    -6------  machine gun motor
+    --5-----  vr1 lamp
+    ---4----  vr2 lamp
+    ----3---  vr3 lamp
+    -----2--  start lamp
+    ------1-  coin counter 2
+    -------0  coin counter 1
 
-	Vcop
-	7654----  unknown (not used?)
-	----32--  start lamps (always set together)
-	------1-  coin counter 2
-	-------0  coin counter 1
+    Vcop
+    7654----  unknown (not used?)
+    ----32--  start lamps (always set together)
+    ------1-  coin counter 2
+    -------0  coin counter 1
 
-	Srallyc
-	7-------  leader lamp   
-	-6------  unknown
-	--5-----  vr lamp
-	---4----  unknown
-	----3---  unknown
-	-----2--  start lamp
-	------1-  coin counter 2
-	-------0  coin counter 1
+    Srallyc
+    7-------  leader lamp
+    -6------  unknown
+    --5-----  vr lamp
+    ---4----  unknown
+    ----3---  unknown
+    -----2--  start lamp
+    ------1-  coin counter 2
+    -------0  coin counter 1
 
-	STCC
-	7-------  unknown
-	-6------  unknown
-	--5-----  view 2 (zoom out) lamp  
-	---4----  view 1 (zoom in) lamp 
-	----3---  rev max lamp 
-	-----2--  start lamp 
-	------1-  coin counter 2
-	-------0  coin counter 1
+    STCC
+    7-------  unknown
+    -6------  unknown
+    --5-----  view 2 (zoom out) lamp
+    ---4----  view 1 (zoom in) lamp
+    ----3---  rev max lamp
+    -----2--  start lamp
+    ------1-  coin counter 2
+    -------0  coin counter 1
 
-	Indy500
-	7-------  race leader lamp 
-	-6------  unknown
-	--5-----  view 2 (zoom out) lamp
-	---4----  view 1 (zoom in) lamp 
-	----3---  unknown
-	-----2--  start lamp 
-	------1-  coin counter 2
-	-------0  coin counter 1
+    Indy500
+    7-------  race leader lamp
+    -6------  unknown
+    --5-----  view 2 (zoom out) lamp
+    ---4----  view 1 (zoom in) lamp
+    ----3---  unknown
+    -----2--  start lamp
+    ------1-  coin counter 2
+    -------0  coin counter 1
 
-	Overrev
-	7-------  unknown
-	-6------  unknown
-	--5-----  view 2 lamp
-	---4----  view 1 lamp
-	----3---  unknown
-	-----2--  start lamp
-	------1-  coin counter 2
-	-------0  coin counter 1
+    Overrev
+    7-------  unknown
+    -6------  unknown
+    --5-----  view 2 lamp
+    ---4----  view 1 lamp
+    ----3---  unknown
+    -----2--  start lamp
+    ------1-  coin counter 2
+    -------0  coin counter 1
 
-	Sgt24h
-	7-------  unknown
-	-6------  unknown
-	--5-----  view 2 lamp
-	---4----  view 1 lamp
-	----3---  unknown
-	-----2--  start lamp
-	------1-  coin counter 2
-	-------0  coin counter 1
+    Sgt24h
+    7-------  unknown
+    -6------  unknown
+    --5-----  view 2 lamp
+    ---4----  view 1 lamp
+    ----3---  unknown
+    -----2--  start lamp
+    ------1-  coin counter 2
+    -------0  coin counter 1
 */
 
 void model2_state::lamp_output_w(u8 data)

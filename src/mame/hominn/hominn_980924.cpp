@@ -18,9 +18,13 @@ JC-10011A
 
 
 TODO:
-- seems protected / to expect pre-programmed NVRAM?
-- while failing it currently shows 红心接龙, which is different to what it shows on
-  provided pics. Title selected via switch?
+- remove PPI1 port B hack;
+- correct IRQs (related to the above?);
+- correct palette;
+- Oki banking;
+- switches;
+- lamps?;
+- simplify descrambling.
 */
 
 
@@ -56,7 +60,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_charram(*this, "charram")
+		m_fg_tileram(*this, "fg_tileram"),
+		m_bg_datarom(*this, "bgdata")
 	{ }
 
 	void qxjl(machine_config &config) ATTR_COLD;
@@ -64,21 +69,29 @@ public:
 	void init_qxjl() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	required_shared_ptr<uint16_t> m_charram;
+	required_shared_ptr<uint16_t> m_fg_tileram;
+	required_region_ptr<uint16_t> m_bg_datarom;
 
-	tilemap_t *m_char_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
 
-	TILE_GET_INFO_MEMBER(get_char_info);
+	uint8_t m_bg_bank = 0;
 
-	void charram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	void fg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void counter_w(uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -86,92 +99,130 @@ private:
 
 void hominn_980924_state::video_start()
 {
-	m_char_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hominn_980924_state::get_char_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hominn_980924_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hominn_980924_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
+
+	m_fg_tilemap->set_transparent_pen(0x0f);
 }
 
-TILE_GET_INFO_MEMBER(hominn_980924_state::get_char_info)
+TILE_GET_INFO_MEMBER(hominn_980924_state::get_fg_tile_info)
 {
-	uint16_t const tile = m_charram[tile_index] & 0xfff;
-	uint16_t const color = (m_charram[tile_index] & 0xf000) >> 12;
+	uint16_t const tile = m_fg_tileram[tile_index] & 0xfff;
+	uint16_t const color = (m_fg_tileram[tile_index] & 0xf000) >> 12;
 
 	tileinfo.set(0, tile, color, 0);
 }
 
-void hominn_980924_state::charram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+TILE_GET_INFO_MEMBER(hominn_980924_state::get_bg_tile_info)
 {
-	COMBINE_DATA(&m_charram[offset]);
-	m_char_tilemap->mark_tile_dirty(offset);
+	uint16_t const tile = m_bg_datarom[tile_index | ((m_bg_bank & 0x7f) * 0x200)] & 0x7ff;
+	uint16_t const color = (m_bg_datarom[tile_index] & 0xf000) >> 12;
+
+	tileinfo.set(1, tile, color, 0);
+}
+
+void hominn_980924_state::fg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_fg_tileram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 uint32_t hominn_980924_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	m_char_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
+void hominn_980924_state::machine_start()
+{
+	save_item(NAME(m_bg_bank));
+}
+
+void hominn_980924_state::counter_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	if (data & 0xfe)
+		logerror("%s unknown counter_w bits set: %02x\n", machine().describe_context(), data);
+}
+
+
 void hominn_980924_state::program_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x000000, 0x03ffff).rom();
-	map(0x060000, 0x067fff).ram().share("nvram");
+	map(0x060000, 0x067fff).ram().share("nvram"); // second half only read at start?
 	map(0x080000, 0x080007).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x084000, 0x084007).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x088000, 0x088001).portr("SERVICE");
+	map(0x08c001, 0x08c001).w(FUNC(hominn_980924_state::counter_w));
 	map(0x090001, 0x090001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	// map(0x09c001, 0x09c001); // ??
-	map(0x0a0000, 0x0a0fff).ram();
-	map(0x0c0000, 0x0c0fff).ram().w(FUNC(hominn_980924_state::charram_w)).share(m_charram);
-	// map(0x0e0001, 0x0e0001); // ??
+	// map(0x09c001, 0x09c001); // writes only 0xf0 or 0xb0?
+	map(0x0a0000, 0x0a0fff).ram().w(FUNC(hominn_980924_state::fg_tileram_w)).share(m_fg_tileram);
+	map(0x0c0000, 0x0c03ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x0c0400, 0x0c07ff).ram();
+	map(0x0e0001, 0x0e0001).lw8(NAME([this] (uint8_t data) { m_bg_bank = data; m_bg_tilemap->mark_all_dirty(); }));
 }
 
 
 static INPUT_PORTS_START( qxjl )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x10, IP_ACTIVE_LOW)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6") // title change
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -179,8 +230,8 @@ INPUT_PORTS_END
 
 // TODO
 static GFXDECODE_START( gfx )
-	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x4_packed_msb, 0, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_16x16x4_packed_lsb, 0, 16 )
+	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_msb, 0, 16 )
+	GFXDECODE_ENTRY( "bgtiles", 0, gfx_16x16x4_packed_lsb, 0x100, 16 )
 GFXDECODE_END
 
 
@@ -189,24 +240,24 @@ void hominn_980924_state::qxjl(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 12_MHz_XTAL); // TODO: XTAL could also be the 16 MHz one
 	m_maincpu->set_addrmap(AS_PROGRAM, &hominn_980924_state::program_map);
-	//m_maincpu->set_vblank_int("screen", FUNC(hominn_980924_state::irq1_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(hominn_980924_state::irq2_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// 82C255 (actual chip on PCB) is equivalent to two 8255s
 	i8255_device &ppi0(I8255(config, "ppi0"));
-	ppi0.in_pa_callback().set([this] () { LOGPORTS("%s: PPI0 port A in\n", machine().describe_context()); return uint8_t(0); });
-	ppi0.in_pb_callback().set([this] () { LOGPORTS("%s: PPI0 port B in\n", machine().describe_context()); return uint8_t(0); });
-	ppi0.in_pc_callback().set([this] () { LOGPORTS("%s: PPI0 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi0.in_pa_callback().set_ioport("P1");
+	ppi0.in_pb_callback().set_ioport("P2");
+	ppi0.in_pc_callback().set_ioport("DSW");
 	ppi0.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port A out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port B out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
 
 
 	i8255_device &ppi1(I8255(config, "ppi1"));
-	ppi1.in_pa_callback().set([this] () { LOGPORTS("%s: PPI1 port A in\n", machine().describe_context()); return uint8_t(0); });
-	ppi1.in_pb_callback().set([this] () { LOGPORTS("%s: PPI1 port B in\n", machine().describe_context()); return uint8_t(0); });
-	ppi1.in_pc_callback().set([this] () { LOGPORTS("%s: PPI1 port C in\n", machine().describe_context()); return uint8_t(0); });
+	ppi1.in_pa_callback().set([this] () { LOGPORTS("%s: PPI1 port A in\n", machine().describe_context()); return uint8_t(0xff); });
+	ppi1.in_pb_callback().set([this] () { return (machine().rand() & 0x01) | 0xfe; }); // TODO: won't boot otherwise
+	ppi1.in_pc_callback().set([this] () { LOGPORTS("%s: PPI1 port C in\n", machine().describe_context()); return uint8_t(0xff); });
 	ppi1.out_pa_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port A out %02x\n", machine().describe_context(), data); });
 	ppi1.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port B out %02x\n", machine().describe_context(), data); });
 	ppi1.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port C out %02x\n", machine().describe_context(), data); });
@@ -221,7 +272,7 @@ void hominn_980924_state::qxjl(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx);
 
-	PALETTE(config, "palette").set_entries(0x100); // TODO
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x200); // TODO: incorrect
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -236,21 +287,17 @@ ROM_START( qxjl )
 	ROM_LOAD16_BYTE( "1.u17", 0x00000, 0x20000, CRC(50c0d1fb) SHA1(4d535c8e3032e651ed0d9b10206530fa5ddebf85) )
 	ROM_LOAD16_BYTE( "2.u16", 0x00001, 0x20000, CRC(36eb936c) SHA1(348f842928177ab72ee62d93a9fb74e9d0cf5fb1) )
 
-	ROM_REGION( 0x20000, "chars", 0 )
+	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "3.uz10", 0x00000, 0x20000, CRC(35cbe0cd) SHA1(f2c11d6e12097e281df6a6bd2ce35c15ef482377) )
 
-	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_REGION( 0x40000, "bgtiles", 0 )
 	ROM_LOAD( "5.ub9", 0x00000, 0x40000, CRC(f12e5c72) SHA1(e4d791bb623a10ee5041f8b52ba82b3e5bb7f5b7) )
 
-	ROM_REGION( 0x10000, "unsorted", 0 ) // is this some kind of data ROM?
+	ROM_REGION16_BE( 0x10000, "bgdata", 0 ) // seems to be a bg tile data table?
 	ROM_LOAD( "4.ub4", 0x00000, 0x10000, CRC(7b44beed) SHA1(9cbdb5dc388665ded2c46d29e19ebcde194e7bc1) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "6.u31", 0x00000, 0x80000, CRC(fad9be9f) SHA1(d58a51b09560edffebe52ec22080a29767273ed3) )
-
-	ROM_REGION( 0x8000, "nvram", ROMREGION_ERASE00 )
-	// ROM_FILL( 0x20b0, 0x02, 0x50 )
-	// ROM_FILL( 0x20b2, 0x02, 0x0a )
 ROM_END
 
 
@@ -264,7 +311,7 @@ void hominn_980924_state::init_qxjl()
 	memcpy(&buffer[0], rom, 0x40000);
 
 	for (int i = 0; i < 0x40000; i++)
-		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 8, 3, 15, 14, 13, 12, 10, 11, 9, 2, 7, 16, 5, 4, 17, 6, 1, 0)];
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 8, 3, 14, 13, 12, 15, 10, 11, 9, 2, 7, 16, 5, 4, 17, 6, 1, 0)];
 
 	for (int i = 0; i < 0x40000; i += 0x100)
 	{
@@ -324,4 +371,4 @@ void hominn_980924_state::init_qxjl()
 } // anonymous namespace
 
 
-GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, init_qxjl, ROT0, "Hom Inn", "Qianxi Jielong", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, init_qxjl, ROT0, "Hom Inn", "Qianxi Jielong", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

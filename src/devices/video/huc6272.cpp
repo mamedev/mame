@@ -266,7 +266,7 @@ void huc6272_device::io_map(address_map &map)
 	map(0x5d, 0x5d).w(FUNC(huc6272_device::adpcm_end_address_w<1>));
 	map(0x5e, 0x5e).w(FUNC(huc6272_device::adpcm_imm_address_w<1>));
 
-//	map(0x61, 0x61) KRAM mode (undocumented, used by backup RAM menu)
+//  map(0x61, 0x61) KRAM mode (undocumented, used by backup RAM menu)
 }
 
 

@@ -188,7 +188,7 @@ void sb16_lle_device::ctrl8_w(uint8_t data)
 	{
 		m_isa->drq1_w(0);
 		//if(m_ctrl16 & 2)
-		//	control_timer(false);
+		//  control_timer(false);
 	}
 	// wolf3d disagrees with drq high here (will be short by 1 sample, cfr. MT09316)
 	//else
@@ -242,12 +242,12 @@ void sb16_lle_device::ctrl16_w(uint8_t data)
 		m_dma16_done = false;
 	}
 	//if(!(data & 2) || !(m_ctrl8 & 2))
-	//	control_timer(true);
+	//  control_timer(true);
 	if(data & 2)
 	{
 		m_isa->drq5_w(0);
 		//if(m_ctrl8 & 2)
-		//	control_timer(false);
+		//  control_timer(false);
 	}
 	//else
 	//  m_isa->drq5_w(1);

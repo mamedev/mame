@@ -24,7 +24,7 @@
     Additional work and refactoring by Angelo Salese
 
     TODO:
-	- Move flash memory implementation into machine/intelfsh.cpp
+    - Move flash memory implementation into machine/intelfsh.cpp
     - provide NVRAM defaults where applicable;
     - add an actual reset button (helps with inp record/playback);
     - donghaer: needs "raster effect" for 2 players mode split screen, but no

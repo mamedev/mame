@@ -115,15 +115,7 @@ u8 am100kbd_device::key_matrix_r()
 void am100kbd_device::p1_w(u8 data)
 {
 	if (BIT(~m_p1data & data, 4))
-	{
 		b_w(m_shiftdata & 0x7f);
-#if 0 // FIXME: remove this part
-		if (m_shiftdata >= 0x20 && m_shiftdata <= 0x7e)
-			logerror("Keycode sent: '%c'\n", m_shiftdata);
-		else
-			logerror("Keycode sent: %02X\n", m_shiftdata);
-#endif
-	}
 	strobe_w(BIT(data, 4));
 
 	if (BIT(~m_p1data & data, 5))
