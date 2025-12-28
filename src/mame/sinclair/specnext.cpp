@@ -61,7 +61,7 @@
 
 namespace {
 
-#define TIMINGS_PERFECT     1
+#define TIMINGS_PERFECT     0
 
 constexpr u8 INT_PRIORITY_LINE     = 0;
 constexpr u8 INT_PRIORITY_UART0_RX = 1;
@@ -137,7 +137,6 @@ public:
 		, m_io_issue(*this, "ISSUE")
 		, m_io_video(*this, "VIDEO")
 		, m_io_layers(*this, "LYRS")
-		, m_io_sdcard(*this, "SDCARD")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 		, m_io_joy_left(*this, "JOY_LEFT")
 		, m_io_joy_right(*this, "JOY_RIGHT")
@@ -370,7 +369,6 @@ private:
 	required_ioport m_io_issue;
 	optional_ioport m_io_video;
 	optional_ioport m_io_layers;
-	optional_ioport m_io_sdcard;
 	required_ioport_array<3> m_io_mouse;
 	required_ioport m_io_joy_left;
 	required_ioport m_io_joy_right;
@@ -2682,23 +2680,6 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 	{
 		m_irq_on_timer->adjust(m_screen->time_until_pos(m_video_timings.int_v, m_video_timings.int_h << 1));
 	}
-
-	switch(m_io_sdcard->read())
-	{
-		default:
-		case 0:
-			m_sdcards[0]->set_delays_ext(120, 2);
-			m_sdcards[1]->set_delays_ext(120, 2);
-			break;
-		case 1:
-			m_sdcards[0]->set_delays_ext(50, 5);
-			m_sdcards[1]->set_delays_ext(50, 5);
-			break;
-		case 2:
-			m_sdcards[0]->set_delays_ext(150, 8);
-			m_sdcards[1]->set_delays_ext(150, 8);
-			break;
-	}
 }
 
 void specnext_state::line_irq_adjust()
@@ -3227,13 +3208,6 @@ INPUT_PORTS_START(specnext)
 	PORT_CONFNAME(0x01, 0x00, "Disable Tiles")
 	PORT_CONFSETTING(   0x00, DEF_STR(Off))
 	PORT_CONFSETTING(   0x01, DEF_STR(On))
-
-	PORT_START("SDCARD")
-	PORT_CONFNAME(0x03, 0x00, "SD-card speed" )
-	PORT_CONFSETTING(0x00, "seek: 120, data: 2 (Next KS1)" )
-	PORT_CONFSETTING(0x01, "seek: 50, data: 5 (Integral)" )
-	PORT_CONFSETTING(0x02, "seek: 150, data: 8 (Gigastone)" )
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 INPUT_PORTS_END
 
@@ -3947,10 +3921,12 @@ void specnext_state::tbblue(machine_config &config)
 	SPI_SDCARD(config, m_sdcards[0], 0);
 	m_sdcards[0]->set_prefer_sdhc();
 	m_sdcards[0]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
+	m_sdcards[0]->set_delays_ext(0, 1);
 
 	SPI_SDCARD(config, m_sdcards[1], 0);
 	m_sdcards[1]->set_prefer_sdhc();
 	m_sdcards[1]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
+	m_sdcards[1]->set_delays_ext(0, 1);
 
 	SPEAKER(config.replace(), "speakers", 2).front();
 	m_speaker->add_route(ALL_OUTPUTS, "speakers", 0.50, 1);
