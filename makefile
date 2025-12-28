@@ -463,7 +463,7 @@ OSD := sdl
 else ifeq ($(TARGETOS),solaris)
 OSD := sdl
 else ifeq ($(TARGETOS),macosx)
-OSD := sdl
+OSD := sdl3
 else ifeq ($(TARGETOS),asmjs)
 OSD := sdl
 endif # TARGETOS

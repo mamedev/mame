@@ -16,13 +16,13 @@
 
 #include "input_common.h"
 
-#include "sdl/osdsdl.h"
+#include "osdsdl.h"
 
 // MAME headers
 #include "inpttype.h"
 
 // standard SDL header
-#include <SDL3/SDL.h>
+#include <SDL2/SDL.h>
 
 // for X11 xinput
 #include <X11/Xlib.h>
