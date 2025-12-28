@@ -375,6 +375,7 @@ private:
 	required_ioport m_io_joy_left;
 	required_ioport m_io_joy_right;
 
+	bitmap_rgb32 m_blendprio_bitmap;
 	video_timings_info m_video_timings;
 	rectangle m_clip256x192;
 	rectangle m_clip320x256;
@@ -1020,7 +1021,9 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
-			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_ALL_CATEGORIES, 2);
+			if (layer2_en) m_layer2->draw_mix(screen, bitmap, m_blendprio_bitmap, clip320x256, m_nr_15_layer_priority & 1);
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_ALL_CATEGORIES);
+			if (layer2_en) m_layer2->copyprio(screen, bitmap, m_blendprio_bitmap, clip320x256);
 		}
 		else if (m_nr_68_blend_mode == 0b10) // Use result of ULA + Tilemap
 		{
@@ -1031,16 +1034,18 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+			if (layer2_en) m_layer2->draw_mix(screen, bitmap, bitmap, clip320x256, m_nr_15_layer_priority & 1);
 		}
 		else if (m_nr_68_blend_mode == 0b11) // Use Tilemap as blend layer
 		{
-			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_ALL_CATEGORIES, 1);
+			if (layer2_en) m_layer2->draw_mix(screen, bitmap, m_blendprio_bitmap, clip320x256, m_nr_15_layer_priority & 1);
 			if (ula_en)
 			{
-				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
-				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
+				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192);
+				else m_ula_scr->draw(screen, bitmap, clip256x192, flash);
 			}
-			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+			if (layer2_en) m_layer2->copyprio(screen, bitmap, m_blendprio_bitmap, clip320x256);
 		}
 		else // 0b01 - No blending (disable blend)
 		{
@@ -1051,9 +1056,8 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
+			if (layer2_en) m_layer2->draw_mix(screen, bitmap, bitmap, clip320x256, m_nr_15_layer_priority & 1);
 		}
-		// mixes only to 1 with no others
-		if (layer2_en) m_layer2->draw_mix(screen, bitmap, clip320x256, m_nr_15_layer_priority & 1);
 	}
 	// sprites below foreground
 	if (sprites_en) m_sprites->draw(screen, bitmap, clip320x256, GFX_PMASK_8);
@@ -3236,6 +3240,8 @@ INPUT_PORTS_END
 void specnext_state::machine_start()
 {
 	spectrum_128_state::machine_start();
+
+	m_screen->register_screen_bitmap(m_blendprio_bitmap);
 
 	m_irq_line_timer = timer_alloc(FUNC(specnext_state::line_irq_on), this);
 	m_spi_clock = timer_alloc(FUNC(specnext_state::spi_clock), this);
