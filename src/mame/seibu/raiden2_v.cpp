@@ -307,10 +307,11 @@ u32 xsedae_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	if (BIT(~m_tilemap_enable, 4))
 		m_spritegen->draw_prio(screen, bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes());
 
-#if DUMP_COP
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
-#endif
+	if (DUMP_COP)
+	{
+		if (m_raiden2cop && machine().input().code_pressed_once(KEYCODE_Z))
+			m_raiden2cop->dump_table();
+	}
 
 	return 0;
 }
@@ -349,10 +350,11 @@ u32 raiden2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	if (BIT(~m_tilemap_enable, 4))
 		blend_layer(bitmap, cliprect, m_sprite_bitmap, m_cur_spri[4]);
 
-#if DUMP_COP
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		if (m_raiden2cop) m_raiden2cop->dump_table();
-#endif
+	if (DUMP_COP)
+	{
+		if (m_raiden2cop && machine().input().code_pressed_once(KEYCODE_Z))
+			m_raiden2cop->dump_table();
+	}
 
 	return 0;
 }
