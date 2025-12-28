@@ -628,6 +628,7 @@ else
 		"LSB_FIRST",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
+
 		configuration { "arm64" }
 			buildoptions {
 				"-arch arm64",

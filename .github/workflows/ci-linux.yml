@@ -48,8 +48,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qtbase5-dev qtbase5-dev-tools
-        /home/linuxbrew/.linuxbrew/bin/brew install sdl3 sdl3_ttf
+        sudo apt-get install -y libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libasound2-dev libxinerama-dev libxi-dev qtbase5-dev qtbase5-dev-tools
     - name: Install clang
       if: matrix.compiler == 'clang'
       run: sudo apt-get install -y clang
@@ -60,7 +59,7 @@ jobs:
         ARCHOPTS: ${{ matrix.archopts }}
         SUBTARGET: ${{ matrix.subtarget }}
         TOOLS: 1
-      run: export PKG_CONFIG_PATH=`/home/linuxbrew/.linuxbrew/bin/brew --prefix sdl3`/lib/pkgconfig ; make -j3
+      run: make -j3
     - name: Validate
       run: ./${{ matrix.executable }} -validate
     - name: Reconcile driver list

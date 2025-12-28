@@ -45,9 +45,16 @@
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 // standard windows headers
 #include <windows.h>
+#if defined(SDLMAME_WIN32) && !defined(SDLMAME_SDL3)
+#include <SDL2/SDL_syswm.h>
+#endif
 #else
 #if defined(OSD_MAC)
 extern void *GetOSWindow(void *wincontroller);
+#else
+#ifndef SDLMAME_SDL3
+#include <SDL2/SDL_syswm.h>
+#endif
 #endif
 #endif
 
@@ -380,7 +387,7 @@ bool video_bgfx::init_bgfx_library(osd_window &window)
 //============================================================
 //  Utility for setting up window handle
 //============================================================
-
+#ifdef SDLMAME_SDL3
 bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window const &window)
 {
 #if defined(OSD_WINDOWS)
@@ -433,6 +440,79 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 
 	return true;
 }
+#else
+bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window const &window)
+{
+#if defined(OSD_WINDOWS)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = dynamic_cast<win_window_info const &>(window).platform_window();
+#elif defined(OSD_MAC)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = GetOSWindow(dynamic_cast<mac_window_info const &>(window).platform_window());
+#elif defined(SDLMAME_EMSCRIPTEN)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = (void *)"#canvas"; // HTML5 target selector
+#else // defined(OSD_*)
+	SDL_SysWMinfo wmi;
+	SDL_VERSION(&wmi.version);
+	if (!SDL_GetWindowWMInfo(dynamic_cast<sdl_window_info const &>(window).platform_window(), &wmi))
+	{
+		osd_printf_error("BGFX: Error getting SDL window info: %s\n", SDL_GetError());
+		return false;
+	}
+
+	switch (wmi.subsystem)
+	{
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+	case SDL_SYSWM_WINDOWS:
+		platform_data.ndt = nullptr;
+		platform_data.nwh = wmi.info.win.window;
+		break;
+#endif
+#if defined(SDL_VIDEO_DRIVER_X11)
+	case SDL_SYSWM_X11:
+		platform_data.ndt = wmi.info.x11.display;
+		platform_data.nwh = (void *)uintptr_t(wmi.info.x11.window);
+		break;
+#endif
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+	case SDL_SYSWM_COCOA:
+		platform_data.ndt = nullptr;
+		platform_data.nwh = wmi.info.cocoa.window;
+		break;
+#endif
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+	case SDL_SYSWM_WAYLAND:
+		platform_data.ndt = wmi.info.wl.display;
+		platform_data.nwh = wmi.info.wl.surface;
+		if (!platform_data.nwh)
+		{
+			osd_printf_error("BGFX: Error creating a Wayland window\n");
+			return false;
+		}
+		platform_data.type = bgfx::NativeWindowHandleType::Wayland;
+		break;
+#endif
+#if defined(SDL_VIDEO_DRIVER_ANDROID)
+	case SDL_SYSWM_ANDROID:
+		platform_data.ndt = nullptr;
+		platform_data.nwh = wmi.info.android.window;
+		break;
+#endif
+	default:
+		osd_printf_error("BGFX: Unsupported SDL window manager type %u\n", wmi.subsystem);
+		return false;
+	}
+#endif // defined(OSD_*)
+
+	platform_data.context = nullptr;
+	platform_data.backBuffer = nullptr;
+	platform_data.backBufferDS = nullptr;
+	bgfx::setPlatformData(platform_data);
+
+	return true;
+}
+#endif
 
 } // anonymous namespace
 
@@ -477,6 +557,7 @@ uint32_t renderer_bgfx::s_height[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 //============================================================
 
 #ifdef OSD_SDL
+#ifdef SDLMAME_SDL3
 static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
 {
 #if defined(SDL_PLATFORM_WIN32)
@@ -500,6 +581,41 @@ static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
 #endif
 		return std::make_pair(nullptr, false);
 }
+#else
+static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
+{
+	SDL_SysWMinfo wmi;
+	SDL_VERSION(&wmi.version);
+	if (!SDL_GetWindowWMInfo(window, &wmi))
+		return std::make_pair(nullptr, false);
+
+	switch (wmi.subsystem)
+	{
+#if defined(SDL_VIDEO_DRIVER_WINDOWS)
+	case SDL_SYSWM_WINDOWS:
+		return std::make_pair(wmi.info.win.window, true);
+#endif
+#if defined(SDL_VIDEO_DRIVER_X11)
+	case SDL_SYSWM_X11:
+		return std::make_pair((void *)uintptr_t(wmi.info.x11.window), true);
+#endif
+#if defined(SDL_VIDEO_DRIVER_COCOA)
+	case SDL_SYSWM_COCOA:
+		return std::make_pair(wmi.info.cocoa.window, true);
+#endif
+#if defined(SDL_VIDEO_DRIVER_WAYLAND) && SDL_VERSION_ATLEAST(2, 0, 16)
+	case SDL_SYSWM_WAYLAND:
+		return std::make_pair(wmi.info.wl.surface, true);
+#endif
+#if defined(SDL_VIDEO_DRIVER_ANDROID)
+	case SDL_SYSWM_ANDROID:
+		return std::make_pair(wmi.info.android.window, true);
+#endif
+	default:
+		return std::make_pair(nullptr, false);
+	}
+}
+#endif
 #endif // OSD_SDL
 
 

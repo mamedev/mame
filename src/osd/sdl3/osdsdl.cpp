@@ -62,7 +62,7 @@ void defines_verbose()
 	MACRO_VERBOSE(SYNC_IMPLEMENTATION);
 	osd_printf_verbose("\n");
 	osd_printf_verbose("SDL/OpenGL defines: ");
-	osd_printf_verbose("SDL_COMPILEDVERSION=%d ", SDL_COMPILEDVERSION);
+	osd_printf_verbose("SDL_VERSION=%d ", SDL_VERSION);
 	MACRO_VERBOSE(USE_OPENGL);
 	MACRO_VERBOSE(USE_DISPATCH_GL);
 	osd_printf_verbose("\n");
@@ -104,25 +104,40 @@ void osd_sdl_info()
 	osd_printf_verbose("\n");
 
 	osd_printf_verbose("Current Videodriver: %s\n", SDL_GetCurrentVideoDriver());
-	num = SDL_GetNumVideoDisplays();
+	const auto displays = SDL_GetDisplays(&num);
+	osd_printf_verbose("%d displays found\n", num);
 	for (int i = 0; i < num; i++)
 	{
-		SDL_DisplayMode mode;
+		SDL_DisplayMode *mode;
 
 		osd_printf_verbose("\tDisplay #%d\n", i);
-		if (SDL_GetDesktopDisplayMode(i, &mode) == 0)
-			osd_printf_verbose("\t\tDesktop Mode:         %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
-		if (SDL_GetCurrentDisplayMode(i, &mode) == 0)
-			osd_printf_verbose("\t\tCurrent Display Mode: %dx%d-%d@%d\n", mode.w, mode.h, SDL_BITSPERPIXEL(mode.format), mode.refresh_rate);
+		mode = (SDL_DisplayMode *)SDL_GetDesktopDisplayMode(displays[i]);
+		if (mode)
+		{
+			osd_printf_verbose("\t\tDesktop Mode:         %dx%d-%d@%d\n", mode->w, mode->h, SDL_BITSPERPIXEL(mode->format), mode->refresh_rate);
+		}
+		else
+		{
+			osd_printf_verbose("Couldn't get desktop mode %s\n", SDL_GetError());
+		}
+
+		mode = (SDL_DisplayMode *)SDL_GetCurrentDisplayMode(displays[i]);
+		if (mode)
+		{
+			osd_printf_verbose("\t\tCurrent Display Mode: %dx%d-%d@%d\n", mode->w, mode->h, SDL_BITSPERPIXEL(mode->format), mode->refresh_rate);
+		}
+		else
+		{
+			osd_printf_verbose("Couldn't get display mode %s\n", SDL_GetError());
+		}
 
 		osd_printf_verbose("\t\tRenderdrivers:\n");
 		for (int j = 0; j < SDL_GetNumRenderDrivers(); j++)
 		{
-			SDL_RendererInfo info;
-			SDL_GetRenderDriverInfo(j, &info);
-			osd_printf_verbose("\t\t\t%10s (%dx%d)\n", info.name, info.max_texture_width, info.max_texture_height);
+			osd_printf_verbose("\t\t\t%10s\n", SDL_GetRenderDriver(j));
 		}
 	}
+	SDL_free(displays);
 
 	osd_printf_verbose("Available audio drivers: \n");
 	num = SDL_GetNumAudioDrivers();
@@ -267,14 +282,13 @@ void sdl_osd_interface::init(running_machine &machine)
 	{
 		if (m_enable_touch)
 		{
-			int const count(SDL_GetNumTouchDevices());
+			int count = 0;
+			const SDL_TouchID *devices = SDL_GetTouchDevices(&count);
 			m_ptrdev_map.reserve(std::max<int>(count + 1, 8));
 			map_pointer_device(SDL_MOUSE_TOUCHID);
 			for (int i = 0; count > i; ++i)
 			{
-				SDL_TouchID const device(SDL_GetTouchDevice(i));
-				if (device)
-					map_pointer_device(device);
+				map_pointer_device(devices[i]);
 			}
 		}
 		else
@@ -294,7 +308,7 @@ void sdl_osd_interface::init(running_machine &machine)
 #endif
 	/* Initialize SDL */
 
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
+	if (!SDL_InitSubSystem(SDL_INIT_VIDEO))
 	{
 		osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 		exit(-1);
@@ -315,9 +329,9 @@ void sdl_osd_interface::init(running_machine &machine)
 
 
 #ifdef SDLMAME_EMSCRIPTEN
-	SDL_EventState(SDL_TEXTINPUT, SDL_FALSE);
+	SDL_SetEventEnabled(SDL_EVENT_TEXT_INPUT, false);
 #else
-	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);
+	SDL_SetEventEnabled(SDL_EVENT_TEXT_INPUT, true);
 #endif
 }
 
@@ -343,7 +357,7 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 				input_item_id mameid_code = ITEM_ID_INVALID;
 				if (!uimode || !*uimode || !strcmp(uimode, "auto"))
 				{
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(SDL_PLATFORM_APPLE) && defined(__MACH__)
 					mameid_code = keyboard_trans_table::instance().lookup_mame_code("ITEM_ID_INSERT");
 #endif
 				}
@@ -422,7 +436,7 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 			break;
 
-#if defined(__APPLE__) && defined(__MACH__)
+#if defined(SDL_PLATFORM_APPLE) && defined(__MACH__)
 		// 78-key Apple MacBook & Bluetooth keyboards have no right control key
 		case IPT_MAHJONG_SCORE:
 			if (entry.player() == 0)
@@ -479,60 +493,84 @@ void sdl_osd_interface::process_events()
 		// handle UI events
 		switch (event.type)
 		{
-		case SDL_WINDOWEVENT:
+			case SDL_EVENT_WINDOW_SHOWN:
+			case SDL_EVENT_WINDOW_HIDDEN:
+			case SDL_EVENT_WINDOW_EXPOSED:
+			case SDL_EVENT_WINDOW_MOVED:
+			case SDL_EVENT_WINDOW_RESIZED:
+			case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+			case SDL_EVENT_WINDOW_METAL_VIEW_RESIZED:
+			case SDL_EVENT_WINDOW_MINIMIZED:
+			case SDL_EVENT_WINDOW_MAXIMIZED:
+			case SDL_EVENT_WINDOW_RESTORED:
+			case SDL_EVENT_WINDOW_MOUSE_ENTER:
+			case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+			case SDL_EVENT_WINDOW_FOCUS_GAINED:
+			case SDL_EVENT_WINDOW_FOCUS_LOST:
+			case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+			case SDL_EVENT_WINDOW_HIT_TEST:
+			case SDL_EVENT_WINDOW_ICCPROF_CHANGED:
+			case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+			case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+			case SDL_EVENT_WINDOW_SAFE_AREA_CHANGED:
+			case SDL_EVENT_WINDOW_OCCLUDED:
+			case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+			case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+			case SDL_EVENT_WINDOW_DESTROYED:
+			case SDL_EVENT_WINDOW_HDR_STATE_CHANGED:
 			process_window_event(event);
 			break;
 
-		case SDL_KEYDOWN:
-			if (event.key.keysym.scancode == SDL_SCANCODE_LCTRL)
+		case SDL_EVENT_KEY_DOWN:
+			if (event.key.scancode == SDL_SCANCODE_LCTRL)
 				m_modifier_keys |= MODIFIER_KEY_LCTRL;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_RCTRL)
+			else if (event.key.scancode == SDL_SCANCODE_RCTRL)
 				m_modifier_keys |= MODIFIER_KEY_RCTRL;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+			else if (event.key.scancode == SDL_SCANCODE_LSHIFT)
 				m_modifier_keys |= MODIFIER_KEY_LSHIFT;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_RSHIFT)
+			else if (event.key.scancode == SDL_SCANCODE_RSHIFT)
 				m_modifier_keys |= MODIFIER_KEY_RSHIFT;
 
-			if (event.key.keysym.sym < 0x20)
+			if (event.key.key < 0x20)
 			{
 				// push control characters - they don't arrive as text input events
-				machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.keysym.sym);
+				machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.key);
 			}
 			else if (m_modifier_keys & MODIFIER_KEY_CTRL)
 			{
 				// SDL filters out control characters for text input, so they are decoded here
-				if (event.key.keysym.sym >= 0x40 && event.key.keysym.sym < 0x7f)
+				if (event.key.key >= 0x40 && event.key.key < 0x7f)
 				{
-					machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.keysym.sym & 0x1f);
+					machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.key & 0x1f);
 				}
 				else if (m_modifier_keys & MODIFIER_KEY_SHIFT)
 				{
-					if (event.key.keysym.sym == SDLK_2) // Ctrl-@ (NUL)
+					if (event.key.key == SDLK_2) // Ctrl-@ (NUL)
 						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x00);
-					else if (event.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
+					else if (event.key.key == SDLK_6) // Ctrl-^ (RS)
 						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1e);
-					else if (event.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
+					else if (event.key.key == SDLK_MINUS) // Ctrl-_ (US)
 						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1f);
 				}
 			}
 			break;
 
-		case SDL_KEYUP:
-			if (event.key.keysym.scancode == SDL_SCANCODE_LCTRL)
+		case SDL_EVENT_KEY_UP:
+			if (event.key.scancode == SDL_SCANCODE_LCTRL)
 				m_modifier_keys &= ~MODIFIER_KEY_LCTRL;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_RCTRL)
+			else if (event.key.scancode == SDL_SCANCODE_RCTRL)
 				m_modifier_keys &= ~MODIFIER_KEY_RCTRL;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_LSHIFT)
+			else if (event.key.scancode == SDL_SCANCODE_LSHIFT)
 				m_modifier_keys &= ~MODIFIER_KEY_LSHIFT;
-			else if (event.key.keysym.scancode == SDL_SCANCODE_RSHIFT)
+			else if (event.key.scancode == SDL_SCANCODE_RSHIFT)
 				m_modifier_keys &= ~MODIFIER_KEY_RSHIFT;
 			break;
 
-		case SDL_TEXTINPUT:
+		case SDL_EVENT_TEXT_INPUT:
 			process_textinput_event(event);
 			break;
 
-		case SDL_MOUSEMOTION:
+		case SDL_EVENT_MOUSE_MOTION:
 			if (!m_enable_touch || (SDL_TOUCH_MOUSEID != event.motion.which))
 			{
 				auto const window = window_from_id(event.motion.windowID);
@@ -556,8 +594,8 @@ void sdl_osd_interface::process_events()
 			}
 			break;
 
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 			if (!m_enable_touch || (SDL_TOUCH_MOUSEID != event.button.which))
 			{
 				auto const window = window_from_id(event.button.windowID);
@@ -580,14 +618,14 @@ void sdl_osd_interface::process_events()
 				unsigned button(event.button.button - 1);
 				if ((1 == button) || (2 == button))
 					button ^= 3;
-				if (SDL_PRESSED == event.button.state)
+				if (event.button.down)
 					window->mouse_down(device, x, y, button);
 				else
 					window->mouse_up(device, x, y, button);
 			}
 			break;
 
-		case SDL_MOUSEWHEEL:
+		case SDL_EVENT_MOUSE_WHEEL:
 			{
 				auto const window = window_from_id(event.wheel.windowID);
 				if (window)
@@ -602,19 +640,15 @@ void sdl_osd_interface::process_events()
 						osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
 						break;
 					}
-#if SDL_VERSION_ATLEAST(2, 0, 18)
-					window->mouse_wheel(device, std::lround(event.wheel.preciseY * 120));
-#else
-					window->mouse_wheel(device, event.wheel.y);
-#endif
+					window->mouse_wheel(device, std::lround(event.wheel.integer_y * 120));
 				}
 			}
 			break;
 
-		case SDL_FINGERMOTION:
-		case SDL_FINGERDOWN:
-		case SDL_FINGERUP:
-			if (m_enable_touch && (SDL_MOUSE_TOUCHID != event.tfinger.touchId))
+		case SDL_EVENT_FINGER_MOTION:
+		case SDL_EVENT_FINGER_DOWN:
+		case SDL_EVENT_FINGER_UP:
+			if (m_enable_touch && (SDL_MOUSE_TOUCHID != event.tfinger.touchID))
 			{
 				// ignore if it doesn't map to a window we own
 				auto const window = window_from_id(event.tfinger.windowID);
@@ -625,7 +659,7 @@ void sdl_osd_interface::process_events()
 				unsigned device;
 				try
 				{
-					device = map_pointer_device(event.tfinger.touchId);
+					device = map_pointer_device(event.tfinger.touchID);
 				}
 				catch (std::bad_alloc const &)
 				{
@@ -643,14 +677,14 @@ void sdl_osd_interface::process_events()
 				// call appropriate window method
 				switch (event.type)
 				{
-				case SDL_FINGERMOTION:
-					window->finger_moved(event.tfinger.fingerId, device, x, y);
+				case SDL_EVENT_FINGER_MOTION:
+					window->finger_moved(event.tfinger.fingerID, device, x, y);
 					break;
-				case SDL_FINGERDOWN:
-					window->finger_down(event.tfinger.fingerId, device, x, y);
+				case SDL_EVENT_FINGER_DOWN:
+					window->finger_down(event.tfinger.fingerID, device, x, y);
 					break;
-				case SDL_FINGERUP:
-					window->finger_up(event.tfinger.fingerId, device, x, y);
+				case SDL_EVENT_FINGER_UP:
+					window->finger_up(event.tfinger.fingerID, device, x, y);
 					break;
 				}
 			}
@@ -688,14 +722,14 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		return;
 	}
 
-	switch (event.window.event)
+	switch (event.window.type)
 	{
-	case SDL_WINDOWEVENT_MOVED:
+	case SDL_EVENT_WINDOW_MOVED:
 		window->notify_changed();
 		m_focus_window = window;
 		break;
 
-	case SDL_WINDOWEVENT_RESIZED:
+	case SDL_EVENT_WINDOW_RESIZED:
 #ifdef SDLMAME_LINUX
 		/* FIXME: SDL2 sends some spurious resize events on Ubuntu
 		* while in fullscreen mode. Ignore them for now.
@@ -708,7 +742,7 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		}
 		break;
 
-	case SDL_WINDOWEVENT_ENTER:
+	case SDL_EVENT_WINDOW_MOUSE_ENTER:
 		{
 			m_mouse_over_window = 1;
 			unsigned device;
@@ -725,7 +759,7 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		}
 		break;
 
-	case SDL_WINDOWEVENT_LEAVE:
+	case SDL_EVENT_WINDOW_MOUSE_LEAVE:
 		{
 			m_mouse_over_window = 0;
 			unsigned device;
@@ -742,19 +776,22 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		}
 		break;
 
-	case SDL_WINDOWEVENT_FOCUS_GAINED:
+	case SDL_EVENT_WINDOW_FOCUS_GAINED:
 		m_focus_window = window;
 		machine().ui_input().push_window_focus_event(window->target());
 		break;
 
-	case SDL_WINDOWEVENT_FOCUS_LOST:
+	case SDL_EVENT_WINDOW_FOCUS_LOST:
 		if (window == m_focus_window)
 			m_focus_window = nullptr;
 		machine().ui_input().push_window_defocus_event(window->target());
 		break;
 
-	case SDL_WINDOWEVENT_CLOSE:
+	case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
 		machine().schedule_exit();
+		break;
+
+	default:
 		break;
 	}
 }

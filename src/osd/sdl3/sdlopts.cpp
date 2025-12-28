@@ -9,7 +9,7 @@
 // lib/util
 #include "util/corestr.h"
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <string>
 
@@ -107,7 +107,7 @@ const options_entry f_sdl_option_entries[] =
 sdl_options::sdl_options() : osd_options()
 {
 #if defined(SDLMAME_ANDROID)
-	chdir(SDL_AndroidGetExternalStoragePath()); // FIXME: why is this here of all places?
+	chdir(SDL_GetAndroidExternalStoragePath()); // FIXME: why is this here of all places?
 #endif
 	std::string ini_path(INI_PATH);
 	add_entries(f_sdl_option_entries);

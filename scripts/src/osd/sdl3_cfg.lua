@@ -7,7 +7,7 @@ forcedincludes {
 	MAME_DIR .. "src/osd/sdl/sdlprefix.h"
 }
 
-if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" or _OPTIONS["USE_VMNET"]==1 or _OPTIONS["USE_VMNET_HELPER"]==1 then
+if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" then
 	defines {
 		"USE_NETWORK",
 	}
@@ -21,16 +21,6 @@ if _OPTIONS["USE_TAPTUN"]=="1" or _OPTIONS["USE_PCAP"]=="1" or _OPTIONS["USE_VMN
 			"OSD_NET_USE_PCAP",
 		}
 	end
-    if _OPTIONS["USE_VMNET"]=="1" then
-        defines {
-            "OSD_NET_USE_VMNET",
-       }
-    end
-    if _OPTIONS["USE_VMNET_HELPER"]=="1" then
-        defines {
-            "OSD_NET_USE_VMNET_HELPER",
-        }
-    end
 end
 
 if _OPTIONS["NO_OPENGL"]~="1" and _OPTIONS["USE_DISPATCH_GL"]~="1" and _OPTIONS["MESA_INSTALL_ROOT"] then
@@ -88,13 +78,8 @@ if _OPTIONS["NO_USE_MIDI"]~="1" and _OPTIONS["targetos"]=="linux" then
 end
 
 defines {
-	"SDLMAME_SDL2=1",
+	"SDLMAME_SDL3=1",
 }
-if _OPTIONS["SDL2_MULTIAPI"]=="1" then
-	defines {
-		"SDL2_MULTIAPI",
-	}
-end
 
 defines {
 	"OSD_SDL",
@@ -114,16 +99,12 @@ if BASE_TARGETOS=="unix" then
 				"MACOSX_USE_LIBSDL",
 			}
 			buildoptions {
-				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
+				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL3::'"),
 			}
 		end
-	elseif _OPTIONS["targetos"]=="android" then
-		buildoptions {
-			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
-		}
 	else
 		buildoptions {
-			backtick(sdlconfigcmd() .. " --cflags"),
+			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL3::'"),
 		}
 		if _OPTIONS["targetos"]~="asmjs" then
 			buildoptions {
