@@ -15,6 +15,8 @@ in-game music.
 The video hardware is pretty much like Irem games too. The only strange thing
 is that the screen is flipped vertically.
 
+The Z80 is a Z80A, not Z80B, but it's been confirmed that it runs at 6.0MHz.
+
 HSync measured 15.9946kHz
 VSync measured 56.7180Hz
 
