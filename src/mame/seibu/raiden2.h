@@ -57,6 +57,9 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	static u16 const raiden_blended_colors[];
+	static u16 const zeroteam_blended_colors[];
+
 	std::unique_ptr<u16[]> m_back_data;
 	std::unique_ptr<u16[]> m_fore_data;
 	std::unique_ptr<u16[]> m_mid_data;
@@ -71,25 +74,22 @@ protected:
 	required_device<sei25x_rise1x_device> m_spritegen;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
-	u16 m_sprite_prot_x,m_sprite_prot_y,m_dst1,m_cop_spr_maxx,m_cop_spr_off;
-	u16 m_sprite_prot_src_addr[2];
-
-	static u16 const raiden_blended_colors[];
-	static u16 const zeroteam_blended_colors[];
-
 	tilemap_t *m_background_layer = nullptr;
 	tilemap_t *m_midground_layer = nullptr;
 	tilemap_t *m_foreground_layer = nullptr;
 	tilemap_t *m_text_layer = nullptr;
 
+	u16 m_sprite_prot_x, m_sprite_prot_y, m_dst1,m_cop_spr_maxx, m_cop_spr_off;
+	u16 m_sprite_prot_src_addr[2];
+
 	u32 m_bg_bank, m_fg_bank, m_mid_bank, m_tx_bank;
 	u16 m_tilemap_enable;
 
-	u16 m_scrollvals[6];
+	u16 m_scrollvals[6]{};
 
 	u32 m_sprcpt_adr = 0, m_sprcpt_idx = 0;
 
-	u32 m_sprcpt_val[2], m_sprcpt_flags1 = 0;
+	u32 m_sprcpt_val[2]{}, m_sprcpt_flags1 = 0;
 	u16 m_sprcpt_flags2 = 0;
 	u32 m_sprcpt_data_1[0x100]{}, m_sprcpt_data_2[0x40]{}, m_sprcpt_data_3[6]{}, m_sprcpt_data_4[4]{};
 
@@ -116,11 +116,11 @@ protected:
 	void sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask);
-	void sprcpt_init();
+	void sprcpt_init(); ATTR_COLD
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	virtual void common_save_state();
-	void common_video_start();
+	virtual void common_save_state() ATTR_COLD;
+	void common_video_start() ATTR_COLD;
 
 	void tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tile_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -178,10 +178,10 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
-	optional_memory_bank m_mainbank;
-
 	static u16 const raiden_blended_colors[];
 	static u16 const zeroteam_blended_colors[];
+
+	optional_memory_bank m_mainbank;
 
 	bool m_blend_active[0x800]; // cfg
 
@@ -190,14 +190,14 @@ protected:
 	bitmap_ind16 m_tile_bitmap;
 	bitmap_ind16 m_sprite_bitmap;
 
-	virtual void common_save_state() override;
+	virtual void common_save_state() override ATTR_COLD;
 
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	void blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind16 &source, int layer);
 	void tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tilemap);
 
-	void init_blending(const u16 *table);
+	void init_blending(const u16 *table) ATTR_COLD;
 
 private:
 	u8 m_prg_bank;
