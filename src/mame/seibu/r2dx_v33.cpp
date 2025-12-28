@@ -390,7 +390,7 @@ u16 nzeroteam_state::sin_r()
 u16 nzeroteam_state::cos_r()
 {
 	const int off = 0x10000 + (m_angle & 0xff) * 4;
-	return (m_math[off + 2]) | (m_math[off+3] << 8);
+	return (m_math[off + 2]) | (m_math[off + 3] << 8);
 }
 
 void nzeroteam_state::sdistl_w(offs_t offset, u16 data, u16 mem_mask)
@@ -809,10 +809,6 @@ void nzeroteam_state::nzerotea(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nzeroteam_state::nzerotea_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nzeroteam_state::interrupt));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'636'363)/8));
-	audiocpu.set_addrmap(AS_PROGRAM, &nzeroteam_state::zeroteam_sound_map);
-	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(55.47);    /* verified on pcb */
@@ -824,22 +820,15 @@ void nzeroteam_state::nzerotea(machine_config &config)
 	base_video(config);
 
 	/* sound hardware */
+	base_sound(config);
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &nzeroteam_state::zeroteam_sound_map);
+
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(28'636'363)/8));
-	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	base_ym3812(config);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
-
-	SEIBU_SOUND(config, m_seibu_sound, 0);
-	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
-	m_seibu_sound->coin_io_callback().set_ioport("COIN");
-	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank");
-	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
-	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
 
 void nzeroteam_eeprom_state::zerotm2k(machine_config &config)
