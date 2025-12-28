@@ -171,13 +171,14 @@ Protection Notes:
 #include "emu.h"
 #include "raiden2.h"
 
+#include "r2crypt.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ymopm.h"
 #include "sound/ymopl.h"
-#include "r2crypt.h"
+#include "sound/ymopm.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -482,7 +483,7 @@ void xsedae_state::sprite_prot_src_w(address_space &space, u16 data)
 	const int w = (((head1 >> 8 ) & 7) + 1) << 4;
 	const int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	u16 flag = x-w/2 > -w && x-w/2 < m_cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+	u16 flag = ((x-w/2 > -w) && (x-w/2 < m_cop_spr_maxx+w) && (y-h/2 > -h) && (y-h/2 < 256+h)) ? 1 : 0;
 
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
@@ -555,7 +556,7 @@ void xsedae_state::xsedae_cop_mem(address_map &map)
 	map(0x00458, 0x00459).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_param_w));
 	map(0x0045a, 0x0045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
 	map(0x0045c, 0x0045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
-	map(0x00470, 0x00471).lr16(NAME([]() { return 0; })).nopw(); // no tilemap bank in xsedae
+	map(0x00470, 0x00471).lr16(NAME([] () { return 0; })).nopw(); // no tilemap bank in xsedae
 
 	map(0x00476, 0x00477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
 	map(0x00478, 0x00479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
@@ -619,9 +620,9 @@ void raiden2_state::raiden2_mem(address_map &map)
 
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8(
-							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
-							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x00700, 0x0071f).umask16(0x00ff).lrw8(
+			NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+			NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }));
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -666,9 +667,9 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x006cc, 0x006cd).nopw();
 
-	map(0x00700, 0x0071f).lrw8(
-							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
-							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x00700, 0x0071f).umask16(0x00ff).lrw8(
+			NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+			NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }));
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -696,9 +697,9 @@ void xsedae_state::xsedae_mem(address_map &map)
 
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8(
-							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
-							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x00700, 0x0071f).umask16(0x00ff).lrw8(
+			NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+			NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }));
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -762,7 +763,7 @@ void xsedae_state::zeroteam_sound_map(address_map &map)
 /* INPUT PORTS */
 
 static INPUT_PORTS_START( raiden2 )
-	SEIBU_COIN_INPUTS_INVERT    /* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS_INVERT    /* coin inputs read through sound CPU */
 
 	PORT_START("P1_P2") /* IN0/1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -782,7 +783,7 @@ static INPUT_PORTS_START( raiden2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")   /* Dip switches  */
+	PORT_START("DSW")   /* DIP switches  */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -838,7 +839,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( raidendx )
 	PORT_INCLUDE( raiden2 )
 
-	PORT_MODIFY("DSW")  /* Dip switches  */
+	PORT_MODIFY("DSW")  /* DIP switches  */
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!5") /* Manual shows "Not Used" */
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1122,7 +1123,7 @@ void raiden2_state::raiden2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::raiden2_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::interrupt));
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, raiden2)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1153,7 +1154,7 @@ void raiden2_state::raidendx(machine_config &config)
 	raiden2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::raidendx_mem);
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raidendx)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, raidendx)
 }
 
 void xsedae_state::zeroteam_base(machine_config &config)
@@ -1186,7 +1187,7 @@ void raiden2_state::zeroteam(machine_config &config)
 	zeroteam_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::zeroteam_mem);
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, zeroteam)
 
 	subdevice<screen_device>("screen")->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
