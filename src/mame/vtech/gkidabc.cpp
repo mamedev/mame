@@ -20,7 +20,7 @@
 	- Disney Princess - Magic Wand Laptop
 	- Dora The Explorer - Carnival Time Laptop/Learning Laptop
 	- DORA - More to Explore Learning Laptop
-	-  Girl Fun PC
+	- Girl Fun PC
 	- Handy Manny's Construction Laptop
 	- Jake & The Neverland Pirates - Treasure Hunt Learning Laptop
 	- Laptop Deluxe
@@ -40,6 +40,7 @@
 	- Sofia the First - Learning Laptop
 	- SpongeBob Laptop
 	- Thomas & Friends - Learn & Explore Laptop
+	- Tree Fu Tom - Learn & Play Laptop
 	- Tote & Go Laptop (2002)
 	- Tote & Go Laptop Plus
 	- Tote 'n' Go Laptop (2009)
@@ -106,4 +107,4 @@ ROM_END
 
 COMP(1996, gkidabc,   0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius KID ABC Fan (Germany)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 COMP(1995, miprimlec, 0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Mis Primeras Lecciones (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1995, gjrprofi,  0, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius Junior Profi (Germany)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1995, gjrprofi,  miprimlec, 0, gkidabc, gkidabc, gkidabc_state, empty_init, "VTech", "Genius Junior Profi (Germany)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
