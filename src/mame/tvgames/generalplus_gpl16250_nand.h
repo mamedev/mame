@@ -42,6 +42,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read_nand(offs_t offset);
+	void write_nand(offs_t offset, uint8_t data);
 	std::vector<uint16_t> m_sdram;
 	std::vector<uint16_t> m_sdram2;
 

@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 /*****************************************************************************
 
+
   SunPlus "GCM394" (based on die pictures)
 
   Also includes GPL162004A (no die picture, this is a GeneralPlus' official datasheet name)
@@ -45,6 +46,9 @@ public:
 	auto space_write_callback() { return m_space_write_cb.bind(); }
 
 	auto nand_read_callback() { return m_nand_read_cb.bind(); }
+	auto nand_write_callback() { return m_nand_write_cb.bind(); }
+
+
 
 	void vblank(int state) { m_spg_video->vblank(state); }
 
@@ -172,6 +176,7 @@ protected:
 	uint16_t m_system_dma_memtype;
 
 	devcb_read16 m_nand_read_cb;
+	devcb_write16 m_nand_write_cb;
 	uint32_t m_csbase;
 
 	uint16_t internalrom_lower32_r(offs_t offset);
@@ -386,7 +391,7 @@ public:
 protected:
 	void gpac800_internal_map(address_map &map) ATTR_COLD;
 
-	//virtual void device_start() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
@@ -394,6 +399,7 @@ private:
 
 	uint16_t nand_7850_status_r();
 	uint16_t nand_7854_r();
+	void nand_7854_w(uint16_t data);
 	void nand_dma_ctrl_w(uint16_t data);
 	void nand_7850_w(uint16_t data);
 	void nand_command_w(uint16_t data);
@@ -407,8 +413,6 @@ private:
 	void nand_785d_w(uint16_t data);
 	uint16_t nand_785e_r();
 
-	uint16_t m_nandcommand;
-
 	uint16_t m_nand_addr_low;
 	uint16_t m_nand_addr_high;
 
@@ -419,6 +423,8 @@ private:
 	uint16_t m_nand_785b;
 	uint16_t m_nand_7856;
 	uint16_t m_nand_7857;
+	uint16_t m_nandcommand;
+	uint16_t m_nand_write_buffer[0x1080];
 
 	int m_curblockaddr;
 	uint32_t m_effectiveaddress;

@@ -56,7 +56,7 @@ void generalplus_gpac800_game_state::cs1_w(offs_t offset, uint16_t data)
 uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
 {
 	if (!m_nandregion)
-		return 0x0000;
+		return 0x00;
 
 	if (offset < m_size)
 	{
@@ -69,6 +69,23 @@ uint8_t generalplus_gpac800_game_state::read_nand(offs_t offset)
 	}
 
 	return 0x00;
+}
+
+void generalplus_gpac800_game_state::write_nand(offs_t offset, uint8_t data)
+{
+	if (!m_nandregion)
+	{
+		return;
+	}
+
+	if (offset < m_size)
+	{
+		m_nandregion[offset] = data;
+	}
+	else
+	{
+		popmessage("write outside of NAND ROM space (offset %08x) (size %08x)\n", offset, m_size);
+	}
 }
 
 void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
@@ -87,6 +104,7 @@ void generalplus_gpac800_game_state::generalplus_gpac800(machine_config &config)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 
 	m_maincpu->nand_read_callback().set(FUNC(generalplus_gpac800_game_state::read_nand));
+	m_maincpu->nand_write_callback().set(FUNC(generalplus_gpac800_game_state::write_nand));
 
 	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_base);
 

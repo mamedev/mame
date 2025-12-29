@@ -44,6 +44,7 @@ sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config& mco
 	m_portc_out(*this),
 	m_portd_out(*this),
 	m_nand_read_cb(*this, 0),
+	m_nand_write_cb(*this),
 	m_csbase(0x20000),
 	m_cs_space(nullptr),
 	m_romtype(0),
@@ -77,10 +78,6 @@ generalplus_gpspispi_device::generalplus_gpspispi_device(const machine_config &m
 
 void generalplus_gpspi_direct_device::ramwrite_w(offs_t offset, uint16_t data)
 {
-	// TODO: Gross hack, it puts some self-check code in RAM at startup, this replaces those calls with retf.
-	if (offset == 0x100 && data == 0xf14c) data = 0x9a90;
-	if (offset == 0x00 && data == 0x9311) data = 0x9a90;
-
 	m_mainram[offset] = data;
 }
 
@@ -1284,16 +1281,16 @@ void sunplus_gcm394_base_device::internalrom_lower32_w(offs_t offset, uint16_t d
 	{
 		logerror("Whoopsie. CPU tried to write into internal ROM. Reseting.\n");
 		sunplus_gcm394_base_device::device_reset();
-		
+
 		// uint16_t* introm = (uint16_t*)m_internalrom->base();
 		// introm[offset] = data;
 	}
 }
 
-
 // GPR27P512A   = C2 76
 // HY27UF081G2A = AD F1 80 1D
 // H27U518S2C   = AD 76
+// TC58BVG0S3HTA00  = 98 D1 80 15 F2
 
 uint16_t generalplus_gpac800_device::nand_7854_r()
 {
@@ -1369,13 +1366,18 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 
 		m_curblockaddr++;
 
-		return data;
+		return /*m_curblockaddr > 2112 - (m_nand_addr_low & 0x00ff) ? 0 :*/ data;
 	}
 	else if (m_nandcommand == 0x70) // read status
 	{
 		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ STATUS byte %d\n", machine().describe_context(), m_curblockaddr);
 
-		return 0xffff;
+		return 0x0040;
+	}
+	else if (m_nandcommand == 0x7a) // read ecc status on TOSHIBA
+	{
+		logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ ECC STATUS byte %d\n", machine().describe_context(), m_curblockaddr);
+		return 0x0000; //no error
 	}
 	else
 	{
@@ -1386,11 +1388,55 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 	return 0x0000;
 }
 
+void generalplus_gpac800_device::nand_7854_w(uint16_t data)
+{
+	if (m_nandcommand == 0x80)
+	{
+		// NOTE: the first thing to do if it won't work is to byteswap this
+		//logerror("%s:sunplus_gcm394_base_device::nand_command_w %04x\n", machine().describe_context(), m_curblockaddr);
+		m_nand_write_buffer[m_curblockaddr / 2] |= (m_curblockaddr % 2 == 0) ? data << 8 : data;
+		m_curblockaddr++;
+
+		// NOTE: then change this to 0x1080
+		if (m_curblockaddr >= 0x840) {
+			m_curblockaddr = 0;
+		}
+	}
+}
+
 // 7998
 
 void generalplus_gpac800_device::nand_command_w(uint16_t data)
 {
 	logerror("%s:sunplus_gcm394_base_device::nand_command_w %04x\n", machine().describe_context(), data);
+
+	if (data == 0x80 || data == 0x10)
+	{
+		m_curblockaddr = 0;
+	}
+
+	if (m_nandcommand == 0x80 && data == 0x10)
+	{
+		recalculate_calculate_effective_nand_address();
+		for (int i = 0; i < 0x420; i++)
+		{
+			m_nand_write_cb(m_effectiveaddress + (i * 2 + 1), m_nand_read_cb((m_effectiveaddress + (i * 2 + 1))) & m_nand_write_buffer[i]);
+			m_nand_write_cb(m_effectiveaddress + (i * 2), m_nand_read_cb((m_effectiveaddress + (i * 2))) & (m_nand_write_buffer[i] >> 8));
+		}
+	}
+
+	if (m_nandcommand == 0x60 && data == 0xd0)
+	{
+		// NOTE: remember those NOTES? Then double-check the alghoritm of finding a block there
+		recalculate_calculate_effective_nand_address();
+		uint32_t block_number = floor(m_effectiveaddress / 0x21000);
+		uint32_t block_address = block_number * 0x21000;
+		for (int i = 0; i < 0x21000; i++)
+		{
+			m_nand_write_cb(i + block_address, 0xff);
+		}
+	}
+
 	m_nandcommand = data;
 }
 
@@ -1411,7 +1457,6 @@ void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 		shift = 4;
 	else if (type == 11)
 		shift = 5;
-
 	if (m_nandcommand == 0x01)
 	{
 		page_offset = 256;
@@ -1428,6 +1473,8 @@ void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 	if (m_nand_7850 & 0x4000)
 		nandaddress *= 2;
 
+	if (m_romtype == 2 && type == 0)
+		page_offset += nandaddress & 0xff;
 	uint32_t page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
 	if (m_romtype == 2)
 		m_effectiveaddress = (page * 2112 + page_offset) << shift;
@@ -1597,7 +1644,7 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x007851, 0x007851).w(FUNC(generalplus_gpac800_device::nand_command_w)); // NAND Command Reg
 	map(0x007852, 0x007852).w(FUNC(generalplus_gpac800_device::nand_addr_low_w)); // NAND Low Address Reg
 	map(0x007853, 0x007853).w(FUNC(generalplus_gpac800_device::nand_addr_high_w)); // NAND High Address Reg
-	map(0x007854, 0x007854).r(FUNC(generalplus_gpac800_device::nand_7854_r)); // NAND Data Reg
+	map(0x007854, 0x007854).rw(FUNC(generalplus_gpac800_device::nand_7854_r), FUNC(generalplus_gpac800_device::nand_7854_w)); // NAND Data Reg
 	map(0x007855, 0x007855).w(FUNC(generalplus_gpac800_device::nand_dma_ctrl_w)); // NAND DMA / INT Control
 	map(0x007856, 0x007856).w(FUNC(generalplus_gpac800_device::nand_7856_type_w)); // usually 0x0021?
 	map(0x007857, 0x007857).w(FUNC(generalplus_gpac800_device::nand_7857_w));
@@ -1776,6 +1823,13 @@ void sunplus_gcm394_base_device::device_reset()
 	m_spg_video->reset();
 }
 
+void generalplus_gpac800_device::device_start()
+{
+	sunplus_gcm394_base_device::device_start();
+
+	save_item(NAME(m_nand_write_buffer));
+}
+
 void generalplus_gpac800_device::device_reset()
 {
 	sunplus_gcm394_base_device::device_reset();
@@ -1789,6 +1843,8 @@ void generalplus_gpac800_device::device_reset()
 	m_nand_785b = 0x0000;
 	m_nand_7856 = 0x0000;
 	m_nand_7857 = 0x0000;
+	m_curblockaddr = 0;
+	memset(m_nand_write_buffer, 0x0000, sizeof(m_nand_write_buffer));
 }
 
 IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
@@ -1911,3 +1967,4 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 }
 
 
+// license:BSD-3-Clause
