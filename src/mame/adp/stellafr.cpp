@@ -240,8 +240,6 @@ private:
 	void ay8910_portb_w(uint8_t data);
 	void lamps_w(uint8_t row, uint16_t data);
 
-	void st_in(uint8_t data);
-
 	void mem_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
 
@@ -281,11 +279,6 @@ void stellafr_state::lamps_w(uint8_t row, uint16_t data)
 		bool lamp_value = BIT(data, i);
 		m_lamps[lamp_index] = lamp_value;
 	}
-}
-
-void stellafr_state::st_in(uint8_t data)
-{
-	m_outst = data;
 }
 
 void stellafr_state::mux_w(uint8_t data)
