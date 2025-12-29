@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "cpu/mcs51/i80c52.h"
 #include "bus/midi/midi.h"
+#include "sound/sam8905.h"
+#include "speaker.h"
 #include "debugger.h"
 
 #define LOG_SERIAL (1U << 1)
@@ -36,6 +38,8 @@ public:
     keyfox10_state(const machine_config &mconfig, device_type type, const char *tag)
         : driver_device(mconfig, type, tag)
         , m_maincpu(*this, "maincpu")
+        , m_sam_snd(*this, "sam_snd")
+        , m_sam_fx(*this, "sam_fx")
         , m_midi_out(*this, "mdout")
         , m_rom(*this, "program")
     { }
@@ -78,6 +82,8 @@ private:
     void midi_rxd_w(int state) { m_midi_rxd = state; }
 
     required_device<i80c32_device> m_maincpu;
+    required_device<sam8905_device> m_sam_snd;
+    required_device<sam8905_device> m_sam_fx;
     required_device<midi_port_device> m_midi_out;
     required_region_ptr<u8> m_rom;
     u8 m_port0 = 0xff;
@@ -327,78 +333,24 @@ void keyfox10_state::sam_fx_w(offs_t offset, u8 data)
 
 u8 keyfox10_state::sam8905_r(int chip, offs_t offset)
 {
-    sam8905_state &sam = m_sam[chip];
+    sam8905_device &sam_dev = chip ? *m_sam_fx : *m_sam_snd;
     const char *chip_name = chip ? "FX" : "SND";
 
-    u8 a2 = BIT(offset, 2);
-    u8 a1 = BIT(offset, 1);
-    u8 a0 = BIT(offset, 0);
-    bool sel_aram = BIT(sam.ctrl, 1);  // SEL bit
+    // Pass through to actual SAM8905 device
+    u8 data = sam_dev.read(offset);
+    LOGMASKED(LOG_SAM, "SAM[%s] read [%d] = 0x%02X\n", chip_name, offset, data);
 
-    if (a2)
-    {
-        // A2=1: Control register (write-only, return 0xff)
-        LOGMASKED(LOG_SAM, "SAM[%s] read ctrl (invalid)\n", chip_name);
-        return 0xff;
-    }
-
-    if (a1 == 0 && a0 == 0)
-    {
-        // A2=0, A1=0, A0=0: Read interrupt status
-        LOGMASKED(LOG_SAM, "SAM[%s] read interrupt status\n", chip_name);
-        return 0x00;  // TODO: implement interrupt status
-    }
-
-    // Data read from A-RAM or D-RAM
-    if (sel_aram)
-    {
-        // A-RAM: 15-bit words, accessed via 2 bytes
-        u16 word = sam.aram[sam.addr % 256];
-        if (a1 == 0 && a0 == 1)
-        {
-            // LSB
-            LOGMASKED(LOG_SAM, "SAM[%s] A-RAM[0x%02X] read LSB = 0x%02X\n", chip_name, sam.addr, word & 0xff);
-            return word & 0xff;
-        }
-        else if (a1 == 1 && a0 == 0)
-        {
-            // MSB (bit 7 undefined)
-            LOGMASKED(LOG_SAM, "SAM[%s] A-RAM[0x%02X] read MSB = 0x%02X\n", chip_name, sam.addr, (word >> 8) & 0x7f);
-            return (word >> 8) & 0x7f;
-        }
-    }
-    else
-    {
-        // D-RAM: 19-bit words, accessed via 3 bytes
-        u32 word = sam.dram[sam.addr % 256];
-        if (a1 == 0 && a0 == 1)
-        {
-            // LSB
-            LOGMASKED(LOG_SAM, "SAM[%s] D-RAM[0x%02X] read LSB = 0x%02X\n", chip_name, sam.addr, word & 0xff);
-            return word & 0xff;
-        }
-        else if (a1 == 1 && a0 == 0)
-        {
-            // NSB (next significant byte)
-            LOGMASKED(LOG_SAM, "SAM[%s] D-RAM[0x%02X] read NSB = 0x%02X\n", chip_name, sam.addr, (word >> 8) & 0xff);
-            return (word >> 8) & 0xff;
-        }
-        else if (a1 == 1 && a0 == 1)
-        {
-            // MSB (5 high bits undefined)
-            LOGMASKED(LOG_SAM, "SAM[%s] D-RAM[0x%02X] read MSB = 0x%02X\n", chip_name, sam.addr, (word >> 16) & 0x07);
-            return (word >> 16) & 0x07;
-        }
-    }
-
-    LOGMASKED(LOG_SAM, "SAM[%s] read: [0x%04X] (unhandled)\n", chip_name, 0x8000 + offset);
-    return 0xff;
+    return data;
 }
 
 void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
 {
     sam8905_state &sam = m_sam[chip];
+    sam8905_device &sam_dev = chip ? *m_sam_fx : *m_sam_snd;
     const char *chip_name = chip ? "FX" : "SND";
+
+    // Pass through to actual SAM8905 device
+    sam_dev.write(offset, data);
 
     u8 a2 = BIT(offset, 2);
     u8 a1 = BIT(offset, 1);
@@ -664,6 +616,21 @@ void keyfox10_state::keyfox10(machine_config &config)
     midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
     mdin.rxd_handler().set(FUNC(keyfox10_state::midi_rxd_w));
     MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+
+    // Sound - two SAM8905 DSP chips
+    SPEAKER(config, "lspeaker").front_left();
+    SPEAKER(config, "rspeaker").front_right();
+
+    // SAM8905 SND - sound generation (at 0x8000 when T1=1)
+    // Clock: 22.5792 MHz / 1024 = 22.05 kHz sample rate
+    SAM8905(config, m_sam_snd, 22'579'200);
+    m_sam_snd->add_route(0, "lspeaker", 1.0);
+    m_sam_snd->add_route(1, "rspeaker", 1.0);
+
+    // SAM8905 FX - effects processor (at 0xE000 when T1=1)
+    SAM8905(config, m_sam_fx, 22'579'200);
+    m_sam_fx->add_route(0, "lspeaker", 1.0);
+    m_sam_fx->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START(keyfox10)
@@ -674,4 +641,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME      FLAGS
-SYST( 1990, keyfox10, 0,      0,      keyfox10, keyfox10, keyfox10_state, empty_init, "Wersi", "Keyfox 10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+SYST( 1990, keyfox10, 0,      0,      keyfox10, keyfox10, keyfox10_state, empty_init, "Wersi", "Keyfox 10",  MACHINE_NOT_WORKING )
