@@ -280,6 +280,7 @@ Capcom ZN-1 generic PCB Layout
 
 Main board (Standard ZN-1 Main Board with Capcom ZN-1 BIOS)
 ZN-1 1-659-709-12  COH-1000C
+Some PCBs have an additional sticker 'COH-1002C'. The '2' means there are 2 VRAMs populated.
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
 |                     |---------------------------|      |
@@ -321,12 +322,13 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000C.353, Capcom ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
-      814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
-      *              - Unpopulated position for KM4132G271Q-12 SGRAM
-      KM48V514BJ-6   - 512k x8 (4MBit) DRAM (SOJ28)
+      BIOS           - COH1000C.353, Capcom ZN-1 BIOS, 4Mbit mask ROM type M534002 (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM (SOP24)
+      814260-70      - 256kB x16 (4Mbit) DRAM (SOJ40)
+      KM4132G271Q-12 - 128kB x32 x2 banks (32Mbit) SGRAM (QFP100)
+      *              - Position for KM4132G271Q-12 SGRAM. Usually not populated but games with sticker
+                       'COH-1002C' have this VRAM populated.
+      KM48V514BJ-6   - 512kB x8 (4Mbit) DRAM (SOJ28)
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'CP01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
@@ -372,17 +374,17 @@ Notes:
       PAL2   - PALCE16V8 stamped "BANK01"
       PAL3   - PALCE16V8 stamped "CS0CNT"
       4.2H   - 27C4002 DIP40 EPROM labelled 'GPAJ_04'
-      5.3H   - uPD23C32020CZ 32MBit DIP42 MaskROM labelled 'GRA-05M'
-      6.4H   - uPD23C32020CZ 32MBit DIP42 MaskROM labelled 'GRA-06M'
-      7.5H   - uPD23C32020CZ 32MBit DIP42 MaskROM labelled 'GRA-07M'
-      8464   - 8K x8 SRAM
+      5.3H   - uPD23C32020CZ 32Mbit DIP42 mask ROM labelled 'GRA-05M'
+      6.4H   - uPD23C32020CZ 32Mbit DIP42 mask ROM labelled 'GRA-06M'
+      7.5H   - uPD23C32020CZ 32Mbit DIP42 mask ROM labelled 'GRA-07M'
+      8464   - 8kB x8 SRAM
       LM833  - National Semiconductor Dual Audio Operational Amplifier
       NE5532 - Fairchild Semiconductor Dual Operational Amplifier
       M54532 - Mitsubishi M54532 IC, connected to CN2
-      93C46  - 128Bytes EEPROM
+      93C46  - 128 byte EEPROM
       TDA1543- PHILIPS Dual 16-bit DAC
       CAPCOM-Q1 - Q-Sound chip also stamped DL-1425 45570 9420S 40 (C)92 AT&T (PLCC84)
-      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom? what is this chip for? Z80 northbridge?(address decode, etc)
+      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom
       Z80 clock - 8.000MHz
 
       Unpopulated sockets - 1.3B, 2.2E, 3.3E, 8.2K, 9.3K, 10.4K, 11.5K, 12.6K & 13.7K
@@ -397,7 +399,7 @@ PCB Layouts
 -----------
 
 1-665-825-11
-ZN-2 COH-3000 (sticker says COH-3002C denoting Capcom ZN2 BIOS version)
+ZN-2 COH-3000 (sticker says COH-3002C denoting Capcom ZN2 BIOS version with 2 VRAMs populated)
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
 |                     |---------------------------|      |
@@ -439,10 +441,10 @@ Notes:
       S301  - Slide switch for stereo or mono sound output
       S551  - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH-3002C.353, Capcom ZN2 BIOS 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM
-      814260-70      - 256K x16 (4MBit) DRAM
-      KM4132G271BQ-8 - 128K x 32Bit x 2 Banks SGRAM
+      BIOS           - COH-3002C.353, Capcom ZN2 BIOS 4Mbit mask ROM type M534002 (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM
+      814260-70      - 256kB x16 (4Mbit) DRAM
+      KM4132G271BQ-8 - 128kB x 32bit x 2 Banks SGRAM
       KM416V1204BT-L5- 1M x16 EDO DRAM
       EPM7064        - Altera EPM7064QC100 CPLD (QFP100)
       CAT702         - Protection chip labelled 'CP10' (DIP20)
@@ -491,41 +493,41 @@ Notes:
       PAL1   - PAL16L8 stamped "CS1CNT"
       PAL2   - PALCE16V8 stamped "BANK02"
       PAL3   - PALCE16V8 stamped "MEMDEC"
-      N341256- 32K x8 SRAM
+      N341256- 32kB x8 SRAM
       LM833  - National Semiconductor Dual Audio Operational Amplifier
       NE5532 - Fairchild Semiconductor Dual Operational Amplifier
       M54532 - Mitsubishi M54532 IC, connected to CN2
-      93C46  - 128Bytes EEPROM
+      93C46  - 128 byte EEPROM
       TDA1543- PHILIPS Dual 16-bit DAC
       CAPCOM-Q1 - Q-Sound chip also stamped DL-1425 11008 9741T 74 (C)92 LUCENT (PLCC84)
-      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom? what is this chip for? Z80 northbridge?(address decode, etc)
+      C.P.S.2-B - RF5C320 CAPCOM C.P.S.2-B DL-3129 (QFP208) - Ricoh custom
       Z80 clock - 8.000MHz
       ROMs      -
                   SFEX2
-                       1.3A   - uPD23C32020CZ 32MBit DIP42 MaskROM labelled 'EX2-01M'
+                       1.3A   - uPD23C32020CZ 32Mbit DIP42 mask ROM labelled 'EX2-01M'
                        2.2E   - 27C1001 DIP32 EPROM labelled 'EX2_02'
                        4.2H   - 27C240 DIP40 EPROM labelled 'EX2J_04'
-                       5.3H   - 64MBit DIP42 MaskROM labelled 'EX2-05M'  \
-                       6.4H   - 64MBit DIP42 MaskROM labelled 'EX2-06M'  |
-                       7.5H   - 64MBit DIP42 MaskROM labelled 'EX2-07M'  |  Unknown type manufactured by Sharp
-                       8.2K   - 64MBit DIP42 MaskROM labelled 'EX2-08M'  /
-                       9.3K   - uPD23C32020CZ 32MBit DIP42 MaskROM labelled 'EX2-09M'
+                       5.3H   - 64Mbit DIP42 mask ROM labelled 'EX2-05M'  \
+                       6.4H   - 64Mbit DIP42 mask ROM labelled 'EX2-06M'  |
+                       7.5H   - 64Mbit DIP42 mask ROM labelled 'EX2-07M'  |  Unknown type manufactured by Sharp
+                       8.2K   - 64Mbit DIP42 mask ROM labelled 'EX2-08M'  /  Probably LH5364000
+                       9.3K   - uPD23C32020CZ 32Mbit DIP42 mask ROM labelled 'EX2-09M'
                        Unpopulated sockets on SFEX2 - 3.3E, 10.4K, 11.5K, 12.6K & 13.7K
 
                   Rival Schools
-                       1.3A   - M533203E 32MBit DIP42 MaskROM labelled 'JST-01M'
+                       1.3A   - M533203E 32Mbit DIP42 mask ROM labelled 'JST-01M'
                        2.2E   - 27C1001 DIP32 EPROM labelled 'JST_02'
                        3.3E   - 27C1001 DIP32 EPROM labelled 'JST_03'
                        4.2H   - 27C240 DIP40 EPROM labelled 'JSTJ_04A'
-                       5.3H   - M533203E 32MBit DIP42 MaskROM labelled 'JST-05M'
-                       6.4H   - M533203E 32MBit DIP42 MaskROM labelled 'JST-06M'
-                       7.5H   - M533203E 32MBit DIP42 MaskROM labelled 'JST-07M'
-                       8.2K   - TC5332202 32MBit DIP42 MaskROM labelled 'JST-08M'
-                       9.3K   - TC5332202 32MBit DIP42 MaskROM labelled 'JST-09M'
-                       10.4K  - TC5332202 32MBit DIP42 MaskROM labelled 'JST-10M'
-                       11.5K  - GM23C32100A 32MBit DIP42 MaskROM labelled 'JST-11M'
-                       12.6K  - GM23C32100A 32MBit DIP42 MaskROM labelled 'JST-12M'
-                       13.7K  - GM23C32100A 32MBit DIP42 MaskROM labelled 'JST-13M'
+                       5.3H   - M533203E 32Mbit DIP42 mask ROM labelled 'JST-05M'
+                       6.4H   - M533203E 32Mbit DIP42 mask ROM labelled 'JST-06M'
+                       7.5H   - M533203E 32Mbit DIP42 mask ROM labelled 'JST-07M'
+                       8.2K   - TC5332202 32Mbit DIP42 mask ROM labelled 'JST-08M'
+                       9.3K   - TC5332202 32Mbit DIP42 mask ROM labelled 'JST-09M'
+                       10.4K  - TC5332202 32Mbit DIP42 mask ROM labelled 'JST-10M'
+                       11.5K  - GM23C32100A 32Mbit DIP42 mask ROM labelled 'JST-11M'
+                       12.6K  - GM23C32100A 32Mbit DIP42 mask ROM labelled 'JST-12M'
+                       13.7K  - GM23C32100A 32Mbit DIP42 mask ROM labelled 'JST-13M'
                        Unpopulated sockets on Rival Schools - None
 */
 
@@ -677,6 +679,9 @@ protected:
 
 Main board (Standard ZN-1 Main Board with Taito FX-1 BIOS)
 ZN-1 1-659-709-12  COH-1000T
+Some PCBs have an additional sticker 'COH-1002T'. The '2' means there are 2 VRAMs populated.
+Taito main boards have an additional game sticker.
+Sticker for Raystorm: K11X0831A RAY STORM
 |--------------------------------------------------------|
 |  LA4705             |---------------------------|      |
 |                     |---------------------------|      |
@@ -718,20 +723,21 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000T.353, Taito FX-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
-      814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
-      *              - Unpopulated position for KM4132G271Q-12 SGRAM
-      KM48V514BJ-6   - 512k x8 (4MBit) DRAM (SOJ28)
+      BIOS           - COH1000T.353, Taito FX-1 BIOS, 4Mbit mask ROM type M534002 (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM (SOP24)
+      814260-70      - 256kB x16 (4Mbit) DRAM (SOJ40)
+      KM4132G271Q-12 - 128kB x32 x2 banks (32Mbit) SGRAM (QFP100)
+      *              - Position for KM4132G271Q-12 SGRAM. Usually not populated but games with sticker
+                       'COH-1002T' have this VRAM populated.
+      KM48V514BJ-6   - 512kB x8 (4Mbit) DRAM (SOJ28)
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
       NEC_78081G503  - NEC uPD78081 MCU, 5MHz
 
 
-Game board
-----------
+Game boards
+-----------
 
 SROM PCB-A
 K11X0643A PSYCHIC FORCE
@@ -767,77 +773,20 @@ M43J0308A 238102270
 |--------------------------------------------|
 Notes:
       IC1, IC6     \
-      IC12, IC20   |   - Unpopulated positions for 16MBit SOP44 MaskROM
+      IC12, IC20   |   - Unpopulated positions for 16Mbit SOP44 mask ROM
       IC27         /
       E22-01, E22-02 \
-      E22-03, E22-04 / - 23C16000 16MBit SOP44 MaskROMs
-      E22-05, E22-10   - 27C040 4MBit DIP32 EPROM
-      E22-07           - 27C010 1MBit DIP32 EPROM
+      E22-03, E22-04 / - 23C16000 16Mbit SOP44 mask ROMs
+      E22-05, E22-10   - 27C040 4Mbit DIP32 EPROM
+      E22-07           - 27C010 1Mbit DIP32 EPROM
       E18-06           - AMD MACH111 CPLD stamped 'E18-06' (PLCC44)
-      LH5268AN-10LL    - Sharp 8K x8 SRAM (SOP28)
+      LH5268AN-10LL    - Sharp 8kB x8 SRAM (SOP28)
       CAT702           - Protection chip labelled 'TT03' (DIP20)
       MB3773           - Power Supply Monitor with Watch Dog Timer (i.e. Reset IC)
       MB87078          - Electronic Volume Control IC
       84C000AM-6       - Z80-A; clock 4.000MHz
       YM2610           - clock 8.000MHz
 
-Main board (Standard ZN-1 Main Board with Taito FX-1 BIOS)
-ZN-1 1-659-709-12  COH-1000T
-K11X0831A RAY STORM
-|--------------------------------------------------------|
-|  LA4705             |---------------------------|      |
-|                     |---------------------------|      |
-|    AKM_AK4310VM      AT28C16                           |
-|  VOL                                                   |
-|       SW1            BIOS                              |
-|  TD62064                                               |
-|  TD62064        PALCE16V8                              |
-|J                                                       |
-|                                                        |
-|A                EPM7032    814260    CXD2922CQ         |
-|                                                        |
-|M                                                       |
-|                                                        |
-|M                                                       |
-|                *                                       |
-|A           DSW                                         |
-|                                CXD8561Q    CXD8530CQ   |
-|                KM4132G271Q-12                          |
-|CN505  CN506                   53.693MHz    67.737MHz   |
-|            CAT702                                      |
-|                                                        |
-|CN504  CN503                                            |
-|                                                        |
-|                                                        |
-|  NEC_78081G503         KM48V514BJ-12   KM48V514BJ-12   |
-|            MC44200FT   KM48V514BJ-12   KM48V514BJ-12   |
-|CN651  CN652            KM48V514BJ-12   KM48V514BJ-12   |
-|                CN654   KM48V514BJ-12   KM48V514BJ-12   |
-|--------------------------------------------------------|
-Notes:
-      CN506 - Connector for optional 3rd player controls
-      CN505 - Connector for optional 4th player controls
-      CN503 - Connector for optional 15kHz external video output (R,G,B,Sync, GND)
-      CN504 - Connector for optional 2nd speaker (for stereo output)
-      CN652 - Connector for optional trackball
-      CN651 - Connector for optional analog controls
-      CN654 - Connector for optional memory card
-      SW1   - Slide switch for stereo or mono sound output
-      DSW   - Dip switch (4 position, defaults all OFF)
-
-      BIOS           - COH1000T.353, Taito FX-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
-      814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
-      *              - Unpopulated position for KM4132G271Q-12 SGRAM
-      KM48V514BJ-6   - 512k x8 (4MBit) DRAM (SOJ28)
-      EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
-      CAT702         - Protection chip labelled 'TT01' (DIP20)
-      PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
-      NEC_78081G503  - NEC uPD78081 MCU, 5MHz
-
-
-Game board
 
 ZROM PCB
 K91J0636A RAY STORM
@@ -873,20 +822,20 @@ M43J0311A 241103582
 |--------------------------------------------|
 Notes:
       IC12, IC13 \
-      IC20, IC21  |  - Unpopulated positions for 16MBit SOP44 MaskROM
+      IC20, IC21  |  - Unpopulated positions for 16Mbit SOP44 mask ROM
       IC25       /
-      IC28           - Unpopulated position for 32MBit SOP44 MaskROM
-      E24-04         - TC5332201 32MBit SOP44 MaskROM
-      E24-02, E24-03 - 23C16000 16MBit SOP44 MaskROM
-      E24-06, E24-05 - M27C4001 4MBit DIP32 EPROM
-      E24-09         - M27C4001 4MBit DIP32 EPROM
+      IC28           - Unpopulated position for 32Mbit SOP44 mask ROM
+      E24-04         - TC5332201 32Mbit SOP44 mask ROM
+      E24-02, E24-03 - 23C16000 16Mbit SOP44 mask ROM
+      E24-06, E24-05 - M27C4001 4Mbit DIP32 EPROM
+      E24-09         - M27C4001 4Mbit DIP32 EPROM
       E24-01         - AMD MACH111 CPLD stamped 'E24-01' (PLCC44)
-      LH52B256       - Sharp 32K x8 SRAM (SOP28)
-      LC321664       - Sanyo 64K x16 EDO DRAM (SOP40)
+      LH52B256       - Sharp 32kB x8 SRAM (SOP28)
+      LC321664       - Sanyo 64kB x16 EDO DRAM (SOP40)
       MN1020012A     - Panasonic MN1020012A Sound CPU (QFP128)
       ZSG-2          - Zoom Corp ZSG-2 sound DSP (QFP100)
       TMS57002DPHA   - Texas Instruments TMS57002DPHA sound DSP (QFP80)
-      M66220FP       - 256 x8bit Mail-Box Inter-MPU data transfer
+      M66220FP       - 256b x8bit Mail-Box Inter-MPU data transfer
       CAT702         - Protection chip labelled 'TT04' (DIP20)
       MB3773         - Power Supply Monitor with Watch Dog Timer (i.e. Reset IC)
       MB87078        - Electronic Volume Control IC
@@ -1177,11 +1126,11 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000W.353, Time Warner ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
-      814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
-      KM48V2104AT-6  - Bank0: 2M x8 (16MBit) DRAM (SOP28).
+      BIOS           - COH1000W.353, Time Warner ZN-1 BIOS, 4Mbit mask ROM type M534002 (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM (SOP24)
+      814260-70      - 256kB x16 (4Mbit) DRAM (SOJ40)
+      KM4132G271Q-12 - 128kB x32 x2 banks (32Mbit) SGRAM (QFP100)
+      KM48V2104AT-6  - Bank0: 2M x8 (16Mbit) DRAM (SOP28).
                        * - Note Bank1 is empty.
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'TW01' (DIP20)
@@ -1445,11 +1394,11 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1002E.353, Raizing/8ing ZN-1 BIOS, 4MBit MaskROM type M53402CZ (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
-      814260-70      - 256K x16 (4MBit) DRAM (SOJ40)
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
-      KM48V514BJ-6   - 512k x8 (4MBit) DRAM (SOJ28)
+      BIOS           - COH1002E.353, Raizing/8ing ZN-1 BIOS, 4Mbit mask ROM type M53402CZ (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM (SOP24)
+      814260-70      - 256kB x16 (4Mbit) DRAM (SOJ40)
+      KM4132G271Q-12 - 128kB x32 x2 banks (32Mbit) SGRAM (QFP100)
+      KM48V514BJ-6   - 512kB x8 (4Mbit) DRAM (SOJ28)
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'ET01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
@@ -1490,11 +1439,11 @@ RA9701 SUB
 |--------------------------------------|
 Notes:
       CAT702              - protection chip labelled 'ET02' (DIP20)
-      ROMs 217, 216 & 326 - surface mounted 32MBit mask ROM (SOP44)
+      ROMs 217, 216 & 326 - 32Mbit mask ROM (SOP44)
       ROMs 042 & 046      - 27C2001 EPROM
       ROMs 212 to 215     - 27C4001 EPROM
       MAIN_IF2 & SUB_IF2  - AMD Mach211 CPLD (PLCC44)
-      M628032             - 32K x8 SRAM, equivalent to 62256 SRAM (SOJ28)
+      M628032             - 32kB x8 SRAM, equivalent to 62256 SRAM (SOJ28)
       68000 clock         - 12MHz
       YMF271-F clock      - 16.93MHz
 
@@ -1534,13 +1483,13 @@ PS9805
 Notes:
       *                   - Unpopulated ROM positions.
       CAT702              - protection chip labelled 'MG11' (DIP20)
-      ROM-x               - surface mounted 32MBit mask ROM (SOP44)
+      ROM-x               - 32Mbit mask ROM (SOP44)
       ROMs 412 & 049      - 27C040 EPROM
-      MASK4A              - smt solder pads (unpopulated)
+      MASK4A              - SOP44 solder pads (unpopulated)
       MASK4B              - DIP42 socket (unpopulated)
-      FLASHx              - surface mounted TSOP56 16MBit FlashROM type Sharp LH28F160S5T-L10
+      FLASHx              - TSOP56 16Mbit flash ROM type Sharp LH28F160S5T-L10
       MAIN_IF2 & SUB_IF2  - AMD Mach211 CPLD (PLCC44)
-      N341256             - 32K x8 SRAM, equivalent to 62256 SRAM (SOJ28)
+      N341256             - 32kB x8 SRAM, equivalent to 62256 SRAM (SOJ28)
       68000 clock         - 12MHz
       YMF271-F clock      - 16.93MHz
 */
@@ -1776,17 +1725,20 @@ MTR990601-(A)
 |----------------------------------------------|
 Notes:
        * - Not populated
-   FLASH - MX29F1610 SOP44 flashROMs
-MTR-BAM* - DIP42 32MBit maskROMs
+   FLASH - MX29F1610 SOP44 flash ROMs
+MTR-BAM* - DIP42 32Mbit mask ROMs
   TC9293 - Toshiba TC9293 Modulation System DAC with Analog Filter
     4560 - JRC 4560 Op Amp
      SEC - CAT702 security IC
  CN3/CN5 - Connectors for ? (controls?)
   IDE-40 - 40 Pin flat cable connector for IDE HDD
            HDD is 3.5" Quantum Fireball CR 4.3AT
-*/
+           Note: Game is married to the factory-supplied HDD brand+model and swapping in a different (replacement)
+           HDD will result in an error at boot-up. The HDD check is done by the H8/3644 MCU. If the HDD needs to
+           be replaced use an identical brand/model. If and/or when the MCU is decapped the check can be modified
+           or removed.
 
-/*
+MCU Notes:
     H8/3644 MCU comms: there are 4 16-bit read/write ports
 
     Port 0: (R) unknown
@@ -1937,29 +1889,18 @@ protected:
 };
 
 /*
-
-Judge Dread
-
-light-gun type shooting game
-
-Uses the Sony ZN-1 hardware with Rom board and
-Hard disk Drive
-
-U35 and U36 EPROMs are 27c1001 are believed to be the BIOS
-data.
-
-Disk Drive is a Quantum ????2.1 GB??
-
-connectors CN506 and CN505 are the gun inputs pins 13, 14, 15
-white/blue/ black respectively.   The + 5 (red) is separate source (not
-from the CN506 or Cn505).
-
-You'll have to get the +5 for the guns from the jamma harness.
+Judge Dredd (light-gun type shooting game)
+Uses the Sony ZN-1 hardware with ROM board and HDD.
+U35 and U36 EPROMs are 27C1001.
+Disk Drive is a Quantum 2.1GB
+Connectors CN506 and CN505 are the gun inputs pins 13/14/15, white/blue/black respectively.
+The +5V (red) is separate source (not from the CN506 or CN505).
+You'll have to get the +5V for the guns from the JAMMA harness.
+--------------
 
 
-NBA Jam Extreme
-Acclaim, 1996
-
+NBA Jam Extreme, Acclaim, 1996
+------------------------------
 
 Main board (Standard ZN-1 Main Board with Acclaim ZN-1 BIOS)
 ZN-1 1-659-709-11  COH-1000A
@@ -2004,11 +1945,11 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1000A.353, Acclaim ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM (SOP24)
-      TC51V4260BJ-80 - 256K x16 (4MBit) DRAM (SOJ40)
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM (QFP100)
-      424805AL-A60   - 512k x8 (4MBit) DRAM (SOJ28)
+      BIOS           - COH1000A.353, Acclaim ZN-1 BIOS, 4Mbit mask ROM type M534002 (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM (SOP24)
+      TC51V4260BJ-80 - 256kB x16 (4Mbit) DRAM (SOJ40)
+      KM4132G271Q-12 - 128kB x32 x2 banks (32Mbit) SGRAM (QFP100)
+      424805AL-A60   - 512kB x8 (4Mbit) DRAM (SOJ28)
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'AC01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
@@ -2050,15 +1991,15 @@ PCB-100102
 Notes:
       CN1      - 40 pin IDC connector (for 40 pin flat cable joining game PCB to sound PCB)
       CAT702   - protection chip labelled 'AC02' (DIP20)
-      71256    - 32K x8 SRAM
+      71256    - 32kB x8 SRAM
       BATT_3V  - 3 Volt coin battery (CR2032)
       ADM619AR - 900MHz RF Transceiver (SOIC16, compatible to AD6190)
       A1425    - Actel A1425A-2 PQ100C 9536 (FPGA, QFP100, labelled 'PD-11010A REV A 05/21 C/S EEC1')
       U35, U36 - 27C080 DIP32 EPROM
       U21, U22 - Unpopulated positions for DIP32 EPROM
-      U6, U20  - Unpopulated position for SOP44 MaskROM
+      U6, U20  - Unpopulated position for SOP44 mask ROM
       U3  to  U6  \
-      U17 to U19  |  surface mounted 32MBit SOP44 MaskROM
+      U17 to U19  |  32Mbit SOP44 mask ROM
       U28 to U31  |
       U41 to U44  /
 
@@ -2095,14 +2036,14 @@ PCB-100095
 Notes:
       CN1       - 40 pin IDC connector (for 40 pin flat cable joining sound PCB to game PCB)
       AD1866    - Dual 16bit Audio DAC
-      52258     - Sharp LH52258 32K x8 SRAM (SOJ28)
+      52258     - Sharp LH52258 32kB x8 SRAM (SOJ28)
       TDA7240A  - 20W Bridge Amplifier
       LMC6484   - CMOS Quad Rail-to-Rail Input and Output Operational Amplifier
       MACH111   - AMD MACH111 CPLD (PLCC44, labelled '360 PLD-A1 CS=0794')
-      ADSP-2181 - Analog Devices DSP (QFP128, 16Bit, 40 MIPs, 5V, 2 serial ports, 16Bit internal DMA
-                  port, a byte DMA port, programmable timer, 80K on-chip memory configured as
-                  16K words (24 Bit) RAM and 16K data (16Bit) RAM
-      U48, U49  - 32MBit DIP42 MaskROM
+      ADSP-2181 - Analog Devices DSP (QFP128, 16bit, 40 MIPs, 5V, 2 serial ports, 16bit internal DMA
+                  port, a byte DMA port, programmable timer, 80kB on-chip memory configured as
+                  16K-words program RAM and 16K-words data RAM)
+      U48, U49  - 32Mbit DIP42 mask ROM
       U52       - 27C040 DIP32 EPROM labelled '360-SND-A1 IC110345 CS = 7D5A'
       *         - Unpopulated DIP42 socket
 */
@@ -2403,11 +2344,11 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - coh1001l.353, Atlus ZN-1 BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM
-      814260         - 256K x16 (4MBit) DRAM
-      MB81G83222-012 - 128K x32 x2 banks (32MBit) SGRAM
-      KM48V514BJ-6   - 512k x8 (4MBit) DRAM
+      BIOS           - COH1001L.353, Atlus ZN-1 BIOS, 4Mbit mask ROM type M534002 (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM
+      814260         - 256kB x16 (4Mbit) DRAM
+      MB81G83222-012 - 128kB x32 x2 banks (32Mbit) SGRAM
+      KM48V514BJ-6   - 512kB x8 (4Mbit) DRAM
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'AT01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
@@ -2452,7 +2393,7 @@ Notes:
       PAL(2)  - labelled 'ROM2'
       PAL(3)  - labelled 'ROM3'
       CAT702  - Protection chip labelled 'AT02' (DIP20)
-      62256   - 32K x8 SRAM
+      62256   - 32kB x8 SRAM
 
       ATHG-01B.18   - Main program (27C040 EPROM)
       ATHG-02B.17   /
@@ -2460,10 +2401,10 @@ Notes:
       ATHG-03.22    - Sound program (27C010 EPROM)
       ATHG-04.21    /
 
-      ATHG-05.4136  - Sound data (16MBit DIP42 mask ROM)
+      ATHG-05.4136  - Sound data (16Mbit DIP42 mask ROM)
       ATHG-06.4134  /
 
-      ATHG-07.027   - Graphics data (32MBit DIP42 mask ROM)
+      ATHG-07.027   - Graphics data (32Mbit DIP42 mask ROM)
       ATHG-08.028   /
       ATHG-09.210   /
       ATHG-10.029   /
@@ -2692,11 +2633,11 @@ Notes:
       SW1   - Slide switch for stereo or mono sound output
       DSW   - Dip switch (4 position, defaults all OFF)
 
-      BIOS           - COH1002M.353, Tecmo TPS System BIOS, 4MBit MaskROM type M534002 (SOP40)
-      AT28C16        - Atmel AT28C16 2K x8 EEPROM
-      M5M44260       - 256K x16 (4MBit) DRAM
-      KM4132G271Q-12 - 128K x32 x2 banks (32MBit) SGRAM
-      KM48V514BJ-6   - 512k x8 (4MBit) DRAM
+      BIOS           - COH1002M.353, Tecmo TPS System BIOS, 4Mbit mask ROM type M534002 (SOP40)
+      AT28C16        - Atmel AT28C16 2kB x8 EEPROM
+      M5M44260       - 256kB x16 (4Mbit) DRAM
+      KM4132G271Q-12 - 128kB x32 x2 banks (32Mbit) SGRAM
+      KM48V514BJ-6   - 512kB x8 (4Mbit) DRAM
       EPM7032        - Altera EPM7032QC44-15 CPLD labelled 'ZN1A' (QFP44)
       CAT702         - Protection chip labelled 'MG01' (DIP20)
       PALCE16V8      - PAL, labelled 'ZN1A' (PLCC20)
@@ -2737,7 +2678,7 @@ Tecmo TPS1-7
 |--------------------------------------|
 Notes:
       There are a few unpopulated positions on this game board, including
-      4 unpopulated positions for 4x 32MBit smt SOP44 mask ROMs
+      4 unpopulated positions for 4x 32Mbit SOP44 mask ROMs
       1 unpopulated position for uPD72103AG near the D43001 RAM
       2 unpopulated positions for 2 connectors near the Z80 ROM possibly for a network link?
       1 unpopulated position for a PAL16V8 near ROM 'CBAJ2'
@@ -2751,12 +2692,12 @@ Notes:
       PAL16V8B(6) labelled 'SOPROM2B'
       CAT702 Protection chip labelled 'MG03' (DIP20)
       3 logic chips near main program ROMs.
-      2x 4MBit EPROMs labelled 'CBAJ1' and 'CBAJ2'
-      1x 2MBit EPROM labelled 'CBAJZ80'
-      9x 32MBit smt SOP44 mask ROMs labelled 'CB-00' through 'CB-08' (Graphics)
-      2x 32MBit smt SOP44 mask ROMs labelled 'CB-SE' and 'CB-V0' (connected to the YMZ280B)
+      2x 4Mbit EPROMs labelled 'CBAJ1' and 'CBAJ2'
+      1x 2Mbit EPROM labelled 'CBAJZ80'
+      9x 32Mbit SOP44 mask ROMs labelled 'CB-00' through 'CB-08' (Graphics)
+      2x 32Mbit SOP44 mask ROMs labelled 'CB-SE' and 'CB-V0' (connected to the YMZ280B)
       LH540202 - CMOS 1024 x 9 Asyncronous FIFO (PLCC32)
-      D43001   - 32K x8 SRAM, equivalent to 62256 SRAM
+      D43001   - 32kB x8 SRAM, equivalent to 62256 SRAM
 
       Z80 clock: 4.000MHz
       VSync    : 60Hz
@@ -2799,9 +2740,9 @@ Notes:
       PAL16V8B labelled 'SOPROM1'
       CAT702 Protection chip labelled 'MG04' (DIP20)
       3 logic chips
-      2x 4MBit EPROMs labelled 'SHMJ-B' and 'SHMJ-A'
-      4x 32MBit smt SOP44 mask ROMs labelled 'SH03, 'SH02', 'SH01' & 'SH00'. There is space
-      for 11 more 32MBit smt SOP44 mask ROMs.
+      2x 4Mbit EPROMs labelled 'SHMJ-B' and 'SHMJ-A'
+      4x 32Mbit SOP44 mask ROMs labelled 'SH03, 'SH02', 'SH01' & 'SH00'. There is space
+      for 11 more 32Mbit SOP44 mask ROMs.
 */
 
 class tecmo_zn_state :

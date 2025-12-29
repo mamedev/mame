@@ -245,7 +245,6 @@ private:
 	void speakres_out2_w(uint8_t data);
 	void stratvox_sn76477_w(uint8_t data);
 	void stratvox_dac_w(uint8_t data);
-	DECLARE_MACHINE_START(speakres);
 
 	void speakres_cpu1_map(address_map &map) ATTR_COLD;
 	void stratvox_cpu1_map(address_map &map) ATTR_COLD;

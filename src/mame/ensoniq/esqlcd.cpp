@@ -168,7 +168,7 @@ void esq2x16_sq1_device::device_add_mconfig(machine_config &config)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------
-void esq2x16_sq1_device::write_char(int data)
+void esq2x16_sq1_device::write_char(uint8_t data)
 {
 	int DisplayCode = data;
 	int LedState;

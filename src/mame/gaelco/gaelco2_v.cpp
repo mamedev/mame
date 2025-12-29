@@ -80,7 +80,10 @@ Multi monitor notes:
 
 #include "emu.h"
 #include "gaelco2.h"
+
 #include "screen.h"
+
+#include <algorithm>
 
 
 /***************************************************************************
@@ -104,7 +107,7 @@ Multi monitor notes:
 
 ***************************************************************************/
 
-template<unsigned Layer>
+template <unsigned Layer>
 TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info)
 {
 	const u16 data = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + (tile_index << 1)];
@@ -137,8 +140,8 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info)
 
 ***************************************************************************/
 
-template<unsigned Layer>
-TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_dual)
+template <unsigned Layer>
+TILE_GET_INFO_MEMBER(gaelco2_dual_state::get_tile_info_dual)
 {
 	const u16 data = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + (tile_index << 1)];
 	const u16 data2 = m_videoram[(((m_vregs[Layer] >> 9) & 0x07) * 0x2000 / 2) + ((tile_index << 1) + 1)];
@@ -210,7 +213,7 @@ void gaelco2_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 ***************************************************************************/
 
 static constexpr u8 RGB_CHG = 0x08;
-static inline const u8 ADJUST_COLOR(s16 c) { return (c < 0) ? 0 : ((c > 255) ? 255 : c); }
+static constexpr u8 ADJUST_COLOR(s16 c) { return std::clamp<s16>(c, 0, 255); }
 
 // table used for color adjustment
 static const s8 pen_color_adjust[16] = {
@@ -249,7 +252,7 @@ void gaelco2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 
 ***************************************************************************/
 
-VIDEO_START_MEMBER(gaelco2_state,gaelco2)
+void gaelco2_state::video_start()
 {
 	m_videoram = m_spriteram->live();
 
@@ -269,13 +272,13 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2)
 	m_dual_monitor = false;
 }
 
-VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
+void gaelco2_dual_state::video_start()
 {
 	m_videoram = m_spriteram->live();
 
 	// create tilemaps
-	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco2_state::get_tile_info_dual<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
-	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco2_state::get_tile_info_dual<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_pant[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco2_dual_state::get_tile_info_dual<0>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_pant[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaelco2_dual_state::get_tile_info_dual<1>)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
 
 	// set tilemap properties
 	m_pant[0]->set_transparent_pen(0);
@@ -360,6 +363,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			for (int y = 0; y < ysize; y++)
 			{
+				const int ey = yflip ? (ysize - 1 - y) : y;
 				for (int x = 0; x < xsize; x++)
 				{
 					// for each x,y of the sprite, fetch the sprite data
@@ -369,7 +373,6 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 					const bool color_effect = m_dual_monitor ? ((color & 0x3f) == 0x3f) : (color == 0x7f);
 
 					const int ex = xflip ? (xsize - 1 - x) : x;
-					const int ey = yflip ? (ysize - 1 - y) : y;
 
 					if (!color_effect)
 					{ // normal sprite, pen 0 transparent
@@ -388,10 +391,11 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							// get a pointer to the current line in the screen bitmap
 							const int ypos = ((sy + ey * 16 + py) & 0x1ff);
-
-							if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y)) continue;
+							if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y))
+								continue;
 
 							const int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
+							u8 const *const gfx_row = &gfx_src[gfx->rowbytes() * gfx_py];
 							u16 *const srcy = &bitmap.pix(ypos);
 
 							for (int px = 0; px < gfx->width(); px++)
@@ -404,7 +408,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 								const int gfx_px = xflip ? (gfx->width() - 1 - px) : px;
 
 								// get asociated pen for the current sprite pixel
-								const u8 gfx_pen = gfx_src[gfx->rowbytes() * gfx_py + gfx_px];
+								const u8 gfx_pen = gfx_row[gfx_px];
 
 								if ((gfx_pen == 0) || (gfx_pen >= 16)) continue;
 
@@ -461,7 +465,7 @@ u32 gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	return 0;
 }
 
-	/*
+/*
 	The Y-scroll value in rowscroll mode has a very unusual implementation
 	the scroll value seems come from a 0x1000 bit being set in one of the
 	512 rowscroll table entries.
@@ -563,11 +567,11 @@ u32 gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 */
 
-int gaelco2_state::get_rowscrollmode_yscroll(bool first_screen)
+int gaelco2_dual_state::get_rowscrollmode_yscroll(bool first_screen)
 {
 	const u16 base = first_screen ? 0x2000 / 2 : 0x2400 / 2;
 
-	const u8 checkoffsets[32] = {
+	constexpr u8 checkoffsets[32] = {
 		0x02, 0x0e, 0x0a, 0x1b, 0x15, 0x13, 0x04, 0x19,
 		0x0c, 0x1f, 0x08, 0x1d, 0x11, 0x06, 0x17, 0x10,
 		0x01, 0x0d, 0x16, 0x09, 0x1a, 0x05, 0x1e, 0x00,
@@ -587,7 +591,7 @@ int gaelco2_state::get_rowscrollmode_yscroll(bool first_screen)
 	return usescroll;
 }
 
-u32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
+u32 gaelco2_dual_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
 	const int xoff0 = 0x14; // intro scenes align better with 0x13, but test screen is definitely 0x14
 	const int xoff1 = xoff0 - 4;
@@ -601,14 +605,10 @@ u32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int scroll1y = m_videoram[0x2804 / 2] + yoff1;
 
 	if (BIT(m_vregs[0], 15))
-	{
 		scroll0y += get_rowscrollmode_yscroll(true);
-	}
 
 	if (BIT(m_vregs[1], 15))
-	{
 		scroll1y += get_rowscrollmode_yscroll(false);
-	}
 
 	// set y scroll registers
 	m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
@@ -630,5 +630,12 @@ u32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	return 0;
 }
 
-u32 gaelco2_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 0); }
-u32 gaelco2_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return dual_update(screen, bitmap, cliprect, 1); }
+u32 gaelco2_dual_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return dual_update(screen, bitmap, cliprect, 0);
+}
+
+u32 gaelco2_dual_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return dual_update(screen, bitmap, cliprect, 1);
+}

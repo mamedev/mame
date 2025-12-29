@@ -950,7 +950,9 @@ license:CC0-1.0
 		<description>Photonix (version 1.46)</description>
 		<year>1989</year>
 		<publisher>Free Tools Association</publisher>
-		<info name="developer" value="El Mathos, Pad, and ACS" />
+		<info name="developer" value="El Mathos" />
+		<info name="developer" value="Pad" />
+		<info name="developer" value="ACS" />
 		<info name="usage" value="Requires a 1.25M Apple IIgs ROM 00 or ROM 01." />
 		<info name="version" value="1.46" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -3512,7 +3514,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rrbit23">
+	<software name="rrabbit">
 		<description>Reader Rabbit (version 2.3)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>

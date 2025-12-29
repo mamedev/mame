@@ -91,7 +91,7 @@ void hohnadam_state::hohnadam(machine_config &config)
 
 	I8032(config, m_panelcpu, 12000000); // unknown type and clock
 	m_panelcpu->set_addrmap(AS_PROGRAM, &hohnadam_state::panel_map);
-	m_panelcpu->set_addrmap(AS_IO, &hohnadam_state::panel_ext_map);
+	m_panelcpu->set_addrmap(AS_DATA, &hohnadam_state::panel_ext_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HY62256ALJ-70 + CR2032 battery
 

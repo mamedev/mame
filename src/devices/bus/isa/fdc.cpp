@@ -29,6 +29,12 @@ static void pc_dd_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
+static void pc_qd_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
+
 static void pc_hd_floppies(device_slot_interface &device)
 {
 	device.option_add("525hd", FLOPPY_525_HD);
@@ -332,6 +338,8 @@ void isa8_ec1841_0003_device::aux_irq_w(int state)
 void isa8_ec1841_0003_device::device_add_mconfig(machine_config &config)
 {
 	isa8_fdc_xt_device::device_add_mconfig(config);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:0", pc_qd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config.replace(), "fdc:1", pc_qd_floppies, "525dd", isa8_fdc_device::floppy_formats).enable_sound(true);
 
 	BUS_MOUSE(config, "bus_mouse", 0).extint_callback().set(FUNC(isa8_ec1841_0003_device::aux_irq_w));
 }

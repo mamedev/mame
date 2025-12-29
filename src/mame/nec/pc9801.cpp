@@ -2242,6 +2242,11 @@ void pc9801_state::config_video(machine_config &config)
 	m_hgdc[1]->set_display_pixels(FUNC(pc9801_state::hgdc_display_pixels));
 }
 
+void pc9801vm_state::config_video(machine_config &config)
+{
+	pc9801_state::config_video(config);
+	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
+}
 
 void pc9801_state::config_keyboard(machine_config &config)
 {
@@ -2528,8 +2533,6 @@ void pc9801vm_state::pc9801rs(machine_config &config)
 	// TODO: should lock as everything else depending on mode bit 0
 	m_dmac->in_ior_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_r));
 	m_dmac->out_iow_callback<3>().set(m_fdc_2hd, FUNC(upd765a_device::dma_w));
-
-	m_hgdc[1]->set_addrmap(0, &pc9801vm_state::upd7220_grcg_2_map);
 
 //  DAC_1BIT(config, m_dac1bit, 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "mono", 0.15);
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);

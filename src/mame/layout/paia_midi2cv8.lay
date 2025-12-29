@@ -53,24 +53,6 @@ copyright-holders:m1macrophage
 		<text string="MIDI to CV" align="0"><color red="0.7" green="0.7" blue="0.7"/></text>
 	</element>
 
-	<element name="dsw_x">
-		<text string="X"><color red="0.7" green="0.7" blue="0.7"/></text>
-	</element>
-
-	<repeat count="4">
-		<param name="num" start="0" increment="1"/>
-		<element name="dsw_c_~num~">
-			<text string="C~num~"><color red="0.7" green="0.7" blue="0.7"/></text>
-		</element>
-	</repeat>
-
-	<repeat count="3">
-		<param name="num" start="0" increment="1"/>
-		<element name="dsw_m_~num~">
-			<text string="M~num~"><color red="0.7" green="0.7" blue="0.7"/></text>
-		</element>
-	</repeat>
-
 	<repeat count="8">
 		<param name="num" start="1" increment="1"/>
 		<element name="output_number_~num~">
@@ -80,12 +62,11 @@ copyright-holders:m1macrophage
 
 	<!-- Shapes and other UI elements -->
 
-	<element name="white_rect">
-		<rect><color red="0.7" green="0.7" blue="0.7"/></rect>
-	</element>
-
-	<element name="black_rect">
-		<rect><color red="0.0" green="0.0" blue="0.0"/></rect>
+	<element name="power_rect">
+		<image><data><![CDATA[
+			<rect fill="#b3b3b3" x="0" y="0" width="62" height="78" rx="9" ry="9"/>
+			<rect fill="#000000" x="2" y="2" width="58" height="74" rx="7" ry="7"/>
+		]]></data></image>
 	</element>
 
 	<element name="blue_rect">
@@ -132,19 +113,18 @@ copyright-holders:m1macrophage
 		</repeat>
 	</group>
 
-	<group name="dsw_legend">
-		<bounds x="0" y="0" width="9" height="41"/>
-		<element ref="white_rect"><bounds x="0" y="5" width="1" height="19"/></element>
-		<element ref="white_rect"><bounds x="0" y="26" width="1" height="13"/></element>
-		<element ref="dsw_c_0"><bounds x="2" y="5" width="7" height="5"/></element>
-		<element ref="dsw_c_1"><bounds x="2" y="10" width="7" height="5"/></element>
-		<element ref="dsw_c_2"><bounds x="2" y="15" width="7" height="5"/></element>
-		<element ref="dsw_c_3"><bounds x="2" y="20" width="7" height="5"/></element>
-		<element ref="dsw_m_0"><bounds x="2" y="25" width="7" height="5"/></element>
-		<element ref="dsw_m_1"><bounds x="2" y="30" width="7" height="5"/></element>
-		<element ref="dsw_m_2"><bounds x="2" y="35" width="7" height="5"/></element>
-		<element ref="dsw_x"><bounds x="2" y="40" width="7" height="5"/></element>
-	</group>
+	<element name="dsw_legend">
+		<rect><color red="0.7" green="0.7" blue="0.7"/><bounds x="0" y="0" width="1" height="18"/></rect>
+		<rect><color red="0.7" green="0.7" blue="0.7"/><bounds x="0" y="20" width="1" height="13"/></rect>
+		<text string="C0"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="0" width="7" height="4"/></text>
+		<text string="C1"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="5" width="7" height="4"/></text>
+		<text string="C2"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="10" width="7" height="4"/></text>
+		<text string="C3"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="15" width="7" height="4"/></text>
+		<text string="M0"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="20" width="7" height="4"/></text>
+		<text string="M1"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="25" width="7" height="4"/></text>
+		<text string="M2"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="30" width="7" height="4"/></text>
+		<text string="X"><color red="0.7" green="0.7" blue="0.7"/><bounds x="2" y="35" width="7" height="4"/></text>
+	</element>
 
 	<element name="screw">
 		<disk>
@@ -157,12 +137,34 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
+	<element name="midi_rect">
+		<image><data><![CDATA[
+			<rect fill="#b3b3b3" x="0" y="0" width="62" height="122" rx="9" ry="9"/>
+			<rect fill="#000000" x="2" y="2" width="58" height="118" rx="7" ry="7"/>
+		]]></data></image>
+	</element>
+
 	<element name="midi_socket">
-		<disk><color red="0.2" green="0.2" blue="0.2"/></disk>
+		<image><data><![CDATA[
+			<circle fill="#333333" cx="17" cy="17" r="17"/>
+			<circle fill="none" stroke="#000000" cx="17" cy="17" r="14"/>
+			<rect fill="#000000" x="26" y="15" width="5" height="5"/>
+		]]></data></image>
+	</element>
+
+	<element name="output_rect">
+		<image><data><![CDATA[<rect fill="#b3b3b3" width="73" height="25" rx="9" ry="9"/>]]></data></image>
 	</element>
 
 	<element name="output_jack">
-		<disk><color red="0.0" green="0.0" blue="0.0"/></disk>
+		<disk>
+			<color red="0.5" green="0.5" blue="0.5"/>
+			<bounds x="0" y="0" width="14" height="14"/>
+		</disk>
+		<disk>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="3" y="3" width="8" height="8"/>
+		</disk>
 	</element>
 
 	<element name="power_led">
@@ -216,17 +218,17 @@ copyright-holders:m1macrophage
 
 	<group name="output">
 		<bounds width="73" height="25"/>
-		<element ref="white_rect">
+		<element ref="output_rect">
 			<bounds x="0" y="0" width="73" height="25"/>
 		</element>
 		<element ref="output_jack">
-			<bounds x="57" y="7" width="10" height="10"/>
+			<bounds x="53" y="9" width="14" height="14"/>
 		</element>
 		<element ref="output_number_~output_num~">
 			<bounds x="4" y="5" width="5" height="7"/>
 		</element>
 		<group ref="voltage">
-			<bounds x="18" y="8" width="30" height="7"/>
+			<bounds x="14" y="12" width="30" height="7"/>
 		</group>
 	</group>
 
@@ -240,10 +242,9 @@ copyright-holders:m1macrophage
 		<element ref="screw"><bounds x="107" y="7" width="10" height="10"/></element>
 
 		<!-- Power section -->
-		<element ref="white_rect"><bounds x="3" y="31" width="62" height="77"/></element>
-		<element ref="black_rect"><bounds x="5" y="33" width="57" height="73"/></element>
+		<element ref="power_rect"><bounds x="3" y="31" width="62" height="77"/></element>
 		<group ref="dsw"><bounds x="13" y="52" width="15" height="45"/></group>
-		<group ref="dsw_legend"><bounds x="28" y="51" width="9" height="40"/></group>
+		<element ref="dsw_legend"><bounds x="28" y="56" width="9" height="39"/></element>
 		<element ref="screw"><bounds x="16" y="36" width="10" height="10"/></element>
 		<element ref="text_power"><bounds x="40" y="38" width="20" height="10"/></element>
 		<element ref="text_system"><bounds x="13" y="99" width="20" height="6"/></element>
@@ -253,8 +254,7 @@ copyright-holders:m1macrophage
 		<element ref="text_reset_caption"><bounds x="45" y="80" width="8" height="8"/></element>
 
 		<!-- Midi section -->
-		<element ref="white_rect"><bounds x="3" y="117" width="62" height="121"/></element>
-		<element ref="black_rect"><bounds x="5" y="119" width="57" height="117"/></element>
+		<element ref="midi_rect"><bounds x="3" y="117" width="62" height="121"/></element>
 		<element ref="midi_socket"><bounds x="8" y="137" width="35" height="35"/></element>
 		<element ref="midi_socket"><bounds x="8" y="185" width="35" height="35"/></element>
 		<element ref="screw"><bounds x="14" y="227" width="10" height="10"/></element>

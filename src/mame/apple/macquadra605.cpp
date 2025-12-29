@@ -18,6 +18,7 @@
 #include "emu.h"
 
 #include "cuda.h"
+#include "dfac2.h"
 #include "djmemc.h"
 #include "iosb.h"
 #include "macadb.h"
@@ -53,6 +54,7 @@ public:
 		m_primetime(*this, "primetime"),
 		m_macadb(*this, "macadb"),
 		m_cuda(*this, "cuda"),
+		m_dfac2(*this, "dfac2"),
 		m_scc(*this, "scc"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
@@ -76,6 +78,7 @@ private:
 	required_device<primetime_device> m_primetime;
 	required_device<macadb_device> m_macadb;
 	required_device<cuda_device> m_cuda;
+	required_device<dfac2_device> m_dfac2;
 	required_device<z80scc_device> m_scc;
 	required_device<ram_device> m_ram;
 	required_device<nscsi_bus_device> m_scsibus;
@@ -217,6 +220,11 @@ void quadra605_state::macqd605(machine_config &config)
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
+
+	APPLE_DFAC2(config, m_dfac2, 22257);
+	m_dfac2->sda_callback().set(m_cuda, FUNC(cuda_device::set_iic_sda));
+	m_cuda->iic_scl_callback().set(m_dfac2, FUNC(dfac2_device::scl_write));
+	m_cuda->iic_sda_callback().set(m_dfac2, FUNC(dfac2_device::sda_write));
 
 	m_primetime->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
 	m_primetime->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));

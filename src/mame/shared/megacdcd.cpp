@@ -11,13 +11,16 @@
 #include "megacdcd.h"
 
 #define LOG_WARN           (1U << 1)
+#define LOG_COMMAND        (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_WARN)
+#define VERBOSE (LOG_GENERAL | LOG_WARN | LOG_COMMAND)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
 #define LOGWARN(...)         LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGCOMMAND(...)      LOGMASKED(LOG_COMMAND, __VA_ARGS__)
+
 
 #define READ_MAIN (0x0200)
 #define READ_SUB  (0x0300)
@@ -140,7 +143,7 @@
 #define SEK_IRQSTATUS_ACK  (0x1000)
 
 
-DEFINE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device, "lc89510_temp", "lc89510_temp_device")
+DEFINE_DEVICE_TYPE(LC89510_TEMP, lc89510_temp_device, "lc89510_temp", "LC89510 CD Controller")
 
 lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LC89510_TEMP, tag, owner, clock)
@@ -292,6 +295,7 @@ void lc89510_temp_device::CDD_Export(bool neocd_hack)
 
 void lc89510_temp_device::CDD_GetStatus(void)
 {
+	//LOGCOMMAND("$00: CDD_GetStatus\n");
 	uint16_t s = (CDD_STATUS & 0x0f00);
 
 	if ((s == 0x0200) || (s == 0x0700) || (s == 0x0e00))
@@ -301,6 +305,7 @@ void lc89510_temp_device::CDD_GetStatus(void)
 
 void lc89510_temp_device::CDD_Stop()
 {
+	LOGCOMMAND("$01: CDD_Stop\n");
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
 	SCD_STATUS = CDD_STOPPED;
@@ -310,10 +315,28 @@ void lc89510_temp_device::CDD_Stop()
 
 	//neocd
 	NeoCD_StatusHack = 0x0E;
-
-
 }
 
+void lc89510_temp_device::CDD_Handle_TOC_Commands(void)
+{
+	int subcmd = CDD_TX[3];
+	// continously accessed by games
+	//LOGCOMMAND("$02: CDD_Handle_TOC_Commands %02x\n", subcmd);
+
+	CDD_STATUS = (CDD_STATUS & 0xFF00) | subcmd;
+
+	switch (subcmd)
+	{
+		case TOCCMD_CURPOS:    CDD_GetPos();      break;
+		case TOCCMD_TRKPOS:    CDD_GetTrackPos(); break;
+		case TOCCMD_CURTRK:    CDD_GetTrack();   break;
+		case TOCCMD_LENGTH:    CDD_Length();      break;
+		case TOCCMD_FIRSTLAST: CDD_FirstLast();   break;
+		case TOCCMD_TRACKADDR: CDD_GetTrackAdr(); break;
+		case 6:                CDD_GetTrackType(); break; // NGCD, might be wrong, make sure Sega CD doesn't hate it
+		default:               CDD_GetStatus();   break;
+	}
+}
 
 void lc89510_temp_device::CDD_GetPos(void)
 {
@@ -461,6 +484,7 @@ uint32_t lc89510_temp_device::getmsf_from_regs(void)
 
 void lc89510_temp_device::CDD_Play()
 {
+	LOGCOMMAND("$03: CDD_Play\n");
 	CLEAR_CDD_RESULT
 	uint32_t msf = getmsf_from_regs();
 	SCD_CURLBA = cdrom_file::msf_to_lba(msf)-150;
@@ -482,12 +506,12 @@ void lc89510_temp_device::CDD_Play()
 
 
 	NeoCD_StatusHack = 1;
-
 }
 
 
 void lc89510_temp_device::CDD_Seek(void)
 {
+	LOGCOMMAND("$04: CDD_Seek\n");
 	CLEAR_CDD_RESULT
 	uint32_t msf = getmsf_from_regs();
 	SCD_CURLBA = cdrom_file::msf_to_lba(msf)-150;
@@ -504,6 +528,7 @@ void lc89510_temp_device::CDD_Seek(void)
 
 void lc89510_temp_device::CDD_Pause()
 {
+	LOGCOMMAND("$06: CDD_Pause\n");
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
 	SCD_STATUS = CDD_READY;
@@ -516,12 +541,11 @@ void lc89510_temp_device::CDD_Pause()
 
 
 	NeoCD_StatusHack = 4;
-
-
 }
 
 void lc89510_temp_device::CDD_Resume()
 {
+	LOGCOMMAND("$07: CDD_Resume\n");
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
 	if(!m_cdrom->exists()) // no CD is there, bail out
@@ -541,32 +565,20 @@ void lc89510_temp_device::CDD_Resume()
 
 void lc89510_temp_device::CDD_FF()
 {
+	LOGCOMMAND("$08: CDD_FF\n");
 	fatalerror("Fast Forward unsupported\n");
 }
 
 
 void lc89510_temp_device::CDD_RW()
 {
+	LOGCOMMAND("$08: CDD_RW\n");
 	fatalerror("Fast Rewind unsupported\n");
 }
 
-
-void lc89510_temp_device::CDD_Open(void)
-{
-	fatalerror("Close Tray unsupported\n");
-	/* TODO: re-read CD-ROM buffer here (Mega CD has multi disc games iirc?) */
-}
-
-
-void lc89510_temp_device::CDD_Close(void)
-{
-	fatalerror("Open Tray unsupported\n");
-	/* TODO: clear CD-ROM buffer here */
-}
-
-
 void lc89510_temp_device::CDD_Init(void)
 {
+	LOGCOMMAND("$0a: CDD_Init\n");
 	CLEAR_CDD_RESULT
 	STOP_CDC_READ
 	SCD_STATUS = CDD_READY;
@@ -575,12 +587,27 @@ void lc89510_temp_device::CDD_Init(void)
 	CDD_FRAME = 1;
 }
 
-
-void lc89510_temp_device::CDD_Default(void)
+void lc89510_temp_device::CDD_CloseTray(void)
 {
+	LOGCOMMAND("$0c: CDD_CloseTray\n");
+	fatalerror("Close Tray unsupported\n");
+	/* TODO: re-read CD-ROM buffer here (Mega CD has multi disc games iirc?) */
+}
+
+
+void lc89510_temp_device::CDD_OpenTray(void)
+{
+	LOGCOMMAND("$0d: CDD_OpenTray\n");
+	fatalerror("Open Tray unsupported\n");
+	/* TODO: clear CD-ROM buffer here */
+}
+
+
+void lc89510_temp_device::CDD_Unknown(u8 which)
+{
+	LOGCOMMAND("$%02x: CDD_Unknown\n");
 	CLEAR_CDD_RESULT
 	CDD_STATUS = SCD_STATUS;
-
 
 	NeoCD_StatusHack = 9;
 }
@@ -849,44 +876,6 @@ void lc89510_temp_device::CDD_Process(int reason)
 	CHECK_SCD_LV4_INTERRUPT
 }
 
-void lc89510_temp_device::CDD_Handle_TOC_Commands(void)
-{
-	int subcmd = CDD_TX[3];
-	CDD_STATUS = (CDD_STATUS & 0xFF00) | subcmd;
-
-	switch (subcmd)
-	{
-		case TOCCMD_CURPOS:    CDD_GetPos();      break;
-		case TOCCMD_TRKPOS:    CDD_GetTrackPos(); break;
-		case TOCCMD_CURTRK:    CDD_GetTrack();   break;
-		case TOCCMD_LENGTH:    CDD_Length();      break;
-		case TOCCMD_FIRSTLAST: CDD_FirstLast();   break;
-		case TOCCMD_TRACKADDR: CDD_GetTrackAdr(); break;
-		case 6:                CDD_GetTrackType(); break; // NGCD, might be wrong, make sure Sega CD doesn't hate it
-		default:               CDD_GetStatus();   break;
-	}
-}
-
-static const char *const CDD_import_cmdnames[] =
-{
-	"Get Status",           // 0
-	"Stop ALL",             // 1
-	"Handle TOC",           // 2
-	"Play",                 // 3
-	"Seek",                 // 4
-	"<undefined> (5)",          // 5
-	"Pause",                // 6
-	"Resume",               // 7
-	"FF",                   // 8
-	"RWD",                  // 9
-	"INIT",                 // A
-	"<undefined> (b)",          // B
-	"Close Tray",           // C
-	"Open Tray",            // D
-	"<undefined> (e)",          // E
-	"<undefined> (f)"           // F
-};
-
 bool lc89510_temp_device::CDD_Import()
 {
 	// don't execute the command if the checksum isn't valid
@@ -895,9 +884,6 @@ bool lc89510_temp_device::CDD_Import()
 		LOG("invalid checksum\n");
 		return false;
 	}
-
-	if(CDD_TX[0] != 2 && CDD_TX[0] != 0)
-		LOG("%s\n",CDD_import_cmdnames[CDD_TX[0]]);
 
 	switch (CDD_TX[0])
 	{
@@ -911,9 +897,9 @@ bool lc89510_temp_device::CDD_Import()
 		case CMD_FF:        CDD_FF();                  break;
 		case CMD_RW:        CDD_RW();                  break;
 		case CMD_INIT:      CDD_Init();                break;
-		case CMD_CLOSE:     CDD_Open();                break;
-		case CMD_OPEN:      CDD_Close();               break;
-		default:            CDD_Default();             break;
+		case CMD_CLOSE:     CDD_CloseTray();           break;
+		case CMD_OPEN:      CDD_OpenTray();            break;
+		default:            CDD_Unknown(CDD_TX[0]);    break;
 	}
 
 	CDD_DONE = 1;

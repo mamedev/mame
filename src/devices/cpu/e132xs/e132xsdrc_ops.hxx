@@ -3305,8 +3305,6 @@ void hyperstone_device::generate_mulsu(drcuml_block &block, compiler_state &comp
 	else
 		UML_MULU(block, I4, I5, I0, I1);
 
-	UML_OR(block, I2, I4, I5);
-	UML_TEST(block, I2, ~uint32_t(0));
 	UML_SETc(block, uml::COND_Z, I2);
 	UML_SHL(block, I2, I2, Z_SHIFT);
 	UML_ROLINS(block, I2, I5, N_SHIFT + 1, N_MASK);
@@ -3385,14 +3383,12 @@ void hyperstone_device::generate_mul(drcuml_block &block, compiler_state &compil
 	UML_ADD(block, I7, I7, mem(&m_core->clock_cycles_2));
 	UML_LABEL(block, set_cycles);
 
-	UML_MULU(block, I2, I3, I0, I1);
+	UML_MULULW(block, I2, I0, I1);
 
-	UML_AND(block, I4, DRC_SR, ~(Z_MASK | N_MASK));
-	UML_TEST(block, I2, ~uint32_t(0));
-	UML_SETc(block, uml::COND_Z, I5);
-	UML_SHL(block, I5, I5, Z_SHIFT);
-	UML_ROLINS(block, I5, I2, N_SHIFT + 1, N_MASK);
-	UML_ROLINS(block, DRC_SR, I5, 0, (Z_MASK | N_MASK));
+	UML_SETc(block, uml::COND_Z, I3);
+	UML_SHL(block, I3, I3, Z_SHIFT);
+	UML_ROLINS(block, I3, I2, N_SHIFT + 1, N_MASK);
+	UML_ROLINS(block, DRC_SR, I3, 0, (Z_MASK | N_MASK));
 
 	if (DstGlobal)
 		UML_MOV(block, mem(&m_core->global_regs[dst_code]), I2);
@@ -4130,36 +4126,31 @@ void hyperstone_device::generate_extend(drcuml_block &block, compiler_state &com
 		// signed or unsigned multiplication, single word product
 		case EMUL:
 		case EMUL_N: // used in "N" type cpu
-			UML_MULU(block, I2, I3, I0, I1);
-			UML_MOV(block, mem(&m_core->global_regs[15]), I2);
+			UML_MULULW(block, mem(&m_core->global_regs[15]), I0, I1);
 			break;
 
 		case EMULU: // unsigned multiplication, double word product
+			UML_MULU(block, mem(&m_core->global_regs[15]), mem(&m_core->global_regs[14]), I0, I1);
+			break;
+
 		case EMULS: // signed multiplication, double word product
-			if (func == EMULU)
-				UML_MULU(block, I2, I3, I0, I1);
-			else
-				UML_MULS(block, I2, I3, I0, I1);
-			UML_MOV(block, mem(&m_core->global_regs[14]), I3);
-			UML_MOV(block, mem(&m_core->global_regs[15]), I2);
+			UML_MULS(block, mem(&m_core->global_regs[15]), mem(&m_core->global_regs[14]), I0, I1);
 			break;
 
 		case EMAC:  // signed multiply/add, single word product sum
 		case EMSUB: // signed multiply/substract, single word product difference
-			UML_MULS(block, I2, I3, I0, I1);
-			UML_MOV(block, I3, mem(&m_core->global_regs[15]));
+			UML_MULSLW(block, I2, I0, I1);
 			if (func == EMAC)
-				UML_ADD(block, I3, I3, I2);
+				UML_ADD(block, mem(&m_core->global_regs[15]), mem(&m_core->global_regs[15]), I2);
 			else
-				UML_SUB(block, I3, I3, I2);
-			UML_MOV(block, mem(&m_core->global_regs[15]), I3);
+				UML_SUB(block, mem(&m_core->global_regs[15]), mem(&m_core->global_regs[15]), I2);
 			break;
 
 		case EMACD:  // signed multiply/add, double word product sum
 		case EMSUBD: // signed multiply/substract, double word product difference
 			UML_DSEXT(block, I0, I0, SIZE_DWORD);
 			UML_DSEXT(block, I1, I1, SIZE_DWORD);
-			UML_DMULS(block, I2, I3, I0, I1);
+			UML_DMULSLW(block, I2, I0, I1);
 			UML_MOV(block, I3, mem(&m_core->global_regs[14]));
 			UML_MOV(block, I4, mem(&m_core->global_regs[15]));
 			UML_DSHL(block, I3, I3, 32);
@@ -4175,16 +4166,14 @@ void hyperstone_device::generate_extend(drcuml_block &block, compiler_state &com
 
 		// signed half-word multiply/add, single word product sum
 		case EHMAC:
-			UML_AND(block, I2, I0, 0x0000ffff);
-			UML_AND(block, I3, I1, 0x0000ffff);
-			UML_MULS(block, I2, I3, I2, I3);
-			UML_SHR(block, I0, I0, 16);
-			UML_SHR(block, I1, I1, 16);
-			UML_MULS(block, I0, I1, I0, I1);
+			UML_SEXT(block, I2, I0, SIZE_WORD);
+			UML_SEXT(block, I3, I1, SIZE_WORD);
+			UML_MULSLW(block, I2, I2, I3);
+			UML_SAR(block, I0, I0, 16);
+			UML_SAR(block, I1, I1, 16);
+			UML_MULSLW(block, I0, I0, I1);
 			UML_ADD(block, I0, I0, I2);
-			UML_MOV(block, I1, mem(&m_core->global_regs[15]));
-			UML_ADD(block, I0, I0, I1);
-			UML_MOV(block, mem(&m_core->global_regs[15]), I0);
+			UML_ADD(block, mem(&m_core->global_regs[15]), mem(&m_core->global_regs[15]), I0);
 			break;
 
 		// signed half-word multiply/add, double word product sum

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni
+// copyright-holders: Mirko Buffoni
+
 /***************************************************************************
 
 Senjyo / Star Force / Baluba-louk
@@ -80,14 +81,424 @@ I/O read/write
 ***************************************************************************/
 
 #include "emu.h"
-#include "senjyo.h"
 
-#include "machine/segacrpt_device.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/segacrpt_device.h"
+#include "machine/z80daisy.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+#include "sound/dac.h"
+#include "sound/flt_vol.h"
 #include "sound/sn76496.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class senjyo_state : public driver_device
+{
+public:
+	senjyo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pio(*this, "z80pio"),
+		m_dac(*this, "dac"),
+		m_volume(*this, "volume"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_radar_palette(*this, "radar_palette"),
+		m_spriteram(*this, "spriteram"),
+		m_fgscroll(*this, "fgscroll"),
+		m_scrollx(*this, "scrollx%u", 1U),
+		m_scrolly(*this, "scrolly%u", 1U),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_fgcolorram(*this, "fgcolorram"),
+		m_bgvideoram(*this, "bgvideoram%u", 1U),
+		m_radarram(*this, "radarram"),
+		m_bgstripesram(*this, "bgstripesram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_dac_prom(*this, "dac")
+	{ }
+
+	void senjyox_e(machine_config &config) ATTR_COLD;
+	void senjyo(machine_config &config) ATTR_COLD;
+	void starforb(machine_config &config) ATTR_COLD;
+	void senjyox_a(machine_config &config) ATTR_COLD;
+
+	void init_starfora() ATTR_COLD;
+	void init_senjyo() ATTR_COLD;
+	void init_starfore() ATTR_COLD;
+	void init_starforc() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio;
+	required_device<dac_8bit_r2r_device> m_dac;
+	required_device<filter_volume_device> m_volume;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<palette_device> m_radar_palette;
+
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgscroll;
+	required_shared_ptr_array<uint8_t, 3> m_scrollx;
+	required_shared_ptr_array<uint8_t, 3> m_scrolly;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_fgcolorram;
+	required_shared_ptr_array<uint8_t, 3> m_bgvideoram;
+	required_shared_ptr<uint8_t> m_radarram;
+	required_shared_ptr<uint8_t> m_bgstripesram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_memory_region m_dac_prom;
+
+	// game specific initialization
+	int m_is_senjyo = 0;
+	int m_scrollhack = 0;
+
+	uint8_t m_dac_clock = 0;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[3] {};
+
+	void flip_screen_w(uint8_t data);
+	void starforb_scrolly2(offs_t offset, uint8_t data);
+	void starforb_scrollx2(offs_t offset, uint8_t data);
+	void fgvideoram_w(offs_t offset, uint8_t data);
+	void fgcolorram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void bgvideoram_w(offs_t offset, uint8_t data);
+	void dac_volume_w(uint8_t data);
+	void dac_enable_w(uint8_t data);
+	void dac_clock_w(int state);
+	void irq_ctrl_w(uint8_t data);
+
+	static rgb_t IIBBGGRR(uint32_t raw);
+	void radar_palette(palette_device &palette) const ATTR_COLD;
+
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(senjyo_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(starforc_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
+
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void senjyo_map(address_map &map) ATTR_COLD;
+	void senjyo_sound_io_map(address_map &map) ATTR_COLD;
+	void senjyo_sound_map(address_map &map) ATTR_COLD;
+	void starforb_map(address_map &map) ATTR_COLD;
+	void starforb_sound_map(address_map &map) ATTR_COLD;
+};
+
+
+/***************************************************************************
+
+  Callbacks for the TileMap code
+
+***************************************************************************/
+
+TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
+{
+	uint8_t const attr = m_fgcolorram[tile_index];
+	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
+
+	if (m_is_senjyo && (tile_index & 0x1f) >= 32 - 8)
+		flags |= TILE_FORCE_LAYER0;
+
+	tileinfo.set(0,
+			m_fgvideoram[tile_index] + ((attr & 0x10) << 4),
+			attr & 0x07,
+			flags);
+}
+
+TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
+{
+	uint8_t const code = m_bgvideoram[0][tile_index];
+
+	tileinfo.set(1,
+			code,
+			(code & 0x70) >> 4,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
+{
+	/* Star Force has more tiles in bg1, so to get a uniform color code spread
+	   they wired bit 7 of the tile code in place of bit 4 to get the color code */
+	uint8_t const code = m_bgvideoram[0][tile_index];
+
+	tileinfo.set(1,
+			code,
+			bitswap<3>(((code & 0xe0) >> 5), 1, 0, 2),
+			0);
+}
+
+TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
+{
+	uint8_t code = m_bgvideoram[1][tile_index];
+
+	tileinfo.set(2,
+			code,
+			(code & 0xe0) >> 5,
+			0);
+}
+
+TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
+{
+	uint8_t code = m_bgvideoram[2][tile_index];
+
+	tileinfo.set(3,
+			code,
+			(code & 0xe0) >> 5,
+			0);
+}
+
+
+
+/***************************************************************************
+
+  Start the video hardware emulation.
+
+***************************************************************************/
+
+void senjyo_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	if (m_is_senjyo)
+	{
+		m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::senjyo_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 48);   // only 16x32 used by Star Force
+		m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg3_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 56);   // only 16x32 used by Star Force
+	}
+	else
+	{
+		m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::starforc_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 32);
+		m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 32); // only 16x32 used by Star Force
+		m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(senjyo_state::get_bg3_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 32); // only 16x32 used by Star Force
+	}
+
+	m_fg_tilemap->set_transparent_pen(0);
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
+	m_bg_tilemap[2]->set_transparent_pen(0);
+	m_fg_tilemap->set_scroll_cols(32);
+}
+
+rgb_t senjyo_state::IIBBGGRR(uint32_t raw)
+{
+	uint8_t const i = (raw >> 6) & 0x03;
+	uint8_t const r = (raw << 2) & 0x0c;
+	uint8_t const g = (raw) & 0x0c;
+	uint8_t const b = (raw >> 2) & 0x0c;
+
+	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
+}
+
+void senjyo_state::radar_palette(palette_device &palette) const
+{
+	// two colors for the radar dots (verified on the real board)
+	palette.set_pen_color(0, rgb_t(0xff, 0x00, 0x00));  // red for enemies
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00));  // yellow for player
+}
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void senjyo_state::fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+void senjyo_state::fgcolorram_w(offs_t offset, uint8_t data)
+{
+	m_fgcolorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
+}
+
+template <uint8_t Which>
+void senjyo_state::bgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_bgvideoram[Which][offset] = data;
+	m_bg_tilemap[Which]->mark_tile_dirty(offset);
+}
+
+
+/***************************************************************************
+
+  Display refresh
+
+***************************************************************************/
+
+void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// assume +1 from disabling layer being 0xff
+	uint8_t stripe_width = m_bgstripesram[0] + 1;
+	if (stripe_width == 0)
+		bitmap.fill(m_palette->pen_color(0), cliprect);
+	else
+	{
+		int const flip = flip_screen();
+
+		int pen = 0;
+		int count = 0;
+		int strwid = stripe_width;
+		if (strwid == 0) strwid = 0x100;
+		if (flip) strwid ^= 0xff;
+
+		for (int x = 0; x < 256; x++)
+		{
+			if (flip)
+			{
+				for (int y = 0; y < 256; y++)
+					bitmap.pix(y, 255 - x) = m_palette->pen_color(384 + pen);
+			}
+			else
+			{
+				for (int y = 0; y < 256; y++)
+					bitmap.pix(y, x) = m_palette->pen_color(384 + pen);
+			}
+
+			count += 0x10;
+			if (count >= strwid)
+			{
+				pen = (pen + 1) & 0x0f;
+				count -= strwid;
+			}
+		}
+	}
+}
+
+void senjyo_state::draw_radar(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = 0; offs < 0x400; offs++)
+		for (int x = 0; x < 8; x++)
+			if (m_radarram[offs] & (1 << x))
+			{
+				int sx = (8 * (offs % 8) + x) + 256 - 64;
+				int sy = ((offs & 0x1ff) / 8) + 96;
+
+				if (flip_screen())
+				{
+					sx = 255 - sx;
+					sy = 255 - sy;
+				}
+
+				if (cliprect.contains(sx, sy))
+					bitmap.pix(sy, sx) =  m_radar_palette->pen_color(offs < 0x200 ? 0 : 1);
+			}
+}
+
+void senjyo_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
+{
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int big, sx, sy, flipx, flipy;
+
+		if (((m_spriteram[offs + 1] & 0x30) >> 4) == priority)
+		{
+			if (m_is_senjyo) // Senjyo
+				big = (m_spriteram[offs] & 0x80);
+			else    // Star Force
+				big = ((m_spriteram[offs] & 0xc0) == 0xc0);
+
+			if (big)
+				sy = 224 - m_spriteram[offs + 2];
+			else
+				sy = 240 - m_spriteram[offs + 2];
+
+			sx = m_spriteram[offs + 3];
+			flipx = m_spriteram[offs + 1] & 0x40;
+			flipy = m_spriteram[offs + 1] & 0x80;
+
+			if (flip_screen())
+			{
+				flipx = !flipx;
+				flipy = !flipy;
+
+				if (big)
+				{
+					sx = 224 - sx;
+					sy = 226 - sy;
+				}
+				else
+				{
+					sx = 240 - sx;
+					sy = 242 - sy;
+				}
+			}
+
+			m_gfxdecode->gfx(big ? 5 : 4)->transpen(bitmap, cliprect,
+					m_spriteram[offs],
+					m_spriteram[offs + 1] & 0x07,
+					flipx, flipy,
+					sx, sy, 0);
+		}
+	}
+}
+
+uint32_t senjyo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int const flip = flip_screen();
+
+	for (int i = 0; i < 32; i++)
+		m_fg_tilemap->set_scrolly(i, m_fgscroll[i]);
+
+	int scrollx = m_scrollx[0][0];
+	int scrolly = m_scrolly[0][0] + 256 * m_scrolly[0][1];
+	if (flip)
+		scrollx = -scrollx;
+	m_bg_tilemap[0]->set_scrollx(0, scrollx);
+	m_bg_tilemap[0]->set_scrolly(0, scrolly);
+
+	scrollx = m_scrollx[1][0];
+	scrolly = m_scrolly[1][0] + 256 * m_scrolly[1][1];
+	if (m_scrollhack)   // Star Force, but NOT the encrypted version
+	{
+		scrollx = m_scrollx[0][0];
+		scrolly = m_scrolly[0][0] + 256 * m_scrolly[0][1];
+	}
+	if (flip)
+		scrollx = -scrollx;
+	m_bg_tilemap[1]->set_scrollx(0, scrollx);
+	m_bg_tilemap[1]->set_scrolly(0, scrolly);
+
+	scrollx = m_scrollx[2][0];
+	scrolly = m_scrolly[2][0] + 256 * m_scrolly[2][1];
+	if (flip)
+		scrollx = -scrollx;
+	m_bg_tilemap[2]->set_scrollx(0, scrollx);
+	m_bg_tilemap[2]->set_scrolly(0, scrolly);
+
+	draw_bgbitmap(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 0);
+	m_bg_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 1);
+	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 2);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 3);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_radar(bitmap, cliprect);
+
+	return 0;
+}
 
 
 void senjyo_state::machine_start()
@@ -127,44 +538,44 @@ void senjyo_state::senjyo_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x93ff).ram().w(FUNC(senjyo_state::fgvideoram_w)).share("fgvideoram");
-	map(0x9400, 0x97ff).ram().w(FUNC(senjyo_state::fgcolorram_w)).share("fgcolorram");
-	map(0x9800, 0x987f).ram().share("spriteram");
+	map(0x9000, 0x93ff).ram().w(FUNC(senjyo_state::fgvideoram_w)).share(m_fgvideoram);
+	map(0x9400, 0x97ff).ram().w(FUNC(senjyo_state::fgcolorram_w)).share(m_fgcolorram);
+	map(0x9800, 0x987f).ram().share(m_spriteram);
 	map(0x9c00, 0x9dff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x9e00, 0x9e1f).ram().share("fgscroll");
-	map(0x9e20, 0x9e21).ram().share("scrolly3");
-/*  map(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
+	map(0x9e00, 0x9e1f).ram().share(m_fgscroll);
+	map(0x9e20, 0x9e21).ram().share(m_scrolly[2]);
+//  map(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380)
 	map(0x9e22, 0x9e24).ram();
-	map(0x9e25, 0x9e25).ram().share("scrollx3");
+	map(0x9e25, 0x9e25).ram().share(m_scrollx[2]);
 	map(0x9e26, 0x9e26).ram();
-	map(0x9e27, 0x9e27).ram().share("bgstripesram");  /* controls width of background stripes */
-	map(0x9e28, 0x9e29).ram().share("scrolly2");
-/*  map(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
+	map(0x9e27, 0x9e27).ram().share(m_bgstripesram);  // controls width of background stripes
+	map(0x9e28, 0x9e29).ram().share(m_scrolly[1]);
+//  map(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200)
 	map(0x9e2a, 0x9e2c).ram();
-	map(0x9e2d, 0x9e2d).ram().share("scrollx2");
+	map(0x9e2d, 0x9e2d).ram().share(m_scrollx[1]);
 	map(0x9e2e, 0x9e2f).ram();
-	map(0x9e30, 0x9e31).ram().share("scrolly1");
-/*  map(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100) */
+	map(0x9e30, 0x9e31).ram().share(m_scrolly[0]);
+//  map(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100)
 	map(0x9e32, 0x9e34).ram();
-	map(0x9e35, 0x9e35).ram().share("scrollx1");
-/*  map(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
-/*  map(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
+	map(0x9e35, 0x9e35).ram().share(m_scrollx[0]);
+//  map(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61)
+//  map(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip)
 	map(0x9e36, 0x9e3f).ram();
-	map(0xa000, 0xa7ff).ram().w(FUNC(senjyo_state::bg3videoram_w)).share("bg3videoram");
-	map(0xa800, 0xafff).ram().w(FUNC(senjyo_state::bg2videoram_w)).share("bg2videoram");
-	map(0xb000, 0xb7ff).ram().w(FUNC(senjyo_state::bg1videoram_w)).share("bg1videoram");
-	map(0xb800, 0xbbff).ram().share("radarram");
+	map(0xa000, 0xa7ff).ram().w(FUNC(senjyo_state::bgvideoram_w<2>)).share(m_bgvideoram[2]);
+	map(0xa800, 0xafff).ram().w(FUNC(senjyo_state::bgvideoram_w<1>)).share(m_bgvideoram[1]);
+	map(0xb000, 0xb7ff).ram().w(FUNC(senjyo_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0xb800, 0xbbff).ram().share(m_radarram);
 	map(0xd000, 0xd000).portr("P1").w(FUNC(senjyo_state::flip_screen_w));
 	map(0xd001, 0xd001).portr("P2");
 	map(0xd002, 0xd002).portr("SYSTEM").w(FUNC(senjyo_state::irq_ctrl_w));
 	map(0xd003, 0xd003).nopr(); // debug cheat port? (i.e. bit 0 in starforc: invincibility, bit 3-0 in senyjo: disables enemy fire)
-	map(0xd004, 0xd004).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd004, 0xd004).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd005, 0xd005).portr("DSW2");
 }
 
 void senjyo_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x7fff).rom().share(m_decrypted_opcodes);
 }
 
 void senjyo_state::senjyo_sound_map(address_map &map)
@@ -190,47 +601,47 @@ void senjyo_state::senjyo_sound_io_map(address_map &map)
 /* are scroll registers 1+2 linked on the bootleg?, only one copy is written */
 void senjyo_state::starforb_scrolly2(offs_t offset, uint8_t data)
 {
-	m_scrolly2[offset] = data;
-	m_scrolly1[offset] = data;
+	m_scrolly[1][offset] = data;
+	m_scrolly[0][offset] = data;
 }
 
 void senjyo_state::starforb_scrollx2(offs_t offset, uint8_t data)
 {
-	m_scrollx2[offset] = data;
-	m_scrollx1[offset] = data;
+	m_scrollx[1][offset] = data;
+	m_scrollx[0][offset] = data;
 }
 
 void senjyo_state::starforb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x93ff).ram().w(FUNC(senjyo_state::fgvideoram_w)).share("fgvideoram");
-	map(0x9400, 0x97ff).ram().w(FUNC(senjyo_state::fgcolorram_w)).share("fgcolorram");
-	map(0x9800, 0x987f).ram().share("spriteram");
+	map(0x9000, 0x93ff).ram().w(FUNC(senjyo_state::fgvideoram_w)).share(m_fgvideoram);
+	map(0x9400, 0x97ff).ram().w(FUNC(senjyo_state::fgcolorram_w)).share(m_fgcolorram);
+	map(0x9800, 0x987f).ram().share(m_spriteram);
 	map(0x9c00, 0x9dff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	/* The format / use of the ram here is different on the bootleg */
+	// The format / use of the RAM here is different on the bootleg
 	map(0x9e00, 0x9e3f).ram();
-	map(0x9e20, 0x9e21).ram().share("scrolly3");
-	map(0x9e25, 0x9e25).ram().share("scrollx3");
-	map(0x9e30, 0x9e31).ram().w(FUNC(senjyo_state::starforb_scrolly2)).share("scrolly2"); // ok
-	map(0x9e35, 0x9e35).ram().w(FUNC(senjyo_state::starforb_scrollx2)).share("scrollx2"); // ok
+	map(0x9e20, 0x9e21).ram().share(m_scrolly[2]);
+	map(0x9e25, 0x9e25).ram().share(m_scrollx[2]);
+	map(0x9e30, 0x9e31).ram().w(FUNC(senjyo_state::starforb_scrolly2)).share(m_scrolly[1]); // ok
+	map(0x9e35, 0x9e35).ram().w(FUNC(senjyo_state::starforb_scrollx2)).share(m_scrollx[1]); // ok
 
-	map(0xa000, 0xa7ff).ram().w(FUNC(senjyo_state::bg3videoram_w)).share("bg3videoram");
-	map(0xa800, 0xafff).ram().w(FUNC(senjyo_state::bg2videoram_w)).share("bg2videoram");
-	map(0xb000, 0xb7ff).ram().w(FUNC(senjyo_state::bg1videoram_w)).share("bg1videoram");
-	map(0xb800, 0xbbff).ram().share("radarram");
+	map(0xa000, 0xa7ff).ram().w(FUNC(senjyo_state::bgvideoram_w<2>)).share(m_bgvideoram[2]);
+	map(0xa800, 0xafff).ram().w(FUNC(senjyo_state::bgvideoram_w<1>)).share(m_bgvideoram[1]);
+	map(0xb000, 0xb7ff).ram().w(FUNC(senjyo_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
+	map(0xb800, 0xbbff).ram().share(m_radarram);
 	map(0xd000, 0xd000).portr("P1").w(FUNC(senjyo_state::flip_screen_w));
 	map(0xd001, 0xd001).portr("P2");
 	map(0xd002, 0xd002).portr("SYSTEM").w(FUNC(senjyo_state::irq_ctrl_w));
 	map(0xd003, 0xd003).nopr();
-	map(0xd004, 0xd004).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd004, 0xd004).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xd005, 0xd005).portr("DSW2");
 
-	/* these aren't used / written, left here to make sure memory is allocated */
-	map(0xfe00, 0xfe1f).ram().share("fgscroll");
-	map(0xfe27, 0xfe27).ram().share("bgstripesram");  /* controls width of background stripes */
-	map(0xfe28, 0xfe29).ram().share("scrolly1");
-	map(0xfe2d, 0xfe2d).ram().share("scrollx1");
+	// these aren't used / written, left here to make sure memory is allocated
+	map(0xfe00, 0xfe1f).ram().share(m_fgscroll);
+	map(0xfe27, 0xfe27).ram().share(m_bgstripesram);  // controls width of background stripes
+	map(0xfe28, 0xfe29).ram().share(m_scrolly[0]);
+	map(0xfe2d, 0xfe2d).ram().share(m_scrollx[0]);
 }
 
 
@@ -269,7 +680,7 @@ static INPUT_PORTS_START( senjyo )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
-	/* coin input for both must be active between 2 and 9 frames to be consistently recognized */
+	// coin input for both must be active between 2 and 9 frames to be consistently recognized
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -350,7 +761,7 @@ static INPUT_PORTS_START( starforc )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
-	/* coin input for both must be active between 2 and 9 frames to be consistently recognized */
+	// coin input for both must be active between 2 and 9 frames to be consistently recognized
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -400,7 +811,8 @@ static INPUT_PORTS_START( starforc )
 	PORT_DIPSETTING(    0x18, DEF_STR( Difficult ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Hardest ) )
-	/* 0x30 and 0x38 are unused */
+	PORT_DIPSETTING(    0x30, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( Unused ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -431,7 +843,7 @@ static INPUT_PORTS_START( baluba )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
-	/* coin input for both must be active between 2 and 9 frames to be consistently recognized */
+	// coin input for both must be active between 2 and 9 frames to be consistently recognized
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -495,45 +907,45 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,3),  /* 512 characters */
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* the bitplanes are separated */
+	8,8,    // 8*8 characters
+	RGN_FRAC(1,3),  // 512 characters
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 static const gfx_layout tilelayout =
 {
-	16,16,  /* 16*16 characters */
-	RGN_FRAC(1,3),  /* 256 characters */
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* the bitplanes are separated */
+	16,16,  // 16*16 characters
+	RGN_FRAC(1,3),  // 256 characters
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every character takes 32 consecutive bytes */
+	32*8    // every character takes 32 consecutive bytes
 };
 
 static const gfx_layout spritelayout1 =
 {
-	16,16,  /* 16*16 sprites */
+	16,16,  // 16*16 sprites
 	RGN_FRAC(1,3),
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* the bitplanes are separated */
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8    // every sprite takes 32 consecutive bytes
 };
 static const gfx_layout spritelayout2 =
 {
-	32,32,  /* 32*32 sprites */
-	RGN_FRAC(1,3),  /* 128 sprites */
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* the bitplanes are separated */
+	32,32,  // 32*32 sprites
+	RGN_FRAC(1,3),  // 128 sprites
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },    // the bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7,
 			32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
@@ -542,17 +954,17 @@ static const gfx_layout spritelayout2 =
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
 			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
 			80*8, 81*8, 82*8, 83*8, 84*8, 85*8, 86*8, 87*8 },
-	128*8   /* every sprite takes 128 consecutive bytes */
+	128*8   // every sprite takes 128 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_senjyo )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 8 ) //   0- 63 characters
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,     64, 8 ) //  64-127 background #1
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,    128, 8 ) // 128-191 background #2
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,    192, 8 ) // 192-255 background #3
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout1, 320, 8 ) // 320-383 normal sprites
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout2, 320, 8 ) // 320-383 large sprites
-	//                                                  // 384-399 is background
+	GFXDECODE_ENTRY( "fgtiles",  0, charlayout,      0, 8 ) //   0- 63 characters
+	GFXDECODE_ENTRY( "bgtiles1", 0, tilelayout,     64, 8 ) //  64-127 background #1
+	GFXDECODE_ENTRY( "bgtiles2", 0, tilelayout,    128, 8 ) // 128-191 background #2
+	GFXDECODE_ENTRY( "bgtiles3", 0, tilelayout,    192, 8 ) // 192-255 background #3
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout1, 320, 8 ) // 320-383 normal sprites
+	GFXDECODE_ENTRY( "sprites",  0, spritelayout2, 320, 8 ) // 320-383 large sprites
+	//                                                      // 384-399 is background
 GFXDECODE_END
 
 
@@ -578,9 +990,9 @@ void senjyo_state::senjyo(machine_config &config)
 
 	Z80PIO(config, m_pio, 4_MHz_XTAL / 2);
 	m_pio->out_int_callback().set_inputline("sub", INPUT_LINE_IRQ0);
-	m_pio->in_pa_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_pio->in_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
 
-	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 4_MHz_XTAL / 2 /* same as "sub" */));
+	z80ctc_device& ctc(Z80CTC(config, "z80ctc", 4_MHz_XTAL / 2)); // same as "sub"
 	ctc.intr_callback().set_inputline("sub", INPUT_LINE_IRQ0);
 	ctc.zc_callback<0>().set("z80ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set(FUNC(senjyo_state::dac_clock_w));
@@ -602,8 +1014,7 @@ void senjyo_state::senjyo(machine_config &config)
 	SN76489A(config, "sn2", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.5);
 	SN76489A(config, "sn3", 4_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set(m_pio, FUNC(z80pio_device::strobe_a)).invert();
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set(m_pio, FUNC(z80pio_device::strobe_a)).invert();
 
 	DAC_8BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "volume", 0.05);
 	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -660,27 +1071,27 @@ ROM_START( senjyo )
 	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "02h_01t.bin", 0x0000, 0x2000, CRC(c1c24455) SHA1(24a2ab9e4df793f68f51bbe6a1313f38d951a8af) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "08h_08b.bin", 0x00000, 0x1000, CRC(0c875994) SHA1(6e4119ade0261eacf8349ff18f1cb7a50be2a9a4) )    /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "08h_08b.bin", 0x00000, 0x1000, CRC(0c875994) SHA1(6e4119ade0261eacf8349ff18f1cb7a50be2a9a4) )
 	ROM_LOAD( "08f_07b.bin", 0x01000, 0x1000, CRC(497bea8e) SHA1(940592e04ef9dff0e410de040dafe4f6fc745070) )
 	ROM_LOAD( "08d_06b.bin", 0x02000, 0x1000, CRC(4ef69b00) SHA1(bad4bbb7159a03efcc9dee1180c231c22bea8f47) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "05n_16m.bin", 0x00000, 0x1000, CRC(0d3e00fb) SHA1(da144da56733e13c754d066932a32eb6fcd9c83a) )    /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "05n_16m.bin", 0x00000, 0x1000, CRC(0d3e00fb) SHA1(da144da56733e13c754d066932a32eb6fcd9c83a) )
 	ROM_LOAD( "05k_15m.bin", 0x02000, 0x1000, CRC(93442213) SHA1(01ceed1124022328b47607ee66d60fe06fdd46ea) )
 	ROM_CONTINUE(            0x04000, 0x1000             )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "07n_18m.bin", 0x00000, 0x1000, CRC(d50fced3) SHA1(41f503b2d980548a564a414847b2b6c5ae71da2b) )    /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "07n_18m.bin", 0x00000, 0x1000, CRC(d50fced3) SHA1(41f503b2d980548a564a414847b2b6c5ae71da2b) )
 	ROM_LOAD( "07k_17m.bin", 0x02000, 0x1000, CRC(10c3a5f0) SHA1(ccf7e0b6686129afc6af542d20734e51702cd8a7) )
 	ROM_CONTINUE(            0x04000, 0x1000             )
 
-	ROM_REGION( 0x03000, "gfx4", 0 )
-	ROM_LOAD( "09n_20m.bin", 0x00000, 0x1000, CRC(54cb8126) SHA1(f2d0b38d1c47a48240bc9e4bc962ef63f5c28ad6) )    /* bg3 */
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "09n_20m.bin", 0x00000, 0x1000, CRC(54cb8126) SHA1(f2d0b38d1c47a48240bc9e4bc962ef63f5c28ad6) )
 	ROM_LOAD( "09k_19m.bin", 0x01000, 0x2000, CRC(373e047c) SHA1(0168e22ca72af515980c0975eb8525a416c6dd79) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "08p_13b.bin", 0x00000, 0x2000, CRC(40127efd) SHA1(6f8c0f7e4658d54d8fcc6b6e6d2650483788eec1) )    /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "08p_13b.bin", 0x00000, 0x2000, CRC(40127efd) SHA1(6f8c0f7e4658d54d8fcc6b6e6d2650483788eec1) )
 	ROM_LOAD( "08s_14b.bin", 0x02000, 0x2000, CRC(42648ffa) SHA1(61965428306f94c717b03208be9ac8c27265fcaa) )
 	ROM_LOAD( "08m_11b.bin", 0x04000, 0x2000, CRC(ccc4680b) SHA1(641d7b57c442074136f01fe288175ed6621813c5) )
 	ROM_LOAD( "08n_12b.bin", 0x06000, 0x2000, CRC(742fafed) SHA1(345683cb9eff1b987721042c36b4d1e0debddd5d) )
@@ -688,7 +1099,7 @@ ROM_START( senjyo )
 	ROM_LOAD( "08k_10b.bin", 0x0a000, 0x2000, CRC(a9f41ec9) SHA1(c24f9d54593e764a0b4530b1a2550b999916992c) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "07b.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* waveform */
+	ROM_LOAD( "07b.bin",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // waveform
 ROM_END
 
 ROM_START( starforc )
@@ -696,36 +1107,36 @@ ROM_START( starforc )
 	ROM_LOAD( "3.3p",    0x0000, 0x4000, CRC(8ba27691) SHA1(2b8b1e634ef5bed5c61a078e64a6dda77f84cdf5) )
 	ROM_LOAD( "2.3mn",   0x4000, 0x4000, CRC(0fc4d2d6) SHA1(0743e3928d5cc0e3f1bcdaf4b0cc83aeb7a2f7a8) )
 
-	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "1.3hj",   0x0000, 0x2000, CRC(2735bb22) SHA1(1bd0558e05b41aebab3911991969512df904fea5) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "7.2fh",   0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )    /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "7.2fh",   0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )
 	ROM_LOAD( "8.3fh",   0x01000, 0x1000, CRC(96979684) SHA1(bb4f7d3afc8dfaa723dfb5374996cc4bfd76fa3c) )
 	ROM_LOAD( "9.3fh",   0x02000, 0x1000, CRC(eead1d5c) SHA1(7c9165ed227c5228122b494a265cbfd6e843ba61) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )    /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )
 	ROM_LOAD( "14.9jk",  0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
 	ROM_LOAD( "13.8jk",  0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )    /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )
 	ROM_LOAD( "11.9de",  0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
 	ROM_LOAD( "10.8de",  0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
 
-	ROM_REGION( 0x03000, "gfx4", 0 )
-	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )    /* bg3 */
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )
 	ROM_LOAD( "17.9pq",  0x01000, 0x1000, CRC(68c60d0f) SHA1(1152ba0c274ecadb534133a860bbc8a93577dcf2) )
 	ROM_LOAD( "16.8pq",  0x02000, 0x1000, CRC(ce20b469) SHA1(60177a669d9c8cbeedd03ca5e2edf3f589c1c815) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )    /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // waveform
 ROM_END
 
 ROM_START( starforcb )
@@ -738,36 +1149,36 @@ ROM_START( starforcb )
 	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "a0.2e",   0x0000, 0x2000, CRC(5ab0e2fa) SHA1(78f0290d1e006a39bb8ee5a29cf229ed2c1f2b09) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "b8.8h",  0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )    /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "b8.8h",  0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )
 	ROM_LOAD( "b7.8f",  0x01000, 0x1000, CRC(96979684) SHA1(bb4f7d3afc8dfaa723dfb5374996cc4bfd76fa3c) )
 	ROM_LOAD( "b6.8d",  0x02000, 0x1000, CRC(eead1d5c) SHA1(7c9165ed227c5228122b494a265cbfd6e843ba61) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "c17.8a", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )    /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "c17.8a", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )
 	ROM_LOAD( "c16.7a", 0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
 	ROM_LOAD( "c15.6a", 0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "c20.8k", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )    /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "c20.8k", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )
 	ROM_LOAD( "c19.7k", 0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
 	ROM_LOAD( "c18.6k", 0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
 
-	ROM_REGION( 0x03000, "gfx4", 0 )
-	ROM_LOAD( "c5.8n",  0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) ) /* bg3 */
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "c5.8n",  0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )
 	ROM_LOAD( "c4.7n",  0x01000, 0x1000, CRC(68c60d0f) SHA1(1152ba0c274ecadb534133a860bbc8a93577dcf2) )
 	ROM_LOAD( "c3.6n",  0x02000, 0x1000, CRC(ce20b469) SHA1(60177a669d9c8cbeedd03ca5e2edf3f589c1c815) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "b13.8p", 0x00000, 0x2000, CRC(1cfc88a8) SHA1(2948864ed88ba3b1d500047e2ef594b67274710c) )   /* sprites */
-	ROM_LOAD( "b14.8r", 0x02000, 0x2000, CRC(902060b4) SHA1(f371aa12ba3f554918e8a482114df166cd007b0e) )   /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "b13.8p", 0x00000, 0x2000, CRC(1cfc88a8) SHA1(2948864ed88ba3b1d500047e2ef594b67274710c) )
+	ROM_LOAD( "b14.8r", 0x02000, 0x2000, CRC(902060b4) SHA1(f371aa12ba3f554918e8a482114df166cd007b0e) )
 	ROM_LOAD( "b11.8m", 0x04000, 0x2000, CRC(7676b970) SHA1(f5fcee4ca555e7c880c6bf5d5ea01ff8d619a837) )
 	ROM_LOAD( "b12.8n", 0x06000, 0x2000, CRC(6f4a5d67) SHA1(182be475dfee4d272f57c030e3acd4e8cfa4fc53) )
 	ROM_LOAD( "b9.8j",  0x08000, 0x2000, CRC(e7d51959) SHA1(34d9afb0f31dc1d02e7b85aa69345fc66cf0f554) )
 	ROM_LOAD( "b10.8l", 0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "a18s030.7b",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )   /* waveform */
+	ROM_LOAD( "a18s030.7b",    0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  // waveform
 ROM_END
 
 ROM_START( starforca )
@@ -780,36 +1191,36 @@ ROM_START( starforca )
 	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "1.3hj",   0x0000, 0x2000, CRC(2735bb22) SHA1(1bd0558e05b41aebab3911991969512df904fea5) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "8.bin",  0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )    /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "8.bin",  0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )
 	ROM_LOAD( "7.bin",  0x01000, 0x1000, CRC(96979684) SHA1(bb4f7d3afc8dfaa723dfb5374996cc4bfd76fa3c) )
 	ROM_LOAD( "6.bin",  0x02000, 0x1000, CRC(eead1d5c) SHA1(7c9165ed227c5228122b494a265cbfd6e843ba61) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "17.bin", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )    /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "17.bin", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )
 	ROM_LOAD( "16.bin", 0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
 	ROM_LOAD( "15.bin", 0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "20.bin", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )    /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "20.bin", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )
 	ROM_LOAD( "19.bin", 0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
 	ROM_LOAD( "18.bin", 0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
 
-	ROM_REGION( 0x06000, "gfx4", 0 ) // twice the size of other sets, but 2nd half is just blank
-	ROM_LOAD( "sw5.bin", 0x00000, 0x2000, CRC(ce6bbc11) SHA1(c8f4b22f5ac1c95fff7758c67bf8c39452f5945b) )   /* bg3 */
+	ROM_REGION( 0x06000, "bgtiles3", 0 ) // twice the size of other sets, but 2nd half is just blank
+	ROM_LOAD( "sw5.bin", 0x00000, 0x2000, CRC(ce6bbc11) SHA1(c8f4b22f5ac1c95fff7758c67bf8c39452f5945b) )
 	ROM_LOAD( "sw4.bin", 0x02000, 0x2000, CRC(f5b4b629) SHA1(d777a144e6dea63f2c3dcd25e32525aa185367ee) )
 	ROM_LOAD( "sw3.bin", 0x04000, 0x2000, CRC(0965346d) SHA1(20b223a6aef8dc9c37ab45c575864bce1e9e50db) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "13.bin",  0x00000, 0x2000, CRC(1cfc88a8) SHA1(2948864ed88ba3b1d500047e2ef594b67274710c) )   /* sprites */
-	ROM_LOAD( "14.bin",  0x02000, 0x2000, CRC(902060b4) SHA1(f371aa12ba3f554918e8a482114df166cd007b0e) )   /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "13.bin",  0x00000, 0x2000, CRC(1cfc88a8) SHA1(2948864ed88ba3b1d500047e2ef594b67274710c) )
+	ROM_LOAD( "14.bin",  0x02000, 0x2000, CRC(902060b4) SHA1(f371aa12ba3f554918e8a482114df166cd007b0e) )
 	ROM_LOAD( "11.bin",  0x04000, 0x2000, CRC(7676b970) SHA1(f5fcee4ca555e7c880c6bf5d5ea01ff8d619a837) )
 	ROM_LOAD( "12.bin",  0x06000, 0x2000, CRC(6f4a5d67) SHA1(182be475dfee4d272f57c030e3acd4e8cfa4fc53) )
 	ROM_LOAD( "9.bin",   0x08000, 0x2000, CRC(e7d51959) SHA1(34d9afb0f31dc1d02e7b85aa69345fc66cf0f554) )
 	ROM_LOAD( "10.bin",  0x0a000, 0x2000, CRC(6ea27bec) SHA1(30da81a99d5920107751afda359576e426c497c4) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "prom.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
+	ROM_LOAD( "prom.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // waveform
 ROM_END
 
 ROM_START( starforce )
@@ -822,33 +1233,33 @@ ROM_START( starforce )
 	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "1.3hj",    0x0000, 0x2000, CRC(2735bb22) SHA1(1bd0558e05b41aebab3911991969512df904fea5) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "7.2fh",   0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )    /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "7.2fh",   0x00000, 0x1000, CRC(f4803339) SHA1(a119d68c2dd1c0e191231ce77353b31f30f7aa76) )
 	ROM_LOAD( "8.3fh",   0x01000, 0x1000, CRC(96979684) SHA1(bb4f7d3afc8dfaa723dfb5374996cc4bfd76fa3c) )
 	ROM_LOAD( "9.3fh",   0x02000, 0x1000, CRC(eead1d5c) SHA1(7c9165ed227c5228122b494a265cbfd6e843ba61) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )    /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )
 	ROM_LOAD( "14.9jk",  0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
 	ROM_LOAD( "13.8jk",  0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )    /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )
 	ROM_LOAD( "11.9de",  0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
 	ROM_LOAD( "10.8de",  0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
 
-	ROM_REGION( 0x03000, "gfx4", 0 )
-	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )    /* bg3 */
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )
 	ROM_LOAD( "17.9pq",  0x01000, 0x1000, CRC(68c60d0f) SHA1(1152ba0c274ecadb534133a860bbc8a93577dcf2) )
 	ROM_LOAD( "16.8pq",  0x02000, 0x1000, CRC(ce20b469) SHA1(60177a669d9c8cbeedd03ca5e2edf3f589c1c815) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )    /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // waveform
 ROM_END
 
 ROM_START( megaforc )
@@ -856,39 +1267,39 @@ ROM_START( megaforc )
 	ROM_LOAD( "3.3p",     0x0000, 0x4000, CRC(8ba27691) SHA1(2b8b1e634ef5bed5c61a078e64a6dda77f84cdf5) )
 	ROM_LOAD( "2.3mn",    0x4000, 0x4000, CRC(0fc4d2d6) SHA1(0743e3928d5cc0e3f1bcdaf4b0cc83aeb7a2f7a8) )
 
-	ROM_REGION( 0x2000, "sub", 0 )     /* 64k for sound board */
+	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "1.3hj",    0x0000, 0x2000, CRC(2735bb22) SHA1(1bd0558e05b41aebab3911991969512df904fea5) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "7.2f",    0x00000, 0x1000, CRC(43ef8d20) SHA1(07ebe3e10fa56b671788a122cdc02e661b624f40) )    /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "7.2f",    0x00000, 0x1000, CRC(43ef8d20) SHA1(07ebe3e10fa56b671788a122cdc02e661b624f40) )
 	ROM_LOAD( "8.3f",    0x01000, 0x1000, CRC(c36fb746) SHA1(01960e068046bcc0e3e9370fdfe73f9fd64491ae) )
 	ROM_LOAD( "9.4f",    0x02000, 0x1000, CRC(62e7c9ec) SHA1(24dd1de3e268865c36c732714dc257c58cb88d67) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )    /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )
 	ROM_LOAD( "14.9jk",  0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
 	ROM_LOAD( "13.8jk",  0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )    /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )
 	ROM_LOAD( "11.9de",  0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
 	ROM_LOAD( "10.8de",  0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
 
-	ROM_REGION( 0x03000, "gfx4", 0 )
-	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )    /* bg3 */
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )
 	ROM_LOAD( "17.9pq",  0x01000, 0x1000, CRC(68c60d0f) SHA1(1152ba0c274ecadb534133a860bbc8a93577dcf2) )
 	ROM_LOAD( "16.8pq",  0x02000, 0x1000, CRC(ce20b469) SHA1(60177a669d9c8cbeedd03ca5e2edf3f589c1c815) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )    /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) /* waveform */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // waveform
 ROM_END
 
-ROM_START( megaforcu ) /* While no "For use in the United States" notice, it's licensed to a US company for distribution */
+ROM_START( megaforcu ) // While no "For use in the United States" notice, it's licensed to a US company for distribution
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "mf3.3p",   0x0000, 0x4000, CRC(d3ea82ec) SHA1(e15fda65ba24517cc04abc55b5d079a33327553c) )
 	ROM_LOAD( "mf2.3mn",  0x4000, 0x4000, CRC(aa320718) SHA1(cbbf8e4d06a1ecf77d776058d965afdaa7f5b47f) )
@@ -896,33 +1307,33 @@ ROM_START( megaforcu ) /* While no "For use in the United States" notice, it's l
 	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "1.3hj",    0x0000, 0x2000, CRC(2735bb22) SHA1(1bd0558e05b41aebab3911991969512df904fea5) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "7.2f",    0x00000, 0x1000, CRC(43ef8d20) SHA1(07ebe3e10fa56b671788a122cdc02e661b624f40) )    /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "7.2f",    0x00000, 0x1000, CRC(43ef8d20) SHA1(07ebe3e10fa56b671788a122cdc02e661b624f40) )
 	ROM_LOAD( "8.3f",    0x01000, 0x1000, CRC(c36fb746) SHA1(01960e068046bcc0e3e9370fdfe73f9fd64491ae) )
 	ROM_LOAD( "9.4f",    0x02000, 0x1000, CRC(62e7c9ec) SHA1(24dd1de3e268865c36c732714dc257c58cb88d67) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )   /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "15.10jk", 0x00000, 0x2000, CRC(c3bda12f) SHA1(3748ea8e34222a31a365a02ec77430f268b0b397) )
 	ROM_LOAD( "14.9jk",  0x02000, 0x2000, CRC(9e9384fe) SHA1(3aaa9cc64ef3775325f64733da4f6c328abf6514) )
 	ROM_LOAD( "13.8jk",  0x04000, 0x2000, CRC(84603285) SHA1(f4d6dfa3968fbd8ebf1a6451d5ea1821d65d9b49) )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )   /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "12.10de", 0x00000, 0x2000, CRC(fdd9e38b) SHA1(3766835d9e9fc7e5dd99521e7303562029b78a65) )
 	ROM_LOAD( "11.9de",  0x02000, 0x2000, CRC(668aea14) SHA1(62eb0df48f2f0c5778bb230cc3bf0b8eb3b4e3f8) )
 	ROM_LOAD( "10.8de",  0x04000, 0x2000, CRC(c62a19c1) SHA1(9ce0e29630d3c8cba4db4cff333b250481348968) )
 
-	ROM_REGION( 0x03000, "gfx4", 0 )
-	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )   /* bg3 */
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "18.10pq", 0x00000, 0x1000, CRC(6455c3ad) SHA1(b163ccd3dc26ccfa8be1d16d52e17bc660ff84e3) )
 	ROM_LOAD( "17.9pq",  0x01000, 0x1000, CRC(68c60d0f) SHA1(1152ba0c274ecadb534133a860bbc8a93577dcf2) )
 	ROM_LOAD( "16.8pq",  0x02000, 0x1000, CRC(ce20b469) SHA1(60177a669d9c8cbeedd03ca5e2edf3f589c1c815) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )   /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "6.10lm",  0x00000, 0x4000, CRC(5468a21d) SHA1(4a1196d4cfb99616efdac9b3927609a85c6f1758) )
 	ROM_LOAD( "5.9lm",   0x04000, 0x4000, CRC(f71717f8) SHA1(bf673571f772d8e0eddae89c00f31390c49a25d2) )
 	ROM_LOAD( "4.8lm",   0x08000, 0x4000, CRC(dd9d68a4) SHA1(34c60d2b34c7980bf65a5ebadb9c73f89128141f) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "07b.bin",  0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )    /* waveform */
+	ROM_LOAD( "07b.bin",  0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )   // waveform
 ROM_END
 
 ROM_START( baluba )
@@ -933,33 +1344,33 @@ ROM_START( baluba )
 	ROM_REGION( 0x2000, "sub", 0 )
 	ROM_LOAD( "2",    0x0000, 0x2000, CRC(441fbc64) SHA1(3853f80043e28e06a3ee399e3cd261b3ee94e0b9) )
 
-	ROM_REGION( 0x03000, "gfx1", 0 )
-	ROM_LOAD( "15",  0x00000, 0x1000, CRC(3dda0d84) SHA1(473c307c157bb229a31cd82ce4cdeca1ff604019) )   /* fg */
+	ROM_REGION( 0x03000, "fgtiles", 0 )
+	ROM_LOAD( "15",  0x00000, 0x1000, CRC(3dda0d84) SHA1(473c307c157bb229a31cd82ce4cdeca1ff604019) )
 	ROM_LOAD( "16",  0x01000, 0x1000, CRC(3ebc79d8) SHA1(a29b4e314446821cd4a2b1a9d3ff16ee3b6a8f7a) )
 	ROM_LOAD( "17",  0x02000, 0x1000, CRC(c4430deb) SHA1(e4c18ff2e2c82f3bce346267bc86d4160cb11995) )
 
-	ROM_REGION( 0x06000, "gfx2", 0 )
-	ROM_LOAD( "9",   0x00000, 0x2000, CRC(90f88c43) SHA1(e4ea963d9c31e34f70aa2b710760e0a102567988) )   /* bg1 */
+	ROM_REGION( 0x06000, "bgtiles1", 0 )
+	ROM_LOAD( "9",   0x00000, 0x2000, CRC(90f88c43) SHA1(e4ea963d9c31e34f70aa2b710760e0a102567988) )
 	ROM_LOAD( "10",  0x02000, 0x2000, CRC(ab117070) SHA1(d9a8580f3b0919208801b00501579cf81665fc36) )
 	ROM_LOAD( "11",  0x04000, 0x2000, CRC(e13b44b0) SHA1(70f3d2465a7652405e23809c81d7ec6ec501835b) )
 
-	ROM_REGION( 0x06000, "gfx3", 0 )
-	ROM_LOAD( "12",  0x00000, 0x2000, CRC(a6541c8d) SHA1(d7a211c58c2067f257f5a9e343ca4bf689edd514) )   /* bg2 */
+	ROM_REGION( 0x06000, "bgtiles2", 0 )
+	ROM_LOAD( "12",  0x00000, 0x2000, CRC(a6541c8d) SHA1(d7a211c58c2067f257f5a9e343ca4bf689edd514) )
 	ROM_LOAD( "13",  0x02000, 0x2000, CRC(afccdd18) SHA1(d238b52a9bb2dfffaf82ca38bc81c0cbd256f79c) )
 	ROM_LOAD( "14",  0x04000, 0x2000, CRC(69542e65) SHA1(4119a6f784ed57592d45d325123b261c8f118ca7) )
 
-	ROM_REGION( 0x03000, "gfx4", 0 )
-	ROM_LOAD( "8",   0x00000, 0x1000, CRC(31e97ef9) SHA1(ed25db4bdaf06f66cfb7179d80425dcb2cb41363) )   /* bg3 */
+	ROM_REGION( 0x03000, "bgtiles3", 0 )
+	ROM_LOAD( "8",   0x00000, 0x1000, CRC(31e97ef9) SHA1(ed25db4bdaf06f66cfb7179d80425dcb2cb41363) )
 	ROM_LOAD( "7",   0x01000, 0x1000, CRC(5915c5e2) SHA1(58301087d91b34747d5cff3c0dca8e9b441ce62d) )
 	ROM_LOAD( "6",   0x02000, 0x1000, CRC(ad6881da) SHA1(df629bd9192279b8ebd9d655a94949559e1f118d) )
 
-	ROM_REGION( 0x0c000, "gfx5", 0 )
-	ROM_LOAD( "5",   0x00000, 0x4000, CRC(3b6b6e96) SHA1(c55f4b6a5f7738a082c02d1adadd9e1d68a0d293) )   /* sprites */
+	ROM_REGION( 0x0c000, "sprites", 0 )
+	ROM_LOAD( "5",   0x00000, 0x4000, CRC(3b6b6e96) SHA1(c55f4b6a5f7738a082c02d1adadd9e1d68a0d293) )
 	ROM_LOAD( "4",   0x04000, 0x4000, CRC(dd954124) SHA1(f37687197d1564331dc27dace23dec462d02202c) )
 	ROM_LOAD( "3",   0x08000, 0x4000, CRC(7ac24983) SHA1(4ac32d95af3147af5b9b1af1f292bb629c5d4fb9) )
 
 	ROM_REGION( 0x0020, "dac", 0 )
-	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) )  /* waveform */
+	ROM_LOAD( "07b.bin", 0x0000, 0x0020, CRC(68db8300) SHA1(33cd6b5ed92d7b73a708f2e4b12b6e7f6496d0c6) ) // waveform
 ROM_END
 
 
@@ -987,12 +1398,14 @@ void senjyo_state::init_senjyo()
 	m_scrollhack = 0;
 }
 
+} // anonymous namespace
 
-GAME( 1983, senjyo,    0,        senjyo,    senjyo,   senjyo_state, init_senjyo,   ROT90, "Tehkan",                      "Senjyo", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforc,  0,        senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Star Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforce, starforc, senjyox_e, starforc, senjyo_state, init_starfore, ROT90, "Tehkan",                      "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1983, senjyo,    0,        senjyo,    senjyo,   senjyo_state, init_senjyo,   ROT90, "Tehkan",                      "Senjyo",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforc,  0,        senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Star Force",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforce, starforc, senjyox_e, starforc, senjyo_state, init_starfore, ROT90, "Tehkan",                      "Star Force (encrypted, set 1)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1984, starforcb, starforc, starforb,  starforc, senjyo_state, init_starfore, ROT90, "bootleg",                     "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforca, starforc, senjyox_a, starforc, senjyo_state, init_starfora, ROT90, "Tehkan",                      "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, megaforc,  starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Mega Force (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, megaforcu, starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforca, starforc, senjyox_a, starforc, senjyo_state, init_starfora, ROT90, "Tehkan",                      "Star Force (encrypted, set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, megaforc,  starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan",                      "Mega Force (World)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, megaforcu, starforc, senjyo,    starforc, senjyo_state, init_starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force (US)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1986, baluba,    0,        senjyo,    baluba,   senjyo_state, init_starforc, ROT90, "Able Corp, Ltd.",             "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )

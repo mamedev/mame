@@ -215,7 +215,12 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 		<notes><![CDATA[
 Black colored OEM CD with no id whatsoever
 ]]></notes>
-		<info name="language" value="English/French/German/Spanish/Norwegian/Portuguese" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Portuguese" />
 		<info name="region" value="Europe" />
 
 		<part name="cdrom" interface="cdrom">
@@ -251,7 +256,11 @@ Black colored OEM CD with no id whatsoever
 CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "Fishing Derby", "Freeway", "Frostbite", "Grand Prix",
 				 "H.E.R.O.", "Kaboom!", "Pitfall!", "River Raid", "Seaquest", "Sky Jinks", "Spider Fighter"
 ]]></notes>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 
 		<part name="cdrom" interface="cdrom">
@@ -446,7 +455,8 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<description>Alien Carnage (Europe)</description>
 		<year>1995</year>
 		<publisher>Kixx XL</publisher>
-		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="developer" value="SubZero Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="region" value="ver acs 1.0" />
@@ -465,7 +475,8 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<description>Alien Carnage (Netherlands)</description>
 		<year>1995</year>
 		<publisher>WizardWorks</publisher>
-		<info name="developer" value="Interactive Binary Illusions / SubZero Software" />
+		<info name="developer" value="Interactive Binary Illusions" />
+		<info name="developer" value="SubZero Software" />
 		<info name="distributor" value="Multi Media International" />
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
@@ -501,7 +512,10 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 Finnish language is only available in the installation setup
 ]]></notes>
 		<info name="developer" value="Housemarquee" />
-		<info name="language" value="English/French/German/Finnish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Finnish" />
 		<info name="region" value="Europe" />
 		<info name="version" value="v1.30" />
 		<sharedfeat name="platform" value="DOS" />
@@ -623,7 +637,11 @@ Finnish language is only available in the installation setup
 		<year>1993</year>
 		<publisher>Infogrames</publisher>
 		<info name="developer" value="Infogrames" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="Windows 95" />
 
@@ -661,7 +679,10 @@ Finnish language is only available in the installation setup
 Original 1993 release without speech
 ]]></notes>
 		<info name="developer" value="Infogrames" />
-		<info name="language" value="English/French/German/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="Windows 95" />
 
@@ -825,7 +846,11 @@ Original 1993 release without speech
 Includes DOS and Windows installation setup.
 ]]></notes>
 		<info name="developer" value="Infogrames" />
-		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -1602,7 +1627,9 @@ Wacky Wheels:
 		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<info name="developer" value="Blizzard Entertainment" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -1869,7 +1896,11 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
 		<!-- Multi 5 language support -->
-		<info name="language" value="English/German/French/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
+		<info name="language" value="French" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1885,7 +1916,11 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<publisher>Virgin</publisher>
 		<info name="developer" value="Revolution Software" />
 		<!-- Multi 5 language support -->
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1902,7 +1937,13 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<year>1996</year>
 		<publisher>Slash</publisher>
 		<info name="developer" value="Revolution Software" />
-		<info name="language" value="English/French/German/Italian/Portuguese/Spanish/Swedish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="region" value="USA" />
 		<info name="version" value="v0.0372" />
 		<sharedfeat name="platform" value="DOS" />
@@ -2258,7 +2299,9 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<notes><![CDATA[
 Offset [CDDA] audio, does not stop when exiting game (including getting to Windows shutdown screen)
 ]]></notes>
-		<info name="language" value="English/German/French" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
+		<info name="language" value="French" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2786,7 +2829,8 @@ Crash at the begining
 		<year>1995</year>
 		<publisher>Cyberdreams</publisher>
 		<info name="developer" value="Cyberdreams" />
-		<info name="language" value="English/German" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
 		<info name="region" value="Germany" />
 		<info name="version" value="1.5" />
 		<sharedfeat name="platform" value="DOS" />
@@ -2806,7 +2850,8 @@ Crash at the begining
 		<year>1994</year>
 		<publisher>Kixx</publisher>
 		<notes>CD-ROM includes: "Another World", "Cruise for a Corpse", "Flashback", "Future Wars", "Operation Stealth"</notes>
-		<info name="language" value="English/German" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3139,7 +3184,11 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<year>1995</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Cryo Interactive Entertainment" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3158,7 +3207,9 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<year>1995</year>
 		<publisher>Hit Squad</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Netherlands" />
 		<info name="version" value="V1.07" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3178,7 +3229,9 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<year>2001</year>
 		<publisher>Electronic Arts / Infogrames</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="version" value="V1.07" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3244,7 +3297,9 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Andrew Spencer Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3263,7 +3318,9 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Andrew Spencer Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3467,7 +3524,9 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<info name="version" value="3.7" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3487,7 +3546,9 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		<year>1995</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.1" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3599,7 +3660,9 @@ This release doesn't have audio speech.
 		<year>1993</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="USA" />
 		<info name="version" value="3.7" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3619,7 +3682,9 @@ This release doesn't have audio speech.
 		<year>1997</year>
 		<publisher>Slash</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="USA" />
 		<info name="version" value="3.7" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3639,7 +3704,9 @@ This release doesn't have audio speech.
 		<year>1993</year>
 		<publisher>Asia-CD</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Asia" />
 		<info name="version" value="3.7" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3659,7 +3726,9 @@ This release doesn't have audio speech.
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe/Japan" />
 		<info name="version" value="V1.02" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3679,7 +3748,9 @@ This release doesn't have audio speech.
 		<year>1995</year>
 		<publisher>Sold Out Software</publisher>
 		<info name="developer" value="Westwood Studios" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="UK" />
 		<info name="version" value="V1.0A" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3772,7 +3843,8 @@ This release doesn't have audio speech.
 		<year>1995</year>
 		<publisher>Renegade Software</publisher>
 		<info name="developer" value="Interactive Binary Illusions" />
-		<info name="language" value="English/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3791,7 +3863,8 @@ This release doesn't have audio speech.
 		<year>1995</year>
 		<publisher>Renegade Software</publisher>
 		<info name="developer" value="Interactive Binary Illusions" />
-		<info name="language" value="English/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3810,7 +3883,8 @@ This release doesn't have audio speech.
 		<year>1995</year>
 		<publisher>Renegade Software</publisher>
 		<info name="developer" value="Interactive Binary Illusions" />
-		<info name="language" value="French/German" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3936,8 +4010,13 @@ This release doesn't have audio speech.
 		<notes><![CDATA[
 Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 ]]></notes>
-		<info name="developer" value="Coktel Vision / M.D.O." />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="M.D.O." />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Italy" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -3956,7 +4035,8 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<description>Gobliiins (USA, Sierra Originals release)</description>
 		<year>1995</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="developer" value="Coktel Vision / M.D.O." />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="M.D.O." />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<info name="version" value="1.000 10.05.93" />
@@ -3978,7 +4058,10 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<year>1993</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Coktel Vision" />
-		<info name="language" value="English/French/German/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.02" />
 		<sharedfeat name="platform" value="DOS" />
@@ -4311,7 +4394,11 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<year>1993</year>
 		<publisher>GameTek</publisher>
 		<info name="developer" value="Imagitec Design" />
-		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
 		<info name="version" value="0.2 4/10/93" />
 		<sharedfeat name="platform" value="DOS" />
@@ -4351,7 +4438,11 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<year>1993</year>
 		<publisher>GameTek</publisher>
 		<info name="developer" value="Imagitec Design" />
-		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
 		<info name="version" value="0.2 4/10/93" />
 		<sharedfeat name="platform" value="DOS" />
@@ -4371,7 +4462,11 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<year>1993</year>
 		<publisher>GameTek</publisher>
 		<info name="developer" value="Imagitec Design" />
-		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
 		<info name="version" value="0.2 4/10/93" />
 		<sharedfeat name="platform" value="DOS" />
@@ -4610,8 +4705,14 @@ Untested multiplayer options
 		<description>Jazz Jackrabbit 2 (Europe)</description>
 		<year>1998</year>
 		<publisher>Project Two Interactive</publisher>
-		<info name="developer" value="Epic MegaGames / Orange Games" />
-		<info name="language" value="English/Dutch/French/German/Italian/Spanish" />
+		<info name="developer" value="Epic MegaGames" />
+		<info name="developer" value="Orange Games" />
+		<info name="language" value="English" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.20" />
 		<sharedfeat name="platform" value="Windows 95" />
@@ -4643,7 +4744,11 @@ Untested multiplayer options
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="Ocean" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.32" />
 		<sharedfeat name="platform" value="DOS" />
@@ -4675,7 +4780,11 @@ Untested multiplayer options
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="Ocean" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Germany" />
 		<info name="version" value="1.37" />
 		<sharedfeat name="platform" value="DOS" />
@@ -4707,7 +4816,11 @@ Untested multiplayer options
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="Ocean" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="USA" />
 		<info name="version" value="1.37" />
 		<sharedfeat name="platform" value="DOS" />
@@ -4953,7 +5066,11 @@ Offset [CDDA] audio
 https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 ]]></notes>
 		<!-- Multi 5 language support -->
-		<info name="language" value="English/German/French/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
+		<info name="language" value="French" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5735,7 +5852,11 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Psygnosis"/>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="USA" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -6293,7 +6414,11 @@ Not extensively tested for the high requirements
 Includes DOS and Windows installation setup.
 ]]></notes>
 		<info name="developer" value="Krisalis" />
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 
@@ -6750,7 +6875,8 @@ Includes DOS and Windows installation setup.
 		Autorun fails to launch on Windows 95, but setup.exe and the game work.
 		]]></notes>
 		<info name="alt_title" value="索尼克CD" />
-		<info name="language" value="Chinese/English" />
+		<info name="language" value="Chinese" />
+		<info name="language" value="English" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sonic cd (china)" sha1="14aba3162a0ed8c734c7713a1986f80aa58c6e47" />
@@ -6797,7 +6923,9 @@ Includes DOS and Windows installation setup.
 		<publisher>Interplay</publisher>
 		<info name="copy_protection" value="Manual required for map" />
 		<info name="developer" value="Interplay" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
 		<part name="cdrom" interface="cdrom">
@@ -7089,7 +7217,10 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		<year>1995</year>
 		<publisher>MicroProse</publisher>
 		<info name="developer" value="Chris Sawyer"/>
-		<info name="language" value="English/French/German/Spanish"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="transport tycoon deluxe (europe)" sha1="b81c9f530ffa6f75fceb0d631ff72cb97e0c8d6f"/>
@@ -7474,7 +7605,11 @@ Other stuff untested
 		<description>PartitionMagic 8.05</description>
 		<year>2004</year>
 		<publisher>Symantec</publisher>
-		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<info name="release" value="20040505" />
 		<info name="usage" value="Windows installer accepts any string starting with &quot;PM805EN1-&quot; for a product key." />
 		<info name="version" value="8.05" />
@@ -8313,7 +8448,13 @@ Installation and Open Circulation CDs are bootable.
 		<description>Windows NT 3.1 Service Pack 2</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish/Swedish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="English, Norwegian" />
@@ -8339,7 +8480,13 @@ Installation and Open Circulation CDs are bootable.
 		<description>Windows NT 3.1 Service Pack 3</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish/Swedish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="English, Swedish" />
@@ -8468,7 +8615,17 @@ Installation and Open Circulation CDs are bootable.
 		<description>Windows NT 3.5 Service Pack 2</description>
 		<year>1995</year>
 		<publisher>Microsoft</publisher>
-		<info name="language" value="Danish/Dutch/English/Finnish/French/German/Italian/Norwegian/Portuguese (Brazil)/Spanish/Swedish" />
+		<info name="language" value="Danish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="Finnish" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
 		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="English" />
@@ -8587,7 +8744,10 @@ Installation and Open Circulation CDs are bootable.
 		<description>Windows NT 3.51 Service Pack 4</description>
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
-		<info name="language" value="English/French/German/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
 		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9425,7 +9585,28 @@ Installation and Open Circulation CDs are bootable.
 		<year>2000</year>
 		<publisher>Microsoft</publisher>
 		<info name="release" value="20000518" />
-		<info name="language" value="Arabic/Chinese (Simplified)/Chinese (Traditional)/Czech/Danish/Dutch/French/Finnish/German/Hebrew/Hungarian/Italian/Japanese/Korean/Norwegian/Polish/Portuguese (Brazil)/Portuguese (Europe)/Russian/Spanish/Swedish/Turkish" />
+		<info name="language" value="Arabic" />
+		<info name="language" value="Chinese (Simplified)" />
+		<info name="language" value="Chinese (Traditional)" />
+		<info name="language" value="Czech" />
+		<info name="language" value="Danish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="French" />
+		<info name="language" value="Finnish" />
+		<info name="language" value="German" />
+		<info name="language" value="Hebrew" />
+		<info name="language" value="Hungarian" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Korean" />
+		<info name="language" value="Norwegian" />
+		<info name="language" value="Polish" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="language" value="Portuguese (Europe)" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Swedish" />
+		<info name="language" value="Turkish" />
 		<info name="usage" value="Installs on the US-English version of Windows 2000; disc 1 is the Windows 2000 install disc" />
 		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />
@@ -9533,7 +9714,9 @@ Video editing software for [ZR36067]-based PCI card, can also detect [DC30] and 
 Has an HW tester, DirectDraw fails to enable overlay with [ViRGE] Scenic Highway interface
 ]]></notes>
 		<!-- Serial number: 3920519554 -->
-		<info name="language" value="Deutsch/Dutch/English"/>
+		<info name="language" value="Deutsch" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pinnacle-studio-dc10-plus" sha1="1530776b913e21774ade2b160960f2fe70bf4c6b"/>
@@ -9819,7 +10002,12 @@ Text Reader
 Texto'LE v1.2
 Wave Studio v3.12
 ]]></notes>
-		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
 		<sharedfeat name="platform" value="Windows 3.x/Windows 95" />
 
 		<part name="cdrom" interface="cdrom">

@@ -121,6 +121,7 @@ protected:
 	int8_t              m_mcir;
 	uint16_t            m_vsel;
 	uint8_t             m_cp_state;
+	bool                m_cp[4];
 	bool                m_vec_active;
 	bool                m_pf_active;
 	bool                m_berr_active;
@@ -1195,6 +1196,16 @@ protected:
 	void sub_ixd_ixd(uint16_t op);
 };
 
+class lsi11_device : public t11_device, public z80_daisy_chain_interface
+{
+public:
+	// construction/destruction
+	lsi11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void t11_check_irqs() override;
+};
+
 class k1801vm1_device : public t11_device, public z80_daisy_chain_interface
 {
 public:
@@ -1229,6 +1240,7 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(T11,      t11_device)
+DECLARE_DEVICE_TYPE(LSI11,    lsi11_device)
 DECLARE_DEVICE_TYPE(K1801VM1, k1801vm1_device)
 DECLARE_DEVICE_TYPE(K1801VM2, k1801vm2_device)
 

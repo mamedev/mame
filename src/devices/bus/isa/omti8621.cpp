@@ -233,7 +233,7 @@ static INPUT_PORTS_START( omti_port )
 	PORT_DIPSETTING(    0x01, "Enabled" )
 	PORT_DIPNAME( 0x02, 0x00, "BIOS base")
 	PORT_DIPSETTING(    0x00, "C8000h" )
-	PORT_DIPSETTING(    0x01, "CA000h" )
+	PORT_DIPSETTING(    0x02, "CA000h" )
 INPUT_PORTS_END
 
 void omti8621_device::device_add_mconfig(machine_config &config)

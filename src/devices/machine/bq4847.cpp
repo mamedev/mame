@@ -119,7 +119,8 @@ void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 	}
 
 	// Clear the saved flags (TODO: check that flags set before power down, or during battery backup are lost)
-	m_register[reg_flags] = 0x00;
+	// The BVF flag should be set to 1 (battery valid flag)
+	m_register[reg_flags] = FLAG_BVF;
 
 	// Interrupts must be re-enabled on power-up (TODO: check, datasheet does not explicitly say ABE & PIE are cleared)
 	m_register[reg_interrupts] = 0x00;
@@ -306,7 +307,8 @@ uint8_t bq4847_device::read(offs_t address)
 	if (regnum == reg_flags)
 	{
 		value &= 0x7f;
-		m_userbuffer[reg_flags] = 0x00;
+		// Clear all flags except for the battery valid flag
+		m_userbuffer[reg_flags] = FLAG_BVF;
 		update_int();
 	}
 	else if (regnum >= reg_interrupts && regnum <= reg_control)

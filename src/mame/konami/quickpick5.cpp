@@ -73,7 +73,7 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	K05324X_CB_MEMBER(sprite_callback) { *priority = ~*color >> 4 & 2; }
+	K053244_CB_MEMBER(sprite_callback) { priority = ~color >> 4 & 2; }
 	virtual TILE_GET_INFO_MEMBER(ttl_get_tile_info);
 	void ccu_int_time_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -103,7 +103,7 @@ protected:
 	required_shared_ptr<u8> m_vram;
 	required_region_ptr<u8> m_ttlrom;
 	required_device<hopper_device> m_hopper;
-	required_device<k05324x_device> m_k053245;
+	required_device<k053244_device> m_k053245;
 	required_device<k051649_device> m_k051649;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
@@ -111,13 +111,13 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<okim6295_device> m_oki;
 
-	int m_ttl_gfx_index = 0;
+	s32 m_ttl_gfx_index = 0;
 	tilemap_t *m_ttl_tilemap;
 	u8 m_control = 0;
 	u16 m_scrollx = 0;
-	int m_ttlrom_offset = 0;
-	int m_ccu_int_time = 0;
-	int m_ccu_int_time_count = 0;
+	u32 m_ttlrom_offset = 0;
+	s32 m_ccu_int_time = 0;
+	s32 m_ccu_int_time_count = 0;
 };
 
 class quickpick5_state : public waijockey_state

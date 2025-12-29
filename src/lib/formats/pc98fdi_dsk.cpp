@@ -105,9 +105,4 @@ bool pc98fdi_format::load(util::random_read &io, uint32_t form_factor, const std
 	return true;
 }
 
-bool pc98fdi_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const pc98fdi_format FLOPPY_PC98FDI_FORMAT;

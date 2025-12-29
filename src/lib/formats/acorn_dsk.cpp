@@ -99,7 +99,7 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 				sectors2 = sectors0;
 			}
 
-			if (sectors0 > 0 && sectors2 > 0 && sectors0 % 10 == 0 && sectors2 % 10 == 0 && size <= (sectors0 + sectors2) * 256)
+			if (sectors0 > 0 && sectors2 > 0 && size <= (sectors0 + sectors2) * 256)
 				return i;
 		}
 	}
@@ -111,7 +111,7 @@ int acorn_ssd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_SIZE | FIFID_STRUCT;
+		return FIFID_SIZE | FIFID_HINT;
 
 	return 0;
 }
@@ -241,7 +241,7 @@ int acorn_dsd_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_STRUCT | FIFID_SIZE;
+		return FIFID_HINT | FIFID_SIZE;
 
 	return 0;
 }
@@ -338,7 +338,7 @@ int opus_ddos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_STRUCT | FIFID_SIZE;
+		return FIFID_HINT | FIFID_SIZE;
 
 	return 0;
 }
@@ -433,7 +433,7 @@ int acorn_adfs_old_format::identify(util::random_read &io, uint32_t form_factor,
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_STRUCT | FIFID_SIZE;
+		return FIFID_HINT | FIFID_SIZE;
 
 	return 0;
 }
@@ -535,7 +535,7 @@ int acorn_adfs_new_format::identify(util::random_read &io, uint32_t form_factor,
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_STRUCT | FIFID_SIZE;
+		return FIFID_HINT | FIFID_SIZE;
 
 	return 0;
 }
@@ -611,7 +611,7 @@ int acorn_dos_format::identify(util::random_read &io, uint32_t form_factor, cons
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_STRUCT | FIFID_SIZE;
+		return FIFID_HINT | FIFID_SIZE;
 
 	return 0;
 }
@@ -648,11 +648,6 @@ const char *opus_ddcpm_format::description() const noexcept
 const char *opus_ddcpm_format::extensions() const noexcept
 {
 	return "ssd";
-}
-
-bool opus_ddcpm_format::supports_save() const noexcept
-{
-	return false;
 }
 
 int opus_ddcpm_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
@@ -720,11 +715,6 @@ bool opus_ddcpm_format::load(util::random_read &io, uint32_t form_factor, const 
 	return true;
 }
 
-bool opus_ddcpm_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
-{
-	return false;
-}
-
 
 cumana_dfs_format::cumana_dfs_format() : wd177x_format(formats)
 {
@@ -775,7 +765,7 @@ int cumana_dfs_format::identify(util::random_read &io, uint32_t form_factor, con
 	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
-		return FIFID_STRUCT | FIFID_SIZE;
+		return FIFID_HINT | FIFID_SIZE;
 
 	return 0;
 }

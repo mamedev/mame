@@ -92,9 +92,4 @@ bool dip_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	return true;
 }
 
-bool dip_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const dip_format FLOPPY_DIP_FORMAT;

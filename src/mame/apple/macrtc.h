@@ -13,7 +13,7 @@
 #pragma once
 
 #include "dirtc.h"
-
+#include "machine/macseconds.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -23,7 +23,8 @@
 
 class rtc3430042_device :  public device_t,
 						public device_rtc_interface,
-						public device_nvram_interface
+						public device_nvram_interface,
+						public macseconds_interface
 {
 	friend class rtc3430040_device;
 

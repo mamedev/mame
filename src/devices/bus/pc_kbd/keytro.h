@@ -56,7 +56,7 @@ protected:
 	uint8_t p3_read();
 	void p3_write(uint8_t data);
 
-	void keytronic_pc3270_io(address_map &map) ATTR_COLD;
+	void keytronic_pc3270_data(address_map &map) ATTR_COLD;
 	void keytronic_pc3270_program(address_map &map) ATTR_COLD;
 
 	required_device<i8051_device> m_cpu;

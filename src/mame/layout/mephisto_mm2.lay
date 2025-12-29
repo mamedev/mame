@@ -520,11 +520,11 @@ thanks-to:Franz Huber
 		<element ref="keys" inputtag="KEY.1" inputmask="0x01"><bounds x="89" y="98" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="keys" inputtag="KEY.1" inputmask="0x02"><bounds x="94" y="98" width="4" height="4" /><color alpha="0.25" /></element>
 
-		<element ref="nothing" inputtag="RESET" inputmask="0x02" clickthrough="yes"><bounds x="69" y="103" width="4" height="4" /></element>
-		<element ref="keys" inputtag="RESET" inputmask="0x01"><bounds x="69" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="nothing" inputtag="RESET" inputmask="0x02"><bounds x="69" y="103" width="4" height="4" /></element>
+		<element ref="keys" inputtag="RESET" inputmask="0x01" clickthrough="yes"><bounds x="69" y="103" width="4" height="4" /><color alpha="0.25" /></element>
 
-		<element ref="nothing" inputtag="RESET" inputmask="0x01" clickthrough="yes"><bounds x="74" y="103" width="4" height="4" /></element>
-		<element ref="keys" inputtag="RESET" inputmask="0x02"><bounds x="74" y="103" width="4" height="4" /><color alpha="0.25" /></element>
+		<element ref="nothing" inputtag="RESET" inputmask="0x01"><bounds x="74" y="103" width="4" height="4" /></element>
+		<element ref="keys" inputtag="RESET" inputmask="0x02" clickthrough="yes"><bounds x="74" y="103" width="4" height="4" /><color alpha="0.25" /></element>
 
 		<element ref="keys" inputtag="KEY.1" inputmask="0x04"><bounds x="79" y="103" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="keys" inputtag="KEY.1" inputmask="0x10"><bounds x="84" y="103" width="4" height="4" /><color alpha="0.25" /></element>

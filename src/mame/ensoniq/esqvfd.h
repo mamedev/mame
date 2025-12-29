@@ -11,7 +11,7 @@ class esqvfd_device : public device_t {
 public:
 	void write(uint8_t data) { write_char(data); }
 
-	virtual void write_char(int data) = 0;
+	virtual void write_char(uint8_t data) = 0;
 	virtual void update_display();
 	virtual bool write_contents(std::ostream &o) { return false; }
 
@@ -36,7 +36,7 @@ protected:
 
 	typedef std::tuple<output_helper::ptr, int, int> dimensions_param;
 
-	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<R * C> >(device), R, C); }
+	template <int R, int C> static dimensions_param make_dimensions(device_t &device) { return dimensions_param(std::make_unique<output_helper_impl<2 * R * C> >(device), R, C); }
 
 	esqvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dimensions_param &&dimensions);
 
@@ -64,7 +64,7 @@ class esq1x22_device : public esqvfd_device {
 public:
 	esq1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void write_char(int data) override;
+	virtual void write_char(uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -76,7 +76,7 @@ class esq2x40_device : public esqvfd_device {
 public:
 	esq2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void write_char(int data) override;
+	virtual void write_char(uint8_t data) override;
 	virtual bool write_contents(std::ostream &o) override;
 
 protected:
@@ -87,7 +87,7 @@ class esq2x40_sq1_device : public esqvfd_device {
 public:
 	esq2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void write_char(int data) override;
+	virtual void write_char(uint8_t data) override;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

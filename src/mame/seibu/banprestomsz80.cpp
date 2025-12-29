@@ -397,7 +397,7 @@ void banprestomsz80_state::banprestomsz80(machine_config &config)
 }
 
 
-// ウルトラマン倶楽部 大地防衛戦 (Club Ultraman - Daichikyū Bōeisen)
+// ウルトラマン倶楽部 大地防衛戦 (Club Ultraman - Daichi Bōeisen)
 ROM_START( dnjsenso )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s83-c01.u0129", 0x00000, 0x10000, CRC(b9cb8a41) SHA1(4ca9c6dd44691e90ac8373fc7e1e6c704cb2f64c) )
@@ -421,4 +421,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, dnjsenso, 0, banprestomsz80, dnjsenso, banprestomsz80_state, empty_init, ROT0, "Banpresto", "Club Ultraman - Daichikyu Boeisen", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dnjsenso, 0, banprestomsz80, dnjsenso, banprestomsz80_state, empty_init, ROT0, "Banpresto", "Club Ultraman - Daichi Boeisen", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

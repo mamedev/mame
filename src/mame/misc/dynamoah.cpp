@@ -81,7 +81,7 @@ void dynamoah_state::dynamoah(machine_config &config)
 	i80c31_device &maincpu(I80C31(config, "maincpu", 6'144'000)); // SC80C31BCCN40
 	// clock needs verification, being the XTAL value from a different board
 	maincpu.set_addrmap(AS_PROGRAM, &dynamoah_state::i8031_mem);
-	maincpu.set_addrmap(AS_IO, &dynamoah_state::i8031_ext_mem);
+	maincpu.set_addrmap(AS_DATA, &dynamoah_state::i8031_ext_mem);
 	maincpu.port_in_cb<1>().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
 	maincpu.port_in_cb<1>().append_constant(0x7f).mask(0x7f);
 	maincpu.port_out_cb<1>().set("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(7);

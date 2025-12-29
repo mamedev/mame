@@ -111,8 +111,6 @@ void if800_state::if800(machine_config &config)
 	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 
 	PALETTE(config, m_palette).set_entries(8);
-
-//  MCFG_VIDEO_START_OVERRIDE(if800_state,if800)
 }
 
 /* ROM definition */

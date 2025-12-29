@@ -608,8 +608,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1983, chexx83,    0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME( 1983, faceoffh,   chexx83,   faceoffh, chexx83, faceoffh_state, empty_init, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, olihockey,  0,         chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, olihockeya, olihockey, chexx,    chexx83, chexx_state,    empty_init, ROT270, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
-GAME( 198?, unkbubsc,   0,         unkbubsc, chexx83, chexx_state,    empty_init, ROT270, "<unknown>",                                           "unknown bubble soccer game",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, chexx83,    0,         chexx,    chexx83, chexx_state,    empty_init, ROT0, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, faceoffh,   chexx83,   faceoffh, chexx83, faceoffh_state, empty_init, ROT0, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, olihockey,  0,         chexx,    chexx83, chexx_state,    empty_init, ROT0, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, olihockeya, olihockey, chexx,    chexx83, chexx_state,    empty_init, ROT0, "Inor",                                                "Olimpic Hockey (EM Bubble Hockey, set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 198?, unkbubsc,   0,         unkbubsc, chexx83, chexx_state,    empty_init, ROT0, "<unknown>",                                           "unknown bubble soccer game",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

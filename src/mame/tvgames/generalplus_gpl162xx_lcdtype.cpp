@@ -134,7 +134,7 @@ private:
 	uint16_t unk_78d8_r();
 	void unk_78d8_w(uint16_t data);
 
-	enum spistate : const int
+	enum spistate : int
 	{
 	   SPI_STATE_READY = 0,
 	   SPI_STATE_WAITING_HIGH_ADDR = 1,
@@ -155,7 +155,7 @@ private:
 
 	spistate m_spistate;
 
-	enum lcdstate : const int
+	enum lcdstate : int
 	{
 		LCD_STATE_READY = 0,
 		LCD_STATE_WAITING_FOR_COMMAND = 1,

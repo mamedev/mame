@@ -10,20 +10,57 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "ramdisc.h"
 
+#include "machine/nvram.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_RAMDISC, bbc_ramdisc_device, "bbc_ramdisc", "Morley Electronics RAM Disc");
+namespace {
+
+class bbc_ramdisc_device: public device_t, public device_bbc_1mhzbus_interface
+{
+public:
+	bbc_ramdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_RAMDISC, tag, owner, clock)
+		, device_bbc_1mhzbus_interface(mconfig, *this)
+		, m_1mhzbus(*this, "1mhzbus")
+		, m_nvram(*this, "nvram")
+		, m_ram_size(*this, "SIZE")
+		, m_power(*this, "POWER")
+		, m_sector(0)
+	{
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(power_changed);
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual uint8_t fred_r(offs_t offset) override;
+	virtual void fred_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t jim_r(offs_t offset) override;
+	virtual void jim_w(offs_t offset, uint8_t data) override;
+
+private:
+	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;
+	required_device<nvram_device> m_nvram;
+	required_ioport m_ram_size;
+	required_ioport m_power;
+
+	std::unique_ptr<uint8_t[]> m_ram;
+	uint16_t m_sector;
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( ramdisc )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START(ramdisc)
@@ -37,17 +74,14 @@ static INPUT_PORTS_START(ramdisc)
 	PORT_CONFSETTING(0x02, "2MB")
 INPUT_PORTS_END
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor bbc_ramdisc_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ramdisc);
 }
 
+
 //-------------------------------------------------
-//  ROM( ramdisc )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START(ramdisc)
@@ -55,47 +89,27 @@ ROM_START(ramdisc)
 	ROM_LOAD("ramdisc101.rom", 0x0000, 0x4000, CRC(627568c2) SHA1(17e727998756fe35ff451fd2ce1d4b5977be24fc))
 ROM_END
 
+const tiny_rom_entry *bbc_ramdisc_device::device_rom_region() const
+{
+	return ROM_NAME(ramdisc);
+}
+
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void bbc_ramdisc_device::device_add_mconfig(machine_config &config)
 {
-	/* ram disk */
+	// ram disk
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, DERIVED_CLOCK(1, 1), bbc_1mhzbus_devices, nullptr);
 	m_1mhzbus->irq_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_1mhzbus->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
+	//m_1mhzbus->add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0);
 }
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *bbc_ramdisc_device::device_rom_region() const
-{
-	return ROM_NAME(ramdisc);
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_ramdisc_device - constructor
-//-------------------------------------------------
-
-bbc_ramdisc_device::bbc_ramdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_RAMDISC, tag, owner, clock)
-	, device_bbc_1mhzbus_interface(mconfig, *this)
-	, m_1mhzbus(*this, "1mhzbus")
-	, m_nvram(*this, "nvram")
-	, m_ram_size(*this, "SIZE")
-	, m_power(*this, "POWER")
-	, m_sector(0)
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -103,11 +117,11 @@ bbc_ramdisc_device::bbc_ramdisc_device(const machine_config &mconfig, const char
 
 void bbc_ramdisc_device::device_start()
 {
-	/* define 2mb ram */
+	// define 2mb ram
 	m_ram = std::make_unique<uint8_t[]>(0x200000);
 	m_nvram->set_base(m_ram.get(), 0x200000);
 
-	/* register for save states */
+	// register for save states
 	save_pointer(NAME(m_ram), 0x200000);
 	save_item(NAME(m_sector));
 }
@@ -119,7 +133,7 @@ void bbc_ramdisc_device::device_start()
 
 INPUT_CHANGED_MEMBER(bbc_ramdisc_device::power_changed)
 {
-	/* clear RAM on power off */
+	// clear RAM on power off
 	if (!newval)
 	{
 		memset(m_ram.get(), 0xff, 0x200000);
@@ -135,17 +149,17 @@ uint8_t bbc_ramdisc_device::fred_r(offs_t offset)
 		switch (offset)
 		{
 		case 0xc0:
-			/* sector LSB */
+			// sector LSB
 			data = m_sector & 0x00ff;
 			break;
 		case 0xc2:
-			/* sector MSB */
+			// sector MSB
 			data = (m_sector & 0xff00) >> 8;
 			break;
 		case 0xc1:
 		case 0xc3:
-			/* TODO: unknown purpose, must return 0x3f or 0x5f */
-			data = 0x3f;
+			// TODO: unknown purpose, must return 0x3f or 0x5f
+			data = 0x1f | (m_ram_size->read() << 5);
 			logerror("Read %04x -> %02x\n", offset | 0xfcc0, data);
 			break;
 		}
@@ -163,16 +177,16 @@ void bbc_ramdisc_device::fred_w(offs_t offset, uint8_t data)
 		switch (offset)
 		{
 		case 0xc0:
-			/* sector LSB */
+			// sector LSB
 			m_sector = (m_sector & 0xff00) | data;
 			break;
 		case 0xc2:
-			/* sector MSB */
+			// sector MSB
 			m_sector = (m_sector & 0x00ff) | (data << 8);
 			break;
 		case 0xc1:
 		case 0xc3:
-			/* TODO: unknown purpose, always writes 0x00 or 0xff */
+			// TODO: unknown purpose, always writes 0x00 or 0xff
 			logerror("Write %04x <- %02x\n", offset | 0xfcc0, data);
 			break;
 		}
@@ -185,8 +199,8 @@ uint8_t bbc_ramdisc_device::jim_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	/* power on and sector < 2mb */
-	if (m_power->read() && m_sector < (m_ram_size->read() << 8))
+	// power on and sector < 2mb
+	if (m_power->read() && m_sector < (m_ram_size->read() << 12))
 	{
 		data &= m_ram[(m_sector << 8) | offset];
 	}
@@ -198,11 +212,16 @@ uint8_t bbc_ramdisc_device::jim_r(offs_t offset)
 
 void bbc_ramdisc_device::jim_w(offs_t offset, uint8_t data)
 {
-	/* power on and sector < 2mb */
-	if (m_power->read() && m_sector < (m_ram_size->read() << 8))
+	// power on and sector < 2mb
+	if (m_power->read() && m_sector < (m_ram_size->read() << 12))
 	{
 		m_ram[(m_sector << 8) | offset] = data;
 	}
 
 	m_1mhzbus->jim_w(offset, data);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_RAMDISC, device_bbc_1mhzbus_interface, bbc_ramdisc_device, "bbc_ramdisc", "Morley Electronics RAM Disc");

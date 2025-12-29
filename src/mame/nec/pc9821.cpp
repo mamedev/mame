@@ -341,7 +341,7 @@ void pc9821_state::pc9821_mode_ff_w(u8 data)
 // $e0000 base
 void pc9821_state::pegc_mmio_map(address_map &map)
 {
-	map(0x0004, 0x0004).select(2).lrw8(
+	map(0x004, 0x004).select(2).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_pegc.bank[offset];
 		}),

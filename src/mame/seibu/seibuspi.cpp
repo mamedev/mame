@@ -895,15 +895,15 @@ Notes:
 
 
 // default values written to CRTC (note: SYS386F does not have this chip)
-#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
+static constexpr XTAL PIXEL_CLOCK = XTAL(28'636'363)/4;
 
-#define SPI_HTOTAL   (448)
-#define SPI_HBEND    (0)
-#define SPI_HBSTART  (320)
+static constexpr u16 SPI_HTOTAL  = 448;
+static constexpr u16 SPI_HBEND   = 0;
+static constexpr u16 SPI_HBSTART = 320;
 
-#define SPI_VTOTAL   (296)
-#define SPI_VBEND    (0)
-#define SPI_VBSTART  (240) /* actually 253, but visible area is 240 lines */
+static constexpr u16 SPI_VTOTAL  = 296;
+static constexpr u16 SPI_VBEND   = 0;
+static constexpr u16 SPI_VBSTART = 240; /* actually 253, but visible area is 240 lines */
 
 
 #define ENABLE_SPEEDUP_HACKS 1 /* speed up at idle loops */
@@ -911,7 +911,7 @@ Notes:
 
 /*****************************************************************************/
 
-u8 seibuspi_state::sound_fifo_status_r()
+u8 seibuspi_z80_state::sound_fifo_status_r()
 {
 	// d0: fifo full flag (z80)
 	// d1: fifo empty flag (main)
@@ -920,27 +920,27 @@ u8 seibuspi_state::sound_fifo_status_r()
 	return d1 | m_soundfifo[0]->ff_r();
 }
 
-u8 seibuspi_state::spi_status_r()
+u8 seibuspi_base_state::spi_status_r()
 {
 	// d0: unknown status, waits for it to be set, video/dma related?
 	// other bits: unused?
 	return 0x01;
 }
 
-u8 seibuspi_state::spi_ds2404_unknown_r()
+u8 seibuspi_z80_state::spi_ds2404_unknown_r()
 {
 	// d0, d1, d2: unknown, waits for it to be cleared
 	return 0x00;
 }
 
-void seibuspi_state::eeprom_w(u8 data)
+void seibuspi_base_state::eeprom_w(u8 data)
 {
-	m_eeprom->di_write((data & 0x80) ? 1 : 0);
-	m_eeprom->clk_write((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 7));
+	m_eeprom->clk_write(BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void seibuspi_state::spi_layerbanks_eeprom_w(u8 data)
+void seibuspi_tilemap_state::spi_layerbanks_eeprom_w(u8 data)
 {
 	// low bits: tile banks
 	rf2_layer_bank_w(data);
@@ -949,9 +949,9 @@ void seibuspi_state::spi_layerbanks_eeprom_w(u8 data)
 	eeprom_w(data);
 }
 
-void seibuspi_state::oki_bank_w(u8 data)
+void sys386i_state::oki_bank_w(u8 data)
 {
-	m_oki[1]->set_rom_bank((data >> 2) & 1);
+	m_oki[1]->set_rom_bank(BIT(data, 2));
 }
 
 void seibuspi_state::z80_prg_transfer_w(u8 data)
@@ -968,10 +968,10 @@ void seibuspi_state::z80_enable_w(u8 data)
 	// d0: reset z80
 	// other bits: unused
 	m_z80_prg_transfer_pos = 0;
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-u8 seibuspi_state::sb_coin_r()
+u8 seibuspi_z80_state::sb_coin_r()
 {
 	const u8 ret = m_sb_coin_latch;
 	if (!machine().side_effects_disabled())
@@ -979,38 +979,38 @@ u8 seibuspi_state::sb_coin_r()
 	return ret;
 }
 
-u32 seibuspi_state::ejsakura_keyboard_r()
+u32 sys386f_state::input_mux_r()
 {
 	// coins/eeprom data
 	u32 ret = m_special->read();
 
 	// switch matrix
-	if (BIT(m_ejsakura_input_port, 0)) ret &= m_key[3]->read();
-	if (BIT(m_ejsakura_input_port, 1)) ret &= m_key[4]->read();
-	if (BIT(m_ejsakura_input_port, 2)) ret &= m_key[2]->read();
-	if (BIT(m_ejsakura_input_port, 3)) ret &= m_key[0]->read();
-	if (BIT(m_ejsakura_input_port, 4)) ret &= m_key[1]->read();
+	if (BIT(m_input_select, 0)) ret &= m_key[3]->read();
+	if (BIT(m_input_select, 1)) ret &= m_key[4]->read();
+	if (BIT(m_input_select, 2)) ret &= m_key[2]->read();
+	if (BIT(m_input_select, 3)) ret &= m_key[0]->read();
+	if (BIT(m_input_select, 4)) ret &= m_key[1]->read();
 	ret = (ret & ~u32(0x1f)) | bitswap<5>(ret, 0, 1, 2, 3, 4);
 
 	return ret;
 }
 
-void seibuspi_state::ejsakura_input_select_w(u32 data)
+void sys386f_state::input_select_w(u32 data)
 {
-	m_ejsakura_input_port = data;
+	m_input_select = data;
 }
 
 
-void seibuspi_state::base_map(address_map &map)
+void seibuspi_tilemap_state::base_map(address_map &map)
 {
-	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	map(0x00000000, 0x0003ffff).ram().share(m_mainram);
 	map(0x00000400, 0x0000043f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
-	map(0x00000480, 0x00000483).w(FUNC(seibuspi_state::tilemap_dma_start_w));
-	map(0x00000484, 0x00000487).w(FUNC(seibuspi_state::palette_dma_start_w));
-	map(0x00000490, 0x00000493).w(FUNC(seibuspi_state::video_dma_length_w));
-	map(0x00000494, 0x00000497).w(FUNC(seibuspi_state::video_dma_address_w));
+	map(0x00000480, 0x00000483).w(FUNC(seibuspi_tilemap_state::tilemap_dma_start_w));
+	map(0x00000484, 0x00000487).w(FUNC(seibuspi_tilemap_state::palette_dma_start_w));
+	map(0x00000490, 0x00000493).w(FUNC(seibuspi_tilemap_state::video_dma_length_w));
+	map(0x00000494, 0x00000497).w(FUNC(seibuspi_tilemap_state::video_dma_address_w));
 	map(0x00000498, 0x0000049b).nopw(); // ? dma address high bits? (always writes 0)
-	map(0x00000600, 0x00000600).r(FUNC(seibuspi_state::spi_status_r));
+	map(0x00000600, 0x00000600).r(FUNC(seibuspi_tilemap_state::spi_status_r));
 	map(0x00000604, 0x00000607).portr("INPUTS");
 	map(0x00000608, 0x0000060b).portr("EXCH");
 	map(0x0000060c, 0x0000060f).portr("SYSTEM");
@@ -1018,10 +1018,10 @@ void seibuspi_state::base_map(address_map &map)
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0); // ROM location in real-mode
 }
 
-void seibuspi_state::sei252_map(address_map &map)
+void seibuspi_z80_state::sei252_map(address_map &map)
 {
 	//map(0x00000500, 0x0000057f).rw("obj", FUNC(sei252_device::read_xor), FUNC(sei252_device::write_xor));
-	map(0x0000050e, 0x0000050f).w(FUNC(seibuspi_state::sprite_dma_start_w));
+	map(0x0000050e, 0x0000050f).w(FUNC(seibuspi_z80_state::sprite_dma_start_w));
 	map(0x00000524, 0x00000527).nopw(); // SEI252 sprite decryption key, see machine/spisprit.c
 	map(0x00000528, 0x0000052b).nopw(); // SEI252 sprite decryption unknown
 	map(0x00000530, 0x00000533).nopw(); // SEI252 sprite decryption table key, see machine/spisprit.c
@@ -1029,11 +1029,11 @@ void seibuspi_state::sei252_map(address_map &map)
 	map(0x0000053c, 0x0000053f).nopw(); // SEI252 sprite decryption table index, see machine/spisprit.c
 }
 
-void seibuspi_state::rise_map(address_map &map)
+void seibuspi_base_state::rise_map(address_map &map)
 {
 	//map(0x00000500, 0x0000057f).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x0000054c, 0x0000054f).nopw(); // RISE10/11 sprite decryption key, see machine/seibuspi.c
-	map(0x00000562, 0x00000563).w(FUNC(seibuspi_state::sprite_dma_start_w));
+	map(0x00000562, 0x00000563).w(FUNC(seibuspi_base_state::sprite_dma_start_w));
 }
 
 void seibuspi_state::spi_map(address_map &map)
@@ -1041,8 +1041,8 @@ void seibuspi_state::spi_map(address_map &map)
 	base_map(map);
 	sei252_map(map);
 	map(0x00000600, 0x00000603).nopw(); // ?
-	map(0x00000680, 0x00000680).r("soundfifo2", FUNC(fifo7200_device::data_byte_r));
-	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
+	map(0x00000680, 0x00000680).r(m_soundfifo[1], FUNC(fifo7200_device::data_byte_r));
+	map(0x00000680, 0x00000680).w(m_soundfifo[0], FUNC(fifo7200_device::data_byte_w));
 	map(0x00000684, 0x00000684).r(FUNC(seibuspi_state::sound_fifo_status_r));
 	map(0x00000688, 0x00000688).w(FUNC(seibuspi_state::z80_prg_transfer_w));
 	map(0x0000068c, 0x0000068c).w(FUNC(seibuspi_state::z80_enable_w));
@@ -1060,8 +1060,8 @@ void seibuspi_state::rdft2_map(address_map &map)
 	base_map(map);
 	rise_map(map);
 	map(0x00000600, 0x00000603).nopw(); // ?
-	map(0x00000680, 0x00000680).r("soundfifo2", FUNC(fifo7200_device::data_byte_r));
-	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
+	map(0x00000680, 0x00000680).r(m_soundfifo[1], FUNC(fifo7200_device::data_byte_r));
+	map(0x00000680, 0x00000680).w(m_soundfifo[0], FUNC(fifo7200_device::data_byte_w));
 	map(0x00000684, 0x00000684).r(FUNC(seibuspi_state::sound_fifo_status_r));
 	map(0x00000688, 0x00000688).w(FUNC(seibuspi_state::z80_prg_transfer_w));
 	map(0x0000068c, 0x0000068c).w(FUNC(seibuspi_state::z80_enable_w));
@@ -1074,57 +1074,57 @@ void seibuspi_state::rdft2_map(address_map &map)
 	map(0x00a00000, 0x013fffff).rom().region("sound01", 0);
 }
 
-void seibuspi_state::sxx2e_map(address_map &map)
+void seibuspi_z80_state::sxx2e_map(address_map &map)
 {
 	base_map(map);
 	sei252_map(map);
-	map(0x00000680, 0x00000680).r(FUNC(seibuspi_state::sb_coin_r));
-	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
-	map(0x00000684, 0x00000684).r(FUNC(seibuspi_state::sound_fifo_status_r));
+	map(0x00000680, 0x00000680).r(FUNC(seibuspi_z80_state::sb_coin_r));
+	map(0x00000680, 0x00000680).w(m_soundfifo[0], FUNC(fifo7200_device::data_byte_w));
+	map(0x00000684, 0x00000684).r(FUNC(seibuspi_z80_state::sound_fifo_status_r));
 	map(0x00000688, 0x0000068b).noprw(); // ?
 	map(0x0000068c, 0x0000068f).nopw();
 	map(0x000006d0, 0x000006d0).w("ds2404", FUNC(ds2404_device::_1w_reset_w));
 	map(0x000006d4, 0x000006d4).w("ds2404", FUNC(ds2404_device::data_w));
 	map(0x000006d8, 0x000006d8).w("ds2404", FUNC(ds2404_device::clk_w));
 	map(0x000006dc, 0x000006dc).r("ds2404", FUNC(ds2404_device::data_r));
-	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_state::spi_ds2404_unknown_r));
+	map(0x000006dd, 0x000006dd).r(FUNC(seibuspi_z80_state::spi_ds2404_unknown_r));
 }
 
-void seibuspi_state::sxx2f_map(address_map &map)
+void seibuspi_z80_state::sxx2f_map(address_map &map)
 {
 	base_map(map);
 	rise_map(map);
-	map(0x00000680, 0x00000680).r(FUNC(seibuspi_state::sb_coin_r));
-	map(0x00000680, 0x00000680).w("soundfifo1", FUNC(fifo7200_device::data_byte_w));
-	map(0x00000684, 0x00000684).r(FUNC(seibuspi_state::sound_fifo_status_r));
+	map(0x00000680, 0x00000680).r(FUNC(seibuspi_z80_state::sb_coin_r));
+	map(0x00000680, 0x00000680).w(m_soundfifo[0], FUNC(fifo7200_device::data_byte_w));
+	map(0x00000684, 0x00000684).r(FUNC(seibuspi_z80_state::sound_fifo_status_r));
 	map(0x00000688, 0x0000068b).noprw(); // ?
-	map(0x0000068e, 0x0000068e).w(FUNC(seibuspi_state::spi_layerbanks_eeprom_w));
+	map(0x0000068e, 0x0000068e).w(FUNC(seibuspi_z80_state::spi_layerbanks_eeprom_w));
 	map(0x00000690, 0x00000693).nopw(); // ?
 }
 
-void seibuspi_state::sys386i_map(address_map &map)
+void sys386i_state::sys386i_map(address_map &map)
 {
 	base_map(map);
 	rise_map(map);
-	map(0x0000068e, 0x0000068e).w(FUNC(seibuspi_state::spi_layerbanks_eeprom_w));
-	map(0x0000068f, 0x0000068f).w(FUNC(seibuspi_state::oki_bank_w));
-	map(0x01200000, 0x01200000).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x01200004, 0x01200004).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x0000068e, 0x0000068e).w(FUNC(sys386i_state::spi_layerbanks_eeprom_w));
+	map(0x0000068f, 0x0000068f).w(FUNC(sys386i_state::oki_bank_w));
+	map(0x01200000, 0x01200000).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x01200004, 0x01200004).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void seibuspi_state::sys386f_map(address_map &map)
+void sys386f_state::sys386f_map(address_map &map)
 {
-	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	map(0x00000000, 0x0003ffff).ram().share(m_mainram);
 	rise_map(map);
-	map(0x00000010, 0x00000010).r(FUNC(seibuspi_state::spi_status_r));
-	map(0x00000400, 0x00000403).portr("SYSTEM").w(FUNC(seibuspi_state::ejsakura_input_select_w));
-	map(0x00000404, 0x00000404).w(FUNC(seibuspi_state::eeprom_w));
+	map(0x00000010, 0x00000010).r(FUNC(sys386f_state::spi_status_r));
+	map(0x00000400, 0x00000403).portr("SYSTEM").w(FUNC(sys386f_state::input_select_w));
+	map(0x00000404, 0x00000404).w(FUNC(sys386f_state::eeprom_w));
 	map(0x00000408, 0x0000040f).w("ymz", FUNC(ymz280b_device::write)).umask32(0x000000ff);
-	map(0x00000484, 0x00000487).w(FUNC(seibuspi_state::palette_dma_start_w));
-	map(0x00000490, 0x00000493).w(FUNC(seibuspi_state::video_dma_length_w));
-	map(0x00000494, 0x00000497).w(FUNC(seibuspi_state::video_dma_address_w));
+	map(0x00000484, 0x00000487).w(FUNC(sys386f_state::palette_dma_start_w));
+	map(0x00000490, 0x00000493).w(FUNC(sys386f_state::video_dma_length_w));
+	map(0x00000494, 0x00000497).w(FUNC(sys386f_state::video_dma_address_w));
 	map(0x00000600, 0x00000607).r("ymz", FUNC(ymz280b_device::read)).umask32(0x000000ff);
-	map(0x0000060c, 0x0000060f).r(FUNC(seibuspi_state::ejsakura_keyboard_r));
+	map(0x0000060c, 0x0000060f).r(FUNC(sys386f_state::input_mux_r));
 	map(0x00200000, 0x003fffff).rom().region("maincpu", 0);
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0); // ROM location in real-mode
 }
@@ -1132,7 +1132,7 @@ void seibuspi_state::sys386f_map(address_map &map)
 
 /*****************************************************************************/
 
-u8 seibuspi_state::z80_soundfifo_status_r()
+u8 seibuspi_z80_state::z80_soundfifo_status_r()
 {
 	// d0: fifo full flag (main)
 	// d1: fifo empty flag (z80)
@@ -1141,7 +1141,7 @@ u8 seibuspi_state::z80_soundfifo_status_r()
 	return d0 | m_soundfifo[0]->ef_r() << 1;
 }
 
-void seibuspi_state::z80_bank_w(u8 data)
+void seibuspi_z80_state::z80_bank_w(u8 data)
 {
 	// d0-d2: bank @ 8000
 	const u8 bank = data & 7;
@@ -1155,10 +1155,10 @@ void seibuspi_state::z80_bank_w(u8 data)
 	// d3: watchdog?
 }
 
-void seibuspi_state::spi_coin_w(u8 data)
+void seibuspi_z80_state::spi_coin_w(u8 data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
 	// coin latch used by single boards
 	if (data)
@@ -1168,41 +1168,41 @@ void seibuspi_state::spi_coin_w(u8 data)
 }
 
 
-void seibuspi_state::sxx2e_soundmap(address_map &map)
+void seibuspi_z80_state::sxx2e_soundmap(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram();
 	map(0x4002, 0x4002).nopw(); // ?
 	map(0x4003, 0x4003).nopw(); // ?
-	map(0x4004, 0x4004).w(FUNC(seibuspi_state::spi_coin_w));
-	map(0x4008, 0x4008).r("soundfifo1", FUNC(fifo7200_device::data_byte_r));
+	map(0x4004, 0x4004).w(FUNC(seibuspi_z80_state::spi_coin_w));
+	map(0x4008, 0x4008).r(m_soundfifo[0], FUNC(fifo7200_device::data_byte_r));
 	map(0x4008, 0x4008).nopw(); // ?
-	map(0x4009, 0x4009).r(FUNC(seibuspi_state::z80_soundfifo_status_r));
+	map(0x4009, 0x4009).r(FUNC(seibuspi_z80_state::z80_soundfifo_status_r));
 	map(0x400b, 0x400b).nopw(); // ?
 	map(0x4013, 0x4013).portr("COIN");
-	map(0x401b, 0x401b).w(FUNC(seibuspi_state::z80_bank_w));
+	map(0x401b, 0x401b).w(FUNC(seibuspi_z80_state::z80_bank_w));
 	map(0x6000, 0x600f).rw("ymf", FUNC(ymf271_device::read), FUNC(ymf271_device::write));
-	map(0x8000, 0xffff).bankr("z80_bank");
+	map(0x8000, 0xffff).bankr(m_z80_bank);
 }
 
 void seibuspi_state::spi_soundmap(address_map &map)
 {
 	sxx2e_soundmap(map);
-	map(0x4008, 0x4008).w("soundfifo2", FUNC(fifo7200_device::data_byte_w));
+	map(0x4008, 0x4008).w(m_soundfifo[1], FUNC(fifo7200_device::data_byte_w));
 	map(0x400a, 0x400a).portr("JUMPERS"); // TODO: get these to actually work (only on SXX2C)
 }
 
 void seibuspi_state::spi_ymf271_map(address_map &map)
 {
 	map.global_mask(0x1fffff);
-	map(0x000000, 0x0fffff).rw("soundflash1", FUNC(intel_e28f008sa_device::read), FUNC(intel_e28f008sa_device::write));
-	map(0x100000, 0x1fffff).rw("soundflash2", FUNC(intel_e28f008sa_device::read), FUNC(intel_e28f008sa_device::write));
+	map(0x000000, 0x0fffff).rw(m_soundflash[0], FUNC(intel_e28f008sa_device::read), FUNC(intel_e28f008sa_device::write));
+	map(0x100000, 0x1fffff).rw(m_soundflash[1], FUNC(intel_e28f008sa_device::read), FUNC(intel_e28f008sa_device::write));
 }
 
 
 /*****************************************************************************/
 
-void seibuspi_state::ymf_irqhandler(int state)
+void seibuspi_z80_state::ymf_irqhandler(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // Z80 - IRQ is RST10
@@ -1695,26 +1695,34 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-INTERRUPT_GEN_MEMBER(seibuspi_state::spi_interrupt)
+INTERRUPT_GEN_MEMBER(seibuspi_base_state::interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE); // where is ack?
 }
 
-IRQ_CALLBACK_MEMBER(seibuspi_state::spi_irq_callback)
+IRQ_CALLBACK_MEMBER(seibuspi_base_state::irq_callback)
 {
 	return 0x20;
 }
 
 
-/* SPI */
-
-void seibuspi_state::init_spi_common()
+void seibuspi_z80_state::machine_reset()
 {
-	if (m_z80_rom != nullptr)
-		m_z80_bank->configure_entries(0, 8, m_z80_rom->base(), 0x8000);
+	seibuspi_tilemap_state::machine_reset();
+
+	m_z80_bank->set_entry(0);
+	m_z80_lastbank = 0;
+	m_sb_coin_latch = 0;
 }
 
-void seibuspi_state::init_sei252()
+/* SPI */
+
+void seibuspi_z80_state::init_spi_common()
+{
+	m_z80_bank->configure_entries(0, 8, m_z80_rom->base(), 0x8000);
+}
+
+void seibuspi_z80_state::init_sei252()
 {
 	text_decrypt(memregion("chars")->base());
 	bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -1723,32 +1731,66 @@ void seibuspi_state::init_sei252()
 }
 
 
+void sys386f_state::machine_start()
+{
+	seibuspi_base_state::machine_start();
+
+	// savestates
+	save_item(NAME(m_input_select));
+}
+
+void seibuspi_z80_state::machine_start()
+{
+	seibuspi_tilemap_state::machine_start();
+
+	// savestates
+	save_item(NAME(m_z80_lastbank));
+	save_item(NAME(m_sb_coin_latch));
+}
+
 void seibuspi_state::machine_start()
 {
+	seibuspi_z80_state::machine_start();
+
 	// use this to determine the region code when adding a new SPI cartridge clone set
 	logerror("Game region code: %02X\n", memregion("maincpu")->base()[0x1ffffc]);
 
 	// savestates
 	save_item(NAME(m_z80_prg_transfer_pos));
-	save_item(NAME(m_z80_lastbank));
-	save_item(NAME(m_sb_coin_latch));
-	save_item(NAME(m_ejsakura_input_port));
-	if (m_z80_rom != nullptr) save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
+	save_pointer(NAME(m_z80_rom->base()), m_z80_rom->bytes());
 }
 
-MACHINE_RESET_MEMBER(seibuspi_state,spi)
+void seibuspi_state::machine_reset()
 {
+	seibuspi_z80_state::machine_reset();
+
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	m_z80_bank->set_entry(0);
-	m_z80_lastbank = 0;
 	m_z80_prg_transfer_pos = 0;
 
-	// fix the magic ID byte so users can't "brick" the machine
-	if (m_soundflash1 && m_soundflash1_region)
+	// Hack: fix the magic ID byte so users can't "brick" the machine
+	if (m_soundflash1_region)
 	{
-		m_soundflash1->write_raw(0, m_soundflash1_region[0]);
+		m_soundflash[0]->write_raw(0, m_soundflash1_region[0]);
 	}
+}
+
+void seibuspi_tilemap_state::base_video(machine_config &config)
+{
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
+	screen.set_screen_update(FUNC(seibuspi_tilemap_state::screen_update_spi));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
+
+	PALETTE(config, m_palette, palette_device::BLACK, 6144);
+
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.decrypt_key_callback().set(FUNC(seibuspi_tilemap_state::tile_decrypt_key_w));
+	crtc.layer_en_callback().set(FUNC(seibuspi_tilemap_state::layer_enable_w));
+	crtc.reg_1a_callback().set(FUNC(seibuspi_tilemap_state::layer_bank_w));
+	crtc.layer_scroll_callback().set(FUNC(seibuspi_tilemap_state::scroll_w));
 }
 
 void seibuspi_state::spi(machine_config &config)
@@ -1756,41 +1798,26 @@ void seibuspi_state::spi(machine_config &config)
 	/* basic machine hardware */
 	I386(config, m_maincpu, 50_MHz_XTAL / 2); // AMD or Intel 386DX, 25MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::irq_callback));
 
 	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Z84C0008PEC, 7.159MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_soundmap);
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
-
 	ds2404_device &rtc(DS2404(config, "ds2404", 32.768_kHz_XTAL));
 	rtc.ref_year(1995);
 	rtc.ref_month(1);
 	rtc.ref_day(1);
 
-	INTEL_E28F008SA(config, "soundflash1"); // Sharp LH28F008 on newer mainboard revision
-	INTEL_E28F008SA(config, "soundflash2"); // "
+	INTEL_E28F008SA(config, m_soundflash[0]); // Sharp LH28F008 on newer mainboard revision
+	INTEL_E28F008SA(config, m_soundflash[1]); // "
 
 	IDT7201(config, m_soundfifo[0]); // LH5496D, but on single board hw it's one CY7C421
 	IDT7201(config, m_soundfifo[1]); // "
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
-	screen.set_screen_update(FUNC(seibuspi_state::screen_update_spi));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
-
-	PALETTE(config, m_palette, palette_device::BLACK, 6144);
-
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
-	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
-	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
-	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
+	base_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
@@ -1822,55 +1849,53 @@ void seibuspi_state::rdft2(machine_config &config)
 
 /* single boards */
 
-MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
+void seibuspi_z80_state::sxx2e(machine_config &config)
 {
-	m_z80_bank->set_entry(0);
-	m_z80_lastbank = 0;
-	m_sb_coin_latch = 0;
-}
-
-void seibuspi_state::sxx2e(machine_config &config)
-{
-	spi(config);
-
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2e_map);
+	I386(config, m_maincpu, 50_MHz_XTAL / 2); // AMD or Intel 386DX, 25MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_z80_state::sxx2e_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_z80_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_z80_state::irq_callback));
 
-	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2e_soundmap);
+	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Unknown part number and clock
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_z80_state::sxx2e_soundmap);
 
-	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, sxx2e)
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	config.device_remove("soundflash1");
-	config.device_remove("soundflash2");
+	ds2404_device &rtc(DS2404(config, "ds2404", 32.768_kHz_XTAL));
+	rtc.ref_year(1995);
+	rtc.ref_month(1);
+	rtc.ref_day(1);
 
-	config.device_remove("soundfifo2");
+	IDT7201(config, m_soundfifo[0]); // LH5496D, but on single board hw it's one CY7C421
+
+	base_video(config);
 
 	/* sound hardware */
 	// Single PCBs only output mono sound, SXX2E : unverified
-	config.device_remove("speaker");
 	SPEAKER(config, "mono").front_center();
 
-	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.9344_MHz_XTAL));
-	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
+	ymf.irq_handler().set(FUNC(seibuspi_z80_state::ymf_irqhandler));
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void seibuspi_state::sxx2f(machine_config &config)
+void seibuspi_z80_state::sxx2f(machine_config &config)
 {
 	sxx2e(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sxx2f_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_z80_state::sxx2f_map);
 
 	config.device_remove("ds2404");
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	// Z80 is Z84C0006PCS instead of Z84C0008PEC
 	// clock is unknown, possibly slower than 7.159MHz
 }
 
-void seibuspi_state::sxx2g(machine_config &config) // clocks differ, but otherwise same hw as sxx2f
+void seibuspi_z80_state::sxx2g(machine_config &config) // clocks differ, but otherwise same hw as sxx2f
 {
 	sxx2f(config);
 
@@ -1880,37 +1905,24 @@ void seibuspi_state::sxx2g(machine_config &config) // clocks differ, but otherwi
 
 	/* sound hardware */
 	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.384_MHz_XTAL)); // 16.384MHz(!)
-	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.irq_handler().set(FUNC(seibuspi_z80_state::ymf_irqhandler));
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
 /* SYS386I */
 
-void seibuspi_state::sys386i(machine_config &config)
+void sys386i_state::sys386i(machine_config &config)
 {
 	/* basic machine hardware */
 	I386(config, m_maincpu, 40_MHz_XTAL); // AMD 386DX, 40MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sys386i_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sys386i_state::sys386i_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sys386i_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sys386i_state::irq_callback));
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
-	screen.set_screen_update(FUNC(seibuspi_state::screen_update_spi));
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spi);
-
-	PALETTE(config, m_palette, palette_device::BLACK, 6144);
-
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.decrypt_key_callback().set(FUNC(seibuspi_state::tile_decrypt_key_w));
-	crtc.layer_en_callback().set(FUNC(seibuspi_state::spi_layer_enable_w));
-	crtc.reg_1a_callback().set(FUNC(seibuspi_state::spi_layer_bank_w));
-	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
+	base_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1925,10 +1937,10 @@ void seibuspi_state::sys386i(machine_config &config)
 
 /* SYS386F */
 
-void seibuspi_state::init_sys386f()
+void sys386f_state::init_sys386f()
 {
 	u16 *src = (u16 *)memregion("sprites")->base();
-	u16 tmp[0x40 / 2], offset;
+	u16 tmp[0x40 / 2];
 
 	// sprite_reorder() only
 	for (int i = 0; i < memregion("sprites")->bytes() / 0x40; i++)
@@ -1937,21 +1949,21 @@ void seibuspi_state::init_sys386f()
 
 		for (int j = 0; j < 0x40 / 2; j++)
 		{
-			offset = (j >> 1) | (j << 4 & 0x10);
+			const u16 offset = (j >> 1) | (j << 4 & 0x10);
 			*src++ = tmp[offset];
 		}
 	}
 }
 
-void seibuspi_state::sys386f(machine_config &config)
+void sys386f_state::sys386f(machine_config &config)
 {
 	/* basic machine hardware */
 	I386(config, m_maincpu, XTAL(50'000'000)/2); // Intel i386DX, 25MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &seibuspi_state::sys386f_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sys386f_state::sys386f_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sys386f_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sys386f_state::irq_callback));
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1959,13 +1971,11 @@ void seibuspi_state::sys386f(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(seibuspi_state::screen_update_sys386f));
+	screen.set_screen_update(FUNC(sys386f_state::screen_update_sys386f));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sys386f);
 
 	PALETTE(config, m_palette, palette_device::BLACK, 8192);
-
-	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, sys386f)
 
 	/* sound hardware */
 	// Single PCBs only output mono sound
@@ -2014,43 +2024,55 @@ void seibuspi_state::init_ejanhs()
 	init_sei252();
 }
 
-void seibuspi_state::init_rdft()
+void seibuspi_z80_state::init_rdft()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32smo_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32smo_delegate(*this, FUNC(seibuspi_z80_state::rdft_speedup_r)));
 	init_sei252();
 }
 
-void seibuspi_state::init_rdft2()
+void seibuspi_tilemap_state::init_rdft22kc()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32smo_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32smo_delegate(*this, FUNC(seibuspi_tilemap_state::rf2_speedup_r)));
 
 	rdft2_text_decrypt(memregion("chars")->base());
 	rdft2_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
 	seibuspi_rise10_sprite_decrypt(memregion("sprites")->base(), 0x600000);
+}
+
+void seibuspi_z80_state::init_rdft2()
+{
+	init_rdft22kc();
 	init_spi_common();
 }
 
-void seibuspi_state::init_rfjet()
+void seibuspi_tilemap_state::init_rfjet2kc()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32smo_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32smo_delegate(*this, FUNC(seibuspi_tilemap_state::rfjet_speedup_r)));
 
 	rfjet_text_decrypt(memregion("chars")->base());
 	rfjet_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
 	seibuspi_rise11_sprite_decrypt_rfjet(memregion("sprites")->base(), 0x800000);
+}
+
+void seibuspi_z80_state::init_rfjet()
+{
+	init_rfjet2kc();
 	init_spi_common();
 }
 
 
 u32 seibuspi_state::senkyu_speedup_r()
 {
-	if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
+	if (!machine().side_effects_disabled())
+		if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
 u32 seibuspi_state::senkyua_speedup_r()
 {
-	if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
+	if (!machine().side_effects_disabled())
+		if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
@@ -2059,113 +2081,134 @@ u32 seibuspi_state::batlball_speedup_r()
 {
 //  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
 
-	/* batlbalu */
-	if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle
+	if (!machine().side_effects_disabled())
+	{
+		/* batlbalu */
+		if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle
 
-	/* batlball */
-	if (m_maincpu->pc()==0x003058aa) m_maincpu->spin_until_interrupt(); // idle
+		/* batlball */
+		if (m_maincpu->pc()==0x003058aa) m_maincpu->spin_until_interrupt(); // idle
+	}
 
 	return m_mainram[0x0018db4/4];
 }
 
 u32 seibuspi_state::viprp1_speedup_r()
 {
-	/* viprp1 */
-	if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
+	if (!machine().side_effects_disabled())
+	{
+		/* viprp1 */
+		if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
 
-	/* viprp1s */
-	if (m_maincpu->pc()==0x02027e9) m_maincpu->spin_until_interrupt(); // idle
+		/* viprp1s */
+		if (m_maincpu->pc()==0x02027e9) m_maincpu->spin_until_interrupt(); // idle
 
-	/* viprp1ot */
-	if (m_maincpu->pc()==0x02026bd) m_maincpu->spin_until_interrupt(); // idle
+		/* viprp1ot */
+		if (m_maincpu->pc()==0x02026bd) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",m_maincpu->pc());
+		//osd_printf_debug("%08x\n",m_maincpu->pc());
+	}
 
 	return m_mainram[0x001e2e0/4];
 }
 
 u32 seibuspi_state::viprp1o_speedup_r()
 {
-	/* viperp1o */
-	if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
-//  osd_printf_debug("%08x\n",m_maincpu->pc());
+	if (!machine().side_effects_disabled())
+	{
+		/* viperp1o */
+		if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
+		//osd_printf_debug("%08x\n",m_maincpu->pc());
+	}
 	return m_mainram[0x001d49c/4];
 }
 
 // causes input problems?
 u32 seibuspi_state::ejanhs_speedup_r()
 {
-	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
-//  osd_printf_debug("%08x\n",m_maincpu->pc());
+	if (!machine().side_effects_disabled())
+	{
+		if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
+		//osd_printf_debug("%08x\n",m_maincpu->pc());
+	}
 	return m_mainram[0x002d224/4];
 }
 
-u32 seibuspi_state::rdft_speedup_r()
+u32 seibuspi_z80_state::rdft_speedup_r()
 {
-	/* rdft */
-	if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
+	if (!machine().side_effects_disabled())
+	{
+		/* rdft */
+		if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdftj? */
-	if (m_maincpu->pc()==0x0203f0a) m_maincpu->spin_until_interrupt(); // idle
+		/* rdftj? */
+		if (m_maincpu->pc()==0x0203f0a) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdftau */
-	if (m_maincpu->pc()==0x0203f16) m_maincpu->spin_until_interrupt(); // idle
+		/* rdftau */
+		if (m_maincpu->pc()==0x0203f16) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdftja? */
-	if (m_maincpu->pc()==0x0203f22) m_maincpu->spin_until_interrupt(); // idle
+		/* rdftja? */
+		if (m_maincpu->pc()==0x0203f22) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdfta, rdftadi, rdftam, rdftit */
-	if (m_maincpu->pc()==0x0203f46) m_maincpu->spin_until_interrupt(); // idle
+		/* rdfta, rdftadi, rdftam, rdftit */
+		if (m_maincpu->pc()==0x0203f46) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdftu */
-	if (m_maincpu->pc()==0x0203f3a) m_maincpu->spin_until_interrupt(); // idle
+		/* rdftu */
+		if (m_maincpu->pc()==0x0203f3a) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdftauge */
-	if (m_maincpu->pc()==0x0203f6e) m_maincpu->spin_until_interrupt(); // idle
+		/* rdftauge */
+		if (m_maincpu->pc()==0x0203f6e) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",m_maincpu->pc());
+		//osd_printf_debug("%08x\n",m_maincpu->pc());
+	}
 
 	return m_mainram[0x00298d0/4];
 }
 
-u32 seibuspi_state::rf2_speedup_r()
+u32 seibuspi_tilemap_state::rf2_speedup_r()
 {
-	/* rdft22kc */
-	if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
+	if (!machine().side_effects_disabled())
+	{
+		/* rdft22kc */
+		if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdft2, rdft2j */
-	if (m_maincpu->pc()==0x0204372) m_maincpu->spin_until_interrupt(); // idle
+		/* rdft2, rdft2j */
+		if (m_maincpu->pc()==0x0204372) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdft2us */
-	if (m_maincpu->pc()==0x020420e) m_maincpu->spin_until_interrupt(); // idle
+		/* rdft2us */
+		if (m_maincpu->pc()==0x020420e) m_maincpu->spin_until_interrupt(); // idle
 
-	/* rdft2a */
-	if (m_maincpu->pc()==0x0204366) m_maincpu->spin_until_interrupt(); // idle
+		/* rdft2a */
+		if (m_maincpu->pc()==0x0204366) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",m_maincpu->pc());
+		//osd_printf_debug("%08x\n",m_maincpu->pc());
+	}
 
 	return m_mainram[0x0282ac/4];
 }
 
-u32 seibuspi_state::rfjet_speedup_r()
+u32 seibuspi_tilemap_state::rfjet_speedup_r()
 {
-	/* rfjet, rfjetu, rfjeta */
-	if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle
-
-	/* rfjetus */
-	if (m_maincpu->pc()==0x0205b39)
+	if (!machine().side_effects_disabled())
 	{
-		u32 r;
-		m_maincpu->spin_until_interrupt(); // idle
-		// Hack to enter test mode
-		r = m_mainram[0x002894c/4] & (~0x400);
-		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
+		/* rfjet, rfjetu, rfjeta */
+		if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle
+
+		/* rfjetus */
+		if (m_maincpu->pc()==0x0205b39)
+		{
+			u32 r;
+			m_maincpu->spin_until_interrupt(); // idle
+			// Hack to enter test mode
+			r = m_mainram[0x002894c/4] & (~0x400);
+			return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
+		}
+
+		/* rfjetj */
+		if (m_maincpu->pc()==0x0205f2e) m_maincpu->spin_until_interrupt(); // idle
+
+		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}
-
-	/* rfjetj */
-	if (m_maincpu->pc()==0x0205f2e) m_maincpu->spin_until_interrupt(); // idle
-
-//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x002894c/4];
 }
@@ -4232,88 +4275,88 @@ ROM_END
 /*****************************************************************************/
 
 /* SPI */
-GAME( 1995, senkyu,     0,        spi,     spi_3button, seibuspi_state, init_senkyu,   ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, senkyua,    senkyu,   spi,     spi_3button, seibuspi_state, init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlball,   senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlballo,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlballu,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Fabtek license)",        "Battle Balls (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlballa,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlballe,  senkyu,   spi,     spi_3button, seibuspi_state, init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, batlballpt, senkyu,   spi,     spi_3button, seibuspi_state, init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Battle Balls (Portugal)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1 program ROM dated 171195
+GAME( 1995, senkyu,     0,        spi,     spi_3button, seibuspi_state,     init_senkyu,   ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, senkyua,    senkyu,   spi,     spi_3button, seibuspi_state,     init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Senkyu (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlball,   senkyu,   spi,     spi_3button, seibuspi_state,     init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlballo,  senkyu,   spi,     spi_3button, seibuspi_state,     init_batlball, ROT0,   "Seibu Kaihatsu (Tuning license)",        "Battle Balls (Germany, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlballu,  senkyu,   spi,     spi_3button, seibuspi_state,     init_batlball, ROT0,   "Seibu Kaihatsu (Fabtek license)",        "Battle Balls (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlballa,  senkyu,   spi,     spi_3button, seibuspi_state,     init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlballe,  senkyu,   spi,     spi_3button, seibuspi_state,     init_batlball, ROT0,   "Seibu Kaihatsu (Metrotainment license)", "Battle Balls (Hong Kong, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, batlballpt, senkyu,   spi,     spi_3button, seibuspi_state,     init_senkyua,  ROT0,   "Seibu Kaihatsu",                         "Battle Balls (Portugal)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1 program ROM dated 171195
 
 // these are unique
-GAME( 1995, viprp1,     0,        spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, viprp1k,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu (Dream Island license)",  "Viper Phase 1 (New Version, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, viprp1u,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1o,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Viper Phase 1 (New Version, US set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) /* New version, "=U.S.A=" seems part of title */
-GAME( 1995, viprp1ua,   viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1o,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Viper Phase 1 (New Version, US set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) /* New version, "=U.S.A=" seems part of title */
-GAME( 1995, viprp1j,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1,     0,        spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1k,    viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu (Dream Island license)",  "Viper Phase 1 (New Version, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1u,    viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1o,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Viper Phase 1 (New Version, US set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) /* New version, "=U.S.A=" seems part of title */
+GAME( 1995, viprp1ua,   viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1o,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Viper Phase 1 (New Version, US set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) /* New version, "=U.S.A=" seems part of title */
+GAME( 1995, viprp1j,    viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // same code revision (010995 code base) - SXX2C ROM SUB cart
 // counterintuitively this seems to be the oldest code base of the game despite playing with the 'new version' rules, it has various typos not present in other sets eg. 'UPDATEING'
-GAME( 1995, viprp1s,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Switzerland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, viprp1h,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Holland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, viprp1t,    viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu (Tuning license)",        "Viper Phase 1 (New Version, Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, viprp1pt,   viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Portugal)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1s,    viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Switzerland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1h,    viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Holland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1t,    viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu (Tuning license)",        "Viper Phase 1 (New Version, Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1pt,   viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (New Version, Portugal)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // these are unique
-GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu (Tuning license)",        "Viper Phase 1 (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, init_viprp1,   ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) /* "=HONG KONG=" seems part of title */
+GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu (Tuning license)",        "Viper Phase 1 (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state,     init_viprp1,   ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) /* "=HONG KONG=" seems part of title */
 
-GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, init_ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state,     init_ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE )
 
 // these are unique
-GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftja,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earliest)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftauge,   rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Evaluation Software For Show, Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftja,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, earliest)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftu,      rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, earlier)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftauge,   rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Evaluation Software For Show, Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // this is one revision - SXX2C ROM SUB4 cart
-GAME( 1996, rdftua,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftjb,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftau,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Australia)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftam,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftadi,    rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters (Korea, SUB4 cart)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftua,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters (US, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftjb,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan, newer)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftau,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Australia)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftam,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftadi,    rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters (Korea, SUB4 cart)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // same code revision - SXX2C ROM SUB2 cart
-GAME( 1996, rdfta,      rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Austria)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftgb,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Great Britain)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftgr,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Greece)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftit,     rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, rdftadia,   rdft,     spi,     spi_3button, seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters (Korea, SUB2 cart)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdfta,      rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Austria)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftgb,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Great Britain)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftgr,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Greece)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftit,     rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdftadia,   rdft,     spi,     spi_3button, seibuspi_state,     init_rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters (Korea, SUB2 cart)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 // this is one revision
-GAME( 1997, rdft2,      0,        rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters 2 - Operation Hell Dive (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2j,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2a,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 - Operation Hell Dive (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2s,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Switzerland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2,      0,        rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters 2 - Operation Hell Dive (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2j,     rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2a,     rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu (Metrotainment license)", "Raiden Fighters 2 - Operation Hell Dive (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2s,     rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Switzerland)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // this is another
-GAME( 1997, rdft2ja,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2aa,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2it,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2ja,    rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2aa,    rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters 2 - Operation Hell Dive (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2it,    rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 // these are unique
-GAME( 1997, rdft2jb,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2jc,    rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2t,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rdft2u,     rdft2,    rdft2,   spi_2button, seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2jb,    rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2jc,    rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Japan set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2t,     rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters 2 - Operation Hell Dive (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rdft2u,     rdft2,    rdft2,   spi_2button, seibuspi_state,     init_rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters 2 - Operation Hell Dive (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, rfjet,      0,        rdft2,   spi_2button, seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters Jet (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, rfjetu,     rfjet,    rdft2,   spi_2button, seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters Jet (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, rfjetj,     rfjet,    rdft2,   spi_2button, seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, rfjeta,     rfjet,    rdft2,   spi_2button, seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters Jet (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, rfjett,     rfjet,    rdft2,   spi_2button, seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, rfjet,      0,        rdft2,   spi_2button, seibuspi_state,     init_rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters Jet (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, rfjetu,     rfjet,    rdft2,   spi_2button, seibuspi_state,     init_rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden Fighters Jet (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, rfjetj,     rfjet,    rdft2,   spi_2button, seibuspi_state,     init_rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, rfjeta,     rfjet,    rdft2,   spi_2button, seibuspi_state,     init_rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)",  "Raiden Fighters Jet (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, rfjett,     rfjet,    rdft2,   spi_2button, seibuspi_state,     init_rfjet,    ROT270, "Seibu Kaihatsu",                         "Raiden Fighters Jet (Taiwan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 /* SXX2E */
-GAME( 1996, rdfts,      rdft,     sxx2e,   sxx2e,       seibuspi_state, init_rdft,     ROT270, "Seibu Kaihatsu (Explorer System Corp. license)", "Raiden Fighters (Taiwan, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, rdfts,      rdft,     sxx2e,   sxx2e,       seibuspi_z80_state, init_rdft,     ROT270, "Seibu Kaihatsu (Explorer System Corp. license)", "Raiden Fighters (Taiwan, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 /* SXX2F */
-GAME( 1997, rdft2us,    rdft2,    sxx2f,   sxx2f,       seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2 - Operation Hell Dive (US, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // title screen shows small '.1'
+GAME( 1997, rdft2us,    rdft2,    sxx2f,   sxx2f,       seibuspi_z80_state, init_rdft2,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2 - Operation Hell Dive (US, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // title screen shows small '.1'
 
 /* SXX2G */
-GAME( 1999, rfjets,     rfjet,    sxx2g,   sxx2f,       seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (US, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // has 1998-99 copyright + planes unlocked
-GAME( 1999, rfjetsa,    rfjet,    sxx2g,   sxx2f,       seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (US, single board, test version?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // maybe test/proto? see notes at romdefs
+GAME( 1999, rfjets,     rfjet,    sxx2g,   sxx2f,       seibuspi_z80_state, init_rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (US, single board)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // has 1998-99 copyright + planes unlocked
+GAME( 1999, rfjetsa,    rfjet,    sxx2g,   sxx2f,       seibuspi_z80_state, init_rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (US, single board, test version?)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // maybe test/proto? see notes at romdefs
 
 /* SYS386I */
-GAME( 2000, rdft22kc,   rdft2,    sys386i, sys386i,     seibuspi_state, init_rdft2,    ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - Operation Hell Dive 2000 (China, SYS386I)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, rfjet2kc,   rfjet,    sys386i, sys386i,     seibuspi_state, init_rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet 2000 (China, SYS386I)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, rdft22kc,   rdft2,    sys386i, sys386i,     sys386i_state,      init_rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - Operation Hell Dive 2000 (China, SYS386I)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, rfjet2kc,   rfjet,    sys386i, sys386i,     sys386i_state,      init_rfjet2kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet 2000 (China, SYS386I)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 /* SYS386F */
-GAME( 1999, ejsakura,   0,        sys386f, ejsakura,    seibuspi_state, init_sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ejsakura12, ejsakura, sys386f, ejsakura,    seibuspi_state, init_sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ejsakura,   0,        sys386f, ejsakura,    sys386f_state,      init_sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, ejsakura12, ejsakura, sys386f, ejsakura,    sys386f_state,      init_sys386f,  ROT0,   "Seibu Kaihatsu", "E-Jan Sakurasou (Japan, SYS386F V1.2)", MACHINE_SUPPORTS_SAVE )

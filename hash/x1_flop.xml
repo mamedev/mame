@@ -1039,23 +1039,6 @@ IPL loading resolves to a red and corrupt screen, baddump?
 		</part>
 	</software>
 
-	<software name="gruppe" supported="no">
-		<description>Gruppe</description>
-		<year>1985</year>
-		<publisher>SPS</publisher>
-		<notes><![CDATA[
-Shows a random bitmap graphic then returns "program load error", wants [FDC] write protection enabled (regression)
-]]></notes>
-
-		<info name="release" value="198506xx"/>
-		<info name="alt_title" value="ぐるっぺ"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="gruppe.d88" size="348848" crc="a50dfd33" sha1="551749d2ec4deb3919f2111d234450fd4f90d54a"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="hajafuin">
 		<description>Haja no Fuuin</description>
 		<year>1986</year>
@@ -3390,19 +3373,6 @@ Expects [KBD] name entry presses with shift held
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="uootoy.d88" size="348848" crc="0923d396" sha1="11cabc256653b12858f17f97df7e3d0284b602d7"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="victnine">
-		<description>Victorious Nine</description>
-		<year>1985</year>
-		<publisher>ニデコム (Nidecom)</publisher>
-		<info name="release" value="198509xx"/>
-		<info name="alt_title" value="ビクトリアスナイン"/>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="350560">
-				<rom name="victorious nine.d88" size="350560" crc="2fc94dfd" sha1="e29f55bed953e0304d88b8eed9448f31eb888298"/>
 			</dataarea>
 		</part>
 	</software>

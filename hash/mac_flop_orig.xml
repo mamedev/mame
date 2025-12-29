@@ -112,30 +112,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="uninvited">
-		<description>Uninvited</description>
-		<year>1986</year>
-		<publisher>Mindscape</publisher>
-		<info name="programmer" value="Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="MC68000" />
-		<sharedfeat name="incompatibility" value="mac128k" />
-		<!--Dump released: 2022-09-28-->
-		<!--adventure game-->
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="649150">
-				<rom name="uninvited disk 1.moof" size="649150" crc="fd19dc18" sha1="ceff741f276fd83ef7ad5f0e746194589e1205b3" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="649150">
-				<rom name="uninvited disk 2.moof" size="649150" crc="04c6f91e" sha1="d70db8a9e11db1243703c87b711be37147530bff" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kquest110">
 		<description>King's Quest (version 1.10)</description>
 		<year>1987</year>
@@ -309,23 +285,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="649065">
 				<rom name="star trek- the kobayashi alternative.moof" size="649065" crc="b0a20dad" sha1="1118fa143ccfffc98f01c46e712c81594c9da048" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="macattk">
-		<description>Mac Attack</description>
-		<year>1984</year>
-		<publisher>Miles Computing</publisher>
-		<info name="programmer" value="Tim Hays" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="MC68000" />
-		<sharedfeat name="incompatibility" value="macse,macclasc" />
-		<!--Dump released: 2022-09-29-->
-		<!--action game-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="648972">
-				<rom name="mac attack.moof" size="648972" crc="d1766425" sha1="4cdcc8508317bae4d91e907b7c42b0e76765bd8b" />
 			</dataarea>
 		</part>
 	</software>
@@ -1102,23 +1061,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dlxmuscset10">
-		<description>Deluxe Music Construction Set (version 1.0)</description>
-		<year>1985</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Geoff Brown and John MacMillan" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="MC68000" />
-		<!--Dump released: 2022-11-07-->
-		<!--music program-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="649041">
-				<rom name="deluxe music construction set v1.0.moof" size="649041" crc="fcfd93cb" sha1="f3831dda946c8233133c690214aea895d30f414e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="apchestr12">
 		<description>Apache Strike (version 1.2)</description>
 		<year>1987</year>
@@ -1179,22 +1121,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk f" />
 			<dataarea name="flop" size="1296283">
 				<rom name="wizardry vi - disk f.moof" size="1296283" crc="c048d63c" sha1="73a3d1d05b99ff8ae81d735ac79efd4a13d240c8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="harstkm">
-		<description>Harrier Strike Mission</description>
-		<year>1985</year>
-		<publisher>Miles Computing</publisher>
-		<info name="programmer" value="Tim Hays" />
-		<info name="usage" value="Self-boots and runs on Mac 512K and Mac 512Ke." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke" />
-		<!--Dump released: 2022-11-18-->
-		<!--action game-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="648964">
-				<rom name="harrier strike mission.moof" size="648964" crc="0b57e1f6" sha1="fc50d46c7df2fb1237118a9279dba5df23cc43cd" />
 			</dataarea>
 		</part>
 	</software>
@@ -1927,24 +1853,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="649016">
 				<rom name="bridge v6.0.moof" size="649016" crc="b2c0dd09" sha1="7a0fd36b73ce8242248d68ba58f0d1186621396c" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="harstkm12">
-		<description>Harrier Strike Mission II (version 1.2)</description>
-		<year>1987</year>
-		<publisher>Miles Computing</publisher>
-		<info name="programmer" value="Tim Hays" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="MC68000" />
-		<sharedfeat name="incompatibility" value="mac128k" />
-		<!--Dump released: 2023-03-30-->
-		<!--action game-->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="649023">
-				<rom name="harrier strike mission ii.moof" size="649023" crc="42a72fe0" sha1="0a106be8dafaafc57decec1b2b89130fec410933" />
 			</dataarea>
 		</part>
 	</software>
@@ -3472,6 +3380,462 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size="1296221">
 				<rom name="nigel's world v1.0.1 disk 7.moof" size="1296221" crc="3f0816c2" sha1="0c48018bc388c0c7d04581d7211e1b9eecd6b3d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cwmagic">
+		<description>Crossword Magic (version 4.0)</description>
+		<year>1987</year>
+		<publisher>Mindscape</publisher>
+		<info name="programmer" value="Larry Sherman" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="4.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-21 -->
+		<!-- puzzle game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649002">
+				<rom name="crossword magic v4.0 mac.moof" size="649002" crc="491eef5d" sha1="5720b8476a53a474823f7a4b39b67380cadbb1ba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxmuscset10" cloneof="dlxmuscset">
+		<description>Deluxe Music Construction Set (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Geoff Brown" />
+		<info name="programmer" value="John MacMillan" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2022-11-07 -->
+		<!-- music program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649041">
+				<rom name="deluxe music construction set v1.0.moof" size="649041" crc="fcfd93cb" sha1="f3831dda946c8233133c690214aea895d30f414e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxmuscset">
+		<description>Deluxe Music Construction Set (version 2.0)</description>
+		<year>1986</year>
+		<publisher> Electronic Arts</publisher>
+		<info name="programmer" value="Geoff Brown" />
+		<info name="programmer" value="John MacMillan" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-16 -->
+		<!-- music program -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program" />
+			<dataarea name="flop" size="649038">
+				<rom name="deluxe music construction set v2.0 disk 1 - program.moof" size="649038" crc="aaf36870" sha1="09069a7cdd7f731acdd93b83eff518c0ea9127d6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Instruments" />
+			<dataarea name="flop" size="649038">
+				<rom name="deluxe music construction set v2.0 disk 2 - instruments.moof" size="649038" crc="99974023" sha1="09a8e6aa1c1f98a12219ec507f293f8f94b1ada0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fokkertps">
+		<description>Fokker Triplane Flight Simulator (version 1985-10-31)</description>
+		<year>1985</year>
+		<publisher>Bullseye Software</publisher>
+		<info name="programmer" value="Donald A. Hill, Jr." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic.  Help pages require 1MB RAM." />
+		<info name="version" value="1985-10-31" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-19 -->
+		<!-- simulation game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649038">
+				<rom name="fokker triplane flight simulator 1985-10-31.moof" size="649038" crc="c2835abd" sha1="b36de3c11f5b0f7d175dd09e2fbb273ac9c180f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harstkm850807" cloneof="harstkm">
+		<description>Harrier Strike Mission (version 1985-08-07)</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 512K and Mac 512Ke." />
+		<info name="version" value="1985-08-07" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke" />
+		<!--Dump released: 2022-11-18-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648964">
+				<rom name="harrier strike mission.moof" size="648964" crc="0b57e1f6" sha1="fc50d46c7df2fb1237118a9279dba5df23cc43cd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harstkm">
+		<description>Harrier Strike Mission (version 1985-09-05)</description>
+		<year>1985</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 128K and Mac 512K only. It does not run on later models." />
+		<info name="version" value="1985-09-05" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648966">
+				<rom name="harrier strike mission 1985-09-05.moof" size="648966" crc="24384c5e" sha1="1c87f53034ed2e636dda02bbfabfdafe8f54645b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harstkm2">
+		<description>Harrier Strike Mission II (version 1.2)</description>
+		<year>1987</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!--Dump released: 2023-03-30-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649023">
+				<rom name="harrier strike mission ii.moof" size="649023" crc="42a72fe0" sha1="0a106be8dafaafc57decec1b2b89130fec410933" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ijlastcru">
+		<description>Indiana Jones and the Last Crusade (version 1.7)</description>
+		<year>1990</year>
+		<publisher>LucasFilm Games</publisher>
+		<info name="programmer" value="Noah Falstein" />
+		<info name="programmer" value="David Fox" />
+		<info name="programmer" value="Ron Gilbert" />
+		<info name="programmer" value="Mike Eber" />
+		<info name="programmer" value="Steve Purcell" />
+		<info name="programmer" value="Martin Cameron" />
+		<info name="programmer" value="Aric Wilmunder" />
+		<info name="usage" value="Runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic and Mac II.  Supports monochrome or 16 colors." />
+		<info name="version" value="1.7" />
+		<sharedfeat name="compatibility" value="MC68000,MC68020" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k,mac512ke" />
+		<!-- Dump released: 2025-09-24 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296257">
+				<rom name="indiana jones and the last crusade v1.7 disk 1.moof" size="1296257" crc="0a53257b" sha1="41217948d35f8367ce1d5f6e0cda2264abf253ba" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296257">
+				<rom name="indiana jones and the last crusade v1.7 disk 2.moof" size="1296257" crc="3c64e382" sha1="53d6d17f68614741d7902ac47a474efed02f4d42" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1296257">
+				<rom name="indiana jones and the last crusade v1.7 disk 3.moof" size="1296257" crc="ce08061b" sha1="d46658be9f375e233141f5450ac5c994fc164137" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goldfngr">
+		<description>James Bond 007 in: Goldfinger</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Angelsoft" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-14 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649023">
+				<rom name="goldfinger.moof" size="649023" crc="24364fb3" sha1="ce18ea6e7a1d3a5dd228e59681c94990c71ed6ef" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jazz">
+		<description>Jazz (version 1A)</description>
+		<year>1986</year>
+		<publisher>Lotus Development</publisher>
+		<info name="developer" value="Lotus Development" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1A" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-20 -->
+		<!-- productivity program -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Startup" />
+			<dataarea name="flop" size="648992">
+				<rom name="jazz v1a disk 1 - startup.moof" size="648992" crc="3b4a5d47" sha1="8ae087a834fa97378938a15cc61ca46da051d184" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Program" />
+			<dataarea name="flop" size="648992">
+				<rom name="jazz v1a disk 2 - program.moof" size="648992" crc="99238a95" sha1="84074ac9c342afe8dedacc97a96126fa631f16dc" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Primer" />
+			<dataarea name="flop" size="648991">
+				<rom name="jazz v1a disk 3 - primer.moof" size="648991" crc="4a36c2e3" sha1="01859b4b0bfc97c4fc90b3a01ea054948feaa823" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kidtalk">
+		<description>KidTalk (version 1.0)</description>
+		<year>1985</year>
+		<publisher>First Byte</publisher>
+		<info name="developer" value="First Byte" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-14 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="691132">
+				<rom name="kidtalk v1.0.moof" size="691132" crc="0127b33a" sha1="2fcf24913a6cf21f38382cc7c1ea2bd545bd905a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macattk">
+		<description>Mac Attack (revision 1-GCBR2)</description>
+		<year>1984</year>
+		<publisher>Miles Computing</publisher>
+		<info name="programmer" value="Tim Hays" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<info name="version" value="1-GCBR2" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
+		<!--Dump released: 2022-09-29-->
+		<!--action game-->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648972">
+				<rom name="mac attack.moof" size="648972" crc="d1766425" sha1="4cdcc8508317bae4d91e907b7c42b0e76765bd8b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macmatch">
+		<description>MacMatch</description>
+		<year>1984</year>
+		<publisher>Axion</publisher>
+		<info name="programmer" value="Eagle I. Berns" />
+		<info name="programmer" value="Michael Kosaka" />
+		<info name="programmer" value="Phillip Goldman" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-16 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649014">
+				<rom name="macmatch.moof" size="649014" crc="cde13207" sha1="3c3bd6bcdff0298c40d255f52cce08f826fb25c3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathtalk">
+		<description>MathTalk (version 1.0)</description>
+		<year>1986</year>
+		<publisher>First Byte</publisher>
+		<info name="developer" value="First Byte" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="691645">
+				<rom name="mathtalk v1.0.moof" size="691645" crc="1398929d" sha1="5c1dc65451e7d46b873be61eb262ebc4ea51a2a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicwks">
+		<description>MusicWorks (version 1.0)</description>
+		<year>1986</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Jay Fenton" />
+		<info name="programmer" value="Marc A. Canter" />
+		<info name="programmer" value="Mark S. Pierce" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-20 -->
+		<!-- audio program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="639305">
+				<rom name="musicworks v1.0.moof" size="639305" crc="d171f805" sha1="6f31b10d20f264914b6fb5e74a76bcfa99f306e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pagemaker">
+		<description>PageMaker (version 1.2)</description>
+		<year>1986</year>
+		<publisher>Aldus Corporation</publisher>
+		<info name="programmer" value="Jeremy Jaech" />
+		<info name="programmer" value="Mike Templeman" />
+		<info name="programmer" value="Dave Walter" />
+		<info name="programmer" value="Mark Sundstrom" />
+		<info name="programmer" value="John Nelson" />
+		<info name="release" value="19860324" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-19 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649050">
+				<rom name="pagemaker v1.2 disk 1.moof" size="649050" crc="bb51637d" sha1="76dcff1d67a4dfba569587eb9593aa344045ff85" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649050">
+				<rom name="pagemaker v1.2 disk 2.moof" size="649050" crc="82b5ce5c" sha1="3e9c331482736a5efc3f455dc33bb0ae2968f811" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sargon3">
+		<description>Sargon III</description>
+		<year>1984</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Dan Spracken" />
+		<info name="programmer" value="Kathe Spracken" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-17 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649010">
+				<rom name="sargon iii.moof" size="649010" crc="864d8213" sha1="ab5050dbbeda26330f71b3b641ff4d3bb0e00bab" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvited860806" cloneof="uninvited">
+		<description>Uninvited (version 1986-08-06)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="ICOM Simulations" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Billy Wolfe" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Mark Waterman" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Steve Hays" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1986-08-06" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited 1986-08-06 disk 1.moof" size="649150" crc="0c3fd0c6" sha1="a6e22832b4b88683e05be31fd2836222bb71e16f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited 1986-08-06 disk 2.moof" size="649150" crc="812d966d" sha1="2f801344ee5213365fe9cd0ba538aefc6a09fdf4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uninvited">
+		<description>Uninvited (version 1986-12-05)</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="ICOM Simulations" />
+		<info name="programmer" value="Craig Erickson" />
+		<info name="programmer" value="Jay Zipnick" />
+		<info name="programmer" value="Billy Wolfe" />
+		<info name="programmer" value="Terry Schulenburg" />
+		<info name="programmer" value="Mark Waterman" />
+		<info name="programmer" value="Darin Adler" />
+		<info name="programmer" value="David Marsh" />
+		<info name="programmer" value="Todd Squires" />
+		<info name="programmer" value="Tod Zipnick" />
+		<info name="programmer" value="Steve Hays" />
+		<info name="programmer" value="Waldemar Horwat" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1986-08-06" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!--Dump released: 2022-09-28-->
+		<!--adventure game-->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited disk 1.moof" size="649150" crc="fd19dc18" sha1="ceff741f276fd83ef7ad5f0e746194589e1205b3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="649150">
+				<rom name="uninvited disk 2.moof" size="649150" crc="04c6f91e" sha1="d70db8a9e11db1243703c87b711be37147530bff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsfile">
+		<description>pfs: file (version A.01)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="developer" value="Software Publishing Corporation" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="A.01" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- productivity program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649004">
+				<rom name="pfs file va.01.moof" size="649004" crc="b64b5e4a" sha1="5ead4ee1de0326772e4eb9d51edba85493e5662c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsreport">
+		<description>pfs: report (version A.00)</description>
+		<year>1984</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="developer" value="Software Publishing Corporation" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="A.00" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-09-25 -->
+		<!-- productivity program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649006">
+				<rom name="pfs report va.00.moof" size="649006" crc="c67e3026" sha1="e27a65ee34e5693070e309525ae061f19f8747eb" />
 			</dataarea>
 		</part>
 	</software>

@@ -73,7 +73,7 @@ private:
 	uint8_t invalid_r();
 	void invalid_w(uint8_t data);
 
-	void stereo_fx_io(address_map &map) ATTR_COLD;
+	void stereo_fx_data(address_map &map) ATTR_COLD;
 	void stereo_fx_rom(address_map &map) ATTR_COLD;
 };
 

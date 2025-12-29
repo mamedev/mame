@@ -100,8 +100,9 @@ Broken [video] during intro, uses bitmap mode with ROZ layer
 		<publisher>C&amp;E Soft</publisher>
 		<notes><![CDATA[
 [video] ROZ is misaligned during intro, and initially concealed (blending?).
-[sound] missing crowd noise during gameplay, tries to play an empty buffer in the $2xxx range.
-[sound] DMA driven samples cuts off too early.
+[sound] missing crowd noise during gameplay, tries to play an empty buffer in the $2xxx range. (fixed with internal sound BIOS dump for attract)
+[sound] Keeps ringing a sound sample on main menu.
+[sound] DMA driven samples cuts off too early during gameplay.
 ]]></notes>
 		<info name="serial" value="F005" />
 		<info name="alt_title" value="超級中華職棒聯盟" />

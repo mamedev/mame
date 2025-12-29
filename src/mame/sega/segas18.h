@@ -129,7 +129,7 @@ private:
 	void set_vdp_enable(int state);
 
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void pcm_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_portmap(address_map &map) ATTR_COLD;

@@ -132,6 +132,12 @@ void a8sio_device::motor_w(int state)
 		m_device->motor_w(state);
 }
 
+void a8sio_device::ready_w(int state)
+{
+	if (m_device)
+		m_device->ready_w(state);
+}
+
 void a8sio_device::proceed_w(int state)
 {
 	m_out_proceed_cb(state);

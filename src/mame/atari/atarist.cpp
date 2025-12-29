@@ -1411,7 +1411,7 @@ void st_state::common(machine_config &config)
 
 	// cartridge
 
-	STCART_CONNECTOR(config, m_cart, stcart_intf, nullptr);
+	STCART_CONNECTOR(config, m_cart, stcart_intf, "rom");
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");

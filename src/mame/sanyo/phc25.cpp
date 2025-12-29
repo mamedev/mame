@@ -66,7 +66,7 @@ public:
 		, m_vram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_chargen(*this, "chargen")
-		, m_vdg(*this, "m5c6847p1")
+		, m_vdg(*this, "vdg")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_cassette(*this, "cassette")
@@ -642,12 +642,12 @@ void phc25_state::phc25(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	M5C6847P1(config, m_vdg, XTAL(4'433'619));
+	M5C6847P1(config, m_vdg, XTAL(4'433'619), true);
 	m_vdg->set_screen("screen");
 	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::fsync_irq_w));
 	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
 	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
-	m_vdg->set_get_fixed_mode(mc6847_pal_device::MODE_GM2 | mc6847_pal_device::MODE_GM1 | mc6847_pal_device::MODE_INTEXT);
+	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT);
 	// other lines not connected
 
 	/* sound hardware (Synthesizer PSG-01 add-on) */
@@ -680,10 +680,10 @@ void phc25_state::phc25j(machine_config &config)
 
 	M5C6847P1(config.replace(), m_vdg, XTAL(3'579'545));
 	m_vdg->set_screen("screen");
-	m_vdg->fsync_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0).invert();
+	m_vdg->fsync_wr_callback().set(FUNC(phc25_state::fsync_irq_w));
 	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
 	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
-	m_vdg->set_get_fixed_mode(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1 | mc6847_ntsc_device::MODE_INTEXT);
+	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT);
 	// other lines not connected
 }
 

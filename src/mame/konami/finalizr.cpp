@@ -375,12 +375,14 @@ int finalizr_state::bootleg_t1_r()
 
 void finalizr_state::main_map(address_map &map)
 {
+	// Konami 005885
 	map(0x0000, 0x0000).nopw();
 	map(0x0001, 0x0001).writeonly().share(m_scroll);
 	map(0x0002, 0x0002).nopw();
 	map(0x0003, 0x0003).w(FUNC(finalizr_state::videoctrl_w));
 	map(0x0004, 0x0004).w(FUNC(finalizr_state::flipscreen_w));
 //  map(0x0020, 0x003f).writeonly().share(m_scroll);
+
 	map(0x0800, 0x0800).portr("DSW3");
 	map(0x0808, 0x0808).portr("DSW2");
 	map(0x0810, 0x0810).portr("SYSTEM");

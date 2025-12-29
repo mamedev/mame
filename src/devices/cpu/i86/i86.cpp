@@ -191,7 +191,7 @@ void i8086_cpu_device::execute_run()
 			m_prev_ip = m_ip;
 			m_seg_prefix = false;
 
-				/* Dispatch IRQ */
+			/* Dispatch IRQ */
 			if ( m_pending_irq && (m_no_interrupt == 0) )
 			{
 				if ( m_pending_irq & NMI_IRQ )
@@ -528,14 +528,6 @@ void i8086_common_cpu_device::device_reset()
 {
 	m_ZeroVal = 1;
 	m_ParityVal = 1;
-	m_regs.w[AX] = 0;
-	m_regs.w[CX] = 0;
-	m_regs.w[DX] = 0;
-	m_regs.w[BX] = 0;
-	m_regs.w[SP] = 0;
-	m_regs.w[BP] = 0;
-	m_regs.w[SI] = 0;
-	m_regs.w[DI] = 0;
 	m_sregs[ES] = 0;
 	m_sregs[CS] = 0xffff;
 	m_sregs[SS] = 0;
@@ -2285,7 +2277,8 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						uresult = m_regs.w[AX];
 						uresult2 = uresult % tmp;
-						if ((uresult /= tmp) > 0xff)
+						uresult /= tmp;
+						if (uresult > 0xff)
 						{
 							interrupt(0);
 						}
@@ -2306,7 +2299,9 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						result = (int16_t)m_regs.w[AX];
 						result2 = result % (int16_t)((int8_t)tmp);
-						if ((result /= (int16_t)((int8_t)tmp)) > 0xff)
+						result /= (int16_t)((int8_t)tmp);
+						int32_t lower_bound = m_MF ? -0x7f : -0x80;
+						if (result > 0x7f || result < lower_bound)
 						{
 							interrupt(0);
 						}
@@ -2377,7 +2372,8 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						uresult = (((uint32_t)m_regs.w[DX]) << 16) | m_regs.w[AX];
 						uresult2 = uresult % tmp;
-						if ((uresult /= tmp) > 0xffff)
+						uresult /= tmp;
+						if (uresult > 0xffff)
 						{
 							interrupt(0);
 						}
@@ -2398,7 +2394,9 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					{
 						result = ((uint32_t)m_regs.w[DX] << 16) + m_regs.w[AX];
 						result2 = result % (int32_t)((int16_t)tmp);
-						if ((result /= (int32_t)((int16_t)tmp)) > 0xffff)
+						result /= (int32_t)((int16_t)tmp);
+						int32_t lower_bound = m_MF ? -0x7fff : -0x8000;
+						if (result > 0x7fff || result < lower_bound)
 						{
 							interrupt(0);
 						}

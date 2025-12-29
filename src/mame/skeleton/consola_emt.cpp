@@ -56,7 +56,7 @@ protected:
 private:
 	required_device<i80188_cpu_device> m_maincpu;
 	required_device<mcs51_cpu_device> m_mcu;
-	required_device<hd44780_device> m_lcdc;
+	required_device<ks0066_device> m_lcdc;
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;

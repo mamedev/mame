@@ -52,27 +52,27 @@ void atari810_device::mem_map(address_map &map)
 
 void atari810_device::data_out_w(int state)
 {
-	m_pia->pb_bit_w<7>(state);
+	m_pia->pb_bit_w<7>(!state);
 }
 
 void atari810_device::command_w(int state)
 {
-	m_pia->pb_bit_w<6>(state);
+	m_pia->pb_bit_w<6>(!state);
 }
 
 void atari810_device::ready_w(int state)
 {
-	m_pia->pb_bit_w<1>(state);
+	m_pia->pb_bit_w<1>(!state);
 }
 
 
 static INPUT_PORTS_START(atari810)
-	PORT_START("SELECT") // values not verified
-	PORT_DIPNAME(0x05, 0x00, "Drive Code") PORT_DIPLOCATION("S101:1,2")
-	PORT_DIPSETTING(0x00, "No. 1")
-	PORT_DIPSETTING(0x01, "No. 2")
-	PORT_DIPSETTING(0x04, "No. 3")
-	PORT_DIPSETTING(0x05, "No. 4")
+	PORT_START("SELECT")
+	PORT_DIPNAME(0x05, 0x05, "Drive Code") PORT_DIPLOCATION("S101:1,2")
+	PORT_DIPSETTING(0x05, "No. 1")
+	PORT_DIPSETTING(0x04, "No. 2")
+	PORT_DIPSETTING(0x00, "No. 3")
+	PORT_DIPSETTING(0x01, "No. 4")
 	PORT_BIT(0xfa, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 

@@ -131,9 +131,4 @@ bool dim_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool dim_format::supports_save() const noexcept
-{
-	return false;
-}
-
 const dim_format FLOPPY_DIM_FORMAT;

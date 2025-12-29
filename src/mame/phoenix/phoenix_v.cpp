@@ -267,7 +267,7 @@ void phoenix_state::pleiads_videoreg_w(uint8_t data)
 	}
 
 	/* the palette table is at $0420-$042f and is set by $06bc. Four palette
-       changes by level.  The same palette is used for both layers. */
+	   changes by level.  The same palette is used for both layers. */
 	if (m_palette_bank != ((data >> 1) & 3))
 	{
 		m_palette_bank = ((data >> 1) & 3);

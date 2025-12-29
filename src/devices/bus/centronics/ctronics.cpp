@@ -132,6 +132,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "chessmec.h"
 #include "smartboard.h"
 #include "nlq401.h"
+#include "mz1p16.h"
 
 void centronics_devices(device_slot_interface &device)
 {
@@ -153,4 +154,5 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("chessmec", CENTRONICS_CHESSMEC);
 	device.option_add("smartboard", CENTRONICS_SMARTBOARD);
 	device.option_add("nlq401", NLQ401);
+	device.option_add("mz1p16", MZ1P16);
 }

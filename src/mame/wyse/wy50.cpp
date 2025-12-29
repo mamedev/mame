@@ -305,7 +305,7 @@ void wy50_state::wy50(machine_config &config)
 {
 	I8031(config, m_maincpu, 11_MHz_XTAL); // SAB8031P or SCN8031A
 	m_maincpu->set_addrmap(AS_PROGRAM, &wy50_state::prg_map);
-	m_maincpu->set_addrmap(AS_IO, &wy50_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &wy50_state::io_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(wy50_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(wy50_state::p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(wy50_state::p3_r));

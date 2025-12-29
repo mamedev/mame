@@ -41,7 +41,7 @@ public:
 private:
 	required_device<sh7042_device> m_maincpu;
 	required_device<swx00_sound_device> m_swx00;
-	required_device<hd44780_device> m_lcdc;
+	required_device<ks0066_device> m_lcdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<hd63266f_device> m_fdc;
 	required_device<nvram_device> m_nvram;

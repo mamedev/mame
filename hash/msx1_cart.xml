@@ -19705,7 +19705,8 @@ legacy FM implementations cannot find it.
 		<description>BitLogic</description>
 		<year>2016</year>
 		<publisher>Matra</publisher>
-		<info name="developer" value="OXiAB Game Studio &amp; ThePetsMode"/>
+		<info name="developer" value="OXiAB Game Studio" />
+		<info name="developer" value="ThePetsMode" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x40000">
@@ -19718,7 +19719,8 @@ legacy FM implementations cannot find it.
 		<description>BitLogic (MSXdev)</description>
 		<year>2015</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="OXiAB Game Studio &amp; ThePetsMode"/>
+		<info name="developer" value="OXiAB Game Studio" />
+		<info name="developer" value="ThePetsMode" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0xc000">
@@ -21107,7 +21109,8 @@ legacy FM implementations cannot find it.
 		<description>Destroyer</description>
 		<year>2014</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="CEZ / RetroWorks"/>
+		<info name="developer" value="CEZ" />
+		<info name="developer" value="RetroWorks" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -21120,7 +21123,8 @@ legacy FM implementations cannot find it.
 		<description>Destroyer (older)</description>
 		<year>2014</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="CEZ / RetroWorks"/>
+		<info name="developer" value="CEZ" />
+		<info name="developer" value="RetroWorks" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
@@ -21923,7 +21927,9 @@ legacy FM implementations cannot find it.
 		<description>Gommy - Medieval Defender (English)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<info name="developer" value="Retroworks" />
+		<info name="developer" value="Dimension Z" />
+		<info name="developer" value="nenefranz" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -21936,7 +21942,9 @@ legacy FM implementations cannot find it.
 		<description>Gommy - Medieval Defender (Spanish)</description>
 		<year>2013</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Retroworks, Dimension Z, nenefranz"/>
+		<info name="developer" value="Retroworks" />
+		<info name="developer" value="Dimension Z" />
+		<info name="developer" value="nenefranz" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -22859,7 +22867,7 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
@@ -22872,7 +22880,7 @@ legacy FM implementations cannot find it.
 		<description>Lotus F3 (alt)</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<dataarea name="rom" size="0x20000">
@@ -24243,7 +24251,7 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24256,7 +24264,7 @@ legacy FM implementations cannot find it.
 		<description>Peek-A-Boo (older)</description>
 		<year>2008</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24565,7 +24573,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.82b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24578,7 +24587,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.8b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -24591,7 +24601,8 @@ legacy FM implementations cannot find it.
 		<description>PSGed (v0.4b)</description>
 		<year>2010</year>
 		<publisher>aorante</publisher>
-		<info name="developer" value="aorante/303bcn"/>
+		<info name="developer" value="aorante" />
+		<info name="developer" value="303bcn" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8001">
@@ -24999,7 +25010,8 @@ legacy FM implementations cannot find it.
 		<description>Sacred Valley</description>
 		<year>2022</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="Visualedu &amp; Bitcaffe"/>
+		<info name="developer" value="Visualedu" />
+		<info name="developer" value="Bitcaffe" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="0"/>
 			<dataarea name="rom" size="0x10000">
@@ -25703,7 +25715,7 @@ legacy FM implementations cannot find it.
 		<description>Sudoku</description>
 		<year>2006</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -27456,7 +27468,7 @@ legacy FM implementations cannot find it.
 		<description>Yahtzee</description>
 		<year>2007</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="dvik &amp; joyrex"/>
+		<info name="developer" value="dvik &amp; joyrex" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -27493,7 +27505,8 @@ legacy FM implementations cannot find it.
 		<description>Yazzie Remastered</description>
 		<year>2020</year>
 		<publisher>MSXdev</publisher>
-		<info name="developer" value="RetroSouls &amp; FRS"/>
+		<info name="developer" value="RetroSouls" />
+		<info name="developer" value="FRS" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">

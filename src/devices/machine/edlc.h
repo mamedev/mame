@@ -60,7 +60,6 @@ protected:
 	int receive(u8 *buf, int length);
 	void interrupt(s32 param = 0);
 	virtual bool address_filter(u8 *address);
-	void dump_bytes(u8 *buf, int length);
 
 	// 80c03 option helpers
 	virtual bool mode_tx_pad() const { return false; }

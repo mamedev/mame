@@ -93,6 +93,7 @@ class device_colecovision_cartridge_interface : public device_interface
 	friend class colecovision_cartridge_slot_device;
 
 public:
+	virtual void load_done() { };
 	virtual uint8_t read(offs_t offset, int _8000, int _a000, int _c000, int _e000) { return 0xff; }
 	virtual void write(offs_t offset, uint8_t data, int _8000, int _a000, int _c000, int _e000) { }
 

@@ -249,7 +249,7 @@ void meadows_state::sh_init()
 {
 	// initialized after samples_device::device_reset
 	for (int i = 0; i < 2; i++)
-		if (!m_samples->playing(i))
+		if (m_samples && !m_samples->playing(i))
 		{
 			m_freq[i] = machine().sample_rate();
 
@@ -376,7 +376,7 @@ void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
 		int const x = m_spriteram[i + 0] - 18;
 		int const y = m_spriteram[i + 4] - 14;
 		int const code = m_spriteram[i + 8] & 0x0f;       // bit #0 .. #3 select sprite
-//      int const bank = (m_spriteram[i + 8] >> 4) & 1;      bit #4 selects PROM ???
+//      int const bank = (m_spriteram[i + 8] >> 4) & 1;   // bit #4 selects PROM ???
 		int const bank = i;                               // that fixes it for now :-/
 		int const flip = m_spriteram[i + 8] >> 5;         // bit #5 flip vertical flag
 

@@ -127,12 +127,17 @@ void ddz_state::machine_reset()
 
 void ddz_state::ddz(machine_config &config)
 {
-	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : different between each PCBs
+	SE3208(config, m_maincpu, 14'318'180 * 3); // TODO : dynamic via PLL
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddz_state::ddz_mem);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
-	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 3);
-	m_vr0soc->set_host_cpu_tag(m_maincpu);
+	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 6); // TODO : dynamic via PLL
+	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
+
+	SPEAKER(config, "speaker", 2).front();
+	m_vr0soc->add_route(0, "speaker", 1.0, 0);
+	m_vr0soc->add_route(1, "speaker", 1.0, 1);
 }
 
 ROM_START( ddz )

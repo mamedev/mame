@@ -182,3 +182,14 @@ void galaxold_state::init_superbikg()
 {
 	save_item(NAME(m_superbikg_latch));
 }
+
+void galaxold_state::init_dkongjrv()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	membank("bank1")->configure_entry(0, &rom[0x8000]);
+	membank("bank1")->configure_entry(1, &rom[0x4000]);
+
+	membank("bank2")->configure_entry(0, &rom[0xa000]);
+	membank("bank2")->configure_entry(1, &rom[0x6000]);
+}

@@ -55,6 +55,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/ticket.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/tc8830f.h"
@@ -144,8 +145,6 @@ public:
 	using timeplt_state::timeplt_state;
 
 	void bikkuric(machine_config &config);
-
-	int hopper_status_r();
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -439,12 +438,6 @@ void chkun_state::sound_w(uint8_t data)
 		m_tc8830f->reset();
 }
 
-int bikkuric_state::hopper_status_r()
-{
-	// temp workaround, needs hopper
-	return machine().rand();
-}
-
 
 
 /*************************************
@@ -596,7 +589,7 @@ static INPUT_PORTS_START( chkun )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet 3B")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bikkuric_state::hopper_status_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet 1B")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bet 2B")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -645,7 +638,7 @@ static INPUT_PORTS_START( bikkuric )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(bikkuric_state::hopper_status_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -802,6 +795,10 @@ void bikkuric_state::bikkuric(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &bikkuric_state::main_map);
+
+	m_mainlatch->q_out_cb<5>().set("hopper", FUNC(hopper_device::motor_w));
+
+	HOPPER(config, "hopper", attotime::from_msec(100)); // period guessed
 }
 
 void chkun_state::chkun(machine_config &config)

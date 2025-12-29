@@ -1012,27 +1012,35 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 	u32 const yextent = visarea.bottom() + visarea.top() + 1; // y0 + y1 + 1 for calculating vertical centre as (y0 + y1 + 1) >> 1
 
 	// cache row/colscroll
-	std::vector<s32> rowscroll(m_scrollrows);
-	std::vector<s32> colscroll(m_scrollcols);
-
 	bool skip_rowscroll = true;
-	bool skip_colscroll = true;
+	std::vector<s32> rowscroll;
+	rowscroll.reserve(m_scrollrows);
 
-	for (int i = 0, scroll = 0; i < m_scrollrows; i++)
+	s32 scroll0 = effective_rowscroll(0, xextent);
+	rowscroll.push_back(scroll0);
+
+	for (int i = 1; i < m_scrollrows; i++)
 	{
-		s32 prev = scroll;
-		scroll = rowscroll[i] = effective_rowscroll(i, xextent);
+		s32 scroll = effective_rowscroll(i, xextent);
+		rowscroll.push_back(scroll);
 
-		if (i > 0 && scroll != prev)
+		if (scroll != scroll0)
 			skip_rowscroll = false;
 	}
 
-	for (int i = 0, scroll = 0; i < m_scrollcols; i++)
-	{
-		s32 prev = scroll;
-		scroll = colscroll[i] = effective_colscroll(i, yextent);
+	bool skip_colscroll = true;
+	std::vector<s32> colscroll;
+	colscroll.reserve(m_scrollcols);
 
-		if (i > 0 && scroll != prev)
+	scroll0 = effective_colscroll(0, yextent);
+	colscroll.push_back(scroll0);
+
+	for (int i = 1; i < m_scrollcols; i++)
+	{
+		s32 scroll = effective_colscroll(i, yextent);
+		colscroll.push_back(scroll);
+
+		if (scroll != scroll0)
 			skip_colscroll = false;
 	}
 

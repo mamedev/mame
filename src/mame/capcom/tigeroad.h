@@ -141,7 +141,7 @@ protected:
 
 private:
 	void f1dream_map(address_map &map) ATTR_COLD;
-	void f1dream_mcu_io(address_map &map) ATTR_COLD;
+	void f1dream_mcu_data(address_map &map) ATTR_COLD;
 
 	void out3_w(u8 data);
 

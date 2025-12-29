@@ -107,7 +107,6 @@ void tecmo_spr_device::gaiden_draw_sprites(screen_device &screen, bitmap_ind16 &
 					if (frame == 1)
 						enabled = false;
 				}
-
 			}
 		}
 
@@ -206,8 +205,8 @@ void tecmo_spr_device::draw_sprites_8bit(screen_device &screen, bitmap_ind16 &bi
 	for (int offs = size - 8; offs >= 0; offs -= 8)
 	{
 		uint8_t const bank = spriteram[offs + 0];
-		if (BIT(bank, 2))
-		{ // visible
+		if (BIT(bank, 2)) // visible
+		{
 			uint8_t const flags = spriteram[offs + 3];
 			uint32_t const priority_mask = m_pri_cb(flags >> 6);
 
@@ -285,8 +284,8 @@ void tecmo_spr_device::draw_wc90_sprites(screen_device &screen, bitmap_ind16 &bi
 	{
 		uint8_t const bank = spriteram[offs + 0];
 
-		if (BIT(bank, 2))
-		{ // visible
+		if (BIT(bank, 2)) // visible
+		{
 			uint32_t const priority_mask = m_pri_cb(bank >> 4);
 			uint32_t const code = spriteram[offs + 2] + (spriteram[offs + 3] << 8);
 
@@ -329,7 +328,7 @@ void tecmo_spr_device::tbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle 
 {
 	for (int offs = 0; offs < 0x800; offs += 8)
 	{
-		if (BIT(spriteram[offs + 0], 7))  // enable
+		if (BIT(spriteram[offs + 0], 7)) // enable
 		{
 			uint32_t const code = spriteram[offs + 2] + (spriteram[offs + 1] << 8);
 			uint32_t const color = spriteram[offs + 3] & 0x1f;

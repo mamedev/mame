@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcbec.c
+    drcbec.cpp
 
     Interpreted C core back-end for the universal machine language.
 
@@ -15,6 +15,7 @@
 
 #include "debug/debugcpu.h"
 
+#include <cfenv>
 #include <cmath>
 
 
@@ -28,6 +29,14 @@ using namespace uml;
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+const int rounding_map[4] =
+{
+	FE_TOWARDZERO,  // ROUND_TRUNC
+	FE_TONEAREST,   // ROUND_ROUND
+	FE_UPWARD,      // ROUND_CEIL
+	FE_DOWNWARD     // ROUND_FLOOR
+};
 
 // define a bit to match each possible condition, starting at bit 12
 constexpr uint32_t ZBIT  = 0x1000 << (COND_Z & 15);
@@ -728,6 +737,9 @@ void drcbe_c::get_info(drcbe_info &info) const noexcept
 
 int drcbe_c::execute(code_handle &entry)
 {
+	// save environment
+	int const feround = std::fegetround();
+
 	// get the entry point
 	const drcbec_instruction *inst = (const drcbec_instruction *)entry.codeptr();
 	assert_in_cache(m_cache, inst);
@@ -786,6 +798,7 @@ int drcbe_c::execute(code_handle &entry)
 				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_EXIT, 4, 0):
+				std::fesetround(feround);
 				return PARAM0;
 
 			case MAKE_OPCODE_SHORT(OP_JMP, 4, 1):       // JMP     imm[,c]
@@ -856,7 +869,8 @@ int drcbe_c::execute(code_handle &entry)
 			// ----------------------- Internal Register Operations -----------------------
 
 			case MAKE_OPCODE_SHORT(OP_SETFMOD, 4, 0):   // SETFMOD src
-				m_state.fmod = PARAM0;
+				m_state.fmod = PARAM0 & 0x03;
+				std::fesetround(rounding_map[PARAM0 & 0x03]);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_GETFMOD, 4, 0):   // GETFMOD dst
@@ -884,7 +898,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RESTORE, 4, 0):   // RESTORE dst
 			case MAKE_OPCODE_SHORT(OP_RESTORE, 4, 1):   // RESTORE dst
 				m_state = *inst[0].state;
-				flags = inst[0].state->flags;
+				flags = m_state.flags &= FLAGS_ALL;
+				std::fesetround(rounding_map[m_state.fmod &= 0x03]);
 				break;
 
 
@@ -1455,9 +1470,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 4, 0):      // RORC    dst,src,count[,f]
 				shift = PARAM2 & 31;
 				if (shift > 1)
-					PARAM0 = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
+					PARAM0 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << (32 - shift)) | (PARAM1 << (33 - shift));
 				else if (shift == 1)
-					PARAM0 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
+					PARAM0 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << 31);
 				else
 					PARAM0 = PARAM1;
 				break;
@@ -1465,9 +1480,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 4, 1):
 				shift = PARAM2 & 31;
 				if (shift > 1)
-					temp32 = (PARAM1 >> shift) | (((flags & FLAG_C) << 31) >> (shift - 1)) | (PARAM1 << (33 - shift));
+					temp32 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << (32 - shift)) | (PARAM1 << (33 - shift));
 				else if (shift == 1)
-					temp32 = (PARAM1 >> shift) | ((flags & FLAG_C) << 31);
+					temp32 = (PARAM1 >> shift) | (uint32_t(flags & FLAG_C) << 31);
 				else
 					temp32 = PARAM1;
 				flags = FLAGS32_NZ(temp32) | (((shift != 0) ? (PARAM1 >> (shift - 1)) : flags) & FLAG_C);
@@ -2084,9 +2099,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 8, 0):      // DRORC   dst,src,count[,f]
 				shift = DPARAM2 & 63;
 				if (shift > 1)
-					DPARAM0 = (DPARAM1 >> shift) | ((((uint64_t)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
+					DPARAM0 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << (64 - shift)) | (DPARAM1 << (65 - shift));
 				else if (shift == 1)
-					DPARAM0 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
+					DPARAM0 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << 63);
 				else
 					DPARAM0 = DPARAM1;
 				break;
@@ -2094,9 +2109,9 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RORC, 8, 1):
 				shift = DPARAM2 & 63;
 				if (shift > 1)
-					temp64 = (DPARAM1 >> shift) | ((((uint64_t)flags & FLAG_C) << 63) >> (shift - 1)) | (DPARAM1 << (65 - shift));
+					temp64 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << (64 - shift)) | (DPARAM1 << (65 - shift));
 				else if (shift == 1)
-					temp64 = (DPARAM1 >> shift) | (((uint64_t)flags & FLAG_C) << 63);
+					temp64 = (DPARAM1 >> shift) | (uint64_t(flags & FLAG_C) << 63);
 				else
 					temp64 = DPARAM1;
 				flags = FLAGS64_NZ(temp64) | (((shift != 0) ? (DPARAM1 >> (shift - 1)) : flags) & FLAG_C);
@@ -2132,55 +2147,73 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4T, 4, 0):    // FSTOI4T dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint32 = floor(FSPARAM1);
-				else
-					*inst[0].pint32 = ceil(FSPARAM1);
+				*inst[0].pint32 = int32_t(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4R, 4, 0):    // FSTOI4R dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint32 = floor(FSPARAM1 + 0.5f);
-				else
-					*inst[0].pint32 = ceil(FSPARAM1 - 0.5f);
+				*inst[0].pint32 = lroundf(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4F, 4, 0):    // FSTOI4F dst,src1
-				*inst[0].pint32 = floor(FSPARAM1);
+				*inst[0].pint32 = int32_t(floorf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4C, 4, 0):    // FSTOI4C dst,src1
-				*inst[0].pint32 = ceil(FSPARAM1);
+				*inst[0].pint32 = int32_t(ceilf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4, 4, 0):     // FSTOI4  dst,src1
-				*inst[0].pint32 = FSPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint32 = int32_t(FSPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint32 = lroundf(FSPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint32 = int32_t(floorf(FSPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint32 = int32_t(ceilf(FSPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8T, 4, 0):    // FSTOI8T dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint64 = floor(FSPARAM1);
-				else
-					*inst[0].pint64 = ceil(FSPARAM1);
+				*inst[0].pint64 = int64_t(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8R, 4, 0):    // FSTOI8R dst,src1
-				if (FSPARAM1 >= 0)
-					*inst[0].pint64 = floor(FSPARAM1 + 0.5f);
-				else
-					*inst[0].pint64 = ceil(FSPARAM1 - 0.5f);
+				*inst[0].pint64 = llroundf(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8F, 4, 0):    // FSTOI8F dst,src1
-				*inst[0].pint64 = floor(FSPARAM1);
+				*inst[0].pint64 = int64_t(floorf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8C, 4, 0):    // FSTOI8C dst,src1
-				*inst[0].pint64 = ceil(FSPARAM1);
+				*inst[0].pint64 = int64_t(ceilf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8, 4, 0):     // FSTOI8  dst,src1
-				*inst[0].pint64 = FSPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint64 = int64_t(FSPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint64 = llroundf(FSPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint64 = int64_t(floorf(FSPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint64 = int64_t(ceilf(FSPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FFRI4, 4, 0):     // FSFRI4  dst,src1
@@ -2275,55 +2308,73 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4T, 8, 0):    // FDTOI4T dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint32 = floor(FDPARAM1);
-				else
-					*inst[0].pint32 = ceil(FDPARAM1);
+				*inst[0].pint32 = int32_t(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4R, 8, 0):    // FDTOI4R dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint32 = floor(FDPARAM1 + 0.5);
-				else
-					*inst[0].pint32 = ceil(FDPARAM1 - 0.5);
+				*inst[0].pint32 = lround(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4F, 8, 0):    // FDTOI4F dst,src1
-				*inst[0].pint32 = floor(FDPARAM1);
+				*inst[0].pint32 = int32_t(floor(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4C, 8, 0):    // FDTOI4C dst,src1
-				*inst[0].pint32 = ceil(FDPARAM1);
+				*inst[0].pint32 = int32_t(ceil(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4, 8, 0):     // FDTOI4  dst,src1
-				*inst[0].pint32 = FDPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint32 = int32_t(FDPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint32 = lround(FDPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint32 = int32_t(floor(FDPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint32 = int32_t(ceil(FDPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8T, 8, 0):    // FDTOI8T dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint64 = floor(FDPARAM1);
-				else
-					*inst[0].pint64 = ceil(FDPARAM1);
+				*inst[0].pint64 = int64_t(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8R, 8, 0):    // FDTOI8R  dst,src1
-				if (FDPARAM1 >= 0)
-					*inst[0].pint64 = floor(FDPARAM1 + 0.5);
-				else
-					*inst[0].pint64 = ceil(FDPARAM1 - 0.5);
+				*inst[0].pint64 = llround(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8F, 8, 0):    // FDTOI8F dst,src1
-				*inst[0].pint64 = floor(FDPARAM1);
+				*inst[0].pint64 = int64_t(floor(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8C, 8, 0):    // FDTOI8C dst,src1
-				*inst[0].pint64 = ceil(FDPARAM1);
+				*inst[0].pint64 = int64_t(ceil(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8, 8, 0):     // FDTOI8  dst,src1
-				*inst[0].pint64 = FDPARAM1;
+				switch (m_state.fmod)
+				{
+				default:
+				case ROUND_TRUNC:
+					*inst[0].pint64 = int64_t(FDPARAM1);
+					break;
+				case ROUND_ROUND:
+					*inst[0].pint64 = llround(FDPARAM1);
+					break;
+				case ROUND_FLOOR:
+					*inst[0].pint64 = int64_t(floor(FDPARAM1));
+					break;
+				case ROUND_CEIL:
+					*inst[0].pint64 = int64_t(ceil(FDPARAM1));
+					break;
+				}
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FFRI4, 8, 0):     // FDFRI4  dst,src1

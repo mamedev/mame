@@ -665,7 +665,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms34010",        le,  3, []() -> util::disasm_interface * { return new tms34010_disassembler(false); } },
 	{ "tms34020",        le,  3, []() -> util::disasm_interface * { return new tms34010_disassembler(true); } },
 	{ "tms57002",        le, -2, []() -> util::disasm_interface * { return new tms57002_disassembler; } },
-	{ "tms7000",         le,  0, []() -> util::disasm_interface * { return new tms7000_disassembler; } },
+	{ "tms7000",         be,  0, []() -> util::disasm_interface * { return new tms7000_disassembler; } },
 	{ "tms9900",         be,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9900_ID); } },
 	{ "tms9980",         be,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9980_ID); } },
 	{ "tms9995",         be,  0, []() -> util::disasm_interface * { return new tms9900_disassembler(TMS9995_ID); } },

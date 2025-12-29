@@ -201,7 +201,6 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void dorunrun(machine_config &config) ATTR_COLD;
 	void docastle(machine_config &config) ATTR_COLD;
 
 protected:
@@ -236,8 +235,6 @@ protected:
 	void main_io(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
 	void sprite_map(address_map &map) ATTR_COLD;
-	void dorunrun_map(address_map &map) ATTR_COLD;
-	void dorunrun_sub_map(address_map &map) ATTR_COLD;
 
 	void docastle_tint(int state);
 	u8 main_from_sub_r(offs_t offset);
@@ -252,16 +249,30 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
-	DECLARE_VIDEO_START(dorunrun);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-class idsoccer_state : public docastle_state
+class dorunrun_state : public docastle_state
+{
+public:
+	using docastle_state::docastle_state;
+
+	void dorunrun(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void dorunrun_map(address_map &map) ATTR_COLD;
+	void dorunrun_sub_map(address_map &map) ATTR_COLD;
+};
+
+class idsoccer_state : public dorunrun_state
 {
 public:
 	idsoccer_state(const machine_config &mconfig, device_type type, const char *tag) :
-		docastle_state(mconfig, type, tag),
+		dorunrun_state(mconfig, type, tag),
 		m_msm(*this, "msm"),
 		m_adpcm_rom(*this, "adpcm")
 	{ }
@@ -346,9 +357,9 @@ void docastle_state::video_start()
 	m_tilemap->set_transmask(0, 0x00ff, 0);
 }
 
-VIDEO_START_MEMBER(docastle_state,dorunrun)
+void dorunrun_state::video_start()
 {
-	video_start();
+	docastle_state::video_start();
 	m_tilemap->set_transmask(0, 0xff00, 0);
 }
 
@@ -751,20 +762,20 @@ void docastle_state::sprite_map(address_map &map)
 }
 
 
-void docastle_state::dorunrun_map(address_map &map)
+void dorunrun_state::dorunrun_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x37ff).ram();
 	map(0x3800, 0x39ff).writeonly().share(m_spriteram);
 	map(0x4000, 0x9fff).rom();
-	map(0xa000, 0xa7ff).rw(FUNC(docastle_state::main_from_sub_r), FUNC(docastle_state::main_to_sub_w));
+	map(0xa000, 0xa7ff).rw(FUNC(dorunrun_state::main_from_sub_r), FUNC(dorunrun_state::main_to_sub_w));
 	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xb000, 0xb3ff).ram().w(FUNC(docastle_state::videoram_w)).share(m_videoram);
-	map(0xb400, 0xb7ff).ram().w(FUNC(docastle_state::colorram_w)).share(m_colorram);
-	map(0xb800, 0xb800).w(FUNC(docastle_state::subcpu_nmi_w));
+	map(0xb000, 0xb3ff).ram().w(FUNC(dorunrun_state::videoram_w)).share(m_videoram);
+	map(0xb400, 0xb7ff).ram().w(FUNC(dorunrun_state::colorram_w)).share(m_colorram);
+	map(0xb800, 0xb800).w(FUNC(dorunrun_state::subcpu_nmi_w));
 }
 
-void docastle_state::dorunrun_sub_map(address_map &map)
+void dorunrun_state::dorunrun_sub_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x87ff).ram();
@@ -772,8 +783,8 @@ void docastle_state::dorunrun_sub_map(address_map &map)
 	map(0xa400, 0xa400).w(m_sn[1], FUNC(sn76489a_device::write));
 	map(0xa800, 0xa800).w(m_sn[2], FUNC(sn76489a_device::write));
 	map(0xac00, 0xac00).w(m_sn[3], FUNC(sn76489a_device::write));
-	map(0xc000, 0xc007).select(0x0080).rw(FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
-	map(0xe000, 0xe7ff).rw(FUNC(docastle_state::sub_from_main_r), FUNC(docastle_state::sub_to_main_w));
+	map(0xc000, 0xc007).select(0x0080).rw(FUNC(dorunrun_state::inputs_flipscreen_r), FUNC(dorunrun_state::flipscreen_w));
+	map(0xe000, 0xe7ff).rw(FUNC(dorunrun_state::sub_from_main_r), FUNC(dorunrun_state::sub_to_main_w));
 }
 
 
@@ -1121,16 +1132,13 @@ void docastle_state::docastle(machine_config &config)
 	m_sn[3]->ready_cb().set("sn_ready", FUNC(input_merger_device::in_w<3>));
 }
 
-void docastle_state::dorunrun(machine_config &config)
+void dorunrun_state::dorunrun(machine_config &config)
 {
 	docastle(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &docastle_state::dorunrun_map);
-	m_subcpu->set_addrmap(AS_PROGRAM, &docastle_state::dorunrun_sub_map);
-
-	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dorunrun_state::dorunrun_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &dorunrun_state::dorunrun_sub_map);
 }
 
 void idsoccer_state::idsoccer(machine_config &config)
@@ -1142,9 +1150,6 @@ void idsoccer_state::idsoccer(machine_config &config)
 
 	m_inp[0]->read_port4_callback().set_ioport("JOYS2");
 	m_inp[1]->read_port4_callback().set_ioport("JOYS2").rshift(4);
-
-	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(idsoccer_state,dorunrun)
 
 	// sound hardware
 	MSM5205(config, m_msm, 384_kHz_XTAL); // XTAL verified on American Soccer board
@@ -1644,15 +1649,15 @@ GAME( 1983, docastle,   0,        docastle, docastle, docastle_state, empty_init
 GAME( 1983, docastle2,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (set 2)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, docastleo,  docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do's Castle (older)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1983, douni,      docastle, docastle, docastle, docastle_state, empty_init, ROT270, "Universal", "Mr. Do! vs. Unicorns (Japan)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 1)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun,   0,        dorunrun, dorunrun, dorunrun_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 1)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dorunrun2,  dorunrun, dorunrun, dorunrun, dorunrun_state, empty_init, ROT0,   "Universal", "Do! Run Run (set 2)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunc,  dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, dorunrunca, dorunrun, docastle, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Do! Run Run (Do's Castle hardware, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, runrun,     dorunrun, docastle, runrun,   docastle_state, empty_init, ROT0,   "bootleg",   "Run Run (Do! Run Run bootleg)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spiero,     dorunrun, dorunrun, dorunrun, docastle_state, empty_init, ROT0,   "Universal", "Super Pierrot (Japan)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dowild,     0,        dorunrun, dowild,   docastle_state, empty_init, ROT0,   "Universal", "Mr. Do's Wild Ride",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, jjack,      0,        dorunrun, jjack,    docastle_state, empty_init, ROT270, "Universal", "Jumping Jack",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kickridr,   0,        dorunrun, kickridr, docastle_state, empty_init, ROT0,   "Universal", "Kick Rider",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spiero,     dorunrun, dorunrun, dorunrun, dorunrun_state, empty_init, ROT0,   "Universal", "Super Pierrot (Japan)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dowild,     0,        dorunrun, dowild,   dorunrun_state, empty_init, ROT0,   "Universal", "Mr. Do's Wild Ride",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, jjack,      0,        dorunrun, jjack,    dorunrun_state, empty_init, ROT270, "Universal", "Jumping Jack",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kickridr,   0,        dorunrun, kickridr, dorunrun_state, empty_init, ROT0,   "Universal", "Kick Rider",                                MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, idsoccer,   0,        idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 1)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1985, idsoccera,  idsoccer, idsoccer, idsoccer, idsoccer_state, empty_init, ROT0,   "Universal", "Indoor Soccer (set 2)",                     MACHINE_SUPPORTS_SAVE )

@@ -154,6 +154,7 @@ reference(xexexj) : https://www.youtube.com/watch?v=TegjBEvvGxI
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
 #include "sound/ymopm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -211,17 +212,17 @@ private:
 	required_memory_bank m_z80bank;
 
 	/* video-related */
-	int        m_layer_colorbase[4]{};
-	int        m_sprite_colorbase = 0;
-	int        m_layerpri[4]{};
-	int        m_cur_alpha = 0;
+	uint16_t   m_layer_colorbase[4]{};
+	uint16_t   m_sprite_colorbase = 0;
+	int32_t    m_layerpri[4]{};
+	int32_t    m_cur_alpha = 0;
 
 	/* misc */
 	uint16_t   m_cur_control2 = 0;
-	int        m_suspension_active = 0;
-	int        m_resume_trigger = 0;
+	int32_t    m_suspension_active = 0;
+	int32_t    m_resume_trigger = 0;
 	emu_timer  *m_dmadelay_timer = nullptr;
-	int        m_frame = 0;
+	int32_t    m_frame = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -242,16 +243,16 @@ private:
 
 	uint16_t spriteram_mirror_r(offs_t offset);
 	void spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t xexex_waitskip_r();
+	uint16_t waitskip_r();
 	uint16_t control2_r();
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_irq_w(uint16_t data);
 	void sound_bankswitch_w(uint8_t data);
 
-	uint32_t screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
-	void xexex_objdma(int limiter);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void object_dma(int limiter);
 	void parse_control2();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
@@ -266,20 +267,20 @@ K053246_CB_MEMBER(xexex_state::sprite_callback)
 {
 	// Xexex doesn't seem to use bit8 and 9 as effect selectors so this should be safe.
 	// (pdrawgfx() still needs change to fix Elaine's end-game graphics)
-	int pri = (*color & 0x3e0) >> 4;
+	int pri = (color & 0x3e0) >> 4;
 
 	if (pri <= m_layerpri[3])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri > m_layerpri[3] && pri <= m_layerpri[2])
-		*priority_mask = 0xff00;
+		priority_mask = 0xff00;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority_mask = 0xff00 | 0xf0f0;
+		priority_mask = 0xff00 | 0xf0f0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
+		priority_mask = 0xff00 | 0xf0f0 | 0xcccc;
 	else
-		*priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
+		priority_mask = 0xff00 | 0xf0f0 | 0xcccc | 0xaaaa;
 
-	*color = m_sprite_colorbase | (*color & 0x001f);
+	color = m_sprite_colorbase | (color & 0x001f);
 }
 
 K056832_CB_MEMBER(xexex_state::tile_callback)
@@ -291,8 +292,8 @@ K056832_CB_MEMBER(xexex_state::tile_callback)
 	    ---- --x- Used, Unknown
 	    Everything else : unknown
 	*/
-	*priority = *color & 1; // alpha flag
-	*color = m_layer_colorbase[layer] | (*color >> 2 & 0x0f);
+	priority = color & 1; // alpha flag
+	color = m_layer_colorbase[layer] | (color >> 2 & 0x0f);
 }
 
 void xexex_state::video_start()
@@ -308,7 +309,7 @@ void xexex_state::video_start()
 	m_k056832->set_layer_offs(3,  6, 16);
 }
 
-uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t xexex_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int layer[4];
@@ -406,8 +407,9 @@ void xexex_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint16_
 #endif
 
 
-void xexex_state::xexex_objdma(int limiter)
+void xexex_state::object_dma(int limiter)
 {
+	// TODO: implement sprite dma in k053246_k053247_k055673.cpp
 	int counter, num_inactive;
 	uint16_t *src, *dst;
 
@@ -417,7 +419,6 @@ void xexex_state::xexex_objdma(int limiter)
 		return; // make sure we only do DMA transfer once per frame
 
 	m_k053246->k053247_get_ram(&dst);
-	counter = m_k053246->k053247_get_dy();
 	src = m_spriteram;
 	num_inactive = counter = 256;
 
@@ -449,7 +450,7 @@ void xexex_state::spriteram_mirror_w(offs_t offset, uint16_t data, uint16_t mem_
 	COMBINE_DATA(m_spriteram + offset);
 }
 
-uint16_t xexex_state::xexex_waitskip_r()
+uint16_t xexex_state::waitskip_r()
 {
 	if (m_maincpu->pc() == 0x1158)
 	{
@@ -525,7 +526,7 @@ TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::interrupt)
 {
 	int scanline = param;
 
@@ -542,13 +543,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 			m_maincpu->set_input_line(6, HOLD_LINE);
 	}
 
-	/* TODO: vblank is at 256! (enable CCU then have fun in fixing offsetted layers) */
-	if (scanline == 128)
+	if (scanline == 256)
 	{
 		if (m_k053246->k053246_is_irq_enabled())
 		{
 			// OBJDMA starts at the beginning of V-blank
-			xexex_objdma(0);
+			object_dma(0);
 
 			// schedule DMA end interrupt
 			m_dmadelay_timer->adjust(XE_DMADELAY);
@@ -568,7 +568,7 @@ void xexex_state::main_map(address_map &map)
 	map(0x080000, 0x08ffff).ram().share("workram");         // work RAM
 
 #if XE_SKIPIDLE
-	map(0x080014, 0x080015).r(FUNC(xexex_state::xexex_waitskip_r));              // helps sound CPU by giving back control as early as possible
+	map(0x080014, 0x080015).r(FUNC(xexex_state::waitskip_r));              // helps sound CPU by giving back control as early as possible
 #endif
 
 	map(0x090000, 0x097fff).ram().share("spriteram");           // K053247 sprite RAM
@@ -580,7 +580,7 @@ void xexex_state::main_map(address_map &map)
 	map(0x0c8000, 0x0c800f).rw(m_k053250, FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
 	map(0x0ca000, 0x0ca01f).w(m_k054338, FUNC(k054338_device::word_w));              // CLTC
 	map(0x0cc000, 0x0cc01f).w(m_k053251, FUNC(k053251_device::write)).umask16(0x00ff);               // priority encoder
-//  map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                // CCU
+	map(0x0d0000, 0x0d001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CCU
 	map(0x0d4000, 0x0d4001).w(FUNC(xexex_state::sound_irq_w));
 	map(0x0d6000, 0x0d601f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x0d8000, 0x0d8007).w(m_k056832, FUNC(k056832_device::b_word_w));                // VSCCS regs
@@ -688,27 +688,22 @@ void xexex_state::machine_reset()
 
 void xexex_state::xexex(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(32'000'000)/2); // 16MHz
+	// basic machine hardware
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &xexex_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(xexex_state::xexex_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(xexex_state::interrupt), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(32'000'000)/4); // Z80E 8Mhz
+	Z80(config, m_audiocpu, 32_MHz_XTAL / 4); // Z80E 8Mhz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xexex_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-//  m_screen->set_refresh_hz(XTAL(32'000'000)/4/512/288);
-	m_screen->set_raw(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255); // 8Mhz horizontal dotclock
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(40, 40+384-1, 0, 0+256-1);
-	m_screen->set_screen_update(FUNC(xexex_state::screen_update_xexex));
+	m_screen->set_raw(32_MHz_XTAL / 4, 512, 0+40, 384+40, 289, 0, 256); // from CCU
+	m_screen->set_screen_update(FUNC(xexex_state::screen_update));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
 	m_palette->enable_shadows();
@@ -728,22 +723,22 @@ void xexex_state::xexex(machine_config &config)
 
 	K053251(config, m_k053251, 0);
 
-	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	K053252(config, m_k053252, 32_MHz_XTAL / 4).set_offsets(40, 0);
 
 	K054338(config, m_k054338, 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	K054321(config, m_k054321, "speaker");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(32'000'000)/8)); // 4MHz
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32_MHz_XTAL / 8)); // 4MHz
 	ymsnd.add_route(0, "filter1_l", 0.2);
 	ymsnd.add_route(0, "filter1_r", 0.2);
 	ymsnd.add_route(1, "filter2_l", 0.2);
 	ymsnd.add_route(1, "filter2_r", 0.2);
 
-	K054539(config, m_k054539, XTAL(18'432'000));
+	K054539(config, m_k054539, 18.432_MHz_XTAL);
 	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
 	m_k054539->add_route(0, "speaker", 0.4, 0);
 	m_k054539->add_route(0, "speaker", 0.4, 1);

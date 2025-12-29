@@ -665,11 +665,11 @@ static INPUT_PORTS_START( kurukuru )
 /*  bits d0-d3 are JAMMA top side pins 20,21,22,23, bits d4-d7 are JAMMA bottom side pins 20,21,22,23
     so that's player 1 left/right/button1/button2 then player 2 left/right/button1/button2
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Botechin)")                       // edge connector pin 20 top
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("2nd (Oume)")                           // edge connector pin 21 top
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyokorin)")                       // edge connector pin 22 top
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Kunio)")                          // edge connector pin 23 top
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Pyon-Pyon)")                      // edge connector pin 20 bottom
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("1st (Botechin)")                        // edge connector pin 20 top
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("2nd (Oume)")                            // edge connector pin 21 top
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("3rd (Pyokorin)")                        // edge connector pin 22 top
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP4 ) PORT_NAME("4th (Kunio)")                           // edge connector pin 23 top
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP5 ) PORT_NAME("5th (Pyon-Pyon)")                       // edge connector pin 20 bottom
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 21 bottom
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 22 bottom
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                                        // edge connector pin 23 bottom
@@ -745,11 +745,11 @@ static INPUT_PORTS_START( ppj )
 /*  bits d0-d3 are JAMMA top side pins 20,21,22,23, bits d4-d7 are JAMMA bottom side pins 20,21,22,23
     so that's player 1 left/right/button1/button2 then player 2 left/right/button1/button2
 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("1st (Boketa)")                         // edge connector pin 20 top
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("2nd (Kunio)")                          // edge connector pin 21 top
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("3rd (Pyon-Pyon)")                      // edge connector pin 22 top
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("4th (Pyokorin)")                       // edge connector pin 23 top
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("5th (Botechin)")                       // edge connector pin 20 bottom
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("1st (Boketa)")                          // edge connector pin 20 top
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("2nd (Kunio)")                           // edge connector pin 21 top
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("3rd (Pyon-Pyon)")                       // edge connector pin 22 top
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP4 ) PORT_NAME("4th (Pyokorin)")                        // edge connector pin 23 top
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP5 ) PORT_NAME("5th (Botechin)")                        // edge connector pin 20 bottom
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 21 bottom (active)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )                                                        // edge connector pin 22 bottom (active)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                                                        // edge connector pin 23 bottom

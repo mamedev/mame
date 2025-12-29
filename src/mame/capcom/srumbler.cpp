@@ -11,9 +11,10 @@
   M6809 for game, Z80 and YM-2203 for sound.
 
   TODO:
-  - Verify screen refresh rate. Start a game (wait for credit sound to finish),
-    and at the intro, the music theme should change at the same time Zapper's
-    love letter is shown. ~59.6Hz from other Capcom games is too fast.
+  - Verify screen refresh rate, it's assumed to be similar to lastduel.cpp
+    (although the PCB only has a 16MHz XTAL). Start a game (wait for credit
+    sound to finish), and at the intro, the music theme should change at
+    the same time Zapper's love letter is shown.
 
 ***************************************************************************/
 
@@ -22,7 +23,6 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "sound/ymopn.h"
 #include "video/bufsprite.h"
 
@@ -40,6 +40,7 @@ public:
 	srumbler_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_spriteram(*this, "spriteram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -57,6 +58,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -82,7 +84,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void interrupt(int state);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
@@ -270,14 +272,11 @@ void srumbler_state::machine_start()
 	bankswitch_w(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::interrupt)
+void srumbler_state::interrupt(int state)
 {
-	int const scanline = param;
-
-	if (scanline == 248)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-
-	if (scanline == 8)
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE); // vblank
+	else
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -460,21 +459,18 @@ void srumbler_state::srumbler(machine_config &config)
 	// basic machine hardware
 	MC6809(config, m_maincpu, 16_MHz_XTAL / 2); // HD68B09P
 	m_maincpu->set_addrmap(AS_PROGRAM, &srumbler_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(srumbler_state::interrupt), "screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 16_MHz_XTAL / 4));
-	audiocpu.set_addrmap(AS_PROGRAM, &srumbler_state::sound_map);
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &srumbler_state::sound_map);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57.5);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(10*8, (64-10)*8-1, 1*8, 31*8-1);
+	screen.set_raw(16_MHz_XTAL / 2, 512, 80, 432, 272, 8, 248); // ~57.5Hz according to PCB video
 	screen.set_screen_update(FUNC(srumbler_state::screen_update));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.screen_vblank().set(FUNC(srumbler_state::interrupt));
+	screen.screen_vblank().append(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_srumbler);

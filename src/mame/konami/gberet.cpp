@@ -18,8 +18,7 @@
     gberetb is a bootleg hacked to run on different hardware.
 
     TODO
-        - Measure IRQ and NMI frequency (of an original board), is IRQ really tied to the same timer that triggers NMI?
-        - Correct PROMs decoding for the bootleg
+    - Correct PROMs decoding for the bootleg
 
 ****************************************************************************
 
@@ -189,9 +188,10 @@ TBP24S10.A12 - 256x4-bit bipolar PROM (possibly also a color PROM)
 #include "emu.h"
 
 #include "konamipt.h"
+#include "k005849.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/timer.h"
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
 
@@ -208,28 +208,28 @@ class gberet_base_state : public driver_device
 public:
 	gberet_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_sn(*this, "snsnd")
+		m_sn(*this, "snsnd"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram")
 	{ }
 
 protected:
 	virtual void video_start() override ATTR_COLD;
-
-	// memory pointers
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<sn76489a_device> m_sn;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	// video-related
 	tilemap_t * m_bg_tilemap = nullptr;
@@ -246,38 +246,30 @@ class gberet_state : public gberet_base_state
 public:
 	gberet_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gberet_base_state(mconfig, type, tag),
+		m_k005849(*this, "k005849"),
 		m_spriteram2(*this, "spriteram2"),
-		m_scrollram(*this, "scrollram"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void gberet(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
-	void prg_map(address_map &map) ATTR_COLD;
+	virtual void coin_counter_w(uint8_t data);
+	virtual void prg_map(address_map &map) ATTR_COLD;
 
 private:
+	// devices
+	required_device<k005849_device> m_k005849;
+
 	// memory pointers
 	required_shared_ptr<uint8_t> m_spriteram2;
-	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_soundlatch;
 
-	// video-related
-	uint8_t m_spritebank = 0U;
-
 	// misc
-	uint8_t m_interrupt_mask = 0U;
-	uint8_t m_interrupt_ticks = 0U;
-	void coin_counter_w(uint8_t data);
-	void flipscreen_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void scroll_w(offs_t offset, uint8_t data);
 	void sprite_bank_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_tick);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -289,17 +281,15 @@ public:
 		m_mainbank(*this, "mainbank")
 	{ }
 
-	void mrgoemon(machine_config &config);
+	void init_mrgoemon();
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
+	virtual void coin_counter_w(uint8_t data) override;
+	virtual void prg_map(address_map &map) override ATTR_COLD;
 
 private:
 	// memory pointers
 	required_memory_bank m_mainbank;
-
-	void coin_counter_w(uint8_t data);
-	void prg_map(address_map &map) ATTR_COLD;
 };
 
 class gberetb_state : public gberet_base_state
@@ -318,6 +308,7 @@ private:
 	void scroll_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void prg_map(address_map &map) ATTR_COLD;
 };
 
@@ -397,19 +388,6 @@ void gberet_base_state::colorram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void gberet_state::scroll_w(offs_t offset, uint8_t data)
-{
-	m_scrollram[offset] = data;
-
-	int const scroll = m_scrollram[offset & 0x1f] | (m_scrollram[offset | 0x20] << 8);
-	m_bg_tilemap->set_scrollx(offset & 0x1f, scroll);
-}
-
-void gberet_state::sprite_bank_w(uint8_t data)
-{
-	m_spritebank = data;
-}
-
 TILE_GET_INFO_MEMBER(gberet_base_state::get_bg_tile_info)
 {
 	int const attr = m_colorram[tile_index];
@@ -434,7 +412,7 @@ void gberet_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *sr;
 
-	if (m_spritebank & 0x08)
+	if (m_k005849->ctrl_r(3) & 0x08)
 		sr = m_spriteram2;
 	else
 		sr = m_spriteram;
@@ -467,9 +445,13 @@ void gberet_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 uint32_t gberet_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	for (int i = 0; i < 32; i++)
+		m_bg_tilemap->set_scrollx(i, m_k005849->scroll_r(i) | ((m_k005849->scroll_r(i | 0x20) & 1) << 8));
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
@@ -523,30 +505,6 @@ uint32_t gberetb_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-/*************************************
- *
- *  Interrupt generators
- *
- *************************************/
-
-TIMER_DEVICE_CALLBACK_MEMBER(gberet_state::interrupt_tick)
-{
-	uint8_t const ticks_mask = ~m_interrupt_ticks & (m_interrupt_ticks + 1); // 0->1
-	m_interrupt_ticks++;
-
-	// NMI on d0
-	if (ticks_mask & m_interrupt_mask & 1)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
-	// IRQ on d3 (used by mrgoemon)
-	if (ticks_mask & m_interrupt_mask << 2 & 8)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	// IRQ on d4 (used by gberet)
-	if (ticks_mask & m_interrupt_mask << 2 & 16)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-}
-
 
 /*************************************
  *
@@ -563,29 +521,10 @@ void gberet_state::coin_counter_w(uint8_t data)
 
 void mrgoemon_state::coin_counter_w(uint8_t data)
 {
-	// bits 0/1 = coin counters
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	gberet_state::coin_counter_w(data);
 
 	// bits 5-7 = ROM bank select
 	m_mainbank->set_entry(((data & 0xe0) >> 5));
-}
-
-void gberet_state::flipscreen_w(uint8_t data)
-{
-	// bits 0/1/2 = interrupt enable
-	uint8_t const ack_mask = ~data & m_interrupt_mask; // 1->0
-
-	if (ack_mask & 1)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-
-	if (ack_mask & 6)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-
-	m_interrupt_mask = data & 7;
-
-	// bit 3 = flip screen
-	flip_screen_set(data & 8);
 }
 
 void gberet_state::sound_w(uint8_t data)
@@ -601,10 +540,8 @@ void gberet_state::prg_map(address_map &map)
 	map(0xd000, 0xd0ff).ram().share(m_spriteram2);
 	map(0xd100, 0xd1ff).ram().share(m_spriteram);
 	map(0xd200, 0xdfff).ram();
-	map(0xe000, 0xe03f).ram().w(FUNC(gberet_state::scroll_w)).share(m_scrollram);
-	map(0xe040, 0xe042).nopw(); // ???
-	map(0xe043, 0xe043).w(FUNC(gberet_state::sprite_bank_w));
-	map(0xe044, 0xe044).w(FUNC(gberet_state::flipscreen_w));
+	map(0xe000, 0xe03f).rw(m_k005849, FUNC(k005849_device::scroll_r), FUNC(k005849_device::scroll_w));
+	map(0xe040, 0xe047).w(m_k005849, FUNC(k005849_device::ctrl_w));
 	map(0xf000, 0xf000).w(FUNC(gberet_state::coin_counter_w));
 	map(0xf200, 0xf200).portr("DSW2").writeonly().share(m_soundlatch);
 	map(0xf400, 0xf400).portr("DSW3").w(FUNC(gberet_state::sound_w));
@@ -617,8 +554,6 @@ void gberet_state::prg_map(address_map &map)
 void mrgoemon_state::prg_map(address_map &map)
 {
 	gberet_state::prg_map(map);
-
-	map(0xf000, 0xf000).w(FUNC(mrgoemon_state::coin_counter_w));
 	map(0xf800, 0xffff).bankr(m_mainbank);
 }
 
@@ -795,42 +730,26 @@ GFXDECODE_END
  *
  *************************************/
 
-void gberet_state::machine_start()
-{
-	save_item(NAME(m_interrupt_mask));
-	save_item(NAME(m_interrupt_ticks));
-	save_item(NAME(m_spritebank));
-}
-
-void mrgoemon_state::machine_start()
-{
-	gberet_base_state::machine_start();
-
-	uint8_t *rom = memregion("maincpu")->base();
-	m_mainbank->configure_entries(0, 8, &rom[0xc000], 0x800);
-}
-
-void gberet_state::machine_reset()
-{
-	m_interrupt_mask = 0;
-	m_interrupt_ticks = 0;
-	m_spritebank = 0;
-}
-
 void gberet_state::gberet(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(18'432'000) / 6);      // X1S (generated by a custom IC)
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // X1S (generated by a custom IC)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gberet_state::prg_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(gberet_state::interrupt_tick), "screen", 0, 16);
+
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
+	K005849(config, m_k005849, 0);
+	m_k005849->set_irq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<0>));
+	m_k005849->set_firq_cb().set("mainirq", FUNC(input_merger_any_high_device::in_w<1>));
+	m_k005849->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_k005849->set_flipscreen_cb().set(FUNC(gberet_state::flip_screen_set));
+
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq"));
+	mainirq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0+8, 256-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(gberet_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -840,24 +759,16 @@ void gberet_state::gberet(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, m_sn, XTAL(18'432'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // type verified
-}
-
-void mrgoemon_state::mrgoemon(machine_config &config)
-{
-	gberet(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &mrgoemon_state::prg_map);
+	SN76489A(config, m_sn, 18.432_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0); // type verified
 }
 
 void gberetb_state::gberetb(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(20'000'000) / 6);
+	Z80(config, m_maincpu, 20_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gberetb_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gberetb_state::irq0_line_assert));
-	m_maincpu->set_periodic_int(FUNC(gberetb_state::nmi_line_assert), attotime::from_hz(XTAL(20'000'000) / 0x8000)); // divider guessed
+	m_maincpu->set_periodic_int(FUNC(gberetb_state::nmi_line_assert), attotime::from_hz(20_MHz_XTAL / 0x8000)); // divider guessed
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -874,7 +785,7 @@ void gberetb_state::gberetb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, m_sn, XTAL(20'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, m_sn, 20_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -969,6 +880,12 @@ ROM_START( mrgoemon )
 	ROM_LOAD( "621a07.6f",    0x0120, 0x0100, CRC(3980acdc) SHA1(f4e0bd74bccd77b84096c38bc70cf488a42d9562) ) // sprites
 ROM_END
 
+void mrgoemon_state::init_mrgoemon()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	m_mainbank->configure_entries(0, 8, &rom[0xc000], 0x800);
+}
+
 } // anonymous namespace
 
 
@@ -978,7 +895,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, gberet,   0,      gberet,   gberet,   gberet_state,   empty_init, ROT0, "Konami",  "Green Beret", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, rushatck, gberet, gberet,   gberet,   gberet_state,   empty_init, ROT0, "Konami",  "Rush'n Attack (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  gberetb_state,  empty_init, ROT0, "bootleg", "Green Beret (bootleg)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs correct PROM decoding
-GAME( 1986, mrgoemon, 0,      mrgoemon, mrgoemon, mrgoemon_state, empty_init, ROT0, "Konami",  "Mr. Goemon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gberet,   0,      gberet,   gberet,   gberet_state,   empty_init,    ROT0, "Konami",  "Green Beret", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, rushatck, gberet, gberet,   gberet,   gberet_state,   empty_init,    ROT0, "Konami",  "Rush'n Attack (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gberetb,  gberet, gberetb,  gberetb,  gberetb_state,  empty_init,    ROT0, "bootleg", "Green Beret (bootleg)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs correct PROM decoding
+
+GAME( 1986, mrgoemon, 0,      gberet,   mrgoemon, mrgoemon_state, init_mrgoemon, ROT0, "Konami",  "Mr. Goemon (Japan)", MACHINE_SUPPORTS_SAVE )

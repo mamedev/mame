@@ -54,6 +54,9 @@ public:
 	void init_battroad();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<irem_audio_device> m_audio;
 
@@ -131,8 +134,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_horizon_bg_tile_info);
 	DECLARE_MACHINE_START(battroad);
 	void machine_init_save();
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	void m62_spr(palette_device &palette) const;
 	void m62_chr(palette_device &palette) const;

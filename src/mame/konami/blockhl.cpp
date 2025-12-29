@@ -121,23 +121,22 @@ K052109_CB_MEMBER(blockhl_state::tile_callback)
 {
 	static const int layer_colorbase[] = { 0 / 16, 256 / 16, 512 / 16 };
 
-	*code |= ((*color & 0x0f) << 8);
-	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x0f) << 8);
+	color = layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 K051960_CB_MEMBER(blockhl_state::sprite_callback)
 {
 	enum { sprite_colorbase = 768 / 16 };
 
-	*priority = (*color & 0x10) ? GFX_PMASK_1 : 0;
-	*color = sprite_colorbase + (*color & 0x0f);
+	priority = (color & 0x10) ? GFX_PMASK_1 : 0;
+	color = sprite_colorbase + (color & 0x0f);
 }
 
 uint32_t blockhl_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 
-	m_k052109->tilemap_update();
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE, 0); // tile 2
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 1); // tile 1
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);

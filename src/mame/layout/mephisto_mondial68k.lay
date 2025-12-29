@@ -404,8 +404,8 @@ authors:Sandro Ronco, hap
 		<element ref="hlb" inputtag="IN.3" inputmask="0x08"> <bounds x="72.5" y="6.5" width="6" height="4" /> <color alpha="0.3"/></element>
 
 		<!-- hidden input between CL/ENT buttons to press both -->
-		<element ref="nothing" inputtag="IN.2" inputmask="0x08" clickthrough="yes"><bounds x="70" y="6.5" width="2.5" height="4" /></element>
-		<element ref="nothing" inputtag="IN.3" inputmask="0x08" clickthrough="no"> <bounds x="70" y="6.5" width="2.5" height="4" /></element>
+		<element ref="nothing" inputtag="IN.2" inputmask="0x08" clickthrough="no"> <bounds x="70" y="6.5" width="2.5" height="4" /></element>
+		<element ref="nothing" inputtag="IN.3" inputmask="0x08" clickthrough="yes"><bounds x="70" y="6.5" width="2.5" height="4" /></element>
 	</group>
 
 

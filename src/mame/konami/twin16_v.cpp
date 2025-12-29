@@ -2,7 +2,7 @@
 // copyright-holders:Phil Stroffolino
 /*
 
-    Konami Twin16 Hardware - Video
+    Konami Twin16 Video subsystem
 
     TODO:
 
@@ -14,7 +14,15 @@
 */
 
 #include "emu.h"
-#include "twin16.h"
+#include "twin16_v.h"
+
+#include <algorithm>
+
+#define LOG_UNKNOWN (1 << 1)
+
+#define VERBOSE (LOG_UNKNOWN)
+
+#include "logmacro.h"
 
 
 enum
@@ -35,69 +43,100 @@ enum
 	TWIN16_SPRITE_OCCUPIED = 0x04
 };
 
+DEFINE_DEVICE_TYPE(KONAMI_TWIN16_VIDEO, konami_twin16_video_device, "konami_twin16_video", "Konami Twin16 Video Subsystem")
 
-void twin16_state::fixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+konami_twin16_video_device::konami_twin16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, KONAMI_TWIN16_VIDEO, tag, owner, clock)
+	, device_video_interface(mconfig, *this, true)
+	, device_gfx_interface(mconfig, *this, nullptr)
+	, m_fixram(*this, "fixram", 0x4000U, ENDIANNESS_BIG)
+	, m_videoram(*this, "videoram_%u", 0U, 0x2000U, ENDIANNESS_BIG)
+	, m_spriteram{*this, "spriteram_%u", 0U, 0x4000U, ENDIANNESS_BIG}
+	, m_sprite_buffer(nullptr)
+	, m_sprite_timer(nullptr)
+	, m_sprite_process_enable(1)
+	, m_sprite_busy(0)
+	, m_need_process_spriteram(0)
+	, m_scrollx{0}
+	, m_scrolly{0}
+	, m_video_register(0)
+	, m_fixed_tmap(nullptr)
+	, m_scroll_tmap{nullptr, nullptr}
+	, m_virq_cb(*this)
+	, m_sprite_cb(*this)
+	, m_tile_cb(*this, DEVICE_SELF, FUNC(konami_twin16_video_device::default_tile))
+{
+}
+
+void konami_twin16_video_device::device_start()
+{
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
+	if (!palette().shadows_enabled())
+		fatalerror("%s: palette shadows must be enabled!", machine().describe_context());
+
+	m_sprite_cb.resolve_safe(0);
+	m_tile_cb.resolve_safe(0);
+
+	const size_t spritebuffer_size = 0x1000 / 2;
+	m_sprite_buffer = std::make_unique<uint16_t []>(spritebuffer_size);
+
+	m_fixed_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(konami_twin16_video_device::fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_scroll_tmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(konami_twin16_video_device::scroll_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_scroll_tmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(konami_twin16_video_device::scroll_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+
+	m_fixed_tmap->set_transparent_pen(0);
+	m_scroll_tmap[0]->set_transparent_pen(0);
+	m_scroll_tmap[1]->set_transparent_pen(0);
+
+	std::fill_n(&m_sprite_buffer[0], 0x800, uint16_t(~0));
+	m_sprite_timer = timer_alloc(FUNC(konami_twin16_video_device::sprite_tick), this);
+	m_sprite_timer->adjust(attotime::never);
+
+	save_pointer(NAME(m_sprite_buffer), spritebuffer_size);
+	save_item(NAME(m_sprite_busy));
+	save_item(NAME(m_need_process_spriteram));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_video_register));
+}
+
+void konami_twin16_video_device::device_reset()
+{
+	m_sprite_process_enable = 1;
+	m_sprite_timer->adjust(attotime::never);
+	m_sprite_busy = 0;
+}
+
+void konami_twin16_video_device::sprite_process_enable_w(uint8_t data)
+{
+	const uint8_t old = m_sprite_process_enable;
+	m_sprite_process_enable = data;
+	if ((old == 0) && (m_sprite_process_enable != 0))
+		spriteram_process();
+}
+
+void konami_twin16_video_device::spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_spriteram[0][offset]);
+}
+
+void konami_twin16_video_device::fixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fixram[offset]);
 	m_fixed_tmap->mark_tile_dirty(offset);
 }
 
-void twin16_state::videoram0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_videoram[0][offset]);
-	m_scroll_tmap[0]->mark_tile_dirty(offset);
-}
-
-void twin16_state::videoram1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_videoram[1][offset]);
-	m_scroll_tmap[1]->mark_tile_dirty(offset);
-}
-
-void twin16_state::zipram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	uint16_t old = m_zipram[offset];
-	COMBINE_DATA(&m_zipram[offset]);
-	if (m_zipram[offset] != old)
-		m_gfxdecode->gfx(1)->mark_dirty(offset / 16);
-}
-
-void fround_state::gfx_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int changed = 0;
-
-	if (ACCESSING_BITS_0_7)
-	{
-		int oldbank0 = m_gfx_bank[0];
-		int oldbank1 = m_gfx_bank[1];
-		m_gfx_bank[0] = (data >> 0) & 0xf;
-		m_gfx_bank[1] = (data >> 4) & 0xf;
-		changed |= (oldbank0 ^ m_gfx_bank[0]) | (oldbank1 ^ m_gfx_bank[1]);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		int oldbank2 = m_gfx_bank[2];
-		int oldbank3 = m_gfx_bank[3];
-		m_gfx_bank[2] = (data >> 8) & 0xf;
-		m_gfx_bank[3] = (data >> 12) & 0xf;
-		changed |= (oldbank2 ^ m_gfx_bank[2]) | (oldbank3 ^ m_gfx_bank[3]);
-	}
-	if (changed)
-	{
-		m_scroll_tmap[0]->mark_all_dirty();
-		m_scroll_tmap[1]->mark_all_dirty();
-	}
-}
-
-void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void konami_twin16_video_device::video_register_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
 		case 0:
 		{
-			int old = m_video_register;
+			const int old = m_video_register;
 			COMBINE_DATA(&m_video_register);
-			int changed = old ^ m_video_register;
+			const int changed = old ^ m_video_register;
 			if (changed & (TWIN16_SCREEN_FLIPX | TWIN16_SCREEN_FLIPY))
 			{
 				int flip = (m_video_register & TWIN16_SCREEN_FLIPX) ? TILEMAP_FLIPX : 0;
@@ -132,7 +171,7 @@ void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_m
 			break;
 
 		default:
-			logerror("unknown video_register write:%d", data );
+			LOGMASKED(LOG_UNKNOWN, "%s: unknown video_register write %02x: %04x & %04x", machine().describe_context(), offset, data, mem_mask);
 			break;
 	}
 }
@@ -182,49 +221,48 @@ void twin16_state::video_register_w(offs_t offset, uint16_t data, uint16_t mem_m
  *   3  | ------------xxxx | color
  */
 
-uint16_t twin16_state::sprite_status_r()
+uint16_t konami_twin16_video_device::sprite_status_r()
 {
 	// bit 0: busy, other bits: dunno
 	return m_sprite_busy;
 }
 
-TIMER_CALLBACK_MEMBER(twin16_state::sprite_tick)
+TIMER_CALLBACK_MEMBER(konami_twin16_video_device::sprite_tick)
 {
 	m_sprite_busy = 0;
 }
 
-int twin16_state::set_sprite_timer()
+int konami_twin16_video_device::set_sprite_timer()
 {
 	if (m_sprite_busy) return 1;
 
 	// sprite system busy, maybe a dma? time is guessed, assume 4 scanlines
 	m_sprite_busy = 1;
-	m_sprite_timer->adjust(m_screen->frame_period() / m_screen->height() * 4);
+	m_sprite_timer->adjust(screen().frame_period() / screen().height() * 4);
 
 	return 0;
 }
 
-void twin16_state::spriteram_process()
+void konami_twin16_video_device::spriteram_process()
 {
-	uint16_t *spriteram16 = m_spriteram->live();
-	uint16_t dx = m_scrollx[0];
-	uint16_t dy = m_scrolly[0];
+	const uint16_t dx = m_scrollx[0];
+	const uint16_t dy = m_scrolly[0];
 
-	const uint16_t *source = &spriteram16[0x0000];
-	const uint16_t *finish = &spriteram16[0x1800];
+	const uint16_t *source = &m_spriteram[0][0x0000];
+	const uint16_t *finish = &m_spriteram[0][0x1800];
 
 	set_sprite_timer();
-	memset(&spriteram16[0x1800], 0xff, 0x800 * sizeof(uint16_t));
+	std::fill_n(&m_spriteram[0][0x1800], 0x800, uint16_t(~0));
 
-	while (source<finish)
+	while (source < finish)
 	{
-		uint16_t priority = source[0];
-		if (priority & 0x8000)
+		const uint16_t priority = source[0];
+		if (BIT(priority, 15))
 		{
-			uint16_t *dest = &spriteram16[0x1800|(priority & 0xff) << 2];
+			uint16_t *dest = &m_spriteram[0][0x1800 | ((priority & 0xff) << 2)];
 
-			uint32_t xpos = (0x10000 * source[4]) | source[5];
-			uint32_t ypos = (0x10000 * source[6]) | source[7];
+			const uint32_t xpos = (uint32_t(source[4]) << 16) | source[5];
+			const uint32_t ypos = (uint32_t(source[6]) << 16) | source[7];
 
 			/* notes on sprite attributes:
 
@@ -241,11 +279,11 @@ void twin16_state::spriteram_process()
 
 			fround, hpuncher, miaj, cuebrickj, don't use the preprocessor.
 			*/
-			uint16_t attributes = 0x8000 | (source[2] & 0x03ff); // scale,size,color
+			const uint16_t attributes = 0x8000 | (source[2] & 0x03ff); // scale,size,color
 
 			dest[0] = source[3]; /* gfx data */
-			dest[1] = ((xpos>>8) - dx) & 0xffff;
-			dest[2] = ((ypos>>8) - dy) & 0xffff;
+			dest[1] = ((xpos >> 8) - dx) & 0xffff;
+			dest[2] = ((ypos >> 8) - dy) & 0xffff;
 			dest[3] = attributes;
 		}
 		source += 0x50/2;
@@ -253,64 +291,33 @@ void twin16_state::spriteram_process()
 	m_need_process_spriteram = 0;
 }
 
-void twin16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void konami_twin16_video_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t *source = 0x1800 + m_spriteram->buffer() + 0x800 - 4;
-	const uint16_t *finish = 0x1800 + m_spriteram->buffer();
+	const uint16_t *source = &m_spriteram[1][0x2000 - 4];
+	const uint16_t *finish = &m_spriteram[1][0x1800];
 
 	for (; source >= finish; source -= 4)
 	{
-		uint16_t attributes = source[3];
+		const uint16_t attributes = source[3];
 		uint16_t code = source[0];
 
-		if ((code != 0xffff) && (attributes & 0x8000))
+		if ((code != 0xffff) && BIT(attributes, 15))
 		{
 			int xpos = source[1];
 			int ypos = source[2];
 
-			int pal_base = ((attributes & 0xf) + 0x10) * 16;
-			int height = 16 << ((attributes >> 6) & 0x3);
-			int width = 16 << ((attributes >> 4) & 0x3);
-			const uint16_t *pen_data = nullptr;
-			int flipy = attributes & 0x0200;
-			int flipx = attributes & 0x0100;
-
-			if (m_is_fround)
-			{
-				/* fround board */
-				pen_data = m_gfxrom;
-			}
-			else
-			{
-				switch ((code >> 12) & 0x3)
-				{
-					/* bank select */
-					case 0:
-						pen_data = m_gfxrom;
-						break;
-
-					case 1:
-						pen_data = m_gfxrom + 0x40000;
-						break;
-
-					case 2:
-						pen_data = m_gfxrom + 0x80000;
-						if (code & 0x4000) pen_data += 0x40000;
-						break;
-
-					case 3:
-						pen_data = m_sprite_gfx_ram;
-						break;
-				}
-				code &= 0xfff;
-			}
+			const int pal_base = 0x100 + ((attributes & 0xf) << 4);
+			const int height = 16 << ((attributes >> 6) & 0x3);
+			const int width = 16 << ((attributes >> 4) & 0x3);
+			bool flipy = BIT(attributes, 9);
+			bool flipx = BIT(attributes, 8);
 
 			/* some code masking */
 			if ((height & width) == 64) code &= ~8;      // gradius2 ending sequence 64*64
 			else if ((height & width) == 32) code &= ~3; // devilw 32*32
 			else if ((height | width) == 48) code &= ~1; // devilw 32*16 / 16*32
 
-			pen_data += code * 0x40;
+			uint32_t pen_addr = code << 6;
 
 			if (m_video_register & TWIN16_SCREEN_FLIPY)
 			{
@@ -327,35 +334,46 @@ void twin16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (xpos >= 320) xpos -= 65536;
 			if (ypos >= 256) ypos -= 65536;
 
+			const int sx_start = flipx ? (xpos + width - 1) : xpos;
+			const int sy_start = flipy ? (ypos + height - 1) : ypos;
+			const int xinc = flipx ? -1 : 1;
+			const int yinc = flipy ? -1 : 1;
+			const int pitch = (width >> 2);
+
 			/* slow slow slow, but it's ok for now */
-			for (int y = 0; y < height; y++, pen_data += width/4)
+			int sy = sy_start;
+			for (int y = 0; y < height; y++, sy += yinc, pen_addr += pitch)
 			{
-				int sy = (flipy) ? (ypos + height - 1 - y) : (ypos + y);
 				if (sy >= cliprect.min_y && sy <= cliprect.max_y)
 				{
 					uint16_t *const dest = &bitmap.pix(sy);
 					uint8_t *const pdest = &screen.priority().pix(sy);
 
-					for (int x = 0; x < width; x++)
+					int sx = sx_start;
+					uint32_t pen_addr_x = pen_addr;
+					for (int x = 0; x < width; x += 4, pen_addr_x++)
 					{
-						int sx = (flipx) ? (xpos + width - 1 - x) : (xpos + x);
-						if (sx >= cliprect.min_x && sx <= cliprect.max_x)
+						uint16_t pen = m_sprite_cb(pen_addr_x);
+						for (int ix = 0; ix < 4; ix++, sx += xinc, pen <<= 4)
 						{
-							uint16_t pen = pen_data[x >> 2] >> ((~x & 3) << 2) & 0xf;
-
-							if (pen && !(pdest[sx] & TWIN16_SPRITE_OCCUPIED))
+							if (sx >= cliprect.min_x && sx <= cliprect.max_x)
 							{
-								pdest[sx] |= TWIN16_SPRITE_OCCUPIED;
+								const uint16_t pixel = (pen >> 12) & 0xf;
 
-								if (pen == 0xf) // shadow
+								if (pixel && !(pdest[sx] & TWIN16_SPRITE_OCCUPIED))
 								{
-									if (!(pdest[sx] & TWIN16_BG_NO_SHADOW))
-										dest[sx] = m_palette->shadow_table()[dest[sx]];
-								}
-								else // opaque pixel
-								{
-									if (!(pdest[sx] & TWIN16_BG_OVER_SPRITES))
-										dest[sx] = pal_base + pen;
+									pdest[sx] |= TWIN16_SPRITE_OCCUPIED;
+
+									if (pixel == 0xf) // shadow
+									{
+										if (!(pdest[sx] & TWIN16_BG_NO_SHADOW))
+											dest[sx] = palette().shadow_table()[dest[sx]];
+									}
+									else // opaque pixel
+									{
+										if (!(pdest[sx] & TWIN16_BG_OVER_SPRITES))
+											dest[sx] = pal_base + pixel;
+									}
 								}
 							}
 						}
@@ -367,100 +385,44 @@ void twin16_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 }
 
 
-TILE_GET_INFO_MEMBER(twin16_state::fix_tile_info)
+TILE_GET_INFO_MEMBER(konami_twin16_video_device::fix_tile_info)
 {
-	int attr = m_fixram[tile_index];
+	const uint16_t attr = m_fixram[tile_index];
 	/* fedcba9876543210
 	   -x-------------- yflip
 	   --x------------- xflip
 	   ---xxxx--------- color
 	   -------xxxxxxxxx tile number
 	*/
-	int code = attr & 0x1ff;
-	int color = (attr >> 9) & 0x0f;
-	int flags=0;
+	const uint32_t code = attr & 0x1ff;
+	const uint32_t color = (attr >> 9) & 0x0f;
+	uint8_t flags = 0;
 
-	if (attr & 0x2000) flags |= TILE_FLIPX;
-	if (attr & 0x4000) flags |= TILE_FLIPY;
+	if (BIT(attr, 13)) flags |= TILE_FLIPX;
+	if (BIT(attr, 14)) flags |= TILE_FLIPY;
 
 	tileinfo.set(0, code, color, flags);
 }
 
-void twin16_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_base)
+template <unsigned Which>
+TILE_GET_INFO_MEMBER(konami_twin16_video_device::scroll_tile_info)
 {
 	/* fedcba9876543210
 	   xxx------------- color; high bit is also priority over sprites
 	   ---xxxxxxxxxxxxx tile number
 	*/
-	int code = (data & 0x1fff);
-	int color = color_base + (data >> 13);
-	int flags = 0;
-	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
+	const uint16_t data = m_videoram[Which][tile_index];
+	const uint32_t code = m_tile_cb(data & 0x1fff);
+	const uint32_t color = (Which << 3) + (data >> 13);
+	uint8_t flags = 0;
+	if (m_video_register & TWIN16_TILE_FLIPY)
+		flags |= TILE_FLIPY;
+
 	tileinfo.set(1, code, color, flags);
 	tileinfo.category = BIT(data, 15);
 }
 
-void fround_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_base)
-{
-	/* fedcba9876543210
-	   xxx------------- color; high bit is also priority over sprites
-	   ---xx----------- tile bank
-	   -----xxxxxxxxxxx tile number
-	*/
-	int bank = (data >> 11) & 3;
-	int code = (m_gfx_bank[bank] << 11) | (data & 0x7ff);
-	int color = color_base | (data >> 13);
-	int flags = 0;
-	if (m_video_register & TWIN16_TILE_FLIPY) flags |= TILE_FLIPY;
-	tileinfo.set(1, code, color, flags);
-	tileinfo.category = BIT(data, 15);
-}
-
-TILE_GET_INFO_MEMBER(twin16_state::layer0_tile_info)
-{
-	tile_get_info(tileinfo, m_videoram[0][tile_index], 0);
-}
-
-TILE_GET_INFO_MEMBER(twin16_state::layer1_tile_info)
-{
-	tile_get_info(tileinfo, m_videoram[1][tile_index], 8);
-}
-
-void twin16_state::video_start()
-{
-	m_fixed_tmap = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::fix_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
-	m_scroll_tmap[0] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::layer0_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-	m_scroll_tmap[1] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::layer1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-
-	m_fixed_tmap->set_transparent_pen(0);
-	m_scroll_tmap[0]->set_transparent_pen(0);
-	m_scroll_tmap[1]->set_transparent_pen(0);
-
-	m_palette->set_shadow_factor(0.4); // screenshots estimate
-
-	memset(m_sprite_buffer, 0xff, 0x800 * sizeof(uint16_t));
-	m_video_register = 0;
-	m_sprite_busy = 0;
-	m_sprite_timer = timer_alloc(FUNC(twin16_state::sprite_tick),this);
-	m_sprite_timer->adjust(attotime::never);
-
-	/* register for savestates */
-	save_item(NAME(m_sprite_buffer));
-	save_item(NAME(m_scrollx));
-	save_item(NAME(m_scrolly));
-
-	save_item(NAME(m_need_process_spriteram));
-	save_item(NAME(m_video_register));
-	save_item(NAME(m_sprite_busy));
-}
-
-void fround_state::video_start()
-{
-	twin16_state::video_start();
-	save_item(NAME(m_gfx_bank));
-}
-
-uint32_t twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t konami_twin16_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
     PAL equations (007789 @ 11J):
@@ -534,31 +496,31 @@ uint32_t twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void twin16_state::screen_vblank_twin16(int state)
+void konami_twin16_video_device::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
 	{
 		set_sprite_timer();
 
-		if (spriteram_process_enable())
+		if (m_sprite_process_enable)
 		{
-			if (m_need_process_spriteram) spriteram_process();
+			if (m_need_process_spriteram)
+				spriteram_process();
 			m_need_process_spriteram = 1;
 
 			/* if the sprite preprocessor is used, sprite ram is copied to an external buffer first,
 			as evidenced by 1-frame sprite lag in gradius2 and devilw otherwise, though there's probably
 			more to it than that */
-			memcpy(&m_spriteram->buffer()[0x1800], m_sprite_buffer, 0x800 * sizeof(uint16_t));
-			memcpy(m_sprite_buffer, &m_spriteram->live()[0x1800], 0x800 * sizeof(uint16_t));
+			std::copy_n(&m_sprite_buffer[0], 0x800, &m_spriteram[1][0x1800]);
+			std::copy_n(&m_spriteram[0][0x1800], 0x800, &m_sprite_buffer[0]);
 		}
 		else
-			m_spriteram->copy();
+		{
+			std::copy_n(&m_spriteram[0][0], 0x2000, &m_spriteram[1][0]);
+		}
 
 		// IRQ generation
-		if (m_CPUA_register & 0x20)
-			m_maincpu->set_input_line(5, HOLD_LINE);
-		if (m_subcpu.found() && (m_CPUB_register & 0x02))
-			m_subcpu->set_input_line(5, HOLD_LINE);
+		m_virq_cb(ASSERT_LINE);
 	}
 }

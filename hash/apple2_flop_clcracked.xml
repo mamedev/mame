@@ -45,19 +45,6 @@ license:CC0-1.0
 
 	<!-- Set "hhlngvwl" (Hugo Hound's Vowel Sounds) may be missing disk 2 - "Short Vowels" based on manual found later. -->
 
-	<software name="101mword">
-		<description>101 Misused Words (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Learning Seed Company</publisher>
-		<info name="release" value="2016-04-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="101 misused words (4am crack).dsk" size="143360" crc="49662c0d" sha1="b71a873630ef10333695890ab66a7bd80a9ef06e" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="alcazar">
 		<description>Alcazar the Forgotten Fortress (cleanly cracked)</description>
 		<year>1985</year>
@@ -373,26 +360,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="alcwndrl">
-		<description>Alice in Wonderland (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2015-05-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland (4am crack) side a.dsk" size="143360" crc="46d03565" sha1="bf3ea2cdf0c5fb63aff9686605c2cae84774c62f" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland (4am crack) side b.dsk" size="143360" crc="f03e007e" sha1="fd960bf392beaa9f081ff36a9f621cd1ce5e3c92" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="animkngd">
 		<description>Animal Kingdom (cleanly cracked)</description>
 		<year>1985</year>
@@ -488,19 +455,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="blazing paddles (4am crack).dsk" size="143360" crc="db4aa57d" sha1="152cc04080e100822bf919879232d175c64e9610" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bmblgmes">
-		<description>Bumble Games (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2017-04-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bumble games (4am crack).dsk" size="143360" crc="0a7eb17b" sha1="9e8fcc6b51003311510165e2ec80b4a9099cb8e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -910,19 +864,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gertrude">
-		<description>Gertrude's Secrets (version 1.2) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2014-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gertrude's secrets (4am crack).dsk" size="143360" crc="a8602d95" sha1="281f09574ca6be91f52182da51429487de6c770d" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="grammst2">
 		<description>Grammar Mastery II (cleanly cracked)</description>
 		<year>1987</year>
@@ -1286,26 +1227,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="alice in logoland (4am crack).dsk" size="143360" crc="b10ee766" sha1="7f5f1fc4ee9c3e5b208a328ff9d62863695f1ec9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="alcwndrlr2">
-		<description>Alice in Wonderland rev. 2 (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-09-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland rev. 2 (4am crack) side a.dsk" size="143360" crc="e9a946e8" sha1="1d23a33c504df204af50d32093010c41f15d8cdc" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="alice in wonderland rev. 2 (4am crack) side b.dsk" size="143360" crc="f249da10" sha1="9ec87f245a6ad0a0414f0b5b1a9c66da94719db0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2067,39 +1988,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bellhop">
-		<description>Bellhop (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2017-10-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bellhop (4am crack).dsk" size="143360" crc="b5a5c914" sha1="fac8017d1810673c8cda26f2e342d30695dba29f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="belwrt">
-		<description>Below the Root (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-11-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="below the root (4am crack) side a.dsk" size="143360" crc="b546f694" sha1="e4a03625fd40389af5f787c39f574c1eed569547" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="below the root (4am crack) side b.dsk" size="143360" crc="3298fdc6" sha1="f6b2a638a96afb4c99e182ff6ee477763bb440fa" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="biblebb">
 		<description>Bible Baseball (cleanly cracked)</description>
 		<year>1983</year>
@@ -2299,32 +2187,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bumblplt82">
-		<description>Bumble Plot (1982) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Apple Computer</publisher>
-		<info name="release" value="2016-12-31"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bumble plot (1982) (4am crack).dsk" size="143360" crc="007bf1e3" sha1="4150eb9ab436be6c44810e5815acd3087f927514" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bumblplt12">
-		<description>Bumble Plot (version 1.2) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-06-01"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bumble plot 1.2 (4am crack).dsk" size="143360" crc="3e79f3ac" sha1="24ab23e8ecf5d893e740ea0e1ca704a91f5fedb9" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cstlwolf">
 		<description>Castle Wolfenstein (cleanly cracked)</description>
 		<year>1981</year>
@@ -2380,19 +2242,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="championship baseball (4am crack) side b.dsk" size="143360" crc="b4767c81" sha1="4ad26e03f0227ec4eada7ad0709222baf79427bb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chmpgolf">
-		<description>Championship Golf (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2018-06-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="championship golf (4am crack).dsk" size="143360" crc="632254c5" sha1="c4613b775f652be87706f89362ebf61bcdd43239" />
 			</dataarea>
 		</part>
 	</software>
@@ -3248,19 +3097,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="crmstopr">
-		<description>Crime Stopper (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2018-08-08"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="crime stopper (4am crack).dsk" size="143360" crc="045b7082" sha1="d0a76363471a6d4f721f8e6506c6b32af2f74e25" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="crossbow">
 		<description>Crossbow (cleanly cracked)</description>
 		<year>1988</year>
@@ -4057,19 +3893,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="energy conversions (4am crack).dsk" size="143360" crc="4622a43a" sha1="3bd4da56ec60de73d1218addd41cd3d9db150309" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="engchlng">
-		<description>English Challenge (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Learning Seed Company</publisher>
-		<info name="release" value="2016-04-11"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="english challenge (4am crack).dsk" size="143360" crc="e23b7121" sha1="ede48949b246423dc9e311f03ff40f778ec090e5" />
 			</dataarea>
 		</part>
 	</software>
@@ -4993,58 +4816,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gertrudepuz10">
-		<description>Gertrude's Puzzles (version 1.0) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2016-01-26"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gertrude's puzzles 1.0 (4am crack).dsk" size="143360" crc="d9511af5" sha1="6f99bb857b392f8dd58030b5464ef2ce19f96932" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gertrudepuz">
-		<description>Gertrude's Puzzles (version 1.2) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-05-31"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gertrude's puzzles 1.2 (4am crack).dsk" size="143360" crc="5f794fa0" sha1="3b65f8e778dc7dd61ae64d6780d298474a1955a3" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gertrudesec10">
-		<description>Gertrude's Secrets (version 1.0) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-08-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gertrude's secrets 1.0 (4am crack).dsk" size="143360" crc="969de34c" sha1="53f470ec6d1e31844c2433d7546a5d3965a0dbaa" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gertrudesec13">
-		<description>Gertrude's Secrets (version 1.3) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-12-27"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gertrude's secrets 1.3 (4am crack).dsk" size="143360" crc="98652042" sha1="881cac9cb46e7d38df878875b242fbb84e909a46" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="gflfootb">
 		<description>GFL Championship Football (cleanly cracked)</description>
 		<year>1987</year>
@@ -5067,19 +4838,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="gin rummy (4am crack).dsk" size="143360" crc="9286c88c" sha1="49140b844e7683a9f0df3eafd4a7fb8cfaa06c76" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gohayden">
-		<description>Go (Hayden) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Co.</publisher>
-		<info name="release" value="2016-07-27"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="go (4am crack).dsk" size="143360" crc="014b2a73" sha1="70a43566885d69bfe902a21103341a431da731a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -5195,32 +4953,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="juglrb14">
-		<description>Juggles' Rainbow (version 1.4) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2016-12-31"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="juggles' rainbow (4am crack).dsk" size="143360" crc="7c06ce26" sha1="72ad78d84728be4aa1198208c095cd5ae37467d1" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="juglrb82">
-		<description>Juggles' Rainbow (Early Version) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Apple Computer</publisher>
-		<info name="release" value="2016-12-31"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="juggles' rainbow (1982) (4am crack).dsk" size="143360" crc="e48d5319" sha1="9c0552c190290dde74b4414d96ce3ca0d7d16d39" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ltlcompp">
 		<description>Little Computer People (cleanly cracked)</description>
 		<year>1986</year>
@@ -5313,32 +5045,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mathrabt">
-		<description>Math Rabbit (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2014-04-11"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math rabbit (4am crack).dsk" size="143360" crc="e3b25282" sha1="6e1f2b1e27be7a9438f46ef25fe04fd7bbf0c63d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mathrb11">
-		<description>Math Rabbit (version 1.1) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-08-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="math rabbit 1.1 (4am crack).dsk" size="143360" crc="53cd9a2f" sha1="98bac9b9218515116c97182b11337183db93a031" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="megabots">
 		<description>Megabots (cleanly cracked)</description>
 		<year>1986</year>
@@ -5404,19 +5110,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mtwnpar12">
-		<description>Moptown Parade (version 1.2) (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2017-04-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="moptown parade (4am crack).dsk" size="143360" crc="ff062b97" sha1="2d7d7b01a621c0c9aab97df33a9f983cc7568bd0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sbmultdv">
 		<description>Multiplication and Division (cleanly cracked)</description>
 		<year>1987</year>
@@ -5478,19 +5171,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="plasmania (4am crack).dsk" size="143360" crc="c2d17ccc" sha1="c391783756e05acc6d725feb68f115fd59004a35" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="racecarr">
-		<description>Race Car 'Rithmetic (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Unicorn Software Company</publisher>
-		<info name="release" value="2014-08-20"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="race car 'rithmetic (4am crack).dsk" size="143360" crc="136fcd47" sha1="3f3a4a5d9465366a22a1e01fc5d0b771f57be7b1" />
 			</dataarea>
 		</part>
 	</software>
@@ -6433,19 +6113,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="logic levels (4am crack).dsk" size="143360" crc="a29ce7eb" sha1="dba5f89f86cefc2cd02c67be9d5f135b6c0b648b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="logictls">
-		<description>Logic Tools (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-01-09"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="logic tools (4am crack).dsk" size="143360" crc="ee462ed7" sha1="5831cb4ed9a1e0aca58c88c2a4ee796b5a9bd3fd" />
 			</dataarea>
 		</part>
 	</software>
@@ -8096,45 +7763,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mptwn81">
-		<description>Moptown (1981 Version) (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Apple Computer</publisher>
-		<info name="release" value="2016-12-31"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="moptown (1981) (4am crack).dsk" size="143360" crc="a1d53302" sha1="3e3b3bdcdb4c1aac4613b40dd09bda3094e87676" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mptwnhtl">
-		<description>Moptown Hotel (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-01-21"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="moptown hotel (4am crack).dsk" size="143360" crc="354f51cc" sha1="343b4be8e781c49d279b3990728cae7b5607aea8" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mptwnh13">
-		<description>Moptown Hotel (version 1.3) (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-07-12"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="moptown hotel 1.3 (4am crack).dsk" size="143360" crc="f7a61838" sha1="ad70f3d9908c3368ee52c67cc5d5c3018623ed66" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mtnclmce">
 		<description>Mountain Climbing - Cause and Effect (cleanly cracked)</description>
 		<year>1982</year>
@@ -8582,19 +8210,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="number please (4am crack).dsk" size="143360" crc="d602d78b" sha1="b92aba698a15ad8ba56fa04469d7b46bb108a104" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nbrstmpr">
-		<description>Number Stumper (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2016-11-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="number stumper (4am crack).dsk" size="143360" crc="427caa58" sha1="514569a27d9ff0e5f25710354baafb5858e2dde2" />
 			</dataarea>
 		</part>
 	</software>
@@ -9543,19 +9158,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="alibi">
-		<description>Alibi (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Hayden Book Company</publisher>
-		<info name="release" value="2019-06-02"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="alibi (4am crack).dsk" size="143360" crc="0b3db1e0" sha1="8d6a7c582944ee1d54c5c4d875ed4d2e41299ec1" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="atwgtmi">
 		<description>Around The World: Getting The Main Idea (cleanly cracked)</description>
 		<year>1985</year>
@@ -10336,39 +9938,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="spellicopter (4am crack).dsk" size="143360" crc="cf7c681b" sha1="1c0a177eae27bb1efa28242537feae1e9d54e40b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrabbt13">
-		<description>Writer Rabbit (version 1.3) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2014-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="Writer Rabbit (4am crack) side A.dsk" size="143360" crc="79b78c0a" sha1="9ee29f8abf062e50de03d4ecec0143cb1db82452" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="Writer Rabbit (4am crack) side B.dsk" size="143360" crc="6f824696" sha1="ebc0d8f34edaff45e584c83be140cddf1cfb7854" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wordspnr">
-		<description>Wordspinner (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2014-08-19"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="wordspinner (4am crack).dsk" size="143360" crc="5eddb086" sha1="96345c0e990ec526d1c56a1a20431a0f9d0a49d2" />
 			</dataarea>
 		</part>
 	</software>
@@ -11289,19 +10858,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rrbit13">
-		<description>Reader Rabbit (version 1.3) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-07-14"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="reader rabbit 1.3 (4am crack).dsk" size="143360" crc="6a1d7564" sha1="75963345129602717b02f8554bd8e759d5d44d4b" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aceclc20">
 		<description>AceCalc (version 2.0) (cleanly cracked)</description>
 		<year>1983</year>
@@ -11434,26 +10990,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wrabbt12">
-		<description>Writer Rabbit (version 1.2) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-08-17"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="writer rabbit 1.2 (4am crack) side a.dsk" size="143360" crc="89feb276" sha1="a03366f12b32b1a1778326565765fa9ceac41bdb" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="writer rabbit 1.2 (4am crack) side b.dsk" size="143360" crc="4f3b676b" sha1="576833e86e42d6667796015cb8ed0e68537bfb11" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="successn">
 		<description>Succession (cleanly cracked)</description>
 		<year>1982</year>
@@ -11476,19 +11012,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the otters' adventure (4am crack).dsk" size="143360" crc="1766d8e7" sha1="7017582c0a5993888e3724a98cca36bef1e41f15" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="spelmach">
-		<description>The Spelling Machine (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Learning Seed Company</publisher>
-		<info name="release" value="2015-08-22"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the spelling machine (4am crack).dsk" size="143360" crc="bac3ea1c" sha1="60771a47cbb3c356d38e3d2110a68c14c90efe0a" />
 			</dataarea>
 		</part>
 	</software>
@@ -11523,26 +11046,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the chief of detectives (4am crack).dsk" size="143360" crc="2e7bc78b" sha1="8f0d7abffefa4bf607b855aea436d18e69e1701f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wrabbt10">
-		<description>Writer Rabbit (version 1.0) (cleanly cracked)</description>
-		<year>1986</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-09-04"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="writer rabbit 1.0 (4am crack) side a.dsk" size="143360" crc="fd1e4a40" sha1="a088465caaf4947e04d52b9ac63cf71fbd5fcbe9" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="writer rabbit 1.0 (4am crack) side b.dsk" size="143360" crc="6f492364" sha1="2a09033d2703e1a3f2aa20fa782361e3574b6a18" />
 			</dataarea>
 		</part>
 	</software>
@@ -11731,32 +11234,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Utilities"/>
 			<dataarea name="flop" size="143360">
 				<rom name="terrapin logo 1.0 (4am crack) disk 2 - utilities.dsk" size="143360" crc="2f9c6677" sha1="67f6f43aff6e6a786a37da515fbcb8e535389520" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thquik12">
-		<description>Think Quick (version 1.2) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2015-11-16"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="think quick 1.2 (4am crack) side a.dsk" size="143360" crc="a75e7419" sha1="22b7e4cf23394f94d85663b18da620acd5f5b96d" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="think quick 1.2 (4am crack) side b.dsk" size="143360" crc="98237aa2" sha1="c7f022caf3aa8bce91397b0081a509e286291535" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Storage Disk"/>
-			<dataarea name="flop" size="143360">
-				<rom name="think quick 1.2 (4am crack) storage disk.dsk" size="143360" crc="33f5a093" sha1="d51eaef571e24ca419f0a93ae740ccfbbf6c4a4f" />
 			</dataarea>
 		</part>
 	</software>
@@ -12035,19 +11512,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="addmagic">
-		<description>Addition Magician (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2016-01-28"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="addition magician (4am crack).dsk" size="143360" crc="16cbdf67" sha1="17bb8a5e1409f67a654b33e243f8ff57fb1f094a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wforecst">
 		<description>Weather Forecasting (cleanly cracked)</description>
 		<year>1985</year>
@@ -12135,41 +11599,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the great american states race (4am crack).dsk" size="143360" crc="6e55dd1a" sha1="aa72af4f148b03fa8bf25c0b2f356b62d1c649f9" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rboots40">
-		<description>Rocky's Boots (version 4.0) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2016-04-01"/>
-		<!-- Disks re-cracked in September 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="rocky's boots 4.0 (4am crack).dsk" size="143360" crc="2fcb648a" sha1="e6dffa75930aba8c4d97a5929be444c3ef8beee6" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rboots40b" cloneof="rboots40">
-		<description>Rocky's Boots (version 4.0) (imperfect clean crack)</description>
-		<year>1985</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2016-04-01"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="rocky's boots 4.0 (imperfect 4am crack).dsk" size="143360" crc="fdf32263" sha1="d1ee264209ad6b497a9c0415954c32f3df788f52" />
 			</dataarea>
 		</part>
 	</software>
@@ -13257,19 +12686,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rboots10">
-		<description>Rocky's Boots (version 1.0) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2017-03-25"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="rocky's boots v1.0 (4am crack).dsk" size="143360" crc="e28b2eb2" sha1="23fdc8a39a9555137d8a71f76c92d112ad3d2dd4" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ttroll11">
 		<description>Tiny Troll (version 1.1) (cleanly cracked)</description>
 		<year>1979</year>
@@ -13456,68 +12872,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the milliken word processor (4am crack).dsk" size="143360" crc="ae22419c" sha1="8860baa9ec434d3db5f070518e621e60f05e6e2a" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="robody11">
-		<description>Robot Odyssey (version 1.1) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2017-04-18"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey v1.1 (4am crack) side a.dsk" size="143360" crc="d96283f8" sha1="52214d4fcecb40ec7960085cccc1ccac564ad016" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey v1.1 (4am crack) side b.dsk" size="143360" crc="ee94e4e3" sha1="de4a3c2fca987603d3e52fe84b3395fe505def14" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="robody11b" cloneof="robody11">
-		<description>Robot Odyssey (version 1.1) (imperfect clean crack)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2017-04-18"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey v1.1 (imperfect 4am crack) side a.dsk" size="143360" crc="8a1986e5" sha1="05d42470c949bf53f6ac7c1ecddeec83859d3649" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey v1.1 (imperfect 4am crack) side b.dsk" size="143360" crc="bdefe1fe" sha1="5f3d8c172bed74f5b95173fcc62cf8fc640cb3eb" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rrbit11">
-		<description>Reader Rabbit (version 1.1) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2017-04-18"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="reader rabbit 1.1 (4am crack).dsk" size="143360" crc="e25f8fa9" sha1="2497899e46ed5243707fb1e2e4c0ba1c00fb9aa0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14286,41 +13640,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="soko-ban (imperfect 4am crack) side b.dsk" size="143360" crc="acb083a6" sha1="75c60df2bedafb294448f5b1fe085b8a509bbf52" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swsfamrb">
-		<description>Swiss Family Robinson (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2017-08-12"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="swiss family robinson (4am crack).dsk" size="143360" crc="1cd108f6" sha1="f072c4dcb9bcc05289927adc55da5cd79170185b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swsfamrbb" cloneof="swsfamrb">
-		<description>Swiss Family Robinson (imperfect clean crack)</description>
-		<year>1984</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2017-08-12"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="swiss family robinson (imperfect 4am crack).dsk" size="143360" crc="75f5b079" sha1="652ec117b904ffbe4a5e7f2b53d58273caf67b59" />
 			</dataarea>
 		</part>
 	</software>
@@ -15316,67 +14635,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wizoz">
-		<description>The Wizard of Oz (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-03-13"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A - Boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (4am crack) disk a - boot.dsk" size="143360" crc="a111593a" sha1="8214a6616fc571ed4e1130e0b37724bc83f5aa35" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (4am crack) disk b.dsk" size="143360" crc="f7f64f0b" sha1="94be36f818a7c76ecba6a485e1b40e2f0c7a2aff" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wizozb" cloneof="wizoz">
-		<description>The Wizard of Oz (imperfect clean crack)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-03-13"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A - Boot"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (imperfect 4am crack) disk a - boot.dsk" size="143360" crc="f11dcc1b" sha1="49190cb5c69a41f4aaa1d135c303ce69c783cfee" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (imperfect 4am crack) disk b.dsk" size="143360" crc="f7f64f0b" sha1="94be36f818a7c76ecba6a485e1b40e2f0c7a2aff" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the wizard of oz (imperfect 4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="zork1r88">
 		<description>Zork I (Release 88 / 840726 / interpreter B) (cleanly cracked)</description>
 		<year>1984</year>
@@ -15494,67 +14752,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="alien munchies (4am crack).dsk" size="143360" crc="355d34aa" sha1="1398c8c58180be81a61487296b4c3ed888cee721" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="robodyv2">
-		<description>Robot Odyssey I (version 2.0) (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2018-05-27"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey i v2.0 (4am crack) disk a.dsk" size="143360" crc="0e720569" sha1="20e555fb142a45ea1398f6efda235300c51a185b" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey i v2.0 (4am crack) disk b.dsk" size="143360" crc="8f85fec4" sha1="c80fe32f89539a6d617d9be92bc08bc63d1f9dac" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey i v2.0 (4am crack) disk c.dsk" size="143360" crc="11152a8d" sha1="7a23f63b20545eeb0865d436f91b8504f745844f" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="robodyv2b" cloneof="robodyv2">
-		<description>Robot Odyssey I (version 2.0) (imperfect clean crack)</description>
-		<year>1985</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2018-05-27"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey i v2.0 (imperfect 4am crack) disk a.dsk" size="143360" crc="9b892eb3" sha1="dd45e3b31932ad7547d130a56f58708744653bca" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey i v2.0 (imperfect 4am crack) disk b.dsk" size="143360" crc="1a7ed51e" sha1="642f6ce855f8e0c3da653527eda2285b600907a5" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="robot odyssey i v2.0 (imperfect 4am crack) disk c.dsk" size="143360" crc="84ee0157" sha1="4265eac0e6eb6eac2abb93a845fc8d25b46a49e7" />
 			</dataarea>
 		</part>
 	</software>
@@ -15779,79 +14976,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the typewriter (4am crack).dsk" size="143360" crc="8ef13d0d" sha1="f5e592d873097db008a5cb5f84e18955242ec193" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trsrisld">
-		<description>Treasure Island (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-10-03"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side a.dsk" size="143360" crc="ae6fd6fd" sha1="8ea61af42b958161c3b50148683e1d8c27573d16" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side b.dsk" size="143360" crc="c3ca1416" sha1="000ffa7d1a40ce5d892a94690a5a398c15bceafc" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side c.dsk" size="143360" crc="0f671042" sha1="3297a11b79c7185a77e8eabd1e93e3d2dabe0a45" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="trsrisldb" cloneof="trsrisld">
-		<description>Treasure Island (imperfect clean crack)</description>
-		<year>1985</year>
-		<publisher>Windham Classics</publisher>
-		<info name="release" value="2018-10-03"/>
-		<!-- Disks re-cracked on August 28th, 2021 due to subtle
-		timing difference between Disk II and IWM hardware that resulted
-		in the previous version not working on some machines.
-
-		This 'imperfect crack' version remains in here for
-		documentation purposes. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side a.dsk" size="143360" crc="fe6343dc" sha1="29c771367983e74bc72825a0dc805b831585f486" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side b.dsk" size="143360" crc="c3ca1416" sha1="000ffa7d1a40ce5d892a94690a5a398c15bceafc" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Side C"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side c.dsk" size="143360" crc="0f671042" sha1="3297a11b79c7185a77e8eabd1e93e3d2dabe0a45" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Side D"/>
-			<dataarea name="flop" size="143360">
-				<rom name="treasure island (imperfect 4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -21295,76 +20419,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bmblgm13">
-		<description>Bumble Games (version 1.3) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-06-03"/>
-		<!-- "Bumble Games" is a 1982 educational program developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.3. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bumble games v1.3 (4am and san inc crack).dsk" size="143360" crc="6636a469" sha1="59badccd350a2c82d6a0140b628a042997b8c88e"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rrbit10">
-		<description>Reader Rabbit (version 1.0) (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-06-03"/>
-		<!-- "Reader Rabbit" is a 1984 educational program developed by Leslie Grimm, illustrated by Corinne and Cindy Grimm, and distributed by The Learning Company. This is version 1.0. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="reader rabbit v1.0 (4am and san inc crack).dsk" size="143360" crc="9033d75d" sha1="fd19516c3a995ed96026e0463030ce6028c07d47"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bumblp11">
-		<description>Bumble Plot (version 1.1) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-06-06"/>
-		<!-- "Bumble Plot" is a 1982 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.1. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bumble plot v1.1 (4am and san inc crack).dsk" size="143360" crc="1a360981" sha1="7675056caea06ca067bb576d835207e1885d68fa"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gertrudep82">
-		<description>Gertrude's Puzzles (1982 Version) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-06-06"/>
-		<!-- "Gertrude's Puzzles" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gertrude's puzzles 1982 (4am and san inc crack).dsk" size="143360" crc="4584488c" sha1="3bb9f19e91b62935cf95c559fd683e08033dc532"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gertrudesec82">
-		<description>Gertrude's Secrets 1982 (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-06-06"/>
-		<!-- "Gertrude's Secrets" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="gertrude's secrets 1982 (4am and san inc crack).dsk" size="143360" crc="0d53b68c" sha1="1ae15f7b76b4324f979c533b67aa63ab9169b631"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pforth30">
 		<description>PAI Forth (version 3.0, 12-21-1985) (cleanly cracked)</description>
 		<year>1985</year>
@@ -21376,20 +20430,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="pai forth v3.0 (4am crack).dsk" size="143360" crc="5f1f43e9" sha1="7a10dd0964da0ba404b1ed0dcce8e7f806a8d6e8"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rboots82">
-		<description>Rocky's Boots (Unknown 1982 version) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-06-10"/>
-		<!-- "Rocky's Boots" is a 1982 educational game developed by Teri Perl, Leslie Grimm and Warren Robinett, and distributed by The Learning Company. This early version has no visible version number and is only distinguishable by its copy protection. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="rocky's boots 1982 (4am and san inc crack).dsk" size="143360" crc="887947a7" sha1="4e3bdda73af0c1069a768a64f32754556c40d223"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21411,34 +20451,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2 - Data disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="pro football pointspread prediction system (4am crack) disk 2 - data.dsk" size="143360" crc="8867facf" sha1="26be3337f12c70ec6407b6b0c6062fd843b246ba"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bmblgm14">
-		<description>Bumble Games (version 1.4) (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-07-05"/>
-		<!-- "Bumble Games" is a 1982 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is version 1.4. It is preserved here for the first time. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="bumble games v1.4 (4am and san inc crack).dsk" size="143360" crc="ea34ac74" sha1="253236c6da94ed7939afe551685d96d3747738ba"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="moptp81">
-		<description>Moptown Parade (1981 Version) (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>The Learning Company</publisher>
-		<info name="release" value="2021-07-05"/>
-		<!-- "Moptown Parade" is a 1981 educational game developed by Leslie Grimm, illustrated by Corinne Grimm, and distributed by The Learning Company. This is the 1981 release. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="moptown parade 1981 (4am and san inc crack).dsk" size="143360" crc="aa354a32" sha1="8830f3f7b9b19c0d7e188878f7b7e6c7b89d45ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21792,27 +20804,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="serendipity (4am crack).dsk" size="143360" crc="31f34848" sha1="45522cd7c33d7b8698670467f0a28afc7972e765"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="inca">
-		<description>Inca (cleanly cracked)</description>
-		<year>1985</year>
-		<publisher>Hayden Software</publisher>
-		<info name="release" value="2021-09-17"/>
-		<!-- "Inca" is a 1985 adventure game developed by Joe Emerson and Ken Smith, and distributed by Hayden Software. -->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="inca (4am crack) side a.dsk" size="143360" crc="622c8e05" sha1="52f15fff82587642fecc73342139260cb12f025e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="inca (4am crack) side b.dsk" size="143360" crc="32d9ef26" sha1="827d2c6c8e93731d1f8b52e5ae3d1ac8fa4754f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23890,6 +22881,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="101mword">
+		<description>101 Misused Words (And How To Use Them Correctly) (4am crack)</description>
+		<year>1986</year>
+		<publisher>The Learning Seed Company</publisher>
+		<info name="programmer" value="Robert Lawrence and Mark Whitehurst" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-04-12 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="101 misused words (4am crack).dsk" size="143360" crc="49662c0d" sha1="b71a873630ef10333695890ab66a7bd80a9ef06e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2400ad">
 		<description>2400 A.D. (4am crack)</description>
 		<year>1987</year>
@@ -24355,6 +23362,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="addmagic">
+		<description>Addition Magician (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Dale DeSharone" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-01-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="addition magician (4am crack).dsk" size="143360" crc="16cbdf67" sha1="17bb8a5e1409f67a654b33e243f8ff57fb1f094a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adjectiv062984" cloneof="adjectiv">
 		<description>Adjectives (version 06.29.84) (4am crack)</description>
 		<year>1984</year>
@@ -24509,7 +23532,7 @@ license:CC0-1.0
 	<software name="apstriplon">
 		<description>Adventures in Problem Solving: A Trip to London (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -24525,7 +23548,7 @@ license:CC0-1.0
 	<software name="apsalicenl">
 		<description>Adventures in Problem Solving: Alice's Adventure in Numberland (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -24541,7 +23564,7 @@ license:CC0-1.0
 	<software name="apsmarat">
 		<description>Adventures in Problem Solving: Marathon (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -24557,7 +23580,7 @@ license:CC0-1.0
 	<software name="apstreasfi">
 		<description>Adventures in Problem Solving: The Treasure of Forest Isle (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -25202,13 +24225,81 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="alibi">
+		<description>Alibi (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Ian Trackman" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-06-02 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alibi (4am crack).dsk" size="143360" crc="0b3db1e0" sha1="8d6a7c582944ee1d54c5c4d875ed4d2e41299ec1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcwndrlr1" cloneof="alcwndrl">
+		<description>Alice in Wonderland (revision 1) (Windham Classics) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="original_publisher" value="Spinnaker Software" />
+		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="revision 1" />
+		<!-- Revision 1 crack of this game was an earlier version. That one was protected with the E7 bitstream, invented in 1983 and productized in 1984. Revision 2 has a newer protection scheme that wasn't invented until 1985. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2015-05-04 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland (4am crack) side a.dsk" size="143360" crc="46d03565" sha1="bf3ea2cdf0c5fb63aff9686605c2cae84774c62f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland (4am crack) side b.dsk" size="143360" crc="f03e007e" sha1="fd960bf392beaa9f081ff36a9f621cd1ce5e3c92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcwndrl">
+		<description>Alice in Wonderland (revision 2) (Windham Classics) (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="original_publisher" value="Spinnaker Software" />
+		<info name="programmer" value="Dale DeSharone, Laurence Yep, William Groetzinger, and Vince Mills" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="revision 2" />
+		<!-- Revision 1 crack of this game was an earlier version. That one was protected with the E7 bitstream, invented in 1983 and productized in 1984. Revision 2 has a newer protection scheme that wasn't invented until 1985. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2018-09-28 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland rev. 2 (4am crack) side a.dsk" size="143360" crc="e9a946e8" sha1="1d23a33c504df204af50d32093010c41f15d8cdc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="alice in wonderland rev. 2 (4am crack) side b.dsk" size="143360" crc="f249da10" sha1="9ec87f245a6ad0a0414f0b5b1a9c66da94719db0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="alcfacflr1" cloneof="alcfacfl">
 		<description>Aliencounter and Face Flash (revision 1) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Milliken Publishing</publisher>
 		<info name="programmer" value="William H. Kraus" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
-		<info name="version" value="revision 2" />
+		<info name="version" value="revision 1" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2015-08-02 -->
 		<!-- educational program -->
@@ -27304,6 +26395,46 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="bellhop">
+		<description>Bellhop (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value=" Garry Kitchen and John van Ryzin" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-10-04 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bellhop (4am crack).dsk" size="143360" crc="b5a5c914" sha1="fac8017d1810673c8cda26f2e342d30695dba29f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="belwrt">
+		<description>Below the Root (4am crack)</description>
+		<year>1984</year>
+		<publisher>Windham Classics</publisher>
+		<info name="programmer" value="Dale DeSharone and William Groetzinger" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released:  2018-11-13 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="below the root (4am crack) side a.dsk" size="143360" crc="b546f694" sha1="e4a03625fd40389af5f787c39f574c1eed569547" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="below the root (4am crack) side b.dsk" size="143360" crc="3298fdc6" sha1="f6b2a638a96afb4c99e182ff6ee477763bb440fa" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="berraids">
 		<description>Berserker Raids (4am crack)</description>
 		<year>1983</year>
@@ -28013,6 +27144,110 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 4 - Frames and Fonts"/>
 			<dataarea name="flop" size="143360">
 				<rom name="bulletin board maker - your neighborhood (4am crack) disk 4 - frames and fonts.dsk" size="143360" crc="785796b8" sha1="4913ced081bf2ed9bc3419e5b31162d56da9a9dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblgmes13" cloneof="bmblgmes">
+		<description>Bumble Games (version 1.3) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-06-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble games v1.3 (4am and san inc crack).dsk" size="143360" crc="6636a469" sha1="59badccd350a2c82d6a0140b628a042997b8c88e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblgmes14" cloneof="bmblgmes">
+		<description>Bumble Games (version 1.4) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-07-05 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble games v1.4 (4am and san inc crack).dsk" size="143360" crc="ea34ac74" sha1="253236c6da94ed7939afe551685d96d3747738ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblgmes">
+		<description>Bumble Games (version 1.5) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.5" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-18 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble games (4am crack).dsk" size="143360" crc="0a7eb17b" sha1="9e8fcc6b51003311510165e2ec80b4a9099cb8e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblplot10a" cloneof="bmblplot">
+		<description>Bumble Plot (Apple Computer) (version 1.0) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Apple Computer</publisher>
+		<info name="original_publisher" value="The Learning Company" />
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<!-- Apple Computer "Special Delivery" label -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-12-31 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble plot (1982) (4am crack).dsk" size="143360" crc="007bf1e3" sha1="4150eb9ab436be6c44810e5815acd3087f927514" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblplot11" cloneof="bmblplot">
+		<description>Bumble Plot (The Learning Company) (version 1.1) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-06-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble plot v1.1 (4am and san inc crack).dsk" size="143360" crc="1a360981" sha1="7675056caea06ca067bb576d835207e1885d68fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmblplot">
+		<description>Bumble Plot (The Learning Company) (version 1.2) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-06-01 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bumble plot 1.2 (4am crack).dsk" size="143360" crc="3e79f3ac" sha1="24ab23e8ecf5d893e740ea0e1ca704a91f5fedb9" />
 			</dataarea>
 		</part>
 	</software>
@@ -28808,6 +28043,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="challenge math (4am crack).dsk" size="143360" crc="13ca32af" sha1="77fd54dfe5bc0b3775c43d38540a3f3366d25c24" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chmpgolf">
+		<description>Championship Golf (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Blair Hadfield" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-06-12 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="championship golf (4am crack).dsk" size="143360" crc="632254c5" sha1="c4613b775f652be87706f89362ebf61bcdd43239" />
 			</dataarea>
 		</part>
 	</software>
@@ -30676,11 +29927,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cntparr0">
+	<software name="cntparad">
 		<description>Counting Parade (revision 0) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="developer" value="Spinnaker Software" />
+		<info name="developer" value="Stepping Stone Software" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="revision 0" />
 		<!-- There is one other known version of this game; it contains differences in several files. -->
@@ -30938,13 +30189,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="crmstopr">
+		<description>Crime Stopper (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="developer" value="Imaginative Systems Software" />
+		<info name="programmer" value="Dan Kitchen and Barry Marx" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-08-08 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="crime stopper (4am crack).dsk" size="143360" crc="045b7082" sha1="d0a76363471a6d4f721f8e6506c6b32af2f74e25" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crmwave">
 		<description>Crime Wave (4am crack)</description>
 		<year>1983</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Scott Schram" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
-		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-02-15 -->
 		<!-- arcade game -->
 		<part name="flop1" interface="floppy_5_25">
@@ -33485,6 +32753,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="engchlng">
+		<description>English Challenge (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Seed Company</publisher>
+		<info name="programmer" value=" Louise Schrank and Mark Whitehurst" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-04-11 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="english challenge (4am crack).dsk" size="143360" crc="e23b7121" sha1="ede48949b246423dc9e311f03ff40f778ec090e5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="epidemic">
 		<description>Epidemic (4am and san inc crack)</description>
 		<year>1983</year>
@@ -34681,6 +33965,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="fragcont">
+		<description>Frag! Fragments in Context (4am crack)</description>
+		<year>1987</year>
+		<publisher>The Learning Seed Company</publisher>
+		<info name="programmer" value="Robert Lawrence" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2024-11-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="frag- fragments in context (4am crack).dsk" size="143360" crc="cc833ffb" sha1="73d0e7e3a95d9ab0e316c0decc6637846916da45" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fredpzad">
 		<description>Freddy's Puzzling Adventures (revision D) (4am crack)</description>
 		<year>1984</year>
@@ -35402,6 +34702,125 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="gertpuzz10" cloneof="gertpuzz">
+		<description>Gertrude's Puzzles (version 1.0) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-01-26 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's puzzles 1.0 (4am crack).dsk" size="143360" crc="d9511af5" sha1="6f99bb857b392f8dd58030b5464ef2ce19f96932" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertpuzz11" cloneof="gertpuzz">
+		<description>Gertrude's Puzzles (version 1.1) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-06-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's puzzles 1982 (4am and san inc crack).dsk" size="143360" crc="4584488c" sha1="3bb9f19e91b62935cf95c559fd683e08033dc532"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertpuzz">
+		<description>Gertrude's Puzzles (version 1.2) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-05-31 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's puzzles 1.2 (4am crack).dsk" size="143360" crc="5f794fa0" sha1="3b65f8e778dc7dd61ae64d6780d298474a1955a3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec10" cloneof="gertsec">
+		<description>Gertrude's Secrets (version 1.0) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-08-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets 1.0 (4am crack).dsk" size="143360" crc="969de34c" sha1="53f470ec6d1e31844c2433d7546a5d3965a0dbaa" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec11" cloneof="gertsec">
+		<description>Gertrude's Secrets (version 1.1) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-06-06 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets 1982 (4am and san inc crack).dsk" size="143360" crc="0d53b68c" sha1="1ae15f7b76b4324f979c533b67aa63ab9169b631"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec12" cloneof="gertsec">
+		<description>Gertrude's Secrets (version 1.2) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets (4am crack).dsk" size="143360" crc="a8602d95" sha1="281f09574ca6be91f52182da51429487de6c770d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gertsec">
+		<description>Gertrude's Secrets (version 1.3) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Teri Perl, and Warren Robinett" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-12-27 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gertrude's secrets 1.3 (4am crack).dsk" size="143360" crc="98652042" sha1="881cac9cb46e7d38df878875b242fbb84e909a46" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kidwrtrg" cloneof="kidwrtr">
 		<description>Geschichten-schreiber Level I, II (German) (4am crack)</description>
 		<!-- German version of KidWriter - Translates to Stories Writer -->
@@ -35508,6 +34927,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="gnee or not gnee (4am crack).dsk" size="143360" crc="76379016" sha1="c2257c5fdacc6b4c44d52cd053aee225fd7a59fb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gohayden">
+		<description>Go (Hayden Book Company) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="programmer" value="Stan Erwin" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-07-27 -->
+		<!-- board game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="go (4am crack).dsk" size="143360" crc="014b2a73" sha1="70a43566885d69bfe902a21103341a431da731a6" />
 			</dataarea>
 		</part>
 	</software>
@@ -37012,6 +36447,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="inca">
+		<description>Inca (4am crack)</description>
+		<year>1985</year>
+		<publisher>Hayden Software</publisher>
+		<info name="programmer" value="Joe Emerson and Ken Smith" />
+		<info name="usage" value="Requires a 128K Apple //e or later." />
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-09-17 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side a.dsk" size="143360" crc="622c8e05" sha1="52f15fff82587642fecc73342139260cb12f025e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Story"/>
+			<dataarea name="flop" size="143360">
+				<rom name="inca (4am crack) side b.dsk" size="143360" crc="32d9ef26" sha1="827d2c6c8e93731d1f8b52e5ae3d1ac8fa4754f7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ioshapes">
 		<description>Inside Outside Shapes (4am crack)</description>
 		<year>1986</year>
@@ -37212,6 +36670,41 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B" />
 			<dataarea name="flop" size="143360">
 				<rom name="joe theismann's pro football (4am crack) side b.dsk" size="143360" crc="c16753f3" sha1="02020209b01d96f170f18bbd3a9ba62dc2216906" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="juglrb82" cloneof="juglrb">
+		<description>Juggles' Rainbow (Apple) (version 1982) (4am crack)</description>
+		<year>1982</year>
+		<publisher>Apple Computer</publisher>
+		<info name="programmer" value="A. Piestrup, B. Jasinski, Leslie Grimm, P. Fiorentini, Warren Robinett, and A. Chiang" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1982" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-12-31 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="juggles' rainbow (1982) (4am crack).dsk" size="143360" crc="e48d5319" sha1="9c0552c190290dde74b4414d96ce3ca0d7d16d39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="juglrb">
+		<description>Juggles' Rainbow (version 1.4) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="original_publisher" value="Apple Computer" />
+		<info name="programmer" value="A. Piestrup, B. Jasinski, Leslie Grimm, P. Fiorentini, Warren Robinett, and A. Chiang" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.4" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-12-31 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="juggles' rainbow (4am crack).dsk" size="143360" crc="7c06ce26" sha1="72ad78d84728be4aa1198208c095cd5ae37467d1" />
 			</dataarea>
 		</part>
 	</software>
@@ -39001,6 +38494,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="logictls">
+		<description>Logic Tools (prototype) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value=" Warren Robinett, Leslie Grimm, Teri Perl, and Ann Piestrup" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-01-09 -->
+		<!-- unreleased prototype -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="logic tools (4am crack).dsk" size="143360" crc="ee462ed7" sha1="5831cb4ed9a1e0aca58c88c2a4ee796b5a9bd3fd" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="logomot">
 		<description>LogoMotion (version 1.2) (Softsmith) (4am and san inc crack)</description>
 		<year>1982</year>
@@ -39532,10 +39042,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="mspells81" cloneof="mspells21">
-		<description>Magic Spells (1981) (Apple) (4am crack)</description>
+		<description>Magic Spells (version 1981) (Apple) (4am crack)</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
 		<info name="developer" value="Advanced Learning Technology"/>
+		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="programmer" value="Leslie Grimm and Corrine Grimm" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="1981" />
@@ -39550,10 +39061,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mspells11" cloneof="mspells21">
-		<description>Magic Spells (version 1.1) (4am and san inc crack)</description>
+		<description>Magic Spells (version 1.1) (The Learning Company) (4am and san inc crack)</description>
 		<year>1981</year>
 		<publisher>The Learning Company</publisher>
-		<info name="original_publisher" value="Apple Computer" />
+		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="programmer" value="Leslie Grimm and Corrine Grimm" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.1" />
@@ -39568,10 +39079,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="mspells21">
-		<description>Magic Spells (version 2.1) (4am crack)</description>
+		<description>Magic Spells (version 2.1) (The Learning Company) (4am crack)</description>
 		<year>1985</year>
 		<publisher>The Learning Company</publisher>
-		<info name="original_publisher" value="Apple Computer" />
+		<info name="original_publisher" value="Advanced Learning Technology" />
 		<info name="programmer" value="K. Elliott, G. Genoar, S. Gordon, L. Grimm, and K. Klose" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<info name="version" value="2.1" />
@@ -40742,6 +40253,40 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="math masters (4am crack).dsk" size="143360" crc="410978d0" sha1="b9d8db84b19138732e982a1713fb8e2e841bee25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathrabt10" cloneof="mathrabt11">
+		<description>Math Rabbit (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Analee Nunan, and Aaron Weiss" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-04-11 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math rabbit (4am crack).dsk" size="143360" crc="e3b25282" sha1="6e1f2b1e27be7a9438f46ef25fe04fd7bbf0c63d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathrabt11">
+		<description>Math Rabbit (version 1.1) (4am crack)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Analee Nunan, and Aaron Weiss" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-08-28 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math rabbit 1.1 (4am crack).dsk" size="143360" crc="53cd9a2f" sha1="98bac9b9218515116c97182b11337183db93a031" />
 			</dataarea>
 		</part>
 	</software>
@@ -43416,6 +42961,92 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="moptown">
+		<description>Moptown (version 1981) (Apple) (4am crack)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<info name="original_publisher" value="Advanced Learning Technology"/>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1981" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-12-31 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown (1981) (4am crack).dsk" size="143360" crc="a1d53302" sha1="3e3b3bdcdb4c1aac4613b40dd09bda3094e87676" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptwnhtl12" cloneof="mptwnhtl">
+		<description>Moptown Hotel (version 1.2) (4am crack)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-01-21 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown hotel (4am crack).dsk" size="143360" crc="354f51cc" sha1="343b4be8e781c49d279b3990728cae7b5607aea8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptwnhtl">
+		<description>Moptown Hotel (version 1.3) (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-07-12 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown hotel 1.3 (4am crack).dsk" size="143360" crc="f7a61838" sha1="ad70f3d9908c3368ee52c67cc5d5c3018623ed66" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptwnpar10" cloneof="mptwnpar">
+		<description>Moptown Parade (version 1.0) (4am and san inc crack)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-07-05 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown parade 1981 (4am and san inc crack).dsk" size="143360" crc="aa354a32" sha1="8830f3f7b9b19c0d7e188878f7b7e6c7b89d45ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mptwnpar">
+		<description>Moptown Parade (version 1.2) (4am crack)</description>
+		<year>1981</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Corinne Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-18 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="moptown parade (4am crack).dsk" size="143360" crc="ff062b97" sha1="2d7d7b01a621c0c9aab97df33a9f983cc7568bd0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moseslhp">
 		<description>Moses Leads His People (4am crack)</description>
 		<year>1986</year>
@@ -44407,6 +44038,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="number quest (4am crack).dsk" size="143360" crc="c1fe8bf4" sha1="c8b9160fd81a03e0fb5a9365be34fbf1f7ff9cdc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbrstmpr">
+		<description>Number Stumper (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Dennis Sorensen" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-11-04 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="number stumper (4am crack).dsk" size="143360" crc="427caa58" sha1="514569a27d9ff0e5f25710354baafb5858e2dde2" />
 			</dataarea>
 		</part>
 	</software>
@@ -45505,7 +45152,7 @@ license:CC0-1.0
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Eagle Berns and Michael Kosaka" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-08-08 -->
 		<!-- arcade game -->
@@ -46263,6 +45910,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-28 -->
 		<!-- educational program -->
+		<!-- This may be side B of Sum Ducks. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="prime ducks (4am crack).dsk" size="143360" crc="7eec8773" sha1="35e17dacfb9d87b68a290aa503464baebc01b285" />
@@ -47079,6 +46727,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="racecarr">
+		<description>Race Car 'Rithmetic (4am crack)</description>
+		<year>1983</year>
+		<publisher>Unicorn Software Company</publisher>
+		<info name="programmer" value="June S. Stark and David Flatman" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-08-20 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="race car 'rithmetic (4am crack).dsk" size="143360" crc="136fcd47" sha1="3f3a4a5d9465366a22a1e01fc5d0b771f57be7b1" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="raceclck">
 		<description>Race the Clock (4am crack)</description>
 		<year>1984</year>
@@ -47380,6 +47044,57 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="143360">
 				<rom name="read and spell - in the days of knights and castles (4am crack) disk 2.dsk" size="143360" crc="dcd2163b" sha1="0a74ec12ff2e432c84e214784fb2a3d72afcafba" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrabbit10" cloneof="rrabbit">
+		<description>Reader Rabbit (version 1.0) (4am and san inc crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Corinne Grimm, and Cindy Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-06-03 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="reader rabbit v1.0 (4am and san inc crack).dsk" size="143360" crc="9033d75d" sha1="fd19516c3a995ed96026e0463030ce6028c07d47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrabbit11" cloneof="rrabbit">
+		<description>Reader Rabbit (version 1.1) (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Corinne Grimm, and Cindy Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-18 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="reader rabbit 1.1 (4am crack).dsk" size="143360" crc="e25f8fa9" sha1="2497899e46ed5243707fb1e2e4c0ba1c00fb9aa0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrabbit">
+		<description>Reader Rabbit (version 1.3) (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Corinne Grimm, and Cindy Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-07-14 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="reader rabbit 1.3 (4am crack).dsk" size="143360" crc="6a1d7564" sha1="75963345129602717b02f8554bd8e759d5d44d4b" />
 			</dataarea>
 		</part>
 	</software>
@@ -48598,6 +48313,60 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="robotody11" cloneof="robotody">
+		<description>Robot Odyssey I (version 1.1) (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Mike Wallace and Leslie Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-04-18. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Robotropolis"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey v1.1 (4am crack) side a.dsk" size="143360" crc="d96283f8" sha1="52214d4fcecb40ec7960085cccc1ccac564ad016" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Innovation lab and tutorials"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey v1.1 (4am crack) side b.dsk" size="143360" crc="ee94e4e3" sha1="de4a3c2fca987603d3e52fe84b3395fe505def14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotody">
+		<description>Robot Odyssey I (version 2.0) (4am crack)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Mike Wallace and Leslie Grimm" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-05-27. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Robotropolis"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey i v2.0 (4am crack) disk a.dsk" size="143360" crc="0e720569" sha1="20e555fb142a45ea1398f6efda235300c51a185b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Robotropolis preview, chip designs, innovation lab, and chip library"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey i v2.0 (4am crack) disk b.dsk" size="143360" crc="8f85fec4" sha1="c80fe32f89539a6d617d9be92bc08bc63d1f9dac" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C - Robot anatomy, robot wiring, sensors, the toolkit, robot circuits, and robot teamwork"/>
+			<dataarea name="flop" size="143360">
+				<rom name="robot odyssey i v2.0 (4am crack) disk c.dsk" size="143360" crc="11152a8d" sha1="7a23f63b20545eeb0865d436f91b8504f745844f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="robotrsc">
 		<description>Robot Rascals (4am and san inc crack)</description>
 		<year>1986</year>
@@ -48641,6 +48410,59 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="robots of dawn (4am crack).dsk" size="143360" crc="e283c525" sha1="7eb8af7214c84c646654d19af9369c7dc1e4af5f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots10e" cloneof="rboots">
+		<description>Rocky's Boots (version 1.0 earlier) (4am crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Warren Robinett, and Leslie Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0 earlier" />
+		<!-- Has a loading screen, different title page, and loads much slower. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-03-25 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rocky's boots v1.0 (4am crack).dsk" size="143360" crc="e28b2eb2" sha1="23fdc8a39a9555137d8a71f76c92d112ad3d2dd4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots10l" cloneof="rboots">
+		<description>Rocky's Boots (version 1.0 later) (4am and san inc crack)</description>
+		<year>1982</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Warren Robinett, and Leslie Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="1.0 later" />
+		<!-- Has a different title page and loads much faster. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2021-06-10 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rocky's boots 1982 (4am and san inc crack).dsk" size="143360" crc="887947a7" sha1="4e3bdda73af0c1069a768a64f32754556c40d223"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rboots">
+		<description>Rocky's Boots (version 4.0) (4am crack)</description>
+		<year>1985</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Teri Perl, Warren Robinett, and Leslie Grimm" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<info name="version" value="4.0" />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2016-04-01. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="rocky's boots 4.0 (4am crack).dsk" size="143360" crc="2fcb648a" sha1="e6dffa75930aba8c4d97a5929be444c3ef8beee6" />
 			</dataarea>
 		</part>
 	</software>
@@ -51387,7 +51209,7 @@ license:CC0-1.0
 	<software name="sshonbear">
 		<description>Start Solving: Honeybear (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -51403,7 +51225,7 @@ license:CC0-1.0
 	<software name="sssamstst">
 		<description>Start Solving: Sam's Sticker Store (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -51419,7 +51241,7 @@ license:CC0-1.0
 	<software name="sstinatvs">
 		<description>Start Solving: Tina's TV Show (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -52775,6 +52597,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="A2C,A2GS" />
 		<!-- Dump released: 2015-10-16 -->
 		<!-- educational program -->
+		<!-- This was also shipped with side B, Prime Ducks. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="sum ducks (4am crack).dsk" size="143360" crc="0838572d" sha1="bc04d30512bac66d6e1fdf80eaef7ae00ecc4ffd" />
@@ -53064,6 +52887,22 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="survival math (4am crack).dsk" size="143360" crc="0965ef15" sha1="e66d1ab9f5b0f244f5cbdb0f0d03c3c850e29aff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swfrobin">
+		<description>Swiss Family Robinson (4am crack)</description>
+		<year>1984</year>
+		<publisher>Windham Classics</publisher>
+		<info name="developer" value="Tom Snyder Productions" />
+		<info name="usage" value="Requires a 48K Apple ][ or later." />
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-08-12. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="swiss family robinson (4am crack).dsk" size="143360" crc="1cd108f6" sha1="f072c4dcb9bcc05289927adc55da5cd79170185b" />
 			</dataarea>
 		</part>
 	</software>
@@ -55011,7 +54850,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="developer" value="Tom Snyder Productions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="version 1" />
 		<!-- This undated version was released with a different copy protection than later versions -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -55029,7 +54868,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="developer" value="Tom Snyder Productions" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="version 2" />
 		<!-- Updated protection and re-released.  There are no other known changes between the two versions. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -55905,6 +55744,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="spelmach">
+		<description>The Spelling Machine (4am crack)</description>
+		<year>1985</year>
+		<publisher>The Learning Seed Company</publisher>
+		<info name="programmer" value="Robert Lawrence and Mark Whitehurst" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-08-22 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the spelling machine (4am crack).dsk" size="143360" crc="bac3ea1c" sha1="60771a47cbb3c356d38e3d2110a68c14c90efe0a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tsnbaseb">
 		<description>The Sporting News: Baseball (4am crack)</description>
 		<year>1988</year>
@@ -56462,6 +56317,35 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wizardoz">
+		<description>The Wizard of Oz (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="programmer" value="Ruth Wick, Ralph Hebb, Dan Mydlack, Mitch Stein, Howard Boles, and Seth Godin" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-03-13. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (4am crack) disk a - boot.dsk" size="143360" crc="a111593a" sha1="8214a6616fc571ed4e1130e0b37724bc83f5aa35" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (4am crack) disk b.dsk" size="143360" crc="f7f64f0b" sha1="94be36f818a7c76ecba6a485e1b40e2f0c7a2aff" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the wizard of oz (4am crack) disk c.dsk" size="143360" crc="4e23048d" sha1="db11585b49ffd145c8b06b33b804cd64fb9efe05" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wgbbg">
 		<description>The World's Greatest Baseball Game (4am crack)</description>
 		<year>1986</year>
@@ -56583,11 +56467,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thquick12">
+		<description>Think Quick! (version 1.2) (4am crack)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm and Sid Weber" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-11-16 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="think quick 1.2 (4am crack) side a.dsk" size="143360" crc="a75e7419" sha1="22b7e4cf23394f94d85663b18da620acd5f5b96d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="think quick 1.2 (4am crack) side b.dsk" size="143360" crc="98237aa2" sha1="c7f022caf3aa8bce91397b0081a509e286291535" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Storage"/>
+			<dataarea name="flop" size="143360">
+				<rom name="think quick 1.2 (4am crack) storage disk.dsk" size="143360" crc="33f5a093" sha1="d51eaef571e24ca419f0a93ae740ccfbbf6c4a4f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thkmathunps">
 		<description>Thinkers: Mathematics Unlimited Problem Solving (4am crack)</description>
 		<year>1986</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
-		<info name="developer" value="Holt, Rinehart, and Winston" />
+		<publisher>Holt, Rinehart and Winston</publisher>
+		<info name="developer" value="Holt, Rinehart and Winston" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2022-12-31 -->
@@ -57106,7 +57020,8 @@ license:CC0-1.0
 		<description>Trains (4am crack)</description>
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="developer" value="Spinnaker Software" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2018-03-08 -->
 		<!-- educational game -->
@@ -57166,7 +57081,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="transyl82" cloneof="transyl">
-		<description>Transylvania (version 1982) (4am crack)</description>
+		<description>Transylvania (version 1982) (Penguin Software) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Antonio Antiochia" />
@@ -57183,7 +57098,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="transyl84" cloneof="transyl">
-		<description>Transylvania (version 1984) (4am crack)</description>
+		<description>Transylvania (version 1984) (Penguin Software) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Penguin Software</publisher>
 		<info name="programmer" value="Antonio Antiochia, Steven Meuse, and Marsha Meuse" />
@@ -57201,7 +57116,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="transyl">
-		<description>Transylvania (version 1985) (4am crack)</description>
+		<description>Transylvania (version 1985) (Polarware) (4am crack)</description>
 		<year>1985</year>
 		<publisher>Polarware</publisher>
 		<info name="original_publisher" value="Penguin Software" />
@@ -57273,6 +57188,42 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="travels with za-zoom- the world rev. 2 (4am crack).dsk" size="143360" crc="da36cc5c" sha1="a1390091e342263a9b2f07863a3a139ddda40d5e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trisland">
+		<description>Treasure Island (4am crack)</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+		<info name="developer" value="Byron Preiss Video Productions" />
+		<info name="programmer" value="Michael P. Meyer, John Pierard, Ann Weil, Andre Garneau, and Lee Jacknow" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-10-03. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side a.dsk" size="143360" crc="ae6fd6fd" sha1="8ea61af42b958161c3b50148683e1d8c27573d16" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side b.dsk" size="143360" crc="c3ca1416" sha1="000ffa7d1a40ce5d892a94690a5a398c15bceafc" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side c.dsk" size="143360" crc="0f671042" sha1="3297a11b79c7185a77e8eabd1e93e3d2dabe0a45" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="143360">
+				<rom name="treasure island (4am crack) side d.dsk" size="143360" crc="ba3b4b42" sha1="5ce7ab049c18615ee5165620aa23185523c5a1e2" />
 			</dataarea>
 		</part>
 	</software>
@@ -58691,7 +58642,7 @@ license:CC0-1.0
 	<software name="voygmimi">
 		<description>Voyage of the Mimi (4am crack)</description>
 		<year>1985</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="programmer" value="Cynthia Char, Bill Tally, Dennis Sullivan, Michael Martin, and Roberta Schwartz" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -59032,7 +58983,7 @@ license:CC0-1.0
 	<software name="wtpacerept">
 		<description>What's the Problem: Ace Reporter (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -59048,7 +58999,7 @@ license:CC0-1.0
 	<software name="wtpchesche">
 		<description>What's the Problem: Chester and the Cheese (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -59064,7 +59015,7 @@ license:CC0-1.0
 	<software name="wtpwhworld">
 		<description>What's the Problem: Where in the World? (4am crack)</description>
 		<year>1987</year>
-		<publisher>Holt, Rinehart, and Winston</publisher>
+		<publisher>Holt, Rinehart and Winston</publisher>
 		<info name="developer" value="Cognetics" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -60118,6 +60069,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="wrdspinr">
+		<description>Word Spinner (4am crack)</description>
+		<year>1984</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Dale Disharoon" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="wordspinner (4am crack).dsk" size="143360" crc="5eddb086" sha1="96345c0e990ec526d1c56a1a20431a0f9d0a49d2" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wdwizard10" cloneof="wdwizard">
 		<description>Word Wizards (A-112 version 1.0) (4am crack)</description>
 		<year>1984</year>
@@ -60381,6 +60348,81 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="write it right - punctuation and capitalization (4am crack).dsk" size="143360" crc="73c4dace" sha1="017a293dbe8820162bc420528208163c0430176a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrabbt10" cloneof="wrabbt">
+		<description>Writer Rabbit (version 1.0) (4am crack)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Dennis Caswell, Gene Genoar, Sid Weber, Shaun Gordon, Pete Rowe, Murray Suid, and Anna Suid" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.0" />
+		<!-- Includes a one-time backup utility (press B at the level selection screen) which has not been used. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-09-04 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer rabbit 1.0 (4am crack) side a.dsk" size="143360" crc="fd1e4a40" sha1="a088465caaf4947e04d52b9ac63cf71fbd5fcbe9" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer rabbit 1.0 (4am crack) side b.dsk" size="143360" crc="6f492364" sha1="2a09033d2703e1a3f2aa20fa782361e3574b6a18" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrabbt12" cloneof="wrabbt">
+		<description>Writer Rabbit (version 1.2) (4am crack)</description>
+		<year>1986</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Dennis Caswell, Gene Genoar, Sid Weber, Shaun Gordon, Pete Rowe, Murray Suid, and Anna Suid" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.2" />
+		<!-- Includes a one-time backup utility (press B at the level selection screen) which has been used. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2015-08-17 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer rabbit 1.2 (4am crack) side a.dsk" size="143360" crc="89feb276" sha1="a03366f12b32b1a1778326565765fa9ceac41bdb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="writer rabbit 1.2 (4am crack) side b.dsk" size="143360" crc="4f3b676b" sha1="576833e86e42d6667796015cb8ed0e68537bfb11" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrabbt">
+		<description>Writer Rabbit (version 1.3) (4am crack)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Leslie Grimm, Dennis Caswell, Gene Genoar, Sid Weber, Shaun Gordon, Pete Rowe, Murray Suid, and Anna Suid" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later." />
+		<info name="version" value="1.3" />
+		<!-- Includes a one-time backup utility (press B at the level selection screen) which has been used. -->
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2014-08-19 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="Writer Rabbit (4am crack) side A.dsk" size="143360" crc="79b78c0a" sha1="9ee29f8abf062e50de03d4ecec0143cb1db82452" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="Writer Rabbit (4am crack) side B.dsk" size="143360" crc="6f824696" sha1="ebc0d8f34edaff45e584c83be140cddf1cfb7854" />
 			</dataarea>
 		</part>
 	</software>

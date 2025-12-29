@@ -13,7 +13,7 @@
 
 #include "dirom.h"
 
-#define K054539_CB_MEMBER(_name)   void _name(double left, double right)
+#define K054539_CB_MEMBER(_name) void _name(double left, double right)
 
 class k054539_device : public device_t,
 					   public device_sound_interface,
@@ -75,32 +75,32 @@ protected:
 
 private:
 	struct channel {
-		uint32_t pos;
-		uint32_t pfrac;
-		int32_t val;
-		int32_t pval;
+		uint32_t pos = 0;
+		uint32_t pfrac = 0;
+		int32_t val = 0;
+		int32_t pval = 0;
 	};
 
-	double voltab[256];
-	double pantab[0xf];
+	double m_voltab[256];
+	double m_pantab[0xf];
 
-	double gain[8];
-	uint8_t posreg_latch[8][3];
-	int flags;
+	double m_gain[8];
+	uint8_t m_posreg_latch[8][3];
+	int m_flags;
 
-	unsigned char regs[0x230];
-	std::unique_ptr<uint8_t []> ram;
-	int reverb_pos;
+	unsigned char m_regs[0x230];
+	std::unique_ptr<uint8_t []> m_ram;
+	int m_reverb_pos;
 
-	int32_t cur_ptr;
-	uint32_t rom_addr;
+	int32_t m_cur_ptr;
+	uint32_t m_rom_addr;
 
-	channel channels[8];
-	sound_stream *stream;
+	channel m_channels[8];
+	sound_stream *m_stream;
 
-	emu_timer          *m_timer;
-	uint32_t             m_timer_state;
-	devcb_write_line   m_timer_handler;
+	emu_timer *m_timer;
+	uint32_t m_timer_state;
+	devcb_write_line m_timer_handler;
 	apan_delegate m_apan_cb;
 
 	bool regupdate();

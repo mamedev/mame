@@ -68,51 +68,44 @@
 
 #include "emu.h"
 #include "seibuspi.h"
+//#include "seibuspi_m.h"
 
-#include "cpu/i386/i386.h"
 //#include "bus/rs232/rs232.h"
+#include "cpu/i386/i386.h"
 #include "machine/i8251.h"
 //#include "machine/microtch.h"
 //#include "machine/rtc4543.h"
-#include "seibuspi_m.h"
 #include "sound/ymz280b.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
 namespace {
 
-// TBD, assume same as Seibu SPI
-#define MAIN_CLOCK   (XTAL(50'000'000)/2)
-#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
-
-#define SPI_HTOTAL   (448)
-#define SPI_HBEND    (0)
-#define SPI_HBSTART  (320)
-
-#define SPI_VTOTAL   (296)
-#define SPI_VBEND    (0)
-#define SPI_VBSTART  (240) /* actually 253, but visible area is 240 lines */
-
-
-class seibucats_state : public seibuspi_state
+class seibucats_state : public seibuspi_base_state
 {
 public:
 	seibucats_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seibuspi_state(mconfig, type, tag)
-//        m_key(*this, "KEY.%u", 0)
+		: seibuspi_base_state(mconfig, type, tag)
+//        m_key(*this, "KEY%u", 0)
 	{
 	}
 
-	void seibucats(machine_config &config);
+	void seibucats(machine_config &config) ATTR_COLD;
 
-	void init_seibucats();
+	void init_seibucats() ATTR_COLD;
+
+protected:
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	// screen updates
-//  u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-//  IRQ_CALLBACK_MEMBER(spi_irq_callback);
-//  INTERRUPT_GEN_MEMBER(spi_interrupt);
+	//u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	//IRQ_CALLBACK_MEMBER(irq_callback);
+	//INTERRUPT_GEN_MEMBER(interrupt);
 
 	u16 input_mux_r();
 	void input_select_w(u16 data);
@@ -121,41 +114,30 @@ private:
 
 	void seibucats_map(address_map &map) ATTR_COLD;
 
-	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
 	u16 m_input_select = 0;
 
-//  optional_ioport_array<5> m_key;
-//  optional_ioport m_special;
+	//optional_ioport_array<5> m_key;
+	//optional_ioport m_special;
 };
 
 void seibucats_state::video_start()
 {
+	seibuspi_base_state::video_start();
+
 	m_video_dma_length = 0;
 	m_video_dma_address = 0;
 	m_layer_enable = 0;
-	m_layer_bank = 0;
-	m_rf2_layer_bank = 0;
-	m_rowscroll_enable = false;
-	set_layer_offsets();
 
-	m_tilemap_ram_size = 0;
 	m_palette_ram_size = 0x4000; // TODO : correct?
 	m_sprite_ram_size = 0x2000; // TODO : correct?
 	m_sprite_bpp = 6; // see above
 
-	m_tilemap_ram = nullptr;
 	m_palette_ram = make_unique_clear<u32[]>(m_palette_ram_size/4);
 	m_sprite_ram = make_unique_clear<u32[]>(m_sprite_ram_size/4);
 
 	m_palette->basemem().set(&m_palette_ram[0], m_palette_ram_size, 32, ENDIANNESS_LITTLE, 2);
 
 	memset(m_alpha_table, 0, 0x2000); // TODO : no alpha blending?
-
-	register_video_state();
 }
 
 // identical to EJ Sakura
@@ -179,9 +161,9 @@ void seibucats_state::input_select_w(u16 data)
 
 void seibucats_state::output_latch_w(u16 data)
 {
-	m_eeprom->di_write((data & 0x8000) ? 1 : 0);
-	m_eeprom->clk_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->cs_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 15));
+	m_eeprom->clk_write(BIT(data, 14) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void seibucats_state::aux_rtc_w(u16 data)
@@ -191,7 +173,7 @@ void seibucats_state::aux_rtc_w(u16 data)
 void seibucats_state::seibucats_map(address_map &map)
 {
 	// TODO: map devices
-	map(0x00000000, 0x0003ffff).ram().share("mainram");
+	map(0x00000000, 0x0003ffff).ram().share(m_mainram);
 
 	map(0x00000010, 0x00000010).r(FUNC(seibucats_state::spi_status_r));
 	map(0x00000400, 0x00000401).w(FUNC(seibucats_state::input_select_w));
@@ -216,7 +198,7 @@ void seibucats_state::seibucats_map(address_map &map)
 }
 
 static INPUT_PORTS_START( spi_mahjong_keyboard )
-	PORT_START("KEY.0")
+	PORT_START("KEY0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -224,7 +206,7 @@ static INPUT_PORTS_START( spi_mahjong_keyboard )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY.1")
+	PORT_START("KEY1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )
@@ -233,7 +215,7 @@ static INPUT_PORTS_START( spi_mahjong_keyboard )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY.2")
+	PORT_START("KEY2")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -241,7 +223,7 @@ static INPUT_PORTS_START( spi_mahjong_keyboard )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY.3")
+	PORT_START("KEY3")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_I )
@@ -250,7 +232,7 @@ static INPUT_PORTS_START( spi_mahjong_keyboard )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xffffffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY.4")
+	PORT_START("KEY4")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_MAHJONG_J )
@@ -272,7 +254,7 @@ static INPUT_PORTS_START( seibucats )
 	PORT_BIT( 0xffffbf3f, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const gfx_layout sys386f_spritelayout =
+static const gfx_layout spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
@@ -285,27 +267,25 @@ static const gfx_layout sys386f_spritelayout =
 
 
 static GFXDECODE_START( gfx_seibucats )
-	GFXDECODE_ENTRY( "sprites", 0, sys386f_spritelayout, 0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 64 )
 GFXDECODE_END
 
 
 void seibucats_state::machine_start()
 {
-	save_item(NAME(m_input_select));
-}
+	seibuspi_base_state::machine_start();
 
-void seibucats_state::machine_reset()
-{
+	save_item(NAME(m_input_select));
 }
 
 #if 0
 // do not remove, might be needed for the DVD stuff (unchecked)
-INTERRUPT_GEN_MEMBER(seibucats_state::spi_interrupt)
+INTERRUPT_GEN_MEMBER(seibucats_state::interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE); // where is ack?
 }
 
-IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
+IRQ_CALLBACK_MEMBER(seibucats_state::irq_callback)
 {
 	return 0x20;
 }
@@ -313,13 +293,25 @@ IRQ_CALLBACK_MEMBER(seibucats_state::spi_irq_callback)
 
 void seibucats_state::seibucats(machine_config &config)
 {
+	// TBD, assume same as Seibu SPI
+	constexpr XTAL MAIN_CLOCK  = XTAL(50'000'000)/2;
+	constexpr XTAL PIXEL_CLOCK = XTAL(28'636'363)/4;
+
+	constexpr u16 SPI_HTOTAL   = 448;
+	constexpr u16 SPI_HBEND    = 0;
+	constexpr u16 SPI_HBSTART  = 320;
+
+	constexpr u16 SPI_VTOTAL   = 296;
+	constexpr u16 SPI_VBEND    = 0;
+	constexpr u16 SPI_VBSTART  = 240; /* actually 253, but visible area is 240 lines */
+
 	/* basic machine hardware */
 	I386(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &seibucats_state::seibucats_map);
-	m_maincpu->set_vblank_int("screen", FUNC(seibuspi_state::spi_interrupt));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::spi_irq_callback));
+	m_maincpu->set_vblank_int("screen", FUNC(seibucats_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(seibucats_state::irq_callback));
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	//JRC6355E(config, m_rtc, XTAL(32'768));
 
@@ -328,8 +320,8 @@ void seibucats_state::seibucats(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_screen_update(FUNC(seibucats_state::screen_update));
-	screen.set_screen_update(FUNC(seibuspi_state::screen_update_sys386f));
+	//screen.set_screen_update(FUNC(seibucats_state::screen_update));
+	screen.set_screen_update(FUNC(seibucats_state::screen_update_sys386f));
 	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seibucats);
@@ -353,7 +345,7 @@ void seibucats_state::seibucats(machine_config &config)
 
 #define SEIBUCATS_OBJ_LOAD \
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00) \
-/*  obj4.u0234 empty slot */ \
+	/* obj4.u0234 empty slot */ \
 	ROM_LOAD16_WORD_SWAP("obj03.u0232", 0x100000, 0x100000, BAD_DUMP CRC(15c230cf) SHA1(7e12871d6e34e28cd4b5b23af6b0cbdff9432500)  ) \
 	ROM_LOAD16_WORD_SWAP("obj02.u0233", 0x200000, 0x100000, BAD_DUMP CRC(dffd0114) SHA1(b74254061b6da5a2ce310ea89684db430b43583e)  ) \
 	ROM_LOAD16_WORD_SWAP("obj01.u0231", 0x300000, 0x100000, BAD_DUMP CRC(ee5ae0fd) SHA1(0baff6ca4e8bceac4e09732da267f57578dcc280)  )
@@ -403,7 +395,7 @@ ROM_END
 void seibucats_state::init_seibucats()
 {
 	u16 *src = (u16 *)memregion("sprites")->base();
-	u16 tmp[0x40 / 2], offset;
+	u16 tmp[0x40 / 2];
 
 	// sprite_reorder() only
 	for (int i = 0; i < memregion("sprites")->bytes() / 0x40; i++)
@@ -412,7 +404,7 @@ void seibucats_state::init_seibucats()
 
 		for (int j = 0; j < 0x40 / 2; j++)
 		{
-			offset = (j >> 1) | (j << 4 & 0x10);
+			const u16 offset = (j >> 1) | (j << 4 & 0x10);
 			*src++ = tmp[offset];
 		}
 	}

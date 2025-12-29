@@ -8,7 +8,9 @@
 #include "emu.h"
 #include "m6805.h"
 
-class m68hc05pge_device : public m6805_base_device, public device_nvram_interface
+#include "machine/macseconds.h"
+
+class m68hc05pge_device : public m6805_base_device, public device_nvram_interface, public macseconds_interface
 {
 public:
 	const address_space_config m_program_config;

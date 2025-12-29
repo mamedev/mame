@@ -286,11 +286,11 @@ void sh7604_device::sh7604_map(address_map &map)
 //  map(0xffffff64, 0xffffff65).rw(FUNC(sh7604_device::bamrbh_r), FUNC(sh7604_device::bamrbh_w));
 //  map(0xffffff66, 0xffffff67).rw(FUNC(sh7604_device::bamrbl_r), FUNC(sh7604_device::bamrbl_w));
 //  map(0xffffff68, ).rw(FUNC(sh7604_device::bbrb_r), FUNC(sh7604_device::bbrb_w));
-//	map(0xffffff70, 0xffffff71).rw(FUNC(sh7604_device::bdrbh_r), FUNC(sh7604_device::bdrbh_w));
-//	map(0xffffff72, 0xffffff73).rw(FUNC(sh7604_device::bdrbl_r), FUNC(sh7604_device::bdrbl_w));
-//	map(0xffffff74, 0xffffff75).rw(FUNC(sh7604_device::bdmrbh_r), FUNC(sh7604_device::bdmrbh_w));
-//	map(0xffffff76, 0xffffff77).rw(FUNC(sh7604_device::bdmrbl_r), FUNC(sh7604_device::bdmrbl_w));
-//	map(0xffffff78, 0xffffff79).rw(FUNC(sh7604_device::brcr_r), FUNC(sh7604_device::brcr_w));
+//  map(0xffffff70, 0xffffff71).rw(FUNC(sh7604_device::bdrbh_r), FUNC(sh7604_device::bdrbh_w));
+//  map(0xffffff72, 0xffffff73).rw(FUNC(sh7604_device::bdrbl_r), FUNC(sh7604_device::bdrbl_w));
+//  map(0xffffff74, 0xffffff75).rw(FUNC(sh7604_device::bdmrbh_r), FUNC(sh7604_device::bdmrbh_w));
+//  map(0xffffff76, 0xffffff77).rw(FUNC(sh7604_device::bdmrbl_r), FUNC(sh7604_device::bdmrbl_w));
+//  map(0xffffff78, 0xffffff79).rw(FUNC(sh7604_device::brcr_r), FUNC(sh7604_device::brcr_w));
 
 	// DMAC
 	map(0xffffff80, 0xffffff83).rw(FUNC(sh7604_device::sar_r<0>), FUNC(sh7604_device::sar_w<0>));

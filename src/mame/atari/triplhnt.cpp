@@ -267,7 +267,7 @@ uint8_t triplhnt_state::da_latch_r(offs_t offset)
 		m_da_latch = offset;
 
 	// the following is a slight simplification
-	return m_stick[offset & 1]->read();
+	return m_stick[~offset & 1]->read();
 }
 
 

@@ -46,7 +46,7 @@ void k051649_device::scc_map(address_map &map)
 }
 
 // device type definition
-DEFINE_DEVICE_TYPE(K051649, k051649_device, "k051649", "K051649 SCC1")
+DEFINE_DEVICE_TYPE(K051649, k051649_device, "k051649", "Konami 051649 SCC1")
 
 
 //******************************************************************************

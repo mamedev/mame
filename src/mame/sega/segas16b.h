@@ -181,7 +181,7 @@ protected:
 	void lockonph_sound_iomap(address_map &map) ATTR_COLD;
 	void lockonph_sound_map(address_map &map) ATTR_COLD;
 	void map_fpointbla(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void sound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_portmap(address_map &map) ATTR_COLD;

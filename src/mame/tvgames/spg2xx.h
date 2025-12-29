@@ -11,6 +11,7 @@
 #include "machine/eepromser.h"
 #include "machine/i2cmem.h"
 #include "machine/spg2xx.h"
+#include "machine/timer.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -104,10 +105,14 @@ public:
 	{ }
 
 	void pballpup(machine_config &config);
+	void mpntbalt(machine_config &config);
+	void mpntball(machine_config &config);
 
 private:
 	uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	void porta_nobank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	TIMER_DEVICE_CALLBACK_MEMBER(gun_irq);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
@@ -479,6 +484,29 @@ private:
 
 	required_device<generic_slot_device> m_cart;
 	memory_region *m_cart_region;
+};
+
+class spg2xx_game_pdcj_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_pdcj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_upperbank(*this, "upperbank")
+	{ }
+
+	void pdcj(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	required_memory_bank m_upperbank;
+
+private:
+
+	void mem_map_upperbank(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_TVGAMES_SPG2XX_H

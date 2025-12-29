@@ -1402,6 +1402,7 @@ GAME( 1999, bbakraid,   0,        bbakraid, bbakraid,  bbakraid_state, empty_ini
 GAME( 1999, bbakraidc,  bbakraid, bbakraid, bbakraid,  bbakraid_state, empty_init,    ROT270, "Eighting", "Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, bbakraidj,  bbakraid, bbakraid, bbakraid,  bbakraid_state, empty_init,    ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
 // older revision of the code
+// A Hong Kong version (Tue May 25 1999), presumably based on the older revision of the code (non unlimited), is known to exist. Video: https://www.youtube.com/watch?v=1Fm6kpPTZkM
 GAME( 1999, bbakraidja, bbakraid, bbakraid, bbakraid,  bbakraid_state, empty_init,    ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
 
 // dedicated PCB

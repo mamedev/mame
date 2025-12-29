@@ -624,7 +624,8 @@ Copy protection check kicks in after selecting an input device on title screen
 		<year>1986</year>
 		<publisher>Data East</publisher>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
-		<info name="developer" value="Capcom / Quicksilver" />
+		<info name="developer" value="Capcom" />
+		<info name="developer" value="Quicksilver" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1617569">
@@ -3415,7 +3416,8 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		<description>DeluxePaint II-PC (French)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="developer" value="Dan Silva, Brent Iverson" />
+		<info name="developer" value="Dan Silva" />
+		<info name="developer" value="Brent Iverson" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="E01551FL(1)" />
 			<feature name="part_id" value="Logiciel français" />
@@ -11526,7 +11528,8 @@ Very broken gfxs in [CGA] mode
 		<description>The Dream Team: 3 on 3 Challenge</description>
 		<year>1991</year>
 		<publisher>Data East</publisher>
-		<info name="developer" value="Park Place Productions, Season Ticket Productions" />
+		<info name="developer" value="Park Place Productions" />
+		<info name="developer" value="Season Ticket Productions" />
 		<info name="version" value="Version 1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Camera 1 Disk" />
@@ -11665,7 +11668,9 @@ Very broken gfxs in [CGA] mode
 		<description>Emmanuelle: A Game of Eroticism</description>
 		<year>1989</year>
 		<publisher>Tomahawk</publisher>
-		<info name="developer" value="Coktel Vision, Inférence, MDO" />
+		<info name="developer" value="Coktel Vision" />
+		<info name="developer" value="Inférence" />
+		<info name="developer" value="MDO" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Emmanuelle [Tomahawk] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="97a14df2" sha1="a4628163e0003e66e38eb58204d5f22b49c52fb5"/>
@@ -13315,7 +13320,8 @@ Hangs when launching soccer.com
 		<description>Kult (cracked)</description>
 		<year>1989</year>
 		<publisher>Infogrames Multimedia SA</publisher>
-		<info name="developer" value="Exxos/ERE Informatique" />
+		<info name="developer" value="Exxos" />
+		<info name="developer" value="ERE Informatique" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Kult (1989) (cracked).img" size="368640" crc="fddcaf43" sha1="e0789a5656461e6abd21c293c490b3d52cc89c9e"/>
@@ -16461,7 +16467,9 @@ When starting the game, the error "Packed file is corrupt" is shown.
 		<year>1991</year>
 		<publisher>Maxis Software</publisher>
 		<info name="developer" value="Maxis Software" />
-		<info name="language" value="English/French/German" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -17188,7 +17196,8 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<publisher>Rainbird Software</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Argonaut Software" />
-		<info name="language" value="English/German" />
+		<info name="language" value="English" />
+		<info name="language" value="German" />
 		<info name="ported_by" value="Realtime Games Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">

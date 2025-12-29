@@ -431,12 +431,12 @@ void bladestl_state::bladestl(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(bladestl_state::palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
 
-	K007342(config, m_k007342, 0, "palette", gfx_bladestl_tiles);
+	K007342(config, m_k007342, 24_MHz_XTAL, "palette", gfx_bladestl_tiles);
 	m_k007342->set_tile_callback(FUNC(bladestl_state::tile_callback));
 	m_k007342->flipscreen_cb().set(m_k007420, FUNC(k007420_device::set_flipscreen));
 	m_k007342->sprite_wrap_y_cb().set(m_k007420, FUNC(k007420_device::set_wrap_y));
 
-	K007420(config, m_k007420, 0, "palette", gfx_bladestl_spr);
+	K007420(config, m_k007420, 24_MHz_XTAL, "palette", gfx_bladestl_spr);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(bladestl_state::sprite_callback));
 

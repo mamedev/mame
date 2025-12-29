@@ -177,6 +177,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_asc(*this, "asc"),
+		m_dfac(*this, "dfac"),
 		m_scc(*this, "scc"),
 		m_vram(*this, "vram"),
 		m_ext_vram(*this, "ext_vram"),
@@ -186,6 +187,7 @@ public:
 		m_ram_mask(0),
 		m_ram_size(0),
 		m_rom_size(0),
+		m_6015_timer(nullptr), m_6015_deassert_timer(nullptr),
 		m_via_interrupt(0),
 		m_via2_interrupt(0),
 		m_scc_interrupt(0),
@@ -237,6 +239,7 @@ private:
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<asc_device> m_asc;
+	required_device<dfac_device> m_dfac;
 	required_device<z80scc_device> m_scc;
 	optional_shared_ptr<u32> m_vram, m_ext_vram;
 	optional_device<wd90c26_vga_device> m_vga;
@@ -244,7 +247,7 @@ private:
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_mask, m_ram_size, m_rom_size;
 
-	emu_timer *m_6015_timer;
+	emu_timer *m_6015_timer, *m_6015_deassert_timer;
 
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	int m_ca1_data;
@@ -286,6 +289,7 @@ private:
 	void via2_out_b(u8 data);
 	void via2_irq_w(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
+	TIMER_CALLBACK_MEMBER(mac_6015_untick);
 
 	u32 rom_switch_r(offs_t offset);
 	u16 scsi_r(offs_t offset, u16 mem_mask);
@@ -342,7 +346,7 @@ void macpb030_state::machine_start()
 	m_ca1_data = 0;
 
 	m_6015_timer = timer_alloc(FUNC(macpb030_state::mac_6015_tick), this);
-	m_6015_timer->adjust(attotime::never);
+	m_6015_deassert_timer = timer_alloc(FUNC(macpb030_state::mac_6015_untick), this);
 
 	/*
 	   HACK-ish: There is an uninitialized variable in the PMU code that can
@@ -1018,6 +1022,14 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
 	m_macadb->portable_update_keyboard();
+
+	m_6015_deassert_timer->adjust(attotime::from_hz(60.15 * 525), 0);
+}
+
+TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_untick)
+{
+	m_ca1_data ^= 1;
+	m_via1->write_ca1(m_ca1_data);
 }
 
 u16 macpb030_state::scsi_r(offs_t offset, u16 mem_mask)
@@ -1220,6 +1232,10 @@ void macpb030_state::via2_out_b(u8 data)
 		m_pmu_req = BIT(data, 2);
 		machine().scheduler().synchronize();
 	}
+
+	m_dfac->data_write(BIT(data, 3));
+	m_dfac->clock_write(BIT(data, 4));
+	m_dfac->latch_write(BIT(data, 0));
 }
 
 static INPUT_PORTS_START( macadb )
@@ -1248,7 +1264,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_pmu->ad_in<0>().set(FUNC(macpb030_state::brightness_r));
 	m_pmu->ad_in<1>().set(FUNC(macpb030_state::battery_r));
 	m_pmu->ad_in<5>().set(FUNC(macpb030_state::battery2_r));
-	m_pmu->ad_in<8>().set(FUNC(macpb030_state::battery3_r));
+	m_pmu->ad_in<7>().set(FUNC(macpb030_state::battery3_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.15);
@@ -1318,6 +1334,9 @@ void macpb030_state::macpb140(machine_config &config)
 	m_pseudovia->writepa_handler().set(FUNC(macpb030_state::via2_out_a));
 	m_pseudovia->writepb_handler().set(FUNC(macpb030_state::via2_out_b));
 	m_pseudovia->irq_callback().set(FUNC(macpb030_state::via2_irq_w));
+
+	// Like the Quadra 700, DFAC is only for audio input on these machines
+	APPLE_DFAC(config, m_dfac, 22257);
 
 	SPEAKER(config, "speaker", 2).front();
 	ASC(config, m_asc, 22.5792_MHz_XTAL, asc_device::asc_type::EASC);

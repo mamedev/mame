@@ -589,7 +589,7 @@ void system1_state::mcu_control_w(u8 data)
 }
 
 
-void system1_state::mcu_io_w(offs_t offset, u8 data)
+void system1_state::mcu_data_w(offs_t offset, u8 data)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -609,7 +609,7 @@ void system1_state::mcu_io_w(offs_t offset, u8 data)
 }
 
 
-u8 system1_state::mcu_io_r(offs_t offset)
+u8 system1_state::mcu_data_r(offs_t offset)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -858,9 +858,9 @@ void system1_state::sound_map(address_map &map)
  *
  *************************************/
 
-void system1_state::mcu_io_map(address_map &map)
+void system1_state::mcu_data_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(system1_state::mcu_data_r), FUNC(system1_state::mcu_data_w));
 }
 
 
@@ -2285,7 +2285,7 @@ void system1_state::mcu(machine_config &config)
 	m_maincpu->remove_vblank_int();
 
 	I8751(config, m_mcu, SOUND_CLOCK);
-	m_mcu->set_addrmap(AS_IO, &system1_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &system1_state::mcu_data_map);
 	m_mcu->port_out_cb<1>().set(FUNC(system1_state::mcu_control_w));
 
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 16));
@@ -5775,8 +5775,8 @@ GAME( 1984, flickyup,   flicky,   flickyo,   flicky,    system1_state, empty_ini
 GAME( 1984, flickyupa,  flicky,   flickyo,   flicky,    system1_state, empty_init,     ROT0,   "bootleg", "Flicky (64k Version, on Up'n Down boardset, set 2)", MACHINE_SUPPORTS_SAVE ) // 84/7/05
 GAME( 1984, wmatch,     0,        wmatch,    wmatch,    system1_state, empty_init,     ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgt,    0,        bullfgt,   bullfgt,   system1_state, empty_init,     ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinces,   seganinj, flickyo,   seganinj,  system1_state, empty_init,     ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesu,  seganinj, sys1ppi,   seganinj,  system1_state, empty_init,     ROT0,   "Sega", "Ninja Princess (64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinces,   seganinj, flickyo,   seganinj,  system1_state, empty_init,     ROT0,   "bootleg?", "Ninja Princess (Japan, 315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesu,  seganinj, sys1ppi,   seganinj,  system1_state, empty_init,     ROT0,   "Sega", "Ninja Princess (Japan, 64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy2,      wboy,     wboy2,     wboy,      system1_state, empty_init,     ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,     wboy,     sys1ppi,   wboy,      system1_state, empty_init,     ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wboy6,      wboy,     wboy6,     wboy,      system1_state, empty_init,     ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
@@ -5801,8 +5801,8 @@ GAME( 1985, seganinj,   0,        seganinj,  seganinj,  system1_state, empty_ini
 GAME( 1985, seganinju,  seganinj, sys1pio,   seganinj,  system1_state, empty_init,     ROT0,   "Sega", "Sega Ninja (not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, seganinja,  seganinj, seganinja, seganinj,  system1_state, empty_init,     ROT0,   "Sega", "Sega Ninja (315-5113)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, ninja,      seganinj, seganinj,  seganinj,  system1_state, empty_init,     ROT0,   "Sega", "Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinceso,  seganinj, nprinceso, seganinj,  system1_state, empty_init,     ROT0,   "Sega", "Ninja Princess (315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesb,  seganinj, flicky,    seganinj,  system1_state, empty_init,     ROT0,   "bootleg?", "Ninja Princess (315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinceso,  seganinj, nprinceso, seganinj,  system1_state, empty_init,     ROT0,   "Sega", "Ninja Princess (Japan, 315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesb,  seganinj, flicky,    seganinj,  system1_state, empty_init,     ROT0,   "bootleg?", "Ninja Princess (Japan, 315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, imsorry,    0,        imsorry,   imsorry,   system1_state, empty_init,     ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, imsorryj,   imsorry,  imsorry,   imsorry,   system1_state, empty_init,     ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, teddybb,    0,        teddybb,   teddybb,   system1_state, empty_init,     ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )

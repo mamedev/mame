@@ -185,8 +185,8 @@ TODO:
 #include "machine/6850acia.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"
 #include "machine/steppers.h"
+#include "video/roc10937.h"
 
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"

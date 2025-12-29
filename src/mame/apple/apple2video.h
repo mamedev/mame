@@ -31,8 +31,8 @@ public:
 	void mix_w(int state);
 	void scr_w(int state);
 	void res_w(int state);
-	void dhires_w(int state);
 	void an2_w(int state);
+	void an3_w(int state);
 
 	bool get_graphics() const   { return m_graphics; }
 	bool get_hires() const      { return m_hires; }

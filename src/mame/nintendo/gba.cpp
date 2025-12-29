@@ -713,6 +713,11 @@ uint32_t gba_state::gba_io_r(offs_t offset, uint32_t mem_mask)
 		case 0x0200/4:
 			retval = IE | (IF << 16);
 			break;
+		case 0x0204/4:
+			// TODO: bit 15 is CGB mode (from cart IN35, read only)
+			// not being writeable fixes hang in dkkswing later stages
+			retval = WAITCNT & 0x5fff;
+			break;
 		default:
 			if( ACCESSING_BITS_0_15 )
 			{

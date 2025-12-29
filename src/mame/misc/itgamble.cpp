@@ -699,5 +699,5 @@ GAME( 2001, bowlroad14n, bowlroad, itgamble, itgamble, itgamble_state, empty_ini
 GAME( 2001, wcup14,      wcup,     itgamble, itgamble, itgamble_state, empty_init, ROT0, "Nazionale Elettronica", "World Cup (Ver 1.4)",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // hardware GIFE-001
-GAME( 2000, mnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Mystery Number",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, gnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "MM / BRL Bologna",      "Golden Number",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, mnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "BRL Bologna",           "Mystery Number",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, gnumber,     0,        mnumber,  itgamble, itgamble_state, empty_init, ROT0, "BRL Bologna",           "Golden Number",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

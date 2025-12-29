@@ -107,7 +107,7 @@ void lrk331_device::device_add_mconfig(machine_config &config)
 {
 	I8032(config, m_mcu, 24_MHz_XTAL / 2);
 	m_mcu->set_addrmap(AS_PROGRAM, &lrk331_device::ucode_map);
-	m_mcu->set_addrmap(AS_IO, &lrk331_device::ext_map);
+	m_mcu->set_addrmap(AS_DATA, &lrk331_device::ext_map);
 
 	//LD1111(config, m_hdc, 24_MHz_XTAL);
 

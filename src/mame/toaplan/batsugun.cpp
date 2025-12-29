@@ -76,7 +76,7 @@ private:
 
 	void reset_audiocpu(int state);
 
-	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
+	optional_shared_ptr<u8> m_shared_ram;  // 8 bit RAM shared between 68K and sound CPU
 	optional_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<toaplan_coincounter_device> m_coincounter;
@@ -307,7 +307,7 @@ static INPUT_PORTS_START( batsugunbl )
 	PORT_INCLUDE( batsugun )
 
 	PORT_MODIFY("JMPR")
-	PORT_CONFNAME( 0x000f,  0x0009, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!4,!3,!2,!1")
+	PORT_CONFNAME( 0x000f,  0x0009, DEF_STR( Region ) )  // PORT_CONFLOCATION("JP:!4,!3,!2,!1")
 	PORT_CONFSETTING(       0x0009, DEF_STR( Europe ) )
 	PORT_CONFSETTING(       0x0008, "Europe (Taito Corp.)" )
 	PORT_CONFSETTING(       0x000b, DEF_STR( USA ) )
@@ -336,7 +336,7 @@ void batsugun_state::batsugun_68k_mem(address_map &map)
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001d, 0x20001d).w(FUNC(batsugun_state::coin_sound_reset_w)); // Coin count/lock + v25 reset line
+	map(0x20001d, 0x20001d).w(FUNC(batsugun_state::coin_sound_reset_w));  // Coin count/lock + v25 reset line
 	map(0x210000, 0x21ffff).rw(FUNC(batsugun_state::shared_ram_r), FUNC(batsugun_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -356,12 +356,12 @@ void batsugun_bootleg_state::batsugunbl_68k_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	// map(0x200004, 0x200005).r() // only cleared at boot?
-	map(0x200005, 0x200005).w(FUNC(batsugun_bootleg_state::batsugunbl_oki_bankswitch_w)); // TODO: doesn't sound correct
+	map(0x200005, 0x200005).w(FUNC(batsugun_bootleg_state::batsugunbl_oki_bankswitch_w));  // TODO: doesn't sound correct
 	map(0x200009, 0x200009).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x200010, 0x200011).portr("IN1");
 	map(0x200014, 0x200015).portr("IN2");
 	map(0x200018, 0x200019).portr("SYS");
-	map(0x20001c, 0x20001d).nopw(); // leftover code from the original?
+	map(0x20001c, 0x20001d).nopw();  // leftover code from the original?
 	map(0x21f004, 0x21f005).portr("DSWA");
 	map(0x21f006, 0x21f007).portr("DSWB");
 	map(0x21f008, 0x21f009).portr("JMPR");
@@ -386,12 +386,12 @@ void batsugun_state::v25_mem(address_map &map)
 
 void batsugun_state::batsugun(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 32_MHz_XTAL/2);           // 16MHz, 32MHz Oscillator
+	// basic machine hardware
+	M68000(config, m_maincpu, 32_MHz_XTAL/2);  // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &batsugun_state::batsugun_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(batsugun_state::reset_audiocpu));
 
-	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));         // NEC V25 type Toaplan marked CPU ???
+	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));  // NEC V25 type Toaplan marked CPU ???
 	audiocpu.set_addrmap(AS_PROGRAM, &batsugun_state::v25_mem);
 	audiocpu.pt_in_cb().set_ioport("DSWA").exor(0xff);
 	audiocpu.p0_in_cb().set_ioport("DSWB").exor(0xff);
@@ -400,7 +400,7 @@ void batsugun_state::batsugun(machine_config &config)
 
 	TOAPLAN_COINCOUNTER(config, m_coincounter, 0);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
@@ -417,7 +417,7 @@ void batsugun_state::batsugun(machine_config &config)
 	GP9001_VDP(config, m_vdp[1], 27_MHz_XTAL);
 	m_vdp[1]->set_palette(m_palette);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -443,15 +443,12 @@ void batsugun_bootleg_state::batsugunbl(machine_config &config)
 }
 
 
-
-
-
 ROM_START( batsugun )
-	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // Main 68K code
 	ROM_LOAD16_WORD_SWAP( "tp030_1a.bin", 0x000000, 0x080000,  CRC(cb1d4554) SHA1(ef31f24d77e1c13bdf5558a04a6253e2e3e6a790) )
 
-	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
+	// Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN)
+	// It's a NEC V25 (PLCC94) (program uploaded by main CPU)
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
 	ROM_LOAD( "tp030_3l.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
@@ -463,20 +460,20 @@ ROM_START( batsugun )
 	ROM_LOAD( "tp030_5.bin",  0x000000, 0x100000, CRC(bcf5ba05) SHA1(40f98888a29cdd30cda5dfb60fdc667c69b0fdb0) )
 	ROM_LOAD( "tp030_6.bin",  0x100000, 0x100000, CRC(0666fecd) SHA1(aa8f921fc51590b5b05bbe0b0ad0cce5ff359c64) )
 
-	ROM_REGION( 0x40000, "oki", 0 )         /* ADPCM Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM Samples
 	ROM_LOAD( "tp030_2.bin", 0x00000, 0x40000, CRC(276146f5) SHA1(bf11d1f6782cefcad77d52af4f7e6054a8f93440) )
 
-	ROM_REGION( 0x1000, "plds", 0 )         /* Logic for mixing output of both GP9001 GFX controllers */
+	ROM_REGION( 0x1000, "plds", 0 )  // Logic for mixing output of both GP9001 GFX controllers
 	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
 //  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
 ROM_END
 
 ROM_START( batsuguna )
-	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // Main 68K code
 	ROM_LOAD16_WORD_SWAP( "tp030_01.bin", 0x000000, 0x080000, CRC(3873d7dd) SHA1(baf6187d7d554cfcf4a86b63f07fc30df7ef84c9) )
 
-	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
+	// Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN)
+	// It's a NEC V25 (PLCC94) (program uploaded by main CPU)
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
 	ROM_LOAD( "tp030_3l.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
@@ -496,11 +493,11 @@ ROM_START( batsuguna )
 ROM_END
 
 ROM_START( batsugunb )
-	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // Main 68K code
 	ROM_LOAD16_WORD_SWAP( "large_rom1.bin", 0x000000, 0x080000,  CRC(c9de8ed8) SHA1(8de9acd26e83c8ea3388137da528704116aa7bdb) )
 
-	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
+	// Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN)
+	// It's a NEC V25 (PLCC94) (program uploaded by main CPU)
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
 	ROM_LOAD16_BYTE( "rom12.bin", 0x000000, 0x080000, CRC(d25affc6) SHA1(00803ae5a2bc06edbfb9ea6e3df51f195bbee8cb) )
@@ -518,21 +515,22 @@ ROM_START( batsugunb )
 	ROM_LOAD16_BYTE( "rom7.bin",  0x100000, 0x080000, CRC(8644518f) SHA1(570141deeb796cfae57600d5a518d34bb6dc14d0) )
 	ROM_LOAD16_BYTE( "rom1.bin",  0x100001, 0x080000, CRC(8e339897) SHA1(80e84c291f287c0783bddfcb1b7ebf78c154cadc) )
 
-	ROM_REGION( 0x40000, "oki", 0 )         /* ADPCM Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM Samples
 	ROM_LOAD( "rom13.bin", 0x00000, 0x40000, CRC(276146f5) SHA1(bf11d1f6782cefcad77d52af4f7e6054a8f93440) )
 
-	ROM_REGION( 0x1000, "plds", 0 )         /* Logic for mixing output of both GP9001 GFX controllers */
+	ROM_REGION( 0x1000, "plds", 0 )  // Logic for mixing output of both GP9001 GFX controllers
 	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
 //  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
 ROM_END
 
+
 // very similar to batsuguna, same main CPU label, seems to have just a tiny bit more code
 ROM_START( batsugunc )
-	ROM_REGION( 0x080000, "maincpu", 0 )            // Main 68K code
+	ROM_REGION( 0x080000, "maincpu", 0 )  // Main 68K code
 	ROM_LOAD16_WORD_SWAP( "tp-030_01.u69", 0x000000, 0x080000, CRC(545305c4) SHA1(9411ad7fe0be89a9f04b9116c9c709dc5e98c345) )
 
-	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
+	// Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN)
+	// It's a NEC V25 (PLCC94) (program uploaded by main CPU)
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
 	ROM_LOAD( "tp030_rom3-l.u55", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
@@ -547,17 +545,17 @@ ROM_START( batsugunc )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "tp030_rom2.u65", 0x00000, 0x40000, CRC(276146f5) SHA1(bf11d1f6782cefcad77d52af4f7e6054a8f93440) )
 
-	ROM_REGION( 0x1000, "plds", 0 )         // Logic for mixing output of both GP9001 GFX controllers
+	ROM_REGION( 0x1000, "plds", 0 )  // Logic for mixing output of both GP9001 GFX controllers
 	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
 //  ROM_LOAD( "tp030_u19_gal16v8b-15.jed", 0x0000, 0x991, CRC(31be54a2) SHA1(06278942a9a2ea858c0352b2ef5a65bf329b7b82) )
 ROM_END
 
 ROM_START( batsugunsp )
-	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )  // Main 68K code
 	ROM_LOAD16_WORD_SWAP( "tp-030sp.u69", 0x000000, 0x080000, CRC(8072a0cd) SHA1(3a0a9cdf894926a16800c4882a2b00383d981367) )
 
-	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
-	/* It's a NEC V25 (PLCC94) (program uploaded by main CPU) */
+	// Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN)
+	// It's a NEC V25 (PLCC94) (program uploaded by main CPU)
 
 	ROM_REGION( 0x400000, "gp9001_0", 0 )
 	ROM_LOAD( "tp030_3l.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
@@ -569,12 +567,13 @@ ROM_START( batsugunsp )
 	ROM_LOAD( "tp030_5.bin",  0x000000, 0x100000, CRC(bcf5ba05) SHA1(40f98888a29cdd30cda5dfb60fdc667c69b0fdb0) )
 	ROM_LOAD( "tp030_6.bin",  0x100000, 0x100000, CRC(0666fecd) SHA1(aa8f921fc51590b5b05bbe0b0ad0cce5ff359c64) )
 
-	ROM_REGION( 0x40000, "oki", 0 )         /* ADPCM Samples */
+	ROM_REGION( 0x40000, "oki", 0 )  // ADPCM Samples
 	ROM_LOAD( "tp030_2.bin", 0x00000, 0x40000, CRC(276146f5) SHA1(bf11d1f6782cefcad77d52af4f7e6054a8f93440) )
 
-	ROM_REGION( 0x1000, "plds", 0 )         /* Logic for mixing output of both GP9001 GFX controllers */
+	ROM_REGION( 0x1000, "plds", 0 )  // Logic for mixing output of both GP9001 GFX controllers
 	ROM_LOAD( "tp030_u19_gal16v8b-15.bin", 0x0000, 0x117, CRC(f71669e8) SHA1(ec1fbe04605fee864af4b01f001af227938c9f21) )
 ROM_END
+
 
 // a cost-cutting bootleg PCB with only M68000 + OKIM6295. A pair of TPC1020 seem to do the job of the GP9001s.
 // according to the dumper 'audio is pretty garbage, and some sprites overlay the UI incorrectly'
@@ -582,19 +581,67 @@ ROM_START( batsugunbl )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "27c240.bin", 0x000000, 0x080000, CRC(a34df8bb) SHA1(10d456f5437b21a95fd8018bdb19a08a110241c4) )
 
-	ROM_REGION( 0x400000, "gp9001_0", 0 ) // same as original
+	ROM_REGION( 0x400000, "gp9001_0", 0 )  // same as original
 	ROM_LOAD( "27c8100-j.bin", 0x000000, 0x100000, CRC(3024b793) SHA1(e161db940f069279356fca2c5bf2753f07773705) )
 	ROM_LOAD( "27c8100-k.bin", 0x100000, 0x100000, CRC(ed75730b) SHA1(341f0f728144a049486d996c9bb14078578c6879) )
 	ROM_LOAD( "27c8100-l.bin", 0x200000, 0x100000, CRC(fedb9861) SHA1(4b0917056bd359b21935358c6bcc729262be6417) )
 	ROM_LOAD( "27c8100-m.bin", 0x300000, 0x100000, CRC(d482948b) SHA1(31be7dc5cff072403b783bf203b9805ffcad7284) )
 
-	ROM_REGION( 0x200000, "gp9001_1", 0 ) // same as original
+	ROM_REGION( 0x200000, "gp9001_1", 0 )  // same as original
 	ROM_LOAD( "27c8100-n.bin",  0x000000, 0x100000, CRC(bcf5ba05) SHA1(40f98888a29cdd30cda5dfb60fdc667c69b0fdb0) )
 	ROM_LOAD( "27c8100-o.bin",  0x100000, 0x100000, CRC(0666fecd) SHA1(aa8f921fc51590b5b05bbe0b0ad0cce5ff359c64) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) // more samples to compensate for missing YM2151
+	ROM_REGION( 0x80000, "oki", 0 )  // more samples to compensate for missing YM2151
 	ROM_LOAD( "27c040.bin", 0x00000, 0x80000, CRC(1f8ec1b6) SHA1(28107a90d29613ceddc001df2556543b33c1294c) )
 ROM_END
+
+/**********************************************************
+
+  Dogyuun bootleg.
+
+  Bootleg board with M68000 & OKI M6295
+  (replacing the original YM2151 fm sounds with samples)
+
+  2x Actel A1020A (seems to replace the GP9001s).
+  The PCB design looks like two side mirrored.
+
+  TODO:
+  - Fix gfx priorities/issues
+  - Check oki banking
+  - Fix DIP switches bank offset
+
+**********************************************************/
+ROM_START( dogyuunbl )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1.bin", 0x000000, 0x040000, CRC(7407d908) SHA1(6fa78c833989322b9424be852b77c9c7df5bf3eb) )
+	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x040000, CRC(013e9801) SHA1(d6f5a53e1b8f304d32fafe44f3a540f3c410e42d) )
+
+	ROM_REGION( 0x10000, "unknown", 0 )
+	ROM_LOAD( "3.bin",  0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+	ROM_LOAD( "4.bin",  0x8000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD( "201.bin", 0x000000, 0x100000, CRC(8bb2ff15) SHA1(4693454b4b4c6984025c34e53f028cfc1ff77f3c) )
+	ROM_LOAD( "202.bin", 0x100000, 0x100000, CRC(c38e7673) SHA1(8bda42704dc2fa269416e49dbac4800bf414de0a) )
+
+	ROM_REGION( 0x400000, "gp9001_1", 0 )  // roms 203 & 204 are damaged and all dumps have a bunch of different bytes
+	ROM_LOAD( "203_bad.bin", 0x000000, 0x200000, BAD_DUMP CRC(d35af12e) SHA1(71f3d4b08d7192063b6720c95c2ab0fb28f6df78) )
+	ROM_LOAD( "204_bad.bin", 0x200000, 0x200000, BAD_DUMP CRC(fd35e7e1) SHA1(a77f3a5327cc9fd17449aecb09319fc0fc0da31e) )
+
+	ROM_REGION( 0x1000000, "altdumps", 0 )  // some alt dumps of roms 203 & 204. Included here in case someone can figure out the correct ones.
+	ROM_LOAD( "203_1_bad.bin", 0x000000, 0x200000, BAD_DUMP CRC(85f0dafd) SHA1(5b6202ed3d1e35396d0dcb925e86b71a86f7943b) )
+	ROM_LOAD( "203_2_bad.bin", 0x200000, 0x200000, BAD_DUMP CRC(6d9bb107) SHA1(5c600119a13b48919bd6a4dacc512b2f0c524020) )
+	ROM_LOAD( "203_3_bad.bin", 0x400000, 0x200000, BAD_DUMP CRC(e6a3aeb7) SHA1(9df29f344e802193d62c201f2305b05fa756e005) )
+	ROM_LOAD( "203_4_bad.bin", 0x600000, 0x200000, BAD_DUMP CRC(2d7595da) SHA1(e882cbb4c26f08970103297148f6dab41a591747) )
+	ROM_LOAD( "204_1_bad.bin", 0x800000, 0x200000, BAD_DUMP CRC(08ab308b) SHA1(b99024475fc7b621becfa2bea8fbdfd7c0cc96ef) )
+	ROM_LOAD( "204_2_bad.bin", 0xa00000, 0x200000, BAD_DUMP CRC(5fc9bafd) SHA1(490e39e24d57bacdc13ceecd5db25ac03c5289c0) )
+	ROM_LOAD( "204_3_bad.bin", 0xc00000, 0x200000, BAD_DUMP CRC(61235e6c) SHA1(56c25c7586692a2e684e54185e1671e0ce6358ec) )
+	ROM_LOAD( "204_4_bad.bin", 0xe00000, 0x200000, BAD_DUMP CRC(ebacdc6e) SHA1(e687164964b1cacdb433c65b8435fc06b9a6ffe3) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // ADPCM Samples... Huge. Need to check the banking
+	ROM_LOAD( "sound.bin", 0x00000, 0x80000, CRC(c963aa9c) SHA1(f02634771ee1343b85b1ebbb5c8819a42c97dc23) )
+ROM_END
+
 
 void batsugun_bootleg_state::init_batsugunbl()
 {
@@ -605,9 +652,16 @@ void batsugun_bootleg_state::init_batsugunbl()
 
 } // anonymous namespace
 
+
+/*********************************************
+*                Game Drivers                *
+*********************************************/
+
+//    YEAR  NAME         PARENT    MACHINE     INPUT       CLASS           INIT           ROT     COMPANY    FULLNAME & FLAGS
 GAME( 1993, batsugun,    0,        batsugun,   batsugun,   batsugun_state, empty_init,    ROT270, "Toaplan", "Batsugun", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsuguna,   batsugun, batsugun,   batsugun,   batsugun_state, empty_init,    ROT270, "Toaplan", "Batsugun (older, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsugunc,   batsugun, batsugun,   batsugun,   batsugun_state, empty_init,    ROT270, "Toaplan", "Batsugun (older, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsugunb,   batsugun, batsugun,   batsugun,   batsugun_state, empty_init,    ROT270, "Toaplan", "Batsugun (Korean PCB)", MACHINE_SUPPORTS_SAVE ) // cheap looking PCB (same 'TP-030' numbering as original) but without Mask ROMs.  Still has original customs etc.  Jumpers were set to the Korea Unite Trading license, so likely made in Korea, not a bootleg tho.
 GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   batsugun_state, empty_init,    ROT270, "Toaplan", "Batsugun - Special Version", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsugunbl,  batsugun, batsugunbl, batsugunbl, batsugun_bootleg_state, init_batsugunbl, ROT270, "Toaplan", "Batsugun (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs correct GFX offsets and oki banking fix
+GAME( 1993, dogyuunbl,   dogyuun,  batsugunbl, batsugunbl, batsugun_bootleg_state, init_batsugunbl, ROT270, "Toaplan", "Dogyuun (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )  // needs fix gfx priorities/issues and check oki banking

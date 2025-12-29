@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 ##
-## icense:BSD-3-Clause
+## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
 
 import io

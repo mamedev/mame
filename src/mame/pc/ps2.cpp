@@ -142,7 +142,7 @@ void ps2_state::ps2386(machine_config &config)
 	at_softlists(config);
 
 	// on board devices
-	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc_smc", true); // FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board2", 0, "mb:isabus", pc_isa16_cards, "comat", true);
 	ISA16_SLOT(config, "board3", 0, "mb:isabus", pc_isa16_cards, "ide", true);
 	ISA16_SLOT(config, "board4", 0, "mb:isabus", pc_isa16_cards, "lpt", true);

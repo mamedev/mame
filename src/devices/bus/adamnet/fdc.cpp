@@ -90,8 +90,9 @@ void adam_fdc_device::adam_fdc_mem(address_map &map)
 	map(0x4800, 0x4800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::sector_r));
 	map(0x5800, 0x5800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::sector_w));
 	map(0x6800, 0x6800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::data_r));
-	map(0x6c00, 0x6fff).r(FUNC(adam_fdc_device::data_r));
+	map(0x6c00, 0x6fff).r(FUNC(adam_fdc_device::read_data_r));
 	map(0x7800, 0x7800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::data_w));
+	map(0x7c00, 0x7fff).r(FUNC(adam_fdc_device::write_data_r));
 	map(0x8000, 0x8fff).mirror(0x7000).rom().region(M6801_TAG, 0);
 }
 
@@ -109,6 +110,7 @@ void adam_fdc_device::floppy_formats(format_registration &fr)
 static void adam_fdc_floppies(device_slot_interface &device)
 {
 	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dsdd", FLOPPY_525_DD);
 }
 
 
@@ -128,7 +130,7 @@ void adam_fdc_device::device_add_mconfig(machine_config &config)
 	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	FLOPPY_CONNECTOR(config, m_connector, adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_connector, adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -198,14 +200,30 @@ void adam_fdc_device::adamnet_reset_w(int state)
 
 
 //-------------------------------------------------
-//  data_r -
+//  read_data_r -
 //-------------------------------------------------
 
-uint8_t adam_fdc_device::data_r(offs_t offset)
+uint8_t adam_fdc_device::read_data_r(offs_t offset)
 {
 	uint8_t data = m_fdc->data_r();
 
-	m_ram[offset & 0x3ff] = data;
+	if (!machine().side_effects_disabled())
+		m_ram[offset & 0x3ff] = data;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write_data_r -
+//-------------------------------------------------
+
+uint8_t adam_fdc_device::write_data_r(offs_t offset)
+{
+	uint8_t data = m_ram[offset & 0x3ff];
+
+	if (!machine().side_effects_disabled())
+		m_fdc->data_w(data);
 
 	return data;
 }
@@ -284,6 +302,9 @@ void adam_fdc_device::p1_w(uint8_t data)
 	}
 
 	m_fdc->set_floppy(m_floppy);
+
+	// side select (320KB)
+	if (m_floppy) m_floppy->ss_w(!BIT(data, 4));
 
 	// motor enable
 	if (m_floppy) m_floppy->mon_w(!BIT(data, 6));

@@ -1187,7 +1187,7 @@ if CPUS["MCS51"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.h",
-		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.hxx",
+		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.cpp",
 	}
 end
 
@@ -3589,11 +3589,6 @@ if CPUS["SWP30"] then
 		MAME_DIR .. "src/devices/sound/swp30.cpp",
 		MAME_DIR .. "src/devices/sound/swp30.h",
 	}
-end
-
-if opt_tool(CPUS, "SWP30") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/swp30d.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/swp30d.h")
 end
 
 --------------------------------------------------

@@ -627,7 +627,7 @@ void othunder_state::othunder(machine_config &config)
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -638,12 +638,12 @@ void othunder_state::othunder(machine_config &config)
 	ymsnd.add_route(2, "2610.2l", 1.0);
 	ymsnd.add_route(2, "2610.2r", 1.0);
 
-	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.1l").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.1r").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_VOLUME(config, "2610.0l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.0r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.1r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

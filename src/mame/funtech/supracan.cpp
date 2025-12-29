@@ -41,7 +41,7 @@ STATUS:
     0x80       read reg 0x14 of sound chip   depends on reg 0x14 of sound chip & 0x40: if not set writes 0x8f to reg 0x14,
                                              otherwise writes 0x4f to reg 0x14 and performs additional processing
 
-    Known unemulated graphical effects and issues:
+    Known unemulated graphical effects and issues (outdated, check hash/supracan.xml instead):
     - All: Sprite sizing is still imperfect.
     - All: Sprites need to be converted to use scanline rendering for proper clipping.
     - All: Improperly-emulated 1bpp ROZ mode, used by the Super A'Can BIOS logo.
@@ -124,6 +124,7 @@ public:
 		, m_cart(*this, "cartslot")
 		, m_lockout(*this, "lockout")
 		, m_internal68(*this, "internal68")
+		, m_internal6502(*this, "internal6502")
 		, m_main_loview(*this, "main_loview")
 		, m_main_hiview(*this, "main_hiview")
 		, m_vram(*this, "vram")
@@ -182,6 +183,7 @@ private:
 	required_device<superacan_cart_slot_device> m_cart;
 	required_device<umc6650_device> m_lockout;
 	required_region_ptr<uint16_t> m_internal68;
+	required_region_ptr<uint8_t> m_internal6502;
 	memory_view m_main_loview;
 	memory_view m_main_hiview;
 
@@ -2311,6 +2313,11 @@ void supracan_state::machine_reset()
 	m_roz_base_addr = 0;
 	m_roz_mode = 0;
 	std::fill(std::begin(m_tilemap_base_addr), std::end(m_tilemap_base_addr), 0);
+
+	// TODO: sound BIOS may really view select with a register bit
+	// 0x0000-0x0fff empty except for a 0x08 at $40f.
+	// 0x1000-0x3fff samples, BIOS uses only a small portion of it at 0x2e00-0x2eff (?)
+	std::copy_n(&m_internal6502[0], 0x4000, &m_soundram[0]);
 }
 
 static const gfx_layout supracan_gfx8bpp =
@@ -2452,10 +2459,10 @@ ROM_START( supracan )
 	// 68k internal ROM (security related)
 	ROM_LOAD16_WORD_SWAP( "internal_68k.bin", 0x0000,  0x1000, CRC(8d575662) SHA1(a8e75633662978d0a885f16a4ed0f898f278a10a) )
 
-	ROM_REGION(0x2000, "internal6502", ROMREGION_ERASEFF)
-	// 2 additional blocks of ROM(?) can be seen next to the 68k ROM on a die shot from Furrtek
-	ROM_LOAD( "internal_6502_1.bin", 0x0000,  0x1000, NO_DUMP )
-	ROM_LOAD( "internal_6502_2.bin", 0x1000,  0x1000, NO_DUMP )
+	ROM_REGION(0x4000, "internal6502", ROMREGION_ERASEFF)
+	// 2 additional blocks of ROM can be seen next to the 68k ROM on a die shot from Furrtek
+	ROM_LOAD( "internal_6502_1.bin", 0x0000,  0x2000, CRC(fc9fb05f) SHA1(8bf17bf311afeb9974bee058ba63eef5e8b6f5c1) )
+	ROM_LOAD( "internal_6502_2.bin", 0x2000,  0x2000, CRC(bf950ab7) SHA1(ab8f15506308b89d2f8ef01b88aa2595d4e1e779) )
 ROM_END
 
 } // Anonymous namespace

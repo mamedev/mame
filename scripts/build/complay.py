@@ -103,8 +103,6 @@ class LayoutChecker(Minifyer):
         self.elements = { }
         self.groups = { }
         self.views = { }
-        self.referenced_elements = { }
-        self.referenced_groups = { }
         self.group_collections = { }
         self.current_collections = None
 
@@ -442,14 +440,6 @@ class LayoutChecker(Minifyer):
         if self.repeat_depth[-1]:
             self.repeat_depth[-1] -= 1
         else:
-            if not self.generated_element_names:
-                for element in self.referenced_elements:
-                    if (element not in self.elements) and (not self.VARPATTERN.match(element)):
-                        self.handle_error('Element "%s" not found (first referenced at %s)' % (element, self.referenced_elements[element]))
-            if not self.generated_group_names:
-                for group in self.referenced_groups:
-                    if (group not in self.groups) and (not self.VARPATTERN.match(group)):
-                        self.handle_error('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
             if not self.views:
                 self.handle_error('No view elements found')
             del self.have_script
@@ -551,8 +541,10 @@ class LayoutChecker(Minifyer):
         if 'element' == name:
             if 'ref' not in attrs:
                 self.handle_error('Element %s missing attribute ref' % (name, ))
-            elif attrs['ref'] not in self.referenced_elements:
-                self.referenced_elements[attrs['ref']] = self.format_location()
+            elif not self.generated_element_names:
+                element = attrs['ref']
+                if (element not in self.elements) and (not self.VARPATTERN.match(element)):
+                    self.handle_error('Element "%s" not found' % (element, ))
             self.check_view_item(name, attrs)
             self.startViewItem(name)
         elif 'screen' == name:
@@ -573,10 +565,12 @@ class LayoutChecker(Minifyer):
             if 'ref' not in attrs:
                 self.handle_error('Element group missing attribute ref')
             else:
-                if attrs['ref'] not in self.referenced_groups:
-                    self.referenced_groups[attrs['ref']] = self.format_location()
-                if (not self.VARPATTERN.match(attrs['ref'])) and (attrs['ref'] in self.group_collections):
-                    for n, l in self.group_collections[attrs['ref']].items():
+                group = attrs['ref']
+                if not self.generated_group_names:
+                    if (group not in self.groups) and (not self.VARPATTERN.match(group)):
+                        self.handle_error('Group "%s" not found' % (group, ))
+                if (not self.VARPATTERN.match(group)) and (group in self.group_collections):
+                    for n, l in self.group_collections[group].items():
                         if n not in self.current_collections:
                             self.current_collections[n] = l
                         else:
@@ -731,8 +725,6 @@ class LayoutChecker(Minifyer):
         self.elements.clear()
         self.groups.clear()
         self.views.clear()
-        self.referenced_elements.clear()
-        self.referenced_groups.clear()
         self.group_collections.clear()
         self.current_collections = None
         del self.handlers

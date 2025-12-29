@@ -30158,7 +30158,6 @@ void m68000_musashi_device::x4ad0_tas_b_ai_071234fc()
 
 	m68ki_write_8(ea, dst | 0x80);
 
-
 }
 void m68000_musashi_device::x4ad8_tas_b_pi_071234fc()
 {
@@ -30171,7 +30170,6 @@ void m68000_musashi_device::x4ad8_tas_b_pi_071234fc()
 	m_c_flag = CFLAG_CLEAR;
 
 	m68ki_write_8(ea, dst | 0x80);
-
 
 }
 void m68000_musashi_device::x4adf_tas_b_pi7_071234fc()
@@ -30186,7 +30184,6 @@ void m68000_musashi_device::x4adf_tas_b_pi7_071234fc()
 
 	m68ki_write_8(ea, dst | 0x80);
 
-
 }
 void m68000_musashi_device::x4ae0_tas_b_pd_071234fc()
 {
@@ -30199,7 +30196,6 @@ void m68000_musashi_device::x4ae0_tas_b_pd_071234fc()
 	m_c_flag = CFLAG_CLEAR;
 
 	m68ki_write_8(ea, dst | 0x80);
-
 
 }
 void m68000_musashi_device::x4ae7_tas_b_pd7_071234fc()
@@ -30214,7 +30210,6 @@ void m68000_musashi_device::x4ae7_tas_b_pd7_071234fc()
 
 	m68ki_write_8(ea, dst | 0x80);
 
-
 }
 void m68000_musashi_device::x4ae8_tas_b_di_071234fc()
 {
@@ -30227,7 +30222,6 @@ void m68000_musashi_device::x4ae8_tas_b_di_071234fc()
 	m_c_flag = CFLAG_CLEAR;
 
 	m68ki_write_8(ea, dst | 0x80);
-
 
 }
 void m68000_musashi_device::x4af0_tas_b_ix_071234fc()
@@ -30242,7 +30236,6 @@ void m68000_musashi_device::x4af0_tas_b_ix_071234fc()
 
 	m68ki_write_8(ea, dst | 0x80);
 
-
 }
 void m68000_musashi_device::x4af8_tas_b_aw_071234fc()
 {
@@ -30256,7 +30249,6 @@ void m68000_musashi_device::x4af8_tas_b_aw_071234fc()
 
 	m68ki_write_8(ea, dst | 0x80);
 
-
 }
 void m68000_musashi_device::x4af9_tas_b_al_071234fc()
 {
@@ -30269,6 +30261,13 @@ void m68000_musashi_device::x4af9_tas_b_al_071234fc()
 	m_c_flag = CFLAG_CLEAR;
 
 	m68ki_write_8(ea, dst | 0x80);
+
+}
+void m68000_musashi_device::x4ac8_halt_c()
+{
+	m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
+	m_icount = 0;
+	m_stopped = STOP_LEVEL_HALT;
 
 
 }
@@ -32985,6 +32984,7 @@ const m68000_musashi_device::opcode_handler_ptr m68000_musashi_device::m68k_hand
 	&m68000_musashi_device::x4aba_tst_l_234fc,
 	&m68000_musashi_device::x4abb_tst_l_234fc,
 	&m68000_musashi_device::x4abc_tst_l_234fc,
+	&m68000_musashi_device::x4ac8_halt_c,
 	&m68000_musashi_device::x4adf_tas_b_pi7_071234fc,
 	&m68000_musashi_device::x4ae7_tas_b_pd7_071234fc,
 	&m68000_musashi_device::x4af8_tas_b_aw_071234fc,
@@ -33244,7 +33244,7 @@ const m68000_musashi_device::opcode_handler_ptr m68000_musashi_device::m68k_hand
 	&m68000_musashi_device::xeff9_bfins_l_al_234fc,
 };
 
-const u16 m68000_musashi_device::m68k_state_illegal = 1797;
+const u16 m68000_musashi_device::m68k_state_illegal = 1798;
 
 const m68000_musashi_device::opcode_handler_struct m68000_musashi_device::m68k_opcode_table[] =
 {
@@ -35042,6 +35042,7 @@ const m68000_musashi_device::opcode_handler_struct m68000_musashi_device::m68k_o
 	{ 0x4aba, 0xffff, {255, 255, 255,   7,   7,   7,   7,   7}},
 	{ 0x4abb, 0xffff, {255, 255, 255,   9,   9,   9,   9,   9}},
 	{ 0x4abc, 0xffff, {255, 255, 255,   6,   6,   6,   6,   6}},
+	{ 0x4ac8, 0xffff, {255, 255, 255, 255, 255, 255, 255,   0}},
 	{ 0x4adf, 0xffff, { 18,  19,  18,  16,  16,  16,  16,  12}},
 	{ 0x4ae7, 0xffff, { 20,  21,  20,  17,  17,  17,  17,  12}},
 	{ 0x4af8, 0xffff, { 22,  23,  22,  16,  16,  16,  16,  12}},

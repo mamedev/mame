@@ -343,13 +343,6 @@ void blktiger_state::video_start()
 	m_bg_tilemap4x8->set_transmask(1, 0xfff0, 0x800f);
 	m_bg_tilemap4x8->set_transmask(2, 0xff00, 0x80ff);
 	m_bg_tilemap4x8->set_transmask(3, 0xf000, 0x8fff);
-
-	m_tx_tilemap->set_scrolldx(128, 128);
-	m_tx_tilemap->set_scrolldy(  6,   6);
-	m_bg_tilemap8x4->set_scrolldx(128, 128);
-	m_bg_tilemap8x4->set_scrolldy(  6,   6);
-	m_bg_tilemap4x8->set_scrolldx(128, 128);
-	m_bg_tilemap4x8->set_scrolldy(  6,   6);
 }
 
 
@@ -469,7 +462,7 @@ void blktiger_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				code,
 				color,
 				flipx, flip_screen(),
-				sx + 128, sy + 6, 15);
+				sx, sy, 15);
 	}
 }
 
@@ -769,7 +762,7 @@ void blktiger_state::nomcu(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(blktiger_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);

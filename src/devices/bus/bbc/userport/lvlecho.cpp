@@ -12,7 +12,6 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "lvlecho.h"
 
@@ -55,7 +54,7 @@ private:
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( lvlecho )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( lvlecho )
@@ -251,11 +250,6 @@ static INPUT_PORTS_START( lvlecho )
 	PORT_START("KEY_63")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
-
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
 
 ioport_constructor bbc_lvlecho_device::device_input_ports() const
 {

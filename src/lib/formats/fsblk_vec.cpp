@@ -8,6 +8,7 @@
 #include "strformat.h"
 
 #include <algorithm>
+#include <cassert>
 #include <stdexcept>
 
 namespace fs {
@@ -24,6 +25,7 @@ u8 *fsblk_vec_t::blk_t::data()
 
 u32 fsblk_vec_t::block_count() const
 {
+	assert(m_block_size);
 	return m_data.size() / m_block_size;
 }
 

@@ -103,6 +103,7 @@
 #include "machine/6522via.h"
 #include "machine/ram.h"
 #include "machine/applefdintf.h"
+#include "machine/macseconds.h"
 #include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
@@ -116,12 +117,13 @@
 #include "speaker.h"
 
 namespace {
-class macportable_state : public driver_device, public device_nvram_interface
+class macportable_state : public driver_device, public device_nvram_interface, public macseconds_interface
 {
 public:
 	macportable_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		device_nvram_interface(mconfig, *this),
+		macseconds_interface(),
 		m_maincpu(*this, "maincpu"),
 		m_pmu(*this, "pmu"),
 		m_via1(*this, "via1"),
@@ -142,7 +144,7 @@ public:
 		m_ram_mask(0),
 		m_ram_size(0),
 		m_rom_size(0),
-		m_6015_timer(nullptr),
+		m_6015_timer(nullptr), m_6015_deassert_timer(nullptr),
 		m_via_cycles(0),
 		m_via_interrupt(0),
 		m_scc_interrupt(0),
@@ -185,6 +187,7 @@ private:
 	void field_interrupts();
 	void via_irq_w(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
+	TIMER_CALLBACK_MEMBER(mac_6015_untick);
 
 	void phases_w(u8 phases);
 	void devsel_w(u8 devsel);
@@ -236,7 +239,7 @@ private:
 	u16 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_mask, m_ram_size, m_rom_size;
 
-	emu_timer *m_6015_timer;
+	emu_timer *m_6015_timer, *m_6015_deassert_timer;
 
 	s32 m_via_cycles, m_via_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
 	s32 m_ca1_data;
@@ -343,19 +346,9 @@ void macportable_state::pmu_p0_w(u8 data)
 	if ((!BIT(data, 7)) && (BIT(m_pmu_p0, 7)))
 	{
 		system_time systime;
-		struct tm cur_time;
 		machine().current_datetime(systime);
+		u32 seconds = get_local_seconds(systime);
 
-		cur_time.tm_sec = systime.local_time.second;
-		cur_time.tm_min = systime.local_time.minute;
-		cur_time.tm_hour = systime.local_time.hour;
-		cur_time.tm_mday = systime.local_time.mday;
-		cur_time.tm_mon = systime.local_time.month;
-		cur_time.tm_year = systime.local_time.year - 1900;
-		cur_time.tm_isdst = 0;
-
-		// add the offset between the Unix epoch and the classic Mac OS epoch (hat tip to https://www.epochconverter.com/mac)
-		u32 seconds = (u32)(mktime(&cur_time) + 2082844800);
 		m_pmu->space(AS_PROGRAM).write_byte(0x28, seconds & 0xff);
 		m_pmu->space(AS_PROGRAM).write_byte(0x27, (seconds >> 8) & 0xff);
 		m_pmu->space(AS_PROGRAM).write_byte(0x26, (seconds >> 16) & 0xff);
@@ -489,7 +482,7 @@ void macportable_state::machine_start()
 	save_item(NAME(m_adb_akd));
 
 	m_6015_timer = timer_alloc(FUNC(macportable_state::mac_6015_tick), this);
-	m_6015_timer->adjust(attotime::never);
+	m_6015_deassert_timer = timer_alloc(FUNC(macportable_state::mac_6015_untick), this);
 }
 
 void macportable_state::machine_reset()
@@ -596,6 +589,14 @@ TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_tick)
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
 	m_macadb->portable_update_keyboard();
+
+	m_6015_deassert_timer->adjust(attotime::from_hz(60.15*525), 0);
+}
+
+TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_untick)
+{
+	m_ca1_data ^= 1;
+	m_via1->write_ca1(m_ca1_data);
 }
 
 u16 macportable_state::scsi_r(offs_t offset, u16 mem_mask)

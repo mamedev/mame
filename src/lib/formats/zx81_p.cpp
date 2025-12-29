@@ -32,6 +32,8 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 *****************************************************************************/
 
 #include "zx81_p.h"
+
+#include "imageutl.h"
 #include "tzx_cas.h"
 
 
@@ -114,9 +116,9 @@ static int16_t* zx81_output_byte(int16_t *p, uint8_t byte)
 	return p;
 }
 
-static uint16_t zx81_cassette_calculate_number_of_1(const uint8_t *bytes, uint16_t length)
+static unsigned int zx81_cassette_calculate_number_of_1(const uint8_t *bytes, uint16_t length)
 {
-	uint16_t number_of_1 = 0;
+	unsigned int number_of_1 = 0;
 	int i,j;
 
 	for (i=0; i<length; i++)
@@ -157,23 +159,21 @@ static void zx81_fill_file_name(const char* name)
 
 static int zx81_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
-	unsigned int number_of_0_data = 0;
-	unsigned int number_of_1_data = 0;
-	unsigned int number_of_0_name = 0;
-	unsigned int number_of_1_name = 0;
+	real_data_length = bytes[ZX81_DATA_LENGTH_OFFSET] + bytes[ZX81_DATA_LENGTH_OFFSET + 1] * 256 - ZX81_START_LOAD_ADDRESS;
 
-	real_data_length = bytes[ZX81_DATA_LENGTH_OFFSET] + bytes[ZX81_DATA_LENGTH_OFFSET+1]*256 - ZX81_START_LOAD_ADDRESS;
+	if (real_data_length > length)
+		return -1;
 
-	number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
-	number_of_0_data = length*8-number_of_1_data;
+	unsigned int number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
+	unsigned int number_of_0_data = length * 8 - number_of_1_data;
 
-	number_of_1_name = zx81_cassette_calculate_number_of_1(zx_file_name, zx_file_name_length);
-	number_of_0_name = zx_file_name_length*8-number_of_1_name;
+	unsigned int number_of_1_name = zx81_cassette_calculate_number_of_1(zx_file_name, zx_file_name_length);
+	unsigned int number_of_0_name = zx_file_name_length * 8 - number_of_1_name;
 
-	return (number_of_0_data+number_of_0_name)*ZX81_LOW_BIT_LENGTH + (number_of_1_data+number_of_1_name)*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
+	return (number_of_0_data + number_of_0_name) * ZX81_LOW_BIT_LENGTH + (number_of_1_data + number_of_1_name) * ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
-static int zx81_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int)
+static int zx81_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int data_available)
 {
 	int16_t * p = buffer;
 	int i;
@@ -184,6 +184,12 @@ static int zx81_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *b
 	/* name */
 	for (i=0; i<zx_file_name_length; i++)
 		p = zx81_output_byte(p, zx_file_name[i]);
+
+	if (data_available < real_data_length)
+	{
+		osd_printf_warning("Block requests %d bytes, but only %d available\n", real_data_length, data_available);
+		real_data_length = data_available;
+	}
 
 	/* data */
 	for (i=0; i<real_data_length; i++)
@@ -239,24 +245,29 @@ CASSETTE_FORMATLIST_END
 
 static int zx80_cassette_calculate_size_in_samples(const uint8_t *bytes, int length)
 {
-	unsigned int number_of_0_data = 0;
-	unsigned int number_of_1_data = 0;
+	real_data_length = bytes[ZX80_DATA_LENGTH_OFFSET] + bytes[ZX80_DATA_LENGTH_OFFSET + 1] * 256 - ZX80_START_LOAD_ADDRESS - 1;
+	if (real_data_length > length)
+		return -1;
 
-	real_data_length = bytes[ZX80_DATA_LENGTH_OFFSET] + bytes[ZX80_DATA_LENGTH_OFFSET+1]*256 - ZX80_START_LOAD_ADDRESS - 1;
+	unsigned int number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
+	unsigned int number_of_0_data = length * 8 - number_of_1_data;
 
-	number_of_1_data = zx81_cassette_calculate_number_of_1(bytes, real_data_length);
-	number_of_0_data = length*8-number_of_1_data;
-
-	return number_of_0_data*ZX81_LOW_BIT_LENGTH + number_of_1_data*ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
+	return number_of_0_data * ZX81_LOW_BIT_LENGTH + number_of_1_data * ZX81_HIGH_BIT_LENGTH + ZX81_PILOT_LENGTH;
 }
 
-static int zx80_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int)
+static int zx80_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int data_available)
 {
 	int16_t * p = buffer;
 	int i;
 
 	/* pilot */
 	p = zx81_emit_level (p, ZX81_PILOT_LENGTH, WAVEENTRY_ZERO);
+
+	if (data_available < real_data_length)
+	{
+		osd_printf_warning("Block requests %d bytes, but only %d available\n", real_data_length, data_available);
+		real_data_length = data_available;
+	}
 
 	/* data */
 	for (i=0; i<real_data_length; i++)

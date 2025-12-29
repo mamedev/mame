@@ -245,14 +245,7 @@ public:
 	{ }
 
 	void elan_eu3a05(machine_config &config);
-	void airblsjs(machine_config& config);
-
-	void elan_sudoku(machine_config &config);
-	void elan_sudoku_pal(machine_config &config);
-	void elan_pvmilfin(machine_config &config);
-
-	void init_sudelan();
-	void init_sudelan3();
+	void elan_eu3a05_pal(machine_config& config);
 
 protected:
 	// driver_device overrides
@@ -265,7 +258,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -276,8 +268,6 @@ private:
 
 	void elan_eu3a05_bank_map(address_map &map) ATTR_COLD;
 	void elan_eu3a05_map(address_map &map) ATTR_COLD;
-	void elan_sudoku_map(address_map &map) ATTR_COLD;
-
 
 	virtual void video_start() override ATTR_COLD;
 
@@ -340,6 +330,25 @@ private:
 	void pvwwc_portc_w(uint8_t data);
 	uint8_t m_prevport_c;
 };
+
+class elan_eu3a13_state : public elan_eu3a05_state
+{
+public:
+	elan_eu3a13_state(const machine_config &mconfig, device_type type, const char *tag)
+		: elan_eu3a05_state(mconfig, type, tag)
+	{}
+
+	void elan_eu3a13(machine_config &config);
+	void elan_eu3a13_pal(machine_config &config);
+	void elan_eu3a13_pvmil8(machine_config &config);
+
+	void init_sudelan();
+	void init_sudelan3();
+
+private:
+	void elan_eu3a13_map(address_map &map) ATTR_COLD;
+};
+
 
 void elan_eu3a05_buzztime_state::machine_start()
 {
@@ -453,8 +462,8 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
-// default e000 mapping is the same as eu3a14, other registers seem closer to eua05, probably a different chip type
-void elan_eu3a05_state::elan_sudoku_map(address_map& map)
+// default e000 mapping is the same as eu3a14, other registers seem closer to eua05
+void elan_eu3a13_state::elan_eu3a13_map(address_map& map)
 {
 	elan_eu3a05_map(map);
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
@@ -640,6 +649,31 @@ static INPUT_PORTS_START( sudoku2p )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rad_ftet )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Pause")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Hold")
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Pause")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Hold")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( carlecfg )
 	PORT_START("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -820,37 +854,38 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	*/
 }
 
-void elan_eu3a05_state::elan_sudoku(machine_config& config)
+void elan_eu3a05_state::elan_eu3a05_pal(machine_config& config)
 {
 	elan_eu3a05(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
+	m_screen->set_refresh_hz(50);
+	m_sys->set_pal(); // TODO: also set PAL clocks
+}
+
+
+void elan_eu3a13_state::elan_eu3a13(machine_config& config)
+{
+	elan_eu3a05(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
 	m_vid->set_is_sudoku();
 	m_vid->set_use_spritepages();
 	m_sys->set_alt_timer(); // for Carl Edwards'
 }
 
-void elan_eu3a05_state::elan_sudoku_pal(machine_config& config)
+void elan_eu3a13_state::elan_eu3a13_pal(machine_config& config)
 {
-	elan_sudoku(config);
+	elan_eu3a13(config);
 	m_sys->set_pal(); // TODO: also set PAL clocks
 	m_screen->set_refresh_hz(50);
 }
 
-void elan_eu3a05_state::elan_pvmilfin(machine_config& config)
+void elan_eu3a13_state::elan_eu3a13_pvmil8(machine_config& config)
 {
 	elan_eu3a05(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_sudoku_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a13_state::elan_eu3a13_map);
 	m_vid->set_is_pvmilfin();
 	m_sys->set_alt_timer();
 	m_sys->set_pal(); // TODO: also set PAL clocks
 	m_screen->set_refresh_hz(50);
-}
-
-void elan_eu3a05_state::airblsjs(machine_config& config)
-{
-	elan_eu3a05(config);
-	m_screen->set_refresh_hz(50);
-	m_sys->set_pal(); // TODO: also set PAL clocks
 }
 
 
@@ -946,7 +981,13 @@ ROM_START( sudoku2p )
 	ROM_RELOAD(0x300000,0x100000)
 ROM_END
 
-
+ROM_START( rad_ftet )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "familytetris.u2", 0x00000, 0x100000, CRC(2b65a70d) SHA1(1c9a960ebb4c2c51177b8596c017a04bf816b020) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
 
 ROM_START( carlecfg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -985,7 +1026,7 @@ ROM_START( pvwwcas )
 	ROM_RELOAD(0x200000, 0x200000)
 ROM_END
 
-void elan_eu3a05_state::init_sudelan3()
+void elan_eu3a13_state::init_sudelan3()
 {
 	// skip infinite loop (why is this needed? does it think we've soft shutdown?)
 	uint8_t* ROM = memregion("maincpu")->base();
@@ -994,7 +1035,7 @@ void elan_eu3a05_state::init_sudelan3()
 	ROM[0x0fce] = 0xea;
 }
 
-void elan_eu3a05_state::init_sudelan()
+void elan_eu3a13_state::init_sudelan()
 {
 	// avoid jump to infinite loop (why is this needed? does it think we've soft shutdown?)
 	uint8_t* ROM = memregion("maincpu")->base();
@@ -1020,25 +1061,28 @@ CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init
 CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
-CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
+CONS( 2005, airblsjs, 0, 0, elan_eu3a05_pal, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
 
 CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, empty_init, "Cadaco", "Buzztime Home Trivia System", MACHINE_NOT_WORKING )
 
-// Below are probably not EU3A05 but use similar modes (possibly EU3A13?)
+CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 
-CONS( 2006, sudelan3, 0,        0, elan_sudoku,      sudoku,   elan_eu3a05_state, init_sudelan3,  "All in 1 Products Ltd / Senario",  "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
+
+// Below seem to be EU3A13, as that was confirmed for the Family Tetris die.  They're like EU3A05, but with a different memory map
+
+CONS( 2006, sudelan3, 0,        0, elan_eu3a13,      sudoku,   elan_eu3a13_state, init_sudelan3,  "All in 1 Products Ltd / Senario",  "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
 // Senario also distributed this version in the US without the '3 in 1' text on the box, ROM has not been verified to match
-CONS( 2005, sudelan, 0,         0, elan_sudoku_pal,  sudoku,   elan_eu3a05_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
+CONS( 2005, sudelan, 0,         0, elan_eu3a13_pal,  sudoku,   elan_eu3a13_state, init_sudelan,  "All in 1 Products Ltd / Play Vision",  "Carol Vorderman's Sudoku Plug & Play TV Game (All in 1 / Play Vision)", MACHINE_NOT_WORKING )
 
-CONS( 2005, sudoku2p, 0,        0, elan_sudoku_pal,  sudoku2p, elan_eu3a05_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
+CONS( 2005, sudoku2p, 0,        0, elan_eu3a13_pal,  sudoku2p, elan_eu3a13_state, empty_init,  "<unknown>",  "Sudoku TV Game (PAL, 2 players)", MACHINE_NOT_WORKING ) // a pair of yellow controllers with 'TV Sudoku Awesome Puzzles' on their label
 
-CONS( 200?, carlecfg, 0,        0, elan_sudoku,  carlecfg,   elan_eu3a05_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
+CONS( 2006, rad_ftet, 0,        0, elan_eu3a13,      rad_ftet, elan_eu3a13_state, empty_init,  "Radica",  "Family Tetris", MACHINE_NOT_WORKING )
+// rad_ftet shows UK logo if set to PAL
+
+CONS( 200?, carlecfg, 0,        0, elan_eu3a13,      carlecfg, elan_eu3a13_state, empty_init,  "Excalibur Electronics",  "Carl Edwards' Chase For Glory", MACHINE_NOT_WORKING )
 
 // this is in very similar packaging to the 'pvmil' game in tvgames/spg2xx_playvision.cpp, and the casing is identical
 // however this is from a year earlier, and there is a subtle difference in the otherwise identical text on the back of the box, mentioning that it uses an 8-bit processor, where the other box states 16-bit
-CONS( 2005, pvmil8,   0,        0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
+CONS( 2005, pvmil8,   0,        0, elan_eu3a13_pvmil8,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", "Who Wants to Be a Millionaire? (Play Vision, Plug and Play, UK, 8-bit version)", MACHINE_NOT_WORKING )
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
-CONS( 2005, pvmilfin, pvmil8,   0, elan_pvmilfin,  sudoku,   elan_eu3a05_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
-
-CONS( 2005, pvwwcas,  0,        0, pvwwcas,    sudoku,   elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-Tac", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
-
+CONS( 2005, pvmilfin, pvmil8,   0, elan_eu3a13_pvmil8,  sudoku,   elan_eu3a13_state, empty_init,  "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )

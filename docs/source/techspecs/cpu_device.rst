@@ -225,5 +225,5 @@ will retry the access.
 
 At this point, interruptibility and DRC are entirely incompatible.  We
 do not have a method to quit the generated code before or after an
-access.  It's theorically possible but definitely non-trivial.
+access.  It's theoretically possible but definitely non-trivial.
 

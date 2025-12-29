@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device,   "vt3
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,vt369_soc_introm_altswap_device,"vt369_soc_altswap", "VT369 series System on a Chip (with D1/D4 opcode swapping)")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,vt369_soc_introm_vibesswap_device,"vt369_soc_vibesswap", "VT369 series System on a Chip (with D4/D5 opcode swapping)")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_GBOX2020,vt369_soc_introm_gbox2020_device,"vt369_soc_gbox2020", "VT369 series System on a Chip (with D6/D7 + D1/D2 opcode swapping)")
+DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_S10SWAP,vt369_soc_introm_s10swap_device,"vt369_soc_s10swap", "VT369 series System on a Chip (with D4/D5 + D1/D2 opcode swapping)")
 
 // uncertain
 DEFINE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device,          "vt3xx_unknown_soc_cy", "VT3xx series System on a Chip (CY)")
@@ -84,6 +85,11 @@ vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machi
 
 vt369_soc_introm_gbox2020_device::vt369_soc_introm_gbox2020_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_GBOX2020, tag, owner, clock)
+{
+}
+
+vt369_soc_introm_s10swap_device::vt369_soc_introm_s10swap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt369_soc_introm_vibesswap_device(mconfig, VT369_SOC_INTROM_S10SWAP, tag, owner, clock)
 {
 }
 
@@ -857,13 +863,20 @@ void vt369_soc_introm_gbox2020_device::device_start()
 	m_encryption_allowed = true;
 }
 
+void vt369_soc_introm_s10swap_device::device_start()
+{
+	vt3xx_soc_base_device::device_start();
+	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(4);
+	m_encryption_allowed = true;
+}
+
 void vt369_soc_introm_vibesswap_device::vibes_411c_w(u8 data)
 {
 	if (m_encryption_allowed)
 	{
 		if (data == 0x05)
 			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(false);
-		else if (data == 0x07)
+		else if (data == 0x07 || data == 0x87)
 			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(true);
 		else
 			logerror("%s: vibes_411c_w %02x (unknown)\n", machine().describe_context(), data);

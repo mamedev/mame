@@ -68,7 +68,7 @@ void applecd150_device::device_add_mconfig(machine_config &config)
 {
 	i80c31_device &mcu1(I80C31(config, "mcu1", 12_MHz_XTAL));
 	mcu1.set_addrmap(AS_PROGRAM, &applecd150_device::prog_map);
-	mcu1.set_addrmap(AS_IO, &applecd150_device::ext_map);
+	mcu1.set_addrmap(AS_DATA, &applecd150_device::ext_map);
 
 	M37450(config, "mcu2", 16.9344_MHz_XTAL / 2).set_disable();
 

@@ -81,7 +81,7 @@ void qmquasar_state::quasar(machine_config &config)
 {
 	I8032(config, m_maincpu, 12'000'000); // exact type and clock unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &qmquasar_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &qmquasar_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &qmquasar_state::ext_map);
 
 	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.irq_handler().set_inputline(m_maincpu, MCS51_INT1_LINE);

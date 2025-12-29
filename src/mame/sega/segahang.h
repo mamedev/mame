@@ -108,7 +108,7 @@ private:
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void fd1094_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void hangon_map(address_map &map) ATTR_COLD;
-	void mcu_io_map(address_map &map) ATTR_COLD;
+	void mcu_data_map(address_map &map) ATTR_COLD;
 	void sharrier_map(address_map &map) ATTR_COLD;
 	void sound_map_2151(address_map &map) ATTR_COLD;
 	void sound_map_2203(address_map &map) ATTR_COLD;

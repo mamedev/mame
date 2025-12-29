@@ -179,6 +179,7 @@ void bit90_state::bit90_map(address_map &map)
 void coleco_state::coleco_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map.unmap_value_high(); // comicbak relies on this
 	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_state::paddle_off_w));
 	map(0xa0, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));

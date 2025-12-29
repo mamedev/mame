@@ -514,7 +514,7 @@ protected:
 	void i386_check_sreg_validity(int reg);
 	int i386_limit_check(int seg, uint32_t offset, int size = 1);
 	void i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault);
-	void i386_trap(int irq, int irq_gate, int trap_level);
+	void i386_trap(int irq, int irq_gate);
 	void i386_trap_with_error(int irq, int irq_gate, int trap_level, uint32_t error);
 	void i286_task_switch(uint16_t selector, uint8_t nested);
 	void i386_task_switch(uint16_t selector, uint8_t nested);

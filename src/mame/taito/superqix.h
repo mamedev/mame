@@ -63,7 +63,6 @@ protected:
 	void superqix_bitmapram2_w(offs_t offset, uint8_t data);
 	void superqix_0410_w(uint8_t data);
 
-	DECLARE_VIDEO_START(superqix);
 	static rgb_t BBGGRRII(uint32_t raw);
 	uint32_t screen_update_superqix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -120,7 +119,6 @@ private:
 	void bootleg_flipscreen_w(uint8_t data);
 	uint8_t bootleg_in0_r();
 	INTERRUPT_GEN_MEMBER(sqix_timer_irq);
-	DECLARE_MACHINE_RESET(superqix);
 
 	void sqix_port_map(address_map &map) ATTR_COLD;
 	void sqix_8031_map(address_map &map) ATTR_COLD;

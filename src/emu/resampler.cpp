@@ -135,13 +135,13 @@
 // length.  The filter itself is made very traditionally, by
 // multiplying a sinc by a Hann window.
 
-// The filter size is selected by maximizing the latency to 5ms and
-// capping the length at 400, which experimentally seems to ensure a
-// sharp rejection of more than 100dB in every case.
+// The default filter size is selected by maximizing the latency to 5ms
+// and capping the length at 400, which experimentally seems to ensure
+// a sharp rejection of more than 100dB in every case.
 
 // Finally, remember that up and downsampling steps multiply the
-// amplitude by a constant (upsampling divides by k, downsamply
-// multiply by k in fact).  To compensate for that and numerical
+// amplitude by a constant (upsampling divides by k, downsampling
+// multiplies by k in fact).  To compensate for that and numerical
 // errors the easiest way to to normalize each phase-filter
 // independently to ensure the sum of their coefficients is 1.  It is
 // easy to see why it works: a constant input signal must be
@@ -159,10 +159,8 @@ audio_resampler_hq::audio_resampler_hq(u32 fs, u32 ft, float latency, u32 max_or
 	m_ftm = fs / gcd;
 	m_fsm = ft / gcd;
 
-	// Compute the per-phase filter length to limit the latency to 5ms and capping it
-	m_order_per_lane = u32(fs * latency * 2);
-	if(m_order_per_lane > max_order_per_lane)
-		m_order_per_lane = max_order_per_lane;
+	// Compute the per-phase filter length to limit the latency and capping it
+	m_order_per_lane = std::clamp(u32(fs * latency * 2), 2U, max_order_per_lane);
 
 	// Reduce the number of phases to be less than max_lanes
 	m_phase_shift = 0;
@@ -175,7 +173,7 @@ audio_resampler_hq::audio_resampler_hq(u32 fs, u32 ft, float latency, u32 max_or
 	u32 filter_length = m_order_per_lane * m_phases;
 	if((filter_length & 1) == 0)
 		filter_length --;
-	u32 hlen = filter_length / 2;
+	u32 hlen = std::max(1U, filter_length / 2);
 
 	// Prepare the per-phase filters
 	m_coefficients.resize(m_phases);

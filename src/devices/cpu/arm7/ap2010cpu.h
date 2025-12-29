@@ -16,6 +16,8 @@
 class ap2010cpu_device : public arm7_cpu_device
 {
 public:
+	static inline constexpr unsigned MAX_HOTSPOTS = 16;
+
 	ap2010cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void add_hotspot(offs_t pc);
@@ -26,7 +28,7 @@ protected:
 
 private:
 	uint32_t m_hotspot_select = 0;
-	uint32_t m_hotspot[ARM7_MAX_HOTSPOTS];
+	uint32_t m_hotspot[MAX_HOTSPOTS];
 };
 
 // device type definition

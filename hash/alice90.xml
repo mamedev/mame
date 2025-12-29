@@ -47,6 +47,8 @@ Thanks to DCALICE (http://alice32.free.fr) for info!
 		<description>Galixian</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="François Chaumartin" />
+		<info name="serial" value="AE 001" />
 
 		<part name="cass" interface="mc10_cass">
 			<dataarea name="cass" size="20961">

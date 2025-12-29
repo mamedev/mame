@@ -376,31 +376,32 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 	u32 samples = src.available_samples();
 	dest.prepare_space(samples);
 
-	double attack_coefficient = exp(-1/(m_sample_rate * m_attack / 1000));
-	double release_coefficient = exp(-1/(m_sample_rate * m_release / 1000));
-	double m_inertia_decay_coefficient = 0.99 + m_inertia_decay * 0.01;
+	const float release = m_release;
+	const double attack_coefficient = exp(-1/(m_sample_rate * m_attack / 1000));
+	const double release_coefficient = exp(-1/(m_sample_rate * release / 1000));
+	const double inertia_decay_coefficient = 0.99 + m_inertia_decay * 0.01;
 
 	for(u32 sample = 0; sample != samples; sample ++) {
 		for(u32 channel = 0; channel != m_channels; channel ++) {
-			double input_db = value_to_db(std::abs(*src.ptrs(channel, sample))) + m_input_gain + std::abs(m_output_samples[channel]) * m_feedback;
+			double input_db = value_to_db(std::abs(*src.ptrs(channel, sample) * db_to_value(m_input_gain))) + std::abs(m_output_samples[channel]) * m_feedback;
 			m_output_samples[channel] = 0;
 
 			if(std::isnan(input_db) || input_db < -200)
 				input_db = -200;
-			else if(input_db > 4)
-				input_db = 4;
+			else if(input_db > 30)
+				input_db = 30;
 
 			float slewed_signal = m_slewed_signal[channel];
 			if(input_db > slewed_signal)
 				slewed_signal = attack_coefficient * (slewed_signal - input_db) + input_db;
-			else
+			else if(release >= 0)
 				slewed_signal = release_coefficient * (slewed_signal - input_db) + input_db;
 
 			m_input_samples[channel] = input_db;
 
 			double gain_reduction;
 			if(slewed_signal > m_threshold) {
-				double target = m_threshold + (slewed_signal - m_threshold) / m_ratio;
+				double target = m_threshold + ((m_ratio > 0) ? ((slewed_signal - m_threshold) / m_ratio) : 0);
 				gain_reduction = pow(slewed_signal - target, m_convexity);
 			} else {
 				slewed_signal = m_threshold;
@@ -419,7 +420,7 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 			if(m_inertia <= 0 || gain_reduction > m_gain_reduction[channel])
 				inertia_velocity -= m_inertia * gain_reduction_value * 0.001;
 
-			inertia_velocity *= m_inertia_decay_coefficient;
+			inertia_velocity *= inertia_decay_coefficient;
 			if(inertia_velocity < -100)
 				inertia_velocity = -100;
 			else if(inertia_velocity > 100)

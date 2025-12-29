@@ -10,9 +10,9 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 	: poly_manager<float, hng64_poly_data, 7>(state.machine())
 	, m_state(state)
 {
-	const int32_t bufferSize = 512 * 512;
+	const s32 bufferSize = 512 * 512;
 	m_depthBuffer3d = std::make_unique<float[]>(bufferSize);
-	m_colorBuffer3d = std::make_unique<uint16_t[]>(bufferSize);
+	m_colorBuffer3d = std::make_unique<u16[]>(bufferSize);
 
 }
 
@@ -31,38 +31,38 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
     30140000-3015ffff is ZBuffer A  (512x256 8-bit?)
 */
 
-uint32_t hng64_state::hng64_fbram1_r(offs_t offset)
+u32 hng64_state::fbram1_r(offs_t offset)
 {
 	return m_fbram1[offset];
 }
 
-void hng64_state::hng64_fbram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::fbram1_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA (&m_fbram1[offset]);
+	COMBINE_DATA(&m_fbram1[offset]);
 }
 
-uint32_t hng64_state::hng64_fbram2_r(offs_t offset)
+u32 hng64_state::fbram2_r(offs_t offset)
 {
 	return m_fbram2[offset];
 }
 
-void hng64_state::hng64_fbram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::fbram2_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA (&m_fbram2[offset]);
+	COMBINE_DATA(&m_fbram2[offset]);
 }
 
 // The 3d 'display list'
-void hng64_state::dl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void hng64_state::dl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_dl[offset]);
 }
 
-void hng64_state::dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::dl_unk_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	logerror("%s: dl_unk_w %08x (%08x)\n", machine().describe_context(), data, mem_mask);
+	LOGDISPLAYLIST("%s: dl_unk_w %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 }
 
-void hng64_state::dl_upload_w(uint32_t data)
+void hng64_state::dl_upload_w(u32 data)
 {
 	//m_paletteState3d = 0; // no, breaks fatfurwa characters
 
@@ -75,23 +75,23 @@ void hng64_state::dl_upload_w(uint32_t data)
 	// We're assuming it to be a 'send to 3d hardware' trigger.
 	// This can be called multiple times per frame (at least 2, as long as it gets the expected interrupt / status flags)
 	auto profile = g_profiler.start(PROFILER_USER1);
-	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
+	for (int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
-		if (!hng64_command3d(&m_dl[packetStart]))
+		if (!command3d(&m_dl[packetStart]))
 			break;
 	}
 
 	// Schedule a small amount of time to let the 3d hardware rasterize the display buffer
-	m_3dfifo_timer->adjust(m_maincpu->cycles_to_attotime(0x200*8));
+	m_3dfifo_timer->adjust(m_maincpu->cycles_to_attotime(0x200 * 8));
 }
 
-TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
+TIMER_CALLBACK_MEMBER(hng64_state::_3dfifo_processed)
 {
 	set_irq(0x0008);
 }
 
-void hng64_state::dl_control_w(uint32_t data)
+void hng64_state::dl_control_w(u32 data)
 {
 	/* m_activeDisplayList is not currently connected to anything, it seems unlikely there are different banks.
 	   games typically write up to 8 lots of 0x200 data, writing bit 0 between them
@@ -109,16 +109,16 @@ void hng64_state::dl_control_w(uint32_t data)
 	*/
 
 	/*
-	logerror("dl_control_w %08x %08x\n", data, mem_mask);
+	LOGDISPLAYLIST("dl_control_w %08x %08x\n", data, mem_mask);
 
-	if(data & 2) // swap buffers
+	if (data & 2) // swap buffers
 	{
 	    clear3d();
 	}
 	*/
 }
 
-uint32_t hng64_state::dl_vreg_r()
+u32 hng64_state::dl_vreg_r()
 {
 	/* tested with possible masked bits 0xf003 (often masking 0xf000 or 0x0003)
 
@@ -135,11 +135,11 @@ uint32_t hng64_state::dl_vreg_r()
 // 3d 'Functions' //
 ////////////////////
 
-void hng64_state::printPacket(const uint16_t* packet, int hex)
+void hng64_state::printPacket(const u16* packet, int hex)
 {
 	if (hex)
 	{
-		logerror("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
+		LOG3D("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
 				packet[0],  packet[1],
 				packet[2],  packet[3],
 				packet[4],  packet[5],
@@ -151,7 +151,7 @@ void hng64_state::printPacket(const uint16_t* packet, int hex)
 	}
 	else
 	{
-		logerror("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
+		LOG3D("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
 				packet[0],            uToF(packet[1] )*128,
 				uToF(packet[2] )*128, uToF(packet[3] )*128,
 				uToF(packet[4] )*128, uToF(packet[5] )*128,
@@ -165,7 +165,7 @@ void hng64_state::printPacket(const uint16_t* packet, int hex)
 
 // Operation 0001
 // Camera transformation.
-void hng64_state::setCameraTransformation(const uint16_t* packet)
+void hng64_state::setCameraTransformation(const u16* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -211,7 +211,7 @@ void hng64_state::setCameraTransformation(const uint16_t* packet)
 
 // Operation 0010
 // Lighting information
-void hng64_state::setLighting(const uint16_t* packet)
+void hng64_state::setLighting(const u16* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -233,8 +233,8 @@ void hng64_state::setLighting(const uint16_t* packet)
 	// [14] - ???? ... ? Used in fatfurwa
 	// [15] - ???? ... ? Used in fatfurwa
 	////////////*/
-	if (packet[1] != 0x0000) logerror("packet[1] in setLighting function is non-zero!\n");
-	if (packet[2] != 0x0000) logerror("packet[2] in setLighting function is non-zero!\n");
+	if (packet[1] != 0x0000) LOG3D("packet[1] in setLighting function is non-zero!\n");
+	if (packet[2] != 0x0000) LOG3D("packet[2] in setLighting function is non-zero!\n");
 
 	m_lightVector[0] = uToF(packet[3]);
 	m_lightVector[1] = uToF(packet[4]);
@@ -244,7 +244,7 @@ void hng64_state::setLighting(const uint16_t* packet)
 
 // Operation 0011
 // Palette / Model flags?
-void hng64_state::set3dFlags(const uint16_t* packet)
+void hng64_state::set3dFlags(const u16* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -277,7 +277,7 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 
 // Operation 0012
 // Projection Matrix.
-void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
+void hng64_state::setCameraProjectionMatrix(const u16* packet)
 {
 	/*//////////////
 	// PACKET FORMAT
@@ -352,7 +352,7 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 #endif
 }
 
-void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter, const uint16_t* packet)
+void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, const u16* chunkOffset_verts, int& counter, const u16* packet)
 {
 	currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset_verts[counter++]);
 	currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset_verts[counter++]);
@@ -361,14 +361,13 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 	currentPoly.n = 3;
 
 	// this seems to be some kind of default lighting value / brightness, probably for unlit polys? used in various places, eg side of house in ice stage of ss64, some shadows
-	[[maybe_unused]] uint16_t maybe_blend = chunkOffset_verts[counter++];
+	[[maybe_unused]] u16 maybe_blend = chunkOffset_verts[counter++];
 
 	currentPoly.vert[m].texCoords[0] = uToF(chunkOffset_verts[counter]);
 	if (currentPoly.flatShade)
 		currentPoly.colorIndex = chunkOffset_verts[counter] >> 5;
 	counter++;
 	currentPoly.vert[m].texCoords[1] = uToF(chunkOffset_verts[counter++]);
-
 
 	// set on the Hyper 64 logos for roadedge and xrally which are known to be scaled
 	// also set on the car select screen in roadedge, and the car on the stage name screen
@@ -386,13 +385,13 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 		currentPoly.vert[m].worldCoords[2] = (currentPoly.vert[m].worldCoords[2] * m_modelscalex) / 0x100;
 
 	//  if ((m_modelscalex != 0x100) || (m_modelscaley != 0x100) || (m_modelscalez != 0x100))
-	//      logerror("maybe using model scale %04x %04x %04x\n", m_modelscalex, m_modelscaley, m_modelscalez);
+	//      LOG3D("maybe using model scale %04x %04x %04x\n", m_modelscalex, m_modelscaley, m_modelscalez);
 	}
 }
 
 // Operation 0100
 // Polygon rasterization.
-void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
+void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 {
 	//printPacket(packet, 1);
 
@@ -454,9 +453,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	objectMatrix[14] = uToF(packet[6]);
 	objectMatrix[15] = 1.0f;
 
-	uint32_t size[4];
-	uint32_t address[4];
-	uint32_t megaOffset;
+	u32 size[4];
+	u32 address[4];
+	u32 megaOffset;
 	polygon lastPoly = { 0 };
 
 
@@ -489,17 +488,16 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	//////////////////////////////////////////////*/
 
 	// 3d ROM Offset
-	uint16_t* threeDRoms = m_vertsrom;
-	uint32_t  threeDOffset = (((uint32_t)packet[2]) << 16) | ((uint32_t)packet[3]);
-	uint16_t* threeDPointer = &threeDRoms[threeDOffset * 3];
+	const u32 threeDOffset = (u32(packet[2]) << 16) | u32(packet[3]);
+	const u16 *const threeDPointer = &m_vertsrom[threeDOffset * 3];
 
-	if (threeDOffset >= m_vertsrom_size)
+	if (threeDOffset >= m_vertsrom.length())
 	{
 		// bbust2 quite often spams this invalid pointer
 		if ((packet[2] == 0x2347) && (packet[3] == 0x5056))
 			return;
 
-		logerror("Strange geometry packet: (ignoring)\n");
+		LOG3D("Strange geometry packet: (ignoring)\n");
 		printPacket(packet, 1);
 		return;
 	}
@@ -522,29 +520,29 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 	address[2] = threeDPointer[3];
 	address[3] = threeDPointer[4];
-	if (threeDPointer[5] != 0x0000) logerror("3dPointer[5] is non-zero!\n");
+	if (threeDPointer[5] != 0x0000) LOG3D("3dPointer[5] is non-zero!\n");
 
 	size[0]    = threeDPointer[6];
 	size[1]    = threeDPointer[7];
-	if (threeDPointer[8] != 0x0000) logerror("3dPointer[8] is non-zero!\n");
+	if (threeDPointer[8] != 0x0000) LOG3D("3dPointer[8] is non-zero!\n");
 
 	size[2]    = threeDPointer[9];
 	size[3]    = threeDPointer[10];
 
 	// the low 8-bits of each of these is used (or at least contains data, probably one byte for each hunk?)
-	//if (threeDPointer[11] != 0x0000) logerror("3dPointer[11] is %04x!\n", threeDPointer[11]); //           ????         [11]; Used.
-	//if (threeDPointer[12] != 0x0000) logerror("3dPointer[12] is %04x!\n", threeDPointer[12]); //           ????         [12]; Used.
-	//if (threeDPointer[13] != 0x0000) logerror("3dPointer[13] is %04x!\n", threeDPointer[13]); //           ????         [13]; Used.
-	//if (threeDPointer[14] != 0x0000) logerror("3dPointer[14] is %04x!\n", threeDPointer[14]); //           ????         [14]; Used.
+	//if (threeDPointer[11] != 0x0000) LOG3D("3dPointer[11] is %04x!\n", threeDPointer[11]); //           ????         [11]; Used.
+	//if (threeDPointer[12] != 0x0000) LOG3D("3dPointer[12] is %04x!\n", threeDPointer[12]); //           ????         [12]; Used.
+	//if (threeDPointer[13] != 0x0000) LOG3D("3dPointer[13] is %04x!\n", threeDPointer[13]); //           ????         [13]; Used.
+	//if (threeDPointer[14] != 0x0000) LOG3D("3dPointer[14] is %04x!\n", threeDPointer[14]); //           ????         [14]; Used.
 
 
-	if (threeDPointer[15] != 0x0000) logerror("3dPointer[15] is non-zero!\n");
-	if (threeDPointer[16] != 0x0000) logerror("3dPointer[16] is non-zero!\n");
-	if (threeDPointer[17] != 0x0000) logerror("3dPointer[17] is non-zero!\n");
+	if (threeDPointer[15] != 0x0000) LOG3D("3dPointer[15] is non-zero!\n");
+	if (threeDPointer[16] != 0x0000) LOG3D("3dPointer[16] is non-zero!\n");
+	if (threeDPointer[17] != 0x0000) LOG3D("3dPointer[17] is non-zero!\n");
 
-	if (threeDPointer[18] != 0x0000) logerror("3dPointer[18] is non-zero!\n");
-	if (threeDPointer[19] != 0x0000) logerror("3dPointer[19] is non-zero!\n");
-	if (threeDPointer[20] != 0x0000) logerror("3dPointer[20] is non-zero!\n");
+	if (threeDPointer[18] != 0x0000) LOG3D("3dPointer[18] is non-zero!\n");
+	if (threeDPointer[19] != 0x0000) LOG3D("3dPointer[19] is non-zero!\n");
+	if (threeDPointer[20] != 0x0000) LOG3D("3dPointer[20] is non-zero!\n");
 
 	// Concatenate the megaOffset with the addresses
 	address[0] |= (megaOffset << 16);
@@ -555,7 +553,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	// For all 4 polygon chunks
 	for (int k = 0; k < 4; k++)
 	{
-		uint16_t* chunkOffset = &threeDRoms[address[k] * 3];
+		const u16 *chunkOffset = &m_vertsrom[address[k] * 3];
 		for (int l = 0; l < size[k]; l++)
 		{
 			////////////////////////////////////////////
@@ -578,12 +576,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// 'Welcome to South Africa' roadside banner on xrally | 000e 8c0d d870 or 0096 8c0d d870  (8c0d, d870 seems key 1000 1100 0000 1101
 			//                                                                                                               1101 1000 0111 0000 )
 
-			uint8_t chunkType = chunkOffset[0] & 0x00ff;
+			u8 chunkType = chunkOffset[0] & 0x00ff;
 
 			// Debug - ajg
 			if (chunkOffset[0] & 0xff00)
 			{
-				logerror("Weird!  The top byte of the chunkType has a value %04x!\n", chunkOffset[0]);
+				LOG3D("Weird!  The top byte of the chunkType has a value %04x!\n", chunkOffset[0]);
 				continue;
 			}
 
@@ -591,7 +589,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			polygon& currentPoly = m_polys[numPolys];
 
 			// Debug - ajg
-			//logerror("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
+			//LOG3D("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
 
 			if (chunkOffset[1] & 0x1000) currentPoly.tex4bpp = 0x1;
@@ -615,8 +613,8 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// PALETTE
 			currentPoly.palOffset = 0;
 
-			//uint16_t explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
-			uint16_t explicitPaletteValue = ((chunkOffset[1] & 0x0ff0) >> 4);
+			//u16 explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
+			u16 explicitPaletteValue = ((chunkOffset[1] & 0x0ff0) >> 4);
 			explicitPaletteValue = explicitPaletteValue << 3;
 
 			// HACK: this is not the enable, the cars in roadedge rely on this to switch palettes
@@ -665,9 +663,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.texscrolly = 0;
 			}
 
-			uint8_t chunkLength = 0;
+			u8 chunkLength = 0;
 			int counter = 3;
-			switch(chunkType)
+			switch (chunkType)
 			{
 			/*/////////////////////////
 			// CHUNK TYPE BITS - These are very likely incorrect.
@@ -784,7 +782,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[3] = lastPoly.faceNormal[3];
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal)
-				[[maybe_unused]] uint16_t unused;
+				[[maybe_unused]] u16 unused;
 				unused = chunkOffset[counter++];
 				unused = chunkOffset[counter++];
 				unused = chunkOffset[counter++];
@@ -793,7 +791,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				break;
 			}
 			default:
-				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
+				LOG3D("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
 				chunkLength = counter;
 				break;
 			}
@@ -906,7 +904,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				if (currentPoly.visible)
 				{
 					// Clip against all edges of the view frustum
-					int num_vertices = frustum_clip_all<float, 5>(clipVerts, currentPoly.n, clipVerts);
+					const int num_vertices = frustum_clip_all<float, 5>(clipVerts, currentPoly.n, clipVerts);
 
 					// Copy the results of
 					currentPoly.n = num_vertices;
@@ -958,11 +956,11 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 }
 
 
-bool hng64_state::hng64_command3d(const uint16_t* packet)
+bool hng64_state::command3d(const u16* packet)
 {
 	int numPolys = 0;
 
-	//logerror("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
+	//LOG3D("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
 
 	switch (packet[0])
 	{
@@ -998,9 +996,9 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 	case 0x0102:    // Geometry with only translation
 		// 'world' in roadedge/xrally (track, trackside objects etc.)
 		// Split the packet and call recoverPolygonBlock on each half.
-		uint16_t miniPacket[16];
-		memset(miniPacket, 0, sizeof(uint16_t)*16);
-		for (int i = 0; i < 7; i++) miniPacket[i] = packet[i];
+		u16 miniPacket[16];
+		std::fill(std::begin(miniPacket), std::end(miniPacket), 0);
+		std::copy_n(&packet[0], 7, std::begin(miniPacket));
 		miniPacket[7] = 0x7fff;
 		miniPacket[11] = 0x7fff;
 		miniPacket[15] = 0x7fff;
@@ -1010,8 +1008,8 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 		{
 			if (packet[8] == 0x0102)
 			{
-				memset(miniPacket, 0, sizeof(uint16_t) * 16);
-				for (int i = 0; i < 7; i++) miniPacket[i] = packet[i + 8];
+				std::fill(std::begin(miniPacket), std::end(miniPacket), 0);
+				std::copy_n(&packet[8], 7, std::begin(miniPacket));
 				miniPacket[7] = 0x7fff;
 				miniPacket[11] = 0x7fff;
 				miniPacket[15] = 0x7fff;
@@ -1030,7 +1028,7 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 		break;
 
 	case 0x1000:    // Unknown: Some sort of global flags?
-		//printPacket(packet, 1); logerror("\n");
+		//printPacket(packet, 1); LOG3D("\n");
 		break;
 
 	case 0x1001:    // Unknown: Some sort of global flags?  Almost always comes in a group of 4 with an index [0,3].
@@ -1038,7 +1036,7 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 		break;
 
 	default:
-		logerror("HNG64: Unknown 3d command %04x.\n", packet[0]);
+		LOG3D("HNG64: Unknown 3d command %04x.\n", packet[0]);
 		break;
 	}
 
@@ -1064,8 +1062,6 @@ void hng64_state::clear3d()
 		m_poly_renderer->colorBuffer3d()[i] = 0;
 	}
 
-
-
 	m_paletteState3d = 0;
 
 	// Set some matrices to the identity...
@@ -1086,25 +1082,25 @@ void hng64_state::clear3d()
  *      3 | ---- ---- |
 */
 
-uint8_t hng64_state::hng64_fbcontrol_r(offs_t offset)
+u8 hng64_state::fbcontrol_r(offs_t offset)
 {
-	logerror("%s: hng64_fbcontrol_r (%03x)\n", machine().describe_context(), offset);
+	LOGFRAMEBUFFER("%s: fbcontrol_r (%03x)\n", machine().describe_context(), offset);
 	return m_fbcontrol[offset];
 }
 
-void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
+void hng64_state::fbcontrol_w(offs_t offset, u8 data)
 {
 
 	/* roadedge does the following to turn off the framebuffer clear (leave trails) and then turn it back on when selecting a car
-	   ':maincpu' (8001EDE0): hng64_fbcontrol_w (002) 10 (disable frame buffer clear)
-	   ':maincpu' (8001FE4C): hng64_fbcontrol_w (002) 38 (normal)
+	   ':maincpu' (8001EDE0): fbcontrol_w (002) 10 (disable frame buffer clear)
+	   ':maincpu' (8001FE4C): fbcontrol_w (002) 38 (normal)
 
 	   during the Hyper Neogeo 64 logo it has a value of
-	   ':maincpu' (8005AA44): hng64_fbcontrol_w (002) 18
+	   ':maincpu' (8005AA44): fbcontrol_w (002) 18
 
 	   sams64 does
-	   ':maincpu' (800C13C4): hng64_fbcontrol_r (002)     (ANDs with 0x07, ORs with 0x18)
-	   ':maincpu' (800C13D0): hng64_fbcontrol_w (002) 18
+	   ':maincpu' (800C13C4): fbcontrol_r (002)     (ANDs with 0x07, ORs with 0x18)
+	   ':maincpu' (800C13D0): fbcontrol_w (002) 18
 
 	   other games use either mix of 0x18 and 0x38.  bit 0x08 must prevent the framebuffer clear tho
 	   according to above table bit 0x20 is color base, but implementation for it is a hack
@@ -1115,44 +1111,44 @@ void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
 
 	*/
 
-	logerror("%s: hng64_fbcontrol_w (%03x) %02x\n", machine().describe_context(), offset, data);
+	LOGFRAMEBUFFER("%s: fbcontrol_w (%03x) %02x\n", machine().describe_context(), offset, data);
 	m_fbcontrol[offset] = data;
 }
 
 
 // the framebuffer scroll and scale registers are used in fatfurwa (intro scaling) and xrally (course select, car select)
 // they are NOT used for buriki 'how to play' scren, which uses unhandled values in the 3d packets to reposition the fighters instead
-void hng64_state::hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::fbscale_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fbscale[offset]);
 
 	if (mem_mask & 0xffff0000)
 	{
 		// NORMAL value is 3fe0 (0x400 / 2 = 0x200 = 512)
-		// ':maincpu' (8006E46C): hng64_fb_scale_x 3fe00000 ffff0000
+		// ':maincpu' (8006E46C): fb_scale_x 3fe00000 ffff0000
 
 		// on xrally course select this is 39e0 (0x3a0 / 2 = 0x1d0 = 464)
-		// hng64_fb_scale_x 39e00000 ffff0000
+		// fb_scale_x 39e00000 ffff0000
 
-		//logerror("%s: hng64_fb_scale_x %08x %08x\n", machine().describe_context(), data, mem_mask);
+		//LOGFRAMEBUFFER("%s: fb_scale_x %08x %08x\n", machine().describe_context(), data, mem_mask);
 	}
 
 	if (mem_mask & 0x0000ffff)
 	{
 		// NORMAL value is 37e0  (0x380 / 2 = 0x1c0 = 448)
-		// hng64_fb_scale_y 000037e0 0000ffff
+		// fb_scale_y 000037e0 0000ffff
 
 		// on xrally course select this is 32e0 (0x330 / 2 = 408)
-		// hng64_fb_scale_y 000032e0 0000ffff
+		// fb_scale_y 000032e0 0000ffff
 
 		// during fatfurwa scaled intro it uses 2de0, although writes 37e0 in the same frame; presumably rendering takes place while it is 2de0 though
 		// 0x2e0 / 2 = 0x170 = 368    (needs to be ~287 pixels though)
-		// ':maincpu' (800667A0): hng64_fb_scale_y 00002de0 0000ffff
-		//logerror("%s: hng64_fb_scale_y %08x %08x\n", machine().describe_context(), data, mem_mask);
+		// ':maincpu' (800667A0): fb_scale_y 00002de0 0000ffff
+		//LOGFRAMEBUFFER("%s: fb_scale_y %08x %08x\n", machine().describe_context(), data, mem_mask);
 	}
 }
 
-void hng64_state::hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::fbscroll_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fbscroll[offset]);
 
@@ -1160,32 +1156,32 @@ void hng64_state::hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	if (mem_mask & 0xffff0000)
 	{
 		// NORMAL value is e000 (e0 = 224)
-		// hng64_fbscroll x e0000000 ffff0000
+		// fbscroll x e0000000 ffff0000
 
 		// on xrally course select this is e600  (+0600 from normal)
-		// ':maincpu' (8002327C): hng64_fbscroll x e6000000 ffff0000
+		// ':maincpu' (8002327C): fbscroll x e6000000 ffff0000
 
 		// on xrally car select this is e680
-		// hng64_fbscroll x e6800000 ffff0000
-		//logerror("%s: hng64_fbscroll x %08x (%d) %08x\n", machine().describe_context(), data, ((data&0x7fff0000) >> 21), mem_mask);
+		// fbscroll x e6800000 ffff0000
+		//LOGFRAMEBUFFER("%s: fbscroll x %08x (%d) %08x\n", machine().describe_context(), data, ((data&0x7fff0000) >> 21), mem_mask);
 	}
 
 	if (mem_mask & 0x0000ffff)
 	{
 		// NORMAL value is 1c00  (1c0 = 448) /2 = 224 (midpoint y?)
-		// ':maincpu' (8006FA18): hng64_fbscroll y 00001c00 0000ffff
+		// ':maincpu' (8006FA18): fbscroll y 00001c00 0000ffff
 
 		// on xrally course select this is 1700  (0x170 = 368)
-		// ':maincpu' (8002327C): hng64_fbscroll y 00001700 0000ffff (-0500 from normal)
+		// ':maincpu' (8002327C): fbscroll y 00001700 0000ffff (-0500 from normal)
 
 		// on xrally car select this is 1260 (and needs to be higher up)
-		// ':maincpu' (80012820): hng64_fbscroll y 00001260 0000ffff
+		// ':maincpu' (80012820): fbscroll y 00001260 0000ffff
 		// 00001a60 on screen after, not quite as high up, but higher than 1c00
-		//logerror("%s: hng64_fbscroll y %08x (%d) %08x\n", machine().describe_context(), data, (data >> 5), mem_mask);
+		//LOGFRAMEBUFFER("%s: fbscroll y %08x (%d) %08x\n", machine().describe_context(), data, (data >> 5), mem_mask);
 	}
 }
 
-void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void hng64_state::fbunkbyte_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_fbunk[offset]);
 
@@ -1193,7 +1189,7 @@ void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_m
 	// is 02 in most games, 03 in samsh4 games
 	// could be related to how fbscrolly is applied?
 
-	logerror("%s: hng64_unkbyte_w %08x %08x\n", machine().describe_context(), data, mem_mask);
+	LOGFRAMEBUFFER("%s: fbunkbyte_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 }
 
 /*
@@ -1215,15 +1211,16 @@ sams64_2  00000000 00000000 00000000 00000000 00000000 07070000 00000000 0000000
 these values are used in the rendering, to control the size at which a texture wraps on each of
 the texture pages.
 */
-uint8_t hng64_state::hng64_texture_wrapsize_table_r(offs_t offset)
+u8 hng64_state::texture_wrapsize_table_r(offs_t offset)
 {
-	logerror("%s: hng64_texture_wrapsize_table_r (%03x)\n", machine().describe_context(), offset * 4);
+	if (!machine().side_effects_disabled())
+		LOGTEXTURE("%s: texture_wrapsize_table_r (%03x)\n", machine().describe_context(), offset * 4);
 	return m_texture_wrapsize_table[offset];
 }
 
-void hng64_state::hng64_texture_wrapsize_table_w(offs_t offset, uint8_t data)
+void hng64_state::texture_wrapsize_table_w(offs_t offset, u8 data)
 {
-	logerror("%s: hng64_texture_wrapsize_table_w (%03x) %08x\n", machine().describe_context(), offset * 4, data);
+	LOGTEXTURE("%s: texture_wrapsize_table_w (%03x) %08x\n", machine().describe_context(), offset * 4, data);
 	m_texture_wrapsize_table[offset] = data;
 
 #if 0
@@ -1275,7 +1272,7 @@ void hng64_state::vecmatmul4(float *product, const float *a, const float *b)
 
 float hng64_state::vecDotProduct(const float *a, const float *b)
 {
-	return ((a[0]*b[0]) + (a[1]*b[1]) + (a[2]*b[2]));
+	return ((a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]));
 }
 
 void hng64_state::setIdentity(float *matrix)
@@ -1288,24 +1285,24 @@ void hng64_state::setIdentity(float *matrix)
 	matrix[0] = matrix[5] = matrix[10] = matrix[15] = 1.0f;
 }
 
-float hng64_state::uToF(uint16_t input)
+float hng64_state::uToF(u16 input)
 {
 	float retVal;
-	retVal = float(int16_t(input)) / 32768.0f;
+	retVal = float(s16(input)) / 32768.0f;
 	return retVal;
 
 #if 0
-	if (int16_t(input) < 0)
-		retVal = float(int16_t(input)) / 32768.0f;
+	if (s16(input) < 0)
+		retVal = float(s16(input)) / 32768.0f;
 	else
-		retVal = float(int16_t(input)) / 32767.0f;
+		retVal = float(s16(input)) / 32767.0f;
 #endif
 }
 
 void hng64_state::normalize(float* x)
 {
-	double l2 = (x[0]*x[0]) + (x[1]*x[1]) + (x[2]*x[2]);
-	double l = sqrt(l2);
+	const double l2 = (x[0] * x[0]) + (x[1] * x[1]) + (x[2] * x[2]);
+	const double l = sqrt(l2);
 
 	x[0] = float(x[0] / l);
 	x[1] = float(x[1] / l);
@@ -1317,7 +1314,7 @@ void hng64_state::normalize(float* x)
 // POLYGON RASTERIZATION CODE //
 ////////////////////////////////
 
-void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
+void hng64_poly_renderer::render_texture_scanline(s32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
 	if ((scanline > 511) | (scanline < 0))
 		return;
@@ -1336,13 +1333,13 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512)];
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
+	u16* colorBuffer = &m_colorBuffer3d[(scanline * 512)];
+	float* depthBuffer = &m_depthBuffer3d[(scanline * 512)];
 
-	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
+	const u8 *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
 
 	// Step over each pixel in the horizontal span
-	for(int x = extent.startx; x < extent.stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (z < depthBuffer[x & 511])
 		{
@@ -1363,10 +1360,9 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				textureS += (renderData.texscrolly & 0x3fff)>>5;
 				textureT += (renderData.texscrollx & 0x3fff)>>5;
 
-
-				int textPageSub = (renderData.texPageSmall & 0xc000) >> 14;
-				int texPageHorizOffset = (renderData.texPageSmall & 0x3f80) >> 7;
-				int texPageVertOffset =  (renderData.texPageSmall & 0x007f) >> 0;
+				const int textPageSub = (renderData.texPageSmall & 0xc000) >> 14;
+				const int texPageHorizOffset = (renderData.texPageSmall & 0x3f80) >> 7;
+				const int texPageVertOffset =  (renderData.texPageSmall & 0x007f) >> 0;
 
 				// Small-Page textures
 				// what is textPageSub & 1 used for? seems to be enabled on almost everything? it does not control wrap enable?
@@ -1376,12 +1372,12 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					textureS = fmod(textureS, (float)renderData.tex_mask_y); textureS += (8.0f * texPageVertOffset);
 				}
 
-				uint8_t paletteEntry;
+				u8 paletteEntry;
 				int t = (int)textureT;
 				int s = (int)textureS;
 
 				t &= 1023;
-				s &= 1023; // 4bpp pages seem to be limited to 1024 pixels, with page numbering being the same, the bottom 1024 pixels of 4bpp pages are unsed?
+				s &= 1023; // 4bpp pages seem to be limited to 1024 pixels, with page numbering being the same, the bottom 1024 pixels of 4bpp pages are unused?
 
 				if (renderData.tex4bpp)
 				{
@@ -1401,8 +1397,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				if (paletteEntry != 0)
 				{
 					float rIntensity = rCorrect / 16.0f;
-					uint8_t lightval = (uint8_t)rIntensity;
-					uint16_t color = ((renderData.palOffset + paletteEntry) & 0x7ff) | (lightval << 12);
+					u8 lightval = (u8)rIntensity;
+					u16 color = ((renderData.palOffset + paletteEntry) & 0x7ff) | (lightval << 12);
 					if (renderData.blend)
 						color |= 0x800;
 
@@ -1420,7 +1416,7 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	}
 }
 
-void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
+void hng64_poly_renderer::render_flat_scanline(s32 scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
 	if ((scanline > 511) | (scanline < 0))
 		return;
@@ -1430,11 +1426,11 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	const float dz = extent.param[0].dpdx;
 
 	// Pointers to the pixel buffers
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
-	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512)];
+	float* depthBuffer = &m_depthBuffer3d[(scanline * 512)];
+	u16* colorBuffer = &m_colorBuffer3d[(scanline * 512)];
 
 	// Step over each pixel in the horizontal span
-	for(int x = extent.startx; x < extent.stopx; x++)
+	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (z < depthBuffer[x & 511])
 		{
@@ -1467,7 +1463,6 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 
 	rectangle visibleArea;
 	visibleArea.set(0, 512, 0, 512);
-
 
 	if (p->flatShade)
 	{

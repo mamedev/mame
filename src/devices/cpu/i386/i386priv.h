@@ -331,7 +331,7 @@ extern int i386_parity_table[256];
 #define CYCLES_NUM(x)       (m_cycles -= (x))
 
 #define FAULT(fault,error)  {m_ext = 1; i386_trap_with_error(fault,0,0,error); return;}
-#define FAULT_EXP(fault,error) {m_ext = 1; i386_trap_with_error(fault,0,trap_level+1,error); return;}
+#define FAULT_EXP(fault,error) {m_ext = 1; FAULT_THROW(fault, (error)); return;}
 
 /***********************************************************************************/
 

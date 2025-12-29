@@ -9,7 +9,6 @@
  * - rewrite fifo hookups, remove them from the actual opcodes.
  * - illegal delay slots unsupported, and no idea about what is supposed to happen;
  * - externalize PDR (error LED flags on Model 2);
- * - perform external memory access if AALU-A is 0x400 or higher
  *
  ********************************************************************************/
 
@@ -86,8 +85,9 @@ void mb86235_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_pcache);
 	space(AS_PROGRAM).specific(m_program);
-	space(AS_DATA).specific(m_dataa);
-	space(AS_IO).specific(m_datab);
+	space(AS_DATA).specific(m_external);
+	space(AS_BUSA).specific(m_dataa);
+	space(AS_BUSB).specific(m_datab);
 
 	m_core = (mb86235_internal_state *)m_cache.alloc_near(sizeof(mb86235_internal_state));
 	memset(m_core, 0, sizeof(mb86235_internal_state));
@@ -255,8 +255,9 @@ void mb86235_cpu_device::execute_set_input(int irqline, int state)
 
 mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MB86235, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
-	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 64, 12, -3)
+	, m_external_config("external", ENDIANNESS_LITTLE, 32, 24, -2)
+	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))
 	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(mb86235_device::internal_bbus), this))
 	, m_fifoin(*this, finder_base::DUMMY_TAG)
 	, m_fifoout(*this, finder_base::DUMMY_TAG)
@@ -274,8 +275,9 @@ device_memory_interface::space_config_vector mb86235_device::memory_space_config
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_dataa_config),
-		std::make_pair(AS_IO,      &m_datab_config)
+		std::make_pair(AS_DATA,    &m_external_config),
+		std::make_pair(AS_BUSA,    &m_dataa_config),
+		std::make_pair(AS_BUSB,    &m_datab_config)
 	};
 }
 

@@ -163,7 +163,7 @@ void adm11_state::adm12(machine_config &config)
 {
 	I8031(config, m_maincpu, 11.0592_MHz_XTAL); // P8031AH
 	m_maincpu->set_addrmap(AS_PROGRAM, &adm11_state::prog_map);
-	m_maincpu->set_addrmap(AS_IO, &adm11_state::ext_map);
+	m_maincpu->set_addrmap(AS_DATA, &adm11_state::ext_map);
 	m_maincpu->port_in_cb<1>().set(FUNC(adm11_state::p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(adm11_state::p1_w));
 	// TODO: RXD/TXD are serial communications; INT0 is serial keyboard data

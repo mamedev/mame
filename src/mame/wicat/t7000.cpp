@@ -16,11 +16,11 @@
 
 #include "emu.h"
 
+#include "bus/keytronic/keytronic.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/input_merger.h"
-#include "machine/keytronic_l2207.h"
 #include "machine/scn_pci.h"
 #include "machine/x2212.h"
 #include "video/i8275.h"
@@ -226,11 +226,12 @@ void t7000_state::t7000(machine_config &config)
 	m_pci[0]->rxrdy_handler().set(m_mainint, FUNC(input_merger_device::in_w<1>));
 
 	SCN2651(config, m_pci[1], 5.0688_MHz_XTAL);
-	m_pci[1]->txd_handler().set("keyboard", FUNC(keytronic_l2207_device::ser_in_w));
+	m_pci[1]->txd_handler().set("keyboard", FUNC(keytronic_connector_device::ser_in_w));
 	m_pci[1]->txrdy_handler().set(m_mainint, FUNC(input_merger_device::in_w<2>));
 	m_pci[1]->rxrdy_handler().set(m_mainint, FUNC(input_merger_device::in_w<3>));
 
-	KEYTRONIC_L2207(config, "keyboard").ser_out_callback().set(m_pci[1], FUNC(scn_pci_device::rxd_w));
+	keytronic_connector_device &keyboard(KEYTRONIC_CONNECTOR(config, "keyboard", ascii_terminal_keyboards, "l2207"));
+	keyboard.ser_out_callback().set(m_pci[1], FUNC(scn_pci_device::rxd_w));
 
 	LS259(config, m_outlatch); // U43
 	m_outlatch->q_out_cb<0>().set(FUNC(t7000_state::vblint_enable_w));

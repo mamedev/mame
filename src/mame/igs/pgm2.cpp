@@ -1567,7 +1567,7 @@ GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, 
 // King of Fighters '98: Ultimate Match Hero
 GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, init_bubucar,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Only the program ROM is dumped
+GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, init_bubucar,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ジグソーワールドアリーナ/Jigsaw World Arena
 

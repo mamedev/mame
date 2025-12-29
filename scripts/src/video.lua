@@ -45,6 +45,19 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ym7101.h,VIDEOS["YM7101"] = true
+--------------------------------------------------
+
+if (VIDEOS["YM7101"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ym7101.cpp",
+		MAME_DIR .. "src/devices/video/ym7101.h",
+	}
+end
+
+
+--------------------------------------------------
+--
 --@src/devices/video/am8052.h,VIDEOS["AM8052"] = true
 --------------------------------------------------
 
@@ -1124,6 +1137,18 @@ if (VIDEOS["RAMDAC"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/video/roc10937.h,VIDEOS["ROC10937"] = true
+---------------------------------------------------
+
+if (VIDEOS["ROC10937"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/roc10937.cpp",
+		MAME_DIR .. "src/devices/video/roc10937.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/video/saa5050.h,VIDEOS["SAA5050"] = true
@@ -1423,6 +1448,18 @@ if (VIDEOS["UPD7227"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/upd7227.cpp",
 		MAME_DIR .. "src/devices/video/upd7227.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/upd72120.h,VIDEOS["UPD72120"] = true
+--------------------------------------------------
+
+if (VIDEOS["UPD72120"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/upd72120.cpp",
+		MAME_DIR .. "src/devices/video/upd72120.h",
 	}
 end
 

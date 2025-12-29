@@ -368,30 +368,27 @@ void rockrage_state::machine_reset()
 void rockrage_state::rockrage(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8);
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rockrage_state::main_map);
 
-	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
+	MC6809E(config, m_audiocpu, 24_MHz_XTAL / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rockrage_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(rockrage_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(rockrage_state::vblank_irq));
 
-	K007342(config, m_k007342, 0, m_palette, gfx_rockrage_tiles);
+	K007342(config, m_k007342, 24_MHz_XTAL, m_palette, gfx_rockrage_tiles);
 	m_k007342->set_tile_callback(FUNC(rockrage_state::tile_callback));
 	m_k007342->flipscreen_cb().set(m_k007420, FUNC(k007420_device::set_flipscreen));
 	m_k007342->sprite_wrap_y_cb().set(m_k007420, FUNC(k007420_device::set_wrap_y));
 
-	K007420(config, m_k007420, 0, m_palette, gfx_rockrage_spr);
+	K007420(config, m_k007420, 24_MHz_XTAL, m_palette, gfx_rockrage_spr);
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(rockrage_state::sprite_callback));
 
@@ -404,9 +401,9 @@ void rockrage_state::rockrage(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	YM2151(config, "ymsnd", 3'579'545).add_route(0, "speaker", 0.30, 0).add_route(1, "speaker", 0.30, 1);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 0.30, 0).add_route(1, "speaker", 0.30, 1);
 
-	VLM5030(config, m_vlm, 3'579'545);
+	VLM5030(config, m_vlm, 3.579545_MHz_XTAL);
 	m_vlm->set_addrmap(0, &rockrage_state::vlm_map);
 	m_vlm->add_route(ALL_OUTPUTS, "speaker", 0.60, 0);
 	m_vlm->add_route(ALL_OUTPUTS, "speaker", 0.60, 1);

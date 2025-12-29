@@ -353,17 +353,17 @@ void elan_eu3a05commonsys_device::elan_eu3a05_rombank_w(offs_t offset, uint8_t d
 {
 	if (offset == 0x00)
 	{
-		// written with the banking?
 		//logerror("%s: elan_eu3a05_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
 		m_rombank_hi = data;
-
-		m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
 	}
 	else
 	{
 		//logerror("%s: elan_eu3a05_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
 		m_rombank_lo = data;
 	}
+
+	// rad_ftet writes only the low and expects bank to change
+	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
 }
 
 uint8_t elan_eu3a05commonsys_device::elan_eu3a05_rombank_r(offs_t offset)

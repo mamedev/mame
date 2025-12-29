@@ -1,11 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Nigel Barnes
-/**********************************************************************
-
-    MasterSD BBC Master SD Cartridge
-
-**********************************************************************/
-
 #ifndef MAME_BUS_BBC_CART_MASTERSD_H
 #define MAME_BUS_BBC_CART_MASTERSD_H
 

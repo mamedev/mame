@@ -181,7 +181,7 @@ public:
 
 protected:
 	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-//	virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+//  virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
@@ -225,6 +225,7 @@ void mz80b_state::video_start()
 	m_tvram = std::make_unique<u8[]>(0x1000);
 	m_gvram = std::make_unique<u8[]>(0x10000);
 	// back color register doesn't apply to monochrome monitor
+	m_back_color = 0;
 	m_back_color_mask = 0;
 
 	save_pointer(NAME(m_tvram), 0x1000);
@@ -402,7 +403,6 @@ void mz2200_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &clipre
 
 uint32_t mz80b_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// mz2000_cass:harvestc uses this extensively
 	bitmap.fill(m_back_color, cliprect);
 
 	if (m_vgate)
@@ -1391,15 +1391,12 @@ void mz80b_state::mz80b(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", mz2000_floppies, nullptr, mz2000_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", mz2000_floppies, nullptr, mz2000_state::floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_original("mz2000_flop");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(mz700_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mz_cass");
-
-	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass").set_filter("MONO");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1415,6 +1412,9 @@ void mz80b_state::mz80b(machine_config &config)
 	// mz800 actually reads $f8-$fa from IPL
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(mz80b_state::snapshot_cb));
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mz80b_flop");
+	SOFTWARE_LIST(config, "cass_list").set_original("mz80b_cass");
 }
 
 
@@ -1425,14 +1425,20 @@ void mz2000_state::mz2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 
 	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
+
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mz2000_flop");
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("MONO");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("mz2000");
 }
 
 void mz2200_state::mz2200(machine_config &config)
 {
 	mz2000(config);
-	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("COLOR");
 
 	PALETTE(config.replace(), m_palette, palette_device::BRG_3BIT);
+
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("COLOR");
+	SOFTWARE_LIST(config.replace(), "flop_generic_list").set_compatible("generic_flop_525").set_filter("mz2200");
 }
 
 
@@ -1472,4 +1478,4 @@ ROM_END
 
 COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz80b_state,  empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
 COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
-COMP( 1982, mz2200, mz2000, 0,      mz2200,  mz80bj, mz2200_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )
+COMP( 1983, mz2200, mz2000, 0,      mz2200,  mz80bj, mz2200_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING ) // Released in July 17 1983

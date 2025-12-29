@@ -12,6 +12,7 @@
     - Proper PIO emulation;
     - Output CRTC border color;
     - Add VCLK select;
+    - Implement dynamic clock via PLL
 
 ***************************************************************************/
 
@@ -37,15 +38,16 @@ DEFINE_DEVICE_TYPE(VRENDER0_SOC, vrender0soc_device, "vrender0", "MagicEyes VRen
 
 vrender0soc_device::vrender0soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VRENDER0_SOC, tag, owner, clock),
-	m_host_cpu(*this, finder_base::DUMMY_TAG),
+	device_mixer_interface(mconfig, *this),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_vr0vid(*this, "vr0vid"),
 	m_vr0snd(*this, "vr0snd"),
-	m_speaker(*this, "speaker"),
 	m_uart(*this, "uart%u", 0),
 	m_crtcregs(*this, "crtcregs"),
-	write_tx(*this)
+	m_host_space(*this, finder_base::DUMMY_TAG, -1, 32),
+	m_int_cb(*this),
+	m_write_tx(*this)
 {
 }
 
@@ -92,6 +94,8 @@ void vrender0soc_device::regs_map(address_map &map)
 //  map(0x03400, 0x037ff)                            // CRT Controller
 	map(0x03400, 0x037ff).rw(FUNC(vrender0soc_device::crtc_r), FUNC(vrender0soc_device::crtc_w)).share("crtcregs");
 //  map(0x04000, 0x043ff)                            // RAMDAC & PLL
+//  map(0x04000, 0x04003)                            // PLL control register
+//  map(0x04004, 0x04007)                            // PLL Program register
 }
 
 void vrender0soc_device::audiovideo_map(address_map &map)
@@ -120,7 +124,7 @@ void vrender0soc_device::frame_map(address_map &map)
 void vrender0soc_device::device_add_mconfig(machine_config &config)
 {
 	for (required_device<vr0uart_device> &uart : m_uart)
-		VRENDER0_UART(config, uart, 3579500);
+		VRENDER0_UART(config, uart, 3'579'500); // DERIVED_CLOCK(1, 24));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// evolution soccer defaults
@@ -129,19 +133,17 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	// runs at double speed wrt of the CPU clock
-	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(2, 1));
+	// runs at double speed WRT the bus clock
+	VIDEO_VRENDER0(config, m_vr0vid, DERIVED_CLOCK(1, 1));
 
 	PALETTE(config, m_palette, palette_device::RGB_565);
 
-	SPEAKER(config, m_speaker, 2).front();
-
-	SOUND_VRENDER0(config, m_vr0snd, DERIVED_CLOCK(1,1)); // Correct?
+	SOUND_VRENDER0(config, m_vr0snd, DERIVED_CLOCK(1, 2)); // Correct?
 	m_vr0snd->set_addrmap(vr0sound_device::AS_TEXTURE, &vrender0soc_device::texture_map);
 	m_vr0snd->set_addrmap(vr0sound_device::AS_FRAME, &vrender0soc_device::frame_map);
 	m_vr0snd->irq_callback().set(FUNC(vrender0soc_device::soundirq_cb));
-	m_vr0snd->add_route(0, m_speaker, 1.0, 0);
-	m_vr0snd->add_route(1, m_speaker, 1.0, 1);
+	m_vr0snd->add_route(0, *this, 1.0, 0);
+	m_vr0snd->add_route(1, *this, 1.0, 1);
 }
 
 
@@ -155,7 +157,6 @@ void vrender0soc_device::device_start()
 	m_frameram = make_unique_clear<uint16_t []>(0x00800000/2);
 
 	m_vr0vid->set_areas(m_textureram.get(), m_frameram.get());
-	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly",this->tag());
@@ -191,7 +192,7 @@ void vrender0soc_device::device_start()
 void vrender0soc_device::write_line_tx(int port, uint8_t value)
 {
 	//printf("callback %d %02x\n",port,value);
-	write_tx[port & 1](value);
+	m_write_tx[port & 1](value);
 }
 
 
@@ -266,7 +267,7 @@ void vrender0soc_device::intvec_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	{
 		m_intst &= ~(1 << (data & 0x1f));
 		if (!m_intst)
-			m_host_cpu->set_input_line(SE3208_INT, CLEAR_LINE);
+			m_int_cb(CLEAR_LINE);
 	}
 	if (ACCESSING_BITS_8_15)
 		m_IntHigh = (data >> 8) & 7;
@@ -283,7 +284,7 @@ void vrender0soc_device::inten_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	// P'S Attack has a timer 0 irq service with no call to intvec_w but just this
 	m_intst &= m_inten;
 	if (!m_intst)
-		m_host_cpu->set_input_line(SE3208_INT, CLEAR_LINE);
+		m_int_cb(CLEAR_LINE);
 }
 
 uint32_t vrender0soc_device::intst_r()
@@ -302,7 +303,7 @@ void vrender0soc_device::IntReq( int num )
 	if (m_inten & (1 << num))
 	{
 		m_intst |= (1 << num);
-		m_host_cpu->set_input_line(SE3208_INT, ASSERT_LINE);
+		m_int_cb(ASSERT_LINE);
 	}
 }
 
@@ -339,8 +340,8 @@ void vrender0soc_device::TimerStart(int which)
 {
 	int PD = (m_timer_control[which] >> 8) & 0xff;
 	int TCV = m_timer_count[which] & 0xffff;
-	// TODO: documentation claims this is bus clock, may be slower than the CPU itself
-	attotime period = attotime::from_hz(this->clock()) * ((PD + 1) * (TCV + 1));
+	// TODO: documentation claims this is bus clock, half the internal PLL frequency.
+	attotime period = attotime::from_hz(this->clock()) * 2 * ((PD + 1) * (TCV + 1));
 	m_Timer[which]->adjust(period);
 
 //  printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());

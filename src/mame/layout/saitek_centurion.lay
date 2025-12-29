@@ -376,8 +376,8 @@ authors:hap
 		<element ref="text_ng"><bounds xc="48.5" y="17.5" width="8.5" height="2.166" /></element>
 
 		<!-- hidden input above CLEAR/ENTER buttons to press both -->
-		<element ref="nothing" inputtag="IN.0" inputmask="0x40" clickthrough="yes"><bounds xc="48.5" y="17.5" width="8.5" height="2.166" /></element>
-		<element ref="nothing" inputtag="IN.0" inputmask="0x80" clickthrough="no"> <bounds xc="48.5" y="17.5" width="8.5" height="2.166" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x40" clickthrough="no"> <bounds xc="48.5" y="17.5" width="8.5" height="2.166" /></element>
+		<element ref="nothing" inputtag="IN.0" inputmask="0x80" clickthrough="yes"><bounds xc="48.5" y="17.5" width="8.5" height="2.166" /></element>
 
 		<element ref="but" inputtag="IN.3" inputmask="0x10"><bounds xc="9" y="10" width="9.3" height="2" /></element>
 		<element ref="but" inputtag="IN.0" inputmask="0x08"><bounds xc="19.8" y="10" width="9.3" height="2" /></element>

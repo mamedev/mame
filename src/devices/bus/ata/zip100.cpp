@@ -85,7 +85,7 @@ void zip100_ide_device::device_add_mconfig(machine_config &config)
 {
 	i80c32_device &mcu(I80C32(config, "mcu", 12'000'000)); // custom SoC; clock unknown
 	mcu.set_addrmap(AS_PROGRAM, &zip100_ide_device::mem_map);
-	mcu.set_addrmap(AS_IO, &zip100_ide_device::ext_map);
+	mcu.set_addrmap(AS_DATA, &zip100_ide_device::ext_map);
 }
 
 ROM_START(zip100_ide)
