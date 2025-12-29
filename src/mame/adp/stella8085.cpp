@@ -294,41 +294,41 @@ void stella8085_state::output_digit(uint8_t digit, uint8_t data)
 	};
 
 	static constexpr u8 ttl7448[16] = {
-	/* 0 */  _a | _b | _c | _d | _e | _f,
-	/* 1 */  _b | _c,
-	/* 2 */  _a | _b | _d | _e | _g,
-	/* 3 */  _a | _b | _c | _d | _g,
-	/* 4 */  _b | _c | _f | _g,
-	/* 5 */  _a | _c | _d | _f | _g,
-	/* 6 */  _c | _d | _e | _f | _g,
-	/* 7 */  _a | _b | _c,
-	/* 8 */  _a | _b | _c | _d | _e | _f | _g,
-	/* 9 */  _a | _b | _c | _f | _g,
-	/* a */  _d | _e | _g,
-	/* b */  _c | _d | _g,
-	/* c */  _b | _f | _g,
-	/* d */  _a | _d | _f | _g,
-	/* e */  _d | _e | _f | _g,
-	/* f */  0
+	_a | _b | _c | _d | _e | _f,
+	_b | _c,
+	_a | _b | _d | _e | _g,
+	_a | _b | _c | _d | _g,
+	_b | _c | _f | _g,
+	_a | _c | _d | _f | _g,
+	_c | _d | _e | _f | _g,
+	_a | _b | _c,
+	_a | _b | _c | _d | _e | _f | _g,
+	_a | _b | _c | _f | _g,
+	_d | _e | _g,
+	_c | _d | _g,
+	_b | _f | _g,
+	_a | _d | _f | _g,
+	_d | _e | _f | _g,
+	0
 	};
 
 	static constexpr u8 cd4543[16] = {
-	/* 0 */  _a | _b | _c | _d | _e | _f,
-	/* 1 */  _b | _c,
-	/* 2 */  _a | _b | _d | _e | _g,
-	/* 3 */  _a | _b | _c | _d | _g,
-	/* 4 */  _b | _c | _f | _g,
-	/* 5 */  _a | _c | _d | _f | _g,
-	/* 6 */  _a | _c | _d | _e | _f | _g,
-	/* 7 */  _a | _b | _c,
-	/* 8 */  _a | _b | _c | _d | _e | _f | _g,
-	/* 9 */  _a | _b | _c | _d | _f | _g,
-	/* a */  0,
-	/* b */  0,
-	/* c */  0,
-	/* d */  0,
-	/* e */  0,
-	/* f */  0
+	_a | _b | _c | _d | _e | _f,
+	_b | _c,
+	_a | _b | _d | _e | _g,
+	_a | _b | _c | _d | _g,
+	_b | _c | _f | _g,
+	_a | _c | _d | _f | _g,
+	_a | _c | _d | _e | _f | _g,
+	_a | _b | _c,
+	_a | _b | _c | _d | _e | _f | _g,
+	_a | _b | _c | _d | _f | _g,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
 	};
 
 	if (i<8)
@@ -409,12 +409,12 @@ void stella8085_state::io71w(uint8_t data)
 		m_maincpu->set_input_line(I8085_RST55_LINE, CLEAR_LINE);
 		m_sound_timer->adjust(attotime::from_msec((60*(m_sounddata & 0x30) >> 4)+1), 0); // TODO: measure this
 	}
-		
+
 	if (GONG)
 		popmessage("GONG");
 	if (US)
 		LOG("activating US\n");
-	
+
 	m_beep->set_output_gain(ALL_OUTPUTS,!DG); //repurposed as unmute on newer boards
 
 	if (UG || DS || DM || UM)
@@ -582,7 +582,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
 
 	config.set_default_layout(layout_adpservice);
-	
+
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
@@ -740,15 +740,15 @@ ROM_START( discoly )
 ROM_END
 
 ROM_START( discryl )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD("disc_royal_1_m27256.ice6", 0x0000, 0x8000, CRC(b286c166) SHA1(08fecc3bf21013f8dbcc08fef3755757c7ff8053))
-    ROM_LOAD("disc_royal_2_m27256.icd6", 0x8000, 0x8000, CRC(be2a96c2) SHA1(07efc914832fe549b69a2ec0de5fd5725502ee86))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("disc_royal_1_m27256.ice6", 0x0000, 0x8000, CRC(b286c166) SHA1(08fecc3bf21013f8dbcc08fef3755757c7ff8053))
+	ROM_LOAD("disc_royal_2_m27256.icd6", 0x8000, 0x8000, CRC(be2a96c2) SHA1(07efc914832fe549b69a2ec0de5fd5725502ee86))
 ROM_END
 
 ROM_START( discrylb )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("disc_royal_dob._i.ice6", 0x0000, 0x8000, CRC(eafe92ca) SHA1(5dc172d7cd4efca7a49ac5884ff30fea7be02a30))
-    ROM_LOAD("disc_royal_dob.ii.icd6", 0x8000, 0x8000, CRC(ad58476d) SHA1(4565156cac372f45058bce20006692e9afa53ebe))
+	ROM_LOAD("disc_royal_dob.ii.icd6", 0x8000, 0x8000, CRC(ad58476d) SHA1(4565156cac372f45058bce20006692e9afa53ebe))
 ROM_END
 
 ROM_START( elitdisc )
@@ -818,9 +818,9 @@ ROM_START( kniffi )
 ROM_END
 
 ROM_START( m21point )
-    ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("21_point_27c256_f3_i.ice6",  0x0000, 0x8000, CRC(c2b7b030) SHA1(affb317da2f892213556937fa8857186dccac58a))
-    ROM_LOAD("21_point_27c256_f3_ii.icd6", 0x8000, 0x8000, CRC(a466591c) SHA1(c481fc91055b41c9976ff86785f7ee0ce631bd69))
+	ROM_LOAD("21_point_27c256_f3_ii.icd6", 0x8000, 0x8000, CRC(a466591c) SHA1(c481fc91055b41c9976ff86785f7ee0ce631bd69))
 ROM_END
 
 ROM_START( macao )
@@ -830,9 +830,9 @@ ROM_START( macao )
 ROM_END
 
 ROM_START(mas)
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD("mega_as_f5_eprom1_27256.ice6", 0x0000, 0x8000, CRC(17e22e95) SHA1(6fbc11c41c99ee4aac3dcad6647cede25b73f3da))
-    ROM_LOAD("mega_as_f5_eprom2_27256.icd6", 0x8000, 0x8000, CRC(12453d57) SHA1(c6c9fa39bdfc7801471bed57e365e37bb02f50b0))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("mega_as_f5_eprom1_27256.ice6", 0x0000, 0x8000, CRC(17e22e95) SHA1(6fbc11c41c99ee4aac3dcad6647cede25b73f3da))
+	ROM_LOAD("mega_as_f5_eprom2_27256.icd6", 0x8000, 0x8000, CRC(12453d57) SHA1(c6c9fa39bdfc7801471bed57e365e37bb02f50b0))
 ROM_END
 
 ROM_START( mastro )
@@ -848,21 +848,21 @@ ROM_START( mbistro )
 ROM_END
 
 ROM_START( mclub )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("merkur_club_f1_i_st_m27256f1_original.bin",  0x0000, 0x8000, CRC(c78b19b2) SHA1(79aeeee6e82bf987e2aa936575e1e1b251b1a425))
-    ROM_LOAD("merkur_club_f1_ii_st_m27256f1_original.bin", 0x8000, 0x8000, CRC(ad3b7d5f) SHA1(317909be8a7853bf83f4f3a2497b1f38a0d954c9))
+	ROM_LOAD("merkur_club_f1_ii_st_m27256f1_original.bin", 0x8000, 0x8000, CRC(ad3b7d5f) SHA1(317909be8a7853bf83f4f3a2497b1f38a0d954c9))
 ROM_END
 
 ROM_START( mmax )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("mega_max_f4_i_st_m27256f1_ice6",  0x0000, 0x8000, CRC(91aa91ba) SHA1(f6c3a6e2e2edeaa79cf0bcdb6af01ddd50eb5488))
-    ROM_LOAD("mega_max_f4_ii_st_m27256f1_icd6", 0x8000, 0x8000, CRC(6120080b) SHA1(16209bfe8e75a165ec1e8a5bf2ec7fa078725380))
+	ROM_LOAD("mega_max_f4_ii_st_m27256f1_icd6", 0x8000, 0x8000, CRC(6120080b) SHA1(16209bfe8e75a165ec1e8a5bf2ec7fa078725380))
 ROM_END
 
 ROM_START( mtrio )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD("mega_trio_f1_ic1.ice6", 0x00000, 0x08000, CRC(9d97fd8c) SHA1(c398610e14c33985a186ae816b759cfdd2b0c6fa))
-    ROM_LOAD("mega_trio_f1_ic2.icd6", 0x00000, 0x08000, CRC(b8c2fc4c) SHA1(ddecd608286eb1f3efc6fccce8806a74ad7ce4b8))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("mega_trio_f1_ic1.ice6", 0x00000, 0x08000, CRC(9d97fd8c) SHA1(c398610e14c33985a186ae816b759cfdd2b0c6fa))
+	ROM_LOAD("mega_trio_f1_ic2.icd6", 0x00000, 0x08000, CRC(b8c2fc4c) SHA1(ddecd608286eb1f3efc6fccce8806a74ad7ce4b8))
 ROM_END
 
 ROM_START( rasant )
@@ -872,10 +872,10 @@ ROM_START( rasant )
 ROM_END
 
 ROM_START( sesam )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD("sesam_1_27128.ice6", 0x0000, 0x4000, CRC(29a07575) SHA1(d7e3355e32fcb7a064d8d0fd9b4904be860f7eed))
-    ROM_LOAD("sesam_2_27128.icd6", 0x4000, 0x4000, CRC(dac087d0) SHA1(0776e3db14c9b88140887237b5b3d71396b2e6e9))
-    ROM_LOAD("sesam_3_2732.icc5",  0x8000, 0x1000, CRC(ec6a2eac) SHA1(6608dd6f477db0df7de3e4262c5b7bcdf1af7ef4))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("sesam_1_27128.ice6", 0x0000, 0x4000, CRC(29a07575) SHA1(d7e3355e32fcb7a064d8d0fd9b4904be860f7eed))
+	ROM_LOAD("sesam_2_27128.icd6", 0x4000, 0x4000, CRC(dac087d0) SHA1(0776e3db14c9b88140887237b5b3d71396b2e6e9))
+	ROM_LOAD("sesam_3_2732.icc5",  0x8000, 0x1000, CRC(ec6a2eac) SHA1(6608dd6f477db0df7de3e4262c5b7bcdf1af7ef4))
 ROM_END
 
 ROM_START( sherzas )
@@ -927,13 +927,13 @@ ROM_START( v4assef2 )
 ROM_END
 
 ROM_START( vmulti )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-    ROM_LOAD("venus_multi_1_2732.bin", 0x0000, 0x1000, CRC(3b269798) SHA1(511fb8a86008c124de37d5359681d8379d25891d))
-    ROM_LOAD("venus_multi_2_2732.bin", 0x1000, 0x1000, CRC(67e22cec) SHA1(8639cb4496012d9f20f2ece89f15290d017ece2e))
-    ROM_LOAD("venus_multi_3_2732.bin", 0x2000, 0x1000, CRC(64bd9bd8) SHA1(c878bdd147e011f4191b5613455648852d395bf1))
-    ROM_LOAD("venus_multi_4_2732.bin", 0x3000, 0x1000, CRC(b47e70c1) SHA1(a52cd6568dee16f917c92a41693abd91c4dc2d8c))
-    ROM_LOAD("venus_multi_5_2732.bin", 0x4000, 0x1000, CRC(c2905422) SHA1(5c8e3f0440671dc16df32b599239b0435f120778))
-    ROM_LOAD("venus_multi_6_2732.bin", 0x7000, 0x1000, CRC(09dd81e7) SHA1(35e9a96d913678a75851a9bf7e7349f93e337805))
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD("venus_multi_1_2732.bin", 0x0000, 0x1000, CRC(3b269798) SHA1(511fb8a86008c124de37d5359681d8379d25891d))
+	ROM_LOAD("venus_multi_2_2732.bin", 0x1000, 0x1000, CRC(67e22cec) SHA1(8639cb4496012d9f20f2ece89f15290d017ece2e))
+	ROM_LOAD("venus_multi_3_2732.bin", 0x2000, 0x1000, CRC(64bd9bd8) SHA1(c878bdd147e011f4191b5613455648852d395bf1))
+	ROM_LOAD("venus_multi_4_2732.bin", 0x3000, 0x1000, CRC(b47e70c1) SHA1(a52cd6568dee16f917c92a41693abd91c4dc2d8c))
+	ROM_LOAD("venus_multi_5_2732.bin", 0x4000, 0x1000, CRC(c2905422) SHA1(5c8e3f0440671dc16df32b599239b0435f120778))
+	ROM_LOAD("venus_multi_6_2732.bin", 0x7000, 0x1000, CRC(09dd81e7) SHA1(35e9a96d913678a75851a9bf7e7349f93e337805))
 ROM_END
 
 } // anonymous namespace
