@@ -213,7 +213,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Title screen foreground layer not drawn properly
-No sound
+No sound (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -408,7 +408,7 @@ Eventually black screens
 		<notes><![CDATA[
 Access [cart] EEPROM
 Huge GFX issues (mostly related with pitch)
-No sound
+No sound (fixed)
 ]]></notes>
 
 		<info name="serial" value="J9000E 700700-3"/>
@@ -426,7 +426,7 @@ No sound
 		<notes><![CDATA[
 Access [cart] EEPROM
 Huge GFX issues (mostly related with pitch)
-No sound
+No sound (fixed)
 ]]></notes>
 
 		<info name="serial" value="J9000E 700700-2"/>
