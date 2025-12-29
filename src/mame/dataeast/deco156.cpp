@@ -109,7 +109,8 @@ uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 // see deco32_state::volume_w
 void deco156_state::hvysmsh_volume_w(uint8_t data)
 {
-	// TODO: assume linear with a 0.0-1.0 dB scale for now
+	// TODO: Assumes linear scaling
+	// values go from 0x00 (max volume) to 0xff (min volume)
 	const u8 raw_vol = 0xff - data;
 	const float vol_output = float(raw_vol) / 255.0f;
 
