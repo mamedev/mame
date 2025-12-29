@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(hominn_980924_state::get_fg_tile_info)
 TILE_GET_INFO_MEMBER(hominn_980924_state::get_bg_tile_info)
 {
 	uint16_t const tile = m_bg_datarom[tile_index | ((m_bg_bank & 0x7f) * 0x200)] & 0x7ff;
-	uint16_t const color = (m_bg_datarom[tile_index] & 0xf000) >> 12;
+	uint16_t const color = (m_bg_datarom[tile_index | ((m_bg_bank & 0x7f) * 0x200)] & 0xf000) >> 12;
 
 	tileinfo.set(1, tile, color, 0);
 }
@@ -293,7 +293,7 @@ ROM_START( qxjl )
 	ROM_REGION( 0x40000, "bgtiles", 0 )
 	ROM_LOAD( "5.ub9", 0x00000, 0x40000, CRC(f12e5c72) SHA1(e4d791bb623a10ee5041f8b52ba82b3e5bb7f5b7) )
 
-	ROM_REGION16_BE( 0x10000, "bgdata", 0 ) // seems to be a bg tile data table?
+	ROM_REGION16_BE( 0x10000, "bgdata", 0 )
 	ROM_LOAD( "4.ub4", 0x00000, 0x10000, CRC(7b44beed) SHA1(9cbdb5dc388665ded2c46d29e19ebcde194e7bc1) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
