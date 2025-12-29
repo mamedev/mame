@@ -1860,6 +1860,7 @@ end
 -- Hohner custom sound chips/boards
 --@src/devices/sound/honmeg.h,SOUNDS["HOHNER"] = true
 --@src/devices/sound/hohnerpcm.h,SOUNDS["HOHNER"] = true
+--@src/devices/sound/sam8905.h,SOUNDS["HOHNER"] = true
 ---------------------------------------------------
 
 if (SOUNDS["HOHNER"]~=null) then
@@ -1868,5 +1869,7 @@ if (SOUNDS["HOHNER"]~=null) then
 		MAME_DIR .. "src/devices/sound/honmeg.h",
 		MAME_DIR .. "src/devices/sound/hohnerpcm.cpp",
 		MAME_DIR .. "src/devices/sound/hohnerpcm.h",
+		MAME_DIR .. "src/devices/sound/sam8905.cpp",
+		MAME_DIR .. "src/devices/sound/sam8905.h",
 	}
 end

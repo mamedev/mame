@@ -111,8 +111,11 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	// Receivers (Active Low except WSP)
 	// WA (Write A)
 	if (!BIT(inst, 7)) {
-		if (wsp) {
-			// WA WSP Truth Table (Section 8-3)
+		bool wphi_active = !BIT(inst, 4);
+
+		// "WPHI WSP takes priority over WA WSP giving a normal WA" (Section 8-3)
+		if (wsp && !wphi_active) {
+			// WA WSP Truth Table - only when WPHI is NOT also active
 			uint32_t wave = (bus >> 9) & 0x1FF;
 			uint32_t final_wave = bus & 0x1FF;
 			bool end_bit = BIT(bus, 18);
@@ -127,6 +130,7 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 				slot.clear_rqst = end_bit;
 			}
 		} else {
+			// Normal WA: load A from bus
 			slot.a = bus;
 			slot.clear_rqst = true;
 			slot.int_mod = false;
@@ -173,17 +177,30 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	// WWF (Write Waveform)
 	if (!BIT(inst, 1)) slot.wf = (bus >> 9) & 0x1FF;
 
-	// WACC (Accumulate)
+	// WACC (Accumulate) - with proper dB attenuation
 	if (!BIT(inst, 0)) {
-		// Apply attenuation (Note: simplistic linear mapping of dB values)
-		slot.l_acc += (slot.mul_result * slot.mix_l) >> 3;
-		slot.r_acc += (slot.mul_result * slot.mix_r) >> 3;
+		// dB attenuation lookup: 000=mute, 001=-36dB, 010=-30dB, 011=-24dB,
+		//                        100=-18dB, 101=-12dB, 110=-6dB, 111=0dB
+		static constexpr uint16_t MIX_ATTEN[8] = { 0, 16, 32, 64, 128, 256, 512, 1024 };
+
+		// Sign-extend 19-bit mul_result to 32-bit for proper signed math
+		int32_t signed_mul = (slot.mul_result & MASK19);
+		if (signed_mul & 0x40000) signed_mul |= 0xFFF80000;  // Sign extend from bit 18
+
+		// Apply dB attenuation lookup
+		int32_t l_contrib = (signed_mul * MIX_ATTEN[slot.mix_l]) >> 10;
+		int32_t r_contrib = (signed_mul * MIX_ATTEN[slot.mix_r]) >> 10;
+		slot.l_acc += l_contrib;
+		slot.r_acc += r_contrib;
 	}
 }
 
-void sam8905_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sam8905_device::sound_stream_update(sound_stream &stream)
 {
-	for (int samp = 0; samp < outputs[0].samples(); ++samp) {
+	// SSR bit (bit 3): 0 = 44.1kHz, 1 = 22.05kHz
+	bool ssr_mode = BIT(m_control_reg, 3);
+
+	for (int samp = 0; samp < stream.samples(); ++samp) {
 		int32_t out_l = 0, out_r = 0;
 
 		for (int s = 0; s < 16; ++s) {
@@ -191,13 +208,27 @@ void sam8905_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			m_slots[s].r_acc = 0;
 
 			// Fetch algorithm block from address 15 of D-RAM block
+			// Word 15 format: | 18-12 (unused) | 11 (I) | 10-8 (ALG) | 7 (M) | 6-0 (unused) |
 			uint32_t param15 = m_dram[(s << 4) | 15];
-			if (BIT(param15, 7)) continue; // Idle bit
+			if (BIT(param15, 11)) continue; // I (Idle) bit - slot produces no sound
 
-			uint8_t alg = param15 & 0x7F;
-			uint16_t pc_start = alg << 5; // 44.1kHz = 32 instructions per block
+			uint16_t pc_start;
+			int inst_count;
 
-			for (int pc = 0; pc < 32; ++pc) {
+			if (ssr_mode) {
+				// 22.05kHz mode: 4 algorithms × 64 instructions
+				uint8_t alg = (param15 >> 8) & 0x3;  // Only 2 bits
+				pc_start = alg << 6;  // 64 instructions per block
+				inst_count = 64;
+			} else {
+				// 44.1kHz mode: 8 algorithms × 32 instructions
+				uint8_t alg = (param15 >> 8) & 0x7;  // 3 bits
+				pc_start = alg << 5;  // 32 instructions per block
+				inst_count = 32;
+			}
+
+			// Skip reserved instructions (last 2)
+			for (int pc = 0; pc < inst_count - 2; ++pc) {
 				execute_cycle(s, m_aram[pc_start + pc]);
 			}
 
@@ -205,8 +236,8 @@ void sam8905_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			out_r += (int32_t)m_slots[s].r_acc;
 		}
 
-		outputs[0].put_int(samp, out_l, 32768);
-		outputs[1].put_int(samp, out_r, 32768);
+		stream.put_int_clamp(0, samp, out_l, 32768);
+		stream.put_int_clamp(1, samp, out_r, 32768);
 	}
 }
 
