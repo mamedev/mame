@@ -6,6 +6,15 @@
 
 #include <cfloat>
 
+namespace {
+
+// Ioutmax = (4.1 / 5.0) * Iabc = 0.82 * Iabc.
+// Look for "Peak Output Current" in the CA3280 datasheet.
+constexpr float CA3280_IOUT_MAX_SCALE = 4.1F / 5.0F;
+
+}  // anonymous namespace
+
+
 va_vca_device::va_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: va_vca_device(mconfig, VA_VCA, tag, owner, clock)
 {
@@ -58,7 +67,6 @@ void va_vca_device::device_start()
 
 void va_vca_device::sound_stream_update(sound_stream &stream)
 {
-	// Implementing 4 variants to minimize unnecessary virtual function calls.
 	if (has_distortion())
 	{
 		if (BIT(get_sound_requested_inputs_mask(), INPUT_GAIN))
@@ -112,10 +120,7 @@ ca3280_vca_device &ca3280_vca_device::configure_voltage_output(float r_out)
 // The output current for a non-linearized OTA can be determined by:
 //   Iout = Ioutmax * tanh(DVin / (2 * VT))
 // For the CA3280:
-//   Ioutmax = 4.1 / 5.0 * Iabc = 0.82 * Iabc (look for "Peak Output Current"
-//   in the datasheet).
-// Therefore:
-//   Iout = 0.82 * Iabc * tanh(DVin / (2 * VT))
+//   Ioutmax = CA3280_IOUT_MAX_SCALE * Iabc
 // Where:
 //   Iabc ~ transconductance (gain) control current.
 //   DVIn ~ (Vin+ - Vin-). Vin- is typically 0V.
@@ -123,10 +128,8 @@ ca3280_vca_device &ca3280_vca_device::configure_voltage_output(float r_out)
 
 float ca3280_vca_device::cv_to_gain(float cv) const
 {
-	// cv = Iabc. The gain calculation below also incorporates any output
-	// scaling (conversion of current to voltage) due to configure_voltate_output().
-	constexpr float IOUT_MAX_SCALE = 4.1F / 5.0F;  // Ioutmax = 0.82 * Iabc.
-	return IOUT_MAX_SCALE * cv * m_output_scale;
+	// cv = Iabc.
+	return CA3280_IOUT_MAX_SCALE * cv * m_output_scale;
 }
 
 float ca3280_vca_device::distorted(float s) const
@@ -175,10 +178,7 @@ ca3280_lin_vca_device &ca3280_lin_vca_device::configure_voltage_output(float r_o
 // The output current for a linearized OTA can be determined by:
 //   Iout = Ioutmax * Iin / Id
 // For the CA3280:
-//   Ioutmax = 4.1 / 5.0 * Iabc = 0.82 * Iabc (look for "Peak Output Current"
-//   in the datasheet).
-// Therefore:
-//   Iout = 0.82 * Iabc * Iin / Id
+//   Ioutmax = CA3280_IOUT_MAX_SCALE * Iabc
 // Where:
 //   Iabc ~ transconductance (gain) control current.
 //   Iin ~ current at in+, assuming in- is connected to ground (via a
@@ -196,7 +196,7 @@ float ca3280_lin_vca_device::cv_to_gain(float cv) const
 
 void ca3280_lin_vca_device::update_cv_scale()
 {
-	m_cv_scale = m_input_scale * m_i_d_inv * m_output_scale;
+	m_cv_scale = CA3280_IOUT_MAX_SCALE * m_input_scale * m_i_d_inv * m_output_scale;
 }
 
 float ca3280_lin_vca_device::i_d(float r, float v_r, float v_minus)
