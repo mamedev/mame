@@ -353,6 +353,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
+Selecting Hi-Res in options menu causes cutoff GFXs
 Access [cart] EEPROM
 ]]></notes>
 		<info name="serial" value="02763-00162"/>
