@@ -57,9 +57,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	static u16 const raiden_blended_colors[];
-	static u16 const zeroteam_blended_colors[];
-
 	std::unique_ptr<u16[]> m_back_data;
 	std::unique_ptr<u16[]> m_fore_data;
 	std::unique_ptr<u16[]> m_mid_data;
