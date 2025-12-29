@@ -81,7 +81,6 @@ public:
 		, m_main_speedup_last_cycles(0)
 		, m_main_speedup_max_cycles(0)
 		, m_main_gpu_wait(nullptr)
-		, m_eeprom_bit_count(0)
 		, m_protection_check(0)
 		, m_eeprom(*this, "eeprom")
 		, m_ide(*this, "ide")
@@ -175,7 +174,6 @@ private:
 	uint32_t *m_main_gpu_wait = 0;
 
 	// driver data
-	uint8_t m_eeprom_bit_count = 0;
 	uint8_t m_protection_check = 0;   /* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
 
 	// audio data
@@ -203,9 +201,6 @@ private:
 	static void (jaguar_state::*const bitmap16[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t);
 	static void (jaguar_state::*const bitmap32[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t);
 
-	void eeprom_w(uint32_t data);
-	uint32_t eeprom_clk();
-	uint32_t eeprom_cs();
 	uint32_t misc_control_r();
 	void misc_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gpuctrl_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -232,9 +227,6 @@ private:
 	void serial_w16(offs_t offset, uint16_t data);
 	uint16_t dspctrl_r16(offs_t offset, uint16_t mem_mask = ~0);
 	void dspctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t eeprom_cs16(offs_t offset);
-	uint16_t eeprom_clk16(offs_t offset);
-	void eeprom_w16(offs_t offset, uint16_t data);
 	uint16_t joystick_r16(offs_t offset);
 	void joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t shared_ram_r(offs_t offset);
