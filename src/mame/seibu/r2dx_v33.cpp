@@ -792,14 +792,7 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 0, 30*8-1);
 	screen.set_screen_update(FUNC(r2dx_v33_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, r2dx_v33_state::gfx_raiden2);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.layer_en_callback().set(FUNC(r2dx_v33_state::tilemap_enable_w));
-	crtc.layer_scroll_callback().set(FUNC(r2dx_v33_state::tile_scroll_w));
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
+	base_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -828,14 +821,7 @@ void nzeroteam_state::nzerotea(machine_config &config)
 	screen.set_visarea(0*8, 40*8-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(nzeroteam_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, nzeroteam_state::gfx_raiden2);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.layer_en_callback().set(FUNC(nzeroteam_state::tilemap_enable_w));
-	crtc.layer_scroll_callback().set(FUNC(nzeroteam_state::tile_scroll_w));
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
+	base_video(config);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

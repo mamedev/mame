@@ -426,7 +426,7 @@ authors:hap
 		<repeat count="5">
 			<param name="x" start="20" increment="5.25" />
 			<param name="i" start="0" increment="1" />
-			<element ref="text_l1~i~"><bounds xc="~x~" y="32.5" width="6" height="1.2" /></element>
+			<element ref="text_l1~i~"><bounds xc="~x~" y="32.5" width="4.5" height="1.2" /></element>
 			<element ref="blackd"><bounds xc="~x~" yc="30" width="4" height="4" /></element>
 		</repeat>
 

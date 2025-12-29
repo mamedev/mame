@@ -267,7 +267,7 @@ static INPUT_PORTS_START( esb )
 	PORT_DIPSETTING(    0x30, "Increment" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("10D:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) // "No Music In Attract Mode" switch 'on'
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) ) // "Music In Attract Mode" switch 'off' 
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) ) // "Music In Attract Mode" switch 'off'
 INPUT_PORTS_END
 
 

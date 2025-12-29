@@ -52,10 +52,7 @@ public:
 	void sound_bankswitch_w(u8 data);
 
 protected:
-	void h6280_sound_custom_latch_map(address_map &map) ATTR_COLD;
-	void h6280_sound_map(address_map &map) ATTR_COLD;
-	void z80_sound_io(address_map &map) ATTR_COLD;
-	void z80_sound_map(address_map &map) ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// common
 	u16 ioprot_r(offs_t offset);
@@ -77,6 +74,15 @@ protected:
 	void buffered_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void palette_dma_w(u32 data);
 
+	void allocate_spriteram(int chip);
+	void allocate_buffered_palette();
+	void allocate_rowscroll(int size1, int size2, int size3, int size4);
+
+	void h6280_sound_custom_latch_map(address_map &map) ATTR_COLD;
+	void h6280_sound_map(address_map &map) ATTR_COLD;
+	void z80_sound_io(address_map &map) ATTR_COLD;
+	void z80_sound_map(address_map &map) ATTR_COLD;
+
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<decospr_device, 2> m_sprgen;
 	required_device_array<deco16ic_device, 2> m_deco_tilegen;
@@ -91,14 +97,8 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	required_device<cpu_device> m_maincpu;
 
-	void allocate_spriteram(int chip);
-	void allocate_buffered_palette();
-	void allocate_rowscroll(int size1, int size2, int size3, int size4);
-
-	virtual void video_start() override ATTR_COLD;
-
 	std::unique_ptr<u8[]> m_dirty_palette{}; // all but captaven
-	int m_pri = 0; // all but dragngun
+	u32 m_pri = 0; // all but dragngun
 	std::unique_ptr<u16[]> m_spriteram16[2]{}; // all but dragngun
 	std::unique_ptr<u16[]> m_spriteram16_buffered[2]{}; // all but dragngun
 	std::unique_ptr<u16[]> m_pf_rowscroll[4]{}; // common
@@ -167,7 +167,6 @@ private:
 
 	void fghthist_map(address_map &map) ATTR_COLD;
 	void fghthsta_memmap(address_map &map) ATTR_COLD;
-private:
 };
 
 // nslasher
@@ -188,6 +187,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<deco_ace_device> m_deco_ace;
+	bitmap_ind16 m_tilemap_alpha_bitmap;
 
 	void tilemap_color_bank_w(u8 data);
 	void sprite1_color_bank_w(u8 data);
@@ -202,8 +202,6 @@ protected:
 	void nslasher_map(address_map &map) ATTR_COLD;
 
 	void mix_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
-
-	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
 };
 
 // tattass
@@ -222,6 +220,14 @@ public:
 private:
 	required_device<decobsmt_device> m_decobsmt;
 
+	u8 m_tattass_eprom_bit = 0;
+	s32 m_last_clock = 0;
+	u32 m_buffer = 0U;
+	u32 m_buf_ptr = 0;
+	s32 m_pending_command = 0;
+	s32 m_read_bit_count = 0;
+	u32 m_byte_addr = 0;
+
 	void tattass_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void tattass_sound_irq_w(int state);
 
@@ -232,14 +238,6 @@ private:
 	void tattass_map(address_map &map) ATTR_COLD;
 
 	void mix_tattass(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
-
-	int m_tattass_eprom_bit = 0;
-	int m_last_clock = 0;
-	u32 m_buffer = 0U;
-	int m_buf_ptr = 0;
-	int m_pending_command = 0;
-	int m_read_bit_count = 0;
-	int m_byte_addr = 0;
 };
 
 class dragngun_state : public deco32_state
@@ -291,9 +289,10 @@ private:
 	optional_ioport_array<2> m_io_light_y;
 
 	u32 m_sprite_ctrl = 0U;
-	int m_lightgun_port = 0;
+	u32 m_lightgun_port = 0;
 	int m_oki2_bank = 0; // lockload
-	bitmap_rgb32 m_temp_render_bitmap{};
+
+	bool m_gun_speaker_disabled;
 
 	u32 lightgun_r();
 	void lightgun_w(offs_t offset, u32 data = 0);
@@ -323,6 +322,7 @@ private:
 	void expand_sprite_data();
 	void dragngun_init_common();
 
+	bool sprite_mix_callback(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
@@ -336,7 +336,6 @@ private:
 	void lockloadu_map(address_map &map) ATTR_COLD;
 	void lockload_sound_map(address_map &map) ATTR_COLD;
 	void lockloadu_sound_map(address_map &map) ATTR_COLD;
-	bool m_gun_speaker_disabled;
 };
 
 #endif // MAME_DATAEAST_DECO32_H

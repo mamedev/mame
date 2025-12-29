@@ -63,7 +63,7 @@
 #define KEYBOARD_TAG        "keyboard"
 #define TIMER_CASSETTE_TAG  "cass"
 #define SN74S263_TAG        "h2"
-#define ABCBUS_TAG 			"bus"
+#define ABCBUS_TAG          "bus"
 
 class abc80_state : public driver_device
 {

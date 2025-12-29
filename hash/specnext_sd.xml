@@ -21,9 +21,9 @@ license:CC0-1.0
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Software images -->
-	
+
 	<software name="fiona">
 		<description>Fiona's Flight</description>
 		<year>2025</year>
@@ -33,6 +33,6 @@ license:CC0-1.0
 				<disk name="fiona" sha1="4e55ef0fb7323bc9d97ac3bb39d13f6825005709" writeable="yes" />
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 </softwarelist>

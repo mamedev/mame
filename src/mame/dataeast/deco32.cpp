@@ -766,10 +766,10 @@ void dragngun_state::speaker_switch_w(u32 data)
 	// TODO: This should switch the oki3 output between the gun speaker and the standard speakers
 	m_gun_speaker_disabled = bool(BIT(data, 0));
 
-	logerror("Gun speaker: %s\n", m_gun_speaker_disabled ? "Disabled" : "Enabled");
+	logerror("%s: Gun speaker: %s\n", machine().describe_context(), m_gun_speaker_disabled ? "Disabled" : "Enabled");
 }
 
-LC7535_VOLUME_CHANGED( dragngun_state::volume_main_changed )
+LC7535_VOLUME_CHANGED(dragngun_state::volume_main_changed)
 {
 	// TODO: Support loudness
 	logerror("Main speaker volume: left = %d dB, right %d dB, loudness = %s\n", attenuation_left, attenuation_right, loudness ? "on" :"off");
@@ -787,7 +787,7 @@ LC7535_VOLUME_CHANGED( dragngun_state::volume_main_changed )
 		m_oki[2]->set_output_gain(ALL_OUTPUTS, gain_l);
 }
 
-LC7535_VOLUME_CHANGED( dragngun_state::volume_gun_changed )
+LC7535_VOLUME_CHANGED(dragngun_state::volume_gun_changed)
 {
 	logerror("Gun speaker volume: left = %d dB, right %d dB, loudness = %s\n", attenuation_left, attenuation_right, loudness ? "on" :"off");
 
@@ -815,7 +815,7 @@ void deco32_state::sound_bankswitch_w(u8 data)
 void dragngun_state::lockload_okibank_lo_w(u8 data)
 {
 	m_oki2_bank = (m_oki2_bank & 2) | ((data >> 1) & 1);
-	logerror("Load OKI2 Bank Low bits: %02x, Current : %02x\n",(data >> 1) & 1, m_oki2_bank);
+	logerror("%s: Load OKI2 Bank Low bits: %02x, Current : %02x\n", machine().describe_context(), (data >> 1) & 1, m_oki2_bank);
 	m_oki[0]->set_rom_bank((data >> 0) & 1);
 	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
@@ -823,7 +823,7 @@ void dragngun_state::lockload_okibank_lo_w(u8 data)
 void dragngun_state::lockload_okibank_hi_w(u8 data)
 {
 	m_oki2_bank = (m_oki2_bank & 1) | ((data & 1) << 1); // TODO : Actually value unverified
-	logerror("Load OKI2 Bank Hi bits: %02x, Current : %02x\n",((data & 1) << 1), m_oki2_bank);
+	logerror("%s: Load OKI2 Bank Hi bits: %02x, Current : %02x\n", machine().describe_context(), ((data & 1) << 1), m_oki2_bank);
 	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
 
@@ -977,13 +977,14 @@ u32 dragngun_state::lightgun_r()
 	case 7: return m_io_light_y[1]->read();
 	}
 
-//  logerror("Illegal lightgun port %d read \n",m_lightgun_port);
+	//if (!machine().side_effects_disabled())
+		//logerror("%s: Illegal lightgun port %d read \n", machine().describe_context(), m_lightgun_port);
 	return 0;
 }
 
 void dragngun_state::lightgun_w(offs_t offset, u32 data)
 {
-//  logerror("Lightgun port %d\n",m_lightgun_port);
+//  logerror("%s: Lightgun port %d\n", machine().describe_context(), m_lightgun_port);
 	m_lightgun_port = offset;
 }
 
@@ -1065,7 +1066,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			if (m_buf_ptr)
 			{
-				logerror("Eprom reset (bit count %d): ", m_read_bit_count);
+				logerror("%s: Eprom reset (bit count %d): ", machine().describe_context(), m_read_bit_count);
 				for (int i = 0; i < m_buf_ptr; i++)
 					logerror("%s", BIT(m_buffer, m_buf_ptr - 1 - i) ? "1" : "0");
 				logerror("\n");
@@ -1081,7 +1082,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			if (m_buf_ptr >= 32)
 			{
-				logerror("Eprom overflow!");
+				logerror("%s: Eprom overflow!\n", machine().describe_context());
 				m_buf_ptr = 0;
 			}
 
@@ -1137,7 +1138,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 				}
 				else
 				{
-					logerror("Detected unknown eprom command\n");
+					logerror("%s: Detected unknown eprom command\n", machine().describe_context());
 				}
 			}
 		}
@@ -1145,7 +1146,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			if (!(BIT(data, 6)))
 			{
-				logerror("Cs set low\n");
+				logerror("%s: Cs set low\n", machine().describe_context());
 				m_buf_ptr = 0;
 			}
 		}
@@ -2207,6 +2208,7 @@ void dragngun_state::namco_sprites(machine_config &config)
 	NAMCO_C355SPR(config, m_sprgenzoom, 0);
 	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
 	m_sprgenzoom->set_palette(m_palette);
+	m_sprgenzoom->set_transparent_pen(15);
 	m_sprgenzoom->set_colors(32);
 	m_sprgenzoom->set_granularity(16);
 	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
@@ -2215,7 +2217,9 @@ void dragngun_state::namco_sprites(machine_config &config)
 	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
 	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
 	m_sprgenzoom->set_priority_callback(FUNC(dragngun_state::sprite_priority_callback));
-	m_sprgenzoom->set_device_allocates_spriteram_and_bitmaps(false);
+	m_sprgenzoom->set_mix_callback(FUNC(dragngun_state::sprite_mix_callback));
+	m_sprgenzoom->set_device_allocates_spriteram(false);
+	m_sprgenzoom->set_alt_precision(true);
 }
 
 // DE-0420-1 + Bottom board DE-0421-0

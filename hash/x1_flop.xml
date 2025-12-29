@@ -2592,6 +2592,7 @@ Broken [kanji] during gameplay (half height)
 	</software>
 
 	<software name="silvergh">
+		<!-- misspelled as "Shilver Ghost" during boot -->
 		<description>Silver Ghost</description>
 		<year>1988</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
@@ -3894,7 +3895,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 
 	<software name="dslayer">
 	<!-- also found as login_ds.d88, harder version, original is undumped -->
-		<description>Dragon Slayer (Login Version)</description>
+		<description>Dragon Slayer (LOGiN Version)</description>
 		<year>1986?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ドラゴンスレイヤー"/>

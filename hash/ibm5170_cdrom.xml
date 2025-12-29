@@ -4014,6 +4014,68 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
+	<!-- Windows 3.1/95 -->
+	<!-- http://redump.org/disc/114360/ -->
+	<software name="fulltilt">
+		<description>Full Tilt! Pinball (version 1.1)</description>
+		<year>1996</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Cinematronics" />
+		<info name="release" value="19960319" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="full tilt pinball 1.1" sha1="c9ab5a92a673924ae341fb6f671715ca42bf6f8c" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1/95 -->
+	<!-- http://redump.org/disc/81828/ -->
+	<software name="fulltiltoem1" cloneof="fulltilt">
+		<description>Full Tilt! Pinball (version 1.1) (Scholastic Edition)</description>
+		<year>1996</year>
+		<publisher>Maxis</publisher>
+		<info name="developer" value="Cinematronics" />
+		<info name="release" value="19960319" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="full tilt pinball 1.1 scholastic" sha1="ff4ad114486f372502359271b5e28bae1975d884" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1/95 -->
+	<!-- http://redump.org/disc/15320 -->
+	<software name="fulltiltoem2" cloneof="fulltilt" supported="partial">
+		<description>Full Tilt! Pinball (version 1.1) (Thrustmaster OEM)</description>
+		<year>1996</year>
+		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Unsupported optional Thrustmaster Wizzard Pinball controller
+]]></notes>
+		<info name="developer" value="Cinematronics" />
+		<info name="release" value="19960930" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="full tilt pinball 1.1 thrustmaster" sha1="0255b26b2de20620569cd35a793ae3c2757cf888" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1/95 -->
+	<!-- http://redump.org/disc/114417/ -->
+	<software name="fulltilt2">
+		<description>Full Tilt! 2 Pinball (version 1.0)</description>
+		<year>1996</year>
+		<publisher>Maxis</publisher>
+		<info name="release" value="19961031" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="full tilt 2 pinball 1.0" sha1="82c1d64d8b98e170e64622243a3c803a098a61ff" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- TODO: runtime check failure -->
 	<software name="fwmigolf" supported="no">

@@ -388,14 +388,14 @@ authors:hap
 		<element name="2.7" ref="ledr"><bounds x="78.5" y="84" width="1" height="2" /></element>
 
 		<!-- right side leds -->
-		<element ref="text_l1"><bounds x="86" y="22.35" width="14" height="1.4" /></element>
-		<element ref="text_l2"><bounds x="86" y="30.06" width="14" height="1.4" /></element>
-		<element ref="text_l3"><bounds x="86" y="37.78" width="14" height="1.4" /></element>
-		<element ref="text_l4"><bounds x="86" y="45.49" width="14" height="1.4" /></element>
-		<element ref="text_l5"><bounds x="86" y="53.21" width="14" height="1.4" /></element>
-		<element ref="text_l6"><bounds x="86" y="60.92" width="14" height="1.4" /></element>
-		<element ref="text_l7"><bounds x="86" y="68.64" width="14" height="1.4" /></element>
-		<element ref="text_l8"><bounds x="86" y="76.35" width="14" height="1.4" /></element>
+		<element ref="text_l1"><bounds x="86" y="22.35" width="3.5" height="1.4" /></element>
+		<element ref="text_l2"><bounds x="86" y="30.06" width="3.5" height="1.4" /></element>
+		<element ref="text_l3"><bounds x="86" y="37.78" width="3.5" height="1.4" /></element>
+		<element ref="text_l4"><bounds x="86" y="45.49" width="3.5" height="1.4" /></element>
+		<element ref="text_l5"><bounds x="86" y="53.21" width="3.5" height="1.4" /></element>
+		<element ref="text_l6"><bounds x="86" y="60.92" width="3.5" height="1.4" /></element>
+		<element ref="text_l7"><bounds x="86" y="68.64" width="3.5" height="1.4" /></element>
+		<element ref="text_l8"><bounds x="86" y="76.35" width="3.5" height="1.4" /></element>
 
 		<element name="0.0" ref="ledg"><bounds x="86" y="25.00" width="1" height="2" /></element>
 		<element name="0.1" ref="ledg"><bounds x="86" y="32.71" width="1" height="2" /></element>
@@ -472,22 +472,22 @@ authors:hap
 			<element ref="white"><bounds x="86" yc="~y~" width="23" height="0.1" /></element>
 		</repeat>
 
-		<element ref="text_m1a"><bounds x="87.63" y="22.35" width="14" height="1.4" /></element>
-		<element ref="text_m2a"><bounds x="90.43" y="30.26" width="8.6" height="1.2" /></element>
-		<element ref="text_m2b"><bounds x="87.63" y="35.91" width="14" height="1.4" /></element>
-		<element ref="text_m3a"><bounds x="87.63" y="37.78" width="14" height="1.4" /></element>
-		<element ref="text_m3b"><bounds x="87.63" y="43.63" width="14" height="1.4" /></element>
-		<element ref="text_m4a"><bounds x="87.63" y="45.49" width="14" height="1.4" /></element>
-		<element ref="text_m7a"><bounds x="87.63" y="68.64" width="14" height="1.4" /></element>
-		<element ref="text_m8a"><bounds x="87.63" y="76.35" width="14" height="1.4" /></element>
+		<element ref="text_m1a"><bounds xc="94.63" y="22.35" width="9" height="1.4" /></element>
+		<element ref="text_m2a"><bounds xc="94.63" y="30.26" width="8.5" height="1.2" /></element>
+		<element ref="text_m2b"><bounds xc="94.63" y="35.91" width="9" height="1.4" /></element>
+		<element ref="text_m3a"><bounds xc="94.63" y="37.78" width="9" height="1.4" /></element>
+		<element ref="text_m3b"><bounds xc="94.63" y="43.63" width="9" height="1.4" /></element>
+		<element ref="text_m4a"><bounds xc="94.63" y="45.49" width="9" height="1.4" /></element>
+		<element ref="text_m7a"><bounds xc="94.63" y="68.64" width="9" height="1.4" /></element>
+		<element ref="text_m8a"><bounds xc="94.63" y="76.35" width="9" height="1.4" /></element>
 
-		<element ref="text_r1a"><bounds x="97.25" y="22.35" width="14" height="1.4" /></element>
-		<element ref="text_r2a"><bounds x="97.25" y="30.06" width="14" height="1.4" /></element>
-		<element ref="text_r2b"><bounds x="97.25" y="35.91" width="14" height="1.4" /></element>
-		<element ref="text_r3a"><bounds x="97.25" y="37.78" width="14" height="1.4" /></element>
-		<element ref="text_r4a"><bounds x="97.25" y="45.49" width="14" height="1.4" /></element>
-		<element ref="text_r7a"><bounds x="97.25" y="68.64" width="14" height="1.4" /></element>
-		<element ref="text_r8a"><bounds x="97.25" y="76.35" width="14" height="1.4" /></element>
+		<element ref="text_r1a"><bounds xc="104.25" y="22.35" width="9" height="1.4" /></element>
+		<element ref="text_r2a"><bounds xc="104.25" y="30.06" width="9" height="1.4" /></element>
+		<element ref="text_r2b"><bounds xc="104.25" y="35.91" width="9" height="1.4" /></element>
+		<element ref="text_r3a"><bounds xc="104.25" y="37.78" width="9" height="1.4" /></element>
+		<element ref="text_r4a"><bounds xc="104.25" y="45.49" width="9" height="1.4" /></element>
+		<element ref="text_r7a"><bounds xc="104.25" y="68.64" width="9" height="1.4" /></element>
+		<element ref="text_r8a"><bounds xc="104.25" y="76.35" width="9" height="1.4" /></element>
 
 	</view>
 </mamelayout>

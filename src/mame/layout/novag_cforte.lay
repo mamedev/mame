@@ -70,7 +70,8 @@ authors:hap
 
 	<element name="text_m1a"><text string="Player/Player"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_m1b"><text string="Gambit/Large"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_m2a"><text string="Random/Tour/Normal"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m2a"><text string=""><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_m2ax"><text string="Random/Tour/Normal"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_m2b"><text string="Training Level"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_m3a"><text string="Sound"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_m3b"><text string="Depth Search"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -480,15 +481,16 @@ authors:hap
 		<repeat count="8">
 			<param name="y" start="23.05" increment="7.71" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_m~i~a"><bounds xc="94.63"  yc="~y~" width="10" height="1.4" /></element>
-			<element ref="text_r~i~a"><bounds xc="104.25" yc="~y~" width="10" height="1.4" /></element>
+			<element ref="text_m~i~a"><bounds xc="94.63"  yc="~y~" width="9" height="1.4" /></element>
+			<element ref="text_r~i~a"><bounds xc="104.25" yc="~y~" width="9" height="1.4" /></element>
 		</repeat>
+		<element ref="text_m2ax"><bounds xc="94.63" yc="30.86" width="9" height="1.2" /></element>
 
 		<repeat count="8">
 			<param name="y" start="28.90" increment="7.71" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_m~i~b"><bounds xc="94.63"  yc="~y~" width="10" height="1.4" /></element>
-			<element ref="text_r~i~b"><bounds xc="104.25" yc="~y~" width="10" height="1.4" /></element>
+			<element ref="text_m~i~b"><bounds xc="94.63"  yc="~y~" width="9" height="1.4" /></element>
+			<element ref="text_r~i~b"><bounds xc="104.25" yc="~y~" width="9" height="1.4" /></element>
 		</repeat>
 
 		<repeat count="6">

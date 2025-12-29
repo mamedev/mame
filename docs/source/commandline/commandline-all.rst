@@ -2621,17 +2621,20 @@ Core Artwork Options
 
 **-artwork_font** / **-artfont** *<fontname>*
 
-    Specifies the name of a font file to use for artwork text elements.  The
-    details are the same as the :ref:`uifont option <mame-commandline-uifont>`.
+    Specifies the font to use for artwork text elements.  The same
+    considerations apply as for the UI font (see the :ref:`uifont option
+    <mame-commandline-uifont>`).
 
-    Be aware that picking a very wide font such as ``Courier New`` can result
-    in text alignment issues with artwork that was designed with a smaller font
-    such as ``Tahoma`` (the default on Windows).
+    Note that artwork is typically designed around a sans serif font with tight
+    character spacing (e.g. **Tahoma**, which is the default on Windows).  Using
+    a font with wider character spacing or a fixed pitch font (e.g. a Courier
+    family font) may result in text positioning issues.
 
     Example:
         .. code-block:: bash
 
             mame starwbc -artwork_font "Comic Sans MS"
+
 
 .. _mame-commandline-screenoptions:
 
@@ -4018,15 +4021,21 @@ Core Misc Options
 
 **-uifont** *<fontname>*
 
-    Specifies the name of a font file to use for the UI font. If this font
-    cannot be found or cannot be loaded, the system will fall back to its
-    built-in UI font. On some platforms *fontname* can be a system font name
-    instead of a BDF font file.
+    Specifies the font to use for UI text. If this font cannot be found or
+    cannot be loaded, MAME will fall back to its built-in UI font.  Supported
+    fonts depend on the platform and selected UI font provider module.  In some
+    configurations, *fontname* can be a system font name or a path to a TrueType
+    font file.  In all cases, a path to  a BDF (Adobe Glyph Bitmap Distribution
+    Format) font file can be used.
 
-    Note that not all fonts support Non Latin script or special glyphs like
-    arrow symbols, and will show squares or questionmarks instead.
+    Note that characters available depend on the font, and many fonts do not
+    cover multiple writing systems and languages, or symbols like arrows.
+    Depending on the configuration, MAME may not automatically substitute
+    characters from other fonts.  Characters that are not available may be
+    replaced with substitute glyphs (often rectangles).
 
-    The default is ``default`` (use the OSD-determined default font).
+    The default is ``default`` (use the default font determined by the UI font
+    provider module).
 
     Example:
         .. code-block:: bash

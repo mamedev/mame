@@ -64,7 +64,6 @@ protected:
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
 	void sound_config_common(machine_config &config);
 	void sound_config(machine_config &config);
-	void sound_config_3812(machine_config &config);
 	void sound_config_legion(machine_config &config);
 	void sound_config_legion_3812(machine_config &config);
 

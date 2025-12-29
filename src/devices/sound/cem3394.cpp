@@ -220,7 +220,12 @@ double cem3394_device::filter(double input, double cutoff)
 	double outscale = 1.0;
 	double res = m_filter_resonance;
 	if (res > 0.99)
-		res = 0.99, outscale = 0.5;
+	{
+		// Don't clamp if there is no input, to allow self-oscillation to occur.
+		if (m_wave_select)
+			res = 0.99;
+		outscale = 0.5;
+	}
 
 	// core filter implementation
 	double g = tan(M_PI * cutoff * m_inv_sample_rate);
@@ -578,7 +583,7 @@ void cem3394_device::set_voltage_internal(int input, double voltage)
 			}
 			else if (voltage > 2.0)
 			{
-				m_pulse_width = 100;
+				m_pulse_width = 1;
 				m_wave_select &= ~WAVE_PULSE;
 			}
 			else

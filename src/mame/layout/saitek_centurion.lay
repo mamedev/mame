@@ -326,15 +326,15 @@ authors:hap
 			<bounds xc="0" yc="0" width="8.2" height="1.866" />
 			<color red="0" green="0" blue="0" />
 		</rect>
-		<text string=" NEW GAME">
-			<bounds xc="0" yc="0" width="8.2" height="1.866" />
+		<text string="NEW GAME">
+			<bounds xc="0" yc="0" width="7.7" height="1.866" />
 			<color red="0.8" green="0.7" blue="0.3" />
 		</text>
 	</element>
 
 	<element name="text_b1y">
 		<rect><color red="0.8" green="0.7" blue="0.3" /></rect>
-		<text string=" GO/STOP"><color red="0" green="0" blue="0" /></text>
+		<text string=" GO/STOP "><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="text_p1"><image file="chess/wk.svg"/></element>
@@ -361,7 +361,7 @@ authors:hap
 			<param name="x" start="8" increment="9" />
 			<param name="i" start="6" increment="1" />
 
-			<element ref="text_b~i~"><bounds xc="~x~" y="20.333" width="8.2" height="1.866" /></element>
+			<element ref="text_b~i~"><bounds xc="~x~" y="20.333" width="7.8" height="1.866" /></element>
 		</repeat>
 		<repeat count="6">
 			<param name="x" start="8" increment="9" />

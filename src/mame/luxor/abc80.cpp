@@ -49,7 +49,7 @@ Notes:
     74S263  - Texas Instruments SN74S263N Row Output Character Generator
     MC1488  - Texas Instruments MC1488 Quadruple Line Driver
     MC1489  - Texas Instruments MC1489 Quadruple Line Receiver
-	XTAL    - 11.9808 MHz Crystal
+    XTAL    - 11.9808 MHz Crystal
     CN1     - RS-232 connector
     CN2     - ABC bus connector (DIN 41612)
     CN3     - video connector
@@ -91,7 +91,7 @@ CATAB-80:1718
 |                 |-------------------------------------------------|                  |
 |   |-----CN6-----|                                                 | LM339            |
 |                 |   |------------|                                |                  |
-|   |-------------|   |    Z80A    |	LS266 LS04 LS00 LS10 LS03   | XTAL     LS08    |
+|   |-------------|   |    Z80A    |    LS266 LS04 LS00 LS10 LS03   | XTAL     LS08    |
 |   |   Z80A PIO  |   |------------|                                |                  |
 |   |-------------|                                                 | LS166    74393   |
 |                 |                                                 |                  |
@@ -109,9 +109,9 @@ CATAB-80:1718
 Notes:
     All IC's shown.
 
-	ROM     - Mostek MK2716J-B 2Kx8 EPROM "L3.0"
-	RAM     - Mostek MK4116J-3 16Kx1 Dynamic RAM
-	*       - Empty footprints for additional RAM chips
+    ROM     - Mostek MK2716J-B 2Kx8 EPROM "L3.0"
+    RAM     - Mostek MK4116J-3 16Kx1 Dynamic RAM
+    *       - Empty footprints for additional RAM chips
 
 
 Activation:

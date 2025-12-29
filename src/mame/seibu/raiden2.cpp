@@ -1039,11 +1039,31 @@ static const gfx_layout tilelayout =
 GFXDECODE_START( raiden2_state::gfx_raiden2 )
 	GFXDECODE_ENTRY( "chars",   0, charlayout,             0x700, 0x10 )
 	GFXDECODE_ENTRY( "tiles",   0, tilelayout,             0x400, 0x30 )
+GFXDECODE_END
+
+GFXDECODE_START( raiden2_state::gfx_raiden2_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0x000, 0x40 ) // really 64, but using the top bits for priority
 GFXDECODE_END
 
 
 /* MACHINE DRIVERS */
+void raiden2_state::base_video(machine_config &config)
+{
+	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
+
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
+
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
+	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, raiden2_state::gfx_raiden2_spr);
+	m_spritegen->set_screen("screen");
+	m_spritegen->set_pix_raw_shift(4);
+	m_spritegen->set_pri_raw_shift(14);
+	m_spritegen->set_transpen(15);
+}
 
 void raiden2_state::raiden2(machine_config &config)
 {
@@ -1064,14 +1084,7 @@ void raiden2_state::raiden2(machine_config &config)
 	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 30*8); /* hand-tuned to match ~55.47 */
 	screen.set_screen_update(FUNC(raiden2_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
-	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
+	base_video(config);
 
 	RAIDEN2COP(config, m_raiden2cop, 0);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
@@ -1129,14 +1142,7 @@ void raiden2_state::zeroteam(machine_config &config)
 	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 32*8); /* hand-tuned to match ~55.47 */
 	screen.set_screen_update(FUNC(raiden2_state::screen_update));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
-
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
-	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
-
-	BUFFERED_SPRITERAM16(config, m_spriteram);
+	base_video(config);
 
 	RAIDEN2COP(config, m_raiden2cop, 0);
 	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));

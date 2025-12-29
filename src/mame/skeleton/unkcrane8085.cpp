@@ -4,6 +4,7 @@
 /*
 unknown crane game (supposedly)
 PCB is only marked DC-1 and there are no strings in ROM
+QC sticker on solder side printed 検査印 and stamped 3.5.15 (15 May 1991, assuming Heisei date)
 
 Components are:
 - D8085AC CPU
