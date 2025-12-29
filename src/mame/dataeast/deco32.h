@@ -281,7 +281,7 @@ private:
 	required_shared_ptr<u32> m_sprite_cliptable;
 	required_shared_ptr<u32> m_sprite_indextable;
 
-	required_device<lc7535_device> m_vol_main;
+	optional_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
 	optional_ioport m_io_inputs;
@@ -303,7 +303,7 @@ private:
 	void eeprom_w(u8 data);
 	u32 lockload_gun_mirror_r(offs_t offset);
 
-	void volume_w(u32 data);
+	void lc7535_volume_w(u8 data);
 	void speaker_switch_w(u32 data);
 	LC7535_VOLUME_CHANGED(volume_main_changed);
 	LC7535_VOLUME_CHANGED(volume_gun_changed);

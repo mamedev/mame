@@ -524,7 +524,7 @@ void dragngun_state::dragngun_map(address_map &map)
 
 	map(0x0300000, 0x03fffff).rom().region("maincpu", 0x100000);
 	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0410000, 0x0410003).w(FUNC(dragngun_state::volume_w));
+	map(0x0410000, 0x0410000).w(FUNC(dragngun_state::lc7535_volume_w));
 	map(0x0418000, 0x0418003).w(FUNC(dragngun_state::speaker_switch_w));
 	map(0x0420000, 0x0420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
 	map(0x0430000, 0x043001f).w(FUNC(dragngun_state::lightgun_w));
@@ -570,7 +570,7 @@ void dragngun_state::lockload_map(address_map &map)
 	namcosprite_map(map);
 
 	map(0x300000, 0x3fffff).rom().region("maincpu", 0x100000);
-	map(0x410000, 0x410003).w(FUNC(dragngun_state::volume_w));
+	map(0x410000, 0x410000).w(FUNC(dragngun_state::volume_w));
 	map(0x420000, 0x420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
 	map(0x440000, 0x440003).portr("IN2");
 	map(0x500000, 0x500003).w(FUNC(dragngun_state::sprite_control_w));
@@ -747,7 +747,7 @@ u8 captaven_state::captaven_soundcpu_status_r()
 	return 0xff;
 }
 
-void dragngun_state::volume_w(u32 data)
+void dragngun_state::lc7535_volume_w(u8 data)
 {
 	m_vol_main->ce_w(BIT(data, 2));
 	m_vol_main->clk_w(BIT(data, 1));
@@ -2310,10 +2310,6 @@ void dragngun_state::lockload(machine_config &config)
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
-
-	LC7535(config, m_vol_main);
-	m_vol_main->select().set_constant(1);
-	m_vol_main->set_volume_callback(FUNC(dragngun_state::volume_main_changed));
 }
 
 void tattass_state::tattass(machine_config &config)
