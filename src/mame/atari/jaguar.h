@@ -116,7 +116,7 @@ protected:
 	// device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void sound_start() override;
+	virtual void sound_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void device_postload();
 
@@ -179,7 +179,7 @@ private:
 	// audio data
 	uint16_t m_dsp_regs[0x40/2]{};
 	uint16_t m_serial_frequency = 0;
-	uint8_t m_gpu_irq_state = 0;
+	uint8_t m_dsp_irq_state = 0;
 	emu_timer *m_serial_timer = nullptr;
 
 	// blitter variables
@@ -189,6 +189,8 @@ private:
 	emu_timer *m_blitter_done_timer = nullptr;
 	emu_timer *m_pit_timer = nullptr;
 	emu_timer *m_gpu_sync_timer = nullptr;
+	emu_timer *m_jpit1_timer = nullptr;
+	emu_timer *m_jpit2_timer = nullptr;
 	uint8_t m_cpu_irq_state = 0;
 	bitmap_rgb32 m_screen_bitmap;
 	uint8_t m_blitter_status = 0;
@@ -267,6 +269,8 @@ private:
 	TIMER_CALLBACK_MEMBER(blitter_done);
 	TIMER_CALLBACK_MEMBER(pit_update);
 	TIMER_CALLBACK_MEMBER(gpu_sync);
+	TIMER_CALLBACK_MEMBER(jpit1_update);
+	TIMER_CALLBACK_MEMBER(jpit2_update);
 
 	void gpu_cpu_int(int state);
 	void dsp_cpu_int(int state);
@@ -295,14 +299,14 @@ private:
 	void init_freeze_common(offs_t main_speedup_addr);
 
 	// from jaguar_a.cpp
-	void update_gpu_irq();
+	void update_dsp_irq();
 	[[maybe_unused]] void dsp_flags_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	// from jaguar_v.cpp
 	void get_crosshair_xy(int player, int &x, int &y);
 	int effective_hvalue(int value);
 	bool adjust_object_timer(int vc);
-	inline void trigger_host_cpu_irq(int level);
+	void trigger_host_cpu_irq(int level);
 	inline void verify_host_cpu_irq();
 	uint8_t *memory_base(uint32_t offset) { return reinterpret_cast<uint8_t *>(m_gpu->space(AS_PROGRAM).get_read_ptr(offset)); }
 	void blitter_run();

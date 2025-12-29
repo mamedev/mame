@@ -295,7 +295,7 @@ inline void jaguar_state::verify_host_cpu_irq()
 	}
 }
 
-inline void jaguar_state::trigger_host_cpu_irq(int level)
+void jaguar_state::trigger_host_cpu_irq(int level)
 {
 	// NOTE: pending flag occurs only if irq is enabled
 	if (!BIT(m_gpu_regs[INT1], level))
