@@ -754,46 +754,29 @@ void dragngun_state::lc7535_volume_w(u8 data)
 	m_vol_main->clk_w(BIT(data, 1));
 	m_vol_main->di_w(BIT(data, 0));
 
-	if (m_vol_gun.found())
-	{
-		m_vol_gun->ce_w(BIT(data, 2));
-		m_vol_gun->clk_w(BIT(data, 1));
-		m_vol_gun->di_w(BIT(data, 0));
-	}
+	m_vol_gun->ce_w(BIT(data, 2));
+	m_vol_gun->clk_w(BIT(data, 1));
+	m_vol_gun->di_w(BIT(data, 0));
 }
 
 void dragngun_state::speaker_switch_w(u32 data)
 {
-	// TODO: This should switch the oki3 output between the gun speaker and the standard speakers
-	m_gun_speaker_disabled = bool(BIT(data, 0));
+	bool gun_speaker_disabled = bool(BIT(data, 0));
 
-	logerror("%s: Gun speaker: %s\n", machine().describe_context(), m_gun_speaker_disabled ? "Disabled" : "Enabled");
-}
+	if (gun_speaker_disabled)
+	{
+		m_oki[2]->set_route_gain(0, m_vol_main, 0, 1.0);
+		m_oki[2]->set_route_gain(0, m_vol_main, 1, 1.0);
+		m_oki[2]->set_route_gain(0, m_vol_gun, 0, 0.0);
+	}
+	else
+	{
+		m_oki[2]->set_route_gain(0, m_vol_main, 0, 0.0);
+		m_oki[2]->set_route_gain(0, m_vol_main, 1, 0.0);
+		m_oki[2]->set_route_gain(0, m_vol_gun, 0, 1.0);
+	}
 
-LC7535_VOLUME_CHANGED(dragngun_state::volume_main_changed)
-{
-	// TODO: Support loudness
-	logerror("Main speaker volume: left = %d dB, right %d dB, loudness = %s\n", attenuation_left, attenuation_right, loudness ? "on" :"off");
-
-	// convert to 0.0 - 1.0
-	const float gain_l = m_vol_main->normalize(attenuation_left);
-	const float gain_r = m_vol_main->normalize(attenuation_right);
-
-	m_ym2151->set_output_gain(0, gain_l);
-	m_ym2151->set_output_gain(1, gain_r); // left and right are always set to the same value
-	m_oki[0]->set_output_gain(ALL_OUTPUTS, gain_l);
-	m_oki[1]->set_output_gain(ALL_OUTPUTS, gain_l);
-
-	if (m_oki[2].found() && m_gun_speaker_disabled)
-		m_oki[2]->set_output_gain(ALL_OUTPUTS, gain_l);
-}
-
-LC7535_VOLUME_CHANGED(dragngun_state::volume_gun_changed)
-{
-	logerror("Gun speaker volume: left = %d dB, right %d dB, loudness = %s\n", attenuation_left, attenuation_right, loudness ? "on" :"off");
-
-	if (m_oki[2].found() && !m_gun_speaker_disabled)
-		m_oki[2]->set_output_gain(ALL_OUTPUTS, m_vol_gun->normalize(attenuation_left));
+	logerror("%s: Gun speaker: %s\n", machine().describe_context(), gun_speaker_disabled ? "Disabled" : "Enabled");
 }
 
 void tattass_state::tattass_sound_irq_w(int state)
@@ -2162,32 +2145,35 @@ void dragngun_state::dragngun(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
+	SPEAKER(config, "gun_speaker").front_center();
+
+	LC7535(config, m_vol_main);
+	m_vol_main->select_cb().set_constant(1);
+	m_vol_main->add_route(0, "speaker", 1.0, 0);
+	m_vol_main->add_route(1, "speaker", 1.0, 1);
+
+	LC7535(config, m_vol_gun);
+	m_vol_gun->select_cb().set_constant(0);
+	m_vol_gun->add_route(0, "gun_speaker", 1.0);
+
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "speaker", 0.42, 0);
-	m_ym2151->add_route(1, "speaker", 0.42, 1);
+	m_ym2151->add_route(0, m_vol_main, 0.42, 0);
+	m_ym2151->add_route(1, m_vol_main, 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	m_oki[0]->add_route(ALL_OUTPUTS, m_vol_main, 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, m_vol_main, 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
-	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
-
-	SPEAKER(config, "gun_speaker").front_center();
+	m_oki[1]->add_route(ALL_OUTPUTS, m_vol_main, 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, m_vol_main, 0.35, 1);
 
 	OKIM6295(config, m_oki[2], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[2]->add_route(ALL_OUTPUTS, "gun_speaker", 1.0);
-
-	LC7535(config, m_vol_main);
-	m_vol_main->select().set_constant(1);
-	m_vol_main->set_volume_callback(FUNC(dragngun_state::volume_main_changed));
-
-	LC7535(config, m_vol_gun);
-	m_vol_gun->select().set_constant(0);
-	m_vol_gun->set_volume_callback(FUNC(dragngun_state::volume_gun_changed));
+	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_main, 0.0, 0);
+	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_main, 0.0, 1);
+	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_gun, 1.0, 0);
 }
 
 void dragngun_state::lockloadu(machine_config &config)
