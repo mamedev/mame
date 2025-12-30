@@ -189,8 +189,7 @@ private:
 	emu_timer *m_blitter_done_timer = nullptr;
 	emu_timer *m_pit_timer = nullptr;
 	emu_timer *m_gpu_sync_timer = nullptr;
-	emu_timer *m_jpit1_timer = nullptr;
-	emu_timer *m_jpit2_timer = nullptr;
+	emu_timer *m_jpit_timer[2] = {};
 	uint8_t m_cpu_irq_state = 0;
 	bitmap_rgb32 m_screen_bitmap;
 	uint8_t m_blitter_status = 0;
@@ -269,8 +268,8 @@ private:
 	TIMER_CALLBACK_MEMBER(blitter_done);
 	TIMER_CALLBACK_MEMBER(pit_update);
 	TIMER_CALLBACK_MEMBER(gpu_sync);
-	TIMER_CALLBACK_MEMBER(jpit1_update);
-	TIMER_CALLBACK_MEMBER(jpit2_update);
+	template <unsigned which> TIMER_CALLBACK_MEMBER(jpit_update);
+	void update_jpit_timer(unsigned which);
 
 	void gpu_cpu_int(int state);
 	void dsp_cpu_int(int state);
