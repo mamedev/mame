@@ -7,7 +7,6 @@
 // they can't be fully identified without decapping.
 
 #include "emu.h"
-
 #include "elan_eu3a05vid.h"
 
 #include "elan_eu3a05_soc.h"
@@ -149,7 +148,7 @@ uint8_t elan_eu3a05vid_device::read_vram(int offset)
 void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect)
 {
 	address_space &extspace = m_cpu->space(elan_eu3a05_soc_device::AS_EXTERNAL);
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	/*
 	    Sprites
@@ -369,7 +368,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int &tile, int 
 void elan_eu3a05vid_device::draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int i, int xpos, uint32_t *row)
 {
 	address_space &extspace = m_cpu->space(elan_eu3a05_soc_device::AS_EXTERNAL);
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 	int colour = attr & 0xf0;
 
 	/* 'tiles' are organized / extracted from 'texture' lines that form a 'page' the length of the rom

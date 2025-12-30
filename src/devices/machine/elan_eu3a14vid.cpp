@@ -6,10 +6,11 @@
 
 #include "elan_eu3a14_soc.h"
 
+
 DEFINE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device, "elan_eu3a14vid", "Elan EU3A14 Video")
 
-elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A14_VID, tag, owner, clock),
+elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05commonvid_device(mconfig, ELAN_EU3A14_VID, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_space_config("regs", ENDIANNESS_NATIVE, 8, 7, 0, address_map_constructor(FUNC(elan_eu3a14vid_device::map), this))
@@ -199,7 +200,7 @@ uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
 
 void elan_eu3a14vid_device::draw_background_tile(bitmap_rgb32 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 
 	int baseaddr = base * 256;
 
@@ -207,26 +208,30 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_rgb32 &bitmap, const rec
 
 	if (bpp == 8) // 8bpp selection
 	{
-		if (size == 8)
+		if (size == 8) // 8x8 8bpp
 		{
-			xstride = size / 1; baseaddr += tileno * 64; // 8x8 8bpp
+			xstride = size / 1;
+			baseaddr += tileno * 64;
 		}
-		else
+		else // 16x16 8bpp
 		{
-			xstride = size / 1; baseaddr += tileno * 256; // 16x16 8bpp
+			xstride = size / 1;
+			baseaddr += tileno * 256;
 		}
 
 		palette &= 0x100; // only top bit valid, as there are only 2 palettes?
 	}
 	else if (bpp == 4) // 4bpp selection
 	{
-		if (size == 8)
+		if (size == 8) // 8x8 4bpp
 		{
-			xstride = size / 2; baseaddr += tileno * 32; // 8x8 4bpp
+			xstride = size / 2;
+			baseaddr += tileno * 32;
 		}
-		else
+		else // 16x16 4bpp
 		{
-			xstride = size / 2; baseaddr += tileno * 128; // 16x16 4bpp
+			xstride = size / 2;
+			baseaddr += tileno * 128;
 		}
 	}
 	else if (bpp == 2) // 2bpp?

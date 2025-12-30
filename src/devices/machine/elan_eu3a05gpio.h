@@ -19,18 +19,18 @@ public:
 	void gpio_unk_w(offs_t offset, uint8_t data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	devcb_read8::array<3> m_read_callback;
-	devcb_write8::array<3> m_write_callback;
-
 	uint8_t read_port_data(int which);
 	uint8_t read_direction(int which);
 	void write_port_data(int which, uint8_t data);
 	void write_direction(int which, uint8_t data);
+
+	devcb_read8::array<3> m_read_callback;
+	devcb_write8::array<3> m_write_callback;
 
 	uint8_t m_ddr[3];
 	uint8_t m_unk[3];
