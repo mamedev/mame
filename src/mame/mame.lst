@@ -43857,6 +43857,9 @@ fs3216
 @source:skeleton/ft68m.cpp
 ft68m
 
+@source:skeleton/gamebox.cpp
+gamebox
+
 @source:skeleton/ganbaremo.cpp
 ganbaremo
 
