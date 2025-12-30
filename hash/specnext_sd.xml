@@ -14,7 +14,7 @@ license:CC0-1.0
 	<software name="sys2411">
 		<description>System/Next 24.11</description>
 		<year>2024</year>
-		<publisher>SpecNext Ltd.</publisher>
+		<publisher>SpecNext Ltd</publisher>
 		<part name="card" interface="sdcard">
 			<diskarea name="harddriv">
 				<disk name="sys2411" sha1="947b7598a034258a3ead994eb3e96f3cada896a8" writeable="yes" />
