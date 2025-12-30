@@ -195,7 +195,7 @@ No sound
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Gameplay graphics have clipping/alignment issues, eventually throws an exception
-No sound
+No sound (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -250,6 +250,7 @@ Title screen has black dots of garbage on top (btanb)
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
 Heavy GFX corruptions after 4 Play logo
+No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -267,6 +268,7 @@ Access [cart] EEPROM
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
 Heavy GFX corruptions after 4 Play logo
+No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -303,6 +305,7 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 Hardlocks then eventually throws a [dsp_endian_w] exception after the Dyna Cam logo
 No sound
+Black screen regression after NHLPA logo after hooking up JPIT sound irqs
 Access [cart] EEPROM
 ]]></notes>
 
@@ -386,7 +389,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[DSP] always do an in-flight PC change at startup (fatalerror)
+[DSP] always do an in-flight PC change at startup (fatalerror, regression)
 No sound
 Title screen cuts off background
 Gameplay GFX pop-ups
@@ -408,7 +411,7 @@ Eventually black screens
 		<notes><![CDATA[
 Access [cart] EEPROM
 Huge GFX issues (mostly related with pitch)
-No sound (fixed)
+No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
 		<info name="serial" value="J9000E 700700-3"/>
@@ -426,7 +429,7 @@ No sound (fixed)
 		<notes><![CDATA[
 Access [cart] EEPROM
 Huge GFX issues (mostly related with pitch)
-No sound (fixed)
+No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
 		<info name="serial" value="J9000E 700700-2"/>
@@ -461,7 +464,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Crashes on title screen
+GPU/DSP crashes after few seconds
 GFX status bar is stretched in horizontal direction (screen mode changes mid-frame)
 Automap becomes blue a few frames after being called
 Sound farts
@@ -481,7 +484,8 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
 		<notes><![CDATA[
-No BGMs
+Regression after hooking DSP JPIT irqs
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -499,7 +503,7 @@ Access [cart] EEPROM
 		<publisher>Virgin Interactibe</publisher>
 		<notes><![CDATA[
 Gameplay backgrounds are missing or garbled, bus hog on 68k irqs? (cfr. INT2)
-Access [cart] EEPROM
+Access [cart] EEPROM, doesn't initialize properly i.e. needs to reset it if any other game is loaded
 ]]></notes>
 
 		<info name="serial" value="J9036E 700128-002"/>
@@ -532,7 +536,9 @@ Access [cart] EEPROM (but game has passwords)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"licensed by Atari" then black screen (INT2?)
+Not extensively tested
+"licensed by Atari" then black screen (fixed, DSP JPIT irqs)
+TODO: check EEPROM access (by logic it should have one)
 ]]></notes>
 
 		<info name="serial" value="J9106E 705106-002"/>
@@ -548,6 +554,7 @@ Access [cart] EEPROM (but game has passwords)
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+[DSP] fatal endian setup 00085128 (regression, crashed?)
 Heavy pitch GFX issues
 No sound
 Access [cart] EEPROM
@@ -600,7 +607,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"Another Great Game" then black screen
+"Another Great Game" then black screen. Known to require tight [GPU] pipeline timings
 ]]></notes>
 
 		<info name="serial" value="J9040E 700740-002"/>
@@ -619,7 +626,9 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+Black screen (JPIT regression)
 Huge GFX issues (mostly related with pitch)
+No sound
 ]]></notes>
 
 		<info name="serial" value="J9009E 700709-002"/>
@@ -668,6 +677,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+Black screen regression after hooking up JPIT sound irqs
 No sound, black screen after briefing
 ]]></notes>
 
@@ -701,7 +711,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen with heavy logs
+Black screen with heavy logs/debugger hang, [object] processor?
 Access [cart] EEPROM
 ]]></notes>
 
@@ -718,7 +728,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Jaguar CD cartridge for saving
+Jaguar CD cartridge for saving, wants its own [cart] scheme
 Draws an incorrect pitch GFX, doesn't do much else
 ]]></notes>
 
@@ -737,7 +747,7 @@ Draws an incorrect pitch GFX, doesn't do much else
 		<notes><![CDATA[
 Black screen
 Text GFXs are solid filled
-no BGMs
+No BGMs
 ]]></notes>
 
 		<info name="serial" value="J9097 705097-001"/>
@@ -804,7 +814,7 @@ Access [cart] EEPROM (options saves)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Hangs after few seconds of gameplay
+Hangs after few seconds of gameplay/intro
 Can crash with [PIT] setup
 Access [cart] EEPROM
 ]]></notes>
@@ -822,6 +832,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
+Crashes during initial logos (regression)
 Water background in stage 1 is in black and white, eventually crashes if bumping into road edges
 No BGMs
 Access [cart] EEPROM
@@ -840,7 +851,8 @@ Access [cart] EEPROM
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Black screen
+[GPU] Black screen, enables bus hog
+No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
 		<info name="serial" value="CF3004"/>
@@ -856,7 +868,8 @@ Black screen
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Black screen
+[GPU] Black screen, enables bus hog
+No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
 		<info name="serial" value="CF3004"/>
@@ -906,6 +919,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
+[DSP] crashes at startup, regression
 No sound
 Saves reports error, access [cart] EEPROM
 ]]></notes>
@@ -1057,7 +1071,7 @@ Access [cart] EEPROM
 		<year>1995?</year>
 		<publisher>Carousel Entertainment</publisher>
 		<notes><![CDATA[
-Crashes when coin is input (P1 Pause)
+Crashes when coin is input (P1 Pause), with a [DSP] in-flight
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1090,6 +1104,7 @@ Draws a cutted off Super Burnout copyright text then black screen
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
+[DSP] jump off the weeds at PC=F1B898, also reads $fffffc (?)
 Gets to title screen (with wrong GFX width) then hangs
 Access [cart] EEPROM
 ]]></notes>
@@ -1124,6 +1139,7 @@ OSD full of pitch imperfections (name entry chars)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Not extensively tested
+Incorrect solid fills on playfield
 Access [cart] EEPROM
 ]]></notes>
 		<info name="serial" value="J9010E 700710-000"/>
@@ -1174,6 +1190,7 @@ no sound (btanb)
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
+Black screen at startup (regression after DSP JPIT irqs)
 Heavy GFX issues
 black screen if left on title screen ("Invalid branch!")
 ]]></notes>
@@ -1191,7 +1208,7 @@ black screen if left on title screen ("Invalid branch!")
 		<year>1996</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-[GPU] in-flight PC write (fatalerror)
+[GPU] in-flight PC write (fatalerror, random?)
 Gameplay screen flickers
 ]]></notes>
 
@@ -1247,6 +1264,7 @@ GFXs missing on gameplay and title screen
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
 		<notes><![CDATA[
+Black screen regression after JPIT DSP irq hookup
 No BGMs
 Has minor GFX pitch issue when action summary message pops up after a play
 Overscan bug with sprites
@@ -1299,7 +1317,7 @@ RSoD on Jaguar logo
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Sound farts
+Sound farts (fixed?)
 Missing/wrong GFXs on menus
 Heavy flickering on gameplay
 Access [cart] EEPROM
@@ -1318,8 +1336,9 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+Black screen, regression after JPIT DSP irq hooks
 Black screen after title screen
-no sound
+No sound
 ]]></notes>
 
 		<info name="serial" value="J9070E 700770-002"/>
@@ -1335,6 +1354,7 @@ no sound
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+Black screen, regression after JPIT DSP irq hooks
 Sound buzz when selecting new game, can eventually black screen or throw an exception
 Access [cart] EEPROM
 ]]></notes>
@@ -1387,6 +1407,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Sound metrics menu has glitchy bars (pause menu then press 'B')
+Main sprite flickers
 Access [cart] EEPROM
 ]]></notes>
 

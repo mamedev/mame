@@ -183,19 +183,10 @@ void jaguar_state::update_dsp_irq()
 			m_gpu->set_input_line(1, CLEAR_LINE);
 	}
 
-
-	for (int level = 0; level < 6; level++)
+	if (BIT(m_gpu_regs[0xe0 / 2], 4) && m_dsp_irq_state & m_dsp_regs[JINTCTRL] & 0x1f)
 	{
-		if (BIT(m_dsp_irq_state, level) & BIT(m_dsp_regs[JINTCTRL], level))
-		{
-			m_dsp->set_input_line(level, ASSERT_LINE);
-			dsp_resume();
-		}
-		else
-			m_dsp->set_input_line(level, CLEAR_LINE);
-
+		trigger_host_cpu_irq(4);
 	}
-
 }
 
 
@@ -219,8 +210,8 @@ void jaguar_state::external_int(int state)
 void jaguar_state::sound_start()
 {
 	m_serial_timer = timer_alloc(FUNC(jaguar_state::serial_update), this);
-	m_jpit1_timer = timer_alloc(FUNC(jaguar_state::jpit1_update), this);
-	m_jpit2_timer = timer_alloc(FUNC(jaguar_state::jpit2_update), this);
+	m_jpit_timer[0] = timer_alloc(FUNC(jaguar_state::jpit_update<0>), this);
+	m_jpit_timer[1] = timer_alloc(FUNC(jaguar_state::jpit_update<1>), this);
 
 	m_dsp_irq_state = 0;
 
@@ -248,42 +239,48 @@ uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 		case JINTCTRL:
 			return m_dsp_irq_state;
 		case ASICTRL:
-			return (m_dsp_regs[offset] & 0xfeff) | 0x100; // assume fifo empty
+			// HACK: assume fifo empty
+			return (m_dsp_regs[offset] & 0xfeff) | 0x100;
+		case 0x36/2:
+		case 0x38/2:
+		case 0x3a/2:
+		case 0x3c/2:
+			if (!machine().side_effects_disabled())
+				popmessage("jaguar_a: JPIT%d timer read", offset - 0x36 / 2);
+			break;
 	}
 
 	return m_dsp_regs[offset];
 }
 
-TIMER_CALLBACK_MEMBER(jaguar_state::jpit1_update)
+void jaguar_state::update_jpit_timer(unsigned which)
 {
-	//trigger_host_cpu_irq(4);
+	const u16 prescaler = m_dsp_regs[which ? JPIT2 : JPIT1];
+	const u16 divider = m_dsp_regs[which ? DSP1 : DSP0];
 
-	m_dsp_irq_state |= 1 << 2;
-	if (BIT(m_dsp_regs[JINTCTRL], 2))
-		m_dsp->set_input_line(2, ASSERT_LINE);
-
-	if (m_dsp_regs[JPIT1] && m_dsp_regs[DSP0])
+	if (prescaler && divider)
 	{
-		attotime sample_period = attotime::from_ticks((1 + m_dsp_regs[JPIT1]) * (1 + m_dsp_regs[DSP0]), m_dsp->clock());
-		m_jpit1_timer->adjust(sample_period);
+		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_dsp->clock());
+		m_jpit_timer[which]->adjust(sample_period);
 	}
+	else
+		m_jpit_timer[which]->adjust(attotime::never);
+
 }
 
-TIMER_CALLBACK_MEMBER(jaguar_state::jpit2_update)
+template <unsigned which> TIMER_CALLBACK_MEMBER(jaguar_state::jpit_update)
 {
-	//trigger_host_cpu_irq(4);
+	// battlesp/battlesg expects JPIT sound irqs to trigger 68k
+	m_dsp_irq_state |= 1 << (2 + which);
+	update_dsp_irq();
 
-	m_dsp_irq_state |= 1 << 3;
-	if (BIT(m_dsp_regs[JINTCTRL], 3))
-		m_dsp->set_input_line(3, ASSERT_LINE);
+	// - mutntpng/cybermor wants these irqs
+	// - atarikrt/feverpit also expects this, unconditionally
+	// TODO: fixing atarikrt causes ironsold/ddragon5 black screen regression at startup, why?
+	m_dsp->set_input_line(2 + which, ASSERT_LINE);
 
-	if (m_dsp_regs[JPIT2] && m_dsp_regs[DSP1])
-	{
-		attotime sample_period = attotime::from_ticks((1 + m_dsp_regs[JPIT2]) * (1 + m_dsp_regs[DSP1]), m_dsp->clock());
-		m_jpit2_timer->adjust(sample_period);
-	}
+	update_jpit_timer(which);
 }
-
 
 
 void jaguar_state::jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -295,24 +292,12 @@ void jaguar_state::jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case JPIT1:
 		case DSP0:
 			//printf("Primary sound %04x %04x\n", m_dsp_regs[JPIT1], m_dsp_regs[DSP0]);
-
-			if (m_dsp_regs[JPIT1] && m_dsp_regs[DSP0])
-			{
-				attotime sample_period = attotime::from_ticks((1 + m_dsp_regs[JPIT1]) * (1 + m_dsp_regs[DSP0]), m_dsp->clock());
-				m_jpit1_timer->adjust(sample_period);
-			}
-
+			update_jpit_timer(0);
 			break;
 		case JPIT2:
 		case DSP1:
 			//printf("Secondary sound %04x %04x\n", m_dsp_regs[JPIT2], m_dsp_regs[DSP1]);
-
-			if (m_dsp_regs[JPIT2] && m_dsp_regs[DSP1])
-			{
-				attotime sample_period = attotime::from_ticks((1 + m_dsp_regs[JPIT2]) * (1 + m_dsp_regs[DSP1]), m_dsp->clock());
-				m_jpit2_timer->adjust(sample_period);
-			}
-
+			update_jpit_timer(1);
 			break;
 		case JINTCTRL:
 			//printf("enable %04x\n", m_dsp_regs[JINTCTRL]);

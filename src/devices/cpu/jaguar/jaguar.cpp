@@ -250,7 +250,7 @@ void jaguar_cpu_device::check_irqs()
 	int which = 0;
 
 	/* if the IMASK is set, bail */
-	if (m_imask == true)
+	if (m_imask == true || m_go == false)
 		return;
 
 	u8 latch = m_int_latch;
@@ -1321,21 +1321,24 @@ void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_flags);
 	// clear imask only on bit 3 clear (1 has no effect)
-	if ((m_flags & 0x08) == 0)
-		m_imask = false;
+	if (ACCESSING_BITS_0_15)
+	{
+		if ((m_flags & 0x08) == 0)
+			m_imask = false;
 
-	// update int latch & mask
-	m_int_mask = (m_flags >> 4) & 0x1f;
-	m_int_latch &= ~((m_flags >> 9) & 0x1f);
+		// update int latch & mask
+		m_int_mask = (m_flags >> 4) & 0x1f;
+		m_int_latch &= ~((m_flags >> 9) & 0x1f);
+
+		// TODO: DMAEN (bit 15)
+	}
 
 	// TODO: move to specific handler
-	if (m_isdsp)
+	if (m_isdsp && ACCESSING_BITS_16_31)
 	{
 		m_int_mask |= (BIT(m_flags, 16) << 5);
 		m_int_latch &= ~(BIT(m_flags, 17) << 5);
 	}
-
-	// TODO: DMAEN (bit 15)
 
 	update_register_banks();
 	check_irqs();
@@ -1376,18 +1379,24 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 void jaguar_cpu_device::endian_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
-	// sburnout sets bit 1 == 0
-	if ((m_io_end & 0x7) != 0x7)
-		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	if (ACCESSING_BITS_0_7)
+	{
+		// sburnout sets bit 1 == 0
+		if ((m_io_end & 0x7) != 0x7)
+			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	}
 }
 
 void jaguardsp_cpu_device::dsp_endian_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
-	// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
-	// bretth sets 0x7e06 after dyna cam logo
-	if ((m_io_end & 0x5) != 0x5)
-		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	if (ACCESSING_BITS_0_7)
+	{
+		// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
+		// bretth sets 0x7e06 after dyna cam logo
+		if ((m_io_end & 0x5) != 0x5)
+			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	}
 }
 
 /*
@@ -1405,10 +1414,10 @@ void jaguardsp_cpu_device::dsp_endian_w(offs_t offset, u32 data, u32 mem_mask)
 u32 jaguar_cpu_device::status_r()
 {
 	u32 result = ((m_version & 0xf)<<12) | (m_bus_hog<<11) | m_go;
-	result|= (m_int_latch & 0x1f) << 6;
+	result |= (m_int_latch & 0x1f) << 6;
 	// TODO: make it DSP specific
 	if (m_isdsp == true)
-		result|= (m_int_latch & 0x20) << 11;
+		result |= (m_int_latch & 0x20) << 11;
 	return result;
 }
 
@@ -1422,26 +1431,30 @@ void jaguar_cpu_device::go_w(int state)
 void jaguar_cpu_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_status);
-	bool new_go = BIT(m_io_status, 0);
-	if (new_go != m_go)
-		go_w(new_go);
-
-	if (BIT(m_io_status, 1))
-		m_cpu_interrupt(ASSERT_LINE);
-
-	// TODO: following does nothing if set by itself, or acts as a trap?
-	if (BIT(m_io_status, 2))
+	if (ACCESSING_BITS_0_15)
 	{
-		m_int_latch |= 1;
-		check_irqs();
+		bool new_go = BIT(m_io_status, 0);
+		if (new_go != m_go)
+			go_w(new_go);
+
+		if (BIT(m_io_status, 1))
+			m_cpu_interrupt(ASSERT_LINE);
+
+		// TODO: following does nothing if set by itself, or acts as a trap?
+		if (BIT(m_io_status, 2))
+		{
+			m_int_latch |= 1;
+			check_irqs();
+		}
+
+
+		// TODO: single step handling
+
+		m_bus_hog = BIT(m_io_status, 11);
+		// TODO: protect/protectse uses this, why?
+		if (m_bus_hog == true)
+			logerror("%s: bus hog enabled\n", this->tag());
 	}
-
-	// TODO: single step handling
-
-	m_bus_hog = BIT(m_io_status, 11);
-	// TODO: protect/protectse uses this, why?
-	if (m_bus_hog == true)
-		logerror("%s: bus hog enabled\n", this->tag());
 }
 
 u32 jaguargpu_cpu_device::hidata_r()
