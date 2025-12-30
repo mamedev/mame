@@ -258,7 +258,8 @@ void jaguar_state::update_jpit_timer(unsigned which)
 	const u16 prescaler = m_dsp_regs[which ? JPIT2 : JPIT1];
 	const u16 divider = m_dsp_regs[which ? DSP1 : DSP0];
 
-	if (prescaler && divider)
+	// pbfant sets a prescaler with no divider, expecting working sound with that alone
+	if (prescaler || divider)
 	{
 		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_dsp->clock());
 		m_jpit_timer[which]->adjust(sample_period);
@@ -401,18 +402,35 @@ void jaguar_state::serial_w(offs_t offset, uint32_t data)
 			break;
 
 		/* frequency register */
+		// TODO: BIOS sets frequency *after* control
 		case 4:
 			m_serial_frequency = data & 0xffff;
+			//printf("%04x\n", m_serial_frequency);
 			break;
 
-		/* control register -- only very specific modes supported */
+		/* control register  */
+		// TODO: only very specific mode supported
+		// --x- ---- EVERYWORD Enable irq on every word at MSB (on both tx and rx)
+		// ---x ---- FALLING enable irq on falling edge
+		// ---- x--- RISING enable irq on rising edge
+		// ---- -x-- WSEN
+		// ---- --x- MODE32
+		// ---- ---x INTERNAL enable serial clock (assume disabled on Jaguar CD)
 		case 5:
-			if ((data & 0x3f) != 0x15)
-				logerror("Unexpected write to SMODE = %X\n", data);
-			if ((data & 0x3f) == 0x15)
+			//printf("SMODE %02x\n", data);
 			{
-				attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
-				m_serial_timer->adjust(rate, 0, rate);
+				const u8 smode = data & 0x3f;
+				if (smode == 0)
+				{
+					m_serial_timer->adjust(attotime::never);
+				}
+				else if (smode != 0x15)
+					logerror("Unsupported write to SMODE = %X\n", data);
+				else if (smode == 0x15)
+				{
+					attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
+					m_serial_timer->adjust(rate, 0, rate);
+				}
 			}
 			break;
 

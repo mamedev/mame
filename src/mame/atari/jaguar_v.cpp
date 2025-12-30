@@ -312,7 +312,9 @@ void jaguar_state::gpu_cpu_int(int state)
 
 void jaguar_state::dsp_cpu_int(int state)
 {
-	trigger_host_cpu_irq(4);
+	m_dsp_irq_state |= 1 << 1;
+	update_dsp_irq();
+	//trigger_host_cpu_irq(4);
 }
 
 
@@ -640,6 +642,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		switch (offset)
 		{
 			case MEMCON1:
+				// TODO: this seems unused by anything in a meaningful way, convert to fatalerror?
 				if((m_gpu_regs[offset] & 1) == 0)
 					printf("Warning: ROMHI = 0!\n");
 
@@ -649,7 +652,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				//FIXME: avoid too much small timers for now
 				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff)
 				{
-					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
+					sample_period = attotime::from_ticks((1 + m_gpu_regs[PIT0]) * (1 + m_gpu_regs[PIT1]), m_gpu->clock() / 2);
 					m_pit_timer->adjust(sample_period);
 				}
 				break;

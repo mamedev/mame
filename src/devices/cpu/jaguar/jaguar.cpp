@@ -208,6 +208,10 @@ device_memory_interface::space_config_vector jaguar_cpu_device::memory_space_con
 
 void jaguar_cpu_device::update_register_banks()
 {
+	// - feverpit doesn't want this
+//	if (m_go == false)
+//		return;
+
 	/* pick the bank */
 	u32 bank = m_flags & RPAGEFLAG;
 	if (m_imask == true) bank = 0;
@@ -1320,15 +1324,21 @@ u32 jaguar_cpu_device::flags_r()
 void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_flags);
-	// clear imask only on bit 3 clear (1 has no effect)
 	if (ACCESSING_BITS_0_15)
 	{
+		// clear imask only on bit 3 clear (1 has no effect)
 		if ((m_flags & 0x08) == 0)
 			m_imask = false;
 
 		// update int latch & mask
 		m_int_mask = (m_flags >> 4) & 0x1f;
 		m_int_latch &= ~((m_flags >> 9) & 0x1f);
+
+		//for (int i = 0; i < 5; i++)
+		//{
+		//	if (BIT(m_flags, 9 + i))
+		//		set_input_line(i, CLEAR_LINE);
+		//}
 
 		// TODO: DMAEN (bit 15)
 	}
@@ -1361,10 +1371,11 @@ void jaguar_cpu_device::matrix_address_w(offs_t offset, u32 data, u32 mem_mask)
 void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_pc);
-	if (m_go == false)
-		m_pc = m_io_pc & 0xffffff;
-	else
-		throw emu_fatalerror("%s: inflight PC write %08x", this->tag(), m_pc);
+	m_pc = m_io_pc & 0xffffff;
+	// HRM warns against changing PC while GPU/DSP is running
+	// - speedst2 does it anyway on DSP side
+	if (m_go == true)
+		logerror("%s: inflight PC write %08x", this->tag(), m_pc);
 }
 
 /*

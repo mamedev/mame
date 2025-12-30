@@ -175,6 +175,7 @@ Access [cart] EEPROM
 		<year>2006</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
+Orange screen due of [DSP] running (regression)
 Heavy color issues
 Crashes by going in main menu again after pressing A button
 No sound
@@ -194,7 +195,8 @@ No sound
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Gameplay graphics have clipping/alignment issues, eventually throws an exception
+Gameplay graphics have clipping/alignment issues, black strip on left side
+Playfield on any track has garbage GFXs on borders
 No sound (fixed)
 Access [cart] EEPROM
 ]]></notes>
@@ -373,6 +375,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Has serious 3D GFX pitch issues
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -389,11 +392,11 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[DSP] always do an in-flight PC change at startup (fatalerror, regression)
+[DSP] always do an in-flight PC change at startup
 No sound
 Title screen cuts off background
 Gameplay GFX pop-ups
-Eventually black screens
+Eventually black screens/crashes
 ]]></notes>
 
 		<info name="serial" value="J9003E 800103-002"/>
@@ -589,8 +592,10 @@ RSoD on Jaguar logo (bad dump?)
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-[DSP] do an in-flight PC change on title screen (fatalerror)
+Hangs when accessing gameplay (regression)
+[DSP] do an in-flight PC change on title screen
 Gameplay area is cut off to the right (especially noticeable when pausing game), no color fill for cutscenes
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -626,7 +631,6 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen (JPIT regression)
 Huge GFX issues (mostly related with pitch)
 No sound
 ]]></notes>
@@ -644,7 +648,7 @@ No sound
 		<year>2000</year>
 		<publisher>Songboard Productions</publisher>
 		<notes><![CDATA[
-Reload after saving doesn't work, access [cart] EEPROM
+Reload after saving doesn't work, access [cart] EEPROM (verify, should be fixed)
 ]]></notes>
 
 		<info name="serial" value="CF3003"/>
@@ -780,9 +784,10 @@ Minor glitch on team box when selecting one (blitter not filling properly)
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-"Enter Combat" has ground textures with black,
+"Enter Combat" has ground textures with black
 "Enter Network" causes a black screen after loading (JagLink)
-no BGMs
+Sometimes hangs on main menu
+No BGMs (random? Worked once)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -797,7 +802,7 @@ no BGMs
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-No sound
+No sound (fixed)
 Access [cart] EEPROM (options saves)
 ]]></notes>
 
@@ -832,9 +837,9 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
-Crashes during initial logos (regression)
+Crashes in scanline_update during initial logos (regression)
 Water background in stage 1 is in black and white, eventually crashes if bumping into road edges
-No BGMs
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -955,7 +960,7 @@ Black screen
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
-No BGMs
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -974,6 +979,7 @@ Access [cart] EEPROM
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
 Hangs after loading a stage
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1036,6 +1042,7 @@ RSoD on Jaguar logo
 		<publisher>B&amp;C Computervisions</publisher>
 		<notes><![CDATA[
 Gets to title screen (with wrong GFX width) then hangs
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1052,6 +1059,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Gets to title screen (with wrong GFX width) then hangs
+No sound
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1071,7 +1079,8 @@ Access [cart] EEPROM
 		<year>1995?</year>
 		<publisher>Carousel Entertainment</publisher>
 		<notes><![CDATA[
-Crashes when coin is input (P1 Pause), with a [DSP] in-flight
+Does a [DSP] in-flight PC change (btanb?)
+No engine sound (serial sampled?)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1139,7 +1148,7 @@ OSD full of pitch imperfections (name entry chars)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Not extensively tested
-Incorrect solid fills on playfield
+Incorrect gouraud fills on playfield
 Access [cart] EEPROM
 ]]></notes>
 		<info name="serial" value="J9010E 700710-000"/>
@@ -1265,7 +1274,7 @@ GFXs missing on gameplay and title screen
 		<publisher>Williams Entertainment</publisher>
 		<notes><![CDATA[
 Black screen regression after JPIT DSP irq hookup
-No BGMs
+No sound
 Has minor GFX pitch issue when action summary message pops up after a play
 Overscan bug with sprites
 Access [cart] EEPROM
@@ -1354,7 +1363,6 @@ No sound
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, regression after JPIT DSP irq hooks
 Sound buzz when selecting new game, can eventually black screen or throw an exception
 Access [cart] EEPROM
 ]]></notes>
