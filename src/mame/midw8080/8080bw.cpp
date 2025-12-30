@@ -1572,14 +1572,21 @@ void rollingc_state::main_map(address_map &map)
 	map(0xe000, 0xffff).rw(FUNC(rollingc_state::scattered_colorram2_r), FUNC(rollingc_state::scattered_colorram2_w));
 }
 
-
-void rollingc_state::io_map(address_map &map)
+void rollingc_state::rollingc_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0").w(FUNC(rollingc_state::rollingc_sh_port_w));
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).portr("IN3").w(FUNC(rollingc_state::invadpt2_sh_port_1_w));
+	map(0x03, 0x03).w(FUNC(rollingc_state::invadpt2_sh_port_1_w));
 	map(0x05, 0x05).w(FUNC(rollingc_state::invadpt2_sh_port_2_w));
+}
+
+void rollingc_state::mraker_io_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(rollingc_state::mraker_sh_port1_w));
+	map(0x01, 0x01).portr("IN0");
+	map(0x02, 0x02).portr("IN1");
+	map(0x03, 0x03).portr("IN2");
 }
 
 
@@ -1600,17 +1607,11 @@ static INPUT_PORTS_START( rollingc )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "RC=3000 / MB=1000" )
 	PORT_DIPSETTING(    0x00, "RC=5000 / MB=2000" )
-
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mraker )
-	PORT_START("IN0") // never reads from here
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN1")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -1620,17 +1621,17 @@ static INPUT_PORTS_START( mraker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 
-	PORT_START("IN3")
+	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -1638,15 +1639,17 @@ static INPUT_PORTS_START( mraker )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:5" ) // cabinet type?
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:6" ) // "
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x10, "Upright (Normal)" )
+	PORT_DIPSETTING(    0x20, "Upright (Flip Screen)" )
+	PORT_DIPSETTING(    0x30, "Single (2 Coins/1 Credit)" )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
 INPUT_PORTS_END
-
 
 
 void rollingc_state::machine_start()
@@ -1663,18 +1666,26 @@ void rollingc_state::machine_start()
 	save_item(NAME(m_port_3_last));
 }
 
-void rollingc_state::rollingc(machine_config &config)
+void rollingc_state::mraker(machine_config &config)
 {
 	mw8080bw_root(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollingc_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &rollingc_state::io_map);
+	m_maincpu->set_addrmap(AS_IO, &rollingc_state::mraker_io_map);
 
 	// video hardware
 	m_screen->set_screen_update(FUNC(rollingc_state::screen_update_rollingc));
 
 	PALETTE(config, m_palette, FUNC(rollingc_state::rollingc_palette), 16);
+}
+
+void rollingc_state::rollingc(machine_config &config)
+{
+	mraker(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &rollingc_state::rollingc_io_map);
 
 	// sound hardware
 	invaders_samples_audio(config);
@@ -6235,7 +6246,7 @@ GAME( 1980?,invrvngegw,  invrvnge, invrvnge,  invrvnge,  invrvnge_state, empty_i
 GAME( 1980, vortex,      0,        vortex,    vortex,    vortex_state,   init_vortex,   ROT270, "Zilec Electronics",                  "Vortex",                                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Encrypted 8080/IO
 
 GAME( 1979, rollingc,    0,        rollingc,  rollingc,  rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Rolling Crash / Moon Base",                                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
-GAME( 1980, mraker,      0,        rollingc,  mraker,    rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Moon Raker",                                                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // Missing starfield
+GAME( 1980, mraker,      0,        mraker,    mraker,    rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Moon Raker",                                                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // Missing starfield
 
 GAME( 1979, ozmawars,    0,        ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 1)",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1979, ozmawars2,   ozmawars, ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 2)",                                               MACHINE_SUPPORTS_SAVE ) // Uses Taito's three board color version of Space Invaders PCB
