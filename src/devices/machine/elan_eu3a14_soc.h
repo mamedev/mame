@@ -12,9 +12,9 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "speaker.h"
 
-class elan_eu3a14_soc_device : public m6502_device {
+class elan_eu3a14_soc_device : public m6502_device
+{
 public:
 	elan_eu3a14_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -50,8 +50,6 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	void int_map(address_map &map);
-	address_space_config m_extbus_config;
-	address_space *m_extbus_space;
 
 	void porta_dir_w(uint8_t data) { m_portdir[0] = data; /* TODO: update state */ }
 	void portb_dir_w(uint8_t data) { m_portdir[1] = data; /* TODO: update state */ }
@@ -77,6 +75,9 @@ protected:
 	uint8_t bank_r(offs_t offset) { return space(AS_EXTERNAL).read_byte((m_current_bank * 0x8000) + offset); }
 	void bank_w(offs_t offset, uint8_t data) { space(AS_EXTERNAL).write_byte((m_current_bank * 0x8000) + offset, data); }
 	uint8_t fixed_r(offs_t offset) { /* always at 0 for this SoC ? */ return space(AS_EXTERNAL).read_byte(offset); }
+
+	address_space_config m_extbus_config;
+	address_space *m_extbus_space;
 
 	required_device<elan_eu3a14sys_device> m_sys;
 	required_device<elan_eu3a05_sound_device> m_sound;

@@ -1627,8 +1627,8 @@ void namcos22_state::namcos22_portbit_w(offs_t offset, u16 data)
 
 void namcos22_state::namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	// 8 leds on cpu board, 0=on 1=off
-	// on System22: two rows of 4 red leds
+	// 8 LEDs on cpu board, 0=on 1=off
+	// on System22: two rows of 4 red LEDs
 	// on SS22: GYRGYRGY green/yellow/red
 	COMBINE_DATA(&m_cpuled_data);
 	for (int i = 0; i < 8; i++)
@@ -2817,7 +2817,7 @@ void namcos22_state::handle_driving_io()
 		m_shareram[0x036/2] = brake;
 		handle_coinage(flags);
 
-		// lamps, coin counters, and also leds for acedrive and victlap
+		// lamps, coin counters, and also LEDs for acedrive and victlap
 		const u16 outputs = (m_shareram[0x42 / 2] << 8) | (m_shareram[0x20 / 2] & 0xff);
 		for (int i = 0; i < 16; i++)
 			m_mcu_out[i] = BIT(outputs, i);

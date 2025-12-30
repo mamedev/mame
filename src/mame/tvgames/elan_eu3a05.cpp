@@ -208,37 +208,35 @@ Set 5043 bit 0 low
 
 #include "emu.h"
 
-#include "softlist_dev.h"
-
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "machine/elan_eu3a05_soc.h"
+
+#include "softlist_dev.h"
+
 
 namespace {
 
 class elan_eu3a05_state : public driver_device
 {
 public:
-	elan_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	elan_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{
 	}
 
-	void elan_eu3a05_4mb(machine_config &config);
-	void elan_eu3a05_1mb(machine_config &config);
-	void elan_eu3a05_512kb(machine_config &config);
+	void elan_eu3a05_4mb(machine_config &config) ATTR_COLD;
+	void elan_eu3a05_1mb(machine_config &config) ATTR_COLD;
+	void elan_eu3a05_512kb(machine_config &config) ATTR_COLD;
 
-	void elan_eu3a05_pal_4mb(machine_config &config);
+	void elan_eu3a05_pal_4mb(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	required_device<elan_eu3a05_soc_device> m_maincpu;
-	required_device<screen_device> m_screen;
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -250,7 +248,8 @@ protected:
 	void elan_eu3a05_extmap_1mb(address_map &map) ATTR_COLD;
 	void elan_eu3a05_extmap_512kb(address_map &map) ATTR_COLD;
 
-	virtual void video_start() override ATTR_COLD;
+	required_device<elan_eu3a05_soc_device> m_maincpu;
+	required_device<screen_device> m_screen;
 };
 
 
@@ -262,7 +261,7 @@ public:
 		m_pixram(*this, "pixram")
 	{ }
 
-	void elan_rad_sinv(machine_config &config);
+	void elan_rad_sinv(machine_config &config) ATTR_COLD;
 
 private:
 	void elan_eu3a05_sinv_map(address_map &map) ATTR_COLD;
@@ -396,10 +395,6 @@ uint8_t elan_eu3a05_buzztime_state::porta_r()
 void elan_eu3a05_buzztime_state::portb_w(uint8_t data)
 {
 	logerror("%s: portb_w %02x\n", machine().describe_context(), data);
-}
-
-void elan_eu3a05_state::video_start()
-{
 }
 
 

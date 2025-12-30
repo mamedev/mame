@@ -62,38 +62,43 @@
 
 #include "emu.h"
 
-#include "screen.h"
-
 #include "machine/elan_eu3a14_soc.h"
 #include "machine/timer.h"
+
+#include "screen.h"
+
 
 namespace {
 
 class elan_eu3a14_state : public driver_device
 {
 public:
-	elan_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	elan_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{ }
 
 
-	void radica_eu3a14(machine_config &config);
-	void radica_eu3a14p(machine_config &config);
+	void radica_eu3a14(machine_config &config) ATTR_COLD;
+	void radica_eu3a14p(machine_config &config) ATTR_COLD;
 
-	void radica_eu3a14p_altrambase(machine_config &config);
-	void radica_eu3a14_altrambase(machine_config &config);
-	void radica_eu3a14_altrambase_adc(machine_config &config);
+	void radica_eu3a14p_altrambase(machine_config &config) ATTR_COLD;
+	void radica_eu3a14_altrambase(machine_config &config) ATTR_COLD;
+	void radica_eu3a14_altrambase_adc(machine_config &config) ATTR_COLD;
 
-	void radica_eu3a14_altrambase_bb3(machine_config &config);
-	void radica_eu3a14p_altrambase_bb3(machine_config &config);
+	void radica_eu3a14_altrambase_bb3(machine_config &config) ATTR_COLD;
+	void radica_eu3a14p_altrambase_bb3(machine_config &config) ATTR_COLD;
 
-	void radica_eu3a14_altspritebase(machine_config &config);
-	void radica_eu3a14_altspritebase_bat(machine_config &config);
+	void radica_eu3a14_altspritebase(machine_config &config) ATTR_COLD;
+	void radica_eu3a14_altspritebase_bat(machine_config &config) ATTR_COLD;
 
 	int tsbuzz_inputs_r();
 
+protected:
+	// driver_device overrides
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// screen updates
@@ -105,10 +110,6 @@ private:
 
 	void external_map_8mb(address_map &map) ATTR_COLD;
 	void external_map_4mb(address_map &map) ATTR_COLD;
-
-	// driver_device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<elan_eu3a14_soc_device> m_maincpu;
 	required_device<screen_device> m_screen;
