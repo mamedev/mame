@@ -113,7 +113,7 @@ protected:
 	void sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask);
-	void sprcpt_init(); ATTR_COLD
+	void sprcpt_init() ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	virtual void common_save_state() ATTR_COLD;
