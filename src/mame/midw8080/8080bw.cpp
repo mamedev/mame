@@ -1603,6 +1603,38 @@ static INPUT_PORTS_START( rollingc )
 	PORT_DIPSETTING(    0x00, "RC=5000 / MB=2000" )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( mraker )
+	PORT_INCLUDE( sicv_base )
+
+	PORT_MODIFY("IN0")
+	// nothing in here seems to matter
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) // uncertain, sometimes there's a switch in here
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+
 void rollingc_state::machine_start()
 {
 	invaders_clone_palette_state::machine_start();
@@ -5504,6 +5536,24 @@ ROM_START( rollingc )
 	ROM_LOAD( "rc12.bin",     0x5800, 0x0800, CRC(2052f6d9) SHA1(036702fc40cf133eb374ed674695d7c6c79e8311) )
 ROM_END
 
+
+ROM_START( mraker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mr_1.4a",     0x0000, 0x0400, CRC(0ba47dea) SHA1(bfd19b4ed673798f5b2b7d086d14c8569464eb64) )
+	ROM_LOAD( "mr_2.4bc",    0x0400, 0x0400, CRC(fead8849) SHA1(7b7285789ec02bce0e357fb3bcba4f13a24e2df6) )
+	ROM_LOAD( "mr_3.4d",     0x0800, 0x0400, CRC(7d65358f) SHA1(96081bec39cb1542858cf60462e03562cb511f29) )
+	ROM_LOAD( "mr_4.4f",     0x0c00, 0x0400, CRC(22cc55ad) SHA1(8f302a8f3362eeaece81c95889774004786c17ef) )
+	ROM_LOAD( "mr_5.4h",     0x1000, 0x0400, CRC(e8048768) SHA1(0e2cc18a2807ae96df36301e2be819299493b247) )
+	ROM_LOAD( "mr_6.4l",     0x1400, 0x0400, CRC(1e717545) SHA1(f9a252a96997eb667c159fd7f9100e24555dbe3b) )
+	ROM_LOAD( "mr_7.5a",     0x1800, 0x0400, CRC(2f19de73) SHA1(59e0aa38c563ca891dfe43f47d8c704c1b29d2e5) )
+	ROM_LOAD( "mr_8.5bc",    0x1c00, 0x0400, CRC(fddaf8d0) SHA1(fa31504780ab48b8c6cf223bae43e670ba121bcc) )
+
+	ROM_LOAD( "mr_9.5d",     0x4000, 0x0800, CRC(1ca1be22) SHA1(63546dd7a15e7eadd8483e2a98f5c8576fec7bfc) )
+	ROM_LOAD( "mr_10.5f",    0x4800, 0x0800, CRC(1901c0d4) SHA1(933d4624b009f239a030ff1fd867eb50363d066a) )
+	ROM_LOAD( "mr_11.5h",    0x5000, 0x0800, CRC(cb8e34ae) SHA1(36040a684d9b18ba38eb4876016fd437ecebe711) )
+	// 5l position for rom 12 unpopulated
+ROM_END
+
 ROM_START( schaser )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rt13.bin",     0x0000, 0x0400, CRC(0dfbde68) SHA1(7367b138ad8448aba9222fed632a892df65cecbd) )
@@ -6172,6 +6222,8 @@ GAME( 1980?,invrvngegw,  invrvnge, invrvnge,  invrvnge,  invrvnge_state, empty_i
 GAME( 1980, vortex,      0,        vortex,    vortex,    vortex_state,   init_vortex,   ROT270, "Zilec Electronics",                  "Vortex",                                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Encrypted 8080/IO
 
 GAME( 1979, rollingc,    0,        rollingc,  rollingc,  rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Rolling Crash / Moon Base",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+// should have a galaxian style starfield?
+GAME( 1980, mraker,      0,        rollingc,  mraker,    rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Moon Raker",                                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1979, ozmawars,    0,        ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 1)",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1979, ozmawars2,   ozmawars, ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 2)",                                               MACHINE_SUPPORTS_SAVE ) // Uses Taito's three board color version of Space Invaders PCB
