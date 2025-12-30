@@ -213,14 +213,22 @@ void jaguar_state::sound_start()
 	m_jpit_timer[0] = timer_alloc(FUNC(jaguar_state::jpit_update<0>), this);
 	m_jpit_timer[1] = timer_alloc(FUNC(jaguar_state::jpit_update<1>), this);
 
-	m_dsp_irq_state = 0;
-
 #if ENABLE_SPEEDUP_HACKS
 	if (m_hacks_enabled)
 		m_dsp->space(AS_PROGRAM).install_write_handler(0xf1a100, 0xf1a103, write32_delegate(*this, FUNC(jaguar_state::dsp_flags_w)));
 #endif
 }
 
+void jaguar_state::sound_reset()
+{
+	m_serial_timer->adjust(attotime::never);
+	m_jpit_timer[0]->adjust(attotime::never);
+	m_jpit_timer[1]->adjust(attotime::never);
+
+	m_serial_frequency = 0;
+	m_serial_smode = 0;
+	m_dsp_irq_state = 0;
+}
 
 
 /*************************************
@@ -380,6 +388,34 @@ TIMER_CALLBACK_MEMBER(jaguar_state::serial_update)
  *
  *************************************/
 
+// TODO: only very specific mode supported
+// --x- ---- EVERYWORD Enable irq on every word at MSB (on both tx and rx)
+// ---x ---- FALLING enable irq on falling edge
+// ---- x--- RISING enable irq on rising edge
+// ---- -x-- WSEN
+// ---- --x- MODE32
+// ---- ---x INTERNAL enable serial clock (assume disabled on Jaguar CD)
+void jaguar_state::update_serial_timer()
+{
+	//printf("%04x %02x\n", m_serial_frequency, m_serial_smode);
+
+	switch(m_serial_smode)
+	{
+		case 0x00:
+			m_serial_timer->adjust(attotime::never);
+			break;
+		case 0x15:
+		{
+			attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
+			m_serial_timer->adjust(rate, 0, rate);
+			break;
+		}
+		default:
+			logerror("Unsupported write to SMODE = %X\n", m_serial_smode);
+			break;
+	}
+}
+
 uint32_t jaguar_state::serial_r(offs_t offset)
 {
 	logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
@@ -402,36 +438,16 @@ void jaguar_state::serial_w(offs_t offset, uint32_t data)
 			break;
 
 		/* frequency register */
-		// TODO: BIOS sets frequency *after* control
+		// NOTE: BIOS sets frequency *after* control
 		case 4:
 			m_serial_frequency = data & 0xffff;
-			//printf("%04x\n", m_serial_frequency);
+			update_serial_timer();
 			break;
 
 		/* control register  */
-		// TODO: only very specific mode supported
-		// --x- ---- EVERYWORD Enable irq on every word at MSB (on both tx and rx)
-		// ---x ---- FALLING enable irq on falling edge
-		// ---- x--- RISING enable irq on rising edge
-		// ---- -x-- WSEN
-		// ---- --x- MODE32
-		// ---- ---x INTERNAL enable serial clock (assume disabled on Jaguar CD)
 		case 5:
-			//printf("SMODE %02x\n", data);
-			{
-				const u8 smode = data & 0x3f;
-				if (smode == 0)
-				{
-					m_serial_timer->adjust(attotime::never);
-				}
-				else if (smode != 0x15)
-					logerror("Unsupported write to SMODE = %X\n", data);
-				else if (smode == 0x15)
-				{
-					attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
-					m_serial_timer->adjust(rate, 0, rate);
-				}
-			}
+			m_serial_smode = data & 0x3f;
+			update_serial_timer();
 			break;
 
 		default:

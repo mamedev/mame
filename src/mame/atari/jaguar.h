@@ -117,6 +117,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void sound_start() override ATTR_COLD;
+	virtual void sound_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void device_postload();
 
@@ -179,6 +180,7 @@ private:
 	// audio data
 	uint16_t m_dsp_regs[0x40/2]{};
 	uint16_t m_serial_frequency = 0;
+	uint8_t m_serial_smode = 0;
 	uint8_t m_dsp_irq_state = 0;
 	emu_timer *m_serial_timer = nullptr;
 
@@ -270,6 +272,7 @@ private:
 	TIMER_CALLBACK_MEMBER(gpu_sync);
 	template <unsigned which> TIMER_CALLBACK_MEMBER(jpit_update);
 	void update_jpit_timer(unsigned which);
+	void update_serial_timer();
 
 	void gpu_cpu_int(int state);
 	void dsp_cpu_int(int state);
