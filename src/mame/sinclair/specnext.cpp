@@ -389,6 +389,9 @@ private:
 	u8 m_nr_register;
 	u8 m_port_e3_reg;
 	bool m_divmmc_delayed_check;
+	bool m_copper_req;
+	u8 m_copper_nr_reg;
+	u8 m_copper_nr_dat;
 
 	u8 m_sram_rom;
 	bool m_sram_rom3;
@@ -1870,9 +1873,22 @@ u8 specnext_state::reg_r(offs_t nr_register)
 
 void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 {
+	if (m_copper_req)
+	{
+		if (nr_wr_reg == 0x02)
+		{
+			LOGINTVVV("Copper write: reg=%02x data=%02x\n", nr_wr_reg, nr_wr_dat);
+			m_copper_nr_reg = nr_wr_reg;
+			m_copper_nr_dat = nr_wr_dat;
+			return;
+		}
+		m_copper_req = false;
+	}
+
 	switch (nr_wr_reg)
 	{
 	case 0x02:
+		LOGINTVVV("[RESET] %02x\n", nr_wr_dat);
 		nr_02_w(nr_wr_dat);
 		break;
 	case 0x03:
@@ -2528,6 +2544,14 @@ void specnext_state::nr_02_w(u8 nr_wr_dat)
 		m_nr_02_generate_divmmc_nmi = 0;
 	}
 
+	const u16 mask = 1 << INT_PRIORITY_NMI;
+	if (!m_nr_02_generate_mf_nmi && !m_nr_02_generate_divmmc_nmi && (m_im2_int_status & mask))
+	{
+		m_maincpu->nmi(CLEAR_LINE);
+		m_im2_int_status &= ~mask;
+		update_dma_delay();
+	}
+
 	if (BIT(nr_wr_dat, 1)) // hard reset
 	{
 		m_nr_02_hard_reset = 1;
@@ -2697,7 +2721,7 @@ void specnext_state::nmi()
 	const u16 mask = 1 << INT_PRIORITY_NMI;
 	if (~m_im2_int_status & mask)
 	{
-		m_maincpu->nmi();
+		m_maincpu->nmi(ASSERT_LINE);
 		m_im2_int_status |= mask;
 		update_dma_delay();
 	}
@@ -2705,9 +2729,6 @@ void specnext_state::nmi()
 
 void specnext_state::leave_nmi(int state)
 {
-	m_im2_int_status &= ~(1 << INT_PRIORITY_NMI);
-	update_dma_delay();
-
 	m_mf->cpu_retn_seen_w(1);
 	m_mf->clock_w();
 
@@ -2756,19 +2777,28 @@ void specnext_state::map_fetch(address_map &map)
 {
 	map(0x0000, 0xffff).lr8(NAME([this](offs_t offset)
 	{
-		if (m_divmmc_delayed_check && !machine().side_effects_disabled())
+		if (!machine().side_effects_disabled())
 		{
-			/* Happens after RW cycles (before next M1 fetch).
-			Fell like side effects check must be ignored here,
-			because doesn't matter who reset this lines and such
-			approach gives better experience in debugger UI. */
-			do_m1(offset);
-			m_divmmc_delayed_check = 0;
-
-			// do_m1 performs read from m_program with waits, we need to take it back
-			if (!machine().side_effects_disabled() && (m_nr_07_cpu_speed == 0b11))
+			if (m_divmmc_delayed_check)
 			{
-				m_maincpu->adjust_icount(1);
+				/* Happens after RW cycles (before next M1 fetch).
+				Fell like side effects check must be ignored here,
+				because doesn't matter who reset this lines and such
+				approach gives better experience in debugger UI. */
+				do_m1(offset);
+				m_divmmc_delayed_check = 0;
+
+				// do_m1 performs read from m_program with waits, we need to take it back
+				if (m_nr_07_cpu_speed == 0b11)
+				{
+					m_maincpu->adjust_icount(1);
+				}
+			}
+
+			if (m_copper_req)
+			{
+				m_copper_req = 0;
+				reg_w(m_copper_nr_reg, m_copper_nr_dat);
 			}
 		}
 
@@ -3213,6 +3243,9 @@ void specnext_state::machine_start()
 	save_item(NAME(m_nr_register));
 	save_item(NAME(m_port_e3_reg));
 	save_item(NAME(m_divmmc_delayed_check));
+	save_item(NAME(m_copper_req));
+	save_item(NAME(m_copper_nr_reg));
+	save_item(NAME(m_copper_nr_dat));
 	save_item(NAME(m_sram_rom));
 	save_item(NAME(m_sram_rom3));
 	save_item(NAME(m_sram_alt_128_n));
@@ -3610,9 +3643,9 @@ void specnext_state::machine_reset()
 	port_ff3b_ulap_en_w(0);
 	m_nr_register = 0x24;
 	//copper_requester_d  = 0;
-	//copper_req  = 0;
-	//copper_nr_reg  = 0x00;
-	//copper_nr_dat  = 0x00;
+	m_copper_req = 0;
+	m_copper_nr_reg = 0x00;
+	m_copper_nr_dat = 0x00;
 	//cpu_requester_d  = 0;
 	//cpu_req  = 0;
 	//cpu_nr_reg  = 0x00;
@@ -3929,7 +3962,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
-	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
+	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_copper_req = 1; m_next_regs.write_byte(offset, data); });
 	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
 
 	SOFTWARE_LIST(config, "sd_list").set_original("specnext_sd");
