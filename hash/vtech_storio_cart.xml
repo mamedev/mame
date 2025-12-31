@@ -83,7 +83,7 @@ license:CC0-1.0
 	       | 80-281500(US)   | Disney Princess - Tangled
 	       | 80-281503(UK)   | Disney Princess - Tangled
 	  XX   | 80-281504(GER)  | Disney Princess - Rapunzel - Neu verföhnt
-		   | 80-281505(FR)   | Disney Princess - Raiponce
+		   | 80-281505(FR)   | Disney Princess - Raiponce (Like SPA Pooh, released as a limited run title)
 	       | 80-281600(US)   | Chuggington - Babysitter Brewster
 	       | 80-281603(UK)   | Chuggington - Babysitter Brewster
 	       | 80-281604(GER)  | Chuggington - Bastian, der Babysitter
@@ -104,7 +104,7 @@ license:CC0-1.0
 	       | 80-282003(UK)   | Disney Winnie the Pooh
 	       | 80-282004(GER)  | Disney Winnie Puuh
 	       | 80-282005(FR)   | Disney Winnie l'ourson
-	       | 80-282022(SP)   | Disney Winnie the Pooh (Found in Spain product catalog, may not have been released) (German, French, British and Dutch versions play OK on Spanish Storio)
+	       | 80-282022(SP)   | Disney Winnie the Pooh (Found in Spain product catalog, released as a limited run title until VTech Spain lost the Winnie the Pooh rights in 2012) (German, French, British and Dutch versions play OK on Spanish Storio)
 	       | 80-282023(NL)   | Disney Winnie de Poeh
 	       | 80-282100(US)   | Super Why! - Attack of the Eraser
 	       | 80-282200(US)   | DreamWorks Madagascar 3 - Europe's Most Wanted
@@ -112,7 +112,7 @@ license:CC0-1.0
 	       | 80-282205(FR)   | DreamWorks Madagascar 3 - Bons baisers d'Europe
 	       | 80-282222(SP)   | DreamWorks Madagascar 3 - De marcha por Europa
 	       | 80-282223(NL)   | DreamWorks Madagascar 3 - Op Avontuur in Europa
-	       | 80-282300(US)   | Dinosaur Train - T.Rex Teeth
+	       | 80-282300(US)   | Jim Henson's Dinosaur Train - T.Rex Teeth
 	  XX   | 80-282400(US)   | Hello Kitty - Hello Kitty's Surprise
 	       | 80-282403(UK)   | Hello Kitty - Hello Kitty's Surprise
 	       | 80-282404(GER)  | Hello Kitty - Hello Kittys Überraschung!
@@ -120,14 +120,14 @@ license:CC0-1.0
 	       | 80-282423(NL)   | Hello Kitty - Hello Kitty's Verrassing!
 	       | 80-282700(US)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
 	       | 80-282703(UK)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
-	       | 80-282704(GER)  | Toggolino - Thomas und seine Freunde - Auf und davon Diesel ist neidisch
+	       | 80-282704(GER)  | Toggolino - Thomas und seine Freunde - Auf und davon, Diesel ist neidisch!
 
 	       Notes: Storio 1 carts follow an 80-28XXXX(XX) product code sequence. Spain and Netherlands releases use an 80-28XX2X(XX) sequence.
 	       EAN is calculated by using a 341776 prefix, appending the six digit product code, and adding an EAN check number at the end.
 	       EG: 341776 + 280003 + 3 (calculated check digit) = 3417762800033 - Shrek's Holiday (UK.)
 
 	       All items have been confirmed via physical photographs, product code searches, and online shopping sites, with the exception of 
-	       Winnie Puuh (Spain) which was listed in a Spanish product catalog and may have not been released.
+	       Winnie Puuh (Spain) which was listed in a Spanish product catalog and released as a limited run title.
 	
 	       Storio 1 carts come in boxes with an orange stripe in front. Storio carts with a blue stripe in front are only compatible with Storio 2 and later systems.
 
