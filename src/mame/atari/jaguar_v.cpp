@@ -649,12 +649,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				break;
 			case PIT0:
 			case PIT1:
-				//FIXME: avoid too much small timers for now
-				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff)
-				{
-					sample_period = attotime::from_ticks((1 + m_gpu_regs[PIT0]) * (1 + m_gpu_regs[PIT1]), m_gpu->clock() / 2);
-					m_pit_timer->adjust(sample_period);
-				}
+				update_pit_timer();
 				break;
 
 			case INT1:
@@ -751,14 +746,26 @@ TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 	m_blitter_status = 1;
 }
 
+void jaguar_state::update_pit_timer()
+{
+	const u16 prescaler = m_gpu_regs[PIT0];
+	const u16 divider = m_gpu_regs[PIT1];
+	// raiden BGM tempo depends on this
+	// TODO: randomly crash/hang here in pitfall
+	if (prescaler != 0)
+	{
+		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_gpu->clock());
+		m_pit_timer->adjust(sample_period);
+	}
+	else
+		m_pit_timer->adjust(attotime::never);
+
+}
+
 TIMER_CALLBACK_MEMBER(jaguar_state::pit_update)
 {
 	trigger_host_cpu_irq(3);
-	if (m_gpu_regs[PIT0] != 0)
-	{
-		attotime sample_period = attotime::from_ticks((1 + m_gpu_regs[PIT0]) * (1 + m_gpu_regs[PIT1]), m_gpu->clock() / 2);
-		m_pit_timer->adjust(sample_period);
-	}
+	update_pit_timer();
 }
 
 TIMER_CALLBACK_MEMBER(jaguar_state::gpu_sync)

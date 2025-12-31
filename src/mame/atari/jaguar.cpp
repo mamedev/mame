@@ -1753,6 +1753,7 @@ void jaguar_state::video_config(machine_config &config, const XTAL clock)
 	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
 
 	// TODO: Tom
+	// TODO: Jerry
 	// TODO: Object Processor
 
 	JAG_BLITTER(config, m_blitter, clock);
@@ -1778,7 +1779,7 @@ void jaguar_state::cojagr3k(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_raw(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257);
+	m_screen->set_raw(COJAG_PIXEL_CLOCK / 2, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
 	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
@@ -1814,7 +1815,7 @@ void jaguar_state::cojag68k(machine_config &config)
 void jaguar_state::jaguar(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, JAGUAR_CLOCK/2); // MC68000FN12F 16 MHz
+	M68000(config, m_maincpu, JAGUAR_CLOCK / 2); // MC68000FN12F 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &jaguar_state::cpu_space_map);
 
@@ -1827,6 +1828,7 @@ void jaguar_state::jaguar(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	// TODO: vestigial (sets 222 Hz), dynamically changed in jaguar_v anyway
 	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 

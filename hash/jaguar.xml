@@ -115,7 +115,7 @@ Unreleased (possibly no prototypes exist):
 		<publisher>ICD</publisher>
 		<notes><![CDATA[
 Gameplay graphics are in shades of blue, pause message gets cut off
-Hangs after few seconds of gameplay
+Randomly hangs after few seconds of gameplay
 Access [cart] EEPROM
 Optionally uses [UART] JagLink
 ]]></notes>
@@ -157,7 +157,8 @@ Optionally uses [UART] JagLink
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Several HUD elements have wrong pitch, HUD automap is incorrectly drawn as a big quadrilateral, HUD blending looks ugly
-No sound
+No sound (fixed, serial clock)
+Randomly crashes during gameplay
 Access [cart] EEPROM
 ]]></notes>
 
@@ -177,8 +178,10 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 Orange screen due of [DSP] running (regression)
 Heavy color issues
-Crashes by going in main menu again after pressing A button
-No sound
+Randomly crashes by going in main menu again after pressing A button
+No sound (fixed, serial clock)
+No SFXs/voices
+Runs too fast?
 ]]></notes>
 
 		<info name="serial" value="J9003E 800108-006"/>
@@ -197,7 +200,8 @@ No sound
 		<notes><![CDATA[
 Gameplay graphics have clipping/alignment issues, black strip on left side
 Playfield on any track has garbage GFXs on borders
-No sound (fixed)
+No sound (fixed, DSP JPIT)
+BGMs are a bit out of octaves
 Access [cart] EEPROM
 ]]></notes>
 
@@ -305,9 +309,9 @@ Access [cart] EEPROM
 		<year>2004</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
-Hardlocks then eventually throws a [dsp_endian_w] exception after the Dyna Cam logo
-No sound
-Black screen regression after NHLPA logo after hooking up JPIT sound irqs
+Randomly crashes between DynaCam logo and gameplay (partial workaround: skip with B button)
+Heavy graphic glitches on gameplay
+No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -375,7 +379,8 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Has serious 3D GFX pitch issues
-No sound
+No sound (fixed, serial clock)
+Crashes in [DSP] after few seconds of gameplay
 Access [cart] EEPROM
 ]]></notes>
 
@@ -487,8 +492,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
 		<notes><![CDATA[
-Regression after hooking DSP JPIT irqs
-No sound
+No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -523,7 +527,7 @@ Access [cart] EEPROM, doesn't initialize properly i.e. needs to reset it if any 
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Gameplay area is cut off to the right, status bar even moreso (screen mode changes mid-frame)
-Access [cart] EEPROM (but game has passwords)
+Access [cart] EEPROM (but game has passwords?)
 ]]></notes>
 
 		<info name="serial" value="J9006 700706-001"/>
@@ -558,8 +562,9 @@ TODO: check EEPROM access (by logic it should have one)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [DSP] fatal endian setup 00085128 (regression, crashed?)
+Randomly hangs/crashes
 Heavy pitch GFX issues
-No sound
+No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -592,10 +597,10 @@ RSoD on Jaguar logo (bad dump?)
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-Hangs when accessing gameplay (regression)
-[DSP] do an in-flight PC change on title screen
-Gameplay area is cut off to the right (especially noticeable when pausing game), no color fill for cutscenes
-No sound
+[DSP] do an in-flight PC change on title screen (ignored)
+Gameplay area is cut off to the right (especially noticeable when pausing game)
+No color fill for cutscenes (fixed, DSP running correctly)
+No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -631,7 +636,8 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Huge GFX issues (mostly related with pitch)
+Bad background RMW colors on difficulty select screen (press A after title)
+Huge GFX issues on gameplay (mostly related with pitch)
 No sound
 ]]></notes>
 
@@ -681,11 +687,13 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen regression after hooking up JPIT sound irqs
-No sound, black screen after briefing
+No sound (fixed, serial clock)
+Bad pitch GFXs on attract mode, after title
+Black screen after briefing, or by selecting demo mode
 ]]></notes>
 
 		<info name="serial" value="J9026E 700726-002"/>
+		<info name="developer" value="Eclipse Software"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="iron soldier (world) (v1.04).j64" size="2097152" crc="08f15576" sha1="8bdefc60dd1734315e1c145e29abf41800f908cb" offset="000000" />
@@ -698,7 +706,10 @@ No sound, black screen after briefing
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-No sound, black screen after title (with incorrect width too)
+No sound
+Stretched title screen pixel width
+Several pitch issues (title logo on main menu)
+Hangs after selecting weapon
 Access [cart] EEPROM
 ]]></notes>
 
@@ -715,7 +726,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen with heavy logs/debugger hang, [object] processor?
+Black screen with heavy logs/debugger hang, [object] processor or [GPU] crash
 Access [cart] EEPROM
 ]]></notes>
 
@@ -732,7 +743,8 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Jaguar CD cartridge for saving, wants its own [cart] scheme
+Jaguar CD cartridge for saving, requires its own [cart] scheme (with atmel_29c010_device or unknown AMD intelfsh)
+Currently hangs, [PIT]?
 Draws an incorrect pitch GFX, doesn't do much else
 ]]></notes>
 
@@ -787,7 +799,7 @@ Minor glitch on team box when selecting one (blitter not filling properly)
 "Enter Combat" has ground textures with black
 "Enter Network" causes a black screen after loading (JagLink)
 Sometimes hangs on main menu
-No BGMs (random? Worked once)
+No BGM on main menu (random? Worked once)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -924,9 +936,9 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
-[DSP] crashes at startup, regression
-No sound
-Saves reports error, access [cart] EEPROM
+No sound (fixed, serial clock)
+No SFXs
+Saves reports error, access [cart] EEPROM (verify, should be fixed)
 ]]></notes>
 
 		<info name="serial" value="C3669T"/>
@@ -959,8 +971,8 @@ Black screen
 		<year>1995</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-[GPU] in-flight PC write (fatalerror)
-No sound
+No sound (fixed, serial clock)
+No ball touch SFXs
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1042,7 +1054,7 @@ RSoD on Jaguar logo
 		<publisher>B&amp;C Computervisions</publisher>
 		<notes><![CDATA[
 Gets to title screen (with wrong GFX width) then hangs
-No sound
+No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1059,7 +1071,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Gets to title screen (with wrong GFX width) then hangs
-No sound
+No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1079,6 +1091,7 @@ Access [cart] EEPROM
 		<year>1995?</year>
 		<publisher>Carousel Entertainment</publisher>
 		<notes><![CDATA[
+Hangs after inserting coin with P1 Pause (regression after serial clock fixes)
 Does a [DSP] in-flight PC change (btanb?)
 No engine sound (serial sampled?)
 ]]></notes>
@@ -1199,9 +1212,9 @@ no sound (btanb)
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Black screen at startup (regression after DSP JPIT irqs)
 Heavy GFX issues
 black screen if left on title screen ("Invalid branch!")
+Hangs after few seconds of gameplay
 ]]></notes>
 
 		<info name="serial" value="CF3006"/>
@@ -1238,6 +1251,7 @@ Gameplay screen flickers
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
+Hang after BIOS after fixing PIT frequency (regression)
 No sound
 GFXs missing on gameplay and title screen
 ]]></notes>
@@ -1256,6 +1270,7 @@ GFXs missing on gameplay and title screen
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
+Hang after BIOS after fixing PIT frequency (regression)
 No sound
 GFXs missing on gameplay and title screen
 ]]></notes>
@@ -1273,9 +1288,9 @@ GFXs missing on gameplay and title screen
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
 		<notes><![CDATA[
-Black screen regression after JPIT DSP irq hookup
-No sound
+No sound (fixed, serial clock)
 Has minor GFX pitch issue when action summary message pops up after a play
+[DSP] randomly crashes on main menu
 Overscan bug with sprites
 Access [cart] EEPROM
 ]]></notes>

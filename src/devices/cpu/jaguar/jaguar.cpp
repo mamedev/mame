@@ -773,7 +773,7 @@ void jaguar_cpu_device::jump_cc_rn(u16 op)
 	{
 		const u8 reg = (op >> 5) & 31;
 
-		/* special kludge for risky code in the cojag DSP interrupt handlers */
+		// HACK: kludge for risky code in the cojag DSP interrupt handlers
 		const u32 newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
 		debugger_instruction_hook(m_pc);
 		op = ROPCODE(m_pc);
