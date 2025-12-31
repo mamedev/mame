@@ -743,15 +743,23 @@ uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
 TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 {
 	m_blitter_status = 1;
+	// TODO: kasumi and nbajamte at least enables the done irq, verify if needed or not
+//	m_gpu->set_input_line(4, ASSERT_LINE);
 }
 
 void jaguar_state::update_pit_timer()
 {
 	const u16 prescaler = m_gpu_regs[PIT0];
 	const u16 divider = m_gpu_regs[PIT1];
+
+	//printf("%04x %04x\n", prescaler, divider);
+
 	// raiden BGM tempo depends on this
 	// TODO: randomly crash/hang here in pitfall
-	if (prescaler != 0)
+	// TODO: prescaler != 0xffff shouldn't be a thing
+	// - aircars/aircars94/fforlife/trevmcfr writes 0xffff to both, also read periodically
+	//   (which is a write only register ...)
+	if (prescaler != 0 && prescaler != 0xffff)
 	{
 		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_gpu->clock());
 		m_pit_timer->adjust(sample_period);
@@ -764,6 +772,10 @@ void jaguar_state::update_pit_timer()
 TIMER_CALLBACK_MEMBER(jaguar_state::pit_update)
 {
 	trigger_host_cpu_irq(3);
+	// PIT also triggers an irq 2 on GPU side
+	// TODO: pinpoint what requires this
+	m_gpu->set_input_line(2, ASSERT_LINE);
+
 	update_pit_timer();
 }
 
