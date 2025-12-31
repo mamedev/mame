@@ -7,8 +7,9 @@
 #pragma once
 
 #include "slot.h"
-#include "machine/timer.h"
+
 #include "imagedev/snapquik.h"
+#include "machine/timer.h"
 
 class megadrive_segach_jp_device : public device_t,
 								   public device_megadrive_cart_interface

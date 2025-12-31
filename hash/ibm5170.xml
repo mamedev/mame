@@ -10863,7 +10863,7 @@ The disks have had their OEM IDs modified by Windows
 	</software>
 
 	<software name="alfonstra">
-	    <description>Alfons på äventyr i trafiken (Sweden)</description>
+		<description>Alfons på äventyr i trafiken (Sweden)</description>
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<notes><![CDATA[
@@ -12291,7 +12291,7 @@ Differences between clone/parent:
 	</software>
 
 	<software name="cheops">
-	    <description>Cheops pyramid (Sweden)</description>
+		<description>Cheops pyramid (Sweden)</description>
 		<year>1991</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="version" value="3.1" />
@@ -15838,7 +15838,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 	</software>
 
 	<software name="hmalfons">
-	    <description>Handla med Alfons (Sweden)</description>
+		<description>Handla med Alfons (Sweden)</description>
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="copy_protection" value="Serial number required: 8E-046-018192, 8E-046-015848, 8E-046-019252" />
@@ -17782,7 +17782,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 	</software>
 
 	<software name="alfonshk">
-	    <description>Kom till Alfons hemliga kalas (Sweden)</description>
+		<description>Kom till Alfons hemliga kalas (Sweden)</description>
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<notes><![CDATA[
@@ -18688,7 +18688,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="mmalfons">
-	    <description>Måla med Alfons (Sweden)</description>
+		<description>Måla med Alfons (Sweden)</description>
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="copy_protection" value="Serial number required: 8B-046-018116" />
@@ -19427,7 +19427,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 	</software>
 
 	<software name="frstprog">
-	    <description>Mitt första datorprogram (Sweden)</description>
+		<description>Mitt första datorprogram (Sweden)</description>
 		<year>1991</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -20568,7 +20568,7 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 	</software>
 
 	<software name="pmalfons">
-	    <description>Pussla med Alfons (Sweden)</description>
+		<description>Pussla med Alfons (Sweden)</description>
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="copy_protection" value="Serial number required: 8C-046-020096" />

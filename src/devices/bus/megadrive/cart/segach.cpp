@@ -6,13 +6,13 @@ Sega Channel
 
 **************************************************************************************************/
 
-#include <fstream>
-
 #include "emu.h"
 #include "segach.h"
+
 #include "segach_img.h"
 
 #include "bus/generic/slot.h"
+
 
 /*
  * Sega Channel Game no Kanzume "digest" RAM cart, developed by CRI
@@ -60,9 +60,8 @@ void megadrive_segach_jp_device::cart_map(address_map &map)
 	// TODO: Fatal error: Attempt to register save state entry after state registration is closed!
 //  m_ram_view[0](0x00'0000, 0x03'ffff).ram();
 	m_ram_view[0](0x00'0000, 0x03'ffff).lrw16(
-		NAME([this] (offs_t offset, u16 mem_mask) { return m_ram[offset]; }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ram[offset]); })
-	);
+			NAME([this] (offs_t offset, u16 mem_mask) { return m_ram[offset]; }),
+			NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_ram[offset]); }));
 }
 
 void megadrive_segach_jp_device::time_io_map(address_map &map)
@@ -385,7 +384,7 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 			if (!machine().side_effects_disabled())
 				logerror("TCU: read channel bitmap read offset %02x\n", offset);
 			if (m_broadcast.size())
-				return 0xFF; // Signal everywhere :D
+				return 0xff; // Signal everywhere :D
 			else
 				return 0x00; // No signal :(
 		}));
@@ -449,13 +448,8 @@ void megadrive_segach_us_device::tcu_map(address_map &map)
 //  map(0x1e2, 0x1e2) menu lptr
 //  map(0x1e6, 0x1e6) tuner type (0) TD1A (1) TD1B
 	map(0x1e0, 0x1ff).lrw8(
-		NAME([this] (offs_t offset) -> u8 {
-			return m_nvm[0x1e0 + offset];
-		}),
-		NAME([this] (offs_t offset, u8 data) {
-			m_nvm[0x1e0 + offset] = data;
-		})
-	);
+			NAME([this] (offs_t offset) -> u8 { return m_nvm[0x1e0 + offset]; }),
+			NAME([this] (offs_t offset, u8 data) { m_nvm[0x1e0 + offset] = data; }));
 }
 
 QUICKLOAD_LOAD_MEMBER(megadrive_segach_us_device::quickload_cb)
@@ -648,7 +642,7 @@ void megadrive_segach_us_device::crc_write(u16 data)
 		}
 		else
 		{
-			crc = (crc << 1) ^ 0x04C11DB7;
+			crc = (crc << 1) ^ 0x04c11db7;
 		}
 	}
 	m_crc = crc;

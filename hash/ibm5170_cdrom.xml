@@ -2307,6 +2307,32 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
+	<!-- OS/2 Warp, untested -->
+	<software name="cgameos2">
+		<description>Classic Games for OS/2 Warp</description>
+		<year>1995</year>
+		<publisher>IBM</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="classic games for os2 warp (1995)(ibm)" sha1="4a377af3d8de57c46870c8c3d56b0a5999123082" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1/95 -->
+	<software name="claimpwr">
+		<description>Claim to Power (Germany, 10 Top Hits: Super Spiele)</description>
+		<year>1995</year>
+		<publisher>Softgold Computerspiele</publisher>
+		<info name="developer" value="Rainbow Arts" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="claim_to_power_(germany)" sha1="19da66cecef09fde584b49b09445203e6b2d81e9"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- EMS386 v3.0 required -->
 	<software name="cfootman" supported="partial">
@@ -2317,19 +2343,6 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="club football - the manager (1995)(boms)(m6)" sha1="07f330b6f789f9d9fbd1572b5f799b5d90dc5403" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- OS/2 Warp, untested -->
-	<software name="cgameos2">
-		<description>Classic Games for OS/2 Warp</description>
-		<year>1995</year>
-		<publisher>IBM</publisher>
-
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="classic games for os2 warp (1995)(ibm)" sha1="4a377af3d8de57c46870c8c3d56b0a5999123082" />
 			</diskarea>
 		</part>
 	</software>

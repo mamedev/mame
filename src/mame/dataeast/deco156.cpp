@@ -56,6 +56,7 @@ public:
 	void wcvol95(machine_config &config);
 
 private:
+	void hvysmsh_volume_w(uint8_t data);
 	void hvysmsh_eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template <unsigned Layer> uint32_t pf_rowscroll_r(offs_t offset);
 	template <unsigned Layer> void pf_rowscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -105,6 +106,18 @@ uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 /***************************************************************************/
 
+// see deco32_state::volume_w
+void deco156_state::hvysmsh_volume_w(uint8_t data)
+{
+	// TODO: Assumes linear scaling
+	// values go from 0x00 (max volume) to 0xff (min volume)
+	const u8 raw_vol = 0xff - data;
+	const float vol_output = float(raw_vol) / 255.0f;
+
+	m_oki1->set_output_gain(ALL_OUTPUTS, vol_output);
+	m_oki2->set_output_gain(ALL_OUTPUTS, vol_output);
+}
+
 void deco156_state::hvysmsh_eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
@@ -132,7 +145,7 @@ void deco156_state::hvysmsh_map(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x107fff).ram();
 	map(0x120000, 0x120003).portr("INPUTS");
-	map(0x120000, 0x120003).nopw(); // Volume control in low byte
+	map(0x120000, 0x120000).w(FUNC(deco156_state::hvysmsh_volume_w));
 	map(0x120004, 0x120007).w(FUNC(deco156_state::hvysmsh_eeprom_w));
 	map(0x120008, 0x12000b).nopw(); // IRQ ack?
 	map(0x12000c, 0x12000f).w(FUNC(deco156_state::hvysmsh_oki_0_bank_w));

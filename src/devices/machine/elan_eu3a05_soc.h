@@ -64,10 +64,10 @@ protected:
 	void sound_end5(int state) { m_sys->generate_custom_interrupt(7); }
 
 	uint8_t read_full_space(offs_t offset) { address_space &extspace = space(AS_EXTERNAL); return extspace.read_byte(offset); }
-	void bank_change(uint16_t bank)	{ m_current_bank = bank; }
-	uint8_t bank_r(offs_t offset) {	return space(AS_EXTERNAL).read_byte((m_current_bank * 0x8000) + offset); }
+	void bank_change(uint16_t bank) { m_current_bank = bank; }
+	uint8_t bank_r(offs_t offset) { return space(AS_EXTERNAL).read_byte((m_current_bank * 0x8000) + offset); }
 	void bank_w(offs_t offset, uint8_t data) { space(AS_EXTERNAL).write_byte((m_current_bank * 0x8000) + offset, data); }
-	uint8_t fixed_r(offs_t offset) { return space(AS_EXTERNAL).read_byte(m_fixed_bank_address + offset); }	
+	uint8_t fixed_r(offs_t offset) { return space(AS_EXTERNAL).read_byte(m_fixed_bank_address + offset); }
 
 	uint16_t m_current_bank;
 	uint32_t m_fixed_bank_address;
@@ -76,8 +76,8 @@ private:
 	devcb_read8::array<3> m_read_callback;
 	devcb_write8::array<3> m_write_callback;
 
-	template <int Port>	void port_w(uint8_t data) { m_write_callback[Port](data); }
-	template <int Port>	uint8_t port_r() { return m_read_callback[Port](); }
+	template <int Port> void port_w(uint8_t data) { m_write_callback[Port](data); }
+	template <int Port> uint8_t port_r() { return m_read_callback[Port](); }
 
 	bool m_is_pal; // configuration (probably a pin)
 	bool m_use_alt_timer; // hack, until timer enables are understood

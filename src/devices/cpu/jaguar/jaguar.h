@@ -87,7 +87,7 @@ protected:
 	void flags_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void matrix_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void matrix_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void endian_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void pc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 status_r();
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -295,7 +295,7 @@ protected:
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	void modulo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void dsp_end_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void dsp_endian_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 high_accum_r();
 };
 

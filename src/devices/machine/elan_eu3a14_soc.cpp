@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "elan_eu3a14_soc.h"
 
+#include "speaker.h"
+
+
 DEFINE_DEVICE_TYPE(ELAN_EU3A14_SOC,     elan_eu3a14_soc_device,     "elan_eu3a14_soc_device",     "ELAN EU3A14")
 
 elan_eu3a14_soc_device::elan_eu3a14_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

@@ -90,7 +90,7 @@ u16 swp00_device::interpolation_step(u32 speed, u32 sample_counter)
 	// Phase is incorrect, and very weird
 
 	if(speed >= 0x78)
-        return 0x1f;
+		return 0x1f;
 
 	u32 k0 = speed >> 3;
 	u32 k1 = speed & 7;

@@ -13,7 +13,7 @@
         * Space Attack / Head On
         * Head On
         * Head On 2
-		* Head On 2 (Slimline)
+        * Head On 2 (Slimline)
         * Invinco / Head On 2
         * N-Sub
         * Samurai
@@ -1672,7 +1672,7 @@ static INPUT_PORTS_START( headon2sl )
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_COIN_DEFAULT
-	
+
 	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x01, "Lives" )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "4" )

@@ -819,7 +819,7 @@ void laser3k_state::rgb_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	static const uint8_t bit_image_color_table[] =
 	{
 		BLACK,  DKRED,  GREEN,  YELLOW,
-        BLUE,   PURPLE, AQUA,   WHITE
+		BLUE,   PURPLE, AQUA,   WHITE
 	};
 
 	/* sanity checks */

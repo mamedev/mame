@@ -5,6 +5,8 @@ authors:hap
 -->
 <mamelayout version="2">
 
+<!-- note: same as lilprof.lay, except that the EQUALS digit is at the same height as the other digits -->
+
 <!-- define elements -->
 
 	<element name="red"><rect><color red="1.0" green="0.1" blue="0.15" /></rect></element>

@@ -364,7 +364,7 @@ void luna_68k_state::cpu_map(address_map &map)
 
 	map(0x20280000, 0x2029ffff).rw(FUNC(luna_68k_state::ioc_ram_r), FUNC(luna_68k_state::ioc_ram_w));
 
-	//	map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
+	//  map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
 	map(0x30000834, 0x30000837).w(FUNC(luna_68k_state::m2i_w));
 	map(0x30000838, 0x3000083b).w(FUNC(luna_68k_state::i2m_int_clear));
 	map(0x30000d00, 0x30000d1f).m(m_ioc_spc[0], FUNC(mb89352_device::map)).umask32(0x00ff00ff);
@@ -580,7 +580,7 @@ void luna_68k_state::luna(machine_config &config)
 	M68020(config, m_cmc_cpu, 25_MHz_XTAL/2);
 	m_cmc_cpu->set_addrmap(AS_PROGRAM, &luna_68k_state::cmc_cpu_map);
 
-	AM7990(config, m_cmc_eth); // Linked to an AM7992BCD, 
+	AM7990(config, m_cmc_eth); // Linked to an AM7992BCD,
 	TMS9914(config, m_cmc_gpib, 25_MHz_XTAL/5);
 	AM9513(config, m_cmc_stc, 25_MHz_XTAL/2); // FIXME: clock unknown
 
@@ -588,7 +588,7 @@ void luna_68k_state::luna(machine_config &config)
 	SCC8530(config, m_cmc_scc2, 4.9152_MHz_XTAL); // AM8530H-6PC
 	m_cmc_scc1->configure_channels(4'915'200, 4'915'200, 4'915'200, 4'915'200);
 	m_cmc_scc2->configure_channels(4'915'200, 4'915'200, 4'915'200, 4'915'200);
-	
+
 }
 
 INPUT_PORTS_START(luna)

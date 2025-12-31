@@ -4001,7 +4001,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		<info name="version" value="4.50" />
 		<info name="release" value="19881016" />
 		<!-- baddump: has volume label and file creation dates in 2010
-			 That type of metadata wasn't even introduced until Windows 95 -->
+		     That type of metadata wasn't even introduced until Windows 95 -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="the norton utilities advanced edition 4.50 3.5-disk 1.img" size="737280" crc="ccdf5293" sha1="37fd31c47f77d1ab02772f5f0127bb597c35ad87" status="baddump" />

@@ -1214,6 +1214,11 @@ void rollingc_state::rollingc_sh_port_w(uint8_t data)
 	m_port_3_last = data;
 }
 
+void rollingc_state::mraker_sh_port1_w(uint8_t data)
+{
+	m_flip_screen = BIT(data, 0);
+}
+
 
 
 /*****************************************/
