@@ -291,8 +291,7 @@ private:
 	bool nr_8f_mapping_mode_pentagon_1024() const { return m_nr_8f_mapping_mode == 0b11; }
 	bool nr_8f_mapping_mode_pentagon_1024_en() const { return nr_8f_mapping_mode_pentagon_1024() && BIT(~m_port_eff7_data, 2); }
 
-	void nr_c0_im2_vector_w(u8 data);
-	void nr_c0_int_mode_pulse_0_im2_1_w(bool mode_im2);
+	void nr_c0_im2_vector_w(bool mode_im2, u8 vector);
 
 	u32 internal_port_enable() const;
 	bool port_ff_io_en() const { return BIT(internal_port_enable(), 0); }
@@ -2457,10 +2456,9 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		m_nr_bb_divmmc_ep_1 = nr_wr_dat;
 		break;
 	case 0xc0:
-		nr_c0_im2_vector_w(BIT(nr_wr_dat, 5, 3));
+		nr_c0_im2_vector_w(BIT(nr_wr_dat, 0), BIT(nr_wr_dat, 5, 3));
 		m_nr_c0_stackless_nmi = BIT(nr_wr_dat, 3);
 		m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
-		nr_c0_int_mode_pulse_0_im2_1_w(BIT(nr_wr_dat, 0));
 		LOGINT("[Interrupt Control] Vector: %02x; HW IM2: %d\n", m_nr_c0_im2_vector << 5, m_nr_c0_int_mode_pulse_0_im2_1);
 		break;
 	case 0xc2:
@@ -2592,18 +2590,14 @@ void specnext_state::nr_1a_ula_clip_y2_w(u8 data)
 	m_lores->clip_y2_w(ula_clip_y2_0);
 }
 
-void specnext_state::nr_c0_im2_vector_w(u8 data)
-{
-	m_nr_c0_im2_vector = data;
-
-	m_im2_line->vector_w((m_nr_c0_im2_vector << 5) | (INT_PRIORITY_LINE << 1));
-	m_ctc->vector_w(m_nr_c0_im2_vector << 5);
-	m_im2_ula->vector_w((m_nr_c0_im2_vector << 5) | (INT_PRIORITY_ULA << 1));
-}
-
-void specnext_state::nr_c0_int_mode_pulse_0_im2_1_w(bool mode_im2)
+void specnext_state::nr_c0_im2_vector_w(bool mode_im2, u8 vector)
 {
 	m_nr_c0_int_mode_pulse_0_im2_1 = mode_im2;
+	m_nr_c0_im2_vector = vector;
+
+	m_im2_line->vector_w(mode_im2 ? (m_nr_c0_im2_vector << 5) | (INT_PRIORITY_LINE << 1) : 0xff);
+	m_ctc->vector_w(m_nr_c0_im2_vector << 5);
+	m_im2_ula->vector_w(mode_im2 ? (m_nr_c0_im2_vector << 5) | (INT_PRIORITY_ULA << 1) : 0xff);
 }
 
 static const z80_daisy_config z80_daisy_chain[] =
@@ -2652,12 +2646,12 @@ void specnext_state::ctc_int_w(int state)
 
 template <unsigned DeviceId> void specnext_state::int_ch_w(int state, u8 channel)
 {
-	int tmp = m_im2_int_status;
+	int old = m_im2_int_status;
 	if (state)
 		m_im2_int_status |= (1 << (DeviceId + channel));
 	else
 		m_im2_int_status &= ~(1 << (DeviceId + channel));
-	LOGINTVVV("INT %04x %s%04x -> %04x\n",tmp , state ? "+" : "-", 1 << (DeviceId + channel), m_im2_int_status);
+	LOGINTVVV("INT %04x %s%04x -> %04x\n", old, state ? "+" : "-", 1 << (DeviceId + channel), m_im2_int_status);
 
 	update_dma_delay();
 }
@@ -3799,10 +3793,9 @@ void specnext_state::machine_reset()
 	m_nr_ba_divmmc_ep_timing_0 = 0x00;
 	m_nr_bb_divmmc_ep_1 = 0xcd;
 
-	nr_c0_im2_vector_w(0x00);
+	nr_c0_im2_vector_w(0, 0x00);
 	m_nr_c0_stackless_nmi = 0;
 	m_maincpu->nmi_stackless_w(m_nr_c0_stackless_nmi);
-	nr_c0_int_mode_pulse_0_im2_1_w(0);
 
 	m_nr_c4_int_en_0_expbus = 1;
 
