@@ -203,6 +203,7 @@ Playfield on any track has garbage GFXs on borders
 No sound (fixed, DSP JPIT)
 BGMs are a bit out of octaves
 Access [cart] EEPROM
+Uses [GPU] irq 3
 ]]></notes>
 
 		<info name="serial" value="J9091E 705091-002"/>
@@ -221,6 +222,7 @@ Access [cart] EEPROM
 Title screen foreground layer not drawn properly
 No sound (fixed)
 Access [cart] EEPROM
+Uses [GPU] irq 3
 ]]></notes>
 
 		<info name="serial" value="J9072E 705072-002"/>
@@ -331,7 +333,7 @@ Access [cart] EEPROM
 Switching items in main menu causes a glitch on the text
 Rightmost column of gameplay has odd "overscan" area, visible on horizontal scrolls
 ]]></notes>
-		<!-- cover title, NOTE: different than all the other version -->
+		<!-- cover title, NOTE: different than all the other versions -->
 		<info name="alt_title" value="Brutal Sports Football" />
 		<info name="serial" value="JA100"/>
 		<part name="cart" interface="jaguar_cart">
@@ -348,6 +350,7 @@ Rightmost column of gameplay has odd "overscan" area, visible on horizontal scro
 		<notes><![CDATA[
 [GPU] can sometimes do an in-flight PC change (fatalerror)
 Access [cart] EEPROM
+Uses [GPU] irq 3
 ]]></notes>
 		<info name="serial" value="J9020E 700720-002"/>
 		<part name="cart" interface="jaguar_cart">
@@ -457,6 +460,7 @@ Defender 2000 and Defender Plus both crashes after some few seconds in gameplay.
 Defender 2000 have misplaced GFX portions.
 "paused" GFX upper part incorrectly placed in Defender Classic
 Access [cart] EEPROM
+Uses [GPU] irqs 0 and 3
 ]]></notes>
 
 		<info name="serial" value="J9041E 705041-002"/>
@@ -477,6 +481,7 @@ GFX status bar is stretched in horizontal direction (screen mode changes mid-fra
 Automap becomes blue a few frames after being called
 Sound farts
 Access [cart] EEPROM
+Uses [GPU] irq 3
 ]]></notes>
 
 		<info name="serial" value="J9029E 800129-002"/>
@@ -638,7 +643,7 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 Bad background RMW colors on difficulty select screen (press A after title)
 Huge GFX issues on gameplay (mostly related with pitch)
-No sound
+No sound (fixed)
 ]]></notes>
 
 		<info name="serial" value="J9009E 700709-002"/>
@@ -671,6 +676,7 @@ Reload after saving doesn't work, access [cart] EEPROM (verify, should be fixed)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Has heavy pitch GFX issues
+Uses [GPU] irq 3
 Access [cart] EEPROM
 ]]></notes>
 
@@ -710,6 +716,7 @@ No sound
 Stretched title screen pixel width
 Several pitch issues (title logo on main menu)
 Hangs after selecting weapon
+Uses [GPU] irqs 0,2,3
 Access [cart] EEPROM
 ]]></notes>
 
@@ -728,6 +735,7 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 Black screen with heavy logs/debugger hang, [object] processor or [GPU] crash
 Access [cart] EEPROM
+Uses [GPU] irqs 0,4
 ]]></notes>
 
 		<info name="serial" value="J9012E 700712-002"/>
@@ -781,6 +789,7 @@ No BGMs
 		<notes><![CDATA[
 Exception on non-debug, [GPU] in-flight? On debug gameplay sports no sprite GFXs
 Minor glitch on team box when selecting one (blitter not filling properly)
+Uses [GPU] irqs 0 and 4
 ]]></notes>
 
 		<info name="serial" value="J9089E 705089-002"/>
@@ -800,6 +809,7 @@ Minor glitch on team box when selecting one (blitter not filling properly)
 "Enter Network" causes a black screen after loading (JagLink)
 Sometimes hangs on main menu
 No BGM on main menu (random? Worked once)
+Uses [GPU] irq 0
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -834,6 +844,7 @@ Access [cart] EEPROM (options saves)
 Hangs after few seconds of gameplay/intro
 Can crash with [PIT] setup
 Access [cart] EEPROM
+Uses [GPU] irq 0
 ]]></notes>
 
 		<info name="serial" value="J9101 700701-001"/>
@@ -853,6 +864,7 @@ Crashes in scanline_update during initial logos (regression)
 Water background in stage 1 is in black and white, eventually crashes if bumping into road edges
 No sound
 Access [cart] EEPROM
+Uses [GPU] irq 3
 ]]></notes>
 
 		<info name="serial" value="31763-11153"/>
@@ -1132,6 +1144,7 @@ Access [cart] EEPROM
 ]]></notes>
 
 		<info name="serial" value="J9044E 705044-002"/>
+		<info name="developer" value="Tiertex"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="supercross 3d (world).j64" size="2097152" crc="ec22f572" sha1="c71e0bc9eeed8670c6e7ccc7a0fe3b815d7bac83" offset="000000" />
@@ -1345,6 +1358,7 @@ Sound farts (fixed?)
 Missing/wrong GFXs on menus
 Heavy flickering on gameplay
 Access [cart] EEPROM
+Uses [GPU] irq 3
 ]]></notes>
 
 		<info name="serial" value="J9060E 700760-002"/>
@@ -1432,6 +1446,7 @@ Access [cart] EEPROM
 Sound metrics menu has glitchy bars (pause menu then press 'B')
 Main sprite flickers
 Access [cart] EEPROM
+Uses [GPU] irq 0
 ]]></notes>
 
 		<info name="serial" value="J9042E 700742-002"/>
