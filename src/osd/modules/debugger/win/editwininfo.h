@@ -36,12 +36,12 @@ protected:
 	constexpr static DWORD  COMBO_BOX_STYLE     = WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL;
 	constexpr static DWORD  COMBO_BOX_STYLE_EX  = 0;
 
-	int expression_view_index() const { return m_viewidx; }
-
 	void set_editwnd_bounds(RECT const &bounds);
 	void set_editwnd_text(char const *text);
 	void editwnd_select_all();
 	void set_edit_defstr(const std::string &string) { m_edit_defstr = string; }
+
+	virtual int expression_view_index() const { return m_viewidx; }
 
 	virtual void draw_contents(HDC dc) override;
 
