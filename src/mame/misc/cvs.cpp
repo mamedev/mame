@@ -101,6 +101,8 @@ Main 2650A runs at 1.78MHz (14.318/8).
 Sound board 2650As run at 0.89MHz (14.318/16). Also seen with a 15.625MHz XTAL,
 which would result in slightly higher DAC sound pitch.
 
+TMS5100 is around 620kHz from an R/C osc with a VR, slightly differs per PCB.
+
 Video timing is via a Signetics 2621 (PAL).
 
 *******************************************************************************/
@@ -1398,7 +1400,7 @@ void cvs_state::cvs(machine_config &config)
 	BEEP(config, m_beep[1], 150).add_route(ALL_OUTPUTS, "speaker", 0.15); // "
 	BEEP(config, m_beep[2], 0).add_route(ALL_OUTPUTS, "speaker", 0.075); // "
 
-	TMS5100(config, m_tms5100, 640_kHz_XTAL);
+	TMS5100(config, m_tms5100, 620'000); // R/C osc, approximation
 	m_tms5100->data().set(FUNC(cvs_state::speech_rom_read_bit));
 	m_tms5100->add_route(ALL_OUTPUTS, "speaker", 0.30);
 }
