@@ -8,8 +8,22 @@
     InnoTab 1/2/3 appear to be compatible with each other (updated internal
     software etc.)
 
-    where do the InnoTab 3S and InnoTab 2 Baby fit in?
+	Factory reset code: R-E-S-E-T
 
+    The InnoTab 3S, the InnoTab 3 Baby, the InnoTab 2S and the InnoTab 2 Baby use the same hardware
+	
+	known undumped international versions:
+	InnoTab 2 Baby (US English, with the dummy Photo Album cartridge, the book Noah's Ark Animal Adventure, 12 nursery rhymes, and the games Tappimals Zoo, Peek-a-Boo Dance Party and Chugga Shapes)
+	InnoTab 2 (US English, with the dummy Read, Play & Create cartridge with What’s That Noise?, Alien Rescue, and Color & Pop, Face Race game in NAND)
+	InnoTab 2S (US English, with the dummy Read, Play & Create cartridge with What’s That Noise?, Alien Rescue, and Color & Pop, Face Race game in NAND, the only difference is the letter S at bootup)
+	InnoTab 3 Baby (US English, with the dummy Photo Album cartridge, the book Cody and Cora Explore the Forest, 12 nursery rhymes, and the games Tappimals Zoo, Peek-a-Boo Dance Party and Chugga Shapes)
+	InnoTab 3 Plus (US English, with the dummy InnoTab® Software Preview Cartridge with ten demo videos, on the NAND, the demo version of What's That Noise?, and Globe)
+	InnoTab 3 (US English, with the dummy Read, Play & Create cartridge with What’s That Noise?, H2O Go!, and Color & Pop, the only difference from US/UK/French InnoTab 2 is the new VTech splash)
+	InnoTab 3S Plus (US English, with the dummy InnoTab® Software Preview Cartridge with ten demo videos, on the NAND, the demo version of What's That Noise?, and Globe, the only difference from InnoTab 3 is the InnoTab splash screen and the orientation being landscape)
+	InnoTab 3S (US English, with the dummy Read, Play & Create cartridge with What’s That Noise?, H2O Go!, and Color & Pop, the only difference from InnoTab 3 is the InnoTab splash screen and the orientation being landscape)
+	InnoTab (US English, with the book What’s That Noise?, the 2 games Pinball Letters and Ice Escape, it also includes Color & Pop)
+
+	
 *******************************************************************************/
 
 #include "emu.h"
