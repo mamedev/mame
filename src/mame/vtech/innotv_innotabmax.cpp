@@ -16,7 +16,7 @@
    This file exists so that the Software List has a place to hook up to for
    the time being.
 
-   InnoTV details
+   InnoTV details:
 
    Rockchip RK3168 (Main CPU / SoC)
    Rockchip RK616 ('Partner Chip for Rockchip mobile application processor'
@@ -54,6 +54,9 @@
     |                     |--| RY/BY
     |                     |--+
     +---------------------+
+
+	Known Undumped international versions:
+	InnoTab Max (US English, with Toca Boca bonus app, Color and Pop 2, Ice Escape and Peek a Martian, What's That Noise isnt included this time)
 
 *******************************************************************************/
 
