@@ -2889,8 +2889,6 @@ ROM_START( swclone )
 	// ensure eeprom defaults to 00 or there are unwanted invalid entries already saved
 ROM_END
 
-	// VTech TV Station (Spanish)/Nitro Vision (US/UK)/TV Learning Station (Germany)/Genius TV Progress (France, Benelux)
-	// Uses 3 LR14 batteries for main unit and 2 AA Batteries for the keyboard (demo batteries not included this time but sold seperately)
 
 ROM_START( vtechtvssp )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -3257,6 +3255,8 @@ CONS( 2007, drumsups,   0,        0, spg28x,    drumsups,  spg2xx_game_state,   
 CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_state,  init_senwfit,  "Senario",                                                "Wireless Fitness / Dance Fit (Senario)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // VTech "TV Station" / "TV Learning Station" / "Nitro Vision"
+// Uses 3 LR14 batteries for main unit and 2 AA Batteries for the keyboard (demo batteries not included this time but sold seperately)
+	
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
@@ -3264,14 +3264,14 @@ CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,   
 
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
 CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day (US/UK)",         MACHINE_IMPERFECT_SOUND ) // same ROM confirmed on both US and UK units
-CONS( 2006, doraphonf,  doraphon, 0, doraphonep,doraphonep,spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / L'anniversaire de Babouche (France)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, doraphonf,  doraphon, 0, doraphonep,doraphonep,spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora L'Exploratrice - Dora TV Explorer Phone / L'anniversaire de Babouche (France)", MACHINE_IMPERFECT_SOUND )
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
 // a Dutch localized version also exists, which again must be different code
 CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (US)",                      MACHINE_IMPERFECT_SOUND )
 CONS( 2007, doraglobuk, doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (UK)",                      MACHINE_IMPERFECT_SOUND )
-CONS( 2007, doraglobf,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Globe-Trotter (France)",                    MACHINE_IMPERFECT_SOUND )
-CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobf,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora L'Exploratrice - Dora TV Globe-Trotter (France)",                    MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
 
 
 // ROM checksum fails, but is expecting 0 as a result? shows 'CopyRight' when booting normally? protection?
