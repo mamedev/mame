@@ -634,7 +634,6 @@ uint16_t jaguar_state::tom_regs_r(offs_t offset)
 void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t reg_store = m_gpu_regs[offset];
-	attotime sample_period;
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&m_gpu_regs[offset]);
