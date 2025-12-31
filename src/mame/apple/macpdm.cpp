@@ -328,7 +328,7 @@ void macpdm_state::driver_reset()
 	m_dma_floppy_byte_count = 0;
 	m_floppy_drq = false;
 
-	m_video->set_vram_base((const u64 *)m_ram->pointer());
+	m_video->set_vram_base(m_ram->pointer<u64>());
 	m_video->set_vram_offset(0);
 
 	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);

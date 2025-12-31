@@ -11,13 +11,14 @@
 
 #include "emu.h"
 
+#include "psxcd.h"
+
 #include "bus/psx/ctlrport.h"
 #include "bus/psx/parallel.h"
 #include "cpu/m6805/hd6305.h"
 #include "cpu/psx/psx.h"
 #include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
-#include "psxcd.h"
 #include "machine/ram.h"
 #include "sound/spu.h"
 #include "video/psx.h"

@@ -106,6 +106,42 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/elan_eu3a14_soc.h,MACHINES["ELAN_6502_SOC"] = true
+--@src/devices/machine/elan_eu3a05_soc.h,MACHINES["ELAN_6502_SOC"] = true
+--@src/devices/machine/elan_ep3a19a_soc.h,MACHINES["ELAN_6502_SOC"] = true
+---------------------------------------------------
+
+if (MACHINES["ELAN_6502_SOC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/elan_ep3a19asys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_ep3a19asys.h",
+		MAME_DIR .. "src/devices/machine/elan_ep3a19a_soc.cpp",
+		MAME_DIR .. "src/devices/machine/elan_ep3a19a_soc.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonsys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonsys.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonvid.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05commonvid.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05gpio.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05gpio.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05sys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05sys.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05vid.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05vid.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_a.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_a.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_soc.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a05_soc.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14sys.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14sys.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14vid.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14vid.h",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14_soc.cpp",
+		MAME_DIR .. "src/devices/machine/elan_eu3a14_soc.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/acorn_lc.h,MACHINES["ACORN_LC"] = true
 ---------------------------------------------------
 
@@ -2901,6 +2937,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pcfx_intc.h,MACHINES["PCFX_INTC"] = true
+---------------------------------------------------
+
+if (MACHINES["PCFX_INTC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pcfx_intc.cpp",
+		MAME_DIR .. "src/devices/machine/pcfx_intc.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pckeybrd.h,MACHINES["PCKEYBRD"] = true
 ---------------------------------------------------
 
@@ -5429,5 +5477,16 @@ if (MACHINES["SCI4"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/sci4.cpp",
 		MAME_DIR .. "src/devices/machine/sci4.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/sun1_mmu.h,MACHINES["SUN1_MMU"] = true
+---------------------------------------------------
+if (MACHINES["SUN1_MMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sun1_mmu.cpp",
+		MAME_DIR .. "src/devices/machine/sun1_mmu.h",
 	}
 end

@@ -10,6 +10,7 @@ NOTE:
   make sure you prefix with pc98_flop_orig:* when testing (in case there's a pc98 alias already).
   Add a single line FIXME note instead, check this file for usage, optionally enable LOG_COMMAND in
   machine/upd765.cpp and check what chrn keeps repeating.
+- No .d88 here, use base pc98[_flop].xml for those.
 
 -->
 <softwarelist name="pc98_flop_orig" description="NEC PC-98 original disk images">
@@ -18,6 +19,19 @@ NOTE:
 
 	<!-- FIXME: Aggres (Riverhill Soft) disk B throws "fail1" (2D interface) -->
 	<!-- FIXME: Cruise Chaser Blassty (Square) both disks throws "fail1" -->
+
+	<software name="crux">
+		<description>Crux</description>
+		<year>1987</year>
+		<publisher>コムパック (Compac)</publisher>
+		<info name="alt_title" value="クラックス" />
+		<info name="release" value="198703xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="6144648">
+				<rom name="crux.mfi" size="6144648" crc="e1870c00" sha1="748096b8c781453bf0a8a1a4f28a9deced38aa23" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cyclefgt" supported="yes">
 		<description>Cycle Fight</description>
@@ -42,6 +56,21 @@ No cross cut on some line elements behind hills (verify)
 		</part>
 	</software>
 
+	<!-- FIXME: Dennou Suikoden (Hot-B / Gamu) both disks throws "fail1" -->
+
+	<software name="dna">
+		<description>DNA</description>
+		<year>1987</year>
+		<publisher>グレイ (Gray)</publisher>
+		<info name="alt_title" value="ドナ" />
+		<info name="release" value="198708xx" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="4985494">
+				<rom name="dna.mfi" size="4985494" crc="1e967aba" sha1="722d7b9575536904754f8e35ff82d33c25d79c2d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elysion" supported="no">
 		<description>Elysion (2HD version)</description>
 		<year>1986</year>
@@ -59,6 +88,8 @@ Incompatible with anything prior to pc9801vm (i.e. requires the [PC-9801-24] 16 
 		</part>
 	</software>
 
+	<!-- FIXME: Gaiflame (NCS) has sector crossing the index (same as Genesis) -->
+
 	<software name="genesis" supported="no">
 		<description>Genesis</description>
 		<year>1985</year>
@@ -74,6 +105,8 @@ Fails at PC=0279D, goes on title screen by forcing aw=dw but then crashes with "
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- FIXME: Kairei naru Erotic Memory (Dott Plan) 3.5" that triggers a few undefined opcodes after N88 Basic load -->
 
 	<software name="kazeslow">
 		<description>Kaze, Slowdown</description>
@@ -97,17 +130,41 @@ Fails at PC=0279D, goes on title screen by forcing aw=dw but then crashes with "
 Stuck [PC-9801-26] note on title screen (verify)
 Runs a bit too fast (verify)
 GFX trails on backgrounds [GRCG] or [7220]
+Hangs when accessing first diamond shaped portal
 ]]></notes>
 		<info name="alt_title" value="未来" />
 		<info name="release" value="198611xx" />
-		<info name="usage" value="Intended for pc9801u and pc9801uv only" />
+		<info name="usage" value="Intended for pc9801u and pc9801uv only. Press STOP key during intro to start a new game" />
 		<part name="flop1" interface="floppy_3_5">
+			<!-- baddump: non-factory default save, starts in planet 3 -->
 			<dataarea name="flop" size="6280416">
-				<rom name="mirai.mfi" size="6280416" crc="8594cbfe" sha1="563dd1b4a39d51059b6b014e9ca532a632cdfe67" offset="0" />
+				<rom name="mirai.mfi" size="6280416" crc="8594cbfe" sha1="563dd1b4a39d51059b6b014e9ca532a632cdfe67" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="moonchil" supported="no">
+		<description>Moon Child</description>
+		<year>1987</year>
+		<publisher>HOT・B</publisher>
+		<notes><![CDATA[
+Crashes when starting a new game
+]]></notes>
+		<info name="alt_title" value="ムーンチャイルド" />
+		<info name="release" value="1987xxxx" />
+		<!-- GA夢 -->
+		<info name="developer" value="Gamu" />
+		<!-- TODO: just wants an empty disk unlike pc8801 and mz2500 versions? -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="5080909">
+				<rom name="moon child.mfi" size="5080909" crc="42606fd6" sha1="53f75f30b954bf62bc8a803f7ba0a7380ecf05d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- FIXME: Soapland Story (Hard) has GFX glitch on title screen -->
+
+	<!-- dumped by Peredonov -->
 	<software name="tritorn" supported="no">
 		<description>Tritorn</description>
 		<year>1986</year>
@@ -118,7 +175,6 @@ Runs too fast on pc9801vm (definitely intended for a 5 MHz machine)
 ]]></notes>
 		<info name="alt_title" value="トリトーン" />
 		<info name="release" value="198611xx" />
-		<info name="usage" value="Requires" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="3834564">
 				<rom name="tritorn.mfi" size="3834564" crc="567b8211" sha1="fcd4f106addfb09c6fa45fad7f0c76b97567cc75" offset="0" />
@@ -126,7 +182,7 @@ Runs too fast on pc9801vm (definitely intended for a 5 MHz machine)
 		</part>
 	</software>
 
-	<!-- FIXME: Ulysses (StarCraft): both disks throws "fail1" -->
+	<!-- FIXME: Ulysses (StarCraft): both disks throws "fail1" (2D interface) -->
 	<!-- FIXME: Val Trad (Riverhill Soft): both disks throws "fail1" -->
 	<!-- FIXME: Youtoden (SystemSoft): I/O Error, chrn=(0, 1, 4, 1024) -->
 

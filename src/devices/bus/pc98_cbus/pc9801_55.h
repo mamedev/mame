@@ -12,7 +12,7 @@
 #pragma once
 
 #include "slot.h"
-#include "bus/nscsi/devices.h"
+#include "bus/nscsi/pc98_hd.h"
 #include "machine/nscsi_bus.h"
 #include "machine/wd33c9x.h"
 
@@ -50,22 +50,25 @@ protected:
 	virtual u8 dack_r(int line) override;
 	virtual void dack_w(int line, u8 data) override;
 
-private:
+	virtual void internal_map(address_map &map) ATTR_COLD;
+	virtual void io_map(address_map &map) ATTR_COLD;
+
+	address_space_config m_space_io_config;
+
 	required_device<nscsi_bus_device> m_scsi_bus;
 	required_device<wd33c9x_base_device> m_wdc;
-	address_space_config m_space_io_config;
 	required_memory_region m_bios;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
 
-	void io_map(address_map &map) ATTR_COLD;
-	void internal_map(address_map &map) ATTR_COLD;
+	u8 m_rom_bank;
+	int m_int_line;
+private:
 	void increment_addr();
 
 	u8 m_ar;
 	u8 m_port30;
 	u8 m_pkg_id;
-	u8 m_rom_bank;
 	bool m_dma_enable;
 };
 

@@ -438,6 +438,14 @@ void magistr16_state::magistr16(machine_config &config)
 	}
 
 	MEGADRIVE_CART_SLOT(config, m_md_cart, md_master_xtal / 7, megadrive_cart_options, nullptr).set_must_be_loaded(true);
+	m_md_cart->vres_cb().set([this](int state) {
+		if (state)
+		{
+			m_md68kcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+			for (auto &port : m_md_ioports)
+				port->reset();
+		}
+	});
 
 	SPEAKER(config, "md_speaker", 2).front();
 

@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="vfxsd_flop" description="Ensoniq VFX-SD Disk Images">
+<softwarelist name="vfxsd_flop" description="Ensoniq VFX-SD disk images">
 
 	<software name="os137" cloneof="os210" supported="yes">
 		<description>VFX-SD Sequencer OS version 1.37</description>

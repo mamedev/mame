@@ -23,7 +23,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="assemblea" cloneof="assemble">
-		<description>Assembler (Alt)</description>
+		<description>Assembler (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames?</publisher>
 
@@ -35,7 +35,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="assembleb" cloneof="assemble">
-		<description>Assembler (Alt 2)</description>
+		<description>Assembler (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames?</publisher>
 
@@ -59,7 +59,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="fontmngra" cloneof="fontmngr">
-		<description>Font Manager (Alt)</description>
+		<description>Font Manager (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -71,7 +71,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="fontmngrb" cloneof="fontmngr">
-		<description>Font Manager (Alt 2)</description>
+		<description>Font Manager (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -110,7 +110,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="produkita" cloneof="produkit">
-		<description>Productivity Kit - Introduzione al software integrato (Alt)</description>
+		<description>Productivity Kit - Introduzione al software integrato (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -135,7 +135,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="produkitb" cloneof="produkit">
-		<description>Productivity Kit - Introduzione al software integrato (Alt 2)</description>
+		<description>Productivity Kit - Introduzione al software integrato (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -160,7 +160,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="produkitc" cloneof="produkit">
-		<description>Productivity Kit - Introduzione al software integrato (Alt 3)</description>
+		<description>Productivity Kit - Introduzione al software integrato (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -249,7 +249,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="malthposa" cloneof="malthpos">
-		<description>Maledizione di Thaar/Poseidone (Alt)</description>
+		<description>Maledizione di Thaar/Poseidone (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -268,7 +268,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="malthposb" cloneof="malthpos">
-		<description>Maledizione di Thaar/Poseidone (Alt 2)</description>
+		<description>Maledizione di Thaar/Poseidone (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -287,7 +287,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="malthposc" cloneof="malthpos">
-		<description>Maledizione di Thaar/Poseidone (Alt 3)</description>
+		<description>Maledizione di Thaar/Poseidone (alt 3)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -334,7 +334,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="pcuser9a" cloneof="pcuser9">
-		<description>PC User #9 Cassette (Alt)</description>
+		<description>PC User #9 Cassette (alt)</description>
 		<year>1987</year>
 		<publisher>PC User</publisher>
 
@@ -374,7 +374,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="astronoma" cloneof="astronom">
-		<description>Astronomia - Sky Map (Alt)</description>
+		<description>Astronomia - Sky Map (alt)</description>
 		<year>1986?</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -386,7 +386,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="astronomb" cloneof="astronom">
-		<description>Astronomia - Sky Map (Alt 2)</description>
+		<description>Astronomia - Sky Map (alt 2)</description>
 		<year>1986?</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -444,7 +444,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="androida" cloneof="android" supported="no">
-		<description>Androides (Alt)</description>
+		<description>Androides (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -457,7 +457,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="androidb" cloneof="android" supported="no">
-		<description>Androides (Alt 2)</description>
+		<description>Androides (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -470,7 +470,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="androidc" cloneof="android" supported="no">
-		<description>Androides (Alt 3)</description>
+		<description>Androides (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -494,7 +494,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="asteroida" cloneof="asteroid">
-		<description>Asteroidi (from issue 11/87) (Alt)</description>
+		<description>Asteroidi (from issue 11/87) (alt)</description>
 		<year>1987</year>
 		<publisher>LIST Magazine</publisher>
 
@@ -542,7 +542,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="bidula" cloneof="bidul">
-		<description>Bidul (Alt)</description>
+		<description>Bidul (alt)</description>
 		<year>198?</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -554,7 +554,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="bidulb" cloneof="bidul">
-		<description>Bidul (Alt 2)</description>
+		<description>Bidul (alt 2)</description>
 		<year>198?</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -578,7 +578,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="bluewar2a" cloneof="bluewar2">
-		<description>Blue War II (Alt)</description>
+		<description>Blue War II (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -602,7 +602,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="moranecaa" cloneof="moraneca">
-		<description>Bob Morane Cavalleria (Alt)</description>
+		<description>Bob Morane Cavalleria (alt)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -614,7 +614,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="moranecab" cloneof="moraneca">
-		<description>Bob Morane Cavalleria (Alt 2)</description>
+		<description>Bob Morane Cavalleria (alt 2)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -638,7 +638,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="moranegia" cloneof="moranegi">
-		<description>Bob Morane Giungla (Alt)</description>
+		<description>Bob Morane Giungla (alt)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -650,7 +650,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="moranegib" cloneof="moranegi">
-		<description>Bob Morane Giungla (Alt 2)</description>
+		<description>Bob Morane Giungla (alt 2)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -662,7 +662,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="moranegic" cloneof="moranegi">
-		<description>Bob Morane Giungla (Alt 3)</description>
+		<description>Bob Morane Giungla (alt 3)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -686,7 +686,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="businessa" cloneof="business">
-		<description>Business+ (Alt)</description>
+		<description>Business+ (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -698,7 +698,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="businessb" cloneof="business">
-		<description>Business+ (Alt 2)</description>
+		<description>Business+ (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -724,7 +724,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="capblooda" cloneof="capblood" supported="no">
-		<description>Captain Blood (Alt)</description>
+		<description>Captain Blood (alt)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -737,7 +737,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="capbloodb" cloneof="capblood" supported="no">
-		<description>Captain Blood (Alt 2)</description>
+		<description>Captain Blood (alt 2)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -761,7 +761,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="chamonixa" cloneof="chamonix">
-		<description>Chamonix Challenge - Quota 2000 (Alt)</description>
+		<description>Chamonix Challenge - Quota 2000 (alt)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -773,7 +773,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="chamonixb" cloneof="chamonix">
-		<description>Chamonix Challenge - Quota 2000 (Alt 2)</description>
+		<description>Chamonix Challenge - Quota 2000 (alt 2)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -785,7 +785,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="chamonixc" cloneof="chamonix">
-		<description>Chamonix Challenge - Quota 2000 (Alt 3)</description>
+		<description>Chamonix Challenge - Quota 2000 (alt 3)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -810,7 +810,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="chicagoa" cloneof="chicago" supported="no">
-		<description>Chicago 90 (Alt)</description>
+		<description>Chicago 90 (alt)</description>
 		<year>1990</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -834,7 +834,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="dakar4x4a" cloneof="dakar4x4">
-		<description>Dakar 4x4 (Alt)</description>
+		<description>Dakar 4x4 (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -846,7 +846,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="dakar4x4b" cloneof="dakar4x4">
-		<description>Dakar 4x4 (Alt 2)</description>
+		<description>Dakar 4x4 (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -882,7 +882,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="domcamila" cloneof="domcamil">
-		<description>Dom Camillo (Alt)</description>
+		<description>Dom Camillo (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -894,7 +894,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="domcamilb" cloneof="domcamil">
-		<description>Dom Camillo (Alt 2)</description>
+		<description>Dom Camillo (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -906,7 +906,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="domcamilc" cloneof="domcamil">
-		<description>Dom Camillo (Alt 3)</description>
+		<description>Dom Camillo (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -942,7 +942,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="entropiea" cloneof="entropie">
-		<description>Entropie (Alt)</description>
+		<description>Entropie (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -954,7 +954,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="entropieb" cloneof="entropie">
-		<description>Entropie (Alt 2)</description>
+		<description>Entropie (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -966,7 +966,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="entropiec" cloneof="entropie">
-		<description>Entropie (Alt 3)</description>
+		<description>Entropie (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -991,7 +991,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="frogsa" cloneof="frogs">
-		<description>Frogs (from Jackson Soft Compilation n. 5) (Alt)</description>
+		<description>Frogs (from Jackson Soft Compilation n. 5) (alt)</description>
 		<year>198?</year>
 		<publisher>Gruppo Editoriale Jackson</publisher>
 		<info name="alt_title" value="Jump for Survival" />
@@ -1004,7 +1004,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="frogsb" cloneof="frogs">
-		<description>Frogs (from Jackson Soft Compilation n. 5) (Alt 2)</description>
+		<description>Frogs (from Jackson Soft Compilation n. 5) (alt 2)</description>
 		<year>198?</year>
 		<publisher>Gruppo Editoriale Jackson</publisher>
 		<info name="alt_title" value="Jump for Survival" />
@@ -1029,7 +1029,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="giochcara" cloneof="giochcar">
-		<description>Giochi di Carte (Alt)</description>
+		<description>Giochi di Carte (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1041,7 +1041,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="giochcarb" cloneof="giochcar">
-		<description>Giochi di Carte (Alt 2)</description>
+		<description>Giochi di Carte (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1072,7 +1072,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="giocholia" cloneof="giocholi">
-		<description>Giochi Olimpici (I/II) (Alt)</description>
+		<description>Giochi Olimpici (I/II) (alt)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1091,7 +1091,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="giocholib" cloneof="giocholi">
-		<description>Giochi Olimpici I/II (Alt 2)</description>
+		<description>Giochi Olimpici I/II (alt 2)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1110,7 +1110,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="giocholic" cloneof="giocholi">
-		<description>Giochi Olimpici I/II (Alt 3)</description>
+		<description>Giochi Olimpici I/II (alt 3)</description>
 		<year>1988</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1141,7 +1141,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="greenbera" cloneof="greenber">
-		<description>Green Beret (Alt)</description>
+		<description>Green Beret (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1153,7 +1153,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="greenberb" cloneof="greenber">
-		<description>Green Beret (Alt 2)</description>
+		<description>Green Beret (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1178,7 +1178,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="ereditaa" cloneof="eredita" supported="no">
-		<description>L'Eredita (Alt)</description>
+		<description>L'Eredita (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1191,7 +1191,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="ereditab" cloneof="eredita" supported="no">
-		<description>L'Eredita (Alt 2)</description>
+		<description>L'Eredita (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1204,7 +1204,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="ereditac" cloneof="eredita" supported="no">
-		<description>L'Eredita (Alt 3)</description>
+		<description>L'Eredita (alt 3)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1228,7 +1228,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="imperiala" cloneof="imperial">
-		<description>Imperialis (Alt)</description>
+		<description>Imperialis (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -1240,7 +1240,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="imperialb" cloneof="imperial">
-		<description>Imperialis (Alt 2)</description>
+		<description>Imperialis (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -1265,7 +1265,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="intrigoa" cloneof="intrigo" supported="no">
-		<description>Intrigo a Parigi (Alt)</description>
+		<description>Intrigo a Parigi (alt)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -1278,7 +1278,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="intrigob" cloneof="intrigo" supported="no">
-		<description>Intrigo a Parigi (Alt 2)</description>
+		<description>Intrigo a Parigi (alt 2)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -1291,7 +1291,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="intrigoc" cloneof="intrigo" supported="no">
-		<description>Intrigo a Parigi (Alt 3)</description>
+		<description>Intrigo a Parigi (alt 3)</description>
 		<year>1986</year>
 		<publisher>Infogrames</publisher>
 
@@ -1327,7 +1327,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="karatea" cloneof="karate">
-		<description>Karate (Alt)</description>
+		<description>Karate (alt)</description>
 		<year>1987?</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1358,7 +1358,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="lasvegasa" cloneof="lasvegas">
-		<description>Las Vegas (Alt)</description>
+		<description>Las Vegas (alt)</description>
 		<year>1985</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1389,7 +1389,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="lasvegasc" cloneof="lasvegas">
-		<description>Las Vegas (Single Tape, Alt)</description>
+		<description>Las Vegas (Single Tape, alt)</description>
 		<year>1985</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1425,7 +1425,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="maddoga" cloneof="maddog">
-		<description>Mad Dog (Alt)</description>
+		<description>Mad Dog (alt)</description>
 		<year>1989</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1461,7 +1461,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="minieraa" cloneof="miniera">
-		<description>La Miniera di Diamanti (Alt)</description>
+		<description>La Miniera di Diamanti (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1473,7 +1473,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="minierab" cloneof="miniera">
-		<description>La Miniera di Diamanti (Alt 2)</description>
+		<description>La Miniera di Diamanti (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1509,7 +1509,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="nottetmpa" cloneof="nottetmp">
-		<description>La Notte dei Templari (Alt)</description>
+		<description>La Notte dei Templari (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1521,7 +1521,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="nottetmpb" cloneof="nottetmp">
-		<description>La Notte dei Templari (Alt 2)</description>
+		<description>La Notte dei Templari (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1545,7 +1545,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="numero10a" cloneof="numero10">
-		<description>Numero 10 (Alt)</description>
+		<description>Numero 10 (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1557,7 +1557,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="numero10b" cloneof="numero10">
-		<description>Numero 10 (Alt 2)</description>
+		<description>Numero 10 (alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1582,7 +1582,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="okcowboya" cloneof="okcowboy" supported="no">
-		<description>OK Cowboy (Alt)</description>
+		<description>OK Cowboy (alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -1595,7 +1595,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="okcowboyb" cloneof="okcowboy" supported="no">
-		<description>OK Cowboy (Alt 2)</description>
+		<description>OK Cowboy (alt 2)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -1608,7 +1608,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="okcowboyc" cloneof="okcowboy" supported="no">
-		<description>OK Cowboy (Alt 3)</description>
+		<description>OK Cowboy (alt 3)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -1651,7 +1651,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="olimpinvb" cloneof="olimpinv">
-		<description>Olimpiadi Invernali (Single Tape, Alt)</description>
+		<description>Olimpiadi Invernali (Single Tape, alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1663,7 +1663,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="olimpinvc" cloneof="olimpinv">
-		<description>Olimpiadi Invernali (Single Tape, Alt 2)</description>
+		<description>Olimpiadi Invernali (Single Tape, alt 2)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1687,7 +1687,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="prohibita" cloneof="prohibit">
-		<description>Prohibition (Alt)</description>
+		<description>Prohibition (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1699,7 +1699,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="prohibitb" cloneof="prohibit">
-		<description>Prohibition (Alt 2)</description>
+		<description>Prohibition (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1711,7 +1711,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="prohibitc" cloneof="prohibit">
-		<description>Prohibition (Alt 3)</description>
+		<description>Prohibition (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1735,7 +1735,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="qrispa" cloneof="qrisp">
-		<description>Qrisp (from Jackson Soft Compilation n. 4) (Alt)</description>
+		<description>Qrisp (from Jackson Soft Compilation n. 4) (alt)</description>
 		<year>198?</year>
 		<publisher>Gruppo Editoriale Jackson</publisher>
 
@@ -1791,7 +1791,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="saphira" cloneof="saphir" supported="no">
-		<description>Saphir (Alt)</description>
+		<description>Saphir (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1822,7 +1822,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="scarfinga" cloneof="scarfing">
-		<description>Scarfinger (Alt)</description>
+		<description>Scarfinger (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1834,7 +1834,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="scarfingb" cloneof="scarfing">
-		<description>Scarfinger (Alt 2)</description>
+		<description>Scarfinger (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1846,7 +1846,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="scarfingc" cloneof="scarfing">
-		<description>Scarfinger (Alt 3)</description>
+		<description>Scarfinger (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1870,7 +1870,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="sservicea" cloneof="sservice">
-		<description>Silent Service (Alt)</description>
+		<description>Silent Service (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1882,7 +1882,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="sserviceb" cloneof="sservice">
-		<description>Silent Service (Alt 2)</description>
+		<description>Silent Service (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1907,7 +1907,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="sorcerya" cloneof="sorcery" supported="no">
-		<description>Sorcery (Alt)</description>
+		<description>Sorcery (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1932,7 +1932,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="sortilega" cloneof="sortileg" supported="no">
-		<description>Sortileges (Alt)</description>
+		<description>Sortileges (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1945,7 +1945,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="sortilegb" cloneof="sortileg" supported="no">
-		<description>Sortileges (Alt 2)</description>
+		<description>Sortileges (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1958,7 +1958,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="sortilegc" cloneof="sortileg" supported="no">
-		<description>Sortileges (Alt 3)</description>
+		<description>Sortileges (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -1994,7 +1994,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="sfliparda" cloneof="sflipard">
-		<description>Super Flippard (Alt)</description>
+		<description>Super Flippard (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -2006,7 +2006,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="sflipardb" cloneof="sflipard">
-		<description>Super Flippard (Alt 2)</description>
+		<description>Super Flippard (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -2043,7 +2043,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="tnta" cloneof="tnt" supported="no">
-		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (Alt)</description>
+		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (alt)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -2056,7 +2056,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="tntb" cloneof="tnt" supported="no">
-		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (Alt 2)</description>
+		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (alt 2)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -2069,7 +2069,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="tntc" cloneof="tnt" supported="no">
-		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (Alt 3)</description>
+		<description>T.N.T. - Territorio da Neutralizzare Tempestivamente (alt 3)</description>
 		<year>1987</year>
 		<publisher>Olivetti Prodest</publisher>
 
@@ -2093,7 +2093,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="tetrisa" cloneof="tetris">
-		<description>Tetris (Alt)</description>
+		<description>Tetris (alt)</description>
 		<year>1991</year>
 		<publisher>Michele Alessandrini</publisher>
 
@@ -2105,7 +2105,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="tetrisb" cloneof="tetris">
-		<description>Tetris (Alt 2)</description>
+		<description>Tetris (alt 2)</description>
 		<year>1991</year>
 		<publisher>Michele Alessandrini</publisher>
 
@@ -2129,7 +2129,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="troffa" cloneof="troff">
-		<description>Troff (Alt)</description>
+		<description>Troff (alt)</description>
 		<year>1983</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -2141,7 +2141,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="troffb" cloneof="troff">
-		<description>Troff (Alt 2)</description>
+		<description>Troff (alt 2)</description>
 		<year>1983</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -2166,7 +2166,7 @@ This list is exclusively for Italian MO5 and MO6 software
 
 	<!-- protection, works in dcmoto -->
 	<software name="vampirea" cloneof="vampire" supported="no">
-		<description>Vampire (Alt)</description>
+		<description>Vampire (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 

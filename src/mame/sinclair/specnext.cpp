@@ -58,7 +58,7 @@
 
 namespace {
 
-#define TIMINGS_PERFECT     0
+#define TIMINGS_PERFECT     1
 
 constexpr u8 INT_PRIORITY_LINE     = 0;
 constexpr u8 INT_PRIORITY_UART0_RX = 1;
@@ -145,6 +145,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	void reset_hard();
 	virtual void video_start() override ATTR_COLD;
@@ -172,6 +173,7 @@ protected:
 	void palette_val_w(u8 nr_palette_priority, u16 nr_palette_value);
 	u8 port_ff_r();
 	void port_ff_w(u8 data);
+	void ulatm_w(u8 data);
 	void turbosound_address_w(u8 data);
 	template <u8 Lsb> u8 mf_port_r(offs_t addr);
 	template <u8 Lsb> void mf_port_w(offs_t addr, u8 data);
@@ -365,6 +367,7 @@ private:
 	video_timings_info m_video_timings;
 	rectangle m_clip256x192;
 	rectangle m_clip320x256;
+	int m_video_output_hdmi = -1;
 	int m_page_shadow[8];
 	bool m_bootrom_en;
 	u8 m_port_ff_data;
@@ -912,7 +915,6 @@ void specnext_state::update_video_mode()
 			};
 	}
 
-	const bool is_hdmi = ~m_io_video.read_safe(1) & 1;
 	const int left = m_video_timings.min_hactive << 1;
 	const int top = m_video_timings.min_vactive;
 	const int width = (m_video_timings.max_hc + 1) << 1;
@@ -920,11 +922,13 @@ void specnext_state::update_video_mode()
 	m_clip256x192 = rectangle(left, left + (256 << 1) - 1, top, top + 192 - 1);
 	m_clip320x256 = rectangle(left - (32 << 1), left + ((256 + 32) << 1) - 1, top - 32, top + 192 + 32 - 1);
 
-	m_screen->configure(width, height
-		, is_hdmi
-			? rectangle(m_video_timings.hdmi_xmin << 1, m_video_timings.hdmi_xmax << 1,m_video_timings.hdmi_ymin, m_video_timings.hdmi_ymax)
-			: m_clip320x256
-		, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
+	rectangle visarea = m_video_output_hdmi
+			? rectangle(m_video_timings.hdmi_xmin << 1, (m_video_timings.hdmi_xmax << 1) | 1, m_video_timings.hdmi_ymin, m_video_timings.hdmi_ymax)
+			: m_clip320x256;
+	// The visarea can't overlap with screen last vpos. Posssibly related to https://github.com/mamedev/mame/pull/9945
+	visarea.max_y = std::min(visarea.max_y, height - 2);
+
+	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(28_MHz_XTAL / 2) * width * height);
 	m_ula_scr->set_raster_offset(left, top);
 	m_lores->set_raster_offset(left, top);
 	m_tiles->set_raster_offset(left, top);
@@ -933,7 +937,7 @@ void specnext_state::update_video_mode()
 
 	m_eff_nr_03_machine_timing = m_nr_03_machine_timing;
 	m_eff_nr_05_5060 = m_nr_05_5060;
-	LOG("%s: %s %dHz\n", machine_name, is_hdmi ? "HDMI" : "VGA", m_nr_05_5060 ? 60 : 50);
+	LOG("%s@%dHz\n", machine_name, m_nr_05_5060 ? 60 : 50);
 }
 
 u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -950,15 +954,19 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	const bool sprites_en = m_nr_15_sprite_en && BIT(layers_dev, 3);
 
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
-	screen.priority().fill(0, cliprect);
 	// background
 	if (ula_en)
+	{
 		m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
+		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), clip256x192);
+	}
 	else
 		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
 
 	if (m_nr_15_layer_priority < 0b110)
 	{
+		screen.priority().fill(0, cliprect);
+
 		static const u8 lcfg[][3] =
 		{
 			// tiles+ula priority; l2 prioryty; l2 mask
@@ -973,7 +981,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 		const u8 (&l)[3] = lcfg[m_nr_15_layer_priority];
 		if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), l[0]);
-		if (ula_en && BIT(~m_nr_6b_tm_control, 3))
+		if (ula_en)
 		{
 			if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, l[0]);
 			else m_ula_scr->draw(screen, bitmap, clip256x192, flash, l[0]);
@@ -983,20 +991,27 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	else // colors mixing case
 	{
+		if (ula_en && (m_nr_68_blend_mode == 0b00 || m_nr_68_blend_mode == 0b10)) // blending with ULA
+		{
+			screen.priority().fill(1, cliprect);
+			screen.priority().fill(0, clip256x192);
+		}
+		else
+			screen.priority().fill(0, cliprect);
+
 		if (m_nr_68_blend_mode == 0b00) // Use ULA as blend layer
 		{
-			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
-			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (ula_en)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
-			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
+			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_ALL_CATEGORIES, 2);
 		}
 		else if (m_nr_68_blend_mode == 0b10) // Use result of ULA + Tilemap
 		{
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
-			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (ula_en)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
@@ -1006,24 +1021,24 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		else if (m_nr_68_blend_mode == 0b11) // Use Tilemap as blend layer
 		{
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
-			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (ula_en)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 1);
 		}
-		else // No blending (disable blend)
+		else // 0b01 - No blending (disable blend)
 		{
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
-			if (ula_en && BIT(~m_nr_6b_tm_control, 3))
+			if (ula_en)
 			{
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
 			}
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(2), 2);
 		}
-		// mixes only to 1
+		// mixes only to 1 with no others
 		if (layer2_en) m_layer2->draw_mix(screen, bitmap, clip320x256, m_nr_15_layer_priority & 1);
 	}
 	// sprites below foreground
@@ -1076,12 +1091,14 @@ void specnext_state::port_ff_w(u8 data)
 	m_port_ff_data = data; // ==port_ff_dat_tmx
 	m_ula_scr->port_ff_reg_w(m_port_ff_data);
 	nr_6a_lores_radastan_xor_w(m_nr_6a_lores_radastan_xor);
+}
 
-	// TODO confirm this
+void specnext_state::ulatm_w(u8 data)
+{
 	u16 nr_palette_value = (data << 1) | BIT(data, 1) | BIT(data, 0);
 	u16 nr_palette_index_utm = (BIT(m_nr_43_palette_write_select, 2) << 8) | (0b11 << 6) | m_port_bf3b_ulap_index;
 
-	m_palette->set_pen_color(nr_palette_index_utm, rgbexpand<3,3,3>(nr_palette_value, 6, 3, 0));
+	m_palette->set_pen_color(nr_palette_index_utm, rgbexpand<3,3,3>(nr_palette_value, 3, 6, 0));
 }
 
 void specnext_state::port_7ffd_reg_w(u8 data)
@@ -1425,7 +1442,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 	case 0x07:
 		{
 			u8 cpu_speed = 0;
-			for (u8 clock_scale = BIT(u8(m_maincpu->clock_scale()), 0, 3) >> 1; clock_scale; clock_scale >>= 1, ++cpu_speed);
+			for (u8 clock_scale = BIT(u8(m_maincpu->clock_scale()), 0, 4) >> 1; clock_scale; clock_scale >>= 1, ++cpu_speed);
 			port_253b_dat = (0b00 << 6) | (cpu_speed << 4) | (0b00 << 2) | m_nr_07_cpu_speed;
 		}
 		break;
@@ -1968,12 +1985,18 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 	case 0x11:
 		if (m_nr_03_config_mode == 1)
 		{
-			if (BIT(nr_wr_dat, 0, 3) == 0b111)
-				m_nr_11_video_timing = 0b000;
-			else if (G_VIDEO_INC == 0b10)
+			if (G_VIDEO_INC == 0b10)
 				m_nr_11_video_timing = (0b00 << 1) | BIT(nr_wr_dat, 0);
 			else
+			{
 				m_nr_11_video_timing = BIT(nr_wr_dat, 0, 3);
+				// MAME supports only mode 0 (VGA)
+				if (m_nr_11_video_timing > 0)
+				{
+					LOG("[Video Timing] Video mode %d selected but not supported\n", m_nr_11_video_timing);
+					m_nr_11_video_timing = 0;
+				}
+			}
 		}
 		break;
 	case 0x12:
@@ -2274,6 +2297,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		nr_6f_tilemap_tiles_w(BIT(nr_wr_dat, 7), BIT(nr_wr_dat, 0, 6));
 		break;
 	case 0x70:
+		m_screen->update_now();
 		nr_70_layer2_resolution_w(BIT(nr_wr_dat, 4, 2));
 		nr_70_layer2_palette_offset_w(BIT(nr_wr_dat, 0, 4));
 		break;
@@ -2570,8 +2594,12 @@ INTERRUPT_GEN_MEMBER(specnext_state::specnext_interrupt)
 {
 	m_tiles->control_w(m_nr_6b_tm_control); // TODO (1): Santa's Pressie, The Next War
 
-	if (m_eff_nr_05_5060 != m_nr_05_5060 || m_nr_03_machine_timing != m_eff_nr_03_machine_timing)
+	const bool tmp = ~m_io_video.read_safe(0) & 1;
+	if (m_video_output_hdmi != tmp || m_eff_nr_05_5060 != m_nr_05_5060 || m_nr_03_machine_timing != m_eff_nr_03_machine_timing)
+	{
+		m_video_output_hdmi = tmp;
 		update_video_mode();
+	}
 
 	line_irq_adjust();
 	if (!port_ff_interrupt_disable())
@@ -2844,7 +2872,7 @@ void specnext_state::map_io(address_map &map)
 		}
 	}));
 	map(0xe0f7, 0xe0f7).mirror(0x0f00).lw8(NAME([this](u8 data) {
-		if(port_eff7_io_en())
+		if (port_eff7_io_en())
 		{
 			m_port_eff7_data = data;
 			memory_change(0xeff7, data);
@@ -2869,7 +2897,7 @@ void specnext_state::map_io(address_map &map)
 	map(0x113b, 0x113b).lrw8(NAME([this]() {
 		return port_i2c_io_en() ? (0xfe | (m_i2c_sda_data & 1)) : 0x00;
 	}), NAME([this](u8 data) {
-		if(port_i2c_io_en())
+		if (port_i2c_io_en())
 			m_i2c->sda_write(data & 1);
 	}));
 	map(0x183b, 0x183b).select(0x0700).lrw8(NAME([this](offs_t offset) {
@@ -2877,7 +2905,7 @@ void specnext_state::map_io(address_map &map)
 		return port_ctc_io_en() && (chanel < 4) ? m_ctc->read(chanel) : 0x00;
 	}), NAME([this](offs_t offset, u8 data) {
 		u8 chanel = offset >> 8;
-		if(port_ctc_io_en() && (chanel < 4))
+		if (port_ctc_io_en() && (chanel < 4))
 			m_ctc->write(chanel, data);
 	}));
 	map(0x123b, 0x123b).lrw8(NAME([this]() {
@@ -2926,7 +2954,9 @@ void specnext_state::map_io(address_map &map)
 	}), NAME([this](u8 data) {
 		if (port_ulap_io_en())
 		{
-			if (m_port_bf3b_ulap_mode == 0b01)
+			if (m_port_bf3b_ulap_mode == 0b00)
+				ulatm_w(data);
+			else if (m_port_bf3b_ulap_mode == 0b01)
 				port_ff3b_ulap_en_w(BIT(data, 0));
 		}
 	})); // ULA+ Data
@@ -3019,9 +3049,9 @@ INPUT_PORTS_START(specnext)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("VIDEO")
-	PORT_CONFNAME(0x01, 0x00, "Video" )
-	PORT_CONFSETTING(0x00, "HDMI" )
-	PORT_CONFSETTING(0x01, "VGA" )
+	PORT_CONFNAME(0x01, 0x00, "Captured Video Resolution" )
+	PORT_CONFSETTING(0x00, "360x288 (HDMI)" )
+	PORT_CONFSETTING(0x01, "320x256 (VGA)" )
 	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("mouse_input1")
@@ -3325,6 +3355,11 @@ void specnext_state::machine_start()
 	save_item(NAME(m_i2c_sda_data));
 }
 
+void specnext_state::device_post_load()
+{
+	m_video_output_hdmi = -1;
+}
+
 void specnext_state::reset_hard()
 {
 	m_nr_02_hard_reset = 0;
@@ -3437,8 +3472,6 @@ void specnext_state::reset_hard()
 
 	// m_port_00_data = 0;
 	m_nr_0a_divmmc_automap_en = 1;
-
-	update_video_mode();
 }
 
 void specnext_state::machine_reset()
@@ -3694,6 +3727,7 @@ void specnext_state::machine_reset()
 	mmu_x2_w(6, 0x00);
 
 	m_ay_select = 0;
+	m_video_output_hdmi = -1;
 }
 
 static const gfx_layout bootrom_charlayout =
@@ -3750,8 +3784,8 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_io_map(&specnext_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
-	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
+	m_maincpu->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
+	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
@@ -3811,7 +3845,7 @@ void specnext_state::tbblue(machine_config &config)
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
 	ZXBUS_SLOT(config, "zxbus:1", 0, zxbus, zxbus_cards, nullptr);
 
-	m_screen->set_raw(28_MHz_XTAL / 2, 456 << 1, 312,  { 0, 360 << 1, 0, 288 });
+	m_screen->set_raw(28_MHz_XTAL / 2, 456 << 1, 312,  { 0, (359 << 1) | 1, 0, 287 });
 	m_screen->set_screen_update(FUNC(specnext_state::screen_update));
 	m_screen->set_no_palette();
 
@@ -3826,8 +3860,10 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
-	m_copper->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
+	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
+
+	SOFTWARE_LIST(config, "sd_list").set_original("specnext_sd");
 
 	config.device_remove("snapshot");
 }

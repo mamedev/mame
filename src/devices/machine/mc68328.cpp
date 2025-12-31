@@ -1276,8 +1276,9 @@ u8 mc68328_base_device::irq_callback(offs_t offset)
 
 void mc68328_base_device::ivr_w(u8 data) // 0x300
 {
-	LOGMASKED(LOG_INTS, "%s: ivr_w: IVR = %02x\n", machine().describe_context(), data);
-	m_ivr = data;
+	// lower three bits are ignored on writes (pls1000 cares)
+	LOGMASKED(LOG_INTS, "%s: ivr_w: IVR = %02x (%02x)\n", machine().describe_context(), data & 0xf8, data);
+	m_ivr = data & 0xf8;
 }
 
 u8 mc68328_base_device::ivr_r() // 0x300

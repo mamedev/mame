@@ -15698,12 +15698,15 @@ Is it really game like intended? [FDC] investigation required
 		</part>
 	</software>
 
+	<!-- TODO: Krugman set is two disks, huh? -->
 	<software name="dennosui">
 		<description>Dennou Suikoden</description>
 		<year>1987</year>
 		<publisher>HOT・B</publisher>
 		<info name="alt_title" value="電脳水滸伝" />
 		<info name="release" value="19870112" />
+		<!-- GA夢 -->
+		<info name="developer" value="Gamu" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="dennou suikoden.hdm" size="1261568" crc="b12425f4" sha1="69ad2baaf14261ade4b3fba70c75cd587440cecf" offset="0" />
@@ -21969,12 +21972,12 @@ Non-functional in gameplay, random tileset (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="gaiflame" supported="partial">
+	<software name="gaiflame" supported="yes">
 		<description>Gai Flame</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
-No sound? (verify)
+No sound (btanb)
 ]]></notes>
 		<info name="alt_title" value="ガイフレーム" />
 		<info name="release" value="19871216" />
@@ -44744,6 +44747,20 @@ hand repaired copy protection, looks for deleted sector -8 and -9 on track 76
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1086448">
 				<rom name="smllobd3.d88" size="1086448" crc="cef320fb" sha1="9a7f0bf6b09dbe02945a483e54a44c24700ab976" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soapstry">
+		<description>Soapland Story</description>
+		<year>1987</year>
+		<publisher>ハード (Hard)</publisher>
+		<info name="alt_title" value="ソープランドストーリー" />
+		<info name="release" value="198709xx" />
+		<info name="usage" value="Boot in BASIC and set MEMSW SSW3 to 05 thru MON (will otherwise throw an overflow error at bootstrap)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1187040">
+				<rom name="soapland story.d88" size="1187040" crc="9dbb2392" sha1="21cd5846770f62c37a4b5118fad7bb2ad25d1f3a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -70222,6 +70239,74 @@ Driver disk for a PC-9801-86-compatible PCMCIA sound card
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="computer technica fmc-98 sound card driver utility.hdm" size="1261568" crc="7bc24877" sha1="50e0bd8568c3705c7911c1f66d80dd9c7d9b4bca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslan21c" supported="no">
+		<!-- Origin: PC-9800 Series Central -->
+		<description>Microsoft LAN Manager for MS-DOS (v2.1c)</description>
+		<year>1997</year>
+		<publisher>マイクロソフト (Microsoft)</publisher>
+		<notes><![CDATA[
+Driver disks for [C-Bus] network cards
+]]></notes>
+		<!-- TODO: likely 3.5" -->
+		<part name="flop1" interface="floppy_5_25">
+			<!-- DOS SETUP -->
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk1.hdm" size="1261568" crc="415787c1" sha1="2fe41958ac8e905453bf57c412da1220e40a15f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<!-- DOS WORKSTATION -->
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk2.hdm" size="1261568" crc="55547c26" sha1="a7a03e09e510d669d8f22bea01f3ea898f341229" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<!-- DOS DRIVERS -->
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk3.hdm" size="1261568" crc="dfe8260a" sha1="328ba94b6ab07b54d8d263137c267fbd53828808" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<!-- NETWARE client -->
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk4.hdm" size="1261568" crc="840eba05" sha1="b68040f17d677a523df2882634990c74bbbf1f3c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<!-- Windows 3.1 related -->
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk5.hdm" size="1261568" crc="c5fd9f25" sha1="bb421c7af54c91d377535876fd11d80362a73c42" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<!-- Windows 3.1 related? -->
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk6.hdm" size="1261568" crc="6b45307b" sha1="3ad3124069a074dc84e62454908007ffe9517e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcfxga" supported="no">
+		<description>PC-FXGA (C-Bus version)</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Install disk for [PC-FXGA]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="pc-fxga.fdi" size="1265664" crc="f2547992" sha1="1bcb715d02acfa89f75578bfa655b01db5726206" offset="0" />
 			</dataarea>
 		</part>
 	</software>

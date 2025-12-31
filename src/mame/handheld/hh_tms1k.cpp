@@ -309,6 +309,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "h2hfootb.lh"
 #include "h2hhockey.lh"
 #include "lilprof.lh"
+#include "lilprofo.lh"
 #include "litelrn.lh"
 #include "liveafb.lh"
 #include "lostreas.lh"
@@ -322,7 +323,6 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "mmarvin.lh"
 #include "mmerlin.lh"
 #include "monkeysee.lh"
-#include "mrmusical.lh"
 #include "palmf31.lh"
 #include "palmmd8.lh"
 #include "pbmastm.lh"
@@ -3702,7 +3702,7 @@ void mrmusical_state::mrmusical(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
 	m_display->set_segmask(0x1ff, 0xff);
 	m_display->set_segmask(0x180, 0x7f); // no DP for leftmost 2 digits
-	config.set_default_layout(layout_mrmusical);
+	config.set_default_layout(layout_lilprofo);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -14367,7 +14367,7 @@ void lilprofo_state::lilprofo(machine_config &config)
 	PWM_DISPLAY(config, m_display).set_size(9, 7);
 	m_display->set_segmask(0x1f7, 0x7f);
 	m_display->set_segmask(8, 0x41); // equals sign
-	config.set_default_layout(layout_lilprof);
+	config.set_default_layout(layout_lilprofo);
 
 	// no sound!
 }
@@ -14437,7 +14437,17 @@ ROM_END
 
 *******************************************************************************/
 
-// class/handlers: uses the ones in lilprofo_state
+class wizatron_state : public lilprofo_state
+{
+public:
+	wizatron_state(const machine_config &mconfig, device_type type, const char *tag) :
+		lilprofo_state(mconfig, type, tag)
+	{ }
+
+	void wizatron(machine_config &config);
+};
+
+// handlers: uses the ones in lilprofo_state
 
 // inputs
 
@@ -14451,6 +14461,14 @@ static INPUT_PORTS_START( wizatron )
 	PORT_MODIFY("IN.4")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+// config
+
+void wizatron_state::wizatron(machine_config &config)
+{
+	lilprofo(config);
+	config.set_default_layout(layout_lilprof);
+}
 
 // roms
 
@@ -17567,7 +17585,7 @@ SYST( 1978, lilprof,    0,         0,      lilprof,   lilprof,   lilprof_state, 
 SYST( 1976, lilprofoa,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofob,  lilprof,   0,      lilprofo,  lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1976, lilprofo,   lilprof,   0,      lilprofoc, lilprofo,  lilprofo_state,  empty_init, "Texas Instruments", "Little Professor (1976 version, rev. C)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1977, wizatron,   0,         0,      lilprofo,  wizatron,  lilprofo_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+SYST( 1977, wizatron,   0,         0,      wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, ti1680,     0,         0,      ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1977, dataman,    0,         0,      dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 SYST( 1980, mathmarv,   0,         0,      mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )

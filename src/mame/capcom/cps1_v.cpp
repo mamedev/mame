@@ -905,6 +905,21 @@ static const struct gfx_range mapper_AR22B_table[] =
 };
 
 
+#define mapper_ARA63B    { 0x8000, 0x8000, 0, 0 }, mapper_ARA63B_table
+static const struct gfx_range mapper_ARA63B_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// pins 12,13,14,15 are always enabled
+
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
+	{ 0 }
+};
+
+
 #define mapper_O224B    { 0x8000, 0x4000, 0, 0 }, mapper_O224B_table
 static const struct gfx_range mapper_O224B_table[] =
 {
@@ -1798,7 +1813,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"1941j",       CPS_B_05,     mapper_YI22B },   // equivalent to YI24B
 	{"unsquad",     CPS_B_11,     mapper_AR24B },
 	{"area88",      CPS_B_11,     mapper_AR22B },   // equivalent to AR24B
-	{"area88r",     CPS_B_21_DEF, mapper_AR22B },   // wrong, this set uses ARA63B, PAL dumped (handcrafted), but not mapped above
+	{"area88r",     CPS_B_21_DEF, mapper_ARA63B },
 	{"mercs",       CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsu",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsur1",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
@@ -1818,7 +1833,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"cawingu",     CPS_B_05,     mapper_CA22B },   // equivalent to CA24B
 	{"cawingur1",   CPS_B_16,     mapper_CA24B },
 	{"cawingj",     CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
-	{"cawingjr",    CPS_B_21_DEF, mapper_VA63B },   // wrong, this set uses ARA63B (same as Area 88 resale version), PAL dumped (handcrafted), but not mapped above
+	{"cawingjr",    CPS_B_21_DEF, mapper_ARA63B },  // yes, this PCB actually has a ARA63B PAL
 	{"cawingbl",    CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
 	{"sf2",         CPS_B_11,     mapper_STF29,  0x36 },
 	{"sf2ea",       CPS_B_17,     mapper_STF29,  0x36 },

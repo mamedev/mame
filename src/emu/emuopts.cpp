@@ -122,6 +122,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_ARTWORK_CROP ";artcrop",                    "0",         core_options::option_type::BOOLEAN,    "crop artwork so emulated screen image fills output screen/window in one axis" },
 	{ OPTION_FALLBACK_ARTWORK,                           nullptr,     core_options::option_type::STRING,     "fallback artwork if no external artwork or internal driver layout defined" },
 	{ OPTION_OVERRIDE_ARTWORK,                           nullptr,     core_options::option_type::STRING,     "override artwork for external artwork and internal driver layout" },
+	{ OPTION_ARTWORK_FONT ";artfont",                    "default",   core_options::option_type::STRING,     "specify a font to use for artwork text elements" },
 
 	// screen options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE SCREEN OPTIONS" },
@@ -203,7 +204,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_BIOS,                                       nullptr,     core_options::option_type::STRING,     "select the system BIOS to use" },
 	{ OPTION_CHEAT ";c",                                 "0",         core_options::option_type::BOOLEAN,    "enable cheat subsystem" },
 	{ OPTION_SKIP_GAMEINFO,                              "0",         core_options::option_type::BOOLEAN,    "skip displaying the system information screen at startup" },
-	{ OPTION_UI_FONT,                                    "default",   core_options::option_type::STRING,     "specify a font to use" },
+	{ OPTION_UI_FONT,                                    "default",   core_options::option_type::STRING,     "specify a font to use for UI text" },
 	{ OPTION_UI,                                         "cabinet",   core_options::option_type::STRING,     "type of UI (simple|cabinet)" },
 	{ OPTION_RAMSIZE ";ram",                             nullptr,     core_options::option_type::STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         core_options::option_type::BOOLEAN,    "ask for confirmation before exiting" },

@@ -121,12 +121,12 @@ void screen_ula_device::draw_ula(bitmap_rgb32 &bitmap, const rectangle &clip, bo
 				const rgb_t pen = (pix8 & b) ? ink : pap;
 				if ((pen != gt0) && (pen != gt1))
 				{
-					*pix = pen;
-					*prio |= pcode;
+					pix[0] = pen;
+					prio[0] |= pcode;
 					if (!off2 && (hpos < clip.right()))
 					{
-						*(pix + 1) = pen;
-						*(prio + 1) |= pcode;
+						pix[1] = pen;
+						prio[1] |= pcode;
 					}
 				}
 				if (off2)
@@ -226,16 +226,8 @@ std::pair<rgb_t, rgb_t> screen_ula_device::parse_attribute(u8 attr)
 	}
 	else if (m_ulap_en)
 	{
-		if (m_ula_type == ULA_TYPE_NEXT)
-		{
-			ink = 0xc0 | ((attr & 0xc0) >> 3) | BIT(attr, 0, 3);
-			pap = 0xe0 | ((attr & 0xc0) >> 3) | BIT(attr, 3, 3);
-		}
-		else
-		{
-			ink = 0xc0 | ((attr & 0xc0) >> 2) | BIT(attr, 0, 3);
-			pap = 0xc8 | ((attr & 0xc0) >> 2) | BIT(attr, 3, 3);
-		}
+		ink = 0xc0 | ((attr & 0xc0) >> 2) | BIT(attr, 0, 3);
+		pap = 0xc8 | ((attr & 0xc0) >> 2) | BIT(attr, 3, 3);
 	}
 	else
 	{

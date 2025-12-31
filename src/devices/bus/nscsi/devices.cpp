@@ -15,6 +15,7 @@
 #include "bus/nscsi/cw7501.h"
 #include "bus/nscsi/dtc510.h"
 #include "bus/nscsi/hd.h"
+#include "bus/nscsi/pc98_hd.h"
 #include "bus/nscsi/s1410.h"
 #include "bus/nscsi/smoc501.h"
 #include "bus/nscsi/tape.h"
@@ -38,6 +39,7 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("aplcd150", APPLECD150);
 	device.option_add("aplcdsc", NSCSI_CDROM_APPLE);
 	device.option_add("cfp1080s", CFP1080S);
+	device.option_add("pc98_hd", NSCSI_PC98_HD);
 }
 
 void mac_scsi_devices(device_slot_interface &device)

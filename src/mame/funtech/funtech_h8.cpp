@@ -18,10 +18,8 @@ TDA 1519 sound amplifier
 
 TODO:
 - unknown reads / writes;
-- reels alignment in most screens;
-- only accepts coins in test mode;
-- NVRAM;
-- outputs (counters, lamps..);
+- layout;
+- identify exact H8 model. Can't be H83030 as the game uses more internal RAM. H83031 seems enough;
 - does the H8 really run so slow or is there something else in play?
 */
 
@@ -29,6 +27,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/h8/h83032.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 
@@ -50,8 +49,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_tileram(*this, "tileram", 0x800U, ENDIANNESS_BIG),
 		m_attrram(*this, "attrram", 0x800U, ENDIANNESS_BIG),
+		m_reel0_full_scrollram(*this, "reel0_full_scrollram", 0x40U, ENDIANNESS_BIG),
 		m_reel_tileram(*this, "reel_tileram%u", 0U, 0x200U, ENDIANNESS_BIG),
-		m_reel_attrram(*this, "reel_attrram%u", 0U, 0x200U, ENDIANNESS_BIG)
+		m_reel_attrram(*this, "reel_attrram%u", 0U, 0x200U, ENDIANNESS_BIG),
+		m_reel_scrollram(*this, "reel_scrollram%u", 0U, 0x80U, ENDIANNESS_BIG)
 	{ }
 
 	void funtech_h8(machine_config &config) ATTR_COLD;
@@ -61,18 +62,21 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<h83030_device> m_maincpu;
+	required_device<h83031_device> m_maincpu;
 	required_device<hopper_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	memory_share_creator<uint8_t> m_tileram;
 	memory_share_creator<uint8_t> m_attrram;
+	memory_share_creator<uint8_t> m_reel0_full_scrollram;
 	memory_share_array_creator<uint8_t, 4> m_reel_tileram;
 	memory_share_array_creator<uint8_t, 4> m_reel_attrram;
+	memory_share_array_creator<uint8_t, 4> m_reel_scrollram;
 
 	tilemap_t *m_tilemap = nullptr;
 	tilemap_t *m_reel_tilemap[4] {};
 	uint8_t m_tilebank = 0;
+	uint8_t m_reel0_full_screen = 0;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void tileram_w(offs_t offset, uint8_t data);
@@ -82,7 +86,9 @@ private:
 	template <uint8_t Which> void reel_attrram_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void hopper_w(uint16_t data);
+	void control_w(uint8_t data);
+	void hopper_counters_w(uint16_t data);
+	void lamps_w(uint16_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -97,10 +103,12 @@ void funtech_h8_state::video_start()
 	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(funtech_h8_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_tilemap->set_transparent_pen(0);
-	m_reel_tilemap[0]->set_transparent_pen(0);
-	m_reel_tilemap[1]->set_transparent_pen(0);
-	m_reel_tilemap[2]->set_transparent_pen(0);
-	m_reel_tilemap[3]->set_transparent_pen(0);
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_reel_tilemap[i]->set_transparent_pen(0xff);
+		m_reel_tilemap[i]->set_scroll_cols(32);
+	}
 }
 
 TILE_GET_INFO_MEMBER(funtech_h8_state::get_tile_info)
@@ -150,10 +158,31 @@ uint32_t funtech_h8_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 {
 	bitmap.fill(0, cliprect);
 
-	m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-	m_reel_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-	m_reel_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
-	m_reel_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
+	if (!(m_reel0_full_screen))
+	{
+		for (int j = 0; j < 4; j ++)
+		{
+			for (int i = 1; i < 0x40; i += 2)
+				m_reel_tilemap[j]->set_scrolly(i / 2, m_reel_scrollram[j][i]);
+		}
+
+		const rectangle visible1(0 * 8, 64 * 8 - 1, 2 * 8, 10 * 8 - 1);
+		const rectangle visible2(0 * 8, 64 * 8 - 1, 10 * 8, 18 * 8 - 1);
+		const rectangle visible3(0 * 8, 64 * 8 - 1, 18 * 8, 26 * 8 - 1);
+		const rectangle visible4(0 * 8, 64 * 8 - 1, 26 * 8, 30 * 8 - 1);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[3]->draw(screen, bitmap, visible4, 0, 0);
+	}
+	else
+	{
+		for (int i = 1; i < 0x40; i += 2)
+			m_reel_tilemap[0]->set_scrolly(i / 2, m_reel0_full_scrollram[i]);
+
+		m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	}
 
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -164,27 +193,56 @@ uint32_t funtech_h8_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 void funtech_h8_state::machine_start()
 {
 	save_item(NAME(m_tilebank));
+	save_item(NAME(m_reel0_full_screen));
 }
 
-void funtech_h8_state::hopper_w(uint16_t data)
+
+void funtech_h8_state::control_w(uint8_t data)
 {
+	m_tilebank = (data & 0x06) >> 1;
+
+	m_reel0_full_screen = BIT(data, 5);
+
+	if (data & 0xd9)
+		logerror("%s control_w unknown bits set: %02x\n", machine().describe_context(), data);
+}
+
+void funtech_h8_state::hopper_counters_w(uint16_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2)); // coin
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3)); // keyin
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 6)); // keyout
+
 	m_hopper->motor_w(BIT(data, 7));
 
-	if (data & 0xff7f)
-		logerror("%s hopper_w unknown bits written: %04x\n", machine().describe_context(), data);
+	if (data & 0xff33)
+		logerror("%s hopper_counters_w unknown bits written: %04x\n", machine().describe_context(), data);
+}
+
+void funtech_h8_state::lamps_w(uint16_t data)
+{
+	// bit 0: bet
+	// bit 1: start / all stop
+	// bit 2: low / stop 2
+	// bit 3: high
+	// bit 4: double up / stop 1
+	// bit 5: take score / stop 3
+
+	if (data & 0xffc0)
+		logerror("%s lamps_w unknown bits written: %04x\n", machine().describe_context(), data);
 }
 
 
 void funtech_h8_state::program_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-	map(0x40000, 0x47fff).ram(); // NVRAM?
-	map(0x48000, 0x48001).w(FUNC(funtech_h8_state::hopper_w));
+	map(0x40000, 0x47fff).ram().share("nvram");
+	map(0x48000, 0x48001).w(FUNC(funtech_h8_state::hopper_counters_w));
 	map(0x48008, 0x48009).portr("IN0").nopw(); // TODO: continuously, alternatively writes 0xff00 and 0x00ff
 	map(0x4800a, 0x4800b).portr("DSW3_4");
-	// map(0x4800c, 0x4800d).w // writes here sometimes
+	map(0x4800c, 0x4800d).w(FUNC(funtech_h8_state::lamps_w));
 	map(0x4800e, 0x4800e).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	// map(0x48ffe, 0x48fff).r // reads here sometimes
+	// map(0x48ffe, 0x48fff).nopr(); // TODO: reads here sometimes, protection?
 	map(0xa0000, 0xa01ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[0][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<0>));
 	map(0xa0200, 0xa03ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[1][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<1>));
 	map(0xa0400, 0xa05ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_tileram[2][offset]; })).w(FUNC(funtech_h8_state::reel_tileram_w<2>));
@@ -195,7 +253,20 @@ void funtech_h8_state::program_map(address_map &map)
 	map(0xa8600, 0xa87ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_attrram[3][offset]; })).w(FUNC(funtech_h8_state::reel_attrram_w<3>));
 	map(0xc0000, 0xc01ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc8000, 0xc81ff).ram().w("palette", FUNC(palette_device::write16_ext)).share("palette_ext");
-	map(0xd8000, 0xd87ff).ram(); // seems unused by this game, only initialized
+	map(0xd8000, 0xd803f).ram(); // ??
+	map(0xd8040, 0xd807f).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[0][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[0][offset] = data; }));
+	map(0xd8080, 0xd80bf).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[1][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[1][offset] = data; }));
+	map(0xd80c0, 0xd80ff).ram(); // ??
+	map(0xd8100, 0xd813f).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[2][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[2][offset] = data; }));
+	map(0xd8140, 0xd817f).ram(); // ??
+	map(0xd8180, 0xd81bf).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel_scrollram[3][offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel_scrollram[3][offset] = data; }));
+	map(0xd81c0, 0xd87bf).ram();
+	map(0xd87c0, 0xd87ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_reel0_full_scrollram[offset]; }))
+							   .lw8(NAME([this] (offs_t offset, uint8_t data) { m_reel0_full_scrollram[offset] = data; }));
 	map(0xe0000, 0xe07ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_tileram[offset]; })).w(FUNC(funtech_h8_state::tileram_w));
 	map(0xe0800, 0xe083f).ram(); // ??
 	map(0xe8000, 0xe87ff).ram().lr8(NAME([this] (offs_t offset) -> uint8_t { return m_attrram[offset]; })).w(FUNC(funtech_h8_state::attrram_w));
@@ -211,27 +282,27 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("P1 Start / Stop All Reels")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // no effect in test mode
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop Reel 3 / Take Score")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop Reel 2 / Low")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 
 	PORT_START("DSW1" )
-	PORT_DIPNAME( 0x03, 0x03, "Main Game Rate" )  PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x03, "45" )
-	PORT_DIPSETTING(    0x02, "50" )
-	PORT_DIPSETTING(    0x01, "55" )
-	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPNAME( 0x04, 0x04, "Double Game Rate" )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x03, 0x03, "Main Game Payout Rate" )  PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "45%" )
+	PORT_DIPSETTING(    0x02, "50%" )
+	PORT_DIPSETTING(    0x01, "55%" )
+	PORT_DIPSETTING(    0x00, "60%" )
+	PORT_DIPNAME( 0x04, 0x04, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "80" )
 	PORT_DIPSETTING(    0x04, "90" )
-	PORT_DIPNAME( 0x18, 0x18, "Max Play" )  PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPNAME( 0x18, 0x18, "Maximum Bet" )  PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x18, "8" )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x08, "64" )
@@ -239,7 +310,7 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6") // no effect shown in test mode
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Min Play for Bonus" )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Minimum Bet for Bonus" )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "8" )
 	PORT_DIPSETTING(    0x00, "32" )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8") // no effect shown in test mode
@@ -247,7 +318,7 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2" )
-	PORT_DIPNAME( 0x01, 0x01, "Double Game" )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Double Up Game" )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2") // no effect shown in test mode
@@ -271,7 +342,7 @@ static INPUT_PORTS_START( goldnegg )
 	PORT_DIPSETTING(    0x00, "1 Coin/1000 Credits" )
 
 	PORT_START("DSW3_4" ) // no effect shown in test mode for most
-	PORT_DIPNAME(           0x0003, 0x0003, "Min Play" )  PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPNAME(           0x0003, 0x0003, "Minimum Bet" )  PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(                0x0003, "1" )
 	PORT_DIPSETTING(                0x0002, "8" )
 	PORT_DIPSETTING(                0x0001, "16" )
@@ -309,11 +380,13 @@ GFXDECODE_END
 
 void funtech_h8_state::funtech_h8(machine_config &config)
 {
-	H83030(config, m_maincpu, 12_MHz_XTAL / 6); // minimal speed for an H8 is 2 MHz and this seems to match available reference, but strange
+	H83031(config, m_maincpu, 12_MHz_XTAL / 6); // minimal speed for an H8 is 2 MHz and this seems to match available reference, but strange
 	m_maincpu->set_addrmap(AS_PROGRAM, &funtech_h8_state::program_map);
 	m_maincpu->read_port7().set_ioport("DSW1");
 	m_maincpu->read_porta().set_ioport("DSW2");
-	m_maincpu->write_portb().set([this] (uint8_t data) { m_tilebank = (data & 0x06) >> 1; }); // TODO: Bit 5 also used.
+	m_maincpu->write_portb().set(FUNC(funtech_h8_state::control_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
@@ -323,6 +396,7 @@ void funtech_h8_state::funtech_h8(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(funtech_h8_state::screen_update));
 	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, 0);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_goldnegg);
 
@@ -346,6 +420,10 @@ ROM_START( goldnegg )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "golden_u72_usa.u72", 0x00000, 0x40000, CRC(a636f06b) SHA1(57a4a809ea0f955482f04cc7aedb5bed1c83aca8) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8h-25.u40",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "palce20v8h-25pc4.u19", 0x200, 0x157, NO_DUMP )
 ROM_END
 
 } // anonymous namespace

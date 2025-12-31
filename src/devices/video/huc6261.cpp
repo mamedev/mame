@@ -86,10 +86,10 @@ void huc6261_device::apply_pal_offs(uint16_t *pix_data)
 	if(*pix_data & 0x100)
 	{
 		*pix_data &= 0xff;
-		*pix_data += ((m_palette_offset[0] & 0x7f00) >> 8) << 1;
+		*pix_data += ((m_palette_offset[0] & 0xff00) >> 8) << 1;
 	}
 	else // background
-		*pix_data += (m_palette_offset[0] & 0x7f) << 1;
+		*pix_data += (m_palette_offset[0] & 0xff) << 1;
 
 	*pix_data &= 0x1ff;
 }
@@ -328,9 +328,14 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 					break;
 
 				// Palette offset 0-3
+				// despite what the documentation claims this is really full 8-bit (Audio CD player)
+				// VCE Sprite & BG
 				case 0x04:
+				// King BG 0 & 1
 				case 0x05:
+				// King BG 2 & 3
 				case 0x06:
+				// <unused> & Rainbow
 				case 0x07:
 					m_palette_offset[m_register & 3] = data;
 					break;

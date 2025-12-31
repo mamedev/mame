@@ -194,15 +194,15 @@ authors:hap
 		<element ref="static_cyan"><bounds x="15" y="15" width="5.6" height="5.6" /></element>
 		<element ref="static_black"><bounds x="15.2" y="15.2" width="5.4" height="5.41" /></element>
 
-		<element ref="text_s3"><bounds x="11" y="4.67" width="1" height="0.23" /></element>
-		<element ref="text_s2"><bounds x="12" y="4.67" width="1" height="0.23" /></element>
-		<element ref="text_s1"><bounds x="13" y="4.67" width="1" height="0.23" /></element>
+		<element ref="text_s3"><bounds x="11.075" y="4.67" width="0.85" height="0.23" /></element>
+		<element ref="text_s2"><bounds x="12.075" y="4.67" width="0.85" height="0.23" /></element>
+		<element ref="text_s1"><bounds x="13.075" y="4.67" width="0.85" height="0.23" /></element>
 
-		<element ref="text_g1"><bounds x="10" y="20.1" width="1" height="0.23" /></element>
-		<element ref="text_g2"><bounds x="11" y="20.1" width="1" height="0.23" /></element>
-		<element ref="text_g3"><bounds x="12" y="20.1" width="1" height="0.23" /></element>
-		<element ref="text_g4"><bounds x="13" y="20.1" width="1" height="0.23" /></element>
-		<element ref="text_g5"><bounds x="14" y="20.1" width="1" height="0.23" /></element>
+		<element ref="text_g1"><bounds x="10.075" y="20.1" width="0.85" height="0.23" /></element>
+		<element ref="text_g2"><bounds x="11.075" y="20.1" width="0.85" height="0.23" /></element>
+		<element ref="text_g3"><bounds x="12.075" y="20.1" width="0.85" height="0.23" /></element>
+		<element ref="text_g4"><bounds x="13.075" y="20.1" width="0.85" height="0.23" /></element>
+		<element ref="text_g5"><bounds x="14.075" y="20.1" width="0.85" height="0.23" /></element>
 
 	</view>
 </mamelayout>

@@ -295,8 +295,11 @@ inline void jaguar_state::verify_host_cpu_irq()
 	}
 }
 
-inline void jaguar_state::trigger_host_cpu_irq(int level)
+void jaguar_state::trigger_host_cpu_irq(int level)
 {
+	// NOTE: pending flag occurs only if irq is enabled
+	if (!BIT(m_gpu_regs[INT1], level))
+		return;
 	m_cpu_irq_state |= 1 << level;
 	verify_host_cpu_irq();
 }
@@ -309,7 +312,9 @@ void jaguar_state::gpu_cpu_int(int state)
 
 void jaguar_state::dsp_cpu_int(int state)
 {
-	trigger_host_cpu_irq(4);
+	m_dsp_irq_state |= 1 << 1;
+	update_dsp_irq();
+	//trigger_host_cpu_irq(4);
 }
 
 
@@ -637,15 +642,17 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		switch (offset)
 		{
 			case MEMCON1:
+				// TODO: this seems unused by anything in a meaningful way, convert to fatalerror?
 				if((m_gpu_regs[offset] & 1) == 0)
 					printf("Warning: ROMHI = 0!\n");
 
 				break;
 			case PIT0:
 			case PIT1:
-				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
+				//FIXME: avoid too much small timers for now
+				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff)
 				{
-					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
+					sample_period = attotime::from_ticks((1 + m_gpu_regs[PIT0]) * (1 + m_gpu_regs[PIT1]), m_gpu->clock() / 2);
 					m_pit_timer->adjust(sample_period);
 				}
 				break;
@@ -746,11 +753,10 @@ TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 
 TIMER_CALLBACK_MEMBER(jaguar_state::pit_update)
 {
-	if (m_gpu_regs[INT1] & 0x8)
-		trigger_host_cpu_irq(3);
+	trigger_host_cpu_irq(3);
 	if (m_gpu_regs[PIT0] != 0)
 	{
-		attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
+		attotime sample_period = attotime::from_ticks((1 + m_gpu_regs[PIT0]) * (1 + m_gpu_regs[PIT1]), m_gpu->clock() / 2);
 		m_pit_timer->adjust(sample_period);
 	}
 }
@@ -771,11 +777,14 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
 	{
+		// TODO: why "760"?
+		// Using this as workaround for stack overflows, investigate.
+		const int line_size = 760;
 		uint32_t *dest = &m_screen_bitmap.pix(vc >> 1);
 		int maxx = visarea.right();
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
-		uint16_t x,scanline[760];
-		uint8_t y,pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
+		uint16_t x, scanline[line_size];
+		uint8_t xx, pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
 
 		/* if we are first on this scanline, clear to the border color */
 		if (ENABLE_BORDERS && vc % 2 == 0)
@@ -792,19 +801,27 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 		if ((m_gpu_regs[VMODE] & 0x106) == 0x002)   /* RGB24 */
 		{
 			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x+=2)
-				for (y = 0; y < pixel_width; y++)
+			{
+				for (xx = 0; xx < pixel_width; xx++)
 				{
-					uint8_t r = m_pen_table[(scanline[x]&0xff)|256];
-					uint8_t g = m_pen_table[(scanline[x]>>8)|512];
-					uint8_t b = m_pen_table[scanline[x+1]&0xff];
-					dest[hdb++] = rgb_t(r, g, b);
+					uint8_t r = m_pen_table[(scanline[x % line_size]&0xff)|256];
+					uint8_t g = m_pen_table[(scanline[x % line_size]>>8)|512];
+					uint8_t b = m_pen_table[scanline[(x+1) % line_size]&0xff];
+					dest[hdb % line_size] = rgb_t(r, g, b);
+					hdb++;
 				}
+			}
 		}
 		else
 		{
 			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x++)
-				for (y = 0; y < pixel_width; y++)
-					dest[hdb++] = m_pen_table[scanline[x]];
+			{
+				for (xx = 0; xx < pixel_width; xx++)
+				{
+					dest[hdb % line_size] = m_pen_table[scanline[x % line_size]];
+					hdb++;
+				}
+			}
 		}
 	}
 

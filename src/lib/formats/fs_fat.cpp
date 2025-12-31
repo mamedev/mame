@@ -191,8 +191,8 @@ public:
 	{
 	}
 
-	std::string_view raw_stem() const   { return m_block->rstr(m_offset + OFFSET_FNAME, 8); }
-	std::string_view raw_ext() const    { return m_block->rstr(m_offset + OFFSET_FNAME + 8, 3); }
+	std::string raw_stem() const        { return m_block->rstr(m_offset + OFFSET_FNAME, 8); }
+	std::string raw_ext() const         { return m_block->rstr(m_offset + OFFSET_FNAME + 8, 3); }
 	u8 attributes() const               { return m_block->r8(m_offset + OFFSET_ATTRIBUTES); }
 	u32 raw_create_datetime() const     { return m_block->r32l(m_offset + OFFSET_CREATE_DATETIME); }
 	u32 raw_modified_datetime() const   { return m_block->r32l(m_offset + OFFSET_MODIFIED_DATETIME); }
@@ -253,6 +253,7 @@ public:
 	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 	virtual std::error_condition remove(const std::vector<std::string> &path) override;
@@ -506,7 +507,8 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, 
 	for (auto i = 0; i < fat_count * sectors_per_fat; i++)
 	{
 		fsblk_t::block_t::ptr fatblk = blockdev.get(starting_sector + reserved_sector_count + i);
-		file_allocation_table.insert(file_allocation_table.end(), fatblk->rodata(), fatblk->rodata() + bytes_per_sector);
+		file_allocation_table.resize(file_allocation_table.size() + bytes_per_sector);
+		fatblk->read(0, &*(file_allocation_table.end() - bytes_per_sector), bytes_per_sector);
 	}
 
 	// and return the implementation
@@ -521,8 +523,8 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, 
 
 std::string directory_entry::name() const
 {
-	std::string_view stem = filesystem_t::trim_end_spaces(raw_stem());
-	std::string_view ext = filesystem_t::trim_end_spaces(raw_ext());
+	std::string stem(filesystem_t::trim_end_spaces(raw_stem()));
+	std::string ext(filesystem_t::trim_end_spaces(raw_ext()));
 	return !ext.empty()
 		? util::string_format("%s.%s", stem, ext)
 		: std::string(stem);
@@ -662,11 +664,34 @@ std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vect
 	for (u32 sector : sectors)
 	{
 		fsblk_t::block_t::ptr block = m_blockdev.get(sector);
-		const u8 *data = block->rodata();
 		size_t length = std::min((size_t)dirent->file_size() - result.size(), (size_t)block->size());
-		result.insert(result.end(), data, data + length);
+		result.resize(result.size() + length);
+		block->read(0, &*(result.end() - length), length);
 	}
 	return std::make_pair(std::error_condition(), std::move(result));
+}
+
+
+//-------------------------------------------------
+//  impl::enum_blocks
+//-------------------------------------------------
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if (path.empty())
+	{
+		// the root directory is treated differently
+		u32 first_sector = m_starting_sector + m_reserved_sector_count + (u32)m_file_allocation_table.size() / m_bytes_per_sector;
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), root_directory_span(*this, first_sector, m_root_directory_size).get_directory_sectors());
+	}
+
+	// find the file
+	std::optional<directory_entry> dirent = find_entity(path);
+	if (!dirent)
+		return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+	// get the list of sectors for this file
+	return std::make_tuple(std::error_condition(), std::vector<u32>(), get_sectors_from_fat(*dirent));
 }
 
 
@@ -1234,8 +1259,8 @@ void impl::iterate_directory_entries(const directory_span &dir, T &&callback) co
 			if (dirent.raw_stem()[0] != 0x00 && !dirent.is_deleted() && !dirent.is_long_file_name())
 			{
 				// get the filename
-				std::string_view stem = trim_end_spaces(dirent.raw_stem());
-				std::string_view ext = trim_end_spaces(dirent.raw_ext());
+				std::string stem(trim_end_spaces(dirent.raw_stem()));
+				std::string ext(trim_end_spaces(dirent.raw_ext()));
 				if (ext.empty() && (stem == "." || stem == ".."))
 					continue;
 

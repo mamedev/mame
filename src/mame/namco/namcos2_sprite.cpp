@@ -17,9 +17,11 @@
     also used a lot in valkyrie.
 
     Device used by the following drivers:
-    namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours,
-    Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see namco_c355spr.cpp).
+    namco/namcos2.cpp (all games EXCEPT Steel Gunner, Steel Gunner 2, Lucky & Wild, Suzuka 8 Hours,
+    Suzuka 8 Hours 2 which use the newer Namco NB1 style sprites, see shared/namco_c355spr.cpp).
 
+    TODO:
+    - Hook up zoom table ROM for vertical zooming ("zoomlut" region in namco/namcos2.cpp)
 */
 
 #include "emu.h"
@@ -37,7 +39,9 @@ namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, cons
 namcos2_sprite_device::namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
-	m_spriteram(*this, finder_base::DUMMY_TAG)
+	m_spriteram(*this, finder_base::DUMMY_TAG),
+	m_pri_cb(*this),
+	m_mix_cb(*this)
 {
 }
 
@@ -54,6 +58,8 @@ namcos2_sprite_finallap_device::namcos2_sprite_finallap_device(const machine_con
 
 void namcos2_sprite_device::device_start()
 {
+	m_pri_cb.resolve_safe(0);
+	m_mix_cb.resolve_safe(false);
 }
 
 /**************************************************************************************/
@@ -64,20 +70,20 @@ void namcos2_sprite_device::zdrawgfxzoom(
 		screen_device &screen,
 		bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		int scalex, int scaley, int zpos)
+		int scalex, int scaley, int primask)
 {
 	if (!scalex || !scaley) return;
 	if (dest_bmp.bpp() == 16)
 	{
 		if (gfx)
 		{
-			device_palette_interface &palette = gfx->palette();
-			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const u8 *source_base = gfx->get_data(code % gfx->elements());
 			const int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
 			const int sprite_screen_width = (scalex * gfx->width() + 0x8000) >> 16;
 			if (sprite_screen_width && sprite_screen_height)
 			{
+				const u8 *source_base = gfx->get_data(code % gfx->elements());
+				const u16 pal = gfx->granularity() * (color % gfx->colors());
+
 				/* compute sprite increment per screen pixel */
 				int dx = (gfx->width() << 16) / sprite_screen_width;
 				int dy = (gfx->height() << 16) / sprite_screen_height;
@@ -138,67 +144,21 @@ void namcos2_sprite_device::zdrawgfxzoom(
 					{
 						for (int y = sy; y < ey; y++)
 						{
-							u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
+							u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
 							u16 *const dest = &dest_bmp.pix(y);
 							u8 *const pri = &priority_bitmap.pix(y);
 							int x_index = x_index_base;
-							/* this code was previously shared with the c355 where this was needed
-							if (m_palxor)
+							for (int x = sx; x < ex; x++)
 							{
-							    for (int x = sx; x < ex; x++)
-							    {
-							        const u8 c = source[x_index >> 16];
-							        if (c != 0xff)
-							        {
-							            if (pri[x] <= zpos)
-							            {
-							                switch(c)
-							                {
-							                case 0:
-							                    dest[x] = 0x4000 | (dest[x] & 0x1fff);
-							                    break;
-							                case 1:
-							                    dest[x] = 0x6000 | (dest[x] & 0x1fff);
-							                    break;
-							                default:
-							                    dest[x] = pal[c];
-							                    break;
-							                }
-							                pri[x] = zpos;
-							            }
-							        }
-							        x_index += dx;
-							    }
-							    y_index += dy;
-							}
-							else
-							*/
-							{
-								for (int x = sx; x < ex; x++)
+								const u8 c = source[x_index >> 16];
+								if (pri[x] != 0xff)
 								{
-									const u8 c = source[x_index >> 16];
-									if (c != 0xff)
-									{
-										if (pri[x] <= zpos)
-										{
-											if (color == 0xf && c == 0xfe)
-											{
-												if (dest[x] & 0x1000)
-													dest[x] |= 0x800;
-												else
-													dest[x] = palette.black_pen();
-											}
-											else
-											{
-												dest[x] = pal[c];
-											}
-											pri[x] = zpos;
-										}
-									}
-									x_index += dx;
+									if (m_mix_cb(dest[x], pri[x], gfx->colorbase(), c + pal, primask))
+										pri[x] = 0xff;
 								}
-								y_index += dy;
+								x_index += dx;
 							}
+							y_index += dy;
 						}
 					}
 				}
@@ -211,7 +171,7 @@ void namcos2_sprite_device::zdrawgfxzoom(
 		screen_device &screen,
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		int scalex, int scaley, int zpos)
+		int scalex, int scaley, int primask)
 {
 	/* nop */
 }
@@ -232,14 +192,12 @@ void namcos2_sprite_finallap_device::get_tilenum_and_size(const u16 word0, const
 	is_32 = BIT(word1, 13);
 }
 
-void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
+void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int control)
 {
+	gfx_element *const sgfx = gfx(0);
+
 	const int offset = (control & 0x000f) * (128 * 4);
-	if (pri == 0)
-	{
-		screen.priority().fill(0, cliprect);
-	}
-	for (int loop = 0; loop < 128; loop++)
+	for (int loop = 127; loop >= 0; loop--)
 	{
 		/****************************************
 		* word#0
@@ -261,58 +219,54 @@ void namcos2_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		*   Sprite colour index         D04-D07
 		*   Sprite Size X               D10-D15
 		*/
-		const u16 word3 = m_spriteram[offset + (loop * 4) + 3];
-		if ((word3 & 0xf) == pri)
+		const u16 word3   = m_spriteram[offset + (loop * 4) + 3];
+		const u16 word0   = m_spriteram[offset + (loop * 4) + 0];
+		const u16 word1   = m_spriteram[offset + (loop * 4) + 1];
+		const int sizey   = ((word0 >> 10) & 0x003f) + 1;
+
+		u32 sprn;
+		bool is_32;
+
+		get_tilenum_and_size(word0, word1, sprn, is_32);
+
+		int sizex = (word3 >> 10) & 0x003f;
+		if (!is_32) sizex >>= 1;
+
+		if ((sizey - 1) && sizex)
 		{
-			const u16 word0   = m_spriteram[offset + (loop * 4) + 0];
-			const u16 word1   = m_spriteram[offset + (loop * 4) + 1];
-			const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
-			const int sizey   = ((word0 >> 10) & 0x003f) + 1;
-
-			u32 sprn;
-			bool is_32;
-
-			get_tilenum_and_size(word0, word1, sprn, is_32);
-
-			int sizex = (word3 >> 10) & 0x003f;
-			if (!is_32) sizex >>= 1;
-
-			if ((sizey - 1) && sizex)
+			const int scalex = (sizex << 16) / (is_32 ? 0x20 : 0x10);
+			const int scaley = (sizey << 16) / (is_32 ? 0x20 : 0x10);
+			if (scalex && scaley)
 			{
+				const u32 primask = m_pri_cb(word3 & 0xf);
+				const u16 offset4 = m_spriteram[offset + (loop * 4) + 2];
 				const u32 color  = (word3 >> 4) & 0x000f;
 				const int ypos   = (0x1ff - (word0 & 0x01ff)) - 0x50 + 0x02;
 				const int xpos   = (offset4 & 0x07ff) - 0x50 + 0x07;
 				const bool flipy = BIT(word1, 15);
 				const bool flipx = BIT(word1, 14);
-				const int scalex = (sizex << 16) / (is_32 ? 0x20 : 0x10);
-				const int scaley = (sizey << 16) / (is_32 ? 0x20 : 0x10);
-				if (scalex && scaley)
-				{
-					gfx_element *sgfx = gfx(0);
 
-					if (!is_32)
-						sgfx->set_source_clip(BIT(word1, 0) ? 16 : 0, 16, BIT(word1, 1) ? 16 : 0, 16);
-					else
-						sgfx->set_source_clip(0, 32, 0, 32);
+				if (!is_32)
+					sgfx->set_source_clip(BIT(word1, 0) ? 16 : 0, 16, BIT(word1, 1) ? 16 : 0, 16);
+				else
+					sgfx->set_source_clip(0, 32, 0, 32);
 
-					zdrawgfxzoom(
+				zdrawgfxzoom(
 						screen,
 						bitmap,
 						cliprect,
 						sgfx,
-						sprn,
-						color,
-						flipx,flipy,
-						xpos,ypos,
-						scalex,scaley,
-						loop);
-				}
+						sprn, color,
+						flipx, flipy,
+						xpos, ypos,
+						scalex, scaley,
+						primask);
 			}
 		}
 	}
 } /* draw_sprites */
 
-void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control)
+void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int control)
 {
 	/**
 	 * word#0
@@ -343,39 +297,37 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 	 *  --------xxxx---- color
 	 *  x--------------- unknown
 	 */
-	const u16 *pSource = m_spriteram;
-	if (pri == 0)
+	for (int loop = 127; loop >= 0; loop--)
 	{
-		screen.priority().fill(0, cliprect);
-	}
-	for (int loop = 0; loop < 128; loop++)
-	{
-		const u16 ypos  = pSource[0];
-		const u16 tile  = pSource[1];
-		const u16 xpos  = pSource[3];
-		const u16 flags = pSource[6];
-		const u16 attrs = pSource[7];
+		const u16 ypos  = m_spriteram[(loop * 8) + 0];
+		const u16 xpos  = m_spriteram[(loop * 8) + 3];
 		const int sizey = ((ypos >> 10) & 0x003f) + 1;
 		const int sizex =  (xpos >> 10) & 0x003f;
-		const u32 sprn  =  (tile >>  2) & 0x0fff;
 
-		if ((sizey - 1) && sizex && (attrs & 0xf) == pri)
+		if ((sizey - 1) && sizex)
 		{
-			const bool bBigSprite = BIT(flags, 3);
+			const u16 attrs = m_spriteram[(loop * 8) + 7];
+
+			const u32 primask = m_pri_cb((attrs & 0xf));
+			const u16 tile  = m_spriteram[(loop * 8) + 1];
+			const u16 flags = m_spriteram[(loop * 8) + 6];
+			const u32 sprn  =  (tile >> 2) & 0x0fff;
+
+			const bool is_bigsprite = BIT(flags, 3);
 			const u32 color  = (attrs >> 4) & 0x000f;
 			int sx           = (xpos & 0x03ff) - 0x50 + 0x07;
 			int sy           = (0x1ff - (ypos & 0x01ff)) - 0x50 + 0x02;
 			const bool flipx = BIT(flags, 1);
 			const bool flipy = BIT(flags, 2);
-			const int scalex = (sizex << 16) / (0x20);//(sizex << 16) / (bBigSprite ? 0x20 : 0x10); correct formula?
-			const int scaley = (sizey << 16) / (bBigSprite ? 0x20 : 0x10);
+			const int scalex = (sizex << 16) / (0x20);//(sizex << 16) / (is_bigsprite ? 0x20 : 0x10); correct formula?
+			const int scaley = (sizey << 16) / (is_bigsprite ? 0x20 : 0x10);
 
 			/* swap xy */
 			const int rgn = (flags & 0x0001);
 
-			gfx_element *sgfx = gfx(rgn);
+			gfx_element *const sgfx = gfx(rgn);
 
-			if (bBigSprite)
+			if (is_bigsprite)
 			{
 				if (sizex < 0x20)
 				{
@@ -391,16 +343,15 @@ void namcos2_sprite_metalhawk_device::draw_sprites(screen_device &screen, bitmap
 				sgfx->set_source_clip(BIT(tile, 0) ? 16 : 0, 16, BIT(tile, 1) ? 16 : 0, 16);
 
 			zdrawgfxzoom(
-				screen,
-				bitmap,
-				cliprect,
-				sgfx,
-				sprn, color,
-				flipx,flipy,
-				sx,sy,
-				scalex, scaley,
-				loop);
+					screen,
+					bitmap,
+					cliprect,
+					sgfx,
+					sprn, color,
+					flipx, flipy,
+					sx, sy,
+					scalex, scaley,
+					primask);
 		}
-		pSource += 8;
 	}
 } /* draw_sprites_metalhawk */

@@ -62,6 +62,10 @@
      On models with localized keyboards, it switches between US QWERTY
      and the local keyboard layout and character set.
 
+     Early IIcs have no 1.8432 MHz XTAL for the ACIAs, which instead use the
+     master clock divided by 8 (~1.789 MHz), producing baud rates 2.9% slower
+     than nominal.  This was fixed before the UniDisk ROM revision was released.
+
     IIc (UniDisk 3.5): IIc with ROM doubled to 32K and the ROMSWITCH register
          added to page between the original 16K ROM and the new added 16K.  The
          extra firmware space was dedicated to implementing the Protocol Converter,
@@ -1348,7 +1352,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	// update character selection
 	if (m_kbd_lang_sel)
 	{
-		u8 charset_id = m_kbd_lang_sel->read() & 0x0f;
+		const u8 charset_id = m_kbd_lang_sel->read() & 0x0f;
 		if (m_video->get_iie_langsw() != charset_id)
 		{
 			m_video->set_iie_langsw(charset_id);
@@ -1984,7 +1988,8 @@ void apple2e_state::do_io(int offset)
 
 u8 apple2e_state::c000_r(offs_t offset)
 {
-	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
+	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
 
 	if ((offset & 0xf0) == 0x00) // keyboard latch, $C000 is really 00-0F
 	{
@@ -2137,7 +2142,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 			break;
 	}
 
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 u8 apple2e_state::c000_iic_r(offs_t offset)
@@ -2269,14 +2274,9 @@ void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 
 u8 apple2e_state::laserprn_busy_r()
 {
-	u8 retval = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
-	if (m_centronics_busy)
-	{
-		retval |= 0x80;
-	}
-
-	return retval;
+	return (m_centronics_busy ? 0x80 : 0) | uFloatingBus7;
 }
 
 void apple2e_state::laserprn_w(u8 data)
@@ -2614,7 +2614,7 @@ void apple2e_state::update_iic_mouse()
 
 u8 apple2e_state::laser_mouse_r(offs_t offset)
 {
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
 
 	switch (offset)
 	{
@@ -3601,7 +3601,7 @@ void apple2e_state::ay3600_data_ready_w(int state)
 
 		if (m_kbd_lang_sel)
 		{
-			u8 kbd_layout_id = (m_kbd_lang_sel->read() & 0xf0) >> 4;
+			const u8 kbd_layout_id = (m_kbd_lang_sel->read() & 0xf0) >> 4;
 			trans += kbd_layout_id * 0x400; // go to second half of the ROM (DVORAK on US IIc/IIe models) or beyond
 		}
 
@@ -5039,7 +5039,7 @@ void apple2e_state::apple2c(machine_config &config)
 	config.device_remove("sl7");
 
 	MOS6551(config, m_acia1, 0);
-	m_acia1->set_xtal(XTAL(14'318'181) / 8); // ~1.789 MHz
+	m_acia1->set_xtal(1.8432_MHz_XTAL);
 	m_acia1->txd_handler().set(PRINTER_PORT_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
 

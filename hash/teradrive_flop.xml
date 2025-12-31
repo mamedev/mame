@@ -10,12 +10,15 @@ Known undumped list (* denotes availablity in HDD folder):
 - Page Pro-S (G-3004), desktop publishing software
 * Puzzle Construction (パズルコンストラクション, G-3002)
 - The BestPlay Baseball (ベストプレーベースボール)
-* The Manhole
 
 - CCT/V, may be just DOS/V compatible
 - Daisenryaku Construction (大戦略 コンストラクション), prototype at best
 - Princess Maker (プリンセスメーカー), may be just DOS/V compatible
 - Wibarm U.S.A. (ウイバーン U.S.A.), may be just DOS/V compatible
+
+TODO:
+- Verify cross-platform compatibility with other DOS/V machines (once they are actually dumped),
+  use back covers to pinpoint, rename list accordingly;
 
 -->
 <softwarelist name="teradrive_flop" description="Sega Teradrive floppy disk images">
@@ -81,5 +84,38 @@ Part of a multidisk set?
 	<!-- another dump floating, same contents plus extra empty folders -->
 	<!-- JDASH, JSW, JSFONT, JSUT -->
 	<!-- <rom name="driver-disk-j4.0-no-serial.ima" size="1474560" crc="b2060607" sha1="b7aba7da01bc3846c1d88857d067e5febafd63f1"/>-->
+
+<!-- !Games -->
+
+	<!-- IBM PS/55 and Teradrive compatible -->
+	<software name="manhole">
+		<!-- origin: archive.org -->
+		<!-- Kryoflux available (but doesn't matter, game has no copy protection)-->
+		<description>The Manhole</description>
+		<!-- from installed timestamps, cover reports original '89 Activision release -->
+		<year>1992</year>
+		<publisher>ADO / Activision</publisher>
+		<!-- NOTE: -->
+		<info name="usage" value="Once installed boot from a startup DOS/V disk then run MHT.BAT in installed folder. Requires at least 512K of conventional memory" />
+		<info name="alt_title" value="マンホール" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="disk_1.img" size="1474560" crc="5c62914b" sha1="8bf14651cd3127c07f279dae462043984f92fabe" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="disk_2.img" size="1474560" crc="7166fe20" sha1="a56941b1edf059c0448afd0e3e931d9d49caf57b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="disk_3.img" size="1474560" crc="d0d267a1" sha1="1a046fc88519384d2667601f0e914c489d3b3565" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

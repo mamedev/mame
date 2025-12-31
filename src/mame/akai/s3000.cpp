@@ -16,7 +16,7 @@
     but again is bare-bones on features.
 
     "XL" models have more ROM and RAM space for a more advanced OS.  Note that the
-    S2000 is based on the XL hardware, not the base S3000/CD3000i hardware.
+    S2000 and S3200 are based on the XL hardware, not the base S3000/CD3000i hardware.
 
     Hardware:
         CPU: NEC V53 (32 MHz on 3x00, 31.94 MHz on 2000)
@@ -24,32 +24,65 @@
         SCSI: MB89352
         LCD: LC7981 (3x00 and 2800) or HD44780 (2000)
         Sound DSP: L7A1045-L6028
-        Filter (XL models and S3200 only): L7A0906-L6029 DFL
-        Effects DSP (XL models only): L7A1414-L6038 DFX
+        Filter (optional IB304F filter card, stock on S3200): L7A0906-L6029 DFL
+            This adds a second filter stage after the L7A DSP with a programmable
+            highpass/lowpass/bandpass filter (another Chamberlin stage?) and a
+            second envelope generator.
+        Effects DSP (optional EB16 effects card, stock on S3200): L7A1414-L6038 DFX
+        Flash ROM: (up to 2 optional FMX008 cards):
 
     Working:
         - Keyboard matrix on all models
         - LED outputs should be correct for all models
-        - MIDI In on all models
-        - SCSI CD-ROM and hard disk on S2000, CD3000i, and CD3000XL
-        - Loading and playing sounds from CD-ROM and hard disk on S2000
-          and CD3000XL
+        - MIDI I/O
+        - SCSI CD-ROM and hard disk
+        - Loading and playing sounds from CD-ROM and hard disk
         - S2000 can save its OS to a hard disk and boot from it instead
           of floppy
         - Floppy can be formatted successfully now, and S2000 boots the OS from
           floppy correctly
 
+    WANTED:
+        - Factory floppy disks for any of these samplers.
+
     TODOs:
-        - Non-XL models appear not to read DiskChg via the uPD TS line like the
-          XLs do.  Need to find where it does that.
-        - S3000 and CD3000i don't find any sample RAM.  The XL models and S2000
-          both use the MPC3000 approach of actually testing the memory and find
-          all 32 megs fine.  This appears to be related to the other bits in the
-          ID register.
-        - Many Akai factory CD sounds have clipping, need to check if that's
-          an L6028 volume issue or bad loop points (or both).
+        - S3000 crashes when trying to access a CD-ROM to load sounds.  The closely
+          related CD3000i does not.
+        - Many Akai factory CD sounds have popping and crackling.  Seems to be
+          an issue with the L6028 DSP.
         - Split the data entry knob into a device so we can share it across the
           various Akai drivers.
+
+    HOWTOs (move to wiki when driver is promoted):
+        - Creating a bootable hard disk for the S2000:
+            * Create an empty image.  With CHDMAN, this will create
+              a new 487 MB image:
+                chdman createhd -tp 8 -c none -o s2000.chd
+              Alternatively on macOS or Linux you can use dd:
+                dd if=/dev/zero of=s2000.hdv bs=512 count=1000000
+            * Run MAME:
+                mame s2000 -harddisk s2000.chd s2000v2
+              If you went the dd route, obviously use s2000.hdv instead of
+              s2000.chd.
+            * After the S2000 boots, click the GLOBAL button, then Page Down
+              until you see "FORMAT DISK  FLASHROM".
+            * Press F1 for DISK then F2 for HDSK (HARD DISK).
+            * You can change the partition size if you want, but the default
+              of 60 MB is fine.  To accept, press PAGE DOWN.
+            * Press F2 to FORMAT then F1 to GO.
+            * When it says "Marking bad blocks" you can pres F2 repeatedly
+              to skip the check since MAME guarantees all blocks are good.
+            * At "HARD DISK EMPTY, READY FOR USE", press SAVE then F1 for
+              DISK then F2 for HDSK.
+            * Press PAGE DOWN until you see "HD SAVE  System", then F2 to GO.
+            * When asked if you want to WIPE first or just SAVE, press F2
+              to save.
+
+        Wave memory test:
+            * S2000: Hold down PAGE UP on power-up.
+            * S3000, S3000XL, CD3000i, CD3000XL: after booting, press MARK and NAME at the same
+              time.  (All LEDs will light on models with a layout).  Then release those and press
+              the "+ / <" button.
 
 ***************************************************************************/
 
@@ -86,6 +119,10 @@
 #include "formats/pc_dsk.h"
 
 #include "s2000.lh"
+#include "s3000.lh"
+#include "s3000xl.lh"
+#include "cd3000i.lh"
+#include "cd3000xl.lh"
 
 namespace {
 
@@ -107,6 +144,7 @@ public:
 		, m_floppy(*this, "fdc:0")
 		, m_floppy_led(*this, "drive_led")
 		, m_klcs(*this, "klcs")
+		, m_wadcs(*this, "wadcs")
 		, m_ledlatch(*this, "ledlatch")
 		, m_keys(*this, "C%u", 0)
 		, m_dataentry(*this, "DATAENTRY")
@@ -114,8 +152,10 @@ public:
 		, m_last_dial(0)
 		, m_count_dial(0)
 		, m_quadrature_phase(0)
+		, m_id_magic(0)
 	{ }
 
+	void base(machine_config & config);
 	void s2000(machine_config &config);
 	void s3000(machine_config &config);
 	void s3000xl(machine_config &config);
@@ -133,6 +173,7 @@ private:
 	required_device<floppy_connector> m_floppy;
 	output_finder<> m_floppy_led;
 	required_device<i8255_device> m_klcs;
+	optional_device<i8255_device> m_wadcs;
 	required_device<output_latch_device> m_ledlatch;
 	required_ioport_array<8> m_keys;
 	required_ioport m_dataentry;
@@ -150,17 +191,22 @@ private:
 	void s3000xl_io_map(address_map &map) ATTR_COLD;
 	void cd3000_io_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_rom_map(address_map &map) ATTR_COLD;
 
 	void floppy_led_cb(floppy_image_device *, int state);
+
+	uint8_t fdc_hc365_r();
 
 	uint8_t dma_memr_cb(offs_t offset);
 	void dma_memw_cb(offs_t offset, uint8_t data);
 	uint16_t dma_mem16r_cb(offs_t offset);
 	void dma_mem16w_cb(offs_t offset, uint16_t data);
+	void s2000_palette(palette_device &palette) const;
 	void s3000_palette(palette_device &palette) const;
 
-	uint8_t id_r();
-	uint8_t cd_id_r();
+	uint8_t id_r(offs_t offset);
+	void id_w(uint8_t data);
+	uint8_t cd_id_r(offs_t offset);
 
 	uint8_t klcs_porta_r();
 	void klcs_portb_w(uint8_t data);
@@ -173,6 +219,8 @@ private:
 
 	uint8_t m_key_scan_row;
 	int m_last_dial, m_count_dial, m_quadrature_phase;
+
+	uint8_t m_id_magic;
 };
 
 void s3000_state::machine_start()
@@ -201,13 +249,13 @@ void s3000_state::s2000_map(address_map &map)
 
 void s3000_state::s3000_map(address_map &map)
 {
-	map(0x000000, 0x0bffff).ram();  // 2x HM514260 256kx16 = 512K
+	map(0x000000, 0x0bffff).ram();  // 2x HM658512 512kx8 = 1 MiB
 	map(0x0c0000, 0x0fffff).rom().region("maincpu", 0);
 }
 
 void s3000_state::s3000xl_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram();
+	map(0x000000, 0x07ffff).ram(); // 2x HM514260 256kx16 = 1 MiB
 	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
 	map(0x180000, 0x1fffff).ram();
 }
@@ -217,12 +265,12 @@ void s3000_state::s3000xl_map(address_map &map)
 // 4 = KLCS (keyboard/LEDs/controls)
 // 6 = LCDCS (LCD controller)
 // 8 = NSCS (DSP)
-// a = FXCS (effects DSP - XL models only)
-// c = WADCS (A/D converter - XL models only)
-// e = FILCS (filter control - XL models only)
+// a = FXCS (effects DSP if EB16 installed or 3200)
+// c = WADCS (A/D converter)
+// e = FILCS (filter control if IB304F installed or 3200)
 void s3000_state::s2000_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x0000, 0x001f).m("scsi:6:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -230,16 +278,26 @@ void s3000_state::s2000_io_map(address_map &map)
 	map(0x0062, 0x0062).rw(m_s2klcd, FUNC(hd44780_device::control_r), FUNC(hd44780_device::control_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x00a0, 0x00a5).nopw(); // quiet writes to the effects DSP
+	map(0x00c0, 0x00c7).rw(m_wadcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
+// 0 = SPCCS (SCSI)
+// 2 = FDCCS (FDC)
+// 4 = KLCS (keyboard/LEDs/controls)
+// 6 = CRCS
+// 8 = LSICS (DSP)
+// a = FIRCS (effects DSP if EB16 installed)
+// c = LTCCS
+// e = DIOCS
 void s3000_state::s3000_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x0000, 0x001f).m("scsi:6:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
+	map(0x0020, 0x0023).r(FUNC(s3000_state::fdc_hc365_r)).umask16(0xff00);
 	map(0x0048, 0x0048).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x004a, 0x004a).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
-	map(0x0060, 0x0061).r(FUNC(s3000_state::id_r)).umask16(0x00ff);
+	map(0x0060, 0x0067).rw(FUNC(s3000_state::id_r), FUNC(s3000_state::id_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x00a0, 0x00a5).nopw(); // quiet writes to the effects DSP
 }
@@ -247,12 +305,12 @@ void s3000_state::s3000_io_map(address_map &map)
 void s3000_state::cd3000_io_map(address_map &map)
 {
 	s3000_io_map(map);
-	map(0x0060, 0x0061).r(FUNC(s3000_state::cd_id_r)).umask16(0x00ff);
+	map(0x0060, 0x0067).rw(FUNC(s3000_state::cd_id_r), FUNC(s3000_state::id_w)).umask16(0x00ff);
 }
 
 void s3000_state::s3000xl_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("scsi:7:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x0000, 0x001f).m("scsi:6:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -260,6 +318,7 @@ void s3000_state::s3000xl_io_map(address_map &map)
 	map(0x0062, 0x0062).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x00a0, 0x00a5).nopw(); // quiet writes to the effects DSP
+	map(0x00c0, 0x00c7).rw(m_wadcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
 // stock wave memory is 4x HM514400 1Mx4 = 2 MiB
@@ -268,24 +327,78 @@ void s3000_state::dsp_map(address_map &map)
 	map(0x0000'0000, 0x01ff'ffff).ram();
 }
 
+void s3000_state::dsp_rom_map(address_map &map)
+{
+}
+
 void s3000_state::floppy_led_cb(floppy_image_device *, int state)
 {
 	m_floppy_led = state;
 }
 
-// 00 = CD3000i (invalid with S3000/3200 ROM)
-// 40 = S3200?
-// 80 = S3000?
-// C0 = S3000XL?
-// other bits involved in SIMM detection
-uint8_t s3000_state::id_r()
+// same as on MPC3000
+// bit 0 = ED   1 if disk was not ejected prior to last check,
+// bit 1 = /EDD (enhanced density if 0, DD/HD if 1?)
+// bit 2 = /HDD (high density if 0, double density if 1)
+uint8_t s3000_state::fdc_hc365_r()
 {
-	return 0x80;
+	const auto imagedev = m_floppy->get_device();
+	return (imagedev->floppy_is_hd() ? 0x04 : 0x00) | imagedev->dskchg_r();
 }
 
-uint8_t s3000_state::cd_id_r()
+static constexpr uint8_t s3000_memory_magic[9*8] =
 {
-	return 0x00;
+	0x01, 0x03, 0x05, 0x07, 0x09, 0x0b, 0x0e, 0x0c, 0x0a,
+	0x05, 0x09, 0x07, 0x03, 0x0d, 0x09, 0x0e, 0x0c, 0x0a,
+	0x07, 0x03, 0x0f, 0x01, 0x09, 0x0d, 0x0e, 0x0c, 0x0a,
+	0x0b, 0x09, 0x0d, 0x01, 0x05, 0x05, 0x0e, 0x0c, 0x0a,
+	0x09, 0x01, 0x03, 0x05, 0x09, 0x07, 0x0e, 0x0c, 0x0a,
+	0x03, 0x05, 0x03, 0x0d, 0x0b, 0x03, 0x0e, 0x0c, 0x0a,
+	0x05, 0x0d, 0x07, 0x0b, 0x03, 0x0f, 0x0e, 0x0c, 0x0a,
+	0x09, 0x0f, 0x07, 0x03, 0x07, 0x09, 0x0e, 0x0c, 0x0a
+};
+
+// IC16 74HC245
+// bits 0-3 = MD0-MD3 from wave memory PCB
+// bit 4 = footswitch 1
+// bit 5 = footswitch 2
+// bits 6-7 = ID jumpers (both grounded on CD3000i)
+//
+// RAM detection routine is at PC=0x20ed9 in S3000 v2.0
+// - Write 0 to the ID.
+// - Read back the ID.  Depending on the SIMM type, this will be
+//   one of the first entries in the magic table plus an offset
+//   (see below).
+// - Read a pseudo-random number from one of the V53 timers and
+//   re-read if it's 0.
+// - Write that number AND 7 to the ID.
+// - Read back the ID.  It must match (random * 9) + (the SIMM
+//   type offset)
+//
+// SIMM type offsets that are recognized:
+// + 0 = 1 MiW DRAM (2 MiB)
+// + 1 = 4 MiW DRAM (8 MiB)
+// + 2 = 16 MiW DRAM (32 MiB)
+// + 3 = 1 MiW SRAM (2 MiB)
+// + 4 = 4 MiW SRAM (8 MiB)
+// + 5 = 16 MiW SRAM (32 MiB)
+// + 6 and + 7 = no SIMM present
+//
+// S3000 only recognizes a total of 8 MiW (16 MiB) of RAM.  The memory sizing
+// routine recognizes 32 MiB SIMMs but the memory test can't handle them.
+uint8_t s3000_state::id_r(offs_t offset)
+{
+	return 0xc0 | s3000_memory_magic[(m_id_magic * 9) + 1];
+}
+
+void s3000_state::id_w(uint8_t data)
+{
+	m_id_magic = data & 0x07;
+}
+
+uint8_t s3000_state::cd_id_r(offs_t offset)
+{
+	return 0x00 | s3000_memory_magic[(m_id_magic * 9) + 1];
 }
 
 uint8_t s3000_state::klcs_porta_r()
@@ -397,12 +510,16 @@ void s3000_state::dma_memw_cb(offs_t offset, uint8_t data)
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-void s3000_state::s3000_palette(palette_device &palette) const
+void s3000_state::s2000_palette(palette_device &palette) const
 {
-//  palette.set_pen_color(0, rgb_t(138, 146, 148));
-//  palette.set_pen_color(1, rgb_t(92, 83, 88));
 	palette.set_pen_color(0, rgb_t(88, 247, 0)); // bright green
 	palette.set_pen_color(1, rgb_t(3, 179, 6));  // dark green
+}
+
+void s3000_state::s3000_palette(palette_device &palette) const
+{
+	palette.set_pen_color(1, rgb_t(230, 240, 250)); // white text
+	palette.set_pen_color(0, rgb_t(64, 140, 250));  // blue bg
 }
 
 void s3000_state::floppies(device_slot_interface &device)
@@ -422,7 +539,7 @@ static void add_formats(format_registration &fr)
 	fr.add(FLOPPY_HFE_FORMAT);
 }
 
-void s3000_state::s3000(machine_config &config)
+void s3000_state::base(machine_config &config)
 {
 	V53A(config, m_maincpu, 32_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s3000_map);
@@ -437,8 +554,8 @@ void s3000_state::s3000(machine_config &config)
 	m_maincpu->sint_handler_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_maincpu->txrdy_handler_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ4);
 
-	m_maincpu->in_ior_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
-	m_maincpu->out_iow_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
+	m_maincpu->in_ior_cb<0>().set("scsi:6:spc", FUNC(mb89352_device::dma_r));
+	m_maincpu->out_iow_cb<0>().set("scsi:6:spc", FUNC(mb89352_device::dma_w));
 	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_r));
 	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_w));
 	m_maincpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
@@ -446,8 +563,6 @@ void s3000_state::s3000(machine_config &config)
 
 	m_maincpu->set_tclk(4'000'000);
 	m_maincpu->v53_tout_handler<0>().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
-	m_maincpu->v53_tout_handler<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
-	// timer 2 is the clock for the LCD controller
 
 	constexpr XTAL V53_CLKOUT = 32_MHz_XTAL / 2;
 //  constexpr XTAL V53_PCLKOUT = 32_MHz_XTAL / 4;
@@ -464,8 +579,8 @@ void s3000_state::s3000(machine_config &config)
 	PALETTE(config, "palette", FUNC(s3000_state::s3000_palette), 2);
 
 	UPD72069(config, m_fdc, V53_CLKOUT);
-	m_fdc->set_ready_line_connected(false); // uPD READY pin is grounded on schematic
-	m_fdc->set_ts_line_connected(false);    // actually connected to DSKCHG (!)
+	m_fdc->set_ready_line_connected(true);  // lines are normal on the S3000/CD3000i
+	m_fdc->set_ts_line_connected(true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_fdc->intrq_wr_callback().append(m_maincpu, FUNC(v53a_device::dsr_w));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
@@ -482,15 +597,16 @@ void s3000_state::s3000(machine_config &config)
 	midiout_slot(MIDI_PORT(config, "mdout"));
 	m_maincpu->txd_handler_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 
-	NSCSI_BUS(config, "scsi");
+	nscsi_bus_device &bus = NSCSI_BUS(config, "scsi");
+	bus.out_bsy_callback().set_output("cd_led");
+
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:6").option_set("spc", MB89352).machine_config(
 		[this](device_t *device)
 		{
 			mb89352_device &spc = downcast<mb89352_device &>(*device);
@@ -499,6 +615,9 @@ void s3000_state::s3000(machine_config &config)
 			spc.out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
 			spc.out_dreq_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
 		});
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, nullptr);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("s3000_cdrom");
 
 	//        S3000/CD3000i     S2000      S3000XL/CD3000XL
 	// led0 - Select Program    Load       Single
@@ -528,6 +647,7 @@ void s3000_state::s3000(machine_config &config)
 
 	L7A1045(config, m_dsp, 33.8688_MHz_XTAL);
 	m_dsp->set_addrmap(AS_DATA, &s3000_state::dsp_map);
+	m_dsp->set_addrmap(AS_IO, &s3000_state::dsp_rom_map);
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
 	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
 	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
@@ -535,50 +655,72 @@ void s3000_state::s3000(machine_config &config)
 	TIMER(config, "dialtimer").configure_periodic(FUNC(s3000_state::dial_timer_tick), attotime::from_hz(60.0));
 }
 
+void s3000_state::s3000(machine_config &config)
+{
+	base(config);
+	config.set_default_layout(layout_s3000);
+}
+
 void s3000_state::s2000(machine_config &config)
 {
-	s3000(config);
+	base(config);
 	m_maincpu->set_clock(31.9488_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s2000_map);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::s2000_io_map);
+	m_maincpu->v53_tout_handler<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 
 	config.device_remove("lcdc");
+
+	PALETTE(config.replace(), "palette", FUNC(s3000_state::s2000_palette), 2);
 
 	HD44780(config, m_s2klcd, 4.9152_MHz_XTAL / 4); // HD44780
 	m_s2klcd->set_lcd_size(2, 16);
 	m_s2klcd->set_pixel_update_cb(FUNC(s3000_state::lcd_pixel_update));
 
+	m_fdc->set_ready_line_connected(false); // uPD READY pin is grounded on schematic
+	m_fdc->set_ts_line_connected(false);    // actually connected to DSKCHG (!)
+
 	m_screen->set_screen_update(m_s2klcd, FUNC(hd44780_device::screen_update));
 	m_screen->set_size(6 * 16, 8 * 2);
 	m_screen->set_visarea_full();
 
-	NSCSI_CONNECTOR(config.replace(), "scsi:5", default_scsi_devices, "cdrom");
+	I8255(config, m_wadcs);
 
 	config.set_default_layout(layout_s2000);
+
+	SOFTWARE_LIST(config, "flop_s2000").set_original("s2000_flop");
 }
 
 void s3000_state::cd3000(machine_config &config)
 {
-	s3000(config);
+	base(config);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::cd3000_io_map);
 
-	NSCSI_CONNECTOR(config.replace(), "scsi:4", default_scsi_devices, "cdrom");
+	config.set_default_layout(layout_cd3000i);
 }
 
 void s3000_state::s3000xl(machine_config &config)
 {
-	s3000(config);
+	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s3000xl_map);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::s3000xl_io_map);
+	m_maincpu->v53_tout_handler<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
+
+	m_fdc->set_ready_line_connected(false); // uPD READY pin is grounded on schematic
+	m_fdc->set_ts_line_connected(false);    // actually connected to DSKCHG (!)
 
 	m_klcs->in_pa_callback().set(FUNC(s3000_state::klcs_porta_r));
+
+	I8255(config, m_wadcs);
+
+	config.set_default_layout(layout_s3000xl);
 }
 
 void s3000_state::cd3000xl(machine_config &config)
 {
 	s3000xl(config);
 
-	NSCSI_CONNECTOR(config.replace(), "scsi:4", default_scsi_devices, "cdrom");
+	config.set_default_layout(layout_cd3000xl);
 }
 
 // KC = port A, KR = port B, KD = port C
@@ -593,45 +735,45 @@ void s3000_state::cd3000xl(machine_config &config)
 // 7 SELECT P/A  F1    3/Y     -/>        LEFT
 static INPUT_PORTS_START(s3000)
 	PORT_START("C0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Help / P") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8 / H") PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 / W") PORT_CODE(KEYCODE_1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 / Z") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Utilities") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Utility / O") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7 / G") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / X") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / <") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tune / Level") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tune / Level / N") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6 / F") PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mark / #") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Jump / .") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_NAME("Up Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Disk / E") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Disk / M") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 / E") PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 / S") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 / R") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 / V") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIDI / D") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIDI / L") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 / D") PORT_CODE(KEYCODE_F4)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 / V") PORT_CODE(KEYCODE_8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 / U") PORT_CODE(KEYCODE_5)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit Prog / K") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3 / C") PORT_CODE(KEYCODE_F3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 / Q") PORT_CODE(KEYCODE_7)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 / T") PORT_CODE(KEYCODE_4)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -646,7 +788,7 @@ static INPUT_PORTS_START(s3000)
 
 	PORT_START("C7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Select Prog / I") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / I") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / A") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / Y") PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / >") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
@@ -668,7 +810,7 @@ static INPUT_PORTS_START(s3000xl)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save / G") PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7 / O") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / X") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / >") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / >") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -713,7 +855,7 @@ static INPUT_PORTS_START(s3000xl)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Single / A") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / I") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / Y") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / <") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / <") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -723,64 +865,54 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(cd3000xl)
 	PORT_START("C0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load / H") PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8 / P") PORT_CODE(KEYCODE_F8)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1 / W") PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0 / Z") PORT_CODE(KEYCODE_0)
-	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load") PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save / G") PORT_CODE(KEYCODE_U)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7 / O") PORT_CODE(KEYCODE_F7)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / X") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / >") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right Arrow")
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xe4, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Global / F") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6 / N") PORT_CODE(KEYCODE_F6)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mark / #") PORT_CODE(KEYCODE_Y)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Jump / .") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Global") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mark") PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Jump") PORT_CODE(KEYCODE_J)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_UP) PORT_NAME("Up Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit / E") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 / M") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9 / S") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6 / V") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Effects / D") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 / L") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8 / R") PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5 / U") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Effect") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample / C") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3 / K") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 / Q") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4 / T") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Sample") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Multi / B") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 / J") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Multi") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Name") PORT_CODE(KEYCODE_N)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter/Play") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Down Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("C7")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Single / A") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / I") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / Y") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Single") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / <") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xe4, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("DATAENTRY")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CODE_DEC(KEYCODE_OPENBRACE) PORT_CODE_INC(KEYCODE_CLOSEBRACE)

@@ -233,6 +233,7 @@ void pc9801_86_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// TODO: check against unmap ROM option
 		logerror("map ROM at 0x000cc000-0x000cffff\n");
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xcc000,

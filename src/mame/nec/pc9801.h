@@ -141,7 +141,7 @@ public:
 		, m_fdc_2hd(*this, "fdc_2hd")
 		, m_hgdc(*this, "hgdc%d", 1)
 		, m_video_ram(*this, "video_ram_%d", 1)
-		, m_cbus_root(*this, "cbus_root")
+		, m_cbus_root(*this, "cbus")
 		, m_pic1(*this, "pic8259_master")
 		, m_pic2(*this, "pic8259_slave")
 		, m_memsw(*this, "memsw")
@@ -440,10 +440,10 @@ private:
 protected:
 	// TODO: map me as a cpu_f0_map
 	void a20_ctrl_w(offs_t offset, uint8_t data);
-private:
 	template <unsigned port> u8 fdc_2hd_2dd_ctrl_r();
 	template <unsigned port> void fdc_2hd_2dd_ctrl_w(u8 data);
 
+private:
 	void fdc_irq_w(int state);
 	void fdc_drq_w(int state);
 
