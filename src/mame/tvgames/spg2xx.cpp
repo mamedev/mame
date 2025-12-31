@@ -2889,6 +2889,9 @@ ROM_START( swclone )
 	// ensure eeprom defaults to 00 or there are unwanted invalid entries already saved
 ROM_END
 
+	// VTech TV Station (Spanish)/Nitro Vision (US/UK)/TV Learning Station (Germany)/Genius TV Progress (France, Benelux)
+	// Uses 3 LR14 batteries for main unit and 2 AA Batteries for the keyboard (demo batteries not included this time but sold seperately)
+
 ROM_START( vtechtvssp )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vtechtvstation_sp.bin", 0x000000, 0x800000, CRC(4a2e91eb) SHA1(1ff9cc0360b670cc0ad7efa9de0edd2c68d4d8e3) )
