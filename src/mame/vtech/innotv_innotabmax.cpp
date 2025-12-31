@@ -57,6 +57,7 @@
 
 	Known Undumped international versions:
 	InnoTab Max (US English, with Toca Boca bonus app, Color and Pop 2, Ice Escape and Peek a Martian, What's That Noise isnt included this time)
+	Storio Max (NL Dutch, without the Toca Boca bonus app but everythign is identical from US English except the language)
 
 *******************************************************************************/
 
@@ -168,4 +169,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, innotvuk,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
