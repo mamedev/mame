@@ -1497,8 +1497,10 @@ void jaguar_cpu_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 		// TODO: following does nothing if set by itself, or acts as a trap?
 		if (BIT(m_io_status, 2))
 		{
-			m_int_latch |= 1;
-			check_irqs();
+			// whitemen/missil3d wants gating thru the mask, as above
+			//m_int_latch |= 1;
+			//check_irqs();
+			set_input_line(0, ASSERT_LINE);
 		}
 
 
