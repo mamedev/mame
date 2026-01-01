@@ -238,8 +238,9 @@ Uses [GPU] irq 3
 		<year>2002</year>
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
-Hangs after choosing a game mode
-No sound
+No sound (fixed, [DSP] irq priority)
+Bad BGM on title screen
+Runs at extremely fast speed
 Access [cart] EEPROM
 Title screen has black dots of garbage on top (btanb)
 ]]></notes>
@@ -294,7 +295,7 @@ Access [cart] EEPROM
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
 Has severe RMW issues in both versions of the game when breaking blocks
-No sound
+No sound (fixed, [DSP] irq priority)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -401,7 +402,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [DSP] always do an in-flight PC change at startup
-No sound
+No sound (check [DSP] serial)
 Title screen cuts off background
 Gameplay GFX pop-ups
 Eventually black screens/crashes
@@ -711,10 +712,10 @@ Black screen after briefing, or by selecting demo mode
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-No sound
+No sound (fixed, [DSP] irq priority)
 Stretched title screen pixel width
 Several pitch issues (title logo on main menu)
-Hangs after selecting weapon
+Hangs after selecting weapon, heavy sound serial reads in [DSP]
 Uses [GPU] irqs 0,2,3
 Access [cart] EEPROM
 ]]></notes>
@@ -732,7 +733,9 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen with heavy logs/debugger hang, [object] processor or [GPU] crash
+Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} ([blitter]?)
+BGM doesn't work in some stages
+Cutoff gameplay area
 Access [cart] EEPROM
 Uses [GPU] irqs 0,4
 ]]></notes>
@@ -879,7 +882,8 @@ Uses [GPU] irq 3
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-[GPU] Black screen, enables bus hog
+[GPU] Black screen, does an unaligned write to border color regs
+[GPU] Enables bus hog
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
@@ -896,7 +900,8 @@ No sound (fixed, DSP JPIT irqs)
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-[GPU] Black screen, enables bus hog
+[GPU] Black screen, does an unaligned write to border color regs
+[GPU] Enables bus hog
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
@@ -966,7 +971,7 @@ Saves reports error, access [cart] EEPROM (verify, should be fixed)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [DSP] in-flight PC write (fatalerror)
-Black screen
+Black screen, 68k reads [GPU] PC
 ]]></notes>
 
 		<info name="serial" value="J9061 7005061-001"/>
@@ -1002,8 +1007,7 @@ Access [cart] EEPROM
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Hangs after loading a stage
-No sound
+Hangs after loading a stage, no sound (fixed, [DSP] irq priority)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1098,12 +1102,12 @@ Access [cart] EEPROM
 	</software>
 
 	<!-- TODO: Arcade game, not a real Jaguar cart -->
+	<!-- version in service mode -->
 	<software name="speedst2" supported="no">
-		<description>Speedster II</description>
+		<description>Speedster II (6.02C)</description>
 		<year>1995?</year>
 		<publisher>Carousel Entertainment</publisher>
 		<notes><![CDATA[
-Hangs after inserting coin with P1 Pause (regression after serial clock fixes)
 Does a [DSP] in-flight PC change (btanb?)
 No engine sound (serial sampled?)
 ]]></notes>
@@ -1225,7 +1229,7 @@ no sound (btanb)
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Heavy GFX issues
+Heavy GFX issues, [blitter]?
 black screen if left on title screen ("Invalid branch!")
 Hangs after few seconds of gameplay
 ]]></notes>
@@ -1264,8 +1268,7 @@ Gameplay screen flickers
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
-Hang after BIOS after fixing PIT frequency (regression)
-No sound
+No sound (fixed, [DSP] irq priority)
 GFXs missing on gameplay and title screen
 ]]></notes>
 
@@ -1284,7 +1287,7 @@ GFXs missing on gameplay and title screen
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
 Hang after BIOS after fixing PIT frequency (regression)
-No sound
+No sound (?)
 GFXs missing on gameplay and title screen
 ]]></notes>
 
@@ -1321,7 +1324,8 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen
+Not extensively tested
+Black screen (fixed, [DSP] irq priority)
 Access [cart] EEPROM
 ]]></notes>
 
