@@ -637,24 +637,24 @@ void jaguar_state::dspctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
  *
  *************************************/
 
+/*
+ *   16        12        8         4         0
+ *   +---------+---------+---------^---------+
+ *   |  pad 1  |  pad 0  |      unused       |
+ *   +---------+---------+-------------------+
+ *     15...12   11...8          7...0
+ *
+ *   Reading this register gives you the output of the selected columns
+ *   of the pads.
+ *   The buttons pressed will appear as cleared bits.
+ *   See the description of the column addressing to map the bits
+ *   to the buttons.
+ */
 uint32_t jaguar_state::joystick_r()
 {
-	uint16_t joystick_result = 0xfffe;
 	uint16_t joybuts_result = 0xffef;
-
-	/*
-	 *   16        12        8         4         0
-	 *   +---------+---------+---------^---------+
-	 *   |  pad 1  |  pad 0  |      unused       |
-	 *   +---------+---------+-------------------+
-	 *     15...12   11...8          7...0
-	 *
-	 *   Reading this register gives you the output of the selected columns
-	 *   of the pads.
-	 *   The buttons pressed will appear as cleared bits.
-	 *   See the description of the column addressing to map the bits
-	 *   to the buttons.
-	 */
+	// bit 7 returns 0, bit 4 is NTSC/PAL flag
+	uint16_t joystick_result = 0xff6e;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -671,55 +671,56 @@ uint32_t jaguar_state::joystick_r()
 	return (joystick_result << 16) | joybuts_result;
 }
 
+/*
+ *   16        12         8         4         0
+ *   +-+-------^------+--+---------+---------+
+ *   |r|    unused    |mu|  col 1  |  col 0  |
+ *   +-+--------------+--+---------+---------+
+ *    15                8   7...4     3...0
+ *
+ *   col 0:   column control of joypad 0
+ *
+ *      Here you select which column of the joypad to poll.
+ *      The columns are:
+ *
+ *                Joystick       Joybut
+ *      col_bit|11 10  9  8     1    0
+ *      -------+--+--+--+--    ---+------
+ *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
+ *         1   | 1  4  7  *     B
+ *         2   | 2  5  8  0     C
+ *         3   | 3  6  9  #   OPTION
+ *
+ *      You select a column my clearing the appropriate bit and setting
+ *      all the other "column" bits.
+ *
+ *
+ *   col1:    column control of joypad 1
+ *
+ *      This is pretty much the same as for joypad EXCEPT that the
+ *      column addressing is reversed (strange!!)
+ *
+ *                Joystick      Joybut
+ *      col_bit|15 14 13 12     3    2
+ *      -------+--+--+--+--    ---+------
+ *         4   | 3  6  9  #   OPTION
+ *         5   | 2  5  8  0     C
+ *         6   | 1  4  7  *     B
+ *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
+ *
+ *   mute (mu):   sound control
+ *
+ *      You can turn off the sound by clearing this bit.
+ *
+ *   read enable (r):
+ *
+ *      Set this bit to read from the joysticks, clear it to write
+ *      to them.
+ */
 void jaguar_state::joystick_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	/*
-	 *   16        12         8         4         0
-	 *   +-+-------^------+--+---------+---------+
-	 *   |r|    unused    |mu|  col 1  |  col 0  |
-	 *   +-+--------------+--+---------+---------+
-	 *    15                8   7...4     3...0
-	 *
-	 *   col 0:   column control of joypad 0
-	 *
-	 *      Here you select which column of the joypad to poll.
-	 *      The columns are:
-	 *
-	 *                Joystick       Joybut
-	 *      col_bit|11 10  9  8     1    0
-	 *      -------+--+--+--+--    ---+------
-	 *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
-	 *         1   | 1  4  7  *     B
-	 *         2   | 2  5  8  0     C
-	 *         3   | 3  6  9  #   OPTION
-	 *
-	 *      You select a column my clearing the appropriate bit and setting
-	 *      all the other "column" bits.
-	 *
-	 *
-	 *   col1:    column control of joypad 1
-	 *
-	 *      This is pretty much the same as for joypad EXCEPT that the
-	 *      column addressing is reversed (strange!!)
-	 *
-	 *                Joystick      Joybut
-	 *      col_bit|15 14 13 12     3    2
-	 *      -------+--+--+--+--    ---+------
-	 *         4   | 3  6  9  #   OPTION
-	 *         5   | 2  5  8  0     C
-	 *         6   | 1  4  7  *     B
-	 *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
-	 *
-	 *   mute (mu):   sound control
-	 *
-	 *      You can turn off the sound by clearing this bit.
-	 *
-	 *   read enable (r):
-	 *
-	 *      Set this bit to read from the joysticks, clear it to write
-	 *      to them.
-	 */
 	COMBINE_DATA(&m_joystick_data);
+	// TODO: audio enable bit 8 & joystick enable bit 15
 }
 
 
@@ -1712,21 +1713,21 @@ static INPUT_PORTS_START( jaguar )
 	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS4")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Option") PORT_PLAYER(2)
-	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Option") PORT_PLAYER(2)
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS5")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 C") PORT_PLAYER(2)
-	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 C") PORT_PLAYER(2)
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS6")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 B") PORT_PLAYER(2)
-	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 B") PORT_PLAYER(2)
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS7")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Pause") PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)
-	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Pause") PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)
+	PORT_BIT( 0xfff3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x02, 0x00, "Show Logo")

@@ -566,8 +566,7 @@ TODO: check EEPROM access (by logic it should have one)
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[DSP] fatal endian setup 00085128 (regression, crashed?)
-Randomly hangs/crashes
+Randomly hangs/crashes (PIT prescaler = 0xffff, fixed?)
 Heavy pitch GFX issues
 No sound (fixed, serial clock)
 Access [cart] EEPROM
@@ -985,6 +984,7 @@ Black screen
 		<notes><![CDATA[
 No sound (fixed, serial clock)
 No ball touch SFXs
+[DSP] sound crashes during gameplay (3rd match at 28 minute on clear EEPROM)
 Access [cart] EEPROM
 ]]></notes>
 
