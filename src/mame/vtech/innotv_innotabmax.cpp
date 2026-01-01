@@ -161,7 +161,7 @@ void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &conf
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_innotv_cart");
 }
 
-ROM_START( innotv )
+ROM_START( innotvuk )
 	DISK_REGION( "internalsd" )
 	DISK_IMAGE( "8gb_sdhc_internal", 0, SHA1(443a0a9cc830387317d3218955b72295ee5a88eb) )
 ROM_END
