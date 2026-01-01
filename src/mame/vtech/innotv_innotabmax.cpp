@@ -16,7 +16,7 @@
    This file exists so that the Software List has a place to hook up to for
    the time being.
 
-   InnoTV details:
+   InnoTV details
 
    Rockchip RK3168 (Main CPU / SoC)
    Rockchip RK616 ('Partner Chip for Rockchip mobile application processor'
@@ -27,6 +27,10 @@
 
    There don't appear to be any ROM / SPI / NAND devices onboard, so must either
    boot directly from the SD, or have some boot program internal to the SoC
+   
+Known Undumped international versions
+	InnoTab Max (US English, with Toca Boca bonus app, Color and Pop 2, Ice Escape and Peek a Martian, What's That Noise isnt included this time)
+	Storio Max (NL Dutch, without the Toca Boca bonus app but everythign is identical from US English except the language)
 
    The following pinout was used for the InnoTV / InnoTab MAX cartridges
 
@@ -54,10 +58,6 @@
     |                     |--| RY/BY
     |                     |--+
     +---------------------+
-
-	Known Undumped international versions:
-	InnoTab Max (US English, with Toca Boca bonus app, Color and Pop 2, Ice Escape and Peek a Martian, What's That Noise isnt included this time)
-	Storio Max (NL Dutch, without the Toca Boca bonus app but everythign is identical from US English except the language)
 
 *******************************************************************************/
 
