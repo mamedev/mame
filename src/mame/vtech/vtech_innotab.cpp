@@ -22,6 +22,7 @@
 	InnoTab 3S Plus (US English, with the dummy InnoTab® Software Preview Cartridge with ten demo videos, on the NAND, the demo version of What's That Noise?, and Globe, the only difference from InnoTab 3 is the InnoTab splash screen and the orientation being landscape)
 	InnoTab 3S (US English, with the dummy Read, Play & Create cartridge with What’s That Noise?, H2O Go!, and Color & Pop, the only difference from InnoTab 3 is the InnoTab splash screen and the orientation being landscape)
 	InnoTab (US English, with the book What’s That Noise?, the 2 games Pinball Letters and Ice Escape, it also includes Color & Pop)
+	Storio 2 Baby (ES Spanish, with the dummy Read, Play & Create cartridge with Noah's Ark Animal Adventure, Peek-a-Boo Dance Party and Chugga Shapes, plus the Tappimals Zoo game on NAND)
 
 	
 *******************************************************************************/
