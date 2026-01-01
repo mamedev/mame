@@ -241,6 +241,7 @@ Uses [GPU] irq 3
 No sound (fixed, [DSP] irq priority)
 Bad BGM on title screen
 Runs at extremely fast speed
+Can randomly black screen after loading a stage/during gameplay
 Access [cart] EEPROM
 Title screen has black dots of garbage on top (btanb)
 ]]></notes>
@@ -389,6 +390,7 @@ Access [cart] EEPROM
 ]]></notes>
 
 		<info name="serial" value="J9007E 700707-002"/>
+		<info name="developer" value="Rebellion"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<rom name="checkered flag (world).j64" size="2097152" crc="fa7775ae" sha1="4d0cc8d248a8bd0fc4b8169c5d5772e59c073c59" offset="000000" />
@@ -402,7 +404,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [DSP] always do an in-flight PC change at startup
-No sound (check [DSP] serial)
+No sound (check [DSP] serial/JPIT)
 Title screen cuts off background
 Gameplay GFX pop-ups
 Eventually black screens/crashes
@@ -771,9 +773,9 @@ Draws an incorrect pitch GFX, doesn't do much else
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen
 Text GFXs are solid filled
-No BGMs
+Background pitch issue on gameplay
+No BGMs (fixed, [DSP] irq 0)
 ]]></notes>
 
 		<info name="serial" value="J9097 705097-001"/>
@@ -810,6 +812,7 @@ Uses [GPU] irqs 0 and 4
 "Enter Combat" has ground textures with black
 "Enter Network" causes a black screen after loading (JagLink)
 Sometimes hangs on main menu
+Main menu background is cutoff to the right
 No BGM on main menu (random? Worked once)
 Uses [GPU] irq 0
 ]]></notes>
@@ -1069,7 +1072,7 @@ RSoD on Jaguar logo
 		<year>2001</year>
 		<publisher>B&amp;C Computervisions</publisher>
 		<notes><![CDATA[
-Gets to title screen (with wrong GFX width) then hangs
+Gets to title screen (with wrong GFX width) then hangs ([blitter]?)
 No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
@@ -1124,8 +1127,9 @@ No engine sound (serial sampled?)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[GPU] fatal endian setup 00050005
-Draws a cutted off Super Burnout copyright text then black screen
+[GPU] fatal endian setup 00050005, requires pixel organization swaps (in [blitter]?)
+Draws a cutted off Super Burnout copyright text, a blue strip then crashes
+Plays [DSP] sound on right speaker only (?)
 ]]></notes>
 
 		<info name="serial" value="J9052E 700752-002"/>
@@ -1268,7 +1272,7 @@ Gameplay screen flickers
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
-No sound (fixed, [DSP] irq priority)
+No sound (?)
 GFXs missing on gameplay and title screen
 ]]></notes>
 
@@ -1378,9 +1382,8 @@ Uses [GPU] irq 3
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, regression after JPIT DSP irq hooks
-Black screen after title screen
-No sound
+Heavy GFX glitches in gameplay
+No sound (fixed, [DSP] irq priority)
 ]]></notes>
 
 		<info name="serial" value="J9070E 700770-002"/>
@@ -1466,7 +1469,7 @@ Uses [GPU] irq 0
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"licensed by Atari" screen then resets to Jaguar logo
+"licensed by Atari" screen then resets to Jaguar logo (PC=8062CA, jumps to unpopulated sharedram)
 "Warning: ROMHI = 0"
 ]]></notes>
 
