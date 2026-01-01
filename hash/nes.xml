@@ -29396,7 +29396,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="popils" supported="partial">
-		<description>Popils (prototype)</description>
+		<description>Magical Puzzle Popils (prototype)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
 		<notes><![CDATA[
@@ -29424,7 +29424,7 @@ The EEPROM chip that contained the sequence data for the music and sound effects
 	</software>
 	
 	<software name="popilss" cloneof="popils">
-		<description>Popils (prototype, with recreated sound)</description>
+		<description>Magical Puzzle Popils (prototype, with recreated sound)</description>
 		<year>1989</year>
 		<publisher>Tengen</publisher>
 		<notes><![CDATA[
