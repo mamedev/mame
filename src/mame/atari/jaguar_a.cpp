@@ -267,8 +267,7 @@ void jaguar_state::update_jpit_timer(unsigned which)
 	const u16 divider = m_dsp_regs[which ? DSP1 : DSP0];
 
 	// pbfant sets a prescaler with no divider, expecting working sound with that alone
-	// jaguarcd uses the external mode from Butch (TBD)
-	if ((prescaler || divider) && BIT(m_serial_smode, 0))
+	if (prescaler || divider)
 	{
 		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_dsp->clock());
 		m_jpit_timer[which]->adjust(sample_period);
@@ -286,7 +285,6 @@ template <unsigned which> TIMER_CALLBACK_MEMBER(jaguar_state::jpit_update)
 
 	// - mutntpng/cybermor wants these irqs
 	// - atarikrt/feverpit also expects this, unconditionally
-	// TODO: atarikrt uses SMODE 0x05 but still expects an irq?
 	m_dsp->set_input_line(2 + which, ASSERT_LINE);
 
 	update_jpit_timer(which);
@@ -405,6 +403,7 @@ void jaguar_state::update_serial_timer()
 		case 0x00:
 			m_serial_timer->adjust(attotime::never);
 			break;
+		// TODO: atarikrt uses SMODE 0x05 but still expects an irq?
 		case 0x05:
 		case 0x15:
 		{
