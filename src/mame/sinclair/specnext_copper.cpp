@@ -102,8 +102,21 @@ TIMER_CALLBACK_MEMBER(specnext_copper_device::timer_callback)
 		++m_copper_list_addr;
 	};
 
+	int times = 1;
+	if (m_copper_dout == 0)
+	{
+		u16 dat_next = (m_listram[m_copper_list_addr << 1] << 8) | m_listram[(m_copper_list_addr << 1) | 1];
+		// helps the scheduler to not get flooded with events when there are multiple NOPs in a row
+		while (dat_next == 0 && m_copper_list_addr < 0x400)
+		{
+			++m_copper_list_addr;
+			dat_next = (m_listram[m_copper_list_addr << 1] << 8) | m_listram[(m_copper_list_addr << 1) | 1];
+			++times;
+		}
+	}
+
 	m_copper_list_addr %= 0x400;
-	m_timer->adjust(attotime::from_hz(clock()));
+	m_timer->adjust(times * attotime::from_hz(clock()));
 }
 
 TIMER_CALLBACK_MEMBER(specnext_copper_device::frame_timer_callback)
