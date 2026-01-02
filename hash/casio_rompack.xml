@@ -11,183 +11,170 @@ license:CC0-1.0
 	MT-18, MT-28, MT-85, MT-86, MT-88, MT-800, MT-820, MT-830, CT-800, CT-805, CT-810, CT-840,
 	SK-8, SK-8A, KS-03, KS-02 and the DH-280 and DH-800 digital horns.
 
-	+=========+====+======================================================+===+
-	|PACK     |YEAR|TITLE                                               DUMPED|
-	+=========+====+======================================================+===+
-	|                  JAPANESE ROM PACKS                                     |
-	+=========+====+======================================================+===+
-	|RO-101   |19??|The Hit Parade                                        | NO|
-	|RO-102   |19??|Hit Songs                                             | NO|
-	|RO-103   |19??|New Music [1]                                         | NO|
-	|RO-104   |19??|Enka [1]                                              | NO|
-	|RO-105   |19??|New Music [5]                                         | NO|
-	|RO-106   |19??|Enka Vol.2                                            | NO|
-	|RO-107   |19??|New Music [2]                                         | NO|
-	|RO-108   |19??|Enka [3]                                              | NO|
-	|RO-109   |19??|New Music [4]                                         | NO|
-	|RO-110   |19??|Easy Listening [3]                                    | NO|
-	|RO-111   |19??|Enka [4]                                              | NO|
-	|RO-113   |19??|Young Best Hits                                       | NO|
-	|RO-114   |19??|Enka [5]                                              | NO|
-	|RO-116   |19??|Young Hits [2]                                        | NO|
-	|RO-117   |19??|New Music [5]                                         | NO|
-	|RO-118   |19??|Screen Themes [3]                                     | NO|
-	|RO-119   |19??|Children's Songs [3]                                  | NO|
-	|RO-121N  |19??|Enjoy Chord Guide                                     | NO|
-	|RO-122Y  |19??|Young Best Hits [2]                                   | NO|
-	|RO-124Y  |19??|Young Best Hits [6]                                   | NO|
-	|RO-125E  |19??|Enka [9]                                              | NO|
-	|RO-126Y  |19??|Young Best Hits [7]                                   | NO|
-	|RO-127E  |19??|Enka [11]                                             | NO|
-	|RO-128P  |19??|Oldies                                                | NO|
-	|RO-129E  |19??|Enka [12]                                             | NO|
-	|RO-130Y  |19??|Young Best Hits [10]                                  | NO|
-	|RO-131Y  |19??|New Music Best [1]                                    | NO|
-	|RO-132Y  |19??|New Music Best [2]                                    | NO|
-	|RO-133E  |19??|Introduction to Karaoke Hits [1]                      | NO|
-	|RO-151   |19??|Paul Mauriat                                          | NO|
-	|RO-152   |19??|Enka                                                  | NO|
-	|RO-153   |19??|Diamond Pupils                                        | NO|
-	|RO-155   |19??|Anime                                                 | NO|
-	|RO-156   |19??|Fun Keyboard Lessons                                  | NO|
-	|RO-157   |19??|Kayokyoku                                             | NO|
-	|RO-158   |19??|Songs for Children [1]                                | NO|
-	|RO-159   |19??|Children's Songs                                      | NO|
-	|RO-162   |19??|Anime [2]                                             | NO|
-	|RO-163   |19??|Pops                                                  | NO|
-	|RO-164   |19??|Play with Pack-chan                                   | NO|
-	|RO-165   |19??|Fun Keyboard Lessons                                  | NO|
-	|RO-166   |19??|Animation Themes [3]                                  | NO|
-	|RO-167K  |19??|Children's Songs [6]                                  | NO|
-	|RO-168K  |19??|Children's Songs [7]                                  | NO|
-	|RO-169A  |19??|Animation Themes [4]                                  | NO|
-	|RO-170A  |19??|Animation Themes [5]                                  | NO|
-	|RO-171l  |19??|Event Songs                                           | NO|
-	|RO-172G  |19??|Game Music                                            | NO|
-	|RO-173Y  |19??|Young Hits [3]                                        | NO|
-	|RO-174Y  |19??|Young Hits [4]                                        | NO|
-	|RO-175K  |19??|Children's Songs [8]                                  | NO|
-	|RO-176Y  |19??|Young Hits [5]                                        | NO|
-	|RO-177K  |19??|Children's Songs [9]                                  | NO|
-	|RO-178A  |19??|Animation Themes [6]                                  | NO|
-	|RO-179K  |19??|Childrens' Songs [10]                                 | NO|
-	|RO-180X  |19??|Christmas Songs [2]                                   | NO|
-	|RO-181S  |19??|Standards [2]                                         | NO|
-	|RO-182B  |19??|Beatles [2]                                           | NO|
-	|RO-183C  |19??|Comic Songs                                           | NO|
-	|RO-184T  |19??|Elementary School Music [1]                           | NO|
-	|RO-185T  |19??|Elementary School Music [2]                           | NO|
-	|RO-186T  |19??|Elementary School Music [3]                           | NO|
-	|RO-188Y  |19??|Young Hits [6]                                        | NO|
-	|RO-189A  |19??|Animation Themes [7]                                  | NO|
-	|RO-190K  |19??|Children's Songs [12]                                 | NO|
-	|RO-191Y  |19??|Young Best Hits [8]                                   | NO|
-	|RO-192Y  |19??|Young Best Hits [9]                                   | NO|
-	|RO-193Y  |19??|Young Hits [7]                                        | NO|
-	|RO-195G  |19??|Game Music [2]                                        | NO|
-	|RO-196G  |19??|Children's Songs [13]                                 | NO|
-	|RO-581   |19??|Family Selection                                      | NO|
-	|RO-582   |19??|DH Tunes & Rhythms                                    | NO|
-	|RO-584   |19??|Intro Address Pack (?)                                | NO|
-	|RO-601E  |19??|Enka [6]                                              | NO|
-	|RO-602Y  |19??|Young Best Hits [3]                                   | NO|
-	|RO-603P  |19??|Pops [2]                                              | NO|
-	|RO-604E  |19??|Enka [7]                                              | NO|
-	|RO-605Y  |19??|Young Best Hits [4]                                   | NO|
-	|RO-606K  |19??|Songs for Children [4]                                | NO|
-	|RO-607K  |19??|Children's Songs [5]                                  | NO|
-	|RO-608Y  |19??|Young Best Hits [5]                                   | NO|
-	|RO-609K  |19??|Children's Songs Best [1]                             | NO|
-	|RO-610K  |19??|Children's Songs Best [2]                             | NO|
-	|RO-611K  |19??|Children's Songs Best [3]                             | NO|
-	|RO-612K  |19??|Children's Songs Best [4]                             | NO|
-	|RO-613A  |19??|Animation Themes [8]                                  | NO|
-	|RO-614Y  |19??|Young Best Hits [11]                                  | NO|
-	|RO-615A  |19??|Animation Themes [9]                                  | NO|
-	|RO-616Y  |19??|Young Best Hits [12]                                  | NO|
-	|RO-617Y  |19??|Young Best Hits [13]                                  | NO|
-	|RO-618K  |19??|Mother and Child TV Songs                             | NO|
-	|RO-701   |19??|Sound Kids 'Excitement'(?) [1]                        | NO|
-	|RO-702   |19??|Sound Kids 'Excitement'(?) [2]                        | NO|
-	|RO-703   |19??|Sound Kids 'Excitement'(?) [3]                        | NO|
-	|RO-704   |19??|Sound Kids 'Excitement'(?) [4]                        | NO|
-	|RO-705   |19??|Sound Kids - Anime Songs [1]                          | NO|
-	|RO-706   |19??|Sound Kids - Hit Songs [1]                            | NO|
-	|RO-708   |19??|Sound Kids - Hit Songs [2]                            | NO|
-	|RO-801F  |1990|Fusion                                                | NO|
-	|RO-802E  |1990|Enka [10]                                             | NO|
-	|RO-803S  |1990|Standards                                             | NO|
-	|RO-804M  |1990|Digital Horn Lessons                                  | NO|
-	+=========+====+======================================================+===+
-	|                  WORLD ROM PACKS                                        |
-	+=========+====+======================================================+===+
-	|RO-201   |1983|Fun with your Casio Keyboard                          | NO|
-	|RO-202?  |19??|Movie Themes                                          | NO|
-	|RO-203?  |19??|Rock On                                               | NO|
-	|RO-204   |198?|Supergroups                                           | NO|
-	|RO-251   |1984|How to Play your Casio ROM Keyboard                   |YES|
-	|RO-252   |1986|Film Classics                                         | NO|
-	|RO-253   |1986|Pop/Rock                                              | NO|
-	|RO-254   |1984|Movie Pops                                            | NO|
-	|RO-255   |1986|Rock On                                               |YES|
-	|RO-256   |1985|Top Pops                                              | NO|
-	|RO-257   |1985|Super Songs                                           |YES|
-	|RO-258   |1985|Latin Hits                                            |YES|
-	|RO-259   |1985|Pop Hits                                              | NO|
-	|RO-260   |1985|Music Collection                                      |YES|
-	|RO-261   |1985|Pop Selection                                         |YES|
-	|RO-262   |1986|Country Greats                                        |YES|
-	|RO-263   |1986|Hymns & Gospel                                        | NO|
-	|RO-264   |1986|Pop Country                                           | NO|
-	|RO-265   |1986|Pop Superstars                                        |YES|
-	|RO-266   |1988|Songs for Children                                    | NO|
-	|RO-268   |1986|Golden Hits                                           | NO|
-	|RO-269   |1986|Rhythm and Blues                                      | NO|
-	|RO-270   |1988|Christmas                                             |YES|
-	|RO-271   |1986|Beatles No.1 Hits                                     | NO|
-	|RO-272   |1987|Rock & Roll Classics                                  |YES|
-	|RO-273   |1987|Best of Motown                                        | NO|
-	|RO-274   |1987|Hot Pop & Rock                                        |YES|
-	|RO-275   |1987|Today's Superstars                                    | NO|
-	|RO-276   |1987|T.V. Tunes                                            |YES|
-	|RO-277   |1988|When You Wish Upon A Star and Other Disney Movie Songs| NO|
-	|RO-278   |1987|Songs of Sesame Street                                | NO|
-	|RO-279   |1988|Solid Gold Rock & Pop                                 | NO|
-	|RO-280   |1988|Star-Studded Rock                                     | NO|
-	|RO-281   |1988|Chartbusting Pop                                      | NO|
-	|RO-282   |198?|New Kids on the Block Greatest Hits                   | NO|
-	|RO-301   |1983|Popular Hits                                          | NO|
-	|RO-302   |1983|Latin                                                 | NO|
-	|RO-303   |1983|Easy Listening                                        | NO|
-	|RO-351   |1984|Best of Carpenters                                    | NO|
-	|RO-352   |1985|All Time Movie Hits                                   | NO|
-	|RO-353   |1985|Beatles                                               | NO|
-	|RO-354   |1985|Pop Themes                                            | NO|
-	|RO-355   |1984|Great Standards / Jazz Standards                      |YES|
-	|RO-356   |1985|Disney Movie Magic                                    | NO|
-	|RO-357   |19??|Christmas Songs                                       | NO|
-	|RO-451   |198?|Chinese Folk Songs                                    | NO|
-	|RO-452   |198?|Most Popular Songs                                    | NO|
-	|RO-453 II|198?|Arabian Nights                                        | NO|
-	|RO-454   |1991|Popular Hindi Film Songs                              |YES|
-	|RO-456   |198?|Beautiful Arabian Music                               | NO|
-	|RO-457   |198?|Arabian Song Selections                               | NO|
-	|RO-458   |198?|Dongge Golden Melodies 1                              | NO|
-	|RO-459   |198?|Dongge Golden Melodies 2                              | NO|
-	|RO-460   |198?|Popular Mandarin Songs                                | NO|
-	|RO-461   |198?|Taiwanese Classic Songs                               | NO|
-	|RO-462   |198?|Les Antilles: Misik An Nou (The Antilles: Our Music)  | NO|
-	|RO-551   |198?|World Songs                                           |YES|
-	|RO-552   |198?|Classic                                               | NO|
-	|RO-553   |1984|Have Fun with Hopsie!                                 | NO|
-	|RO-554   |198?|Family Songs                                          |YES|
-	|RO-555   |198?|Home Melodies                                         | NO|
-	|RO-556   |198?|DH Songs & Rhythms                                    | NO|
-	|RO-557   |198?|Family Collection                                     | NO|
-	|RO-558   |198?|Kids Selection                                        | NO|
-	|RO-559   |1990|New Kids on the Block Greatest Hits                   | NO|
-	|RO-560   |1990|New Kids on the Block Greatest Hits                   | NO|
-	+=========+====+======================================================+===+
+	==============================================================================================
+	MISSING DUMPS
+	==============================================================================================
+	JAPANESE ROM PACKS
+	==============================================================================================
+	RO-101		1983	The Hit Parade
+	RO-102		1983	Hit Kayou
+	RO-103		1983	New Music [1]
+	RO-104		19??	Enka Vol.1 Karaoke Hit Shuu
+	RO-105		19??	New Music [2]
+	RO-106		19??	Enka Vol.2 Karaoke Hit Shuu
+	RO-107		19??	New Music [3]
+	RO-108		1984	Enka [3]
+	RO-109		1984	New Music [4]
+	RO-110		1985	Easy Listening [3]
+	RO-111		1985	Enka [4]
+	RO-113		1985	Young Best Hits
+	RO-114		19??	Enka [5]
+	RO-116		1985	Young Hits [2]
+	RO-117		1985	New Music [5]
+	RO-118		19??	Screen Themes [3]
+	RO-119		19??	Kodomo no uta    [3]
+	RO-121N		1986	Introduction to Casio Keyboard III, Enjoy Chord Guide
+	RO-122Y		1986	Young Best Hits [2]
+	RO-124Y		1988	Young Best Hits [6]
+	RO-125E		19??	Enka [9]
+	RO-126Y		1989	Young Best Hits [7]
+	RO-127E		19??	Enka [11]
+	RO-128P		19??	Oldies
+	RO-129E		19??	Enka [12]
+	RO-130Y		19??	Young Best Hits [10]
+	RO-131Y		19??	New Music Best [1]
+	RO-132Y		1992	New Music Best [2]
+	RO-133E		1992	Introduction to Karaoke Hits [1]
+	RO-151		19??	Paul Mauriat
+	RO-152		19??	Enka Vol.1 Group Hit
+	RO-153		19??	Young Hits
+	RO-155		1984	Animation
+	RO-156		19??	Introduction to Casio Keyboard II, Fun Keyboard Lessons
+	RO-157		19??	Kayokyoku
+	RO-158		19??	Kodomo no uta [1]
+	RO-159		19??	Kodomo no uta [2]
+	RO-162		1984	Animation [2]
+	RO-163		1985	Pops
+	RO-164		1985	Introduction to Casio Keyboard I, Let's Play with Pack-chan
+	RO-165		1985	Fun Keyboard Lessons
+	RO-166		19??	Animation Themes [3]
+	RO-167K		1988	Kodomo no uta [6]
+	RO-168K		1988	Kodomo no uta [7]
+	RO-169A		19??	Animation Themes [4]
+	RO-170A		1988	Animation Themes [5]
+	RO-171l		1988	Event Songs
+	RO-172G		19??	Game Music
+	RO-173Y		19??	Young Hits [3]
+	RO-174Y		19??	Young Hits [4]
+	RO-175K		19??	Kodomo no uta [8], Pikkapika Ongakukan
+	RO-176Y		19??	Young Hits [5]
+	RO-177K		19??	Kodomo no uta [9]
+	RO-178A		1989	Animation Themes [6]
+	RO-179K		19??	Kodomo no uta [10]
+	RO-180X		19??	Christmas Songs [2]
+	RO-181S		19??	Standards [2]
+	RO-182B		19??	Beatles [2]
+	RO-183C		19??	Comic Songs
+	RO-184T		1989	Elementary School Music [1]
+	RO-185T		19??	Elementary School Music [2]
+	RO-186T		19??	Elementary School Music [3]
+	RO-187K		1989	Kodomo no uta [11]
+	RO-188Y		19??	Young Hits [6]
+	RO-189A		19??	Animation Themes [7]
+	RO-190K		19??	Kodomo no uta [12], Pikkapika Ongakukan 2
+	RO-191Y		19??	Young Best Hits [8]
+	RO-192Y		19??	Young Best Hits [9]
+	RO-193Y		19??	Young Hits [7]
+	RO-195G		19??	Game Music [2]
+	RO-196K		1991	Kodomo no uta [13], NHK Minna no Uta Yori
+	RO-581		1988	Family Selection
+	RO-582		1989	DH Tunes & Rhythms
+	RO-583?		19??	Kids Selection, bundled with Casio Sound Kids 03 keyboard?
+	RO-584		19??	Intro Address Pack (?)
+	RO-601E		19??	Enka [6]
+	RO-602Y		19??	Young Best Hits [3]
+	RO-603P		1985	Pops [2]
+	RO-604E		1986	Enka [7]
+	RO-605Y		1986	Young Best Hits [4]
+	RO-606K		1988	Kodomo no uta [4]
+	RO-607K		19??	Kodomo no uta [5]
+	RO-608Y		19??	Young Best Hits [5]
+	RO-609K		19??	Kodomo no uta Best [1]
+	RO-610K		19??	Kodomo no uta Best [2]
+	RO-611K		1990	Kodomo no uta Best [3]
+	RO-612K		19??	Kodomo no uta Best [4]
+	RO-613A		1990	Animation Themes [8]
+	RO-614Y		1990	Young Best Hits [11]
+	RO-615A		1991	Animation Themes [9]
+	RO-616Y		1991	Young Best Hits [12]
+	RO-617Y		1992	Young Best Hits [13]
+	RO-618K		1993	Mother and Child TV Songs
+	RO-681Y		1988	Sun Chain '88 Big Summer Campaign, Masatoshi Nakamura Original Hit Melody
+	RO-701		1990	Sound Kids, Nursery rhymes [1]
+	RO-702		1990	Sound Kids, Nursery rhymes [2]
+	RO-703		1990	Sound Kids, Nursery rhymes [3]
+	RO-704		1990	Sound Kids, Nursery rhymes [4]
+	RO-705		1990	Sound Kids, Anime Songs [1]
+	RO-706		1990	Sound Kids, Hit Songs [1]
+	RO-707		19??	Sound Kids, Anime Songs [2]
+	RO-708		19??	Sound Kids, Hit Songs [2]
+	RO-801F		1988	Fusion
+	RO-802E		1988	Enka [10]
+	RO-803S		1988	Standards
+	RO-804M		1989	Introduction to Digital Horn, Digital Horn Lessons
+	==============================================================================================
+	WORLD ROM PACKS
+	==============================================================================================
+	RO-201		1983	Fun with your Casio Keyboard
+	RO-202?				Movie Themes? (unreleased)
+	RO-203?				Rock On? (unreleased)
+	RO-204		1984	Supergroups
+	RO-252		1986	Film Classics
+	RO-253		1986	Pop/Rock
+	RO-254		1984	Movie Pops
+	RO-256		1985	Top Pops
+	RO-259		1985	Pop Hits
+	RO-263		1986	Hymns & Gospel
+	RO-264		1986	Pop Country
+	RO-266		1988	Songs for Children
+	RO-268		1986	Golden Hits
+	RO-269		1986	Rhythm and Blues
+	RO-271		1986	Beatles No.1 Hits
+	RO-273		1987	Best of Motown
+	RO-275		1987	Today's Superstars
+	RO-277		1988	When You Wish Upon A Star and Other Disney Movie Songs
+	RO-278		1987	Songs of Sesame Street
+	RO-279		1988	Solid Gold Rock & Pop
+	RO-280		1988	Star-Studded Rock
+	RO-281		1988	Chartbusting Pop
+	RO-282		198?	New Kids on the Block Greatest Hits
+	RO-301		1983	Popular Hits / Easy Listening
+	RO-302		1983	Latin
+	RO-303		1983	Easy Listening / Easy Listening [2]
+	RO-351		1984	Best of Carpenters
+	RO-352		1985	All Time Movie Hits
+	RO-353		1985	Beatles
+	RO-354		1985	Pop Themes
+	RO-356		1985	Disney Movie Magic
+	RO-357		19??	Christmas Songs
+	RO-451		198?	Chinese Folk Songs [1]
+	RO-452		198?	Most Popular Songs
+	RO-453 II	198?	Arabian Nights
+	RO-456		198?	Beautiful Arabian Music
+	RO-457		198?	Arabian Song Selections
+	RO-458		198?	Dongge Golden Melodies 1
+	RO-459		198?	Dongge Golden Melodies 2
+	RO-460		198?	Popular Mandarin Songs
+	RO-461		198?	Taiwanese Classic Songs
+	RO-462		198?	Les Antilles: Misik An Nou (The Antilles: Our Music)
+	RO-552		198?	Classic
+	RO-553		1984	Have Fun with Hopsie!
+	RO-555		198?	Home Melodies
+	RO-556		198?	DH Songs & Rhythms
+	RO-557?		198?	Family Collection
+	RO-558?		19??	Kids Selection, bundled with Casio Sound Kids 03 keyboard?
+	RO-559		1990	New Kids on the Block Greatest Hits
+	RO-560		1990	New Kids on the Block Greatest Hits
 	-->
 
 	<!--
