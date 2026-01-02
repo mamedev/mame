@@ -8,6 +8,7 @@
 
     Other known undumped international versions:
     - Smart Start Elite (English version of Genius Junior Profi / Mis Primeras Lecciones)
+	
 	Possibly on similar hardware:
 	- Animal Friends Toddler Laptop
 	- Bob the Builder Laptop
@@ -31,6 +32,7 @@
 	- Genius Copine (French version of Tote and Go Laptop 2009)
 	- Genius Dora (French version of Dora's Laptop)
 	- Genius Ecriture (French version of Writing Fun Laptop)
+	- Genius Ni Hao, Kai Lan (French version of Ni Hao Kai Lan Learning Laptop)
 	- Genius Fun (French generic version of Dora's Laptop)
 	- Genius Go Diego (French version of Go Diego Go Laptop)
 	- Genius Malice (French version of Tote and Go Laptop Plus)
