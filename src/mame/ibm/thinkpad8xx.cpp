@@ -82,6 +82,7 @@ void thinkpad8xx_state::thinkpad850(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	SOFTWARE_LIST(config, "thinkpad8xx").set_original("thinkpad8xx");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("prep");
 }
 
 
