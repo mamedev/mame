@@ -581,6 +581,10 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;
 		int32_t iwidth = (lower2 >> 28) | ((upper2 & 0x3f) << 4);
 		uint8_t _index = (upper2 >> 6) & 0x3f;
+		// bit 0: REFLECT (a.k.a. flip X)
+		// bit 1: RMW
+		// bit 2: TRANS(parent)
+		// bit 3: RELEASE (bus)
 		uint8_t flags = (upper2 >> 13) & 0x0f;
 		uint8_t firstpix = (upper2 >> 17) & 0x3f;
 

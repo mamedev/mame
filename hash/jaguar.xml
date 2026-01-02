@@ -259,6 +259,7 @@ Title screen has black dots of garbage on top (btanb)
 		<year>2000</year>
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
+4 Play logo has [blitter] SRCSHADE bug on rolling section (red-ish, should be same-ish color as logo)
 Heavy GFX corruptions after 4 Play logo
 No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
