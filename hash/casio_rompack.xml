@@ -969,8 +969,8 @@ license:CC0-1.0
 		6. Runner
 	-->
 	<software name="ro191y">
-		<year>19??</year>
 		<description>Young Best Hits 8 (RO-191Y)</description>
+		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
 		<info name="alt_title" value="ヤングベストヒット8"/>
 		<part name="cart" interface="casio_rompack">
