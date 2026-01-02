@@ -13848,7 +13848,7 @@ Entirely different from Namco's port. The CHR ROM to this prototype is lost.
 				<rom size="16384" offset="0x4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="chr" size="8192" crc="" sha1="" status="nodump" />	<!-- CHR ROM missing -->
+				<rom name="chr" size="8192" status="nodump" />	<!-- CHR ROM missing -->
 			</dataarea>
 		</part>
 	</software>
