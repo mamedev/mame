@@ -2595,9 +2595,10 @@ void specnext_state::nr_c0_im2_vector_w(bool mode_im2, u8 vector)
 	m_nr_c0_int_mode_pulse_0_im2_1 = mode_im2;
 	m_nr_c0_im2_vector = vector;
 
-	m_im2_line->vector_w(mode_im2 ? (m_nr_c0_im2_vector << 5) | (INT_PRIORITY_LINE << 1) : 0xff);
-	m_ctc->vector_w(m_nr_c0_im2_vector << 5);
-	m_im2_ula->vector_w(mode_im2 ? (m_nr_c0_im2_vector << 5) | (INT_PRIORITY_ULA << 1) : 0xff);
+	const u8 vector_base = mode_im2 ? m_nr_c0_im2_vector << 5 : 0xff;
+	m_im2_line->vector_w(vector_base | (INT_PRIORITY_LINE << 1));
+	m_ctc->vector_w(vector_base);
+	m_im2_ula->vector_w(vector_base | (INT_PRIORITY_ULA << 1));
 }
 
 static const z80_daisy_config z80_daisy_chain[] =
