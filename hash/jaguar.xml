@@ -351,6 +351,7 @@ Rightmost column of gameplay has odd "overscan" area, visible on horizontal scro
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] can sometimes do an in-flight PC change (fatalerror)
+Randomly crashes on title screen animation
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
@@ -738,6 +739,7 @@ Access [cart] EEPROM
 Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} ([blitter]?)
 BGM doesn't work in some stages
 Cutoff gameplay area
+Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irqs 0,4
 ]]></notes>
@@ -865,9 +867,9 @@ Uses [GPU] irq 0
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
-Crashes in scanline_update during initial logos (regression)
+Crashes in scanline_update during initial logos (regression, actually bus priority?)
 Water background in stage 1 is in black and white, eventually crashes if bumping into road edges
-No sound
+No sound (fixed)
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
@@ -1010,6 +1012,7 @@ Access [cart] EEPROM
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
+Not extensively tested
 Hangs after loading a stage, no sound (fixed, [DSP] irq priority)
 Access [cart] EEPROM
 ]]></notes>
@@ -1365,6 +1368,7 @@ RSoD on Jaguar logo
 Sound farts (fixed?)
 Missing/wrong GFXs on menus
 Heavy flickering on gameplay
+Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>

@@ -1051,6 +1051,7 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
 				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
 				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
+
 				m_gpu->set_input_line(3, ASSERT_LINE);
 				done = 1;
 				// mutntpng, atarikrt VPOS = 0
@@ -1067,6 +1068,11 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 			/* stop */
 			case 4:
 			{
+				m_gpu_regs[OB_HH] = (objdata[1] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
+				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
+
 				int interrupt = (objdata[1] >> 3) & 1;
 				done = 1;
 
