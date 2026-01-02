@@ -239,7 +239,7 @@ void jaguar_state::sound_reset()
 
 uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 {
-	if (offset != JINTCTRL && offset != JINTCTRL+2)
+	if (offset != JINTCTRL && offset != JINTCTRL+2 && !machine().side_effects_disabled())
 		logerror("%s:jerry read register @ F10%03X\n", machine().describe_context(), offset * 2);
 
 	switch (offset)
