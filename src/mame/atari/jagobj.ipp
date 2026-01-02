@@ -581,6 +581,10 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;
 		int32_t iwidth = (lower2 >> 28) | ((upper2 & 0x3f) << 4);
 		uint8_t _index = (upper2 >> 6) & 0x3f;
+		// bit 0: REFLECT (a.k.a. flip X)
+		// bit 1: RMW
+		// bit 2: TRANS(parent)
+		// bit 3: RELEASE (bus)
 		uint8_t flags = (upper2 >> 13) & 0x0f;
 		uint8_t firstpix = (upper2 >> 17) & 0x3f;
 
@@ -720,9 +724,8 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		}
 
 		/* decrement the height and add to the source data offset */
-		// TODO: RMW only the affected parts, this can possibly cause out of bounds
-		objdata[0] = upper + (dwidth << 11);
-		objdata[1] = lower - (1 << 14);
+		objdata[0] = (upper & 0x7ff) | ((upper + (dwidth << 11)) & ~0x7ff);
+		objdata[1] = (lower & ~0xffc000) | ((lower - (1 << 14)) & 0xffc000);
 	}
 
 	return (uint32_t *)memory_base(link << 3);
@@ -936,9 +939,8 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
 			yinc = height, remainder = 0;
 
 		/* decrement the height and add to the source data offset */
-		// TODO: RMW only the affected parts, this can possibly cause out of bounds
-		objdata[0] = upper + yinc * (dwidth << 11);
-		objdata[1] = lower - yinc * (1 << 14);
+		objdata[0] = (upper & 0x7ff) | ((upper + yinc * (dwidth << 11)) & ~0x7ff);
+		objdata[1] = (lower & ~0xffc000) | ((lower - yinc * (1 << 14)) & 0xffc000);
 		objdata[5] = (lower3 & ~0xff0000) | ((remainder & 0xff) << 16);
 	}
 
@@ -1051,6 +1053,7 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
 				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
 				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
+
 				m_gpu->set_input_line(3, ASSERT_LINE);
 				done = 1;
 				// mutntpng, atarikrt VPOS = 0
@@ -1067,6 +1070,11 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 			/* stop */
 			case 4:
 			{
+				m_gpu_regs[OB_HH] = (objdata[1] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
+				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
+
 				int interrupt = (objdata[1] >> 3) & 1;
 				done = 1;
 

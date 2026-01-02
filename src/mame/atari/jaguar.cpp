@@ -1097,6 +1097,8 @@ void jaguar_state::jaguar_map(address_map &map)
 	map(0x800000, 0xdfffff).r(FUNC(jaguar_state::cart_base_r16));
 }
 
+// TODO: JTRM claims "no autovectors / no VPA pin, all irqs are at vector 0x40"
+// cfr. section 7 of "Tom bugs"
 void jaguar_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));

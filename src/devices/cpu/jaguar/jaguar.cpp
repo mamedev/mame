@@ -1415,7 +1415,7 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_pc);
 	m_pc = m_io_pc & 0xffffff;
-	// HRM warns against changing PC while GPU/DSP is running
+	// JTRM warns against changing PC while GPU/DSP is running
 	// - speedst2 does it anyway on DSP side
 	if (m_go == true)
 		logerror("%s: inflight PC write %08x\n", this->tag(), m_pc);

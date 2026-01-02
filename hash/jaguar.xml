@@ -219,7 +219,7 @@ Uses [GPU] irq 3
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Title screen foreground layer not drawn properly
+Title screen foreground layer not drawn properly ([object] pitch = 3 in scaled mode)
 No sound (fixed)
 Access [cart] EEPROM
 Uses [GPU] irq 3
@@ -259,7 +259,8 @@ Title screen has black dots of garbage on top (btanb)
 		<year>2000</year>
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
-Heavy GFX corruptions after 4 Play logo
+4 Play logo has [blitter] SRCSHADE bug on rolling section (red-ish, should be same-ish color as logo)
+Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
 No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
 ]]></notes>
@@ -277,7 +278,7 @@ Access [cart] EEPROM
 		<year>2002</year>
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
-Heavy GFX corruptions after 4 Play logo
+Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
 No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
 ]]></notes>
@@ -351,6 +352,7 @@ Rightmost column of gameplay has odd "overscan" area, visible on horizontal scro
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] can sometimes do an in-flight PC change (fatalerror)
+Randomly crashes on title screen animation
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
@@ -383,7 +385,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Has serious 3D GFX pitch issues
+Has serious 3D GFX pitch issues ([object] pitch = 2 16bpp)
 No sound (fixed, serial clock)
 Crashes in [DSP] after few seconds of gameplay
 Access [cart] EEPROM
@@ -405,7 +407,8 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 [DSP] always do an in-flight PC change at startup
 No sound (check [DSP] serial/JPIT)
-Title screen cuts off background
+Reads [Jerry] ASISTAT
+Title screen cuts off background (triggers unhandled [object] pitch = 0 16bpp)
 Gameplay GFX pop-ups
 Eventually black screens/crashes
 ]]></notes>
@@ -424,7 +427,7 @@ Eventually black screens/crashes
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Access [cart] EEPROM
-Huge GFX issues (mostly related with pitch)
+Huge GFX issues ([object] pitch = 4 16bpp)
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
@@ -442,7 +445,7 @@ No sound (fixed, DSP JPIT irqs)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Access [cart] EEPROM
-Huge GFX issues (mostly related with pitch)
+Huge GFX issues ([object] pitch = 4 16bpp)
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
@@ -570,7 +573,7 @@ TODO: check EEPROM access (by logic it should have one)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Randomly hangs/crashes (PIT prescaler = 0xffff, fixed?)
-Heavy pitch GFX issues
+Heavy pitch GFX issues ([object] pitch = 3 16bpp)
 No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
@@ -644,7 +647,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Bad background RMW colors on difficulty select screen (press A after title)
-Huge GFX issues on gameplay (mostly related with pitch)
+Huge GFX issues on gameplay ([object] pitch = 0 4bpp and pitch = 3 16bpp)
 No sound (fixed)
 ]]></notes>
 
@@ -677,7 +680,7 @@ Reload after saving doesn't work, access [cart] EEPROM (verify, should be fixed)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Has heavy pitch GFX issues
+Has heavy pitch GFX issues (unhandled [object] pitch = 4 16bpp)
 Uses [GPU] irq 3
 Access [cart] EEPROM
 ]]></notes>
@@ -696,7 +699,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 No sound (fixed, serial clock)
-Bad pitch GFXs on attract mode, after title
+Bad pitch GFXs on attract mode, after title ([object] pitch = 4 32bpp)
 Black screen after briefing, or by selecting demo mode
 ]]></notes>
 
@@ -716,7 +719,7 @@ Black screen after briefing, or by selecting demo mode
 		<notes><![CDATA[
 No sound (fixed, [DSP] irq priority)
 Stretched title screen pixel width
-Several pitch issues (title logo on main menu)
+Several pitch issues (title logo on main menu [object] pitch = 3 16bpp)
 Hangs after selecting weapon, heavy sound serial reads in [DSP]
 Uses [GPU] irqs 0,2,3
 Access [cart] EEPROM
@@ -738,6 +741,7 @@ Access [cart] EEPROM
 Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} ([blitter]?)
 BGM doesn't work in some stages
 Cutoff gameplay area
+Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irqs 0,4
 ]]></notes>
@@ -757,7 +761,7 @@ Uses [GPU] irqs 0,4
 		<notes><![CDATA[
 Jaguar CD cartridge for saving, requires its own [cart] scheme (with atmel_29c010_device or unknown AMD intelfsh)
 Currently hangs, [PIT]?
-Draws an incorrect pitch GFX, doesn't do much else
+Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 ]]></notes>
 
 		<info name="serial" value="J8911 700140"/>
@@ -773,7 +777,7 @@ Draws an incorrect pitch GFX, doesn't do much else
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Text GFXs are solid filled
+Text GFXs are solid filled, enables [blitter] BCOMPEN
 Background pitch issue on gameplay
 No BGMs (fixed, [DSP] irq 0)
 ]]></notes>
@@ -792,7 +796,7 @@ No BGMs (fixed, [DSP] irq 0)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Exception on non-debug, [GPU] in-flight? On debug gameplay sports no sprite GFXs
-Minor glitch on team box when selecting one (blitter not filling properly)
+Minor glitch on team box when selecting one ([blitter] not filling properly)
 Uses [GPU] irqs 0 and 4
 ]]></notes>
 
@@ -811,9 +815,10 @@ Uses [GPU] irqs 0 and 4
 		<notes><![CDATA[
 "Enter Combat" has ground textures with black
 "Enter Network" causes a black screen after loading (JagLink)
+Reads error bit in [Jerry] ASISTAT
 Sometimes hangs on main menu
 Main menu background is cutoff to the right
-No BGM on main menu (random? Worked once)
+BGM randomly don't work on main menu
 Uses [GPU] irq 0
 ]]></notes>
 
@@ -865,9 +870,9 @@ Uses [GPU] irq 0
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<notes><![CDATA[
-Crashes in scanline_update during initial logos (regression)
+Crashes in scanline_update during initial logos (regression, actually bus priority?)
 Water background in stage 1 is in black and white, eventually crashes if bumping into road edges
-No sound
+No sound (fixed)
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
@@ -956,6 +961,7 @@ Access [cart] EEPROM
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
 No sound (fixed, serial clock)
+Transitions reads the currently selected line buffer in [Tom]
 No SFXs
 Saves reports error, access [cart] EEPROM (verify, should be fixed)
 ]]></notes>
@@ -1010,6 +1016,7 @@ Access [cart] EEPROM
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
+Not extensively tested
 Hangs after loading a stage, no sound (fixed, [DSP] irq priority)
 Access [cart] EEPROM
 ]]></notes>
@@ -1072,7 +1079,7 @@ RSoD on Jaguar logo
 		<year>2001</year>
 		<publisher>B&amp;C Computervisions</publisher>
 		<notes><![CDATA[
-Gets to title screen (with wrong GFX width) then hangs ([blitter]?)
+Gets to title screen (with [object] pitch = 2 16bpp) then 68k crashes ([blitter]? waitstates?)
 No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
@@ -1089,7 +1096,7 @@ Access [cart] EEPROM
 		<year>19??</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Gets to title screen (with wrong GFX width) then hangs
+Gets to title screen (with [object] pitch = 2 16bpp) then 68k crashes ([blitter]? waitstates?)
 No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
@@ -1147,7 +1154,7 @@ Plays [DSP] sound on right speaker only (?)
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
 [DSP] jump off the weeds at PC=F1B898, also reads $fffffc (?)
-Gets to title screen (with wrong GFX width) then hangs
+Gets to title screen (with wrong GFX width) then hangs ([GPU] core bug?)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1365,6 +1372,8 @@ RSoD on Jaguar logo
 Sound farts (fixed?)
 Missing/wrong GFXs on menus
 Heavy flickering on gameplay
+Triggers [object] pitch = 0 8bpp at start of gameplay
+Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
@@ -1382,6 +1391,7 @@ Uses [GPU] irq 3
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+Triggers [object] pitch = 2 8bpp at Trimark logo
 Heavy GFX glitches in gameplay
 No sound (fixed, [DSP] irq priority)
 ]]></notes>
@@ -1450,7 +1460,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Sound metrics menu has glitchy bars (pause menu then press 'B')
+Sound metrics menu has glitchy bars (pause menu then press 'B', [object] pitch = 0 16bpp)
 Main sprite flickers
 Access [cart] EEPROM
 Uses [GPU] irq 0

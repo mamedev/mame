@@ -149,13 +149,13 @@
 #include "jagblit.h"
 
 #define LOG_BLITS           (1U << 1)
-#define LOG_BAD_BLITS       (1U << 2)
-#define LOG_BLITTER_STATS   (1U << 3)
-#define LOG_BLITTER_WRITE   (1U << 4)
-#define LOG_UNHANDLED_BLITS (1U << 5)
-#define LOG_OBJECTS         (1U << 6)
+#define LOG_BLITTER_STATS   (1U << 2)
+#define LOG_BLITTER_WRITE   (1U << 3)
+#define LOG_UNHANDLED_BLITS (1U << 4)
+#define LOG_OBJECTS         (1U << 5)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_UNHANDLED_BLITS)
+// #define LOG_OUTPUT_FUNC osd_printf_warning
 #include "logmacro.h"
 
 
@@ -560,11 +560,27 @@ uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
 #if USE_LEGACY_BLITTER
 	switch (offset)
 	{
-		case B_CMD: /* B_CMD */
-			return m_blitter_status & 3;
+		// $f02238
+		case B_CMD:
+		{
+			// handle normal idle + inner/outer idle
+			const u32 is_idle = (m_blitter_status & 1) * 0x805;
+			return is_idle | (m_blitter_status & 2);
+		}
+
+		// avsp reads A1/A2_PIXEL data there (doors after the first section)
+		// this is documented in JTRM, cfr. section 10 of "Tom bugs"
+		// $f02204
+		case A1_FLAGS:
+			return m_blitter_regs[A1_PIXEL];
+
+		// $f0222c
+		case A2_FLAGS:
+			return m_blitter_regs[A2_PIXEL];
 
 		default:
-			logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
+			if(!machine().side_effects_disabled())
+				logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
 			return 0;
 	}
 	#else
@@ -602,7 +618,7 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint16_t jaguar_state::tom_regs_r(offs_t offset)
 {
-	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
+	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC && !machine().side_effects_disabled())
 		logerror("%s:TOM read register @ F00%03X\n", machine().describe_context(), offset * 2);
 
 	switch (offset)
