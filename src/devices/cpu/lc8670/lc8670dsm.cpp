@@ -109,18 +109,18 @@ void lc8670_disassembler::dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg,
 			pc++;
 			[[fallthrough]];
 		case OP_R8RI:
-			buffer += sprintf(buffer, "%04x", (pc + 1 + opcodes.r8(pos) - (opcodes.r8(pos)&0x80 ? 0x100 : 0)) & 0xffff);
+			buffer += sprintf(buffer, "%04x", ((u32)pc + 1 + opcodes.r8(pos) - (opcodes.r8(pos)&0x80 ? 0x100 : 0)) & 0xffff);
 			pos++;
 			break;
 		case OP_R16:
-			buffer += sprintf(buffer, "%04x", (pc + 2 + ((opcodes.r8(pos+1)<<8) | opcodes.r8(pos))) & 0xffff);
+			buffer += sprintf(buffer, "%04x", ((u32)pc + 2 + ((opcodes.r8(pos+1)<<8) | opcodes.r8(pos))) & 0xffff);
 			pos += 2;
 			break;
 		case OP_RI:
 			buffer += sprintf(buffer, "@%x", op & 0x03);
 			break;
 		case OP_A12:
-			buffer += sprintf(buffer, "%04x", ((pc + 2) & 0xf000) | ((op & 0x10)<<7) | ((op & 0x07)<<8) | opcodes.r8(pos));
+			buffer += sprintf(buffer, "%04x", (((u32)pc + 2) & 0xf000) | ((op & 0x10)<<7) | ((op & 0x07)<<8) | opcodes.r8(pos));
 			pos++;
 			break;
 		case OP_A16:

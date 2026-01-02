@@ -78,7 +78,7 @@ u8 rtpc_iocc_device::dma_b_r(offs_t offset)
 	if (!BIT(m_dmr, 7 - m_adc))
 	{
 		u16 const tcw = m_tcw[(m_adc << 6) | (offset >> 11)];
-		u32 const real = ((tcw & TCW_PFX) << 11) | (offset & 0x7ff);
+		offs_t const real = ((tcw & TCW_PFX) << 11) | (offset & 0x7ff);
 
 		LOGMASKED(LOG_DMA, "dma0 tcw 0x%04x real 0x%08x\n", tcw, real);
 		if (tcw & TCW_IOC)
@@ -131,7 +131,7 @@ u8 rtpc_iocc_device::dma_w_r(offs_t offset)
 	if (!BIT(m_dmr, 7 - m_adc))
 	{
 		u16 const tcw = m_tcw[(m_adc << 6) | (offset >> 10)];
-		u32 const real = ((tcw & TCW_PFX) << 11) | (offset & 0x7ff);
+		offs_t const real = ((tcw & TCW_PFX) << 11) | (offset & 0x7ff);
 
 		LOGMASKED(LOG_DMA, "dma1 tcw 0x%04x real 0x%08x\n", tcw, real);
 		if (tcw & TCW_IOC)
@@ -170,7 +170,7 @@ void rtpc_iocc_device::dma_w_w(offs_t offset, u8 data)
 #pragma warning(disable:4333)
 #endif
 
-template <typename T> bool rtpc_iocc_device::mem_load(u32 address, T &data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::mem_load(offs_t address, T &data, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && !(m_ccr & CCR_MMP))
 	{
@@ -193,7 +193,7 @@ template <typename T> bool rtpc_iocc_device::mem_load(u32 address, T &data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::mem_store(u32 address, T data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::mem_store(offs_t address, T data, rsc_mode const mode)
 {
 	int const spacenum = (address >> 24) & 15 ? AS_PROGRAM : AS_IO;
 
@@ -225,7 +225,7 @@ template <typename T> bool rtpc_iocc_device::mem_store(u32 address, T data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::mem_modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::mem_modify(offs_t address, std::function<T(T)> f, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && !(m_ccr & CCR_MMP))
 	{
@@ -262,7 +262,7 @@ template <typename T> bool rtpc_iocc_device::mem_modify(u32 address, std::functi
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::pio_load(offs_t address, T &data, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && (address == CSR_ADDR || !(m_ccr & CCR_IMP)))
 	{
@@ -323,7 +323,7 @@ template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::pio_store(u32 address, T data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::pio_store(offs_t address, T data, rsc_mode const mode)
 {
 	if ((mode & RSC_U) && (address == CSR_ADDR || !(m_ccr & CCR_IMP)))
 	{
@@ -393,7 +393,7 @@ template <typename T> bool rtpc_iocc_device::pio_store(u32 address, T data, rsc_
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::pio_modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::pio_modify(offs_t address, std::function<T(T)> f, rsc_mode const mode)
 {
 	LOG("modify pio space invalid operation (%s)\n", machine().describe_context());
 	m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_INVOP;

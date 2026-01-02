@@ -3562,7 +3562,7 @@ uint8_t royalcrdf_state::royalcrdf_opcode_r(offs_t offset)
 	if(offset < 0x800)
 		data = bitswap<8>(data ^ 0x22, 2, 6, 7, 4, 3, 1, 5, 0);
 
-	unsigned idx {bitswap<4>(offset, 8, 5, 2, 1)};
+	uint64_t idx {bitswap<4>(offset, 8, 5, 2, 1)};
 
 	return bitswap<8>(data, bs[idx][3], 6, bs[idx][2], 4, 3, bs[idx][1], bs[idx][0], 0) ^ xm[idx];
 }
@@ -3623,7 +3623,7 @@ uint8_t multiwin_state::multiwin_opcode_r(offs_t offset)
 	};
 
 	uint8_t data {m_maincpu->space(AS_PROGRAM).read_byte(offset)};
-	unsigned idx {bitswap<4>(offset, 6,9,5,3)};
+	uint64_t idx {bitswap<4>(offset, 6,9,5,3)};
 
 	return bitswap<8>(data, bs[idx&7][4],6,bs[idx&7][3],bs[idx&7][2],3,bs[idx&7][1],1,bs[idx&7][0]) ^ xm[idx];
 }

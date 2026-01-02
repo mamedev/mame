@@ -128,7 +128,7 @@ class drc_frontend
 {
 public:
 	// construction/destruction
-	drc_frontend(device_t &cpu, u32 window_start, u32 window_end, u32 max_sequence);
+	drc_frontend(device_t &cpu, offs_t window_start, offs_t window_end, u32 max_sequence);
 	virtual ~drc_frontend();
 
 	// describe a block
@@ -148,8 +148,8 @@ private:
 	void release_descriptions();
 
 	// configuration parameters
-	u32                 m_window_start;             // code window start offset = startpc - window_start
-	u32                 m_window_end;               // code window end offset = startpc + window_end
+	offs_t              m_window_start;             // code window start offset = startpc - window_start
+	offs_t              m_window_end;               // code window end offset = startpc + window_end
 	u32                 m_max_sequence;             // maximum instructions to include in a sequence
 
 	// CPU parameters

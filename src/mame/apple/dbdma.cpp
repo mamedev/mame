@@ -162,13 +162,13 @@ void dbdma_device::waitselect_w(u32 data)
 	m_waitselect = data;
 }
 
-u32 dbdma_device::dma_read(u32 offset)
+u32 dbdma_device::dma_read(offs_t offset)
 {
 	step_program();
 	return m_xfer_word;
 }
 
-void dbdma_device::dma_write(u32 offset, u32 data)
+void dbdma_device::dma_write(offs_t offset, u32 data)
 {
 	m_xfer_word = data;
 	step_program();

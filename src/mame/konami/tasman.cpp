@@ -192,12 +192,12 @@ void kongambl_state::eeprom_w(offs_t offset, uint8_t data)
 	{
 		ioport("EEPROMOUT")->write(data&0x7, 0xff);
 		if(data & 0xf8)
-			printf("Unused EEPROM bits %02x %02x\n",offset,data);
+			printf("Unused EEPROM bits %02x %02x\n", (uint8_t)offset, data);
 	}
 	else
-		printf("%02x %02x\n",offset,data);
+		printf("%02x %02x\n", (uint8_t)offset, data);
 
-	if(offset == 0)
+	if (offset == 0)
 		m_irq_mask = data;
 }
 

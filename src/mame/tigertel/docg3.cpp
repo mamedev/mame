@@ -117,7 +117,7 @@ uint16_t diskonchip_g3_device::sec_1_r(offs_t offset)
 	{
 		data = (g3_read_data() << 0) | (g3_read_data() << 8);
 	}
-	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x0800 + (offset << 1), data);
+	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x0800 + ((uint32_t)offset << 1), data);
 	return data;
 }
 
@@ -146,7 +146,7 @@ void diskonchip_g3_device::g3_write_data(uint8_t data)
 
 void diskonchip_g3_device::sec_1_w(offs_t offset, uint16_t data)
 {
-	verboselog(*this, 9, "(DOC) %08X <- %04X\n", 0x0800 + (offset << 1), data);
+	verboselog(*this, 9, "(DOC) %08X <- %04X\n", 0x0800 + ((uint32_t)offset << 1), data);
 	if (m_sec_2[0x1B] & 0x40)
 	{
 		g3_write_data(data);
@@ -737,13 +737,13 @@ void diskonchip_g3_device::sec_2_w(offs_t offset, uint16_t data, uint16_t mem_ma
 uint16_t diskonchip_g3_device::sec_3_r(offs_t offset)
 {
 	uint16_t data = 0;
-	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x1800 + (offset << 1), data);
+	verboselog(*this, 9, "(DOC) %08X -> %04X\n", 0x1800 + ((uint32_t)offset << 1), data);
 	return data;
 }
 
 void diskonchip_g3_device::sec_3_w(offs_t offset, uint16_t data)
 {
-	verboselog(*this, 9, "(DOC) %08X <- %02X\n", 0x1800 + (offset << 1), data);
+	verboselog(*this, 9, "(DOC) %08X <- %02X\n", 0x1800 + ((uint32_t)offset << 1), data);
 }
 
 //-------------------------------------------------

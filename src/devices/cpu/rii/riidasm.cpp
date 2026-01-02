@@ -14,7 +14,7 @@
 
 using osd::u32;
 using util::BIT;
-using offs_t = u32;
+using offs_t = u64;
 
 // TODO: add register sets for other models
 const char *const epg3231_disassembler::s_regs[0x60] =

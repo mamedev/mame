@@ -66,7 +66,7 @@ public:
 
 	uint16_t read(offs_t offset);
 	uint16_t gram_read(offs_t offset);
-	uint16_t grom_read(offs_t offset) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
+	uint16_t grom_read(offs_t offset) { if (offset > 0x800) printf("help! %x\n", (uint16_t)offset); return (0xff00 | m_grom[offset]); }
 	void write(offs_t offset, uint16_t data);
 	void gram_write(offs_t offset, uint16_t data);
 

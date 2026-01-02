@@ -2860,7 +2860,7 @@ void drcbe_x86::emit_fstp_p(Assembler &a, int size, be_parameter const &param)
 
 void drcbe_x86::debug_log_hashjmp(int mode, offs_t pc)
 {
-	std::printf("mode=%d PC=%08X\n", mode, pc);
+	std::printf("mode=%d PC=%s\n", mode, util::string_format("%x", pc).c_str());
 }
 
 
