@@ -9,6 +9,7 @@
 #include "cpu/drcumlsh.h"
 
 #include "debugger.h"
+#include "emuopts.h"
 
 #include <algorithm>
 #include <sstream>
@@ -1718,7 +1719,8 @@ void swp30_device::device_start()
 	m_wave->cache(m_wave_cache);
 	m_reverb->cache(m_reverb_cache);
 
-	m_meg = static_cast<meg_state *>(m_drccache.alloc_near(sizeof(meg_state)));
+	m_drccache.allocate_cache(mconfig().options().drc_rwx());
+	m_meg = m_drccache.alloc_near<meg_state>();
 	m_meg->m_swp = this;
 	m_meg->reset();
 

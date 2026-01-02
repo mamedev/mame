@@ -175,7 +175,8 @@ private:
 	class core_state;
 	class frontend;
 	class recompiler;
-	using core_state_ptr = std::unique_ptr<core_state, void (*)(core_state *)>;
+	struct core_destructer { void operator()(core_state *obj) const noexcept; };
+	using core_state_ptr = std::unique_ptr<core_state, core_destructer>;
 	using recompiler_ptr = std::unique_ptr<recompiler>;
 
 	// internal address maps

@@ -1549,7 +1549,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_nocode(nullptr)
 	, m_endofblock(nullptr)
 	, m_baseptr(cache.near() + 0x100)
-	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
+	, m_near(*cache.alloc_near<near_state>())
 {
 	// create the log
 	if (device.machine().options().drc_log_native())
