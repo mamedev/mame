@@ -33,49 +33,59 @@ license:CC0-1.0
 	
 	80-136800(US) - InnoTab 2
 	80-146800(US) - InnoTab 2 Baby
-	80-156800(US) - InnoTab 2S
 	80-147900(US) - InnoTab 3 Baby
+	80-156800(US) - InnoTab 2S
 	80-157800(US) - InnoTab 3
 	80-158800(US) - InnoTab 3S
-	80-230000(US) - Toy Story 3 (gray cart) (Requires InnoTab 1/2/3)
-	80-230000-101(US) - Toy Story 3 (blue cart) (Requires InnoTab 1/2/3)
-	80-230003(UK) - Toy Story 3 (gray cart) (Requires InnoTab 1/2/3)
-	80-230003-103(UK) - Toy Story 3 (blue cart) (Requires InnoTab 1/2/3)
-	80-230100(US) - Cars 2 (InnoTab Max Compatible) (grey cart)
-	80-230103-103(UK) - Cars 2 (InnoTab Max Compatible) (blue cart)
+	80-230000(US) - Toy Story (2011) (InnoTab Max Compatible?) (https://www.innotabsoftware.com/)
+	80-230000-101(US) - Toy Story (2012) (InnoTab Max Compatible?) (https://www.innotabsoftware.com/)
+	80-230003(UK) - Toy Story (2011) (InnoTab Max Compatible?) (https://www.innotabsoftware.com/)
+	80-230003-103(UK) - Toy Story (2012) (InnoTab Max Compatible?) (https://www.innotabsoftware.com/)
+	80-230100(US) - Cars 2 (InnoTab Max Compatible) (2011)
+	80-230103(UK) - Cars 2 (InnoTab Max Compatible) (2011)
+	80-230103-103(UK) - Cars 2 (InnoTab Max Compatible) (2012)
 	80-230104(GE) - Cars 2 (InnoTab Max Compatible)
 	80-230105(FR) - Cars 2 (InnoTab Max Compatible)
 	80-230122(SP) - Cars 2 (InnoTab Max Compatible)
 	80-230123(NL) - Cars 2 (InnoTab Max Compatible)
-	80-230200(US) - Disney Princesses (gray cart)
-	80-230200-101(US) - Disney Princesses (blue cart)
-	80-230203-103(UK) - Disney Princesses (blue cart)
-	80-230204(GE) - Princess (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
-	80-230205(FR) - Princesses (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
-	80-230222(SP) - Disney Princesas (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
+	80-230200(US) - Disney Princess (2011) (InnoTab Max Compatible)
+	80-230200-101(US) - Disney Princess (2012) (InnoTab Max Compatible)
+	80-230203(UK) - Disney Princess (2011) (InnoTab Max Compatible)
+	80-230203-103(UK) - Disney Princess (2012) (InnoTab Max Compatible)
+	80-230204(GE) - Disney Princess (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
+	80-230205(FR) - Disney Princess (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
+	80-230222(SP) - Disney Princess (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
 	80-230223(NL) - Disney Princess (InnoTab Max Compatible) (Contains the Belle and Cinderella stories)
-	80-230300(US) - Fairies (contains the story Tinker Bell And The Great Fairy Rescue, but with MobiGo TinkerBell games) (gray cart)
-	80-230300-101(US) - Fairies (blue cart)
-	80-230303(UK) - Fairies (contains the story Tinker Bell And The Great Fairy Rescue, but with MobiGo TinkerBell games)
-	80-230300-103(UK) - Fairies (blue cart)
-	80-230304(GE) - Fairies (contains the story Tinker Bell And The Great Fairy Rescue, but with MobiGo TinkerBell games)
-	80-230305(FR) - Les fees Disney (contains the story Tinker Bell And The Great Fairy Rescue, but with MobiGo TinkerBell games)
+	80-230300(US) - Disney Fairies (2011)
+	80-230300-101(US) - Disney Fairies (2012)
+	80-230300-103(UK) - Disney Fairies (2012)
+	80-230303(UK) - Disney Fairies (2011)
+	80-230304(GE) - Disney Fairies (2013)
+	80-230305(FR) - Les fees Disney (2013)
 	80-230400(US) - Mickey Mouse Clubhouse (InnoTab Max Compatible)
 	80-230403(UK) - Mickey's Clubhouse (InnoTab Max Compatible) (DUMPED) (contains the story Mickey Go Seek)
 	80-230404(GE) - Mickey Maus Wunderhaus (InnoTab Max Compatible) (contains the story Mickey Go Seek)
-	80-230405(FR) - La Maison de Mickey (InnoTab Max Compatible) (contains the story Mickey Go Seek)
-	80-230423(NL) - Mickey Mouse Clubhouse (InnoTab Max Compatible) (label in Dutch) (contains the story Mickey Go Seek)
+	80-230405(FR) - La Maison de Mickey (InnoTab Max Compatible) (contains the story Mickey Go Seek) (2012)
+	80-230405-105(FR) - La Maison de Mickey (InnoTab Max Compatible) (contains the story Mickey Go Seek) (2013)
+	80-230405-205(FR) - La Maison de Mickey (InnoTab Max Compatible) (contains the story Mickey Go Seek) (2014)
+	80-230423(NL) - Mickey Mouse Clubhouse (InnoTab Max Compatible) (label in Dutch) (contains the story Mickey Go Seek) (2012)
+	80-230423-123(NL) - Mickey Mouse Clubhouse (InnoTab Max Compatible) (label in Dutch) (2013)
+	80-230423-123(NL) - Mickey Mouse Clubhouse (InnoTab Max Compatible) (label in Dutch) (contains the story Mickey Go Seek) (2016)
 	80-230500(US) - The Penguins of Madagascar (DUMPED)
-	80-230600(US) - Dora the Explorer: Let's Help! (InnoTab Max Compatible) (gray cart)
-	80-230603-103(UK) - Dora the Explorer: Let's Help! (InnoTab Max Compatible) (blue cart)
-	80-230604(GE) - Dora: Lass Dem Hilfen! (InnoTab Max Compatible)
-	80-230605(FR) - Dora l'Exploratrice a la rescousse (InnoTab Max Compatible)
-	80-230622(SP) - Dora la Exploradora (InnoTab Max Compatible)
-	80-230623(NL) - Dora the Explorer: Laten we Helpen! (InnoTab Max Compatible)
-	80-230700(US) - SpongeBob SquarePants: A Busy Day in Bikini Bottom
-	80-230704(GE) - SpongeBob Schwammkopf
-	80-230803(UK) - Scooby Doo!: Mystery Madness
-	80-230805(FR) - Scooby Doo (contains the Mummy story)
+	80-230503(UK) - The Penguins of Madagascar
+	80-230600(US) - Dora the Explorer: Let's Help! (InnoTab Max Compatible) (2011)
+	80-230603(UK) - Dora the Explorer: Let's Help! (InnoTab Max Compatible) (2011)
+	80-230603-103(UK) - Dora the Explorer: Let's Help! (InnoTab Max Compatible) (2012)
+	80-230604(GE) - Dora: Lass Dem Hilfen! (InnoTab Max Compatible) (2012)
+	80-230605(FR) - Dora l'Exploratrice a la rescousse (InnoTab Max Compatible) (2012)
+	80-230622(SP) - Dora la Exploradora: Vamos a ayudar (InnoTab Max Compatible) (2013)
+	80-230623(NL) - Dora the Explorer: Laten we Helpen! (InnoTab Max Compatible) (2013)
+	80-230700(US) - SpongeBob SquarePants: A Busy Day in Bikini Bottom (2011)
+	80-230703(UK) - SpongeBob SquarePants: A Busy Day in Bikini Bottom (2011)
+	80-230704(GE) - SpongeBob Schwammkopf: Ein Arbeitsdag in Bikini Bottom (2012)
+	80-230800(US) - Scooby-Doo!: Mystery Madness
+	80-230803(UK) - Scooby-Doo!: Mystery Madness
+	80-230805(FR) - Scooby-Doo (contains the Mummy story)
 	80-230900(US) - Madagascar 3: Europe's Most Wanted
 	80-231000(US) - Dinosaur Train World Tour
 	80-231004(GE) - Dino-Zug: Weltreise (contains T.Rex Teeth story)
@@ -92,6 +102,7 @@ license:CC0-1.0
 	80-231400(US) - Brave
 	80-231403(UK) - Brave
 	80-231404(GE) - Merida
+	80-231405(FR) - Rebelle
 	80-231500(US) - Thomas Exploring Sodor
 	80-231503(UK) - Thomas Exploring Sodor
 	80-231600(US) - Jake and the Never Land Pirates (InnoTab Max Compatible)
@@ -120,7 +131,7 @@ license:CC0-1.0
 	80-232105(FR) - Docteur la peluche (InnoTab Max Compatible)
 	80-232200(US) - Bubble Guppies: Pet Care School Day (InnoTab Max Compatible)
 	80-232300(US) - Turbo (InnoTab Max Compatible)
-	80-232400(US) - <unknown>
+	80-232400(US) - &lt;unknown&gt;
 	80-232500(US) - Go! Go! Smart Wheels - Busy Day in Alphabet Town (InnoTab Max Compatible)
 	80-232504(GE) - Tut Tut Baby Flitzer (InnoTab Max Compatible)
 	80-232505(FR) - Tut Tut Bolides - La Ville Alphabet (InnoTab Max Compatible)
@@ -139,8 +150,8 @@ license:CC0-1.0
 	80-233105(FR) - Winnie l'ourson
 	80-233122(SP) - Winnie Puuh (ever released?)
 	80-233123(NL) - Winnie de Poeh
-	80-233300(US) - My first Nursery Rhymes
-	80-233304(GE) - Nino & Nina Hoerne Musik
+	80-233300(US) - My First Nursery Rhymes
+	80-233304(GE) - Nino & Nina Hörne Musik
 	80-233305(FR) - Mes Comptines Animéés
 	80-233323(NL) - Vrolijke Kinderliedjes
 	80-233403(UK) - Peppa Pig (InnoTab Max Compatible)
@@ -149,13 +160,18 @@ license:CC0-1.0
 	80-233500(US) - Pixar Play (InnoTab Max Compatible)
 	80-233505(FR) - Pixar Aventures (InnoTab Max Compatible)
 	80-233700(US) - Classic Stories
-	80-233704(GE) - Classic Stories
+	80-233704(GE) - Märchenstundenbande
 	80-233800(US) - Doc McStuffins: Create & Explore with Doc! (InnoTab Max Compatible)
 	80-233900(US) - I-Spy Adventure (InnoTab Max Compatible)
 	80-234000(US) - Octonauts (InnoTab Max Compatible)
 	80-234004(GE) - Octonauts (InnoTab Max Compatible)
 	80-234005(FR) - Octonauts (InnoTab Max Compatible)
 
+	Those dont belong because of InnoTV/InnoTab Max games
+	80-274403(UK) - Miles from Tommorrow
+	80-275003(UK) - Dora and Friends - The Search for Mono
+	
+	
 	Not all games are compatible with InnoTab Max [unlike V.Smile Motion, can play any V.Smile game], but there are games that are only suitable for InnoTab older models.
 
 	English game cartridges are not compatible with the Spanish version of Storio 2. German and French Storio 2 cartridges are compatible.
