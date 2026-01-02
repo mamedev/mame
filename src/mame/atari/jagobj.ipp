@@ -724,9 +724,8 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		}
 
 		/* decrement the height and add to the source data offset */
-		// TODO: RMW only the affected parts, this can possibly cause out of bounds
-		objdata[0] = upper + (dwidth << 11);
-		objdata[1] = lower - (1 << 14);
+		objdata[0] = (upper & 0x7ff) | ((upper + (dwidth << 11)) & ~0x7ff);
+		objdata[1] = (lower & ~0xffc000) | ((lower - (1 << 14)) & 0xffc000);
 	}
 
 	return (uint32_t *)memory_base(link << 3);
@@ -940,9 +939,8 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
 			yinc = height, remainder = 0;
 
 		/* decrement the height and add to the source data offset */
-		// TODO: RMW only the affected parts, this can possibly cause out of bounds
-		objdata[0] = upper + yinc * (dwidth << 11);
-		objdata[1] = lower - yinc * (1 << 14);
+		objdata[0] = (upper & 0x7ff) | ((upper + yinc * (dwidth << 11)) & ~0x7ff);
+		objdata[1] = (lower & ~0xffc000) | ((lower - yinc * (1 << 14)) & 0xffc000);
 		objdata[5] = (lower3 & ~0xff0000) | ((remainder & 0xff) << 16);
 	}
 

@@ -579,7 +579,8 @@ uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
 			return m_blitter_regs[A2_PIXEL];
 
 		default:
-			logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
+			if(!machine().side_effects_disabled())
+				logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
 			return 0;
 	}
 	#else
@@ -617,7 +618,7 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint16_t jaguar_state::tom_regs_r(offs_t offset)
 {
-	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
+	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC && !machine().side_effects_disabled())
 		logerror("%s:TOM read register @ F00%03X\n", machine().describe_context(), offset * 2);
 
 	switch (offset)
