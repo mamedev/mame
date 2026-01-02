@@ -2599,6 +2599,9 @@ void specnext_state::nr_c0_im2_vector_w(bool mode_im2, u8 vector)
 	m_im2_line->vector_w(vector_base | (INT_PRIORITY_LINE << 1));
 	m_ctc->vector_w(vector_base);
 	m_im2_ula->vector_w(vector_base | (INT_PRIORITY_ULA << 1));
+
+	m_im2_int_status &= 1 << INT_PRIORITY_NMI;
+	update_dma_delay();
 }
 
 static const z80_daisy_config z80_daisy_chain[] =
