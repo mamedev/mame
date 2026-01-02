@@ -560,8 +560,23 @@ uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
 #if USE_LEGACY_BLITTER
 	switch (offset)
 	{
-		case B_CMD: /* B_CMD */
-			return m_blitter_status & 3;
+		// $f02238
+		case B_CMD:
+		{
+			// handle normal idle + inner/outer idle
+			const u32 is_idle = (m_blitter_status & 1) * 0x805;
+			return is_idle | (m_blitter_status & 2);
+		}
+
+		// avsp reads A1/A2_PIXEL data there (doors after the first section)
+		// this is documented in JTRM, cfr. section 10 of "Tom bugs"
+		// $f02204
+		case A1_FLAGS:
+			return m_blitter_regs[A1_PIXEL];
+
+		// $f0222c
+		case A2_FLAGS:
+			return m_blitter_regs[A2_PIXEL];
 
 		default:
 			logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
