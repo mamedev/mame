@@ -36,7 +36,6 @@
 	- Genius Malice (French version of Tote and Go Laptop Plus)
 	- Genius Petits Einstein (French Version of Little Einsteins laptop)
 	- Genius Récré (French Version of Letter Fun Laptop)
-	- L'ordi Copain Malin (French version)
 	- Ordinateur cendrillon Baguette magique (French version of Cinderella Carriage Laptop)
 	- P'tit Genius (French version of the first tote and go laptop)
 	- WallE Ordi Copain Interactif (French Version of WallE Laptop)
