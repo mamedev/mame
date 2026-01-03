@@ -782,9 +782,9 @@ ROM_START(trumpfas)
     ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
     ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr2.u6", 0x00001, 0x20000, CRC(d39bbd88) SHA1(64f47fd0076845ed3f9f3e84aca3504c110ad8ad))
 
-	ROM_REGION16_BE( 0x40000, "gfx1", 0 ) // no dump available, using skattv roms
-	ROM_LOAD16_BYTE( "f1_i.bin", 0x00000, 0x20000, BAD_DUMP CRC(4869a889) SHA1(ad9f3fcdfd3630f9ad5b93a9d2738de9fc3514d3) )
-	ROM_LOAD16_BYTE( "f1_ii.bin", 0x00001, 0x20000, BAD_DUMP CRC(17681537) SHA1(133685854b2080aaa3d0cced0287bc454d1f3bfc) )
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "trumpf_as_video_1.u2", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "trumpf_as_video_2.u6", 0x00001, 0x20000, NO_DUMP )
 ROM_END
 
 } // Anonymous namespace
