@@ -1378,6 +1378,10 @@ void lua_engine::initialize()
 		[this](core_options::entry &e) -> sol::object {
 			if (e.type() == core_options::option_type::INVALID)
 				return sol::lua_nil;
+			// Save current locale
+			std::string oldLocale = setlocale(LC_NUMERIC, nullptr);
+			// Force "C" locale for parsing
+			setlocale(LC_NUMERIC, "C");
 			switch(e.type())
 			{
 				case core_options::option_type::BOOLEAN:
@@ -1389,6 +1393,8 @@ void lua_engine::initialize()
 				default:
 					return sol::make_object(sol(), e.value());
 			}
+			// Restore old locale
+			setlocale(LC_NUMERIC, oldLocale.c_str());
 		}));
 	core_options_entry_type.set("description", &core_options::entry::description);
 	core_options_entry_type.set("default_value", &core_options::entry::default_value);
