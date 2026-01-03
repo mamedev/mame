@@ -90,18 +90,20 @@ Connectors:
 
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
-//#define VERBOSE 1
-#include "logmacro.h"
-
 #include "stellafr.lh"
+
+//#define VERBOSE 1
+//#include "logmacro.h"
 
 namespace {
 
@@ -271,7 +273,7 @@ uint8_t stellafr_state::mux_r()
 
 void stellafr_state::lamps_w(uint8_t row, uint16_t data)
 {
-	LOG("Row %d\n",row);
+	//LOG("Row %d\n",row);
 	for (int i = 0; i < 8; i++)
 	{
 		uint8_t lamp_index = (row * 10) + i;
