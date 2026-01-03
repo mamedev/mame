@@ -456,7 +456,7 @@ GAME(2003, colossos,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen
 GAME(2003, matrixx,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Matrixx",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2004, avanti,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Avanti",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2004, macaor,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Macao",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2004, mtclssic,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "mtclssic",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2004, mtclssic,  0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Multiclassic",     	MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2005, alphar,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Rotamint Alpha",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2005, spasch,    0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Super Pasch",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2006, bigkick,   0,     st25, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Big Kick",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
