@@ -263,13 +263,16 @@ uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 
 void jaguar_state::update_jpit_timer(unsigned which)
 {
-	const u16 prescaler = m_dsp_regs[which ? JPIT2 : JPIT1];
-	const u16 divider = m_dsp_regs[which ? DSP1 : DSP0];
+	// NOTE: in u64 because `from_ticks` expects u64
+	// - jaguarcd will otherwise hang with a 0xffff 0xffff setup right off the bat (PC=802008)
+	const u64 prescaler = m_dsp_regs[which ? JPIT2 : JPIT1];
+	const u64 divider = m_dsp_regs[which ? DSP1 : DSP0];
 
 	// pbfant sets a prescaler with no divider, expecting working sound with that alone
 	if (prescaler || divider)
 	{
-		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_dsp->clock());
+		const u64 jpit_value = (1 + prescaler) * (1 + divider);
+		attotime sample_period = attotime::from_ticks(jpit_value, m_dsp->clock());
 		m_jpit_timer[which]->adjust(sample_period);
 	}
 	else
