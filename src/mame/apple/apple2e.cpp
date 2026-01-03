@@ -5639,8 +5639,8 @@ ROM_END
 // CM630 = 6502 CPU
 // CM631 = MMU clone
 // CM632 = IOU clone
-// CM633 = video encoder (22 pins, custom?)
-// CM650 = keyboard controller (28 pins, possible MCU; accessed through II/II+-style keyboard connector with some nonstandard signals)
+// CM633 = video encoder (22-pin custom logic array)
+// CM650 = keyboard scanner (28-pin MCU, supposedly a MC6805 clone; accessed through II/II+-style keyboard connector with some nonstandard signals)
 ROM_START(prav8c)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "charrom.d20", 0x0000, 0x2000,CRC(935212cc) SHA1(934603a441c631bd841ea0d2ff39525474461e47))
