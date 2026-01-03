@@ -497,8 +497,8 @@ ROM_END
 
 ROM_START( jumbo400 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "jumbo_400_f3_i.u2", 0x00000, 0x20000, CRC(c2e57b9c) SHA1(7f9b39f2c07dcbe0fbef6c23c57a55c77041d2ee) )
-	ROM_LOAD16_BYTE( "jumbo_400_f3_ii.u6", 0x00001, 0x20000, CRC(6a9849fb) SHA1(c8464a8c7c4342e218ca6e9be1c6523f231c60c2) )
+	ROM_LOAD16_BYTE( "jumbo_400_f3_i.u2", 0x00000, 0x10000, CRC(c2e57b9c) SHA1(7f9b39f2c07dcbe0fbef6c23c57a55c77041d2ee) )
+	ROM_LOAD16_BYTE( "jumbo_400_f3_ii.u6", 0x00001, 0x10000, CRC(6a9849fb) SHA1(c8464a8c7c4342e218ca6e9be1c6523f231c60c2) )
 ROM_END
 
 ROM_START( jumboa )
@@ -513,19 +513,19 @@ ROM_START( kleoptra )
 	ROM_LOAD16_BYTE( "kleopatra_w4_ii.u6", 0x00001, 0x80000, CRC(fdf02576) SHA1(7750ff6f3611b5c6903cdd3c138e34248ba378be) )
 ROM_END
 
-ROM_START( komet )
+ROM_START( kometf1 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "komet_f1_pr1.u2", 0x00000, 0x80000, CRC(c0328d5d) SHA1(ebb934f72e2bf275717d47b72aeffe4b38136622) )
-	ROM_LOAD16_BYTE( "komet_f1_pr2.u6", 0x00001, 0x80000, CRC(86715c37) SHA1(cb986eb50d215294375450c651043e617f66fe21) )
+	ROM_LOAD16_BYTE( "komet_f1_pr1.u2", 0x00000, 0x20000, CRC(c0328d5d) SHA1(ebb934f72e2bf275717d47b72aeffe4b38136622) )
+	ROM_LOAD16_BYTE( "komet_f1_pr2.u6", 0x00001, 0x20000, CRC(86715c37) SHA1(cb986eb50d215294375450c651043e617f66fe21) )
 ROM_END
 
 ROM_START( mdouble )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "double_f4_1.u2", 0x00000, 0x20000, CRC(0b84c92f) SHA1(818f21d43571a214862e84efd3ee083515ba5860) )
-	ROM_LOAD16_BYTE( "double_f4_2.u6", 0x00001, 0x20000, CRC(b1f6c974) SHA1(db8622f2109ebb2ca0797e8228519cf0f80a41be) )
+	ROM_LOAD16_BYTE( "double_f4_1.u2", 0x00000, 0x10000, CRC(0b84c92f) SHA1(818f21d43571a214862e84efd3ee083515ba5860) )
+	ROM_LOAD16_BYTE( "double_f4_2.u6", 0x00001, 0x10000, CRC(b1f6c974) SHA1(db8622f2109ebb2ca0797e8228519cf0f80a41be) )
 ROM_END
 
-ROM_START( money )
+ROM_START( moneyf1 )
     ROM_REGION( 0x40000, "maincpu", 0 )
     ROM_LOAD16_BYTE( "m27c1001_money_f1_ic1", 0x00000, 0x20000, CRC(5ca79bfa) SHA1(c52b7d2ecd649ccde3457bc922ad05e734fba862) )
     ROM_LOAD16_BYTE( "m27c1001_money_f1_ic2", 0x00001, 0x20000, CRC(ad95ffc4) SHA1(1062be41a3822efd1d4c848c8ec50488dde42a78) )
@@ -546,16 +546,16 @@ ROM_START( multprim )
     ROM_LOAD16_BYTE( "m27c1001_multi_prima_f1_ii.u6", 0x00001, 0x20000, CRC(2a4e371c) SHA1(02494cab0ff7e4c169383a335169edf76501ed1a) )
 ROM_END
 
-ROM_START(multstar)
+ROM_START( multstar )
     ROM_REGION(0x40000, "maincpu", 0)
-    ROM_LOAD16_BYTE( "multi_star_f2_pr_1.u2", 0x00000, 0x20000, CRC(8f63fd16) SHA1(d9b8ef2e1f7616bc0569768af26794fa6166cc0d))
-    ROM_LOAD16_BYTE( "multi_star_f2_pr_2.u6", 0x00001, 0x20000, CRC(26952bd7) SHA1(20de0d890a91e728776278fb9c8d6de3b65f8703))
+    ROM_LOAD16_BYTE( "multi_star_f2_pr_1.u2", 0x00000, 0x20000, CRC(8f63fd16) SHA1(d9b8ef2e1f7616bc0569768af26794fa6166cc0d) )
+    ROM_LOAD16_BYTE( "multi_star_f2_pr_2.u6", 0x00001, 0x20000, CRC(26952bd7) SHA1(20de0d890a91e728776278fb9c8d6de3b65f8703) )
 ROM_END
 
-ROM_START(nunran)
+ROM_START( nunran )
     ROM_REGION(0x40000, "maincpu", 0)
-    ROM_LOAD16_BYTE("nun_ran_f1_nr1.u2", 0x00000, 0x20000, CRC(d8eed6de) SHA1(937cf33694a3d3baf1cc0577cef6974e1d99a6c4))
-    ROM_LOAD16_BYTE("nun_ran_f1_nr2.u6", 0x00001, 0x20000, CRC(2a7b9cf2) SHA1(bf30d41dd75b4d316f2f24d11886126484b10415))
+    ROM_LOAD16_BYTE( "nun_ran_f1_nr1.u2", 0x00000, 0x20000, CRC(d8eed6de) SHA1(937cf33694a3d3baf1cc0577cef6974e1d99a6c4) )
+    ROM_LOAD16_BYTE( "nun_ran_f1_nr2.u6", 0x00001, 0x20000, CRC(2a7b9cf2) SHA1(bf30d41dd75b4d316f2f24d11886126484b10415) )
 ROM_END
 
 ROM_START( suprdisc )
@@ -618,8 +618,8 @@ GAMEL(1997, dpplson,  0,        stellafr, stellafr, stellafr_state, empty_init, 
 GAMEL(1997, gjubil,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Golden Jubilar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, jkrpoker, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Joker Poker (Merkur)",  MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, jumboa,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Jumbo Action",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, komet,    0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Komet",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1997, money,    0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Money",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, kometf1,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Komet",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, moneyf1,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Money",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, multprim, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Multi Prima",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, nunran,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, allfred,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
