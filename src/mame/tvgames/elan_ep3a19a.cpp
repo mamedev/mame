@@ -24,13 +24,10 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	void elan_ep3a19a(machine_config &config);
-	void elan_ep3a19a_1mb(machine_config &config);
+	void elan_ep3a19a(machine_config &config) ATTR_COLD;
+	void elan_ep3a19a_1mb(machine_config &config) ATTR_COLD;
 
-	void init_tvbg();
-
-	required_device<elan_ep3a19a_soc_device> m_maincpu;
-	required_device<screen_device> m_screen;
+	void init_tvbg() ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -46,12 +43,9 @@ private:
 	void elan_ep3a19a_extmap_2mb(address_map &map) ATTR_COLD;
 	void elan_ep3a19a_extmap_1mb(address_map &map) ATTR_COLD;
 
-	virtual void video_start() override ATTR_COLD;
+	required_device<elan_ep3a19a_soc_device> m_maincpu;
+	required_device<screen_device> m_screen;
 };
-
-void elan_ep3a19a_state::video_start()
-{
-}
 
 uint32_t elan_ep3a19a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

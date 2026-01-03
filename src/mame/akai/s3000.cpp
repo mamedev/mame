@@ -119,6 +119,9 @@
 #include "formats/pc_dsk.h"
 
 #include "s2000.lh"
+#include "s3000.lh"
+#include "s3000xl.lh"
+#include "cd3000i.lh"
 #include "cd3000xl.lh"
 
 namespace {
@@ -152,6 +155,7 @@ public:
 		, m_id_magic(0)
 	{ }
 
+	void base(machine_config & config);
 	void s2000(machine_config &config);
 	void s3000(machine_config &config);
 	void s3000xl(machine_config &config);
@@ -187,6 +191,7 @@ private:
 	void s3000xl_io_map(address_map &map) ATTR_COLD;
 	void cd3000_io_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_rom_map(address_map &map) ATTR_COLD;
 
 	void floppy_led_cb(floppy_image_device *, int state);
 
@@ -320,6 +325,10 @@ void s3000_state::s3000xl_io_map(address_map &map)
 void s3000_state::dsp_map(address_map &map)
 {
 	map(0x0000'0000, 0x01ff'ffff).ram();
+}
+
+void s3000_state::dsp_rom_map(address_map &map)
+{
 }
 
 void s3000_state::floppy_led_cb(floppy_image_device *, int state)
@@ -530,7 +539,7 @@ static void add_formats(format_registration &fr)
 	fr.add(FLOPPY_HFE_FORMAT);
 }
 
-void s3000_state::s3000(machine_config &config)
+void s3000_state::base(machine_config &config)
 {
 	V53A(config, m_maincpu, 32_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s3000_map);
@@ -638,6 +647,7 @@ void s3000_state::s3000(machine_config &config)
 
 	L7A1045(config, m_dsp, 33.8688_MHz_XTAL);
 	m_dsp->set_addrmap(AS_DATA, &s3000_state::dsp_map);
+	m_dsp->set_addrmap(AS_IO, &s3000_state::dsp_rom_map);
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
 	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
 	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
@@ -645,9 +655,15 @@ void s3000_state::s3000(machine_config &config)
 	TIMER(config, "dialtimer").configure_periodic(FUNC(s3000_state::dial_timer_tick), attotime::from_hz(60.0));
 }
 
+void s3000_state::s3000(machine_config &config)
+{
+	base(config);
+	config.set_default_layout(layout_s3000);
+}
+
 void s3000_state::s2000(machine_config &config)
 {
-	s3000(config);
+	base(config);
 	m_maincpu->set_clock(31.9488_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s2000_map);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::s2000_io_map);
@@ -677,13 +693,15 @@ void s3000_state::s2000(machine_config &config)
 
 void s3000_state::cd3000(machine_config &config)
 {
-	s3000(config);
+	base(config);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::cd3000_io_map);
+
+	config.set_default_layout(layout_cd3000i);
 }
 
 void s3000_state::s3000xl(machine_config &config)
 {
-	s3000(config);
+	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s3000_state::s3000xl_map);
 	m_maincpu->set_addrmap(AS_IO, &s3000_state::s3000xl_io_map);
 	m_maincpu->v53_tout_handler<1>().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
@@ -694,6 +712,8 @@ void s3000_state::s3000xl(machine_config &config)
 	m_klcs->in_pa_callback().set(FUNC(s3000_state::klcs_porta_r));
 
 	I8255(config, m_wadcs);
+
+	config.set_default_layout(layout_s3000xl);
 }
 
 void s3000_state::cd3000xl(machine_config &config)
@@ -790,7 +810,7 @@ static INPUT_PORTS_START(s3000xl)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Save / G") PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7 / O") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / X") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / >") PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / >") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -835,7 +855,7 @@ static INPUT_PORTS_START(s3000xl)
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Single / A") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 / I") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3 / Y") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("- / <") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+ / <") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left Arrow")
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 

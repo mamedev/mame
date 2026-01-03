@@ -7,7 +7,7 @@
     driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
     TODO:
-	- Move flash memory implementation into machine/intelfsh.cpp
+    - Move flash memory implementation into machine/intelfsh.cpp
     - HY04 protection (controls tile RNG, 8bpp colors, a few program flow bits)
     - 8bpp colors are washed, data from flash ROMs is XORed with contents
       of NVRAM area 0x1400070b-80f in menghong, might be shared with

@@ -2398,7 +2398,7 @@ ROM_START( gauntleg14 )
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // GUTS 1.4 10/28/1998 Main 11/10/1998
-	DISK_IMAGE( "gauntleg14", 0, SHA1(920a1048fb0503026ab0da2c1f82f6c11a51e0e7) ) 
+	DISK_IMAGE( "gauntleg14", 0, SHA1(920a1048fb0503026ab0da2c1f82f6c11a51e0e7) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // Vegas SIO boot ROM
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )

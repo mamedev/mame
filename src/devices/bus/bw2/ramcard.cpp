@@ -95,7 +95,7 @@ void bw2_ramcard_device::ram_select()
 		m_rom_tap.remove();
 	}
 
-	if (m_en && m_slot->ram5())	{
+	if (m_en && m_slot->ram5()) {
 		m_ram_tap = m_slot->memspace()->install_readwrite_tap(0x0000, 0x7fff, "ram",
 			[this] (offs_t offset, u8 &data, u8) { data &= m_ram[m_bank << 15 | offset]; },
 			[this] (offs_t offset, u8 &data, u8) { m_ram[m_bank << 15 | offset] = data; }, &m_ram_tap);

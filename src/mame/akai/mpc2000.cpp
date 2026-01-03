@@ -47,6 +47,7 @@
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
+#include "machine/intelfsh.h"
 #include "machine/mb87030.h"
 #include "machine/mb89371.h"
 #include "machine/pit8253.h"
@@ -61,6 +62,8 @@
 
 #include "mpc2000xl.lh"
 
+#define ENABLE_FLASH (0)
+
 static constexpr uint8_t BIT4 = (1 << 4);
 static constexpr uint8_t BIT5 = (1 << 5);
 
@@ -72,6 +75,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_dsp(*this, "dsp")
+#if ENABLE_FLASH
+		, m_flash(*this, "flash%u", 0U)
+#endif
 		, m_screen(*this, "screen")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
@@ -109,6 +115,9 @@ private:
 	required_device<v53a_device> m_maincpu;
 	required_device<upd7810_device> m_subcpu;
 	required_device<l7a1045_sound_device> m_dsp;
+#if ENABLE_FLASH
+	required_device_array<intel_28f016sa_16bit_device, 8> m_flash;
+#endif
 	required_device<screen_device> m_screen;
 	required_device<upd72069_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
@@ -127,6 +136,7 @@ private:
 	void mpc2000_io_map(address_map &map) ATTR_COLD;
 	void mpc2000_sub_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_rom_map(address_map &map) ATTR_COLD;
 
 	uint8_t dma_memr_cb(offs_t offset);
 	void dma_memw_cb(offs_t offset, uint8_t data);
@@ -263,6 +273,20 @@ void mpc2000_state::mpc2000_sub_map(address_map &map)
 void mpc2000_state::dsp_map(address_map &map)
 {
 	map(0x0000'0000, 0x01ff'ffff).ram();
+}
+
+void mpc2000_state::dsp_rom_map(address_map &map)
+{
+#if ENABLE_FLASH
+	map(0x0000'0000, 0x001f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0020'0000, 0x003f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0040'0000, 0x005f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0060'0000, 0x007f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0080'0000, 0x009f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x00a0'0000, 0x00bf'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x00c0'0000, 0x00df'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x00e0'0000, 0x00ff'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+#endif
 }
 
 void mpc2000_state::mpc2000_palette(palette_device &palette) const
@@ -639,7 +663,7 @@ void mpc2000_state::mpc2000(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc2000_state::floppies, "35hd", add_formats).enable_sound(false);
 
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "cdrom", nullptr, false);
 	m_ata->irq_handler().set(FUNC(mpc2000_state::ata_irq_w));
 	m_ata->dmarq_handler().set(FUNC(mpc2000_state::ata_drq_w));
 
@@ -685,6 +709,7 @@ void mpc2000_state::mpc2000(machine_config &config)
 
 	L7A1045(config, m_dsp, 33.8688_MHz_XTAL); // clock verified by schematic
 	m_dsp->set_addrmap(AS_DATA, &mpc2000_state::dsp_map);
+	m_dsp->set_addrmap(AS_IO, &mpc2000_state::dsp_rom_map);
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
 	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
 	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
@@ -697,6 +722,17 @@ void mpc2000_state::mpc2000(machine_config &config)
 	m_dsp->add_route(l7a1045_sound_device::L6028_OUT5, "outputs", 1.0, 5);
 	m_dsp->add_route(l7a1045_sound_device::L6028_OUT6, "outputs", 1.0, 6);
 	m_dsp->add_route(l7a1045_sound_device::L6028_OUT7, "outputs", 1.0, 7);
+
+#if ENABLE_FLASH
+	INTEL_28F016SA_16BIT(config, m_flash[0]);
+	INTEL_28F016SA_16BIT(config, m_flash[1]);
+	INTEL_28F016SA_16BIT(config, m_flash[2]);
+	INTEL_28F016SA_16BIT(config, m_flash[3]);
+	INTEL_28F016SA_16BIT(config, m_flash[4]);
+	INTEL_28F016SA_16BIT(config, m_flash[5]);
+	INTEL_28F016SA_16BIT(config, m_flash[6]);
+	INTEL_28F016SA_16BIT(config, m_flash[7]);
+#endif
 
 	// back compatible with MPC3000 and MPC60 disks
 	SOFTWARE_LIST(config, "flop_mpc3000").set_original("mpc3000_flop");

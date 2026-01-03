@@ -256,7 +256,6 @@ public:
 		, m_io_inputs(*this, "INPUTS")
 		, m_io_light_x(*this, "LIGHT%u_X", 0U)
 		, m_io_light_y(*this, "LIGHT%u_Y", 0U)
-		, m_gun_speaker_disabled(true)
 	{ }
 
 	void dragngun(machine_config &config);
@@ -281,7 +280,7 @@ private:
 	required_shared_ptr<u32> m_sprite_cliptable;
 	required_shared_ptr<u32> m_sprite_indextable;
 
-	required_device<lc7535_device> m_vol_main;
+	optional_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
 	optional_ioport m_io_inputs;
@@ -292,8 +291,6 @@ private:
 	u32 m_lightgun_port = 0;
 	int m_oki2_bank = 0; // lockload
 
-	bool m_gun_speaker_disabled;
-
 	u32 lightgun_r();
 	void lightgun_w(offs_t offset, u32 data = 0);
 	void sprite_control_w(u32 data);
@@ -303,10 +300,8 @@ private:
 	void eeprom_w(u8 data);
 	u32 lockload_gun_mirror_r(offs_t offset);
 
-	void volume_w(u32 data);
+	void lc7535_volume_w(u8 data);
 	void speaker_switch_w(u32 data);
-	LC7535_VOLUME_CHANGED(volume_main_changed);
-	LC7535_VOLUME_CHANGED(volume_gun_changed);
 
 	void lockload_okibank_lo_w(u8 data);
 	void lockload_okibank_hi_w(u8 data); // lockload

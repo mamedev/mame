@@ -112,7 +112,7 @@ private:
 
 	void write_centronics_busy(int state) { m_centronics_busy = state; }
 	int m_centronics_busy;
-	
+
 	void bw2_io(address_map &map) ATTR_COLD;
 	void bw2_mem(address_map &map) ATTR_COLD;
 	void lcdc_map(address_map &map) ATTR_COLD;
@@ -409,10 +409,10 @@ u8 bw2_state::ppi_pc_r()
 {
 	/*
 
-		PC0     +5V
-		PC1     +5V
-		PC2     +5V
-		PC3     Not connected
+	    PC0     +5V
+	    PC1     +5V
+	    PC2     +5V
+	    PC3     Not connected
 	    PC4     BUSY from centronics printer
 	    PC5     M/FDBK motor feedback
 	    PC6     RLSD Carrier detect from RS232

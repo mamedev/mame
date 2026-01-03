@@ -150,8 +150,8 @@ void pls1000_state::pls1000(machine_config &config)
 	m_maincpu->in_port_d<6>().set(FUNC(pls1000_state::kbd_r)).bit(6);
 	m_maincpu->in_port_d<7>().set(FUNC(pls1000_state::kbd_r)).bit(7);
 
-//	m_maincpu->out_port_f<0..1> shut off system if both high, at the end of the auto off time
-//	m_maincpu->out_port_f<2> low when any key is pressed
+//  m_maincpu->out_port_f<0..1> shut off system if both high, at the end of the auto off time
+//  m_maincpu->out_port_f<2> low when any key is pressed
 	m_maincpu->in_port_f<3>().set_constant(0); // battery low if '1', checked periodically
 
 	m_maincpu->out_port_j<0>().set(FUNC(pls1000_state::kbd_select_w<0>));

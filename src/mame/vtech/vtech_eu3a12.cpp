@@ -16,7 +16,7 @@ Nitro Jr. Notebook (with low battery splash)
 Genius Notebook (2005)
 Challenger Laptop (US version of Genius Notebook)
 Nitro Notebook (US version of Reader Laptop E)
-Nitro Web Notebook (US Web connected version of Reader Laptop E) 
+Nitro Web Notebook (US Web connected version of Reader Laptop E)
 Manege Laptop (Dutch version of Reader Laptop E)
 Language Lab Laptop
 Cars 2: Lightning McQueen™ Learning Laptop

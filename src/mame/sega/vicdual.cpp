@@ -13,7 +13,7 @@
         * Space Attack / Head On
         * Head On
         * Head On 2
-		* Head On 2 (Slimline)
+        * Head On 2 (Slimline)
         * Invinco / Head On 2
         * N-Sub
         * Samurai
@@ -1672,7 +1672,7 @@ static INPUT_PORTS_START( headon2sl )
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_COIN_DEFAULT
-	
+
 	PORT_START("FAKE_LIVES.0")
 	PORT_DIPNAME( 0x03, 0x01, "Lives" )   PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "4" )
@@ -4673,7 +4673,7 @@ ROM_START( carnivalb )
 	ROM_LOAD( "316-0633.u49",  0x0000, 0x0020, CRC(f0084d80) SHA1(95ec912ac2c64cd58a50c68afc0993746841a531) )
 
 	ROM_REGION( 0x0400, "audiocpu", 0 ) // sound ROM
-	ROM_LOAD( "carnival_b.u5", 0x0000, 0x0400, CRC(422abb43) SHA1(edb6f74ccf9382624353e927ac225e1455bb1144) )
+	ROM_LOAD( "epr-647a.u5", 0x0000, 0x0400, CRC(422abb43) SHA1(edb6f74ccf9382624353e927ac225e1455bb1144) )
 
 	ROM_REGION( 0x0020, "user1", 0 )    // timing PROM
 	ROM_LOAD( "316-0206.u14",  0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    // control PROM

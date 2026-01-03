@@ -556,6 +556,7 @@ static inline uint8_t lookup_pixel(const uint32_t *src, int i, int pitch, int de
  *
  *************************************/
 
+// TODO: convert to 64-bit
 uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc)
 {
 	/* extract minimal data */
@@ -580,6 +581,10 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;
 		int32_t iwidth = (lower2 >> 28) | ((upper2 & 0x3f) << 4);
 		uint8_t _index = (upper2 >> 6) & 0x3f;
+		// bit 0: REFLECT (a.k.a. flip X)
+		// bit 1: RMW
+		// bit 2: TRANS(parent)
+		// bit 3: RELEASE (bus)
 		uint8_t flags = (upper2 >> 13) & 0x0f;
 		uint8_t firstpix = (upper2 >> 17) & 0x3f;
 
@@ -719,8 +724,8 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		}
 
 		/* decrement the height and add to the source data offset */
-		objdata[0] = upper + (dwidth << 11);
-		objdata[1] = lower - (1 << 14);
+		objdata[0] = (upper & 0x7ff) | ((upper + (dwidth << 11)) & ~0x7ff);
+		objdata[1] = (lower & ~0xffc000) | ((lower - (1 << 14)) & 0xffc000);
 	}
 
 	return (uint32_t *)memory_base(link << 3);
@@ -934,8 +939,8 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
 			yinc = height, remainder = 0;
 
 		/* decrement the height and add to the source data offset */
-		objdata[0] = upper + yinc * (dwidth << 11);
-		objdata[1] = lower - yinc * (1 << 14);
+		objdata[0] = (upper & 0x7ff) | ((upper + yinc * (dwidth << 11)) & ~0x7ff);
+		objdata[1] = (lower & ~0xffc000) | ((lower - yinc * (1 << 14)) & 0xffc000);
 		objdata[5] = (lower3 & ~0xff0000) | ((remainder & 0xff) << 16);
 	}
 
@@ -1044,12 +1049,13 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 
 			/* GPU interrupt */
 			case 2:
-				m_gpu_regs[OB_HH]=(objdata[1]&0xffff0000)>>16;
-				m_gpu_regs[OB_HL]=objdata[1]&0xffff;
-				m_gpu_regs[OB_LH]=(objdata[0]&0xffff0000)>>16;
-				m_gpu_regs[OB_LL]=objdata[0]&0xffff;
+				m_gpu_regs[OB_HH] = (objdata[1] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
+				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
+
 				m_gpu->set_input_line(3, ASSERT_LINE);
-				done=1;
+				done = 1;
 				// mutntpng, atarikrt VPOS = 0
 				// TODO: what the VPOS is actually for?
 				//printf("GPU irq VPOS = %04x\n",(objdata[1] >> 3) & 0x7ff);
@@ -1064,25 +1070,38 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 			/* stop */
 			case 4:
 			{
+				m_gpu_regs[OB_HH] = (objdata[1] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
+				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
+
 				int interrupt = (objdata[1] >> 3) & 1;
 				done = 1;
 
 				LOGMASKED(LOG_OBJECTS, "stop   = %08X-%08X\n", objdata[0], objdata[1]);
 				if (interrupt)
 				{
-					// TODO: fball95 doesn't have a real handling for stop irq, causing the line to be always asserted, how to prevent?
+					// fball95 and zoop depends on this irq being masked (inside fn)
 //                  fprintf(stderr, "stop int=%d\n", interrupt);
 					trigger_host_cpu_irq(2);
 				}
 				break;
 			}
 
+			case 5:
+				// bretth: FF000020 0000FEE5
+				break;
+
 			case 6:
 				// kasumi: F7000000 00F0311E (nop? bad align?)
 				break;
 
+			case 7:
+				// ttoonadv: F5F104DE 05E706EF
+				break;
+
 			default:
-				fprintf(stderr, "%08X %08X\n", objdata[0], objdata[1]);
+				fprintf(stderr, "jagobj: undocumented/illegal %08X %08X\n", objdata[0], objdata[1]);
 				//done = 1;
 				break;
 		}

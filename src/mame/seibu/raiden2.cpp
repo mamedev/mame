@@ -171,13 +171,14 @@ Protection Notes:
 #include "emu.h"
 #include "raiden2.h"
 
+#include "r2crypt.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ymopm.h"
 #include "sound/ymopl.h"
-#include "r2crypt.h"
+#include "sound/ymopm.h"
 
 #include "debugger.h"
 #include "speaker.h"
@@ -191,15 +192,13 @@ Protection Notes:
 #include "logmacro.h"
 
 
-void raiden2_state::common_save_state()
+void xsedae_state::common_save_state()
 {
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_fg_bank));
 	save_item(NAME(m_mid_bank));
 	save_item(NAME(m_tx_bank));
 	save_item(NAME(m_tilemap_enable));
-	save_item(NAME(m_prg_bank));
-	save_item(NAME(m_cop_bank));
 
 	save_item(NAME(m_sprite_prot_x));
 	save_item(NAME(m_sprite_prot_y));
@@ -212,7 +211,14 @@ void raiden2_state::common_save_state()
 	save_item(NAME(m_sprite_prot_src_addr));
 }
 
-void raiden2_state::machine_start()
+void raiden2_state::common_save_state()
+{
+	xsedae_state::common_save_state();
+	save_item(NAME(m_prg_bank));
+	save_item(NAME(m_cop_bank));
+}
+
+void xsedae_state::machine_start()
 {
 	common_save_state();
 
@@ -228,19 +234,19 @@ void raiden2_state::machine_start()
 }
 
 /*
-u16 raiden2_state::rps()
+u16 xsedae_state::rps()
 {
     return m_maincpu->state_int(NEC_CS);
 }
 
-u16 raiden2_state::rpc()
+u16 xsedae_state::rpc()
 {
     return m_maincpu->state_int(NEC_IP);
 }
 */
 
 
-void raiden2_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
 {
 	u16 *dest = (u16 *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
@@ -253,7 +259,7 @@ void raiden2_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(raiden2_state::interrupt)
+INTERRUPT_GEN_MEMBER(xsedae_state::interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0 / 4);   /* V30 - VBL */
 }
@@ -261,7 +267,7 @@ INTERRUPT_GEN_MEMBER(raiden2_state::interrupt)
 
 // Sprite encryption key upload
 
-void raiden2_state::sprcpt_init()
+void xsedae_state::sprcpt_init()
 {
 	std::fill(std::begin(m_sprcpt_data_1), std::end(m_sprcpt_data_1), 0);
 	std::fill(std::begin(m_sprcpt_data_2), std::end(m_sprcpt_data_2), 0);
@@ -273,22 +279,22 @@ void raiden2_state::sprcpt_init()
 }
 
 
-void raiden2_state::sprcpt_adr_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_adr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(&m_sprcpt_adr, offset, data, mem_mask);
 }
 
-void raiden2_state::sprcpt_data_1_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_data_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_1 + m_sprcpt_adr, offset, data, mem_mask);
 }
 
-void raiden2_state::sprcpt_data_2_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_data_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_2 + m_sprcpt_adr, offset, data, mem_mask);
 }
 
-void raiden2_state::sprcpt_data_3_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_data_3_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_3 + m_sprcpt_idx, offset, data, mem_mask);
 	if (offset == 1)
@@ -299,7 +305,7 @@ void raiden2_state::sprcpt_data_3_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void raiden2_state::sprcpt_data_4_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_data_4_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_data_4 + m_sprcpt_idx, offset, data, mem_mask);
 	if (offset == 1)
@@ -310,17 +316,17 @@ void raiden2_state::sprcpt_data_4_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void raiden2_state::sprcpt_val_1_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_val_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_val + 0, offset, data, mem_mask);
 }
 
-void raiden2_state::sprcpt_val_2_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_val_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(m_sprcpt_val + 1, offset, data, mem_mask);
 }
 
-void raiden2_state::sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	combine32(&m_sprcpt_flags1, offset, data, mem_mask);
 	if (offset == 1)
@@ -354,7 +360,7 @@ void raiden2_state::sprcpt_flags_1_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void raiden2_state::sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask)
+void xsedae_state::sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_sprcpt_flags2);
 	if (offset == 0)
@@ -367,7 +373,7 @@ void raiden2_state::sprcpt_flags_2_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-void raiden2_state::bank_reset(int bgbank, int fgbank, int midbank, int txbank)
+void xsedae_state::bank_reset(int bgbank, int fgbank, int midbank, int txbank)
 {
 	if (m_bg_bank != bgbank)
 	{
@@ -389,6 +395,13 @@ void raiden2_state::bank_reset(int bgbank, int fgbank, int midbank, int txbank)
 		m_tx_bank = txbank;
 		m_text_layer->mark_all_dirty();
 	}
+}
+
+void xsedae_state::machine_reset()
+{
+	bank_reset(0,2,1,0);
+	sprcpt_init();
+	//cop_init();
 }
 
 MACHINE_RESET_MEMBER(raiden2_state,raiden2)
@@ -425,12 +438,6 @@ MACHINE_RESET_MEMBER(raiden2_state,zeroteam)
 	//cop_init();
 }
 
-MACHINE_RESET_MEMBER(raiden2_state,xsedae)
-{
-	bank_reset(0,2,1,0);
-	sprcpt_init();
-}
-
 void raiden2_state::raiden2_bank_w(u8 data)
 {
 	const u8 bb = BIT(~data, 7);
@@ -440,29 +447,29 @@ void raiden2_state::raiden2_bank_w(u8 data)
 }
 
 
-void raiden2_state::sprite_prot_x_w(u16 data)
+void xsedae_state::sprite_prot_x_w(u16 data)
 {
 	m_sprite_prot_x = data;
 	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
-void raiden2_state::sprite_prot_y_w(u16 data)
+void xsedae_state::sprite_prot_y_w(u16 data)
 {
 	m_sprite_prot_y = data;
 	//popmessage("%04x %04x",m_sprite_prot_x,m_sprite_prot_y);
 }
 
-void raiden2_state::sprite_prot_src_seg_w(u16 data)
+void xsedae_state::sprite_prot_src_seg_w(u16 data)
 {
 	m_sprite_prot_src_addr[0] = data;
 }
 
-u16 raiden2_state::sprite_prot_src_seg_r()
+u16 xsedae_state::sprite_prot_src_seg_r()
 {
 	return m_sprite_prot_src_addr[0];
 }
 
-void raiden2_state::sprite_prot_src_w(address_space &space, u16 data)
+void xsedae_state::sprite_prot_src_w(address_space &space, u16 data)
 {
 	m_sprite_prot_src_addr[1] = data;
 	const u32 src = (m_sprite_prot_src_addr[0] << 4) + m_sprite_prot_src_addr[1];
@@ -476,7 +483,7 @@ void raiden2_state::sprite_prot_src_w(address_space &space, u16 data)
 	const int w = (((head1 >> 8 ) & 7) + 1) << 4;
 	const int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	u16 flag = x-w/2 > -w && x-w/2 < m_cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+	u16 flag = ((x-w/2 > -w) && (x-w/2 < m_cop_spr_maxx+w) && (y-h/2 > -h) && (y-h/2 < 256+h)) ? 1 : 0;
 
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
@@ -494,38 +501,38 @@ void raiden2_state::sprite_prot_src_w(address_space &space, u16 data)
 	//machine().debug_break();
 }
 
-u16 raiden2_state::sprite_prot_dst1_r()
+u16 xsedae_state::sprite_prot_dst1_r()
 {
 	return m_dst1;
 }
 
-u16 raiden2_state::sprite_prot_maxx_r()
+u16 xsedae_state::sprite_prot_maxx_r()
 {
 	return m_cop_spr_maxx;
 }
 
-u16 raiden2_state::sprite_prot_off_r()
+u16 xsedae_state::sprite_prot_off_r()
 {
 	return m_cop_spr_off;
 }
 
-void raiden2_state::sprite_prot_dst1_w(u16 data)
+void xsedae_state::sprite_prot_dst1_w(u16 data)
 {
 	m_dst1 = data;
 }
 
-void raiden2_state::sprite_prot_maxx_w(u16 data)
+void xsedae_state::sprite_prot_maxx_w(u16 data)
 {
 	m_cop_spr_maxx = data;
 }
 
-void raiden2_state::sprite_prot_off_w(u16 data)
+void xsedae_state::sprite_prot_off_w(u16 data)
 {
 	m_cop_spr_off = data;
 }
 
 /* MEMORY MAPS */
-void raiden2_state::raiden2_cop_mem(address_map &map)
+void xsedae_state::xsedae_cop_mem(address_map &map)
 {
 	map(0x0041c, 0x0041d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_target_w)); // angle target (for 0x6200 COP macro)
 	map(0x0041e, 0x0041f).w(m_raiden2cop, FUNC(raiden2cop_device::cop_angle_step_w));   // angle step   (for 0x6200 COP macro)
@@ -549,7 +556,7 @@ void raiden2_state::raiden2_cop_mem(address_map &map)
 	map(0x00458, 0x00459).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_param_w));
 	map(0x0045a, 0x0045b).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_val_w)); //palette DMA brightness val, used by X Se Dae / Zero Team
 	map(0x0045c, 0x0045d).w(m_raiden2cop, FUNC(raiden2cop_device::cop_pal_brightness_mode_w));  //palette DMA brightness mode, used by X Se Dae / Zero Team (sets to 5)
-	map(0x00470, 0x00471).rw(FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::cop_tile_bank_2_w)); // implementaton of this varies between games, external hookup?
+	map(0x00470, 0x00471).lr16(NAME([] () { return 0; })).nopw(); // no tilemap bank in xsedae
 
 	map(0x00476, 0x00477).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_adr_rel_w));
 	map(0x00478, 0x00479).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_src_w));
@@ -570,31 +577,39 @@ void raiden2_state::raiden2_cop_mem(address_map &map)
 
 	map(0x00600, 0x0063f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	//map(0x00640, 0x006bf).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
-	map(0x006a0, 0x006a3).w(FUNC(raiden2_state::sprcpt_val_1_w));
-	map(0x006a4, 0x006a7).w(FUNC(raiden2_state::sprcpt_data_3_w));
-	map(0x006a8, 0x006ab).w(FUNC(raiden2_state::sprcpt_data_4_w));
-	map(0x006ac, 0x006af).w(FUNC(raiden2_state::sprcpt_flags_1_w));
-	map(0x006b0, 0x006b3).w(FUNC(raiden2_state::sprcpt_data_1_w));
-	map(0x006b4, 0x006b7).w(FUNC(raiden2_state::sprcpt_data_2_w));
-	map(0x006b8, 0x006bb).w(FUNC(raiden2_state::sprcpt_val_2_w));
-	map(0x006bc, 0x006bf).w(FUNC(raiden2_state::sprcpt_adr_w));
-	map(0x006c0, 0x006c1).rw(FUNC(raiden2_state::sprite_prot_off_r), FUNC(raiden2_state::sprite_prot_off_w));
-	map(0x006c2, 0x006c3).rw(FUNC(raiden2_state::sprite_prot_src_seg_r), FUNC(raiden2_state::sprite_prot_src_seg_w));
+	map(0x006a0, 0x006a3).w(FUNC(xsedae_state::sprcpt_val_1_w));
+	map(0x006a4, 0x006a7).w(FUNC(xsedae_state::sprcpt_data_3_w));
+	map(0x006a8, 0x006ab).w(FUNC(xsedae_state::sprcpt_data_4_w));
+	map(0x006ac, 0x006af).w(FUNC(xsedae_state::sprcpt_flags_1_w));
+	map(0x006b0, 0x006b3).w(FUNC(xsedae_state::sprcpt_data_1_w));
+	map(0x006b4, 0x006b7).w(FUNC(xsedae_state::sprcpt_data_2_w));
+	map(0x006b8, 0x006bb).w(FUNC(xsedae_state::sprcpt_val_2_w));
+	map(0x006bc, 0x006bf).w(FUNC(xsedae_state::sprcpt_adr_w));
+	map(0x006c0, 0x006c1).rw(FUNC(xsedae_state::sprite_prot_off_r), FUNC(xsedae_state::sprite_prot_off_w));
+	map(0x006c2, 0x006c3).rw(FUNC(xsedae_state::sprite_prot_src_seg_r), FUNC(xsedae_state::sprite_prot_src_seg_w));
 	map(0x006c4, 0x006c5).nopw(); // constant value written along with 0x6c0
-	map(0x006c6, 0x006c7).w(FUNC(raiden2_state::sprite_prot_dst1_w));
-	map(0x006cb, 0x006cb).w(FUNC(raiden2_state::raiden2_bank_w));
-	map(0x006cc, 0x006cc).w(FUNC(raiden2_state::tile_bank_01_w));
-	map(0x006ce, 0x006cf).w(FUNC(raiden2_state::sprcpt_flags_2_w));
-	map(0x006d8, 0x006d9).w(FUNC(raiden2_state::sprite_prot_x_w));
-	map(0x006da, 0x006db).w(FUNC(raiden2_state::sprite_prot_y_w));
-	map(0x006dc, 0x006dd).rw(FUNC(raiden2_state::sprite_prot_maxx_r), FUNC(raiden2_state::sprite_prot_maxx_w));
-	map(0x006de, 0x006df).w(FUNC(raiden2_state::sprite_prot_src_w));
+	map(0x006c6, 0x006c7).w(FUNC(xsedae_state::sprite_prot_dst1_w));
+	map(0x006ca, 0x006cb).nopw(); // no program ROM bank in xsedae
+	map(0x006cc, 0x006cd).nopw(); // no tilemap bank in xsedae
+	map(0x006ce, 0x006cf).w(FUNC(xsedae_state::sprcpt_flags_2_w));
+	map(0x006d8, 0x006d9).w(FUNC(xsedae_state::sprite_prot_x_w));
+	map(0x006da, 0x006db).w(FUNC(xsedae_state::sprite_prot_y_w));
+	map(0x006dc, 0x006dd).rw(FUNC(xsedae_state::sprite_prot_maxx_r), FUNC(xsedae_state::sprite_prot_maxx_w));
+	map(0x006de, 0x006df).w(FUNC(xsedae_state::sprite_prot_src_w));
 	/* end video block */
 
 	map(0x006fc, 0x006fd).w(m_raiden2cop, FUNC(raiden2cop_device::cop_dma_trigger_w));
 	map(0x006fe, 0x006ff).w(m_raiden2cop, FUNC(raiden2cop_device::cop_sort_dma_trig_w)); // sort-DMA trigger
 
-	map(0x00762, 0x00763).r(FUNC(raiden2_state::sprite_prot_dst1_r));
+	map(0x00762, 0x00763).r(FUNC(xsedae_state::sprite_prot_dst1_r));
+}
+
+void raiden2_state::raiden2_cop_mem(address_map &map)
+{
+	xsedae_cop_mem(map);
+	map(0x00470, 0x00471).rw(FUNC(raiden2_state::cop_tile_bank_2_r), FUNC(raiden2_state::cop_tile_bank_2_w)); // implementaton of this varies between games, external hookup?
+	map(0x006cb, 0x006cb).w(FUNC(raiden2_state::raiden2_bank_w));
+	map(0x006cc, 0x006cc).w(FUNC(raiden2_state::tile_bank_01_w));
 }
 
 void raiden2_state::raiden2_mem(address_map &map)
@@ -605,9 +620,9 @@ void raiden2_state::raiden2_mem(address_map &map)
 
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8(
-							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
-							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x00700, 0x0071f).umask16(0x00ff).lrw8(
+			NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+			NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }));
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -649,13 +664,12 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	raiden2_cop_mem(map);
 
 	map(0x00470, 0x00471).nopw();
+	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0x006cc, 0x006cd).nopw();
 
-	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
-
-	map(0x00700, 0x0071f).lrw8(
-							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
-							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x00700, 0x0071f).umask16(0x00ff).lrw8(
+			NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+			NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }));
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -675,20 +689,17 @@ void raiden2_state::zeroteam_mem(address_map &map)
 	map(0x40000, 0xfffff).rom().region("maincpu", 0x40000);
 }
 
-void raiden2_state::xsedae_mem(address_map &map)
+void xsedae_state::xsedae_mem(address_map &map)
 {
 	map(0x00000, 0x003ff).ram();
 
-	raiden2_cop_mem(map);
-
-	map(0x00470, 0x00471).nopw();
-	map(0x006cc, 0x006cd).nopw();
+	xsedae_cop_mem(map);
 
 	map(0x0068e, 0x0068f).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 
-	map(0x00700, 0x0071f).lrw8(
-							   NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
-							   NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
+	map(0x00700, 0x0071f).umask16(0x00ff).lrw8(
+			NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+			NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }));
 
 	map(0x00740, 0x00741).portr("DSW");
 	map(0x00744, 0x00745).portr("P1_P2");
@@ -696,10 +707,10 @@ void raiden2_state::xsedae_mem(address_map &map)
 	map(0x0074c, 0x0074d).portr("SYSTEM");
 
 	map(0x00800, 0x0b7ff).ram();
-	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(raiden2_state::background_w)).share("back_data");
-	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(raiden2_state::foreground_w).share("fore_data");
-	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(raiden2_state::midground_w).share("mid_data");
-	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(raiden2_state::text_w).share("text_data");
+	map(0x0b800, 0x0bfff).ram(); // .w(FUNC(xsedae_state::background_w)).share("back_data");
+	map(0x0c000, 0x0c7ff).ram(); // .w(FUNC(xsedae_state::foreground_w).share("fore_data");
+	map(0x0c800, 0x0cfff).ram(); // .w(FUNC(xsedae_state::midground_w).share("mid_data");
+	map(0x0d000, 0x0dfff).ram(); // .w(FUNC(xsedae_state::text_w).share("text_data");
 	map(0x0e000, 0x0efff).ram(); // .w("palette", palette_device, write).share("palette");
 	map(0x0f000, 0x0ffff).ram().share("spriteram");
 
@@ -729,7 +740,7 @@ void raiden2_state::raiden2_sound_map(address_map &map)
 	map(0x8000, 0xffff).bankr("seibu_bank");
 }
 
-void raiden2_state::zeroteam_sound_map(address_map &map)
+void xsedae_state::zeroteam_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x27ff).ram();
@@ -752,7 +763,7 @@ void raiden2_state::zeroteam_sound_map(address_map &map)
 /* INPUT PORTS */
 
 static INPUT_PORTS_START( raiden2 )
-	SEIBU_COIN_INPUTS_INVERT    /* coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS_INVERT    /* coin inputs read through sound CPU */
 
 	PORT_START("P1_P2") /* IN0/1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -772,7 +783,7 @@ static INPUT_PORTS_START( raiden2 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")   /* Dip switches  */
+	PORT_START("DSW")   /* DIP switches  */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!1,!2,!3")
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -828,7 +839,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( raidendx )
 	PORT_INCLUDE( raiden2 )
 
-	PORT_MODIFY("DSW")  /* Dip switches  */
+	PORT_MODIFY("DSW")  /* DIP switches  */
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!5") /* Manual shows "Not Used" */
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1036,33 +1047,73 @@ static const gfx_layout tilelayout =
 	128*8
 };
 
-GFXDECODE_START( raiden2_state::gfx_raiden2 )
+GFXDECODE_START( xsedae_state::gfx_raiden2 )
 	GFXDECODE_ENTRY( "chars",   0, charlayout,             0x700, 0x10 )
 	GFXDECODE_ENTRY( "tiles",   0, tilelayout,             0x400, 0x30 )
 GFXDECODE_END
 
-GFXDECODE_START( raiden2_state::gfx_raiden2_spr )
+GFXDECODE_START( xsedae_state::gfx_raiden2_spr )
 	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_lsb, 0x000, 0x40 ) // really 64, but using the top bits for priority
 GFXDECODE_END
 
 
 /* MACHINE DRIVERS */
-void raiden2_state::base_video(machine_config &config)
+void xsedae_state::base_cop(machine_config &config)
 {
-	GFXDECODE(config, m_gfxdecode, m_palette, raiden2_state::gfx_raiden2);
+	RAIDEN2COP(config, m_raiden2cop, 0);
+	m_raiden2cop->videoramout_cb().set(FUNC(xsedae_state::m_videoram_private_w));
+	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
+	m_raiden2cop->set_host_cpu_tag(m_maincpu);
+}
+
+void xsedae_state::base_video(machine_config &config)
+{
+	GFXDECODE(config, m_gfxdecode, m_palette, xsedae_state::gfx_raiden2);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.layer_en_callback().set(FUNC(raiden2_state::tilemap_enable_w));
-	crtc.layer_scroll_callback().set(FUNC(raiden2_state::tile_scroll_w));
+	crtc.layer_en_callback().set(FUNC(xsedae_state::tilemap_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(xsedae_state::tile_scroll_w));
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, raiden2_state::gfx_raiden2_spr);
+	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, xsedae_state::gfx_raiden2_spr);
 	m_spritegen->set_screen("screen");
 	m_spritegen->set_pix_raw_shift(4);
 	m_spritegen->set_pri_raw_shift(14);
 	m_spritegen->set_transpen(15);
+}
+
+void xsedae_state::base_sound(machine_config &config)
+{
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'636'363)/8));
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
+
+	SEIBU_SOUND(config, m_seibu_sound, 0);
+	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->coin_io_callback().set_ioport("COIN");
+	m_seibu_sound->set_rom_tag("audiocpu");
+	m_seibu_sound->set_rombank_tag("seibu_bank");
+}
+
+void xsedae_state::base_ym2151(machine_config &config)
+{
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(28'636'363)/8));
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
+}
+
+void xsedae_state::base_ym3812(machine_config &config)
+{
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(28'636'363)/8));
+	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
 
 void raiden2_state::raiden2(machine_config &config)
@@ -1072,11 +1123,7 @@ void raiden2_state::raiden2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::raiden2_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::interrupt));
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
-
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'636'363)/8));
-	audiocpu.set_addrmap(AS_PROGRAM, &raiden2_state::raiden2_sound_map);
-	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, raiden2)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1085,33 +1132,21 @@ void raiden2_state::raiden2(machine_config &config)
 	screen.set_screen_update(FUNC(raiden2_state::screen_update));
 
 	base_video(config);
-
-	RAIDEN2COP(config, m_raiden2cop, 0);
-	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
-	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
-	m_raiden2cop->set_host_cpu_tag(m_maincpu);
+	base_cop(config);
 
 	/* sound hardware */
+	base_sound(config);
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &raiden2_state::raiden2_sound_map);
+
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(28'636'363)/8));
-	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.50);
+	base_ym2151(config);
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
 	oki1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
 	oki2.add_route(ALL_OUTPUTS, "mono", 0.40);
-
-	SEIBU_SOUND(config, m_seibu_sound, 0);
-	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
-	m_seibu_sound->coin_io_callback().set_ioport("COIN");
-	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank");
-	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
-	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 }
 
 void raiden2_state::raidendx(machine_config &config)
@@ -1119,71 +1154,56 @@ void raiden2_state::raidendx(machine_config &config)
 	raiden2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::raidendx_mem);
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raidendx)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, raidendx)
+}
+
+void xsedae_state::zeroteam_base(machine_config &config)
+{
+	/* basic machine hardware */
+	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
+	m_maincpu->set_vblank_int("screen", FUNC(xsedae_state::interrupt));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(55.47);    /* verified on pcb */
+	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 32*8); /* hand-tuned to match ~55.47 */
+	screen.set_screen_update(FUNC(xsedae_state::screen_update));
+
+	base_video(config);
+	base_cop(config);
+
+	/* sound hardware */
+	base_sound(config);
+	subdevice<z80_device>("audiocpu")->set_addrmap(AS_PROGRAM, &xsedae_state::zeroteam_sound_map);
+
+	SPEAKER(config, "mono").front_center();
+
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void raiden2_state::zeroteam(machine_config &config)
 {
-	/* basic machine hardware */
-	V30(config, m_maincpu, XTAL(32'000'000)/2); /* verified on pcb */
+	zeroteam_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::zeroteam_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(raiden2_state::interrupt));
 
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
+	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state, zeroteam)
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(28'636'363)/8));
-	audiocpu.set_addrmap(AS_PROGRAM, &raiden2_state::zeroteam_sound_map);
-	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
+	subdevice<screen_device>("screen")->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-//  screen.set_refresh_hz(55.47);    /* verified on pcb */
-	screen.set_raw(XTAL(32'000'000)/4, 512, 0, 40*8, 282, 0, 32*8); /* hand-tuned to match ~55.47 */
-	screen.set_screen_update(FUNC(raiden2_state::screen_update));
-
-	base_video(config);
-
-	RAIDEN2COP(config, m_raiden2cop, 0);
-	m_raiden2cop->videoramout_cb().set(FUNC(raiden2_state::m_videoram_private_w));
-	m_raiden2cop->paletteramout_cb().set(m_palette, FUNC(palette_device::write16));
-	m_raiden2cop->set_host_cpu_tag(m_maincpu);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(28'636'363)/8));
-	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
-	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	okim6295_device &oki(OKIM6295(config, "oki", XTAL(28'636'363)/28, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
-
-	SEIBU_SOUND(config, m_seibu_sound, 0);
-	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
-	m_seibu_sound->coin_io_callback().set_ioport("COIN");
-	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank");
-	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
-	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+	base_ym3812(config);
 }
 
-void raiden2_state::xsedae(machine_config &config)
+void xsedae_state::xsedae(machine_config &config)
 {
-	zeroteam(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &raiden2_state::xsedae_mem);
-
-	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,xsedae)
+	zeroteam_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xsedae_state::xsedae_mem);
 
 	subdevice<screen_device>("screen")->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 
-	ym2151_device &ymsnd(YM2151(config.replace(), "ymsnd", XTAL(28'636'363)/8));
-	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.50);
+	m_spritegen->set_pri_callback(FUNC(xsedae_state::pri_callback));
 
-	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
-	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
+	base_ym2151(config);
 }
 
 /* ROM LOADING */
@@ -3153,18 +3173,6 @@ void raiden2_state::init_raidendx()
 	raiden2_decrypt_sprites((u32*)memregion("sprites")->base(), memregion("sprites")->bytes() / 4);
 }
 
-const u16 raiden2_state::xsedae_blended_colors[] = {
-	0xffff,
-};
-
-void raiden2_state::init_xsedae()
-{
-	init_blending(xsedae_blended_colors);
-	static const s32 spri[5] = { -1, 0, 1, 2, 3 };
-	m_cur_spri = spri;
-	/* doesn't have banking */
-}
-
 const u16 raiden2_state::zeroteam_blended_colors[] = {
 	// Player selection
 	0x37e,
@@ -3279,4 +3287,4 @@ GAME( 1993, zeroteamsr, zeroteam, zeroteam, zeroteam, raiden2_state, init_zerote
 
 // X Se Dae Quiz sets
 
-GAME( 1995, xsedae,     0,        xsedae,   xsedae,   raiden2_state, init_xsedae,   ROT0,   "Dream Island", "X Se Dae Quiz (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995, xsedae,     0,        xsedae,   xsedae,   xsedae_state,  empty_init,    ROT0,   "Dream Island", "X Se Dae Quiz (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

@@ -19,6 +19,7 @@
         * Freeze
 
     To do:
+        * Untangle CoJag from Jagaur console, split drivers;
         * (CoJag) map out unused RAM per-game via memory_nop_read/write
         * (Jaguar) support is very poor, most games aren't properly playable
           or have severe performance issues or crashes related to the unsafe
@@ -440,7 +441,6 @@ void jaguar_state::machine_reset()
 	/* set blitter idle flag */
 	m_blitter_status = 1;
 	m_joystick_data = 0xffffffff;
-	m_eeprom_bit_count = 0;
 
 	if ((m_using_cart) && (m_config_io->read() & 2))
 	{
@@ -539,41 +539,6 @@ static NVRAM_HANDLER( jaguar )
     }
 }
 */
-void jaguar_state::eeprom_w(uint32_t data)
-{
-	m_eeprom_bit_count++;
-	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
-	{
-		m_eeprom->di_write(data >> 31);
-		m_eeprom->clk_write(0);
-		m_eeprom->clk_write(1);
-	}
-}
-
-uint32_t jaguar_state::eeprom_clk()
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_eeprom->clk_write(0);
-		m_eeprom->clk_write(1); /* get next bit when reading */
-	}
-	return 0;
-}
-
-uint32_t jaguar_state::eeprom_cs()
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_eeprom->cs_write(CLEAR_LINE);   /* must do at end of an operation */
-		m_eeprom->cs_write(ASSERT_LINE);        /* enable chip for next operation */
-		m_eeprom->di_write(1);           /* write a start bit */
-		m_eeprom->clk_write(0);
-		m_eeprom->clk_write(1);
-		m_eeprom_bit_count = 0;
-	}
-	return 0;
-}
-
 
 
 /*************************************
@@ -672,24 +637,24 @@ void jaguar_state::dspctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
  *
  *************************************/
 
+/*
+ *   16        12        8         4         0
+ *   +---------+---------+---------^---------+
+ *   |  pad 1  |  pad 0  |      unused       |
+ *   +---------+---------+-------------------+
+ *     15...12   11...8          7...0
+ *
+ *   Reading this register gives you the output of the selected columns
+ *   of the pads.
+ *   The buttons pressed will appear as cleared bits.
+ *   See the description of the column addressing to map the bits
+ *   to the buttons.
+ */
 uint32_t jaguar_state::joystick_r()
 {
-	uint16_t joystick_result = 0xfffe;
 	uint16_t joybuts_result = 0xffef;
-
-	/*
-	 *   16        12        8         4         0
-	 *   +---------+---------+---------^---------+
-	 *   |  pad 1  |  pad 0  |      unused       |
-	 *   +---------+---------+-------------------+
-	 *     15...12   11...8          7...0
-	 *
-	 *   Reading this register gives you the output of the selected columns
-	 *   of the pads.
-	 *   The buttons pressed will appear as cleared bits.
-	 *   See the description of the column addressing to map the bits
-	 *   to the buttons.
-	 */
+	// bit 7 returns 0, bit 4 is NTSC/PAL flag
+	uint16_t joystick_result = 0xff6e;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -706,55 +671,56 @@ uint32_t jaguar_state::joystick_r()
 	return (joystick_result << 16) | joybuts_result;
 }
 
+/*
+ *   16        12         8         4         0
+ *   +-+-------^------+--+---------+---------+
+ *   |r|    unused    |mu|  col 1  |  col 0  |
+ *   +-+--------------+--+---------+---------+
+ *    15                8   7...4     3...0
+ *
+ *   col 0:   column control of joypad 0
+ *
+ *      Here you select which column of the joypad to poll.
+ *      The columns are:
+ *
+ *                Joystick       Joybut
+ *      col_bit|11 10  9  8     1    0
+ *      -------+--+--+--+--    ---+------
+ *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
+ *         1   | 1  4  7  *     B
+ *         2   | 2  5  8  0     C
+ *         3   | 3  6  9  #   OPTION
+ *
+ *      You select a column my clearing the appropriate bit and setting
+ *      all the other "column" bits.
+ *
+ *
+ *   col1:    column control of joypad 1
+ *
+ *      This is pretty much the same as for joypad EXCEPT that the
+ *      column addressing is reversed (strange!!)
+ *
+ *                Joystick      Joybut
+ *      col_bit|15 14 13 12     3    2
+ *      -------+--+--+--+--    ---+------
+ *         4   | 3  6  9  #   OPTION
+ *         5   | 2  5  8  0     C
+ *         6   | 1  4  7  *     B
+ *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
+ *
+ *   mute (mu):   sound control
+ *
+ *      You can turn off the sound by clearing this bit.
+ *
+ *   read enable (r):
+ *
+ *      Set this bit to read from the joysticks, clear it to write
+ *      to them.
+ */
 void jaguar_state::joystick_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	/*
-	 *   16        12         8         4         0
-	 *   +-+-------^------+--+---------+---------+
-	 *   |r|    unused    |mu|  col 1  |  col 0  |
-	 *   +-+--------------+--+---------+---------+
-	 *    15                8   7...4     3...0
-	 *
-	 *   col 0:   column control of joypad 0
-	 *
-	 *      Here you select which column of the joypad to poll.
-	 *      The columns are:
-	 *
-	 *                Joystick       Joybut
-	 *      col_bit|11 10  9  8     1    0
-	 *      -------+--+--+--+--    ---+------
-	 *         0   | R  L  D  U     A  PAUSE       (RLDU = Joypad directions)
-	 *         1   | 1  4  7  *     B
-	 *         2   | 2  5  8  0     C
-	 *         3   | 3  6  9  #   OPTION
-	 *
-	 *      You select a column my clearing the appropriate bit and setting
-	 *      all the other "column" bits.
-	 *
-	 *
-	 *   col1:    column control of joypad 1
-	 *
-	 *      This is pretty much the same as for joypad EXCEPT that the
-	 *      column addressing is reversed (strange!!)
-	 *
-	 *                Joystick      Joybut
-	 *      col_bit|15 14 13 12     3    2
-	 *      -------+--+--+--+--    ---+------
-	 *         4   | 3  6  9  #   OPTION
-	 *         5   | 2  5  8  0     C
-	 *         6   | 1  4  7  *     B
-	 *         7   | R  L  D  U     A  PAUSE     (RLDU = Joypad directions)
-	 *
-	 *   mute (mu):   sound control
-	 *
-	 *      You can turn off the sound by clearing this bit.
-	 *
-	 *   read enable (r):
-	 *
-	 *      Set this bit to read from the joysticks, clear it to write
-	 *      to them.
-	 */
 	COMBINE_DATA(&m_joystick_data);
+	// TODO: audio enable bit 8 & joystick enable bit 15
 }
 
 
@@ -1042,9 +1008,6 @@ uint16_t jaguar_state::serial_r16(offs_t offset){ if (!(offset&1)) { return seri
 void jaguar_state::serial_w16(offs_t offset, uint16_t data){ if (!(offset&1)) { serial_w(offset>>1, data << 16); } else { serial_w(offset>>1, data); } }
 uint16_t jaguar_state::dspctrl_r16(offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return dspctrl_r(offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(offset>>1, mem_mask); } }
 void jaguar_state::dspctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { dspctrl_w(offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(offset>>1, data, mem_mask); } }
-uint16_t jaguar_state::eeprom_cs16(offs_t offset){ if (!(offset&1)) { return eeprom_cs() >> 16;  } else { return eeprom_cs(); } }
-uint16_t jaguar_state::eeprom_clk16(offs_t offset){ if (!(offset&1)) { return eeprom_clk() >> 16;  } else { return eeprom_clk(); } }
-void jaguar_state::eeprom_w16(offs_t offset, uint16_t data){ if (!(offset&1)) { eeprom_w(data << 16); } else { eeprom_w(data); } }
 uint16_t jaguar_state::joystick_r16(offs_t offset){ if (!(offset&1)) { return joystick_r() >> 16;  } else { return joystick_r(); } }
 void jaguar_state::joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { joystick_w(offset>>1, data << 16, mem_mask << 16); } else { joystick_w(offset>>1, data, mem_mask); } }
 
@@ -1074,15 +1037,54 @@ void jaguar_state::console_base_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).mirror(0x200000).rw(FUNC(jaguar_state::shared_ram_r16), FUNC(jaguar_state::shared_ram_w16));
 	map(0xe00000, 0xe1ffff).rom().region("mainrom", 0);
+	// Tom section
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
 	map(0xf00400, 0xf005ff).mirror(0x000200).rw(FUNC(jaguar_state::gpu_clut_r16), FUNC(jaguar_state::gpu_clut_w16));
 	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r16), FUNC(jaguar_state::gpuctrl_w16));
 	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r16), FUNC(jaguar_state::blitter_w16));
 	map(0xf03000, 0xf03fff).mirror(0x008000).rw(FUNC(jaguar_state::gpu_ram_r16), FUNC(jaguar_state::gpu_ram_w16));
+	// Jerry section
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w)); // might be reversed endian of the others..
 	map(0xf14000, 0xf14003).rw(FUNC(jaguar_state::joystick_r16), FUNC(jaguar_state::joystick_w16));
-	map(0xf14800, 0xf14803).rw(FUNC(jaguar_state::eeprom_clk16), FUNC(jaguar_state::eeprom_w16));  // GPIO0
-	map(0xf15000, 0xf15003).r(FUNC(jaguar_state::eeprom_cs16));               // GPIO1
+	// GPI00 "CD-interface"
+	map(0xf14801, 0xf14801).lrw8(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
+			{
+				m_eeprom->clk_write(0);
+				m_eeprom->clk_write(1);
+			}
+			return 0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_eeprom->di_write(data & 1);
+			m_eeprom->clk_write(0);
+			m_eeprom->clk_write(1);
+		})
+	);
+	// GPI01 "DMA ACK"
+	map(0xf15001, 0xf15001).lrw8(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
+			{
+				m_eeprom->cs_write(CLEAR_LINE);
+				m_eeprom->cs_write(ASSERT_LINE);
+			}
+			return 0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_eeprom->cs_write(CLEAR_LINE);
+			m_eeprom->cs_write(ASSERT_LINE);
+		})
+	);
+	// GPI02 "Cartridge"
+	// map(0xf16000, 0xf16fff)
+	// GPI03
+	// map(0xf17000, 0xf177ff)
+	// GPI04
+	// map(0xf17800, 0xf17bff)
+	// GPI05 "Paddle Interface"
+	// map(0xf17c00, 0xf17fff)
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r16), FUNC(jaguar_state::dspctrl_w16));
 	map(0xf1a140, 0xf1a17f).rw(FUNC(jaguar_state::serial_r16), FUNC(jaguar_state::serial_w16));
 	map(0xf1b000, 0xf1cfff).rw(FUNC(jaguar_state::dsp_ram_r16), FUNC(jaguar_state::dsp_ram_w16));
@@ -1095,6 +1097,8 @@ void jaguar_state::jaguar_map(address_map &map)
 	map(0x800000, 0xdfffff).r(FUNC(jaguar_state::cart_base_r16));
 }
 
+// TODO: JTRM claims "no autovectors / no VPA pin, all irqs are at vector 0x40"
+// cfr. section 7 of "Tom bugs"
 void jaguar_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
@@ -1711,21 +1715,21 @@ static INPUT_PORTS_START( jaguar )
 	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS4")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Option") PORT_PLAYER(2)
-	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Option") PORT_PLAYER(2)
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS5")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 C") PORT_PLAYER(2)
-	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 C") PORT_PLAYER(2)
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS6")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 B") PORT_PLAYER(2)
-	PORT_BIT( 0xfffd, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 B") PORT_PLAYER(2)
+	PORT_BIT( 0xfff7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS7")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Pause") PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)
-	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Pause") PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)
+	PORT_BIT( 0xfff3, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME( 0x02, 0x00, "Show Logo")
@@ -1752,6 +1756,7 @@ void jaguar_state::video_config(machine_config &config, const XTAL clock)
 	m_dsp->irq().set(FUNC(jaguar_state::dsp_cpu_int));
 
 	// TODO: Tom
+	// TODO: Jerry
 	// TODO: Object Processor
 
 	JAG_BLITTER(config, m_blitter, clock);
@@ -1777,7 +1782,7 @@ void jaguar_state::cojagr3k(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_raw(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257);
+	m_screen->set_raw(COJAG_PIXEL_CLOCK / 2, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
 	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
@@ -1813,7 +1818,7 @@ void jaguar_state::cojag68k(machine_config &config)
 void jaguar_state::jaguar(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, JAGUAR_CLOCK/2); // MC68000FN12F 16 MHz
+	M68000(config, m_maincpu, JAGUAR_CLOCK / 2); // MC68000FN12F 16 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::jaguar_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &jaguar_state::cpu_space_map);
 
@@ -1826,6 +1831,7 @@ void jaguar_state::jaguar(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	// TODO: vestigial (sets 222 Hz), dynamically changed in jaguar_v anyway
 	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
@@ -1837,7 +1843,8 @@ void jaguar_state::jaguar(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg,rom", attotime::from_seconds(1)).set_load_callback(FUNC(jaguar_state::quickload_cb));
+	// need to skip BIOS asap for quickload to work (particularly after DSP sound fixes)
+	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg,rom", attotime::from_usec(10)).set_load_callback(FUNC(jaguar_state::quickload_cb));
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64"));
@@ -1967,7 +1974,7 @@ std::pair<std::error_condition, std::string> jaguar_state::quickload_cb(snapshot
 	m_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */
-	m_maincpu->set_pc(quickload_begin);
+	m_maincpu->set_pc(start);
 	m_shared_ram[1]=quickload_begin;
 	return std::make_pair(std::error_condition(), std::string());
 }

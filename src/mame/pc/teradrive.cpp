@@ -880,7 +880,7 @@ void teradrive_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 //  SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
-//  SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom");
+//  SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 //  SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
@@ -1040,7 +1040,12 @@ void teradrive_state::teradrive(machine_config &config)
 	MEGADRIVE_CART_SLOT(config, m_md_cart, md_master_xtal / 7, megadrive_cart_options, nullptr).set_must_be_loaded(false);
 	m_md_cart->vres_cb().set([this](int state) {
 		if (state)
+		{
 			m_md68kcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+			// segachnl seems to also require a port reset too
+			for (auto &port : m_md_ioports)
+				port->reset();
+		}
 	});
 
 	SPEAKER(config, "md_speaker", 2).front();

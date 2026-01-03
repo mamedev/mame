@@ -12,7 +12,7 @@ license:CC0-1.0
 	<!-- pinout is identical to Storio cartridges -->
 	<!--
 	Also known as "Storio 2 and Future versions" in Europe excluding UK
-	
+
 	Language:
 	********0 = US / Canada / Hong Kong / Japan
 	********1 = Unused
@@ -27,7 +27,7 @@ license:CC0-1.0
 	********5 = France / Canada (French)
 	*******26 = Russia
 	********6 = Portugal
-	********7 = Italy			Distributed by the company 'Hasbro'
+	********7 = Italy           Distributed by the company 'Hasbro'
 
 	Where do Poland, Czech and Slovakia fit in?
 	
@@ -178,6 +178,7 @@ license:CC0-1.0
 	-->
 
 	<!-- 2011 and 2012 have identical ROMs 	-->
+  
 	<software name="mickeychuk" supported="no">
 		<description>Mickey Mouse Clubhouse (UK) (InnoTab Max Compatible)</description>
 		<year>2012</year>

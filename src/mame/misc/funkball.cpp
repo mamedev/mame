@@ -793,7 +793,7 @@ void funkball_state::funkball(machine_config &config)
 	m_screen->set_screen_update(FUNC(funkball_state::screen_update));
 
 	ns16550_device &uart(NS16550(config, "uart", 1843200)); // exact type unknown
-//	uart.out_int_callback().set(m_pic8259_1, FUNC(pic8259_device::ir4_w));
+//  uart.out_int_callback().set(m_pic8259_1, FUNC(pic8259_device::ir4_w));
 	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart.out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));

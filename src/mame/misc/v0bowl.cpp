@@ -4,16 +4,28 @@
 
     "Unknown VRender0+ Bowling Game" (c) 200x A1 Amusement One
 
+    VRender0+ SOC
+    512MB compact flash
+    W29X040 boot ROM
+    Atmel PLD (undumped)
+    XTALs 15.175 mhz and 1.8432mhz
+    2x bank of 8 switches
+    VGA and CGA on switch
+
     TODO:
-    - checkout the actual SanDisk device
+    - checkout the actual SanDisk device (seems SanDisk Ultra II 512 MB)
+
+    Reference video: https://www.youtube.com/watch?v=Rp7XpDtvrPo
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/se3208/se3208.h"
 #include "machine/vrender0.h"
 #include "sound/vrender0.h"
 #include "video/vrender0.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -33,14 +45,12 @@ public:
 	void v0bowl(machine_config &config) ATTR_COLD;
 
 protected:
-	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void v0bowl_map(address_map &map) ATTR_COLD;
 
-	// devices
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 };
@@ -64,7 +74,7 @@ void v0bowl_state::v0bowl_map(address_map &map)
 
 
 static INPUT_PORTS_START( v0bowl )
-	/* dummy active high structure */
+	// dummy active high structure
 	PORT_START("SYSA")
 	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -91,7 +101,7 @@ static INPUT_PORTS_START( v0bowl )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	/* dummy active low structure */
+	// dummy active low structure
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -156,7 +166,7 @@ ROM_START( v0bowl )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "bootrom.u16",  0x000000, 0x080000, CRC(f8f4cf22) SHA1(881d8eeb6f50b2e7933e7c3c93adcdd0c1e93e77) )
 
-	ROM_REGION32_LE( 0x20000000, "flash", ROMREGION_ERASEFF ) // SanDisk CF
+	ROM_REGION32_LE( 0x20000000, "flash", ROMREGION_ERASEFF ) // SanDisk CF dumped via DD
 	// zipped FAT16, filesystem was made with DOS 3.31 but the folders have Windows Thumbs.db files as well.
 	ROM_LOAD( "bowling.001",  0x000000, 0x1e8be000, BAD_DUMP CRC(aebb2b01) SHA1(cd11f74f6512350ac10f822937b8769f552aabf3) )
 ROM_END
