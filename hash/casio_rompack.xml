@@ -36,24 +36,24 @@ license:CC0-1.0
 	RO-153		19??	Young Hits
 	RO-156		19??	Introduction to Casio Keyboard II, Fun Keyboard Lessons
 	RO-157		19??	Kayokyoku
-	RO-159		19??	Kodomo no uta [2]
+	RO-159		19??	Kodomo no Uta [2]
 	RO-163		1985	Pops
 	RO-164		1985	Introduction to Casio Keyboard I, Let's Play with Pack-chan
 	RO-165		1985	Fun Keyboard Lessons
-	RO-167K		1988	Kodomo no uta [6]
-	RO-168K		1988	Kodomo no uta [7]
+	RO-167K		1988	Kodomo no Uta [6]
+	RO-168K		1988	Kodomo no Uta [7]
 	RO-173Y		19??	Young Hits [3]
 	RO-174Y		19??	Young Hits [4]
-	RO-175K		19??	Kodomo no uta [8], Pikkapika Ongakukan
+	RO-175K		19??	Kodomo no Uta [8], Pikkapika Ongakukan
 	RO-176Y		19??	Young Hits [5]
-	RO-177K		19??	Kodomo no uta [9]
-	RO-179K		19??	Kodomo no uta [10]
-	RO-187K		1989	Kodomo no uta [11]
+	RO-177K		19??	Kodomo no Uta [9]
+	RO-179K		19??	Kodomo no Uta [10]
+	RO-187K		1989	Kodomo no Uta [11]
 	RO-188Y		19??	Young Hits [6]
-	RO-190K		19??	Kodomo no uta [12], Pikkapika Ongakukan 2
+	RO-190K		19??	Kodomo no Uta [12], Pikkapika Ongakukan 2
 	RO-193Y		19??	Young Hits [7]
 	RO-195G		19??	Game Music [2]
-	RO-196K		1991	Kodomo no uta [13], NHK Minna no Uta Yori
+	RO-196K		1991	Kodomo no Uta [13], NHK Minna no Uta Yori
 	RO-581		1988	Family Selection
 	RO-582		1989	DH Tunes & Rhythms
 	RO-583?		19??	Kids Selection, bundled with Casio Sound Kids 03 keyboard?
@@ -63,13 +63,13 @@ license:CC0-1.0
 	RO-603P		1985	Pops [2]
 	RO-604E		1986	Enka [7]
 	RO-605Y		1986	Young Best Hits [4]
-	RO-606K		1988	Kodomo no uta [4]
-	RO-607K		19??	Kodomo no uta [5]
+	RO-606K		1988	Kodomo no Uta [4]
+	RO-607K		19??	Kodomo no Uta [5]
 	RO-608Y		19??	Young Best Hits [5]
-	RO-609K		19??	Kodomo no uta Best [1]
-	RO-610K		19??	Kodomo no uta Best [2]
-	RO-611K		1990	Kodomo no uta Best [3]
-	RO-612K		19??	Kodomo no uta Best [4]
+	RO-609K		19??	Kodomo no Uta Best [1]
+	RO-610K		19??	Kodomo no Uta Best [2]
+	RO-611K		1990	Kodomo no Uta Best [3]
+	RO-612K		19??	Kodomo no Uta Best [4]
 	RO-613A		1990	Animation Themes [8]
 	RO-614Y		1990	Young Best Hits [11]
 	RO-615A		1991	Animation Themes [9]
@@ -867,7 +867,7 @@ license:CC0-1.0
 		15. アンダルコのうた
 	-->
 	<software name="ro184t">
-		<description>Shougakusei no ongaku 1 (RO-184T)</description>
+		<description>Shougakusei no Ongaku 1 (RO-184T)</description>
 		<year>1989?</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
 		<info name="alt_title" value="しょうがくせいのおんがく1"/>
@@ -897,7 +897,7 @@ license:CC0-1.0
 		15. 月夜
 	-->
 	<software name="ro185t">
-		<description>Shougakusei no ongaku 2 (RO-185T)</description>
+		<description>Shougakusei no Ongaku 2 (RO-185T)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
 		<info name="alt_title" value="小学生の音楽2"/>
@@ -925,7 +925,7 @@ license:CC0-1.0
 		13. あおげばとうとし
 	-->
 	<software name="ro186t">
-		<description>Shougakusei no ongaku 3 (RO-186T)</description>
+		<description>Shougakusei no Ongaku 3 (RO-186T)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
 		<info name="alt_title" value="小学生の音楽3"/>
