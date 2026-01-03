@@ -336,7 +336,7 @@ void stellafr_state::ay8910_portb_w(uint8_t data)
 
 void stellafr_state::mem_map(address_map &map)
 {
-	map(0x000000, 0x01ffff).rom();
+	map(0x000000, 0x0fffff).rom(); //up to 2x 27c4001
 	// controlled by U17 74HC138
 	map(0x800001, 0x800001).w(m_dac, FUNC(dac_byte_interface::data_w)); // Y0
 	// Y1 device on cpu board
@@ -347,6 +347,7 @@ void stellafr_state::mem_map(address_map &map)
 	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
 	// Y7 NC
+	map(0xfc0000, 0xfc7fff).ram();
 	map(0xff0000, 0xffffff).ram().share("nvram");
 }
 
@@ -478,7 +479,7 @@ ROM_START( jack4000 )
 ROM_END
 
 ROM_START( jkrpoker )
-	ROM_REGION( 0x300000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "joker_poker_f1.u2", 0x00000, 0x18000, CRC(9f8ef927) SHA1(9a894e7a9326c9846eabb7b22916244b51c16fd3) )
 	ROM_LOAD16_BYTE( "joker_poker_f1.u6", 0x00001, 0x18000, CRC(f53973a1) SHA1(27dabe5e6df6ec03080635da5b68b5a8125e71d1) )
 ROM_END
@@ -514,7 +515,7 @@ ROM_START( kleoptra )
 ROM_END
 
 ROM_START( kometf1 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "komet_f1_pr1.u2", 0x00000, 0x20000, CRC(c0328d5d) SHA1(ebb934f72e2bf275717d47b72aeffe4b38136622) )
 	ROM_LOAD16_BYTE( "komet_f1_pr2.u6", 0x00001, 0x20000, CRC(86715c37) SHA1(cb986eb50d215294375450c651043e617f66fe21) )
 ROM_END
@@ -547,13 +548,19 @@ ROM_START( multprim )
 ROM_END
 
 ROM_START( multstar )
-    ROM_REGION(0x40000, "maincpu", 0)
+    ROM_REGION( 0x40000, "maincpu", 0 )
     ROM_LOAD16_BYTE( "multi_star_f2_pr_1.u2", 0x00000, 0x20000, CRC(8f63fd16) SHA1(d9b8ef2e1f7616bc0569768af26794fa6166cc0d) )
     ROM_LOAD16_BYTE( "multi_star_f2_pr_2.u6", 0x00001, 0x20000, CRC(26952bd7) SHA1(20de0d890a91e728776278fb9c8d6de3b65f8703) )
 ROM_END
 
+ROM_START( mystjack )
+    ROM_REGION( 0x100000, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "mystery_jackpot_f4_i.u2", 0x00000, 0x80000, CRC(4ff3ddd7) SHA1(6765628c4858ba78898bad5d3aed6e2e8e651264) )
+    ROM_LOAD16_BYTE( "mystery_jackpot_f4_ii.u6", 0x00001, 0x80000, CRC(96523e1a) SHA1(4f53b454790dab4ce45b1db78bd033c40ce47179) )
+ROM_END
+
 ROM_START( nunran )
-    ROM_REGION(0x40000, "maincpu", 0)
+    ROM_REGION( 0x40000, "maincpu", 0)
     ROM_LOAD16_BYTE( "nun_ran_f1_nr1.u2", 0x00000, 0x20000, CRC(d8eed6de) SHA1(937cf33694a3d3baf1cc0577cef6974e1d99a6c4) )
     ROM_LOAD16_BYTE( "nun_ran_f1_nr2.u6", 0x00001, 0x20000, CRC(2a7b9cf2) SHA1(bf30d41dd75b4d316f2f24d11886126484b10415) )
 ROM_END
@@ -621,6 +628,7 @@ GAMEL(1997, jumboa,   0,        stellafr, stellafr, stellafr_state, empty_init, 
 GAMEL(1997, kometf1,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Komet",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, moneyf1,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Money",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, multprim, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Venus",  "Multi Prima",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1997, mystjack, 0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Mystery Jackpot",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1997, nunran,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Nun Ran",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, allfred,  0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
 GAMEL(1998, grnada,   0,        stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Granada",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
