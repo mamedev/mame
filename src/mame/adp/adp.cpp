@@ -159,6 +159,7 @@ Quick Jack administration/service mode:
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/microtch.h"
@@ -167,6 +168,7 @@ Quick Jack administration/service mode:
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -208,10 +210,10 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_ioport m_in0;
 
-	/* misc */
+	// misc
 	uint8_t m_mux_data;
 
-	/* devices */
+	// devices
 	uint16_t input_r();
 	void input_w(uint16_t data);
 	void adp_palette(palette_device &device) const;
@@ -274,11 +276,11 @@ void adp_state::adp_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int const r = 0x21 * BIT(i, 0) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 0);
-		int const g = 0x21 * BIT(i, 1) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 1);
-		int const b = 0x21 * BIT(i, 2) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 2);
+		int const R = 0x21 * BIT(i, 0) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 0);
+		int const G = 0x21 * BIT(i, 1) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 1);
+		int const B = 0x21 * BIT(i, 2) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 2);
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(R, G, B));
 	}
 }
 
