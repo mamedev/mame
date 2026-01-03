@@ -17873,8 +17873,38 @@ ROM_START( cb3h )  // very similar to the cb3 set, but changes are legit
 ROM_END
 
 /*
-  Blue Taiwanese W4 PCB + Daughterboard
-  Original Dyna
+  Cherry Bonus III (ver.3.0)
+
+  Blue Taiwanese W4 PCB + original Dyna daughterboard
+  silkscreened DYNA D9005 with:
+
+  - Unknown DIL-40 IC (maybe a Z80) (IC4)
+  - 68-pins custom Dyna "DP 1200-5" IC (IC3)
+  - 1x 27C512 ROM (IC5)
+  - 1x Sanyo LC3517AS-12 (IC6)
+  - 1x empty DIL-8 socket (IC1)
+
+  - 1x Battery
+  - 1x 8-DIP switches bank (SW5)
+  - 1x Reset switch
+
+  Main Board:
+
+  - 1x DIL40 IC (seems a 8255)
+    stickered:
+
+    Micro Manufacturing, Inc.
+    Date: 04-20-1994
+	Ser#: MAC-PCB-145090
+
+  - 1x NEC D8255AC-2
+  - 6x HM6116 SRAMs
+  - 3x 27C256 ROMs
+  - 4x 2764 ROMs
+
+  - 4x 8-DIP switches banks
+  - 1x 12 MHz crystal
+
 */
 ROM_START( cb3i )
 	ROM_REGION( 0x10000, "maincpu", 0 )
