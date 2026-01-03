@@ -2268,7 +2268,7 @@ ROM_END
 
 
 // This shows ジャンボジェッタ on title screen, but is called わくわくジャンボ on the cabinet and on promotional material.
-// Going with the latter as it seems the intended title as past of the Waku Waku series
+// Going with the latter as it seems the intended title as part of the Waku Waku series
 ROM_START( wwjumbo ) // Waku Waku Jumbo (Rev.A) (c)1990 Sega - 834-7691 (EMP5032 labeled 317-0140 at ic27)
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "epr-13474a.ic32", 0x000000, 0x020000, CRC(a9373fe0) SHA1(1abb334bbd16ab62459b25834ca1510af6dd5291) ) // hand-written label
