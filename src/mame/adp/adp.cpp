@@ -630,7 +630,7 @@ void adp_state::fstation(machine_config &config)
 
 
 ROM_START( fashiong )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "fashion_gambler_s6_i.u2", 0x00000, 0x80000, CRC(827a164d) SHA1(dc16380226cabdefbfd893cb50cbfca9e134be40) )
 	ROM_LOAD16_BYTE( "fashion_gambler_s6_ii.u6", 0x00001, 0x80000, CRC(5a2466d1) SHA1(c113a2295beed2011c70887a1f2fcdec00b055cb) )
 
@@ -644,7 +644,7 @@ ROM_START( fashiong )
 ROM_END
 
 ROM_START( fashiong2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "fashion_gambler_f3_i.u2", 0x00000, 0x80000, CRC(2939279a) SHA1(75798ea41dd713d294ea341cbcdb73a76d9f63f4) )
 	ROM_LOAD16_BYTE( "fashion_gambler_f3_ii.u6", 0x00001, 0x80000, CRC(7d48e9ab) SHA1(603e946b95c53ee75c9ca10751316e723242424f) )
 
@@ -659,7 +659,7 @@ ROM_START( fashiong2 )
 ROM_END
 
 ROM_START( funcpro )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "fun_city_pro_1.u2", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fun_city_pro_2.u6", 0x00001, 0x80000, NO_DUMP )
 
@@ -669,7 +669,7 @@ ROM_START( funcpro )
 ROM_END
 
 ROM_START( funlddlx )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "fldl_f6_1.bin", 0x00001, 0x80000, CRC(85c74040) SHA1(24a7d3e6acbaf73ef9817379bef64c38a9ff7896) )
 	ROM_LOAD16_BYTE( "fldl_f6_2.bin", 0x00000, 0x80000, CRC(93bf1a4b) SHA1(5b4353feba1e0d4402cd26f4855e3803e6be43b9) )
 
@@ -684,7 +684,7 @@ ROM_START( funlddlx )
 ROM_END
 
 ROM_START( funlddlx2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "funny_land_dlx_w2.p1", 0x00000, 0x80000, CRC(d51abc1d) SHA1(e9c30efc36cf754fe8aa369c83ead6a8f4b300f4) )
 	ROM_LOAD16_BYTE( "funny_land_dlx_w2.p2", 0x00001, 0x80000, CRC(44691005) SHA1(faf88d6e5e67a4f789f5535a1f2eb2eb93d0f9fd) )
 
@@ -699,7 +699,7 @@ ROM_START( funlddlx2 )
 ROM_END
 
 ROM_START( funlddlx4 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "fldl_w4_1.u2", 0x00000, 0x80000, CRC(dc64234e) SHA1(4bdcb6b54095307939118cc479aa89db66e02757) )
 	ROM_LOAD16_BYTE( "fldl_w4_2.u6", 0x00001, 0x80000, CRC(fde4caa0) SHA1(0db9e8c16c86d005b2f0957f0a42a947b24890a9) )
 
@@ -714,7 +714,7 @@ ROM_START( funlddlx4 )
 ROM_END
 
 ROM_START( fstation7 )
-    ROM_REGION(0x100000, "maincpu", 0)
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_i.u2", 0x00000, 0x80000, CRC(bbf4bbd9) SHA1(80e785cb04213f8cc2f580b523e20b4825ba45e5))
     ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u6", 0x00001, 0x80000, CRC(cd8ab9e3) SHA1(cb9206d0367f00bec278cee0a4115594ba715fcd))
 
@@ -724,7 +724,7 @@ ROM_START( fstation7 )
 ROM_END
 
 ROM_START( fstation8 )
-    ROM_REGION(0x100000, "maincpu", 0)
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_i.u2", 0x00000, 0x80000, CRC(f9c792ab) SHA1(30ab7352cce22340be87ddae80e4b3c2f69ea778))
     ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_ii.u5", 0x00001, 0x80000, CRC(0cb7b719) SHA1(e87bc67da903d9514dd97a6abf2d4e2171e15dbd))
 
@@ -734,7 +734,7 @@ ROM_START( fstation8 )
 ROM_END
 
 ROM_START( fstation9 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1_i.u2", 0x00000, 0x80000, CRC(4572efbd) SHA1(e0a91d32ab4096767cafb743523d038f5e0d3238) )
 	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1_ii.u6", 0x00001, 0x80000, CRC(a972184d) SHA1(1849e71e696039f07b7b67c4172c7999e81664c3) )
 
@@ -747,7 +747,7 @@ ROM_START( fstation9 )
 ROM_END
 
 ROM_START( quickjac )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "quick_jack_1.u2", 0x00000, 0x10000, CRC(c2fba6fe) SHA1(f79e5913f9ded1e370cc54dd55860263b9c51d61) )
 	ROM_LOAD16_BYTE( "quick_jack_2.u6", 0x00001, 0x10000, CRC(210cb89b) SHA1(8eac60d40b60e845f9c02fee6c447f125ba5d1ab) )
 
@@ -757,7 +757,7 @@ ROM_START( quickjac )
 ROM_END
 
 ROM_START( skattv )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "f2_i.bin", 0x00000, 0x20000, CRC(3cb8b431) SHA1(e7930876b6cd4cba837c3da05d6948ef9167daea) )
 	ROM_LOAD16_BYTE( "f2_ii.bin", 0x00001, 0x20000, CRC(0db1d2d5) SHA1(a29b0299352e0b2b713caf02aa7978f2a4b34e37) )
 
@@ -767,7 +767,7 @@ ROM_START( skattv )
 ROM_END
 
 ROM_START( skattva )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "skat_tv_version_ts3.1.u2", 0x00000, 0x20000, CRC(68f82fe8) SHA1(d5f9cb600531cdd748616d8c042b6a151ebe205a) )
 	ROM_LOAD16_BYTE( "skat_tv_version_ts3.2.u6", 0x00001, 0x20000, CRC(4f927832) SHA1(bbe013005fd00dd42d12939eab5c80ec44a54b71) )
 
@@ -777,7 +777,7 @@ ROM_START( skattva )
 ROM_END
 
 ROM_START(trumpfas)
-    ROM_REGION( 0x100000, "maincpu", 0 )
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
     ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
     ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr2.u6", 0x00001, 0x20000, CRC(d39bbd88) SHA1(64f47fd0076845ed3f9f3e84aca3504c110ad8ad))
 
