@@ -40,8 +40,6 @@
 class i8256_device : public device_t, public device_serial_interface
 {
 public:
-	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
-
 	i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto inta_callback()    { return m_in_inta_cb.bind(); }
@@ -62,6 +60,7 @@ public:
 
 	void write(offs_t offset, u8 data);
 	uint8_t read(offs_t offset);
+	uint8_t acknowledge();
 
 	uint8_t p1_r();
 	void    p1_w(uint8_t data);
@@ -91,8 +90,8 @@ private:
 
 	uint8_t m_command1, m_command2, m_command3;
 	uint8_t m_data_bits_count;
-	parity_t m_parity;
-	stop_bits_t m_stop_bits;
+	uint8_t m_parity;
+	uint8_t m_stop_bits;
 
 	uint8_t m_mode;
 	uint8_t m_port1_control;
@@ -112,6 +111,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(timer_check);
 
+	void reset_timer();
 	void receive_clock();
 	void sync1_rxc();
 	void sync2_rxc();
