@@ -90,7 +90,7 @@ VTech V.Smile Baby cartridges
 
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
 
-	<software name="babyeins" supported="no">
+	<software name="babyeins" supported="partial">
 		<description>Baby Einstein - World of Discoveries (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -103,9 +103,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="babyeinsa" cloneof="babyeins" supported="no">
+	<software name="babyeinsa" cloneof="babyeins" supported="partial">
 		<description>Baby Einstein - World of Discoveries (USA, alt)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099040(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -116,9 +116,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="babyeinsfr" cloneof="babyeins" supported="no">
+	<software name="babyeinsfr" cloneof="babyeins" supported="partial">
 		<description>Baby Einstein - Un monde de découvertes (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099045(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -129,7 +129,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="backyardi" supported="no">
+	<software name="backyardi" supported="partial">
 		<description>Nickelodeon The Backyardigans - Big Backyard Adventure (USA)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -142,7 +142,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="barney" supported="no">
+	<software name="barney" supported="partial">
 		<description>Barney - Let's Go to a Party (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -155,7 +155,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="carebear" supported="no">
+	<software name="carebear" supported="partial">
 		<description>Care Bears - Play Day (USA)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -168,9 +168,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarm" supported="no">
+	<software name="dayfarm" supported="partial">
 		<description>A Day on the Farm (USA)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099060(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -181,9 +181,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmge" cloneof="dayfarm" supported="no">
+	<software name="dayfarmge" cloneof="dayfarm" supported="partial">
 		<description>Mein erster Bauernhof (Germany)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099064(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -196,9 +196,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmfr" cloneof="dayfarm" supported="no">
+	<software name="dayfarmfr" cloneof="dayfarm" supported="partial">
 		<description>Un jour à la ferme (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099065(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -209,9 +209,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmsp" cloneof="dayfarm" supported="no">
+	<software name="dayfarmsp" cloneof="dayfarm" supported="partial">
 		<description>Un Día en la Granja (Spain)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099067(SP)" />
 		<part name="cart" interface="vsmile_cart">
@@ -224,9 +224,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dbabymi" supported="no">
+	<software name="dbabymi" supported="partial">
 		<description>Discovery with Baby Mickey &amp; Friends (USA)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099160(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -237,9 +237,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dbabymifr" cloneof="dbabymi" supported="no">
+	<software name="dbabymifr" cloneof="dbabymi" supported="partial">
 		<description>Les découvertes de Mickey et ses amis (France)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099165(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -251,9 +251,9 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhnl" supported="no">
+	<software name="learndhnl" supported="partial">
 		<description>Dierenhuis (Netherlands)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099002(NL)" />
 		<part name="cart" interface="vsmile_cart">
@@ -265,9 +265,9 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhge" cloneof="learndhnl" supported="no">
+	<software name="learndhge" cloneof="learndhnl" supported="partial">
 		<description>Meine kleinen Tierfreunde (Germany)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099004(GE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -281,9 +281,9 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhfr" cloneof="learndhnl" supported="no">
+	<software name="learndhfr" cloneof="learndhnl" supported="partial">
 		<description>La Maison Des Animaux (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099005(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -294,9 +294,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="mothergoo" supported="no">
+	<software name="mothergoo" supported="partial">
 		<description>Mother Goose (USA)</description>
-		<year>200?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099200(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -307,9 +307,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="noahark" supported="no">
+	<software name="noahark" supported="partial">
 		<description>Noah's Ark - Animal Adventures (USA)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099100(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -320,9 +320,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="noaharkfr" cloneof="noahark" supported="no">
+	<software name="noaharkfr" cloneof="noahark" supported="partial">
 		<description>L'arche de Noé - L'aventure des animaux (France)</description>
-		<year>200?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099105(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -333,9 +333,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="poohhawa" supported="no">
+	<software name="poohhawa" supported="partial">
 		<description>Pooh's Hundred Acre Wood Adventure (USA)</description>
-		<year>2007</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099020(US)" />
 		<part name="cart" interface="vsmile_cart">
@@ -345,9 +345,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="poohhawase" cloneof="poohhawa" supported="no">
+	<software name="poohhawase" cloneof="poohhawa" supported="partial">
 		<description>Nalle Puhs Äventyr i Sjumilaskogen (Sweden)</description>
-		<year>2007?</year>
+		<year>2006</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099034(SE)" />
 		<part name="cart" interface="vsmile_cart">
@@ -360,7 +360,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletub" supported="no">
+	<software name="teletub" supported="partial">
 		<description>Teletubbies - Time for Teletubbies (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -372,9 +372,9 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletubfr" cloneof="teletub" supported="no">
+	<software name="teletubfr" cloneof="teletub" supported="partial">
 		<description>Teletubbies - C'est l'heure des Teletubbies (France)</description>
-		<year>2007?</year>
+		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-099145(FR)" />
 		<part name="cart" interface="vsmile_cart">
@@ -384,7 +384,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletubsp" cloneof="teletub" supported="no">
+	<software name="teletubsp" cloneof="teletub" supported="partial">
 		<description>Teletubbies - ¡Es la hora de los Teletubbies! (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
