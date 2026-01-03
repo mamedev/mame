@@ -929,17 +929,17 @@ render_primitive_list *renderer_sdl2::get_primitives()
 }
 
 
-class video_sdl2 : public osd_module, public render_module
+class video_sdl3_accel : public osd_module, public render_module
 {
 public:
-	video_sdl2()
+	video_sdl3_accel()
 		: osd_module(OSD_RENDERER_PROVIDER, "accel")
 		, m_blit_info_initialized(false)
 		, m_gllib_loaded(false)
 	{
 		std::fill(std::begin(m_blit_info), std::end(m_blit_info), nullptr);
 	}
-	~video_sdl2()
+	~video_sdl3_accel()
 	{
 		free_copy_info();
 	}
@@ -967,7 +967,7 @@ private:
 	static copy_info_t const s_blit_info_default[];
 };
 
-int video_sdl2::init(osd_interface &osd, osd_options const &options)
+int video_sdl3_accel::init(osd_interface &osd, osd_options const &options)
 {
 	osd_printf_verbose("Using SDL native texturing driver (SDL 3.2+)\n");
 
@@ -996,7 +996,7 @@ int video_sdl2::init(osd_interface &osd, osd_options const &options)
 	return 0;
 }
 
-std::unique_ptr<osd_renderer> video_sdl2::create(osd_window &window)
+std::unique_ptr<osd_renderer> video_sdl3_accel::create(osd_window &window)
 {
 	if (!m_blit_info_initialized)
 	{
@@ -1009,7 +1009,7 @@ std::unique_ptr<osd_renderer> video_sdl2::create(osd_window &window)
 	return std::make_unique<renderer_sdl2>(window, m_blit_info);
 }
 
-void video_sdl2::expand_copy_info()
+void video_sdl3_accel::expand_copy_info()
 {
 	for (const copy_info_t *bi = s_blit_info_default; bi->src_fmt != -1; bi++)
 	{
@@ -1027,7 +1027,7 @@ void video_sdl2::expand_copy_info()
 	}
 }
 
-void video_sdl2::free_copy_info()
+void video_sdl3_accel::free_copy_info()
 {
 	if (m_blit_info_initialized)
 	{
@@ -1054,7 +1054,7 @@ void video_sdl2::free_copy_info()
 	}
 }
 
-void video_sdl2::add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm)
+void video_sdl3_accel::add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm)
 {
 	copy_info_t *const newci = new copy_info_t(element);
 
@@ -1072,7 +1072,7 @@ void video_sdl2::add_list(copy_info_t const *&head, copy_info_t const &element, 
 #define ENTRY_BM(a,b,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
 #define ENTRY_LR(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
 
-copy_info_t const video_sdl2::s_blit_info_default[] =
+copy_info_t const video_sdl3_accel::s_blit_info_default[] =
 {
 	/* no rotation */
 	ENTRY(ARGB32,           ARGB8888,   argb32_argb32),
@@ -1158,8 +1158,8 @@ copy_info_t const video_sdl2::s_blit_info_default[] =
 
 #else // defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
-namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl2, OSD_RENDERER_PROVIDER, "accel") } }
+namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl3_accel, OSD_RENDERER_PROVIDER, "accel") } }
 
 #endif // defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
-MODULE_DEFINITION(RENDERER_SDL2, osd::video_sdl2)
+MODULE_DEFINITION(RENDERER_SDL3ACCEL, osd::video_sdl3_accel)

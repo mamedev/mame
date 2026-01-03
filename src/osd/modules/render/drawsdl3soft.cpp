@@ -615,10 +615,10 @@ render_primitive_list *renderer_sdl1::get_primitives()
 }
 
 
-class video_sdl1 : public osd_module, public render_module
+class video_sdl3soft : public osd_module, public render_module
 {
 public:
-	video_sdl1()
+	video_sdl3soft()
 		: osd_module(OSD_RENDERER_PROVIDER, "soft")
 		, m_scale_mode(-1)
 	{
@@ -640,7 +640,7 @@ private:
 	static sdl_scale_mode const s_scale_modes[];
 };
 
-int video_sdl1::init(osd_interface &osd, osd_options const &options)
+int video_sdl3soft::init(osd_interface &osd, osd_options const &options)
 {
 	osd_printf_verbose("Using SDL multi-window soft driver (SDL 3.2+)\n");
 
@@ -656,12 +656,12 @@ int video_sdl1::init(osd_interface &osd, osd_options const &options)
 	return 0;
 }
 
-std::unique_ptr<osd_renderer> video_sdl1::create(osd_window &window)
+std::unique_ptr<osd_renderer> video_sdl3soft::create(osd_window &window)
 {
 	return std::make_unique<renderer_sdl1>(window, s_scale_modes[m_scale_mode]);
 }
 
-int video_sdl1::get_scale_mode(char const *modestr)
+int video_sdl3soft::get_scale_mode(char const *modestr)
 {
 	const sdl_scale_mode *sm = s_scale_modes;
 	int index = 0;
@@ -675,7 +675,7 @@ int video_sdl1::get_scale_mode(char const *modestr)
 	return -1;
 }
 
-sdl_scale_mode const video_sdl1::s_scale_modes[] = {
+sdl_scale_mode const video_sdl3soft::s_scale_modes[] = {
 		{ "none",    0, 0, 1, 1, DRAW2_SCALEMODE_NEAREST, 0,                    nullptr },
 		{ "hwblit",  1, 0, 1, 1, DRAW2_SCALEMODE_LINEAR,  0,                    nullptr },
 		{ "hwbest",  1, 0, 1, 1, DRAW2_SCALEMODE_BEST,    0,                    nullptr },
@@ -692,8 +692,9 @@ sdl_scale_mode const video_sdl1::s_scale_modes[] = {
 
 #else // defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
-namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl1, OSD_RENDERER_PROVIDER, "soft") } }
+namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl3soft, OSD_RENDERER_PROVIDER, "soft") } }
 
 #endif // defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
-MODULE_DEFINITION(RENDERER_SDL1, osd::video_sdl1)
+MODULE_DEFINITION(RENDERER_SDL3SOFT, osd::video_sdl3soft)
+
