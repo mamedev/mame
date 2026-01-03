@@ -765,19 +765,21 @@ TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 
 void jaguar_state::update_pit_timer()
 {
-	const u16 prescaler = m_gpu_regs[PIT0];
-	const u16 divider = m_gpu_regs[PIT1];
-
-	//printf("%04x %04x\n", prescaler, divider);
-
 	// raiden BGM tempo depends on this
-	// TODO: randomly crash/hang here in pitfall
-	// TODO: prescaler != 0xffff shouldn't be a thing
-	// - aircars/aircars94/fforlife/trevmcfr writes 0xffff to both, also read periodically
+	// NOTE: in u64 because `from_ticks` expects u64
+	// - aircars/aircars94/fforlife/trevmcfr writes 0xffff 0xffff, also read periodically
 	//   (which is a write only register ...)
-	if (prescaler != 0 && prescaler != 0xffff)
+	const u64 prescaler = m_gpu_regs[PIT0];
+	const u64 divider = m_gpu_regs[PIT1];
+
+	// printf("%04x %04x\n", prescaler, divider);
+
+	// TODO: randomly crash/hang here in pitfall (or it's something else?)
+	if (prescaler != 0)
 	{
-		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_gpu->clock());
+		const u64 pit_value = (1 + prescaler) * (1 + divider);
+
+		attotime sample_period = attotime::from_ticks(pit_value, m_gpu->clock());
 		m_pit_timer->adjust(sample_period);
 	}
 	else
