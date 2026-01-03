@@ -60,7 +60,7 @@ end
 local input_menu
 local input_start_field
 
-function start_input_menu(handler, start_field)
+local function start_input_menu(handler, start_field)
 	local function supported(f)
 		if f.is_analog or f.is_toggle then
 			return false
@@ -539,7 +539,7 @@ end
 
 local macros_item_add
 
-function handle_macros(index, event)
+local function handle_macros(index, event)
 	if index == macros_item_add then
 		if event == 'select' then
 			edit_current_macro = new_macro()
@@ -570,7 +570,7 @@ function handle_macros(index, event)
 	return false
 end
 
-function populate_macros()
+local function populate_macros()
 	local input = manager.machine.input
 	local ioport = manager.machine.ioport
 	local items = { }
