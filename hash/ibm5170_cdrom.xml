@@ -7478,36 +7478,6 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		</part>
 	</software>
 
-	<!-- Windows 95/98/ME/XP and Mac OS supported -->
-	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
-	<software name="v16imagine" supported="partial">
-		<description>Viper -V16- Imagine (International)</description>
-		<year>2001</year>
-		<publisher>Sogna / Hobibox Europe</publisher>
-		<notes><![CDATA[
-Has [8514] icon glitch
-]]></notes>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="GX" sha1="5de4abf4a883a56ec389bb255d176b5a39a63420" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="v16rise" supported="partial">
-		<description>Viper -V16- RISE (International)</description>
-		<year>2001</year>
-		<publisher>Sogna / Hobibox Europe</publisher>
-		<notes><![CDATA[
-Has [8514] icon glitch
-]]></notes>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Windows 95 -->
 	<!-- Pentium class 90 MHz -->
 	<software name="vf" supported="no">
