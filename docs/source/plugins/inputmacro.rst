@@ -111,7 +111,7 @@ item will only appear after you set the first input for the initially created
 step when creating a new macro.
 
 When creating a new macro, there is a **Cancel** option that changes to
-**Create** after you set the activating sequence and the first input for the
+**Create** after you set the activation sequence and the first input for the
 initially created step.  Select **Create** to finish creating the macro and
 return to the list of input macros.  The new macro will be added at the end of
 the list.  Press the UI Back key, or select **Cancel** before setting the
