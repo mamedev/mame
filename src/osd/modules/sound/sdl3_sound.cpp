@@ -31,15 +31,15 @@ namespace osd {
 
 namespace {
 
-class sound_sdl : public osd_module, public sound_module
+class sound_sdl3 : public osd_module, public sound_module
 {
 public:
-	sound_sdl() :
+	sound_sdl3() :
 		osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module()
 	{
 	}
 
-	virtual ~sound_sdl() { }
+	virtual ~sound_sdl3() { }
 
 	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
@@ -93,10 +93,10 @@ private:
 };
 
 //============================================================
-//  sound_sdl::init
+//  sound_sdl3::init
 //============================================================
 
-int sound_sdl::init(osd_interface &osd, const osd_options &options)
+int sound_sdl3::init(osd_interface &osd, const osd_options &options)
 {
 	m_stream_next_id = 1;
 
@@ -180,18 +180,18 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	return 0;
 }
 
-void sound_sdl::exit()
+void sound_sdl3::exit()
 {
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	m_devices.clear();
 }
 
-uint32_t sound_sdl::get_generation()
+uint32_t sound_sdl3::get_generation()
 {
 	return 1;
 }
 
-osd::audio_info sound_sdl::get_information()
+osd::audio_info sound_sdl3::get_information()
 {
 	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR, AUX };
 	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
@@ -247,7 +247,7 @@ osd::audio_info sound_sdl::get_information()
 	return m_deviceinfo;
 }
 
-uint32_t sound_sdl::stream_sink_open(uint32_t node, std::string name, uint32_t rate)
+uint32_t sound_sdl3::stream_sink_open(uint32_t node, std::string name, uint32_t rate)
 {
 	const int devnode = node - 1;
 	const SDL_AudioDeviceID device_id = m_devices[devnode].m_device_id;
@@ -285,7 +285,7 @@ uint32_t sound_sdl::stream_sink_open(uint32_t node, std::string name, uint32_t r
 	return id;
 }
 
-uint32_t sound_sdl::stream_source_open(uint32_t node, std::string name, uint32_t rate)
+uint32_t sound_sdl3::stream_source_open(uint32_t node, std::string name, uint32_t rate)
 {
 	const int devnode = node - 1;
 	const SDL_AudioDeviceID device_id = m_devices[devnode].m_device_id;
@@ -328,7 +328,7 @@ uint32_t sound_sdl::stream_source_open(uint32_t node, std::string name, uint32_t
 	return id;
 }
 
-void sound_sdl::stream_close(uint32_t id)
+void sound_sdl3::stream_close(uint32_t id)
 {
 	osd_printf_verbose("SDL Audio: Closing stream id %d\n", id);
 
@@ -341,7 +341,7 @@ void sound_sdl::stream_close(uint32_t id)
 	m_streams.erase(si);
 }
 
-void sound_sdl::stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)
+void sound_sdl3::stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)
 {
 	auto si = m_streams.find(id);
 	if(si == m_streams.end())
@@ -350,7 +350,7 @@ void sound_sdl::stream_sink_update(uint32_t id, const int16_t *buffer, int sampl
 	SDL_PutAudioStreamData(stream->m_sdl_stream, (void *)buffer, samples_this_frame * sizeof(int16_t) * stream->m_buffer.channels());
 }
 
-void sound_sdl::stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame)
+void sound_sdl3::stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame)
 {
 	auto si = m_streams.find(id);
 	if (si == m_streams.end())
@@ -365,9 +365,9 @@ void sound_sdl::stream_source_update(uint32_t id, int16_t *buffer, int samples_t
 
 #else // (defined(OSD_SDL) || defined(USE_SDL_SOUND)) && defined(SDLMAME_SDL3)
 
-namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl") } }
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_sdl3, OSD_SOUND_PROVIDER, "sdl") } }
 
 #endif
 
-MODULE_DEFINITION(SOUND_SDL, osd::sound_sdl)
+MODULE_DEFINITION(SOUND_SDL3, osd::sound_sdl3)
 

@@ -237,9 +237,16 @@ void osd_common_t::register_options()
 #if !defined(OSD_WINDOWS) && !defined(SDLMAME_WIN32)
 	REGISTER_MODULE(m_mod_man, RENDERER_BGFX); // try BGFX after OpenGL on other operating systems for now
 #endif
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, RENDERER_SDL3ACCEL);
+#if !defined(SDLMAME_EMSCRIPTEN)
+	REGISTER_MODULE(m_mod_man, RENDERER_SDL3SOFT);
+#endif
+#else
 	REGISTER_MODULE(m_mod_man, RENDERER_SDL2);
 #if !defined(SDLMAME_EMSCRIPTEN)
 	REGISTER_MODULE(m_mod_man, RENDERER_SDL1);
+#endif
 #endif
 	REGISTER_MODULE(m_mod_man, RENDERER_NONE);
 
@@ -247,7 +254,11 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, SOUND_SDL3);
+#else
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
+#endif
 #ifndef NO_USE_PORTAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
 #endif
