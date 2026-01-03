@@ -157,6 +157,7 @@ DE-0397-0   DEC-22VO
 |  CN3      LH52250  LH52250   LX-00          |-----| |
 |-----------------------------------------------------|
 Notes:
+       Also seen with 28.0MHz and 32.22MHz XTALs (matches the other games in this driver, MAME chooses this configuration).
        The CPU is chip 156. It's an encrypted ARM-based CPU. The CPU is running at 7.0805MHz [28.322/4]
 
        Z80B      - Goldstar Z8400B, running at 3.5555MHz [32/9]
@@ -1886,10 +1887,10 @@ GFXDECODE_END
 void captaven_state::captaven(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, XTAL(28'000'000)/4); // verified on pcb (Data East 101 custom)*/
+	ARM(config, m_maincpu, 28_MHz_XTAL / 4); // verified on pcb (Data East 101 custom)*/
 	m_maincpu->set_addrmap(AS_PROGRAM, &captaven_state::captaven_map);
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000)/4/3));  // pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb)
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3)); // pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb)
 	audiocpu.set_addrmap(AS_PROGRAM, &captaven_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
@@ -1902,7 +1903,7 @@ void captaven_state::captaven(machine_config &config)
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(captaven_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1947,17 +1948,17 @@ void captaven_state::captaven(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, m_ym2151, XTAL(32'220'000)/9); // verified on pcb
+	YM2151(config, m_ym2151, 32.22_MHz_XTAL / 9); // verified on pcb
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
 	m_ym2151->add_route(0, "speaker", 0.42, 0);
 	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
-	OKIM6295(config, m_oki[0], XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH);  // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
+	OKIM6295(config, m_oki[0], 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH); // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	OKIM6295(config, m_oki[1], XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH); // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
+	OKIM6295(config, m_oki[1], 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH); // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 }
@@ -1965,11 +1966,11 @@ void captaven_state::captaven(machine_config &config)
 // DE-0380-2
 void fghthist_state::fghthist(machine_config &config)
 {
-	ARM(config, m_maincpu, XTAL(28'000'000) / 4);
+	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fghthist_state::fghthist_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3)); // assume same as captaven
 	audiocpu.set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_custom_latch_map);
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
@@ -1977,7 +1978,7 @@ void fghthist_state::fghthist(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(fghthist_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghthist);
@@ -2025,17 +2026,17 @@ void fghthist_state::fghthist(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, 32.22_MHz_XTAL / 9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
 	m_ym2151->add_route(0, "speaker", 0.42, 0);
 	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 }
@@ -2057,7 +2058,7 @@ void fghthist_state::fghthistu(machine_config &config)
 {
 	fghthsta(config);
 
-	Z80(config.replace(), m_audiocpu, XTAL(32'220'000) / 9);
+	Z80(config.replace(), m_audiocpu, 32.22_MHz_XTAL / 9);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fghthist_state::z80_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &fghthist_state::z80_sound_io);
 
@@ -2075,10 +2076,10 @@ void fghthist_state::fghthistu(machine_config &config)
 void dragngun_state::dragngun(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, XTAL(28'000'000) / 4);
+	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::dragngun_map);
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3)); // assume same as captaven
 	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
@@ -2094,7 +2095,7 @@ void dragngun_state::dragngun(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(dragngun_state::screen_update));
 	//m_screen->set_palette(m_palette);
 
@@ -2156,21 +2157,21 @@ void dragngun_state::dragngun(machine_config &config)
 	m_vol_gun->select_cb().set_constant(0);
 	m_vol_gun->add_route(0, "gun_speaker", 1.0);
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, 32.22_MHz_XTAL / 9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
 	m_ym2151->add_route(0, m_vol_main, 0.42, 0);
 	m_ym2151->add_route(1, m_vol_main, 0.42, 1);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, m_vol_main, 1.0, 0);
 	m_oki[0]->add_route(ALL_OUTPUTS, m_vol_main, 1.0, 1);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, m_vol_main, 0.35, 0);
 	m_oki[1]->add_route(ALL_OUTPUTS, m_vol_main, 0.35, 1);
 
-	OKIM6295(config, m_oki[2], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[2], 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
 	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_main, 0.0, 0);
 	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_main, 0.0, 1);
 	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_gun, 1.0, 0);
@@ -2213,12 +2214,12 @@ void dragngun_state::namco_sprites(machine_config &config)
 void dragngun_state::lockload(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, XTAL(28'000'000) / 4);
+	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_map);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
-	Z80(config, m_audiocpu, 32220000/8);
+	Z80(config, m_audiocpu, 32.22_MHz_XTAL / 9);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &dragngun_state::z80_sound_io);
 
@@ -2238,7 +2239,7 @@ void dragngun_state::lockload(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(dragngun_state::screen_update));
 
 	BUFFERED_SPRITERAM32(config, m_spriteram);
@@ -2284,17 +2285,17 @@ void dragngun_state::lockload(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, 32.22_MHz_XTAL / 9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
 	m_ym2151->add_route(0, "speaker", 0.42, 0);
 	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 }
@@ -2302,16 +2303,16 @@ void dragngun_state::lockload(machine_config &config)
 void tattass_state::tattass(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28000000/4); // unconfirmed
+	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tattass_state::tattass_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
+	config.set_maximum_quantum(attotime::from_hz(6000)); // to improve main<->audio comms
 
 	EEPROM_93C76_8BIT(config, m_eeprom);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(tattass_state::screen_update_tattass));
 
 	DECO_ACE(config, m_deco_ace, 0);
@@ -2366,22 +2367,22 @@ void tattass_state::tattass(machine_config &config)
 void nslasher_state::nslasher(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, XTAL(28'322'000) / 4);
+	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nslasher_state::nslasher_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
 
-	Z80(config, m_audiocpu, 32220000/9);
+	Z80(config, m_audiocpu, 32.22_MHz_XTAL / 9);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nslasher_state::z80_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nslasher_state::z80_sound_io);
 
 	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
+	config.set_maximum_quantum(attotime::from_hz(6000)); // to improve main<->audio comms
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248);
+	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(nslasher_state::screen_update_nslasher));
 
 	DECO_ACE(config, m_deco_ace, 0);
@@ -2428,17 +2429,17 @@ void nslasher_state::nslasher(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, m_ym2151, 32220000/9);
+	YM2151(config, m_ym2151, 32.22_MHz_XTAL / 9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
 	m_ym2151->add_route(0, "speaker", 0.40, 0);
 	m_ym2151->add_route(1, "speaker", 0.40, 1);
 
-	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], 32.22_MHz_XTAL / 32, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
 	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 
-	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[1], 32.22_MHz_XTAL / 16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 }
@@ -2449,7 +2450,7 @@ void nslasher_state::nslasheru(machine_config &config)
 	nslasher(config);
 	config.device_remove("audiocpu");
 
-	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
+	h6280_device &audiocpu(H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3)); // assume same as captaven
 	audiocpu.set_addrmap(AS_PROGRAM, &nslasher_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
