@@ -3042,7 +3042,7 @@ void specnext_state::map_regs(address_map &map)
 INPUT_PORTS_START(specnext)
 	PORT_INCLUDE(spec_plus)
 
-	// PS2 Keyboard Mapping
+	// PS/2 Keyboard Mapping
 	PORT_MODIFY("PLUS0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EDIT") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TRUE VID") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
