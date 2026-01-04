@@ -276,7 +276,7 @@ void i8256_device::reset_timer()
 	m_timer->adjust(TIME, 0, TIME);
 }
 
-void i8255_device::gen_interrupt(uint8_t level)
+void i8256_device::gen_interrupt(uint8_t level)
 {
 	LOG("i8256_device::gen_interrupt %d\n", level);
 	if (BIT(m_interrupts, level))
