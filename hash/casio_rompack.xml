@@ -295,7 +295,7 @@ license:CC0-1.0
 		15. 恋の街札幌
 		16. 大阪しぐれ
 		17. 雨の慕情
-		18ふたりの春
+		18. ふたりの春
 	-->
 	<software name="ro108">
 		<description>Enka 3 (RO-108)</description>
@@ -533,10 +533,10 @@ license:CC0-1.0
 
 	<!--
 	  4 songs
-		1. El Bimbo
-		2. Nocturne
-		3. Penelope
-		4. Toccata
+		1. オリーブの首飾り / EL BIMBO
+		2. 蒼いノクターン / NOCTURNE
+		3. エーゲ海の真珠 / PENELOPE
+		4. 涙のトッカータ / TOCCATA
 	-->
 	<software name="ro151">
 		<description>Paul Mauriat (RO-151)</description>
@@ -573,7 +573,7 @@ license:CC0-1.0
 	  4 songs
 		1. サザエさん
 		2. ドラえもんのうた
-		3. ワイワイワールド～Dr.スランプ・アラレちゃん～
+		3. ワイワイワールド ～Dr.スランプ・アラレちゃん～
 		4. CAT'S EYE
 	-->
 	<software name="ro155">
@@ -762,13 +762,13 @@ license:CC0-1.0
 
 	<!--
 	  7 songs
-		1. Rudolph The Red Nose Reindeer
-		2. Blue Christmas
-		3. Winter Wonderland
-		4. Silver Bells
-		5. Oh Bethlehem
-		6. The Son of God
-		7. Gloria (At The End of the Wilderness)
+		1. 赤鼻のトナカイ / RUDOLPH, THE RED-NOSED REINDEER
+		2. ブルークリスマス / BLUE CHRISTMAS
+		3. ウィンターワンダーランド / WINTER WONDERLAND
+		4. シルバーベルズ/ SILVER BELLS
+		5. ああベツレヘムよ
+		6. 神の御子は
+		7. グローリア(荒野の果てに)
 	-->
 	<software name="ro180x">
 		<description>Christmas Songs 2 (RO-180X)</description>
@@ -784,13 +784,13 @@ license:CC0-1.0
 
 	<!--
 	  7 songs
-		1. All of Me
-		2. As Time Goes By
-		3. Autumn Leaves
-		4. Day By Day
-		5. It's Only A Paper Moon
-		6. Days of Wine and Roses
-		7. You'd Be So Nice To Come Home To
+		1. オール・オブ・ミー / ALL OF ME
+		2. 時のたつまま / AS TIME GOES BY
+		3. 枯葉 / AUTUMN LEAVES
+		4. デイ・バイ・デイ / DAY BY DAY
+		5. イッツ・オンリー・ア・ベイパー・ムーン / IT'S ONLY A PAPER MOON
+		6. 酒とバラの日々 / DAYS OF WINE AND ROSES
+		7. ユード・ビー・ソー・ナイス・トゥカム・ホーム・トゥ / YOU'D BE SO NICE TO COME HOME TO
 	-->
 	<software name="ro181s">
 		<description>Standards 2 (RO-181S)</description>
@@ -806,13 +806,13 @@ license:CC0-1.0
 
 	<!--
 	  7 songs
-		1. Yesterday
-		2. I Want To Hold Your Hand
-		3. And I Love Her
-		4. Yellow Submarine
-		5. Lady Madonna
-		6. Day Tripper
-		7. Please Please Me
+		1. イエスタディ / YESTERDAY
+		2. 抱きしめたい / I WANT TO HOLD YOUR HAND
+		3. アンド・アイ・ラブ・ハー / AND I LOVE HER
+		4. イエロー・サブマリン / YELLOW SUBMARINE
+		5. レディー・マドンナ / LADY MADONNA
+		6. ディ・トリッパー / DAY TRIPPER
+		7. プリーズ・プリーズ・ミー / PLEASE PLEASE ME
 	-->
 	<software name="ro182b">
 		<description>Beatles 2 (RO-182B)</description>
@@ -938,15 +938,13 @@ license:CC0-1.0
 
 	<!--
 	  7 songs
-		1. 高速戦隊ターボレンジャー「高速戦隊ターボレンジャー」より
-		2. セント・ジュエルを探せ「新ビックリマン」より
-		3. ぼくドラえもん「どらえもん」より
-		4. CHA-LA HEAD-CHA-LA (チャラ・ヘッチャラ)
-		「ドラゴンボールZ」より
-		5. サザエさん一家「サザエさん」より
-		6. Dang Dang 気になる「美味しんぼ」より
-		7. キッチンから愛をこめて「ハーイ あっこです」より
-	-->
+		1. 高速戦隊ターボレンジャー 「高速戦隊ターボレンジャー」より
+		2. セント・ジュエルを探せ 「新ビックリマン」より
+		3. ぼくドラえもん 「どらえもん」より
+		4. CHA-LA HEAD-CHA-LA(チャラ・ヘッチャラ) 「ドラゴンボールZ」より
+		5. サザエさん一家 「サザエさん」より
+		6. Dang Dang 気になる 「美味しんぼ」より
+		7. キッチンから愛をこめて 「ハーイ あっこです」より
 	<software name="ro189a">
 		<description>Animation Themes 7 (RO-189A)</description>
 		<year>19??</year>
