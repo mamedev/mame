@@ -596,6 +596,12 @@ void i8256_device::rcv_complete()
 	receive_register_extract();
 	m_rx_buffer = get_received_char();
 	m_status |= (1 << I8256_STATUS_RB_FULL);
+	if (BIT(m_interrupts, I8256_INT_RX))
+	{
+		m_current_interrupt_level = I8256_INT_RX;
+		m_out_int_cb(ASSERT_LINE);
+		m_interrupts &= ~(1 << I8256_INT_RX);
+	}
 	update_status();
 }
 
@@ -607,6 +613,12 @@ void i8256_device::tra_callback()
 void i8256_device::tra_complete()
 {
 	m_status |= (1 << I8256_STATUS_TB_EMPTY);
+	if (BIT(m_interrupts, I8256_INT_TX))
+	{
+		m_current_interrupt_level = I8256_INT_TX;
+		m_out_int_cb(ASSERT_LINE);
+		m_interrupts &= ~(1 << I8256_INT_TX);
+	}
 	update_status();
 }
 
