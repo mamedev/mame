@@ -252,6 +252,7 @@ void i8256_device::device_reset()
 
 uint8_t i8256_device::acknowledge()
 {
+	LOG("i8256_device::acknowledge %d\n", m_current_interrupt_level);
 	if (BIT(m_command3,I8256_CMD3_IAE) == 0)
 		return 0x00;
 
@@ -275,6 +276,17 @@ void i8256_device::reset_timer()
 	m_timer->adjust(TIME, 0, TIME);
 }
 
+void i8255_device::gen_interrupt(uint8_t level)
+{
+	LOG("i8256_device::gen_interrupt %d\n", level);
+	if (BIT(m_interrupts, level))
+	{
+		m_current_interrupt_level = level;
+		m_out_int_cb(ASSERT_LINE);
+		m_interrupts &= ~(1 << level);
+	}
+}
+
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 {
 	bool t24 = BIT(m_mode, I8256_MODE_T24);
@@ -292,11 +304,8 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 						m_timers[high_index]--;
 						m_timers[i] = 255;
 					}
-					if (m_timers[high_index] == 0 && BIT(m_interrupts, int_level)) {
-						m_current_interrupt_level = int_level;
-						m_out_int_cb(ASSERT_LINE);
-						m_interrupts &= ~(1 << int_level);
-					}
+					if (m_timers[high_index] == 0 ) 
+						gen_interrupt(int_level);
 				}
 			}
 		} else if (!((i == 3 && t24) || (i == 4 && t35))) {
@@ -308,9 +317,7 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 					if (i == I8256_INT_TIMER2 && BIT(m_command1, I8256_CMD1_BITI))
 						continue;
 
-					m_current_interrupt_level = timer_interrupt[i];
-					m_out_int_cb(ASSERT_LINE);
-					m_interrupts &= ~(1 << timer_interrupt[i]);
+					gen_interrupt(timer_interrupt[i]);
 				}
 			}
 		}
@@ -513,11 +520,9 @@ uint8_t i8256_device::p1_r()
 void i8256_device::p1_w(uint8_t data)
 {
 	// Check for P17 interrupt if BITI=1
-	if (BIT(m_command1, I8256_CMD1_BITI) && !BIT(m_port1_int, 7) && BIT(data, 7) && BIT(m_interrupts, I8256_INT_TIMER2))
+	if (BIT(m_command1, I8256_CMD1_BITI) && !BIT(m_port1_int, 7) && BIT(data, 7))
 	{
-		m_current_interrupt_level = I8256_INT_TIMER2;
-		m_out_int_cb(ASSERT_LINE);
-		m_interrupts &= ~(1 << I8256_INT_TIMER2);
+		gen_interrupt(I8256_INT_TIMER2);
 	}
 
 	m_port1_int = (m_port1_int & ~m_port1_control) | (data & m_port1_control);
@@ -596,12 +601,7 @@ void i8256_device::rcv_complete()
 	receive_register_extract();
 	m_rx_buffer = get_received_char();
 	m_status |= (1 << I8256_STATUS_RB_FULL);
-	if (BIT(m_interrupts, I8256_INT_RX))
-	{
-		m_current_interrupt_level = I8256_INT_RX;
-		m_out_int_cb(ASSERT_LINE);
-		m_interrupts &= ~(1 << I8256_INT_RX);
-	}
+	gen_interrupt(I8256_INT_RX);
 	update_status();
 }
 
@@ -613,12 +613,7 @@ void i8256_device::tra_callback()
 void i8256_device::tra_complete()
 {
 	m_status |= (1 << I8256_STATUS_TB_EMPTY);
-	if (BIT(m_interrupts, I8256_INT_TX))
-	{
-		m_current_interrupt_level = I8256_INT_TX;
-		m_out_int_cb(ASSERT_LINE);
-		m_interrupts &= ~(1 << I8256_INT_TX);
-	}
+	gen_interrupt(I8256_INT_TX);
 	update_status();
 }
 
