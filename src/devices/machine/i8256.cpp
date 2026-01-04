@@ -635,3 +635,13 @@ void i8256_device::write_rxd(int state)
 {
 	device_serial_interface::rx_w(m_rxd);
 }
+
+void i8256_device::write_txc(int state)
+{
+	device_serial_interface::tx_clock_w(m_txc);
+}
+
+void i8256_device::write_rxc(int state)
+{
+	device_serial_interface::rx_clock_w(m_rxc);
+}
