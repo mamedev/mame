@@ -368,86 +368,74 @@ void tiny_vicky_video_device::draw_sprites(uint32_t *row, bool enable_gamma, uin
         uint8_t sprite_layer = (reg & 0x18) >> 3;
         // if the sprite is enabled and the layer matches, then check the line
         if ((reg & 1) != 0 && layer == sprite_layer)
-        {
-            uint8_t sprite_size = 32;
-            switch ((reg & 0x60) >> 5)
-            {
-                case 1:
-                    sprite_size = 24;
-                    break;
-                case 2:
-                    sprite_size = 16;
-                    break;
-                case 3:
-                    sprite_size = 8;
-                    break;
-            }
-            int posY = m_iopage0_ptr[addr_sprite + 6] + (m_iopage0_ptr[addr_sprite + 7] << 8) - 32;
-            int actualLine = line / 2;
-            if ((actualLine >= posY && actualLine < posY + sprite_size))
-            {
-                // TODO Fix this when Vicky II fixes the LUT issue
-                uint8_t lut_index = ((reg & 6) >> 1);
+		{
+			uint8_t sprite_size = 32;
+			switch ((reg & 0x60) >> 5)
+			{
+				case 1:
+					sprite_size = 24;
+					break;
+				case 2:
+					sprite_size = 16;
+					break;
+				case 3:
+					sprite_size = 8;
+					break;
+			}
+			int posY = m_iopage0_ptr[addr_sprite + 6] + (m_iopage0_ptr[addr_sprite + 7] << 8) - 32;
+			int actualLine = line / 2;
+			if ((actualLine >= posY && actualLine < posY + sprite_size))
+			{
+				// TODO Fix this when Vicky II fixes the LUT issue
+				uint8_t lut_index = ((reg & 6) >> 1);
 
-                //int lut_address = 0xd000 - 0xc000 + lut_index * 0x400;
-                //bool striding = (reg & 0x80) == 0x80;
+				//int lut_address = 0xd000 - 0xc000 + lut_index * 0x400;
+				//bool striding = (reg & 0x80) == 0x80;
 
-                int sprite_address = (m_iopage0_ptr[addr_sprite + 1] +
-                                     (m_iopage0_ptr[addr_sprite + 2] << 8) +
-                                     (m_iopage0_ptr[addr_sprite + 3] << 16)) & 0x3f'ffff;
-                int posX = m_iopage0_ptr[addr_sprite + 4] + (m_iopage0_ptr[addr_sprite + 5] << 8) - 32;
-                posX *= 2;
+				int sprite_address = (m_iopage0_ptr[addr_sprite + 1] +
+					(m_iopage0_ptr[addr_sprite + 2] << 8) +
+					(m_iopage0_ptr[addr_sprite + 3] << 16)) & 0x3f'ffff;
 
-                if (posX >= width || posY >= height || (posX + sprite_size) < 0 || (posY + sprite_size) < 0)
-                {
-                    continue;
-                }
-                int sprite_width = sprite_size;
-                int xOffset = 0;
-                // Check for sprite bleeding on the left-hand-side
-                if (posX < borderXSize)
-                {
-                    xOffset = borderXSize - posX;
-                    posX = borderXSize;
-                    sprite_width = sprite_size - xOffset;
-                    if (sprite_width == 0)
-                    {
-                        continue;
-                    }
-                }
-                // Check for sprite bleeding on the right-hand side
-                if (posX + sprite_size > width - borderXSize)
-                {
-                    sprite_width = width - borderXSize - posX;
-                    if (sprite_width == 0)
-                    {
-                        continue;
-                    }
-                }
+				int posX = m_iopage0_ptr[addr_sprite + 4] + (m_iopage0_ptr[addr_sprite + 5] << 8) - 32;
+				posX *= 2; // screen pixels
 
-                rgb_t clrVal = 0;
-                uint8_t pixVal = 0;
+				// sprite spans sprite_size source columns, but sprite_size*2 screen pixels
+				int spriteScreenW = sprite_size * 2;
 
-                int sline = actualLine - posY;
-                int cols = sprite_size;
-                if (posX + sprite_size*2 >= width - borderXSize)
-                {
-                    cols = width - borderXSize - posX;
-                    cols /= 2;
-                }
-                for (int col = xOffset; col < xOffset + cols; col++)
-                {
-                    // Lookup the pixel in the tileset - if the value is 0, it's transparent
-                    pixVal = m_videoram_ptr[sprite_address + col + sline * sprite_size];
-                    if (pixVal != 0)
-                    {
-                        clrVal = get_lut_value(lut_index, pixVal, enable_gamma);
-                        row[(col * 2) - xOffset + posX] = clrVal;
-                        row[(col * 2) + 1 - xOffset + posX] = clrVal;
-                    }
-                }
-            }
-        }
+				int clipLeft  = borderXSize;
+				int clipRight = width - borderXSize;
+
+				int startX = posX;
+				int endX   = posX + spriteScreenW;
+
+				// Fully off-screen horizontally?
+				if (endX <= clipLeft || startX >= clipRight)
+					continue;
+
+				// Clamp to visible area
+				int drawStartX = std::max(startX, clipLeft);
+				int drawEndX   = std::min(endX,   clipRight);
+
+				// Convert clamped screen range back to source columns
+				int startCol = (drawStartX - posX) / 2;
+				int endCol   = (drawEndX   - posX + 1) / 2; // +1 so we include the last pixel column properly
+
+				int sline = actualLine - posY;
+
+				for (int col = startCol; col < endCol; col++)
+				{
+					uint8_t pixVal = m_videoram_ptr[sprite_address + col + sline * sprite_size];
+					if (pixVal != 0)
+					{
+						rgb_t clrVal = get_lut_value(lut_index, pixVal, enable_gamma);
+
+						int sx = posX + col * 2;      // screen pixel x (left of the doubled pair)
+						row[sx]     = clrVal;
+						row[sx + 1] = clrVal;
+					}
+				}
+			}
+		}
     }
 }
 
