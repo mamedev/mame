@@ -17910,12 +17910,12 @@ ROM_START( cb3i )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dyna.ic5", 0x0000, 0x1000, CRC(89924713) SHA1(f1334772f4855b492f3de6621803c02f018331a5) )
 	ROM_CONTINUE(         0x7000, 0x1000)  // 1000 to 7000
-	ROM_CONTINUE(         0x1000, 0x1000)  // 2000 to 6000 ok
+	ROM_CONTINUE(         0x1000, 0x1000)  // 2000 to 1000 ok
 	ROM_CONTINUE(         0x5000, 0x1000)  // 3000 to 5000 ok
 	ROM_CONTINUE(         0x2000, 0x1000)  // 4000 to 2000 ok
 	ROM_CONTINUE(         0x4000, 0x1000)  // 5000 to 4000
 	ROM_CONTINUE(         0x3000, 0x1000)  // 6000 to 3000 ok
-	ROM_CONTINUE(         0x6000, 0x1000)  // 7000 to 1000 ok
+	ROM_CONTINUE(         0x6000, 0x1000)  // 7000 to 6000 ok
 	ROM_CONTINUE(         0x8000, 0x8000)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -17947,10 +17947,21 @@ ROM_END
 
   Main + daughterbord
 
+  Same daughterboard from the V.30
+  DYNA D9005
+
 */
 ROM_START( cb3j )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // daughterboard
-	ROM_LOAD( "cb3s_v2.20.ic5", 0x00000, 0x10000, CRC(a8379120) SHA1(b31a2f65d610bd24a714e9455d917a8b9c9c452d) )
+	ROM_LOAD( "cb3s_v2.20.ic5", 0x0000, 0x1000, CRC(a8379120) SHA1(b31a2f65d610bd24a714e9455d917a8b9c9c452d) )
+	ROM_CONTINUE(         0x7000, 0x1000)  // 1000 to 7000
+	ROM_CONTINUE(         0x1000, 0x1000)  // 2000 to 1000
+	ROM_CONTINUE(         0x5000, 0x1000)  // 3000 to 5000
+	ROM_CONTINUE(         0x2000, 0x1000)  // 4000 to 2000
+	ROM_CONTINUE(         0x4000, 0x1000)  // 5000 to 4000
+	ROM_CONTINUE(         0x3000, 0x1000)  // 6000 to 3000
+	ROM_CONTINUE(         0x6000, 0x1000)  // 7000 to 6000
+	ROM_CONTINUE(         0x8000, 0x8000)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rom5.bin",  0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
