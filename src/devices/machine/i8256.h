@@ -106,7 +106,7 @@ private:
 	uint8_t m_sync_byte_count, m_rxc_count, m_txc_count;
 	uint8_t m_br_factor;
 	uint8_t m_rxd_bits;
-	uint8_t m_rx_data, m_tx_data;
+	uint8_t m_rx_register, m_tx_register;
 	uint8_t m_sync1, m_sync2, m_sync8, m_sync16;
 
 	TIMER_CALLBACK_MEMBER(timer_check);

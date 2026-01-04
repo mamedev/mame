@@ -241,8 +241,8 @@ void i8256_device::device_start()
 	save_item(NAME(m_txc_count));
 	save_item(NAME(m_br_factor));
 	save_item(NAME(m_rxd_bits));
-	save_item(NAME(m_rx_data));
-	save_item(NAME(m_tx_data));
+	save_item(NAME(m_rx_register));
+	save_item(NAME(m_tx_register));
 	save_item(NAME(m_sync1));
 	save_item(NAME(m_sync2));
 	save_item(NAME(m_sync8));
@@ -651,8 +651,8 @@ void i8256_device::check_for_tx_start()
 
 void i8256_device::start_tx()
 {
-	LOG("start_tx %02x\n", m_tx_data);
-	transmit_register_setup(m_tx_data);
+	LOG("start_tx %02x\n", m_tx_register);
+	transmit_register_setup(m_tx_register);
 	m_status &= ~I8256_STATUS_TR_EMPTY;
 }
 
