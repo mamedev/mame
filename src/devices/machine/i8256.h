@@ -73,6 +73,7 @@ protected:
 
 	// device_serial_interface implementation
 	virtual void rcv_complete() override;
+	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 
 private:

@@ -620,8 +620,18 @@ void i8256_device::rcv_complete()
 	update_status();
 }
 
+void i8256_device::tra_callback()
+{
+	m_txd_handler(transmit_register_get_data_bit());
+}
+
 void i8256_device::tra_complete()
 {
 	m_status |= (1 << I8256_STATUS_TB_EMPTY);
 	update_status();
+}
+
+void i8256_device::write_rxd(int state)
+{
+	device_serial_interface::rx_w(m_rxd);
 }
