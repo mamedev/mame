@@ -420,7 +420,21 @@ void i8256_device::write(offs_t offset, u8 data)
 			{
 				m_command2 = data;
 
-				set_rate(BAUD_RATES[m_command2 & 0x0f]);
+				uint8_t baud_sel = m_command2 & 0x0f;
+
+				set_rate(BAUD_RATES[baud_sel]);
+
+				if (baud_sel == 1) {
+					m_br_factor = 32;
+				} else if (baud_sel == 2) {
+					m_br_factor = 64;
+				} else if (baud_sel == 3) {
+					m_br_factor = 32;
+				} else if (baud_sel > 3) {
+					m_br_factor = 64;
+				} else {
+					m_br_factor = 1;
+				}
 
 				if (BIT(m_command2,I8256_CMD2_PARITY_ENABLE))
 					m_parity = BIT(m_command2,I8256_CMD2_EVEN_PARITY) ? PARITY_EVEN : PARITY_ODD;
