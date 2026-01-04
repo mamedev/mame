@@ -59,12 +59,14 @@ public:
 	void roadrunn(machine_config &config);
 	void roadb109(machine_config &config);
 	void marble(machine_config &config);
+	void reliefs1(machine_config &config);
 
 	void init_roadblst();
 	void init_peterpak();
 	void init_marble();
 	void init_roadrunn();
 	void init_indytemp();
+	void init_reliefs1();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -75,8 +77,8 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
-	required_device<atari_slapstic_device> m_slapstic;
-	required_memory_bank m_slapstic_bank;
+	optional_device<atari_slapstic_device> m_slapstic;
+	optional_memory_bank m_slapstic_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -151,6 +153,7 @@ protected:
 	void add_speech(machine_config &config);
 	void atarisy1(machine_config &config);
 
+	void main_map_noslapstic(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_ext_map(address_map &map) ATTR_COLD;
