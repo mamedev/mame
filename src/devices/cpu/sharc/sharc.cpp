@@ -7,8 +7,11 @@
 
 #include "emu.h"
 #include "sharc.h"
-#include "sharcfe.h"
+
 #include "sharcdsm.h"
+#include "sharcfe.h"
+
+#include "emuopts.h"
 
 
 #define DISABLE_FAST_REGISTERS      1
@@ -474,7 +477,8 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 
 void adsp21062_device::device_start()
 {
-	m_core = (sharc_internal_state *)m_cache.alloc_near(sizeof(sharc_internal_state));
+	m_cache.allocate_cache(mconfig().options().drc_rwx());
+	m_core = m_cache.alloc_near<sharc_internal_state>();
 	memset(m_core, 0, sizeof(sharc_internal_state));
 
 	m_program = &space(AS_PROGRAM);

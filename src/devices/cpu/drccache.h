@@ -14,6 +14,12 @@
 
 #include "modules/lib/osdlib.h"
 
+#include <algorithm>
+#include <cstdlib>
+#include <list>
+#include <optional>
+#include <utility>
+
 
 //**************************************************************************
 //  MACROS
@@ -37,13 +43,16 @@ typedef uint8_t *drccodeptr;
 typedef delegate<void (drccodeptr *, void *, void *)> drc_oob_delegate;
 
 
-// drc_cache
 class drc_cache
 {
 public:
 	// construction/destruction
-	drc_cache(size_t bytes);
+	drc_cache(std::size_t bytes) noexcept;
 	~drc_cache();
+
+	// setup
+	void set_size(std::size_t bytes) ATTR_COLD;
+	void allocate_cache(bool rwx) ATTR_COLD;
 
 	// getters
 	drccodeptr near() const { return m_near; }
@@ -55,64 +64,118 @@ public:
 	bool contains_near_pointer(const void *ptr) const { return ((const drccodeptr)ptr >= m_near && (const drccodeptr)ptr < m_neartop); }
 	bool generating_code() const { return (m_codegen != nullptr); }
 
-	// memory management
+	// cache memory allocation
 	void flush();
-	void *alloc(size_t bytes);
-	void *alloc_near(size_t bytes);
-	void *alloc_temporary(size_t bytes);
-	void dealloc(void *memory, size_t bytes);
+	void *alloc(std::size_t bytes, std::align_val_t align) noexcept;
+	void *alloc_near(std::size_t bytes, std::align_val_t align) noexcept;
+	void *alloc_temporary(std::size_t bytes, std::align_val_t align) noexcept;
+	void dealloc(void *memory, std::size_t bytes) noexcept;
+
+	template <typename T, typename... Params>
+	T *alloc(Params &&... args)
+	{
+		auto const result = reinterpret_cast<T *>(alloc(sizeof(T), std::align_val_t(alignof(T))));
+		if (result)
+		{
+			try
+			{
+				new (result) T(std::forward<Params>(args)...);
+			}
+			catch (...)
+			{
+				dealloc(result, sizeof(T));
+				throw;
+			}
+		}
+		return result;
+	}
+
+	template <typename T, typename... Params>
+	T *alloc_near(Params &&... args)
+	{
+		auto const result = reinterpret_cast<T *>(alloc_near(sizeof(T), std::align_val_t(alignof(T))));
+		if (result)
+		{
+			try
+			{
+				new (result) T(std::forward<Params>(args)...);
+			}
+			catch (...)
+			{
+				dealloc(result, sizeof(T));
+				throw;
+			}
+		}
+		return result;
+	}
 
 	// codegen helpers
-	void codegen_init();
-	void codegen_complete();
-	drccodeptr *begin_codegen(uint32_t reserve_bytes);
+	void codegen_init() noexcept;
+	void codegen_complete() noexcept;
+	drccodeptr *begin_codegen(uint32_t reserve_bytes) noexcept;
 	drccodeptr end_codegen();
 	void request_oob_codegen(drc_oob_delegate &&callback, void *param1 = nullptr, void *param2 = nullptr);
 
 private:
 	// largest block of code that can be generated at once
-	static constexpr size_t CODEGEN_MAX_BYTES = 131072;
+	static constexpr std::size_t CODEGEN_MAX_BYTES = 128 * 1024;
 
 	// minimum alignment, in bytes (must be power of 2)
-	static constexpr size_t CACHE_ALIGNMENT = alignof(std::max_align_t);
+	static constexpr std::size_t CACHE_ALIGNMENT = std::max<std::size_t>(alignof(std::max_align_t), 8);
 
 	// largest permanent allocation we allow
-	static constexpr size_t MAX_PERMANENT_ALLOC = 1024;
+	static constexpr std::size_t MAX_PERMANENT_ALLOC = 1024;
 
 	// size of "near" area at the base of the cache
-	static constexpr size_t NEAR_CACHE_SIZE = 131072;
+	static constexpr std::size_t NEAR_CACHE_SIZE = 128 * 1024;
 
-	osd::virtual_memory_allocation m_cache;
-
-	// core parameters
-	drccodeptr const    m_near;             // pointer to the near part of the cache
-	drccodeptr          m_neartop;          // unallocated area of near cache
-	drccodeptr const    m_base;             // end of near cache
-	drccodeptr          m_top;              // end of temporary allocations and code
-	drccodeptr          m_limit;            // limit for temporary allocations and code (page-aligned)
-	drccodeptr          m_end;              // first allocated byte in cache
-	drccodeptr          m_codegen;          // start of current generated code block
-	size_t const        m_size;             // size of the cache in bytes
-	bool                m_executable;       // whether cached code is currently executable
-	bool                m_rwx;              // whether pages can be simultaneously writable and executable
-
-	// oob management
 	struct oob_handler
 	{
 		drc_oob_delegate    m_callback;     // callback function
 		void *              m_param1;       // 1st pointer parameter
 		void *              m_param2;       // 2nd pointer parameter
 	};
-	std::list<oob_handler> m_oob_list;      // list of active oob handlers
-	std::list<oob_handler> m_oob_free;      // list of recyclable oob handlers
 
-	// free lists
+	std::optional<osd::virtual_memory_allocation> m_cache;
+
 	struct free_link
 	{
 		free_link *         m_next;         // pointer to the next guy
 	};
+
+	// core parameters
+	drccodeptr  m_near;             // pointer to the near part of the cache
+	drccodeptr  m_neartop;          // unallocated area of near cache
+	drccodeptr  m_base;             // end of near cache
+	drccodeptr  m_top;              // end of temporary allocations and code
+	drccodeptr  m_limit;            // limit for temporary allocations and code (page-aligned)
+	drccodeptr  m_end;              // first allocated byte in cache
+	drccodeptr  m_codegen;          // start of current generated code block
+	std::size_t m_size;             // size of the cache in bytes
+	bool        m_executable;       // whether cached code is currently executable
+	bool        m_rwx;              // whether pages can be simultaneously writable and executable
+
+	// oob management
+	std::list<oob_handler> m_oob_list;      // list of active oob handlers
+	std::list<oob_handler> m_oob_free;      // list of recyclable oob handlers
+
+	// free lists
 	free_link *         m_free[MAX_PERMANENT_ALLOC / CACHE_ALIGNMENT];
 	free_link *         m_nearfree[MAX_PERMANENT_ALLOC / CACHE_ALIGNMENT];
+
+	// stats
+	std::size_t m_max_temporary;
+	uint32_t    m_flush_count;
+#if defined(MAME_DEBUG)
+	uint32_t    m_near_allocated;
+	uint32_t    m_near_oversize;
+	uint32_t    m_near_freed;
+	uint32_t	m_near_reused;
+	uint32_t    m_cache_allocated;
+	uint32_t    m_cache_oversize;
+	uint32_t    m_cache_freed;
+	uint32_t    m_cache_reused;
+#endif
 };
 
 #endif // MAME_CPU_DRCCACHE_H
