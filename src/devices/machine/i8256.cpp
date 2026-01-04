@@ -489,7 +489,6 @@ void i8256_device::write(offs_t offset, u8 data)
 			m_interrupts = m_interrupts & ~data;
 			break;
 		case I8256_REG_BUFFER:
-			LOG("I8256 write serial: %u\n", data);
 			m_tx_buffer = data;
 			transmit_register_setup(m_tx_buffer);
 			m_status &= ~ (1 << I8256_STATUS_TB_EMPTY);
@@ -616,7 +615,6 @@ void i8256_device::rcv_complete()
 	receive_register_extract();
 	m_rx_buffer = get_received_char();
 	m_status |= (1 << I8256_STATUS_RB_FULL);
-	LOG("I8256 Received byte: %02x '%c'\n", m_rx_buffer, m_rx_buffer);
 	update_status();
 }
 
@@ -633,15 +631,15 @@ void i8256_device::tra_complete()
 
 void i8256_device::write_rxd(int state)
 {
-	device_serial_interface::rx_w(m_rxd);
+	device_serial_interface::rx_w(state);
 }
 
 void i8256_device::write_txc(int state)
 {
-	device_serial_interface::tx_clock_w(m_txc);
+	device_serial_interface::tx_clock_w(state);
 }
 
 void i8256_device::write_rxc(int state)
 {
-	device_serial_interface::rx_clock_w(m_rxc);
+	device_serial_interface::rx_clock_w(state);
 }
