@@ -16,27 +16,15 @@ license:CC0-1.0
 	==============================================================================================
 	JAPANESE ROM PACKS
 	==============================================================================================
-	RO-101		1983	The Hit Parade
-	RO-102		1983	Hit Kayou
-	RO-103		1983	New Music [1]
 	RO-104		19??	Enka Vol.1 Karaoke Hit Shuu
 	RO-105		19??	New Music [2]
-	RO-106		19??	Enka Vol.2 Karaoke Hit Shuu
 	RO-107		19??	New Music [3]
-	RO-108		1984	Enka [3]
 	RO-109		1984	New Music [4]
-	RO-110		1985	Easy Listening [3]
-	RO-111		1985	Enka [4]
-	RO-113		1985	Young Best Hits
-	RO-114		19??	Enka [5]
 	RO-116		1985	Young Hits [2]
 	RO-117		1985	New Music [5]
-	RO-118		19??	Screen Themes [3]
-	RO-119		19??	Kodomo no uta    [3]
 	RO-121N		1986	Introduction to Casio Keyboard III, Enjoy Chord Guide
 	RO-122Y		1986	Young Best Hits [2]
 	RO-124Y		1988	Young Best Hits [6]
-	RO-125E		19??	Enka [9]
 	RO-126Y		1989	Young Best Hits [7]
 	RO-127E		19??	Enka [11]
 	RO-128P		19??	Oldies
@@ -45,48 +33,27 @@ license:CC0-1.0
 	RO-131Y		19??	New Music Best [1]
 	RO-132Y		1992	New Music Best [2]
 	RO-133E		1992	Introduction to Karaoke Hits [1]
-	RO-151		19??	Paul Mauriat
-	RO-152		19??	Enka Vol.1 Group Hit
 	RO-153		19??	Young Hits
-	RO-155		1984	Animation
 	RO-156		19??	Introduction to Casio Keyboard II, Fun Keyboard Lessons
 	RO-157		19??	Kayokyoku
-	RO-158		19??	Kodomo no uta [1]
-	RO-159		19??	Kodomo no uta [2]
-	RO-162		1984	Animation [2]
+	RO-159		19??	Kodomo no Uta [2]
 	RO-163		1985	Pops
 	RO-164		1985	Introduction to Casio Keyboard I, Let's Play with Pack-chan
 	RO-165		1985	Fun Keyboard Lessons
-	RO-166		19??	Animation Themes [3]
-	RO-167K		1988	Kodomo no uta [6]
-	RO-168K		1988	Kodomo no uta [7]
-	RO-169A		19??	Animation Themes [4]
-	RO-170A		1988	Animation Themes [5]
-	RO-171l		1988	Event Songs
-	RO-172G		19??	Game Music
+	RO-167K		1988	Kodomo no Uta [6]
+	RO-168K		1988	Kodomo no Uta [7]
 	RO-173Y		19??	Young Hits [3]
 	RO-174Y		19??	Young Hits [4]
-	RO-175K		19??	Kodomo no uta [8], Pikkapika Ongakukan
+	RO-175K		19??	Kodomo no Uta [8], Pikkapika Ongakukan
 	RO-176Y		19??	Young Hits [5]
-	RO-177K		19??	Kodomo no uta [9]
-	RO-178A		1989	Animation Themes [6]
-	RO-179K		19??	Kodomo no uta [10]
-	RO-180X		19??	Christmas Songs [2]
-	RO-181S		19??	Standards [2]
-	RO-182B		19??	Beatles [2]
-	RO-183C		19??	Comic Songs
-	RO-184T		1989	Elementary School Music [1]
-	RO-185T		19??	Elementary School Music [2]
-	RO-186T		19??	Elementary School Music [3]
-	RO-187K		1989	Kodomo no uta [11]
+	RO-177K		19??	Kodomo no Uta [9]
+	RO-179K		19??	Kodomo no Uta [10]
+	RO-187K		1989	Kodomo no Uta [11]
 	RO-188Y		19??	Young Hits [6]
-	RO-189A		19??	Animation Themes [7]
-	RO-190K		19??	Kodomo no uta [12], Pikkapika Ongakukan 2
-	RO-191Y		19??	Young Best Hits [8]
-	RO-192Y		19??	Young Best Hits [9]
+	RO-190K		19??	Kodomo no Uta [12], Pikkapika Ongakukan 2
 	RO-193Y		19??	Young Hits [7]
 	RO-195G		19??	Game Music [2]
-	RO-196K		1991	Kodomo no uta [13], NHK Minna no Uta Yori
+	RO-196K		1991	Kodomo no Uta [13], NHK Minna no Uta Yori
 	RO-581		1988	Family Selection
 	RO-582		1989	DH Tunes & Rhythms
 	RO-583?		19??	Kids Selection, bundled with Casio Sound Kids 03 keyboard?
@@ -96,13 +63,13 @@ license:CC0-1.0
 	RO-603P		1985	Pops [2]
 	RO-604E		1986	Enka [7]
 	RO-605Y		1986	Young Best Hits [4]
-	RO-606K		1988	Kodomo no uta [4]
-	RO-607K		19??	Kodomo no uta [5]
+	RO-606K		1988	Kodomo no Uta [4]
+	RO-607K		19??	Kodomo no Uta [5]
 	RO-608Y		19??	Young Best Hits [5]
-	RO-609K		19??	Kodomo no uta Best [1]
-	RO-610K		19??	Kodomo no uta Best [2]
-	RO-611K		1990	Kodomo no uta Best [3]
-	RO-612K		19??	Kodomo no uta Best [4]
+	RO-609K		19??	Kodomo no Uta Best [1]
+	RO-610K		19??	Kodomo no Uta Best [2]
+	RO-611K		1990	Kodomo no Uta Best [3]
+	RO-612K		19??	Kodomo no Uta Best [4]
 	RO-613A		1990	Animation Themes [8]
 	RO-614Y		1990	Young Best Hits [11]
 	RO-615A		1991	Animation Themes [9]
@@ -176,6 +143,866 @@ license:CC0-1.0
 	RO-559		1990	New Kids on the Block Greatest Hits
 	RO-560		1990	New Kids on the Block Greatest Hits
 	-->
+
+
+<!--		JAPANESE ROM PACKS			-->
+
+	<!--
+	  19 songs
+		1. マイ・ウェイ
+		2. サン・トワ・マミー
+		3. イエスタデイ
+		4. イエスタデイ・ワンス・モア
+		5. モア
+		6. ミスティ
+		7. A列車でゆこう
+		8. グリーンスリーブス
+		9. G線上のアリア
+		10. くちなしの花
+		11. 銀座の恋の物語
+		12. 別れても好きな人
+		13. 鈴懸の径
+		14. 赤いスイートピー
+		15. もしもピアノが弾けたなら
+		16. 恋人よ
+		17. 君といつまでも
+		18. 花
+		19. 故郷
+	-->
+	<software name="ro101">
+		<description>The Hit Parade (RO-101)</description>
+		<year>1983</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro101.bin" size="24576" crc="57e80c1c" sha1="f10c95e9d681ef1b2f190dc9a2af165d1afff536"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  18 songs
+		1. 夜霧よ今夜もありがとう
+		2. 星影のワルツ
+		3. わたしの城下町
+		4. ついて来るかい
+		5. おまえに
+		6. 雨の慕情
+		7. ブランデーグラス
+		8. 大阪しぐれ
+		9. ふたりの夜明け
+		10. 奥飛騨慕情
+		11. 津軽海峡・冬景色
+		12. 北国の春
+		13. 夢追い酒
+		14. おもいで酒
+		15. それぞれの原宿
+		16. みちのくひとり旅
+		17. 契り
+		18. 北酒場
+	-->
+	<software name="ro102">
+		<description>Hit Kayou (RO-102)</description>
+		<year>1983</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ヒット歌謡"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro102.bin" size="24576" crc="030e4df4" sha1="886aa160c7e8230c5029a335c85952623b2ba291"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  16 songs
+		1. 待つわ
+		2. 私はピアノ
+		3. 愛はかげろう
+		4. 守ってあげたい
+		5. 贈る言葉
+		6. 悪女
+		7. きみの朝
+		8. 海岸通
+		9. 秋止符
+		10. 冬の稲妻
+		11. 秋桜
+		12. 天までとどけ
+		13. 眠れぬ夜
+		14. さよなら
+		15. 季節の中で
+		16. 人生の空から
+	-->
+	<software name="ro103">
+		<description>New Music (RO-103)</description>
+		<year>1983</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ニューミュージック"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro103.bin" size="24576" crc="74ed4d2d" sha1="d6927cc4b7b43a783176bf95b13a8cb4c7523aaa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  17 songs
+		1. 恋吹雪
+		2. ふたたびの
+		3. 愛の終着駅
+		4. あなたひとすじ
+		5. 忘れてほしい
+		6. 別れの夜明け
+		7. 雨あがり
+		8. 細の女
+		9. コモエスタ赤坂
+		10. 時間よお前は
+		11. 純子
+		12. 鴎という名の酒場
+		13. 水割り
+		14. そんな夕子にほれました
+		15. 襟裳岬
+		16. 浮草ぐらし
+		17. 中の島ブルース
+	-->
+	<software name="ro106">
+		<description>Enka Vol.2 Karaoke Hit Shuu (RO-106)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="演歌 Vol.2 カラオケヒット集"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro106.bin" size="24576" crc="9e7eaf15" sha1="745c595e7b8230736ad0a5eda5cb9922771e4d78"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  18 songs
+		1. 釜山港へ帰れ
+		2. 秋冬
+		3. 娘よ
+		4. 矢切の渡し
+		5. さざんかの宿
+		6. 氷雨
+		7. 盛り場おんな酒
+		8. 細雪
+		9. ブランデーグラス
+		10. ついて来るかい
+		11. 水割り
+		12. 北国の春
+		13. 奥飛騨慕情
+		14. 兄弟船
+		15. 恋の街札幌
+		16. 大阪しぐれ
+		17. 雨の慕情
+		18. ふたりの春
+	-->
+	<software name="ro108">
+		<description>Enka 3 (RO-108)</description>
+		<year>1984</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="演歌3"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro108.bin" size="24576" crc="f9385764" sha1="ba374c58b7f7de91cdaa855f1afd0c6b518ef7d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  17 songs
+		1. ゴッドファーザー/愛のテーマ
+		2. ムーンリバー
+		3. ある愛の詩
+		4. エンターテイナー
+		5. 追憶
+		6. アモール
+		7. ペサメムーチョ
+		8. パーフィディア
+		9. トップオブザワールド
+		10. 想い出のグリーングラス
+		11. ロミオとジュリエット
+		12. シバの女王
+		13. フィーリング
+		14. やさしく歌って
+		15. そよ風のメヌエット
+		16. 愛のオルゴール
+		17. 雨にぬれても
+	-->
+	<software name="ro110">
+		<description>Easy Listening 3 (RO-110)</description>
+		<year>1985</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="イージーリスニング3"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro110.bin" size="24576" crc="b59fb818" sha1="659e686286d40f5d4d4e2fcb691de9342eb97ef2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  15 songs
+		1. 浪花節だよ人生は
+		2. 長良川艶歌
+		3. つぐない
+		4. もしかして-PARTⅡ
+		5. 片恋酒
+		6. 北の螢
+		7. 津軽平野
+		8. 伊豆の雨
+		9. 夜霧よ今夜もありがとう
+		10. 津軽海峡・冬景色
+		11. 北酒場
+		12. 北の宿から
+		13. そんな女のひとりごと
+		14. 居酒屋
+		15. 中の島ブルース
+	-->
+	<software name="ro111">
+		<description>Enka 4 (RO-111)</description>
+		<year>1985?</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="演歌4"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro111.bin" size="24576" crc="eddff940" sha1="346f61ee130a4dccfcaa04ef39d733ded5fc6216"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  15 songs
+		1. 北ウイング
+		2. サザン・ウインド
+		3. 十戒(1984)
+		4. 探偵物語
+		5. メイン・テーマ
+		6. 一番野郎
+		7. ケジメなさい
+		8. 微風のメロディー
+		9. コントロール
+		10. 騎士道
+		11. 顔に書いた恋愛小説
+		12. 時をかける少女
+		13. 愛情物語
+		14. 港のはいから人魚
+		15. 迷宮のアンドローラ
+	-->
+	<software name="ro113">
+		<description>Young Best Hits (RO-113)</description>
+		<year>1985</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ヤングベストヒット"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro113.bin" size="24576" crc="1032f6df" sha1="f18cf07b8557d4db935aaa6b84daa2474042e8e0" status="baddump"/> <!-- Faulty byte at 0x14F1 (expected 10, got 21) -->
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  X songs
+		1. おまえとふたり
+		2. くちなしの花
+		3. ふたり酒
+		4. おもいで酒
+		5. コモエスタ赤坂
+		6. 別れても好きな人
+		7. みちのくひとり旅
+		8. 浪花恋しぐれ
+		9. 長崎は今日も雨だった
+		10. わたし祈ってます
+		11. 心のこり
+		12. そんな夕子にほれました
+		13. おんな港町
+		14. 港町ブルース
+		15. 冬のリヴィエラ
+	-->
+	<software name="ro114">
+		<description>Enka 5 (RO-114)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="演歌5"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro114.bin" size="24576" crc="05b9d534" sha1="6bf45d5745c86fdb612876c7de6ed0b0a4b3ce06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  X songs
+		1. 愛のロマンス
+		2. 白い恋人たち
+		3. 踊り明かそう
+		4. ロッキーのテーマ
+		5. 愛のファンタジー
+		6. 魅惑のワルツ
+		7. 夜霧のしのび逢い
+		8. 慕 情
+		9. エーデルワイス
+		10. ドレミの歌
+		11. 雨に唄えば
+		12. 第三の男
+		13. サンライズ・サンセット
+		14. ラスト・コンサート
+		15. 80日間世界一周
+	-->
+	<software name="ro118">
+		<description>Screen Themes 3 (RO-118)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="スクリーン・テーマ3"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro118.bin" size="24576" crc="8853e424" sha1="fa53efca762de33b1a80f0f9a493bd06a2197328"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  20 songs
+		1. アイアイ
+		2. おはなしゆびさん
+		3. ぞうさん
+		4. てをつなごう
+		5. ぶんぶんぶん
+		6. おなかのへるうた
+		7. メリーさんのひつじ
+		8. おかあさん
+		9. ロンドンばし
+		10. やまのワルツ
+		11. きゅっきゅっきゅう
+		12. てをたたきましょう
+		13. 十人のインディアン
+		14. ドロップスのうた
+		15. サッちゃん
+		16. 七つの子
+		17. アビニョンのはしで
+		18. とんとんともだち
+		19. はしれ ちょうとっきゅう
+		20. こぎつね
+	-->
+	<software name="ro119">
+		<description>Kodomo no Uta 3 (RO-119)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="こどものうた3"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro119.bin" size="24576" crc="5314ccba" sha1="84a66d231321ea1fb8a2f3dda92da185b474323f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  20 songs
+		1. 憂き世川
+		2. それは・・・黄昏
+		3. 豊後水道
+		4. 海峡
+		5. 夕霧岬
+		6. さよならの翼
+		7. 恋人たちの神話
+		8. 想いで迷子-2
+		9. 浪花の夢
+		10. 北斗船
+		11. 祝い酒
+		12. 夢情話
+		13. 乱れ花
+		14. すずめの涙
+		15. 駅舎
+		16. ロンリーウェイ・ロンリーナイト
+		17. 王将一代小春しぐれ
+		18. 夕陽
+		19. かもめの歌
+		20. 北空港
+	-->
+	<software name="ro125e">
+		<description>Enka 9 (RO-125E)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="演歌9"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="24576">
+				<rom name="ro125e.bin" size="24576" crc="56539d87" sha1="31710285ab98b649c70cd67fbee08a0dc0a9462b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+		1. オリーブの首飾り / EL BIMBO
+		2. 蒼いノクターン / NOCTURNE
+		3. エーゲ海の真珠 / PENELOPE
+		4. 涙のトッカータ / TOCCATA
+	-->
+	<software name="ro151">
+		<description>Paul Mauriat (RO-151)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ポールモーリア"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro151.bin" size="6144" crc="9b39d536" sha1="5140d64c96715668e2c261263764a8e82723960a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+		1. 瞳はダイアモンド
+		2. ガラスの林檎
+		3. 天国のキッス
+		4. 秘密の楽園
+	-->
+	<software name="ro153">
+		<description>Young Hits (RO-153)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ヤングヒット"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro153.bin" size="6144" crc="8e7e5b81" sha1="5d7d4fddaccbc7cbb162dacc1a9339c26dc968e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+		1. サザエさん
+		2. ドラえもんのうた
+		3. ワイワイワールド ～Dr.スランプ・アラレちゃん～
+		4. CAT'S EYE
+	-->
+	<software name="ro155">
+		<description>Animation (RO-155)</description>
+		<year>1984?</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="アニメーション"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro155.bin" size="6144" crc="28691f18" sha1="5eb2d218ff7f6052d8c5a03255a876e0be55ef35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  8 songs
+		1. とんぼのめがね
+		2. やぎさんゆうびん
+		3. ことりのうた
+		4. もりのくまさん
+		5. ふしぎなポケット
+		6. いちねんせいになったら
+		7. いぬのおまわりさん
+		8. とんでったバナナ
+	-->
+	<software name="ro158">
+		<description>Kodomo no Uta 1 (RO-158)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="こどものうた1"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro158.bin" size="6144" crc="f2fa960a" sha1="7c8c9d144dea13f6b92002baa033d70747cf1d8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  4 songs
+		1. きてよパーマン
+		2. 忍者ハットリくん
+		3. 日本昔ばなし
+		4. ラムのラブソング-うる星やつら-
+	-->
+	<software name="ro162">
+		<description>Animation 2 (RO-162)</description>
+		<year>1984</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="アニメーション2"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro162.bin" size="6144" crc="73459234" sha1="ae1392025b63aa6900629405dba4d693f94a841c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  5 songs
+		1. 炎のキン肉マン～「キン肉マン」
+		2. 大人になんかならないよ～「オバケのQ太郎」
+		3. にんげんっていいな～「まんが日本昔ばなし」
+		4. タッチ～「タッチ」
+		5. 水の星より愛をこめて～「機動戦士Zガンダム」
+	-->
+	<software name="ro166">
+		<description>Animation Themes 3 (RO-166)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="アニメーション・テーマ3"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro166.bin" size="6144" crc="ca682900" sha1="9071238f0667af27992a16e748e06fa82cbf89c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  8 songs
+		1. 『ドラゴンボール』より『摩訶不思議アドベンチャー』
+		2. 『ドラゴンボール』より『ロマンティックあげるよ』
+		3. 『ウルトラB』より『バビバビブー ウルトラB』
+		4. 『エスパー魔美』より『テレポーテーション～恋の未確認～』
+		5. 『ゲゲゲの鬼太郎』より『ゲゲゲの鬼太郎』
+		6. 『アニメ三銃士』より『夢冒険』
+		7. 『聖闘士星矢(セイントセイヤ)』より『ペガサス幻想(ファンタジー)』
+		8. 『のらくろクン』より『Hold Me(ホールド ミー)』
+	-->
+	<software name="ro169a">
+		<description>Animation Themes 4 (RO-169A)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="アニメーション テーマ4"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro169a.bin" size="6144" crc="63b59fd9" sha1="1a1d0c7a166a47b734d5ecde6644ad70386ec19f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  8 songs
+		1. 『つるピカハゲ丸くん』より『つるピカハゲ丸倶楽部』
+		2. 『ついでにとんちんかん』より『ほらね、春が来た』
+		3. 『ドラえもん』より『青い空はポケットさ』
+		4. 『ドラえもん』より『ぼくたち地球人』
+		5. 『ビックリマン』より『ドリーミング・A・Go-Go』
+		6. 『ミスター味っ子』より『ルネッサンス情熱』
+		7. 『キテレツ大百科』より『キテレツ大百科』
+		8. 『小公子セディ』より『ぼくらのセディ』
+	-->
+	<software name="ro170a">
+		<description>Animation Themes 5 (RO-170A)</description>
+		<year>1988</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="アニメーション テーマ5"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro170a.bin" size="6144" crc="f0079562" sha1="21d2e25806eacea8dabc522ae0811c03ed0fc9db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  6 songs
+		1. ハッピー・バースディ・トゥ・ユー
+		2. お正月
+		3. ぼくのバレンタインデー
+		4. うれしいひなまつり
+		5. こいのぼり
+		6. 婚礼の合唱
+	-->
+	<software name="ro171i">
+		<description>Event Songs (RO-171I)</description>
+		<year>1988?</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="イベント・ソング"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro171i.bin" size="6144" crc="dc3a3f42" sha1="7f3d1688cc23894a345cefe840e97e3eb94437b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  6 songs
+		1. ロトのテーマ
+		2. 街
+		3. 村
+		4. 海を越えて
+		5. 戦闘のテーマ
+		6. そして伝説へ・・・
+	-->
+	<software name="ro172g">
+		<description>Game Music: Dragon Quest III Yori (RO-172G)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ゲーム ミュージック 『ドラゴンクエストⅢ』より"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro172g.bin" size="6144" crc="8681f1b2" sha1="f907f2ab92cf18cf0343bc3411b54bb36b37d5bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  7 songs
+		1. ボディー だけ レディー
+		2. ドラゴンボール伝説
+		3. ひみつのアッコちゃん
+		4. ぶぁい Yai Yai
+		5. おそ松くん音頭
+		6. 仮面ライダーBLACK RX
+		7. 勇気りんりん
+	-->
+	<software name="ro178a">
+		<description>Animation Themes 6 (RO-178A)</description>
+		<year>1989</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="アニメーションテーマ6"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro178a.bin" size="6144" crc="e59b057d" sha1="31dbf4477038c08a72b787819d1c5ccfcf2994bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  7 songs
+		1. 赤鼻のトナカイ / RUDOLPH, THE RED-NOSED REINDEER
+		2. ブルークリスマス / BLUE CHRISTMAS
+		3. ウィンターワンダーランド / WINTER WONDERLAND
+		4. シルバーベルズ/ SILVER BELLS
+		5. ああベツレヘムよ
+		6. 神の御子は
+		7. グローリア(荒野の果てに)
+	-->
+	<software name="ro180x">
+		<description>Christmas Songs 2 (RO-180X)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="クリスマスソング2"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro180x.bin" size="6144" crc="b7ac5aa4" sha1="071bae3979628b22293d6261f3d1abab3cc7c5b9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  7 songs
+		1. オール・オブ・ミー / ALL OF ME
+		2. 時のたつまま / AS TIME GOES BY
+		3. 枯葉 / AUTUMN LEAVES
+		4. デイ・バイ・デイ / DAY BY DAY
+		5. イッツ・オンリー・ア・ベイパー・ムーン / IT'S ONLY A PAPER MOON
+		6. 酒とバラの日々 / DAYS OF WINE AND ROSES
+		7. ユード・ビー・ソー・ナイス・トゥカム・ホーム・トゥ / YOU'D BE SO NICE TO COME HOME TO
+	-->
+	<software name="ro181s">
+		<description>Standards 2 (RO-181S)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="スタンダード2"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro181s.bin" size="6144" crc="e0ac7758" sha1="299f3d8397a8cc70950157d453270e67f086402a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  7 songs
+		1. イエスタディ / YESTERDAY
+		2. 抱きしめたい / I WANT TO HOLD YOUR HAND
+		3. アンド・アイ・ラブ・ハー / AND I LOVE HER
+		4. イエロー・サブマリン / YELLOW SUBMARINE
+		5. レディー・マドンナ / LADY MADONNA
+		6. ディ・トリッパー / DAY TRIPPER
+		7. プリーズ・プリーズ・ミー / PLEASE PLEASE ME
+	-->
+	<software name="ro182b">
+		<description>Beatles 2 (RO-182B)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ビートルズ2"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro182b.bin" size="6144" crc="5f3ddb1e" sha1="b4daa6b0c2dc3a988e6a488932576c0a45019524"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  7 songs
+		1. 仮面ノリダー～「レッツゴー！！ライダーキック」かえうた
+		2. ウンジャラゲ
+		3. ダダダダ ダイエット
+		4. あっぱれ さんま大先生
+		5. アミダばばあの唄
+		6. 炎のエスカルゴ
+		7. 小市民 2
+	-->
+	<software name="ro183c">
+		<description>Comic Songs (RO-183C)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="コミックソング"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro183c.bin" size="6144" crc="c3f2e34b" sha1="aa2104d092ff2acb783496abcbdcdd6f67b423ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  15 songs
+		1. こいのぼり
+		2. いっぷ　にっぷ　じゃんぷ
+		3. ひらいた ひらいた
+		4. たなばたさま
+		5. うみ
+		6. おおきなくりのきのしたで
+		7. きらきらぼし
+		8. ことりの うた
+		9. もりの くまさん
+		10. だるまさん
+		11. かくれんぼ
+		12. 虫の こえ
+		13. あわてんぼうの サンタクロース
+		14. あかちゃん
+		15. アンダルコのうた
+	-->
+	<software name="ro184t">
+		<description>Shougakusei no Ongaku 1 (RO-184T)</description>
+		<year>1989?</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="しょうがくせいのおんがく1"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro184t.bin" size="6144" crc="3cfae2b0" sha1="6f6c4022824c6e10092d52a2e9248617d31051aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  15 songs
+		1. 春の小川
+		2. 山の朝
+		3. ふじ山
+		4. うさぎ
+		5. みんな音楽家
+		6. はさみとぎ
+		7. さようなら
+		8. さくら　さくら
+		9. そよ風
+		10. この山光る
+		11. おどろう楽しいポーレチケ
+		12. もみじ
+		13. とんび
+		14. 夜汽車
+		15. 月夜
+	-->
+	<software name="ro185t">
+		<description>Shougakusei no Ongaku 2 (RO-185T)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="小学生の音楽2"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro185t.bin" size="6144" crc="a76ae229" sha1="bba5acd10763facbd6f15571e124a26f3a4124a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  13 songs
+		1. ゆかいに歩けば
+		2. 子もり歌
+		3. 荒城の月
+		4. 星の世界
+		5. 冬げしき
+		6. スキーの歌
+		7. 水車
+		8. ほたるの光
+		9. 大分地方の子もり歌
+		10. かりがわたる
+		11. ふるさと
+		12. 星に向かい 光に向かい
+		13. あおげばとうとし
+	-->
+	<software name="ro186t">
+		<description>Shougakusei no Ongaku 3 (RO-186T)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="小学生の音楽3"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro186t.bin" size="6144" crc="78141aaf" sha1="af538244ca4770c5f56797d938c9d0ca9c14cb7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  7 songs
+		1. 高速戦隊ターボレンジャー 「高速戦隊ターボレンジャー」より
+		2. セント・ジュエルを探せ 「新ビックリマン」より
+		3. ぼくドラえもん 「どらえもん」より
+		4. CHA-LA HEAD-CHA-LA(チャラ・ヘッチャラ) 「ドラゴンボールZ」より
+		5. サザエさん一家 「サザエさん」より
+		6. Dang Dang 気になる 「美味しんぼ」より
+		7. キッチンから愛をこめて 「ハーイ あっこです」より
+	-->
+	<software name="ro189a">
+		<description>Animation Themes 7 (RO-189A)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="アニメーションテーマ7"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro189a.bin" size="6144" crc="7441d24e" sha1="3cd0dde248f1bd10d7a6f5440435e7abb7f11ed5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  6 songs
+		1. ごめんよ　涙
+		2. あ・き・す・と・ぜ・ね・こ
+		3. TIME ZONE
+		4. ボクらの夢によろしく
+		5. BE MY BABY
+		6. Runner
+	-->
+	<software name="ro191y">
+		<description>Young Best Hits 8 (RO-191Y)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ヤングベストヒット8"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro191y.bin" size="6144" crc="0b63336c" sha1="bb84b55d3fc6c2181d2c20aa14d91cae1e4134f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	  7 songs
+		1. Diamonds ダイアモンド
+		2. 愛が止まらない
+		3. 涙をみせないで
+		4. 嵐の素顔
+		5. 夢の中へ
+		6. NEVERLAND～YAWARA! メインテーマ～
+		7. Return to Myself～しない、しない、ナツ。
+	-->
+	<software name="ro192y">
+		<description>Young Best Hits 9 (RO-192Y)</description>
+		<year>19??</year>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
+		<info name="alt_title" value="ヤングベストヒット9"/>
+		<part name="cart" interface="casio_rompack">
+			<dataarea name="rom" size="6144">
+				<rom name="ro192y.bin" size="6144" crc="f5820444" sha1="502b761d12921d18053b612b3f4094f29d8c9b15"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!--		WORLD ROM PACKS			-->
 
 	<!--
 	  11 songs
