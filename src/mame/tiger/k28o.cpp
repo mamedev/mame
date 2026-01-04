@@ -22,23 +22,22 @@ Hardware notes:
 - SC-01-A speech chip
 - module slot
 
-6 modules were announced (see back of the box), but it's not known if they were
-actually released.
-
 TODO:
 - plosive consonants are very difficult to hear, it's an issue in votrax.cpp
-- add module slot
 
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/tms6100.h"
 #include "video/mm5445.h"
 #include "video/pwm.h"
 #include "sound/votrax.h"
 
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork
@@ -57,6 +56,7 @@ public:
 		m_display(*this, "display"),
 		m_tms6100(*this, "tms6100"),
 		m_speech(*this, "speech"),
+		m_cart(*this, "cartslot"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -75,6 +75,7 @@ private:
 	required_device<pwm_display_device> m_display;
 	required_device<tms6100_device> m_tms6100;
 	required_device<votrax_sc01_device> m_speech;
+	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<7> m_inputs;
 
 	bool m_power_on = false;
@@ -84,13 +85,14 @@ private:
 	int m_speech_strobe = 0;
 	u64 m_vfd_data = 0;
 
+	void power_off();
 	void vfd_output_w(u64 data);
 	void mcu_p0_w(u8 data);
 	u8 mcu_p1_r();
 	u8 mcu_p2_r();
 	void mcu_p2_w(u8 data);
 
-	void power_off();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 };
 
 void k28o_state::machine_start()
@@ -131,6 +133,25 @@ void k28o_state::power_off()
 	m_power_on = false;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_display->clear();
+}
+
+
+
+/*******************************************************************************
+    Cartridge
+*******************************************************************************/
+
+DEVICE_IMAGE_LOAD_MEMBER(k28o_state::cart_load)
+{
+	u32 const size = m_cart->common_get_size("rom");
+
+	if (size > 0x4000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid image file size (must be no more than 16K)");
+
+	u8 *const base = memregion("tms6100")->base() + 0x8000;
+	m_cart->common_load_rom(base, size, "rom");
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 
@@ -325,6 +346,12 @@ void k28o_state::k28o(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	VOTRAX_SC01A(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
+
+	// cartridge
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "k28o", "vsm,bin");
+	m_cart->set_device_load(FUNC(k28o_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("k28o");
 }
 
 
@@ -337,7 +364,7 @@ ROM_START( k28o )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "p8021_7-230-itl", 0x0000, 0x0400, CRC(15536d20) SHA1(fac98ce652340ffb2d00952697c3a9ce75393fa4) )
 
-	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff? = space reserved for cartridge
+	ROM_REGION( 0x10000, "tms6100", ROMREGION_ERASEFF ) // 8000-bfff = space reserved for cartridge
 	ROM_LOAD( "cm62050u", 0x0000, 0x4000, CRC(6afb8645) SHA1(e22435568ed11c6516a3b4008131f99cd4e47aa9) )
 	ROM_LOAD( "cm62051u", 0x4000, 0x4000, CRC(0fa61baa) SHA1(831be669423ba60c7f85a896b4b09a1295478bd9) )
 ROM_END
