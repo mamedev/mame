@@ -612,9 +612,9 @@ void i8256_device::receive_clock()
 		{
 			receive_register_extract();
 			if (is_receive_parity_error())
-				m_status |= I8256_STATUS_PARITY_ERROR;
+				m_status |= (1 << I8256_STATUS_PARITY_ERROR);
 			if (is_receive_framing_error())
-				m_status |= I8256_STATUS_FRAMING_ERROR;
+				m_status |= (1 << I8256_STATUS_FRAMING_ERROR);
 			receive_character(get_received_char());
 		}
 	}
@@ -632,7 +632,7 @@ void i8256_device::sync1_rxc()
 	if (need_parity && (m_rxd_bits == m_data_bits_count))
 	{
 		if ((population_count_32(m_sync1) & 1) != m_rxd)
-			m_status |= I8256_STATUS_PARITY_ERROR;
+			m_status |= (1 << I8256_STATUS_PARITY_ERROR);
 		// and then continue on as if everything was ok
 	}
 	else
@@ -667,7 +667,7 @@ void i8256_device::sync2_rxc()
 	if (need_parity && (m_rxd_bits == m_data_bits_count))
 	{
 		if ((population_count_32(m_sync1) & 1) != m_rxd)
-			m_status |= I8256_STATUS_PARITY_ERROR;
+			m_status |= (1 << I8256_STATUS_PARITY_ERROR);
 		// and then continue on as if everything was ok
 	}
 	else
@@ -712,7 +712,7 @@ void i8256_device::start_tx()
 {
 	LOG("start_tx %02x\n", m_tx_register);
 	transmit_register_setup(m_tx_register);
-	m_status &= ~I8256_STATUS_TR_EMPTY;
+	m_status &= ~(1 << I8256_STATUS_TR_EMPTY);
 }
 
 
@@ -750,7 +750,7 @@ void i8256_device::receive_character(uint8_t ch)
 	// char has not been read and another has arrived!
 	if (BIT(m_status, I8256_STATUS_RB_FULL))
 	{
-		m_status |= I8256_STATUS_OVERRUN_ERROR;
+		m_status |= (1 << I8256_STATUS_OVERRUN_ERROR);
 		LOG("status overrun set\n");
 	}
 }
