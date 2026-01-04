@@ -407,7 +407,6 @@ void snspell_state::write_r(u32 data)
 {
 	// R0-R7: input mux and select digit (+R8 if the device has 9 digits)
 	// R15: filament on
-	// other bits: MCU internal use
 	m_grid = data & 0x81ff;
 	update_display();
 
@@ -415,6 +414,7 @@ void snspell_state::write_r(u32 data)
 	if (~data & m_r & 0x2000)
 		power_off();
 
+	// other bits: MCU internal use
 	m_r = data;
 }
 
