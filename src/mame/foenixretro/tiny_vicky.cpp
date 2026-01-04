@@ -81,7 +81,7 @@ uint32_t tiny_vicky_video_device::screen_update(screen_device &screen, bitmap_rg
                 // Check the Sart of Line registers
                 uint8_t sol_reg = m_iopage0_ptr[0x1018];
                 // 12-bit line
-                uint16_t sol_line = m_iopage0_ptr[0x1018] + ((m_iopage0_ptr[0x101a] & 0xf) << 8);
+                uint16_t sol_line = m_iopage0_ptr[0x1019] + ((m_iopage0_ptr[0x101a] & 0xf) << 8);
                 uint32_t *row = topleft + y * 800;
                 if ((sol_reg & 1) != 0 && y == sol_line)
                 {
