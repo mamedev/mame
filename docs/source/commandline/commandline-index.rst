@@ -318,6 +318,7 @@ Core Misc Options
 ~~~~~~~~~~~~~~~~~
 
 | :ref:`[no]drc <mame-commandline-drc>`
+| :ref:`[no]drc_rwx <mame-commandline-drcrwx>`
 | :ref:`[no]drc_use_c <mame-commandline-drcusec>`
 | :ref:`[no]drc_log_uml <mame-commandline-drcloguml>`
 | :ref:`[no]drc_log_native <mame-commandline-drclognative>`
