@@ -71,6 +71,10 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	// device_serial_interface implementation
+	virtual void rcv_complete() override;
+	virtual void tra_complete() override;
+
 private:
 	devcb_read_line m_in_inta_cb;
 	devcb_write_line m_out_int_cb;
@@ -119,6 +123,7 @@ private:
 	void check_for_tx_start();
 	void start_tx();
 	void transmit_clock();
+	void update_status();
 	void receive_character(uint8_t ch);
 };
 
