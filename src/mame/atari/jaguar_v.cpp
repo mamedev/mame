@@ -153,9 +153,10 @@
 #define LOG_BLITTER_WRITE   (1U << 3)
 #define LOG_UNHANDLED_BLITS (1U << 4)
 #define LOG_OBJECTS         (1U << 5)
+#define LOG_OBJECT_BRANCH   (1U << 6)
 
 #define VERBOSE (LOG_UNHANDLED_BLITS)
-// #define LOG_OUTPUT_FUNC osd_printf_warning
+//#define LOG_OUTPUT_FUNC osd_printf_warning
 #include "logmacro.h"
 
 

@@ -1035,7 +1035,7 @@ void jaguar_state::gpu_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask){
 
 void jaguar_state::console_base_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).mirror(0x200000).rw(FUNC(jaguar_state::shared_ram_r16), FUNC(jaguar_state::shared_ram_w16));
+	map(0x000000, 0x1fffff).mirror(0x600000).rw(FUNC(jaguar_state::shared_ram_r16), FUNC(jaguar_state::shared_ram_w16));
 	map(0xe00000, 0xe1ffff).rom().region("mainrom", 0);
 	// Tom section
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w)); // might be reversed endian of the others..
@@ -1428,7 +1428,7 @@ void jaguar_state::dsp_rom_map(address_map &map)
 void jaguar_state::console_base_gpu_map(address_map &map)
 {
 	map.global_mask(0xffffff);
-	map(0x000000, 0x1fffff).ram().mirror(0x200000).share("sharedram");
+	map(0x000000, 0x1fffff).ram().mirror(0x600000).share("sharedram");
 	map(0xe00000, 0xe1ffff).r(FUNC(jaguar_state::rom_base_r));
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
