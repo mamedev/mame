@@ -336,7 +336,7 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 	}
 }
 
-void update_status()
+void i8256_device::update_status()
 {
 	// TR Empty
 	if (is_transmit_register_empty())
@@ -622,12 +622,6 @@ void i8256_device::rcv_complete()
 
 void i8256_device::tra_complete()
 {
-	if (!m_empty)
-	{
-		transmit_register_setup(m_fifo[m_head]);
-		m_head = (m_head + 1U) % FIFO_LENGTH;
-		m_empty = (m_head == m_tail) ? 1U : 0U;
-	}
 	m_status |= (1 << I8256_STATUS_TB_EMPTY);
 	update_status();
 }
