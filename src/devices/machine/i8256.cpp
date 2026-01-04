@@ -296,22 +296,41 @@ void i8256_device::reset_timer()
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 {
+	bool t24 = BIT(m_mode, I8256_MODE_T24);
+	bool t35 = BIT(m_mode, I8256_MODE_T35);
 	for (int i = 0; i < 5; ++i)
 	{
-		if (m_timers[i] > 0)
-		{
-			m_timers[i]--;
-			if (m_timers[i] == 0 && BIT(m_interrupts,timer_interrupt[i])) // If the interrupt is enabled
-			{
-				// For Timer2, only trigger if BITI=0
-				if (i == I8256_INT_TIMER2 && BIT(m_command1, I8256_CMD1_BITI))
-					continue;
+		if ((i == 1 && t24) || (i == 2 && t35)) {
+			// cascaded low timer
+			int high_index = (i == 1) ? 3 : 4;
+			int int_level = (i == 1) ? I8256_INT_TIMER4 : I8256_INT_TIMER5;
+			if (m_timers[i] > 0) {
+				m_timers[i]--;
+				if (m_timers[i] == 0) {
+					if (m_timers[high_index] > 0) {
+						m_timers[high_index]--;
+						m_timers[i] = 255;
+					}
+					if (m_timers[high_index] == 0 && BIT(m_interrupts, int_level)) {
+						m_current_interrupt_level = int_level;
+						m_out_int_cb(ASSERT_LINE);
+						m_interrupts &= ~(1 << int_level);
+					}
+				}
+			}
+		} else if (!((i == 3 && t24) || (i == 4 && t35))) {
+			// normal timer, not cascaded high
+			if (m_timers[i] > 0) {
+				m_timers[i]--;
+				if (m_timers[i] == 0 && BIT(m_interrupts, timer_interrupt[i])) {
+					// For Timer2, only trigger if BITI=0
+					if (i == I8256_INT_TIMER2 && BIT(m_command1, I8256_CMD1_BITI))
+						continue;
 
-				m_current_interrupt_level = timer_interrupt[i];
-				m_out_int_cb(ASSERT_LINE); // it occurs when the counter changes from 1 to 0.
-
-				// The timer interrupts are automatically disabled when the interrupt request is generated.
-				m_interrupts = m_interrupts & ~(1 << timer_interrupt[i]);
+					m_current_interrupt_level = timer_interrupt[i];
+					m_out_int_cb(ASSERT_LINE);
+					m_interrupts &= ~(1 << timer_interrupt[i]);
+				}
 			}
 		}
 	}
@@ -448,8 +467,14 @@ void i8256_device::write(offs_t offset, u8 data)
 		case I8256_REG_TIMER1:
 		case I8256_REG_TIMER2:
 		case I8256_REG_TIMER3:
+			m_timers[reg-10] = data;
+			break;
 		case I8256_REG_TIMER4:
+			if (BIT(m_mode, I8256_MODE_T24)) m_timers[1] = 255;
+			m_timers[reg-10] = data;
+			break;
 		case I8256_REG_TIMER5:
+			if (BIT(m_mode, I8256_MODE_T35)) m_timers[2] = 255;
 			m_timers[reg-10] = data;
 			break;
 		case I8256_REG_STATUS:
