@@ -114,7 +114,7 @@ TIMER_CALLBACK_MEMBER(specnext_copper_device::timer_callback)
 	} while (m_copper_dout == 0 && m_copper_list_addr < 0x400);
 
 	m_copper_list_addr %= 0x400;
-	m_timer->adjust(times * attotime::from_hz(clock()));
+	m_timer->adjust(clocks_to_attotime(times));
 }
 
 TIMER_CALLBACK_MEMBER(specnext_copper_device::frame_timer_callback)
