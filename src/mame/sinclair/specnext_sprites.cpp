@@ -343,6 +343,8 @@ void specnext_sprites_device::device_add_mconfig(machine_config &config)
 
 void specnext_sprites_device::device_start()
 {
+	save_item(NAME(m_offset_h));
+	save_item(NAME(m_offset_v));
 	save_item(NAME(m_sprite_palette_select));
 
 	save_item(NAME(m_zero_on_top));

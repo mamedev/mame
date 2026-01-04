@@ -5636,6 +5636,11 @@ ROM_START(tk3000)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
 ROM_END
 
+// CM630 = 6502 CPU
+// CM631 = MMU clone
+// CM632 = IOU clone
+// CM633 = video encoder (22-pin custom logic array)
+// CM650 = keyboard scanner (28-pin MCU, supposedly a MC6805 clone; accessed through II/II+-style keyboard connector with some nonstandard signals)
 ROM_START(prav8c)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "charrom.d20", 0x0000, 0x2000,CRC(935212cc) SHA1(934603a441c631bd841ea0d2ff39525474461e47))
@@ -5644,12 +5649,12 @@ ROM_START(prav8c)
 	ROM_LOAD ( "prom_cd.d46", 0x0000, 0x2000, CRC(195d0b48) SHA1(f8c4f3722159081f6950207f03bc85da30980c08))
 	ROM_LOAD ( "prom_ef.d41", 0x2000, 0x2000, CRC(ec6aa2f6) SHA1(64bce893ebf0e22cd8f22436b97ef1bfeddf692f))
 
-	// contains slot firmware for slots 1, 2, and 6 (6 is the usual Disk II f/w)
+	// contains slot firmware for slots 1, 2, and 6 (1 is Centronics, 2 is optional 8250-based RS-232, 6 is the usual Disk II f/w)
 	ROM_REGION(0x2000,"unknown",0)
 	ROM_LOAD ( "eprom.d38", 0x0000, 0x2000, CRC(c8d00b19) SHA1(13d156957ea68d0e7bc4be57cb1580c8b1399981))
 
 	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // we don't know what this machine used
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // not what this machine used
 ROM_END
 
 ROM_START(apple2c0)

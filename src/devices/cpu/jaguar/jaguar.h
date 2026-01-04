@@ -88,6 +88,7 @@ protected:
 	void matrix_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void matrix_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void endian_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	uint32_t pc_r(offs_t offset);
 	void pc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 status_r();
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);

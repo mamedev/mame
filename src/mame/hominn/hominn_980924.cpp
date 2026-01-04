@@ -329,43 +329,10 @@ void hominn_980924_state::init_qxjl()
 		std::swap_ranges(&rom[i + 0x7c], &rom[i + 0x80], &rom[i + 0xbc]);
 	}
 
-	for (int i = 0; i < 0x40000; i += 0x200)
-	{
-		std::swap_ranges(&rom[i + 0x80], &rom[i + 0x100], &rom[i + 0x100]);
-	}
+	memcpy(&buffer[0], rom, 0x40000);
 
-	for (int i = 0; i < 0x40000; i += 0x400)
-	{
-		std::swap_ranges(&rom[i + 0x100], &rom[i + 0x200], &rom[i + 0x200]);
-	}
-
-	for (int i = 0; i < 0x40000; i += 0x1000)
-	{
-		std::swap_ranges(&rom[i + 0x200], &rom[i + 0x300], &rom[i + 0x800]);
-		std::swap_ranges(&rom[i + 0x300], &rom[i + 0x400], &rom[i + 0x900]);
-		std::swap_ranges(&rom[i + 0x600], &rom[i + 0x700], &rom[i + 0xc00]);
-		std::swap_ranges(&rom[i + 0x700], &rom[i + 0x800], &rom[i + 0xd00]);
-	}
-
-	for (int i = 0; i < 0x40000; i += 0x20000)
-	{
-		std::swap_ranges(&rom[i + 0x0800], &rom[i + 0x1000], &rom[i + 0x10000]);
-		std::swap_ranges(&rom[i + 0x1800], &rom[i + 0x2000], &rom[i + 0x11000]);
-		std::swap_ranges(&rom[i + 0x2800], &rom[i + 0x3000], &rom[i + 0x12000]);
-		std::swap_ranges(&rom[i + 0x3800], &rom[i + 0x4000], &rom[i + 0x13000]);
-		std::swap_ranges(&rom[i + 0x4800], &rom[i + 0x5000], &rom[i + 0x14000]);
-		std::swap_ranges(&rom[i + 0x5800], &rom[i + 0x6000], &rom[i + 0x15000]);
-		std::swap_ranges(&rom[i + 0x6800], &rom[i + 0x7000], &rom[i + 0x16000]);
-		std::swap_ranges(&rom[i + 0x7800], &rom[i + 0x8000], &rom[i + 0x17000]);
-		std::swap_ranges(&rom[i + 0x8800], &rom[i + 0x9000], &rom[i + 0x18000]);
-		std::swap_ranges(&rom[i + 0x9800], &rom[i + 0xa000], &rom[i + 0x19000]);
-		std::swap_ranges(&rom[i + 0xa800], &rom[i + 0xb000], &rom[i + 0x1a000]);
-		std::swap_ranges(&rom[i + 0xb800], &rom[i + 0xc000], &rom[i + 0x1b000]);
-		std::swap_ranges(&rom[i + 0xc800], &rom[i + 0xd000], &rom[i + 0x1c000]);
-		std::swap_ranges(&rom[i + 0xd800], &rom[i + 0xe000], &rom[i + 0x1d000]);
-		std::swap_ranges(&rom[i + 0xe800], &rom[i + 0xf000], &rom[i + 0x1e000]);
-		std::swap_ranges(&rom[i + 0xf800], &rom[i + 0x10000], &rom[i + 0x1f000]);
-	}
+	for (int i = 0; i < 0x40000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 11, 15, 14, 13, 12, 9, 10, 8, 7, 16, 6, 5, 4, 3, 2, 1, 0)];
 }
 
 } // anonymous namespace
