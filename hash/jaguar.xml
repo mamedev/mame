@@ -261,6 +261,7 @@ Title screen has black dots of garbage on top (btanb)
 		<notes><![CDATA[
 4 Play logo has [blitter] SRCSHADE bug on rolling section (red-ish, should be same-ish color as logo)
 Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
+Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram
 No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
 ]]></notes>
@@ -280,6 +281,7 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
 No sound (fixed, 68k JPIT irqs)
+Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram
 Access [cart] EEPROM
 ]]></notes>
 
@@ -681,6 +683,7 @@ Reload after saving doesn't work, access [cart] EEPROM (verify, should be fixed)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Has heavy pitch GFX issues (unhandled [object] pitch = 4 16bpp)
+Uses a mix of [blitter] BCOMPEN and GOURD + GOURZ
 Uses [GPU] irq 3
 Access [cart] EEPROM
 ]]></notes>
@@ -699,7 +702,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 No sound (fixed, serial clock)
-Bad pitch GFXs on attract mode, after title ([object] pitch = 4 32bpp)
+Bad pitch GFXs on attract mode, after title ([object] pitch = 4 24bpp)
 Black screen after briefing, or by selecting demo mode
 ]]></notes>
 
@@ -760,7 +763,7 @@ Uses [GPU] irqs 0,4
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Jaguar CD cartridge for saving, requires its own [cart] scheme (with atmel_29c010_device or unknown AMD intelfsh)
-Currently hangs, [PIT]?
+Uses [blitter] BCOMPEN
 Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 ]]></notes>
 
@@ -778,6 +781,7 @@ Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Text GFXs are solid filled, enables [blitter] BCOMPEN
+NOTE: original Missile Command present on this (first option in main menu), good test case for said BCOMPEN
 Background pitch issue on gameplay
 No BGMs (fixed, [DSP] irq 0)
 ]]></notes>
@@ -813,11 +817,11 @@ Uses [GPU] irqs 0 and 4
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-"Enter Combat" has ground textures with black
+"Enter Combat" has ground textures with black, uses [blitter] GOURZ
 "Enter Network" causes a black screen after loading (JagLink)
-Reads error bit in [Jerry] ASISTAT
+Reads error bit 15 in [Jerry] ASISTAT
 Sometimes hangs on main menu
-Main menu background is cutoff to the right
+Main menu background is cutoff to the right, uses unemulated [object] scaled blend mode (pillar in the center)
 BGM randomly don't work on main menu
 Uses [GPU] irq 0
 ]]></notes>
@@ -926,7 +930,7 @@ No sound (fixed, DSP JPIT irqs)
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Ranking screen cuts off text on 9th and 10th places
+Ranking screen cuts off text on 9th and 10th places (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -943,7 +947,7 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Ranking screen cuts off text on 9th and 10th places
+Ranking screen cuts off text on 9th and 10th places (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1222,8 +1226,7 @@ Access [cart] EEPROM
 		<year>2010</year>
 		<publisher>Team Jaguar</publisher>
 		<notes><![CDATA[
-No sprites
-main menu with incorrect width
+Overstretched pixel width
 no sound (btanb)
 ]]></notes>
 
@@ -1498,6 +1501,9 @@ These have been converted to j64 format with the universal header -->
 		<description>Atari Karts (prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Same as parent set
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1510,6 +1516,12 @@ These have been converted to j64 format with the universal header -->
 		<description>Barkley Shut Up and Jam! (prototype)</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
+		<notes><![CDATA[
+Cutoff ball sprite on main menu
+No sound
+Either crashes or returns to player selection after stage select
+Has timing sensitive color bugs
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1522,6 +1534,9 @@ These have been converted to j64 format with the universal header -->
 		<description>Brett Hull NHL Hockey (prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Same as parent set
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1534,6 +1549,9 @@ These have been converted to j64 format with the universal header -->
 		<description>Breakout 2000 (prototype, xx0327)</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
+		<notes><![CDATA[
+Same as parent set
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1546,6 +1564,9 @@ These have been converted to j64 format with the universal header -->
 		<description>Cybermorph (prototype)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Same(-ish) as parent set
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="1048576" width="32" endianness="big">
@@ -1559,7 +1580,7 @@ These have been converted to j64 format with the universal header -->
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen, [GPU] crashes
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1574,7 +1595,7 @@ Black screen
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen, [GPU] crashes
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1589,7 +1610,7 @@ Black screen
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen, [GPU] crashes
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1603,6 +1624,9 @@ Black screen
 		<description>Defender 2000 (prototype)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Same as parent set
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1615,6 +1639,9 @@ Black screen
 		<description>Fight for Life (prototype, xx0907)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Same as parent set
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1627,6 +1654,9 @@ Black screen
 		<description>Fight for Life (prototype, xx0322)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Same as parent set
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1640,7 +1670,7 @@ Black screen
 		<year>2008</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen, 68k jumps to lalaland
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1656,7 +1686,8 @@ Black screen
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay
+Text GFXs are solid filled, same as missil3d
+GFXs are cut off during gameplay
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1670,6 +1701,9 @@ Text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay
 		<description>Rayman (prototype)</description>
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
+		<notes><![CDATA[
+All sprites are cutoff, wants prototype [Tom] semantics?
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1678,10 +1712,16 @@ Text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay
 		</part>
 	</software>
 
-	<software name="ttoonadvp" cloneof="ttoonadv" supported="no">
-		<description>Tiny Toon Adventures (prototype)</description>
+	<!-- looks very different compared to ttoonadv -->
+	<software name="ttoonadvp" supported="partial">
+		<description>Tiny Toon Adventures: Plucky Duck in Hollywood Hijinks (prototype)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Tech demo of an action adventure game in alpha stage
+Overscan scrolling during gameplay (verify)
+No sound in gameplay (verify)
+]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1695,7 +1735,7 @@ Text GFXs are solid filled, no BGMs, GFXs are cut off during gameplay
 		<year>199?</year>
 		<publisher>Crazy Ace</publisher>
 		<notes><![CDATA[
-Black screen
+Black screen, attempts to write in [cart] space, DRAM?
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
