@@ -73,11 +73,42 @@ inline u8 jaguar_cpu_device::CONDITION(u8 x)
 
 inline u8 jaguar_cpu_device::READBYTE(offs_t a)  { return m_program.read_byte(a); }
 inline u16 jaguar_cpu_device::READWORD(offs_t a) { return m_program.read_word(a); }
-inline u32 jaguar_cpu_device::READLONG(offs_t a) { return m_program.read_dword(a); }
+inline u32 jaguar_cpu_device::READLONG(offs_t a)
+{
+	// - fball95 GPU
+	// - kasumi GPU 0x01e0'34ce (???)
+	// - sensible DSP $b14689e2 (???)
+	//if (a & 2)
+	//{
+	//	printf("%d: %08x R\n", m_isdsp, a);
+	//	u32 res = READWORD(a) << 16;
+	//	res |= READWORD(a + 2) & 0xffff;
+	//	//machine().debug_break();
+	//	return res;
+	//}
+
+	return m_program.read_dword(a);
+}
 
 inline void jaguar_cpu_device::WRITEBYTE(offs_t a, u8 v)  { m_program.write_byte(a, v); }
 inline void jaguar_cpu_device::WRITEWORD(offs_t a, u16 v) { m_program.write_word(a, v); }
-inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v) { m_program.write_dword(a, v); }
+inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
+{
+	// TODO: protect/protctse wants proper alignment at PC=f03004
+	//   (wants to reprogram border color registers, would otherwise hit VMODE)
+	// - atarikrt $06bf 0x0000'0007 (?)
+	// - barkley/bretth/chekflag DSP
+	// - kasumi $f0'34ab 0x0000'0003 (?)
+	// - pdrive $580e (?)
+	//if (a & 2)
+	//{
+	//	printf("%d: %08x %08x W\n", m_isdsp, a, v);
+	//	WRITEWORD(a, v >> 16);
+	//	WRITEWORD(a + 2, v & 0xffff);
+	//  return;
+	//}
+	m_program.write_dword(a, v);
+}
 
 
 /***************************************************************************
@@ -261,6 +292,8 @@ void jaguar_cpu_device::check_irqs()
 	u8 mask = m_int_mask;
 
 	/* bail if nothing is available */
+//	if (m_isdsp)
+//		printf("%02x %02x\n", latch, mask);
 	latch &= mask;
 	if (latch == 0)
 		return;
@@ -288,7 +321,10 @@ void jaguar_cpu_device::execute_set_input(int irqline, int state)
 {
 	const u32 mask = (1 << irqline);
 	m_int_latch &= ~mask;
-	if (state != CLEAR_LINE)
+	// Ignore irq if masked
+	// - barkley, breakout, clubdriv, ironsol2, skyhamm, ultravor all wants to not read a pending
+	//   DSP serial irq *before* JPIT
+	if (state != CLEAR_LINE && BIT(m_int_mask, irqline))
 	{
 		m_int_latch |= mask;
 		check_irqs();
@@ -773,7 +809,7 @@ void jaguar_cpu_device::jump_cc_rn(u16 op)
 	{
 		const u8 reg = (op >> 5) & 31;
 
-		/* special kludge for risky code in the cojag DSP interrupt handlers */
+		// HACK: kludge for risky code in the cojag DSP interrupt handlers
 		const u32 newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
 		debugger_instruction_hook(m_pc);
 		op = ROPCODE(m_pc);
@@ -1293,7 +1329,7 @@ void jaguar_cpu_device::io_common_map(address_map &map)
 	map(0x04, 0x07).w(FUNC(jaguar_cpu_device::matrix_control_w));
 	map(0x08, 0x0b).w(FUNC(jaguar_cpu_device::matrix_address_w));
 //  map(0x0c, 0x0f) endian
-	map(0x10, 0x13).w(FUNC(jaguar_cpu_device::pc_w));
+	map(0x10, 0x13).rw(FUNC(jaguar_cpu_device::pc_r), FUNC(jaguar_cpu_device::pc_w));
 	map(0x14, 0x17).rw(FUNC(jaguar_cpu_device::status_r), FUNC(jaguar_cpu_device::control_w));
 //  map(0x18, 0x1b) implementation specific
 	map(0x1c, 0x1f).rw(FUNC(jaguar_cpu_device::div_remainder_r), FUNC(jaguar_cpu_device::div_control_w));
@@ -1368,14 +1404,21 @@ void jaguar_cpu_device::matrix_address_w(offs_t offset, u32 data, u32 mem_mask)
 	m_mtxaddr = m_internal_ram_start | (m_io_mtxa & 0xffc);
 }
 
+// TODO: ruinerp 68k reads this twice
+// (which allegedly wants a tight sync ...)
+uint32_t jaguar_cpu_device::pc_r(offs_t offset)
+{
+	return m_pc;
+}
+
 void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_pc);
 	m_pc = m_io_pc & 0xffffff;
-	// HRM warns against changing PC while GPU/DSP is running
+	// JTRM warns against changing PC while GPU/DSP is running
 	// - speedst2 does it anyway on DSP side
 	if (m_go == true)
-		logerror("%s: inflight PC write %08x", this->tag(), m_pc);
+		logerror("%s: inflight PC write %08x\n", this->tag(), m_pc);
 }
 
 /*
@@ -1454,8 +1497,10 @@ void jaguar_cpu_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 		// TODO: following does nothing if set by itself, or acts as a trap?
 		if (BIT(m_io_status, 2))
 		{
-			m_int_latch |= 1;
-			check_irqs();
+			// whitemen/missil3d wants gating thru the mask, as above
+			//m_int_latch |= 1;
+			//check_irqs();
+			set_input_line(0, ASSERT_LINE);
 		}
 
 

@@ -1176,7 +1176,7 @@ void unidasm_data_buffer::decrypt(const unidasm_data_buffer &buffer, bool opcode
 static int parse_number(const char *curarg, const char *default_format, u32 *value)
 {
 	int result;
-	if(curarg[0] == '0') {
+	if(curarg[0] == '0' && curarg[1] != '\0') {
 		if(tolower((uint8_t)curarg[1]) == 'x')
 			result = sscanf(&curarg[2], "%x", value);
 		else if(tolower((uint8_t)curarg[1]) == 'o')

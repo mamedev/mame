@@ -185,7 +185,7 @@ private:
 	emu_timer *m_serial_timer = nullptr;
 
 	// blitter variables
-	uint32_t m_blitter_regs[40]{};
+	uint32_t m_blitter_regs[0x40]{};
 	uint16_t m_gpu_regs[0x100/2]{};
 	emu_timer *m_object_timer = nullptr;
 	emu_timer *m_blitter_done_timer = nullptr;
@@ -271,6 +271,7 @@ private:
 	TIMER_CALLBACK_MEMBER(pit_update);
 	TIMER_CALLBACK_MEMBER(gpu_sync);
 	template <unsigned which> TIMER_CALLBACK_MEMBER(jpit_update);
+	void update_pit_timer();
 	void update_jpit_timer(unsigned which);
 	void update_serial_timer();
 

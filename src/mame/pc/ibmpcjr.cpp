@@ -117,7 +117,7 @@ private:
 	uint8_t m_pcjx_1ff_count = 0;
 	uint8_t m_pcjx_1ff_val = 0;
 	uint8_t m_pcjx_1ff_bankval = 0;
-	uint8_t m_pcjx_1ff_bank[20][2]{};
+	uint8_t m_pcjx_1ff_bank[0x20][2]{};
 	int m_ppi_portc_switch_high = 0;
 	uint8_t m_ppi_portb = 0;
 
@@ -236,7 +236,7 @@ TIMER_CALLBACK_MEMBER(pcjr_state::kb_signal)
 void pcjr_state::pic8259_set_int_line(int state)
 {
 	uint32_t pc = m_maincpu->pc();
-	if ( (pc == 0xF0453) || (pc == 0xFF196) )
+	if ( (pc == 0xf0453) || (pc == 0xff196) )
 	{
 		m_pc_int_delay_timer->adjust( m_maincpu->cycles_to_attotime(20), state );
 	}
@@ -652,11 +652,8 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-/*
-  On the PC Jr the input for clock 1 seems to be selectable
-  based on bit 4(/5?) written to output port A0h. This is not
-  supported yet.
- */
+    // On the PC Jr the input for clock 1 seems to be selectable based on bit 4(/5?) written to output port A0h.
+	// This is not supported yet.
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
@@ -754,7 +751,6 @@ void pcjr_state::ibmpcjx(machine_config &config)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "jx_list").set_original("ibmpcjx");
-
 }
 
 
@@ -791,4 +787,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY                            FULLNAME           FLAGS
 COMP( 1983, ibmpcjr, ibm5150, 0,      ibmpcjr, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM PCjr (4860)", MACHINE_IMPERFECT_COLORS )
-COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM JX (5510)",   MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)
+COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM JX (5510)",   MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )

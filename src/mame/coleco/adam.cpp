@@ -351,7 +351,7 @@ uint8_t adam_state::mreq_r(offs_t offset)
 {
 	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
-	uint8_t data = 0;
+	uint8_t data = 0xff;
 
 	if (offset < 0x8000)
 	{
@@ -976,9 +976,6 @@ void adam_state::machine_reset()
 	}
 
 	m_an = 0;
-
-	m_maincpu->reset();
-	m_netcpu->reset();
 }
 
 

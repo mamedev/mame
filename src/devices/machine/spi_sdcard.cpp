@@ -160,7 +160,8 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 	m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
 	m_out_delay(0), m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_xferblk(512), m_blknext(0),
 	m_crc_off(true),
-	m_bACMD(false)
+	m_bACMD(false),
+	m_delay_seek(0), m_delay_data(0)
 {
 	std::fill(std::begin(m_csd), std::end(m_csd), 0);
 	std::fill(std::begin(m_cmd), std::end(m_cmd), 0xff);
@@ -168,6 +169,12 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 
 spi_sdcard_device::~spi_sdcard_device()
 {
+}
+
+void spi_sdcard_device::set_delays_ext(u16 seek, u16 data)
+{
+	m_delay_seek = seek;
+	m_delay_data = data;
 }
 
 void spi_sdcard_device::device_start()
@@ -191,6 +198,8 @@ void spi_sdcard_device::device_start()
 	save_item(NAME(m_blknext));
 	save_item(NAME(m_crc_off));
 	save_item(NAME(m_bACMD));
+	save_item(NAME(m_delay_seek));
+	save_item(NAME(m_delay_data));
 }
 
 std::error_condition spi_sdcard_device::image_loaded(device_image_interface &image)
@@ -432,7 +441,7 @@ void spi_sdcard_device::latch_in()
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[1], m_blksize);
 					put_u16be(&m_data[m_blksize + 1], crc16);
 					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", m_blknext - 1, m_data[1], m_data[2], m_blksize - 2, m_data[m_blksize - 1], m_data[m_blksize], crc16);
-					send_data(1 + m_blksize + 2, SD_STATE_DATA_MULTI);
+					send_data(1 + m_blksize + 2, SD_STATE_DATA_MULTI, m_delay_data);
 				}
 			}
 			else if ((m_state == SD_STATE_IDLE) || (((m_cmd[0] & 0x70) == 0x40) || (m_out_count == 0))) // CMD0 - GO_IDLE_STATE
@@ -597,7 +606,7 @@ void spi_sdcard_device::do_command()
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk);
 					put_u16be(&m_data[m_xferblk + 3], crc16);
 					LOG("reading LBA %x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk, m_data[3], m_data[4], m_xferblk - 2, m_data[m_xferblk + 1], m_data[m_xferblk + 2], crc16);
-					send_data(3 + m_xferblk + 2, SD_STATE_DATA);
+					send_data(3 + m_xferblk + 2, SD_STATE_DATA, m_delay_seek);
 				}
 				else
 				{
@@ -607,7 +616,7 @@ void spi_sdcard_device::do_command()
 					util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_xferblk);
 					put_u16be(&m_data[m_xferblk + 3], crc16);
 					LOG("reading LBA %x+%x: [0] %02x %02x .. [%d] %02x %02x [crc16] %04x\n", blk / m_blksize, blk % m_blksize, m_data[3], m_data[4], m_xferblk - 2, m_data[m_xferblk + 1], m_data[m_xferblk + 2], crc16);
-					send_data(3 + m_xferblk + 2, SD_STATE_DATA);
+					send_data(3 + m_xferblk + 2, SD_STATE_DATA, m_delay_seek);
 				}
 			}
 			else
@@ -631,7 +640,7 @@ void spi_sdcard_device::do_command()
 					{
 						m_blknext /= m_xferblk;
 					}
-					send_data(1, SD_STATE_DATA_MULTI);
+					send_data(1, SD_STATE_DATA_MULTI, m_delay_seek);
 				}
 				else
 				{
