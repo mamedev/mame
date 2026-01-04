@@ -88,11 +88,6 @@ private:
 	devcb_read8 m_in_p1_cb;
 	devcb_write8 m_out_p1_cb;
 
-	int32_t m_rxc;
-	int32_t m_rxd;
-	int32_t m_cts;
-	int32_t m_txc;
-
 	uint8_t m_command1, m_command2, m_command3;
 	uint8_t m_data_bits_count;
 	uint8_t m_parity;
@@ -108,11 +103,7 @@ private:
 
 	uint8_t m_status, m_modification;
 
-	uint8_t m_sync_byte_count, m_rxc_count, m_txc_count;
 	uint8_t m_br_factor;
-	uint8_t m_rxd_bits;
-	uint8_t m_rx_register, m_tx_register;
-	uint8_t m_sync1, m_sync2, m_sync8, m_sync16;
 
 	TIMER_CALLBACK_MEMBER(timer_check);
 
