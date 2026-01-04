@@ -296,7 +296,7 @@ void tiny_vicky_video_device::draw_text(uint32_t *row, uint8_t mcr, bool enable_
                     row[screen_x] = fg_color;
                     row[screen_x + 1] = fg_color;
                 }
-                else if (!overlay || (overlay_font && (bg_color == 0)))
+                else if (!overlay || (overlay_font && (bg_color_index != 0)))
                 {
                     row[screen_x] = bg_color;
                     row[screen_x + 1] = bg_color;
@@ -309,7 +309,7 @@ void tiny_vicky_video_device::draw_text(uint32_t *row, uint8_t mcr, bool enable_
                 {
                     row[screen_x] = fg_color;
                 }
-                else if (!overlay || (overlay_font && (bg_color != 0)))
+                else if (!overlay || (overlay_font && (bg_color_index != 0)))
                 {
                     row[screen_x] = bg_color;
                 }
