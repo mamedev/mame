@@ -523,7 +523,7 @@ void i8256_device::p1_w(uint8_t data)
 
 uint8_t i8256_device::p2_r()
 {
-	uint8_t p2c = m_mode & 0x03;
+	uint8_t p2c = m_mode & 0x07;
 	uint8_t result = 0;
 	
 	switch (p2c)
@@ -539,6 +539,22 @@ uint8_t i8256_device::p2_r()
 		case I8256_PORT2C_OO:
 			result = m_port2_int;
 			break;
+		case I8256_PORT2C_HI:
+			// TODO Handshake
+			result = m_in_p2_cb(0);
+			break;
+		case I8256_PORT2C_HO:
+			// TODO Handshake
+			result = m_port2_int;
+			break;
+		case I8256_PORT2C_DNU:
+			// Do not use
+			result = 0;
+			break;
+		case I8256_PORT2C_TEST:
+			// TODO Test mode
+			result = 0;
+			break;
 		case I8256_PORT2C_II:
 		default:
 			result = m_in_p2_cb(0);
@@ -549,7 +565,7 @@ uint8_t i8256_device::p2_r()
 
 void i8256_device::p2_w(uint8_t data)
 {
-	uint8_t p2c = m_mode & 0x03;
+	uint8_t p2c = m_mode & 0x07;
 	m_port2_int = data;
 	uint8_t port2_data = 0;
 	switch (p2c)
@@ -557,9 +573,13 @@ void i8256_device::p2_w(uint8_t data)
 		case I8256_PORT2C_IO: port2_data = m_port2_int & 0x0f; break;
 		case I8256_PORT2C_OI: port2_data = m_port2_int & 0xf0; break;
 		case I8256_PORT2C_OO: port2_data = m_port2_int; break;
+		case I8256_PORT2C_HI: port2_data = 0; break;
+		case I8256_PORT2C_HO: port2_data = m_port2_int; break;
+		case I8256_PORT2C_DNU: port2_data = 0; break;
+		case I8256_PORT2C_TEST: port2_data = 0; break;
 		default: port2_data = 0; break;
 	}
-	if (p2c == I8256_PORT2C_IO || p2c == I8256_PORT2C_OI || p2c == I8256_PORT2C_OO)
+	if (p2c == I8256_PORT2C_IO || p2c == I8256_PORT2C_OI || p2c == I8256_PORT2C_OO || p2c == I8256_PORT2C_HO)
 		m_out_p2_cb(0, port2_data);
 }
 
