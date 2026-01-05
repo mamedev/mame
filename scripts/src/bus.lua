@@ -5800,6 +5800,8 @@ if (BUSES["MULTIBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/multibus/multibus.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/multibus.h",
+		MAME_DIR .. "src/devices/bus/multibus/dsd5217.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/dsd5217.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc8024.cpp",

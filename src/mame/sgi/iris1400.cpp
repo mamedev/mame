@@ -28,8 +28,11 @@
 #include "emu.h"
 
 #include "bus/multibus/multibus.h"
+#include "bus/multibus/dsd5217.h"
 
 #include "pm2.h"
+
+#include "iris1400.lh"
 
 namespace {
 
@@ -59,10 +62,34 @@ void iris1400_state::machine_reset()
 {
 }
 
+static DEVICE_INPUT_DEFAULTS_START(dsd)
+	// wake-up address 0x7f00
+	DEVICE_INPUT_DEFAULTS("W7", 0x01, 0x01)
+	DEVICE_INPUT_DEFAULTS("W7", 0x02, 0x02)
+	DEVICE_INPUT_DEFAULTS("W7", 0x04, 0x04)
+	DEVICE_INPUT_DEFAULTS("W7", 0x08, 0x08)
+	DEVICE_INPUT_DEFAULTS("W7", 0x10, 0x10)
+	DEVICE_INPUT_DEFAULTS("W7", 0x20, 0x20)
+	DEVICE_INPUT_DEFAULTS("W7", 0x40, 0x40)
+	DEVICE_INPUT_DEFAULTS("W7", 0x80, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x01, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x02, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x04, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x08, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x10, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x20, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x40, 0x00)
+	DEVICE_INPUT_DEFAULTS("W9", 0x80, 0x00)
+
+	// interrupt level 1
+	DEVICE_INPUT_DEFAULTS("W10", 0xff, 0xfd)
+DEVICE_INPUT_DEFAULTS_END
+
 static void iris1400_p_cards(device_slot_interface &device)
 {
 	// processor side cards
-	device.option_add("pm2",  SGI_PM2);
+	device.option_add("pm2", SGI_PM2);
+	device.option_add("dsd", MULTIBUS_DSD5217).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(dsd));
 }
 static void iris1400_g_cards(device_slot_interface &device)
 {
@@ -77,7 +104,7 @@ void iris1400_state::iris1400(machine_config &config)
 	MULTIBUS_SLOT(config,  "slot1", m_bus, iris1400_p_cards, nullptr, false); // memory
 	MULTIBUS_SLOT(config,  "slot2", m_bus, iris1400_p_cards, "pm2",   false);
 	MULTIBUS_SLOT(config,  "slot3", m_bus, iris1400_p_cards, nullptr, false); // ethernet
-	MULTIBUS_SLOT(config,  "slot4", m_bus, iris1400_p_cards, nullptr, false); // disk/tape controller
+	MULTIBUS_SLOT(config,  "slot4", m_bus, iris1400_p_cards, "dsd",   false); // disk/tape controller
 	MULTIBUS_SLOT(config,  "slot5", m_bus, iris1400_p_cards, nullptr, false);
 	MULTIBUS_SLOT(config,  "slot6", m_bus, iris1400_p_cards, nullptr, false);
 	MULTIBUS_SLOT(config,  "slot7", m_bus, iris1400_p_cards, nullptr, false);
@@ -95,6 +122,8 @@ void iris1400_state::iris1400(machine_config &config)
 	MULTIBUS_SLOT(config, "slot18", m_bus, iris1400_g_cards, nullptr, false); // display controller
 	MULTIBUS_SLOT(config, "slot19", m_bus, iris1400_g_cards, nullptr, false); // update controller
 	MULTIBUS_SLOT(config, "slot20", m_bus, iris1400_g_cards, nullptr, false); // frame buffer
+
+	config.set_default_layout(layout_iris1400);
 }
 
 ROM_START(iris1400)
