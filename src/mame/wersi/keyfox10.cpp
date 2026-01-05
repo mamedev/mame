@@ -42,6 +42,8 @@ public:
         , m_sam_fx(*this, "sam_fx")
         , m_midi_out(*this, "mdout")
         , m_rom(*this, "program")
+        , m_samples_rom(*this, "samples")
+        , m_rhythms_rom(*this, "rhythms")
     { }
 
     ~keyfox10_state()
@@ -79,6 +81,10 @@ private:
     u8 sam8905_r(int chip, offs_t offset);
     void sam8905_w(int chip, offs_t offset, u8 data);
 
+    // SAM8905 external waveform ROM handlers
+    u16 sam_snd_waveform_r(offs_t offset);
+    u16 sam_fx_waveform_r(offs_t offset);
+
     void midi_rxd_w(int state) { m_midi_rxd = state; }
 
     required_device<i80c32_device> m_maincpu;
@@ -86,6 +92,8 @@ private:
     required_device<sam8905_device> m_sam_fx;
     required_device<midi_port_device> m_midi_out;
     required_region_ptr<u8> m_rom;
+    required_region_ptr<u8> m_samples_rom;  // IC17 "Samples" 128KB
+    required_region_ptr<u8> m_rhythms_rom;  // IC14 "Rhythmen" 128KB
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
@@ -595,6 +603,43 @@ void keyfox10_state::dump_sam_memory() const
     }
 }
 
+// SAM8905 external waveform ROM read handlers
+// Address format: WA[19:0] = { WAVE[7:0], PHI[11:0] }
+// ROM address: WA[18:2] (17 bits → 128KB ROM)
+// Data: 8-bit ROM → sign-extended to 12-bit
+u16 keyfox10_state::sam_snd_waveform_r(offs_t offset)
+{
+    // offset = 20-bit address from SAM8905
+    // ROM address = offset >> 2 (skip lower 2 fractional bits)
+    // Upper bit (WA19) selects ROM: 0 = Samples (IC17), 1 = Rhythms (IC14)
+    uint32_t rom_addr = (offset >> 2) & 0x1FFFF;  // 17-bit ROM address
+    bool use_rhythm = BIT(offset, 19);  // WA19 selects ROM
+
+    u8 sample;
+    if (use_rhythm)
+        sample = m_rhythms_rom[rom_addr];
+    else
+        sample = m_samples_rom[rom_addr];
+
+    // Sign-extend 8-bit to 12-bit (shift to upper bits, then sign-extend)
+    return (int16_t)(int8_t)sample << 4;
+}
+
+u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
+{
+    // FX chip uses same ROM mapping
+    uint32_t rom_addr = (offset >> 2) & 0x1FFFF;
+    bool use_rhythm = BIT(offset, 19);
+
+    u8 sample;
+    if (use_rhythm)
+        sample = m_rhythms_rom[rom_addr];
+    else
+        sample = m_samples_rom[rom_addr];
+
+    return (int16_t)(int8_t)sample << 4;
+}
+
 static INPUT_PORTS_START(keyfox10)
 INPUT_PORTS_END
 
@@ -624,11 +669,13 @@ void keyfox10_state::keyfox10(machine_config &config)
     // SAM8905 SND - sound generation (at 0x8000 when T1=1)
     // Clock: 22.5792 MHz / 1024 = 22.05 kHz sample rate
     SAM8905(config, m_sam_snd, 22'579'200);
+    m_sam_snd->waveform_read_callback().set(FUNC(keyfox10_state::sam_snd_waveform_r));
     m_sam_snd->add_route(0, "lspeaker", 1.0);
     m_sam_snd->add_route(1, "rspeaker", 1.0);
 
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     SAM8905(config, m_sam_fx, 22'579'200);
+    m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->add_route(0, "lspeaker", 1.0);
     m_sam_fx->add_route(1, "rspeaker", 1.0);
 }
@@ -636,6 +683,12 @@ void keyfox10_state::keyfox10(machine_config &config)
 ROM_START(keyfox10)
     ROM_REGION(0x20000, "program", 0)
     ROM_LOAD("kf10_ic27_v2.bin", 0x0000, 0x20000, CRC(c04e40a9) SHA1(668d40761658f1863ab028ed317141839d1075ac))
+
+    ROM_REGION(0x20000, "samples", 0)  // IC17 "Samples" 128KB
+    ROM_LOAD("kf10_ic17.bin", 0x0000, 0x20000, CRC(fa8f2632) SHA1(c252ebd54de7f14c4b11014e5bebdb440cd54690))
+
+    ROM_REGION(0x20000, "rhythms", 0)  // IC14 "Rhythmen" 128KB
+    ROM_LOAD("max1_ic14.bin", 0x0000, 0x20000, CRC(6b8c4eb8) SHA1(097e5612fd75dd82efc18ffc66694bf7f31cfe5a))
 ROM_END
 
 } // anonymous namespace
