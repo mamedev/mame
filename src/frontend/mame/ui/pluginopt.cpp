@@ -126,7 +126,7 @@ bool menu_plugin_opt::handle(event const *ev)
 	auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, itemrefno, key);
 	if (result.second)
 	{
-		auto const selno(uintptr_t(*result.second));
+		auto const selno = uintptr_t(*result.second);
 		if (selno >= 1)
 			set_selection(reinterpret_cast<void *>(selno));
 	}
@@ -194,9 +194,9 @@ void menu_plugin_opt::populate()
 
 	if (sel)
 	{
-		auto const selno(uintptr_t(*sel));
+		auto const selno = uintptr_t(*sel);
 		if ((sel >= 1U) && (sel < i))
-			set_selection(reinterpret_cast<void *>(uintptr_t(*sel)));
+			set_selection(reinterpret_cast<void *>(selno));
 	}
 
 	uint32_t process_flags = 0U;
