@@ -10,6 +10,7 @@ sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SAM8905, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_waveform_read(*this, 0)
 {
 }
 
@@ -72,7 +73,17 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad)
 			}
 		}
 	} else {
-		// External memory access logic would go here
+		// External memory access
+		if (!m_waveform_read.isunset()) {
+			// Build 20-bit address: WAVE[7:0] | PHI[11:0]
+			uint32_t addr = ((wf & 0xFF) << 12) | phi;
+
+			// Read 12-bit sample from external ROM
+			int16_t sample = m_waveform_read(addr);
+
+			// Sign-extend to 32-bit (sample is already in 12-bit signed format)
+			return (int32_t)(int16_t)(sample << 4) >> 4;
+		}
 		return 0;
 	}
 	return 0;

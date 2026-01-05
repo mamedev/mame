@@ -14,6 +14,9 @@ public:
 	void write(offs_t offset, uint8_t data);
 	uint8_t read(offs_t offset);
 
+	// External waveform memory callback (address 20-bit → data 12-bit signed)
+	auto waveform_read_callback() { return m_waveform_read.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -45,6 +48,9 @@ private:
 	void execute_cycle(int slot_idx, uint16_t inst);
 	int32_t get_waveform(uint32_t wf, uint32_t phi, uint8_t mad);
 	uint32_t get_constant(uint8_t mad);
+
+	// External waveform memory callback
+	devcb_read16 m_waveform_read;
 
 	static constexpr uint32_t MASK19 = 0x7FFFF;
 };
