@@ -264,7 +264,6 @@ Core Input Options
 | :ref:`[no]multimouse <mame-commandline-nomultimouse>`
 | :ref:`[no]steadykey <mame-commandline-nosteadykey>`
 | :ref:`[no]ui_active <mame-commandline-uiactive>`
-| :ref:`[no]offscreen_reload <mame-commandline-nooffscreenreload>`
 | :ref:`joystick_map <mame-commandline-joystickmap>`
 | :ref:`joystick_deadzone <mame-commandline-joystickdeadzone>`
 | :ref:`joystick_saturation <mame-commandline-joysticksaturation>`
