@@ -258,6 +258,7 @@ uint8_t i8256_device::acknowledge()
 
 	const uint8_t vector = m_current_interrupt_level;
 	m_out_int_cb(CLEAR_LINE);
+	m_status &= ~(1 << I8256_STATUS_INT);
 	m_current_interrupt_level = 0;
 	if (BIT(m_command1,I8256_CMD1_8086)) // 8086 mode, TODO: only on second INTA
 		return 0x40 | vector;
@@ -283,7 +284,7 @@ void i8256_device::gen_interrupt(uint8_t level)
 	{
 		m_current_interrupt_level = level;
 		m_out_int_cb(ASSERT_LINE);
-		m_interrupts &= ~(1 << level);
+		m_status |= (1 << I8256_STATUS_INT);
 	}
 }
 
@@ -368,9 +369,10 @@ uint8_t i8256_device::read(offs_t offset)
 			return m_interrupts;
 		case I8256_REG_INTAD:
 			m_out_int_cb(CLEAR_LINE);
+			m_status &= ~(1 << I8256_STATUS_INT);
 			return m_current_interrupt_level*4;
 		case I8256_REG_BUFFER:
-			m_status &= ~ (1 << I8256_STATUS_RB_FULL);
+			m_status &= ~(1 << I8256_STATUS_RB_FULL);
 			return m_rx_buffer;
 		case I8256_REG_PORT1:
 			return m_port1_int;
