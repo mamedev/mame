@@ -1916,5 +1916,23 @@ Cutoff title screen at bottom (scaled [blitter]?)
 		</part>
 	</software>
 
+	<software name="tripper" supported="partial">
+		<description>Tripper Getem</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+A compressed music video from an original song by TripperOnDaTrack
+https://www.youtube.com/watch?v=o7eVhfQFEok
+Bit of sound aliasing (verify)
+Keeps popping sound once the video ends (verify)
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom name="tripper.j64" size="0x400000" crc="f7756a03" sha1="e886eb07d402d05463ef8356a462c15c1b839c42" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
