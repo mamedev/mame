@@ -437,8 +437,10 @@ void stella8085_state::setsound(uint8_t tone, uint8_t octave)
 
 int stella8085_state::soundfreq(uint8_t tone, uint8_t octave)
 {
-	const int SOUND_CLOCK = (m_maincpu->clock() / 3);
-	const int INT_CLOCK = SOUND_CLOCK >> (4-octave);
+	const int BUS_CLOCK = (m_maincpu->clock() / 2);
+	const int SOUND_CLOCK = BUS_CLOCK >> 2; //74LS290
+	const int INT_CLOCK = SOUND_CLOCK >> (1 + octave); //CD4040
+	popmessage("octave %d tone %d clk %d", octave, tone, INT_CLOCK);
 
 	//                             C9   B8   A8#  A8   G8#  G8   F8#  F8   E8   D8#  D8   C8#
 	const int FREQOUT[16] = { 478, 239, 253, 268, 284, 301, 319, 338, 358, 379, 402, 426, 451, 478, 478, 478 };
