@@ -95,10 +95,10 @@ void pm2_mmu_device::device_start()
 	save_item(NAME(m_super));
 	save_item(NAME(m_boot));
 
-	m_space[0]->specific(m_cpu_mem);
-	m_space[1]->specific(m_cpu_spc);
-	m_space[2]->specific(m_bus_mem);
-	m_space[3]->specific(m_bus_pio);
+	m_space[0]->specific(m_bus_mem);
+	m_space[1]->specific(m_bus_pio);
+	m_space[2]->specific(m_cpu_mem);
+	m_space[3]->specific(m_cpu_spc);
 }
 
 void pm2_mmu_device::device_reset()
