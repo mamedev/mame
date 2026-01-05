@@ -1763,7 +1763,7 @@ license:CC0-1.0
 	<software name="ro355" supported="no">
 		<description>Great Standards (RO-355)</description>
 		<year>1984</year>
-		<publisher>Casio / Sight &amp; Sound International Inc. / HP Hal Leonard Publishing Corporation</publisher>
+		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
 		<info name="alt_title" value="Jazz Standards"/>
 		<info name="alt_title" value="ジャズ"/>
 		<part name="cart" interface="casio_rompack">
