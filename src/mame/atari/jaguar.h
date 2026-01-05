@@ -318,9 +318,9 @@ private:
 
 	// from jagobj.ipp
 	void jagobj_init();
-	uint32_t *process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
-	uint32_t *process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
-	uint32_t *process_branch(uint32_t *objdata, int vc);
+	uint32_t process_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t process_scaled_bitmap(uint16_t *scanline, uint32_t *objdata, int vc);
+	uint32_t process_branch(uint32_t *objdata, uint32_t object_pointer, int vc);
 	void process_object_list(int vc, uint16_t *_scanline);
 	void bitmap_4_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos, uint16_t *clutbase);
 	void bitmap_4_0(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase);
