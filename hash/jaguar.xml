@@ -109,6 +109,8 @@ Unreleased (possibly no prototypes exist):
 
 <softwarelist name="jaguar" description="Atari Jaguar cartridges">
 
+<!-- !Official games -->
+
 	<software name="aircars" supported="no">
 		<description>Air Cars</description>
 		<year>1997</year>
@@ -312,6 +314,7 @@ Access [cart] EEPROM
 		</part>
 	</software>
 
+	<!-- Reboot JHL 13 and JHL 15 hacks known to exist (which acts the same as this) -->
 	<software name="bretth" supported="no">
 		<description>Brett Hull NHL Hockey</description>
 		<year>2004</year>
@@ -1285,7 +1288,8 @@ Gameplay screen flickers
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
 No sound (?)
-GFXs missing on gameplay and title screen
+GFXs missing on gameplay and title screen, uses [blitter] BCOMPEN extensively
+Randomly has more or less severe GFX glitches
 ]]></notes>
 
 		<info name="serial" value="J9001E 700701-2"/>
@@ -1496,6 +1500,7 @@ Uses [GPU] irq 0
 		</part>
 	</software>
 
+<!-- !Prototypes -->
 <!-- The following are roms that have been leaked onto the internet, but don't seem to be proper dumps of cartridges.
 These have been converted to j64 format with the universal header -->
 
@@ -1714,6 +1719,42 @@ All sprites are cutoff, wants prototype [Tom] semantics?
 		</part>
 	</software>
 
+	<software name="therealf" supported="no">
+		<description>Thea Realm Fighters (prototype, v2)</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Allows 2 players gameplay only
+No BGMs, samples can get cut off (verify)
+]]></notes>
+		<info name="developer" value="High Voltage" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom name="thea_realm_fighters_prototype.rom" size="0x400000" crc="bb06d3c6" sha1="9ad03858597aa1e1fff26250996b07d1a70d1296" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="therealfa" cloneof="therealf" supported="no">
+		<description>Thea Realm Fighters (prototype, v1)</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Allows 1 or 2 players gameplay, but looks earlier revision than the other one
+No sound (verify)
+GFX pitch bugs (verify)
+]]></notes>
+		<info name="developer" value="High Voltage" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
+				<rom name="thea_realm_fighters_proto_v1.rom" size="0x400000" crc="85be7e07" sha1="07c76d3f4ae05b75ea7ad62147172fd146f4f876" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!-- looks very different compared to ttoonadv -->
 	<software name="ttoonadvp" supported="partial">
 		<description>Tiny Toon Adventures: Plucky Duck in Hollywood Hijinks (prototype)</description>
@@ -1746,5 +1787,134 @@ Black screen, attempts to write in [cart] space, DRAM?
 			</dataarea>
 		</part>
 	</software>
+
+<!-- !Homebrews -->
+
+	<software name="beebris" supported="no">
+		<description>Beebris</description>
+		<!-- "25 years of fun", from the original '88 Tetris release? -->
+		<year>2013?</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Bit of cutoff on bottom
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x100000" width="32" endianness="big">
+				<rom name="beebris.rom" size="0x100000" crc="a84955ba" sha1="2419909334bcbd2e4f48ccd241d6c96f8462c0e6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="degz" supported="no">
+		<description>Degz</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Bit of cutoff on top
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x200000" width="32" endianness="big">
+				<rom name="degz.rom" size="0x200000" crc="343c3010" sha1="8dacaa5f6cd88871ccc78a396d1760038ecce3d9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="downfall" supported="no">
+		<description>Downfall</description>
+		<year>2011</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x200000" width="32" endianness="big">
+				<rom name="downfall.j64" size="0x200000" crc="acfceabd" sha1="8939ba84cf27e7c4bc659f6d61c07c5b03ccdc9d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expway" supported="no">
+		<description>Expressway</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+4 players game, requires [multitap] emulation
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x200000" width="32" endianness="big">
+				<rom name="expressway.j64" size="0x200000" crc="499429b2" sha1="21b1f1cea213291e841c0b4cf6c88d8cf9a5488a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Good Old Games retail version known to exist -->
+	<software name="fcrock" supported="no">
+		<description>Full Circle: Rocketeer</description>
+		<year>2013</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Bit of overscan clipping with shots on left side
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x200000" width="32" endianness="big">
+				<rom name="fcr_rls_jiffi.rom" size="0x200000" crc="d5be4e16" sha1="2eac6f173ff9968992922efb2ef6433d179eb443" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="project1" supported="no">
+		<description>Project One</description>
+		<year>2009</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x200000" width="32" endianness="big">
+				<rom name="projectone.rom" size="0x200000" crc="a00c6406" sha1="eaca103055d0b643955f162b3b22d962ed719ac1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocksoff" supported="no">
+		<description>Rocks Off!</description>
+		<year>2012</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x100000" width="32" endianness="big">
+				<rom name="rocksoff.j64" size="0x100000" crc="d1bc114e" sha1="cdadf1f855ec127d47a04e322f7ecd6b26f8b18b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfdx" supported="no">
+		<description>SuperFly DX (v1.1)</description>
+		<year>2010</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<notes><![CDATA[
+Cutoff title screen at bottom (scaled [blitter]?)
+]]></notes>
+		<info name="developer" value="Reboot" />
+		<part name="cart" interface="jaguar_cart">
+			<dataarea name="rom" size="0x200000" width="32" endianness="big">
+				<rom name="sfdx_v1_1.j64" size="0x200000" crc="85919165" sha1="824c5e0946d2491000fc7458cd6e27d9077b40a3" />
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
