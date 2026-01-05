@@ -356,6 +356,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				else
 				{
 					srcdata = READ_RDATA(B_SRCD_H, asrc, asrcflags, asrc_phrase_mode);
+					// (PATDSEL | TOPBEN | TOPNEN | DSTWRZ)
 					if (COMMAND & 0x001c020)
 						srczdata = READ_RDATA(B_SRCZ1_H, asrc, asrcflags, asrc_phrase_mode);
 				}
@@ -394,6 +395,14 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 					if (srczdata == dstzdata) inhibit = 1;
 				if (COMMAND & 0x00100000)
 					if (srczdata > dstzdata) inhibit = 1;
+
+				// apply bit comparator (BCOMPEN)
+				// - missil3d, clubdriv, avsp score/automap
+				if (COMMAND & 0x04000000)
+				{
+					if (srcdata == 0)
+						inhibit = 1;
+				}
 
 				/* apply data comparator (DCOMPEN) */
 				if (COMMAND & 0x08000000)

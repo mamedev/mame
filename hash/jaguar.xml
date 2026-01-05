@@ -156,7 +156,8 @@ Optionally uses [UART] JagLink
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Several HUD elements have wrong pitch, HUD automap is incorrectly drawn as a big quadrilateral, HUD blending looks ugly
+Several HUD elements have wrong pitch, HUD blending looks ugly
+HUD automap draws garbage [blitter]
 No sound (fixed, serial clock)
 Randomly crashes during gameplay
 Access [cart] EEPROM
@@ -780,9 +781,10 @@ Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Text GFXs are solid filled, enables [blitter] BCOMPEN
-NOTE: original Missile Command present on this (first option in main menu), good test case for said BCOMPEN
+Text GFXs are solid filled, enables [blitter] BCOMPEN (fixed)
 Background pitch issue on gameplay
+[DSP] sound test produces no sound, can potentially crash on multiple triggers
+Virtual mode has same GFX bugs as missilvr
 No BGMs (fixed, [DSP] irq 0)
 ]]></notes>
 
@@ -1686,7 +1688,7 @@ Black screen, 68k jumps to lalaland
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Text GFXs are solid filled, same as missil3d
+Text GFXs are solid filled, same as missil3d (fixed)
 GFXs are cut off during gameplay
 ]]></notes>
 
