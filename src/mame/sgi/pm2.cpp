@@ -26,7 +26,7 @@
 #include "machine/mc68681.h"
 #include "machine/input_merger.h"
 
-#define VERBOSE 0
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 enum status_mask : u16
@@ -161,7 +161,9 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	m_mmu->error().set([this](int state) { m_cpu->trigger_bus_error(); });
 	m_cpu->set_current_mmu(m_mmu);
 
-	// multibus interrupt level 5
+	// Multibus interrupts
+	int_callback<1>().set_inputline(m_cpu, INPUT_LINE_IRQ1);
+	int_callback<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2);
 	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 
 	input_merger_any_high_device &irq5(INPUT_MERGER_ANY_HIGH(config, "irq5"));
@@ -202,10 +204,10 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 
 void sgi_pm2_device::device_config_complete()
 {
-	m_mmu.lookup()->set_space<0>(m_cpu, AS_PROGRAM);
-	m_mmu.lookup()->set_space<1>(m_cpu, m68000_device::AS_CPU_SPACE);
-	m_mmu.lookup()->set_space<2>(m_bus, AS_PROGRAM);
-	m_mmu.lookup()->set_space<3>(m_bus, AS_IO);
+	m_mmu.lookup()->set_space<0>(m_bus, AS_PROGRAM);
+	m_mmu.lookup()->set_space<1>(m_bus, AS_IO);
+	m_mmu.lookup()->set_space<2>(m_cpu, AS_PROGRAM);
+	m_mmu.lookup()->set_space<3>(m_cpu, m68000_device::AS_CPU_SPACE);
 }
 
 void sgi_pm2_device::mem_map(address_map &map)

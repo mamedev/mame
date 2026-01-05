@@ -55,11 +55,10 @@ private:
 	required_address_space m_space[4];
 	devcb_write_line m_error;
 
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_mem;
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_spc;
-
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_bus_mem;
 	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::specific m_bus_pio;
+	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_mem;
+	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_spc;
 
 	std::unique_ptr<u16[]> m_page;
 	std::unique_ptr<u16[]> m_prot;
