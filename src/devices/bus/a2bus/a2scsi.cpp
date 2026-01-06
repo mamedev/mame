@@ -71,18 +71,18 @@ void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsibus:0", mac_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:1", mac_scsi_devices, "cdrom", false).set_option_machine_config("cdrom",
+	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:1").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
-	NSCSI_CONNECTOR(config, "scsibus:2", mac_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:3", mac_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:5", mac_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:6", mac_scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
 		downcast<ncr5380_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
 	});
