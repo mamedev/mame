@@ -24,7 +24,7 @@ public:
 	mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// write16 callback.
-	// - offset: Output pins DCBA. Pins CBA hold the current counter.
+	// - offset: Output pins DCBA. Pins CBA hold the index of the current counter.
 	// - data: The current counter's 13-bit value.
 	auto counter_cb() { return m_counter_func.bind(); }
 

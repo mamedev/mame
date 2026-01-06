@@ -20,6 +20,7 @@ known chips:
  @049     uPD552C  1981, Bambino Safari (ET-11)
  @054     uPD552C  1980, Epoch Invader From Space
 
+ *024     uPD553C  1981, JIL SX-200 (radio scanner)
  @031     uPD553C  1979, Bambino Super Star Football (ET-03)
  @049     uPD553C  1979, Mego Mini-Vid: Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)

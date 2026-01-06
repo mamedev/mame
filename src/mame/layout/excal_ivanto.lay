@@ -399,8 +399,8 @@ authors:hap
 			<param name="y" start="7" increment="6" />
 			<param name="i" start="0" increment="1" />
 
-			<element ref="text_b0~i~"><bounds xc="6" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_b1~i~"><bounds xc="13.75" y="~y~" width="10" height="1.4" /></element>
+			<element ref="text_b0~i~"><bounds xc="6" y="~y~" width="8" height="1.4" /></element>
+			<element ref="text_b1~i~"><bounds xc="13.75" y="~y~" width="8" height="1.4" /></element>
 		</repeat>
 
 		<repeat count="3">
@@ -430,9 +430,9 @@ authors:hap
 			<param name="y" start="3.6" increment="4" />
 			<param name="i" start="0" increment="1" />
 
-			<element ref="text_b2~i~"><bounds xc="6" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_b3~i~"><bounds xc="13.75" y="~y~" width="10" height="1.4" /></element>
-			<element ref="text_b4~i~"><bounds xc="21.5" y="~y~" width="10" height="1.4" /></element>
+			<element ref="text_b2~i~"><bounds xc="6" y="~y~" width="8" height="1.4" /></element>
+			<element ref="text_b3~i~"><bounds xc="13.75" y="~y~" width="8" height="1.4" /></element>
+			<element ref="text_b4~i~"><bounds xc="21.5" y="~y~" width="8" height="1.4" /></element>
 		</repeat>
 
 		<element ref="triangle"><bounds xc="6" y="19.3" width="1.5" height="1.1" /><orientation rotate="270" /></element>

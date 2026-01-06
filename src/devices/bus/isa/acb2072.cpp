@@ -22,7 +22,7 @@
 #include "emu.h"
 #include "acb2072.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 // device type definition
 DEFINE_DEVICE_TYPE(ACB2072, acb2072_device, "acb2072", "ACB-2072 RLL Drive Controller")

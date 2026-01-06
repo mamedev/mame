@@ -192,14 +192,8 @@ private:
 	uint16_t *m_32x_display_dram = nullptr, *m_32x_access_dram = nullptr;
 	std::unique_ptr<uint16_t[]> m_32x_palette;
 
-	uint16_t m_fifo_block_a[4]{};
-	uint16_t m_fifo_block_b[4]{};
-	uint16_t* m_current_fifo_block = nullptr;
-	uint16_t* m_current_fifo_readblock = nullptr;
-	int m_current_fifo_write_pos = 0;
-	int m_current_fifo_read_pos = 0;
-	int m_fifo_block_a_full = 0;
-	int m_fifo_block_b_full = 0;
+	util::fifo<u16, 4> m_fifo[2];
+	u8 m_fifo_write_block, m_fifo_read_block;
 };
 
 

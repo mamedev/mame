@@ -307,7 +307,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 		<description>Anglais - Volume 1 - Tests de Niveau</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 		<info name="serial" value="45 1901"/>
 
 		<part name="cass1" interface="to_cass">
@@ -328,7 +329,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 		<description>Anglais - Volume 1 - Tests de Niveau (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 		<info name="serial" value="45 1901"/>
 
 		<part name="cass1" interface="to_cass">
@@ -349,7 +351,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 		<description>Anglais - Volume 2 - Le Système Verbal 1</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -369,7 +372,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 		<description>Anglais - Volume 2 - Le Système Verbal 1 (alt)</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>
@@ -389,7 +393,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 		<description>Anglais - Volume 3 - Le Système Verbal 2</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 		<info name="serial" value="45 1903"/>
 
 		<part name="cass1" interface="to_cass">
@@ -410,7 +415,8 @@ Loading cassette software on TO7 and TO7/70 also requires a cartridge, usually B
 		<description>Anglais - Volume 4 - Le Groupe Nominal 1</description>
 		<year>1984</year>
 		<publisher>VIFI-Nathan</publisher>
-		<info name="developer" value="CEGOS / Alpha-Langues"/>
+		<info name="developer" value="CEGOS" />
+		<info name="developer" value="Alpha-Langues" />
 
 		<part name="cass1" interface="to_cass">
 			<feature name="part_id" value="Side A"/>

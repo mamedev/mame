@@ -789,11 +789,9 @@ void z80_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case Z80_INPUT_LINE_BUSRQ:
-		m_busrq_state = state;
-		if (state != CLEAR_LINE)
+		if (m_busrq_state == CLEAR_LINE && state != CLEAR_LINE)
 			set_service_attention<SA_BUSRQ, 1>();
-		else
-			set_service_attention<SA_BUSRQ, 0>();
+		m_busrq_state = state;
 		break;
 
 	case INPUT_LINE_NMI:
@@ -808,7 +806,7 @@ void z80_device::execute_set_input(int inputnum, int state)
 		m_irq_state = state;
 		if (daisy_chain_present())
 			m_irq_state = (daisy_update_irq_state() == ASSERT_LINE) ? ASSERT_LINE : m_irq_state;
-		if (state != CLEAR_LINE)
+		if (m_irq_state != CLEAR_LINE)
 			set_service_attention<SA_IRQ_ON, 1>();
 		else
 			set_service_attention<SA_IRQ_ON, 0>();

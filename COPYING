@@ -11,7 +11,7 @@ distributions.
 
 
 MAME
-Copyright (c) 1997-2025 MAMEdev and contributors
+Copyright (c) 1997-2026 MAMEdev and contributors
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License version 2, as provided
@@ -54,6 +54,9 @@ Other Information
   * When using or citing the work, you should not imply endorsement by
     the author or the affirmer.
 
+
+AES-256-CBC
+Copyright (c) 2024 Hallo Weeks
 
 Asio C++ Library
 Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)

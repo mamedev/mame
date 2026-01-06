@@ -18,11 +18,13 @@ public:
 	specnext_tiles_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 	void tilemap_update();
 
+	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; tilemap_update(); }
+
 	void control_w(u8 control) { m_control = control; tilemap_update(); }
 	void default_flags_w(u8 default_flags) { m_default_flags = default_flags; m_tilemap[0]->mark_all_dirty(); m_tilemap[1]->mark_all_dirty(); }
 	void transp_colour_w(u8 transp_colour) { m_transp_colour = transp_colour; tilemap_update(); }
 
-	void tm_map_base_w(u8 tm_map_base) { m_tm_map_base = tm_map_base; m_tilemap[0]->mark_all_dirty(); m_tilemap[1]->mark_all_dirty(); }
+	void tm_map_base_w(u8 tm_map_base) { m_tm_map_base = tm_map_base; tilemap_update(); }
 	void tm_tile_base_w(u8 tm_tile_base) { m_tm_tile_base = tm_tile_base; tilemap_update(); }
 
 	void tm_scroll_x_w(u16 tm_scroll_x) { m_tm_scroll_x = tm_scroll_x; tilemap_update(); }
@@ -33,7 +35,7 @@ public:
 	void clip_y1_w(u8 clip_y1) { m_clip_y1 = clip_y1; }
 	void clip_y2_w(u8 clip_y2) { m_clip_y2 = clip_y2; }
 
-	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode = 0xff);
+	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode = 0, u8 priority_mask = 0xff);
 
 protected:
 	static constexpr u8 OVER_BORDER = 32;
@@ -49,6 +51,7 @@ protected:
 	tilemap_t *m_tilemap[2];
 
 private:
+	u8 m_global_transparent;
 	u16 m_palette_base_offset;
 	u16 m_palette_alt_offset;
 	bool m_tm_palette_select;

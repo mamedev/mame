@@ -179,7 +179,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="enroute">
+	<software name="enroute_b" cloneof="enroute">
 		<description>En Route: Belgium, Netherlands, Luxembourg</description>
 		<year>1997</year>
 		<publisher>Palmtop BV</publisher>
@@ -187,7 +187,32 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="S3A"/>
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="1048576">
-				<rom name="EnRoute.rom" size="1048576" crc="5af14e37" sha1="8ce7adfad71392a2d5854c5bb1e7724ac36ce1f6"/>
+				<rom name="EnRoute_B.rom" size="1048576" crc="5af14e37" sha1="8ce7adfad71392a2d5854c5bb1e7724ac36ce1f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enroute">
+		<description>En Route: United Kingdom, Eire</description>
+		<year>1997</year>
+		<publisher>Palmtop BV</publisher>
+		<info name="usage" value="Requires 512K" />
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="1048576">
+				<rom name="EnRoute_UK.rom" size="1048576" crc="e3baa9c2" sha1="dc8f28300961321bc5d7d382a25176a51a95263a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="finpack3">
+		<description>Finance Pack 3</description>
+		<year>1993</year>
+		<publisher>Widget Software</publisher>
+		<sharedfeat name="compatibility" value="S3"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Finance_Pack_3.rom" size="131072" crc="cdc7f002" sha1="e02a5ece237d79e71c28a4cb7314ba4572ff4878"/>
 			</dataarea>
 		</part>
 	</software>
@@ -394,6 +419,18 @@ license:CC0-1.0
 		<part name="cart" interface="psion_ssd">
 			<dataarea name="rom" size="131072">
 				<rom name="Spreadsheet_3.bin" size="131072" crc="23c22f01" sha1="c2edbbe958a3ed277335ae8f5c83df0afe023ad2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="telenote">
+		<description>Telenote Link</description>
+		<year>1995</year>
+		<publisher>Psion</publisher>
+		<sharedfeat name="compatibility" value="S3A"/>
+		<part name="cart" interface="psion_ssd">
+			<dataarea name="rom" size="131072">
+				<rom name="Telenote_Link.rom" size="131072" crc="d59111fb" sha1="cbb74fe07cf6580e67144459ee82e36eaed8bb59"/>
 			</dataarea>
 		</part>
 	</software>

@@ -34,6 +34,8 @@
 
 namespace {
 
+// ======================> bbc_tube_matchbox_device
+
 class bbc_tube_matchbox_device : public device_t, public device_bbc_tube_interface
 {
 public:
@@ -309,7 +311,7 @@ void bbc_tube_matchbox_device::ns32016_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( matchbox )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START(matchbox)
@@ -338,10 +340,6 @@ INPUT_CHANGED_MEMBER(bbc_tube_matchbox_device::dip_changed)
 	m_soft_dip = newval;
 }
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor bbc_tube_matchbox_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( matchbox );
@@ -349,7 +347,7 @@ ioport_constructor bbc_tube_matchbox_device::device_input_ports() const
 
 
 //-------------------------------------------------
-//  ROM( matchbox )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( matchbox )
@@ -377,10 +375,6 @@ ROM_START( matchbox )
 	ROM_REGION16_LE(0x8000, "ns32016_rom", 0)
 	ROM_LOAD("tuberom_32016.bin", 0x0000, 0x8000, CRC(11dfca39) SHA1(80343cb198b03ea91c8790d765f7d3869ba9bb32)) // from LX9CoProCombined_20171007_0719_dmb firmware
 ROM_END
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
 
 const tiny_rom_entry *bbc_tube_matchbox_device::device_rom_region() const
 {

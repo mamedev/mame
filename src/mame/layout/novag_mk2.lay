@@ -125,7 +125,7 @@ authors:hap
 		<element ref="orange"><bounds x="6" y="11" width="4" height="4" /></element>
 		<element ref="orange"><bounds x="12" y="11" width="10" height="4" /></element>
 
-		<element ref="text_l01"><bounds x="-2" y="15.2" width="8" height="1.5" /></element>
+		<element ref="text_l01"><bounds x="-1" y="15.2" width="6" height="1.5" /></element>
 		<element ref="text_l02"><bounds x="6" y="15.2" width="4" height="1.5" /></element>
 		<element ref="text_l03"><bounds x="13" y="11.9" width="8" height="2.2" /></element>
 		<element ref="text_l07"><bounds x="35" y="15.2" width="6" height="1.5" /></element>

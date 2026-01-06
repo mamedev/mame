@@ -2530,7 +2530,10 @@ cdtv: black screen, boots on cdtvn
 cd32: boot OK
 ]]></notes>
 		<info name="developer" value="The Assembly Line"/>
-		<info name="language" value="English/French/German/Italian" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
 		<info name="sku" value="CDT-3523"/>
 		<info name="disc_matrix" value="EXNON 2 CDTV (V) : MASTERED BY NIMBUS"/>
 		<!-- Barcode Sticker: Xenon II CDTV CD1X-XEN7 5 020026 900998 -->

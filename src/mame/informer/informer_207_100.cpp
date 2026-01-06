@@ -18,8 +18,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "informer_207_100_kbd.h"
 
+#include "bus/keytronic/keytronic.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
 #include "machine/input_merger.h"
@@ -213,15 +213,15 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set("mainirq", FUNC(input_merger_device::in_w<0>));
-	m_duart->b_tx_cb().set("kbd", FUNC(informer_207_100_kbd_device::rxd_w));
+	m_duart->b_tx_cb().set("kbd", FUNC(keytronic_connector_device::ser_in_w));
 	m_duart->outport_cb().set(m_acia, FUNC(acia6850_device::write_txc)).bit(3);
 	m_duart->outport_cb().append(m_acia, FUNC(acia6850_device::write_rxc)).bit(3);
 
 	ACIA6850(config, m_acia);
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	informer_207_100_kbd_device &kbd(INFORMER_207_100_KBD(config, "kbd"));
-	kbd.txd_callback().set(m_duart, FUNC(scn2681_device::rx_b_w));
+	keytronic_connector_device &kbd(KEYTRONIC_CONNECTOR(config, "kbd", informer_207_100_keyboards, "in207100"));
+	kbd.ser_out_callback().set(m_duart, FUNC(scn2681_device::rx_b_w));
 
 	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
 

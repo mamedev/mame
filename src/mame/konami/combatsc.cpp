@@ -132,6 +132,12 @@ We are using the other sound hardware for now.
  *************************************/
 
 template <uint8_t Which>
+void combatsc_state::sprite_callback(int &code, int &color, int colbank)
+{
+	color += (Which << 6) + (colbank & 0x20);
+}
+
+template <uint8_t Which>
 void combatsc_state::flipscreen_w(int state)
 {
 	const uint32_t flip = state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0;
@@ -684,9 +690,11 @@ void combatsc_state::combatsc(machine_config &config)
 	K007121(config, m_k007121[0], 0, gfx_combatsc_1, m_palette, m_screen);
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<0>));
+	m_k007121[0]->set_sprite_callback(FUNC(combatsc_state::sprite_callback<0>));
 
 	K007121(config, m_k007121[1], 0, gfx_combatsc_2, m_palette, m_screen);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<1>));
+	m_k007121[1]->set_sprite_callback(FUNC(combatsc_state::sprite_callback<1>));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -888,7 +896,7 @@ ROM_START( combatscb )
 	ROM_REGION( 0x30000, "maincpu", 0 ) // 6809 code
 	ROM_LOAD( "combat.003",  0x00000, 0x10000, CRC(229c93b2) SHA1(ac3fd3df1bb5f6a461d0d1423c50568348ef69df) )
 	ROM_LOAD( "combat.004",  0x10000, 0x10000, CRC(a069cb84) SHA1(f49f70afb17df46b16f5801ef42edb0706730723) )
-	ROM_LOAD( "combat.002",  0x20000, 0x10000, CRC(0996755d) SHA1(bb6bbbf7ab3b5fab5e1c6cebc7b3f0d720493c3b) )
+	ROM_LOAD( "combat.002",  0x20000, 0x10000, CRC(0996755d) SHA1(bb6bbbf7ab3b5fab5e1c6cebc7b3f0d720493c3b) ) // also seen with Datsu copyright modified to Kan Nam
 
 	ROM_REGION( 0x10000 , "audiocpu", 0 )
 	ROM_LOAD( "combat.001",  0x00000, 0x10000, CRC(61456b3b) SHA1(320db628283dd1bec465e95020d1a1158e6d6ae4) )

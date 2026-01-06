@@ -645,6 +645,7 @@ void electron_state::electron(machine_config &config)
 
 	ELECTRON_ULA(config, m_ula, 16_MHz_XTAL);
 	m_ula->set_cpu_tag("maincpu");
+	m_ula->set_screen("screen");
 	m_ula->kbd_cb().set(FUNC(electron_state::keyboard_r));
 	m_ula->caps_lock_cb().set([this](int state) { m_capslock_led = state; });
 	m_ula->cas_mo_cb().set([this](int state) { m_cassette->set_motor(state); });

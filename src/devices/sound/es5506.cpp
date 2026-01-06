@@ -1039,7 +1039,8 @@ void es5506_device::generate_samples(sound_stream &stream)
 		}
 
 		for (int c = 0; c < stream.output_count(); c++)
-			stream.put_int(c, sampindex, cursample[c], 32768);
+			// generated samples are 20-bit signed, range is [-2^19 .. 2^19-1]
+			stream.put_int_clamp(c, sampindex, cursample[c], (1 << 19));
 	}
 }
 
@@ -1077,7 +1078,8 @@ void es5505_device::generate_samples(sound_stream &stream)
 		}
 
 		for (int c = 0; c < stream.output_count(); c++)
-			stream.put_int(c, sampindex, cursample[c], 32768);
+			// generated samples are 20-bit signed, range is [-2^19 .. 2^19-1]
+			stream.put_int_clamp(c, sampindex, cursample[c], (1 << 19));
 	}
 }
 

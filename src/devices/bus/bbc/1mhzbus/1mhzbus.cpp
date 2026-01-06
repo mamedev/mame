@@ -17,7 +17,6 @@
 DEFINE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device, "bbc_1mhzbus_slot", "BBC Micro 1MHz Bus port")
 
 
-
 //**************************************************************************
 //  DEVICE BBC_1MHZBUS PORT INTERFACE
 //**************************************************************************
@@ -41,12 +40,13 @@ device_bbc_1mhzbus_interface::device_bbc_1mhzbus_interface(const machine_config 
 //  bbc_1mhzbus_slot_device - constructor
 //-------------------------------------------------
 
-bbc_1mhzbus_slot_device::bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, BBC_1MHZBUS_SLOT, tag, owner, clock),
-	device_single_card_slot_interface<device_bbc_1mhzbus_interface>(mconfig, *this),
-	m_card(nullptr),
-	m_irq_handler(*this),
-	m_nmi_handler(*this)
+bbc_1mhzbus_slot_device::bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BBC_1MHZBUS_SLOT, tag, owner, clock)
+	, device_single_card_slot_interface<device_bbc_1mhzbus_interface>(mconfig, *this)
+	, device_mixer_interface(mconfig, *this)
+	, m_card(nullptr)
+	, m_irq_handler(*this)
+	, m_nmi_handler(*this)
 {
 }
 
@@ -136,7 +136,7 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 
 void bbc_1mhzbus_devices(device_slot_interface &device)
 {
-	//device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
+	//device.option_add("ttxta",      BBC_TTXTA);           /* Acorn ANE01 Teletext Adapter */
 	device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
 	device.option_add("m500",       BBC_M500);            /* Acorn ANV02 Music 500 */
 	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
@@ -167,7 +167,7 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("beebopl",    BBC_BEEBOPL);         /* BeebOPL */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	device.option_add("cc500",      BBC_CC500);           /* CTS Colour Card 500 */
-	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
+	//device.option_add("prisma3",    BBC_PRISMA3);         /* Millipede PRISMA-3 1988 */
 	device.option_add("sprite",     BBC_SPRITE);          /* Logotron Sprite Board */
 	device.option_add_internal("cfa3000opt", CFA3000_OPT);/* Henson CFA 3000 Option Board */
 	device.option_add_internal("cisco",    BBC_CISCO);    /* Cisco Terminal */
@@ -175,7 +175,7 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 
 void bbcm_1mhzbus_devices(device_slot_interface &device)
 {
-	//device.option_add("teletext",   BBC_TELETEXT);        /* Acorn ANE01 Teletext Adapter */
+	//device.option_add("ttxta",      BBC_TTXTA);           /* Acorn ANE01 Teletext Adapter */
 	device.option_add("ieee488",    BBC_IEEE488);         /* Acorn ANK01 IEEE488 Interface */
 	device.option_add("awhd",       BBC_AWHD);            /* Acorn Winchester Disc */
 	device.option_add("barrybox",   BBC_BARRYBOX);        /* The Barry-Box */
@@ -193,7 +193,7 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("m5000",      BBC_M5000);           /* Hybrid Music 5000 Synthesiser */
 	device.option_add("m87",        BBC_M87);             /* Peartree Music 87 Synthesiser */
 	device.option_add("multiform",  BBC_MULTIFORM);       /* PEDL Multiform Z80 */
-	device.option_add("opusa",      BBC_OPUSA);           /* Opus Challenger ADFS */
+	device.option_add("opusa",      BBC_OPUSA);           /* Opus Challenger 3 ADFS */
 	device.option_add("pdram",      BBC_PDRAM);           /* Micro User Pull Down RAM */
 	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
 	device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
@@ -203,7 +203,7 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	device.option_add("beebopl",    BBC_BEEBOPL);         /* BeebOPL */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	device.option_add("cc500",      BBC_CC500);           /* CTS Colour Card 500 */
-	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
+	//device.option_add("prisma3",    BBC_PRISMA3);         /* Millipede PRISMA-3 1988 */
 	device.option_add("sprite",     BBC_SPRITE);          /* Logotron Sprite Board */
 	device.option_add_internal("cfa3000opt", CFA3000_OPT);/* Henson CFA 3000 Option Board */
 }

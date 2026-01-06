@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!--
+
+Known modules:
+- Advanced Spelling I (7-240): VSM: 16KB CM62052U
+
+Other announced modules (unsure if they were released):
+- Math Expander I (7-241)
+- Math Expander II (7-242)
+- Grammar II (7-243)
+- Geography I (7-244)
+
+-->
+
+<softwarelist name="k28o" description="K-2-8 (model 7-230) modules">
+
+	<software name="spell1">
+		<description>Advanced Spelling I</description>
+		<year>1981</year>
+		<publisher>Tiger Electronics</publisher>
+		<info name="serial" value="7-240"/>
+		<part name="cart" interface="k28o">
+			<dataarea name="rom" size="0x4000">
+				<rom name="cm62052u" size="0x4000" crc="24635137" sha1="e1ddfed4ce77f42533f2e88dff6f07738ca5586f" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

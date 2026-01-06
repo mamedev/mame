@@ -12,7 +12,7 @@
 class glukrs_device : public mc146818_device
 {
 public:
-	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 32'768);
 
 	void enable() { m_glukrs_active = true; }
 	void disable() { m_glukrs_active = false; }
@@ -24,6 +24,7 @@ public:
 	virtual void data_w(u8 data) override { if (m_glukrs_active) { mc146818_device::data_w(data); } }
 
 protected:
+	virtual void device_validity_check(validity_checker &valid) const override;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 

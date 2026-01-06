@@ -52,11 +52,11 @@ authors:hap
 	<group name="status">
 		<bounds x="0" y="0" width="5.5" height="3" />
 
-		<element ref="text_m2"><bounds x="0" y="0" width="4" height="1" /></element>
+		<element ref="text_m2"><bounds x="0" y="0" width="3.5" height="1" /></element>
 		<element name="motor2_left" ref="text_ml"><bounds x="3.5" y="0" width="1" height="1" /></element>
 		<element name="motor2_right" ref="text_mr"><bounds x="4.5" y="0" width="1" height="1" /></element>
 
-		<element ref="text_m1"><bounds x="0" y="1.15" width="4" height="1" /></element>
+		<element ref="text_m1"><bounds x="0" y="1.15" width="3.5" height="1" /></element>
 		<element name="motor1" ref="text_mdrv"><bounds x="3.5" y="1.15" width="2" height="1" /></element>
 	</group>
 
@@ -67,9 +67,9 @@ authors:hap
 		<bounds x="0" y="5" width="15" height="11" />
 
 		<!-- pro/run switch -->
-		<element ref="nothing" clickthrough="no"><bounds x="2" y="5" width="2.9" height="1.1" /></element> <!-- block clickable input -->
 		<element ref="switch1" inputtag="IN.0" inputmask="0x02" inputraw="yes"><bounds x="2" y="5" width="2.9" height="1.1" /></element>
 		<element ref="gray" inputtag="IN.0" inputmask="0x02" inputraw="yes"><bounds x="2" y="6.2" width="2.9" height="2.2" /></element>
+		<element ref="nothing" clickthrough="no"><bounds x="2" y="5" width="2.9" height="1.1" /></element> <!-- block clickable input -->
 
 		<!-- buttons -->
 		<element ref="but" inputtag="IN.1" inputmask="0x08"><bounds x="12" y="6.2" width="2.9" height="2.2" /></element>

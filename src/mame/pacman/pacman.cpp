@@ -1686,6 +1686,26 @@ static INPUT_PORTS_START( pacmansp )
 	PORT_DIPSETTING(    0x00, "Hard (Invalid)" ) // breaks the attract screen on this version
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( newpuc2 )
+	PORT_INCLUDE(pacman)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x30, 0x00, DEF_STR(Bonus_Life))   PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(0x00, "20000")
+	PORT_DIPSETTING(0x10, "25000")
+	PORT_DIPSETTING(0x20, "30000")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(newpuc2b)
+	PORT_INCLUDE(pacman)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x30, 0x00, DEF_STR(Bonus_Life))   PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(0x00, "30000")
+	PORT_DIPSETTING(0x10, "60000")
+	PORT_DIPSETTING(0x20, "90000")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pacmanpe )
 	PORT_INCLUDE( pacman )
 
@@ -6103,6 +6123,30 @@ ROM_START( mspacmab3 ) // main PCB with GDP-02 auxiliary card
 	ROM_LOAD( "82s141.i14", 0x0000, 0x0200, CRC(8d43d0a6) SHA1(be4e0d86ce4c6f1833cc0efc18277b4e04dc458f) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
+ROM_START( mspacmab5 ) // GDP-01 PCB (same as Piranha). Very similar to mspacmab3, code-wise
+	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_LOAD( "d1.d7",  0x0000, 0x1000, CRC(50b38941) SHA1(c798fe6efe7ec6d15add74986d72d9ea8676d14a) )
+	ROM_LOAD( "d2.e7",  0x1000, 0x1000, CRC(713af282) SHA1(7258e966a117d4d9129e3d9af23ad9b403394ece) )
+	ROM_LOAD( "d3.g7",  0x2000, 0x1000, CRC(124a4507) SHA1(a7c82970ac53129c7a642322214adee4206298ff) )
+	ROM_LOAD( "d4.j7",  0x3000, 0x1000, CRC(08ac65da) SHA1(745d9d054c33df96a7f27a1f4575f8770d92ac10) )
+	ROM_LOAD( "d5.g6",  0x8000, 0x1000, CRC(50b29f09) SHA1(27ca2cdf57b96d628b1811210d254b107e2f324e) )
+	ROM_LOAD( "d6.j6",  0x9000, 0x0800, CRC(33b09ed9) SHA1(a2a3e069cce442c3b179315e90476cd431c604c2) )
+
+	ROM_REGION( 0x2000, "gfx1" , 0 )
+	ROM_LOAD( "d7.d5",  0x0000, 0x0800, CRC(b5d8c872) SHA1(d137b0cff8635a6a02f9334b7fa72dc1a623fe9b) )
+	ROM_LOAD( "d9.g5",  0x0800, 0x0800, CRC(9b2b936c) SHA1(d6f57d0ce6fba37d4838cdcace7e2e02c94b1ba1) )
+	ROM_LOAD( "d8.e5",  0x1000, 0x0800, CRC(a70a6ac4) SHA1(81b0c56697bb671cc43928133446da74e74b4982) )
+	ROM_LOAD( "d10.j5", 0x1800, 0x0800, CRC(53368498) SHA1(0409288fe59c2bbf2730c31e4c7817392a544165) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "6331.8h", 0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "6301.4a", 0x0020, 0x0100, CRC(08c9447b) SHA1(5e4fbfcc7179fc4b1436af9bb709ffc381479315) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs
+	ROM_LOAD( "63s141.1k", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "63s141.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+ROM_END
+
 ROM_START( ctrpllrp )
 	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "c1.bin", 0x0000, 0x0800, CRC(9d027c4a) SHA1(88e094880057451a75cdc2ce9477403021813982) )
@@ -6291,6 +6335,29 @@ ROM_START( mspacmab4 )
 	ROM_LOAD( "subpal16l8d.bin", 0x000, 0x104, CRC(5f852ffa) SHA1(244a28261b4004264cc20851062c7f3e659862c9) )
 ROM_END
 
+ROM_START( mspacmab6 ) // very close to mspacmab
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.7c",        0x0000, 0x1000, CRC(d16b31b7) SHA1(bc2247ec946b639dd1f00bfc603fa157d0baaa97) )
+	ROM_LOAD( "2_faspac.7d", 0x1000, 0x1000, CRC(a8d6c227) SHA1(b5891f911bb054ca2547e663a3c27c93897f2075) ) // faspac handwritten
+	ROM_LOAD( "3.7e",        0x2000, 0x1000, CRC(1821ee0b) SHA1(5ea4d907dbb2690698db72c4e0b5be4d3e9a7786) )
+	ROM_LOAD( "4.7f",        0x3000, 0x1000, CRC(66e68887) SHA1(d67e7b7416048f6b7a56689c2f3219ae5cff3ba0) )
+	ROM_LOAD( "5.7h",        0x8000, 0x1000, CRC(8c3e6de6) SHA1(fed6e9a2b210b07e7189a18574f6b8c4ec5bb49b) )
+	ROM_LOAD( "6.7k",        0x9000, 0x1000, CRC(368cb165) SHA1(387010a0c76319a1eab61b54c9bcb5c66c4b67a1) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "7.5e", 0x0000, 0x0800, CRC(0a91fe67) SHA1(9987d5c46d2361f1556fdbefad5925c369ee74fa) )
+	ROM_CONTINUE(     0x1000, 0x0800 )
+	ROM_LOAD( "8.5f", 0x0800, 0x0800, CRC(112b5ed2) SHA1(861d33b46cb19dcba98140f99e2a114cdb79a9e5) )
+	ROM_CONTINUE(     0x1800, 0x0800 )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.8h", 0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "mb7052.4a", 0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs
+	ROM_LOAD( "mb7052.1k", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "mb7052.3k", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+ROM_END
 
 ROM_START( mspacmbe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8882,8 +8949,8 @@ GAME( 1981, pacmod,    puckman,  pacman,   pacman,   pacman_state,  empty_init, 
 GAME( 1981, pacmanjpm, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (JPM)",                     "Pac-Man (JPM bootleg)",                                    MACHINE_SUPPORTS_SAVE ) // aka 'Muncher', UK bootleg, JPM later made fruit machines etc.
 GAME( 1981, pacmanmr,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "bootleg (Model Racing)",            "Pac-Man (Model Racing bootleg)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1980, pacmanpe,  puckman,  pacman,   pacmanpe, pacman_state,  empty_init,    ROT90,  "bootleg (Petaco SA)",               "Come Come (Petaco SA bootleg of Puck Man)",                MACHINE_SUPPORTS_SAVE ) // might have a speed-up button, check
-GAME( 1980, newpuc2,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 1)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, newpuc2b,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 2)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuc2,   puckman,  pacman,   newpuc2,  pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 1)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuc2b,  puckman,  pacman,   newpuc2b, pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 2)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1980, newpuckx,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "New Puck-X",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacheart,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Pac-Man (Hearts)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1981, bucaner,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Video Research)",             "Buccaneer (set 1)",                                        MACHINE_SUPPORTS_SAVE )
@@ -8902,6 +8969,7 @@ GAME( 1982, ctrpllrp,  puckman,  pacman,   pacman,   pacman_state,  empty_init, 
 GAME( 1981, piranha,   puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "GL (US Billiards license)",         "Piranha",                                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1981, piranhao,  puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "GL (US Billiards license)",         "Piranha (older)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmab3, puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "bootleg",                           "Ms. Pac-Man (bootleg, set 3)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab5, puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "bootleg",                           "Ms. Pac-Man (bootleg, set 5)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, abscam,    puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "GL (US Billiards license)",         "Abscam",                                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, piranhah,  puckman,  pacman,   mspacman, pacman_state,  empty_init,    ROT90,  "hack",                              "Piranha (hack)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, titanpac,  puckman,  piranha,  mspacman, pacman_state,  init_eyes,     ROT90,  "hack (NSM)",                        "Titan (hack of Pac-Man)",                                  MACHINE_SUPPORTS_SAVE )
@@ -8919,6 +8987,7 @@ GAME( 1981, mspacmancr,  mspacman, mspacman, mspacman, pacman_state,  init_mspac
 GAME( 1981, mspacmab,    mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 1)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmab2,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 2)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmab4,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 4)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mspacmab6,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, set 6)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmbe,    mspacman, woodpek,  mspacman, pacman_state,  init_mspacmbe,  ROT90,  "bootleg",                               "Ms. Pac-Man (bootleg, encrypted)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mspacmbmc,   mspacman, woodpek,  mspacman, pacman_state,  empty_init,     ROT90,  "bootleg (Marti Colls)",                 "Ms. Pac-Man (Marti Colls bootleg)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, mspacmbn,    mspacman, woodpek,  mspacman, pacman_state,  init_pengomc1,  ROT90,  "bootleg (Novatronic)",                  "Ms. Pac-Man (Novatronic bootleg)",                 MACHINE_SUPPORTS_SAVE )

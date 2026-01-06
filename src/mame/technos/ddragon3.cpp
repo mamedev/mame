@@ -162,7 +162,7 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
   X1 - 28.000 MHz
   X2 - 3.579545 MHz (for Z80)
   X3 - 24.000 MHz (for 68000)
-  X4 - 1.056 MHz (not used, initially intended for OKI6295?)
+  X4 - 1.056 MHz (for M6295)
 
 
   The mask roms at IC1 and IC2 have the same pinouts as a MX27C4100 or M27C400

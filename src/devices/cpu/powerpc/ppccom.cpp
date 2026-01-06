@@ -10,8 +10,12 @@
 
 #include "emu.h"
 #include "ppccom.h"
+
 #include "ppcfe.h"
 #include "ppc_dasm.h"
+
+#include "emuopts.h"
+
 
 /***************************************************************************
     DEBUGGING
@@ -596,7 +600,8 @@ static inline int sign_double(double x)
 void ppc_device::device_start()
 {
 	/* allocate the core from the near cache */
-	m_core = (internal_ppc_state *)m_cache.alloc_near(sizeof(internal_ppc_state));
+	m_cache.allocate_cache(mconfig().options().drc_rwx());
+	m_core = m_cache.alloc_near<internal_ppc_state>();
 	memset(m_core, 0, sizeof(internal_ppc_state));
 
 	m_entry = nullptr;

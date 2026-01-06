@@ -17,7 +17,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80a" cloneof="cpm80"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 (Alt 1)</description>
+		<description>CP/M 2.2 (alt 1)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -28,7 +28,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80b" cloneof="cpm80"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 (Alt 2)</description>
+		<description>CP/M 2.2 (alt 2)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -39,7 +39,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80c" cloneof="cpm80"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 (Alt 3)</description>
+		<description>CP/M 2.2 (alt 3)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -50,7 +50,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80d" cloneof="cpm80"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 (Alt 4)</description>
+		<description>CP/M 2.2 (alt 4)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -61,7 +61,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80e" cloneof="cpm80"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 (Alt 5)</description>
+		<description>CP/M 2.2 (alt 5)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -83,7 +83,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80sua" cloneof="cpm80su"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 Supplement (Alt 1)</description>
+		<description>CP/M 2.2 Supplement (alt 1)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -94,7 +94,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80sub" cloneof="cpm80su"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 Supplement (Alt 2)</description>
+		<description>CP/M 2.2 Supplement (alt 2)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -105,7 +105,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm80suc" cloneof="cpm80su" supported="no"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 Supplement (Alt 3)</description>
+		<description>CP/M 2.2 Supplement (alt 3)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -127,7 +127,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86a" cloneof="cpm86"> <!-- CP/M-86 -->
-		<description>CP/M-86 1.1 (Alt 1)</description>
+		<description>CP/M-86 1.1 (alt 1)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -138,7 +138,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86b" cloneof="cpm86"> <!-- CP/M-86 -->
-		<description>CP/M-86 1.1 (Alt 2)</description>
+		<description>CP/M-86 1.1 (alt 2)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -149,7 +149,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86c" cloneof="cpm86"> <!-- CP/M-86 -->
-		<description>CP/M-86 1.1 (Alt 3)</description>
+		<description>CP/M-86 1.1 (alt 3)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -160,7 +160,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86d" cloneof="cpm86"> <!-- CP/M-86 -->
-		<description>CP/M-86 1.1 (Alt 4)</description>
+		<description>CP/M-86 1.1 (alt 4)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -171,7 +171,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86e" cloneof="cpm86"> <!-- CP/M-86 -->
-		<description>CP/M-86 1.1 (Alt 5)</description>
+		<description>CP/M-86 1.1 (alt 5)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -182,7 +182,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86f" cloneof="cpm86"> <!-- CP/M-86 -->
-		<description>CP/M-86 1.1 (Alt 6)</description>
+		<description>CP/M-86 1.1 (alt 6)</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -205,7 +205,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm68ka" cloneof="cpm68k"> <!-- CP/M-68k -->
-		<description>CP/M-68k (Alt)</description>
+		<description>CP/M-68k (alt)</description>
 		<year>198?</year>
 		<publisher>NCR Corporation</publisher>
 		<info name="usage" value="Requires K234" />
@@ -243,7 +243,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="psysa" cloneof="psys"> <!-- p-System -->
-		<description>UCSD p-System IV.13 (Alt)</description>
+		<description>UCSD p-System IV.13 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires K200, K202 or K208" />
@@ -524,7 +524,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pc2pca" cloneof="pc2pc"> <!-- MS-DOS -->
-		<description>NCR PC2PC Network Requester v1.01.00 (Alt)</description>
+		<description>NCR PC2PC Network Requester v1.01.00 (alt)</description>
 		<year>1985</year>
 		<publisher>NCR Corporation</publisher>
 		<info name="usage" value="Requires MS-DOS" />
@@ -744,7 +744,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ws330a" cloneof="ws330"> <!-- MS-DOS -->
-		<description>WordStar V3.30 (Alt)</description>
+		<description>WordStar V3.30 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires MS-DOS" />
@@ -756,7 +756,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ws330b" cloneof="ws330"> <!-- MS-DOS -->
-		<description>WordStar V3.30 (Alt 2)</description>
+		<description>WordStar V3.30 (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires MS-DOS" />
@@ -932,7 +932,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="drgrapha" cloneof="drgraph"> <!-- CP/M-80 -->
-		<description>DR Graph (Alt)</description>
+		<description>DR Graph (alt)</description>
 		<year>1983</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -1132,7 +1132,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="acada" cloneof="acad"> <!-- MS-DOS -->
-		<description>AutoCAD (Alt 1)</description>
+		<description>AutoCAD (alt 1)</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires K208" />
@@ -1159,7 +1159,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="acadb" cloneof="acad"> <!-- MS-DOS -->
-		<description>AutoCAD (Alt 2)</description>
+		<description>AutoCAD (alt 2)</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires K208" />
@@ -1220,7 +1220,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpmutila"> <!-- CP/M-80 -->
-		<description>CP/M Utilities (Alt)</description>
+		<description>CP/M Utilities (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -1242,7 +1242,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpmgamesa" cloneof="cpmgames"> <!-- CP/M-80 -->
-		<description>CP/M 2.2 Games (Alt)</description>
+		<description>CP/M 2.2 Games (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="floppy_5_25">
@@ -1298,7 +1298,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dos211hda" cloneof="dos211hd"> <!-- MS-DOS -->
-		<description>MS-DOS v2.11 HD (Alt)</description>
+		<description>MS-DOS v2.11 HD (alt)</description>
 		<year>198?</year>
 		<publisher>Microsoft</publisher>
 		<info name="usage" value="Requires K012 or C3282" />
@@ -1310,7 +1310,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dos211hdb" cloneof="dos211hd"> <!-- MS-DOS -->
-		<description>MS-DOS v2.11 HD (Alt 2)</description>
+		<description>MS-DOS v2.11 HD (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires K012 or C3282" />
@@ -1322,7 +1322,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dos211hdc" cloneof="dos211hd"> <!-- MS-DOS -->
-		<description>MS-DOS v2.11 HD (Alt 3)</description>
+		<description>MS-DOS v2.11 HD (alt 3)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires K012 or C3282" />
@@ -1370,7 +1370,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nortonuta" cloneof="nortonut"> <!-- MS-DOS -->
-		<description>Norton Utilities v3.00 (Alt)</description>
+		<description>Norton Utilities v3.00 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires MS-DOS" />

@@ -61,7 +61,6 @@ public:
 		m_k056832(*this, "k056832"),
 		m_k055673(*this, "k055673"),
 		m_k055555(*this, "k055555"),
-		//m_k053246(*this, "k053246"),
 		m_k054539(*this, "k054539"),
 		m_tickets(*this, "ticket"),
 		m_hopper(*this, "hopper"),
@@ -87,16 +86,15 @@ private:
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
 	required_device<k054539_device> m_k054539;
-//  required_device<k053247_device> m_k053246;
 
 	required_device<ticket_dispenser_device> m_tickets;
 	required_device<ticket_dispenser_device> m_hopper;
 
 	optional_shared_ptr<uint16_t> m_spriteram;
 
-	int m_layer_colorbase[6]{};
-	int m_sprite_colorbase = 0;
-	int m_lvc_colorbase = 0;
+	uint16_t m_layer_colorbase[6]{};
+	uint16_t m_sprite_colorbase = 0;
+	uint16_t m_lvc_colorbase = 0;
 
 	uint8_t m_int_enable = 0;
 	uint8_t m_int_status = 0;
@@ -111,12 +109,12 @@ private:
 	void control2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void control3_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint32_t screen_update_piratesh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void k054539_nmi_gen(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(piratesh_interrupt);
-	K056832_CB_MEMBER(piratesh_tile_callback);
-	K055673_CB_MEMBER(piratesh_sprite_callback);
-	void piratesh_map(address_map &map) ATTR_COLD;
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	K056832_CB_MEMBER(tile_callback);
+	K055673_CB_MEMBER(sprite_callback);
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -136,7 +134,7 @@ void piratesh_state::update_interrupts()
 
 */
 
-K056832_CB_MEMBER(piratesh_state::piratesh_tile_callback)
+K056832_CB_MEMBER(piratesh_state::tile_callback)
 {
 	// Layer
 	// Code
@@ -145,14 +143,14 @@ K056832_CB_MEMBER(piratesh_state::piratesh_tile_callback)
 //  if (*color != 0)
 //      logerror("%x %x %x\n", layer, *code, *color >> 2);
 
-	*color = (m_layer_colorbase[layer] << 4) + ((*color >> 2));// & 0x0f);
+	color = (m_layer_colorbase[layer] << 4) + ((color >> 2));// & 0x0f);
 }
 
-K055673_CB_MEMBER(piratesh_state::piratesh_sprite_callback)
+K055673_CB_MEMBER(piratesh_state::sprite_callback)
 {
-	int c = *color;
+	int c = color;
 
-	*color = (c & 0x001f);
+	color = (c & 0x001f);
 	//int pri = (c >> 5) & 7;
 	// .... .... ...x xxxx - Color
 	// .... .... xxx. .... - Priority?
@@ -170,16 +168,16 @@ K055673_CB_MEMBER(piratesh_state::piratesh_sprite_callback)
 
 	// TODO: THIS IS ALL WRONG
 	if (pri <= layerpri[0])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri <= layerpri[1])
-		*priority_mask = 0xf0;
+		priority_mask = 0xf0;
 	else if (pri <= layerpri[2])
-		*priority_mask = 0xf0|0xcc;
+		priority_mask = 0xf0|0xcc;
 	else
-		*priority_mask = 0xf0|0xcc|0xaa;
+		priority_mask = 0xf0|0xcc|0xaa;
 #endif
 
-	*priority_mask = 0;
+	priority_mask = 0;
 
 	// 0 - Sprites over everything
 	// f0 -
@@ -213,7 +211,7 @@ void piratesh_state::video_start()
 }
 
 
-uint32_t piratesh_state::screen_update_piratesh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t piratesh_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 #if 1
@@ -301,7 +299,7 @@ uint32_t piratesh_state::screen_update_piratesh(screen_device &screen, bitmap_rg
 /**********************************************************************************/
 /* IRQ controllers */
 
-TIMER_DEVICE_CALLBACK_MEMBER(piratesh_state::piratesh_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(piratesh_state::interrupt)
 {
 	int scanline = param;
 
@@ -395,7 +393,7 @@ void piratesh_state::control3_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 
-void piratesh_state::piratesh_map(address_map &map)
+void piratesh_state::main_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x083fff).ram().share("nvram");
@@ -602,8 +600,8 @@ void piratesh_state::piratesh(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(32'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &piratesh_state::piratesh_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(piratesh_state::piratesh_interrupt), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &piratesh_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(piratesh_state::interrupt), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -621,12 +619,12 @@ void piratesh_state::piratesh(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(600));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
-	screen.set_screen_update(FUNC(piratesh_state::screen_update_piratesh));
+	screen.set_screen_update(FUNC(piratesh_state::screen_update));
 
 	PALETTE(config, "palette").set_format(palette_device::BGRx_888, 2048).enable_shadows().enable_highlights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(piratesh_state::piratesh_tile_callback));
+	m_k056832->set_tile_callback(FUNC(piratesh_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette("palette");
 
@@ -635,15 +633,9 @@ void piratesh_state::piratesh(machine_config &config)
 	K053250PS(config, m_k053250, 12000000, "palette", "screen", -16, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(piratesh_state::piratesh_sprite_callback));
+	m_k055673->set_sprite_callback(FUNC(piratesh_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette("palette");
-
-	// ????
-	//K053246(config, m_k053246, 0);
-	//m_k053246->set_sprite_callback(FUNC(moo_state::sprite_callback));
-	//m_k053246->set_config("k053246", NORMAL_PLANE_ORDER, -48+1, 23);
-	//m_k053246->set_palette(m_palette);
 
 	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
 

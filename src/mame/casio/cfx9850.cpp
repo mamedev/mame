@@ -66,6 +66,7 @@ private:
 	void port_w(u8 data);
 	void opt_w(u8 data);
 	u8 ki_r();
+	u8 port_r();
 	u8 in0_r();
 	void cfx9850_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -100,6 +101,10 @@ void cfx9850_state::koh_w(u8 data)
 	logerror("KO is now %04x\n", m_ko);
 }
 
+u8 cfx9850_state::port_r()
+{
+	return m_port;
+}
 
 // 7------- PORT7 - RX enable?
 // -6------ PORT6 - NC / CP45
@@ -295,9 +300,10 @@ void cfx9850_state::cfx9850(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cfx9850_state::cfx9850_mem);
 	m_maincpu->kol_cb().set(FUNC(cfx9850_state::kol_w));
 	m_maincpu->koh_cb().set(FUNC(cfx9850_state::koh_w));
-	m_maincpu->port_cb().set(FUNC(cfx9850_state::port_w));
+	m_maincpu->port_w_cb().set(FUNC(cfx9850_state::port_w));
 	m_maincpu->opt_cb().set(FUNC(cfx9850_state::opt_w));
 	m_maincpu->ki_cb().set(FUNC(cfx9850_state::ki_r));
+	m_maincpu->port_r_cb().set(FUNC(cfx9850_state::port_r));
 	m_maincpu->in0_cb().set(FUNC(cfx9850_state::in0_r));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

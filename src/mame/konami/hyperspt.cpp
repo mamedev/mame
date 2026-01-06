@@ -275,9 +275,7 @@ void base_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 		/* Note that this adjustment must be done AFTER handling flip_screen(), thus
 		   proving that this is a hardware related "feature" */
-
 		sy += 1;
-
 
 		m_gfxdecode->gfx(0)->transmask(bitmap, cliprect,
 		code, color,

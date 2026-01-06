@@ -24,9 +24,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ata(*this, "ata")
-		, m_bank_a(*this, "bank_a")
-		, m_bank_b(*this, "bank_b")
+		, m_ram_bank(*this, "ram_bank_%u", 0U)
 		, m_screen(*this, "screen")
+		, m_input_port(*this,
+			{
+				"PORT.0X", "PORT.4X", "PORT.CX",
+				"PORT.DX", "PORT.EX", "PORT.FX"
+			})
 	{
 	}
 
@@ -45,9 +49,9 @@ private:
 	// devices
 	required_device<r3041_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
-	required_shared_ptr<uint16_t> m_bank_a;
-	required_shared_ptr<uint16_t> m_bank_b;
+	required_shared_ptr_array<uint16_t, 2> m_ram_bank;
 	required_device<screen_device> m_screen;
+	required_ioport_array<6> m_input_port;
 
 	// handlers
 	void dma_w(offs_t offset, uint32_t data);
@@ -65,8 +69,8 @@ private:
 	// functions
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t write_video_ram(uint16_t data);
-	void update_video_addr(void);
-	uint32_t update_inputs(void);
+	void update_video_addr();
+	uint32_t update_inputs();
 
 	// members
 	emu_timer *m_dma_timer = nullptr;

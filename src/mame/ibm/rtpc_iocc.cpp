@@ -185,7 +185,7 @@ template <typename T> bool rtpc_iocc_device::mem_load(u32 address, T &data, rsc_
 	case 1: data = m_mem.read_byte(address); break;
 	case 2: data = swapendian_int16(m_mem.read_word(address)); break;
 	case 4:
-		data = swapendian_int32(m_mem.read_word(address + 0));
+		data = u32(swapendian_int16(m_mem.read_word(address + 0))) << 16;
 		data |= swapendian_int16(m_mem.read_word(address + 2));
 		break;
 	}
@@ -248,7 +248,7 @@ template <typename T> bool rtpc_iocc_device::mem_modify(u32 address, std::functi
 	case 2: m_mem.write_word(address, swapendian_int16(f(swapendian_int16(m_mem.read_word(address))))); break;
 	case 4:
 		{
-			T data = swapendian_int32(m_mem.read_word(address + 0));
+			T data = u32(swapendian_int16(m_mem.read_word(address + 0))) << 16;
 			data |= swapendian_int16(m_mem.read_word(address + 2));
 
 			data = f(data);
@@ -292,7 +292,7 @@ template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_
 		switch (m_pio.lookup_read_word_flags(address) & PIO_SIZE)
 		{
 		case PIO_B:
-			data = swapendian_int16(m_pio.read_byte(address));
+			data = u16(m_pio.read_byte(address)) << 8;
 			data |= m_pio.read_byte(address);
 			LOGMASKED(LOG_WIDEPIO, "load pio w<-b 0x%08x data 0x%04x (%s)\n", address, data, machine().describe_context());
 			break;
@@ -302,7 +302,7 @@ template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_
 		}
 		break;
 	case 4:
-		switch (m_pio.lookup_read_dword_flags(address) & PIO_SIZE)
+		switch (m_pio.lookup_read_word_flags(address) & PIO_SIZE)
 		{
 		case PIO_B:
 			data = u32(m_pio.read_byte(address)) << 24;
@@ -312,7 +312,7 @@ template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_
 			LOGMASKED(LOG_WIDEPIO, "load pio d<-b 0x%08x data 0x%08x (%s)\n", address, data, machine().describe_context());
 			break;
 		case PIO_W:
-			data = swapendian_int32(m_pio.read_word(address));
+			data = u32(swapendian_int16(m_pio.read_word(address))) << 16;
 			data |= swapendian_int16(m_pio.read_word(address));
 			LOGMASKED(LOG_WIDEPIO, "load pio d<-w 0x%08x data 0x%08x(%s)\n", address, data, machine().describe_context());
 			break;
@@ -370,7 +370,7 @@ template <typename T> bool rtpc_iocc_device::pio_store(u32 address, T data, rsc_
 		}
 		break;
 	case 4:
-		switch (m_pio.lookup_write_dword_flags(address) & PIO_SIZE)
+		switch (m_pio.lookup_write_word_flags(address) & PIO_SIZE)
 		{
 		case PIO_B:
 			// HACK: suppress excessive logging from frequent delay register word writes

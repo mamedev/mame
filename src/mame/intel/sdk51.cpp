@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/mcs48/mcs48.h"
 //#include "imagedev/cassette.h"
 #include "machine/bankdev.h"
@@ -265,7 +265,7 @@ void sdk51_state::sdk51(machine_config &config)
 {
 	I8031(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sdk51_state::psen_map);
-	m_maincpu->set_addrmap(AS_IO, &sdk51_state::movx_map);
+	m_maincpu->set_addrmap(AS_DATA, &sdk51_state::movx_map);
 
 	ADDRESS_MAP_BANK(config, m_progmem);
 	m_progmem->set_addrmap(0, &sdk51_state::progmem_map);

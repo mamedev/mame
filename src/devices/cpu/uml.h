@@ -29,8 +29,8 @@ struct drcuml_machine_state;
 
 // use a namespace to wrap all the UML instruction concepts so that
 // we can keep names short
-namespace uml
-{
+namespace uml {
+
 	// integer registers
 	constexpr int REG_I0 = 0x400;
 	constexpr int REG_I_COUNT = 10;
@@ -46,11 +46,19 @@ namespace uml
 	constexpr int MAPVAR_END = MAPVAR_M0 + MAPVAR_COUNT;
 
 	// flag definitions
-	constexpr u8 FLAG_C = 0x01;     // carry flag
-	constexpr u8 FLAG_V = 0x02;     // overflow flag (defined for integer only)
-	constexpr u8 FLAG_Z = 0x04;     // zero flag
-	constexpr u8 FLAG_S = 0x08;     // sign flag (defined for integer only)
-	constexpr u8 FLAG_U = 0x10;     // unordered flag (defined for FP only)
+	enum : unsigned
+	{
+		FLAG_BIT_C = 0,
+		FLAG_BIT_V,
+		FLAG_BIT_Z,
+		FLAG_BIT_S,
+		FLAG_BIT_U
+	};
+	constexpr u8 FLAG_C = 1U << FLAG_BIT_C; // carry flag
+	constexpr u8 FLAG_V = 1U << FLAG_BIT_V; // overflow flag (defined for integer only)
+	constexpr u8 FLAG_Z = 1U << FLAG_BIT_Z; // zero flag
+	constexpr u8 FLAG_S = 1U << FLAG_BIT_S; // sign flag (defined for integer only)
+	constexpr u8 FLAG_U = 1U << FLAG_BIT_U; // unordered flag (defined for FP only)
 
 	// flag combinations
 	constexpr u8 FLAGS_NONE = 0x00;
@@ -173,6 +181,8 @@ namespace uml
 		OP_SET,                     // SET     dst,c
 		OP_MOV,                     // MOV     dst,src[,c]
 		OP_SEXT,                    // SEXT    dst,src,size
+		OP_BFXU,                    // BFXU    dst,src,shift,width
+		OP_BFXS,                    // BFXS    dst,src,shift,width
 		OP_ROLAND,                  // ROLAND  dst,src,shift,mask
 		OP_ROLINS,                  // ROLINS  dst,src,shift,mask
 		OP_ADD,                     // ADD     dst,src1,src2[,f]
@@ -481,6 +491,8 @@ namespace uml
 		void mov(parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1); }
 		void mov(condition_t cond, parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1, cond); }
 		void sext(parameter dst, parameter src1, operand_size size) { configure(OP_SEXT, 4, dst, src1, parameter::make_size(size)); }
+		void bfxu(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXU, 4, dst, src, shift, width); }
+		void bfxs(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXS, 4, dst, src, shift, width); }
 		void roland(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLAND, 4, dst, src, shift, mask); }
 		void rolins(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLINS, 4, dst, src, shift, mask); }
 		void add(parameter dst, parameter src1, parameter src2) { configure(OP_ADD, 4, dst, src1, src2); }
@@ -522,6 +534,8 @@ namespace uml
 		void dmov(parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1); }
 		void dmov(condition_t cond, parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1, cond); }
 		void dsext(parameter dst, parameter src1, operand_size size) { configure(OP_SEXT, 8, dst, src1, parameter::make_size(size)); }
+		void dbfxu(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXU, 8, dst, src, shift, width); }
+		void dbfxs(parameter dst, parameter src, parameter shift, parameter width) { configure(OP_BFXS, 8, dst, src, shift, width); }
 		void droland(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLAND, 8, dst, src, shift, mask); }
 		void drolins(parameter dst, parameter src, parameter shift, parameter mask) { configure(OP_ROLINS, 8, dst, src, shift, mask); }
 		void dadd(parameter dst, parameter src1, parameter src2) { configure(OP_ADD, 8, dst, src1, src2); }
@@ -669,6 +683,7 @@ namespace uml
 	const parameter M7(parameter::make_mapvar(MAPVAR_M0 + 7));
 	const parameter M8(parameter::make_mapvar(MAPVAR_M0 + 8));
 	const parameter M9(parameter::make_mapvar(MAPVAR_M0 + 9));
-}
+
+} // namespace uml
 
 #endif // MAME_CPU_UML_H

@@ -25,7 +25,7 @@ unmarked chip at C6 (RAM?)
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/6821pia.h"
 #include "machine/at28c16.h"
 #include "sound/okim6295.h"
@@ -200,7 +200,7 @@ void sealy_8031_state::jinsanse(machine_config &config)
 {
 	I8031(config, m_maincpu, 10.240_MHz_XTAL); // P8031AH. Is this the correct XTAL or the other one? Divider?
 	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_8031_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &sealy_8031_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &sealy_8031_state::io_map);
 	m_maincpu->port_in_cb<0>().set([this] () { LOGPORTS("%s: 8031 port 0 in\n", machine().describe_context()); return uint8_t(0); });
 	m_maincpu->port_in_cb<1>().set([this] () { LOGPORTS("%s: 8031 port 1 in\n", machine().describe_context()); return uint8_t(0); });
 	m_maincpu->port_in_cb<2>().set([this] () { LOGPORTS("%s: 8031 port 2 in\n", machine().describe_context()); return uint8_t(0); });

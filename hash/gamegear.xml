@@ -3604,7 +3604,7 @@ a certain item) -->
 	</software>
 
 	<software name="ironman1" cloneof="ironman">
-		<description>Iron Man X-O Manowar in Heavy Metal (USA, Alt)</description>
+		<description>Iron Man X-O Manowar in Heavy Metal (USA, alt)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8759,7 +8759,7 @@ a certain item) -->
 	</software>
 
 	<software name="sheroa" cloneof="shero">
-		<description>Street Hero (USA, prototype Alt, SMS mode)</description>
+		<description>Street Hero (USA, prototype alt, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Innovation Tech</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9935,7 +9935,7 @@ a certain item) -->
 	</software>
 
 	<software name="wagyana" cloneof="wagyan">
-		<description>Wagyan Land (Japan, Alt)</description>
+		<description>Wagyan Land (Japan, alt)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14047"/>
@@ -10095,6 +10095,18 @@ a certain item) -->
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="wonder boy iii - the dragon's trap (europe) (beta).bin" size="262144" crc="db1b5b44" sha1="5108c4920b4a14fd06f1a024e1be5f6bf233bd84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wondrkid" supported="no"> <!-- also found in the Australian 4 Pak All Action compilation, game requires custom mapper -->
+		<description>Wonder Kid (USA, prototype)</description>
+		<year>1993</year>
+		<publisher>Innovation Tech</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<feature name="pin_42" value="sms_mode" />
+			<dataarea name="rom" size="131072">
+				<rom name="wonder kid [proto] [sms-gg].sms" size="131072" crc="5e7b18c8" sha1="90a556bd3e1c2b0a5b66f7a778193d2edf09942f"/>
 			</dataarea>
 		</part>
 	</software>

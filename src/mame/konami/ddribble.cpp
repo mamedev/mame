@@ -2,14 +2,19 @@
 // copyright-holders: Manuel Abadia
 /***************************************************************************
 
-    Double Dribble (GX690) (c) Konami 1986
+Double Dribble (GX690) (c) Konami 1986
+Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
-    Driver by Manuel Abadia <emumanu+mame@gmail.com>
+XTAL: 18.43200MHz, 3.579545MHz
+CPU: 3*MC68B09EP
+Sound: Yamaha YM2203C, Sanyo LM5030
+Konami custom: 2*005885, 007452, 007327
 
-    2008-08
-    Dip locations and suggested settings verified with US manual.
+2008-08
+Dip locations and suggested settings verified with US manual.
 
-    TODO: using a debug build, the cmd prompt is filled with sound_assert: u32(start) < samples()
+TODO:
+- using a debug build, the cmd prompt is filled with sound_assert: u32(start) < samples()
 
 ***************************************************************************/
 
@@ -571,9 +576,7 @@ void ddribble_state::ddribble(machine_config &config)
 	m_vlm->set_addrmap(0, &ddribble_state::vlm_map);
 
 	FILTER_RC(config, m_filter[0]).add_route(ALL_OUTPUTS, "mono", 1.0);
-
 	FILTER_RC(config, m_filter[1]).add_route(ALL_OUTPUTS, "mono", 1.0);
-
 	FILTER_RC(config, m_filter[2]).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

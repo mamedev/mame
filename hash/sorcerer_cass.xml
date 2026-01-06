@@ -305,7 +305,7 @@ Compiled by Robbbert
 	</software>
 	<software name="dodge">
 		<description>Dodgem</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="serial" value="311ES" />
 		<info name="usage" value="In Basic, CLOAD then RUN" />
@@ -572,7 +572,9 @@ Compiled by Robbbert
 		<year>1982</year>
 		<publisher>System Software</publisher>
 		<info name="serial" value="507ES" />
-		<info name="developer" value="J Forster, N Leith, Leitronics"/>
+		<info name="developer" value="J Forster" />
+		<info name="developer" value="N Leith" />
+		<info name="developer" value="Leitronics" />
 		<info name="usage" value="Boot to Monitor, LOG" />
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="13867098">
@@ -921,7 +923,7 @@ Compiled by Robbbert
 	</software>
 	<software name="checkers">
 		<description>Checkers</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -968,7 +970,7 @@ Compiled by Robbbert
 	</software>
 	<software name="nuclear">
 		<description>Nuclear Reaction</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -979,7 +981,7 @@ Compiled by Robbbert
 	</software>
 	<software name="pielob">
 		<description>Pie Lob</description>
-		<year>198?</year>
+		<year>1978</year>
 		<publisher>Creative Computing</publisher>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1288,7 +1290,7 @@ Compiled by Robbbert
 	<software name="cadas">
 		<description>Cassette Disk database system</description>
 		<year>1981</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Global Software Network</publisher>
 		<info name="developer" value="Bob Stafford"/>
 		<info name="usage" value="In Basic, CLOAD then RUN" />
 		<part name="cass" interface="sorcerer_cass">
@@ -1305,6 +1307,18 @@ Compiled by Robbbert
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="0x11fff26">
 				<rom name="com48.wav" size="0x11fff26" crc="db015584" sha1="593ee5afa5ac1721955e35af38e7f1152831c963" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="duel">
+		<description>DUEL: A Dogfight in Space</description>
+		<year>1982</year>
+		<publisher>Dayspring Computer Enterprises</publisher>
+		<info name="developer" value="Bill Boucher"/>
+		<info name="usage" value="Boot to Monitor, LOG. Player 1: Z to Rotate CCW, X to Rotate CW, C to Accelerate, V to Fire. Player 2: Numpad + to Rotate CCW, Numpad = to Rotate CW, Numpad 0 to Accelerate, Numpad . to Fire" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="8470074">
+				<rom name="duel.wav" size="8470074" crc="e4c35a75" sha1="79a2697223eab3947Baeb1999d40505eb93b2442" />
 			</dataarea>
 		</part>
 	</software>

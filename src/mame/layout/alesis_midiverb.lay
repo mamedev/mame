@@ -664,11 +664,11 @@ copyright-holders:m1macrophage
 
 		<!-- I/O section -->
 
-		<element ref="transparent_rect" clickthrough="no">
-			<!-- Disables clicks to the simplecounter below. -->
+		<element ref="mix-display" inputtag="mix" inputmask="0x7f" inputraw="yes">
 			<bounds x="410" y="40" width="100" height="30"/>
 		</element>
-		<element ref="mix-display" inputtag="mix" inputmask="0x7f" inputraw="yes">
+		<element ref="transparent_rect" clickthrough="no">
+			<!-- Disables clicks to the simplecounter above. -->
 			<bounds x="410" y="40" width="100" height="30"/>
 		</element>
 

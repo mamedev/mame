@@ -48,7 +48,6 @@ public:
 	typedef device_delegate<void (int scanline, bool vblank, bool blanked)> scanline_delegate;
 	typedef device_delegate<void (int scanline, bool vblank, bool blanked)> hblank_delegate;
 	typedef device_delegate<void (int *ppu_regs)> nmi_delegate;
-	typedef device_delegate<int (int address, int data)> vidaccess_delegate;
 	typedef device_delegate<void (offs_t offset)> latch_delegate;
 
 	enum
@@ -86,7 +85,6 @@ public:
 	int get_current_scanline() { return m_scanline; }
 	template <typename... T> void set_scanline_callback(T &&... args) { m_scanline_callback_proc.set(std::forward<T>(args)...); m_scanline_callback_proc.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
 	template <typename... T> void set_hblank_callback(T &&... args) { m_hblank_callback_proc.set(std::forward<T>(args)...); m_hblank_callback_proc.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
-	template <typename... T> void set_vidaccess_callback(T &&... args) { m_vidaccess_callback_proc.set(std::forward<T>(args)...); m_vidaccess_callback_proc.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
 	void set_scanlines_per_frame(int scanlines) { m_scanlines_per_frame = scanlines; }
 
 	// MMC5 has to be able to check this
@@ -231,7 +229,6 @@ private:
 
 	scanline_delegate           m_scanline_callback_proc;   /* optional scanline callback */
 	hblank_delegate             m_hblank_callback_proc; /* optional hblank callback */
-	vidaccess_delegate          m_vidaccess_callback_proc;  /* optional video access callback */
 	devcb_write_line            m_int_callback;         /* nmi access callback from interface */
 
 	s32                         m_refresh_latch;        /* refresh-related */

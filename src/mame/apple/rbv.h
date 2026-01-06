@@ -7,13 +7,14 @@
 #pragma once
 
 #include "machine/pseudovia.h"
+#include "video/bt47x.h"
 
 #include "screen.h"
 
 
 // ======================> rbv_device
 
-class rbv_device :  public device_t, public device_palette_interface
+class rbv_device :  public device_t
 {
 public:
 	// construction/destruction
@@ -36,14 +37,12 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	// device_palette_interface implementation
-	u32 palette_entries() const noexcept override;
-
 private:
 	devcb_write_line write_6015, write_irq;
 
 	required_ioport m_io_montype;
 	required_device<screen_device> m_screen;
+	required_device<bt478_device> m_bt478;
 	required_device<pseudovia_device> m_pseudovia;
 
 	emu_timer *m_6015_timer;
@@ -53,7 +52,6 @@ private:
 	u8 m_montype;
 	bool m_monochrome;
 
-	u8 m_pal_address, m_pal_idx;
 	u32 *m_ram_ptr;
 	u32 m_ram_size;
 	u8 m_video_config;
@@ -63,9 +61,6 @@ private:
 	void via2_irq_w(int state);
 
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-
-	u8 dac_r(offs_t offset);
-	void dac_w(offs_t offset, u8 data);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template <bool Mono> u32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

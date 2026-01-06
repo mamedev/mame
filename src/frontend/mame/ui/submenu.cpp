@@ -88,7 +88,6 @@ std::vector<submenu::option> submenu::advanced_options()
 			{ option_type::EMU,  N_("Multi-mouse"),                             OPTION_MULTIMOUSE },
 			{ option_type::EMU,  N_("Steadykey"),                               OPTION_STEADYKEY },
 			{ option_type::EMU,  N_("UI active"),                               OPTION_UI_ACTIVE },
-			{ option_type::EMU,  N_("Off-screen reload"),                       OPTION_OFFSCREEN_RELOAD },
 			{ option_type::EMU,  N_("Joystick deadzone"),                       OPTION_JOYSTICK_DEADZONE },
 			{ option_type::EMU,  N_("Joystick saturation"),                     OPTION_JOYSTICK_SATURATION },
 			{ option_type::EMU,  N_("Joystick threshold"),                      OPTION_JOYSTICK_THRESHOLD },

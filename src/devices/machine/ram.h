@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <cassert>
+#include <cstdlib>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -41,20 +43,21 @@ public:
 	// accessors
 	u32 size() const { return m_size; }
 	u32 mask() const { return m_size - 1; }
-	u8 *pointer() { return &m_pointer[0]; }
+	template <typename T> T *pointer() { static_assert(std::is_integral_v<T>); return reinterpret_cast<T *>(m_pointer.get()); }
+	u8 *pointer() { return pointer<u8>(); }
 	char const *default_size_string() const { return m_default_size; }
 	u32 default_size() const;
 	extra_option_vector const &extra_options() const;
 
 	// read/write
-	u8 read(offs_t offset)              { return m_pointer[offset % m_size]; }
-	void write(offs_t offset, u8 data)  { m_pointer[offset % m_size] = data; }
+	u8 read(offs_t offset)              { return pointer<u8>()[offset % m_size]; }
+	void write(offs_t offset, u8 data)  { pointer<u8>()[offset % m_size] = data; }
 
 	// inline configuration helpers
 	ram_device &set_default_size(char const *default_size) { m_default_size = default_size; return *this; }
 	ram_device &set_extra_options(char const *extra_options)
 	{
-		m_extra_options_string = extra_options && extra_options[0] ? extra_options : nullptr;
+		m_extra_options_string = (extra_options && extra_options[0]) ? extra_options : nullptr;
 		m_extra_options.clear();
 		return *this;
 	}
@@ -65,17 +68,19 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
+	struct stdlib_deleter { void operator()(void *p) const { std::free(p); } };
+
 	bool is_valid_size(u32 size) const;
 
 	// device state
-	u32                         m_size;
-	std::unique_ptr<u8 []>      m_pointer;
+	u32                                     m_size;
+	std::unique_ptr<void, stdlib_deleter>   m_pointer;
 
 	// device config
-	char const *                m_default_size;
-	u8                          m_default_value;
-	mutable extra_option_vector m_extra_options;
-	char const *                m_extra_options_string;
+	char const *                            m_default_size;
+	u8                                      m_default_value;
+	mutable extra_option_vector             m_extra_options;
+	char const *                            m_extra_options_string;
 };
 
 

@@ -51,7 +51,7 @@ Main PCB
       |                   -----------------------------------------            |
       |                   -------------- V24 INTERFACE ------------            |
       |_______________________      ___      ___      ___      ________________|
-                              |____|   |____|   |____|   |____|   
+                              |____|   |____|   |____|   |____|
                              Keyboard   Tape      CVS     Modem
 
 V24 Interface riser PCB
@@ -74,7 +74,7 @@ Keyboard PCB
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 #include "machine/6821pia.h"
 
@@ -139,6 +139,7 @@ ROM_START( blaucds32 )
 	ROM_REGION( 0x0eb, "prom", 0 )
 	ROM_LOAD( "n82s153n.v4245",       0x00000, 0x000eb, NO_DUMP ) // On main PCB
 ROM_END
+
 } // anonymous namespace
 
 

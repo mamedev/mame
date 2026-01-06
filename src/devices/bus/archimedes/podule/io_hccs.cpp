@@ -10,27 +10,30 @@
 
 #include "emu.h"
 #include "io_hccs.h"
-#include "machine/6522via.h"
-#include "machine/upd7002.h"
+
 #include "bus/bbc/analogue/analogue.h"
 #include "bus/bbc/userport/userport.h"
+#include "machine/6522via.h"
+#include "machine/upd7002.h"
 
 
 namespace {
 
 // ======================> arc_upa_hccs_device
 
-class arc_upa_hccs_device :
-	public device_t,
-	public device_archimedes_podule_interface
+class arc_upa_hccs_device : public device_t, public device_archimedes_podule_interface
 {
 public:
-	// construction/destruction
-	arc_upa_hccs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	arc_upa_hccs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, ARC_UPA_HCCS, tag, owner, clock)
+		, device_archimedes_podule_interface(mconfig, *this)
+		, m_podule_rom(*this, "podule_rom")
+	{
+	}
 
 protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -41,9 +44,6 @@ protected:
 
 private:
 	required_memory_region m_podule_rom;
-	required_device<bbc_analogue_slot_device> m_analog;
-
-	int get_analogue_input(int channel_number);
 };
 
 
@@ -79,7 +79,7 @@ void arc_upa_hccs_device::device_add_mconfig(machine_config &config)
 {
 	via6522_device &via(MOS6522(config, "via", DERIVED_CLOCK(1, 4)));
 	via.irq_handler().set([this](int state) { set_pirq(state); });
-	via.readpa_handler().set(m_analog, FUNC(bbc_analogue_slot_device::pb_r));
+	via.readpa_handler().set("analog", FUNC(bbc_analogue_slot_device::pb_r));
 	via.readpb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_r));
 	via.writepb_handler().set("userport", FUNC(bbc_userport_slot_device::pb_w));
 	via.cb1_handler().set("userport", FUNC(bbc_userport_slot_device::write_cb1));
@@ -90,54 +90,14 @@ void arc_upa_hccs_device::device_add_mconfig(machine_config &config)
 	userport.cb2_handler().set("via", FUNC(via6522_device::write_cb2));
 
 	upd7002_device &upd7002(UPD7002(config, "upd7002", DERIVED_CLOCK(1, 4)));
-	upd7002.set_get_analogue_callback(FUNC(arc_upa_hccs_device::get_analogue_input));
-	upd7002.set_eoc_callback("via", FUNC(via6522_device::write_ca2));
+	upd7002.get_analogue_callback().set("analog", FUNC(bbc_analogue_slot_device::ch_r));
+	upd7002.eoc_callback().set("via", FUNC(via6522_device::write_ca2));
 
-	BBC_ANALOGUE_SLOT(config, m_analog, bbc_analogue_devices, nullptr);
-	m_analog->lpstb_handler().set("via", FUNC(via6522_device::write_ca1));
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  arc_upa_hccs_device - constructor
-//-------------------------------------------------
-
-arc_upa_hccs_device::arc_upa_hccs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ARC_UPA_HCCS, tag, owner, clock)
-	, device_archimedes_podule_interface(mconfig, *this)
-	, m_podule_rom(*this, "podule_rom")
-	, m_analog(*this, "analogue")
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void arc_upa_hccs_device::device_start()
-{
-}
-
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-int arc_upa_hccs_device::get_analogue_input(int channel_number)
-{
-	return m_analog->ch_r(channel_number) << 8;
+	bbc_analogue_slot_device &analog(BBC_ANALOGUE_SLOT(config, "analog", bbc_analogue_devices, nullptr));
+	analog.lpstb_handler().set("via", FUNC(via6522_device::write_ca1));
 }
 
 } // anonymous namespace
 
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_UPA_HCCS, device_archimedes_podule_interface, arc_upa_hccs_device, "arc_upa_hccs", "HCCS User/Analogue Podule")

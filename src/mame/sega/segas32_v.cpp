@@ -20,11 +20,8 @@
     - Verify that X/Y center has 10 bits of resolution when zooming and
       9 when not.
 
-    - In svf (the field) and radr (on the field), they use tilemap-specific
-      flip in conjunction with rowscroll AND rowselect. According to Charles,
-      in this case, the rowselect lookups should be done in reverse order,
-      but this results in an incorrect display. For now, we assume there is
-      a bug in the procedure and implement it so that it looks correct.
+    - Sonic while globally flipped via the service menu, fails to flip
+      the "SEGA" and "SEGASONIC" sprite based logos on the title screen.
 
     - titlef NBG0 and NBG2 layers are currently hidden during gameplay.
       It sets $31ff02 with either $7be0 and $2960 (and $31ff8e is $c00).
@@ -61,8 +58,8 @@
          $31FF00 : w--- ---- ---- ---- : Screen width (0= 320, 1= 412)
                    ---- f--- ---- ---- : Bitmap format (1= 8bpp, 0= 4bpp)
                    ---- -t-- ---- ---- : Tile banking related
-                   ---- --f- ---- ---- : 1= Global X/Y flip? (most games?)
-                   ---- ---f ---- ---- : 1= prohbit Y flip? (Air Rescue 2nd screen title, also gets set on one of the intro sequence screens)
+                   ---- --f- ---- ---- : 1= Global X/Y flip (enabled via service menu)
+                   ---- ---f ---- ---- : 1= Prohibit layer Y flip (NBG0 - NBG3)
                    ---- ---- ---- 4--- : 1= X+Y flip for NBG3
                    ---- ---- ---- -2-- : 1= X+Y flip for NBG2
                    ---- ---- ---- --1- : 1= X+Y flip for NBG1
@@ -178,7 +175,6 @@
 */
 
 
-
 #include "emu.h"
 #include "segas32.h"
 
@@ -216,13 +212,6 @@
 #define MIXER_LAYER_MULTISPR_2  10
 
 static constexpr int TILEMAP_CACHE_SIZE = 32;
-
-
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
 
 
 /*************************************
@@ -544,30 +533,29 @@ TILE_GET_INFO_MEMBER(segas32_state::get_tile_info)
 
 int segas32_state::compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, extents_list *list)
 {
-	int flip = (m_videoram[0x1ff00/2] >> 9) & 1;
+	int flip = BIT(m_videoram[0x1ff00 / 2], 9);
 	rectangle tempclip;
-	rectangle clips[5];
-	int sorted[5];
-	int i, j, y;
 
-	/* expand our cliprect to exclude the bottom-right */
+	// expand our cliprect to exclude the bottom-right
 	tempclip = cliprect;
 	tempclip.max_x++;
 	tempclip.max_y++;
 
-	/* create the 0th entry */
+	// create the 0th entry
 	list->extent[0][0] = tempclip.min_x;
 	list->extent[0][1] = tempclip.max_x;
 
-	/* simple case if not enabled */
+	// simple case if not enabled
 	if (!enable)
 	{
 		memset(&list->scan_extent[tempclip.min_y], 0, sizeof(list->scan_extent[0]) * (tempclip.max_y - tempclip.min_y));
 		return 1;
 	}
 
-	/* extract the from videoram into locals, and apply the cliprect */
-	for (i = 0; i < 5; i++)
+	// extract the from videoram into locals, and apply the cliprect
+	rectangle clips[5];
+	int sorted[5];
+	for (int i = 0; i < 5; i++)
 	{
 		if (!flip)
 		{
@@ -589,52 +577,55 @@ int segas32_state::compute_clipping_extents(screen_device &screen, int enable, i
 		sorted[i] = i;
 	}
 
-	/* bubble sort them by min_x */
-	for (i = 0; i < 5; i++)
-		for (j = i + 1; j < 5; j++)
+	// bubble sort them by min_x
+	for (int i = 0; i < 5; i++)
+		for (int j = i + 1; j < 5; j++)
 			if (clips[sorted[i]].min_x > clips[sorted[j]].min_x) { int temp = sorted[i]; sorted[i] = sorted[j]; sorted[j] = temp; }
 
-	/* create all valid extent combinations */
-	for (i = 1; i < 32; i++)
+	// create all valid extent combinations
+	for (int i = 1; i < 32; i++)
+	{
 		if (i & clipmask)
 		{
 			uint16_t *extent = &list->extent[i][0];
 
-			/* start off with an entry at tempclip.min_x */
+			// start off with an entry at tempclip.min_x
 			*extent++ = tempclip.min_x;
 
-			/* loop in sorted order over extents */
-			for (j = 0; j < 5; j++)
+			// loop in sorted order over extents
+			for (int j = 0; j < 5; j++)
+			{
 				if (i & (1 << sorted[j]))
 				{
 					const rectangle &cur = clips[sorted[j]];
 
-					/* see if this intersects our last extent */
+					// see if this intersects our last extent
 					if (extent != &list->extent[i][1] && cur.min_x <= extent[-1])
 					{
 						if (cur.max_x > extent[-1])
 							extent[-1] = cur.max_x;
 					}
-
-					/* otherwise, just append to the list */
 					else
 					{
+						// otherwise, just append to the list
 						*extent++ = cur.min_x;
 						*extent++ = cur.max_x;
 					}
 				}
+			}
 
-			/* append an ending entry */
+			// append an ending entry
 			*extent++ = tempclip.max_x;
 		}
+	}
 
-	/* loop over scanlines and build extents */
-	for (y = tempclip.min_y; y < tempclip.max_y; y++)
+	// loop over scanlines and build extents
+	for (int y = tempclip.min_y; y < tempclip.max_y; y++)
 	{
 		int sect = 0;
 
-		/* figure out all the clips that intersect this scanline */
-		for (i = 0; i < 5; i++)
+		// figure out all the clips that intersect this scanline
+		for (int i = 0; i < 5; i++)
 			if ((clipmask & (1 << i)) && y >= clips[i].min_y && y < clips[i].max_y)
 				sect |= 1 << i;
 		list->scan_extent[y] = sect;
@@ -646,20 +637,14 @@ int segas32_state::compute_clipping_extents(screen_device &screen, int enable, i
 
 void segas32_state::compute_tilemap_flips(int bgnum, int &flipx, int &flipy)
 {
-	/* determine if we're flipped */
-	int global_flip = (m_videoram[0x1ff00 / 2] >> 9)&1;
+	// determine flip bits
+	const int global_flip    = BIT(m_videoram[0x1ff00 / 2], 9);
+	const int layer_flip     = BIT(m_videoram[0x1ff00 / 2], bgnum);
+	const int prohibit_flipy = BIT(m_videoram[0x1ff00 / 2], 8);
 
-	flipx = global_flip;
-	flipy = global_flip;
+	flipx = layer_flip ? !global_flip : global_flip;
 
-	int layer_flip = (m_videoram[0x1ff00 / 2] >> bgnum) & 1;
-
-	flipy ^= layer_flip;
-	flipx ^= layer_flip;
-
-	// this bit is set on Air Rescue (screen 2) title screen, during the Air Rescue introduction demo, and in f1en when you win a single player race
-	// it seems to prohibit (at least) the per-tilemap y flipping (maybe global y can override it)
-	if ((m_videoram[0x1ff00 / 2] >> 8) & 1) flipy = 0;
+	flipy = (layer_flip && !prohibit_flipy) ? !global_flip : global_flip;
 }
 
 /*************************************
@@ -705,7 +690,7 @@ void segas32_state::update_tilemap_zoom(screen_device &screen, segas32_state::la
 //if (screen.machine().input().code_pressed(KEYCODE_X) && bgnum == 1) opaque = 1;
 	int flipx, flipy;
 
-	// todo determine flipping
+	// determine flipping
 	compute_tilemap_flips(bgnum, flipx, flipy);
 
 	/* determine the clipping */
@@ -863,9 +848,8 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 
 	int flipx, flipy;
 
-	// todo determine flipping
+	// determine flipping
 	compute_tilemap_flips(bgnum, flipx, flipy);
-
 
 	/* determine the clipping */
 	int clipenable = (m_videoram[0x1ff02/2] >> (11 + bgnum)) & 1;
@@ -914,22 +898,24 @@ void segas32_state::update_tilemap_rowscroll(screen_device &screen, segas32_stat
 			}
 
 			int srcy;
+			int ylookup;
 			if (!flipy)
 			{
 				srcy = yscroll + y;
+				ylookup = y;
 			}
 			else
 			{
 				const rectangle &visarea = screen.visible_area();
 				srcy = yscroll + visarea.max_y - y;
+				ylookup = visarea.max_y - y;
 			}
 
 			/* apply row scroll/select */
 			if (rowscroll)
-				srcx += table[0x000 + 0x100 * (bgnum - 2) + y] & 0x3ff;
+				srcx += table[0x000 + 0x100 * (bgnum - 2) + ylookup] & 0x3ff;
 			if (rowselect)
-				srcy = (yscroll + table[0x200 + 0x100 * (bgnum - 2) + y]) & 0x1ff;
-
+				srcy = (yscroll + table[0x200 + 0x100 * (bgnum - 2) + ylookup]) & 0x1ff;
 
 			/* look up the pages and get their source pixmaps */
 			bitmap_ind16 const &tm0 = tilemaps[((srcy >> 7) & 2) + 0]->pixmap();
@@ -996,7 +982,7 @@ void segas32_state::update_tilemap_text(screen_device &screen, segas32_state::la
 	bitmap_ind16 &bitmap = layer.bitmap;
 
 	/* determine if we're flipped */
-	int flip = (m_videoram[0x1ff00/2] >> 9) & 1;
+	int flip = BIT(m_videoram[0x1ff00 / 2], 9);
 
 	/* determine the base of the tilemap and graphics data */
 	uint16_t const *const tilebase = &m_videoram[((m_videoram[0x1ff5c/2] >> 4) & 0x1f) * 0x800];
@@ -1108,7 +1094,7 @@ void segas32_state::update_tilemap_text(screen_device &screen, segas32_state::la
 						pix |= color;
 					dst[-3] = pix;
 
-					pix = *src++;
+					pixels = *src++;
 
 					pix = (pixels >> 4) & 0x0f;
 					if (pix)

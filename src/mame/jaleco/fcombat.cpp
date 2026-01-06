@@ -11,10 +11,6 @@ TS 2004.10.22.
 
 (press buttons 1+2 at the same time, to release 'army' ;)
 
-TODO:
-- verify sprite colors, not many PCB references online, but comparing with
-  the small amount of photos that are there, they match
-
 
 PCB Notes:
 
@@ -27,7 +23,11 @@ Other: Unmarked 24 pin near ROMs 2 & 3 (maybe same protection chip as dday?)
 
 RAM: 6116 (x3)
 
-X-TAL: 20 MHz
+X-TAL: 20 MHz (also seen with 19.968 MHz)
+
+Video measurements (from a board with a 19.968MHz XTAL):
+HSync: 14.84948kHz
+VSync: 58.00548Hz
 
 */
 
@@ -51,14 +51,16 @@ class fcombat_state : public driver_device
 public:
 	fcombat_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_bgdata_rom(*this, "bgdata"),
-		m_terrain_rom(*this, "terrain_info"),
-		m_inputs(*this, "IN%u", 0U),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_terrain_rom(*this, "terrain"),
+		m_inputs(*this, "IN%u", 0U)
 	{ }
 
 	void fcombat(machine_config &config);
@@ -72,6 +74,13 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
 	// memory pointers
 	required_shared_ptr<u8> m_videoram;
 	required_shared_ptr<u8> m_spriteram;
@@ -93,11 +102,6 @@ private:
 	u8 m_tx = 0;
 	u8 m_ty = 0;
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
 	u8 protection_r();
 	u8 port01_r();
 	void e900_w(u8 data);
@@ -117,19 +121,6 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 };
 
-
-// this is copied from Exerion, but it should be correct
-static constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
-static constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 6;
-static constexpr XTAL AY8910_CLOCK = CPU_CLOCK / 2;
-static constexpr XTAL PIXEL_CLOCK  = MASTER_CLOCK / 3;
-static constexpr int HCOUNT_START  = 0x58;
-static constexpr int HTOTAL        = 512 - HCOUNT_START;
-static constexpr int HBEND         = 12 * 8;  // ??
-static constexpr int HBSTART       = 52 * 8;  // ??
-static constexpr int VTOTAL        = 256;
-static constexpr int VBEND         = 16;
-static constexpr int VBSTART       = 240;
 
 
 /***************************************************************************
@@ -491,32 +482,33 @@ static INPUT_PORTS_START( fcombat )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("DSW0")      // dip switches (0xe100)
-	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )
+	PORT_START("DSW0")      // 8-position DIP switch (0xe100)
+	PORT_DIPNAME( 0x07, 0x02, DEF_STR( Lives ) )       PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x07, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x05, "5" ) // duplicate
+	PORT_DIPSETTING(    0x06, "5" ) // duplicate
+	PORT_DIPSETTING(    0x07, "Infinite (Cheat)") // probably really 254 or 255
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Bonus_Life ) )  PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x10, "30000" )
 	PORT_DIPSETTING(    0x18, "40000" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Difficulty ) )  PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW1")      // dip switches/VBLANK (0xe200)
+	PORT_START("DSW1")      // 4-position DIP switch / VBLANK (0xe200)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
-	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )     PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 3C_1C ) )
@@ -525,7 +517,8 @@ static INPUT_PORTS_START( fcombat )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )        PORT_DIPLOCATION("SW2:4")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(fcombat_state::coin_inserted), 0)
@@ -590,17 +583,19 @@ void fcombat_state::machine_start()
 void fcombat_state::fcombat(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, CPU_CLOCK);
+	constexpr XTAL MASTER_CLOCK = 19.968_MHz_XTAL; // also seen with 20_MHz_XTAL
+
+	Z80(config, m_maincpu, MASTER_CLOCK / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fcombat_state::main_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", CPU_CLOCK));
-	audiocpu.set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
+	Z80(config, m_audiocpu, MASTER_CLOCK / 6);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(fcombat_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK / 3, 448, 96, 96+320, 256, 16, 240);
+	m_screen->set_screen_update(FUNC(fcombat_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fcombat);
 	PALETTE(config, m_palette, FUNC(fcombat_state::fcombat_palette), 256 * 3, 32);
@@ -610,9 +605,9 @@ void fcombat_state::fcombat(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2149(config, "ay1", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
-	YM2149(config, "ay2", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
-	YM2149(config, "ay3", AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay1", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay2", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
+	YM2149(config, "ay3", MASTER_CLOCK / 12).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -699,8 +694,8 @@ void fcombat_state::init_fcombat()
 	}
 
 	src = &temp[0];
-	dst = memregion("terrain_info")->base();
-	length = memregion("terrain_info")->bytes();
+	dst = memregion("terrain")->base();
+	length = memregion("terrain")->bytes();
 	memcpy(src, dst, length);
 
 	for (u32 oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -732,7 +727,7 @@ ROM_START( fcombat )
 	ROM_REGION( 0x04000, "bgdata", 0 )
 	ROM_LOAD( "fcombat5.l3",  0x00000, 0x4000, CRC(96194ca7) SHA1(087d6ac8f93f087cb5e378dbe9a8cfcffa2cdddc) )
 
-	ROM_REGION( 0x04000, "terrain_info", 0 )
+	ROM_REGION( 0x04000, "terrain", 0 )
 	ROM_LOAD( "fcombat4.p3",  0x00000, 0x4000, CRC(efe098ab) SHA1(fe64a5e9170835d242368109b1b221b0f8090e7e) )
 
 	ROM_REGION( 0x0420, "proms", 0 )

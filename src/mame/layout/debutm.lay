@@ -341,14 +341,14 @@ authors:hap
 		<element name="digit2" ref="digit"><bounds x="17.2" y="92.625" width="3.7" height="5.55" /></element>
 		<element name="digit3" ref="digit"><bounds x="22.3" y="92.625" width="3.7" height="5.55" /></element>
 
-		<element ref="text_8"><bounds x="-0.5" y="6.5"  width="3" height="3" /></element>
-		<element ref="text_7"><bounds x="-0.5" y="16.5" width="3" height="3" /></element>
-		<element ref="text_6"><bounds x="-0.5" y="26.5" width="3" height="3" /></element>
-		<element ref="text_5"><bounds x="-0.5" y="36.5" width="3" height="3" /></element>
-		<element ref="text_4"><bounds x="-0.5" y="46.5" width="3" height="3" /></element>
-		<element ref="text_3"><bounds x="-0.5" y="56.5" width="3" height="3" /></element>
-		<element ref="text_2"><bounds x="-0.5" y="66.5" width="3" height="3" /></element>
-		<element ref="text_1"><bounds x="-0.5" y="76.5" width="3" height="3" /></element>
+		<element ref="text_8"><bounds x="-0.6" y="6.5"  width="3" height="3" /></element>
+		<element ref="text_7"><bounds x="-0.6" y="16.5" width="3" height="3" /></element>
+		<element ref="text_6"><bounds x="-0.6" y="26.5" width="3" height="3" /></element>
+		<element ref="text_5"><bounds x="-0.6" y="36.5" width="3" height="3" /></element>
+		<element ref="text_4"><bounds x="-0.6" y="46.5" width="3" height="3" /></element>
+		<element ref="text_3"><bounds x="-0.6" y="56.5" width="3" height="3" /></element>
+		<element ref="text_2"><bounds x="-0.6" y="66.5" width="3" height="3" /></element>
+		<element ref="text_1"><bounds x="-0.6" y="76.5" width="3" height="3" /></element>
 
 		<element ref="text_a"><bounds x="7"  y="85.5" width="3" height="3" /></element>
 		<element ref="text_b"><bounds x="17" y="85.5" width="3" height="3" /></element>
@@ -418,15 +418,15 @@ authors:hap
 		<group ref="sb_board"><bounds x="3.5" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 
-		<element ref="text_b1"><bounds x="33.0" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b2"><bounds x="38.5" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b3"><bounds x="44.0" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b4"><bounds x="49.5" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b5"><bounds x="55.0" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b6"><bounds x="60.5" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b7"><bounds x="66.0" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b8"><bounds x="71.5" y="90" width="5.2" height="2.5" /></element>
-		<element ref="text_b9"><bounds x="78.8" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b1"><bounds xc="35.6" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b2"><bounds xc="41.1" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b3"><bounds xc="46.6" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b4"><bounds xc="52.1" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b5"><bounds xc="57.6" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b6"><bounds xc="63.1" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b7"><bounds xc="68.6" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b8"><bounds xc="74.1" y="90" width="5.2" height="2.5" /></element>
+		<element ref="text_b9"><bounds xc="81.4" y="90" width="5.2" height="2.5" /></element>
 
 		<group ref="shared"><bounds x="-0.5" y="6.5" width="83" height="94.9" /></group>
 	</view>
@@ -440,20 +440,20 @@ authors:hap
 		<group ref="sb_board"><bounds x="3.5" y="3" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-12.5" y="3" width="10" height="80" /></group>
 
-		<element ref="text_tb1"><bounds x="32.0" y="90.7" width="7.2" height="1.75" /></element>
-		<element ref="text_tb2a"><bounds x="38.5" y="89.0" width="5.2" height="1.75" /></element>
-		<element ref="text_tb2b"><bounds x="38.9" y="90.7" width="4.6" height="1.75" /></element>
-		<element ref="text_tb3"><bounds x="44.0" y="90.7" width="5.2" height="1.75" /></element>
-		<element ref="text_tb4a"><bounds x="49.5" y="89.0" width="5.2" height="1.75" /></element>
-		<element ref="text_tb4b"><bounds x="49.5" y="90.7" width="5.2" height="1.75" /></element>
-		<element ref="text_tb5a"><bounds x="55.0" y="89.0" width="5.2" height="1.75" /></element>
-		<element ref="text_tb5b"><bounds x="55.0" y="90.7" width="5.2" height="1.75" /></element>
-		<element ref="text_tb6a"><bounds x="60.5" y="89.0" width="5.2" height="1.75" /></element>
-		<element ref="text_tb6b"><bounds x="60.5" y="90.7" width="5.2" height="1.75" /></element>
-		<element ref="text_tb7"><bounds x="66.0" y="90.7" width="5.2" height="1.75" /></element>
-		<element ref="text_tb8a"><bounds x="71.5" y="89.0" width="5.2" height="1.75" /></element>
-		<element ref="text_tb8b"><bounds x="71.5" y="90.7" width="5.2" height="1.75" /></element>
-		<element ref="text_tb9"><bounds x="78.8" y="90.7" width="5.2" height="1.75" /></element>
+		<element ref="text_tb1"> <bounds xc="35.6" y="90.7" width="5.5" height="1.65" /></element>
+		<element ref="text_tb2a"><bounds xc="41.1" y="89.0" width="5.2" height="1.65" /></element>
+		<element ref="text_tb2b"><bounds xc="41.1" y="90.7" width="4.5" height="1.65" /></element>
+		<element ref="text_tb3"> <bounds xc="46.6" y="90.7" width="5.2" height="1.65" /></element>
+		<element ref="text_tb4a"><bounds xc="52.1" y="89.0" width="5.2" height="1.65" /></element>
+		<element ref="text_tb4b"><bounds xc="52.1" y="90.7" width="5.2" height="1.65" /></element>
+		<element ref="text_tb5a"><bounds xc="57.6" y="89.0" width="5.2" height="1.65" /></element>
+		<element ref="text_tb5b"><bounds xc="57.6" y="90.7" width="5.2" height="1.65" /></element>
+		<element ref="text_tb6a"><bounds xc="63.1" y="89.0" width="5.2" height="1.65" /></element>
+		<element ref="text_tb6b"><bounds xc="63.1" y="90.7" width="5.2" height="1.65" /></element>
+		<element ref="text_tb7"> <bounds xc="68.6" y="90.7" width="5.2" height="1.65" /></element>
+		<element ref="text_tb8a"><bounds xc="74.1" y="89.0" width="5.2" height="1.65" /></element>
+		<element ref="text_tb8b"><bounds xc="74.1" y="90.7" width="5.2" height="1.65" /></element>
+		<element ref="text_tb9"> <bounds xc="81.4" y="90.7" width="5.2" height="1.65" /></element>
 
 		<group ref="shared"><bounds x="-0.5" y="6.5" width="83" height="94.9" /></group>
 	</view>

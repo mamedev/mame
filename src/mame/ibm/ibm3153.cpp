@@ -38,7 +38,7 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -61,7 +61,7 @@ private:
 	void ibm3153_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void io_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -75,7 +75,7 @@ void ibm3153_state::mem_map(address_map &map)
 	map(0x00000, 0x0ffff).rom().region("user1", 0);
 }
 
-void ibm3153_state::io_map(address_map &map)
+void ibm3153_state::data_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram();
 	//map.unmap_value_high();
@@ -108,7 +108,7 @@ void ibm3153_state::ibm3153(machine_config &config)
 	/* basic machine hardware */
 	I80C32(config, m_maincpu, XTAL(16'000'000)); // no idea of clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &ibm3153_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &ibm3153_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &ibm3153_state::data_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

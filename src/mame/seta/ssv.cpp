@@ -56,7 +56,8 @@ STA-0001B   SSV_SUB     01  Vasara 2                                Visco
 
 (1) Uses ST010 MCU / Math chip
 (2) Uses ST-0009 & ST-0020 & Light Gun
-(3) Uses NEC V810 CPU as sub cpu for the AI (basically the same as the majinsen games on st0016)
+(3) Uses NEC V810 CPU as sub cpu for the AI (basically the same as the mayjinsen games on
+    seta/simple_st0016.cpp)
 
 SSV Hardware Overview
 Sammy/Seta/Visco, 1993-2001
@@ -2453,8 +2454,8 @@ void ssv_state::ssv(machine_config &config)
 	m_ensoniq->set_region2("ensoniq.2");
 	m_ensoniq->set_region3("ensoniq.3");
 	m_ensoniq->set_channels(1);
-	m_ensoniq->add_route(0, "speaker", 0.075, 0);
-	m_ensoniq->add_route(1, "speaker", 0.075, 1);
+	m_ensoniq->add_route(0, "speaker", 1.2, 0);
+	m_ensoniq->add_route(1, "speaker", 1.2, 1);
 }
 
 void drifto94_state::drifto94(machine_config &config)

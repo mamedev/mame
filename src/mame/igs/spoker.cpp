@@ -212,6 +212,7 @@ public:
 	void jinhulu2(machine_config &config)ATTR_COLD;
 
 	void init_dafuwng3() ATTR_COLD;
+	void init_dahuangg() ATTR_COLD;
 	void init_hsheng2() ATTR_COLD;
 	void init_huahuas2() ATTR_COLD;
 	void init_huluw2() ATTR_COLD;
@@ -254,7 +255,7 @@ public:
 		m_reel_scroll_ram(*this, "reel_scroll_ram.%u", 0U)
 	{ }
 
-	void jb(machine_config &config);
+	void jb(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -797,7 +798,7 @@ static INPUT_PORTS_START( spoker ) // this has every hold key which also does an
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, "Min Bet" )
+	PORT_DIPNAME( 0x03, 0x00, "Minimum Bet" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x01, "10" )
@@ -811,7 +812,9 @@ static INPUT_PORTS_START( spoker ) // this has every hold key which also does an
 	PORT_DIPSETTING(    0x08, "200 Credits" )
 	PORT_DIPSETTING(    0x04, "250 Credits" )
 	PORT_DIPSETTING(    0x00, "500 Credits" )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x20, 0x20, "Show Discard" )
+	PORT_DIPSETTING(    0x20, "Hold" )
+	PORT_DIPSETTING(    0x00, "Discard" )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
@@ -828,7 +831,7 @@ static INPUT_PORTS_START( spoker ) // this has every hold key which also does an
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x07, 0x07, "Max Bet" )
+	PORT_DIPNAME( 0x07, 0x07, "Maximum Bet" )
 	PORT_DIPSETTING(    0x07, "1" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "5" )
@@ -864,11 +867,11 @@ static INPUT_PORTS_START( spoker ) // this has every hold key which also does an
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2   )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -878,12 +881,109 @@ static INPUT_PORTS_START( spoker ) // this has every hold key which also does an
 
 	PORT_START("BUTTONS2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / High / Low")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Low")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Take")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / W-Up")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Red / Black")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Take Score")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Double Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / High")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spk306us )
+	PORT_INCLUDE(spoker)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Hold Mode" )                   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Hold Win" )
+	PORT_DIPSETTING(    0x00, "Auto Hold" )
+	PORT_DIPNAME( 0x06, 0x06, "Maximum Bet" )                 PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPSETTING(    0x06, "8" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x02, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x18, 0x18, "Minimum Bet" )                 PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x20, 0x20, "Ticket Payout" )               PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )                 PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPNAME( 0x80, 0x80, "System Limit" )                PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Payout Rate" )       PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, "50%" )
+	PORT_DIPSETTING(    0x0e, "60%" )
+	PORT_DIPSETTING(    0x0d, "65%" )
+	PORT_DIPSETTING(    0x0c, "70%" )
+	PORT_DIPSETTING(    0x0b, "75%" )
+	PORT_DIPSETTING(    0x0a, "80%" )
+	PORT_DIPSETTING(    0x09, "85%" )
+	PORT_DIPSETTING(    0x08, "90%" )
+	PORT_DIPNAME( 0x30, 0x30, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "75%" )
+	PORT_DIPSETTING(    0x20, "80%" )
+	PORT_DIPSETTING(    0x10, "85%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x40, 0x40, "Show Discard" )                PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, "Hold" )
+	PORT_DIPSETTING(    0x00, "Discard" )
+	PORT_DIPNAME( 0x80, 0x80, "Double Up Game" )              PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "Hand Count" )                  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Play Score" )                  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "Box Score" )                   PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Box Score: 10 Times" )         PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Auto Ticket" )                 PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+	// Remarks:
+	// The function of AUTO TICKET will work only when Box Score is not set to "NO".
+	// When Box Score is set to "10 Times", the W-UP GAME is disabled even if the W-UP GAME option is set to "Yes".
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW4:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW4:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW4:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW4:8" )
+
+	PORT_MODIFY("DSW5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW5:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW5:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW5:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW5:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW5:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW5:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW5:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW5:8" )
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spk203us )
@@ -915,7 +1015,7 @@ static INPUT_PORTS_START( spk203us )
 	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME(    0x03, 0x03, "Min Bet" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME(    0x03, 0x03, "Minimum Bet" ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(       0x03, "1" )
 	PORT_DIPSETTING(       0x02, "5" )
 	PORT_DIPSETTING(       0x01, "10" )
@@ -964,7 +1064,7 @@ static INPUT_PORTS_START( spk203us )
 	PORT_DIPSETTING(       0x00, "90%" )
 
 	PORT_MODIFY("DSW4")
-	PORT_DIPNAME(    0x01, 0x01, "W-Up Game" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPNAME(    0x01, 0x01, "Double Up Game" ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(       0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(       0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SW4:2") // from here on, not shown / listed in test mode
@@ -1246,16 +1346,16 @@ static INPUT_PORTS_START( 3super8 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / High / Low")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Low")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Take")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / W-Up")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Red / Black")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Take Score")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Double Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / High")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 INPUT_PORTS_END
 
-// TODO: copied over from older versions in igs/igs009.cpp. Verify if dips are the same. Inputs are verified the same.
+// TODO: copied over from older versions in igs/igs009.cpp. Verify if DIPs are the same. Inputs are verified the same.
 static INPUT_PORTS_START( jb )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW1:1")
@@ -1384,27 +1484,27 @@ static INPUT_PORTS_START( jb )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )    // stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_READ_LINE_MEMBER(FUNC(spoker_state::hopper_r)) PORT_NAME("HPSW")   // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spoker_state::hopper_r)) PORT_NAME("HPSW")   // hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pay Out")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   PORT_NAME("Records")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1         )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2         )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BUTTONS1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1    )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2    )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3    )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1412,12 +1512,12 @@ static INPUT_PORTS_START( jb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("BUTTONS2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1      ) PORT_NAME("Start / Half D-Up Bet")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW  ) PORT_NAME("Small")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1     ) PORT_NAME("Left Bet / 2X D-Up Bet")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Start / Double Up (half)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Low / Show Odds")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet / Double Up (double)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2     ) PORT_NAME("Right Bet / D-Up Bet")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1589,6 +1689,8 @@ static INPUT_PORTS_START( jinhuang )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
 /***************************************************************************
                      Graphics Layout & Graphics Decode
 ***************************************************************************/
@@ -2407,6 +2509,20 @@ ROM_START( jinhuang2 )
 	ROM_LOAD( "sp.u34", 0x00000, 0x40000, CRC(1250998d) SHA1(57f81bc6661f1cfe94fd44ccf8b7bdd064521816) ) // same as xjinhuang
 ROM_END
 
+// 大皇冠 (Dà Huángguān)
+// IGS PCB NO.T0058-7. HD64180RP8, 12.28800 MHz XTAL, MK6264UN-60, AMT 001, IGS 002, AR17961, 2x D8255AC, 3 banks of 8 switches
+ROM_START( dahuangg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u5.u5", 0x00000, 0x10000, CRC(64eb5e52) SHA1(f0ceb50488c7395d102c6b18e49a7589ec18ab3c) )
+
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD16_BYTE( "b_crown_bg.u17", 0x00000, 0x20000, CRC(728a450b) SHA1(944269dca76424b669e6a4971f0b086979d94dc5) )
+	ROM_LOAD16_BYTE( "b_crown_bg.u18", 0x00001, 0x20000, CRC(95e4e63d) SHA1(14063311bd761d1a328819e686c11c9c4a5d76e5) )
+
+	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "b_crown_bg.u41", 0x00000, 0x20000, CRC(65b59683) SHA1(5450c337e5369698f0be19215425a9d107d91825) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 /***************************************************************************
                               Driver Init
 ***************************************************************************/
@@ -2548,6 +2664,19 @@ void jinhulu2_state::init_jinhuang()
 		if ((a & 0x0300) != 0x0100) rom[a] ^= 0x40;
 }
 
+void jinhulu2_state::init_dahuangg()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0xf000; a++)
+	{
+		rom[a] ^= 0x01;
+		if ((a & 0x0282) == 0x0282) rom[a] ^= 0x01;
+		if ((a & 0x0940) == 0x0940) rom[a] ^= 0x02;
+		if ((a & 0x0300) != 0x0100) rom[a] ^= 0x40;
+	}
+}
+
 void spoker_state::init_spk116it()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2669,8 +2798,8 @@ void spoker_state::init_3super8()
 ***************************************************************************/
 
 //    YEAR   NAME           PARENT    MACHINE   INPUT     STATE           INIT                ROT    COMPANY      FULLNAME                            FLAGS
-GAME( 1996,  spk306us,      0,        spokeru,  spoker,   spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v306US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  spk205us,      spk306us, spokeru,  spoker,   spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v205US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk306us,      0,        spokeru,  spk306us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v306US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk205us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v205US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk203us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v203US)",             MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
 GAME( 1996,  spk201ua,      spk306us, spokeru,  spk201ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v201UA)",             MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode
 GAME( 1996,  spk200ua,      spk306us, spokeru,  spk200ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v200UA)",             MACHINE_SUPPORTS_SAVE )
@@ -2700,3 +2829,4 @@ GAME( 1995,  dafuwng3,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_d
 GAME( 1996,  zuanshiw,      0,        jinhulu2, zuanshiw, jinhulu2_state, init_jinhulu2120gi, ROT0,  "IGS",       "Zuanshi Wutai (V110II)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
 GAME( 2002,  jinhuang,      0,        jinhuang, jinhuang, jinhulu2_state, init_jinhuang,      ROT0,  "IGS",       "Jin Huangguan",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // different memory map
 GAME( 1998,  sleyuan2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_sleyuan2,      ROT0,  "IGS",       "Shuiguo Leyuan II (V150UI)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper
+GAME( 1995,  dahuangg,      0,        jinhuang, jinhuang, jinhulu2_state, init_dahuangg,      ROT0,  "IGS",       "Da Huangguan",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // hopper

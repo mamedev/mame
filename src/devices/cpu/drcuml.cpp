@@ -89,7 +89,7 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	, m_cache(cache)
 	, m_device(device)
 	, m_space()
-	, m_state(*reinterpret_cast<drcuml_machine_state *>(cache.alloc_near(sizeof(m_state))))
+	, m_state(*cache.alloc_near<drcuml_machine_state>())
 {
 	// reset the machine state
 	memset(&m_state, 0, sizeof(m_state));

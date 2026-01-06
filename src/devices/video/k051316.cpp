@@ -112,7 +112,7 @@ k051316_device::k051316_device(const machine_config &mconfig, const char *tag, d
 	, m_zoom_rom(*this, DEVICE_SELF)
 	, m_dx(0)
 	, m_dy(0)
-	, m_wrap(0)
+	, m_wrap(false)
 	, m_pixels_per_byte(2) // 4bpp layout is default
 	, m_layermask(0)
 	, m_k051316_cb(*this)
@@ -252,9 +252,9 @@ void k051316_device::ctrl_w(offs_t offset, u8 data)
 }
 
 // some games (ajax, rollerg, ultraman, etc.) have external logic that can enable or disable wraparound dynamically
-void k051316_device::wraparound_enable(int status)
+void k051316_device::wraparound_enable(int state)
 {
-	m_wrap = status;
+	m_wrap = state;
 }
 
 /***************************************************************************
@@ -275,7 +275,7 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 	if (m_flipy_enabled && (color & 0x80))
 		flags |= TILE_FLIPY;
 
-	m_k051316_cb(&code, &color);
+	m_k051316_cb(code, color);
 
 	tileinfo.set(0,
 			code,

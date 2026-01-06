@@ -35,6 +35,9 @@ public:
 	static const uint16_t HUC6270_SPRITE     = 0x0100;    // sprite colour information
 	static const uint16_t HUC6270_BACKGROUND = 0x0000;    // background colour information
 
+	// pcfx can read AR thru some buffer latch
+	u8 get_ar(offs_t offset) { return m_register_index; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

@@ -1984,7 +1984,7 @@ ROM_START( quizvid )
 	ROM_LOAD( "pal16l8cn.pal5", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
-ROM_START( quiz211 )
+ROM_START( quiz211 ) // code-wise, it's just a year hack of the set below. Different question ROMs, though.
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "1a.bin",         0x000000, 0x4000, CRC(116de0ea) SHA1(9af97b100aa2c79a58de055abe726d6e2e00aab4) )
 	ROM_CONTINUE(               0x000000, 0x4000 ) // halves identical
@@ -2005,6 +2005,16 @@ ROM_START( quiz211 )
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pal10l8cn.bin",   0x0000, 0x002c, CRC(86095226) SHA1(e7496efbd5ca240f0df2dfa5627402342c7f5384) )
+ROM_END
+
+ROM_START( quiz211a )
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "k1.01", 0x00000, 0x4000, CRC(19a7b1d0) SHA1(6fe0e7094c660a91534e2bcaee5c26bb7f0e1d1a) )
+	ROM_LOAD( "k1.02", 0x10000, 0x8000, CRC(ad50a89c) SHA1(96fb52871bcc4379060fe174044b19a19ff82867) ) // 'VARIE', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.03", 0x18000, 0x8000, CRC(f8eafe92) SHA1(5a8da108720b8aaad68d294b4b5cc5d1073545e0) ) // 'GUINNESS', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.04", 0x20000, 0x8000, CRC(2b39801c) SHA1(4265d981458bfb10137848f7aac17c78e956bcb4) ) // 'MUSICA II', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.05", 0x28000, 0x8000, CRC(56d62074) SHA1(979205b4098eb8fd5c8488072a3ce4efabf8a6a4) ) // 'OLIMPIADI', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.06", 0x30000, 0x8000, CRC(796b9474) SHA1(fbebb79a4b0dd4e3a69c0426e976cc075cb777de) ) // 'MONDIALI 1', 1xxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 ROM_START( bigjoke ) // TRIV3D PCB, stickered THE JOKE 11/87
@@ -2253,6 +2263,7 @@ GAME( 1986, suprpokrb, suprpokr, suprpokr,  suprpokr, gei_state, empty_init,    
 GAME( 1987, bigjoke,   0,        findout,   bigjoke,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "The Big Joke (Version 0.00)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, init_bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2.11)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quiz211a,  quiz211,  findout,   quiz,     gei_state, init_bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2.11, alt questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, sexappl,   0,        findout,   sexappl,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Sex Appeal (Version 6.02)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 

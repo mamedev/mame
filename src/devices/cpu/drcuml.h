@@ -247,7 +247,7 @@ inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
 	std::string const temp(util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 
 	// allocate space in the cache to hold the comment
-	char *const comment = reinterpret_cast<char *>(m_drcuml.cache().alloc_temporary(temp.length() + 1));
+	char *const comment = reinterpret_cast<char *>(m_drcuml.cache().alloc_temporary(temp.length() + 1, std::align_val_t(alignof(char))));
 	if (comment)
 	{
 		strcpy(comment, temp.c_str());

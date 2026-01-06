@@ -268,7 +268,8 @@ int i82586_base_device::recv_start(u8 *buf, int length)
 	if (address_filter(buf))
 	{
 		LOG("recv_start receiving frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		return ru_execute(buf, length);
 	}
@@ -602,7 +603,7 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 		// fetch aligned words from the source
 		while (offset + 1 < length)
 		{
-			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
+			put_u16le(&buf[offset], m_space->read_word(src + offset));
 			offset += 2;
 		}
 
@@ -619,15 +620,12 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 		switch (src & 3)
 		{
 		case 1:
-			buf[offset] = m_space->read_byte(src + offset);
-			offset++;
-
-			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
-			offset += 2;
+			put_u24le(&buf[offset], m_space->read_dword(src + offset, 0xffffff));
+			offset += 3;
 			break;
 
 		case 2:
-			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
+			put_u16le(&buf[offset], m_space->read_word(src + offset));
 			offset += 2;
 			break;
 
@@ -640,7 +638,7 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 		// fetch aligned dwords from the source
 		while (offset + 3 < length)
 		{
-			*(u32 *)&buf[offset] = m_space->read_dword(src + offset);
+			put_u32le(&buf[offset], m_space->read_dword(src + offset));
 			offset += 4;
 		}
 
@@ -653,15 +651,13 @@ int i82586_base_device::fetch_bytes(u8 *buf, u32 src, int length)
 			break;
 
 		case 2:
-			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
+			put_u16le(&buf[offset], m_space->read_word(src + offset));
 			offset += 2;
 			break;
 
 		case 3:
-			*(u16 *)&buf[offset] = m_space->read_word(src + offset);
-			offset += 2;
-			buf[offset] = m_space->read_byte(src + offset);
-			offset++;
+			put_u24le(&buf[offset], m_space->read_dword(src + offset, 0xffffff));
+			offset += 3;
 			break;
 		}
 		break;
@@ -687,7 +683,7 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 		// store aligned words to the destination
 		while (offset + 1 < length)
 		{
-			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
+			m_space->write_word(dst + offset, get_u16le(&buf[offset]));
 			offset += 2;
 		}
 
@@ -704,14 +700,12 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 		switch (dst & 3)
 		{
 		case 1:
-			m_space->write_byte(dst + offset, buf[offset]);
-			offset++;
-			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
-			offset += 2;
+			m_space->write_dword(dst + offset, get_u24le(&buf[offset]), 0xffffff);
+			offset += 3;
 			break;
 
 		case 2:
-			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
+			m_space->write_word(dst + offset, get_u16le(&buf[offset]));
 			offset += 2;
 			break;
 
@@ -724,7 +718,7 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 		// store aligned dwords to the destination
 		while (offset + 3 < length)
 		{
-			m_space->write_dword(dst + offset, *(u32 *)&buf[offset]);
+			m_space->write_dword(dst + offset, get_u32le(&buf[offset]));
 			offset += 4;
 		}
 
@@ -737,37 +731,19 @@ int i82586_base_device::store_bytes(u32 dst, u8 *buf, int length)
 			break;
 
 		case 2:
-			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
+			m_space->write_word(dst + offset, get_u16le(&buf[offset]));
 			offset += 2;
 			break;
 
 		case 3:
-			m_space->write_word(dst + offset, *(u16 *)&buf[offset]);
-			offset += 2;
-			m_space->write_byte(dst + offset, buf[offset]);
-			offset++;
+			m_space->write_dword(dst + offset, get_u24le(&buf[offset]), 0xffffff);
+			offset += 3;
 			break;
 		}
 		break;
 	}
 
 	return offset;
-}
-
-void i82586_base_device::dump_bytes(u8 *buf, int length)
-{
-	if (VERBOSE & LOG_FRAMES)
-	{
-		// pad frame with zeros to 8-byte boundary
-		for (int i = 0; i < 8 - (length % 8); i++)
-			buf[length + i] = 0;
-
-		// dump length / 8 (rounded up) groups of 8 bytes
-		for (int i = 0; i < (length + 7) / 8; i++)
-			LOGMASKED(LOG_FRAMES, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
-				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
-				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
-	}
 }
 
 // 82586 implementation
@@ -1020,7 +996,8 @@ bool i82586_device::cu_transmit(u32 command)
 	else
 	{
 		LOG("cu_transmit sending frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		return send(buf, length, 4) == length;
 	}
@@ -1057,7 +1034,7 @@ bool i82586_device::cu_dump()
 	memcpy(&buf[0x0c], &get_mac()[0], 6);
 
 	// hash register
-	*(u64 *)&buf[0x24] = m_mac_multi;
+	put_u64le(&buf[0x24], m_mac_multi);
 
 	// store dump buffer
 	dump_address = m_scb_base + m_space->read_word(m_cba + 6);
@@ -1100,7 +1077,7 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
 		LOGMASKED(LOG_FRAMES, "ru_execute crc error computed 0x%08x stored 0x%08x\n",
-			compute_crc(buf, length - 4, cfg_crc16()), *(u32 *)&buf[length - 4]);
+			compute_crc(buf, length - 4, cfg_crc16()), get_u32le(&buf[length - 4]));
 
 		// increment crc error count
 		m_space->write_word(m_scb_address + 8, m_space->read_word(m_scb_address + 8) + 1);
@@ -1680,7 +1657,8 @@ bool i82596_device::cu_transmit(u32 command)
 	else
 	{
 		LOG("cu_transmit sending frame length %d\n", length);
-		dump_bytes(buf, length);
+		if (VERBOSE & LOG_FRAMES)
+			log_bytes(buf, length);
 
 		return send(buf, length) == length;
 	}
@@ -1722,7 +1700,7 @@ bool i82596_device::cu_dump()
 		memcpy(&buf[0x0c], &get_mac()[0], 6);
 
 		// hash register
-		*(u64 *)&buf[0x24] = m_mac_multi;
+		put_u64le(&buf[0x24], m_mac_multi);
 	}
 	else
 	{
@@ -1733,7 +1711,7 @@ bool i82596_device::cu_dump()
 		memcpy(&buf[0x0e], &get_mac()[0], 6);
 
 		// hash register
-		*(u64 *)&buf[0x26] = m_mac_multi;
+		put_u64le(&buf[0x26], m_mac_multi);
 	}
 
 	// store dump buffer
@@ -1812,7 +1790,7 @@ u16 i82596_device::ru_execute(u8 *buf, int length)
 	if (~compute_crc(buf, length, cfg_crc16()) != FCS_RESIDUE)
 	{
 		LOGMASKED(LOG_FRAMES, "ru_execute crc error computed 0x%08x stored 0x%08x\n",
-			compute_crc(buf, length - 4, cfg_crc16()), *(u32 *)&buf[length - 4]);
+			compute_crc(buf, length - 4, cfg_crc16()), get_u32le(&buf[length - 4]));
 
 		// increment crc error count
 		if (mode() == MODE_82586)

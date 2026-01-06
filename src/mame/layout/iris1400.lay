@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Patrick Mackinlay
+
+Silicon Graphics IRIS 1400.
+-->
+<mamelayout version="2">
+	<element name="green_led" defstate="1">
+		<disk state="1">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="0.0" green="1.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="red_led" defstate="1">
+		<disk state="1">
+			<color red="0.2" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<view name="Graphics">
+		<screen index="0">
+			<bounds x="0" y="0" width="1024" height="768" />
+		</screen>
+		<element name="CR1" ref="red_led">
+			<bounds x="1004" y="768" width="10" height="10" />
+		</element>
+		<element name="CR2" ref="green_led">
+			<bounds x="984" y="768" width="10" height="10" />
+		</element>
+	</view>
+</mamelayout>

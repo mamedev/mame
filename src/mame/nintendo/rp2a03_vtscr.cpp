@@ -25,16 +25,16 @@ rp2a03_vtscr::rp2a03_vtscr(const machine_config &mconfig, const char *tag, devic
 void rp2a03_vtscr::device_start()
 {
 	mintf = std::make_unique<mi_decrypt>();
-	set_scramble(false);
+	set_scramble(0x00);
 	init();
 }
 
-void rp2a03_vtscr::set_next_scramble(bool scr)
+void rp2a03_vtscr::set_next_scramble(uint8_t scr)
 {
 	downcast<mi_decrypt &>(*mintf).m_next_scramble = scr;
 }
 
-void rp2a03_vtscr::set_scramble(bool scr)
+void rp2a03_vtscr::set_scramble(uint8_t scr)
 {
 	downcast<mi_decrypt &>(*mintf).m_next_scramble = scr;
 	downcast<mi_decrypt &>(*mintf).m_scramble_en = scr;
@@ -43,7 +43,7 @@ void rp2a03_vtscr::set_scramble(bool scr)
 
 void rp2a03_vtscr::device_reset()
 {
-	set_scramble(false);
+	set_scramble(0x00);
 	rp2a03_core_device::device_reset();
 }
 
@@ -69,7 +69,7 @@ uint8_t rp2a03_vtscr::mi_decrypt::read_sync(uint16_t adr)
 
 uint8_t rp2a03_vtscr::mi_decrypt::descramble(uint8_t op)
 {
-	return op ^ 0xa1;
+	return op ^ m_scramble_en;
 }
 
 std::unique_ptr<util::disasm_interface> rp2a03_vtscr::create_disassembler()

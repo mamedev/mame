@@ -611,7 +611,7 @@ static INPUT_PORTS_START ( by35_os35 )
 	PORT_DIPSETTING(    0x0d, "1 Coin/13 Credits")
 	PORT_DIPSETTING(    0x0e, "1 Coin/14 Credits")
 	PORT_DIPSETTING(    0x0f, "1 Coin/15 Credits")
-	PORT_DIPNAME( 0x30, 0x60, "Score Level Award")      PORT_DIPLOCATION("SW2:!5,!6") // s21, s22
+	PORT_DIPNAME( 0x30, 0x30, "Score Level Award")      PORT_DIPLOCATION("SW2:!5,!6") // s21, s22
 	PORT_DIPSETTING(    0x00, "Nothing")
 	PORT_DIPSETTING(    0x10, "1 Credit")
 	PORT_DIPSETTING(    0x20, "2 Credits")
@@ -1796,6 +1796,17 @@ ROM_END
 /-------------------------------*/
 ROM_START(rollston)
 	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD( "e-796-21-u1.u1", 0x1000, 0x0800, CRC(35141d40) SHA1(22283ff6f15e91838edbe6260faa0c1059499917))
+	ROM_LOAD( "796-18_2.716",   0x5000, 0x0800, CRC(08c75b1a) SHA1(792a535514fe4d9476914f7f61c696a7a1bdb549))
+	ROM_LOAD( "720-35_6.716",   0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
+	ROM_RELOAD( 0x7800, 0x0800)
+	ROM_REGION(0x10000, "as3022:cpu", 0)
+	ROM_LOAD("796-19_4.716", 0x1000, 0x0800, CRC(b740d047) SHA1(710edb6bbba0a03e4f516b501f019493a3a4033e))
+	ROM_RELOAD( 0x1800, 0x0800)
+ROM_END
+
+ROM_START(rollstonv17)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD( "796-17_1.716", 0x1000, 0x0800, CRC(51a826d7) SHA1(6811149c8948066b85b4018802afd409dbe8c2e1))
 	ROM_LOAD( "796-18_2.716", 0x5000, 0x0800, CRC(08c75b1a) SHA1(792a535514fe4d9476914f7f61c696a7a1bdb549))
 	ROM_LOAD( "720-35_6.716", 0x5800, 0x0800, CRC(78d6d289) SHA1(47c3005790119294309f12ea68b7e573f360b9ef))
@@ -2874,7 +2885,8 @@ GAME( 1980, ngndshkr,   0,        as3022,      by35_os35, by35_state, init_by35_
 GAME( 1980, slbmania,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Silverball Mania",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, futurspa,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Future Spa",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spaceinv,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Space Invaders",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rollston,   0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones (V21)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rollstonv17,rollston, as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Rolling Stones (V17)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mystic,     0,        as3022,      by35_os35, by35_state, init_by35_6, ROT0, "Bally", "Mystic",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, xenon,      0,        sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, xenonf,     xenon,    sounds_plus, by35_os40, by35_state, init_by35_6, ROT0, "Bally", "Xenon (French)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

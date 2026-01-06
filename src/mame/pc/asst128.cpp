@@ -2,13 +2,13 @@
 // copyright-holders:Sergey Svishchev
 
 #include "emu.h"
-#include "machine/genpc.h"
 
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
+#include "machine/genpc.h"
 #include "machine/pc_fdc.h"
 
 #include "formats/asst128_dsk.h"
@@ -29,9 +29,9 @@ public:
 
 void asst128_mb_device::map(address_map &map)
 {
-	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0020, 0x002f).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x004f).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x006f).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0080, 0x008f).w(FUNC(asst128_mb_device::pc_page_w));
 	map(0x00a0, 0x00a1).w(FUNC(asst128_mb_device::nmi_enable_w));
 }

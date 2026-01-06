@@ -43,7 +43,7 @@ drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbit
 	m_l2shift(ignorebits),
 	m_l1mask((1 << m_l1bits) - 1),
 	m_l2mask((1 << m_l2bits) - 1),
-	m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base)))),
+	m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base), std::align_val_t(alignof(drccodeptr *))))),
 	m_emptyl1(nullptr),
 	m_emptyl2(nullptr)
 {
@@ -59,8 +59,8 @@ drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbit
 bool drc_hash_table::reset()
 {
 	// allocate an empty l2 hash table
-	m_emptyl2 = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
-	if (m_emptyl2 == nullptr)
+	m_emptyl2 = reinterpret_cast<drccodeptr *>(m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits, std::align_val_t(alignof(drccodeptr))));
+	if (!m_emptyl2)
 		return false;
 
 	// populate it with pointers to the recompile_exit code
@@ -68,8 +68,8 @@ bool drc_hash_table::reset()
 		m_emptyl2[entry] = m_nocodeptr;
 
 	// allocate an empty l1 hash table
-	m_emptyl1 = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
-	if (m_emptyl1 == nullptr)
+	m_emptyl1 = reinterpret_cast<drccodeptr **>(m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits, std::align_val_t(alignof(drccodeptr *))));
+	if (!m_emptyl1)
 		return false;
 
 	// populate it with pointers to the empty l2 table
@@ -166,10 +166,10 @@ bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code)
 	assert(mode < m_modes);
 	if (m_base[mode] == m_emptyl1)
 	{
-		drccodeptr **newtable = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits);
-		if (newtable == nullptr)
+		drccodeptr **newtable = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits, std::align_val_t(alignof(drccodeptr *)));
+		if (!newtable)
 			return false;
-		memcpy(newtable, m_emptyl1, sizeof(drccodeptr *) << m_l1bits);
+		std::copy_n(m_emptyl1, 1U << m_l1bits, newtable);
 		m_base[mode] = newtable;
 	}
 
@@ -177,10 +177,10 @@ bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code)
 	uint32_t l1 = (pc >> m_l1shift) & m_l1mask;
 	if (m_base[mode][l1] == m_emptyl2)
 	{
-		drccodeptr *newtable = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits);
-		if (newtable == nullptr)
+		drccodeptr *newtable = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits, std::align_val_t(alignof(drccodeptr)));
+		if (!newtable)
 			return false;
-		memcpy(newtable, m_emptyl2, sizeof(drccodeptr) << m_l2bits);
+		std::copy_n(m_emptyl2, 1U << m_l2bits, newtable);
 		m_base[mode][l1] = newtable;
 	}
 

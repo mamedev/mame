@@ -5,7 +5,8 @@ authors:hap
 -->
 <mamelayout version="2">
 
-	<!-- Screen mode is configured in Test Mode -> Game System -> Monitor -->
+	<!-- Virtua Racing Screen mode is configured in Test Mode -> Game System -> Monitor -->
+	<!-- For Sega Touring Car Championship, when the cabinet option in the Test Menu is set to Deluxe, the screen's aspect ratio is set to 16:9. -->
 
 	<view name="Wide (16:9)">
 		<screen index="0">

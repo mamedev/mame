@@ -149,7 +149,8 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	if (m_reg[RCR] & RCR_LB)
 		m_reg[RCR] |= RCR_LBK;
 
-	dump_bytes(buf, length);
+	if (VERBOSE & LOG_PACKETS)
+		log_bytes(buf, length);
 
 	// save rba pointer registers
 	m_reg[TRBA0] = m_reg[CRBA0];
@@ -411,7 +412,8 @@ void dp83932c_device::transmit()
 	LOG("transmit length %d word %d tda 0x%08x\n", length, word, EA(m_reg[UTDA], m_reg[CTDA]));
 
 	// transmit data
-	dump_bytes(buf, length);
+	if (VERBOSE & LOG_PACKETS)
+		log_bytes(buf, length);
 	send(buf, length, 4);
 }
 
@@ -573,22 +575,6 @@ bool dp83932c_device::address_filter(u8 *buf)
 	}
 
 	return false;
-}
-
-void dp83932c_device::dump_bytes(u8 *buf, int length)
-{
-	if (VERBOSE & LOG_PACKETS)
-	{
-		// pad with zeros to 8-byte boundary
-		for (int i = 0; i < 8 - (length % 8); i++)
-			buf[length + i] = 0;
-
-		// dump length / 8 (rounded up) groups of 8 bytes
-		for (int i = 0; i < (length + 7) / 8; i++)
-			LOGMASKED(LOG_PACKETS, "%02x %02x %02x %02x %02x %02x %02x %02x\n",
-				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
-				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
-	}
 }
 
 u16 dp83932c_device::read_bus_word(offs_t address)

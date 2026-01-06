@@ -10,25 +10,33 @@
 #include "ram.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_RAM, bbc_ram_device, "bbc_ram", "BBC Micro Sideways RAM")
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_ram_device - constructor
-//-------------------------------------------------
-
-bbc_ram_device::bbc_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_RAM, tag, owner, clock)
-	, device_bbc_rom_interface(mconfig, *this)
+class bbc_ram_device : public device_t, public device_bbc_rom_interface
 {
-}
+public:
+	bbc_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_RAM, tag, owner, clock)
+		, device_bbc_rom_interface(mconfig, *this)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// device_bbc_rom_interface overrides
+	virtual uint8_t read(offs_t offset) override
+	{
+		return get_ram_base()[offset & (get_ram_size() - 1)];
+	}
+
+	virtual void write(offs_t offset, uint8_t data) override
+	{
+		get_ram_base()[offset & (get_ram_size() - 1)] = data;
+	}
+};
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -39,20 +47,7 @@ void bbc_ram_device::device_start()
 	ram_alloc(0x8000);
 }
 
-//-------------------------------------------------
-//  read
-//-------------------------------------------------
+} // anonymous namespace
 
-uint8_t bbc_ram_device::read(offs_t offset)
-{
-	return get_ram_base()[offset & (get_ram_size() - 1)];
-}
 
-//-------------------------------------------------
-//  write
-//-------------------------------------------------
-
-void bbc_ram_device::write(offs_t offset, uint8_t data)
-{
-	get_ram_base()[offset & (get_ram_size() - 1)] = data;
-}
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_RAM, device_bbc_rom_interface, bbc_ram_device, "bbc_ram", "BBC Micro Sideways RAM")

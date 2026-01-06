@@ -23,7 +23,7 @@ TODO:
 - Demo Sound enabled doesn't produce any sound (?)
 
 Notes:
-- On first boot it will moan about uninitailized RAM, enable service mode then
+- On first boot it will moan about uninitialized RAM, enable service mode then
   press all five hold buttons at same time
   (game is fussy on being exactly pressed together)
 
@@ -31,7 +31,7 @@ Notes:
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 

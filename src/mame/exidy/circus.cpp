@@ -40,7 +40,7 @@ NOTES:
 - Circus: Taito licensed and released the game as "Acrobat TV"
 
 TODO:
-- generic video timing (vsync, vblank, # of scanlines)
+- circus: use PROM data to draw framing box and diving boards
 - circus/ripcord collision detection is accurate?
 - crash: irq timing
 - improve discrete sound
@@ -358,16 +358,13 @@ GFXDECODE_END
 void circus_state::base_mcfg(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, XTAL(11'289'000) / 16); // 705.562kHz
+	M6502(config, m_maincpu, 11.289_MHz_XTAL / 16); // 705.562kHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &circus_state::main_map);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // needed for proper hardware collisions
-	m_screen->set_refresh_hz(57);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3500)); // complete guess
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
+	m_screen->set_raw(11.289_MHz_XTAL / 2, 42*8, 0, 31*8, 280, 0, 256);
 	m_screen->set_screen_update(FUNC(circus_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -473,7 +470,7 @@ ROM_START( circus )
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
@@ -498,7 +495,7 @@ ROM_START( circuso ) // older set, there exist several bootlegs identical to thi
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
@@ -523,7 +520,7 @@ ROM_START( springbd )
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "93448.14d",  0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but should match
+	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but should match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END
@@ -548,7 +545,7 @@ ROM_START( robotbwl )
 	ROM_REGION( 0x0020, "gfx2", ROMREGION_INVERT ) // ball sprite
 	ROM_LOAD( "6000.14d", 0x0000, 0x0020, CRC(a402ac06) SHA1(3bd75630786bcc86d9e9fbc826adc909eef9b41f) )
 
-	ROM_REGION( 0x0100, "proms", 0 ) // timing? not used by the emulation
+	ROM_REGION( 0x0100, "proms", 0 ) // line drawing; not used by the emulation
 	ROM_LOAD( "5000.4d",  0x0000, 0x0020, NO_DUMP ) // both of these are MMI6306-1J (N82S131 equivalent) BPROMs
 	ROM_LOAD( "5001.5d",  0x0020, 0x0020, NO_DUMP )
 ROM_END
@@ -573,7 +570,7 @@ ROM_START( trapeze ) // loose roms labelled with pencil
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
 	ROM_LOAD( "9012.14d",   0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 
-	ROM_REGION( 0x400, "proms", 0 ) // timing? not used by the emulation, dumped for the circusb bootleg but might match
+	ROM_REGION( 0x400, "proms", 0 ) // line drawing; not used by the emulation, dumped for the circusb bootleg but might match
 	ROM_LOAD( "dm74s570-d4.4d", 0x000, 0x200, BAD_DUMP CRC(aad8da33) SHA1(1d60a6b75b94f5be5bad190ef56e9e3da20bf81a) )
 	ROM_LOAD( "dm74s570-d5.5d", 0x200, 0x200, BAD_DUMP CRC(ed2493fa) SHA1(57ee357b68383b0880bfa385820605bede500747) )
 ROM_END

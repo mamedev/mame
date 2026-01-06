@@ -30,11 +30,11 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/meters.h"
-#include "machine/roc10937.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
+#include "video/roc10937.h"
 
 #include "speaker.h"
 

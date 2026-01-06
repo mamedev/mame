@@ -434,7 +434,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
+	screen.set_raw(960*(312*2-32)*50, 960, 0, 768, 312*2-32, 32, 312*2-32);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
 
@@ -655,7 +655,10 @@ ROM_END
 
 ROM_START( cdimono2 )
 	ROM_REGION(0x80000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP( "philips__cdi-220_ph3_r1.2__mb834200b-15__02f_aa__9402_z04.tc574200-le._1.7211", 0x000000, 0x80000, CRC(17d723e7) SHA1(6c317a82e35d60ca5e7a74fc99f665055693169d) )
+	ROM_SYSTEM_BIOS(0, "pcdi220", "Philips CD-i 220 F3")
+	ROMX_LOAD( "philips__cdi-220_ph3_r1.2__mb834200b-15__02f_aa__9402_z04.tc574200-le._1.7211", 0x000000, 0x80000, CRC(17d723e7) SHA1(6c317a82e35d60ca5e7a74fc99f665055693169d), ROM_BIOS(0) | ROM_GROUPWORD | ROM_REVERSE )
+	ROM_SYSTEM_BIOS(1, "pcdi210", "Philips CD-i 210 F2")
+	ROMX_LOAD( "philips__cd-i_4.1_r1.1__mb834200b-15__10e_aa__9336_z01.7211", 0x000000, 0x80000, CRC(8453553f) SHA1(5ee4dc3e7eb4c3867ac9d04f1614908906af19fb), ROM_BIOS(1) | ROM_GROUPWORD | ROM_REVERSE )
 
 	ROM_REGION(0x2000, "servo", 0)
 	ROM_LOAD( "zc405351p__servo_cdi_4.1__0d67p__lluk9404.mc68hc705c8a.7490", 0x0000, 0x2000, CRC(2bc8e4e9) SHA1(8cd052b532fc052d6b0077261c12f800e8655bb1) )

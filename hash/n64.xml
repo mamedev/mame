@@ -14142,12 +14142,23 @@ Occasionally sky background flickers with wrong colors
 	</software>
 
 	<software name="vpointp" supported="no">
-		<description>Viewpoint 2064 (prototype)</description>
+		<description>Viewpoint 2064 (prototype 19991217, 12/17/3 version)</description>
 		<year>1999</year>
 		<publisher>Sammy</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0x1000000">
 				<rom name="Viewpoint2064.z64" size="0x1000000" crc="93a630cb" sha1="defacaf6dbd22962ec0184849ed4a4c53a147454" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vpoint" supported="no">
+		<description>Viewpoint 2064 (prototype 20000413, master 4/13 version)</description>
+		<year>1999</year>
+		<publisher>Sammy</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x2000000">
+				<rom name="VIEWPOINT 2064 [NJKJ].z64" size="0x2000000" crc="927562ce" sha1="56368bbc7485f140078f1891cede69bd1ee2662a" />
 			</dataarea>
 		</part>
 	</software>

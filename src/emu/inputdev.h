@@ -148,7 +148,6 @@ public:
 	void *internal() const { return m_internal; }
 	s32 threshold() const { return m_threshold; }
 	bool steadykey_enabled() const { return m_steadykey_enabled; }
-	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
 
 	// setters
 	void set_devindex(int devindex) { m_devindex = devindex; }
@@ -184,7 +183,6 @@ private:
 
 	s32 const               m_threshold;            // threshold for treating absolute axis as active
 	bool const              m_steadykey_enabled;    // steadykey enabled for keyboards
-	bool const              m_lightgun_reload_button; // lightgun reload hack
 };
 
 
@@ -380,12 +378,8 @@ public:
 	// construction/destruction
 	input_class_joystick(input_manager &manager);
 
-	// misc
-	bool set_global_joystick_map(const char *mapstring);
-
 	// standard joystick maps
 	static const char map_8way[];
-	static const char map_4way_diagonal[];
 
 protected:
 	// specific overrides

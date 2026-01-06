@@ -13,13 +13,62 @@
 #include "emu.h"
 #include "rtc.h"
 
+#include "machine/ds1215.h"
+#include "machine/mc146818.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(BBC_STLRTC, bbc_stlrtc_device, "bbc_stlrtc", "Solidisk Real Time Clock")
-DEFINE_DEVICE_TYPE(BBC_PMSRTC, bbc_pmsrtc_device, "bbc_pmsrtc", "PMS Genie Real Time Clock")
+namespace {
+
+// ======================> bbc_stlrtc_device
+
+class bbc_stlrtc_device : public device_t, public device_bbc_rom_interface
+{
+public:
+	bbc_stlrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_STLRTC, tag, owner, clock)
+		, device_bbc_rom_interface(mconfig, *this)
+		, m_rtc(*this, "rtc")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD { }
+
+	// device_bbc_rom_interface overrides
+	virtual uint8_t read(offs_t offset) override;
+
+private:
+	required_device<mc146818_device> m_rtc;
+};
+
+
+// ======================> bbc_pmsrtc_device
+
+class bbc_pmsrtc_device : public device_t, public device_bbc_rom_interface
+{
+public:
+	bbc_pmsrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_PMSRTC, tag, owner, clock)
+		, device_bbc_rom_interface(mconfig, *this)
+		, m_rtc(*this, "rtc")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD { }
+
+	// device_bbc_rom_interface overrides
+	virtual uint8_t read(offs_t offset) override;
+
+private:
+	required_device<ds1216e_device> m_rtc;
+};
 
 
 //-------------------------------------------------
@@ -31,45 +80,13 @@ void bbc_stlrtc_device::device_add_mconfig(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL); // TODO: verify clock
 }
 
+
 void bbc_pmsrtc_device::device_add_mconfig(machine_config &config)
 {
-	/* Dallas DS1216 SmartWatch ROM */
+	// Dallas DS1216 SmartWatch ROM
 	DS1216E(config, m_rtc);
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_stlrtc_device - constructor
-//-------------------------------------------------
-
-bbc_stlrtc_device::bbc_stlrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_STLRTC, tag, owner, clock)
-	, device_bbc_rom_interface(mconfig, *this)
-	, m_rtc(*this, "rtc")
-{
-}
-
-bbc_pmsrtc_device::bbc_pmsrtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_PMSRTC, tag, owner, clock)
-	, device_bbc_rom_interface(mconfig, *this)
-	, m_rtc(*this, "rtc")
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void bbc_stlrtc_device::device_start()
-{
-}
-
-void bbc_pmsrtc_device::device_start()
-{
-}
 
 //-------------------------------------------------
 //  read
@@ -103,6 +120,7 @@ uint8_t bbc_stlrtc_device::read(offs_t offset)
 	return data;
 }
 
+
 uint8_t bbc_pmsrtc_device::read(offs_t offset)
 {
 	uint8_t data = get_rom_base()[offset & 0x1fff];
@@ -114,3 +132,9 @@ uint8_t bbc_pmsrtc_device::read(offs_t offset)
 
 	return data;
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_STLRTC, device_bbc_rom_interface, bbc_stlrtc_device, "bbc_stlrtc", "Solidisk Real Time Clock")
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_PMSRTC, device_bbc_rom_interface, bbc_pmsrtc_device, "bbc_pmsrtc", "PMS Genie Real Time Clock")
