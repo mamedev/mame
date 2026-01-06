@@ -100,7 +100,6 @@ Scanline 0 is the start of vblank.
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/rescap.h"
-#include "bus/nscsi/devices.h"
 #include "machine/ram.h"
 #include "machine/applefdintf.h"
 #include "machine/timer.h"
@@ -1259,7 +1258,7 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, "cdrom").set_option_machine_config("cdrom",
 		[](device_t *device)
 		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakers", 1.0, 0);
