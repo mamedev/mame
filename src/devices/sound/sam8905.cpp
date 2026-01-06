@@ -114,11 +114,16 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	}
 
 	// Carry calculation (Section 8-1)
-	// From truth table: CARRY = 1 when result is negative, 0 when positive
-	// This allows envelope to update while amplitude stays positive,
-	// and stop when it goes negative (reached target/limit)
+	// When B positive: carry=1 if A+B overflows 19 bits
+	// When B negative: carry=1 if result is positive, carry=0 if result went negative
+	// This allows envelope to decay while positive, and stop when it goes negative
+	bool b_neg = BIT(slot.b, 18);
 	uint32_t result = (slot.a + slot.b) & MASK19;
-	bool carry = BIT(result, 18);
+	bool carry;
+	if (!b_neg)
+		carry = ((uint64_t)slot.a + slot.b) > MASK19;
+	else
+		carry = !BIT(result, 18);
 
 	// Receivers (Active Low except WSP)
 	// WA (Write A)
