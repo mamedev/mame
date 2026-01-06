@@ -960,10 +960,12 @@ void macii_state::macii(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
-																							{
+	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, "cdrom").set_option_machine_config("cdrom",
+		[](device_t *device)
+		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1); });
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
+		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
