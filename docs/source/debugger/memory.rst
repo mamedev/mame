@@ -65,6 +65,7 @@ find
 ----
 
 **f[ind][{d|i|o}] <address>[:<space>],<length>[,<data>[,…]]**
+**f[ind] <address>:<memory>.{m|s},<length>[,<data>[,…]]**
 
 Search through memory for the specified sequence of data.  The
 **<address>** is the address to begin searching from, optionally
@@ -114,6 +115,7 @@ fill
 ----
 
 **fill[{d|i|o}] <address>[:<space>],<length>[,<data>[,…]]**
+**fill <address>:<memory>.{m|s},<length>[,<data>[,…]]**
 
 Overwrite a block of memory with copies of the supplied data sequence.
 The **<address>** specifies the address to begin writing at, optionally
@@ -146,6 +148,7 @@ dump
 ----
 
 **dump[{d|i|o}] <filename>,<address>[:<space>],<length>[,<group>[,<ascii>[,<rowsize>]]]**
+**dump <filename>,<address>:<memory>.{m|s},<length>[,<group>[,<ascii>[,<rowsize>]]]**
 
 Dump memory to the text file specified by the **<filename>** parameter.
 The **<address>** specifies the address to start dumping from,
@@ -190,6 +193,7 @@ strdump
 -------
 
 **strdump[{d|i|o}] <filename>,<address>[:<space>],<length>[,<term>]**
+**strdump <filename>,<address>:<memory>.{m|s},<length>[,<term>]**
 
 Dump memory to the text file specified by the **<filename>** parameter.
 The **<address>** specifies the address to start dumping from,
@@ -205,7 +209,10 @@ By default, the data will be interpreted as a series of NUL-terminated
 (ASCIIZ) strings, the dump will have one string per line, and C-style
 escapes sequences will be used for bytes that do not represent printable
 ASCII characters.  The optional **<term>** parameter can be used to
-specify a different string terminator character.
+specify a different string terminator character.  If **<term>** is equal
+to -0x80, strings will be treated as terminating after any byte with the
+most significant bit set, and the most significant bit will be ignored
+when printing characters.
 
 Back to :ref:`debugger-memory-list`
 
@@ -216,6 +223,7 @@ save
 ----
 
 **save[{d|i|o}] <filename>,<address>[:<space>],<length>**
+**save <filename>,<address>:<memory>.{m|s},<length>**
 
 Save raw memory to the binary file specified by the **<filename>**
 parameter.  The **<address>** specifies the address to start saving
@@ -260,6 +268,9 @@ start saving from, and the **<length>** specifies how much memory to
 save.  The range **<address>** through **<address>+<length>-1**,
 inclusive, will be output to the file.
 
+Alternetevely use :ref:`debugger-command-save` syntax:
+``save <filename>,<address>:<region>.m,<length>``
+
 Examples:
 
 ``saver data.bin,200,100,:monitor``
@@ -278,6 +289,7 @@ load
 ----
 
 **load[{d|i|o}] <filename>,<address>[:<space>][,<length>]**
+**load <filename>,<address>:<memory>.{m|s}[,<length>]**
 
 Load raw memory from the binary file specified by the **<filename>**
 parameter.  The **<address>** specifies the address to start loading to,
@@ -333,6 +345,9 @@ start loading to, and the
 through **<address>+<length>-1**, inclusive, will be read in from the
 file.  If the **<length>** is zero, or is greater than the total length
 of the file, the entire contents of the file will be loaded but no more.
+
+Alternetevely use :ref:`debugger-command-load` syntax:
+``load <filename>,<address>:<region>.m[,<length>]``
 
 Examples:
 

@@ -47,9 +47,6 @@ void spectrum_state::video_start()
 
 	m_frame_invert_count = 16;
 	m_screen_location = m_video_ram;
-	m_contention_pattern = {6, 5, 4, 3, 2, 1, 0, 0};
-	m_contention_offset = -1;
-	m_border4t_render_at = 2;
 }
 
 /***************************************************************************
@@ -115,7 +112,7 @@ u8 spectrum_state::get_border_color(u16 hpos, u16 vpos)
 u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle scr = get_screen_area();
-	rectangle vis = screen.visible_area();
+	const rectangle vis = screen.visible_area();
 	if (vis != scr)
 	{
 		rectangle bsides[4] = {
@@ -141,17 +138,17 @@ u32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &
 
 void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &border)
 {
-	u8 mod = m_contention_pattern.empty() ? 1 : 8;
-	u8 at = m_contention_pattern.empty() ? 0 : m_border4t_render_at;
+	const u8 mod = m_ula->get_border_chunk_size();
+	const u8 btime = m_ula->get_btime();
 	for (auto y = border.top(); y <= border.bottom(); y++)
 	{
 		u16 *pix = &(bitmap.pix(y, border.left()));
 		for (auto x = border.left(); x <= border.right(); )
 		{
-			if (x % mod == at)
+			if (x % mod == btime)
 			{
-				pix -= at;
-				x -= at;
+				pix -= btime;
+				x -= btime;
 				for (auto m = 0; m < mod; m++, x++)
 					*pix++ = get_border_color(y, x);
 			}
@@ -164,7 +161,7 @@ void spectrum_state::spectrum_update_border(screen_device &screen, bitmap_ind16 
 	}
 }
 
-/* ULA reads screen data in 16px (8T) chunks as following:
+/* ULA reads screen data in 16px (8T) chunks as following (48K Spectrum case):
              T: |       |   0   |   1   |   2   |   3   |   4   |   5   |   6   |   7   |
 ULA contention: |       |   6   |   5   |   4   |   3   |   2   |   1   |   0   |   0   |
  opcode read T: |   0   |   1   | 2 RSH | 3 RSH |       |       |       |       |       | ULA reads lower address for char1/attr1 from R6:0
@@ -177,13 +174,13 @@ TODO Curren implementation only tracks char switch position. In order to track b
 */
 void spectrum_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool invert_attrs = u64(screen.frame_number() / m_frame_invert_count) & 1;
+	const bool invert_attrs = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	for (u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		u16 hpos = cliprect.left();
 		u16 x = hpos - get_screen_area().left();
 		bool chunk_right = x & 8;
-		if (x % 8 <= (chunk_right ? 0 : 4))
+		if (x % 8 <= (chunk_right ? m_ula->get_atime_right() : m_ula->get_atime_left()))
 		{
 			u8 shift = x % 8;
 			x -= shift;
@@ -201,7 +198,7 @@ void spectrum_state::spectrum_update_screen(screen_device &screen, bitmap_ind16 
 		u8 *attr = &m_screen_location[0x1800 | (((y & 0xf8) << 2) | (x >> 3))];
 		u16 *pix = &(bitmap.pix(vpos, hpos));
 
-		while ((hpos + (chunk_right ? 0 : 4)) <= cliprect.right())
+		while ((hpos + (chunk_right ? m_ula->get_atime_right() : m_ula->get_atime_left())) <= cliprect.right())
 		{
 			u16 ink = ((*attr >> 3) & 0x08) | (*attr & 0x07);
 			u16 pap = (*attr >> 3) & 0x0f;
@@ -220,71 +217,15 @@ bool spectrum_state::is_vram_write(offs_t offset) {
 	return offset >= 0x4000 && offset < 0x5b00;
 }
 
-bool spectrum_state::is_contended(offs_t offset) {
-	return offset >= 0x4000 && offset < 0x8000;
-}
-
-void spectrum_state::content_early(s8 shift)
-{
-	u64 vpos = m_screen->vpos();
-	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
-		return;
-
-	u64 now = m_maincpu->total_cycles() - m_int_at + shift;
-	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
-	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
-
-	if(cf <= now && now < ct)
-	{
-		m_is_m1_rd_contended = true; // make sure M1 sets it to false before
-		u64 clocks = now - cf;
-		u8 c = m_contention_pattern[clocks % m_contention_pattern.size()];
-		m_maincpu->adjust_icount(-c);
-	}
-}
-
-void spectrum_state::content_late()
-{
-	u64 vpos = m_screen->vpos();
-	if (m_contention_pattern.empty() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
-		return;
-
-	u64 now = m_maincpu->total_cycles() - m_int_at + 1;
-	u64 cf = vpos * m_screen->width() * m_maincpu->clock() / m_screen->clock() + m_contention_offset;
-	u64 ct = cf + get_screen_area().width() * m_maincpu->clock() / m_screen->clock();
-	for(auto i = 0x04; i; i >>= 1)
-	{
-		if(cf <= now && now < ct)
-		{
-			u64 clocks = now - cf;
-			u8 c = m_contention_pattern[clocks % m_contention_pattern.size()];
-			m_maincpu->adjust_icount(-c);
-			now += c;
-		}
-		now++;
-	}
-}
-
-void spectrum_state::spectrum_nomreq(offs_t offset, uint8_t data)
-{
-	if (is_contended(offset)) content_early();
-}
-
 // see: spectrum_state::spectrum_update_screen()
 void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
 {
-	const u8 i = offset >> 8;
-	bool is_snow_possible = !m_contention_pattern.empty() && is_contended(i << 8);
-	if (!is_snow_possible || m_is_m1_rd_contended)
+	if (!m_ula->is_snow_possible(offset))
 		return;
 
-	const u64 hpos = m_screen->hpos();
-	const u64 vpos = m_screen->vpos();
-	if (hpos < get_screen_area().left() || hpos > get_screen_area().right() || vpos < get_screen_area().top() || vpos > get_screen_area().bottom())
-		return;
-
-	u8 x = hpos - get_screen_area().left();
-	const u16 y = vpos - get_screen_area().top();
+	const rectangle screen = get_screen_area();
+	u8 x = m_screen->hpos() - screen.left();
+	const u16 y = m_screen->vpos() - screen.top();
 
 	// icount is not adjusted yet, everything below is happening during
 	// the last REFRESH cycle: +2px(1t of 3.5MHz)
@@ -315,6 +256,7 @@ void spectrum_state::spectrum_refresh_w(offs_t offset, uint8_t data)
 
 	if (snow_pattern == 1)
 	{
+		const u8 i = offset >> 8;
 		const u8 r = (offset + 1) & 0x7f; // R must be already incremented during refresh. Consider z80 update.
 		const u8 *const base = snow_pattern1_base(i);
 		m_screen_location[px_addr_hi | addr_lo] = base[px_addr_hi | r];

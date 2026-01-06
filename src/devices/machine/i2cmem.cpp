@@ -65,6 +65,7 @@ DEFINE_DEVICE_TYPE(I2C_X2404P,  i2c_x2404p_device,  "x2404p",  "X2404P I2C Memor
 DEFINE_DEVICE_TYPE(I2C_24C08,   i2c_24c08_device,   "24c08",   "24C08 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C16,   i2c_24c16_device,   "24c16",   "24C16 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C64,   i2c_24c64_device,   "24c64",   "24C64 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C65,   i2c_24c65_device,   "24c65",   "24C65 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C128,  i2c_24c128_device,  "24c128",  "24C128 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C256,  i2c_24c256_device,  "24c256",  "24C256 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C512,  i2c_24c512_device,  "24c512",  "24C512 I2C Memory")
@@ -172,6 +173,12 @@ i2c_24c16_device::i2c_24c16_device(const machine_config &mconfig, const char *ta
 
 i2c_24c64_device::i2c_24c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i2cmem_device(mconfig, I2C_24C64, tag, owner, clock, 0, 32, 0x2000)
+{
+}
+
+// TODO: write protection differs too compared to '64
+i2c_24c65_device::i2c_24c65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C65, tag, owner, clock, 0, 64, 0x2000)
 {
 }
 
@@ -316,7 +323,7 @@ void i2cmem_device::write_sda(int state)
 	state &= 1;
 	if( m_sdaw != state )
 	{
-		LOGMASKED( LOG_WRITELINE, "%s: SDA = %d @ %s\n", machine().describe_context(), state, machine().time().to_string() );
+		LOGMASKED( LOG_WRITELINE, "%s: SDA = %d @ %s (%d)\n", machine().describe_context(), state, machine().time().to_string(), state );
 		m_sdaw = state;
 
 		// Ignore transitions on SDA while device is driving it low
@@ -352,7 +359,7 @@ void i2cmem_device::write_scl(int state)
 	if( m_scl != state )
 	{
 		m_scl = state;
-		LOGMASKED( LOG_WRITELINE, "%s: SCL = %d @ %s\n", machine().describe_context(), m_scl, machine().time().to_string() );
+		LOGMASKED( LOG_WRITELINE, "%s: SCL = %d @ %s (%d)\n", machine().describe_context(), m_scl, machine().time().to_string(), m_state );
 
 		switch( m_state )
 		{
@@ -567,8 +574,12 @@ void i2cmem_device::write_wc(int state)
 int i2cmem_device::read_sda()
 {
 	int res = m_sdar & 1;
+	// https://github.com/mamedev/mame/issues/13998
+	// pullup write value if reading doesn't belong to this device
+	if (m_state == STATE_IDLE)
+		res = m_sdaw & 1;
 	if( !machine().side_effects_disabled() )
-		LOGMASKED( LOG_READLINE, "%s: SDA = %d\n", machine().describe_context(), res );
+		LOGMASKED( LOG_READLINE, "%s: SDA = %d (%d)\n", machine().describe_context(), res, m_state );
 
 	return res;
 }

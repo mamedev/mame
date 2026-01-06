@@ -1,6 +1,6 @@
 // This file is part of AsmJit project <https://asmjit.com>
 //
-// See asmjit.h or LICENSE.md for license and copyright information
+// See <asmjit/core.h> or LICENSE.md for license and copyright information
 // SPDX-License-Identifier: Zlib
 
 // ============================================================================
@@ -24,8 +24,6 @@ const asmdb = require("../db");
 
 exports.asmdb = asmdb;
 exports.exp = asmdb.base.exp;
-
-const hasOwn = Object.prototype.hasOwnProperty;
 
 const FATAL = commons.FATAL;
 const StringUtils = commons.StringUtils;
@@ -56,35 +54,50 @@ class InstructionNameData {
     this.maxNameLength = 0;
   }
 
-  add(s) {
-    // First try to encode the string with 5-bit characters that fit into a 32-bit int.
-    if (/^[a-z0-4]{0,6}$/.test(s)) {
-      let index = 0;
-      for (let i = 0; i < s.length; i++)
-        index |= charTo5Bit(s[i]) << (i * 5);
+  add(name, alt) {
+    if (name === alt) {
+      alt = "";
+    }
 
-      this.names.push(s);
+    if (this.maxNameLength < name.length) {
+      this.maxNameLength = name.length;
+    }
+
+    this.names.push(name);
+
+    // First try to encode the string with 5-bit characters that fit into a 32-bit int.
+    if (/^[a-z0-4]{0,6}$/.test(name) && !alt) {
+      let index = 0;
+      for (let i = 0; i < name.length; i++) {
+        index |= charTo5Bit(name[i]) << (i * 5);
+      }
+
+      this.indexComment.push(`Small '${name}'.`);
       this.primaryTable.push(index | (1 << 31));
-      this.indexComment.push(`Small '${s}'.`);
+    }
+    else if (alt) {
+      const prefixIndex = this.addOrReferenceString(name + String.fromCharCode(alt.length) + alt);
+
+      if (name === "jz") {
+        console.log(`jz prefix: ${prefixIndex}`);
+      }
+
+      this.indexComment.push(`Large '${name}' + '${alt}'`);
+      this.primaryTable.push(prefixIndex | (name.length << 12) | (0xFFF << 16) | 0);
     }
     else {
-      // Put the string into a string table.
-      this.names.push(s);
-      this.primaryTable.push(-1);
       this.indexComment.push(``);
+      this.primaryTable.push(0);
     }
-
-    if (this.maxNameLength < s.length)
-      this.maxNameLength = s.length;
   }
 
   index() {
     const kMaxPrefixSize = 15;
-    const kMaxSuffixSize = 7;
+    const kMaxSuffixSize = 6;
     const names = [];
 
     for (let idx = 0; idx < this.primaryTable.length; idx++) {
-      if (this.primaryTable[idx] === -1) {
+      if (this.primaryTable[idx] === 0) {
         names.push({ name: this.names[idx], index: idx });
       }
     }
@@ -205,11 +218,20 @@ class InstructionNameData {
       FATAL(`IndexedString.formatStringTable(): Not indexed yet, call index()`);
 
     let s = "";
-    for (let i = 0; i < this.stringTable.length; i += 80) {
-      if (s)
-        s += "\n"
-      s += '"' + this.stringTable.substring(i, i + 80) + '"';
+    let line = "";
+
+    for (let i = 0; i < this.stringTable.length; i++) {
+      const c = this.stringTable.charCodeAt(i);
+      line += "\\x" + cxx.Utils.toHexRaw(c, 2);
+
+      if (line.length >= 115 || i === this.stringTable.length - 1) {
+        if (s)
+          s += "\n"
+        s += `"${line}"`;
+        line = "";
+      }
     }
+
     s += ";\n";
 
     return `const char ${tableName}[] =\n${StringUtils.indent(s, "  ")}\n`;
@@ -226,7 +248,7 @@ class InstructionNameData {
     if (this.size === -1)
       FATAL(`IndexedString.getIndex(): Not indexed yet, call index()`);
 
-    if (!hasOwn.call(this.map, k))
+    if (!Object.hasOwn(this.map, k))
       FATAL(`IndexedString.getIndex(): Key '${k}' not found.`);
 
     return this.map[k];
@@ -288,7 +310,9 @@ class Injector {
         const path = kAsmJitRoot + "/" + file;
         console.log(`MODIFIED '${file}'`);
 
-        fs.writeFileSync(path + ".backup", obj.prev, "utf8");
+        if (!fs.existsSync(path + ".backup")) {
+          fs.writeFileSync(path + ".backup", obj.prev, "utf8");
+        }
         fs.writeFileSync(path, obj.data, "utf8");
       }
     }
@@ -346,7 +370,7 @@ exports.Injector = Injector;
 // Main context used to load, generate, and store instruction tables. The idea
 // is to be extensible, so it stores 'Task's to be executed with minimal deps
 // management.
-class TableGen extends Injector{
+class TableGen extends Injector {
   constructor(arch) {
     super();
 
@@ -418,7 +442,7 @@ class TableGen extends Injector{
   // [Instruction Management]
   // --------------------------------------------------------------------------
 
-  addInst(inst) {
+  addInstruction(inst) {
     if (this.instMap[inst.name])
       FATAL(`TableGen.addInst(): Instruction '${inst.name}' already added`);
 
@@ -471,19 +495,35 @@ class IdEnum extends Task {
   run() {
     const insts = this.ctx.insts;
 
-    var s = "";
-    for (var i = 0; i < insts.length; i++) {
+    let s = "";
+    let aliases = "";
+
+    for (let i = 0; i < insts.length; i++) {
       const inst = insts[i];
 
-      var line = "kId" + inst.enum + (i ? "" : " = 0") + ",";
-      var text = this.comment(inst);
+      let line = "kId" + inst.enum + (i ? "" : " = 0") + ",";
+      let text = this.comment(inst);
 
       if (text)
         line = line.padEnd(37) + "//!< " + text;
 
       s += line + "\n";
+
+      if (inst.aliases) {
+        for (let aliasName of inst.aliases.aliasNames) {
+          if (aliases) aliases += ",\n";
+          aliases += `kId${StringUtils.makeEnumName(aliasName)} = kId${inst.enum}`;
+        }
+      }
     }
-    s += "_kIdCount\n";
+    s += "_kIdCount";
+
+    if (aliases) {
+      s += ",\n\n" + "// Aliases.\n" + aliases + "\n";
+    }
+    else {
+      s += "\n";
+    }
 
     return this.ctx.inject("InstId", s);
   }
@@ -507,16 +547,43 @@ class Output {
 };
 exports.Output = Output;
 
-function generateNameData(out, instructions) {
+function cmp(a, b) { return (a < b) ? -1 : a > b ? 1 : 0; }
+
+function generateNameData(out, instructions, generateAliases) {
   const none = "Inst::kIdNone";
+
+  const aliases = [];
+  const aliasNameData = new InstructionNameData();
+  const aliasLinkData = [];
 
   const instFirst = new Array(26);
   const instLast  = new Array(26);
   const instNameData = new InstructionNameData();
 
-  for (let i = 0; i < instructions.length; i++)
-    instNameData.add(instructions[i].displayName);
+  for (let i = 0; i < instructions.length; i++) {
+    const instruction = instructions[i];
+
+    if (instruction.aliases) {
+      instNameData.add(instruction.displayName, instruction.aliases.format);
+      for (let aliasName of instruction.aliases.aliasNames) {
+        aliases.push({ name: instruction.name, alt: aliasName });
+      }
+    }
+    else {
+      instNameData.add(instruction.displayName);
+    }
+  }
+
+  aliases.sort(function(a, b) { return cmp(a.alt, b.alt); });
+
+  for (let i = 0; i < aliases.length; i++) {
+    const alias = aliases[i];
+    aliasNameData.add(alias.alt);
+    aliasLinkData.push(`Inst::kId${StringUtils.makeEnumName(alias.name)}`);
+  }
+
   instNameData.index();
+  aliasNameData.index();
 
   for (let i = 0; i < instructions.length; i++) {
     const inst = instructions[i];
@@ -532,7 +599,7 @@ function generateNameData(out, instructions) {
   }
 
   var s = "";
-  s += `const InstNameIndex InstDB::instNameIndex = {{\n`;
+  s += `const InstNameIndex InstDB::_inst_name_index = {{\n`;
   for (var i = 0; i < instFirst.length; i++) {
     const firstId = instFirst[i] || none;
     const lastId = instLast[i] || none;
@@ -544,25 +611,45 @@ function generateNameData(out, instructions) {
   }
   s += `}, uint16_t(${instNameData.maxNameLength})};\n`;
   s += `\n`;
-  s += instNameData.formatStringTable("InstDB::_instNameStringTable");
+  s += instNameData.formatStringTable("InstDB::_inst_name_string_table");
   s += `\n`;
-  s += instNameData.formatIndexTable("InstDB::_instNameIndexTable");
+  s += instNameData.formatIndexTable("InstDB::_inst_name_index_table");
 
-  const dataSize = instNameData.getSize() + 26 * 4;
+  let dataSize = instNameData.getSize() + 26 * 4;
+
+  if (generateAliases) {
+    s += `\n`;
+    s += aliasNameData.formatStringTable("InstDB::alias_name_string_table");
+    s += `\n`;
+    s += aliasNameData.formatIndexTable("InstDB::alias_name_index_table");
+    s += "\n";
+    s += "const uint32_t InstDB::alias_index_to_inst_id_table[] = {\n" + StringUtils.format(aliasLinkData, "  ", true, null) + "\n};\n";
+
+    dataSize += aliasNameData.getSize();
+    let info = `static constexpr uint32_t kAliasTableSize = ${aliasLinkData.length};\n`;
+    out.add("NameDataInfo", StringUtils.disclaimer(info), 0);
+  }
+
   out.add("NameData", StringUtils.disclaimer(s), dataSize);
   return out;
 }
 exports.generateNameData = generateNameData;
 
 class NameTable extends Task {
-  constructor(name, deps) {
+  constructor(name, deps, generateAliases) {
     super(name || "NameTable", deps);
+    this.generateAliases = generateAliases;
   }
 
   run() {
     const output = new Output();
-    generateNameData(output, this.ctx.insts);
+    generateNameData(output, this.ctx.insts, this.generateAliases);
+
     this.ctx.inject("NameData", output.content["NameData"], output.tableSize["NameData"]);
+
+    if (this.generateAliases) {
+      this.ctx.inject("NameDataInfo", output.content["NameDataInfo"], output.tableSize["NameDataInfo"]);
+    }
   }
 }
 exports.NameTable = NameTable;

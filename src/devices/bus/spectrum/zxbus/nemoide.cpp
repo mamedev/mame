@@ -21,12 +21,13 @@ public:
 		, m_ata(*this, "ata")
 	{ }
 
+	virtual void io_map(address_map &map) override ATTR_COLD;
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:
-	void map_io(address_map &map) ATTR_COLD;
 
 	u8 ata_r(offs_t offset);
 	void ata_w(offs_t offset, u8 data);
@@ -51,7 +52,7 @@ void nemoide_device::ata_w(offs_t offset, u8 data)
 	m_ata->cs0_w((offset >> 5) & 7, ata_data);
 }
 
-void nemoide_device::map_io(address_map &map)
+void nemoide_device::io_map(address_map &map)
 {
 	map(0x0011, 0x0011).mirror(0xff00).lrw8(NAME([this]() { return m_ata_data_latch; })
 		, NAME([this](offs_t offset, u8 data) { m_ata_data_latch = data; }));
@@ -74,8 +75,6 @@ void nemoide_device::device_add_mconfig(machine_config &config)
 void nemoide_device::device_start()
 {
 	save_item(NAME(m_ata_data_latch));
-
-	m_zxbus->install_device(0x0000, 0xffff, *this, &nemoide_device::map_io);
 }
 
 } // anonymous namespace

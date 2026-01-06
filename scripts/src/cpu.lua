@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "ARM7", "ADSP21062", "MB86235", "DSP16", "UNSP" }
+DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "ADSP21062", "MB86235", "DSP16", "UNSP", "SWP30" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -1180,14 +1180,24 @@ end
 
 --------------------------------------------------
 -- Intel 8051 and derivatives
---@src/devices/cpu/mcs51/mcs51.h,CPUS["MCS51"] = true
+--@src/devices/cpu/mcs51/i8051.h,CPUS["MCS51"] = true
 --------------------------------------------------
 
 if CPUS["MCS51"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.cpp",
-		MAME_DIR .. "src/devices/cpu/mcs51/mcs51.h",
-		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.hxx",
+		MAME_DIR .. "src/devices/cpu/mcs51/i8051.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/i8051.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/i8052.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/i8052.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/i80c52.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/i80c52.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/ds5002fp.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/ds5002fp.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/sab80c535.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/sab80c535.h",
 	}
 end
 
@@ -3591,11 +3601,6 @@ if CPUS["SWP30"] then
 	}
 end
 
-if opt_tool(CPUS, "SWP30") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/swp30d.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/sound/swp30d.h")
-end
-
 --------------------------------------------------
 -- Yamaha DSPV
 --@src/devices/sound/dspv.h,CPUS["DSPV"] = true
@@ -4136,20 +4141,20 @@ if opt_tool(CPUS, "DDP516") then
 end
 
 --------------------------------------------------
--- Whatever is in the Evolution
---@src/devices/cpu/evolution/evo.h,CPUS["EVOLUTION"] = true
+-- Sonix 16-bit DSP
+--@src/devices/cpu/sonix16/sonix16.h,CPUS["SONIX16"] = true
 --------------------------------------------------
 
-if CPUS["EVOLUTION"] then
+if CPUS["SONIX16"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/evolution/evo.cpp",
-		MAME_DIR .. "src/devices/cpu/evolution/evo.h",
+		MAME_DIR .. "src/devices/cpu/sonix16/sonix16.cpp",
+		MAME_DIR .. "src/devices/cpu/sonix16/sonix16.h",
 	}
 end
 
-if opt_tool(CPUS, "EVOLUTION") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.h")
+if opt_tool(CPUS, "SONIX16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sonix16/sonix16d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sonix16/sonix16d.h")
 end
 
 --------------------------------------------------
@@ -4270,4 +4275,36 @@ end
 if opt_tool(CPUS, "MN10300") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.h")
+end
+
+--------------------------------------------------
+-- Motorola DSP563xx
+--@src/devices/cpu/dsp563xx/dsp563xx.h,CPUS["DSP563XX"] = true
+--------------------------------------------------
+
+if CPUS["DSP563XX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx-tables.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx-interp.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56303.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56303.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56311.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56311.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56362.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56362.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56364.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56364.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/shi.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/shi.h",
+	}
+end
+
+if opt_tool(CPUS, "DSP563XX") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd-tables.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.h")
 end

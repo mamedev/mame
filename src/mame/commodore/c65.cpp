@@ -1120,7 +1120,7 @@ uint8_t c65_state::cia0_portb_r()
 	res &= (0xf0 | (joy_a & 0x0f));
 	res &= ~(!BIT(joy_a, 5) << 4);
 
-	for(int i=0;i<8;i++)
+	for(int i = 0; i < 8; i++)
 	{
 		m_keyb_input[i] = ioport(c64ports[i])->read();
 
@@ -1128,12 +1128,12 @@ uint8_t c65_state::cia0_portb_r()
 			res &= m_keyb_input[i];
 	}
 
-	for(int i=0;i<2;i++)
+	for(int i = 0; i < 2; i++)
 	{
-		m_keyb_input[i+8] = ioport(c65ports[i])->read();
+		m_keyb_input[i + 8] = ioport(c65ports[i])->read();
 
 		if(m_keyb_c8_c9 & 1 << (i))
-			res &= m_keyb_input[i+8];
+			res &= m_keyb_input[i + 8];
 	}
 
 	return res;

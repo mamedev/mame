@@ -245,9 +245,9 @@ authors:hap
 		<group ref="digits"><bounds xc="150" y="33" width="45" height="43" /></group>
 
 		<!-- other buttons -->
-		<element ref="nothing" clickthrough="no"><bounds xc="150" y="232.5" width="230" height="4.5" /></element>
 		<element ref="switch1" inputtag="IN.3" inputmask="0x02" inputraw="yes"><bounds xc="111" y="232.5" width="30" height="4.5" /></element>
 		<element ref="switch2" inputtag="IN.3" inputmask="0x01" inputraw="yes"><bounds xc="193" y="232.5" width="30" height="4.5" /></element>
+		<element ref="nothing" clickthrough="no"><bounds xc="150" y="232.5" width="230" height="4.5" /></element>
 
 		<element ref="black2d" inputtag="IN.3" inputmask="0x02" inputraw="yes"><bounds xc="100" y="226" width="6" height="6" /></element>
 		<element ref="black2d" inputtag="IN.3" inputmask="0x01" inputraw="yes"><bounds xc="200" y="226" width="6" height="6" /></element>

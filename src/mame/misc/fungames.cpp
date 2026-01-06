@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
+
 /***************************************************************************
 
  Fun Games discrete hardware games
@@ -52,13 +53,11 @@ public:
 	void fungames(machine_config &config);
 
 protected:
-	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 };
@@ -68,7 +67,7 @@ static NETLIST_START(fungames)
 {
 	SOLVER(Solver, 48000)
 //  PARAM(Solver.FREQ, 48000)
-	PARAM(Solver.ACCURACY, 1e-4) // works and is sufficient
+	PARAM(Solver.ACCURACY, 1e-4)
 
 	// schematics
 	//...
@@ -94,10 +93,10 @@ void fungames_state::video_start()
 
 void fungames_state::fungames(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(netlist_fungames);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK);
@@ -175,24 +174,23 @@ ROM_END
 Fun Games Tankers has a similar PCB design set up with four PROMs located only on the 'memory' PCB just like
 Fun Games BiPlane. The chip type is probably the same type used with Fun Games BiPlane and
 Fun Games BiPlane 4.
-
-ROM_START( tankers )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-
-    ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 ) // most likely 82s115 PROMs as well
-    ROM_LOAD( "12345.h6", 0x0000, 0x0200, NO_DUMP )
-    ROM_LOAD( "12346.h7", 0x0000, 0x0200, NO_DUMP )
-    ROM_LOAD( "12347.h8", 0x0000, 0x0200, NO_DUMP )
-    ROM_LOAD( "12348.h9", 0x0000, 0x0200, NO_DUMP )
-ROM_END
-
 */
 
-} // Anonymous namespace
+ROM_START( tankers )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x0800, "roms", ROMREGION_ERASE00 ) // 82s115 PROMs
+	ROM_LOAD( "12345.h6", 0x0000, 0x0200, CRC(3c9a06e8) SHA1(73c9e2244d574c92dc859f1a8cbc32d60e6c6356) )
+	ROM_LOAD( "12346.h7", 0x0200, 0x0200, CRC(a26a8f3b) SHA1(5f36b08d74429af6fcf56b1bbaf6882b8ed7b2e4) )
+	ROM_LOAD( "12347.h8", 0x0400, 0x0200, CRC(5f9c1e11) SHA1(a5b4500296891ac7296600e6be180623f937a449) )
+	ROM_LOAD( "12348.h9", 0x0600, 0x0200, CRC(b43ed45f) SHA1(e2c51ca3037bdbbb541138851e5943697e00df75) )
+ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1975, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 //GAME( 1975, skywar, biplane, 0, fungames, 0, fungames_state, empty_init, ROT0, "Mirco Games", "Sky War", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1976, biplane4, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Biplane 4", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1975, take5, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Take 5", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-//GAME( 1975, tankers, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Tankers", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1975, tankers, 0, fungames, 0, fungames_state, empty_init, ROT0, "Fun Games", "Tankers", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

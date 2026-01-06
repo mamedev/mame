@@ -162,7 +162,7 @@ private:
 
 		T data = 0;
 
-		switch (address >> 28)
+		switch (address >> 24)
 		{
 		default:
 			if (m_mmu->mem_load(address, data, mode))
@@ -171,30 +171,38 @@ private:
 				program_check(PCS_PCK | PCS_DAE);
 			break;
 
-		case 15:
-			switch (address >> 24)
-			{
-			case 0xf0:
-				if (m_iou->pio_load(address, data, mode))
-					f(data);
-				else
-					program_check(PCS_PCK | PCS_DAE);
-				break;
-			case 0xf4:
-				if (m_iou->mem_load(address, data, mode))
-					f(data);
-				else
-					program_check(PCS_PCK | PCS_DAE);
-				break;
-
-			case 0xfc: // mc68881 assist mode
-			case 0xfd: // mc68881 non-assist mode
-			case 0xfe: // afpa dma
-			case 0xff: // fpa
-			default: // reserved
+		case 0xf0:
+			if (m_iou->pio_load(address, data, mode))
+				f(data);
+			else
 				program_check(PCS_PCK | PCS_DAE);
-				break;
-			}
+			break;
+		case 0xf4:
+			if (m_iou->mem_load(address, data, mode))
+				f(data);
+			else
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 0xfc: // mc68881 assist mode
+		case 0xfd: // mc68881 non-assist mode
+		case 0xfe: // afpa dma
+		case 0xff: // fpa
+			program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 0xf1:
+		case 0xf2:
+		case 0xf3:
+		case 0xf5:
+		case 0xf6:
+		case 0xf7:
+		case 0xf8:
+		case 0xf9:
+		case 0xfa:
+		case 0xfb:
+			//reserved
+			program_check(PCS_PCK | PCS_DAE);
 			break;
 		}
 	}
@@ -203,33 +211,41 @@ private:
 	{
 		rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
 
-		switch (address >> 28)
+		switch (address >> 24)
 		{
 		default:
 			if (!m_mmu->mem_store(address, data, mode))
 				program_check(PCS_PCK | PCS_DAE);
 			break;
 
-		case 15:
-			switch (address >> 24)
-			{
-			case 0xf0:
-				if (!m_iou->pio_store(address, data, mode))
-					program_check(PCS_PCK | PCS_DAE);
-				break;
-			case 0xf4:
-				if (!m_iou->mem_store(address, data, mode))
-					program_check(PCS_PCK | PCS_DAE);
-				break;
-
-			case 0xfc: // mc68881 assist mode
-			case 0xfd: // mc68881 non-assist mode
-			case 0xfe: // afpa dma
-			case 0xff: // fpa
-			default: // reserved
+		case 0xf0:
+			if (!m_iou->pio_store(address, data, mode))
 				program_check(PCS_PCK | PCS_DAE);
-				break;
-			}
+			break;
+		case 0xf4:
+			if (!m_iou->mem_store(address, data, mode))
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 0xfc: // mc68881 assist mode
+		case 0xfd: // mc68881 non-assist mode
+		case 0xfe: // afpa dma
+		case 0xff: // fpa
+			program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 0xf1:
+		case 0xf2:
+		case 0xf3:
+		case 0xf5:
+		case 0xf6:
+		case 0xf7:
+		case 0xf8:
+		case 0xf9:
+		case 0xfa:
+		case 0xfb:
+			//reserved
+			program_check(PCS_PCK | PCS_DAE);
 			break;
 		}
 	}
@@ -238,33 +254,41 @@ private:
 	{
 		rsc_mode const mode = mask ? rsc_mode((m_scr[ICS] >> 9) & 7) : rsc_mode::RSC_N;
 
-		switch (address >> 28)
+		switch (address >> 24)
 		{
 		default:
 			if (!m_mmu->mem_modify(address, f, mode))
 				program_check(PCS_PCK | PCS_DAE);
 			break;
 
-		case 15:
-			switch (address >> 24)
-			{
-			case 0xf0:
-				if (!m_iou->pio_modify(address, f, mode))
-					program_check(PCS_PCK | PCS_DAE);
-				break;
-			case 0xf4:
-				if (!m_iou->mem_modify(address, f, mode))
-					program_check(PCS_PCK | PCS_DAE);
-				break;
-
-			case 0xfc: // mc68881 assist mode
-			case 0xfd: // mc68881 non-assist mode
-			case 0xfe: // afpa dma
-			case 0xff: // fpa
-			default: // reserved
+		case 0xf0:
+			if (!m_iou->pio_modify(address, f, mode))
 				program_check(PCS_PCK | PCS_DAE);
-				break;
-			}
+			break;
+		case 0xf4:
+			if (!m_iou->mem_modify(address, f, mode))
+				program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 0xfc: // mc68881 assist mode
+		case 0xfd: // mc68881 non-assist mode
+		case 0xfe: // afpa dma
+		case 0xff: // fpa
+			program_check(PCS_PCK | PCS_DAE);
+			break;
+
+		case 0xf1:
+		case 0xf2:
+		case 0xf3:
+		case 0xf5:
+		case 0xf6:
+		case 0xf7:
+		case 0xf8:
+		case 0xf9:
+		case 0xfa:
+		case 0xfb:
+			//reserved
+			program_check(PCS_PCK | PCS_DAE);
 			break;
 		}
 	}

@@ -38,6 +38,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
+91 Mj Tokkyu Kaitenban P2  D5902258L-0               TLCS  AY8910        YM2413                   Various scratched off devices
 91 Mj Ougon no Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
@@ -82,6 +83,7 @@ TODO:
 #include "emu.h"
 #include "dynax.h"
 
+#include "hanafuda.h"
 #include "mjdipsw.h"
 
 #include "mahjong.h"
@@ -1428,161 +1430,6 @@ INPUT_PORTS_START( dynax_mahjong_keys )
 	PORT_MODIFY("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
 INPUT_PORTS_END
-
-static INPUT_PORTS_START( dynax_hanafuda_keys )
-	PORT_START("KEY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(1) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(1)   // "f"
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("KEY6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2) // "l"
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)   // "f"
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-// Medal hanafuda games use 6 card hands
-INPUT_PORTS_START( dynax_hanafuda_keys_bet )
-	PORT_INCLUDE( dynax_hanafuda_keys )
-
-	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(1)
-
-	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("KEY3")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )          // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )      // "w"
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )            // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )          // "s"
-
-	PORT_MODIFY("KEY6")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
-
-	PORT_MODIFY("KEY7")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("KEY8")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("KEY9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)         // "b"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)       // "s"
-INPUT_PORTS_END
-
-#if 0
-[[maybe_unused]] static INPUT_PORTS_START( HANAFUDA_KEYS_BET_ALT )
-	PORT_INCLUDE( dynax_hanafuda_keys )
-
-	PORT_MODIFY("KEY0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )          // "t"
-
-	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )          // "s"
-
-	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )            // "b"
-
-	PORT_MODIFY("KEY3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )      // "w"
-
-	PORT_MODIFY("KEY4")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("KEY5")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE ) PORT_PLAYER(2)       // "t"
-
-	PORT_MODIFY("KEY6")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)       // "s"
-
-	PORT_MODIFY("KEY7")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)         // "b"
-
-	PORT_MODIFY("KEY8")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) PORT_PLAYER(2)   // "w"
-
-	PORT_MODIFY("KEY9")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-#endif
 
 #define MAHJONG_COIN_TEST(ct, cm) \
 		PORT_START("COINS") \
@@ -3657,7 +3504,7 @@ static INPUT_PORTS_START( mjreach )
 	PORT_DIPSETTING(    0x20, "Small" )                                                            // 小さい
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                    // 通常
 	PORT_DIPNAME( 0x40, 0x40, "Renchan Gal Display" )           PORT_DIPLOCATION("DIP-SW4:9")      // 連荘ギャルの表示の方式
-	PORT_DIPSETTING(    0x40, "After Each Win" )                                                   // 勝つごとに表示 (= On according to manual page?)
+	PORT_DIPSETTING(    0x40, "After Every Win" )                                                  // 勝つごとに表示 (= On according to manual page?)
 	PORT_DIPSETTING(    0x00, "After 3 Consecutive Wins" )                                         // ３連荘のみ表示 (= Off according to manual page?)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )                PORT_DIPLOCATION("DIP-SW4:10")     // ＯＦＦ固定
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
@@ -6577,7 +6424,7 @@ ROM_END
 
 ROM_START( mjreachp2 ) // BTANB: typo on title screen shows 'Mahjong Reach Rart II' (verified with reference pics)
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "880q.wc",         0x00000, 0x40000, CRC(a92954bc) SHA1(473778eabd0ecc7b66c7e66ab7eb3d8b40554434) )
+	ROM_LOAD( "8801.2c",         0x00000, 0x40000, CRC(a92954bc) SHA1(473778eabd0ecc7b66c7e66ab7eb3d8b40554434) )
 	ROM_RELOAD(                  0x10000, 0x40000 )
 	ROM_LOAD( "mjreach2-mcu.5b", 0x00000, 0x02000, CRC(091a85dc) SHA1(964ccbc13466464c2feee10f807078ec517bed5c) ) // MCU has pins 9 to 12 & 15 to 16 stripped out
 
@@ -7046,9 +6893,33 @@ ROM_START( mjcomv1 )
 ROM_END
 
 
+/*
+特急回転盤 Part 2 - Mahjong Tokkyū Kaiten-ban Part 2
+Dynax 1991
+*/
+
+ROM_START( mjtkp2 )
+	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "5909c_dynax.5a", 0x00000, 0x20000, CRC(61916017) SHA1(2f39749512a3e36966e3bd787f1fa3378e96b4bb) )
+	ROM_RELOAD(                 0x10000, 0x20000 )
+	ROM_LOAD( "tmp90840.2c",    0x00000, 0x02000, NO_DUMP ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
+	ROM_FILL(                   0x00000, 0x02000, 0xff ) // avoid fatal error due to random crap in the first 0x2000 of the external ROM. TODO: remove it once internal ROM is dumped
+
+	ROM_REGION( 0x100000, "blitter", 0 )
+	ROM_LOAD( "5908_dynax.6a",  0x00000, 0x20000, CRC(7ef47e7b) SHA1(15d05b8c52b82f1b43f0cc03979b2f2e8dd05ddd) )
+	ROM_LOAD( "5907_dynax.7a",  0x20000, 0x20000, CRC(f36baf94) SHA1(8474404a4137f7448c66a5adf507b474a97443a2) )
+	ROM_LOAD( "5906_dynax.8a",  0x40000, 0x20000, CRC(283935b1) SHA1(6af14310e44dfd7102f3c649c0c729ef406545e6) )
+	ROM_LOAD( "5905a_dynax.9a", 0x60000, 0x20000, CRC(62f9f922) SHA1(b75978db127fa24b28ac2c7c2587f3a5a360df6d) )
+	ROM_LOAD( "5904_dynax.10a", 0x80000, 0x20000, CRC(098a15dc) SHA1(4cc3313ca56c9c9a42e294e6d837c24c00463f73) )
+	ROM_LOAD( "5903_dynax.12a", 0xa0000, 0x20000, CRC(20f68aa7) SHA1(e18d39962caefb22c1ff39fd0fda0563877fa79c) )
+	ROM_LOAD( "5902_dynax.13a", 0xc0000, 0x20000, CRC(c053ba24) SHA1(76524a5a8f727c50be13adbca5eb9388c1f9887c) )
+	ROM_LOAD( "5901_dynax.15a", 0xe0000, 0x20000, CRC(8b9d0192) SHA1(77ba366c87d3f1eb5549de30a1d066684950622a) )
+ROM_END
+
+
 /***************************************************************************
 
-Hana Jingi
+華仁義 Hana Jingi
 Dynax 1990
 
 PCB Layout
@@ -7283,6 +7154,7 @@ GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty
 GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjtkp2,     0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing internal ROM dump
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreacha,   mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )

@@ -3,6 +3,7 @@
 
 /*
 Ganso Janken Man 2
+Pretty Present
 'S9405021 CPU-DM-NEW' PCB
 
 Z0840004PSC
@@ -161,7 +162,17 @@ ROM_START( jankmg2 )
 	// 3 more unpopulated ROM spaces at u14, u15 and u16
 ROM_END
 
+ROM_START( ppresent )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "ppr1.u17", 0x0000, 0x4000, CRC(c4a38d1c) SHA1(cfab8e494794ecdb7ac3418b5e71b7c028656456) )
+
+	ROM_REGION( 0x40000, "dac_data", 0 )
+	ROM_LOAD( "ppr2.u13", 0x00000, 0x40000, CRC(9757383d) SHA1(33204b82f6f3c14b42fad743f62764730c05d038) )
+	// 3 more unpopulated ROM spaces at u14, u15 and u16
+ROM_END
+
 } // anonymous namespace
 
-// title machine translated from auction, not verified
-GAME( 199?, jankmg2, 0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Ganso Janken Man 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 199?, jankmg2,  0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Ganso Janken Man 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ppresent, 0, jankmg2, jankmg2, jankmg2_state, empty_init, ROT0, "Sunwise", "Pretty Present",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

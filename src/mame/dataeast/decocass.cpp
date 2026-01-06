@@ -2,58 +2,58 @@
 // copyright-holders:Juergen Buchmueller, David Haywood
 /*******************************************************************************
 
-    The DECO cassette system consists of three PCBs in a card cage:
+The DECO cassette system consists of three PCBs in a card cage:
 
-    **** Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset) ****
+**** Early boardset: (1980-1983) (proms unknown for this boardset, no schematics for this boardset) ****
 
-    One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control),
-    two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external
-    amp and volume control)
+One DE-0069C-0 RMS-3 pcb with a 6502 processor, D8041C MCU (DECO Cassette control),
+two ay-3-8910s, and one 2708 eprom holding the audio bios. (audio, needs external
+amp and volume control)
 
-    One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor
-    and bios, graphics, dipswitches?)
+One DE-0068B-0 DSP-3 pcb with a 'DECO CPU-3' custom, two 2716 eproms. (main processor
+and bios, graphics, dipswitches?)
 
-    One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc.
+One DE-0070C-0 BIO-3 pcb with an analog ADC0908 8-bit adc.
 
-    One DE-0066B-0 card rack board that the other three boards plug into.
-    This boardset has two versions: MD, known as "shokase" in Japan, and MT, known as "daikase",
-    which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
+One DE-0066B-0 card rack board that the other three boards plug into.
+This boardset has two versions: MD, known as "shokase" in Japan, and MT, known as "daikase",
+which is using bigger data tapes. (MT was only sold in Japan, not emulated yet)
 
-    **** Later boardset: (1984 onward, schematic is dated October 1983) ****
+**** Later boardset: (1984 onward, schematic is dated October 1983) ****
 
-    One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732)
-    plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM.
-    (audio processor and RAM, Main processor's dram, dipswitches)
+One DE-0097C-0 RMS-8 pcb with a 6502 processor, two ay-3-8910s, two eproms (2716 and 2732)
+plus one prom, and 48k worth of 4116 16kx1 DRAMs; the 6502 processor has its own 4K of SRAM.
+(audio processor and RAM, Main processor's dram, dipswitches)
 
-    One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which
-    appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three
-    hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
+One DE-0096C-0 DSP-8 board with a 'DECO 222' custom on it (labeled '8049 // C10707-2') which
+appears to really be a 'cleverly' disguised 6502, and two proms, plus 4K of sram, and three
+hm2511-1 1kx1 srams. (main processor, sprites, missiles, palette)
 
-    One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc,
-    and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
+One DE-0098C-0 B10-8 (BIO-8 on schematics) board with an 8041, an analog devices ADC0908 8-bit adc,
+and 4K of SRAM on it. (DECO Cassette control, inputs, tilemaps, headlights)
 
-    One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for
-    DE-109C-0 is shorter than in earlier versions)
+One DE-0109C-0 card rack board that the other three boards plug into. (fourth connector for
+DE-109C-0 is shorter than in earlier versions)
 
 
-    The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette
-    form factor, but are larger and will not fit in a conventional microcassette player. Each cassette
-    has one track on it and is separated into clock and data by two Magtek IC in the player, for
-    a form of synchronous serial. The data is stored in blocks with headers and CRC16 checksums.
-    The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe)
-    and the total number of blocks left to read. The last physical block on the cassette is a dummy
-    block not used by the system. (only used to mark the end of last block)
+The actual cassettes use a custom player hooked to the BIO board, and are roughly microcassette
+form factor, but are larger and will not fit in a conventional microcassette player. Each cassette
+has one track on it and is separated into clock and data by two Magtek IC in the player, for
+a form of synchronous serial. The data is stored in blocks with headers and CRC16 checksums.
+The first block contains information such as the region (A:Japan, B:USA, C:UK, D:Europe)
+and the total number of blocks left to read. The last physical block on the cassette is a dummy
+block not used by the system. (only used to mark the end of last block)
 
 *******************************************************************************/
 
 #include "emu.h"
 #include "decocass.h"
 
-#include "cpu/m6502/m6502.h"
-#include "cpu/mcs48/mcs48.h"
 #include "deco222.h"
-#include "decocass_tape.h"
+
+#include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+
 #include "speaker.h"
 
 #define MASTER_CLOCK    XTAL(12'000'000)
@@ -101,7 +101,7 @@ void decocass_state::decocass_map(address_map &map)
 	map(0xe302, 0xe302).w(FUNC(decocass_state::decocass_color_missiles_w));
 	map(0xe400, 0xe400).w(FUNC(decocass_state::decocass_reset_w));
 
-/* BIO-3 board */
+	/* BIO-3 board */
 	map(0xe402, 0xe402).w(FUNC(decocass_state::decocass_mode_set_w));      /* scroll mode regs + various enable regs */
 	map(0xe403, 0xe403).w(FUNC(decocass_state::decocass_back_h_shift_w));  /* back (both)  tilemap x scroll */
 	map(0xe404, 0xe404).w(FUNC(decocass_state::decocass_back_vl_shift_w)); /* back (left)  (top@rot0) tilemap y scroll */
@@ -130,7 +130,7 @@ void decocass_state::decocass_map(address_map &map)
 void decocass_state::decocrom_map(address_map &map)
 {
 	decocass_map(map);
-	map(0x6000, 0xafff).bankr("bank1").w(FUNC(decocass_state::decocass_de0091_w));
+	map(0x6000, 0xafff).bankr(m_rombank).w(FUNC(decocass_state::decocass_de0091_w));
 	map(0xe900, 0xe900).w(FUNC(decocass_state::decocass_e900_w));
 }
 
@@ -177,8 +177,8 @@ static INPUT_PORTS_START( decocass )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_START1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_START2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(decocass_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(decocass_state::coin_inserted), 0)
 
 	PORT_START("AN0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -930,7 +930,7 @@ static INPUT_PORTS_START( cprobowl )
 	PORT_INCLUDE( decocass )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Show Bonus Instructions" )                        PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x01, 0x01, "Show Bonus Instructions" )               PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	/* other dips not verified */
@@ -1028,9 +1028,9 @@ void decocass_state::decocass(machine_config &config)
 	m_mcu->p2_in_cb().set(FUNC(decocass_state::i8041_p2_r));
 	m_mcu->p2_out_cb().set(FUNC(decocass_state::i8041_p2_w));
 
-	config.set_maximum_quantum(attotime::from_hz(4200));              /* interleave CPUs */
+	config.set_maximum_quantum(attotime::from_hz(4200)); /* interleave CPUs */
 
-	WATCHDOG_TIMER(config, m_watchdog);
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 16);
 
 	DECOCASS_TAPE(config, m_cassette, 0);
 
@@ -1050,9 +1050,108 @@ void decocass_state::decocass(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	AY8910(config, "ay1", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
-
 	AY8910(config, "ay2", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 }
+
+// type 1
+
+void decocass_type1_state::ctsttape(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctsttape)
+}
+
+void decocass_type1_state::cprogolfj(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolfj)
+}
+
+void decocass_type1_state::cdsteljn(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cdsteljn)
+}
+
+void decocass_type1_state::cnebula(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cnebula)
+}
+
+void decocass_type1_state::cmanhat(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cmanhat)
+}
+
+void decocass_type3_state::cfishing(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfishing)
+}
+
+void decocass_type1_state::chwy(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,chwy)
+}
+
+void decocass_type1_state::cterrani(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cterrani)
+}
+
+void decocass_type1_state::castfant(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,castfant)
+}
+
+void decocass_type1_state::csuperas(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,csuperas)
+}
+
+void decocass_type1_state::cocean1a(machine_config &config) /* 10 */
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cocean1a)
+}
+
+void decocass_type1_state::clocknch(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknch)
+}
+
+void decocass_type1_state::clocknchj(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknchj)
+}
+
+void decocass_type1_state::cfboy0a1(machine_config &config) /* 12 */
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cfboy0a1)
+}
+
+void decocass_type1_state::cprogolf(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolf)
+}
+
+void decocass_type1_state::cluckypo(machine_config &config)
+{
+	decocass(config);
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cluckypo)
+}
+
+// type 1 crom
 
 void decocass_state::decocrom(machine_config &config)
 {
@@ -1060,295 +1159,110 @@ void decocass_state::decocrom(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &decocass_state::decocrom_map);
 }
 
-
-void decocass_type1_state::ctsttape(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctsttape)
-}
-
-void decocass_type1_state::cprogolfj(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolfj)
-}
-
-void decocass_type1_state::cdsteljn(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cdsteljn)
-}
-
-void decocass_type1_state::cnebula(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cnebula)
-}
-
-
-void decocass_type1_state::cmanhat(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cmanhat)
-}
-
-void decocass_type3_state::cfishing(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfishing)
-}
-
-
-void decocass_type1_state::chwy(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,chwy)
-}
-
-
-void decocass_type1_state::cterrani(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cterrani)
-}
-
-
-void decocass_type1_state::castfant(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,castfant)
-}
-
-
-void decocass_type1_state::csuperas(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,csuperas)
-}
-
-
-void decocass_type1_state::cocean1a(machine_config &config) /* 10 */
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cocean1a)
-}
-
-
-void decocass_type1_state::clocknch(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknch)
-}
-
-void decocass_type1_state::clocknchj(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,clocknchj)
-}
-
-void decocass_type1_state::cfboy0a1(machine_config &config) /* 12 */
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cfboy0a1)
-}
-
-
-void decocass_type1_state::cprogolf(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cprogolf)
-}
-
-
-void decocass_type1_state::cluckypo(machine_config &config)
-{
-	decocass(config);
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cluckypo)
-}
-
-
 void decocass_type1_state::ctisland(machine_config &config)
 {
 	decocrom(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland)
 }
 
 void decocass_type1_state::ctisland3(machine_config &config)
 {
 	decocrom(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland3)
 }
 
 void decocass_type1_state::cexplore(machine_config &config)
 {
 	decocrom(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cexplore)
 }
 
-
-
+// type 3
 
 void decocass_type3_state::cbtime(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cbtime)
 }
-
 
 void decocass_type3_state::cburnrub(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cburnrub)
 }
-
 
 void decocass_type3_state::cgraplop(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop)
 }
-
 
 void decocass_type3_state::cgraplop2(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cgraplop2)
 }
-
 
 void decocass_type3_state::clapapa(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,clapapa)
 }
-
 
 void decocass_type3_state::cskater(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cskater)
 }
-
 
 void decocass_type3_state::cprobowl(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cprobowl)
 }
-
 
 void decocass_type3_state::cnightst(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cnightst)
 }
-
 
 void decocass_type3_state::cpsoccer(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cpsoccer)
 }
-
 
 void decocass_type3_state::csdtenis(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,csdtenis)
 }
-
 
 void decocass_type3_state::czeroize(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,czeroize)
 }
-
 
 void decocass_type3_state::cppicf(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cppicf)
 }
-
 
 void decocass_type3_state::cfghtice(machine_config &config)
 {
 	decocass(config);
-
-	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type3_state,cfghtice)
 }
 
 
 
+/************ Version A BIOS roms *************/
+
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
-
-
-/************ Version A BIOS roms *************/
 
 #define DECOCASS_BIOS_AUDIOCPU(biosindex) \
 	ROM_LOAD_BIOS( biosindex, "v1-.5a",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) /* from RMS-8 board: 2716 eprom @5A w/V1- label,  contains audio cpu code */
@@ -2184,34 +2098,24 @@ void decocass_state::init_decocrom()
 	init_decocass();
 
 	/* convert charram to a banked ROM */
-	membank("bank1")->configure_entry(0, m_charram);
-	membank("bank1")->configure_entry(1, memregion("user3")->base());
-	membank("bank1")->configure_entry(2, memregion("user3")->base()+0x5000);
-	membank("bank1")->set_entry(0);
+	m_rombank->configure_entry(0, m_charram);
+	m_rombank->configure_entry(1, memregion("user3")->base());
+	m_rombank->configure_entry(2, memregion("user3")->base()+0x5000);
+	m_rombank->set_entry(0);
 }
 
 uint8_t decocass_state::cdsteljn_input_r(offs_t offset)
 {
-	uint8_t res;
-	static const char *const portnames[2][4] = {
-		{"P1_MP0", "P1_MP1", "P1_MP2", "P1_MP3"},
-		{"P2_MP0", "P2_MP1", "P2_MP2", "P2_MP3"}         };
-
 	if(offset & 6)
 		return decocass_input_r(offset);
-
-	res = ioport(portnames[offset & 1][m_mux_data])->read();
-
-	return res;
+	else
+		return m_muxport[BIT(offset, 0)][m_mux_data]->read();
 }
 
 void decocass_state::cdsteljn_mux_w(uint8_t data)
 {
 	m_mux_data = (data & 0xc) >> 2;
 	/* bit 0 and 1 are p1/p2 lamps */
-
-	if(data & ~0xf)
-		printf("%02x\n",data);
 }
 
 void decocass_state::init_cdsteljn()

@@ -16,7 +16,7 @@ Public documentation:
 
 - US Patent 4933980
 
-Games using ADSR: gyruss
+Games using ADSR: gyruss (though easier to test with software on Spectrum/MSX)
 
 A list with more games using ADSR can be found here:
       http://mametesters.org/view.php?id=3043

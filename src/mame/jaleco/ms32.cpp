@@ -1774,8 +1774,6 @@ void ms32_f1superbattle_state::f1superb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_f1superbattle_state::f1superb_map);
 
 	m_gfxdecode->set_info(gfx_f1superb);
-
-//  MCFG_VIDEO_START_OVERRIDE(ms32_state,f1superb)
 }
 
 

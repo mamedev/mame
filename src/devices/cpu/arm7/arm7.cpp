@@ -1151,8 +1151,6 @@ void arm7_cpu_device::device_reset()
 	SwitchMode(eARM7_MODE_SVC);
 	m_r[eR15] = 0 | m_vectorbase;
 
-	m_impstate.cache_dirty = true;
-
 	for (auto &entry : m_dtlb_entries)
 	{
 		entry.valid = false;
@@ -2411,5 +2409,3 @@ uint8_t arm7_cpu_device::arm7_cpu_read8(uint32_t addr)
 	// Handle through normal 8 bit handler (for 32 bit cpu)
 	return m_program->read_byte(addr);
 }
-
-#include "arm7drc.hxx"

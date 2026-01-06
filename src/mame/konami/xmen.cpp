@@ -92,7 +92,7 @@ protected:
 	// video-related
 	uint8_t m_layer_colorbase[3]{};
 	uint8_t m_sprite_colorbase = 0;
-	int m_layerpri[3]{};
+	int32_t m_layerpri[3]{};
 	bool m_tilemap_select;
 
 	// devices
@@ -116,7 +116,8 @@ private:
 	required_ioport m_eeprom_out;
 
 	// misc
-	uint8_t m_vblank_irq_mask = 0;
+	bool m_irq3_enable = false;
+	bool m_irq5_enable = false;
 
 	void sound_bankswitch_w(uint8_t data);
 
@@ -173,9 +174,9 @@ K052109_CB_MEMBER(xmen_state::tile_callback)
 {
 	// (color & 0x02) is flip y handled internally by the 052109
 	if (layer == 0)
-		*color = m_layer_colorbase[layer] + ((*color & 0xf0) >> 4);
+		color = m_layer_colorbase[layer] + ((color & 0xf0) >> 4);
 	else
-		*color = m_layer_colorbase[layer] + ((*color & 0x7c) >> 2);
+		color = m_layer_colorbase[layer] + ((color & 0x7c) >> 2);
 }
 
 /***************************************************************************
@@ -186,18 +187,18 @@ K052109_CB_MEMBER(xmen_state::tile_callback)
 
 K053246_CB_MEMBER(xmen_state::sprite_callback)
 {
-	int const pri = (*color & 0x00e0) >> 4;   // ???????
+	int const pri = (color & 0x00e0) >> 4;   // ???????
 
 	if (pri <= m_layerpri[2])
-		*priority_mask = 0;
+		priority_mask = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority_mask = 0xf0;
+		priority_mask = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority_mask = 0xf0 | 0xcc;
+		priority_mask = 0xf0 | 0xcc;
 	else
-		*priority_mask = 0xf0 | 0xcc | 0xaa;
+		priority_mask = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x001f);
+	color = m_sprite_colorbase + (color & 0x001f);
 }
 
 
@@ -358,6 +359,10 @@ void xmen_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_eeprom_out->write(data, 0xff);
 
 		// bit 5 is enabled in IRQ3, disabled in IRQ5 (sprite DMA start?)
+		m_irq5_enable = bool(BIT(data, 5));
+		if (!m_irq5_enable)
+			m_maincpu->set_input_line(5, CLEAR_LINE);
+
 		// bit 7 used in xmen6p to select other tilemap bank (see halfway level 5)
 		m_tilemap_select = BIT(data, 7);
 	}
@@ -381,8 +386,10 @@ void xmen_state::_18fa00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// bit 2 is interrupt enable
-		m_vblank_irq_mask = data & 0x04;
+		// bit 2 is irq3 interrupt enable
+		m_irq3_enable = bool(BIT(data, 2));
+		if (!m_irq3_enable)
+			m_maincpu->set_input_line(3, CLEAR_LINE);
 	}
 }
 
@@ -615,7 +622,8 @@ void xmen_state::machine_start()
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
-	save_item(NAME(m_vblank_irq_mask));
+	save_item(NAME(m_irq3_enable));
+	save_item(NAME(m_irq5_enable));
 	save_item(NAME(m_tilemap_select));
 }
 
@@ -628,18 +636,19 @@ void xmen_state::machine_reset()
 	}
 
 	m_sprite_colorbase = 0;
-	m_vblank_irq_mask = 0;
+	m_irq3_enable = false;
+	m_irq5_enable = false;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::scanline)
 {
 	int const scanline = param;
 
-	if (scanline == 240 && m_vblank_irq_mask) // vblank-out irq
-		m_maincpu->set_input_line(3, HOLD_LINE);
+	if (scanline == 240 && m_irq3_enable) // vblank-out irq
+		m_maincpu->set_input_line(3, ASSERT_LINE);
 
-	if (scanline == 0) // sprite DMA irq?
-		m_maincpu->set_input_line(5, HOLD_LINE);
+	if (scanline == 0 && m_irq5_enable && m_k053246->k053246_is_irq_enabled()) // sprite DMA irq?
+		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
 void xmen_state::sound_hardware(machine_config &config)

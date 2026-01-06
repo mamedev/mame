@@ -42,6 +42,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="6502basic">
+		<description>6502 2nd Processor BASIC Selector</description>
+		<year>1986</year>
+		<publisher>Gordon Horsington</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ram" />
+			<dataarea name="rom" size="16384">
+				<rom name="6502_2ndProcessorBASICSelector.rom" size="999" crc="aa16cca4" sha1="48cdc6079e685aadceca8347b7edc478a79eff2c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="65c02asm">
 		<description>65C02 Assembler 1.60</description>
 		<year>1987</year>
@@ -2168,6 +2180,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="BeebScan-1.31.rom" size="16384" crc="5f3a3452" sha1="50f1c05079bd5dec715321122a86cb7efabd6d40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beebsupp">
+		<description>Beeb Support 1.00</description>
+		<year>1986</year>
+		<publisher>Supreme Software Support</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="BeebSupport-1.00.rom" size="16384" crc="de7ea000" sha1="5d08ab55f051f1501bcfc70578b376e4088bd938"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5295,7 +5318,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="genie101" cloneof="genie" supported="no">
+	<software name="genie101" cloneof="genie">
 		<description>PMS Genie 1.01</description>
 		<year>1987</year>
 		<publisher>Permanent Memory Systems</publisher>
@@ -5307,7 +5330,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="genie" supported="no">
+	<software name="genie">
 		<description>PMS Genie 1.02</description>
 		<year>1987</year>
 		<publisher>Permanent Memory Systems</publisher>
@@ -6441,7 +6464,6 @@ license:CC0-1.0
 			<dataarea name="rom" size="8192">
 				<rom name="Kenda-1.02.rom" size="8192" crc="430b911c" sha1="594ae1d1aeaa20a1d5d1c64cd94d43926dda4029"/>
 			</dataarea>
-			<dataarea name="ram" size="2048" />
 		</part>
 	</software>
 
@@ -6456,7 +6478,6 @@ license:CC0-1.0
 			<dataarea name="rom" size="8192">
 				<rom name="Kenda-1.04.rom" size="8192" crc="1c0013de" sha1="7845a69dd8d05cf905f8e11ad3abeebb4b0b187d"/>
 			</dataarea>
-			<dataarea name="ram" size="2048" />
 		</part>
 	</software>
 
@@ -6511,6 +6532,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Kermit-1.45.rom" size="16384" crc="8a661f49" sha1="347aee917addbeb361fb3a3fca7531b0145c8eb5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keypad">
+		<description>Keypad</description>
+		<year>1984</year>
+		<publisher>Viglen</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Keypad-1.0.rom" size="8192" crc="ba1a8747" sha1="df90341a659638da19ecca125879d8644ccee2c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6995,6 +7027,18 @@ license:CC0-1.0
 			<feature name="slot" value="cciword" />
 			<dataarea name="rom" size="32768">
 				<rom name="MasterROM-1.05.rom" size="32768" crc="bc093018" sha1="81a152427b86fbc5d48a2f7ccd1f265abc0bcb9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masterom">
+		<description>The Master ROM 1.778</description>
+		<year>1988</year>
+		<publisher>John Robinson</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ram" />
+			<dataarea name="rom" size="16384">
+				<rom name="TheMasterROM-1.778.rom" size="16384" crc="907c5322" sha1="450e0dc2847e0ddebba2fc24501e3561429218a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7582,16 +7626,31 @@ license:CC0-1.0
 	</software>
 
 	<software name="moffice2">
-		<description>Instant Mini Office II</description>
+		<description>Instant Mini Office II 2.01D</description>
 		<year>1986</year>
 		<publisher>Database Software</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<feature name="slot" value="palmo2" />
 			<dataarea name="rom" size="131072">
-				<rom name="MiniOfficeII-1.rom" size="32768" crc="5e0f6853" sha1="3deef1b1680c9a1449009b11899bf5ab360f89ef" offset="0x18000"/>
-				<rom name="MiniOfficeII-2.rom" size="32768" crc="afb646cc" sha1="d7ead85e32930b0f35ad87d3a825f48896abc8e1" offset="0x10000"/>
-				<rom name="MiniOfficeII-3.rom" size="32768" crc="e8a1cbd8" sha1="9e31542d2099c98605032c175c196f3ea073de5f" offset="0x08000"/>
-				<rom name="MiniOfficeII-4.rom" size="32768" crc="d041fe31" sha1="cd0297096009c71ebb00709cfb32a6c56e7eea8b" offset="0x00000"/>
+				<rom name="MiniOfficeII-1-2.01d.rom" size="32768" crc="5e0f6853" sha1="3deef1b1680c9a1449009b11899bf5ab360f89ef" offset="0x18000"/>
+				<rom name="MiniOfficeII-2-2.01d.rom" size="32768" crc="afb646cc" sha1="d7ead85e32930b0f35ad87d3a825f48896abc8e1" offset="0x10000"/>
+				<rom name="MiniOfficeII-3-2.01d.rom" size="32768" crc="e8a1cbd8" sha1="9e31542d2099c98605032c175c196f3ea073de5f" offset="0x08000"/>
+				<rom name="MiniOfficeII-4-2.01d.rom" size="32768" crc="d041fe31" sha1="cd0297096009c71ebb00709cfb32a6c56e7eea8b" offset="0x00000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moffice2_201c" cloneof="moffice2">
+		<description>Instant Mini Office II 2.01C</description>
+		<year>1986</year>
+		<publisher>Database Software</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="palmo2" />
+			<dataarea name="rom" size="131072">
+				<rom name="MiniOfficeII-1-2.01c.rom" size="32768" crc="38bbad3e" sha1="1821ab47b2f7e02ed3af7e804030519bf3a42076" offset="0x18000"/>
+				<rom name="MiniOfficeII-2-2.01c.rom" size="32768" crc="9a2898c9" sha1="e8ae6cb24dd28d5c84eed25ca48e14def96878bc" offset="0x10000"/>
+				<rom name="MiniOfficeII-3-2.01c.rom" size="32768" crc="c439ac92" sha1="27e7a9273aa068d80f8da32c209c27a21e046a70" offset="0x08000"/>
+				<rom name="MiniOfficeII-4-2.01c.rom" size="32768" crc="1aef200a" sha1="9b4966354cfb9a6e928bd287db8d84bb62491434" offset="0x00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7752,8 +7811,6 @@ license:CC0-1.0
 			<dataarea name="rom" size="8192">
 				<rom name="MRM-E00-DFS-1.20.rom" size="8192" crc="944958b6" sha1="0db7be4deb303af2400f9af20a9a7211dcbaeae5"/>
 			</dataarea>
-			<!-- TODO: Verify amount of RAM -->
-			<dataarea name="ram" size="4096" />
 		</part>
 	</software>
 
@@ -10110,6 +10167,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="soundfx">
+		<description>Sound Effects</description>
+		<year>1986</year>
+		<publisher>Gordon Horsington</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<feature name="slot" value="ram" />
+			<dataarea name="rom" size="16384">
+				<rom name="SoundEffects.rom" size="5176" crc="13befd46" sha1="05d37f9d86cf48dac24039f4de5b660036a416ca"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sparkdmp">
 		<description>Spark Dump</description>
 		<year>1985</year>
@@ -11072,6 +11141,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="smorset">
+		<description>Super Morse Tutor 1.03b</description>
+		<year>1991</year>
+		<publisher>BLT Software</publisher>
+		<sharedfeat name="compatibility" value="M"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="SuperMorseTutor-1.03b.rom" size="16384" crc="cebbebf5" sha1="b6d39af3bbb577c13f52f30ba1a747aa35bcdda0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprutil">
 		<description>Super Utility</description>
 		<year>1985</year>
@@ -11616,6 +11697,17 @@ license:CC0-1.0
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="TNC3.rom" size="16384" crc="4bad82be" sha1="be0d29c263517003517039fd02bdc521342069c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tncasa">
+		<description>TNC-ASA</description>
+		<year>1988</year>
+		<publisher>&gt;unknown&lt;</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TNC-ASA-1.0.rom" size="16384" crc="bf95819b" sha1="07612c22401ff970ff92077bdae4b7b9ba6ed9d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12165,16 +12257,6 @@ license:CC0-1.0
 			<dataarea name="rom" size="8192">
 				<rom name="UserDUMP-1.6.rom" size="8192" crc="b8939b2c" sha1="223c99058cb92047e4b94142d1e48335697b4de5"/>
 			</dataarea>
-		</part>
-	</software>
-
-	<software name="userram">
-		<description>UserRAM</description>
-		<year>1985</year>
-		<publisher>Acorn User</publisher>
-		<part name="rom1" interface="bbc_rom">
-			<feature name="slot" value="ram" />
-			<dataarea name="ram" size="16384" />
 		</part>
 	</software>
 

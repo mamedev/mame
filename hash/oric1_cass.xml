@@ -1130,7 +1130,8 @@ Side B: An instruction program is recorded at fast speed
 		<description>Dernier Metro</description>
 		<year>1983</year>
 		<publisher>Micro Programmes 5</publisher>
-		<info name="developer" value="Claude Akriche / MP5" />
+		<info name="developer" value="Claude Akriche" />
+		<info name="developer" value="MP5" />
 		<info name="language" value="French" />
 		<part name="cass" interface="oric1_cass">
 			<dataarea name="cass" size="55124">
@@ -5249,7 +5250,8 @@ Works only on Oric Atmos
 		<description>Torreoscura</description>
 		<year>2021</year>
 		<publisher>Commodore Plus</publisher>
-		<info name="developer" value="Bieno Marti / Chema Enguito" />
+		<info name="developer" value="Bieno Marti" />
+		<info name="developer" value="Chema Enguito" />
 		<info name="language" value="Spanish" />
 		<part name="cass1" interface="oric1_cass">
 			<feature name="part_id" value="part 1"/>

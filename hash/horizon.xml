@@ -369,7 +369,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="td130a" cloneof="td130" supported="no">
-		<description>TurboDos 1.30 1.1.1 QH (Alt)</description>
+		<description>TurboDos 1.30 1.1.1 QH (alt)</description>
 		<year>1984</year>
 		<publisher>North Star Computers</publisher>
 		<info name="serial" value="20/002756" />
@@ -2728,7 +2728,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="117disk" supported="no">
-		<description>FORTRAN, CBASIC-2, MBASIC, MAC, NO BOOT (Alt)</description>
+		<description>FORTRAN, CBASIC-2, MBASIC, MAC, NO BOOT (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 

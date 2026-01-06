@@ -146,7 +146,7 @@ int i386_device::x87_mf_fault()
 	if ((m_x87_sw & X87_SW_ES) && (m_cr[0] & CR0_NE)) // FIXME: 486 and up only
 	{
 		m_ext = 1;
-		i386_trap(FAULT_MF, 0, 0);
+		i386_trap(FAULT_MF, 0);
 		return 1;
 	}
 	return 0;
@@ -5057,7 +5057,7 @@ void i386_device::x87_invalid(uint8_t modrm)
 {
 	// TODO
 	report_invalid_opcode();
-	i386_trap(6, 0, 0);
+	i386_trap(6, 0);
 }
 
 
@@ -5072,7 +5072,7 @@ void i386_device::i386_x87_group_d8()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();
@@ -5083,7 +5083,7 @@ void i386_device::i386_x87_group_d9()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();
@@ -5094,7 +5094,7 @@ void i386_device::i386_x87_group_da()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();
@@ -5105,7 +5105,7 @@ void i386_device::i386_x87_group_db()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();
@@ -5116,7 +5116,7 @@ void i386_device::i386_x87_group_dc()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();
@@ -5127,7 +5127,7 @@ void i386_device::i386_x87_group_dd()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();
@@ -5138,7 +5138,7 @@ void i386_device::i386_x87_group_de()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();
@@ -5149,7 +5149,7 @@ void i386_device::i386_x87_group_df()
 {
 	if (m_cr[0] & (CR0_TS | CR0_EM))
 	{
-		i386_trap(FAULT_NM, 0, 0);
+		i386_trap(FAULT_NM, 0);
 		return;
 	}
 	uint8_t modrm = FETCH();

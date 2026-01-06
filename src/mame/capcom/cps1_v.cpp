@@ -93,6 +93,7 @@ Carrier Air Wing (World 901012)                                    89624B-3   CA
 Carrier Air Wing (USA 901130)                                      89625B-1   CA22B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
 Carrier Air Wing (USA 901012)                                      89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 U.S. Navy (Japan 901012)                                           89625B-1   CA22B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
+U.S. Navy (Japan Resale Ver. 901130)                               91634B-2   ARA63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Nemo (World 901109)                                          1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (World 901130)                                                89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
@@ -900,6 +901,21 @@ static const struct gfx_range mapper_AR22B_table[] =
 
 	{ GFXTYPE_SCROLL2, 0x4000, 0x5fff, 1 },
 	{ GFXTYPE_SCROLL3, 0x6000, 0x7fff, 1 },
+	{ 0 }
+};
+
+
+#define mapper_ARA63B    { 0x8000, 0x8000, 0, 0 }, mapper_ARA63B_table
+static const struct gfx_range mapper_ARA63B_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// pins 12,13,14,15 are always enabled
+
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
 	{ 0 }
 };
 
@@ -1797,7 +1813,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"1941j",       CPS_B_05,     mapper_YI22B },   // equivalent to YI24B
 	{"unsquad",     CPS_B_11,     mapper_AR24B },
 	{"area88",      CPS_B_11,     mapper_AR22B },   // equivalent to AR24B
-	{"area88r",     CPS_B_21_DEF, mapper_AR22B },   // wrong, this set uses ARA63B, still not dumped
+	{"area88r",     CPS_B_21_DEF, mapper_ARA63B },
 	{"mercs",       CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsu",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsur1",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
@@ -1817,6 +1833,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"cawingu",     CPS_B_05,     mapper_CA22B },   // equivalent to CA24B
 	{"cawingur1",   CPS_B_16,     mapper_CA24B },
 	{"cawingj",     CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
+	{"cawingjr",    CPS_B_21_DEF, mapper_ARA63B },  // yes, this PCB actually has a ARA63B PAL
 	{"cawingbl",    CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
 	{"sf2",         CPS_B_11,     mapper_STF29,  0x36 },
 	{"sf2ea",       CPS_B_17,     mapper_STF29,  0x36 },

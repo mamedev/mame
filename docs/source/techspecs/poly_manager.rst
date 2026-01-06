@@ -556,7 +556,7 @@ typically have many more object-wide parameters defined here::
         bitmap_rgb32 *dest;    // pointer to the rendering bitmap
         bitmap_ind16 *depth;   // pointer to the depth bitmap
         rgb_t color;           // overall color (for clearing and flat shaded case)
-        uint16_t depthval;     // fixed depth v alue (for clearing)
+        uint16_t depthval;     // fixed depth value (for clearing)
     };
 
 Now it’s time to define our renderer class, which we derive from **poly_manager**. As
@@ -1018,7 +1018,7 @@ returned in **chunk**:
 
 * **chunk** is a reference to a variable that will be set to the actual number of
   contiguous items available starting at **index**. If **chunk** is less than **count**,
-  then the caller should process the **chunk** items returned, then call ``countiguous()``
+  then the caller should process the **chunk** items returned, then call ``contiguous()``
   again at (**index** + **chunk**) to access the rest.
 
 **Return value:** a pointer to the first item in the contiguous chunk. No range checking

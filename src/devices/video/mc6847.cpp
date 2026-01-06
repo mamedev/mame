@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /*********************************************************************
 
-    mc6847.c
+    mc6847.cpp
 
     Implementation of Motorola 6847 video hardware chip
 
@@ -102,11 +102,13 @@
 #define VERBOSE      (0)
 #include "logmacro.h"
 
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
 namespace {
+
 constexpr int LINES_TOP_BORDER                  = 25;
 constexpr int LINES_ACTIVE_VIDEO                = 192;
 constexpr int LINES_BOTTOM_BORDER               = 26;
@@ -137,6 +139,7 @@ constexpr int TIMER_FSYNC_TIME                  = 212;
 // the pixel clock is the mc6847's clock * 2
 constexpr int BMP_L_OR_R_BORDER                 = CLOCKS_L_OR_R_BORDER * 2;
 constexpr int BMP_ACTIVE_VIDEO                  = CLOCKS_ACTIVE_VIDEO * 2;
+
 } // anonymous namespace
 
 

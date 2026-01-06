@@ -195,6 +195,7 @@ public:
 	void yunit_adpcm_6bit_faster(machine_config &config);
 
 	void init_mkla3bl();
+	void init_mkrep();
 	void init_mkyturbo();
 	void init_mkyunit();
 	void init_totcarn();

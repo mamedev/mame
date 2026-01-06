@@ -34,7 +34,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void plus3_update_memory() override;
-	virtual bool is_contended(offs_t offset) override;
 
 private:
 	void rom_w(offs_t offset, uint8_t data);

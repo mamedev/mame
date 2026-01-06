@@ -23,7 +23,7 @@
     - A phone line interface for the Duo's optional built-in modem
 
     The Duo Dock II is similar but adds SONIC Ethernet and has a larger slot
-    to acommodate later Duos which were slightly thicker.  A retrofit for the
+    to accommodate later Duos which were slightly thicker.  A retrofit for the
     original Duo Dock to accomdate those machines was also available.
 
     Emulation status:

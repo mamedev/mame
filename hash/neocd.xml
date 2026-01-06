@@ -340,7 +340,8 @@ license:CC0-1.0
 		<year>2011</year>
 		<publisher>Neo Conception International</publisher>
 		<info name="alt_title" value="バンバン バスターズ"/>
-		<info name="language" value="English/Japanese" />
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
 		<info name="release" value="20111222" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1620,6 +1621,23 @@ license:CC0-1.0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Xeno Crisis (World) (Unl)" sha1="792ee3aa806d06163b4d613f47d8ac9802a20c92"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="cbarrel_Neocd.cue" size="531" crc="b63384ae" sha1="252244d8d5429d13ac765d6050f53de87d484ef0"/>
+	<rom name="cbarrel_Neocd.bin" size="756918288" crc="be62cc20" sha1="010cc136afe8912cef700ae787139846a04d35eb"/>
+	-->
+	<software name="cpbarrel">
+		<description>Captain Barrel</description>
+		<year>2024</year>
+		<publisher>Neo Byte Force</publisher>
+		<info name="developer" value="OzzyOuzo" />
+		<info name="developer" value="Johnny16bit" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cbarrel_Neocd" sha1="c36ef17f7c00a25ca443f3aac01afffa24539de6"/>
 			</diskarea>
 		</part>
 	</software>

@@ -35,7 +35,7 @@ It means we probably would have to emulate a modem device for it to treat commun
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -70,7 +70,7 @@ private:
 	void i80c31_p3_w(uint8_t data);
 	uint8_t i80c31_p1_r();
 	void ti630_palette(palette_device &palette) const;
-	void i80c31_io(address_map &map) ATTR_COLD;
+	void i80c31_data(address_map &map) ATTR_COLD;
 	void i80c31_prg(address_map &map) ATTR_COLD;
 
 	required_device<i80c31_device> m_maincpu;
@@ -86,7 +86,7 @@ void ti630_state::init_ti630()
 {
 }
 
-void ti630_state::i80c31_io(address_map &map)
+void ti630_state::i80c31_data(address_map &map)
 {
 	map(0x0000, 0x0000) /*.mirror(?)*/ .w(m_lcdc, FUNC(hd44780_device::control_w));
 	map(0x1000, 0x1000) /*.mirror(?)*/ .w(m_lcdc, FUNC(hd44780_device::data_w));
@@ -145,7 +145,7 @@ void ti630_state::ti630(machine_config &config)
 	/* basic machine hardware */
 	I80C31(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti630_state::i80c31_prg);
-	m_maincpu->set_addrmap(AS_IO, &ti630_state::i80c31_io);
+	m_maincpu->set_addrmap(AS_DATA, &ti630_state::i80c31_data);
 	m_maincpu->port_in_cb<1>().set(FUNC(ti630_state::i80c31_p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(ti630_state::i80c31_p1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(ti630_state::i80c31_p3_w));

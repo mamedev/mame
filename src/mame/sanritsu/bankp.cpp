@@ -557,6 +557,7 @@ void bankp_state::bankp(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
+	// 1.0 is ok, sound does not overflow other than the boot-up beep
 	SN76489A(config, "sn1", 15.46848_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76489A(config, "sn2", 15.46848_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 	SN76489A(config, "sn3", 15.46848_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -595,7 +596,7 @@ ROM_START( bankp )
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )
-	ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, NO_DUMP ) // read protected
+	ROM_LOAD( "315-5073.pal16l4",  0x025b, 0x0001, NO_DUMP ) // read protected
 ROM_END
 
 ROM_START( bankpt )
@@ -653,7 +654,7 @@ ROM_START( combh )
 
 	ROM_REGION( 0x025c, "user1", 0 )
 	ROM_LOAD( "315-5074.2c.bin",   0x0000, 0x025b, CRC(2e57bbba) SHA1(c3e45e8a972342779442e50872a2f5f2d61e9c0a) )
-	ROM_LOAD( "315-5073.pal16l4",  0x0000, 0x0001, NO_DUMP ) // read protected
+	ROM_LOAD( "315-5073.pal16l4",  0x025b, 0x0001, NO_DUMP ) // read protected
 ROM_END
 
 } // anonymous namespace

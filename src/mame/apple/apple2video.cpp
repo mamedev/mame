@@ -113,9 +113,12 @@ void a2_video_device::txt_w(int state)
 
 void a2_video_device::mix_w(int state)
 {
-	// select mixed mode or nomix
-	screen().update_now();
-	m_mix = state;
+	if (m_mix != state)
+	{
+		// select mixed or full mode
+		screen().update_now();
+		m_mix = state;
+	}
 }
 
 void a2_video_device::scr_w(int state)
@@ -128,12 +131,25 @@ void a2_video_device::scr_w(int state)
 
 void a2_video_device::res_w(int state)
 {
-	// select lo-res or hi-res
-	screen().update_now();
-	m_hires = state;
+	if (m_hires != state)
+	{
+		// select lo-res or hi-res
+		screen().update_now();
+		m_hires = state;
+	}
 }
 
-void a2_video_device::dhires_w(int state)
+void a2_video_device::an2_w(int state)
+{
+	if (m_an2 != state)
+	{
+		// select katakana on II_J_PLUS
+		screen().update_now();
+		m_an2 = state;
+	}
+}
+
+void a2_video_device::an3_w(int state)
 {
 	// select double hi-res
 	screen().update_now();
@@ -148,15 +164,32 @@ void a2_video_device::dhires_w(int state)
 	m_dhires = !state;
 }
 
-void a2_video_device::an2_w(int state)
-{
-	m_an2 = state;
-}
-
 void a2_video_device::a80col_w(bool b80Col)
 {
-	screen().update_now();
-	m_80col = b80Col;
+	if (m_80col != b80Col)
+	{
+		// select 80 or 40 columns
+		screen().update_now();
+		m_80col = b80Col;
+	}
+}
+
+void a2_video_device::altcharset_w(bool altch)
+{
+	if (m_altcharset != altch)
+	{
+		// select primary or alternate (MouseText) character set
+		screen().update_now();
+		m_altcharset = altch;
+	}
+}
+
+void a2_video_device::set_GS_langsel(u8 langsel)
+{
+	// select primary language character set
+	if ((langsel & 0xe8) != (m_GS_langsel & 0xe8))
+		screen().update_now();
+	m_GS_langsel = langsel;
 }
 
 // 4-bit left rotate. Bits 4-6 of n must be a copy of bits 0-2.
@@ -400,10 +433,20 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 		{
 			code |= get_iie_langsw() * 0x100;
 		}
-		else if (Model == model::IIGS)
+		else if ((Model == model::IIGS) && BIT(m_GS_langsel, 3))
 		{
-			code |= get_GS_language() * 0x100;
+			code |= (m_GS_langsel >> 5) * 0x100;
 		}
+	}
+	else if (Model == model::IVEL_ULTRA)
+	{
+		// this model doesn't seem to support flashing characters
+		if (code < 0x80)
+			invert_mask ^= 0x7f;
+
+		// YU/ASCII select
+		if (m_an2)
+			code |= 0x100;
 	}
 	else    // original II and II Plus
 	{
@@ -418,7 +461,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				invert_mask ^= 0x7f;
 			}
 		}
-		else if (code < 0x40 && Model != model::IVEL_ULTRA) // inverse: flip FG and BG
+		else if (code < 0x40) // inverse: flip FG and BG
 		{
 			invert_mask ^= 0x7f;
 		}
@@ -431,7 +474,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 
 	/* look up the character data */
 	unsigned bits = m_char_ptr[code * 8 + row];
-	bits = (Model == model::IVEL_ULTRA) ? (bits >> 1) : (bits & 0x7f);
+	bits = (Invert && !Flip) ? (bits >> 1) : (bits & 0x7f);
 	bits ^= invert_mask;
 	return Flip ? reverse_7_bits[bits] : bits;
 }
@@ -444,8 +487,6 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	/* perform adjustments */
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
 	const int startcol = (cliprect.left() / 14);
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
@@ -457,7 +498,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 	//printf("GR: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	for (int row = startrow; row <= stoprow; row += 4)
+	for (int row = beginrow; row <= endrow; row += 4)
 	{
 		/* calculate address */
 		uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
@@ -519,13 +560,13 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			render_line(&bitmap.pix(row), words, startcol, stopcol, monochrome, Double);
 		}
 
-		if (startcol < stopcol)
+		// copy this row down through the end of its lo-res pixel, respecting cliprect
+		for (int y = 1; ((row + y) & 3) && ((row + y) <= endrow); y++)
 		{
-			for (int y = 1; y < 4; y++)
-			{
-				memcpy(&bitmap.pix(row + y, startcol * 14), &bitmap.pix(row, startcol * 14), (stopcol - startcol) * 14 * (bitmap.bpp() / 8));
-			}
+			memcpy(&bitmap.pix(row + y, startcol * 14), &bitmap.pix(row, startcol * 14), (stopcol - startcol) * 14 * (bitmap.bpp() / 8));
 		}
+		// align subsequent loops to the first row of a lo-res pixel
+		row -= row & 3;
 	}
 }
 
@@ -533,14 +574,10 @@ template <a2_video_device::model Model, bool Invert, bool Flip>
 void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
-
 	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
 
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
+	beginrow = (std::max)(beginrow, cliprect.top());
+	endrow = (std::min)(endrow, cliprect.bottom());
 	const int startcol = (cliprect.left() / 14);
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
@@ -548,7 +585,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	bool const is_80_column = (Model == model::IIE || Model == model::IIGS) && m_80col;
 	bool const monochrome = !(m_graphics && composite_monitor() && composite_text_color(is_80_column));
-	for (int row = startrow; row < stoprow; row++)
+	for (int row = beginrow; row <= endrow; row++)
 	{
 		uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5));
 		uint32_t const aux_address = (Model == model::IIGS) ? address : (address & m_aux_mask);
@@ -583,6 +620,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
+// explicit instantiations
 template void a2_video_device::text_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -594,9 +632,12 @@ template void a2_video_device::text_update<a2_video_device::model::IIE, false, f
 template void a2_video_device::text_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
+	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
+
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
@@ -604,8 +645,6 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
 	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
-
-	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 	uint8_t const bit7_mask = m_dhires ? 0 : 0x80;
@@ -653,13 +692,13 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	int const page = use_page_2() ? 0x4000 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
-	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
-	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
-
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
+
+	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
+	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
 
 	uint8_t const *const vram = &m_ram_ptr[page];
 	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
@@ -918,7 +957,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 			screen_update<model::IIGS, false, false>(screen, *m_8bit_graphics, new_cliprect);
 		}
 
-		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
+		if ((beamy < BORDER_TOP) || (beamy >= (192 + BORDER_TOP)))
 		{
 			if (beamy >= (231+BORDER_TOP))
 			{
@@ -942,7 +981,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				scanline[col+BORDER_LEFT+600] = m_GSborder_colors[m_GSborder];
 			}
 
-			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy-(BORDER_TOP+4));
+			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy - BORDER_TOP);
 			for (int x = 0; x < 560; x++)
 			{
 				scanline[40 + BORDER_LEFT + x] = m_GSborder_colors[*a2pixel++];
@@ -961,7 +1000,16 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// always update the flash timer here so it's smooth regardless of mode switches
-	m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
+	if (Model == model::IIE || Model == model::IIGS)
+	{
+		// video scanner overflow flash timer every 16 frames, ~1.87 Hz (NTSC)
+		m_flash = screen.frame_number() & 0x10;
+	}
+	else
+	{
+		// approximate 555 flash timer, ~2 Hz cycle
+		m_flash = (machine().time() * 4).seconds() & 1;
+	}
 
 	int text_start_row = 0;
 
@@ -1001,6 +1049,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+// explicit instantiations
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1012,6 +1061,7 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, fa
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")

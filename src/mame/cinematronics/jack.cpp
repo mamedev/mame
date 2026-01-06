@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Brad Oliver
+// copyright-holders: Brad Oliver
+
 /***************************************************************************
 
 Jack the Giant Killer memory map (preliminary)
@@ -39,8 +40,8 @@ The 2 ay-8910 read ports are responsible for reading the sound commands.
 
 Notes:
   - "Jack to Mame no Ki (Jack the Giant Killer)" and
-    "Pro Billiard (Tri Pool)" is developed by Noma Trading
-    (distributed via SNK).  Hara Industries probably a bootlegger.
+    "Pro Billiard (Tri Pool)" are developed by Noma Trading
+    (distributed via SNK).  Hara Industries is probably a bootlegger.
 
 Todo:
   - fix striv hanging notes
@@ -49,7 +50,7 @@ Todo:
     The tripool driver used to have a hack making the vblank interrupt go off
     twice per frame, this made the game run way too fast, but no palette bug.
   - what's the correct irq0 frequency of joinem/unclepoo/loverboy?
-  - some remaining unknown memorymap writes
+  - some remaining unknown memory map writes
 
 
 ****************************************************************************
@@ -82,12 +83,346 @@ Stephh's Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "jack.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "sound/ay8910.h"
 
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
+
+namespace {
+
+class jack_state : public driver_device
+{
+public:
+	jack_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
+		m_aysnd(*this, "aysnd"),
+		m_soundlatch(*this, "soundlatch"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	void jack(machine_config &config) ATTR_COLD;
+	void treahunt(machine_config &config) ATTR_COLD;
+	void zzyzzyxx(machine_config &config) ATTR_COLD;
+
+	void init_treahunt() ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<ay8910_device> m_aysnd;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	optional_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+
+	void videoram_w(offs_t offset, uint8_t data);
+	void colorram_w(offs_t offset, uint8_t data);
+	uint8_t flipscreen_r(offs_t offset);
+	void flipscreen_w(offs_t offset, uint8_t data);
+	uint8_t timer_r();
+	uint8_t zzyzzyxx_timer_r();
+
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
+
+	template <bool Has_sprites> uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void program_map(address_map &map) ATTR_COLD;
+
+private:
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+};
+
+class striv_state : public jack_state
+{
+public:
+	striv_state(const machine_config &mconfig, device_type type, const char *tag) :
+		jack_state(mconfig, type, tag),
+		m_questions(*this, "questions")
+	{ }
+
+	void striv(machine_config &config) ATTR_COLD;
+
+	void init_striv() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_region_ptr<uint8_t> m_questions;
+
+	uint16_t m_question_address = 0;
+	uint8_t m_question_rom = 0;
+	uint8_t m_remap_address[16] {};
+
+	uint8_t question_r(offs_t offset);
+
+	void program_map(address_map &map) ATTR_COLD;
+};
+
+class joinem_state : public jack_state
+{
+public:
+	joinem_state(const machine_config &mconfig, device_type type, const char *tag) :
+		jack_state(mconfig, type, tag),
+		m_scrollram(*this, "scrollram")
+	{ }
+
+	void joinem(machine_config &config) ATTR_COLD;
+	void unclepoo(machine_config &config) ATTR_COLD;
+	void loverboy(machine_config &config) ATTR_COLD;
+
+	void init_loverboy() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_shared_ptr<uint8_t> m_scrollram;
+
+	uint8_t m_nmi_enable = 0U;
+	uint8_t m_palette_bank = 0U;
+
+	void control_w(uint8_t data);
+	void scroll_w(offs_t offset, uint8_t data);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void palette_init(palette_device &palette) const ATTR_COLD;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void joinem_program_map(address_map &map) ATTR_COLD;
+	void unclepoo_program_map(address_map &map) ATTR_COLD;
+};
+
+void jack_state::videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void jack_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+uint8_t jack_state::flipscreen_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		flip_screen_set(offset);
+	return 0;
+}
+
+void jack_state::flipscreen_w(offs_t offset, uint8_t data)
+{
+	flip_screen_set(offset);
+}
+
+
+/**************************************************************************/
+
+TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
+{
+	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x18) << 5);
+	int const color = m_colorram[tile_index] & 0x07;
+
+	// striv: m_colorram[tile_index] & 0x80 ???
+
+	tileinfo.set(0, code, color, 0);
+}
+
+TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
+{
+	// logical (col,row) -> memory offset
+	return (col * num_rows) + (num_rows - 1 - row);
+}
+
+void jack_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jack_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(jack_state::tilemap_scan_cols_flipy)), 8, 8, 32, 32);
+}
+
+
+/**************************************************************************/
+
+void jack_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int sy = m_spriteram[offs];
+		int sx = m_spriteram[offs + 1];
+		int const code = m_spriteram[offs + 2] | ((m_spriteram[offs + 3] & 0x08) << 5);
+		int const color = m_spriteram[offs + 3] & 0x07;
+		int flipx = (m_spriteram[offs + 3] & 0x80) >> 7;
+		int flipy = (m_spriteram[offs + 3] & 0x40) >> 6;
+
+		if (flip_screen())
+		{
+			sx = 248 - sx;
+			sy = 248 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+}
+
+template <bool Has_sprites>
+uint32_t jack_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (Has_sprites == true)
+		draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+
+/***************************************************************************
+
+   Joinem has a bit different video hardware with PROMs based palette,
+   3bpp gfx and different banking / colors bits
+
+***************************************************************************/
+
+void joinem_state::scroll_w(offs_t offset, uint8_t data)
+{
+	switch (offset & 3)
+	{
+		// byte 0: column scroll
+		case 0:
+			m_bg_tilemap->set_scrolly(offset >> 2, -data);
+			break;
+
+		// byte 1/2/3: no effect?
+		default:
+			break;
+	}
+
+	m_scrollram[offset] = data;
+}
+
+
+/**************************************************************************/
+
+void joinem_state::palette_init(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
+TILE_GET_INFO_MEMBER(joinem_state::get_bg_tile_info)
+{
+	int const code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
+	int const color = (m_colorram[tile_index] & 0x38) >> 3 | m_palette_bank;
+
+	tileinfo.set(0, code, color, 0);
+}
+
+void joinem_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(joinem_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(joinem_state::tilemap_scan_cols_flipy)), 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_cols(32);
+}
+
+
+/**************************************************************************/
+
+void joinem_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	{
+		int sy = m_spriteram[offs];
+		int sx = m_spriteram[offs + 1];
+		int const code = m_spriteram[offs + 2] | ((m_spriteram[offs + 3] & 0x03) << 8);
+		int const color = (m_spriteram[offs + 3] & 0x38) >> 3 | m_palette_bank;
+		int flipx = (m_spriteram[offs + 3] & 0x80) >> 7;
+		int flipy = (m_spriteram[offs + 3] & 0x40) >> 6;
+
+		if (flip_screen())
+		{
+			sx = 248 - sx;
+			sy = 248 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
+		m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
+				code,
+				color,
+				flipx, flipy,
+				sx, sy, 0);
+	}
+}
+
+uint32_t joinem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
 
 
 /*************************************
@@ -96,7 +431,7 @@ Stephh's Notes:
  *
  *************************************/
 
-uint8_t jack_state::jack_timer_r()
+uint8_t jack_state::timer_r()
 {
 	// jack, tripool, sucasino: checks bit 3
 	// zzyzzyxx, joinem, unclepoo: adds 0x0a and expects 0 (0xf6 + 0x0a)
@@ -104,11 +439,11 @@ uint8_t jack_state::jack_timer_r()
 	// freeze, striv: unused
 
 	// 74LS74 and 74LS393 to divide audiocpu clock
-	uint64_t input = m_audiocpu->total_cycles() >> 9;
+	uint64_t const input = m_audiocpu->total_cycles() >> 9;
 
 	// 74LS393 2QD: 74LS90 in bi-quinary count mode
 	static const int lut_74ls90[10] = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 };
-	uint8_t output = lut_74ls90[(input >> 1) % 10];
+	uint8_t const output = lut_74ls90[(input >> 1) % 10];
 
 	// B3,B6,B7: 74LS90 QC,QD,QA
 	// B4: 74LS393 2QD
@@ -124,56 +459,53 @@ uint8_t jack_state::zzyzzyxx_timer_r()
 
 /***************************************************************/
 
-uint8_t jack_state::striv_question_r(offs_t offset)
+uint8_t striv_state::question_r(offs_t offset)
 {
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)
 	{
 		m_remap_address[offset & 0x0f] = (offset & 0xf0) >> 4;
 	}
-	// Select which rom to read and the high 5 bits of address
+	// Select which ROM to read and the high 5 bits of address
 	else if ((offset & 0xc00) == 0xc00)
 	{
 		m_question_rom = offset & 7;
 		m_question_address = (offset & 0xf8) << 7;
 	}
-	// Read the actual byte from question roms
+	// Read the actual byte from question ROMs
 	else
 	{
-		uint8_t *ROM = memregion("user1")->base();
-		int real_address;
+		int real_address = m_question_address | (offset & 0x3f0) | m_remap_address[offset & 0x0f];
 
-		real_address = m_question_address | (offset & 0x3f0) | m_remap_address[offset & 0x0f];
-
-		// Check if it wants to read from the upper 8 roms or not
+		// Check if it wants to read from the upper 8 ROMs or not
 		if (offset & 0x400)
 			real_address |= 0x8000 * (m_question_rom + 8);
 		else
 			real_address |= 0x8000 * m_question_rom;
 
-		return ROM[real_address];
+		return m_questions[real_address];
 	}
 
 	return 0; // the value read from the configuration reads is discarded
 }
 
 
-void jack_state::joinem_control_w(uint8_t data)
+void joinem_state::control_w(uint8_t data)
 {
 	// d0: related to test mode?
 	// d1: unused?
 	// d2: ?
 
 	// d3-d4: palette bank
-	int palette_bank = data & (m_palette->entries() - 1) >> 3 & 0x18;
-	if (m_joinem_palette_bank != palette_bank)
+	int const palette_bank = data & (m_palette->entries() - 1) >> 3 & 0x18;
+	if (m_palette_bank != palette_bank)
 	{
-		m_joinem_palette_bank = palette_bank;
+		m_palette_bank = palette_bank;
 		m_bg_tilemap->mark_all_dirty();
 	}
 
 	// d5: assume nmi enable
-	m_joinem_nmi_enable = data & 0x20;
+	m_nmi_enable = data & 0x20;
 
 	// d6: unused?
 
@@ -189,11 +521,11 @@ void jack_state::joinem_control_w(uint8_t data)
  *
  *************************************/
 
-void jack_state::jack_map(address_map &map)
+void jack_state::program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).ram();
-	map(0xb000, 0xb07f).ram().share("spriteram");
+	map(0xb000, 0xb07f).ram().share(m_spriteram);
 	map(0xb400, 0xb400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb500, 0xb500).portr("DSW1");
 	map(0xb501, 0xb501).portr("DSW2");
@@ -201,47 +533,47 @@ void jack_state::jack_map(address_map &map)
 	map(0xb503, 0xb503).portr("IN1");
 	map(0xb504, 0xb504).portr("IN2");
 	map(0xb505, 0xb505).portr("IN3");
-	map(0xb506, 0xb507).rw(FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
+	map(0xb506, 0xb507).rw(FUNC(jack_state::flipscreen_r), FUNC(jack_state::flipscreen_w));
 	map(0xb600, 0xb61f).w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xb800, 0xbbff).ram().w(FUNC(jack_state::jack_videoram_w)).share("videoram");
-	map(0xbc00, 0xbfff).ram().w(FUNC(jack_state::jack_colorram_w)).share("colorram");
+	map(0xb800, 0xbbff).ram().w(FUNC(jack_state::videoram_w)).share(m_videoram);
+	map(0xbc00, 0xbfff).ram().w(FUNC(jack_state::colorram_w)).share(m_colorram);
 	map(0xc000, 0xffff).rom();
 }
 
 void jack_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x3fff).rom().share(m_decrypted_opcodes);
 }
 
-void jack_state::striv_map(address_map &map)
+void striv_state::program_map(address_map &map)
 {
-	jack_map(map);
+	jack_state::program_map(map);
 	map(0xb000, 0xb0ff).nopw();
-	map(0xc000, 0xcfff).r(FUNC(jack_state::striv_question_r));
+	map(0xc000, 0xcfff).r(FUNC(striv_state::question_r));
 }
 
 
-void jack_state::joinem_map(address_map &map)
+void joinem_state::joinem_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0xb000, 0xb07f).ram().share("spriteram");
-	map(0xb080, 0xb0ff).ram().w(FUNC(jack_state::joinem_scroll_w)).share("scrollram");
+	map(0xb000, 0xb07f).ram().share(m_spriteram);
+	map(0xb080, 0xb0ff).ram().w(FUNC(joinem_state::scroll_w)).share(m_scrollram);
 	map(0xb400, 0xb400).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xb500, 0xb500).portr("DSW1");
 	map(0xb501, 0xb501).portr("DSW2");
 	map(0xb502, 0xb502).portr("IN0");
 	map(0xb503, 0xb503).portr("IN1");
 	map(0xb504, 0xb504).portr("IN2");
-	map(0xb506, 0xb507).rw(FUNC(jack_state::jack_flipscreen_r), FUNC(jack_state::jack_flipscreen_w));
-	map(0xb700, 0xb700).w(FUNC(jack_state::joinem_control_w));
-	map(0xb800, 0xbbff).ram().w(FUNC(jack_state::jack_videoram_w)).share("videoram");
-	map(0xbc00, 0xbfff).ram().w(FUNC(jack_state::jack_colorram_w)).share("colorram");
+	map(0xb506, 0xb507).rw(FUNC(joinem_state::flipscreen_r), FUNC(joinem_state::flipscreen_w));
+	map(0xb700, 0xb700).w(FUNC(joinem_state::control_w));
+	map(0xb800, 0xbbff).ram().w(FUNC(joinem_state::videoram_w)).share(m_videoram);
+	map(0xbc00, 0xbfff).ram().w(FUNC(joinem_state::colorram_w)).share(m_colorram);
 }
 
-void jack_state::unclepoo_map(address_map &map)
+void joinem_state::unclepoo_program_map(address_map &map)
 {
-	joinem_map(map);
+	joinem_program_map(map);
 	map(0x9000, 0x97ff).ram();
 }
 
@@ -250,7 +582,7 @@ void jack_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x6000, 0x6fff).nopw();  /* R/C filter ??? */
+	map(0x6000, 0x6fff).nopw();  // R/C filter ???
 }
 
 void jack_state::sound_io_map(address_map &map)
@@ -339,7 +671,7 @@ static INPUT_PORTS_START( jack )
 INPUT_PORTS_END
 
 
-/* Same as 'jack', but different coinage */
+// Same as 'jack', but different coinage
 static INPUT_PORTS_START( jack2 )
 	PORT_INCLUDE( jack )
 
@@ -357,7 +689,7 @@ static INPUT_PORTS_START( jack2 )
 INPUT_PORTS_END
 
 
-/* Same as 'jack', but another different coinage */
+// Same as 'jack', but another different coinage
 static INPUT_PORTS_START( jack3 )
 	PORT_INCLUDE( jack )
 
@@ -375,7 +707,7 @@ static INPUT_PORTS_START( jack3 )
 INPUT_PORTS_END
 
 
-/* Same as 'jack', but different "Bullets per Bean Collected" and "Difficulty" Dip Switches */
+// Same as 'jack', but different "Bullets per Bean Collected" and "Difficulty" Dip Switches
 static INPUT_PORTS_START( treahunt )
 	PORT_INCLUDE( jack )
 
@@ -435,7 +767,7 @@ static INPUT_PORTS_START( zzyzzyxx )
 	PORT_DIPSETTING(    0x00, "3 under 4000 pts" )
 	PORT_DIPSETTING(    0x80, "5 under 4000 pts" )
 	PORT_DIPSETTING(    0x40, DEF_STR( None ) )         // 3 under 0 pts
-//  PORT_DIPSETTING(    0xc0, DEF_STR( None ) )         // 5 under 0 pts
+	PORT_DIPSETTING(    0xc0, DEF_STR( None ) )         // 5 under 0 pts
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -875,7 +1207,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_jack )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "gfx", 0, charlayout, 0, 8 )
 GFXDECODE_END
 
 
@@ -891,14 +1223,10 @@ static const gfx_layout joinem_charlayout =
 };
 
 static GFXDECODE_START( gfx_joinem )
-	GFXDECODE_ENTRY( "gfx1", 0, joinem_charlayout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx", 0, joinem_charlayout, 0, 32 )
 GFXDECODE_END
 
 /***************************************************************/
-
-void jack_state::machine_start()
-{
-}
 
 void jack_state::machine_reset()
 {
@@ -906,14 +1234,14 @@ void jack_state::machine_reset()
 }
 
 
-MACHINE_START_MEMBER(jack_state,striv)
+void striv_state::machine_start()
 {
 	save_item(NAME(m_question_address));
 	save_item(NAME(m_question_rom));
 	save_item(NAME(m_remap_address));
 }
 
-MACHINE_RESET_MEMBER(jack_state,striv)
+void striv_state::machine_reset()
 {
 	m_question_address = 0;
 	m_question_rom = 0;
@@ -923,17 +1251,17 @@ MACHINE_RESET_MEMBER(jack_state,striv)
 }
 
 
-MACHINE_START_MEMBER(jack_state,joinem)
+void joinem_state::machine_start()
 {
-	m_joinem_palette_bank = 0;
+	m_palette_bank = 0;
 
-	save_item(NAME(m_joinem_nmi_enable));
-	save_item(NAME(m_joinem_palette_bank));
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_palette_bank));
 }
 
-MACHINE_RESET_MEMBER(jack_state,joinem)
+void joinem_state::machine_reset()
 {
-	joinem_control_w(0);
+	control_w(0);
 }
 
 
@@ -943,25 +1271,25 @@ void jack_state::jack(machine_config &config)
 {
 	constexpr XTAL MASTER_XTAL = 18_MHz_XTAL; // 18MHz in the schematics, should be correct
 
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, MASTER_XTAL / 6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::jack_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(jack_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, MASTER_XTAL / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jack_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &jack_state::sound_io_map);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_XTAL / 3, 384, 0, 256, 264, 16, 240);
-	m_screen->set_screen_update(FUNC(jack_state::screen_update_jack));
+	m_screen->set_screen_update(FUNC(jack_state::screen_update<true>));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jack);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -969,7 +1297,7 @@ void jack_state::jack(machine_config &config)
 
 	AY8910(config, m_aysnd, MASTER_XTAL / 12);
 	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	m_aysnd->port_b_read_callback().set(FUNC(jack_state::jack_timer_r));
+	m_aysnd->port_b_read_callback().set(FUNC(jack_state::timer_r));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -986,65 +1314,57 @@ void jack_state::zzyzzyxx(machine_config &config)
 }
 
 
-void jack_state::striv(machine_config &config)
+void striv_state::striv(machine_config &config)
 {
 	jack(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::striv_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &striv_state::program_map);
 
-	MCFG_MACHINE_START_OVERRIDE(jack_state,striv)
-	MCFG_MACHINE_RESET_OVERRIDE(jack_state,striv)
-
-	/* video hardware */
-	m_screen->set_screen_update(FUNC(jack_state::screen_update_striv));
+	// video hardware
+	m_screen->set_screen_update(FUNC(striv_state::screen_update<false>));
 }
 
 
 /***************************************************************/
 
-INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
+INTERRUPT_GEN_MEMBER(joinem_state::vblank_irq)
 {
-	if (m_joinem_nmi_enable)
+	if (m_nmi_enable)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void jack_state::loverboy(machine_config &config)
+void joinem_state::loverboy(machine_config &config)
 {
 	jack(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::joinem_map);
-	m_maincpu->set_vblank_int("screen", FUNC(jack_state::joinem_vblank_irq));
-	m_maincpu->set_periodic_int(FUNC(jack_state::irq0_line_hold), attotime::from_hz(250)); // ??? controls game speed
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &joinem_state::joinem_program_map);
+	m_maincpu->set_vblank_int("screen", FUNC(joinem_state::vblank_irq));
+	m_maincpu->set_periodic_int(FUNC(joinem_state::irq0_line_hold), attotime::from_hz(250)); // ??? controls game speed
 
-	MCFG_MACHINE_START_OVERRIDE(jack_state,joinem)
-	MCFG_MACHINE_RESET_OVERRIDE(jack_state,joinem)
-
-	/* video hardware */
-	m_screen->set_screen_update(FUNC(jack_state::screen_update_joinem));
+	// video hardware
+	m_screen->set_screen_update(FUNC(joinem_state::screen_update));
 
 	m_gfxdecode->set_info(gfx_joinem);
 
-	PALETTE(config.replace(), m_palette, FUNC(jack_state::joinem_palette), 64);
-
-	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
+	PALETTE(config.replace(), m_palette, FUNC(joinem_state::palette_init), 64);
 }
 
-void jack_state::joinem(machine_config &config)
+void joinem_state::joinem(machine_config &config)
 {
 	loverboy(config);
-	m_aysnd->port_b_read_callback().set(FUNC(jack_state::zzyzzyxx_timer_r));
+	m_aysnd->port_b_read_callback().set(FUNC(joinem_state::zzyzzyxx_timer_r));
 }
 
-void jack_state::unclepoo(machine_config &config)
+void joinem_state::unclepoo(machine_config &config)
 {
 	joinem(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::unclepoo_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &joinem_state::unclepoo_program_map);
 
-	/* video hardware */
+	// video hardware
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_palette->set_entries(256);
 }
@@ -1068,10 +1388,10 @@ ROM_START( jack )
 	ROM_LOAD( "jgk.j2",       0xe000, 0x1000, CRC(db21bd55) SHA1(5518c34d381129c7940de85c476639cafd0e5025) )
 	ROM_LOAD( "jgk.j1",       0xf000, 0x1000, CRC(49fffe31) SHA1(b5a0a7d021c8001368bb5d3b41a728734eb50ac5) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "jgk.j9",       0x0000, 0x1000, CRC(c2dc1e00) SHA1(57e8abf5a5eb3f5a22e206ee2562b64ea0ba2d05) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "jgk.j12",      0x0000, 0x1000, CRC(ce726df0) SHA1(d0b83c5ceb558dafb6387445d5cfb4668f2f4386) )
 	ROM_LOAD( "jgk.j13",      0x1000, 0x1000, CRC(6aec2c8d) SHA1(f81c44e79e18a864abfeb8769f012a6e93679164) )
 	ROM_LOAD( "jgk.j11",      0x2000, 0x1000, CRC(fd14c525) SHA1(5e6a8274d008c5dd276aaf85f7f943810b5ac987) )
@@ -1090,10 +1410,10 @@ ROM_START( jack2 )
 	ROM_LOAD( "jgk.j2",       0xe000, 0x1000, CRC(db21bd55) SHA1(5518c34d381129c7940de85c476639cafd0e5025) )
 	ROM_LOAD( "jgk.j1",       0xf000, 0x1000, CRC(49fffe31) SHA1(b5a0a7d021c8001368bb5d3b41a728734eb50ac5) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "jgk.j9",       0x0000, 0x1000, CRC(c2dc1e00) SHA1(57e8abf5a5eb3f5a22e206ee2562b64ea0ba2d05) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "jgk.j12",      0x0000, 0x1000, CRC(ce726df0) SHA1(d0b83c5ceb558dafb6387445d5cfb4668f2f4386) )
 	ROM_LOAD( "jgk.j13",      0x1000, 0x1000, CRC(6aec2c8d) SHA1(f81c44e79e18a864abfeb8769f012a6e93679164) )
 	ROM_LOAD( "jgk.j11",      0x2000, 0x1000, CRC(fd14c525) SHA1(5e6a8274d008c5dd276aaf85f7f943810b5ac987) )
@@ -1112,10 +1432,10 @@ ROM_START( jack3 )
 	ROM_LOAD( "jgk.j2",       0xe000, 0x1000, CRC(db21bd55) SHA1(5518c34d381129c7940de85c476639cafd0e5025) )
 	ROM_LOAD( "jack1",        0xf000, 0x1000, CRC(7e75ea3d) SHA1(9f3b998a8a494d67e3aa8933eb113fa2d2adae61) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "jgk.j9",       0x0000, 0x1000, CRC(c2dc1e00) SHA1(57e8abf5a5eb3f5a22e206ee2562b64ea0ba2d05) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "jack12",       0x0000, 0x1000, CRC(80320647) SHA1(5e39891033e23256456aad1a3f53cd1e516de51d) )
 	ROM_LOAD( "jgk.j13",      0x1000, 0x1000, CRC(6aec2c8d) SHA1(f81c44e79e18a864abfeb8769f012a6e93679164) )
 	ROM_LOAD( "jgk.j11",      0x2000, 0x1000, CRC(fd14c525) SHA1(5e6a8274d008c5dd276aaf85f7f943810b5ac987) )
@@ -1124,7 +1444,7 @@ ROM_END
 
 
 ROM_START( treahunt )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "thunt-1.f2",   0x0000, 0x1000, CRC(0b35858c) SHA1(b8f80c69fcbce71e1b85c8f39599f8bebfeb2585) )
 	ROM_LOAD( "thunt-2.f3",   0x1000, 0x1000, CRC(67305a51) SHA1(c00b9592c4e146892313e8d32261338957a6a04a) )
 	ROM_LOAD( "thunt-3.4f",   0x2000, 0x1000, CRC(d7a969c3) SHA1(7edcbc90836e32aff4a26b0c55a76bbc9bb488fe) )
@@ -1134,10 +1454,10 @@ ROM_START( treahunt )
 	ROM_LOAD( "thunt-7.6e",   0xe000, 0x1000, CRC(7c2d6279) SHA1(b3dd9875faf9cd91034193794a7b187d79741353) )
 	ROM_LOAD( "thunt-8.4e",   0xf000, 0x1000, CRC(f73b86fb) SHA1(7fd4d0876ffee74ec73def085fc845535bb7e451) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "jgk.j9",       0x0000, 0x1000, CRC(c2dc1e00) SHA1(57e8abf5a5eb3f5a22e206ee2562b64ea0ba2d05) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "thunt-13.a4",  0x0000, 0x1000, CRC(e03f1f09) SHA1(546b270aeeb2d35b718ddd6f15829d4cbe0f7ef6) )
 	ROM_LOAD( "thunt-12.a3",  0x1000, 0x1000, CRC(da4ee9eb) SHA1(e01c9cfa426d2b94e6bc976622b888b2ca224771) )
 	ROM_LOAD( "thunt-10.a1",  0x2000, 0x1000, CRC(51ec7934) SHA1(f39d99c356d8d9960022fa2c068b5f7206404d85) )
@@ -1156,11 +1476,11 @@ ROM_START( zzyzzyxx )
 	ROM_LOAD( "g.6e",         0xe000, 0x1000, CRC(408f2326) SHA1(fe45084ed50701577eade2da8f4f787ee41d7acf) )
 	ROM_LOAD( "h.4e",         0xf000, 0x1000, CRC(f8bbabe0) SHA1(59b2223219712f8a572b2cfbbc14f80ec2b32aae) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "i.5a",         0x0000, 0x1000, CRC(c7742460) SHA1(1dbf0f5be1e2666feef83f256e2993a6c23d7cfc) )
 	ROM_LOAD( "j.6a",         0x1000, 0x1000, CRC(72166ccd) SHA1(4f4efcd8ed7f729f4630446607b0e9c93098aa3a) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "n.1c",         0x0000, 0x1000, CRC(4f64538d) SHA1(1d48f12ff0d1c5604d19338b26e800a91f1be9c1) )
 	ROM_LOAD( "m.1d",         0x1000, 0x1000, CRC(217b1402) SHA1(b842b2bde8ff5be6b240ccfb35c7a9f701dab5f4) )
 	ROM_LOAD( "k.1b",         0x2000, 0x1000, CRC(b8b2b8cc) SHA1(e149fc91043f3233e10c81358b8624a4bc0baf4e) )
@@ -1179,11 +1499,11 @@ ROM_START( zzyzzyxx2 )
 	ROM_LOAD( "g.6e",         0xe000, 0x1000, CRC(408f2326) SHA1(fe45084ed50701577eade2da8f4f787ee41d7acf) )
 	ROM_LOAD( "h.4e",         0xf000, 0x1000, CRC(f8bbabe0) SHA1(59b2223219712f8a572b2cfbbc14f80ec2b32aae) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "i.5a",         0x0000, 0x1000, CRC(c7742460) SHA1(1dbf0f5be1e2666feef83f256e2993a6c23d7cfc) )
 	ROM_LOAD( "j.6a",         0x1000, 0x1000, CRC(72166ccd) SHA1(4f4efcd8ed7f729f4630446607b0e9c93098aa3a) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "n.1c",         0x0000, 0x1000, CRC(4f64538d) SHA1(1d48f12ff0d1c5604d19338b26e800a91f1be9c1) )
 	ROM_LOAD( "m.1d",         0x1000, 0x1000, CRC(217b1402) SHA1(b842b2bde8ff5be6b240ccfb35c7a9f701dab5f4) )
 	ROM_LOAD( "k.1b",         0x2000, 0x1000, CRC(b8b2b8cc) SHA1(e149fc91043f3233e10c81358b8624a4bc0baf4e) )
@@ -1202,11 +1522,11 @@ ROM_START( brix ) // P-1244-1A PCB
 	ROM_LOAD( "brix_g.6e",    0xe000, 0x1000, CRC(adca02d8) SHA1(75703a6f6d8b5eeb609ed5829d12b97b62309ba4) )
 	ROM_LOAD( "brix_h.4e",    0xf000, 0x1000, CRC(bc3b878c) SHA1(91a5daa90a4c46a354f4ef64730b4a0a8348b6a0) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "brix_i.5a",    0x0000, 0x1000, CRC(c7742460) SHA1(1dbf0f5be1e2666feef83f256e2993a6c23d7cfc) )
 	ROM_LOAD( "brix_j.6a",    0x1000, 0x1000, CRC(72166ccd) SHA1(4f4efcd8ed7f729f4630446607b0e9c93098aa3a) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "brix_n.1c",    0x0000, 0x1000, CRC(8064910e) SHA1(331048e30604ef2a0ae0d7ee5ca5c230b601aec7) )
 	ROM_LOAD( "brix_m.1d",    0x1000, 0x1000, CRC(217b1402) SHA1(b842b2bde8ff5be6b240ccfb35c7a9f701dab5f4) )
 	ROM_LOAD( "brix_k.1b",    0x2000, 0x1000, CRC(c7d7e2a0) SHA1(9790e78abf4f57ddfcef8e5632699152f9440a67) )
@@ -1225,10 +1545,10 @@ ROM_START( freeze )
 	ROM_LOAD( "freeze.e5",    0xe000, 0x1000, CRC(95c18d75) SHA1(02c8b9738049f61d1d34053f508b26ee588b2025) )
 	ROM_LOAD( "freeze.e4",    0xf000, 0x1000, CRC(7e8f5afc) SHA1(5694982671ef5c7564f216150825f4e81c4ba617) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "freeze.a1",    0x0000, 0x1000, CRC(7771f5b9) SHA1(48715945f67a0d736c86d1fdd738964c6cf74c35) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "freeze.5a",    0x0000, 0x1000, CRC(6c8a98a0) SHA1(358a88377a227566962251c2a6ad7aea52ae1d17) )
 	ROM_LOAD( "freeze.3a",    0x1000, 0x1000, CRC(6d2125e4) SHA1(6c3a12af512a1243b73759a758da8329bca38833) )
 	ROM_LOAD( "freeze.1a",    0x2000, 0x1000, CRC(3a7f2fa9) SHA1(5f0811ea4e61b9918de2d16ffcfa4a02af833613) )
@@ -1247,10 +1567,10 @@ ROM_START( sucasino )
 	ROM_LOAD( "7",            0xe000, 0x1000, CRC(67c68b82) SHA1(b5d3977bf1f1337a96ae7bb60fe11e6ca9e87485) )
 	ROM_LOAD( "8",            0xf000, 0x1000, CRC(f5b63006) SHA1(a069fb9b9b6d47ac3f0fbbd9b2c89da31d6b1202) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "9",            0x0000, 0x1000, CRC(67cf8aec) SHA1(95be671d5f7526610b175fc4121459e0ffc3649b) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "11",           0x0000, 0x1000, CRC(f92c4c5b) SHA1(a415c8f55d1792e79d05ece223ef423f8578f896) )
 	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "10",           0x2000, 0x1000, CRC(3b0783ce) SHA1(880f258351a8b0d76abe433cc77d95b991ae1adc) )
@@ -1269,10 +1589,10 @@ ROM_START( tripool )
 	ROM_LOAD( "tri25d.bin",   0xe000, 0x1000, CRC(8e64512d) SHA1(c4983db1e8143dc90f9a8c99bdbb73dc31529a6c) )
 	ROM_LOAD( "tri13d.bin",   0xf000, 0x1000, CRC(ad268e9b) SHA1(5d8d9b1c57b332b5a28b01d6a4f4885239d80b00) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "trisnd.bin",   0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
 	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
@@ -1291,10 +1611,10 @@ ROM_START( tripoola )
 	ROM_LOAD( "tri25d.bin",   0xe000, 0x1000, CRC(8e64512d) SHA1(c4983db1e8143dc90f9a8c99bdbb73dc31529a6c) )
 	ROM_LOAD( "tp1ckt",       0xf000, 0x1000, CRC(72ec43a3) SHA1(a4f5b20872e41845340db627321e0dbcad4b964e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "trisnd.bin",   0x0000, 0x1000, CRC(945c4b8b) SHA1(f574de1633e7dd71d29c0bcdbc6fa675d1a3f7d1) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "tri105a.bin",  0x0000, 0x1000, CRC(366a753c) SHA1(30fa8d80e42287e3e8677aefd15beab384265728) )
 	ROM_FILL(                 0x1000, 0x1000, 0x00 )
 	ROM_LOAD( "tri93a.bin",   0x2000, 0x1000, CRC(35213782) SHA1(05d5a67ffa3d26377c54777917d3ba51677ebd28) )
@@ -1383,21 +1703,21 @@ ROM_START( striv )
 	ROM_LOAD( "s.triv_p2.3f",       0x1000, 0x1000, CRC(921610ba) SHA1(7dea7a57543dd79325da34cebd7b9dd8a767bb2a) )
 	ROM_LOAD( "pr3.5f",             0x2000, 0x1000, BAD_DUMP CRC(c36f0e21) SHA1(d036a56798bbb42bee269450524172ec071dcf03) ) // wasn't in the romset, but the other 3 ROMs match the ones from strivf
 	ROM_LOAD( "s.triv_cp4.6f",      0x3000, 0x1000, CRC(0dc98a97) SHA1(36c1c61d3330e2c00d9aa94ae80bcb1b9c5aea21) )
-	/* 0xc000 - 0xcfff questions rom space */
+	// 0xc000 - 0xcfff questions ROM space
 	ROM_LOAD( "s.triv_c3.7e",       0xd000, 0x1000, CRC(2f4b0570) SHA1(32f9fed9898de9059e39bc80700f65c2690383b6) )
 	ROM_LOAD( "s.triv_c2.6e",       0xe000, 0x1000, CRC(e21bd3ab) SHA1(a34056df2df3e5fcdfee78b65caff0eb82733d42) ) // FIXED BITS (x0xxxxxx)
 	ROM_LOAD( "s.triv_c1.5e",       0xf000, 0x1000, CRC(2c2c7282) SHA1(91b983e8cd86579f6ebbe72ebaaa98814da27f9b) ) // FIXED BITS (x0xxxxxx)
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "s.triv_sound.5a",       0x0000, 0x1000, CRC(b7ddf84f) SHA1(fa4cc0b2e5a88c82c62492c03e97ac6aa8a905b1) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "s.triv.5a",      0x0000, 0x1000, CRC(8f982a9c) SHA1(dd6f454dfd3e03d008080890881cfafd79758a40) )
 	ROM_LOAD( "s.triv.4a",      0x1000, 0x1000, CRC(8f982a9c) SHA1(dd6f454dfd3e03d008080890881cfafd79758a40) )
 	ROM_LOAD( "s.triv.2a",      0x2000, 0x1000, CRC(7ad4358e) SHA1(dd3a03c78fa8bf435e9905b901dc5a9987cd52e4) )
 	ROM_LOAD( "s.triv.1a",      0x3000, 0x1000, CRC(8f60229b) SHA1(96a888ae02797a205e1c6202395d3b42a820ad4d) )
 
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF ) /* Question roms */
+	ROM_REGION( 0x80000, "questions", ROMREGION_ERASEFF )
 	ROM_LOAD( "s.triv_ts0.u6",     0x00000, 0x8000, CRC(796849da) SHA1(c72ef2fecd5b4ec887759cae49eb837f96acc7eb) )
 	ROM_LOAD( "s.triv_ts1.u7",     0x08000, 0x8000, CRC(059d4900) SHA1(c7affe5ee9e4111f89e0cd8357ba795480c46cbb) )
 	ROM_LOAD( "s.triv_ts2.u8",     0x10000, 0x8000, CRC(184159aa) SHA1(b239d14f43b5bd493e5df430fa34aa60ab861079) )
@@ -1417,21 +1737,21 @@ ROM_START( strivf )
 	ROM_LOAD( "pr2.4f",       0x1000, 0x1000, CRC(921610ba) SHA1(7dea7a57543dd79325da34cebd7b9dd8a767bb2a) )
 	ROM_LOAD( "pr3.5f",       0x2000, 0x1000, CRC(c36f0e21) SHA1(d036a56798bbb42bee269450524172ec071dcf03) )
 	ROM_LOAD( "pr4.6f",       0x3000, 0x1000, CRC(0dc98a97) SHA1(36c1c61d3330e2c00d9aa94ae80bcb1b9c5aea21) )
-	/* 0xc000 - 0xcfff questions rom space */
+	// 0xc000 - 0xcfff questions ROM space
 	ROM_LOAD( "bc3.7e",       0xd000, 0x1000, CRC(83f03885) SHA1(d83f03752ccf85fd9f10c2d801ecd5f4ef729cde) )
 	ROM_LOAD( "bc2.6e",       0xe000, 0x1000, CRC(75f18361) SHA1(4966418f3b6204e888bd56f36db88518dcd08640) )
 	ROM_LOAD( "bc1.5e",       0xf000, 0x1000, CRC(0d150385) SHA1(090139797a1b6935fcf4c239e11bdd7ae55fac76) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "snd.5a",       0x0000, 0x1000, CRC(b7ddf84f) SHA1(fa4cc0b2e5a88c82c62492c03e97ac6aa8a905b1) )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_REGION( 0x4000, "gfx", 0 )
 	ROM_LOAD( "chr3.5a",      0x0000, 0x1000, CRC(8f982a9c) SHA1(dd6f454dfd3e03d008080890881cfafd79758a40) )
 	ROM_LOAD( "chr2.4a",      0x1000, 0x1000, CRC(8f982a9c) SHA1(dd6f454dfd3e03d008080890881cfafd79758a40) )
 	ROM_LOAD( "chr1.2a",      0x2000, 0x1000, CRC(7ad4358e) SHA1(dd3a03c78fa8bf435e9905b901dc5a9987cd52e4) )
 	ROM_LOAD( "chr0.1a",      0x3000, 0x1000, CRC(8f60229b) SHA1(96a888ae02797a205e1c6202395d3b42a820ad4d) )
 
-	ROM_REGION( 0x80000, "user1", ROMREGION_ERASEFF ) /* Question roms */
+	ROM_REGION( 0x80000, "questions", ROMREGION_ERASEFF )
 	ROM_LOAD( "rom.u6",       0x00000, 0x8000, CRC(a32d7a28) SHA1(fbad0b5c9f1dbeb4f245a2198248c18ceae556fa) )
 	ROM_LOAD( "rom.u7",       0x08000, 0x8000, CRC(bc44ae18) SHA1(815cc3c87b89fc702a9ca88d5117ab46464b53c0) )
 	ROM_LOAD( "tbfd2.u8",     0x10000, 0x8000, CRC(9572984a) SHA1(0edd668754b84cc8c3dce9c8db17ea6e4a397765) )
@@ -1444,62 +1764,62 @@ ROM_START( strivf )
 	ROM_LOAD( "tbfd1.u15",    0x48000, 0x8000, CRC(745db398) SHA1(52b6999699ebae8ed9ada45d47a8f8ee68e36bf1) )
 	// 0x50000 - 0x7ffff empty
 
-	ROM_REGION( 0x2000, "user2", 0 ) // ? probably leftover / unused, it's a program rom from Hyper Olympic
+	ROM_REGION( 0x2000, "user2", 0 ) // ? probably leftover / unused, it's a program ROM from Hyper Olympic
 	ROM_LOAD( "tbfd0.u21",    0x0000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )
 ROM_END
 
 ROM_START( joinem )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "join1.r0", 0x0000, 0x2000, CRC(b5b2e2cc) SHA1(e939478d19ac27807ba4180835c512b5fcb8d0c5) )
 	ROM_LOAD( "join2.r2", 0x2000, 0x2000, CRC(bcf140e6) SHA1(3fb4fbb758518d8ae26abbe76f12678cf988bd0e) )
 	ROM_LOAD( "join3.r4", 0x4000, 0x2000, CRC(fe04e4d4) SHA1(9b34cc5915dd78340d1cedb34f5d397d3b39ca14) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "join7.s0", 0x0000, 0x1000, CRC(bb8a7814) SHA1(cfb85408827b96a81401223256e23082b7e9598f) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_REGION( 0x3000, "gfx", 0 )
 	ROM_LOAD( "join4.p3", 0x0000, 0x1000, CRC(4964c82c) SHA1(7a45399db20f9bbdb2de58243732e3951ffe358c) )
 	ROM_LOAD( "join5.p2", 0x1000, 0x1000, CRC(ae78fa89) SHA1(8f43fd2ec037185a1b9bd9c61c49ad891c504d4d) )
 	ROM_LOAD( "join6.p1", 0x2000, 0x1000, CRC(2b533261) SHA1(ce6c1fa833b34aeb401f430d212415c33beb2922) )
 
-	ROM_REGION( 0x100, "proms", 0 ) /* colours */
+	ROM_REGION( 0x100, "proms", 0 ) // colours
 	ROM_LOAD_NIB_LOW(  "l82s129.11n", 0x000, 0x100, CRC(7b724211) SHA1(7396c773e8d48dea856d9482d6c48de966616c83) )
 	ROM_LOAD_NIB_HIGH( "h82s129.12n", 0x000, 0x100, CRC(2e81c5ff) SHA1(e103c8813af704d5de11fe705de5105ff3a691c3) )
 ROM_END
 
 
 ROM_START( unclepoo )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "01.f17", 0x0000, 0x2000, CRC(92fb238c) SHA1(e9476c5c1a0bf9e8c6c364ac022ed1d97ae66d2e) )
 	ROM_LOAD( "02.f14", 0x2000, 0x2000, CRC(b99214ef) SHA1(c8e4af0efbc5ea543277b2764dc6f119aae477ca) )
 	ROM_LOAD( "03.f11", 0x4000, 0x2000, CRC(a136af97) SHA1(cfa610bf357870053617fed8aef6bb30bd996422) )
 	ROM_LOAD( "04.f09", 0x6000, 0x2000, CRC(c4bcd414) SHA1(df3125358530f5fb8d202bddcb0ef5e322fabb7b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "08.c15", 0x0000, 0x1000, CRC(fd84106b) SHA1(891853d2b39850a981016108b74ca20337d2cdd8) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_REGION( 0x6000, "gfx", 0 )
 	ROM_LOAD( "07.h04", 0x0000, 0x2000, CRC(e2f73e99) SHA1(61cb09ff424ba63b892b4822e7ed916af73412f1) )
 	ROM_LOAD( "06.j04", 0x2000, 0x2000, CRC(94b5f676) SHA1(32c27854726636c4ce03bb6a83b32d04ed6c42af) )
 	ROM_LOAD( "05.k04", 0x4000, 0x2000, CRC(64026934) SHA1(a5342335d02d34fa6ba2b29484ed71ecc96292f2) )
 
-	ROM_REGION( 0x200, "proms", 0 ) /* colours */
+	ROM_REGION( 0x200, "proms", 0 ) // colours
 	ROM_LOAD_NIB_LOW(  "diatec_l.bin", 0x000, 0x100, CRC(b04d466a) SHA1(1438abeae76ef807ba34bd6d3e4c44f707dbde6e) )
 	ROM_LOAD_NIB_HIGH( "diatec_h.bin", 0x000, 0x100, CRC(938601b1) SHA1(8213284989bebb5f7375878181840de8079dc1f3) )
 ROM_END
 
 
 ROM_START( loverboy )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lover.r0", 0x0000, 0x2000, CRC(ffec4e41) SHA1(65428ebcb3af47071fef70a35388e070a019f692) )
 	ROM_LOAD( "lover.r2", 0x2000, 0x2000, CRC(04052262) SHA1(056a225c8625e53881753b0b0330f9b277d14a7d) )
 	ROM_LOAD( "lover.r4", 0x4000, 0x2000, CRC(ce5f3b49) SHA1(cb55e1f7c3df59389ac14b7da4f584ae054abca3) )
 	ROM_LOAD( "lover.r6", 0x6000, 0x1000, CRC(839d79b7) SHA1(ac1c0fbf23e7d1a53b47dae16170857c55e6ae48) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "lover.s0", 0x0000, 0x1000, CRC(ec38111c) SHA1(09efded9e905658bdbcde4ad4f0b4cb9585bdb33) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_REGION( 0x6000, "gfx", 0 )
 	ROM_LOAD( "lover.p3", 0x0000, 0x2000, CRC(1a519c8f) SHA1(36f546deaf36e8cd3bd113d84fd5e5f6e98d5de5) )
 	ROM_LOAD( "lover.p2", 0x2000, 0x2000, CRC(e465372f) SHA1(345b769ebc33f60daa9692b64e8ef43062552a33) )
 	ROM_LOAD( "lover.p1", 0x4000, 0x2000, CRC(cda0d87e) SHA1(efff230e994e21705902f252e50ee40a20444c0f) )
@@ -1510,16 +1830,16 @@ ROM_START( loverboy )
 ROM_END
 
 ROM_START( trikitri )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* main z80 cpu */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(248f2f12) SHA1(a1796e3e56a2b499997b0459ab875e7e50b797a2) )
 	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(04052262) SHA1(056a225c8625e53881753b0b0330f9b277d14a7d) )
 	ROM_LOAD( "3.bin", 0x4000, 0x2000, CRC(979c17c1) SHA1(518500d35241ceefa802edd6ffd948385faac9eb) )
 	ROM_LOAD( "4.bin", 0x6000, 0x1000, CRC(839d79b7) SHA1(ac1c0fbf23e7d1a53b47dae16170857c55e6ae48) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 cpu */
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "snd.bin", 0x0000, 0x1000, CRC(1589c4a9) SHA1(9422d55952b939c761fc47147f392ef0cc7d141b) )
 
-	ROM_REGION( 0x6000, "gfx1", 0 ) /* gfx - 8x8x3bpp */
+	ROM_REGION( 0x6000, "gfx", 0 )
 	ROM_LOAD( "5.bin", 0x0000, 0x2000, CRC(8cb6ec1c) SHA1(89fb29b9c4931d1e32e705ee4c4e38af219100e4) )
 	ROM_LOAD( "6.bin", 0x2000, 0x2000, CRC(a7bed0c1) SHA1(67484858abf08b3ffc320777befbfb922d867af9) )
 	ROM_LOAD( "7.bin", 0x4000, 0x2000, CRC(b473ce14) SHA1(491539de23fc4b9d0705434bcfba26043414b3b4) )
@@ -1540,43 +1860,30 @@ void jack_state::init_treahunt()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	/* Thanks to Mike Balfour for helping out with the decryption */
-	for (int A = 0; A < 0x4000; A++)
+	// Thanks to Mike Balfour for helping out with the decryption
+	for (int a = 0; a < 0x4000; a++)
 	{
-		uint8_t data = rom[A];
+		uint8_t const data = rom[a];
 
-		if (A & 0x1000)
+		if (a & 0x1000)
 		{
-			/* unencrypted = D0 D2 D5 D1 D3 D6 D4 D7 */
-			m_decrypted_opcodes[A] =
-					((data & 0x01) << 7) |
-					((data & 0x02) << 3) |
-					((data & 0x04) << 4) |
-					(data & 0x28) |
-					((data & 0x10) >> 3) |
-					((data & 0x40) >> 4) |
-					((data & 0x80) >> 7);
+			// unencrypted = D0 D2 D5 D1 D3 D6 D4 D7
+			m_decrypted_opcodes[a] = bitswap<8>(data, 0, 2, 5, 1, 3, 6, 4, 7);
 
-			if ((A & 0x04) == 0)
-			/* unencrypted = !D0 D2 D5 D1 D3 D6 D4 !D7 */
-				m_decrypted_opcodes[A] ^= 0x81;
+			if ((a & 0x04) == 0)
+			// unencrypted = !D0 D2 D5 D1 D3 D6 D4 !D7
+				m_decrypted_opcodes[a] ^= 0x81;
 		}
 		else
 		{
-			/* unencrypted = !D7 D2 D5 D1 D3 D6 D4 !D0 */
-			m_decrypted_opcodes[A] =
-					(~data & 0x81) |
-					((data & 0x02) << 3) |
-					((data & 0x04) << 4) |
-					(data & 0x28) |
-					((data & 0x10) >> 3) |
-					((data & 0x40) >> 4);
+			// unencrypted = !D7 D2 D5 D1 D3 D6 D4 !D0
+			m_decrypted_opcodes[a] = bitswap<8>(data, 7, 2, 5, 1, 3, 6, 4, 0) ^ 0x81;
 		}
 	}
 }
 
 
-void jack_state::init_loverboy()
+void joinem_state::init_loverboy()
 {
 	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
 	   I replace the startup jump with another jump to what appears to be
@@ -1589,39 +1896,40 @@ void jack_state::init_loverboy()
 	   code, the protection device is disabled or changes behaviour via
 	   writes at 0xf000 and 0xf008. -AS
 	*/
-	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[0x13] = 0x01;
-	ROM[0x12] = 0x9d;
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x13] = 0x01;
+	rom[0x12] = 0x9d;
 }
 
 
-void jack_state::init_striv()
+void striv_state::init_striv()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
-	/* decrypt program rom */
-	/* thanks to David Widel to have helped with the decryption */
-	for (int A = 0; A < 0x4000; A++)
+	// decrypt program ROM
+	// thanks to David Widel for helping out with the decryption
+	for (int a = 0; a < 0x4000; a++)
 	{
-		uint8_t data = ROM[A];
+		uint8_t const data = rom[a];
 
-		if (A & 0x1000)
+		if (a & 0x1000)
 		{
-			if (A & 4)
-				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
+			if (a & 4)
+				rom[a] = bitswap<8>(data,7, 2, 5, 1, 3, 6, 4, 0) ^ 1;
 			else
-				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7) ^ 0x81;
+				rom[a] = bitswap<8>(data,0, 2, 5, 1, 3, 6, 4, 7) ^ 0x81;
 		}
 		else
 		{
-			if (A & 4)
-				ROM[A] = bitswap<8>(data,7,2,5,1,3,6,4,0) ^ 1;
+			if (a & 4)
+				rom[a] = bitswap<8>(data,7, 2, 5, 1, 3, 6, 4, 0) ^ 1;
 			else
-				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7);
+				rom[a] = bitswap<8>(data,0, 2, 5, 1, 3, 6, 4, 7);
 		}
 	}
 }
 
+} // anonymous namespace
 
 
 /*************************************
@@ -1630,21 +1938,21 @@ void jack_state::init_striv()
  *
  *************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS       INIT           SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1982, jack,      0,        jack,     jack,     jack_state, empty_init,    ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, empty_init,    ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, empty_init,    ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, treahunt,  jack,     treahunt, treahunt, jack_state, init_treahunt, ROT90,  "Hara Industries", "Treasure Hunt", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zzyzzyxx,  0,        zzyzzyxx, zzyzzyxx, jack_state, empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zzyzzyxx2, zzyzzyxx, zzyzzyxx, zzyzzyxx, jack_state, empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, brix,      zzyzzyxx, zzyzzyxx, zzyzzyxx, jack_state, empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, empty_init,    ROT90,  "Cinematronics", "Freeze", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, empty_init,    ROT90,  "Noma (Casino Tech license)", "Tri-Pool: 3-In-One (Casino Tech)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, empty_init,    ROT90,  "Noma (Coastal Games license)", "Tri-Pool: 3-In-One (Coastal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, empty_init,    ROT90,  "Data Amusement", "Super Casino", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, striv,     0,        striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (English questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, strivf,    striv,    striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (French questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Hara Industries PCB
-GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, empty_init,    ROT90,  "Global Corporation", "Joinem", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, empty_init,    ROT90,  "Diatec", "Uncle Poo", MACHINE_SUPPORTS_SAVE ) // based on Joinem?
-GAME( 1983, loverboy,  0,        loverboy, loverboy, jack_state, init_loverboy, ROT90,  "G.T Enterprise Inc", "Lover Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, trikitri,  loverboy, loverboy, loverboy, jack_state, init_loverboy, ROT90,  "bootleg (DDT Enterprise Inc)", "Triki Triki (bootleg of Lover Boy)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS         INIT           SCREEN  COMPANY,                                          FULLNAME,                             FLAGS
+GAME( 1982, jack,      0,        jack,     jack,     jack_state,   empty_init,    ROT90,  "Hara Industries (Cinematronics license)",        "Jack the Giantkiller (set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state,   empty_init,    ROT90,  "Hara Industries (Cinematronics license)",        "Jack the Giantkiller (set 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state,   empty_init,    ROT90,  "Hara Industries (Cinematronics license)",        "Jack the Giantkiller (set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, treahunt,  jack,     treahunt, treahunt, jack_state,   init_treahunt, ROT90,  "Hara Industries",                                "Treasure Hunt",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zzyzzyxx,  0,        zzyzzyxx, zzyzzyxx, jack_state,   empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zzyzzyxx2, zzyzzyxx, zzyzzyxx, zzyzzyxx, jack_state,   empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, brix,      zzyzzyxx, zzyzzyxx, zzyzzyxx, jack_state,   empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, freeze,    0,        jack,     freeze,   jack_state,   empty_init,    ROT90,  "Cinematronics",                                  "Freeze",                             MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1981, tripool,   0,        jack,     tripool,  jack_state,   empty_init,    ROT90,  "Noma (Casino Tech license)",                     "Tri-Pool: 3-In-One (Casino Tech)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state,   empty_init,    ROT90,  "Noma (Coastal Games license)",                   "Tri-Pool: 3-In-One (Coastal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state,   empty_init,    ROT90,  "Data Amusement",                                 "Super Casino",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, striv,     0,        striv,    striv,    striv_state,  init_striv,    ROT270, "Nova du Canada",                                 "Super Triv (English questions)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, strivf,    striv,    striv,    striv,    striv_state,  init_striv,    ROT270, "Nova du Canada",                                 "Super Triv (French questions)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Hara Industries PCB
+GAME( 1983, joinem,    0,        joinem,   joinem,   joinem_state, empty_init,    ROT90,  "Global Corporation",                             "Joinem",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, joinem_state, empty_init,    ROT90,  "Diatec",                                         "Uncle Poo",                          MACHINE_SUPPORTS_SAVE ) // based on Joinem?
+GAME( 1983, loverboy,  0,        loverboy, loverboy, joinem_state, init_loverboy, ROT90,  "G.T Enterprise Inc",                             "Lover Boy",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1993, trikitri,  loverboy, loverboy, loverboy, joinem_state, init_loverboy, ROT90,  "bootleg (DDT Enterprise Inc)",                   "Triki Triki (bootleg of Lover Boy)", MACHINE_SUPPORTS_SAVE )

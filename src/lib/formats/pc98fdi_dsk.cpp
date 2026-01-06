@@ -94,7 +94,8 @@ bool pc98fdi_format::load(util::random_read &io, uint32_t form_factor, const std
 				sects[i].size        = ssize;
 				sects[i].actual_size = sector_size;
 				sects[i].deleted     = false;
-				sects[i].bad_crc     = false;
+				sects[i].bad_data_crc = false;
+				sects[i].bad_addr_crc = false;
 				sects[i].data        = sect_data + i*sector_size;
 			}
 
@@ -103,11 +104,6 @@ bool pc98fdi_format::load(util::random_read &io, uint32_t form_factor, const std
 	}
 
 	return true;
-}
-
-bool pc98fdi_format::supports_save() const noexcept
-{
-	return false;
 }
 
 const pc98fdi_format FLOPPY_PC98FDI_FORMAT;

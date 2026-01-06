@@ -101,7 +101,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mada" cloneof="mad">
-		<description>MAD v1.1 (Alt)</description>
+		<description>MAD v1.1 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load in &quot;cart1&quot;"/>

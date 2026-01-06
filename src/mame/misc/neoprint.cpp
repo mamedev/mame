@@ -57,18 +57,19 @@ public:
 		m_generic_paletteram_16(*this, "paletteram")
 	{ }
 
-	void neoprint(machine_config &config);
-	void nprsp(machine_config &config);
+	void neoprint(machine_config &config) ATTR_COLD;
+	void nprsp(machine_config &config) ATTR_COLD;
 
-	void init_98best44();
-	void init_npmillen();
-	void init_npcartv1();
-	void init_npotogib();
-	void init_nprsp();
-	void init_npscv1();
-	void init_npskv();
-	void init_npsprgv4();
-	void init_unkneo();
+	void init_98best44() ATTR_COLD;
+	void init_npmillen() ATTR_COLD;
+	void init_npcartv1() ATTR_COLD;
+	void init_npotogib() ATTR_COLD;
+	void init_nprsp() ATTR_COLD;
+	void init_npscv1() ATTR_COLD;
+	void init_npskv() ATTR_COLD;
+	void init_npsprgv4() ATTR_COLD;
+	void init_npspscv() ATTR_COLD;
+	void init_unkneo() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -783,6 +784,25 @@ ROM_START( npssr2 ) // STAFYAMA19980925 string
 	ROM_LOAD( "br9020 nps-prg1.u5", 0x000, 0x100, NO_DUMP ) // dump provided was 0xff filled
 ROM_END
 
+ROM_START( npspscv ) // STAFYAMA19970717 string
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "s005-ep1.ep1", 0x000000, 0x080000, CRC(4b280134) SHA1(6cd1517c2f15dcb6ad4eb4384b9b4fa1b1723747) )
+	ROM_LOAD16_WORD_SWAP( "s005-p2.p2",   0x080000, 0x080000, CRC(93f618c2) SHA1(3e4b018095ee1c17dfaefb85e8bcc683bb77e93a) )
+	ROM_IGNORE(                                     0x180000 ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_LOAD( "s001-m1.m1", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) )
+
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_LOAD( "s001-v1.v1", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "s005-c1.c1", 0x000000, 0x200000, CRC(eb7181b5) SHA1(21a70c8a7474de9b323171788c0b30fb71070322) )
+	ROM_LOAD32_BYTE( "s005-c2.c2", 0x000001, 0x200000, CRC(39fcdf15) SHA1(347b03fcd8917f7cde28650700b033f3548c3bc8) )
+	ROM_LOAD32_BYTE( "s005-c3.c3", 0x000002, 0x200000, CRC(92f8d78e) SHA1(0768ccddd50c8cd2159b33afb0908553a64216bf) )
+	// c4, c5 and c6 not populated
+ROM_END
+
 ROM_START( npmillen ) // NP 1.30 19990225 string
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p093-ep1.bin", 0x000000, 0x080000, CRC(47783f56) SHA1(1845e90b05a58010054c4158ef08e167e61ea370) )
@@ -956,6 +976,18 @@ void neoprint_state::init_nprsp()
 	ROM[0x4834/2] = 0x4e71;
 }
 
+void neoprint_state::init_npspscv()
+{
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+
+	ROM[0x13a4/2] = 0x4e71;
+	ROM[0x13bc/2] = 0x4e71;
+	ROM[0x13f0/2] = 0x4e71;
+
+	ROM[0x44b0/2] = 0x4e71; //ROM checksum
+	ROM[0x44b2/2] = 0x4e71;
+}
+
 void neoprint_state::init_unkneo()
 {
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
@@ -999,3 +1031,4 @@ GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, init_n
 GAME( 1999, npft,        0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fairy Tales (World) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npspscv,     0,        nprsp,       neoprint, neoprint_state, init_npspscv,  ROT0, "SNK", "Neo Print SP! Super Collection Version (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

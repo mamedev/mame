@@ -107,7 +107,7 @@ public:
 
 // standard joystick mappings
 const char          input_class_joystick::map_8way[] = "7778...4445";
-const char          input_class_joystick::map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
+// const char          input_class_joystick::map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
 // const char          input_class_joystick::map_4way_sticky[] = "s8.4s8.44s8.4445";
 
 
@@ -284,7 +284,6 @@ input_device::input_device(input_manager &manager, std::string_view name, std::s
 	, m_internal(internal)
 	, m_threshold(std::max<s32>(s32(manager.machine().options().joystick_threshold() * osd::input_device::ABSOLUTE_MAX), 1))
 	, m_steadykey_enabled(manager.machine().options().steadykey())
-	, m_lightgun_reload_button(manager.machine().options().offscreen_reload())
 {
 }
 
@@ -669,28 +668,6 @@ input_class_joystick::input_class_joystick(input_manager &manager)
 }
 
 
-//-------------------------------------------------
-//  set_global_joystick_map - set the map for all
-//  joysticks
-//-------------------------------------------------
-
-bool input_class_joystick::set_global_joystick_map(const char *mapstring)
-{
-	// parse the map
-	joystick_map map;
-	if (!map.parse(mapstring))
-		return false;
-
-	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string());
-
-	// iterate over joysticks and set the map
-	for (int joynum = 0; joynum <= maxindex(); joynum++)
-		if (device(joynum) != nullptr)
-			downcast<input_device_joystick &>(*device(joynum)).set_joystick_map(map);
-	return true;
-}
-
-
 //**************************************************************************
 //  INPUT DEVICE ITEM
 //**************************************************************************
@@ -786,24 +763,8 @@ input_device_switch_item::input_device_switch_item(
 
 s32 input_device_switch_item::read_as_switch(input_item_modifier modifier)
 {
-	// if we're doing a lightgun reload hack, button 1 and 2 operate differently
-	input_device_class devclass = m_device.devclass();
-	if (devclass == DEVICE_CLASS_LIGHTGUN && m_device.lightgun_reload_button())
-	{
-		// button 1 is pressed if either button 1 or 2 are active
-		if (m_itemid == ITEM_ID_BUTTON1)
-		{
-			input_device_item *button2_item = m_device.item(ITEM_ID_BUTTON2);
-			if (button2_item != nullptr)
-				return button2_item->update_value() | update_value();
-		}
-
-		// button 2 is never officially pressed
-		if (m_itemid == ITEM_ID_BUTTON2)
-			return 0;
-	}
-
 	// steadykey for keyboards
+	input_device_class devclass = m_device.devclass();
 	if (devclass == DEVICE_CLASS_KEYBOARD && m_device.steadykey_enabled())
 		return m_steadykey;
 
@@ -1045,15 +1006,6 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 	// start with the current value
 	s32 result = m_device.adjust_absolute(update_value());
 	assert(result >= osd::input_device::ABSOLUTE_MIN && result <= osd::input_device::ABSOLUTE_MAX);
-
-	// if we're doing a lightgun reload hack, override the value
-	if (m_device.devclass() == DEVICE_CLASS_LIGHTGUN && m_device.lightgun_reload_button())
-	{
-		// if it is pressed, return (min,max)
-		input_device_item *button2_item = m_device.item(ITEM_ID_BUTTON2);
-		if (button2_item != nullptr && button2_item->update_value())
-			result = (m_itemid == ITEM_ID_XAXIS) ? osd::input_device::ABSOLUTE_MIN : osd::input_device::ABSOLUTE_MAX;
-	}
 
 	// positive/negative: scale to full axis
 	if (modifier == ITEM_MODIFIER_REVERSE)

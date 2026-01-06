@@ -2281,7 +2281,7 @@ From Analog Computing Magazine, issue 16 (1984-02):
   POT7, TRIG2, TRIG3, and bit 1 of CONSOL useless. A few of the
   connector pins have been redefined. Pin 2 of the I/O expansion
   connector now carries POKEY's Audio Out signal. Three pins on the
-  cartridge connector have changed to accomodate the new 2600 adapter.
+  cartridge connector have changed to accommodate the new 2600 adapter.
   The system clock, 02, is output on pin 14, isolated through a diode.
   An alternate video input is taken from pin 24 and is also isolated
   through a diode. Pin 30 provides an alternate audio input.

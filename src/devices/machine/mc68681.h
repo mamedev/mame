@@ -75,6 +75,7 @@ private:
 	bool m_tx_data_in_buffer;
 	bool m_tx_break;
 	uint8_t m_bits_transmitted;
+	bool m_tx_enabled;
 
 	/* Rx/Tx clocking */
 	uint8_t m_rx_prescaler , m_tx_prescaler;

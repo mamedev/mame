@@ -76,140 +76,118 @@ inline void i8086_common_cpu_device::CLKM(uint8_t op_reg, uint8_t op_mem)
 inline uint32_t i8086_common_cpu_device::get_ea(int size, int op)
 {
 	uint16_t e16;
+	uint8_t modrm = m_modrm & 0xc7;
 
-	switch( m_modrm & 0xc7 )
+	switch( modrm )
 	{
 	case 0x00:
-		m_icount -= 7;
 		m_eo = m_regs.w[BX] + m_regs.w[SI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x01:
-		m_icount -= 8;
 		m_eo = m_regs.w[BX] + m_regs.w[DI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x02:
-		m_icount -= 8;
 		m_eo = m_regs.w[BP] + m_regs.w[SI];
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x03:
-		m_icount -= 7;
 		m_eo = m_regs.w[BP] + m_regs.w[DI];
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x04:
-		m_icount -= 5;
 		m_eo = m_regs.w[SI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x05:
-		m_icount -= 5;
 		m_eo = m_regs.w[DI];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x06:
-		m_icount -= 6;
 		m_eo = fetch_word();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x07:
-		m_icount -= 5;
 		m_eo = m_regs.w[BX];
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 
 	case 0x40:
-		m_icount -= 11;
 		m_eo = m_regs.w[BX] + m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x41:
-		m_icount -= 12;
 		m_eo = m_regs.w[BX] + m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x42:
-		m_icount -= 12;
 		m_eo = m_regs.w[BP] + m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x43:
-		m_icount -= 11;
 		m_eo = m_regs.w[BP] + m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x44:
-		m_icount -= 9;
 		m_eo = m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x45:
-		m_icount -= 9;
 		m_eo = m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x46:
-		m_icount -= 9;
 		m_eo = m_regs.w[BP] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x47:
-		m_icount -= 9;
 		m_eo = m_regs.w[BX] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 
 	case 0x80:
-		m_icount -= 11;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BX] + m_regs.w[SI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x81:
-		m_icount -= 12;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BX] + m_regs.w[DI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x82:
-		m_icount -= 11;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BP] + m_regs.w[SI] + (int16_t)e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x83:
-		m_icount -= 11;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BP] + m_regs.w[DI] + (int16_t)e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x84:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[SI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x85:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[DI] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x86:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BP] + (int16_t)e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x87:
-		m_icount -= 9;
 		e16 = fetch_word();
 		m_eo = m_regs.w[BX] + (int16_t)e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	}
+	m_icount -= m_ea_timing[modrm];
 	return m_ea;
 }
 

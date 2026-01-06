@@ -577,7 +577,7 @@ Including subsets of supported systems
 SUBTARGET
     Set emulator subtarget to build.  Some pre-defined subtargets are provided,
     using Lua scripts in *scripts/target/mame* and system driver filter files in
-    *src/mame*.  User-defined substargets can be created using the **SOURCES**
+    *src/mame*.  User-defined subtargets can be created using the **SOURCES**
     or **SOURCEFILTER** option.
 SOURCES
     Specify system driver source files and/or folders to include.  Usually used
@@ -656,6 +656,14 @@ SYMLEVEL
     similar compilers, **1** includes line number tables and external variables,
     **2** also includes local variables, and **3** also includes macro
     definitions.
+PDB_SYMBOLS
+    Set to **1** to generate CodeView format symbols in separate PDB files,
+    allowing source-level debugging using Microsoft Visual Studio or WinDbg.
+    It can also be used with other tools that can load symbols from PDB files,
+    e.g. the Intel VTune and AMD µProf performance analysis tools.  This option
+    is only supported for MinGW builds using the clang compiler and the LLVM
+    linker (lld).  This option only takes effect if the **SYMBOLS** option is
+    set to a non-zero value.
 ARCHOPTS
     Additional command-line options to pass to the compiler and linker.  This is
     useful for supplying code generation or ABI options, for example to enable
@@ -762,7 +770,7 @@ the ``_FORTIFY_SOURCE`` macro is set in the RPM build environment, and not by
 distributing a modified version of GCC.)
 
 If you get compilation errors in ``bits/string_fortified.h`` you should first
-ensure that the ``_FORTIY_SOURCE`` macro is defined via the environment (e.g.
+ensure that the ``_FORTIFY_SOURCE`` macro is defined via the environment (e.g.
 a **CFLAGS** or **CXXFLAGS** environment variable).  You can check to see
 whether the ``_FORTIFY_SOURCE`` macro is a built-in macro with your version of
 GCC with a command like this:

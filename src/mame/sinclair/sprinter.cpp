@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
+// thanks-to:Blade, TolikTrek, RomanRom2
 /*******************************************************************************************
 
 Sprinter Sp2000 (Peters Plus Ltd)
@@ -70,6 +71,9 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
+#include <algorithm>
+#include <iterator>
+
 #include "sprinter.lh"
 
 
@@ -94,7 +98,7 @@ public:
 	sprinter_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_isa(*this, "isa%u", 0U)
+		, m_isa(*this, "isa8%u", 0U)
 		, m_irqs(*this, "irqs")
 		, m_rtc(*this, "rtc")
 		, m_ata(*this, "ata%u", 1U)
@@ -578,7 +582,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		do_mem_wait(4);
 	}
 
-	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (BIT(m_pn, 5) << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	const u8 dcpp = m_dcp_location[dcp_offset];
 	u8 data = 0xff;
 	switch (dcpp)
@@ -700,7 +704,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	}
 	do_mem_wait(4);
 
-	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (BIT(m_pn, 5) << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	const u8 dcpp = m_dcp_location[dcp_offset];
 	if ((dcpp >= 0xc0) && (dcpp < 0xf0))
 		m_ram_pages[dcpp - 0xc0] = data;
@@ -826,14 +830,15 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0xc0: // 1FFD
 	case 0xc8:
 		m_sc = data;
-		if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
+		if (BIT(m_cnf, 6)) m_sc = 0; // CNF_SC_CLEAN
 		update_memory();
 		break;
 	case 0xc1: // 7FFD
 	case 0xc9:
 		m_pn = data;
-		if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
-		if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
+		if (BIT(~m_cnf, 7)) m_pn &= 0x3f; // CNF_PN[7..6]_CLEAN
+		if (BIT(~m_cnf, 7) && BIT(m_cnf, 5)) m_pn &= 0xdf; // CNF_PN[5]_CLEAN
+		if (BIT(m_cnf, 5)) m_pn &= 0xe0;  // CNF_PN[4..0]_CLEAN
 		update_memory();
 		break;
 	case 0xc2:
@@ -871,9 +876,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		if (BIT(data, 2))
 		{
 			m_cnf = data;
-			if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
-			if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
-			if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
+			if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_CLEAN
+			if (BIT(~m_cnf, 7)) m_pn &= 0x3f; // CNF_PN[7..6]_CLEAN
+			if (BIT(~m_cnf, 7) && BIT(m_cnf, 5)) m_pn &= 0xdf; // CNF_PN[5]_CLEAN
+			if (BIT(m_cnf, 5)) m_pn &= 0xe0;  // CNF_PN[4..0]_CLEAN
 		}
 
 		update_memory();
@@ -1429,6 +1435,21 @@ void sprinter_state::init_taps()
 			check_accel(false, offset, data);
 		}
 	});
+
+	m_maincpu->space(AS_IO).install_write_tap(0x0000, 0xffff, "cpu_io_w", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		// Internal z84 ports are not accessible through IO map, hence they need special case here
+		// Keep these in ascending order
+		constexpr u8 z84_int[] = {
+			0x10, 0x11, 0x12, 0x13,
+			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+			0xee, 0xef,
+			0xf0, 0xf1, 0xf4
+		};
+		const auto found = std::lower_bound(std::begin(z84_int), std::end(z84_int), offset);
+		if ((found != std::end(z84_int)) && (*found == offset))
+			dcp_w(offset, data);
+	});
 }
 
 void sprinter_state::machine_start()
@@ -1621,7 +1642,6 @@ void sprinter_state::video_start()
 
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprinter_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
-	m_contention_pattern = {};
 	init_taps();
 
 	m_acc_timer = timer_alloc(FUNC(sprinter_state::acc_tick), this);
@@ -1948,18 +1968,17 @@ void sprinter_state::sprinter(machine_config &config)
 
 	ISA8(config, m_isa[0], X_SP / 5);
 	m_isa[0]->set_custom_spaces();
-	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace(m_isa[0], isa8_device::AS_ISA_IO);
-	ZXBUS_SLOT(config, "zxbus2isa", 0, "zxbus", zxbus_cards, nullptr);
+	ISA8_SLOT(config, "isa0", 0, m_isa[0], pc_isa8_cards, "zxbus_adapter", false);
 
 	ISA8(config, m_isa[1], X_SP / 5);
 	m_isa[1]->set_custom_spaces();
-	ISA8_SLOT(config, "isa8", 0, m_isa[1], pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa1", 0, m_isa[1], pc_isa8_cards, nullptr, false);
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
 
 	PALETTE(config, "palette", palette_device::BLACK).set_entries(256 * 8);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	PC_KBDC(config, m_kbd, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbd->out_data_cb().set(m_maincpu, FUNC(z84c015_device::rxa_w)); // KBD_DATR

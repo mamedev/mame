@@ -6,7 +6,8 @@ on:
     - '.github/workflows/**'
     - 'src/devices/**.h'
     - 'src/mame/**.h'
-    pull_request:
+  pull_request:
+    paths:
     - '.github/workflows/**'
     - 'src/devices/**.h'
     - 'src/mame/**.h'

@@ -26,7 +26,7 @@ class n64_texture_pipe_t
 		typedef void (n64_texture_pipe_t::*texel_fetcher_t) (rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata);
 		typedef void (n64_texture_pipe_t::*texel_cycler_t) (color_t* TEX, color_t* prev, int32_t SSS, int32_t SST, uint32_t tilenum, uint32_t cycle, rdp_span_aux* userdata, const rdp_poly_state& object);
 
-		n64_texture_pipe_t()
+		n64_texture_pipe_t(n64_rdp &rdp) : m_rdp(rdp)
 		{
 			m_maskbits_table[0] = 0xffff;
 			for(int i = 1; i < 16; i++)
@@ -104,7 +104,7 @@ class n64_texture_pipe_t
 		void                lod_2cycle(int32_t* sss, int32_t* sst, const int32_t s, const int32_t t, const int32_t w, const int32_t dsinc, const int32_t dtinc, const int32_t dwinc, const int32_t prim_tile, int32_t* t1, int32_t* t2, rdp_span_aux* userdata, const rdp_poly_state& object);
 		void                lod_2cycle_limited(int32_t* sss, int32_t* sst, const int32_t s, const int32_t t, int32_t w, const int32_t dsinc, const int32_t dtinc, const int32_t dwinc, const int32_t prim_tile, int32_t* t1, const rdp_poly_state& object);
 
-		void                set_machine(running_machine& machine);
+		void                init_internal_state();
 
 		bool                m_start_span;
 
@@ -154,11 +154,11 @@ class n64_texture_pipe_t
 
 		texel_fetcher_t     m_texel_fetch[16*5];
 
-		n64_rdp*            m_rdp;
+		n64_rdp&            m_rdp;
 
-		int32_t               m_maskbits_table[16];
+		int32_t             m_maskbits_table[16];
 		color_t             m_expand_16to32_table[0x10000];
-		uint16_t              m_lod_lookup[0x80000];
+		uint16_t            m_lod_lookup[0x80000];
 
 		rgbaint_t           m_st2_add;
 		rgbaint_t           m_v1;

@@ -13,51 +13,42 @@
 #include "dfs.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_DFSE00, bbc_dfse00_device, "bbc_dfse00", "BBC Micro E00 DFS")
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_rom_device - constructor
-//-------------------------------------------------
-
-bbc_dfse00_device::bbc_dfse00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_DFSE00, tag, owner, clock)
-	, device_bbc_rom_interface(mconfig, *this)
+class bbc_dfse00_device : public device_t, public device_bbc_rom_interface
 {
-}
+public:
+	bbc_dfse00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_DFSE00, tag, owner, clock)
+		, device_bbc_rom_interface(mconfig, *this)
+		, m_ram(*this, "ram", 0x800, ENDIANNESS_LITTLE)
+	{
+	}
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
 
-void bbc_dfse00_device::device_start()
-{
-}
+	// device_bbc_rom_interface overrides
+	virtual uint8_t read(offs_t offset) override
+	{
+		if (offset & 0x2000)
+			return m_ram[offset & 0x7ff];
+		else
+			return get_rom_base()[offset];
+	}
 
-//-------------------------------------------------
-//  read
-//-------------------------------------------------
+	virtual void write(offs_t offset, uint8_t data) override
+	{
+		if (offset & 0x2000)
+			m_ram[offset & 0x7ff] = data;
+	}
 
-uint8_t bbc_dfse00_device::read(offs_t offset)
-{
-	if (offset < get_rom_size())
-		return get_rom_base()[offset & (get_rom_size() - 1)];
-	else
-		return get_ram_base()[offset & (get_ram_size() - 1)];
-}
+private:
+	memory_share_creator<uint8_t> m_ram;
+};
 
-//-------------------------------------------------
-//  write
-//-------------------------------------------------
+} // anonymous namespace
 
-void bbc_dfse00_device::write(offs_t offset, uint8_t data)
-{
-	get_ram_base()[offset & (get_ram_size() - 1)] = data;
-}
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_DFSE00, device_bbc_rom_interface, bbc_dfse00_device, "bbc_dfse00", "BBC Micro E00 DFS")

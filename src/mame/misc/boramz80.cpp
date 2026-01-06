@@ -190,7 +190,7 @@ void boramz80_state::output_w(uint8_t data)
 	for (int i = 0; i < 4; i++)
 		machine().bookkeeping().coin_counter_w(i, BIT(data, i));
 
-	if (data & 0xf0)
+	if (data & 0x70)
 		logerror("%s output_w: %02x\n", machine().describe_context(), data);
 
 	// bit 6 is used often

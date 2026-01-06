@@ -9,9 +9,6 @@
 #include "emu.h"
 #include "decocass_tape.h"
 
-#include "cpu/m6502/m6502.h"
-#include "cpu/mcs48/mcs48.h"
-
 #include <sstream>
 
 #define LOG_CASSETTE_STATE      0
@@ -138,9 +135,7 @@ void decocass_tape_device::device_reset()
 
 static uint16_t tape_crc16_byte(uint16_t crc, uint8_t data)
 {
-	int bit;
-
-	for (bit = 0; bit < 8; bit++)
+	for (int bit = 0; bit < 8; bit++)
 	{
 		crc = (crc >> 1) | (crc << 15);
 		crc ^= (data << 7) & 0x80;
@@ -316,7 +311,7 @@ uint8_t decocass_tape_device::get_status_bits()
 		/* everywhere else, the clock holds to 0 */
 		else
 		{
-				/* nothing */
+			/* nothing */
 		}
 
 		/* lead-in and lead-out bytes are 0xAA */

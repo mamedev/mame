@@ -45,6 +45,8 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+#include "softlist_dev.h"
+
 namespace {
 
 class jensen_state : public driver_device
@@ -229,6 +231,9 @@ void jensen_state::jensen(machine_config &config)
 
 	// Optional
 	// DE422-SA Digital EISA Ethernet Controller (10 Mbps TP and BNC connectors)
+
+	// software lists
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("alpha");
 }
 
 void jensen_state::d2k300axp(machine_config &config)
@@ -304,6 +309,6 @@ ROM_END
 }
 
 /*    YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS         INIT         COMPANY  FULLNAME                  FLAGS */
-COMP( 1993,  d2k300axp, 0,      0,      d2k300axp, 0,     jensen_state, init_common, "DEC",   "DEC 2000 Model 300 AXP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP( 1993,  d2k500axp, 0,      0,      d2k500axp, 0,     jensen_state, init_common, "DEC",   "DEC 2000 Model 500 AXP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP( 1993,  dpcaxp150, 0,      0,      dpcaxp150, 0,     jensen_state, init_common, "DEC",   "DECpc AXP 150",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1993,  d2k300axp, 0,      0,      d2k300axp, 0,     jensen_state, init_common, "Digital Equipment Corporation",   "DEC 2000 Model 300 AXP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1993,  d2k500axp, 0,      0,      d2k500axp, 0,     jensen_state, init_common, "Digital Equipment Corporation",   "DEC 2000 Model 500 AXP", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1993,  dpcaxp150, 0,      0,      dpcaxp150, 0,     jensen_state, init_common, "Digital Equipment Corporation",   "DECpc AXP 150",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

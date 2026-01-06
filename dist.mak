@@ -7,39 +7,30 @@
 ###########################################################################
 
 ifeq ($(OS),Windows_NT)
-OS := windows
+  OS := windows
 else
-UNAME := $(shell uname -mps)
-ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
-OS := linux
-endif
-ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
-OS := solaris
-endif
-ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
-OS := solaris
-endif
-ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
-OS := freebsd
-endif
-ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
-OS := freebsd
-endif
-ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
-OS := netbsd
-endif
-ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
-OS := openbsd
-endif
-ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
-OS := osx
-endif
-ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
-OS := haiku
-endif
-ifndef OS
-$(error Unable to detect OS from uname -a: $(UNAME))
-endif
+  UNAME := $(shell uname -mps)
+  ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
+    OS := linux
+  else ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
+    OS := solaris
+  else ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
+    OS := solaris
+  else ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
+    OS := freebsd
+  else ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
+    OS := freebsd
+  else ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
+    OS := netbsd
+  else ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
+    OS := openbsd
+  else ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
+    OS := osx
+  else ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
+    OS := haiku
+  else ifndef OS
+    $(error Unable to detect OS from uname -a: $(UNAME))
+  endif
 endif
 
 ifndef TARGETOS
@@ -48,14 +39,16 @@ endif
 
 EXE :=
 ifeq ($(OS),windows)
-EXE := .exe
-PROJECTTYPE := mingw-gcc
+  EXE := .exe
+  ifeq ($(MSYSTEM),CLANGARM64)
+    PROJECTTYPE := mingw-clang
+  else
+    PROJECTTYPE := mingw-gcc
+  endif
+else ifeq ($(OS),osx)
+  PROJECTTYPE := osx_clang
 else
-ifeq ($(OS),osx)
-PROJECTTYPE := osx_clang
-else
-PROJECTTYPE := $(OS)_gcc
-endif
+  PROJECTTYPE := $(OS)_gcc
 endif
 
 ifeq ($(DEBUG),1)
@@ -75,11 +68,9 @@ endif
 SHELLTYPE := msdos
 ifeq (,$(ComSpec)$(COMSPEC))
   SHELLTYPE := posix
-endif
-ifeq (/bin,$(findstring /bin,$(SHELL)))
+else ifeq (/bin,$(findstring /bin,$(SHELL)))
   SHELLTYPE := posix
-endif
-ifeq (/bin,$(findstring /bin,$(MAKESHELL)))
+else ifeq (/bin,$(findstring /bin,$(MAKESHELL)))
   SHELLTYPE := posix
 endif
 
@@ -99,6 +90,12 @@ MAINBIN := $(TARGET)$(MAINBINVARIANT)
 BINDIR := build/$(PROJECTTYPE)/bin/$(BUILDARCH)/$(BUILDVARIANT)
 STAGEDIR := build/release/$(BUILDARCH)/$(BUILDVARIANT)/$(TARGET)
 
+ifeq ($(OS),windows)
+  SYMFILE := $(addsuffix .sym,$(MAINBIN))
+else
+  SYMFILE :=
+endif
+
 BINARIES = $(MAINBIN) castool chdman floptool imgtool jedutil ldresample ldverify nltool nlwav romcmp unidasm
 SIMPLE_DIRS := ctrlr docs/legal docs/man docs/swlist hash ini/examples ini/presets
 LOCALISATIONS := $(wildcard language/*/*.mo)
@@ -106,7 +103,7 @@ COPIED_FILES := COPYING uismall.bdf roms/dir.txt $(foreach DIR,$(SIMPLE_DIRS),$(
 CREATED_DIRS := docs ini roms $(SIMPLE_DIRS) language $(dir $(LOCALISATIONS))
 
 GEN_FOLDERS := $(addprefix $(STAGEDIR)/,$(CREATED_DIRS))
-COPY_BINARIES := $(addprefix $(STAGEDIR)/,$(addsuffix $(EXE),$(BINARIES)))
+COPY_BINARIES := $(addprefix $(STAGEDIR)/,$(addsuffix $(EXE),$(BINARIES)) $(SYMFILE))
 COPY_FILES := $(addprefix $(STAGEDIR)/,$(COPIED_FILES))
 
 all: $(COPY_BINARIES) $(COPY_FILES) $(STAGEDIR)/docs/MAME.pdf
@@ -117,9 +114,12 @@ clean:
 $(GEN_FOLDERS):
 	$(call MKDIR,$@)
 
-$(STAGEDIR)/%: $(BINDIR)/% | $(GEN_FOLDERS)
+$(STAGEDIR)/%$(EXE): $(BINDIR)/%$(EXE) | $(GEN_FOLDERS)
 	$(call COPY,$<,$@)
 	$(SILENT) strip $@
+
+$(STAGEDIR)/%.sym: $(BINDIR)/%.sym | $(GEN_FOLDERS)
+	$(call COPY,$<,$@)
 
 $(STAGEDIR)/%: % | $(GEN_FOLDERS)
 	$(call COPY,$<,$@)

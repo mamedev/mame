@@ -578,25 +578,17 @@ Enable cropping of artwork to the game screen area only. This
 option can also be controlled via the Video Options menu in the user
 interface. The default is OFF (\-noartwork_crop).
 .TP
-.B \-[no]use_backdrops, \-[no]backdrop
-Enables/disables the display of backdrops. The default is ON
-(\-use_backdrops).
+.B \-fallback_artwork \fIartworkname
+Specifies fallback artwork if no external artwork or internal driver layout
+is defined. If external artwork for the system is present or a layout is
+included in the driver for the system, then that will take precedence.
 .TP
-.B \-[no]use_overlays, \-[no]overlay
-Enables/disables the display of overlays. The default is ON
-(\-use_overlays).
+.B \-override_artwork \fIartworkname
+Specifies override artwork for external artwork and internal driver layout.
 .TP
-.B \-[no]use_bezels, \-[no]bezel
-Enables/disables the display of bezels. The default is ON
-(\-use_bezels).
-.TP
-.B \-[no]use_cpanels, \-[no]cpanel
-Enables/disables the display of cpanels. The default is ON
-(\-use_bezels).
-.TP
-.B \-[no]use_marquees, \-[no]marquee
-Enables/disables the display of marquees. The default is ON
-(\-use_bezels).
+.B \-artwork_font, \-artfont \fIfontname
+Specifies the name of a font file to use for artwork text elements.
+The specifics are the same as the \-uifont option.
 .\"
 .\" *******************************************************
 .SS Screen options
@@ -745,7 +737,7 @@ Default is OFF (\-nosyncrefresh).
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .B NOTE:
-All the options in this group are available only with softare video
+All the options in this group are available only with software video
 rendering subsystem, i.e \fB\-video soft\fR.
 .TP
 .B \-prescale\fR [\fIvalue\fR]
@@ -959,7 +951,7 @@ pick a sane duration.
 .\" *******************************************************
 .TP
 .B \-[no]coin_lockout, \-[no]coinlock
-Enables simulation of the "coin lockout" feature that is implmeneted
+Enables simulation of the "coin lockout" feature that is implemented
 on a number of game PCBs. It was up to the operator whether or not
 the coin lockout outputs were actually connected to the coin
 mechanisms. If this feature is enabled, then attempts to enter a coin
@@ -1168,7 +1160,7 @@ information. The default is OFF (\-noverbose).
 .TP
 .B \-[no]update_in_pause
 Enables updating the screen bitmap while the game is paused. This is
-useful for debuggin in some scenarios (and gets in the way in others).
+useful for debugging in some scenarios (and gets in the way in others).
 Default is OFF (\-noupdate_in_pause).
 .TP
 .B \-[no]debug, \-[no]d

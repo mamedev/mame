@@ -69,9 +69,6 @@ license:CC0-1.0
 		</screen>
 		<collection name="Shifters">
 			<collection name="1P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
 					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -81,11 +78,11 @@ license:CC0-1.0
 						<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="2P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
 					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -95,11 +92,11 @@ license:CC0-1.0
 						<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="3P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
 					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -111,11 +108,11 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="4P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
 					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -127,6 +124,9 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 		</collection>
 	</view>
@@ -150,9 +150,6 @@ license:CC0-1.0
 		</screen>
 		<collection name="Shifters">
 			<collection name="1P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
 					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -164,11 +161,11 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="2P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
 					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -180,11 +177,11 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="3P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
 					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -194,11 +191,11 @@ license:CC0-1.0
 						<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="4P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
 					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -208,6 +205,9 @@ license:CC0-1.0
 						<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 		</collection>
 	</view>
@@ -227,9 +227,6 @@ license:CC0-1.0
 		</screen>
 		<collection name="Shifters">
 			<collection name="1P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
 					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -239,11 +236,11 @@ license:CC0-1.0
 						<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="2P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
 					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -253,11 +250,11 @@ license:CC0-1.0
 						<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="3P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
 					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -269,11 +266,11 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="4P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
 					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -285,6 +282,9 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 		</collection>
 	</view>
@@ -308,9 +308,6 @@ license:CC0-1.0
 		</screen>
 		<collection name="Shifters">
 			<collection name="1P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
 					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -322,11 +319,11 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="2P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
 					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -338,11 +335,11 @@ license:CC0-1.0
 						<orientation rotate="180" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="3P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
 					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -352,11 +349,11 @@ license:CC0-1.0
 						<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 			<collection name="4P Shifter">
-				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
-				</element>
 				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
 					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
@@ -366,6 +363,9 @@ license:CC0-1.0
 						<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
 					</element>
 				</collection>
+				<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
+				</element>
 			</collection>
 		</collection>
 	</view>

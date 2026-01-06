@@ -29,6 +29,7 @@
 
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
+#include "util/multibyte.h"
 
 
 //**************************************************************************
@@ -427,7 +428,7 @@ inline save_error save_manager::do_write(T check_space, U write_block, V start_h
 	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
 	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
 	u32 sig = signature();
-	*(u32 *)&header[0x1c] = little_endianize_int32(sig);
+	put_u32le(&header[0x1c], sig);
 
 	// write the header and turn on compression for the rest of the file
 	if (!start_header() || !write_block(header, sizeof(header)) || !start_data())
@@ -570,11 +571,11 @@ save_error save_manager::validate_header(const u8 *header, const char *gamename,
 	// check signature, if we were asked to
 	if (signature != 0)
 	{
-		u32 rawsig = *(u32 *)&header[0x1c];
-		if (signature != little_endianize_int32(rawsig))
+		u32 rawsig = get_u32le(&header[0x1c]);
+		if (signature != rawsig)
 		{
 			if (errormsg != nullptr)
-				(*errormsg)("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, little_endianize_int32(rawsig), signature);
+				(*errormsg)("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, rawsig, signature);
 			return STATERR_INVALID_HEADER;
 		}
 	}

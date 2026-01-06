@@ -136,6 +136,7 @@ public:
 
 	void psion3a(machine_config &config);
 	void psion3a2(machine_config &config);
+	void pocketbk2(machine_config &config);
 
 private:
 	required_device<psion_sibo_slot_device> m_sibo;
@@ -554,6 +555,13 @@ void psion3a_state::psion3a2(machine_config &config)
 	m_ram->set_default_size("2M").set_extra_options("1M");
 }
 
+void psion3a_state::pocketbk2(machine_config &config)
+{
+	psion3a(config);
+
+	m_ram->set_default_size("1M").set_extra_options("256K,512K");
+}
+
 void psion3c_state::psion3c(machine_config &config)
 {
 	psion_asic9(config);
@@ -688,7 +696,7 @@ ROM_END
 
 //    YEAR  NAME          PARENT    COMPAT  MACHINE    INPUT        CLASS           INIT         COMPANY             FULLNAME                    FLAGS
 COMP( 1993, psion3a,      0,        0,      psion3a,   psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a",                MACHINE_SUPPORTS_SAVE )
-COMP( 1994, pocketbk2,    psion3a,  0,      psion3a,   pocketbk2,   psion3a_state,  empty_init,  "Acorn Computers",  "Pocket Book II",           MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pocketbk2,    psion3a,  0,      pocketbk2, pocketbk2,   psion3a_state,  empty_init,  "Acorn Computers",  "Pocket Book II",           MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2,     psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M)",           MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2_us,  psion3a,  0,      psion3a2,  psion3a,     psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (US)",      MACHINE_SUPPORTS_SAVE )
 COMP( 1995, psion3a2_it,  psion3a,  0,      psion3a2,  psion3a_it,  psion3a_state,  empty_init,  "Psion",            "Series 3a (2M) (Italian)", MACHINE_SUPPORTS_SAVE )

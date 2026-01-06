@@ -122,6 +122,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_ARTWORK_CROP ";artcrop",                    "0",         core_options::option_type::BOOLEAN,    "crop artwork so emulated screen image fills output screen/window in one axis" },
 	{ OPTION_FALLBACK_ARTWORK,                           nullptr,     core_options::option_type::STRING,     "fallback artwork if no external artwork or internal driver layout defined" },
 	{ OPTION_OVERRIDE_ARTWORK,                           nullptr,     core_options::option_type::STRING,     "override artwork for external artwork and internal driver layout" },
+	{ OPTION_ARTWORK_FONT ";artfont",                    "default",   core_options::option_type::STRING,     "specify a font to use for artwork text elements" },
 
 	// screen options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE SCREEN OPTIONS" },
@@ -156,7 +157,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_MULTIMOUSE,                                 "0",         core_options::option_type::BOOLEAN,    "enable separate input from each mouse device (if present)" },
 	{ OPTION_STEADYKEY ";steady",                        "0",         core_options::option_type::BOOLEAN,    "enable steadykey support" },
 	{ OPTION_UI_ACTIVE,                                  "0",         core_options::option_type::BOOLEAN,    "enable user interface on top of emulated keyboard (if present)" },
-	{ OPTION_OFFSCREEN_RELOAD ";reload",                 "0",         core_options::option_type::BOOLEAN,    "convert lightgun button 2 into offscreen reload" },
 	{ OPTION_JOYSTICK_MAP ";joymap",                     "auto",      core_options::option_type::STRING,     "explicit joystick map, or auto to auto-select" },
 	{ OPTION_JOYSTICK_DEADZONE ";joy_deadzone;jdz(0.00-1)",       "0.15", core_options::option_type::FLOAT,  "center deadzone range for joystick where change is ignored (0.0 center, 1.0 end)" },
 	{ OPTION_JOYSTICK_SATURATION ";joy_saturation;jsat(0.00-1)",  "0.85", core_options::option_type::FLOAT,  "end of axis saturation range for joystick where change is ignored (0.0 center, 1.0 end)" },
@@ -196,14 +196,15 @@ const options_entry emu_options::s_option_entries[] =
 
 	// misc options
 	{ nullptr,                                           nullptr,     core_options::option_type::HEADER,     "CORE MISC OPTIONS" },
-	{ OPTION_DRC,                                        "1",         core_options::option_type::BOOLEAN,    "enable DRC CPU core if available" },
+	{ OPTION_DRC,                                        "1",         core_options::option_type::BOOLEAN,    "enable DRC CPU cores if available" },
+	{ OPTION_DRC_RWX,                                    "1",         core_options::option_type::BOOLEAN,    "allow DRC to use writable executable pages if supported" },
 	{ OPTION_DRC_USE_C,                                  "0",         core_options::option_type::BOOLEAN,    "force DRC to use C backend" },
 	{ OPTION_DRC_LOG_UML,                                "0",         core_options::option_type::BOOLEAN,    "write DRC UML disassembly log" },
 	{ OPTION_DRC_LOG_NATIVE,                             "0",         core_options::option_type::BOOLEAN,    "write DRC native disassembly log" },
 	{ OPTION_BIOS,                                       nullptr,     core_options::option_type::STRING,     "select the system BIOS to use" },
 	{ OPTION_CHEAT ";c",                                 "0",         core_options::option_type::BOOLEAN,    "enable cheat subsystem" },
 	{ OPTION_SKIP_GAMEINFO,                              "0",         core_options::option_type::BOOLEAN,    "skip displaying the system information screen at startup" },
-	{ OPTION_UI_FONT,                                    "default",   core_options::option_type::STRING,     "specify a font to use" },
+	{ OPTION_UI_FONT,                                    "default",   core_options::option_type::STRING,     "specify a font to use for UI text" },
 	{ OPTION_UI,                                         "cabinet",   core_options::option_type::STRING,     "type of UI (simple|cabinet)" },
 	{ OPTION_RAMSIZE ";ram",                             nullptr,     core_options::option_type::STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         core_options::option_type::BOOLEAN,    "ask for confirmation before exiting" },

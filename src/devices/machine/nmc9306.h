@@ -48,11 +48,13 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
-	inline uint16_t read(offs_t offset);
+	optional_memory_region m_region;
+
+	inline u16 read(offs_t offset);
 	inline void write(offs_t offset, u16 data);
 	inline void erase(offs_t offset);
 
-	uint16_t m_register[16];
+	u16 m_register[16];
 
 	int m_bits;
 	int m_state;

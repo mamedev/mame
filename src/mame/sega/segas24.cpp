@@ -2573,7 +2573,7 @@ void segas24_state::init_roughrac()
 /* 06 */GAME( 1990, roughrac,  0,        system24_floppy_fd_upd, roughrac, segas24_state, init_roughrac, ROT0,   "Sega", "Rough Racer (Japan, Floppy Based, FD1094 317-0058-06b)", 0 )
 /* 07 */GAME( 1990, bnzabros,  0,        system24_floppy_rom,    bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (US, Floppy DS3-5000-07d? Based)", 0 )
 /* 07 */GAME( 1990, bnzabrosj, bnzabros, system24_floppy_rom,    bnzabros, segas24_state, init_bnzabros, ROT0,   "Sega", "Bonanza Bros (Japan, Floppy DS3-5000-07b Based)", 0 )
-/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, init_qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", MACHINE_IMPERFECT_GRAPHICS ) // wrong bg colour on title
+/* 08 */GAME( 1991, qsww,      0,        system24_floppy_fd1094, qsww,     segas24_state, init_qsww,     ROT0,   "Sega", "Quiz Syukudai wo Wasuremashita (Japan, Floppy Based, FD1094 317-0058-08b)", 0 )
 /* 09 */GAME( 1991, dcclubfd,  dcclub,   system24_floppy_dcclub, dcclub,   segas24_state, init_dcclubfd, ROT0,   "Sega", "Dynamic Country Club (US, Floppy Based, FD1094 317-0058-09d)", 0 )
 
 //    YEAR  NAME      PARENT    MACHINE       INPUT     CLASS          INIT           MONITOR COMPANY FULLNAME FLAGS

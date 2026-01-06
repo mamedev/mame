@@ -4,6 +4,7 @@
 #include "86f_dsk.h"
 
 #include "ioprocs.h"
+#include "multibyte.h"
 
 #include <cstring>
 #include <tuple>
@@ -72,11 +73,6 @@ const char *_86f_format::description() const noexcept
 const char *_86f_format::extensions() const noexcept
 {
 	return "86f";
-}
-
-bool _86f_format::supports_save() const noexcept
-{
-	return false;
 }
 
 int _86f_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
@@ -214,7 +210,7 @@ bool _86f_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			trackoff = tracklist[(track * imagesides) + side];
 			if(!trackoff) break;
 			if(!skip_odd || track%2 == 0) {
-				char trackinfo[10];
+				uint8_t trackinfo[10];
 				std::tie(err, actual) = read_at(io, trackoff, &trackinfo, trackinfolen); // FIXME: check for errors and premature EOF
 				if(err || (actual != trackinfolen))
 					return false;
@@ -222,15 +218,15 @@ bool _86f_format::load(util::random_read &io, uint32_t form_factor, const std::v
 				uint32_t index_cell;
 				if(header.flags & EXTRA_BC)
 				{
-					uint32_t extra = *(uint32_t *)(trackinfo + 2);
-					index_cell = *(uint32_t *)(trackinfo + 6);
+					uint32_t extra = get_u32le(trackinfo + 2);
+					index_cell = get_u32le(trackinfo + 6);
 					if((header.flags & TOTAL_BC) && !tracklen)
 						bitcells = extra;
 					else
 						bitcells += (int32_t)extra;
 				}
 				else
-					index_cell = *(uint32_t *)(trackinfo + 2);
+					index_cell = get_u32le(trackinfo + 2);
 				uint32_t fulltracklen = (bitcells >> 3) + (bitcells & 7 ? 1 : 0);
 				uint8_t *weak = nullptr;
 				trackbuf.resize(fulltracklen);

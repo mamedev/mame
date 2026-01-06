@@ -1,12 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders: Mirko Buffoni, Couriersud
-
 /***************************************************************************
 
-    IronHorse
-    GX560
+Iron Horse
+GX560
 
-    driver by Mirko Buffoni
+driver by Mirko Buffoni
+
+****************************************************************************
+
+Fujitsu MBL68B09E, NEC D780C-1, Konami 005885, Yamaha YM2203C
+
+clock measurements:
+main Xtal is 18.432mhz
+
+Z80 runs at 3.072mhz
+M6809E runs at 1.532mhz
+
+Vsync is 61hz
+Hsync is 15,56khz
 
 ***************************************************************************/
 
@@ -814,21 +826,6 @@ void ironhors_base_state::machine_reset()
 	m_charbank = 0;
 	m_spriterambank = 0;
 }
-
-/*
-clock measurements:
-main Xtal is 18.432mhz
-
-Z80 runs at 3.072mhz
-
-M6809E runs at 1.532mhz
-
-Vsync is 61hz
-
-Hsync is 15,56khz
-
-These clocks make the emulation run too fast.
-*/
 
 void ironhors_base_state::base(machine_config &config)
 {

@@ -114,9 +114,9 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 		5, 5, 5, 5, /* port reads */
 		3, 3, 3, 3, /* port writes */
 
-		2, 3, 3,        /* move, 8-bit */
+		2, 5, 3,        /* move, 8-bit */
 		2, 3,           /* move, 8-bit immediate */
-		2, 3, 3,        /* move, 16-bit */
+		2, 5, 3,        /* move, 16-bit */
 		2, 3,           /* move, 16-bit immediate */
 		5, 5, 3, 3, /* move, AL/AX memory */
 		2, 5, 2, 3, /* move, segment registers */
@@ -164,6 +164,25 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 	13,             /* (80186) BOUND */
 };
 
+// Effective Address calculation takes one extra clock if offset calculation
+// requires summing 3 elements.
+const uint8_t i80286_cpu_device::m_i80286_ea_timing[] =
+{
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	1,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	1,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+	0,  0,  0,  0,  0,  0,  0,  0,
+};
+
 DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "Intel 80286")
 
 i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -175,6 +194,7 @@ i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *
 	, m_out_shutdown_func(*this)
 {
 	memcpy(m_timing, m_i80286_timing, sizeof(m_i80286_timing));
+	memcpy(m_ea_timing, m_i80286_ea_timing, sizeof(m_i80286_ea_timing));
 	m_amask = 0xffffff;
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 	m_sregs[CS] = 0xf000;

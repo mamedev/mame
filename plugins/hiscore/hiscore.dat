@@ -2586,7 +2586,6 @@ ragtimea:
 
 ;forcebrk:******Force Break (Japan)
 brkthru:
-brkthrubl:
 brkthruj:
 forcebrk:
 @:maincpu,program,0531,27,00,32
@@ -4126,8 +4125,8 @@ wrally2a:
 ;maniac square (unprotected)(by tamphax)
 maniacsq:
 maniacsqa:
+maniacsqb:
 maniacsqs:
-maniacsqu:
 @:maincpu,program,fe982c,48,50,00
 
 
@@ -8910,13 +8909,6 @@ miraxa:
 @:maincpu,program,d021,6,00,00
 
 
-;@s:misc/mole.cpp
-
-mole:
-@:maincpu,program,02e1,0a,00,05
-@:maincpu,program,0375,50,19,00
-
-
 ;@s:misc/mosaic.cpp
 
 ;(mosaic)
@@ -9015,14 +9007,6 @@ sprcros2a:
 @:master_cpu,program,f013,1,03,03
 
 
-;@s:misc/sstrangr.cpp
-
-;(space stranger & space stranger 2)
-sstrangr:
-sstrangr2:
-@:maincpu,program,20f4,2,00,00
-
-
 ;@s:misc/statriv2.cpp
 
 ;*******super triv II(By Firebrand)
@@ -9050,6 +9034,24 @@ stuntair:
 @:maincpu,program,f9e1,01,b0,b0
 @:maincpu,program,f9c1,01,b0,b0
 @:maincpu,program,f9a1,01,b0,b0
+
+
+;@s:misc/timelimt.cpp
+
+;(time limit) (by GeoMan) 
+timelimt:
+@:maincpu,program,80ca,3,0,0
+@:maincpu,program,8981,1,27,27
+@:maincpu,program,89a1,1,00,00
+@:maincpu,program,89c1,1,27,27
+@:maincpu,program,89e1,1,27,27
+@:maincpu,program,8a01,1,27,27
+@:maincpu,program,8a21,1,27,27
+
+
+;*******progress(By Firebrand)(Hiscore does not seem to change during game)
+progress:
+@:maincpu,program,8711,e,00,01
 
 
 ;@s:misc/tugboat.cpp
@@ -9292,7 +9294,7 @@ cgangpzlj:
 ;**** thanks to Takasaki for this fix ****
 emeralda:
 emeraldaj:
-emeraldaja:
+emeraldajb:
 @:maincpu,program,9c9e,10e,4b,01
 
 
@@ -12303,6 +12305,15 @@ ssf2mdb:
 @:maincpu,program,fffcb3,29,00,20
 
 
+;@s:sega/megadriv_ybox.cpp
+
+;*******puckman pockimon
+jingling:
+puckpkmn:
+puckpkmnb:
+@:maincpu,program,ff0020,30,38,36
+
+
 ;@s:sega/megatech.cpp
 
 ;******megatech: e-swat
@@ -12333,15 +12344,6 @@ vr:
 ;*******Virtua Fighter 1
 vf:
 @:maincpu,program,40f800,b3,09,4d
-
-
-;@s:sega/puckpkmn.cpp
-
-;*******puckman pockimon
-jingling:
-puckpkmn:
-puckpkmnb:
-@:maincpu,program,ff0020,30,38,36
 
 
 ;@s:sega/segac2.cpp
@@ -15966,6 +15968,105 @@ rollace:
 @:maincpu,program,c026,3,00,00
 
 
+;@s:taito/roundup.cpp
+
+theportr:
+@:maincpu,program,40fd,3,00,00
+@:maincpu,program,9201,1,24,24
+@:maincpu,program,91e1,1,24,24
+@:maincpu,program,91c1,1,24,24
+@:maincpu,program,91a1,1,24,24
+@:maincpu,program,9181,1,00,00
+
+
+thehole:
+@:maincpu,program,8283,1a,19,00
+@:maincpu,program,8039,f,19,00
+
+
+;porter:******Port Man (bootleg on Moon Cresta hardware)
+dockman:
+dockmanb:
+dockmanc:
+porter:
+portera:
+portman:
+portmanj:
+@:maincpu,program,80fd,3,00,00
+@:maincpu,program,92c1,1,00,00
+@:maincpu,program,92e1,1,24,24
+@:maincpu,program,9301,1,24,24
+@:maincpu,program,9321,1,24,24
+@:maincpu,program,9341,1,24,24
+@:maincpu,program,9181,1,00,00
+@:maincpu,program,91a1,1,24,24
+@:maincpu,program,91c1,1,24,24
+@:maincpu,program,91e1,1,24,24
+@:maincpu,program,9201,1,24,24
+
+
+intrepid:
+intrepid2:
+intrepidb:
+intrepidb2:
+intrepidb3:
+@:maincpu,program,803c,3d,02,fd
+@:maincpu,program,8035,2,00,00
+
+
+;(funny mouse) parent
+funnymou:
+suprmous:
+@:maincpu,program,804a,03,00,00
+@:maincpu,program,9221,01,24,24
+@:maincpu,program,9201,01,24,24
+@:maincpu,program,91e1,01,24,24
+@:maincpu,program,91c1,01,24,24
+@:maincpu,program,91a1,01,24,24
+@:maincpu,program,9181,01,00,00
+
+
+machomou:
+@:maincpu,program,804a,3,00,00
+@:maincpu,program,9181,1,00,00
+@:maincpu,program,91a1,1,24,24
+@:maincpu,program,91c1,1,24,24
+@:maincpu,program,91e1,1,24,24
+@:maincpu,program,9201,1,24,24
+@:maincpu,program,9221,1,24,24
+
+
+fitter:
+fitterbl:
+roundup:
+ttfitter:
+@:maincpu,program,8050,03,00,00
+@:maincpu,program,9621,01,24,24
+@:maincpu,program,9601,01,24,24
+@:maincpu,program,95e1,01,24,24
+@:maincpu,program,95c1,01,24,24
+@:maincpu,program,95a1,01,24,24
+@:maincpu,program,9581,01,00,00
+
+
+thepitu2:
+@:maincpu,program,8283,17,10,00
+@:maincpu,program,8037,f,10,00
+
+
+;thepit:******The Pit (Bootleg)
+thepit:
+thepitj:
+thepitu1:
+@:maincpu,program,8283,17,10,0
+@:maincpu,program,8039,f,10,0
+
+
+desertdn:
+@:maincpu,program,82c7,3,00,00
+@:maincpu,program,82c8,1,50,50
+
+
 ;@s:taito/sbowling.cpp
 
 ;******strike bowling(By Firebrand)
@@ -16025,6 +16126,19 @@ perestro:
 perestrof:
 @:maincpu,program,f4c0,28,00,03
 @:maincpu,program,f8f1,4,00,00
+
+
+;@s:taito/suprridr.cpp
+
+;******super rider
+suprridr:
+@:maincpu,program,80ca,3,00,00
+@:maincpu,program,8a21,1,24,24
+@:maincpu,program,8a01,1,24,24
+@:maincpu,program,89e1,1,24,24
+@:maincpu,program,89c1,1,24,24
+@:maincpu,program,89a1,1,24,24
+@:maincpu,program,8981,1,00,00
 
 
 ;@s:taito/taito_b.cpp
@@ -17069,7 +17183,7 @@ wyvernf0a:
 @:maincpu,program,8800,190,00,26
 
 
-;@s:tatsumi/tatsumi.cpp
+;@s:tatsumi/cyclwarr.cpp
 
 bigfight:
 bigfightj:
@@ -17606,123 +17720,6 @@ twcup90c:
 twcup90t:
 @:maincpu,program,800f,1e,00,00
 @:maincpu,program,804d,01,11,11
-
-
-;@s:thepit/thepit.cpp
-
-theportr:
-@:maincpu,program,40fd,3,00,00
-@:maincpu,program,9201,1,24,24
-@:maincpu,program,91e1,1,24,24
-@:maincpu,program,91c1,1,24,24
-@:maincpu,program,91a1,1,24,24
-@:maincpu,program,9181,1,00,00
-
-
-thehole:
-@:maincpu,program,8283,1a,19,00
-@:maincpu,program,8039,f,19,00
-
-
-;porter:******Port Man (bootleg on Moon Cresta hardware)
-dockman:
-dockmanb:
-dockmanc:
-porter:
-portera:
-portman:
-portmanj:
-@:maincpu,program,80fd,3,00,00
-@:maincpu,program,92c1,1,00,00
-@:maincpu,program,92e1,1,24,24
-@:maincpu,program,9301,1,24,24
-@:maincpu,program,9321,1,24,24
-@:maincpu,program,9341,1,24,24
-@:maincpu,program,9181,1,00,00
-@:maincpu,program,91a1,1,24,24
-@:maincpu,program,91c1,1,24,24
-@:maincpu,program,91e1,1,24,24
-@:maincpu,program,9201,1,24,24
-
-
-intrepid:
-intrepid2:
-intrepidb:
-intrepidb2:
-intrepidb3:
-@:maincpu,program,803c,3d,02,fd
-@:maincpu,program,8035,2,00,00
-
-
-;(funny mouse) parent
-funnymou:
-suprmous:
-@:maincpu,program,804a,03,00,00
-@:maincpu,program,9221,01,24,24
-@:maincpu,program,9201,01,24,24
-@:maincpu,program,91e1,01,24,24
-@:maincpu,program,91c1,01,24,24
-@:maincpu,program,91a1,01,24,24
-@:maincpu,program,9181,01,00,00
-
-
-machomou:
-@:maincpu,program,804a,3,00,00
-@:maincpu,program,9181,1,00,00
-@:maincpu,program,91a1,1,24,24
-@:maincpu,program,91c1,1,24,24
-@:maincpu,program,91e1,1,24,24
-@:maincpu,program,9201,1,24,24
-@:maincpu,program,9221,1,24,24
-
-
-fitter:
-fitterbl:
-roundup:
-ttfitter:
-@:maincpu,program,8050,03,00,00
-@:maincpu,program,9621,01,24,24
-@:maincpu,program,9601,01,24,24
-@:maincpu,program,95e1,01,24,24
-@:maincpu,program,95c1,01,24,24
-@:maincpu,program,95a1,01,24,24
-@:maincpu,program,9581,01,00,00
-
-
-thepitu2:
-@:maincpu,program,8283,17,10,00
-@:maincpu,program,8037,f,10,00
-
-
-;thepit:******The Pit (Bootleg)
-thepit:
-thepitj:
-thepitu1:
-@:maincpu,program,8283,17,10,0
-@:maincpu,program,8039,f,10,0
-
-
-desertdn:
-@:maincpu,program,82c7,3,00,00
-@:maincpu,program,82c8,1,50,50
-
-
-;@s:thepit/timelimt.cpp
-
-;(time limit) (by GeoMan) 
-timelimt:
-@:maincpu,program,80ca,3,0,0
-@:maincpu,program,8981,1,27,27
-@:maincpu,program,89a1,1,00,00
-@:maincpu,program,89c1,1,27,27
-@:maincpu,program,89e1,1,27,27
-@:maincpu,program,8a01,1,27,27
-@:maincpu,program,8a21,1,27,27
-
-
-;*******progress(By Firebrand)(Hiscore does not seem to change during game)
-progress:
-@:maincpu,program,8711,e,00,01
 
 
 ;@s:toaplan/batsugun.cpp
@@ -18545,19 +18542,6 @@ spcforce:
 @:maincpu,program,4300,50,30,30
 
 
-;@s:venture/suprridr.cpp
-
-;******super rider
-suprridr:
-@:maincpu,program,80ca,3,00,00
-@:maincpu,program,8a21,1,24,24
-@:maincpu,program,8a01,1,24,24
-@:maincpu,program,89e1,1,24,24
-@:maincpu,program,89c1,1,24,24
-@:maincpu,program,89a1,1,24,24
-@:maincpu,program,8981,1,00,00
-
-
 ;@s:vsystem/aerofgt.cpp
 
 aerofgt:
@@ -18744,6 +18728,21 @@ welltrisj:
 
 superwng:
 @:maincpu,program,7920,c8,00,19
+
+
+;@s:yachiyo/mole.cpp
+
+mole:
+@:maincpu,program,02e1,0a,00,05
+@:maincpu,program,0375,50,19,00
+
+
+;@s:yachiyo/sstrangr.cpp
+
+;(space stranger & space stranger 2)
+sstrangr:
+sstrangr2:
+@:maincpu,program,20f4,2,00,00
 
 
 ;@s:yunsung/nmg5.cpp

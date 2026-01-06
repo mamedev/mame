@@ -19,17 +19,17 @@ DEFINE_DEVICE_TYPE(ARCHIMEDES_ECONET_SLOT, archimedes_econet_slot_device, "archi
 
 
 //**************************************************************************
-//  DEVICE BBC_MODEM PORT INTERFACE
+//  DEVICE ARCHIMEDES_ECONET PORT INTERFACE
 //**************************************************************************
 
 //-------------------------------------------------
 //  device_archimedes_econet_interface - constructor
 //-------------------------------------------------
 
-device_archimedes_econet_interface::device_archimedes_econet_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "arceconet")
+device_archimedes_econet_interface::device_archimedes_econet_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "arceconet")
+	, m_slot(dynamic_cast<archimedes_econet_slot_device *>(device.owner()))
 {
-	m_slot = dynamic_cast<archimedes_econet_slot_device *>(device.owner());
 }
 
 

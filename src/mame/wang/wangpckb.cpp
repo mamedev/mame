@@ -96,10 +96,10 @@ const tiny_rom_entry *wangpc_keyboard_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( wangpc_keyboard_io )
+//  ADDRESS_MAP( wangpc_keyboard_data )
 //-------------------------------------------------
 
-void wangpc_keyboard_device::wangpc_keyboard_io(address_map &map)
+void wangpc_keyboard_device::wangpc_keyboard_data(address_map &map)
 {
 	//map(0x0000, 0xfeff).nopr();
 	map(0x47, 0x58).mirror(0xff00).nopr();
@@ -114,7 +114,7 @@ void wangpc_keyboard_device::wangpc_keyboard_io(address_map &map)
 void wangpc_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	I8051(config, m_maincpu, XTAL(4'000'000));
-	m_maincpu->set_addrmap(AS_IO, &wangpc_keyboard_device::wangpc_keyboard_io);
+	m_maincpu->set_addrmap(AS_DATA, &wangpc_keyboard_device::wangpc_keyboard_data);
 	m_maincpu->port_in_cb<1>().set(FUNC(wangpc_keyboard_device::kb_p1_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(wangpc_keyboard_device::kb_p1_w));
 	m_maincpu->port_out_cb<2>().set(FUNC(wangpc_keyboard_device::kb_p2_w));

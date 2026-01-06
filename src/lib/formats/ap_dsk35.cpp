@@ -315,7 +315,7 @@ const char *apple_gcr_format::description() const noexcept
 
 const char *apple_gcr_format::extensions() const noexcept
 {
-	return "img";
+	return "img,po";
 }
 
 bool apple_gcr_format::supports_save() const noexcept
