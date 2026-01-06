@@ -33,41 +33,43 @@
 #error jagblit.inc -- requires A2FIXED to be predefined
 #endif
 
+// TODO: fix all these "huh" (relevant for Z scissoring in 3d games)
+
 #ifndef PIXEL_SHIFT_1
 #define PIXEL_SHIFT_1(a)      ((~a##_x >> 16) & 7)
-#define PIXEL_OFFSET_1(a)     (((uint32_t)a##_y >> 16) * a##_width / 8 + (((uint32_t)a##_x >> 19) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 19) & 7))
+#define PIXEL_OFFSET_1(a)     (((uint32_t)a##_y >> 16) * (a##_width / 8) * (1 + a##_pitch) + (((uint32_t)a##_x >> 19) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 19) & 7))
 #define ZDATA_OFFSET_1(a)     0 /* huh? */
 #define READ_RDATA_1(r,a,p)   ((p) ? (((((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 19) & 7)]) >> PIXEL_SHIFT_1(a)) & 0x01) : (m_blitter_regs[r] & 0x01))
 #define READ_PIXEL_1(a)       ((m_gpu->space(AS_PROGRAM).read_byte(a##_base + PIXEL_OFFSET_1(a)) >> PIXEL_SHIFT_1(a)) & 0x01)
 #define READ_ZDATA_1(a)       0 /* huh? */
 
 #define PIXEL_SHIFT_2(a)      ((~a##_x >> 15) & 6)
-#define PIXEL_OFFSET_2(a)     (((uint32_t)a##_y >> 16) * a##_width / 4 + (((uint32_t)a##_x >> 18) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 18) & 7))
+#define PIXEL_OFFSET_2(a)     (((uint32_t)a##_y >> 16) * (a##_width / 4) * (1 + a##_pitch) + (((uint32_t)a##_x >> 18) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 18) & 7))
 #define ZDATA_OFFSET_2(a)     0 /* huh? */
 #define READ_RDATA_2(r,a,p)   ((p) ? (((((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 18) & 7)]) >> PIXEL_SHIFT_2(a)) & 0x03) : (m_blitter_regs[r] & 0x03))
 #define READ_PIXEL_2(a)       ((m_gpu->space(AS_PROGRAM).read_byte(a##_base + PIXEL_OFFSET_2(a)) >> PIXEL_SHIFT_2(a)) & 0x03)
 #define READ_ZDATA_2(a)       0 /* huh? */
 
 #define PIXEL_SHIFT_4(a)      ((~a##_x >> 14) & 4)
-#define PIXEL_OFFSET_4(a)     (((uint32_t)a##_y >> 16) * a##_width / 2 + (((uint32_t)a##_x >> 17) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 17) & 7))
+#define PIXEL_OFFSET_4(a)     (((uint32_t)a##_y >> 16) * (a##_width / 2) * (1 + a##_pitch) + (((uint32_t)a##_x >> 17) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 17) & 7))
 #define ZDATA_OFFSET_4(a)     0 /* huh? */
 #define READ_RDATA_4(r,a,p)   ((p) ? (((((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 17) & 7)]) >> PIXEL_SHIFT_4(a)) & 0x0f) : (m_blitter_regs[r] & 0x0f))
 #define READ_PIXEL_4(a)       ((m_gpu->space(AS_PROGRAM).read_byte(a##_base + PIXEL_OFFSET_4(a)) >> PIXEL_SHIFT_4(a)) & 0x0f)
 #define READ_ZDATA_4(a)       0 /* huh? */
 
-#define PIXEL_OFFSET_8(a)     (((uint32_t)a##_y >> 16) * a##_width + (((uint32_t)a##_x >> 16) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 7))
+#define PIXEL_OFFSET_8(a)     (((uint32_t)a##_y >> 16) * a##_width * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & ~7) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 7))
 #define ZDATA_OFFSET_8(a)     (PIXEL_OFFSET_8(a) + a##_zoffs * 8)
 #define READ_RDATA_8(r,a,p)   ((p) ? (((uint8_t *)&m_blitter_regs[r])[BYTE4_XOR_BE(((uint32_t)a##_x >> 16) & 7)]) : (m_blitter_regs[r] & 0xff))
 #define READ_PIXEL_8(a)       (m_gpu->space(AS_PROGRAM).read_byte(a##_base + PIXEL_OFFSET_8(a)))
 #define READ_ZDATA_8(a)       (m_gpu->space(AS_PROGRAM).read_byte(a##_base + ZDATA_OFFSET_8(a)))
 
-#define PIXEL_OFFSET_16(a)    (((uint32_t)a##_y >> 16) * a##_width + (((uint32_t)a##_x >> 16) & ~3) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 3))
+#define PIXEL_OFFSET_16(a)    (((uint32_t)a##_y >> 16) * a##_width * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & ~3) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 3))
 #define ZDATA_OFFSET_16(a)    (PIXEL_OFFSET_16(a) + a##_zoffs * 4)
 #define READ_RDATA_16(r,a,p)  ((p) ? (((uint16_t *)&m_blitter_regs[r])[BYTE_XOR_BE(((uint32_t)a##_x >> 16) & 3)]) : (m_blitter_regs[r] & 0xffff))
 #define READ_PIXEL_16(a)      (m_gpu->space(AS_PROGRAM).read_word(a##_base + (PIXEL_OFFSET_16(a)<<1)))
 #define READ_ZDATA_16(a)      (m_gpu->space(AS_PROGRAM).read_word(a##_base + (ZDATA_OFFSET_16(a)<<1)))
 
-#define PIXEL_OFFSET_32(a)    (((uint32_t)a##_y >> 16) * a##_width + (((uint32_t)a##_x >> 16) & ~1) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 1))
+#define PIXEL_OFFSET_32(a)    (((uint32_t)a##_y >> 16) * a##_width * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & ~1) * (1 + a##_pitch) + (((uint32_t)a##_x >> 16) & 1))
 #define ZDATA_OFFSET_32(a)    (PIXEL_OFFSET_32(a) + a##_zoffs * 2)
 #define READ_RDATA_32(r,a,p)  ((p) ? (m_blitter_regs[r + (((uint32_t)a##_x >> 16) & 1)]) : m_blitter_regs[r])
 #define READ_PIXEL_32(a)      (m_gpu->space(AS_PROGRAM).read_dword(a##_base + (PIXEL_OFFSET_32(a)<<2)))
@@ -101,12 +103,12 @@
 #define PIXEL_SHIFT_WRITE_2      ((~adest_x >> 15) & 6)
 #define PIXEL_SHIFT_WRITE_4      ((~adest_x >> 14) & 4)
 
-#define PIXEL_OFFSET_WRITE_1     (((uint32_t)adest_y >> 16) * adest_width / 8 + (((uint32_t)adest_x >> 19) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 19) & 7))
-#define PIXEL_OFFSET_WRITE_2     (((uint32_t)adest_y >> 16) * adest_width / 4 + (((uint32_t)adest_x >> 18) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 18) & 7))
-#define PIXEL_OFFSET_WRITE_4     (((uint32_t)adest_y >> 16) * adest_width / 2 + (((uint32_t)adest_x >> 17) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 17) & 7))
-#define PIXEL_OFFSET_WRITE_8     (((uint32_t)adest_y >> 16) * adest_width + (((uint32_t)adest_x >> 16) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 7))
-#define PIXEL_OFFSET_WRITE_16    (((uint32_t)adest_y >> 16) * adest_width + (((uint32_t)adest_x >> 16) & ~3) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 3))
-#define PIXEL_OFFSET_WRITE_32    (((uint32_t)adest_y >> 16) * adest_width + (((uint32_t)adest_x >> 16) & ~1) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 1))
+#define PIXEL_OFFSET_WRITE_1     (((uint32_t)adest_y >> 16) * (adest_width / 8) * (1 + adest_pitch) + (((uint32_t)adest_x >> 19) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 19) & 7))
+#define PIXEL_OFFSET_WRITE_2     (((uint32_t)adest_y >> 16) * (adest_width / 4) * (1 + adest_pitch) + (((uint32_t)adest_x >> 18) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 18) & 7))
+#define PIXEL_OFFSET_WRITE_4     (((uint32_t)adest_y >> 16) * (adest_width / 2) * (1 + adest_pitch) + (((uint32_t)adest_x >> 17) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 17) & 7))
+#define PIXEL_OFFSET_WRITE_8     (((uint32_t)adest_y >> 16) * adest_width * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & ~7) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 7))
+#define PIXEL_OFFSET_WRITE_16    (((uint32_t)adest_y >> 16) * adest_width * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & ~3) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 3))
+#define PIXEL_OFFSET_WRITE_32    (((uint32_t)adest_y >> 16) * adest_width * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & ~1) * (1 + adest_pitch) + (((uint32_t)adest_x >> 16) & 1))
 
 #define ZDATA_OFFSET_WRITE_1     0 /* huh? */
 #define ZDATA_OFFSET_WRITE_2     0 /* huh? */
