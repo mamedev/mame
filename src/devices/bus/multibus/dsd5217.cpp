@@ -27,10 +27,13 @@
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-enum port20_bits : unsigned
+enum port20_mask : unsigned
 {
-	P20_FDIDX = 4, // floppy index
-	P20_FDWP  = 6, // floppy write protect
+	P20_WTRK0  = 0x02, // winchester track 0
+	P20_WWFLT  = 0x04, // winchester write fault
+	P20_FIDX   = 0x10, // floppy index
+	P20_FTRK0  = 0x20, // floppy track 0
+	P20_FWPT   = 0x40, // floppy write protect
 };
 enum port78_bits : unsigned
 {
@@ -40,6 +43,23 @@ enum port78_bits : unsigned
 	P78_MBA15  = 3, // Multibus address bit 15
 	P78_CR1    = 4, // CR1 (ERR) LED
 	P78_CR2    = 5, // CR2 (RDY) LED
+};
+
+enum portB_bits : unsigned
+{
+	PB_SIDE  = 4, // floppy side select
+	PB_HS0   = 4, // winchester head select 0
+	PB_HS1   = 5, // winchester head select 1
+	PB_HS2   = 6, // winchester head select 2
+	PB_MOTOR = 7, // floppy motor
+};
+enum portC_bits : unsigned
+{
+	PC_STEP = 0, // step pulse
+	PC_DIR  = 1, // step direction
+	PC_HS3  = 2, // winchester head select 3/reduced write current
+	PC_RWC  = 3, // winchester reduced write current
+	PC_WUA  = 5, // wake-up address
 };
 
 class multibus_dsd5217_device
@@ -54,6 +74,7 @@ public:
 		, m_rwc(*this, "rwc")
 		, m_rio(*this, "rio")
 		, m_dma(*this, "dma")
+		, m_fdc(*this, "fdc%u", 0U)
 		, m_w6(*this, "W6")
 		, m_w7(*this, "W7")
 		, m_w9(*this, "W9")
@@ -86,6 +107,7 @@ protected:
 	template <unsigned Port> u8 buf_r();
 	template <unsigned Port> void buf_w(u8 data);
 	void mua_w(u8 data);
+	u8 port20_r();
 	void port78_w(u8 data);
 
 	// helpers
@@ -98,6 +120,8 @@ private:
 	required_device<i8155_device> m_rio;
 	required_device<am9517a_device> m_dma;
 
+	required_device_array<floppy_connector, 2> m_fdc;
+
 	required_ioport m_w6;
 	required_ioport m_w7;
 	required_ioport m_w9;
@@ -107,9 +131,11 @@ private:
 	u16 m_wua; // wake-up address latch
 	u8 m_mua;  // Multibus upper address
 	u8 m_port78;
-	u8 m_rwc_reg[4];
+	u8 m_scratch[4];
 
 	u8 m_pa; // i8155 port A
+	u8 m_pb; // i8155 port B
+	u8 m_pc; // i8155 port C
 
 	std::unique_ptr<u8[]> m_buf;
 	u16 m_ctr[2]; // buffer counters (AM25LS2569PC x6)
@@ -130,8 +156,10 @@ void multibus_dsd5217_device::device_start()
 	save_item(NAME(m_wua));
 	save_item(NAME(m_mua));
 	save_item(NAME(m_port78));
-	save_item(NAME(m_rwc_reg));
+	save_item(NAME(m_scratch));
 	save_item(NAME(m_pa));
+	save_item(NAME(m_pb));
+	save_item(NAME(m_pc));
 	save_item(NAME(m_ctr));
 
 	save_pointer(NAME(m_buf), 4096);
@@ -169,6 +197,9 @@ void multibus_dsd5217_device::device_reset()
 	m_wua = 0;
 	m_mua = 0;
 	m_port78 = 0;
+	m_pa = 0;
+	m_pb = 0;
+	m_pc = 0;
 	m_ctr[0] = 0;
 	m_ctr[1] = 0;
 
@@ -187,25 +218,52 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 
 	I8155(config, m_rio, 10_MHz_XTAL / 2);
 	m_rio->out_to_callback().set_inputline(m_cpu, I8085_TRAP_LINE);
-	m_rio->out_pa_callback().set([this](u8 data) { logerror("pa 0x%02x\n", data); m_pa = data; });
-	m_rio->out_pc_callback().set(
-		[this](int state)
+	m_rio->out_pa_callback().set(
+		[this](u8 data)
 		{
-			/*
-			 * 3 precomp
-			 * 2 reduced write current/hs3
-			 * 1 direction?
-			 * 0 step?
-			 *
-			 */
-			if (state)
+			LOG("%s: port A 0x%02x\n", machine().describe_context(), data);
+			m_pa = data;
+		});
+	m_rio->out_pb_callback().set(
+		[this](u8 data)
+		{
+			LOG("%s: port B 0x%02x\n", machine().describe_context(), data);
+
+			if (floppy_image_device *f = m_fdc[0]->get_device())
+			{
+				if (BIT(m_pb ^ data, PB_MOTOR))
+					f->mon_w(!BIT(data, PB_MOTOR));
+				if (BIT(m_pb ^ data, PB_SIDE))
+					f->ss_w(BIT(data, PB_SIDE));
+			}
+
+			m_pb = data;
+		});
+
+	m_rio->out_pc_callback().set(
+		[this](u8 data)
+		{
+			LOG("%s: port C 0x%02x\n", machine().describe_context(), data);
+
+			if (BIT(data, PC_WUA))
 			{
 				if (BIT(m_port78, P78_CR1))
 					m_wua <<= 1;
 				else
 					m_wua = (m_w7->read() << 8) | m_w9->read();
 			}
-		}).bit(5);
+
+			if (floppy_image_device *f = m_fdc[0]->get_device())
+			{
+				if (BIT(m_pc ^ data, PC_DIR))
+					f->dir_w(!BIT(data, PC_DIR));
+
+				if (BIT(m_pc ^ data, PC_STEP) && BIT(m_pb, PB_MOTOR))
+					f->stp_w(BIT(data, PC_STEP));
+			}
+
+			m_pc = data;
+		});
 
 	AM9517A(config, m_dma, 10_MHz_XTAL / 2);
 	// ch0: tape, ch1: buffer
@@ -214,6 +272,10 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	m_dma->out_memw_callback().set([this](offs_t offset, u8 data) { m_cpu->space(AS_PROGRAM).write_byte(offset, data); });
 	m_dma->in_ior_callback<1>().set([this](offs_t offset) { return m_buf[offset & 0xfff]; });
 	m_dma->out_iow_callback<1>().set([this](offs_t offset, u8 data) { m_buf[offset & 0xfff] = data; });
+
+	// floppy: 250Kbps MFM, 80 tracks, 2 sides, 8 sectors/track, 512 byte sectors,
+	FLOPPY_CONNECTOR(config, m_fdc[0], "525qd", FLOPPY_525_QD, true,  floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_fdc[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void multibus_dsd5217_device::append_crc()
@@ -226,7 +288,6 @@ void multibus_dsd5217_device::append_crc()
 		for (u16 offset = 0; offset < m_ctr[0]; offset++)
 			crc = m_crc[u8((crc >> 24) ^ m_buf[offset])] ^ (crc << 8);
 
-		logerror("crc 0x%08x\n", crc);
 		put_u32be(&m_buf[m_ctr[0]], crc);
 		m_ctr[0] += 4;
 	}
@@ -249,17 +310,19 @@ void multibus_dsd5217_device::cpu_mem(address_map &map)
 	map(0x6000, 0x6003).lw8(
 		[this](offs_t offset, u8 data)
 		{
+			LOG("%s: scratch_%x data 0x%02x\n", machine().describe_context(), offset, data);
+
 			// TODO: fd: sector,head,cyl,flags
-			m_rwc_reg[offset] = data;
+			m_scratch[offset] = data;
 
 			// HACK: this code allows diagnostic to pass, but is probably wrong
 			if (offset == 0)
 			{
 				append_crc();
 
-				// append data written to 0x6000..6003
-				for (size_t i = 0; i < std::size(m_rwc_reg); i++)
-					m_buf[m_ctr[0]++] = m_rwc_reg[i];
+				// append scratch data
+				for (size_t i = 0; i < std::size(m_scratch); i++)
+					m_buf[m_ctr[0]++] = m_scratch[i];
 
 				// append one more byte (valid values 0x52..0x5f)?
 				m_buf[m_ctr[0]++] = 0x53;
@@ -272,7 +335,7 @@ void multibus_dsd5217_device::cpu_mem(address_map &map)
 void multibus_dsd5217_device::cpu_pio(address_map &map)
 {
 	map(0x00, 0x0f).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x20, 0x20).lr8([]() { return 0x09; }, "unit_ready");
+	map(0x20, 0x20).r(FUNC(multibus_dsd5217_device::port20_r));
 	map(0x40, 0x47).rw(m_rio, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 
 	map(0x60, 0x60).rw(FUNC(multibus_dsd5217_device::buf_r<0>), FUNC(multibus_dsd5217_device::buf_w<0>));
@@ -333,7 +396,8 @@ template <unsigned Port> u8 multibus_dsd5217_device::buf_r()
 {
 	u8 const data = m_buf[m_ctr[Port]];
 
-	m_ctr[Port] = (m_ctr[Port] + 1) & 0x0fffU;
+	if (!machine().side_effects_disabled())
+		m_ctr[Port] = (m_ctr[Port] + 1) & 0x0fffU;
 
 	return data;
 }
@@ -350,6 +414,25 @@ void multibus_dsd5217_device::mua_w(u8 data)
 	LOG("%s: mua_w 0x%02x\n", machine().describe_context(), data);
 	m_mua = data;
 }
+
+u8 multibus_dsd5217_device::port20_r()
+{
+	// TODO: drive ready, seek complete
+	u8 data = 0x09;
+
+	if (floppy_image_device *f = m_fdc[0]->get_device())
+	{
+		if (f->idx_r())
+			data |= P20_FIDX;
+		if (!f->trk00_r())
+			data |= P20_FTRK0;
+		if (f->wpt_r())
+			data |= P20_FWPT;
+	}
+
+	return data;
+}
+
 void multibus_dsd5217_device::port78_w(u8 data)
 {
 	LOG("%s: port78_w 0x%02x\n", machine().describe_context(), data);
