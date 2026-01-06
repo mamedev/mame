@@ -7,12 +7,19 @@
     Written by Aaron Giles
 
     TODO:
-    - Implement pipeline, actually instruction cycles;
-      Currently implementation is similar to single stepping
-      with single cycle
+    - Make the core interruptible so it can cooperate with 68k when it comes
+      to who owns the bus shenanigans;
+    - Implement pipeline, actual instruction cycles
+      (Current implementation is akin to single stepping with single cycle);
     - Implement and acknowlodge remain registers;
-    - Improve delay slot display in debugger (highlight current instruction
-      doesn't work but instruction hook does);
+    - Improve delay slot behaviour display in debugger
+      (highlight current instruction doesn't work but instruction hook does);
+    - Fix interrupt checks, and make sure delay slot doesn't overrun it;
+    - Interrupt acknowledge cycle is iffy
+      (pending irq should really not depend on being masked, and acknowledge
+      should be only if imask is cleared, but that causes more problems than
+      it resolves ...)
+    - Unaligned accesses, which should really belong to an external bus entity.
 
 ***************************************************************************/
 
@@ -75,17 +82,25 @@ inline u8 jaguar_cpu_device::READBYTE(offs_t a)  { return m_program.read_byte(a)
 inline u16 jaguar_cpu_device::READWORD(offs_t a) { return m_program.read_word(a); }
 inline u32 jaguar_cpu_device::READLONG(offs_t a)
 {
-	// - fball95 GPU
-	// - kasumi GPU 0x01e0'34ce (???)
+	// - fball95 GPU $00f0'3b56
+	// - kasumi GPU $01e0'34ce (???)
 	// - sensible DSP $b14689e2 (???)
-	//if (a & 2)
-	//{
-	//	printf("%d: %08x R\n", m_isdsp, a);
-	//	u32 res = READWORD(a) << 16;
-	//	res |= READWORD(a + 2) & 0xffff;
-	//	//machine().debug_break();
-	//	return res;
-	//}
+	// - pdrive $580e
+	if (!DWORD_ALIGNED(a))
+	{
+		if (a == std::clamp(a, (u32)0xf00000, (u32)0xf00fff) || a == std::clamp(a, (u32)0xf10000, (u32)0xf10fff))
+		{
+			//printf("%d: %08x R\n", m_isdsp, a);
+			u32 res = m_program.read_word(a) << 0;
+			res |= m_program.read_word(a + 2) << 16;
+
+			//machine().debug_break();
+			return res;
+		}
+
+		//if (a == std::clamp(a, (u32)0xf03000, (u32)0xf03fff) || a == std::clamp(a, (u32)0xf1b000, (u32)0xf1cfff))
+		//  a &= ~3;
+	}
 
 	return m_program.read_dword(a);
 }
@@ -94,19 +109,29 @@ inline void jaguar_cpu_device::WRITEBYTE(offs_t a, u8 v)  { m_program.write_byte
 inline void jaguar_cpu_device::WRITEWORD(offs_t a, u16 v) { m_program.write_word(a, v); }
 inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
 {
-	// TODO: protect/protctse wants proper alignment at PC=f03004
-	//   (wants to reprogram border color registers, would otherwise hit VMODE)
+	// protect/protctse wants proper alignment for Tom writes at PC=f03004
+	// (wants to reprogram border color registers, would otherwise hit VMODE)
+	// Other stuff tries to do unaligned R/Ws which contradicts this, namely:
 	// - atarikrt $06bf 0x0000'0007 (?)
 	// - barkley/bretth/chekflag DSP
 	// - kasumi $f0'34ab 0x0000'0003 (?)
 	// - pdrive $580e (?)
-	//if (a & 2)
-	//{
-	//	printf("%d: %08x %08x W\n", m_isdsp, a, v);
-	//	WRITEWORD(a, v >> 16);
-	//	WRITEWORD(a + 2, v & 0xffff);
-	//  return;
-	//}
+	// We currently narrow by Tom or Jerry accesses only.
+	// TODO: verify what happens on other accesses (just rolls over?)
+	if (!DWORD_ALIGNED(a))
+	{
+		if(a == std::clamp(a, (u32)0xf00000, (u32)0xf00fff) || a == std::clamp(a, (u32)0xf10000, (u32)0xf10fff))
+		{
+			//printf("%d: %08x %08x W\n", m_isdsp, a, v);
+			m_program.write_word(a, v & 0xffff);
+			m_program.write_word(a + 2, v >> 16);
+			return;
+		}
+
+		//if (a == std::clamp(a, (u32)0xf03000, (u32)0xf03fff) || a == std::clamp(a, (u32)0xf1b000, (u32)0xf1cfff))
+		//  a &= ~3;
+	}
+
 	m_program.write_dword(a, v);
 }
 
@@ -240,8 +265,8 @@ device_memory_interface::space_config_vector jaguar_cpu_device::memory_space_con
 void jaguar_cpu_device::update_register_banks()
 {
 	// - feverpit doesn't want this
-//	if (m_go == false)
-//		return;
+//  if (m_go == false)
+//      return;
 
 	/* pick the bank */
 	u32 bank = m_flags & RPAGEFLAG;
@@ -292,8 +317,8 @@ void jaguar_cpu_device::check_irqs()
 	u8 mask = m_int_mask;
 
 	/* bail if nothing is available */
-//	if (m_isdsp)
-//		printf("%02x %02x\n", latch, mask);
+//  if (m_isdsp)
+//      printf("%02x %02x\n", latch, mask);
 	latch &= mask;
 	if (latch == 0)
 		return;
@@ -1372,8 +1397,8 @@ void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 
 		//for (int i = 0; i < 5; i++)
 		//{
-		//	if (BIT(m_flags, 9 + i))
-		//		set_input_line(i, CLEAR_LINE);
+		//  if (BIT(m_flags, 9 + i))
+		//      set_input_line(i, CLEAR_LINE);
 		//}
 
 		// TODO: DMAEN (bit 15)
@@ -1418,7 +1443,9 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 	// JTRM warns against changing PC while GPU/DSP is running
 	// - speedst2 does it anyway on DSP side
 	if (m_go == true)
+	{
 		logerror("%s: inflight PC write %08x\n", this->tag(), m_pc);
+	}
 }
 
 /*

@@ -604,6 +604,8 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		blitter_run();
 	}
 
+	// TODO: B_STOP (for collision detection, assuming anything ever used this)
+
 	LOGMASKED(LOG_BLITTER_WRITE, "%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
 #else
 	m_blitter->iobus_w(offset, data, mem_mask);
@@ -762,7 +764,7 @@ TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 {
 	m_blitter_status = 1;
 	// TODO: kasumi and nbajamte at least enables the done irq, verify if needed or not
-//	m_gpu->set_input_line(4, ASSERT_LINE);
+//  m_gpu->set_input_line(4, ASSERT_LINE);
 }
 
 void jaguar_state::update_pit_timer()
