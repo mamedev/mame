@@ -428,8 +428,9 @@ uint32_t jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int
 
 		// TODO: iwidth == 0 clamps to 1
 		// easy to fix, need use cases
-		if (iwidth == 0)
-			popmessage("jagobj.ipp: iwidth == 0!");
+		// rayman & ultravor on transitions
+		//if (iwidth == 0)
+		//	popmessage("jagobj.ipp: iwidth == 0!");
 
 		/* switch off the depth */
 		switch (depthlog)
