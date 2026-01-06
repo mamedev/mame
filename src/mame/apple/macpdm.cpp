@@ -1181,18 +1181,18 @@ void macpdm_state::macpdm(machine_config &config)
 	m_awacs->add_route(1, "speaker", 1.0, 1);
 
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3", mac_scsi_devices, "cdrom").set_option_machine_config("cdrom",
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).machine_config(
 		[this] (device_t *device)
 		{
