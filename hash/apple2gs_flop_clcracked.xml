@@ -1047,7 +1047,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3 - Hot & Cool Jazz Deluxe Library disk"/>
+			<feature name="part_id" value="Disk 3 - Hot &amp; Cool Jazz Deluxe Library disk"/>
 			<dataarea name="flop" size="819264">
 				<rom name="hot&amp;cool jazz deluxe library disk.2mg" size="819264" crc="89cc7d25" sha1="0e53bc7cb770a5512b874dbcac1be5db2afd4891" />
 			</dataarea>
