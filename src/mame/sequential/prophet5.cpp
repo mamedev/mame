@@ -151,7 +151,7 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
-	required_device<ca3280_lin_vca_device> m_vca;
+	required_device<ca3280_vca_lin_device> m_vca;
 
 	sound_stream *m_stream = nullptr;
 	device_sound_interface *m_noise = nullptr;
@@ -186,7 +186,7 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	constexpr double NOISE_I2V = RES_K(100);
 	MIXER(config, "osc_mixer").add_route(0, m_vca, NOISE_I2V);
 
-	CA3280_LIN_VCA(config, m_vca, RES_K(68), VPLUS, VMINUS)  // R4546
+	CA3280_VCA_LIN(config, m_vca, RES_K(68), VPLUS, VMINUS)  // R4546
 		.configure_voltage_input(RES_K(20))  // R4548
 		.add_route(0, *this, 1.0);
 }
@@ -243,7 +243,7 @@ private:
 	required_device<filter_rc_device> m_a440_lpf;  // C4183 and surrounding resistors.
 	required_device<filter_rc_device> m_parasitic_filter;  // C4183's "parasitic" effect on the voice outputs.
 	required_device<ca3280_vca_device> m_noise_vca;  // U430B (CA3280)
-	required_device<ca3280_lin_vca_device> m_master_vol_vca;  // U479B (CA3280)
+	required_device<ca3280_vca_lin_device> m_master_vol_vca;  // U479B (CA3280)
 	required_ioport_array<5> m_voice_vol;  // R4529 on voice 1.
 	required_ioport m_master_vol_pot;  // R113
 	required_ioport m_amp_cv_in_connected;
@@ -329,7 +329,7 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// The master volume is controlled by a VCA. Its control current is set by
 	// the master volume knob and, if connected, the external AMPLIFIER CV IN
 	// input (J7). See update_master_volume().
-	CA3280_LIN_VCA(config, m_master_vol_vca, RES_K(68), VPLUS, VMINUS)  // R4561
+	CA3280_VCA_LIN(config, m_master_vol_vca, RES_K(68), VPLUS, VMINUS)  // R4561
 		.configure_voltage_input(RES_K(15))  // R4564
 		.configure_voltage_output(RES_K(20))  // R4562
 		.add_route(0, "dcblock", 1.0);

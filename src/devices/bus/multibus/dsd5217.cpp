@@ -17,15 +17,17 @@
 #include "dsd5217.h"
 
 #include "cpu/i8085/i8085.h"
+#include "imagedev/floppy.h"
 #include "machine/am2910.h"
 #include "machine/am9517a.h"
 #include "machine/i8155.h"
-#include "imagedev/floppy.h"
 
 #include "multibyte.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
+
+namespace {
 
 enum port20_mask : unsigned
 {
@@ -145,8 +147,6 @@ private:
 	bool m_interrupt;
 	bool m_installed;
 };
-
-DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_DSD5217, device_multibus_interface, multibus_dsd5217_device, "dsd5217", "Data Systems Design DSD 5217 Multibus Disk Controller")
 
 void multibus_dsd5217_device::device_start()
 {
@@ -480,7 +480,7 @@ const tiny_rom_entry *multibus_dsd5217_device::device_rom_region() const
 	return ROM_NAME(dsd5217);
 }
 
-static INPUT_PORTS_START(dsd5217)
+INPUT_PORTS_START(dsd5217)
 	PORT_START("W6")
 	PORT_DIPNAME(0x03, 0x00, "Floppy Drive Class") PORT_DIPLOCATION("W6:!1,W6:!2") PORT_CONDITION("W6", 0x20, EQUALS, 0x00)
 	PORT_DIPSETTING(0x00, "0")
@@ -585,3 +585,7 @@ ioport_constructor multibus_dsd5217_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(dsd5217);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_DSD5217, device_multibus_interface, multibus_dsd5217_device, "dsd5217", "Data Systems Design DSD 5217 Multibus Disk Controller")

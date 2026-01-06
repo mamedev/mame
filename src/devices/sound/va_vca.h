@@ -39,7 +39,7 @@ Summary of devices. See class comments for more details.
 
 DECLARE_DEVICE_TYPE(VA_VCA, va_vca_device)
 DECLARE_DEVICE_TYPE(CA3280_VCA, ca3280_vca_device)
-DECLARE_DEVICE_TYPE(CA3280_LIN_VCA, ca3280_lin_vca_device)
+DECLARE_DEVICE_TYPE(CA3280_VCA_LIN, ca3280_vca_lin_device)
 DECLARE_DEVICE_TYPE(CEM3360_VCA, cem3360_vca_device)
 
 
@@ -81,7 +81,7 @@ private:
 
 
 // Emulates a CA3280-based VCA with its Id pin connected to V-, or not connected
-// at all. For the linearized version (Id pin in use), see ca3280_lin_vca_device
+// at all. For the linearized version (Id pin in use), see ca3280_vca_lin_device
 // instead.
 //
 // In this configuration, the CA3280 has a tanh response, and can only be
@@ -170,29 +170,29 @@ private:
 //
 // This implementation assumes Rin- == Rin+, which is typical.
 //
-class ca3280_lin_vca_device : public va_vca_device
+class ca3280_vca_lin_device : public va_vca_device
 {
 public:
 	// Use this constructor if Id is connected to a constant current source.
-	ca3280_lin_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, float i_d) ATTR_COLD;
+	ca3280_vca_lin_device(const machine_config &mconfig, const char *tag, device_t *owner, float i_d) ATTR_COLD;
 
 	// Use this constructor if Id is connected to a resistor to some voltage source.
 	// r: resistor connected to pin Id.
 	// v_r: voltage on the other side of the resistor, typically the positive
 	//      supply voltage to the chip.
 	// v_minus: negative supply voltage to the chip.
-	ca3280_lin_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float v_r, float v_minus) ATTR_COLD;
+	ca3280_vca_lin_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float v_r, float v_minus) ATTR_COLD;
 
 	// Don't use.
-	ca3280_lin_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
+	ca3280_vca_lin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
 	// By default, the streaming input should be the *current* at point B.
 	// This method will configure the input to be the voltage at point A.
-	ca3280_lin_vca_device &configure_voltage_input(float r_in) ATTR_COLD;
+	ca3280_vca_lin_device &configure_voltage_input(float r_in) ATTR_COLD;
 
 	// By default, the streaming output will be the current at point C. This
 	// method will configure the output to be the voltage at point C.
-	ca3280_lin_vca_device &configure_voltage_output(float r_out) ATTR_COLD;
+	ca3280_vca_lin_device &configure_voltage_output(float r_out) ATTR_COLD;
 
 protected:
 	float cv_to_gain(float cv) const override;
