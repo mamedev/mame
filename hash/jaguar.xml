@@ -222,7 +222,8 @@ Uses [GPU] irq 3
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Title screen foreground layer not drawn properly ([object] pitch = 3 in scaled mode)
+Title screen foreground layer not drawn properly ([object] pitch = 3 in scaled mode) (fixed)
+Main menu text flickers, [object] timings?
 No sound (fixed)
 Access [cart] EEPROM
 Uses [GPU] irq 3
@@ -267,6 +268,7 @@ Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
 Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram
 No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
+Access [paddle] interface
 ]]></notes>
 
 		<info name="serial" value="J9807E"/>
@@ -282,10 +284,7 @@ Access [cart] EEPROM
 		<year>2002</year>
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
-Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
-No sound (fixed, 68k JPIT irqs)
-Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram
-Access [cart] EEPROM
+Same as battlesp
 ]]></notes>
 
 		<info name="serial" value="J0201G"/>
@@ -833,11 +832,12 @@ Uses [GPU] irqs 0 and 4
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
 "Enter Combat" has ground textures with black, uses [blitter] GOURZ
-"Enter Network" causes a black screen after loading (JagLink)
+"Enter Network" causes a black screen after loading (JagLink), 68k trash DSP memory at PC=73CCC
 Reads error bit 15 in [Jerry] ASISTAT
 Sometimes hangs on main menu
-Main menu background is cutoff to the right, uses unemulated [object] scaled blend mode (pillar in the center)
-BGM randomly don't work on main menu
+Main menu background is cutoff to the right
+Unemulated [object] scaled blend mode (pillar in the center) (fixed)
+BGM randomly don't work on title and main menu
 Uses [GPU] irq 0
 ]]></notes>
 

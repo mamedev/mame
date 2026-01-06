@@ -327,8 +327,9 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 	LOGMASKED(LOG_BLITS, "  command  = %08X\n", COMMAND);
 
 	/* check for unhandled command bits */
-	if (COMMAND & 0x24003000)
-		LOGMASKED(LOG_UNHANDLED_BLITS, "Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24003000);
+	// NOTE: disabled check for GOURZ (it's pretty obvious everywhere is used)
+	if (COMMAND & 0x24000000)
+		LOGMASKED(LOG_UNHANDLED_BLITS, "Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24000000);
 
 	/* top of the outer loop */
 	outer = outer_count;
