@@ -1340,6 +1340,9 @@ void jaguar_state::r3000_rom_map(address_map &map)
 	r3000_map(map);
 	map(0x04800000, 0x04bfffff).bankr("maingfxbank");
 	map(0x04c00000, 0x04dfffff).bankr("mainsndbank");
+	// TODO: fishfren access latter when entering service mode (overlay from somewhere or btanb?)
+	// map(0x04d001f0, 0x04d001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
+	// map(0x04d003f0, 0x04d003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));
 }
 
 
@@ -1591,6 +1594,15 @@ static INPUT_PORTS_START( fishfren )
 	PORT_BIT( 0x000f0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // coin returns
 	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("FAKE1_X")
+
+	PORT_START("FAKE1_Y")
+
+	PORT_START("FAKE2_X")
+
+	PORT_START("FAKE2_Y")
+
 INPUT_PORTS_END
 
 
@@ -2626,7 +2638,7 @@ GAME( 1996, area51,     0,        cojagr3k,     area51,   jaguar_state, init_are
 GAME( 1995, area51t,    area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Oct 17, 1996)", 0 )
 GAME( 1995, area51ta,   area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games (Time Warner license)", "Area 51 (Time Warner license, Nov 27, 1995)", 0 )
 GAME( 1995, area51a,    area51,   cojag68k,     area51,   jaguar_state, init_area51a,   ROT0, "Atari Games", "Area 51 (Atari Games license, Oct 25, 1995)", 0 )
-GAME( 1995, fishfren,   0,        cojagr3k_rom, fishfren, jaguar_state, init_fishfren,  ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
+GAME( 1995, fishfren,   0,        cojagr3k_rom, fishfren, jaguar_state, init_fishfren,  ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 ) // OS: 2.02CJ July 28 1995, MAIN: Aug 1 1995
 GAME( 1996, freezeat,   0,        cojagr3k_rom, freezeat, jaguar_state, init_freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, English voice, 96/10/25)", 0 )
 GAME( 1996, freezeatjp, freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat,  ROT0, "Atari Games", "Freeze (Atari) (prototype, Japanese voice, 96/10/25)", 0 )
 GAME( 1996, freezeat2,  freezeat, cojagr3k_rom, freezeat, jaguar_state, init_freezeat2, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/18)", 0 )
