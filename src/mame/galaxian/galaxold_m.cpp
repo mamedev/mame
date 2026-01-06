@@ -183,7 +183,7 @@ void galaxold_state::init_superbikg()
 	save_item(NAME(m_superbikg_latch));
 }
 
-void galaxold_state::init_dkongjrv()
+void galaxold_state::init_dkingjrv()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 

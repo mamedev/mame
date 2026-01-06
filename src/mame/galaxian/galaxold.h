@@ -155,7 +155,7 @@ public:
 	void init_ladybugg();
 	void init_4in1();
 	void init_superbikg();
-	void init_dkongjrv();
+	void init_dkingjrv();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -195,6 +195,7 @@ public:
 	DECLARE_VIDEO_START(mariner);
 	DECLARE_VIDEO_START(mimonkey);
 	DECLARE_VIDEO_START(scorpion);
+	DECLARE_VIDEO_START(dkingjrv);
 	DECLARE_VIDEO_START(ad2083);
 	DECLARE_VIDEO_START(dambustr);
 	DECLARE_VIDEO_START(harem);
@@ -222,6 +223,7 @@ public:
 	void batman2_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dkongjrm_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dkongjrmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void dkingjrv_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void ad2083_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dambustr_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void drivfrcg_modify_color(uint8_t *color);
@@ -257,7 +259,10 @@ public:
 	void racknrol(machine_config &config);
 	void hunchbkg(machine_config &config);
 	void videotron(machine_config &config);
-	void dkongjrv(machine_config &config);
+	void devilfshv(machine_config &config);
+	void dingov(machine_config &config);
+	void dkingjrv(machine_config &config);
+	void junglekv(machine_config &config);
 	void hexpoola(machine_config &config);
 	void dkongjrm(machine_config &config);
 	void tazzmang(machine_config &config);
@@ -276,12 +281,14 @@ public:
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map) ATTR_COLD;
 	void bullsdrtg_data_map(address_map &map) ATTR_COLD;
+	void devilfshv_map(address_map &map) ATTR_COLD;
+	void dingov_map(address_map &map) ATTR_COLD;
 	void dkongjrm_map(address_map &map) ATTR_COLD;
 	void dkongjrmc_map(address_map &map) ATTR_COLD;
-	void dkongjrv_audio_map(address_map &map) ATTR_COLD;
-	void dkongjrv_audio_io_map(address_map &map) ATTR_COLD;
-	void dkongjrv_io_map(address_map &map) ATTR_COLD;
-	void dkongjrv_map(address_map &map) ATTR_COLD;
+	void dkingjrv_audio_map(address_map &map) ATTR_COLD;
+	void dkingjrv_audio_io_map(address_map &map) ATTR_COLD;
+	void dkingjrv_io_map(address_map &map) ATTR_COLD;
+	void dkingjrv_map(address_map &map) ATTR_COLD;
 	void drivfrcg_program(address_map &map) ATTR_COLD;
 	void drivfrcg_io(address_map &map) ATTR_COLD;
 	void galaxold_map(address_map &map) ATTR_COLD;
@@ -303,6 +310,7 @@ public:
 	void superbikg_data(address_map &map) ATTR_COLD;
 	void superbikg_io(address_map &map) ATTR_COLD;
 	void superbikg_map(address_map &map) ATTR_COLD;
+	void junglekv_map(address_map &map) ATTR_COLD;
 	void tazzmang_map(address_map &map) ATTR_COLD;
 
 protected:
