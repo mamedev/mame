@@ -1763,9 +1763,8 @@ void nscsi_cdrom_apple_ext_device::device_add_mconfig(machine_config &config)
 {
 	nscsi_cdrom_apple_device::device_add_mconfig(config);
 
-	SPEAKER(config, "cdrom_speaker_l").front_left();
-	SPEAKER(config, "cdrom_speaker_r").front_right();
+	SPEAKER(config, "cdrom_speaker", 2).front();
 	const auto cdda = subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "cdrom_speaker_l", 1.0, 0);
-	cdda->add_route(1, "cdrom_speaker_r", 1.0, 0);
+	cdda->add_route(0, "cdrom_speaker", 1.0, 0);
+	cdda->add_route(1, "cdrom_speaker", 1.0, 1);
 }

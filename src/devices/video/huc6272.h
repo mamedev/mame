@@ -43,8 +43,7 @@ protected:
 
 private:
 	required_device<huc6271_device> m_huc6271;
-	required_device<speaker_device> m_cdda_l;
-	required_device<speaker_device> m_cdda_r;
+	required_device<speaker_device> m_cdda;
 
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;
