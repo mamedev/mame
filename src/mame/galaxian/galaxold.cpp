@@ -1920,7 +1920,7 @@ void galaxold_state::dkingjrv(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxold_state::dkingjrv_map);
 	m_maincpu->set_addrmap(AS_IO, &galaxold_state::dkingjrv_io_map);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", PIXEL_CLOCK / 2)); // clock not verified
+	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK / 3 / 4)); // measured 1.53547 MHz
 	audiocpu.set_addrmap(AS_PROGRAM, &galaxold_state::dkingjrv_audio_map);
 	audiocpu.set_addrmap(AS_IO, &galaxold_state::dkingjrv_audio_io_map);
 	audiocpu.set_vblank_int("screen", FUNC(galaxold_state::irq0_line_hold));
@@ -1931,7 +1931,7 @@ void galaxold_state::dkingjrv(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "aysnd", MASTER_CLOCK / 3 / 4).add_route(ALL_OUTPUTS, "speaker", 0.50); // clock not verified
+	AY8910(config, "aysnd", MASTER_CLOCK / 3 / 4).add_route(ALL_OUTPUTS, "speaker", 0.50); // measured 1.53547 MHz
 }
 
 void galaxold_state::dingov(machine_config &config)
