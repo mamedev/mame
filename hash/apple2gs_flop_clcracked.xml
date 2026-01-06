@@ -184,7 +184,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="btlchess">
-		<description>Battle Chess (trex crack)</description>
+		<description>Battle Chess (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Jim Sproul" />
@@ -200,8 +200,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- board game. The manual at https://archive.org/details/Battle_Chess_Manual contains the information you need for the copy protection questions -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- board game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="battle chess iigs (trex crack).2mg" size="819264" crc="f40de0f7" sha1="8cd2fc36064fe531172d532db948865bce36307a"/>
@@ -272,7 +274,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="calcraft">
-		<description>Calendar Crafter (A-194 version 1.2) (trex crack)</description>
+		<description>Calendar Crafter (A-194 version 1.2) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-194" />
@@ -285,8 +287,10 @@ license:CC0-1.0
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
 		<!-- productivity program -->
 		<!-- Protection: Bad block check for block $8 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="calendar crafter v1.2 iigs(trex crack).2mg" size="819264" crc="65717231" sha1="2f2415385a699fc78a68a3a73ff8470a5fc8df6f"/>
@@ -295,7 +299,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="calgames">
-		<description>California Games (trex crack)</description>
+		<description>California Games (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Jimmy Huey" />
@@ -308,8 +312,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
 		<!-- sports game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="california games iigs (trex crack).2mg" size="819264" crc="908b7825" sha1="d276969f7e11b493d10fb2d7b2943c3e668864aa"/>
@@ -318,7 +324,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="captbld">
-		<description>Captain Blood (trex crack)</description>
+		<description>Captain Blood (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Philippe Ulrich" />
@@ -329,8 +335,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- simulation game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="captain blood iigs (trex crack).2mg" size="819264" crc="7b2dede6" sha1="6ead26e7e2c4d3bb65b3d91e13df784503c9e643"/>
@@ -359,7 +367,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="clbbgmn">
-		<description>Club Backgammon (version 2.0) (cleanly cracked)</description>
+		<description>Club Backgammon (version 2.0 12-Dec-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 		<info name="programmer" value="Staszek Bartkowski" />
@@ -367,12 +375,13 @@ license:CC0-1.0
 		<info name="programmer" value="Dorota B&#x142;aszczak" />
 		<info name="programmer" value="Maciej Markuszewski" />
 		<info name="programmer" value="Marcin Szostakowski" />
-		<info name="version" value="2.0" />
+		<info name="version" value="2.0 12-Dec-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
 		<!-- It requires a 512K Apple IIgs. -->
 		<!-- "Club Backgammon" is a 1988 board game developed by Staszek Bartkowski, Jarek Olszewski, Dorota Błaszczak, Maciej Markuszewski, and Marcin Szostakowski, and distributed by California Dreams. -->
+		<!-- gammon.sys16 dated 12-Dec-88 -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
 
 		<part name="flop1" interface="floppy_3_5">
@@ -383,7 +392,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="clbbgmna" cloneof="clbbgmn">
-		<description>Club Backgammon (version 1.0) (cleanly cracked)</description>
+		<description>Club Backgammon (version 1.0 09-May-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 		<info name="programmer" value="Staszek Bartkowski" />
@@ -391,12 +400,13 @@ license:CC0-1.0
 		<info name="programmer" value="Dorota B&#x142;aszczak" />
 		<info name="programmer" value="Maciej Markuszewski" />
 		<info name="programmer" value="Marcin Szostakowski" />
-		<info name="version" value="1.0" />
+		<info name="version" value="1.0 09-May-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
 		<!-- It requires a 512K Apple IIgs. -->
 		<!-- "Club Backgammon" is a 1988 board game developed by Staszek Bartkowski, Jarek Olszewski, Dorota Błaszczak, Maciej Markuszewski, and Marcin Szostakowski, and distributed by California Dreams. -->
+		<!-- gammon.sys16 dated 09-May-88 -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
 
 		<part name="flop1" interface="floppy_3_5">
@@ -556,7 +566,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnprnt">
-		<description>Designer Prints (A-252 version 1.0) (trex crack)</description>
+		<description>Designer Prints (A-252 version 1.0) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-252" />
@@ -568,8 +578,10 @@ license:CC0-1.0
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
 		<!-- desktop publishing program -->
 		<!-- Protection: Bad block check for block $8 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -585,7 +597,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnpuzl">
-		<description>Designer Puzzles (A-223 version 1.0) (trex crack)</description>
+		<description>Designer Puzzles (A-223 version 1.0) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-223" />
@@ -599,6 +611,7 @@ license:CC0-1.0
 		<!-- Dump released: 2021-08-13 -->
 		<!-- desktop publishing program -->
 		<!-- Protection: Bad block check for block $8 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -614,7 +627,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="destryr">
-		<description>Destroyer (trex crack)</description>
+		<description>Destroyer (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Michael Kosaka" />
@@ -622,8 +635,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 - 10 separate occurrences (Yes 10!) -->
 		<!-- simulation game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="destroyer iigs (trex crack).2mg" size="819264" crc="a6943b6d" sha1="2160a034da86a894a0615490d55b8c585f0e1fcc"/>
@@ -773,8 +788,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 256K Apple IIgs. -->
 		<!-- Protection: Bad block check for block $7 -->
 		<!-- arcade game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="gauntlet iigs (trex crack).2mg" size="819264" crc="9350598a" sha1="e594829ae86956a4e86a5e7243e82bf7d3606c17"/>
@@ -962,15 +979,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="hostage">
-		<description>Hostage: Rescue Mission (trex crack)</description>
+		<description>Hostage: Rescue Mission (cleanly cracked)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Infogrames" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- simulation game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="hostage - rescue mission iigs (trex crack).2mg" size="819264" crc="96b1c5b2" sha1="8c541ef7455a4cd5f9cb90093b158b618cdb131c"/>
@@ -979,7 +998,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="impmiss2">
-		<description>Impossible Mission II (trex crack)</description>
+		<description>Impossible Mission II (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Istvan Cseri" />
@@ -989,11 +1008,48 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- action game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="impossible mission ii iigs (trex crack).2mg" size="819264" crc="74ff8279" sha1="53daf3ca16a5f2bee0104e1d6688ce45ead599bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="instmus">
+		<description>Instant Music</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Bob Campbell" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2026-01-05 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- audio program -->
+		<!-- Protection: Bad block check for block $63F -->
+		<!-- This archive includes the two add-on disks that were available separately. -->
+		<!-- Electronic Arts' It's Only Rock 'N' Roll -->
+		<!-- Electronic Arts' Hot & Cool Jazz Deluxe Library -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="819264">
+				<rom name="instant music iigs (trex crack).2mg" size="819264" crc="df085767" sha1="6fea4620b343385de318963a8882f171b7dd9c51" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - It's Only Rock 'N' Roll Music disk"/>
+			<dataarea name="flop" size="819264">
+				<rom name="it's only rock'n'roll music disk.2mg" size="819264" crc="24e05c46" sha1="beadb4dd288cf1bd4d3532f344318a0a7de889db" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Hot & Cool Jazz Deluxe Library disk"/>
+			<dataarea name="flop" size="819264">
+				<rom name="hot&amp;cool jazz deluxe library disk.2mg" size="819264" crc="89cc7d25" sha1="0e53bc7cb770a5512b874dbcac1be5db2afd4891" />
 			</dataarea>
 		</part>
 	</software>
@@ -1053,7 +1109,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-
 	<software name="jigsaw">
 		<description>Jigsaw (version 1.4 - 022988) (cleanly cracked)</description>
 		<year>1988</year>
@@ -1083,7 +1138,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kquest">
-		<description>King's Quest - Quest for the Crown (trex crack)</description>
+		<description>King's Quest - Quest for the Crown (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="author" value="Roberta Williams, Al Lowe, Charles Tingley, Ken MacNeill, Chris Iden, Doug MacNeill, Greg Rowland, and Chris Iden" />
@@ -1091,8 +1146,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- Protection: Bad block check for block $634 -->
 		<!-- adventure game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1108,7 +1165,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kquest2">
-		<description>King's Quest II - Romancing The Throne (trex crack)</description>
+		<description>King's Quest II - Romancing The Throne (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Roberta Williams" />
@@ -1124,8 +1181,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- Protection: Bad block check for block $634 -->
 		<!-- adventure game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1141,7 +1200,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kquest3">
-		<description>King's Quest III - To Hier is Human (trex crack)</description>
+		<description>King's Quest III - To Hier is Human (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Roberta Williams" />
@@ -1163,8 +1222,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- Protection: Bad block check for block $634 -->
 		<!-- adventure game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1211,7 +1272,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lsl1">
-		<description>Leisure Suit Larry in The Land of the Lounge Lizards (trex crack)</description>
+		<description>Leisure Suit Larry in The Land of the Lounge Lizards (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Al Lowe" />
@@ -1225,8 +1286,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- Protection: Bad block check for block $634 -->
 		<!-- adventure game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1293,7 +1356,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness (trex crack)</description>
+		<description>Marble Madness (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey" />
@@ -1301,6 +1364,7 @@ license:CC0-1.0
 		<info name="programmer" value="Will Harvey"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- action game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
 		<part name="flop1" interface="floppy_3_5">
@@ -1310,27 +1374,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mathblsta" cloneof="mathblst">
-		<description>Math Blaster Plus! (version 1.0) (trex crack)</description>
-		<year>1989</year>
-		<publisher>Davidson &amp; Associates</publisher>
-		<info name="author" value="Jan Davidson and Cathy Johnson" />
-		<info name="programmer" value="C.K. Haun" />
-		<info name="version" value="1.0" />
-		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- educational program -->
-		<!-- Protection: Bad block check for block $308 -->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="math blaster plus v1.0 iigs (trex crack).2mg" size="819264" crc="37120366" sha1="b6a585415cbac0f69182da911bf7ec298df5fcbc" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mathblst">
-		<description>Math Blaster Plus! (version 1.1) (trex crack)</description>
+		<description>Math Blaster Plus! (version 1.1) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="author" value="Jan Davidson and Cathy Johnson" />
@@ -1339,11 +1384,34 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- educational program -->
 		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
+		<!-- educational program -->
+		<!-- Protection: Bad block check for block $308 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="math blaster plus v1.1 iigs (trex crack).2mg" size="819264" crc="96b3a909" sha1="5c7a1e8172f25ef328239971175b1f28a317fe2a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathblsta" cloneof="mathblst">
+		<description>Math Blaster Plus! (version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="author" value="Jan Davidson and Cathy Johnson" />
+		<info name="programmer" value="C.K. Haun" />
+		<info name="version" value="1.0" />
+		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
+		<!-- educational program -->
+		<!-- Protection: Bad block check for block $308 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="math blaster plus v1.0 iigs (trex crack).2mg" size="819264" crc="37120366" sha1="b6a585415cbac0f69182da911bf7ec298df5fcbc" />
 			</dataarea>
 		</part>
 	</software>
@@ -1380,7 +1448,7 @@ license:CC0-1.0
 		<description>Mavis Beacon Teaches Typing (version 1.8 21-Dec-88) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>The Software Toolworks</publisher>
-		<info name="version" value="1.8" />
+		<info name="version" value="1.8 21-Dec-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1407,7 +1475,7 @@ license:CC0-1.0
 		<description>Mavis Beacon Teaches Typing (version 1.2 16-Nov-87) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>The Software Toolworks</publisher>
-		<info name="version" value="1.2" />
+		<info name="version" value="1.2 16-Nov-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -1533,7 +1601,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mcs">
-		<description>Music Construction Set (version 1.0) (trex crack)</description>
+		<description>Music Construction Set (version 1.0) (cleanly cracked)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey" />
@@ -1543,8 +1611,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 256K Apple IIgs. -->
 		<!-- audio program -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="music construction set v1.0 iigs (trex crack).2mg" size="819264" crc="278ef676" sha1="22808e777a37118c7cfd0bc639aac756843ce8ce"/>
@@ -1553,15 +1623,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="neuromnc">
-		<description>Neuromancer (trex crack)</description>
+		<description>Neuromancer (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Rebecca Heineman" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- adventure game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="neuromancer iigs (trex crack).2mg" size="819264" crc="158c6c93" sha1="aee79701fdcbc9204f979087cd420c4b462c3b66"/>
@@ -1577,8 +1649,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs ROM 01." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 256K Apple IIgs ROM 01. -->
 		<!-- Protection: Bad block check for block $7 -->
 		<!-- arcade game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="paperboy iigs (trex crack).2mg" size="819264" crc="a914d4a0" sha1="16990a565fdd157e58481113f30bb6725b38e958"/>
@@ -1685,46 +1759,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="rrabbit20" cloneof="rrabbit">
-		<description>Reader Rabbit (version 2.0) (trex crack)</description>
-		<year>1987</year>
-		<publisher>The Learning Company</publisher>
-		<info name="programmer" value="Pete Rowe" />
-		<info name="programmer" value="Aaron Weiss" />
-		<info name="usage" value="Requires a 256K Apple IIgs." />
-		<info name="version" value="2.0" />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2023-04-13 -->
-		<!-- educational program -->
-		<!-- Protection: Bad block check for block $7 -->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="reader rabbit v2.0 iigs (trex crack).2mg" size="819264" crc="0d7519e3" sha1="105012eccd7f066a0c3344b8f51b111fff7fc170"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rrabbit22" cloneof="rrabbit">
-		<description>Reader Rabbit (version 2.2) (trex crack)</description>
-		<year>1987</year>
-		<publisher>The Learning Company</publisher>
-		<info name="programmer" value="Pete Rowe" />
-		<info name="programmer" value="Aaron Weiss" />
-		<info name="usage" value="Requires a 256K Apple IIgs." />
-		<info name="version" value="2.2" />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- educational program -->
-		<!-- Protection: Bad block check for block $7 -->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="reader rabbit v2.2 iigs (trex crack).2mg" size="819264" crc="518994ed" sha1="48290f00ea231e7df039b89c74bafcf00ee28854"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="rrabbit">
-		<description>Reader Rabbit (version 2.3) (trex crack)</description>
+		<description>Reader Rabbit (version 2.3) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>The Learning Company</publisher>
 		<info name="programmer" value="Pete Rowe" />
@@ -1733,8 +1769,10 @@ license:CC0-1.0
 		<info name="version" value="2.3" />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 256K Apple IIgs. -->
 		<!-- educational program -->
 		<!-- Protection: Bad block check for block $7 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="reader rabbit v2.3 iigs (trex crack).2mg" size="819264" crc="b59cc9f2" sha1="3cb739ae7b6c2a967ea649f944cd3d41221f6ba4"/>
@@ -1742,8 +1780,50 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="rrabbit22" cloneof="rrabbit">
+		<description>Reader Rabbit (version 2.2) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Pete Rowe" />
+		<info name="programmer" value="Aaron Weiss" />
+		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<info name="version" value="2.2" />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 256K Apple IIgs. -->
+		<!-- educational program -->
+		<!-- Protection: Bad block check for block $7 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="reader rabbit v2.2 iigs (trex crack).2mg" size="819264" crc="518994ed" sha1="48290f00ea231e7df039b89c74bafcf00ee28854"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrabbit20" cloneof="rrabbit">
+		<description>Reader Rabbit (version 2.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>The Learning Company</publisher>
+		<info name="programmer" value="Pete Rowe" />
+		<info name="programmer" value="Aaron Weiss" />
+		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2023-04-13 -->
+		<!-- It requires a 256K Apple IIgs. -->
+		<!-- educational program -->
+		<!-- Protection: Bad block check for block $7 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="reader rabbit v2.0 iigs (trex crack).2mg" size="819264" crc="0d7519e3" sha1="105012eccd7f066a0c3344b8f51b111fff7fc170"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="readandme">
-		<description>Reading and Me (version 1.0) (trex crack)</description>
+		<description>Reading and Me (version 1.0) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Louis X. Savain" />
@@ -1752,8 +1832,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- Protection: Bad block check for block $308 -->
 		<!-- educational program -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Program disk"/>
 			<dataarea name="flop" size="819264">
@@ -1981,7 +2063,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="silpheed">
-		<description>Silpheed - Super Dogfighter (trex crack)</description>
+		<description>Silpheed - Super Dogfighter (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="John Rettig" />
@@ -1999,8 +2081,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- action game -->
+		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -2016,7 +2100,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="skatedie">
-		<description>Skate or Die! IIgs (version 1.1 07-Oct-88) (trex crack)</description>
+		<description>Skate or Die! IIgs (version 1.1 07-Oct-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Michael Kosaka" />
@@ -2025,13 +2109,14 @@ license:CC0-1.0
 		<info name="programmer" value="Michelle Shelfer" />
 		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<info name="version" value="1.1 07-Oct-88 - ROM 03 compatible" />
-		<!-- sod.sys16 dated 07-Oct-88 -->
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. Music requires 768K. -->
 		<!-- sports game -->
 		<!-- Patched to be compatible with ROM03 -->
 		<!-- sod.sys16 dated 07-Oct-88 -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="skate or die v1.1 iigs (trex crack).2mg" size="819264" crc="dde655cd" sha1="cf40c92a699cf9e7c79f1a25c3f22f32f5a28d46"/>
@@ -2040,7 +2125,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="skatediea" cloneof="skatedie">
-		<description>Skate or Die! IIgs (version 1.0 12-Aug-88) (trex crack)</description>
+		<description>Skate or Die! IIgs (version 1.0 12-Aug-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Michael Kosaka" />
@@ -2049,13 +2134,14 @@ license:CC0-1.0
 		<info name="programmer" value="Michelle Shelfer" />
 		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
 		<info name="version" value="1.0 12-Aug-88 - ROM 03 compatible" />
-		<!-- sod.sys16 dated 12-Aug-88 -->
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2025-01-25, redump based on WOZ released on 2024-09-02 -->
+		<!-- It requires a 512K Apple IIgs. Music requires 768K. -->
 		<!-- sports game -->
 		<!-- Patched to be compatible with ROM03 -->
 		<!-- sod.sys16 dated 12-Aug-88 -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="skate or die v1.0 iigs (trex crack).2mg" size="819264" crc="f87d1ec3" sha1="9e28b572f9d53fd276066b3701de42d45ee9cc51"/>
@@ -2064,7 +2150,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="squest">
-		<description>Space Quest: The Sarien Encounter (trex crack)</description>
+		<description>Space Quest: The Sarien Encounter (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Scott Murphy" />
@@ -2076,8 +2162,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- Protection: Bad block check for block $634 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- adventure game -->
+		<!-- Protection: Bad block check for block $634 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -2093,7 +2181,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="squest2">
-		<description>Space Quest II: Vohaul's Revenge (trex crack)</description>
+		<description>Space Quest II: Vohaul's Revenge (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Scott Murphy" />
@@ -2105,8 +2193,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- Protection: Bad block check for block $634 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- adventure game -->
+		<!-- Protection: Bad block check for block $634 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -2248,15 +2338,18 @@ license:CC0-1.0
 	</software>
 
 	<software name="strsoccr">
-		<description>Street Sports Soccer (trex crack)</description>
+		<description>Street Sports Soccer (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 		<info name="developer" value="Designer Software" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs ROM 01 or earlier. -->
+		<!-- NOT Compatible with the Apple IIgs ROM03. -->
 		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="street sports soccer iigs (trex crack).2mg" size="819264" crc="28862df6" sha1="8154843041284a59017021d4783cbe2c4f22c929"/>
@@ -2265,7 +2358,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ssicehock">
-		<description>Superstar Ice Hockey (trex crack)</description>
+		<description>Superstar Ice Hockey (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Ed Ringler" />
@@ -2277,8 +2370,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- sports game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="superstar ice hockey iigs (trex crack).2mg" size="819264" crc="6f405a10" sha1="41e963da1f389f94697c024190bbb89ac3c14421"/>
@@ -2539,7 +2634,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="immortal">
-		<description>The Immortal (trex crack)</description>
+		<description>The Immortal (cleanly cracked)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey" />
@@ -2550,8 +2645,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 1MB Apple IIgs. -->
 		<!-- roleplaying game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Play"/>
 			<dataarea name="flop" size="819264">
@@ -2641,6 +2738,45 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819264">
 				<rom name="the logic master v1.5 iigs - disk 2 (trex crack).2mg" size="819264" crc="ce00fefc" sha1="a842bb884202af66e865117290c24a279003263e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musstdio1">
+		<description>The Music Studio (version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="programmer" value="Ric Forrester" />
+		<info name="programmer" value="Rick Parfitt" />
+		<info name="programmer" value="Peter Wickman" />
+		<info name="programmer" value="Paul Zuzelo" />
+		<info name="programmer" value="Sally Froud" />
+		<info name="programmer" value="Jeff Cable" />
+		<info name="programmer" value="Carl Bacani" />
+		<info name="programmer" value="Jim Inscore" />
+		<info name="programmer" value="Sydney Williams Lewis" />
+		<info name="programmer" value="Nancy Waisanen" />
+		<info name="programmer" value="Steve Young" />
+		<info name="programmer" value="Laura E. Singer" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2026-01-05 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- audio program -->
+		<!-- Protection: Bad block check for block $7 -->
+		<!-- Activision removed the copy protection for v2.0 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk" />
+			<dataarea name="flop" size="1296337">
+				<rom name="the music studio v1.0 iigs - disk 1 (trex crack).2mg" size="819264" crc="ea5c86fd" sha1="06b7f4dc8225c5bf0317dcca7ec9ae21093d9b17" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Additional songs and instruments disk" />
+			<dataarea name="flop" size="1296362">
+				<rom name="the music studio iigs - disk 2 - additional songs and instruments.2mg" size="819264" crc="610ea822" sha1="071329f3e8c303086a576fd47d85dccc4f57ee2d" />
 			</dataarea>
 		</part>
 	</software>
@@ -2882,6 +3018,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thexder">
+		<description>Thexder (version 2.7) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="H. Godai" />
+		<info name="programmer" value="S. Uesaka" />
+		<info name="programmer" value="Michael D. Branham" />
+		<info name="programmer" value="Robert C. Clardy" />
+		<info name="programmer" value="John P. Conley" />
+		<info name="programmer" value="Lloyd Ollmann, Jr." />
+		<info name="programmer" value="Michael Ormsby" />
+		<info name="version" value="2.7" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- action game -->
+		<!-- Protection: Bad block check for block $634 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="thexder v2.7 iigs (trex crack).2mg" size="819264" crc="7fa5ad73" sha1="acb227363d426c86ab5ac80c126fc430616cb535"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thexder10" cloneof="thexder">
 		<description>Thexder (version 1.0) (trex crack) (No OS, not self booting)</description>
 		<year>1987</year>
@@ -2897,10 +3059,12 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- action game -->
 		<!-- Original release by Sierra On-Line - Did NOT come with OS and was NOT self bootable -->
 		<!-- The file "othexder" had been undeleted (and cracked) and is closer to v2.7 in how it's demo sounds fade -->
 		<!-- Protection: Bad block check for block $634 -->
-		<!-- action game -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="thexder v1.0 iigs (trex crack).2mg" size="819264" crc="5a105720" sha1="31061b4561c967d824936c94ce882f2efcb017da"/>
@@ -2908,37 +3072,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="thexder">
-		<description>Thexder (version 2.7) (trex crack)</description>
-		<year>1987</year>
-		<publisher>Sierra On-Line</publisher>
-		<info name="programmer" value="H. Godai" />
-		<info name="programmer" value="S. Uesaka" />
-		<info name="programmer" value="Michael D. Branham" />
-		<info name="programmer" value="Robert C. Clardy" />
-		<info name="programmer" value="John P. Conley" />
-		<info name="programmer" value="Lloyd Ollmann, Jr." />
-		<info name="programmer" value="Michael Ormsby" />
-		<info name="version" value="2.7" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- Protection: Bad block check for block $634 -->
-		<!-- action game -->
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="thexder v2.7 iigs (trex crack).2mg" size="819264" crc="7fa5ad73" sha1="acb227363d426c86ab5ac80c126fc430616cb535"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="topdraw">
-		<description>TopDraw (version 1.01A (8/4/87)) (cleanly cracked)</description>
+		<description>TopDraw (version 1.01A 04-Aug-87) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>StyleWare</publisher>
 		<info name="programmer" value="Robert A. Hearn" />
 		<info name="programmer" value="Jeff G. Erickson" />
-		<info name="version" value="1.01A (8/4/87)" />
+		<info name="version" value="1.01A 04-Aug-87" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2025-01-25 -->
@@ -2954,18 +3094,20 @@ license:CC0-1.0
 	</software>
 
 	<software name="topdraw100a" cloneof="topdraw">
-		<description>TopDraw (version 1.00A (7/12/87)) (cleanly cracked)</description>
+		<description>TopDraw (version 1.00A 12-Jul-87) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>StyleWare</publisher>
 		<info name="programmer" value="Robert A. Hearn" />
 		<info name="programmer" value="Jeff G. Erickson" />
-		<info name="usage" value="Requires a 1MB Apple IIgs." />
-		<info name="version" value="1.00A (7/12/87)" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<info name="version" value="1.00A 12-Jul-87" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- graphics program -->
-		<!-- TopDraw later became Beagle Draw sold under the Beagle Brothers banner. -->
+		<!-- "TopDraw" is a professional object-oriented graphics drawing environment. Beagle Bros Software later acquired the StyleWare library and rebranded TopDraw as BeagleDraw. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="topdraw v1.00a iigs (trex crack).2mg" size="819264" crc="39e7967f" sha1="35746bbc2232251d96264989705a6e6286bafef5"/>
@@ -2974,19 +3116,44 @@ license:CC0-1.0
 	</software>
 
 	<software name="triango">
-		<description>TrianGo (version 1.0) (cleanly cracked)</description>
+		<description>TrianGo (version 1.1 12-Dec-88) (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>California Dreams</publisher>
 		<info name="programmer" value="Staszek Bartkowski" />
 		<info name="programmer" value="Marcin Szostakowski" />
 		<info name="programmer" value="Maciej Markuszewski" />
 		<info name="programmer" value="Dorota Błaszczak" />
-		<info name="version" value="1.0" />
+		<info name="version" value="1.1 12-Dec-88" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2026-01-05 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- "TrianGo" is a 1988 board game developed by Staszek Bartkowski, Marcin Szostakowski, Maciej Markuszewski, Dorota Błaszczak, and distributed by California Dreams. -->
+		<!-- triango.sys16 dated 12-Dec-88 -->
+		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="triango v1.1 iigs (trex crack).2mg" size="819264" crc="f8d47b34" sha1="aacc5f57dded29acd945d0f46b046415b2e6e2fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="triangoa" cloneof="triango">
+		<description>TrianGo (version 1.0 02-Oct-88) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>California Dreams</publisher>
+		<info name="programmer" value="Staszek Bartkowski" />
+		<info name="programmer" value="Marcin Szostakowski" />
+		<info name="programmer" value="Maciej Markuszewski" />
+		<info name="programmer" value="Dorota Błaszczak" />
+		<info name="version" value="1.0 02-Oct-88" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
 		<!-- It requires a 512K Apple IIgs. -->
 		<!-- "TrianGo" is a 1988 board game developed by Staszek Bartkowski, Marcin Szostakowski, Maciej Markuszewski, Dorota Błaszczak, and distributed by California Dreams. -->
+		<!-- triango.sys16 dated 02-Oct-88 -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3248,15 +3415,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="wingames">
-		<description>Winter Games (trex crack)</description>
+		<description>Winter Games (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="developer" value="Westwood Studios" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="winter games iigs (trex crack).2mg" size="819264" crc="03f522af" sha1="467d2782f572c107f2b9fa7789761d789ce21763"/>
@@ -3265,15 +3434,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="wldgames">
-		<description>World Games (trex crack)</description>
+		<description>World Games (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="developer" value="Westwood Studios" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="world games iigs (trex crack).2mg" size="819264" crc="6b94c2b7" sha1="34bb9fbd79847d2cbf7c1ad9ba087faa986a16a0"/>
@@ -3315,15 +3486,18 @@ license:CC0-1.0
 	</software>
 
 	<software name="wltrgolf">
-		<description>World Tour Golf (trex crack)</description>
+		<description>World Tour Golf (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="author" value="Evan and Nicky Robinson and Paul Reiche III" />
 		<info name="programmer" value="John Selhorst" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- sports game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="world tour golf iigs (trex crack).2mg" size="819264" crc="bf54fe36" sha1="3b1082b75860d10493c9015c5fd22ef3150c686b"/>
@@ -3366,7 +3540,7 @@ license:CC0-1.0
 		<!-- It requires a 512K Apple IIgs. -->
 		<!-- "Xenocide" is a 1989 action game developed by Brian Greenstone and Dave Triplett, and distributed by Micro Revelations. -->
 		<!-- xeno.sys16 dated 25-Sep-89 14:23, 63090 bytes long, 121 blocks -->
-		<!-- Unprotected version released by Micro Revelations. Currently NOT archived: xeno.sys16 dated 23-JUL-89 11:35, 64996 bytes long, 128 blocks -->
+		<!-- Unprotected version released by Micro Revelations. -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
@@ -3397,8 +3571,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="xenocideb" cloneof="xenocide">
+		<description>Xenocide (version 21-Jul-89) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Micro Revelations</publisher>
+		<info name="programmer" value="Brian Greenstone" />
+		<info name="programmer" value="Dave Triplett" />
+		<info name="version" value="21-Jul-89" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
+		<!-- "Xenocide" is a 1989 action game developed by Brian Greenstone and Dave Triplett, and distributed by Micro Revelations. -->
+		<!-- xeno.sys16 dated 21-JUL-89 11:35, 64996 bytes long, 128 blocks -->
+		<!-- Protection: Check for Macintosh "tag bytes" on block $4E1 -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="xenocide (21-jul-89) iigs (trex crack).2mg" size="819264" crc="1358f0ad" sha1="250fcbf30f38f2df388544151399d4d42b434f19"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zanygolf">
-		<description>Zany Golf (trex crack)</description>
+		<description>Zany Golf (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey" />
@@ -3408,8 +3604,10 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
+		<!-- It requires a 512K Apple IIgs. -->
 		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="zany golf iigs (trex crack).2mg" size="819264" crc="5e917b13" sha1="37658ef75ca9a35277023e66fe0280058d8a237a"/>
